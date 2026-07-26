@@ -1,0 +1,73 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-FINAL-APPROVAL-V1",
+  "artifact": "execution-order-ledger",
+  "status": "APPROVED_FOR_PRODUCTION",
+  "agent": "na",
+  "readOnly": true,
+  "dbWrite": 0,
+  "route": "nonoral",
+  "totals": {
+    "fingerprints": 70,
+    "masters": 443,
+    "writePlan": {
+      "ko": 1772,
+      "en": 886,
+      "total": 2658
+    }
+  },
+  "writeOwner": {
+    "policy": "단일 에이전트",
+    "note": "nonoral Unit 1 → Unit 2 순차. 병렬 write-owner 불필요."
+  },
+  "sequence": [
+    {
+      "step": 1,
+      "unitId": "nonoral-unit-1",
+      "ssot": "otc-unproduced-nonoral-unit1-approved-ssot-v1.json",
+      "routes": [
+        "topical",
+        "oromucosal",
+        "vaginal"
+      ],
+      "fingerprints": 70,
+      "masters": 443,
+      "write": {
+        "ko": 1772,
+        "en": 886,
+        "total": 2658
+      },
+      "precondition": "승인 즉시 착수 가능 — 러너 route profile 기보유(cutaneous·oromucosal·vaginal)"
+    },
+    {
+      "step": 2,
+      "unitId": "nonoral-unit-2",
+      "ssot": "(미작성 — 별도 승인 WO)",
+      "routes": [
+        "ophthalmic"
+      ],
+      "fingerprints": 34,
+      "masters": 159,
+      "write": {
+        "ko": 636,
+        "en": 318,
+        "total": 954
+      },
+      "precondition": "ophthalmic RouteProfile 추가(다 세션) · nonoral-unit-1 완료·독립검증 GREEN"
+    }
+  ],
+  "gates": {
+    "G1_unitFpIntersection": 0,
+    "G1_unitMasterIntersection": 0,
+    "G2_fpGroupSplitAcrossUnits": 0,
+    "G3_totalNonOralReady": {
+      "fingerprints": 104,
+      "masters": 602
+    },
+    "G3_unit1Plus2": {
+      "fingerprints": 104,
+      "masters": 602
+    },
+    "G3_sumMatch": true,
+    "G4_dbWrite": 0
+  }
+}
