@@ -322,8 +322,19 @@ async function fetchSecondaryCounts(
       FROM organization_service_enrollments ose
       WHERE ose.service_code = 'kpa-society'
     `).catch(() => [{ active_count: '0', total_count: '0' }]),
+    // WO-O4O-OPERATOR-CONSOLE-MEMBER-FLOW-AND-STANDARD-LIST-CONSOLIDATION-V1:
+    //   '전체 회원' KPI 는 클릭 시 /operator/members 로 이동하므로, 그 목록 API
+    //   (GET /api/v1/kpa/members) 의 **기본 모집단과 동일**해야 한다.
+    //   기존에는 `COUNT(*) FROM kpa_members` 로 다른 테이블을 세어 KPI 6 / 목록 5 로 어긋났다
+    //   (kpa_members 행은 있으나 service_membership 이 없는 사용자 존재).
+    //   목록의 base 조건은 `service_memberships.service_key IN ('kpa-society','kpa')` 이며
+    //   status 필터는 쿼리 파라미터가 있을 때만 적용되는 선택 조건이므로 여기서도 걸지 않는다.
     isAdmin
-      ? dataSource.query(`SELECT COUNT(*) AS count FROM kpa_members`).catch(() => [{ count: '0' }])
+      ? dataSource.query(`
+          SELECT COUNT(*) AS count
+          FROM service_memberships sm
+          WHERE sm.service_key IN ('kpa-society', 'kpa')
+        `).catch(() => [{ count: '0' }])
       : Promise.resolve([{ count: '0' }]),
     // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
     //   '서비스 신청'(organization_join/org_join) KPI 제거 — 해당 entity_type 은 어디서도 INSERT 되지 않아
