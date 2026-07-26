@@ -1,0 +1,181 @@
+{
+ "batch": 2,
+ "groups": [
+  {
+   "fp": "bce8d4f5af0b07a3",
+   "title": "Antihistamine Decongestant Tablet",
+   "efficacy": "This medicine is used to relieve sneezing, runny nose, nasal congestion and watery eyes caused by a head cold and by allergic or vasomotor rhinitis.",
+   "usage": "For adults, 1 tablet per dose; for children aged 12 to 14 years, 1/2 tablet per dose, 3 times a day after each meal.",
+   "caution": "If a severe skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking it and consult a doctor or pharmacist. Do not take if you are hypersensitive to this medicine, have severe hepatic or renal impairment, severe coronary heart disease, difficulty passing urine, high blood pressure or coronary artery disease, are pregnant or may be pregnant, are breastfeeding, are an infant aged 2 years or under, are receiving an MAO inhibitor, or are hypersensitive to methyl parahydroxybenzoate. Before taking it, consult a doctor or pharmacist if you have asthma, glaucoma, arrhythmia, diabetes or hyperthyroidism.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis", "Check with a pharmacist": "Age 2 years or under; MAO inhibitor use; glaucoma, arrhythmia, hypertension" }
+  },
+  {
+   "fp": "fe23af95b37c531e",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For people aged 6 years and over and adults, 1 tablet (10 mg) once a day at bedtime. For patients sensitive to adverse reactions, 1/2 tablet (5 mg) split into a morning and an evening dose. Adjust appropriately according to age and symptoms. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives, or have renal failure (creatinine clearance < 10 mL/min). Before taking it, pregnant women, breastfeeding women, patients with renal or hepatic impairment, elderly people, patients with epilepsy or a risk of seizures, and patients with predisposing factors for urinary retention (for example spinal cord lesion or prostate enlargement) should consult a doctor or pharmacist. Small amounts pass into breast milk, so stop breastfeeding during treatment. Because it suppresses the intradermal allergen response, stop it 3 to 5 days before intradermal allergen testing.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching", "Check with a pharmacist": "Renal or hepatic impairment, epilepsy, urinary retention, pregnancy, breastfeeding" }
+  },
+  {
+   "fp": "43ec2257c5a50edf",
+   "title": "Acetaminophen Tablet",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "For adults, 300 to 1000 mg 3 to 4 times a day. Up to 8 tablets (4000 mg) may be taken in a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Fever and pain from a cold, headache, neuralgia, muscle and joint pain", "Check with a pharmacist": "Regular alcohol use; maximum 4000 mg a day; serious skin reactions" }
+  },
+  {
+   "fp": "e6633b085305f58e",
+   "title": "Acid Reducer Tablet",
+   "efficacy": "This medicine is used for excess stomach acid, heartburn and acid reflux.",
+   "usage": "For people aged 16 years and over, 1 tablet (10 mg) per dose, up to 2 tablets (20 mg) a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to H2 receptor antagonists, are hypersensitive to soybean oil, soya or peanut, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist if you have difficulty or pain on swallowing, vomiting of blood or bloody stools, heartburn lasting 3 months or longer, dizziness or drowsiness with cold sweats, or chest or shoulder pain with shortness of breath.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Excess stomach acid, heartburn, acid reflux", "Check with a pharmacist": "Soya or peanut allergy; difficulty swallowing; symptoms lasting 3 months or longer" }
+  },
+  {
+   "fp": "06e80424f7f00857",
+   "title": "Acetaminophen Tablet",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "For adults, 300 to 1000 mg 3 to 4 times a day. Up to 4000 mg may be taken in a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Fever and pain from a cold, headache, neuralgia, muscle and joint pain", "Check with a pharmacist": "Regular alcohol use; maximum 4000 mg a day; serious skin reactions" }
+  },
+  {
+   "fp": "29bfcbc5e671401b",
+   "title": "Acid Reducer Tablet",
+   "efficacy": "This medicine is used for excess stomach acid, heartburn and acid reflux.",
+   "usage": "For people aged 16 years and over, 1 tablet (10 mg) per dose, up to 2 tablets (20 mg) a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to H2 receptor antagonists. Before taking it, consult a doctor or pharmacist if you have difficulty or pain on swallowing, vomiting of blood or bloody stools, heartburn lasting 3 months or longer, dizziness or drowsiness with cold sweats, chest or shoulder pain with shortness of breath, frequent chest pain, unexpected weight loss, nausea, vomiting or gastrointestinal pain, or hypersensitivity to medicines.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Excess stomach acid, heartburn, acid reflux", "Check with a pharmacist": "Difficulty swallowing, bleeding, chest pain, symptoms lasting 3 months or longer" }
+  },
+  {
+   "fp": "8ab38565851f5482",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For adults and children aged 6 years and over, 1 tablet (10 mg) once a day at bedtime; for patients sensitive to adverse reactions, 1/2 tablet (5 mg) split into a morning and an evening dose. Adjust appropriately according to age and symptoms. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives, have renal failure, are a child under 6 years, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, patients with renal or hepatic impairment, elderly people, patients with epilepsy or a risk of seizures, patients with predisposing factors for urinary retention (such as spinal cord lesion or prostate enlargement), pregnant women, breastfeeding women and those planning pregnancy should consult a doctor or pharmacist. Do not take theophylline or ritonavir together with this medicine.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching", "Check with a pharmacist": "Under 6 years; renal failure; epilepsy; urinary retention; pregnancy" }
+  },
+  {
+   "fp": "908d786fe2b9dd59",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For adults and children aged 6 years and over, 1 tablet (10 mg) once a day at bedtime; for patients sensitive to adverse reactions, 1/2 tablet (5 mg) split into a morning and an evening dose. Adjust appropriately according to age and symptoms. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives, or have renal failure (creatinine clearance < 10 mL/min). Before taking it, pregnant women, breastfeeding women, patients with renal or hepatic impairment, elderly people, patients with epilepsy or a risk of seizures, and patients with predisposing factors for urinary retention (spinal cord lesion, prostate enlargement) should consult a doctor or pharmacist. Do not take it together with theophylline or ritonavir. Do not take it with excessive alcohol.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching", "Check with a pharmacist": "Renal or hepatic impairment, epilepsy, urinary retention, pregnancy" }
+  },
+  {
+   "fp": "f1b8cc2beea348bc",
+   "title": "Anti-inflammatory Analgesic Soft Capsule",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Taking this medicine increases the risk of serious and potentially fatal cardiovascular thrombotic events, myocardial infarction and stroke, and serious gastrointestinal adverse reactions such as bleeding, ulceration and perforation may occur. Do not take if you are hypersensitive to this medicine, have or have had a gastrointestinal ulcer, have bleeding in the gastrointestinal tract, brain or elsewhere, severe blood disorder, severe hepatic impairment, severe renal impairment or severe cardiac insufficiency.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery", "Check with a pharmacist": "Gastrointestinal ulcer or bleeding; cardiovascular risk; maximum 1200 mg a day" }
+  },
+  {
+   "fp": "65466931f3bd63a2",
+   "title": "Liver Support Powder",
+   "efficacy": "This medicine is used as supportive treatment for detoxification in severe liver disease.",
+   "usage": "Dissolve 2 sachets (6 g) in a large amount of water and take 2 times a day after meals.",
+   "caution": "This medicine contains aspartame, which is metabolised to phenylalanine in the body, so it must not be taken by people with phenylketonuria who need to restrict phenylalanine intake. Patients with severe renal failure (serum creatinine 3 mg/100 mL or above) must not take this medicine. Before taking it, people hypersensitive to acetylsalicylic acid and people who have experienced hypersensitivity or an allergic reaction to Yellow No. 5 should consult a doctor or pharmacist. Keep to the stated directions and amount. If there is no improvement after about 2 weeks, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral powder", "Use": "Supportive detoxification treatment in severe liver disease", "Check with a pharmacist": "Phenylketonuria; severe renal failure; no improvement after 2 weeks" }
+  },
+  {
+   "fp": "fece07342655b341",
+   "title": "Antihistamine Decongestant Tablet",
+   "efficacy": "This medicine is used to relieve sneezing, runny nose, nasal congestion and watery eyes caused by a head cold and by allergic or vasomotor rhinitis.",
+   "usage": "For adults, 1 tablet per dose; for children aged 12 to 14 years, 1/2 tablet per dose, 3 times a day after each meal.",
+   "caution": "If a severe skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking it and consult a doctor or pharmacist. Do not take if you are hypersensitive to this medicine, have severe hepatic or renal impairment, severe coronary heart disease, difficulty passing urine, high blood pressure or coronary artery disease, are pregnant or may be pregnant, are breastfeeding, are an infant aged 2 years or under, are receiving an MAO inhibitor, are hypersensitive to methyl parahydroxybenzoate, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis", "Check with a pharmacist": "Age 2 years or under; MAO inhibitor use; hypertension, urinary difficulty" }
+  },
+  {
+   "fp": "31038478f94256d1",
+   "title": "Acetaminophen Tablet",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "For adults, 300 to 1000 mg 3 to 4 times a day. Up to 4000 mg may be taken in a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. This medicine contains aspartame, which is metabolised to phenylalanine in the body, so it must not be taken by people with phenylketonuria who need to restrict phenylalanine intake. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Fever and pain from a cold, headache, neuralgia, muscle and joint pain", "Check with a pharmacist": "Phenylketonuria; regular alcohol use; serious skin reactions" }
+  },
+  {
+   "fp": "8678ffe09d519600",
+   "title": "Anthelmintic Tablet",
+   "efficacy": "This medicine is used to treat infection with roundworm, pinworm, hookworm, whipworm, American hookworm and threadworm, and mixed infections with these.",
+   "usage": "For adults and children aged 24 months and over: for pinworm infection, 1 tablet (400 mg) once a day, and to eradicate it take 1 more tablet (400 mg) once, 7 days later. For roundworm, hookworm, whipworm or American hookworm infection, take 1 tablet (400 mg) as a single dose. For severe mixed infection of threadworm with another parasite such as tapeworm, take 1 tablet (400 mg) once a day for 3 days. If it is difficult to swallow, it may be chewed or taken with a small amount of water, and no special preparation such as fasting or a laxative is needed.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are pregnant or may be pregnant, are breastfeeding, are a child under 2 years, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, patients with hepatic or renal impairment and people hypersensitive to Yellow No. 5 or with such a history should consult a doctor or pharmacist. Consult a doctor or pharmacist about taking theophylline, cimetidine, praziquantel, dexamethasone, ritonavir, phenytoin, carbamazepine or phenobarbital together with this medicine.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Roundworm, pinworm, hookworm, whipworm and threadworm infection", "Check with a pharmacist": "Under 2 years; pregnancy, breastfeeding; hepatic or renal impairment" }
+  },
+  {
+   "fp": "075dc67b068df488",
+   "title": "Low-dose Aspirin Enteric-coated Tablet",
+   "efficacy": "This medicine is used to inhibit thrombus formation in myocardial infarction, cerebral infarction and unstable angina, to inhibit thrombus formation after coronary artery bypass grafting (CABG) or percutaneous transluminal coronary angioplasty (PTCA), and to reduce cardiovascular risk in high-risk patients (those with combined risk factors such as a family history of ischaemic heart disease, high blood pressure, high cholesterol, obesity or diabetes).",
+   "usage": "For adults, 1 tablet once a day. As this is an enteric-coated tablet, it may be taken before a meal with plenty of water.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Do not take if you are hypersensitive to this medicine or to other salicylates, or if you have peptic ulcer, aspirin-induced asthma (asthma attacks triggered by non-steroidal anti-inflammatory analgesics) or a history of it, haemophilia, severe hepatic impairment, severe renal impairment, severe cardiac insufficiency or a bleeding tendency, if you are receiving methotrexate at 15 mg or more per week, or if you are in the third trimester of pregnancy.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Prevention of thrombus formation; cardiovascular risk reduction", "Check with a pharmacist": "Peptic ulcer, bleeding tendency, aspirin asthma, methotrexate use, pregnancy" }
+  },
+  {
+   "fp": "0e1b5623c9b89616",
+   "title": "Detoxifying Tablet",
+   "efficacy": "This medicine is used for drug poisoning and autointoxication.",
+   "usage": "For adults, 0.5 to 1 tablet (50 to 100 mg) 1 to 3 times a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Do not take if you have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Drug poisoning and autointoxication", "Check with a pharmacist": "Galactose intolerance and related genetic problems" }
+  },
+  {
+   "fp": "2d23e7337c5bf695",
+   "title": "Mucolytic Syrup",
+   "efficacy": "This medicine is used for acute and chronic bronchitis and asthmatic bronchitis with impaired mucus secretion.",
+   "usage": "For adults, 30 mg 3 times a day at the start of treatment, then 15 mg 3 times a day for continued treatment. For children aged 5 years and over, 15 mg 2 to 3 times a day; for children aged 2 to 4 years, 7.5 mg 3 times a day, regardless of meals.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have severe renal impairment, severe hepatic impairment or a hereditary predisposition to fructose intolerance, are a child under 2 years, or are within the first 3 months of pregnancy. Before taking it, patients with renal impairment or peptic ulcer, pregnant women, breastfeeding women, elderly people, children under 2 years when it is essential, and people hypersensitive to caramel or with such a history should consult a doctor or pharmacist. Consult a doctor or pharmacist when taking it together with an antibiotic such as erythromycin, cephalexin, oxytetracycline, amoxicillin, cefuroxime or doxycycline.",
+   "summaryTable": { "Category": "OTC medicine - oral syrup", "Use": "Acute and chronic bronchitis, asthmatic bronchitis with impaired mucus secretion", "Check with a pharmacist": "Under 2 years; first 3 months of pregnancy; renal or hepatic impairment" }
+  },
+  {
+   "fp": "6fdc88076d037157",
+   "title": "Antispasmodic Analgesic Tablet",
+   "efficacy": "This medicine is used for paroxysmal pain of gastrointestinal disease and for functional disorders and spasmodic pain of the biliary tract, urinary tract and female reproductive system such as period pain.",
+   "usage": "For adults, 1 to 2 tablets 3 times a day. Do not exceed a maximum of 6 tablets a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage. Do not take it together with another product containing acetaminophen. Do not take if you have experienced hypersensitivity to this medicine (rash, red patches, itching, swelling of the throat, eyelids or lips), have experienced asthma caused by another cold medicine or antipyretic analgesic, or have severe renal impairment or a glucose-related genetic problem.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Spasmodic pain of the gastrointestinal, biliary, urinary and female reproductive systems", "Check with a pharmacist": "Maximum 6 tablets a day; acetaminophen 4000 mg limit; renal impairment" }
+  },
+  {
+   "fp": "a79a0013b04f5794",
+   "title": "Analgesic Antipyretic Tablet",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache, joint pain, neuralgia, low back pain, muscle pain, stiff shoulders, bruise pain, fracture pain, sprain pain, period pain and pain from injury, and to reduce fever with chills.",
+   "usage": "For people aged 15 years and over and adults, 1 tablet up to 2 times a day, avoiding an empty stomach. Leave an interval of at least 6 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Headache, toothache, sore throat, joint and muscle pain; fever with chills", "Check with a pharmacist": "Under 15 years; at least 6 hours between doses; 4000 mg daily limit" }
+  },
+  {
+   "fp": "d8ea0ee4fde1cfec",
+   "title": "Calcium Antacid Tablet",
+   "efficacy": "This medicine is used for the antacid action and symptom relief of gastric and duodenal ulcer, gastritis and excess stomach acid, and for calcium supplementation.",
+   "usage": "For gastric or duodenal ulcer, gastritis and excess stomach acid, 2 to 10 tablets (1 to 5 g) a day in 3 to 4 divided doses; for calcium supplementation, 3 to 6 tablets (1.5 to 3 g) a day in 1 to 2 divided doses. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not exceed a maximum of 15 tablets (7.5 g) a day. Do not take if you have severe high blood calcium or severe high urine calcium, hyperparathyroidism or hypothyroidism, severe renal failure, achlorhydria or gastric acid deficiency, or galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, patients with renal impairment, cardiac impairment, lung impairment or constipation should consult a doctor or pharmacist. Keep to the stated directions and amount. When given to a child, give it under the supervision of a guardian.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Antacid for ulcer, gastritis and excess acid; calcium supplementation", "Check with a pharmacist": "Maximum 15 tablets a day; high blood calcium, renal failure, thyroid disorder" }
+  },
+  {
+   "fp": "38d1524ccfe33e36",
+   "title": "Analgesic Tablet for Neuralgia",
+   "efficacy": "This medicine is used for neuralgia, low back pain and stiff shoulders.",
+   "usage": "For adults, 1 to 2 tablets 2 times a day, when pain or an attack occurs.",
+   "caution": "Before taking it, consult a doctor or pharmacist if you have an allergic constitution, have experienced allergic symptoms from a medicine such as fever, rash, joint pain, asthma or itching, if the person is an infant, young child or child aged 14 years or under who has or is suspected of having chickenpox or influenza, if you are pregnant or may be pregnant, are breastfeeding, are elderly, are frail or have a high fever, or have liver, kidney or thyroid disease, diabetes or high blood pressure. If there is no improvement after taking it several times, stop taking it immediately and consult a doctor.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Neuralgia, low back pain, stiff shoulders", "Check with a pharmacist": "Age 14 years or under with chickenpox or influenza; pregnancy; liver, kidney or thyroid disease" }
+  },
+  {
+   "fp": "7af7338b77bdf237",
+   "title": "Acid Reducer Tablet",
+   "efficacy": "This medicine is used for excess stomach acid, heartburn and acid reflux.",
+   "usage": "For people aged 16 years and over, 1 tablet (10 mg) per dose, up to 2 tablets (20 mg) a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to other H2 receptor antagonists, are hypersensitive to soybean oil, soya or peanut, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist if you have difficulty or pain on swallowing, vomiting of blood or bloody stools, heartburn lasting 3 months or longer, dizziness or drowsiness with cold sweats, chest or shoulder pain with shortness of breath, or frequent chest pain.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Excess stomach acid, heartburn, acid reflux", "Check with a pharmacist": "Soya or peanut allergy; difficulty swallowing; symptoms lasting 3 months or longer" }
+  },
+  {
+   "fp": "8ba1a1fc30e06636",
+   "title": "Expectorant Capsule",
+   "efficacy": "This medicine is used for difficulty bringing up phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis.",
+   "usage": "For acute disease, adults take 1 capsule (200 mg) 3 times a day and children aged 6 to 14 years take 1 capsule (200 mg) 2 times a day, before meals with a small amount of water. For chronic disease, adults take 1 capsule (200 mg) 2 times a day and children aged 6 to 14 years take 1/2 capsule (100 mg) 3 times a day, before meals with a small amount of water. For cystic fibrosis, people aged 6 years and over take 1 capsule (200 mg) 3 times a day, before meals with a small amount of water.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, or are an infant under 2 years. Before taking it, pregnant women or women who may be pregnant, breastfeeding women, and people hypersensitive to Yellow No. 5 or with such a history should consult a doctor or pharmacist. When taking it with an oral antibiotic (amoxicillin, cefuroxime, doxycycline, erythromycin, thiamphenicol), leave an interval of at least 2 hours.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Difficulty bringing up phlegm in bronchitis, asthma, laryngitis, sinusitis", "Check with a pharmacist": "Under 2 years; gastric or duodenal ulcer; 2-hour gap from oral antibiotics" }
+  }
+ ]
+}
