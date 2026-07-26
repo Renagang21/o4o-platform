@@ -6,7 +6,9 @@
  * Core Freeze F10 준수: AdminUserController/users.routes 미수정, Extension 엔드포인트 사용
  */
 import { Request, Response } from 'express';
+import { In } from 'typeorm';
 import { AppDataSource } from '../../database/connection.js';
+import { User } from '../../modules/auth/entities/User.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 import { hashPassword } from '../../utils/auth.utils.js';
@@ -18,6 +20,9 @@ import { isOperationalRole } from '../../types/roles.js';
 import { ActionLogService } from '@o4o/action-log-core';
 
 const approvalService = new MembershipApprovalService();
+
+// WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1: canonical 최고 관리자 역할
+const PLATFORM_SUPER_ADMIN_ROLE = 'platform:super_admin';
 
 // WO-O4O-GLYCOPHARM-OPERATOR-MEMBER-EDIT-INVALID-USERID-GUARD-V1:
 // :userId 라우트 파라미터가 UUID 형식인지 검증하여 PostgreSQL UUID 파싱 500 을 400 으로 정리한다.
@@ -1226,6 +1231,32 @@ export class MembershipConsoleController {
             success: false,
             error: '운영자·관리자 권한 회수는 플랫폼 관리자(admin)에서만 가능합니다.',
             code: 'ROLE_ASSIGNMENT_PLATFORM_ADMIN_ONLY',
+          });
+          return;
+        }
+      }
+
+      // WO-O4O-ADMIN-DEDICATED-SUPER-ADMIN-CUTOVER-AND-LEGACY-CLEANUP-V1:
+      //   최후 platform:super_admin 보호 — 마지막 1명의 canonical 최고 관리자 역할을 회수하면
+      //   플랫폼 관리자가 0명이 되고, 역할 재부여 API 자체가 platform admin 을 요구하므로
+      //   애플리케이션 경로로는 복구가 불가능하다(직접 DB write 필요).
+      //   AdminUserController.revokeRoleAssignment 는 platform:super_admin 회수를 전면 차단하므로
+      //   실제로 열려 있는 회수 경로는 본 엔드포인트뿐이라 여기서 막는다.
+      //   '활성 사용자' 기준으로 센다 — 비활성 계정은 로그인할 수 없어 예비 관리자가 되지 못한다.
+      if (role === PLATFORM_SUPER_ADMIN_ROLE) {
+        const holderIds = await roleAssignmentService.getUsersWithRole(PLATFORM_SUPER_ADMIN_ROLE);
+        const activeHolders = holderIds.length
+          ? await AppDataSource.getRepository(User).count({
+              where: { id: In(holderIds), isActive: true },
+            })
+          : 0;
+        const targetIsActiveHolder = holderIds.includes(userId);
+        if (targetIsActiveHolder && activeHolders <= 1) {
+          res.status(409).json({
+            success: false,
+            error:
+              '마지막 platform:super_admin 역할은 회수할 수 없습니다. 다른 활성 플랫폼 관리자를 먼저 확보하세요.',
+            code: 'LAST_PLATFORM_SUPER_ADMIN',
           });
           return;
         }
