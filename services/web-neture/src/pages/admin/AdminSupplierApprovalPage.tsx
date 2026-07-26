@@ -6,6 +6,8 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
 import { adminSupplierApi, type AdminSupplier, PROFILE_FIELD_LABELS } from '../../lib/api';
 import SupplierRegulatedCategoriesModal from '../../components/supplier/SupplierRegulatedCategoriesModal';
 
@@ -150,6 +152,112 @@ export default function AdminSupplierApprovalPage() {
     return matchStatus && matchSearch;
   });
 
+  // WO-O4O-NETURE-APPROVAL-AND-OPERATION-LISTS-STANDARDIZATION-BATCH-V3:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용(서류/정산 복합 셀 포함)은 기존과 동일하게 유지.
+  //   행 액션만 RowActionMenu 로 이관하며 상태별 노출 분기와 처리중 disabled 를 보존한다.
+  const columns: ListColumnDef<AdminSupplier>[] = [
+    {
+      key: 'name',
+      header: '공급자명',
+      minWidth: 160,
+      render: (_v, s) => (
+        <div>
+          <p className="font-medium text-slate-800">{s.name}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{s.id.slice(0, 8)}...</p>
+        </div>
+      ),
+    },
+    { key: 'representativeName', header: '대표자', width: '100px', render: (_v, s) => s.representativeName || '-' },
+    { key: 'businessNumber', header: '사업자번호', width: '130px', render: (_v, s) => s.businessNumber || '-' },
+    {
+      key: 'email',
+      header: '이메일',
+      minWidth: 160,
+      render: (_v, s) => (
+        <div>
+          <div>{s.email}</div>
+          {s.taxInvoiceEmail && s.taxInvoiceEmail !== s.email && (
+            <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxInvoiceEmail}</div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: '_docs',
+      header: '서류/정산',
+      minWidth: 260,
+      render: (_v, s) => {
+        const deferred = getDeferredItems(s);
+        const profileComplete = s.profileComplete ?? s.activationReady ?? !!s.representativeName;
+        const missingProfile = profileMissingLabels(s);
+        return (
+          <div className="space-y-1">
+            <div className={profileComplete ? 'text-emerald-700' : 'text-sky-700'}>
+              {profileComplete
+                ? '프로필 정보 완료'
+                : `정보 미완료 — 미입력: ${missingProfile.join(', ')} (승인 가능, 승인 후 보완)`}
+            </div>
+            {deferred.length > 0 && <div className="text-xs text-amber-600">{describeDeferred(deferred)}</div>}
+            <div className="text-xs text-slate-500">
+              {s.settlementBankName && s.settlementAccountHolder
+                ? `${s.settlementBankName} / ${s.settlementAccountHolder} / ${s.settlementAccountNumberMasked || '-'}`
+                : '정산 정보 없음'}
+            </div>
+            <div className="text-xs text-slate-500">
+              통신판매업: {s.mailOrderSalesStatus
+                ? `${mailOrderStatusLabels[s.mailOrderSalesStatus] || s.mailOrderSalesStatus}${s.mailOrderSalesRegistrationNumber ? ` (${s.mailOrderSalesRegistrationNumber})` : ''}`
+                : '미입력'}
+            </div>
+            <div className="flex gap-2 text-xs">
+              {s.businessRegistrationDocumentId && (
+                <button type="button" onClick={() => handleDownloadDocument(s.id, 'business_registration')} className="text-emerald-700 hover:text-emerald-900">사업자등록증</button>
+              )}
+              {s.settlementBankbookDocumentId && (
+                <button type="button" onClick={() => handleDownloadDocument(s.id, 'bank_statement')} className="text-emerald-700 hover:text-emerald-900">통장 사본</button>
+              )}
+              {s.mailOrderSalesDocumentId && (
+                <button type="button" onClick={() => handleDownloadDocument(s.id, 'mail_order_report')} className="text-emerald-700 hover:text-emerald-900">통신판매업 신고증</button>
+              )}
+            </div>
+          </div>
+        );
+      },
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '100px',
+      render: (_v, s) => (
+        <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-gray-100 text-gray-700'}`}>
+          {statusLabels[s.status] || s.status}
+        </span>
+      ),
+    },
+    { key: 'createdAt', header: '등록일', width: '110px', render: (_v, s) => new Date(s.createdAt).toLocaleDateString('ko-KR') },
+    {
+      key: '_actions',
+      header: '관리',
+      width: '72px',
+      align: 'center',
+      system: true,
+      render: (_v, s) => {
+        const actions = [
+          { key: 'categories', label: '품목군', onClick: () => setCategoryModal({ id: s.id, name: s.name }) },
+          ...(s.status === 'PENDING'
+            ? [
+                { key: 'approve', label: '승인', onClick: () => setApproveConfirmId(s.id) },
+                { key: 'reject', label: '거절', variant: 'danger' as const, onClick: () => setRejectModal({ id: s.id, name: s.name }) },
+              ]
+            : []),
+          ...(s.status === 'ACTIVE'
+            ? [{ key: 'deactivate', label: '비활성화', variant: 'danger' as const, onClick: () => setDeactivateConfirmId(s.id) }]
+            : []),
+        ];
+        return <RowActionMenu actions={actions} disabled={actionLoading === s.id} />;
+      },
+    },
+  ];
+
   const pendingCount = suppliers.filter((s) => s.status === 'PENDING').length;
   const activeCount = suppliers.filter((s) => s.status === 'ACTIVE').length;
   const inactiveCount = suppliers.filter((s) => s.status === 'INACTIVE' || s.status === 'REJECTED').length;
@@ -227,149 +335,15 @@ export default function AdminSupplierApprovalPage() {
         </div>
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
-            {suppliers.length === 0 ? '등록된 공급자가 없습니다' : '검색 결과가 없습니다'}
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">공급자명</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">대표자</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">사업자번호</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">이메일</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">서류/정산</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상태</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">등록일</th>
-                <th className="text-center px-6 py-4 text-sm font-medium text-slate-500">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((s) => {
-                const deferred = getDeferredItems(s);
-                const profileComplete = s.profileComplete ?? s.activationReady ?? !!s.representativeName;
-                const missingProfile = profileMissingLabels(s);
-                return (
-                <tr key={s.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-800">{s.name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{s.id.slice(0, 8)}...</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{s.representativeName || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{s.businessNumber || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    <div>{s.email}</div>
-                    {s.taxInvoiceEmail && s.taxInvoiceEmail !== s.email && (
-                      <div className="text-xs text-slate-400 mt-0.5">세금: {s.taxInvoiceEmail}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">
-                    <div className="space-y-1">
-                      <div className={profileComplete ? 'text-emerald-700' : 'text-sky-700'}>
-                        {profileComplete
-                          ? '프로필 정보 완료'
-                          : `정보 미완료 — 미입력: ${missingProfile.join(', ')} (승인 가능, 승인 후 보완)`}
-                      </div>
-                      {deferred.length > 0 && (
-                        <div className="text-xs text-amber-600">{describeDeferred(deferred)}</div>
-                      )}
-                      <div className="text-xs text-slate-500">
-                        {s.settlementBankName && s.settlementAccountHolder
-                          ? `${s.settlementBankName} / ${s.settlementAccountHolder} / ${s.settlementAccountNumberMasked || '-'}`
-                          : '정산 정보 없음'}
-                      </div>
-                      <div className="text-xs text-slate-500">
-                        통신판매업: {s.mailOrderSalesStatus
-                          ? `${mailOrderStatusLabels[s.mailOrderSalesStatus] || s.mailOrderSalesStatus}${s.mailOrderSalesRegistrationNumber ? ` (${s.mailOrderSalesRegistrationNumber})` : ''}`
-                          : '미입력'}
-                      </div>
-                      <div className="flex gap-2 text-xs">
-                        {s.businessRegistrationDocumentId && (
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadDocument(s.id, 'business_registration')}
-                            className="text-emerald-700 hover:text-emerald-900"
-                          >
-                            사업자등록증
-                          </button>
-                        )}
-                        {s.settlementBankbookDocumentId && (
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadDocument(s.id, 'bank_statement')}
-                            className="text-emerald-700 hover:text-emerald-900"
-                          >
-                            통장 사본
-                          </button>
-                        )}
-                        {s.mailOrderSalesDocumentId && (
-                          <button
-                            type="button"
-                            onClick={() => handleDownloadDocument(s.id, 'mail_order_report')}
-                            className="text-emerald-700 hover:text-emerald-900"
-                          >
-                            통신판매업 신고증
-                          </button>
-                        )}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[s.status] || 'bg-gray-100 text-gray-700'}`}>
-                      {statusLabels[s.status] || s.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(s.createdAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 text-center space-x-2 whitespace-nowrap">
-                    <button
-                      onClick={() => setCategoryModal({ id: s.id, name: s.name })}
-                      className="text-slate-600 hover:text-slate-900 font-medium text-sm"
-                    >
-                      품목군
-                    </button>
-                    {s.status === 'PENDING' && (
-                      <>
-                        <button
-                          onClick={() => setApproveConfirmId(s.id)}
-                          disabled={actionLoading === s.id}
-                          className="text-emerald-600 hover:text-emerald-800 font-medium text-sm disabled:opacity-50"
-                        >
-                          {actionLoading === s.id ? '처리중...' : '승인'}
-                        </button>
-                        <button
-                          onClick={() => setRejectModal({ id: s.id, name: s.name })}
-                          disabled={actionLoading === s.id}
-                          className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50"
-                        >
-                          거절
-                        </button>
-                      </>
-                    )}
-                    {s.status === 'ACTIVE' && (
-                      <button
-                        onClick={() => setDeactivateConfirmId(s.id)}
-                        disabled={actionLoading === s.id}
-                        className="text-red-500 hover:text-red-700 font-medium text-sm disabled:opacity-50"
-                      >
-                        {actionLoading === s.id ? '처리중...' : '비활성화'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {/* WO-…-BATCH-V3: raw <table> → 표준 DataTable. 로딩·빈 상태는 DataTable 이 처리한다.
+          행 액션(품목군/승인/거절/비활성화)은 RowActionMenu 로 이관하며 상태별 분기를 보존한다. */}
+      <DataTable<AdminSupplier>
+        columns={columns}
+        data={filtered}
+        rowKey={(s) => s.id}
+        loading={loading}
+        emptyMessage={suppliers.length === 0 ? '등록된 공급자가 없습니다' : '검색 결과가 없습니다'}
+      />
 
       {categoryModal && (
         <SupplierRegulatedCategoriesModal

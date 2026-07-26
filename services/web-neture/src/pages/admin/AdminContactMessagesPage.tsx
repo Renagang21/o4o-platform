@@ -11,6 +11,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/api/client';
 
 interface ContactMessage {
@@ -107,6 +108,73 @@ export default function AdminContactMessagesPage() {
   const formatDate = (dateStr: string) =>
     new Date(dateStr).toLocaleDateString('ko-KR', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' });
 
+  // WO-O4O-NETURE-APPROVAL-AND-OPERATION-LISTS-STANDARDIZATION-BATCH-V3:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   '처리'는 상태 변경 select(즉시 반영)라 RowActionMenu 로 감싸지 않고 인라인 유지한다.
+  const columns: ListColumnDef<ContactMessage>[] = [
+    {
+      key: 'contactType',
+      header: '유형',
+      width: '90px',
+      render: (_v, msg) => (
+        <span className="text-xs font-medium">{typeLabels[msg.contactType] || msg.contactType}</span>
+      ),
+    },
+    {
+      key: 'name',
+      header: '이름',
+      width: '120px',
+      render: (_v, msg) => (
+        <button
+          onClick={() => setExpandedId(expandedId === msg.id ? null : msg.id)}
+          className="text-primary-600 hover:underline font-medium"
+        >
+          {msg.name}
+        </button>
+      ),
+    },
+    {
+      key: 'subject',
+      header: '제목',
+      minWidth: 180,
+      render: (_v, msg) => <span className="block max-w-xs truncate text-gray-700">{msg.subject}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '90px',
+      render: (_v, msg) => (
+        <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${statusColors[msg.status] || 'bg-gray-100 text-gray-600'}`}>
+          {statusLabels[msg.status] || msg.status}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '접수일',
+      width: '140px',
+      render: (_v, msg) => <span className="text-gray-500 text-xs whitespace-nowrap">{formatDate(msg.createdAt)}</span>,
+    },
+    {
+      key: '_process',
+      header: '처리',
+      width: '110px',
+      system: true,
+      render: (_v, msg) => (
+        <select
+          value={msg.status}
+          onChange={(e) => handleStatusChange(msg.id, e.target.value)}
+          disabled={updatingId === msg.id}
+          className="px-2 py-1 border border-gray-300 rounded text-xs disabled:opacity-50"
+        >
+          <option value="new">신규</option>
+          <option value="in_progress">처리중</option>
+          <option value="resolved">완료</option>
+        </select>
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">문의 관리</h1>
@@ -144,54 +212,15 @@ export default function AdminContactMessagesPage() {
         <div className="text-center py-12 text-gray-500">문의가 없습니다.</div>
       ) : (
         <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-200">
-              <tr>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">유형</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">이름</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">제목</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">상태</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">접수일</th>
-                <th className="text-left px-4 py-3 font-medium text-gray-600">처리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {messages.map((msg) => (
-                <tr key={msg.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3">
-                    <span className="text-xs font-medium">{typeLabels[msg.contactType] || msg.contactType}</span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <button
-                      onClick={() => setExpandedId(expandedId === msg.id ? null : msg.id)}
-                      className="text-primary-600 hover:underline font-medium"
-                    >
-                      {msg.name}
-                    </button>
-                  </td>
-                  <td className="px-4 py-3 text-gray-700 max-w-xs truncate">{msg.subject}</td>
-                  <td className="px-4 py-3">
-                    <span className={`inline-block px-2 py-0.5 text-xs font-medium rounded-full ${statusColors[msg.status] || 'bg-gray-100 text-gray-600'}`}>
-                      {statusLabels[msg.status] || msg.status}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">{formatDate(msg.createdAt)}</td>
-                  <td className="px-4 py-3">
-                    <select
-                      value={msg.status}
-                      onChange={(e) => handleStatusChange(msg.id, e.target.value)}
-                      disabled={updatingId === msg.id}
-                      className="px-2 py-1 border border-gray-300 rounded text-xs disabled:opacity-50"
-                    >
-                      <option value="new">신규</option>
-                      <option value="in_progress">처리중</option>
-                      <option value="resolved">완료</option>
-                    </select>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {/* WO-…-BATCH-V3: raw <table> → 표준 DataTable.
+              이름 클릭으로 아래 상세를 토글하는 기존 동선과 상태 변경 select 를 그대로 유지한다. */}
+          <DataTable<ContactMessage>
+            columns={columns}
+            data={messages}
+            rowKey={(m) => m.id}
+            loading={loading}
+            emptyMessage="접수된 문의가 없습니다"
+          />
 
           {/* Expanded Detail */}
           {expandedId && (() => {

@@ -8,6 +8,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { ExternalLink, Search, RefreshCw } from 'lucide-react';
 import { useAuth } from '../../../contexts';
 import { partnerRecruitmentApi, type PartnerRecruitment } from '../../../lib/api';
@@ -60,6 +61,107 @@ export default function PartnershipRequestListPage() {
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
+
+  // WO-O4O-NETURE-APPROVAL-AND-OPERATION-LISTS-STANDARDIZATION-BATCH-V3:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   신청 액션은 단일 주 CTA 라 RowActionMenu 로 감추지 않고 인라인 유지(상태 3분기 보존).
+  const columns: ListColumnDef<PartnerRecruitment>[] = [
+    {
+      key: 'imageUrl',
+      header: '이미지',
+      width: '64px',
+      render: (_v, product) => (
+        <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
+          {product.imageUrl ? (
+            <img src={product.imageUrl} alt={product.productName} className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-gray-400 text-xs">IMG</span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'productName',
+      header: '제품명',
+      minWidth: 160,
+      render: (_v, product) => <span className="font-medium text-gray-900">{product.productName}</span>,
+    },
+    { key: 'manufacturer', header: '제조사', width: '120px', render: (_v, product) => product.manufacturer },
+    {
+      key: 'consumerPrice',
+      header: '소비자가',
+      width: '110px',
+      align: 'right',
+      render: (_v, product) => (
+        <span className="text-gray-900 font-medium tabular-nums">{formatPrice(product.consumerPrice)}</span>
+      ),
+    },
+    {
+      key: 'commissionRate',
+      header: '수수료',
+      width: '90px',
+      align: 'center',
+      render: (_v, product) => (
+        <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-semibold rounded">
+          {product.commissionRate}%
+        </span>
+      ),
+    },
+    { key: 'sellerName', header: '요청 업체', width: '130px', render: (_v, product) => product.sellerName },
+    {
+      key: 'serviceName',
+      header: '서비스명',
+      width: '120px',
+      render: (_v, product) => (
+        <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded">
+          {product.serviceName}
+        </span>
+      ),
+    },
+    {
+      key: 'shopUrl',
+      header: '몰 URL',
+      width: '110px',
+      render: (_v, product) =>
+        product.shopUrl ? (
+          <a
+            href={product.shopUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-primary-600 hover:text-primary-700 text-xs"
+          >
+            바로가기 <ExternalLink className="w-3 h-3" />
+          </a>
+        ) : (
+          <span className="text-gray-400 text-xs">-</span>
+        ),
+    },
+    {
+      key: '_apply',
+      header: '신청',
+      width: '112px',
+      align: 'center',
+      system: true,
+      render: (_v, product) =>
+        product.status === 'closed' ? (
+          <span className="text-xs text-gray-400">마감</span>
+        ) : appliedIds.has(product.id) ? (
+          <span className="text-xs text-green-600 font-medium">신청 완료</span>
+        ) : (
+          <button
+            onClick={() => handleApply(product.id)}
+            disabled={applyingId === product.id}
+            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+              applyingId === product.id
+                ? 'bg-primary-300 text-white cursor-wait'
+                : 'bg-primary-600 text-white hover:bg-primary-700'
+            }`}
+          >
+            {applyingId === product.id ? '신청 중...' : '파트너 신청'}
+          </button>
+        ),
+    },
+  ];
 
   const handleApply = async (recruitmentId: string) => {
     if (!isAuthenticated) {
@@ -152,100 +254,16 @@ export default function PartnershipRequestListPage() {
           <p className="text-gray-400 text-sm mt-1">현재 모집 중인 제품이 없습니다.</p>
         </div>
       ) : (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-gray-50 border-b border-gray-200">
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 w-16">이미지</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">제품명</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">제조사</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">소비자가</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600">수수료</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">요청 업체</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">서비스명</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">몰 URL</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600 w-28">신청</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filtered.length === 0 ? (
-                  <tr>
-                    <td colSpan={9} className="text-center py-12 text-gray-500">
-                      해당하는 제품이 없습니다
-                    </td>
-                  </tr>
-                ) : (
-                  filtered.map((product) => (
-                    <tr key={product.id} className="border-b border-gray-100 hover:bg-gray-50 transition-colors">
-                      <td className="px-4 py-3">
-                        <div className="w-10 h-10 bg-gray-100 rounded-md flex items-center justify-center overflow-hidden">
-                          {product.imageUrl ? (
-                            <img src={product.imageUrl} alt={product.productName} className="w-full h-full object-cover" />
-                          ) : (
-                            <span className="text-gray-400 text-xs">IMG</span>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="font-medium text-gray-900">{product.productName}</span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-600">{product.manufacturer}</td>
-                      <td className="px-4 py-3 text-right text-gray-900 font-medium tabular-nums">
-                        {formatPrice(product.consumerPrice)}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        <span className="inline-block px-2 py-0.5 bg-blue-50 text-blue-700 text-xs font-semibold rounded">
-                          {product.commissionRate}%
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-gray-700">{product.sellerName}</td>
-                      <td className="px-4 py-3">
-                        <span className="inline-block px-2 py-0.5 bg-gray-100 text-gray-700 text-xs font-medium rounded">
-                          {product.serviceName}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {product.shopUrl ? (
-                          <a
-                            href={product.shopUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 text-xs"
-                          >
-                            방문
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        ) : (
-                          <span className="text-gray-400 text-xs">-</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3 text-center">
-                        {product.status === 'closed' ? (
-                          <span className="text-xs text-gray-400">마감</span>
-                        ) : appliedIds.has(product.id) ? (
-                          <span className="text-xs text-green-600 font-medium">신청 완료</span>
-                        ) : (
-                          <button
-                            onClick={() => handleApply(product.id)}
-                            disabled={applyingId === product.id}
-                            className={`px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-                              applyingId === product.id
-                                ? 'bg-primary-300 text-white cursor-wait'
-                                : 'bg-primary-600 text-white hover:bg-primary-700'
-                            }`}
-                          >
-                            {applyingId === product.id ? '신청 중...' : '파트너 신청'}
-                          </button>
-                        )}
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
-          </div>
-        </div>
+        /* WO-…-BATCH-V3: raw <table> → 표준 DataTable.
+           행 액션이 단일 주 CTA("파트너 신청")이므로 RowActionMenu 로 감추지 않고
+           인라인 버튼을 유지한다(주 동선 접근성 우선). */
+        <DataTable<PartnerRecruitment>
+          columns={columns}
+          data={filtered}
+          rowKey={(p) => p.id}
+          loading={false}
+          emptyMessage="해당하는 제품이 없습니다"
+        />
       )}
 
       {/* Footer info */}
