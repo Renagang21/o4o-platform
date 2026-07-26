@@ -178,34 +178,37 @@ isStoreTarget = !!config.onCopyToStore && reusable_policy !== 'restricted'
 같은 템플릿을 쓰므로, 본 WO 범위(§11 "공통 UI 변경 금지" · 중지 조건 "공용 컴포넌트 변경이
 다른 서비스에 영향")에서 변경하지 않았다. 라벨 정비는 별도 작업 대상.
 
-### 11-3. 미검증 항목 (세션 확보 실패)
+### 11-3. API 우회 검증 (WO §13) — ✅ **전건 PASS** (2026-07-26 재검증 완료)
 
-**인증이 필요한 API 우회 검증(WO §13)을 수행하지 못했다.**
+최초 시도 시 브라우저 프로필 불안정으로 세션 확보에 실패해 미검증으로 남겼으나,
+환경 복구 후 **`renagang21`(kpa:store_owner) 실로그인 세션으로 전건 재검증**했다.
 
-| 미검증 | 기대값(코드 근거) |
-|--------|------------------|
-| `copy { assetType:'forum' }` | 400 INVALID_ASSET_TYPE (허용 목록 미등록) |
-| `copy { assetType:'resource', 자료실 id }` | 404 SOURCE_NOT_FOUND (resolve 분기 제거) |
-| `copy { assetType:'content', 자료실 id }` 우회 | 404 SOURCE_NOT_FOUND (sub_type 필터) |
-| `copy { assetType:'content', 문서형 id }` | 201 정상 |
-| `GET /assets?type=resource` | 200 (기존 사본 조회 호환) |
-| `/forum` 작성·댓글 회귀 / 기존 사본 조회 회귀 | 정상 |
+| # | 요청 | 결과 | 기대 일치 |
+|---|------|------|:---:|
+| t1 | `copy { assetType:'forum' }` | **400 `INVALID_ASSET_TYPE`** | ✅ |
+| t2 | `copy { assetType:'resource', 자료실 id }` | **404 `SOURCE_NOT_FOUND`** | ✅ |
+| t3 | **`copy { assetType:'content', 자료실 id }` (우회)** | **404 `SOURCE_NOT_FOUND`** | ✅ |
+| t4 | `GET /assets?type=resource` | **200** (기존 사본 조회 호환 유지) | ✅ |
+| t5 | `GET /assets?type=signage` | **200** | ✅ |
+| t6 | `copy { assetType:'content', 문서형 id }` | **201 생성** (`2e6600cf…`) | ✅ |
 
-**사유:** Playwright MCP 브라우저 프로필이 반복적으로 잠기고(`Browser is already in use`)
-강제 종료를 되풀이하는 과정에서 로그인 세션이 유실됐다. 재로그인은 성공했으나
-(`/admin` 리다이렉트 확인) 이 배포는 **access token 을 localStorage 에 남기지 않고
-메모리에 보관**하며 인증 쿠키는 `api.neture.co.kr` 도메인의 httpOnly 라, 페이지
-`evaluate` 에서 인증 요청을 재현할 수 없었다. 전체 리로드 시 토큰이 사라져
-`/store/library/resources` 는 `/login` 으로 리다이렉트됐다.
+- **t3 이 본 WO 의 핵심**이다 — `resolveContent` 의 `sub_type <> 'resource'` 필터가 실제로
+  우회 복사를 차단함을 프로덕션에서 확인했다.
+- **t6 은 회귀 확인**이다 — 필터가 자료실만 막고 **문서형 콘텐츠 복사는 정상 유지**됨을 확인했다.
 
-→ **추정으로 PASS 처리하지 않고 미검증으로 남긴다.** 서버 차단은 §4 의 코드 경로
-(resolve 분기 제거 + sub_type 필터)로만 확인된 상태이며, 인증 세션이 안정된 환경에서
-1회 재확인을 권장한다.
+### 11-4. 포럼 회귀 — ✅ PASS
 
-### 11-4. 테스트 데이터
+`/forum` 정상 렌더, 검색 입력 존재, 글쓰기/개설신청 CTA 존재, **매장 복사 관련 문구 0건**.
 
-**검증 과정에서 사본을 생성하지 않았다**(copy 요청이 인증 실패로 서버에 도달하지 않음).
-정리할 테스트 데이터 없음.
+### 11-5. 테스트 데이터 — 생성 후 정리 완료
+
+| 항목 | 값 |
+|------|-----|
+| 생성 | t6 검증용 snapshot **`2e6600cf-00b3-4dfd-b3c5-9f846096fb6a`** ("껌의 효능…") |
+| 정리 | `DELETE /assets/2e6600cf…` → **200 `deleted: true`** |
+| 확인 | 목록 재조회 시 해당 ID **부재**(`stillPresent: false`) |
+
+> 원본 커뮤니티 콘텐츠는 무변경(사본만 삭제하는 엔드포인트).
 
 ---
 
