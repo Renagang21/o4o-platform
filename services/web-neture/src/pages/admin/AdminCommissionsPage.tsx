@@ -12,8 +12,10 @@
  * - 페이지네이션
  */
 
-import { useState, useEffect, useCallback, Fragment } from 'react';
-import { ChevronDown, ChevronUp, Calculator, Check, CreditCard, XCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Calculator } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
 import {
   adminCommissionApi,
@@ -126,6 +128,77 @@ export default function AdminCommissionsPage() {
     setDetail(d);
     setDetailLoading(false);
   }, [expandedId]);
+
+  // ── WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1 : 표준 DataTable 어댑터 ──
+  const expandedKeys = new Set(expandedId ? [expandedId] : []);
+  const handleExpandedChange = useCallback((keys: Set<string>) => {
+    const next = Array.from(keys).find((k) => k !== expandedId) ?? null;
+    void toggleExpand(next ?? expandedId ?? '');
+  }, [expandedId, toggleExpand]);
+
+  const renderCommissionDetail = useCallback(() => {
+    if (detailLoading) return <p style={styles.detailLoading}>주문 정보 불러오는 중...</p>;
+    if (!detail || detail.items.length === 0) return <p style={styles.detailLoading}>연결된 주문 항목이 없습니다.</p>;
+    return (
+      <table style={styles.detailTable}>
+        <thead>
+          <tr>
+            <th style={styles.detailTh}>상품명</th>
+            <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>수량</th>
+            <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>단가</th>
+            <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>금액</th>
+          </tr>
+        </thead>
+        <tbody>
+          {detail.items.map((item, idx) => (
+            <tr key={idx}>
+              <td style={styles.detailTd}>{item.product_name}</td>
+              <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{item.quantity}</td>
+              <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{formatPrice(item.unit_price)}원</td>
+              <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{formatPrice(item.total_price)}원</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }, [detail, detailLoading]);
+
+  const columns: ListColumnDef<Commission>[] = [
+    { key: 'partner_name', header: '파트너', minWidth: 140, render: (_v, c) => c.partner_name || c.partner_id.slice(0, 8) },
+    { key: 'order_number', header: '주문번호', width: '150px', render: (_v, c) => c.order_number },
+    { key: 'commission_rate', header: '커미션율', width: '100px', align: 'right', render: (_v, c) => `${c.commission_rate}%` },
+    { key: 'order_amount', header: '주문금액', width: '120px', align: 'right', render: (_v, c) => `${formatPrice(c.order_amount)}원` },
+    {
+      key: 'commission_amount', header: '커미션금액', width: '130px', align: 'right',
+      render: (_v, c) => <span style={{ fontWeight: 600 }}>{formatPrice(c.commission_amount)}원</span>,
+    },
+    {
+      key: 'status', header: '상태', width: '100px', align: 'center',
+      render: (_v, c) => {
+        const st = getStatus(c.status);
+        return <span style={{ ...styles.badge, backgroundColor: st.bg, color: st.color }}>{st.label}</span>;
+      },
+    },
+    {
+      key: '_actions', header: '액션', width: '72px', align: 'center', system: true,
+      render: (_v, c) => {
+        const actions =
+          c.status === 'pending'
+            ? [
+                { key: 'approve', label: '승인', onClick: () => handleApprove(c.id) },
+                { key: 'cancel', label: '취소', variant: 'danger' as const, onClick: () => handleCancel(c.id) },
+              ]
+            : c.status === 'approved'
+              ? [
+                  { key: 'pay', label: '지급', onClick: () => handlePay(c.id) },
+                  { key: 'cancel', label: '취소', variant: 'danger' as const, onClick: () => handleCancel(c.id) },
+                ]
+              : [];
+        if (actions.length === 0) return <span style={{ color: '#cbd5e1' }}>—</span>;
+        return <RowActionMenu actions={actions} disabled={actionLoading === c.id} />;
+      },
+    },
+  ];
 
   // ---- Calculate ----
 
@@ -270,133 +343,18 @@ export default function AdminCommissionsPage() {
         <p style={styles.emptyText}>커미션 내역이 없습니다.</p>
       ) : (
         <div style={styles.tableWrapper}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>파트너</th>
-                <th style={styles.th}>주문번호</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>커미션율</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>주문금액</th>
-                <th style={{ ...styles.th, textAlign: 'right' as const }}>커미션금액</th>
-                <th style={{ ...styles.th, textAlign: 'center' as const }}>상태</th>
-                <th style={{ ...styles.th, textAlign: 'center' as const }}>액션</th>
-                <th style={{ ...styles.th, width: '40px' }}></th>
-              </tr>
-            </thead>
-            <tbody>
-              {commissions.map((c) => {
-                const st = getStatus(c.status);
-                const isExpanded = expandedId === c.id;
-                const isActioning = actionLoading === c.id;
-
-                return (
-                  <Fragment key={c.id}>
-                    <tr
-                      style={{ ...styles.row, cursor: 'pointer' }}
-                      onClick={() => toggleExpand(c.id)}
-                    >
-                      <td style={styles.td}>{c.partner_name || c.partner_id.slice(0, 8)}</td>
-                      <td style={styles.td}>{c.order_number}</td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const }}>{c.commission_rate}%</td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const }}>{formatPrice(c.order_amount)}원</td>
-                      <td style={{ ...styles.td, textAlign: 'right' as const, fontWeight: 600 }}>
-                        {formatPrice(c.commission_amount)}원
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' as const }}>
-                        <span style={{ ...styles.badge, backgroundColor: st.bg, color: st.color }}>
-                          {st.label}
-                        </span>
-                      </td>
-                      <td
-                        style={{ ...styles.td, textAlign: 'center' as const }}
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <div style={styles.actionGroup}>
-                          {c.status === 'pending' && (
-                            <>
-                              <button
-                                onClick={() => handleApprove(c.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.approveBtn }}
-                                title="승인"
-                              >
-                                <Check size={14} /> 승인
-                              </button>
-                              <button
-                                onClick={() => handleCancel(c.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.cancelBtn }}
-                                title="취소"
-                              >
-                                <XCircle size={14} /> 취소
-                              </button>
-                            </>
-                          )}
-                          {c.status === 'approved' && (
-                            <>
-                              <button
-                                onClick={() => handlePay(c.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.payBtn }}
-                                title="지급"
-                              >
-                                <CreditCard size={14} /> 지급
-                              </button>
-                              <button
-                                onClick={() => handleCancel(c.id)}
-                                disabled={isActioning}
-                                style={{ ...styles.actionBtn, ...styles.cancelBtn }}
-                                title="취소"
-                              >
-                                <XCircle size={14} /> 취소
-                              </button>
-                            </>
-                          )}
-                        </div>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' as const }}>
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </td>
-                    </tr>
-
-                    {/* Expanded Detail */}
-                    {isExpanded && (
-                      <tr>
-                        <td colSpan={8} style={styles.detailCell}>
-                          {detailLoading ? (
-                            <p style={styles.detailLoading}>주문 정보 불러오는 중...</p>
-                          ) : detail && detail.items.length > 0 ? (
-                            <table style={styles.detailTable}>
-                              <thead>
-                                <tr>
-                                  <th style={styles.detailTh}>상품명</th>
-                                  <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>수량</th>
-                                  <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>단가</th>
-                                  <th style={{ ...styles.detailTh, textAlign: 'right' as const }}>금액</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {detail.items.map((item, idx) => (
-                                  <tr key={idx}>
-                                    <td style={styles.detailTd}>{item.product_name}</td>
-                                    <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{item.quantity}</td>
-                                    <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{formatPrice(item.unit_price)}원</td>
-                                    <td style={{ ...styles.detailTd, textAlign: 'right' as const }}>{formatPrice(item.total_price)}원</td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          ) : (
-                            <p style={styles.detailLoading}>연결된 주문 항목이 없습니다.</p>
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </Fragment>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1: raw <table> → 표준 DataTable(행 확장).
+              단일 확장 + 확장 시 상세 API 조회 계약(toggleExpand) 보존. */}
+          <DataTable<Commission>
+            columns={columns}
+            data={commissions}
+            rowKey={(c) => c.id}
+            expandable
+            expandedRowKeys={expandedKeys}
+            onExpandedRowKeysChange={handleExpandedChange}
+            renderExpandedRow={renderCommissionDetail}
+            emptyMessage="커미션 내역이 없습니다"
+          />
         </div>
       )}
 

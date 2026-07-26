@@ -13,7 +13,9 @@
  */
 
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { ChevronDown, ChevronUp, Plus, CreditCard, Search, X } from 'lucide-react';
+import { Plus, Search, X } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
 import {
   adminPartnerSettlementApi,
   adminPartnerMonitoringApi,
@@ -132,6 +134,81 @@ export default function AdminPartnerSettlementsPage() {
   useEffect(() => {
     fetchList();
   }, [fetchList]);
+
+  // ── WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1 : 표준 DataTable 어댑터 ──
+  const expandedKeys = new Set(expandedId ? [expandedId] : []);
+  const handleExpandedChange = useCallback((keys: Set<string>) => {
+    const next = Array.from(keys).find((k) => k !== expandedId) ?? null;
+    void handleExpand(next ?? expandedId ?? '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expandedId]);
+
+  const renderPartnerSettlementDetail = useCallback(() => {
+    if (detailLoading) return <p style={{ color: '#94A3B8', fontSize: '13px' }}>상세 로딩 중...</p>;
+    if (!expandedDetail) return <p style={{ color: '#94A3B8', fontSize: '13px' }}>상세 정보를 불러올 수 없습니다.</p>;
+    return (
+      <table style={{ ...styles.table, border: '1px solid #E2E8F0', borderRadius: '8px', overflow: 'hidden' }}>
+        <thead>
+          <tr>
+            <th style={styles.thSub}>주문번호</th>
+            <th style={styles.thSub}>공급자</th>
+            <th style={{ ...styles.thSub, textAlign: 'right' }}>주문금액</th>
+            <th style={{ ...styles.thSub, textAlign: 'right' }}>커미션</th>
+          </tr>
+        </thead>
+        <tbody>
+          {expandedDetail.items.map((item, idx) => (
+            <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
+              <td style={styles.tdSub}>{item.order_number || '-'}</td>
+              <td style={styles.tdSub}>{item.supplier_name || '-'}</td>
+              <td style={{ ...styles.tdSub, textAlign: 'right' }}>{formatCurrency(item.order_amount)}원</td>
+              <td style={{ ...styles.tdSub, textAlign: 'right', fontWeight: 600, color: '#16A34A' }}>
+                {formatCurrency(item.commission_amount)}원
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    );
+  }, [expandedDetail, detailLoading]);
+
+  const columns: ListColumnDef<PartnerSettlement>[] = [
+    {
+      key: 'partner_name', header: '파트너', minWidth: 160,
+      render: (_v, s) => (
+        <div>
+          <div style={{ fontWeight: 600, fontSize: '14px' }}>{s.partner_name || '-'}</div>
+          <div style={{ fontSize: '12px', color: '#94A3B8' }}>{s.partner_email || s.partner_id.slice(0, 8)}</div>
+        </div>
+      ),
+    },
+    { key: 'commission_count', header: '커미션 건수', width: '110px', align: 'right', render: (_v, s) => `${s.commission_count}건` },
+    {
+      key: 'total_commission', header: '총 금액', width: '130px', align: 'right',
+      render: (_v, s) => <span style={{ fontWeight: 600 }}>{formatCurrency(s.total_commission)}원</span>,
+    },
+    {
+      key: 'status', header: '상태', width: '100px', align: 'center',
+      render: (_v, s) => {
+        const st = getStatus(s.status);
+        return (
+          <span style={{ padding: '3px 10px', borderRadius: '12px', fontSize: '12px', fontWeight: 600, backgroundColor: st.bg, color: st.color }}>
+            {st.label}
+          </span>
+        );
+      },
+    },
+    { key: 'created_at', header: '생성일', width: '120px', render: (_v, s) => <span style={{ fontSize: '13px', color: '#64748B' }}>{formatDate(s.created_at)}</span> },
+    { key: 'paid_at', header: '지급일', width: '120px', render: (_v, s) => <span style={{ fontSize: '13px', color: '#64748B' }}>{s.paid_at ? formatDate(s.paid_at) : '-'}</span> },
+    {
+      key: '_actions', header: '관리', width: '80px', align: 'center', system: true,
+      render: (_v, s) => {
+        if (s.status === 'paid') return <span style={{ fontSize: '12px', color: '#94A3B8' }}>완료</span>;
+        if (s.status !== 'pending') return <span style={{ color: '#cbd5e1' }}>—</span>;
+        return <RowActionMenu actions={[{ key: 'pay', label: payingId === s.id ? '처리 중...' : '지급', onClick: () => handlePay(s.id) }]} disabled={payingId === s.id} />;
+      },
+    },
+  ];
 
   const handleExpand = async (id: string) => {
     if (expandedId === id) {
@@ -300,117 +377,18 @@ export default function AdminPartnerSettlementsPage() {
         <div style={styles.emptyBox}>정산 내역이 없습니다.</div>
       ) : (
         <div style={styles.tableWrap}>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}></th>
-                <th style={styles.th}>파트너</th>
-                <th style={{ ...styles.th, textAlign: 'right' }}>커미션 건수</th>
-                <th style={{ ...styles.th, textAlign: 'right' }}>총 금액</th>
-                <th style={{ ...styles.th, textAlign: 'center' }}>상태</th>
-                <th style={styles.th}>생성일</th>
-                <th style={styles.th}>지급일</th>
-                <th style={{ ...styles.th, textAlign: 'center' }}>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {settlements.map((s) => {
-                const st = getStatus(s.status);
-                const isExpanded = expandedId === s.id;
-                return (
-                  <>
-                    <tr key={s.id} style={styles.tr}>
-                      <td style={{ ...styles.td, width: '40px', cursor: 'pointer' }} onClick={() => handleExpand(s.id)}>
-                        {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-                      </td>
-                      <td style={styles.td}>
-                        <div style={{ fontWeight: 600, fontSize: '14px' }}>{s.partner_name || '-'}</div>
-                        <div style={{ fontSize: '12px', color: '#94A3B8' }}>{s.partner_email || s.partner_id.slice(0, 8)}</div>
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'right' }}>{s.commission_count}건</td>
-                      <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>
-                        {formatCurrency(s.total_commission)}원
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <span style={{
-                          padding: '3px 10px',
-                          borderRadius: '12px',
-                          fontSize: '12px',
-                          fontWeight: 600,
-                          backgroundColor: st.bg,
-                          color: st.color,
-                        }}>
-                          {st.label}
-                        </span>
-                      </td>
-                      <td style={{ ...styles.td, fontSize: '13px', color: '#64748B' }}>
-                        {formatDate(s.created_at)}
-                      </td>
-                      <td style={{ ...styles.td, fontSize: '13px', color: '#64748B' }}>
-                        {s.paid_at ? formatDate(s.paid_at) : '-'}
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        {s.status === 'pending' && (
-                          <button
-                            onClick={() => handlePay(s.id)}
-                            disabled={payingId === s.id}
-                            style={{
-                              ...styles.actionBtn,
-                              backgroundColor: '#16A34A',
-                              color: '#fff',
-                              opacity: payingId === s.id ? 0.5 : 1,
-                            }}
-                          >
-                            <CreditCard size={12} />
-                            {payingId === s.id ? '처리 중...' : '지급'}
-                          </button>
-                        )}
-                        {s.status === 'paid' && (
-                          <span style={{ fontSize: '12px', color: '#94A3B8' }}>완료</span>
-                        )}
-                      </td>
-                    </tr>
-                    {isExpanded && (
-                      <tr key={`${s.id}-detail`}>
-                        <td colSpan={8} style={{ padding: '0 16px 16px 56px', backgroundColor: '#F8FAFC' }}>
-                          {detailLoading ? (
-                            <p style={{ color: '#94A3B8', fontSize: '13px' }}>상세 로딩 중...</p>
-                          ) : expandedDetail ? (
-                            <table style={{ ...styles.table, border: '1px solid #E2E8F0', borderRadius: '8px', overflow: 'hidden' }}>
-                              <thead>
-                                <tr>
-                                  <th style={styles.thSub}>주문번호</th>
-                                  <th style={styles.thSub}>공급자</th>
-                                  <th style={{ ...styles.thSub, textAlign: 'right' }}>주문금액</th>
-                                  <th style={{ ...styles.thSub, textAlign: 'right' }}>커미션</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {expandedDetail.items.map((item, idx) => (
-                                  <tr key={idx} style={{ borderBottom: '1px solid #F1F5F9' }}>
-                                    <td style={styles.tdSub}>{item.order_number || '-'}</td>
-                                    <td style={styles.tdSub}>{item.supplier_name || '-'}</td>
-                                    <td style={{ ...styles.tdSub, textAlign: 'right' }}>
-                                      {formatCurrency(item.order_amount)}원
-                                    </td>
-                                    <td style={{ ...styles.tdSub, textAlign: 'right', fontWeight: 600, color: '#16A34A' }}>
-                                      {formatCurrency(item.commission_amount)}원
-                                    </td>
-                                  </tr>
-                                ))}
-                              </tbody>
-                            </table>
-                          ) : (
-                            <p style={{ color: '#94A3B8', fontSize: '13px' }}>상세 정보를 불러올 수 없습니다.</p>
-                          )}
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                );
-              })}
-            </tbody>
-          </table>
+          {/* WO-O4O-DATATABLE-EXPANDABLE-ROW-…-V1: raw <table> → 표준 DataTable(행 확장).
+              단일 확장 + 확장 시 상세 API 조회 계약(handleExpand) 보존. */}
+          <DataTable<PartnerSettlement>
+            columns={columns}
+            data={settlements}
+            rowKey={(s) => s.id}
+            expandable
+            expandedRowKeys={expandedKeys}
+            onExpandedRowKeysChange={handleExpandedChange}
+            renderExpandedRow={renderPartnerSettlementDetail}
+            emptyMessage="정산 내역이 없습니다"
+          />
         </div>
       )}
 
