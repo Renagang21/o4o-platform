@@ -110,6 +110,7 @@ function StatusBadge({ status }: { status: string }) {
 export default function SupplierOrdersListPage() {
   const [orders, setOrders] = useState<SupplierOrderSummary[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [total, setTotal] = useState(0);
@@ -118,8 +119,11 @@ export default function SupplierOrdersListPage() {
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
+  // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+  //   getOrders() 가 throw 하도록 바뀌었다. 기존 catch 는 빈 목록만 세팅해 "주문 0건" 과 구분되지 않았다.
   const fetchOrders = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const result = await supplierApi.getOrders({
         page,
@@ -131,6 +135,9 @@ export default function SupplierOrdersListPage() {
       setTotal(result.meta.total);
     } catch {
       setOrders([]);
+      setTotalPages(0);
+      setTotal(0);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -228,8 +235,26 @@ export default function SupplierOrdersListPage() {
         </div>
       )}
 
+      {/* Error — 조회 실패를 "주문 0건" 으로 표시하지 않는다 */}
+      {!loading && loadError && (
+        <div style={styles.emptyState}>
+          <ShoppingCart size={48} style={{ color: '#dc2626', marginBottom: '12px' }} />
+          <p style={styles.emptyText}>주문 정보를 불러오지 못했습니다.</p>
+          <button
+            onClick={fetchOrders}
+            style={{
+              marginTop: '12px', padding: '8px 16px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#fff',
+              color: '#475569', fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {/* Empty */}
-      {!loading && filteredOrders.length === 0 && (
+      {!loading && !loadError && filteredOrders.length === 0 && (
         <div style={styles.emptyState}>
           <ShoppingCart size={48} style={{ color: '#cbd5e1', marginBottom: '12px' }} />
           <p style={styles.emptyText}>현재 주문이 없습니다.</p>

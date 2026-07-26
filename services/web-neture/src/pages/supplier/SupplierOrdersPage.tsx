@@ -9,7 +9,7 @@
  * - 주문 처리는 각 서비스에서 수행
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { ShoppingBag, ExternalLink, Info, Users, Clock, Mail, ChevronDown, ChevronUp, Compass, Truck, ArrowRight, Lock } from 'lucide-react';
@@ -72,6 +72,8 @@ export default function SupplierOrdersPage() {
     totalPendingRequests: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [summaryError, setSummaryError] = useState(false);
+  const [unifiedError, setUnifiedError] = useState(false);
   const [expandedService, setExpandedService] = useState<string | null>(null);
 
   // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1: 통합 주문(읽기) 상태
@@ -80,26 +82,39 @@ export default function SupplierOrdersPage() {
   const [unifiedTotal, setUnifiedTotal] = useState(0);
   const [sourceFilter, setSourceFilter] = useState<'all' | 'neture' | 'checkout'>('all');
 
-  useEffect(() => {
-    const fetchSummary = async () => {
-      setLoading(true);
-      const result = await supplierApi.getOrdersSummary();
-      setData(result);
+  // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+  //   두 조회는 실패 시 throw 한다. 요약과 통합 목록은 서로 독립 영역이므로 각각 오류 상태를 가진다.
+  const fetchSummary = useCallback(async () => {
+    setLoading(true);
+    setSummaryError(false);
+    try {
+      setData(await supplierApi.getOrdersSummary());
+    } catch {
+      setData({ services: [], totalApprovedSellers: 0, totalPendingRequests: 0 });
+      setSummaryError(true);
+    } finally {
       setLoading(false);
-    };
-    fetchSummary();
+    }
   }, []);
 
-  useEffect(() => {
-    const fetchUnified = async () => {
-      setUnifiedLoading(true);
+  const fetchUnified = useCallback(async () => {
+    setUnifiedLoading(true);
+    setUnifiedError(false);
+    try {
       const result = await supplierApi.getUnifiedOrders({ page: 1, limit: 20, source: sourceFilter });
       setUnifiedOrders(result.data);
       setUnifiedTotal(result.meta.total);
+    } catch {
+      setUnifiedOrders([]);
+      setUnifiedTotal(0);
+      setUnifiedError(true);
+    } finally {
       setUnifiedLoading(false);
-    };
-    fetchUnified();
+    }
   }, [sourceFilter]);
+
+  useEffect(() => { fetchSummary(); }, [fetchSummary]);
+  useEffect(() => { fetchUnified(); }, [fetchUnified]);
 
   const toggleExpand = (serviceId: string) => {
     setExpandedService(expandedService === serviceId ? null : serviceId);
@@ -133,7 +148,8 @@ export default function SupplierOrdersPage() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Stats — 조회 실패 시 0 으로 오인시키지 않도록 숨긴다 */}
+      {!summaryError && (
       <div style={styles.statsRow}>
         <div style={styles.statCard}>
           <ShoppingBag size={24} style={{ color: '#3b82f6' }} />
@@ -157,6 +173,7 @@ export default function SupplierOrdersPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* 주문 처리 workspace 진입 — WO-O4O-NETURE-SUPPLIER-ORDER-WORKSPACE-IA-LINK-V1 */}
       <Link to="/supplier/orders" style={styles.fulfillCard}>
@@ -180,6 +197,8 @@ export default function SupplierOrdersPage() {
       <UnifiedOrdersSection
         orders={unifiedOrders}
         loading={unifiedLoading}
+        error={unifiedError}
+        onRetry={fetchUnified}
         total={unifiedTotal}
         sourceFilter={sourceFilter}
         onChangeFilter={setSourceFilter}
@@ -188,6 +207,23 @@ export default function SupplierOrdersPage() {
       {/* Service List */}
       {loading ? (
         <div style={styles.loading}>로딩 중...</div>
+      ) : summaryError ? (
+        <div style={styles.emptyState}>
+          <div style={styles.emptyStateIcon}>
+            <Compass size={40} style={{ color: '#dc2626' }} />
+          </div>
+          <p>서비스별 주문 현황을 불러오지 못했습니다.</p>
+          <button
+            onClick={fetchSummary}
+            style={{
+              marginTop: '12px', padding: '8px 16px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#fff',
+              color: '#475569', fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
       ) : data.services.length === 0 ? (
         <div style={styles.emptyState}>
           <div style={styles.emptyStateIcon}>
@@ -357,12 +393,16 @@ function ServiceCard({
 function UnifiedOrdersSection({
   orders,
   loading,
+  error,
+  onRetry,
   total,
   sourceFilter,
   onChangeFilter,
 }: {
   orders: UnifiedSupplierOrder[];
   loading: boolean;
+  error: boolean;
+  onRetry: () => void;
   total: number;
   sourceFilter: 'all' | 'neture' | 'checkout';
   onChangeFilter: (f: 'all' | 'neture' | 'checkout') => void;
@@ -379,7 +419,8 @@ function UnifiedOrdersSection({
         <div>
           <h2 style={styles.unifiedTitle}>통합 주문 보기</h2>
           <p style={styles.unifiedSubtitle}>
-            Neture 주문과 이벤트 오퍼·서비스 주문을 한 곳에서 확인합니다. (읽기 전용 · 총 {total}건)
+            Neture 주문과 이벤트 오퍼·서비스 주문을 한 곳에서 확인합니다.
+            {error ? ' (읽기 전용)' : ` (읽기 전용 · 총 ${total}건)`}
           </p>
         </div>
         <div style={styles.filterRow}>
@@ -400,6 +441,16 @@ function UnifiedOrdersSection({
 
       {loading ? (
         <div style={styles.unifiedLoading}>주문을 불러오는 중...</div>
+      ) : error ? (
+        <div style={{ ...styles.unifiedEmpty, color: '#dc2626' }}>
+          통합 주문을 불러오지 못했습니다.{' '}
+          <button
+            onClick={onRetry}
+            style={{ background: 'none', border: 'none', color: '#dc2626', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+          >
+            다시 시도
+          </button>
+        </div>
       ) : orders.length === 0 ? (
         <div style={styles.unifiedEmpty}>표시할 주문이 없습니다.</div>
       ) : (

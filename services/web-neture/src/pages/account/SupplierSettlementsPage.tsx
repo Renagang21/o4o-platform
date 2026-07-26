@@ -85,15 +85,21 @@ export default function SupplierSettlementsPage() {
     pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [page, setPage] = useState(1);
   const [meta, setMeta] = useState({ page: 1, limit: 20, total: 0, totalPages: 0 });
   const [statusFilter, setStatusFilter] = useState<SettlementStatus | undefined>(undefined);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [detail, setDetail] = useState<SettlementDetail | null>(null);
   const [loadingDetail, setLoadingDetail] = useState(false);
+  const [detailError, setDetailError] = useState(false);
 
+  // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+  //   기존 catch 는 API 가 먼저 오류를 삼켜 실행되지 않았고, 실패가 "정산 0건 · 0원" 으로 표시됐다.
+  //   이제 두 API 가 throw 하므로 실패를 명시 상태로 분리한다.
   const fetchData = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const [result, kpiData] = await Promise.all([
         supplierApi.getSettlements({ page, limit: 20, status: statusFilter }),
@@ -103,9 +109,12 @@ export default function SupplierSettlementsPage() {
       setMeta(result.meta);
       setKpi(kpiData);
     } catch {
-      // non-critical
+      setSettlements([]);
+      setMeta({ page: 1, limit: 20, total: 0, totalPages: 0 });
+      setLoadError(true);
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   }, [page, statusFilter]);
 
   useEffect(() => {
@@ -127,13 +136,17 @@ export default function SupplierSettlementsPage() {
     }
     setExpandedId(id);
     setLoadingDetail(true);
+    setDetailError(false);
     try {
+      // null = 미존재(404) / throw = 조회 실패 — 두 상태를 분리한다.
       const data = await supplierApi.getSettlementDetail(id);
       setDetail(data);
     } catch {
       setDetail(null);
+      setDetailError(true);
+    } finally {
+      setLoadingDetail(false);
     }
-    setLoadingDetail(false);
   };
 
   return (
@@ -151,6 +164,8 @@ export default function SupplierSettlementsPage() {
       </div>
 
       {/* KPI Cards */}
+      {/* KPI — 조회 실패 시 0원/0건 으로 오인시키지 않도록 숨긴다 */}
+      {!loadError && (
       <div style={styles.kpiGrid}>
         <div style={{ ...styles.kpiCard, backgroundColor: '#fffbeb' }}>
           <DollarSign size={20} style={{ color: '#b45309' }} />
@@ -167,6 +182,7 @@ export default function SupplierSettlementsPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Filter Tabs */}
       <div style={styles.filterTabs}>
@@ -188,6 +204,21 @@ export default function SupplierSettlementsPage() {
       {loading ? (
         <div style={styles.emptyState}>
           <p style={styles.emptyText}>정산 정보를 불러오는 중...</p>
+        </div>
+      ) : loadError ? (
+        <div style={styles.emptyState}>
+          <DollarSign size={40} style={{ color: '#dc2626' }} />
+          <p style={styles.emptyText}>정산 정보를 불러오지 못했습니다.</p>
+          <button
+            onClick={fetchData}
+            style={{
+              marginTop: '12px', padding: '8px 16px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#fff',
+              color: '#475569', fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
         </div>
       ) : settlements.length === 0 ? (
         <div style={styles.emptyState}>
@@ -236,6 +267,16 @@ export default function SupplierSettlementsPage() {
                   <div style={styles.detailSection}>
                     {loadingDetail ? (
                       <p style={styles.detailLoading}>주문 정보를 불러오는 중...</p>
+                    ) : detailError ? (
+                      <p style={{ ...styles.detailLoading, color: '#dc2626' }}>
+                        정산 상세를 불러오지 못했습니다.{' '}
+                        <button
+                          onClick={() => { setExpandedId(null); setDetailError(false); handleToggleDetail(s.id); }}
+                          style={{ background: 'none', border: 'none', color: '#dc2626', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+                        >
+                          다시 시도
+                        </button>
+                      </p>
                     ) : detail && detail.orders && detail.orders.length > 0 ? (
                       <table style={styles.detailTable}>
                         <thead>

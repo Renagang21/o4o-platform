@@ -66,6 +66,22 @@ type InventoryCounts = { lowStock: number; outOfStock: number; tracked: number }
 /** 처리 필요 항목 — value > 0 일 때만 렌더된다. */
 type ActionItem = { key: string; label: string; value: number; unit: string; to: string; tone: 'red' | 'amber' };
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+ * 주문·재고·정산 조회 실패를 영역 단위로 구분한다. 단일 boolean 으로 뭉개면
+ * 어느 영역이 실패했는지 알 수 없어 실패 영역만 골라낼 수 없다.
+ */
+type OpsArea = 'orders' | 'inventory' | 'settlements';
+type OpsFailures = Record<OpsArea, boolean>;
+const NO_OPS_FAILURE: OpsFailures = { orders: false, inventory: false, settlements: false };
+/** 조회 실패 영역의 수치 자리 표시 — 0 으로 대체하지 않는다. */
+const UNAVAILABLE = '—';
+const OPS_AREA_LABELS: Record<OpsArea, string> = {
+  orders: '주문',
+  inventory: '재고',
+  settlements: '정산',
+};
+
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
@@ -145,13 +161,13 @@ export default function SupplierDashboardPage() {
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [opsFailed, setOpsFailed] = useState(false);
+  const [opsFailed, setOpsFailed] = useState<OpsFailures>(NO_OPS_FAILURE);
   const [aiOpen, setAiOpen] = useState(false);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
-    setOpsFailed(false);
+    setOpsFailed(NO_OPS_FAILURE);
 
     // Primary await — 공급자 권한 확인 (실패 시 전체 화면 오류)
     try {
@@ -166,7 +182,7 @@ export default function SupplierDashboardPage() {
       return;
     }
 
-    // 운영 현황 — 병렬. 일부 실패해도 나머지는 표시한다.
+    // 운영 현황 — 병렬. 일부 실패해도 나머지는 그대로 표시한다(영역별 독립 처리).
     const ops = await Promise.allSettled([
       supplierApi.getOrderKpi(),
       supplierApi.getInventory(),
@@ -179,14 +195,24 @@ export default function SupplierDashboardPage() {
       supplierKpaEventOfferApi.getStats(),
     ]);
 
-    setOrderKpi(settled(ops[0] as PromiseSettledResult<SupplierOrderKpi>, null as any));
-    const invItems = settled(ops[1] as PromiseSettledResult<any[]>, []);
-    setInventory({
-      lowStock: invItems.filter((i) => getInventoryStatus(i) === 'low_stock').length,
-      outOfStock: invItems.filter((i) => getInventoryStatus(i) === 'out_of_stock').length,
-      tracked: invItems.filter((i) => getInventoryStatus(i) !== 'untracked').length,
-    });
-    setSettlementKpi(settled(ops[2] as PromiseSettledResult<SettlementKpi>, null as any));
+    // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+    //   주문·재고·정산은 영역별로 독립 처리한다. 실패한 영역은 null 로 두고 0 으로 대체하지 않는다.
+    const ordersFailed = ops[0].status === 'rejected';
+    const inventoryFailed = ops[1].status === 'rejected';
+    const settlementsFailed = ops[2].status === 'rejected';
+
+    setOrderKpi(ordersFailed ? null : (ops[0] as PromiseFulfilledResult<SupplierOrderKpi>).value);
+    if (inventoryFailed) {
+      setInventory(null);
+    } else {
+      const invItems = (ops[1] as PromiseFulfilledResult<any[]>).value;
+      setInventory({
+        lowStock: invItems.filter((i) => getInventoryStatus(i) === 'low_stock').length,
+        outOfStock: invItems.filter((i) => getInventoryStatus(i) === 'out_of_stock').length,
+        tracked: invItems.filter((i) => getInventoryStatus(i) !== 'untracked').length,
+      });
+    }
+    setSettlementKpi(settlementsFailed ? null : (ops[2] as PromiseFulfilledResult<SettlementKpi>).value);
     setApproval(settled(ops[3] as PromiseSettledResult<ApprovalCounts>, null as any));
     setProfile(settled(ops[4] as PromiseSettledResult<SupplierProfile | null>, null));
     setRecruitments(settled(ops[5] as PromiseSettledResult<SupplierRecruitment[]>, []));
@@ -194,8 +220,7 @@ export default function SupplierDashboardPage() {
     setTrials(settled(ops[7] as PromiseSettledResult<Trial[]>, []));
     setEventOfferStats(settled(ops[8] as PromiseSettledResult<SupplierEventOfferStats | null>, null));
 
-    // 주문·재고·정산 중 하나라도 실패하면 처리 필요 영역이 불완전하다는 안내만 띄운다.
-    if (ops.slice(0, 3).some((r) => r.status === 'rejected')) setOpsFailed(true);
+    setOpsFailed({ orders: ordersFailed, inventory: inventoryFailed, settlements: settlementsFailed });
 
     // AI · 분석 — fire-and-forget (기존 동작 유지)
     supplierCopilotApi.getAiInsight().then(setAiInsight).catch(() => {});
@@ -244,8 +269,16 @@ export default function SupplierDashboardPage() {
     { key: 'product-approval', label: '상품 승인 대기', value: approval?.pending ?? 0, unit: '개', to: '/supplier/products', tone: 'amber' },
     { key: 'settlement', label: '정산 대기', value: settlementKpi?.pending_count ?? 0, unit: '건', to: '/supplier/settlements', tone: 'amber' },
   ];
-  const actionItems = actionCandidates.filter((a) => a.value > 0);
+  // 실패 영역의 카드는 값이 없으므로 아예 후보에서 제외한다 (0 으로 표시하지 않는다).
+  const actionItems = actionCandidates.filter((a) => {
+    if (a.value <= 0) return false;
+    if (opsFailed.orders && a.key.startsWith('orders-')) return false;
+    if (opsFailed.inventory && a.key.startsWith('inv-')) return false;
+    if (opsFailed.settlements && a.key === 'settlement') return false;
+    return true;
+  });
 
+  const failedAreas = (Object.keys(opsFailed) as OpsArea[]).filter((k) => opsFailed[k]);
   const showProfileAction = !loading && profile != null && !profileComplete;
   const hasAnyAction = actionItems.length > 0 || showProfileAction;
 
@@ -333,15 +366,25 @@ export default function SupplierDashboardPage() {
               </Link>
             )}
           </div>
+        ) : failedAreas.length > 0 ? (
+          // 주문·재고·정산 중 하나라도 실패하면 "처리할 업무 없음" 으로 단정하지 않는다.
+          <div className="flex items-center gap-2 py-2">
+            <AlertTriangle size={18} className="text-amber-500" />
+            <p className="text-sm text-slate-600">
+              {failedAreas.map((a) => OPS_AREA_LABELS[a]).join(' · ')} 현황을 불러오지 못해 처리 필요 업무를 확인할 수 없습니다.
+            </p>
+          </div>
         ) : (
           <div className="flex items-center gap-2 py-2">
             <CheckCircle2 size={18} className="text-emerald-500" />
             <p className="text-sm text-slate-600">현재 바로 처리해야 할 주요 업무가 없습니다.</p>
           </div>
         )}
-        {opsFailed && (
-          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-50 px-3 py-2">
-            <p className="text-xs text-slate-500">일부 운영 현황을 불러오지 못했습니다.</p>
+        {failedAreas.length > 0 && (
+          <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2">
+            <p className="text-xs text-amber-800">
+              {failedAreas.map((a) => OPS_AREA_LABELS[a]).join(' · ')} 현황을 불러오지 못했습니다. 나머지 현황은 정상입니다.
+            </p>
             <button onClick={fetchData} className="text-xs font-medium text-slate-600 underline">다시 시도</button>
           </div>
         )}
@@ -356,16 +399,31 @@ export default function SupplierDashboardPage() {
           </div>
         ) : (
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+            {/* 실패 영역은 0 이 아니라 '—' 로 표시한다 (수치 오인 방지) */}
             <KpiLink label="등록 상품" value={(kpi?.registeredProducts ?? 0).toLocaleString()} to="/supplier/products" />
             <KpiLink label="판매 중" value={(kpi?.activeProducts ?? 0).toLocaleString()} to="/supplier/products" accent />
-            <KpiLink label="처리 대기 주문" value={(orderKpi?.pending_processing ?? 0).toLocaleString()} to="/supplier/orders" accent />
-            <KpiLink label="배송 준비 주문" value={(orderKpi?.pending_shipping ?? 0).toLocaleString()} to="/supplier/orders" />
+            <KpiLink
+              label="처리 대기 주문"
+              value={opsFailed.orders ? UNAVAILABLE : (orderKpi?.pending_processing ?? 0).toLocaleString()}
+              to="/supplier/orders"
+              accent
+            />
+            <KpiLink
+              label="배송 준비 주문"
+              value={opsFailed.orders ? UNAVAILABLE : (orderKpi?.pending_shipping ?? 0).toLocaleString()}
+              to="/supplier/orders"
+            />
             <KpiLink
               label="재고 주의"
-              value={((inventory?.lowStock ?? 0) + (inventory?.outOfStock ?? 0)).toLocaleString()}
+              value={opsFailed.inventory ? UNAVAILABLE : ((inventory?.lowStock ?? 0) + (inventory?.outOfStock ?? 0)).toLocaleString()}
               to="/supplier/inventory"
             />
-            <KpiLink label="정산 대기" value={won(settlementKpi?.pending_amount ?? 0)} to="/supplier/settlements" small />
+            <KpiLink
+              label="정산 대기"
+              value={opsFailed.settlements ? UNAVAILABLE : won(settlementKpi?.pending_amount ?? 0)}
+              to="/supplier/settlements"
+              small
+            />
           </div>
         )}
       </section>

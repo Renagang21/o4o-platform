@@ -105,6 +105,7 @@ export default function SupplierOrderDetailPage() {
   const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/orders' : '/account/supplier/orders';
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [updating, setUpdating] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -114,18 +115,22 @@ export default function SupplierOrderDetailPage() {
   const [trackingNumber, setTrackingNumber] = useState('');
   const [submittingShipment, setSubmittingShipment] = useState(false);
 
+  // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+  //   getOrderById() 는 미존재(404)만 null 을 반환하고 조회 실패는 throw 한다.
+  //   not-found 와 error 는 다른 상태다 — 하나로 합치지 않는다.
+  //   getShipment() 는 IR E 등급(미변경)이라 실패해도 배송정보만 비운다.
   const fetchOrder = useCallback(async () => {
     if (!id) return;
     setLoading(true);
+    setLoadError(false);
     try {
-      const [orderData, shipmentData] = await Promise.all([
-        supplierApi.getOrderById(id),
-        supplierApi.getShipment(id),
-      ]);
+      const orderData = await supplierApi.getOrderById(id);
       setOrder(orderData);
-      setShipment(shipmentData);
+      setShipment(await supplierApi.getShipment(id).catch(() => null));
     } catch {
       setOrder(null);
+      setShipment(null);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -215,7 +220,31 @@ export default function SupplierOrderDetailPage() {
     );
   }
 
-  // Not found
+  // Error — 조회 실패. not-found 와 구분해 다시 시도를 제공한다.
+  if (loadError) {
+    return (
+      <div style={styles.notFound}>
+        <h2 style={styles.notFoundTitle}>주문 정보를 불러오지 못했습니다</h2>
+        <p style={styles.notFoundText}>잠시 후 다시 시도해 주세요.</p>
+        <button
+          onClick={fetchOrder}
+          style={{
+            marginTop: '12px', padding: '8px 16px', borderRadius: '8px',
+            border: '1px solid #e2e8f0', backgroundColor: '#fff',
+            color: '#475569', fontSize: '14px', cursor: 'pointer',
+          }}
+        >
+          다시 시도
+        </button>
+        <Link to={backPath} style={styles.backLink}>
+          <ArrowLeft size={16} />
+          주문 목록으로 돌아가기
+        </Link>
+      </div>
+    );
+  }
+
+  // Not found — 미존재(404). 다시 시도 대상이 아니다.
   if (!order) {
     return (
       <div style={styles.notFound}>

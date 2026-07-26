@@ -39,17 +39,27 @@ export default function SupplierInventoryPage() {
   const backPath = location.pathname.startsWith('/supplier/') ? '/supplier/dashboard' : '/account/supplier';
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editStock, setEditStock] = useState(0);
   const [editThreshold, setEditThreshold] = useState(10);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
+  // WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1:
+  //   getInventory() 는 실패 시 throw 한다. 조회 실패를 빈 목록(정상 0건)으로 표시하지 않는다.
   const fetchInventory = useCallback(async () => {
     setLoading(true);
-    const data = await supplierApi.getInventory();
-    setItems(data);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const data = await supplierApi.getInventory();
+      setItems(data);
+    } catch {
+      setItems([]);
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -148,7 +158,8 @@ export default function SupplierInventoryPage() {
         </div>
       )}
 
-      {/* Stats */}
+      {/* Stats — 조회 실패 시 0 으로 오인시키지 않도록 숨긴다 */}
+      {!loadError && (
       <div style={styles.statsGrid}>
         <div style={styles.statCard}>
           <Package size={20} style={{ color: '#3b82f6' }} />
@@ -179,10 +190,26 @@ export default function SupplierInventoryPage() {
           </div>
         </div>
       </div>
+      )}
 
       {/* Inventory List */}
       {loading ? (
         <div style={styles.loading}>로딩 중...</div>
+      ) : loadError ? (
+        <div style={styles.emptyState}>
+          <AlertTriangle size={48} style={{ color: '#dc2626', marginBottom: '16px' }} />
+          <p>재고 정보를 불러오지 못했습니다.</p>
+          <button
+            onClick={fetchInventory}
+            style={{
+              marginTop: '12px', padding: '8px 16px', borderRadius: '8px',
+              border: '1px solid #e2e8f0', backgroundColor: '#fff',
+              color: '#475569', fontSize: '14px', cursor: 'pointer',
+            }}
+          >
+            다시 시도
+          </button>
+        </div>
       ) : items.length === 0 ? (
         <div style={styles.emptyState}>
           <Package size={48} style={{ color: '#94a3b8', marginBottom: '16px' }} />

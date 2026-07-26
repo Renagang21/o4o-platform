@@ -35,6 +35,28 @@ function extractApiError(error: any): string {
   return 'NETWORK_ERROR';
 }
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-ORDER-INVENTORY-SETTLEMENT-LOAD-ERROR-CONTRACT-V1
+ *
+ * 조회 실패를 []·0·null·빈 pagination 으로 삼키면 화면에서 "정상 0건" 과 구분되지 않는다.
+ * 실패는 영역별 고정 코드로 throw 하고, 서버 원문은 console 로만 남긴다.
+ * (선행: SUPPLIER_PRODUCTS_LOAD_FAILED / SUPPLIER_COMMISSION_LOAD_FAILED 와 동일 패턴)
+ */
+export const SUPPLIER_ORDERS_LOAD_FAILED = 'SUPPLIER_ORDERS_LOAD_FAILED';
+export const SUPPLIER_INVENTORY_LOAD_FAILED = 'SUPPLIER_INVENTORY_LOAD_FAILED';
+export const SUPPLIER_SETTLEMENTS_LOAD_FAILED = 'SUPPLIER_SETTLEMENTS_LOAD_FAILED';
+
+/**
+ * 상세 조회용 — backend 가 미존재를 404 로 명시 반환한다.
+ *   주문   ORDER_NOT_FOUND (supplier-order.controller)
+ *   재고   NOT_FOUND       (inventory.controller)
+ *   정산   NOT_FOUND       (supplier-settlement.controller)
+ * 404 만 null(미존재)로 유지하고 그 외 오류는 throw 해서 "없음" 과 "실패" 를 분리한다.
+ */
+function isNotFound(error: unknown): boolean {
+  return (error as { response?: { status?: number } })?.response?.status === 404;
+}
+
 // ==================== Supplier Types ====================
 
 export type SupplierProductPurpose = 'CATALOG' | 'APPLICATION' | 'ACTIVE_SALES';
@@ -795,14 +817,19 @@ export const supplierApi = {
   },
 
   async getOrdersSummary(): Promise<OrderSummaryResponse> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/orders/summary');
-      const result = response.data;
-      return result.data || { services: [], totalApprovedSellers: 0, totalPendingRequests: 0 };
+      response = await api.get('/neture/supplier/orders/summary');
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch orders summary:', error);
-      return { services: [], totalApprovedSellers: 0, totalPendingRequests: 0 };
+      console.warn('[Supplier API] Failed to fetch orders summary:', extractApiError(error));
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
     }
+    const result = response.data?.data;
+    if (!result || typeof result !== 'object' || !Array.isArray(result.services)) {
+      console.warn('[Supplier API] Unexpected orders summary payload shape');
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
+    }
+    return result as OrderSummaryResponse;
   },
 
   // Library API
@@ -873,47 +900,66 @@ export const supplierApi = {
 
   // Order Management
   async getOrders(params?: { page?: number; limit?: number; status?: string }): Promise<SupplierOrdersResponse> {
+    let response;
     try {
       const searchParams = new URLSearchParams();
       if (params?.page) searchParams.set('page', String(params.page));
       if (params?.limit) searchParams.set('limit', String(params.limit));
       if (params?.status) searchParams.set('status', params.status);
       const qs = searchParams.toString();
-      const response = await api.get(`/neture/supplier/orders${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/neture/supplier/orders${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch orders:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Supplier API] Failed to fetch orders:', extractApiError(error));
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!Array.isArray(result?.data)) {
+      console.warn('[Supplier API] Unexpected orders payload shape');
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
+    }
+    // meta 는 성공 응답의 보조 필드다. 누락 시에도 목록 자체는 유효하므로 기본값을 유지한다.
+    return {
+      data: result.data as SupplierOrdersResponse['data'],
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
   // WO-O4O-NETURE-SUPPLIER-ORDER-UNIFIED-VIEW-V1: neture_orders + checkout_orders 통합 조회(읽기)
   async getUnifiedOrders(params?: { page?: number; limit?: number; source?: 'neture' | 'checkout' | 'all' }): Promise<UnifiedOrdersResponse> {
+    let response;
     try {
       const searchParams = new URLSearchParams();
       if (params?.page) searchParams.set('page', String(params.page));
       if (params?.limit) searchParams.set('limit', String(params.limit));
       if (params?.source) searchParams.set('source', params.source);
       const qs = searchParams.toString();
-      const response = await api.get(`/neture/supplier/orders/unified${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/neture/supplier/orders/unified${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch unified orders:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Supplier API] Failed to fetch unified orders:', extractApiError(error));
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!Array.isArray(result?.data)) {
+      console.warn('[Supplier API] Unexpected unified orders payload shape');
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
+    }
+    return {
+      data: result.data as UnifiedSupplierOrder[],
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
+  /** null = 미존재(404). 조회 실패는 throw — "없음" 과 "실패" 를 분리한다. */
   async getOrderById(id: string): Promise<StoreOrder | null> {
+    let response;
     try {
-      const response = await api.get(`/neture/supplier/orders/${id}`);
-      const result = response.data;
-      return result.data || null;
+      response = await api.get(`/neture/supplier/orders/${id}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch order detail:', error);
-      return null;
+      if (isNotFound(error)) return null;
+      console.warn('[Supplier API] Failed to fetch order detail:', extractApiError(error));
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
     }
+    return (response.data?.data as StoreOrder) ?? null;
   },
 
   async updateOrderStatus(id: string, status: string): Promise<{ success: boolean; error?: string; data?: any }> {
@@ -926,37 +972,49 @@ export const supplierApi = {
   },
 
   async getOrderKpi(): Promise<SupplierOrderKpi> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/orders/kpi');
-      const result = response.data;
-      return result.data || { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
+      response = await api.get('/neture/supplier/orders/kpi');
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch order KPI:', error);
-      return { today_orders: 0, pending_processing: 0, pending_shipping: 0, total_orders: 0 };
+      console.warn('[Supplier API] Failed to fetch order KPI:', extractApiError(error));
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
     }
+    const result = response.data?.data;
+    if (!result || typeof result !== 'object') {
+      console.warn('[Supplier API] Unexpected order KPI payload shape');
+      throw new Error(SUPPLIER_ORDERS_LOAD_FAILED);
+    }
+    return result as SupplierOrderKpi;
   },
 
   // Inventory
   async getInventory(): Promise<InventoryItem[]> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/inventory');
-      const result = response.data;
-      return result.data || [];
+      response = await api.get('/neture/supplier/inventory');
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch inventory:', error);
-      return [];
+      console.warn('[Supplier API] Failed to fetch inventory:', extractApiError(error));
+      throw new Error(SUPPLIER_INVENTORY_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!Array.isArray(result?.data)) {
+      console.warn('[Supplier API] Unexpected inventory payload shape');
+      throw new Error(SUPPLIER_INVENTORY_LOAD_FAILED);
+    }
+    return result.data as InventoryItem[];
   },
 
+  /** null = 미존재(404). 조회 실패는 throw. */
   async getInventoryItem(offerId: string): Promise<InventoryItem | null> {
+    let response;
     try {
-      const response = await api.get(`/neture/supplier/inventory/${offerId}`);
-      const result = response.data;
-      return result.data || null;
+      response = await api.get(`/neture/supplier/inventory/${offerId}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch inventory item:', error);
-      return null;
+      if (isNotFound(error)) return null;
+      console.warn('[Supplier API] Failed to fetch inventory item:', extractApiError(error));
+      throw new Error(SUPPLIER_INVENTORY_LOAD_FAILED);
     }
+    return (response.data?.data as InventoryItem) ?? null;
   },
 
   async updateInventory(
@@ -1011,6 +1069,7 @@ export const supplierApi = {
   async getSettlements(
     params?: { page?: number; limit?: number; status?: SettlementStatus }
   ): Promise<SettlementsResponse> {
+    let response;
     try {
       const sp = new URLSearchParams();
       if (params?.page) sp.append('page', String(params.page));
@@ -1018,35 +1077,49 @@ export const supplierApi = {
       if (params?.status) sp.append('status', params.status);
       const qs = sp.toString() ? `?${sp}` : '';
 
-      const response = await api.get(`/neture/supplier/settlements${qs}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/neture/supplier/settlements${qs}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch settlements:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Supplier API] Failed to fetch settlements:', extractApiError(error));
+      throw new Error(SUPPLIER_SETTLEMENTS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!Array.isArray(result?.data)) {
+      console.warn('[Supplier API] Unexpected settlements payload shape');
+      throw new Error(SUPPLIER_SETTLEMENTS_LOAD_FAILED);
+    }
+    return {
+      data: result.data as SettlementsResponse['data'],
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
+  /** null = 미존재(404). 조회 실패는 throw. */
   async getSettlementDetail(id: string): Promise<SettlementDetail | null> {
+    let response;
     try {
-      const response = await api.get(`/neture/supplier/settlements/${id}`);
-      const result = response.data;
-      return result.data || null;
+      response = await api.get(`/neture/supplier/settlements/${id}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch settlement detail:', error);
-      return null;
+      if (isNotFound(error)) return null;
+      console.warn('[Supplier API] Failed to fetch settlement detail:', extractApiError(error));
+      throw new Error(SUPPLIER_SETTLEMENTS_LOAD_FAILED);
     }
+    return (response.data?.data as SettlementDetail) ?? null;
   },
 
   async getSettlementKpi(): Promise<SettlementKpi> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/settlements/kpi');
-      const result = response.data;
-      return result.data || { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
+      response = await api.get('/neture/supplier/settlements/kpi');
     } catch (error) {
-      console.warn('[Supplier API] Failed to fetch settlement KPI:', error);
-      return { pending_amount: 0, paid_amount: 0, total_amount: 0, pending_count: 0, paid_count: 0 };
+      console.warn('[Supplier API] Failed to fetch settlement KPI:', extractApiError(error));
+      throw new Error(SUPPLIER_SETTLEMENTS_LOAD_FAILED);
     }
+    const result = response.data?.data;
+    if (!result || typeof result !== 'object') {
+      console.warn('[Supplier API] Unexpected settlement KPI payload shape');
+      throw new Error(SUPPLIER_SETTLEMENTS_LOAD_FAILED);
+    }
+    return result as SettlementKpi;
   },
 
   // ==================== WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1 ====================
