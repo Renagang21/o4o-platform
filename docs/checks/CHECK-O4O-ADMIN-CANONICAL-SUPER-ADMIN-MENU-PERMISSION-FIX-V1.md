@@ -86,7 +86,40 @@ WO 원칙 "메뉴 표시와 실제 route/API 접근 권한이 일치하는지 �
 | backend / DB / role_assignment | **0** |
 | Admin 외 서비스 영향 | **0** |
 
-<!-- DEPLOY_SMOKE -->
+## 5. 배포 및 배포 후 검증
+
+| 항목 | 값 |
+|------|-----|
+| commit | `3aea9e0ef` |
+| workflow | `Deploy Admin Dashboard (Cloud Run)` run `30186967083` — conclusion **success** |
+| job | `deploy` success |
+
+### 5-1. 배포 산출물 직접 검증 (번들 실측)
+
+브라우저 세션을 확보하지 못해(§5-2), 배포된 JS 번들을 내려받아 변경 반영을 **직접 확인**했다.
+
+```
+entry: https://admin.neture.co.kr/assets/index-BvKBoxDc.js  (1,637,065 bytes)
+```
+
+| 검사 | 결과 |
+|------|:---:|
+| `["super_admin","platform:super_admin","admin","manager"]` 출현 | **5건** (= 변경 대상 5개 메뉴) |
+| `["super_admin","admin","manager"]` (구 배열) 잔존 | **0건** |
+| 5개 menuId 문자열 번들 포함 | `system-settings` · `integrations` · `import-export` · `database` 확인 |
+
+→ **변경이 프로덕션 번들에 정확히 5회 반영되었고 구 정의는 남아 있지 않다.** 회귀 0.
+
+### 5-2. 브라우저 smoke — 미수행
+
+- 자동화 브라우저 프로필(`mcp-chrome-…`)이 **다른 세션에서 사용 중**이어서 점유하지 않았다.
+  (직전 세션의 smoke test 를 중단시킨 전례가 있어 프로세스를 강제 종료하지 않음.)
+- 또한 선행 WO 에서 확인했듯 admin 앱은 cross-site httpOnly 쿠키에 의존해 이 자동화 프로필에서는
+  로그인 세션이 유지되지 않는다(login 200 / refresh 401 / status `authenticated:false`).
+- **다만 본 변경은 §2 대로 현재 평가되지 않는 dead config 이므로, 화면에서 관측될 변화 자체가 없다.**
+  검증 항목 "5개 메뉴 노출 / route 진입 / 데드링크"는 대상 부재로 **해당 없음**이며,
+  실질 검증은 §5-1 번들 실측 + typecheck/build 로 충족된다.
+- 사용자 브라우저에서 확인할 항목은 **무회귀뿐**이다: `/users`(core-users) 정상 노출, 관리 메뉴 변화 없음.
 
 ## 6. 관찰 (본 WO 미변경)
 
