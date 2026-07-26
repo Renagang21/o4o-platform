@@ -313,7 +313,10 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         const isOwner = !!(currentUserId && row.created_by === currentUserId);
         // WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: restricted 콘텐츠는 가져가기 차단
         const isRestricted = isContentImportRestricted(row);
-        const actions: RowActionItem[] = [
+        // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1:
+        //   자료실(subType='resource')은 매장 복사 대상이 아니다 — 가져가기 액션 미제공.
+        //   문서형 콘텐츠(subType='content')는 기존과 동일하게 유지한다.
+        const actions: RowActionItem[] = isResource ? [] : [
           {
             key: 'copy-to-store',
             label: isRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
@@ -343,15 +346,16 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
         return <RowActionMenu actions={actions} />;
       },
     },
-  ], [currentUserId, copyingId, selectedKeys, navigate, handleCopyToStore, handleDelete]);
+  ], [currentUserId, copyingId, selectedKeys, navigate, handleCopyToStore, handleDelete, isResource]);
 
+  // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실은 일괄 가져가기도 제공하지 않는다.
   const bulkActions: ActionBarAction[] = [
-    {
+    ...(isResource ? [] : [{
       key: 'copy',
-      label: '내 자료함 가져가기',
+      label: CONTENT_IMPORT_LABEL,
       onClick: handleBulkCopy,
       loading: bulkBusy,
-    },
+    } as ActionBarAction]),
     {
       key: 'delete',
       label: '삭제',
@@ -372,13 +376,14 @@ export function ContentDocumentsPage({ subType = 'content' }: ContentDocumentsPa
   //   상세 응답이 authoritative — 로드 전에는 목록 행으로 폴백(이제 목록도 필드를 반환)
   const drawerIsRestricted = isContentImportRestricted(drawerDetail ?? drawerItem);
   const drawerActions = drawerItem ? [
-    {
+    // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실 Drawer 에는 가져가기 미노출
+    ...(isResource ? [] : [{
       label: drawerIsRestricted ? CONTENT_IMPORT_RESTRICTED_LABEL : CONTENT_IMPORT_LABEL,
       variant: 'primary' as const,
       onClick: () => handleCopyToStore(drawerItem.id),
       loading: copyingId === drawerItem.id,
       disabled: drawerIsRestricted,
-    },
+    }]),
     ...(drawerIsOwner ? [
       {
         label: '수정',

@@ -10,8 +10,14 @@
  * WO-O4O-CMS-CONTENT-REUSABLE-POLICY-ALIGN-V1: resolveContent 에 reusable_policy 검증 추가
  * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: resource type 추가
  *   (kpa_contents sub_type='resource' 자료실 → 자료함 Full Copy 경로)
+ *   — WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: resource 분기·resolveResource() 제거.
+ *     자료실 신규 매장 복사 경로를 닫는다(404 SOURCE_NOT_FOUND). 기존 row /
+ *     GET /assets?type=resource 조회 호환은 유지(allowedAssetTypes 에 'resource' 존치).
+ *     resolveContent 에도 sub_type<>'resource' 필터를 추가해 content 타입 우회를 차단한다.
+ *     매장 복사 허용 대상은 콘텐츠(content/cms)·디지털사이니지(signage) 뿐이다.
+ *     포럼은 애초에 assetType·resolver 가 없어 복사 경로가 존재하지 않는다.
  *
- * Resolves KPA community CMS, Signage, KPA Content, KPA Resource assets
+ * Resolves KPA community CMS, Signage, KPA Content assets
  * into the standard ResolvedContent format.
  */
 
@@ -32,9 +38,12 @@ export class KpaAssetResolver implements ContentResolver {
     if (assetType === 'content') {
       return this.resolveContent(sourceAssetId);
     }
-    if (assetType === 'resource') {
-      return this.resolveResource(sourceAssetId);
-    }
+    // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1:
+    //   'resource'(자료실) 신규 매장 복사 차단 — 분기 제거로 아래 `return null` 에 도달하고
+    //   controller 가 404 SOURCE_NOT_FOUND 로 거부한다(기존 오류 코드 재사용, 신규 체계 없음).
+    //   allowedAssetTypes 에는 'resource' 를 남겨 둔다 — 기존에 가져간 사본의 목록 조회
+    //   (GET /assets?type=resource, StoreLibraryResourcesPage)가 계속 동작해야 하기 때문이다.
+    //   포럼은 애초에 복사 경로(assetType/resolver)가 존재하지 않는다.
     if (assetType === 'blog') {
       return this.resolveBlog(sourceAssetId);
     }
@@ -225,6 +234,10 @@ export class KpaAssetResolver implements ContentResolver {
               thumbnail_url, author_name, reusable_policy
        FROM kpa_contents
        WHERE id = $1 AND is_deleted = false
+         -- WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실 row 우회 복사 차단.
+         --   자료실도 kpa_contents 를 쓰므로 sub_type 필터가 없으면 assetType='content' 로
+         --   자료실 항목을 복사할 수 있었다. 문서형(sub_type='content')만 통과시킨다.
+         AND (sub_type IS NULL OR sub_type <> 'resource')
        LIMIT 1`,
       [id],
     );
@@ -257,57 +270,6 @@ export class KpaAssetResolver implements ContentResolver {
     };
   }
 
-  /**
-   * WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1
-   *
-   * KPA 자료실(`kpa_contents` WHERE sub_type='resource')의 파일/외부링크/문서 자료를
-   * 매장 자료함으로 Full Copy. 자료실은 콘텐츠 허브와 동일 테이블을 공유하지만 sub_type
-   * 으로 분리되며, 자료함 자료 탭(StoreLibraryResourcesPage)에서 제작 시작 진입점이 된다.
-   *
-   * Gates:
-   *   1. is_deleted = false  (삭제된 자료 차단)
-   *   2. sub_type = 'resource'  (콘텐츠 허브 항목이 resource 로 잘못 가져가지지 않도록 강제)
-   *   3. reusable_policy ≠ 'restricted'  (제작자 명시적 차단)
-   * 위 조건 미충족 시 null 반환 → AssetCopyService 가 SOURCE_NOT_FOUND 로 처리.
-   */
-  private async resolveResource(id: string): Promise<ResolvedContent | null> {
-    const rows = await this.dataSource.query(
-      `SELECT id, title, summary, body, blocks, tags, category, status,
-              content_type, sub_type, source_type, source_url, source_file_name,
-              usage_type, thumbnail_url, author_name, reusable_policy
-       FROM kpa_contents
-       WHERE id = $1 AND is_deleted = false AND sub_type = 'resource'
-       LIMIT 1`,
-      [id],
-    );
-    if (!rows || rows.length === 0) return null;
-    const r = rows[0];
-
-    if (r.reusable_policy === 'restricted') return null;
-
-    return {
-      title: r.title,
-      type: 'resource',
-      sourceService: 'kpa',
-      contentJson: {
-        title: r.title,
-        summary: r.summary,
-        body: r.body,
-        blocks: r.blocks,
-        tags: r.tags,
-        category: r.category,
-        contentType: r.content_type,
-        subType: r.sub_type,
-        sourceType: r.source_type,
-        sourceUrl: r.source_url,
-        sourceFileName: r.source_file_name,
-        usageType: r.usage_type,
-        thumbnailUrl: r.thumbnail_url,
-        authorName: r.author_name,
-        capturedAt: new Date().toISOString(),
-      },
-    };
-  }
 
   /**
    * WO-O4O-SUPPLIER-RESOURCE-CURRENT-PUBLISH-AND-HUB-FLOW-PRESERVE-V1:

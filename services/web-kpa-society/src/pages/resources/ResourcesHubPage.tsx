@@ -19,7 +19,6 @@ import { useNavigate } from 'react-router-dom';
 import { ResourcesHubTemplate, type ResourcesHubConfig, type ResourcesHubItem } from '@o4o/shared-space-ui';
 import { toast } from '@o4o/error-handling';
 import { resourcesApi } from '../../api';
-import { assetSnapshotApi } from '../../api/assetSnapshot';
 import { useAuth } from '../../contexts/AuthContext';
 import { hasAnyRole, PLATFORM_ROLES } from '../../lib/role-constants';
 import { ResourceWriteModal } from './ResourceWriteModal';
@@ -61,10 +60,11 @@ function ResourceUploadButton({ variant = 'hero', onOpenModal }: UploadButtonPro
 
 // ─── KPA Config ───────────────────────────────────────────────────────────────
 
+// WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1:
+//   매장 복사 제거로 store_owner 판정이 더 이상 필요 없어 인자에서 제외.
 function useKpaResourcesConfig(
   isOperator: boolean,
   userId: string | null | undefined,
-  isStoreOwner: boolean,
   onOpenModal: () => void,
 ): ResourcesHubConfig {
   return useMemo(() => ({
@@ -145,28 +145,17 @@ function useKpaResourcesConfig(
       else toast.success(message);
     },
 
-    // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: 매장 경영자에게만 "내 자료함 가져가기" 노출.
-    //   resolver 가 sub_type='resource' + reusable_policy≠restricted + is_deleted=false 통과시킨다.
-    // WO-O4O-STORE-LIBRARY-COPY-INDEPENDENCE-ALIGN-V1: 중복 허용 — 매번 새 library item 생성
-    onCopyToStore: isStoreOwner
-      ? async (id) => {
-          try {
-            await assetSnapshotApi.copy({ sourceService: 'kpa', sourceAssetId: id, assetType: 'resource' });
-            toast.success('내 자료함에 자료를 추가했습니다.');
-          } catch (e: any) {
-            if (e?.code === 'SOURCE_NOT_FOUND' || e?.code === 'POLICY_VIOLATION') {
-              toast.error('가져가기 불가 자료입니다');
-            } else {
-              toast.error(e?.message || '가져오기에 실패했습니다');
-            }
-          }
-        }
-      : undefined,
+    // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1:
+    //   자료실은 매장 복사 대상이 아니다. 복사 허용 대상은 콘텐츠·디지털사이니지 2종뿐이며,
+    //   자료실은 다운로드·외부 링크·첨부파일 이용 영역이다.
+    //   (기존 WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1 의 onCopyToStore 경로 제거.
+    //    서버도 KpaAssetResolver 에서 'resource' 복사를 거부한다 — 404 SOURCE_NOT_FOUND.)
+    //   onCopyToStore 미전달 → 템플릿이 가져가기 액션을 렌더하지 않는다.
 
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [isOperator, userId, isStoreOwner, onOpenModal]);
+  }), [isOperator, userId, onOpenModal]);
 }
 
 // ─── Page Component ───────────────────────────────────────────────────────────
@@ -174,15 +163,13 @@ function useKpaResourcesConfig(
 export function ResourcesHubPage() {
   const { user } = useAuth();
   const isOperator = hasAnyRole(user?.roles ?? [], PLATFORM_ROLES);
-  // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: store_owner 만 자료함 가져가기 노출 (LmsCoursesPage 패턴)
-  const isStoreOwner = !!user?.isStoreOwner && !!user?.kpaMembership?.organizationId;
 
   const [modalOpen, setModalOpen] = useState(false);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const openModal = useCallback(() => setModalOpen(true), []);
 
-  const config = useKpaResourcesConfig(isOperator, user?.id, isStoreOwner, openModal);
+  const config = useKpaResourcesConfig(isOperator, user?.id, openModal);
 
   return (
     <>

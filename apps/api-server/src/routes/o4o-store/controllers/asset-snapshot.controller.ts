@@ -67,7 +67,12 @@ export function createAssetSnapshotController(
     // WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1: KPA 콘텐츠 허브(content) 가져가기 허용.
     //   Resolver가 is_deleted=false 만 통과시킨다.
     // WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1: KPA 자료실(resource) 가져가기 허용.
-    //   Resolver가 sub_type='resource' + is_deleted=false + reusable_policy≠restricted 통과시킨다.
+    // WO-O4O-KPA-FORUM-RESOURCE-STORE-COPY-REMOVAL-V1: 자료실 신규 복사 차단.
+    //   'resource' 를 allowedAssetTypes 에서 빼지 않는 이유 — 이 목록은 copy 뿐 아니라
+    //   목록 조회(GET /assets?type=)에도 쓰여서, 제거하면 기존에 가져간 자료 사본을 보는
+    //   StoreLibraryResourcesPage(/store/library/resources) 가 400 으로 깨진다.
+    //   따라서 차단은 KpaAssetResolver 에서 수행한다(resource 분기 제거 → 404 SOURCE_NOT_FOUND).
+    //   기존 사본은 삭제하지 않고 그대로 조회·사용 가능하다.
     // WO-O4O-OPERATOR-BLOG-PUBLISHING-BACKEND-FOUNDATION-V1: 'blog' assetType 등록 (Phase 1 Placeholder).
     //   현재 resolveBlog 는 null 반환 — Phase 2 schema 확장 후 활성화.
     // WO-O4O-KPA-POP-OPERATOR-PUBLISHING-V1 Phase 1 (2026-05-24): 'pop' assetType 등록 (Phase 1 Placeholder).
