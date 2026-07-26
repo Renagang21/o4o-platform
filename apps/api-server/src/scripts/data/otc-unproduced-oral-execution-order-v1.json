@@ -1,0 +1,202 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-ORAL-LARGE-UNIT-APPROVAL-V1",
+  "artifact": "execution-order-ledger",
+  "status": "APPROVED_FOR_PRODUCTION",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "route": "oral",
+  "totals": {
+    "fingerprints": 747,
+    "masters": 3699,
+    "writePlan": {
+      "ko": 14796,
+      "en": 7398,
+      "total": 22194
+    }
+  },
+  "writeOwner": {
+    "policy": "단일 에이전트",
+    "note": "Unit 1 과 Unit 2 의 DB write-owner 는 동일 에이전트 사용을 권고한다."
+  },
+  "sequence": [
+    {
+      "step": 1,
+      "unitId": "oral-unit-1",
+      "ssot": "otc-unproduced-oral-unit1-approved-ssot-v1.json",
+      "fingerprints": 373,
+      "masters": 1850,
+      "write": {
+        "ko": 7400,
+        "en": 3700,
+        "total": 11100
+      },
+      "precondition": "승인 즉시 착수 가능"
+    },
+    {
+      "step": 2,
+      "unitId": "oral-unit-2",
+      "ssot": "otc-unproduced-oral-unit2-approved-ssot-v1.json",
+      "fingerprints": 374,
+      "masters": 1849,
+      "write": {
+        "ko": 7396,
+        "en": 3698,
+        "total": 11094
+      },
+      "precondition": "oral-unit-1 완료 · postVerify · 독립검증 GREEN"
+    }
+  ],
+  "gates": {
+    "G1_totalMasters": 3699,
+    "G1_expected": 3699,
+    "G1_totalMatch": true,
+    "G1_totalFingerprints": 747,
+    "G1_fpExpected": 747,
+    "G1_fpMatch": true,
+    "G2_missingMasters": 0,
+    "G2_duplicateMasters": 0,
+    "G3_fpGroupSplitAcrossUnits": 0,
+    "G3_unitFpIntersection": 0,
+    "G3_unitMasterIntersection": 0,
+    "G4_safetyFpMismatch": 0,
+    "G5_officialSourceMissing": 0,
+    "G6_nonOralContamination": 0,
+    "G6_oralRouteConflict": 0,
+    "G7_liveMasterIntersection": 0,
+    "G7_liveFpIntersection": 0,
+    "G7_liveSourceRefIntersection": 0,
+    "G7_liveTotals": {
+      "masters": 2877,
+      "fps": 785,
+      "sourceRefs": 714
+    },
+    "G8_authoredCanonicalPresent": 0,
+    "G9_writeTotal": 22194,
+    "G9_writeMatch": true,
+    "dbWrite": 0
+  },
+  "allGatesPass": true,
+  "distribution": {
+    "byForm": {
+      "정": 1591,
+      "캡슐": 762,
+      "연질캡슐": 471,
+      "장용정": 321,
+      "내복액": 250,
+      "시럽": 132,
+      "현탁액": 100,
+      "산": 51,
+      "과립": 11,
+      "장용캡슐": 10
+    },
+    "byIngredientStrengthCodeTop": [
+      {
+        "code": "153101",
+        "masters": 369
+      },
+      {
+        "code": "101804",
+        "masters": 246
+      },
+      {
+        "code": "130501",
+        "masters": 177
+      },
+      {
+        "code": "111001",
+        "masters": 171
+      },
+      {
+        "code": "142301",
+        "masters": 122
+      },
+      {
+        "code": "A49300",
+        "masters": 99
+      },
+      {
+        "code": "106301",
+        "masters": 97
+      },
+      {
+        "code": "157301",
+        "masters": 95
+      },
+      {
+        "code": "172806",
+        "masters": 67
+      },
+      {
+        "code": "D12500",
+        "masters": 66
+      },
+      {
+        "code": "D33500",
+        "masters": 64
+      },
+      {
+        "code": "101305",
+        "masters": 62
+      },
+      {
+        "code": "A06600",
+        "masters": 61
+      },
+      {
+        "code": "260300",
+        "masters": 57
+      },
+      {
+        "code": "244301",
+        "masters": 50
+      },
+      {
+        "code": "B04300",
+        "masters": 46
+      },
+      {
+        "code": "B03600",
+        "masters": 41
+      },
+      {
+        "code": "292800",
+        "masters": 40
+      },
+      {
+        "code": "347904",
+        "masters": 39
+      },
+      {
+        "code": "308000",
+        "masters": 38
+      },
+      {
+        "code": "101404",
+        "masters": 33
+      },
+      {
+        "code": "A65401",
+        "masters": 31
+      },
+      {
+        "code": "166502",
+        "masters": 29
+      },
+      {
+        "code": "227730",
+        "masters": 29
+      },
+      {
+        "code": "104303",
+        "masters": 28
+      }
+    ]
+  },
+  "integrityLists": {
+    "safetyFpMismatch": [],
+    "officialSourceMissing": [],
+    "nonOral": [],
+    "oralRouteConflict": []
+  }
+}
