@@ -37,6 +37,11 @@ import { ProductApprovalV2Service } from '../../product-policy-v2/product-approv
 import { resolveStoreAccess } from '../../../utils/store-owner.utils.js';
 import logger from '../../../utils/logger.js';
 
+// WO-O4O-NETURE-ORDER-UUID-PARAM-VALIDATION-V1:
+//   비-UUID 경로 파라미터가 DB cast 오류로 500 이 되는 것을 막는다.
+//   supplier-order.controller 의 POST shipment 에 이미 있던 검증 패턴을 그대로 재사용한다.
+const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 // ==================== Seller Controller ====================
 
 export function createSellerController(dataSource: DataSource): Router {
@@ -269,6 +274,10 @@ export function createSellerController(dataSource: DataSource): Router {
         return res.status(401).json({ success: false, error: 'UNAUTHORIZED', message: 'Authentication required' });
       }
 
+      if (!UUID_REGEX.test(req.params.id)) {
+        return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+      }
+
       const order = await legacyNetureService.getOrder(req.params.id, userId);
       if (!order) {
         return res.status(404).json({ success: false, error: 'ORDER_NOT_FOUND', message: 'Order not found' });
@@ -298,6 +307,9 @@ export function createSellerController(dataSource: DataSource): Router {
       }
 
       const { orderId } = req.params;
+      if (!UUID_REGEX.test(orderId)) {
+        return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+      }
 
       // Verify order belongs to this user
       const order = await legacyNetureService.getOrder(orderId, userId);

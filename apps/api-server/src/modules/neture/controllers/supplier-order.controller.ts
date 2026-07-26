@@ -247,6 +247,10 @@ export function createSupplierOrderController(dataSource: DataSource): Router {
     try {
       const supplierId = (req as SupplierRequest).supplierId;
       const { orderId } = req.params;
+      // WO-O4O-NETURE-ORDER-UUID-PARAM-VALIDATION-V1: POST shipment 와 동일한 검증을 GET 에도 적용
+      if (!UUID_REGEX.test(orderId)) {
+        return res.status(400).json({ success: false, error: 'INVALID_ORDER_ID', message: 'Invalid order ID format' });
+      }
 
       const isOwner = await service.validateOwnership(orderId, supplierId);
       if (!isOwner) {
