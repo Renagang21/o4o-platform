@@ -980,10 +980,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     if (filterType === 'all' || filterType === 'course') {
       tasks.push((async () => {
+        // WO-O4O-KPA-COMMUNITY-FINAL-STABILIZATION-V1:
+        //   lms_courses 는 camelCase 인용 컬럼("instructorId"/"createdAt")을 쓰는데
+        //   snake_case(instructor_id/created_at)로 조회해 쿼리가 매번 throw 됐고,
+        //   상위 Promise.allSettled 가 이를 삼켜 **강의 탭이 항상 빈 목록**이었다
+        //   (데이터 부재가 아님 — /lms 목록에는 published 강의가 존재).
+        //   컬럼명만 실제 스키마에 맞춘다. 조회 조건·정렬·개수는 무변경.
         const rows: any[] = await dataSource.query(
-          `SELECT c.id, c.title, c.created_at, u.name AS author_name
-           FROM lms_courses c LEFT JOIN users u ON c.instructor_id = u.id
-           WHERE c.status = 'published' ORDER BY c.created_at DESC LIMIT $1`,
+          `SELECT c.id, c.title, c."createdAt" AS created_at, u.name AS author_name
+           FROM lms_courses c LEFT JOIN users u ON c."instructorId" = u.id
+           WHERE c.status = 'published' ORDER BY c."createdAt" DESC LIMIT $1`,
           [perLimit],
         );
         for (const r of rows) {
