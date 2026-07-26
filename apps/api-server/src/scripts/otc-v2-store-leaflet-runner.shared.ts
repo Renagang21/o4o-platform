@@ -69,7 +69,7 @@ function sections(content: string): Record<string, string> {
 }
 const stripTags = (s: string): string => s.replace(/<[^>]+>/g, ' ');
 /** census-v2.ts:68-78 VERBATIM */
-function normalize(s: string): string {
+export function normalize(s: string): string {
   return stripTags(s)
     .normalize('NFKC')
     .replace(/&nbsp;/g, ' ').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
@@ -116,15 +116,15 @@ const SITE_AMBIGUOUS: Record<string, string> = {
   CSI: '스프레이(구강/피부 혼재)',
 };
 
-const AUTHORED_SOURCES = ['mfds_drug_otc', 'mfds_drug_otc_nutrition_combo', 'nutrition_combo'] as const;
+export const AUTHORED_SOURCES = ['mfds_drug_otc', 'mfds_drug_otc_nutrition_combo', 'nutrition_combo'] as const;
 
 /** 빅콘에스600정 — 공식 용법 1축 부재로 HOLD_SOURCE 확정(8bab22471). 입력 차단. */
-const BLOCKED_MASTER_IDS = new Set<string>([
+export const BLOCKED_MASTER_IDS = new Set<string>([
   '96b520aa-eb65-43cd-86bf-8bf4d442f9f0',
   'ae6ada5f-a9ae-4cba-80d2-86225a56e672',
   'bf9dba11-5d9f-4c4e-8e57-ca5c6054e170',
 ]);
-const BLOCKED_FPS = new Set<string>(['44a15789a2cc1596']);
+export const BLOCKED_FPS = new Set<string>(['44a15789a2cc1596']);
 
 // ════════════════════════════════════════════════════════════════════════════════
 // 2. V2 fingerprint 재현기 — census 와 동일 입력 → 동일 출력
@@ -189,11 +189,11 @@ export interface RouteProfile {
   enForbidden: RegExp[];
 }
 
-const ORAL_VERB_RE = [/복용/g, /먹\s*(?:습니다|어요|는다)/g, /내복/g];
-const EN_ORAL_VERB_RE = [/\btake\b/gi, /\btaken\b/gi, /\bswallow\b/gi, /\borally\b/gi, /\bby mouth\b/gi];
+export const ORAL_VERB_RE = [/복용/g, /먹\s*(?:습니다|어요|는다)/g, /내복/g];
+export const EN_ORAL_VERB_RE = [/\btake\b/gi, /\btaken\b/gi, /\bswallow\b/gi, /\borally\b/gi, /\bby mouth\b/gi];
 
 /** 비경구 공통 재표현 — 동사만 바꾸고 수치·연령·횟수·기간은 건드리지 않는다. */
-const NONORAL_REWRITE: Array<[RegExp, string]> = [
+export const NONORAL_REWRITE: Array<[RegExp, string]> = [
   [/복용하기\s*전에/g, '사용하기 전에'],
   [/복용을\s*중지/g, '사용을 중지'],
   [/복용을\s*중단/g, '사용을 중단'],
@@ -356,8 +356,9 @@ export function composeKo(
   route: string,
   form: string,
   gencode: string,
+  profiles: Record<string, RouteProfile> = ROUTE_PROFILE,
 ): KoComposeResult {
-  const prof = ROUTE_PROFILE[route];
+  const prof = profiles[route];
   const anomalies: string[] = [];
   if (!prof) {
     return { source: { summaryTable: {}, efficacy: '', usage: '', usageLabel: '', caution: '' },
@@ -410,8 +411,9 @@ export function renderEn(
   t: Omit<DrugOtcEnTranslation, 'usageLabel'>,
   route: string,
   officialDosage: string,
+  profiles: Record<string, RouteProfile> = ROUTE_PROFILE,
 ): EnRenderResult {
-  const prof = ROUTE_PROFILE[route];
+  const prof = profiles[route];
   const anomalies: string[] = [];
   if (!prof) return { html: '', anomalies: [`미지원 route(${route})`] };
 
@@ -490,8 +492,8 @@ export interface ApplyLedger {
   status: Record<string, { koApplied: boolean; enApplied: boolean; independentVerified: boolean; note?: string }>;
 }
 
-export function readLedger(): ApplyLedger {
-  if (fs.existsSync(LEDGER_PATH)) return JSON.parse(fs.readFileSync(LEDGER_PATH, 'utf8')) as ApplyLedger;
+export function readLedger(ledgerPath: string = LEDGER_PATH): ApplyLedger {
+  if (fs.existsSync(ledgerPath)) return JSON.parse(fs.readFileSync(ledgerPath, 'utf8')) as ApplyLedger;
   const status: ApplyLedger['status'] = {};
   for (const s of APPLY_ORDER) status[s] = { koApplied: false, enApplied: false, independentVerified: false };
   return { wo: 'WO-O4O-OTC-REMAINING-READY-V2-SHARED-RUNNER-APPLY-SUPPORT-V1', order: [...APPLY_ORDER], status };
@@ -612,14 +614,14 @@ export function verifyGroupMasters(g: V2Group, st: TargetState): GroupVerdict {
 }
 
 /** 그룹의 KO 산출물. dry-run·apply 가 동일 결과를 써야 하므로 한 곳에서만 만든다. */
-export function buildGroupKo(g: V2Group, st: TargetState): {
+export function buildGroupKo(g: V2Group, st: TargetState, profiles: Record<string, RouteProfile> = ROUTE_PROFILE): {
   html: string; source: KoComposeResult['source'] | null; officialDosage: string; anomalies: string[];
 } {
   const anomalies: string[] = [];
   const repId = g.masterIds.find((id) => st.contentByMid.has(id));
   if (!repId) return { html: '', source: null, officialDosage: '', anomalies: ['대표 원문 없음'] };
   const ax = officialAxes(st.contentByMid.get(repId)!);
-  const ko = composeKo(ax, g.route, g.form, g.gencode);
+  const ko = composeKo(ax, g.route, g.form, g.gencode, profiles);
   anomalies.push(...ko.anomalies);
   const built = buildDrugOtcConsumerHtml(ko.source as never, { title: `${g.form} (${g.gencode})` });
   if (built.missing.length) anomalies.push(`KO 필수필드 누락 ${built.missing.join(',')}`);
