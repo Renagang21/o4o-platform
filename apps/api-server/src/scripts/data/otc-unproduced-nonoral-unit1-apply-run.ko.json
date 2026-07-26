@@ -1,0 +1,529 @@
+{
+  "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-PRODUCTION-READINESS-AND-EN-V1",
+  "track": "nonoral-unit-1",
+  "lang": "ko",
+  "mode": "apply",
+  "approvalCommit": "4f188953d",
+  "ssot": "otc-unproduced-nonoral-unit1-approved-ssot-v1.json",
+  "fingerprints": 70,
+  "masters": 443,
+  "writePlan": 1772,
+  "writeActual": 1772,
+  "writeMatch": true,
+  "preGates": {
+    "K1 SSOT status=APPROVED_FOR_PRODUCTION": true,
+    "K2 70 fp / 443 master": true,
+    "K3 authored KO canonical 0": true,
+    "K4 EN canonical 0": true,
+    "K5 easy canonical 443": true,
+    "K6 기존 LIVE 교집합 0": true,
+    "K7 HOLD 대상 혼입 0": true,
+    "K8 canonicalDup 0": true,
+    "K9 예상 KO write 1,772T": true,
+    "K10 이상 그룹 0": true
+  },
+  "postVerify": {
+    "koAuthoredCanonical": 443,
+    "easyDeprecated": 443,
+    "easyStillCanonical": 0,
+    "auditKo": 443,
+    "enCanonical": 0,
+    "needsReviewLeft": 0,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "enHangul": 0,
+    "writeActual": 1772
+  },
+  "reports": [
+    {
+      "fp": "0a73d615e9a36877",
+      "sourceRef": "11c0a41b-8676-ef20-d037-d1e034d94398",
+      "route": "topical",
+      "size": 68,
+      "t": 272
+    },
+    {
+      "fp": "713bd9cf71b4ce20",
+      "sourceRef": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+      "route": "topical",
+      "size": 46,
+      "t": 184
+    },
+    {
+      "fp": "71c52233fb91edef",
+      "sourceRef": "5e26c91d-fe37-5c91-7075-63a0a36ce4e4",
+      "route": "topical",
+      "size": 19,
+      "t": 76
+    },
+    {
+      "fp": "81e81be4178744f9",
+      "sourceRef": "de4b8811-b1f3-dffe-0dc9-04cc6949593b",
+      "route": "topical",
+      "size": 17,
+      "t": 68
+    },
+    {
+      "fp": "8828c09746b29f38",
+      "sourceRef": "acb72c6c-0e30-23db-42d4-37913b043d16",
+      "route": "topical",
+      "size": 17,
+      "t": 68
+    },
+    {
+      "fp": "248982a68b2ad690",
+      "sourceRef": "1dfa6f97-6905-c420-95ab-0610a3974ed3",
+      "route": "topical",
+      "size": 13,
+      "t": 52
+    },
+    {
+      "fp": "2e697b803cc3a553",
+      "sourceRef": "bd6eed79-d8b6-b30a-501b-069651c45392",
+      "route": "topical",
+      "size": 12,
+      "t": 48
+    },
+    {
+      "fp": "130e0c721590505f",
+      "sourceRef": "34a267d5-16a8-ff6f-8af7-2d023e6a2fcc",
+      "route": "topical",
+      "size": 11,
+      "t": 44
+    },
+    {
+      "fp": "33535a1064bbad58",
+      "sourceRef": "8c1a181e-c662-5465-3703-4b45896eb93e",
+      "route": "topical",
+      "size": 10,
+      "t": 40
+    },
+    {
+      "fp": "90765dbaea3a1ab0",
+      "sourceRef": "5f2a387e-1e1a-1b88-ed37-4dc9604dd482",
+      "route": "oromucosal",
+      "size": 10,
+      "t": 40
+    },
+    {
+      "fp": "0c9fda758be46afc",
+      "sourceRef": "98d0900e-4765-0561-cd20-e6f38376588b",
+      "route": "topical",
+      "size": 9,
+      "t": 36
+    },
+    {
+      "fp": "5bba497e94292643",
+      "sourceRef": "c96d140a-c00d-fd7b-dfa4-cbc526eeb5b0",
+      "route": "topical",
+      "size": 9,
+      "t": 36
+    },
+    {
+      "fp": "7d278a24d227c451",
+      "sourceRef": "ef309ce9-395c-459d-3215-dcbd783fa4de",
+      "route": "topical",
+      "size": 9,
+      "t": 36
+    },
+    {
+      "fp": "91a8f5a3c2097654",
+      "sourceRef": "a535b814-5662-f9e2-1b07-5427b568626d",
+      "route": "topical",
+      "size": 9,
+      "t": 36
+    },
+    {
+      "fp": "d8c7b73753dfb033",
+      "sourceRef": "8da829fe-d3d9-01d5-30a5-ef3d38a5ae42",
+      "route": "oromucosal",
+      "size": 9,
+      "t": 36
+    },
+    {
+      "fp": "456783b15f8909e9",
+      "sourceRef": "d9cee067-c2dd-aecc-e52a-5d7b8daa75b4",
+      "route": "vaginal",
+      "size": 6,
+      "t": 24
+    },
+    {
+      "fp": "6556faea04cc13b3",
+      "sourceRef": "4d1b799c-dcc7-c7f8-49e4-38c939db05c7",
+      "route": "topical",
+      "size": 6,
+      "t": 24
+    },
+    {
+      "fp": "71548c12c7eb10f1",
+      "sourceRef": "85216f73-849f-0962-f4e4-2dacc012391a",
+      "route": "topical",
+      "size": 6,
+      "t": 24
+    },
+    {
+      "fp": "1c33b712e12bf68c",
+      "sourceRef": "bd51ef10-4404-f001-9a47-da3afc958415",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "4b7006113fd29d95",
+      "sourceRef": "3f6e2981-4c14-d495-428b-c25dca30ecbb",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "4f55e332ebb1f301",
+      "sourceRef": "75951e11-1f9e-d300-dd00-3912def8cdc6",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "6feec6603464312d",
+      "sourceRef": "0270a54c-60b1-0c0e-25d3-5e879d407bf5",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "8f5f35929f858d9d",
+      "sourceRef": "d6d7f963-528b-eb4a-5c16-d63ec63075c5",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "dcad5a5e64ef5bcf",
+      "sourceRef": "012a2a83-d937-ebb1-46a0-7f6e8676280a",
+      "route": "oromucosal",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "df28ec6c8f9b9faf",
+      "sourceRef": "666e6366-b2ff-283b-de76-65b467186a44",
+      "route": "topical",
+      "size": 5,
+      "t": 20
+    },
+    {
+      "fp": "2d5b130e0035e8e6",
+      "sourceRef": "1d3addaf-1fd2-758d-5518-b479fca23a49",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "384dd85d7c9d4ab1",
+      "sourceRef": "4a59bf78-2abb-6cda-d79d-db07ec6591c8",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "502f7e7803703459",
+      "sourceRef": "81bf7337-b08f-850e-8eb8-53c30fca2220",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "66d7698ffae52396",
+      "sourceRef": "5c9ffa5a-2a7b-ad5c-77bb-5398afb19676",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "81bb3b7083ad11c4",
+      "sourceRef": "e68db88c-6a6d-1ea5-c736-050317a5debd",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "a4cf00b953703bcb",
+      "sourceRef": "7c58fc4c-334e-4fbb-4102-cd61be3ef763",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "b8c1a9bf654cc52c",
+      "sourceRef": "a37d9532-f1a3-af91-553f-a365bc669e1f",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "bb422e8b5b99d426",
+      "sourceRef": "dac2becc-1095-9832-6e5f-7d850e76d7e1",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "ebcc7dd033d83737",
+      "sourceRef": "f0d14808-a1d5-b36d-061b-86a9e5e2718c",
+      "route": "topical",
+      "size": 4,
+      "t": 16
+    },
+    {
+      "fp": "048cc50a09e53860",
+      "sourceRef": "a7328816-d564-5356-1886-2190bbd83902",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "0c1b08d4a378c3e3",
+      "sourceRef": "3bc03746-af2b-fbe6-2617-b05d963fc500",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "18f6046fcc71999e",
+      "sourceRef": "b0f9b3e9-3b8d-3e48-b4e3-4717418d9254",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "527c326e572114a7",
+      "sourceRef": "fcfe487c-9439-c5c0-4a6b-6622f569a9ed",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "5f4235b8d0c8676a",
+      "sourceRef": "f5f4a948-85f0-0a91-99f3-165c46b209be",
+      "route": "vaginal",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "6a16edf177c8be74",
+      "sourceRef": "257094ac-b458-0939-2d31-34380a5c384e",
+      "route": "vaginal",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "b0b1242f1726ea1f",
+      "sourceRef": "dc4ad2fa-ddae-768c-4181-246e4b548058",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "c9659ddcc4c144bf",
+      "sourceRef": "7f74dd39-82d5-6478-aaf4-2320d2c21d3a",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "cac0945b55517f16",
+      "sourceRef": "0468c782-4ecd-a706-e594-cba684dab46e",
+      "route": "vaginal",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "d836e36b79a92957",
+      "sourceRef": "3da323c9-2f05-0b13-4566-c2a2a2294a6e",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "e359930baf19f65f",
+      "sourceRef": "a92ae1b0-a77d-741b-209b-8b8a7870e31a",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "e59814f802ce6f0f",
+      "sourceRef": "f02147ae-5253-7c77-ad96-92eafebc03ae",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "ec33a1e1da5b38a0",
+      "sourceRef": "1d8ff817-f865-0b6e-44ce-a20e3745aaa6",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "f59b7b1c2e80a7d2",
+      "sourceRef": "eb76aca2-91cb-9b72-deba-1d875a54df81",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "ff115a9ae4db473a",
+      "sourceRef": "d524f4b0-6d93-f784-7266-05216f407905",
+      "route": "topical",
+      "size": 3,
+      "t": 12
+    },
+    {
+      "fp": "075b7d9ba048443b",
+      "sourceRef": "32459b81-71e7-5fd9-d0b5-733304d5c211",
+      "route": "vaginal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "1841a94833c49604",
+      "sourceRef": "07a702e3-5d7f-1a36-4d30-1bf51932061a",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "321adcea63d19542",
+      "sourceRef": "f04dde02-a5e3-a7e2-d0f5-e36a83602358",
+      "route": "oromucosal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "3fffa5590382e1eb",
+      "sourceRef": "b77bc923-5667-1610-7fb9-446065c49a33",
+      "route": "vaginal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "5aeeb9c287b0796d",
+      "sourceRef": "c7197c5c-6877-b80a-7148-2c16e880a789",
+      "route": "oromucosal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "6b024e15ec2c1704",
+      "sourceRef": "6c58f33d-feb7-3f79-d66e-9a24d9797eda",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "75fc816ef7758b02",
+      "sourceRef": "b3c1c3b0-b904-33ed-050d-5f088b5e0443",
+      "route": "vaginal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "7e3bb7c8a23c4deb",
+      "sourceRef": "e059ee8c-6068-2fca-4316-b26648d93981",
+      "route": "oromucosal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "8137728114ad6559",
+      "sourceRef": "f06fabd9-ad98-3086-ab38-419e116d8df7",
+      "route": "oromucosal",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "815a8b88b3498ef2",
+      "sourceRef": "5b53b5c1-e947-0f18-c379-48d788a0fd34",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "87833d620456daf7",
+      "sourceRef": "35634859-cf9b-6add-5469-4207552d28fa",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "882bb1ca3b3fb441",
+      "sourceRef": "068c8cc7-5cf6-3a1c-ff78-916dd98b04f4",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "8c16f5460ed1a751",
+      "sourceRef": "e467bef3-1848-9756-42a5-6041abb606df",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "8c661c49e6582823",
+      "sourceRef": "cf91386e-514f-86cf-1b70-2890c2fef026",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "a5642ede188c68f6",
+      "sourceRef": "c0e56b9b-4a38-0319-6a8f-cdf1e38f69d9",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "aaad3eb9fc5b3341",
+      "sourceRef": "6342de06-e318-7cbc-6ea4-41f2951a12c4",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "adf3c63a90a05189",
+      "sourceRef": "a798cff8-5c72-44f4-7692-d6b3ef33a87e",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "b918e02d846e4065",
+      "sourceRef": "ba962d19-8d9c-2f34-d8f3-ba0366c82653",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "bf4a061b1a6254d6",
+      "sourceRef": "6d00e4d4-a3a0-55e2-3325-0768ec8b35a5",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "e632d571ca052291",
+      "sourceRef": "8967daa2-63c7-8b46-54e1-2f38b1103d98",
+      "route": "topical",
+      "size": 2,
+      "t": 8
+    },
+    {
+      "fp": "6d103adbbad1f104",
+      "sourceRef": "fd841b15-7efe-b0d9-898c-958379b9d1b5",
+      "route": "topical",
+      "size": 1,
+      "t": 4
+    }
+  ]
+}

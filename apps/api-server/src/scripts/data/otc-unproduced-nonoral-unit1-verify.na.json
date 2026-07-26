@@ -12,15 +12,14 @@
     "en": 886,
     "total": 2658
   },
-  "state": "PRE_APPLY",
-  "note": "apply 전 실행이므로 ko/en canonical 계열은 0 이 정상이다. GREEN 판정은 apply 후 실행 결과로만 한다.",
+  "state": "APPLIED",
   "values": {
     "targetMasters": 443,
-    "koAuthoredCanonical": 0,
-    "enCanonical": 0,
-    "easyDeprecated": 0,
-    "easyStillCanonical": 443,
-    "auditKo": 0,
+    "koAuthoredCanonical": 443,
+    "enCanonical": 443,
+    "easyDeprecated": 443,
+    "easyStillCanonical": 0,
+    "auditKo": 443,
     "needsReviewLeft": 0,
     "canonicalDup": 0,
     "sourceRefLeak": 0,
@@ -38,33 +37,33 @@
     },
     {
       "name": "koAuthoredCanonical",
-      "actual": 0,
+      "actual": 443,
       "expected": 443,
-      "pass": false
+      "pass": true
     },
     {
       "name": "enCanonical",
-      "actual": 0,
+      "actual": 443,
       "expected": 443,
-      "pass": false
+      "pass": true
     },
     {
       "name": "easyDeprecated",
-      "actual": 0,
+      "actual": 443,
       "expected": 443,
-      "pass": false
+      "pass": true
     },
     {
       "name": "easyStillCanonical",
-      "actual": 443,
+      "actual": 0,
       "expected": 0,
-      "pass": false
+      "pass": true
     },
     {
       "name": "auditKo",
-      "actual": 0,
+      "actual": 443,
       "expected": 443,
-      "pass": false
+      "pass": true
     },
     {
       "name": "needsReviewLeft",
@@ -103,7 +102,7 @@
       "pass": true
     }
   ],
-  "allPass": false,
+  "allPass": true,
   "priorLiveInvariant": {
     "authoredCanonicalOutsideUnit": 10696,
     "note": "apply 전후 동일해야 한다(본 단위 밖 write 0 증거). 스냅샷 비교는 apply 후 재실행으로 수행."

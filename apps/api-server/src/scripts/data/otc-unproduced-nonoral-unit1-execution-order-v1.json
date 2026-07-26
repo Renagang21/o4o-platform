@@ -69,5 +69,78 @@
     },
     "G3_sumMatch": true,
     "G4_dbWrite": 0
+  },
+  "executionStatus": {
+    "note": "집행 상태 기록(추가 블록). 위 승인 선언·게이트 수치는 변경하지 않는다. 기록 주체=agent-na(단일 write-owner).",
+    "wo": "WO-O4O-OTC-UNPRODUCED-NONORAL-UNIT1-FINAL-PRODUCTION-V1",
+    "units": [
+      {
+        "unitId": "nonoral-unit-1",
+        "state": "GREEN",
+        "writeOwner": "agent-na",
+        "applied": {
+          "ko": 1772,
+          "en": 886,
+          "total": 2658
+        },
+        "declared": {
+          "ko": 1772,
+          "en": 886,
+          "total": 2658
+        },
+        "independentVerify": {
+          "allPass": true,
+          "checks": 12,
+          "state": "APPLIED"
+        },
+        "inTxPostVerify": {
+          "ko": {
+            "koAuthoredCanonical": 443,
+            "easyDeprecated": 443,
+            "easyStillCanonical": 0,
+            "auditKo": 443,
+            "enCanonical": 0,
+            "needsReviewLeft": 0,
+            "canonicalDup": 0,
+            "sourceRefLeak": 0,
+            "enHangul": 0,
+            "writeActual": 1772
+          },
+          "en": {
+            "koAuthoredCanonical": 443,
+            "easyDeprecated": 443,
+            "easyStillCanonical": 0,
+            "auditKo": 443,
+            "enCanonical": 443,
+            "needsReviewLeft": 0,
+            "canonicalDup": 0,
+            "sourceRefLeak": 0,
+            "enHangul": 0,
+            "writeActual": 886
+          }
+        },
+        "priorLiveInvariant": {
+          "authoredCanonicalOutsideUnit": 10696,
+          "unchanged": true
+        },
+        "evidence": [
+          "otc-unproduced-nonoral-unit1-apply-run.ko.json",
+          "otc-unproduced-nonoral-unit1-apply-run.en.json",
+          "otc-unproduced-nonoral-unit1-verify.na.json",
+          "otc-unproduced-nonoral-unit1-dryrun.na.json"
+        ]
+      },
+      {
+        "unitId": "nonoral-unit-2",
+        "state": "UNBLOCKED",
+        "precondition": "nonoral-unit-1 GREEN 충족",
+        "routes": [
+          "ophthalmic"
+        ],
+        "fingerprints": 34,
+        "masters": 159,
+        "note": "착수 조건 해제. 본 WO 범위에서 점안 Unit 2 LIVE apply 는 수행하지 않는다. write-owner 지정·ophthalmic RouteProfile 반영은 별도 WO."
+      }
+    ]
   }
 }
