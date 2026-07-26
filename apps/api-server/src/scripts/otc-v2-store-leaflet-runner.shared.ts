@@ -309,18 +309,58 @@ const EN_NUM_WORDS: Record<string, string[]> = {
  */
 const EN_NUM_RANGE_HYPHEN = /(\d)\s*[-–—]\s*(\d)/g;
 
+const NUM_UNIT = '(?:세|개월|주|일|회|정|캡슐|포|매|방울|밀리그램|밀리리터|그램|시간|년|mg|ml|g|%|iu)';
+
+/**
+ * 범위 표기 인식 — `200-600 mg` 은 끝값 두 개이지 `200600` 이라는 한 값이 아니다.
+ *
+ * 위 하이픈 치환으로도 **원문이 이미 쉼표로 기록된 경우**(승인 SSOT 의 official 은 정규화 후 값이라
+ * `200,600` · `3,4` 형태로 저장돼 있다)는 남는다. 이를 한 숫자로 요구하면 EN 에 존재하지 않는
+ * 용량(200600 mg)을 쓰라고 강요하게 된다 — 실사례: 이부프로펜 2 그룹.
+ *
+ * 그래서 요구사항을 "값 하나"가 아니라 **대안 집합**으로 만든다.
+ *  · `A~B` / `A-B` / `A–B`      → 범위 확정. **A 와 B 를 모두** 요구(예전엔 B 만 봤으므로 더 엄격해진다).
+ *  · `A,B` 이고 B 가 3자리      → 천단위(1,000)와 범위(200,600)는 어휘로 구분되지 않는다.
+ *                                 결합값 `AB` **또는** 양 끝값 `A`+`B` 중 하나를 만족해야 한다.
+ *  · `A,B` 이고 B 가 3자리 아님  → 범위 확정(3,4 · 30,40). **A 와 B 모두** 요구.
+ * 어떤 경우에도 검사를 건너뛰지 않는다 — 만족하는 대안이 하나도 없으면 FAIL 이다.
+ */
 export function missingNumericsEn(official: string, en: string): string[] {
   const lower = ' ' + en.toLowerCase().replace(/\s+/g, ' ') + ' ';
-  const vals = new Set<string>();
-  const re = /(\d+(?:[.,]\d+)?)\s*(세|개월|주|일|회|정|캡슐|포|매|방울|밀리그램|밀리리터|그램|시간|년|mg|ml|g|%|iu)/gi;
-  const t = normalize(official.replace(EN_NUM_RANGE_HYPHEN, '$1 ~ $2'));
-  let m: RegExpExecArray | null;
-  while ((m = re.exec(t))) vals.add(m[1].replace(/,/g, ''));
-  return [...vals].sort().filter((v) => {
+  const present = (v: string): boolean => {
     const esc = v.replace('.', '\\.');
-    if (new RegExp(`(?:^|[^\\d])${esc}(?:[^\\d]|$)`).test(lower)) return false;
-    return !(EN_NUM_WORDS[v] || []).some((w) => lower.includes(w));
-  });
+    if (new RegExp(`(?:^|[^\\d.])${esc}(?:[^\\d.]|$)`).test(lower)) return true;
+    return (EN_NUM_WORDS[v] || []).some((w) => lower.includes(w));
+  };
+  const t = normalize(official.replace(EN_NUM_RANGE_HYPHEN, '$1 ~ $2'));
+  const reqs: Array<{ label: string; alts: string[][] }> = [];
+  const seen = new Set<string>();
+  const spans: Array<[number, number]> = [];
+  const covered = (i: number): boolean => spans.some(([s, e]) => i >= s && i < e);
+  const add = (label: string, alts: string[][]): void => {
+    if (seen.has(label)) return;
+    seen.add(label); reqs.push({ label, alts });
+  };
+  let m: RegExpExecArray | null;
+
+  // 1) 명시적 범위 기호 — 양 끝값 모두 필수
+  const rangeRe = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*[-–—~]\\s*(\\d+(?:\\.\\d+)?)\\s*${NUM_UNIT}`, 'gi');
+  while ((m = rangeRe.exec(t))) { add(`${m[1]}~${m[2]}`, [[m[1], m[2]]]); spans.push([m.index, m.index + m[0].length]); }
+
+  // 2) 쉼표 결합 — 천단위/범위 모호성을 대안 집합으로 해소
+  const commaRe = new RegExp(`(\\d+)\\s*,\\s*(\\d+)\\s*${NUM_UNIT}`, 'gi');
+  while ((m = commaRe.exec(t))) {
+    if (covered(m.index)) continue;
+    const a = m[1], b = m[2];
+    add(`${a},${b}`, b.length === 3 ? [[a + b], [a, b]] : [[a, b]]);
+    spans.push([m.index, m.index + m[0].length]);
+  }
+
+  // 3) 단일 수치
+  const singleRe = new RegExp(`(\\d+(?:\\.\\d+)?)\\s*${NUM_UNIT}`, 'gi');
+  while ((m = singleRe.exec(t))) { if (!covered(m.index)) add(m[1], [[m[1]]]); }
+
+  return reqs.filter((r) => !r.alts.some((g) => g.every(present))).map((r) => r.label).sort();
 }
 
 // ════════════════════════════════════════════════════════════════════════════════
@@ -730,6 +770,27 @@ function selfTest(): void {
   if (fpToUuidV2('abc') === `${md5('otc-combo-leaflet:abc').slice(0, 8)}-${md5('otc-combo-leaflet:abc').slice(8, 12)}-${md5('otc-combo-leaflet:abc').slice(12, 16)}-${md5('otc-combo-leaflet:abc').slice(16, 20)}-${md5('otc-combo-leaflet:abc').slice(20, 32)}`) {
     fail.push('V1 앵커와 충돌');
   }
+
+  // (7-B) EN 수량 게이트 — 범위 표기 인식 회귀 (WO 지정 시험 전건)
+  const numOk = (off: string, en: string): boolean => missingNumericsEn(off, en).length === 0;
+  if (!numOk('200-600 mg', 'Take 200 to 600 mg.')) fail.push('범위 200-600: 양끝 모두 있는데 FAIL');
+  if (!numOk('200~600 mg', 'Take 200 to 600 mg.')) fail.push('범위 200~600: 양끝 모두 있는데 FAIL');
+  if (!numOk('200–600 mg', 'Take 200 to 600 mg.')) fail.push('범위 200–600(en dash): 양끝 모두 있는데 FAIL');
+  if (!numOk('200,600 mg', 'Take 200 to 600 mg.')) fail.push('쉼표 범위 200,600: 양끝 모두 있는데 FAIL');
+  if (!numOk('체중 kg당 30-40 mg', 'Give 30 to 40 mg per kg.')) fail.push('범위 30-40 mg/kg FAIL');
+  if (!numOk('체중 kg당 30,40 mg', 'Give 30 to 40 mg per kg.')) fail.push('쉼표 범위 30,40 mg/kg FAIL');
+  if (!numOk('1일 3-4회', 'Take it 3 to 4 times a day.')) fail.push('범위 3-4회 FAIL');
+  if (!numOk('1일 3,4회', 'Take it 3 to 4 times a day.')) fail.push('쉼표 범위 3,4회 FAIL');
+  if (!numOk('1일 최고 1,000 mg', 'Up to 1000 mg a day.')) fail.push('천단위 1,000 처리 FAIL');
+  if (!numOk('1일 최고 4,000 mg', 'Up to 4000 mg a day.')) fail.push('천단위 4,000 처리 FAIL');
+  if (!numOk('1일 최고 1,200 mg', 'Up to 1200 mg a day.')) fail.push('천단위 1,200 처리 FAIL');
+  if (!numOk('1일 최고 3,200 mg', 'Up to 3200 mg a day.')) fail.push('천단위 3,200 처리 FAIL');
+  // 범위 한쪽 끝값이 빠지면 반드시 FAIL (게이트가 느슨해지지 않았음을 증명)
+  if (numOk('200-600 mg', 'Take 600 mg.')) fail.push('범위 좌측 끝값 누락인데 PASS');
+  if (numOk('200,600 mg', 'Take 200 mg.')) fail.push('쉼표 범위 우측 끝값 누락인데 PASS');
+  if (numOk('체중 kg당 30,40 mg', 'Give 30 mg per kg.')) fail.push('30,40 우측 누락인데 PASS');
+  if (numOk('1일 최고 4,000 mg', 'Up to 500 mg a day.')) fail.push('천단위 값 누락인데 PASS');
+  if (numOk('300 mg 함유', 'Take one tablet.')) fail.push('단일 수치 300 누락인데 PASS');
 
   // (8) apply 순서 게이트 — 앞 shard 독립검증 없이 다음 shard 진행 불가
   const freshLedger: ApplyLedger = { wo: 'test', order: ['ga', 'na', 'da'],
