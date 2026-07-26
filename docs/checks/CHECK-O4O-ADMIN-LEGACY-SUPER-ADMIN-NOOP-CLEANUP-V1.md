@@ -87,7 +87,32 @@ WO 가 금지한 대상을 `git diff` 로 검증했다 — **전부 무변경**.
 
 본 변경은 api-server 실행 코드에 포함되므로 배포가 필요하다.
 
-<!-- DEPLOY -->
+| 항목 | 값 |
+|------|-----|
+| commit | `a0b0c89d8` |
+| workflow | `Deploy API Server (Cloud Run)` run `30190696677` — conclusion **success** |
+| 배포 image | `…/api-server:a0b0c89d898a2a5ea553a0500501ca5aa61bc173` |
+| commit 일치 | **PASS** |
+
+### 6-1. 배포 후 무회귀 smoke (read-only GET)
+
+정리한 4건 중 실경로가 있는 2건(`media-library`, `roles.routes`)을 두 역할 유형으로 교차 검증했다.
+
+| 경로 | `renariver21` (platform:super_admin 단독) | `sohae2100` (서비스 admin/operator 9종) |
+|------|:---:|:---:|
+| `/api/v1/platform/media-library` | **200** | **200** |
+| `/api/v1/operator/roles` | **200** | **200** |
+| `/api/v1/admin/platform-accounts` | **200** | **403** |
+
+**해석:**
+
+- `media-library` — `includes('super_admin')` 제거 후에도 **`platform:super_admin` 단독 계정이 200**.
+  남은 `includes('admin')` 이 `'platform:super_admin'` 을 부분문자열로 커버함을 실증(§2-1 근거 확인).
+- `roles.routes` — 무접두 `'super_admin'` 제거 후에도 양쪽 200. prefixed 항목이 실동작을 담당함을 확인.
+- `platform-accounts` — 200/403 대비로 **권한 경계가 그대로 유지**됨을 확인(cutover 결과 무손상).
+
+`guide.controller` / `product-access.utils` 는 완전일치 매칭 + 보유자 0명이라 판정이 구조적으로
+불변이므로 별도 라이브 probe 를 수행하지 않았다.
 
 ## 7. 커밋
 
