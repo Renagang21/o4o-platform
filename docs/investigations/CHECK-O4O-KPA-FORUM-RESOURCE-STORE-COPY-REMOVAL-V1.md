@@ -143,31 +143,69 @@ WO §10(기존 사본 유지)을 지키기 위해 **차단은 resolver 에서만
 
 ## 11. 브라우저 · API smoke
 
-⏭️ **배포 후 수행.**
+**배포:** Deploy Web Services ✅ success · Deploy API Server ✅ success (`ab4c31b53`)
 
-### API 우회 검증 (WO §13)
+### 11-1. 화면 검증 (비로그인 상태에서 수행)
 
-| 요청 | 기대 |
-|------|------|
-| `copy { assetType:'forum' }` | **400 INVALID_ASSET_TYPE** |
-| `copy { assetType:'resource', 자료실 id }` | **404 SOURCE_NOT_FOUND** |
-| `copy { assetType:'content', 자료실 id }` (우회) | **404 SOURCE_NOT_FOUND** |
-| `copy { assetType:'content', 문서형 id }` | **201 정상** |
-| `copy { assetType:'signage', media id }` | 정상(데이터 있을 때) |
-| `GET /assets?type=resource` | **200** (기존 사본 조회 호환) |
+| # | 화면 | 결과 | 근거 |
+|---|------|:----:|------|
+| 1 | `/content/resources` (자료실) | ✅ **PASS** | 자료 3건 정상 렌더, **행 액션 메뉴 자체가 없음**(마지막 셀 버튼 0), 페이지 전체에 가져가기 문자열 0 |
+| 2 | `/content/documents` (문서형, 회귀) | ✅ **PASS** | 동일 컴포넌트인데 마지막 셀에 **액션 버튼 1개 유지** → `isResource` 분기만 동작, 문서형 회귀 없음 |
+| 3 | `/resources` (자료실 허브) | ✅ **PASS** (단, §11-2 주의) | 페이지·검색·자료 3건 정상, 오류 문구 없음 |
 
-### 화면 검증
+> #1 과 #2 는 **같은 파일(ContentDocumentsPage)** 이 subType 만 달리 렌더한 결과를 직접 비교한 것이라, 제거가 자료실에만 적용됐음을 보여주는 가장 강한 증거다.
+
+### 11-2. `/resources` 에 남아 있는 "가져가기" 버튼 — 매장 복사 아님 (확인 완료)
+
+smoke 중 `/resources` 자료 행마다 **"가져가기" 버튼이 남아 있는 것**을 발견해 원인을 추적했다.
+
+공용 `ResourcesHubTemplate` 의 이 버튼은 **두 동작 겸용**이다
+([ResourcesHubTemplate.tsx:666-694](../../packages/shared-space-ui/src/ResourcesHubTemplate.tsx#L666-L694)):
 
 ```
-/resources           가져가기 버튼 0, 다운로드·외부링크·검색·상세 정상
-/content/resources   행/Drawer/일괄 가져가기 0, 목록·검색·상세 정상
-/content             가져가기 정상(회귀)
-/content/documents   가져가기 정상(회귀)
-/forum               작성·댓글·상세 정상(회귀)
-/store/library/resources  기존 자료 사본 조회 정상
+isStoreTarget = !!config.onCopyToStore && reusable_policy !== 'restricted'
+  true  → config.onCopyToStore(row.id)   ← 매장 자료함 복사
+  false → handleTakeAction(row, e)       ← 자료 이용
 ```
 
-> 테스트로 사본을 생성했다면 ID 를 기록하고 검증 후 정리한다.
+본 WO 에서 `onCopyToStore` 를 제거해 **`isStoreTarget` 이 항상 false** 가 되었고, 버튼은
+`handleTakeAction` — **외부 링크 열기 / 다운로드 / 본문 클립보드 복사** 로만 동작한다
+(`assetSnapshotApi` 미호출). 즉 **매장 복사 경로는 제거되었고**, 남은 동작은 WO §8 이
+"유지하라"고 명시한 자료 이용 기능이다.
+
+⚠️ **라벨 혼동 가능성(후속 권장):** 자료 이용 액션의 라벨이 "가져가기" 라서 매장 복사로
+오인될 수 있다. 다만 이 라벨은 **공용 템플릿의 기존 동작**이며 GlycoPharm·K-Cosmetics 도
+같은 템플릿을 쓰므로, 본 WO 범위(§11 "공통 UI 변경 금지" · 중지 조건 "공용 컴포넌트 변경이
+다른 서비스에 영향")에서 변경하지 않았다. 라벨 정비는 별도 작업 대상.
+
+### 11-3. 미검증 항목 (세션 확보 실패)
+
+**인증이 필요한 API 우회 검증(WO §13)을 수행하지 못했다.**
+
+| 미검증 | 기대값(코드 근거) |
+|--------|------------------|
+| `copy { assetType:'forum' }` | 400 INVALID_ASSET_TYPE (허용 목록 미등록) |
+| `copy { assetType:'resource', 자료실 id }` | 404 SOURCE_NOT_FOUND (resolve 분기 제거) |
+| `copy { assetType:'content', 자료실 id }` 우회 | 404 SOURCE_NOT_FOUND (sub_type 필터) |
+| `copy { assetType:'content', 문서형 id }` | 201 정상 |
+| `GET /assets?type=resource` | 200 (기존 사본 조회 호환) |
+| `/forum` 작성·댓글 회귀 / 기존 사본 조회 회귀 | 정상 |
+
+**사유:** Playwright MCP 브라우저 프로필이 반복적으로 잠기고(`Browser is already in use`)
+강제 종료를 되풀이하는 과정에서 로그인 세션이 유실됐다. 재로그인은 성공했으나
+(`/admin` 리다이렉트 확인) 이 배포는 **access token 을 localStorage 에 남기지 않고
+메모리에 보관**하며 인증 쿠키는 `api.neture.co.kr` 도메인의 httpOnly 라, 페이지
+`evaluate` 에서 인증 요청을 재현할 수 없었다. 전체 리로드 시 토큰이 사라져
+`/store/library/resources` 는 `/login` 으로 리다이렉트됐다.
+
+→ **추정으로 PASS 처리하지 않고 미검증으로 남긴다.** 서버 차단은 §4 의 코드 경로
+(resolve 분기 제거 + sub_type 필터)로만 확인된 상태이며, 인증 세션이 안정된 환경에서
+1회 재확인을 권장한다.
+
+### 11-4. 테스트 데이터
+
+**검증 과정에서 사본을 생성하지 않았다**(copy 요청이 인증 실패로 서버에 도달하지 않음).
+정리할 테스트 데이터 없음.
 
 ---
 
