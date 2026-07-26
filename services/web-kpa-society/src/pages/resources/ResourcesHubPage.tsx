@@ -150,7 +150,10 @@ function useKpaResourcesConfig(
     //   자료실은 다운로드·외부 링크·첨부파일 이용 영역이다.
     //   (기존 WO-O4O-RESOURCES-LIBRARY-IMPORT-FLOW-V1 의 onCopyToStore 경로 제거.
     //    서버도 KpaAssetResolver 에서 'resource' 복사를 거부한다 — 404 SOURCE_NOT_FOUND.)
-    //   onCopyToStore 미전달 → 템플릿이 가져가기 액션을 렌더하지 않는다.
+    //   onCopyToStore 미전달 → 템플릿 버튼이 매장 복사 대신 자료 이용(handleTakeAction:
+    //   링크 열기 / 파일 링크 복사 / 내용 복사)만 수행한다. 버튼 자체는 계속 렌더되며,
+    //   라벨은 WO-O4O-KPA-RESOURCE-ACTION-LABEL-SEMANTIC-ALIGNMENT-V1 에서 실제 동작에 맞춰
+    //   유형별로 표시한다. (이전 주석의 "액션을 렌더하지 않는다" 는 부정확 — 정정)
 
     emptyMessage: '등록된 자료가 없습니다.',
     emptyFilteredMessage: '검색 결과가 없습니다.',

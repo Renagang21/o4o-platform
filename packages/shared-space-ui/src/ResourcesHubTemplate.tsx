@@ -158,6 +158,28 @@ function formatDate(dateStr: string): string {
   return `${y}.${m}.${day}`;
 }
 
+/**
+ * WO-O4O-KPA-RESOURCE-ACTION-LABEL-SEMANTIC-ALIGNMENT-V1
+ *
+ * 행/카드 버튼 라벨을 **handleTakeAction 의 실제 실행 분기와 동일한 기준**으로 계산한다.
+ * 기존에는 유형과 무관하게 '가져가기' 고정이라 매장 복사로 오인될 수 있었다.
+ *
+ * 실행 분기(handleTakeAction) ↔ 라벨 대응:
+ *   external → window.open(url)                      → '링크 열기'
+ *   download → writeClipboard(source_url)            → '파일 링크 복사'
+ *              ※ 파일을 내려받지 않고 **링크를 클립보드에 복사**한다. 따라서 '다운로드'
+ *                라벨은 실제 동작과 어긋난다(실제 다운로드는 Drawer 하단 버튼이 수행).
+ *   copy/view → writeClipboard(본문 텍스트)           → '내용 복사'
+ *
+ * 서비스별 분기는 두지 않는다 — 모든 소비처가 같은 handleTakeAction 을 쓰므로
+ * 동작 기준 계산만으로 4개 서비스(KPA/GlycoPharm/K-Cosmetics/Neture) 라벨이 정합된다.
+ */
+function getTakeLabel(at: 'view' | 'download' | 'external' | 'copy'): string {
+  if (at === 'external') return '링크 열기';
+  if (at === 'download') return '파일 링크 복사';
+  return '내용 복사';
+}
+
 /** actionType 파생: 명시 값 우선, 없으면 source_type/source_url에서 추론 */
 function getActionType(item: ResourcesHubItem): 'view' | 'download' | 'external' | 'copy' {
   if (item.actionType) return item.actionType;
@@ -669,12 +691,15 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
           // 그 외(일반 사용자 / restricted 자료) 는 기존 handleTakeAction(클립보드 복사) 유지.
           const isCopied = copiedId === row.id;
           const isStoreTarget = !!config.onCopyToStore && row.reusable_policy !== 'restricted';
+          // WO-O4O-KPA-RESOURCE-ACTION-LABEL-SEMANTIC-ALIGNMENT-V1:
+          //   download 는 파일을 내려받지 않고 링크를 클립보드에 복사하므로 Download 아이콘이
+          //   실제 동작과 어긋난다 → 기존 아이콘 세트 안에서 Copy 로 정렬.
           const takeIcon = isStoreTarget ? null
             : actionType === 'external' ? <ExternalLink size={12} />
-            : actionType === 'download' ? <Download size={12} />
-            : actionType === 'copy' ? <Copy size={12} />
-            : null;
-          const takeLabel = isCopied ? '복사됨!' : '가져가기';
+            : <Copy size={12} />;
+          const takeLabel = isCopied ? '복사됨!'
+            : isStoreTarget ? '가져가기'
+            : getTakeLabel(actionType);
 
           return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 6, justifyContent: 'center' }}>
@@ -894,12 +919,13 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
                             }}
                             style={{ ...st.actionBtn, ...(isCopied ? { background: '#D1FAE5', color: '#065F46' } : {}) }}
                           >
+                            {/* WO-O4O-KPA-RESOURCE-ACTION-LABEL-SEMANTIC-ALIGNMENT-V1: 데스크톱 행과 동일 기준 */}
                             {isStoreTargetCard ? null
                               : actionType === 'external' ? <ExternalLink size={12} />
-                              : actionType === 'download' ? <Download size={12} />
-                              : actionType === 'copy' ? <Copy size={12} />
-                              : null}
-                            {isCopied ? '복사됨!' : '가져가기'}
+                              : <Copy size={12} />}
+                            {isCopied ? '복사됨!'
+                              : isStoreTargetCard ? '가져가기'
+                              : getTakeLabel(actionType)}
                           </button>
                         </div>
                       </div>
