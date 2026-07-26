@@ -1,0 +1,341 @@
+{
+ "batch": 3,
+ "groups": [
+  {
+   "fp": "cb4202e09decee8a",
+   "title": "Analgesic Tablet for Neuralgia",
+   "efficacy": "This medicine is used for neuralgia, low back pain and stiff shoulders.",
+   "usage": "For adults, 1 to 2 tablets 2 times a day, when pain or an attack occurs.",
+   "caution": "Before taking it, consult a doctor or pharmacist if you have an allergic constitution, have experienced allergic symptoms from a medicine such as fever, rash, joint pain, asthma or itching, if the person is an infant, young child or child aged 14 years or under who has or is suspected of having chickenpox or influenza, or if you are pregnant or may be pregnant. If there is no improvement after taking it several times, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Neuralgia, low back pain, stiff shoulders",
+    "Check with a pharmacist": "Age 14 years or under with chickenpox or influenza; pregnancy; allergic constitution"
+   }
+  },
+  {
+   "fp": "e79f8fec629767b0",
+   "title": "Expectorant Capsule",
+   "efficacy": "This medicine is used for difficulty bringing up phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis.",
+   "usage": "For acute disease, adults take 1 capsule (200 mg) 3 times a day and children aged 6 to 14 years take 1 capsule (200 mg) 2 times a day, before meals with a small amount of water. For chronic disease, adults take 1 capsule (200 mg) 2 times a day and children aged 6 to 14 years take 1/2 capsule (100 mg) 3 times a day, before meals with a small amount of water. For cystic fibrosis, people aged 6 years and over take 1 capsule (200 mg) 3 times a day, before meals with a small amount of water.",
+   "caution": "This medicine contains aspartame, which is metabolised to phenylalanine in the body, so it must not be taken by people with phenylketonuria who need to restrict phenylalanine intake. Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, are an infant under 2 years, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral capsule",
+    "Use": "Difficulty bringing up phlegm in bronchitis, asthma, laryngitis, sinusitis",
+    "Check with a pharmacist": "Phenylketonuria; under 2 years; gastric or duodenal ulcer"
+   }
+  },
+  {
+   "fp": "0df582ad3882bb79",
+   "title": "Analgesic Tablet",
+   "efficacy": "This medicine is used for headache, toothache, joint pain, neuralgia, muscle pain, sprain pain and period pain.",
+   "usage": "For adults, 1 to 2 tablets up to 3 to 4 times a day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Do not exceed the maximum daily dose of acetaminophen (4000 mg), as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Headache, toothache, joint pain, neuralgia, muscle pain, period pain",
+    "Check with a pharmacist": "Regular alcohol use; at least 4 hours between doses; 4000 mg daily limit"
+   }
+  },
+  {
+   "fp": "2acfa0b1ed1f384e",
+   "title": "Cold Relief Tablet",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches",
+    "Check with a pharmacist": "Under 15 years; regular alcohol use; serious skin reactions"
+   }
+  },
+  {
+   "fp": "2f186d101a27620b",
+   "title": "Tonic Oral Liquid",
+   "efficacy": "This medicine is used as a tonic and restorative for a weak constitution, physical fatigue, reduced strength after illness, loss of appetite, nutritional disorder, and febrile or wasting disease.",
+   "usage": "For adults, 1 bottle (20 mL) once a day. This medicine is for oral use only and must not be used as an injection.",
+   "caution": "Because it is manufactured from human placenta as a raw material, take it only when the benefit outweighs the risk. Do not take if you are hypersensitive to this medicine or are taking a medicine containing levodopa. Before taking it, pregnant women, breastfeeding women and patients under a doctor's treatment should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral liquid",
+    "Use": "Tonic for fatigue, weak constitution, loss of appetite, recovery after illness",
+    "Check with a pharmacist": "Levodopa use, pregnancy, breastfeeding, ongoing medical treatment"
+   }
+  },
+  {
+   "fp": "4151937d21bda3f1",
+   "title": "Antihistamine Decongestant Tablet",
+   "efficacy": "This medicine is used for temporary relief of sneezing, runny nose, nasal congestion and watery eyes caused by a cold or by allergic and vasomotor rhinitis, and of nasal congestion caused by sinusitis.",
+   "usage": "For children aged 12 years and over and adults, 1 tablet every 4 hours, not exceeding 6 tablets in 24 hours. For children aged 6 years to under 12 years, 1/2 tablet every 4 hours, not exceeding 3 tablets in 24 hours. For children under 6 years, follow a doctor's instructions.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to amine sympathomimetics or antihistamines, are breastfeeding, or have severe high blood pressure, severe coronary artery disease, narrow-angle glaucoma, urinary retention, peptic ulcer, asthma, emphysema, chronic lung disease, breathlessness or difficulty breathing, or galactose intolerance and related genetic problems. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis",
+    "Check with a pharmacist": "Under 6 years; glaucoma, urinary retention, hypertension, asthma; breastfeeding"
+   }
+  },
+  {
+   "fp": "592b1efb7cd2b294",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for temporary relief of runny nose, sneezing, itchy and watery eyes, and itching of the nose or throat caused by pollen allergy or other upper airway allergy.",
+   "usage": "For adults and adolescents aged 12 years and over, 1 tablet every 12 hours with water. Do not take more than 2 tablets within 24 hours. Patients with renal impairment and elderly people aged 65 years and over should consult a doctor or pharmacist before taking it.",
+   "caution": "Do not take if you are hypersensitive to this medicine or are breastfeeding. Do not drink alcohol while taking it. Do not exceed the recommended dose. Before taking it, consult a doctor or pharmacist if you have experienced an allergic reaction to a medicine, or are taking another medicine for allergic rhinitis or a cold.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Runny nose, sneezing, itchy eyes and throat from pollen or airway allergy",
+    "Check with a pharmacist": "Under 12 years; renal impairment; age 65 and over; breastfeeding"
+   }
+  },
+  {
+   "fp": "5e1eeb48bb847e00",
+   "title": "Laxative Enteric-coated Tablet",
+   "efficacy": "This medicine is used for constipation and for relief of the loss of appetite, abdominal bloating, abnormal intestinal fermentation and haemorrhoids that accompany constipation.",
+   "usage": "For people aged 15 years and over and adults, 1 to 3 tablets once a day at bedtime (or on an empty stomach). Start with the smallest amount and increase or decrease it gradually while watching the frequency and condition of bowel movements.",
+   "caution": "Do not take if you are hypersensitive to soybean oil, soya or peanut, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist if you have severe abdominal pain or other symptoms.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral enteric-coated tablet",
+    "Use": "Constipation and related bloating, poor appetite and haemorrhoids",
+    "Check with a pharmacist": "Under 15 years; soya or peanut allergy; severe abdominal pain"
+   }
+  },
+  {
+   "fp": "6bc77e8fcec65056",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For adults and children aged 6 years and over, 1 tablet (10 mg) once a day at bedtime; for patients sensitive to adverse reactions, 1/2 tablet (5 mg) split into a morning and an evening dose. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives, have renal failure, are pregnant or may be pregnant, are breastfeeding, are a child under 6 years, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching",
+    "Check with a pharmacist": "Under 6 years; renal failure; pregnancy; breastfeeding"
+   }
+  },
+  {
+   "fp": "7d1ccbfd45a2d289",
+   "title": "Anti-inflammatory Analgesic Tablet",
+   "efficacy": "This medicine is used to relieve mild to moderate pain in muscle pain, neuralgia, pain after injury or surgery, headache, toothache and earache.",
+   "usage": "For adults, 1 to 2 tablets (125 to 250 mg) 3 times a day.",
+   "caution": "Do not take if you have a peptic ulcer, if gastric or duodenal upset occurs because of medicines, if you are hypersensitive to this medicine, if you have experienced asthma, urticaria or an allergic reaction to aspirin or another non-steroidal anti-inflammatory analgesic (including COX-2 inhibitors), or before or after coronary artery bypass grafting (CABG). Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Mild to moderate pain: muscle pain, neuralgia, headache, toothache, earache",
+    "Check with a pharmacist": "Peptic ulcer; NSAID or aspirin allergy; around CABG surgery"
+   }
+  },
+  {
+   "fp": "87e26acb6019d195",
+   "title": "Antifoaming Oral Suspension",
+   "efficacy": "This medicine is used to remove intestinal foam during gastroscopy, to remove intestinal gas for abdominal X-ray imaging, and to improve abdominal symptoms caused by gas in the gastrointestinal tract (such as bloating and aerophagia).",
+   "usage": "For adults, to remove intestinal foam for gastroscopy, take 40 to 80 mg with about 10 mL of water 15 to 40 minutes before the examination. To remove intestinal gas for abdominal X-ray examination, take 40 to 80 mg 3 times a day after or between meals, starting 3 to 4 days before the examination. To improve abdominal symptoms caused by gas, take 40 to 80 mg 3 times a day after meals or at bedtime. Adjust appropriately according to age and symptoms.",
+   "caution": "This medicine contains aspartame, which is metabolised to phenylalanine in the body, so it must not be taken by people with phenylketonuria who need to restrict phenylalanine intake. Before taking it, patients with asthma should consult a doctor or pharmacist. Shake well before use.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral suspension",
+    "Use": "Removing intestinal foam and gas; abdominal bloating from gas",
+    "Check with a pharmacist": "Phenylketonuria; asthma"
+   }
+  },
+  {
+   "fp": "8ecf524a7b78966b",
+   "title": "Cold Relief Tablet",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (cough, phlegm, sore throat, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For adults, 1 tablet 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Cold symptoms: cough, phlegm, sore throat, chills, fever, aches",
+    "Check with a pharmacist": "Regular alcohol use; serious skin reactions"
+   }
+  },
+  {
+   "fp": "bab4b9e48b63e418",
+   "title": "Carnitine Tablet",
+   "efficacy": "This medicine is used for primary and secondary carnitine deficiency and for myocardial metabolic disorder caused by ischaemic heart disease such as angina and acute myocardial infarction.",
+   "usage": "For adults, 2 to 3 g a day in 2 to 3 divided doses. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, pregnant women or women who may be pregnant should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Carnitine deficiency; myocardial metabolic disorder in ischaemic heart disease",
+    "Check with a pharmacist": "Galactose intolerance and related genetic problems; pregnancy"
+   }
+  },
+  {
+   "fp": "c54fc9e4d5a996aa",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 300 mg of erdosteine 2 to 3 times a day. For acute respiratory disease, do not take it continuously for 10 days or more.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer, severe renal impairment or severe hepatic impairment. Before taking it, patients with mild or moderate hepatic impairment and patients with diabetes should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral capsule",
+    "Use": "Mucolytic and expectorant in acute and chronic respiratory disease",
+    "Check with a pharmacist": "Liver cirrhosis, peptic ulcer, severe renal or hepatic impairment, diabetes"
+   }
+  },
+  {
+   "fp": "d51d0c8d7ee1927f",
+   "title": "Antihistamine Decongestant Syrup",
+   "efficacy": "This medicine is used for temporary relief of sneezing, runny nose, nasal congestion and watery eyes caused by a cold or by allergic and vasomotor rhinitis, and of nasal congestion caused by sinusitis.",
+   "usage": "For children aged 12 years and over and adults, 10 mL every 4 hours, not exceeding 60 mL in 24 hours. For children aged 6 years to under 12 years, 5 mL every 4 hours, not exceeding 30 mL in 24 hours. For children aged 2 years to under 6 years, follow a doctor's instructions.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to amine sympathomimetics or antihistamines, have an idiosyncratic constitution, are breastfeeding, or have severe high blood pressure, severe coronary artery disease, narrow-angle glaucoma, urinary retention, peptic ulcer, asthma, emphysema, chronic lung disease, breathlessness or difficulty breathing. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral syrup",
+    "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis",
+    "Check with a pharmacist": "Under 2 years; glaucoma, urinary retention, hypertension, asthma; breastfeeding"
+   }
+  },
+  {
+   "fp": "f06b042c5f4143e6",
+   "title": "Caffeine Tablet for Drowsiness",
+   "efficacy": "This medicine is used for drowsiness.",
+   "usage": "For adults, 2 to 6 tablets (100 to 300 mg) 1 to 3 times a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Do not take if you have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, pregnant women or women who may be pregnant, breastfeeding women and elderly people should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Drowsiness",
+    "Check with a pharmacist": "Galactose intolerance; pregnancy, breastfeeding, elderly people"
+   }
+  },
+  {
+   "fp": "1ceaa270d179a87c",
+   "title": "Digestive Oral Liquid",
+   "efficacy": "This medicine is used for loss of appetite, a feeling of fullness in the stomach, indigestion, overeating, feeling of heaviness, nausea and vomiting.",
+   "usage": "For people aged 15 years and over and adults, 1 bottle (75 mL) per dose; aged 11 years to under 15 years, 2/3 bottle (50 mL); aged 8 years to under 11 years, 1/2 bottle (37.5 mL); aged 5 years to under 8 years, 1/3 bottle (25 mL); aged 3 years to under 5 years, 1/4 bottle (18.75 mL); aged 1 year to under 3 years, 1/5 bottle (15 mL), 3 times a day after meals.",
+   "caution": "Do not give to infants under 3 months. Before taking it, people hypersensitive to caramel or with such a history and pregnant women or women who may be pregnant should consult a doctor or pharmacist. Keep to the stated directions and amount.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral liquid",
+    "Use": "Loss of appetite, indigestion, overeating, nausea and vomiting",
+    "Check with a pharmacist": "Infants under 3 months; caramel sensitivity; pregnancy"
+   }
+  },
+  {
+   "fp": "2918c378e4384881",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral soft capsule",
+    "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+    "Check with a pharmacist": "Under 15 years; regular alcohol use; serious skin reactions"
+   }
+  },
+  {
+   "fp": "3b93877bbfec79d1",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious and potentially fatal skin reactions such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis have been reported; stop taking it immediately if a rash or other sign of hypersensitivity appears. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral soft capsule",
+    "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+    "Check with a pharmacist": "Under 15 years; regular alcohol use; serious skin reactions"
+   }
+  },
+  {
+   "fp": "4bea5f23c80966c3",
+   "title": "Expectorant Capsule",
+   "efficacy": "This medicine is used for difficulty bringing up phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis.",
+   "usage": "For acute disease, adults take 1 capsule (200 mg) 3 times a day and children aged 6 to 14 years take 1 capsule (200 mg) 2 times a day, before meals with a small amount of water. For chronic disease, adults take 1 capsule (200 mg) 2 times a day and children aged 6 to 14 years take 1/2 capsule (100 mg) 3 times a day, before meals with a small amount of water. For cystic fibrosis, people aged 6 years and over take 1 capsule (200 mg) 3 times a day, before meals with a small amount of water.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, are an infant under 2 years, or have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, pregnant women should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral capsule",
+    "Use": "Difficulty bringing up phlegm in bronchitis, asthma, laryngitis, sinusitis",
+    "Check with a pharmacist": "Under 2 years; gastric or duodenal ulcer; pregnancy"
+   }
+  },
+  {
+   "fp": "59e92a427aedf0b6",
+   "title": "Antihistamine Tablet",
+   "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria and skin itching, and for eczema and dermatitis when used together with a topical hydrocortisone preparation.",
+   "usage": "For adults and children aged 6 years and over, 1 tablet (10 mg) once a day at bedtime. Patients sensitive to adverse reactions take 1/2 tablet (5 mg) split into a morning and an evening dose. Adjust appropriately according to age and symptoms. In patients with renal impairment the dosing interval must be adjusted to renal function, and in children with renal impairment the dose must be individualised according to renal clearance and body weight, so refer to the approved product information for details.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to hydroxyzine or piperazine derivatives or have experienced such hypersensitivity, or have renal failure (creatinine clearance < 10 mL/min). Before taking it, patients with renal or hepatic impairment, elderly people, patients with epilepsy or a risk of seizures, and patients with predisposing factors for urinary retention such as spinal cord lesion should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Allergic rhinitis, allergic conjunctivitis, chronic urticaria, skin itching",
+    "Check with a pharmacist": "Renal or hepatic impairment; epilepsy; urinary retention"
+   }
+  },
+  {
+   "fp": "5b99d6efe707f7cf",
+   "title": "Combined Oral Contraceptive Tablet",
+   "efficacy": "This medicine is used for contraception and for the treatment of moderate acne in women who can take this medicine.",
+   "usage": "Take 1 tablet a day for 21 days in the order shown, then have a 7-day break. Refer to the detailed approved product information.",
+   "caution": "Because the risk of serious cardiovascular events such as thrombosis may increase, women taking an oral contraceptive should refrain from smoking. Smokers aged 35 years and over must not take this medicine. Do not take if you are hypersensitive to this medicine, or have an oestrogen-dependent tumour (for example endometrial cancer) or breast cancer. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Contraception; moderate acne in eligible women",
+    "Check with a pharmacist": "Smoking at 35 years and over; hormone-dependent tumour; breast cancer"
+   }
+  },
+  {
+   "fp": "5f27a427fc082f2e",
+   "title": "Digestive Enzyme Enteric-coated Tablet",
+   "efficacy": "This medicine is used for indigestion, loss of appetite, overeating, feeling of heaviness, promotion of digestion, and a feeling of fullness in the upper abdomen caused by indigestion.",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 3 times a day after meals.",
+   "caution": "Do not give to children aged 7 years or under. Before taking it, people with an allergic constitution should consult a doctor or pharmacist. If there is no improvement after about 2 weeks, stop taking it immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral enteric-coated tablet",
+    "Use": "Indigestion, loss of appetite, overeating, upper abdominal fullness",
+    "Check with a pharmacist": "Age 7 years or under; allergic constitution; no improvement after 2 weeks"
+   }
+  },
+  {
+   "fp": "6037918b30866e13",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 1 capsule 2 to 3 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are pregnant or may be pregnant, are breastfeeding, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer, severe renal impairment (creatinine clearance under 25 mL/min), severe hepatic impairment, galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral capsule",
+    "Use": "Mucolytic and expectorant in acute and chronic respiratory disease",
+    "Check with a pharmacist": "Pregnancy, breastfeeding; liver cirrhosis; severe renal or hepatic impairment"
+   }
+  },
+  {
+   "fp": "694ea438feae7dcd",
+   "title": "Digestive Enzyme Enteric-coated Tablet",
+   "efficacy": "This medicine is used for indigestion, loss of appetite, overeating, feeling of heaviness, promotion of digestion, and a feeling of fullness in the stomach caused by indigestion.",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 3 times a day after meals.",
+   "caution": "Do not give to children aged 7 years or under. Before taking it, people with an allergic constitution and people hypersensitive to Yellow No. 4 or with such a history should consult a doctor or pharmacist. Keep to the stated directions and amount. If there is no improvement after about 2 weeks, stop taking it and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral enteric-coated tablet",
+    "Use": "Indigestion, loss of appetite, overeating, stomach fullness",
+    "Check with a pharmacist": "Age 7 years or under; tartrazine sensitivity; no improvement after 2 weeks"
+   }
+  },
+  {
+   "fp": "81902a8cc5340e92",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 1 capsule 2 to 3 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are pregnant or may be pregnant, are breastfeeding, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer, severe renal impairment (creatinine clearance under 25 mL/min), severe hepatic impairment, galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral capsule",
+    "Use": "Mucolytic and expectorant in acute and chronic respiratory disease",
+    "Check with a pharmacist": "Pregnancy, breastfeeding; liver cirrhosis; severe renal or hepatic impairment"
+   }
+  },
+  {
+   "fp": "929be2fd1334e34b",
+   "title": "Anti-inflammatory Analgesic Soft Capsule",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Taking this medicine increases the risk of serious and potentially fatal cardiovascular thrombotic events, myocardial infarction and stroke. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral soft capsule",
+    "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery",
+    "Check with a pharmacist": "Maximum 1200 mg a day; gastrointestinal bleeding; cardiovascular risk"
+   }
+  },
+  {
+   "fp": "a5e3b0f313ac932f",
+   "title": "Low-dose Aspirin Enteric-coated Tablet",
+   "efficacy": "This medicine is used to inhibit thrombus formation in myocardial infarction, cerebral infarction and unstable angina, to inhibit thrombus formation after coronary artery bypass grafting (CABG) or percutaneous transluminal coronary angioplasty (PTCA), and to reduce cardiovascular risk in high-risk patients (those with combined risk factors such as a family history of ischaemic heart disease, high blood pressure, high cholesterol, obesity or diabetes).",
+   "usage": "For adults, 1 tablet once a day. As this is an enteric-coated tablet, it may be taken before a meal with plenty of water.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Do not take if you are hypersensitive to this medicine or to other salicylates, analgesics, anti-inflammatory medicines or antirheumatic medicines. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral enteric-coated tablet",
+    "Use": "Prevention of thrombus formation; cardiovascular risk reduction",
+    "Check with a pharmacist": "Salicylate or NSAID hypersensitivity; gastrointestinal bleeding"
+   }
+  }
+ ]
+}

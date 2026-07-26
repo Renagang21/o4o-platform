@@ -1,0 +1,29 @@
+{
+ "reason": "공식 원문의 범위 표기가 정규화 과정에서 쉼표로 병합되어(200-600 → 200,600) 수치 추출기가 실존하지 않는 값(200600·3040·34·200400)을 요구함. 의학적으로 틀린 숫자를 EN 에 쓸 수 없고 게이트 완화도 금지되어 판단 요청 대기.",
+ "groups": [
+  {
+   "fp": "998366614345e8f2",
+   "title": "Ibuprofen Oral Syrup",
+   "efficacy": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), fever and pain from a cold, low back pain, period pain, pain after surgery, ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, strain) and non-articular rheumatic disease (tendinitis, tenosynovitis, bursitis).",
+   "usage": "For adults with rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic disease, acute gout or psoriatic arthritis, take 200 to 600 mg 3 to 4 times a day, up to a maximum of 3200 mg a day. For juvenile rheumatoid arthritis, take 30 to 40 mg per kg of body weight a day in 3 to 4 divided doses. For mild to moderate pain and for a cold, adults take 200 to 400 mg 3 to 4 times a day. Adjust appropriately according to age and symptoms. For children, follow the recommended amount for the age group.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Taking a non-steroidal anti-inflammatory analgesic including this medicine increases the risk of serious and potentially fatal cardiovascular thrombotic events. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral syrup",
+    "Use": "Arthritis, fever and pain, period pain, soft tissue injury, gout",
+    "Check with a pharmacist": "Maximum 3200 mg a day; gastrointestinal bleeding; cardiovascular risk"
+   }
+  },
+  {
+   "fp": "76cb6ae9a1db974e",
+   "title": "Ibuprofen Tablet",
+   "efficacy": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), fever and pain from a cold, low back pain, period pain, pain after surgery, ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, strain) and non-articular rheumatic disease (tendinitis, tenosynovitis, bursitis).",
+   "usage": "For rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic disease, acute gout or psoriatic arthritis, adults take 1/2 to 1.5 tablets (200 to 600 mg) 3 to 4 times a day, up to a maximum of 3200 mg a day. For juvenile rheumatoid arthritis, take 30 to 40 mg per kg of body weight a day in 3 to 4 divided doses. For mild to moderate pain or a cold, adults take 1/2 to 1 tablet (200 to 400 mg) 3 to 4 times a day. Keep to the stated directions and amount and adjust according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Taking this medicine increases the risk of serious and potentially fatal cardiovascular thrombotic events, myocardial infarction and stroke. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - oral tablet",
+    "Use": "Arthritis, fever and pain, period pain, soft tissue injury, gout",
+    "Check with a pharmacist": "Maximum 3200 mg a day; gastrointestinal bleeding; cardiovascular risk"
+   }
+  }
+ ]
+}
