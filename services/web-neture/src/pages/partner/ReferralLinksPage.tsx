@@ -9,6 +9,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { Link2, Copy, Check, ExternalLink } from 'lucide-react';
 import { partnerAffiliateApi } from '../../lib/api/index.js';
 import type { ReferralLink } from '../../lib/api/index.js';
@@ -44,6 +45,70 @@ export default function ReferralLinksPage() {
     window.open(buildUrl(link), '_blank', 'noopener,noreferrer');
   }, [buildUrl]);
 
+  // WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   Copy 는 '복사됨' 상태 피드백이 있는 주 CTA 라 인라인 유지(RowActionMenu 미적용).
+  const columns: ListColumnDef<ReferralLink>[] = [
+    {
+      key: 'product_name',
+      header: 'Product',
+      minWidth: 180,
+      render: (_v, link) => (
+        <div>
+          <div style={{ fontWeight: 500, color: '#1e293b' }}>{link.product_name}</div>
+          {link.commission_per_unit != null && (
+            <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>
+              커미션 ₩{link.commission_per_unit.toLocaleString()}/개
+            </div>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: 'store_slug',
+      header: 'Store',
+      width: '140px',
+      render: (_v, link) => <span style={{ color: '#64748b', fontSize: '13px' }}>{link.store_slug || '-'}</span>,
+    },
+    { key: 'referral_url', header: 'Referral URL', minWidth: 200, render: (_v, link) => <code style={styles.urlCode}>{buildUrl(link)}</code> },
+    {
+      key: 'created_at',
+      header: 'Created',
+      width: '120px',
+      render: (_v, link) => (
+        <span style={{ color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>
+          {new Date(link.created_at).toLocaleDateString('ko-KR')}
+        </span>
+      ),
+    },
+    {
+      key: '_actions',
+      header: 'Actions',
+      width: '170px',
+      align: 'center',
+      system: true,
+      render: (_v, link) => {
+        const isCopied = copiedId === link.id;
+        return (
+          <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
+            <button
+              onClick={() => handleCopy(link)}
+              style={{ ...styles.actionBtn, ...(isCopied ? styles.actionBtnDone : {}) }}
+              title="URL 복사"
+            >
+              {isCopied ? <Check size={14} /> : <Copy size={14} />}
+              {isCopied ? '복사됨' : 'Copy'}
+            </button>
+            <button onClick={() => handleOpen(link)} style={styles.actionBtnOpen} title="URL 열기">
+              <ExternalLink size={14} />
+              Open
+            </button>
+          </div>
+        );
+      },
+    },
+  ];
+
   return (
     <div style={styles.container}>
       <div style={styles.header}>
@@ -63,67 +128,14 @@ export default function ReferralLinksPage() {
         <>
           {/* Desktop Table */}
           <div className="referral-links-table" style={styles.tableWrap}>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>Product</th>
-                  <th style={styles.th}>Store</th>
-                  <th style={styles.th}>Referral URL</th>
-                  <th style={styles.th}>Created</th>
-                  <th style={{ ...styles.th, textAlign: 'center' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {links.map((link) => {
-                  const url = buildUrl(link);
-                  const isCopied = copiedId === link.id;
-                  return (
-                    <tr key={link.id} style={styles.tr}>
-                      <td style={styles.td}>
-                        <div style={{ fontWeight: 500, color: '#1e293b' }}>{link.product_name}</div>
-                        {link.commission_per_unit != null && (
-                          <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>
-                            커미션 ₩{link.commission_per_unit.toLocaleString()}/개
-                          </div>
-                        )}
-                      </td>
-                      <td style={{ ...styles.td, color: '#64748b', fontSize: '13px' }}>
-                        {link.store_slug || '-'}
-                      </td>
-                      <td style={styles.td}>
-                        <code style={styles.urlCode}>{url}</code>
-                      </td>
-                      <td style={{ ...styles.td, color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>
-                        {new Date(link.created_at).toLocaleDateString('ko-KR')}
-                      </td>
-                      <td style={{ ...styles.td, textAlign: 'center' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
-                          <button
-                            onClick={() => handleCopy(link)}
-                            style={{
-                              ...styles.actionBtn,
-                              ...(isCopied ? styles.actionBtnDone : {}),
-                            }}
-                            title="URL 복사"
-                          >
-                            {isCopied ? <Check size={14} /> : <Copy size={14} />}
-                            {isCopied ? '복사됨' : 'Copy'}
-                          </button>
-                          <button
-                            onClick={() => handleOpen(link)}
-                            style={styles.actionBtnOpen}
-                            title="URL 열기"
-                          >
-                            <ExternalLink size={14} />
-                            Open
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+            {/* WO-…-V1: raw <table> → 표준 DataTable (데스크톱 표만, 모바일 카드 뷰 유지).
+                복사는 '복사됨' 상태 피드백이 있는 주 CTA 라 인라인 유지. */}
+            <DataTable<ReferralLink>
+              columns={columns}
+              data={links}
+              rowKey={(l) => l.id}
+              emptyMessage="생성된 링크가 없습니다"
+            />
           </div>
 
           {/* Mobile Cards */}

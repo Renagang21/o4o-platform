@@ -10,7 +10,9 @@
  */
 
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
+import { RowActionMenu } from '@o4o/ui';
+import { Link, useNavigate } from 'react-router-dom';
 import { Search, Eye, Link2, UserMinus, Store } from 'lucide-react';
 
 // ── Types ──
@@ -48,6 +50,7 @@ const statusStyle: Record<StoreStatus, string> = {
 };
 
 export function PartnerStoresPage() {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [regionFilter, setRegionFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<StoreStatus | ''>('');
@@ -58,6 +61,39 @@ export function PartnerStoresPage() {
     if (statusFilter && s.status !== statusFilter) return false;
     return true;
   });
+
+  // WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   아이콘 3종(보기/링크/해제)은 다중 행 액션이라 RowActionMenu 로 이관.
+  const columns: ListColumnDef<StoreItem>[] = [
+    { key: 'name', header: '매장명', minWidth: 150, render: (_v, s) => <span className="text-sm font-medium text-gray-900">{s.name}</span> },
+    { key: 'region', header: '지역', width: '110px', render: (_v, s) => <span className="text-sm text-gray-600">{s.region}</span> },
+    { key: 'contact', header: '연락처', width: '140px', render: (_v, s) => <span className="text-sm text-gray-500 font-mono">{s.contact}</span> },
+    { key: 'contentTitle', header: '연결 콘텐츠', minWidth: 150, render: (_v, s) => <span className="text-sm text-gray-900">{s.contentTitle}</span> },
+    { key: 'connectedAt', header: '연결일', width: '120px', render: (_v, s) => <span className="text-sm text-gray-500">{s.connectedAt}</span> },
+    {
+      key: 'status',
+      header: '상태',
+      width: '100px',
+      render: (_v, s) => <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[s.status]}`}>{s.status}</span>,
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      width: '72px',
+      align: 'center',
+      system: true,
+      render: (_v, s) => (
+        <RowActionMenu
+          actions={[
+            { key: 'view', label: '보기', onClick: () => { /* TODO: 상세 보기 미구현 (기존 동작 유지) */ } },
+            { key: 'links', label: '링크', onClick: () => navigate(`/account/partner/links?store=${s.id}`) },
+            { key: 'remove', label: '해제', variant: 'danger' as const, onClick: () => { /* TODO: 해제 API 미구현 (기존 동작 유지) */ } },
+          ]}
+        />
+      ),
+    },
+  ];
 
   return (
     <div className="space-y-5">
@@ -115,68 +151,14 @@ export function PartnerStoresPage() {
         <>
           {/* Desktop Table */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">매장명</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">지역</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">연락처</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">연결 콘텐츠</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">연결일</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">상태</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">관리</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.map((s) => (
-                  <tr key={s.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm font-medium text-gray-900">{s.name}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-600">{s.region}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-500 font-mono">{s.contact}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-900">{s.contentTitle}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-500">{s.connectedAt}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${statusStyle[s.status]}`}>
-                        {s.status}
-                      </span>
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          className="p-1.5 text-gray-400 hover:text-primary-600 hover:bg-primary-50 rounded-md transition-colors"
-                          title="View"
-                        >
-                          <Eye size={15} />
-                        </button>
-                        <Link
-                          to={`/account/partner/links?store=${s.id}`}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                          title="Links"
-                        >
-                          <Link2 size={15} />
-                        </Link>
-                        <button
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition-colors"
-                          title="Remove"
-                        >
-                          <UserMinus size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* WO-…-V1: raw <table> → 표준 DataTable (데스크톱 표만, 모바일 카드 뷰 유지).
+                행 액션 3종(보기/링크/해제)은 RowActionMenu 로 이관. */}
+            <DataTable<StoreItem>
+              columns={columns}
+              data={filtered}
+              rowKey={(s) => s.id}
+              emptyMessage="연결된 매장이 없습니다"
+            />
           </div>
 
           {/* Mobile Cards */}

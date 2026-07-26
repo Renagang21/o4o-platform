@@ -7,6 +7,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { Search, Copy, ExternalLink, Link2, Loader2 } from 'lucide-react';
 import { partnerAffiliateApi, type ReferralLink } from '../../lib/api/partner';
 
@@ -40,6 +41,53 @@ export function PartnerLinksPage() {
       l.referral_token.toLowerCase().includes(q)
     );
   });
+
+  // WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1:
+  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
+  //   액션 2종(복사/열기) 중 복사는 copied 상태 피드백을 즉시 보여주는 주 CTA 라
+  //   RowActionMenu 로 감추지 않고 인라인 버튼을 유지한다.
+  const columns: ListColumnDef<ReferralLink>[] = [
+    { key: 'product_name', header: 'Product', minWidth: 160, render: (_v, l) => <span className="text-sm font-medium text-gray-900">{l.product_name}</span> },
+    { key: 'store_name', header: 'Store', width: '150px', render: (_v, l) => <span className="text-sm text-gray-600">{l.store_name || l.store_slug}</span> },
+    {
+      key: 'referral_url',
+      header: 'Referral URL',
+      minWidth: 200,
+      render: (_v, l) => (
+        <code className="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded max-w-xs truncate block">
+          {l.referral_url}
+        </code>
+      ),
+    },
+    { key: 'created_at', header: 'Created', width: '120px', render: (_v, l) => <span className="text-sm text-gray-500">{fmtDate(l.created_at)}</span> },
+    {
+      key: '_actions',
+      header: 'Actions',
+      width: '96px',
+      align: 'right',
+      system: true,
+      render: (_v, l) => (
+        <div className="flex items-center justify-end gap-1">
+          <button
+            onClick={() => handleCopy(l)}
+            className={`p-1.5 rounded-md transition-colors ${
+              copiedId === l.id ? 'text-emerald-600 bg-emerald-50' : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
+            }`}
+            title={copiedId === l.id ? 'Copied!' : 'Copy URL'}
+          >
+            <Copy size={15} />
+          </button>
+          <button
+            onClick={() => handleOpen(l)}
+            className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
+            title="Open Page"
+          >
+            <ExternalLink size={15} />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   const handleCopy = async (link: ReferralLink) => {
     try {
@@ -98,59 +146,14 @@ export function PartnerLinksPage() {
         <>
           {/* Desktop Table */}
           <div className="hidden md:block bg-white rounded-xl border border-gray-200 overflow-hidden">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-100 bg-gray-50">
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Product</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Store</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Referral URL</th>
-                  <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Created</th>
-                  <th className="text-right px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-gray-100">
-                {filtered.map((l) => (
-                  <tr key={l.id} className="hover:bg-gray-50 transition-colors">
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm font-medium text-gray-900">{l.product_name}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-600">{l.store_name || l.store_slug}</span>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <code className="text-xs font-mono bg-gray-100 text-gray-700 px-2 py-1 rounded max-w-xs truncate block">
-                        {l.referral_url}
-                      </code>
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <span className="text-sm text-gray-500">{fmtDate(l.created_at)}</span>
-                    </td>
-                    <td className="px-5 py-3.5 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => handleCopy(l)}
-                          className={`p-1.5 rounded-md transition-colors ${
-                            copiedId === l.id
-                              ? 'text-emerald-600 bg-emerald-50'
-                              : 'text-gray-400 hover:text-blue-600 hover:bg-blue-50'
-                          }`}
-                          title={copiedId === l.id ? 'Copied!' : 'Copy URL'}
-                        >
-                          <Copy size={15} />
-                        </button>
-                        <button
-                          onClick={() => handleOpen(l)}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors"
-                          title="Open Page"
-                        >
-                          <ExternalLink size={15} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+            {/* WO-…-V1: raw <table> → 표준 DataTable (데스크톱 표만, 모바일 카드 뷰 유지).
+                복사는 copied 상태 피드백이 있는 주 CTA 라 RowActionMenu 로 감추지 않고 인라인 유지. */}
+            <DataTable<ReferralLink>
+              columns={columns}
+              data={filtered}
+              rowKey={(l) => l.id}
+              emptyMessage="생성된 링크가 없습니다"
+            />
           </div>
 
           {/* Mobile Cards */}
