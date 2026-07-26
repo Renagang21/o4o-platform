@@ -1,0 +1,377 @@
+{
+  "batch": 14,
+  "groups": [
+    {
+      "fp": "cb5ca830f650e4c3",
+      "title": "Cough and Phlegm Capsule",
+      "efficacy": "This medicine is used for cough and phlegm.",
+      "usage": "For adults, 2 capsules per dose, 3 times a day after meals.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by women who are or may be pregnant, by infants under 3 months of age, by people who are taking an MAO inhibitor (such as an antidepressant, antipsychotic, mood stabiliser or anti-Parkinson medicine) or who stopped taking one within the last 2 weeks, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Cough and phlegm",
+        "Check with a pharmacist": "Pregnancy; infants under 3 months; MAO inhibitors"
+      }
+    },
+    {
+      "fp": "cd08cf678751db75",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used for rheumatoid arthritis, osteoarthritis (degenerative joint disease), ankylosing spondylitis, tendinitis, acute gout, dysmenorrhoea and bursitis, and for skeletal muscle disorders (sprain, bruise, injury), lumbosacral pain, pain after surgery, migraine and pain after a tooth extraction.",
+      "usage": "For adults, for rheumatoid arthritis, osteoarthritis and ankylosing spondylitis, 1 to 2 capsules (250 to 500 mg) per dose, 2 times a day (every 12 hours). For acute gout, take 3 capsules (750 mg) as the first dose, then 1 capsule (250 mg) at intervals of 8 hours until the attack has gone. For skeletal muscle disorders, pain after surgery, pain after a tooth extraction, dysmenorrhoea, tendinitis and bursitis, take 2 capsules (500 mg) as the first dose, then 1 capsule (250 mg) at intervals of 6 to 8 hours. See the approved product information for the remaining dosing details.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. It must not be taken by people who are hypersensitive to this medicine or to aspirin. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis, ankylosing spondylitis, acute gout, period pain, pain after surgery",
+        "Check with a pharmacist": "Aspirin allergy; regular alcohol use; heart or stomach problems"
+      }
+    },
+    {
+      "fp": "ce19ee5ee2c30094",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthrosis, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+      "usage": "For adults, 1 capsule (300 mg) per dose, 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. It must not be taken by people who are hypersensitive to it. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis and joint inflammation; pain and swelling after injury or surgery",
+        "Check with a pharmacist": "Regular alcohol use; heart, blood vessel or stomach problems"
+      }
+    },
+    {
+      "fp": "d167fe6e902361ec",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used for rheumatoid arthritis, osteoarthritis (degenerative joint disease), ankylosing spondylitis, tendinitis, acute gout, dysmenorrhoea and bursitis, and for skeletal muscle disorders (sprain, bruise, injury), lumbosacral pain, pain after surgery, migraine and pain after a tooth extraction.",
+      "usage": "For rheumatoid arthritis, osteoarthritis and ankylosing spondylitis, adults take 1 to 2 capsules (250 to 500 mg) per dose, 2 times a day, every 12 hours. For acute gout, take 3 capsules (750 mg) as the first dose, then 1 capsule (250 mg) at intervals of 8 hours until the attack has gone. For skeletal muscle disorders, pain after surgery, pain after a tooth extraction, dysmenorrhoea, tendinitis and bursitis, take 2 capsules (500 mg) as the first dose, then 1 capsule (250 mg) at intervals of 6 to 8 hours. See the approved product information for the remaining dosing details.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. It must not be taken by people who are hypersensitive to this medicine or to aspirin. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis, ankylosing spondylitis, acute gout, period pain, pain after surgery",
+        "Check with a pharmacist": "Aspirin allergy; regular alcohol use; heart or stomach problems"
+      }
+    },
+    {
+      "fp": "d2b90e4a72a9a4ed",
+      "title": "Children's Anti-inflammatory Analgesic Syrup",
+      "efficacy": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), fever and pain due to a cold, low back pain, dysmenorrhoea, pain after surgery, ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, bruise) and non-articular rheumatic disease.",
+      "usage": "For children aged 11 to 14 years, 200 to 250 mg (10 to 13 mL) per dose; for children aged 7 to 10 years, 150 to 200 mg (8 to 10 mL) per dose; for children aged 3 to 6 years, 100 to 150 mg (5 to 8 mL) per dose; and for children aged 1 to 2 years, 50 to 100 mg (3 to 5 mL) per dose, taken 3 to 4 times a day. For children weighing less than 30 kg, the daily amount must not exceed 500 mg (25 mL), and it is best to avoid giving it on an empty stomach.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. People with uncontrolled high blood pressure should take particular care. Before giving it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral syrup",
+        "Use": "Arthritis; fever and pain from a cold; headache, toothache, muscle and joint pain",
+        "Check with a pharmacist": "Dosing by age and weight; stomach, heart or blood pressure problems"
+      }
+    },
+    {
+      "fp": "d41ed642975494a2",
+      "title": "Cold Relief Tablet",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 1 tablet per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Cold symptoms: sore throat, cough, phlegm, fever, headache, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "d47ca889cefbc163",
+      "title": "Nasal Symptom Relief Capsule",
+      "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing, watery eyes, sore throat and a heavy feeling in the head caused by a nasal cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "usage": "For people aged 15 years and over and adults, 1 capsule per dose, 3 times a day after meals. Leave an interval of at least 4 hours between doses.",
+      "caution": "If a serious skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking this medicine and consult a doctor or pharmacist. It must not be taken by people who are hypersensitive to it, by children under 2 years of age, by children under 15 years of age, by people who are taking an MAO inhibitor (such as an antidepressant, antipsychotic, mood stabiliser or anti-Parkinson medicine) or who stopped taking one within the last 2 weeks, or by people with severe or uncontrolled high blood pressure. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Nasal congestion, runny nose, sneezing and watery eyes from a cold or rhinitis",
+        "Check with a pharmacist": "Under 15 years; high blood pressure; MAO inhibitors"
+      }
+    },
+    {
+      "fp": "d69681fea9f4f37f",
+      "title": "Cold Relief Tablet",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold, such as sore throat, chills, fever, headache, joint pain and muscle pain.",
+      "usage": "For adults, 1 tablet per dose, 3 times a day, 30 minutes after meals. Leave an interval of at least 4 hours between doses.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome (a skin and mucous membrane disorder) and toxic epidermal necrolysis (Lyell's syndrome), have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Cold symptoms: sore throat, chills, fever, headache, joint and muscle pain",
+        "Check with a pharmacist": "Regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "da300c45f3967337",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "db972c8af5714fb7",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for children aged 8 years and over to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 8 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "dcaadbb3984eba33",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For adults, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "dd193aaf93f3ab38",
+      "title": "Cold Relief Tablet",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 1 tablet per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Cold symptoms: sore throat, chills, fever, headache, joint and muscle pain",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "dd5e70033672e501",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "e00e212ffe713c88",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for children aged 8 years and over to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 8 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "e334d6b2ff3a914d",
+      "title": "Children's Fever Reducer Syrup",
+      "efficacy": "This medicine is used to reduce fever caused by an acute upper respiratory tract infection.",
+      "usage": "For children aged 6 months and over, 0.4 to 0.6 mL/kg per dose (5 to 7 mg/kg), taken as needed at intervals of 4 to 6 hours, up to a maximum of 4 doses a day (28 mg/kg). For children weighing 30 kg or less, do not exceed a maximum of 25 mL (300 mg) a day. If the child's weight is known, dosing by weight is more appropriate, so see the approved product information for the recommended dose by age group.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. This medicine may increase the risk of serious cardiovascular thrombotic events, myocardial infarction and stroke, which can be fatal, and serious gastrointestinal reactions such as bleeding, ulcer and perforation may occur. It must not be given to anyone who is hypersensitive to it or who has a peptic ulcer. Before giving it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral syrup",
+        "Use": "Fever due to an acute upper respiratory tract infection (children)",
+        "Check with a pharmacist": "Under 6 months; dosing by body weight; stomach or heart problems"
+      }
+    },
+    {
+      "fp": "e67b4dd5d7413b98",
+      "title": "Enteric-coated Laxative Tablet",
+      "efficacy": "This medicine is used to relieve constipation and the poor appetite, abdominal bloating, abnormal fermentation in the bowel and haemorrhoids that come with constipation.",
+      "usage": "For adults, 1 to 2 tablets per dose, 3 times a day after meals, leaving an interval of at least 4 hours between doses. Take the smallest amount for the first dose, then increase or decrease it a little at a time while watching the form and condition of the stools.",
+      "caution": "This medicine must not be taken by people with an acute abdominal disease (such as appendicitis, intestinal bleeding or ulcerative colitis), intestinal obstruction or hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, or by children aged 10 years and under. Before taking it, people with severe abdominal pain, nausea or vomiting, women who are or may be pregnant, and people on a sodium-restricted diet should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral enteric-coated tablet",
+        "Use": "Constipation and the poor appetite, bloating and haemorrhoids that come with it",
+        "Check with a pharmacist": "Age 10 years and under; severe abdominal pain; pregnancy"
+      }
+    },
+    {
+      "fp": "e714ff162cf5a093",
+      "title": "Cold Relief Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, muscle pain and joint pain).",
+      "usage": "For people aged 15 years and over, 2 capsules per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome (a skin and mucous membrane disorder) and toxic epidermal necrolysis (Lyell's syndrome), have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "e99db3cc42e6c3fb",
+      "title": "Vitamin B6 Tablet",
+      "efficacy": "This medicine is used to supply vitamin B6 during pregnancy and breastfeeding and when strength is low during or after illness, and to relieve angular stomatitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, 2 times a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by infants under 3 months of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, infants under 1 year of age and people who are short of folic acid should consult a doctor or pharmacist. Keep to the stated dosage. When it is given to a child, an adult should supervise.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin B6 supply; mouth and lip inflammation, eczema, dermatitis",
+        "Check with a pharmacist": "Infants under 3 months; low folic acid"
+      }
+    },
+    {
+      "fp": "ee2cae45526c7452",
+      "title": "Cold Relief Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 15 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "f0158dd64dc037fb",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for children over 7 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Age 7 years or under; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "f0be7cfefe8cfbd1",
+      "title": "Antihistamine Tablet for Allergy",
+      "efficacy": "This medicine is used for seasonal and perennial allergic rhinitis, allergic conjunctivitis, chronic idiopathic urticaria, itchy skin, eczema and dermatitis (used together with a hydrocortisone product applied to the skin).",
+      "usage": "For adults and children aged 6 years and over, 10 mg once a day by mouth before bedtime. For patients who are sensitive to side effects, 5 mg in divided doses in the morning and evening. The dose may be increased or decreased as appropriate for age and symptoms. For patients with kidney impairment, see the approved product information for the dosing interval.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by people with kidney failure, by infants under 6 years of age, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, pregnant women, breastfeeding women, older people, people with kidney or liver impairment, people with epilepsy or a risk of seizures, and people with a condition that predisposes them to urine retention (such as a spinal cord lesion or prostate problems) should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Allergic rhinitis and conjunctivitis, chronic urticaria, itchy skin, dermatitis",
+        "Check with a pharmacist": "Under 6 years; kidney or liver problems; epilepsy; urine retention"
+      }
+    },
+    {
+      "fp": "f2b41f02fca422a2",
+      "title": "Vitamin D and B Complex Tablet",
+      "efficacy": "This medicine is used to supply vitamins D, B1, B2 and B6 in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age, to relieve neuralgia, muscle pain and joint pain (such as low back pain and stiff shoulders), and for beriberi and eye strain.",
+      "usage": "For adults aged 19 years and over, 1 tablet per dose, once a day after a meal.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by people with hypercalcaemia (too much calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease, kidney stones or hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption, or by infants under 3 months of age. Before taking it, infants under 1 year of age and other people at risk should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin D, B1, B2 and B6 supply; neuralgia, muscle and joint pain; eye strain",
+        "Check with a pharmacist": "Infants under 3 months; high blood calcium; kidney disease or stones"
+      }
+    },
+    {
+      "fp": "f389f592a61c0ab9",
+      "title": "Oral Contraceptive Tablet",
+      "efficacy": "This medicine is used for contraception and for the treatment of moderate acne in women who are able to take this medicine.",
+      "usage": "Take 1 tablet a day for 21 days, at the same time each day, then have a 7-day break. See the approved product information for details.",
+      "caution": "Women taking oral contraceptives should avoid smoking, because the risk of serious cardiovascular events such as thrombosis may increase. Smokers aged 35 years and over must not take this medicine. It must also not be taken by people who are hypersensitive to it, people with an oestrogen-dependent tumour (for example endometrial cancer), people who have or are suspected of having breast cancer or who have had it, people who have or have had thrombophlebitis or thromboembolism, people with deep vein thrombosis, or people with an inherited or acquired tendency to thrombosis. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Contraception; treatment of moderate acne in eligible women",
+        "Check with a pharmacist": "Smoking, age 35 years and over; blood clots; breast cancer"
+      }
+    },
+    {
+      "fp": "f5ff6e1ad1c05b1e",
+      "title": "Periodontal Support Capsule",
+      "efficacy": "This medicine is used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+      "usage": "For adults, 1 capsule per dose, 3 times a day after meals.",
+      "caution": "This medicine must not be taken by children under 15 years of age or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people who have had allergic symptoms from a medicine or cosmetic product (rash, redness, itching), people who have had allergic symptoms to egg (fever, rash, joint pain, asthma, itching), and people with an allergic constitution should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral capsule",
+        "Use": "Supportive treatment for gingivitis and mild to moderate periodontitis",
+        "Check with a pharmacist": "Under 15 years; egg allergy; allergic constitution"
+      }
+    },
+    {
+      "fp": "face87c012d3cbe6",
+      "title": "Antidiarrhoeal Tablet",
+      "efficacy": "This medicine is used for diarrhoea, diarrhoea with abdominal pain, a feeling of food stuck in the stomach, loose stools, and vomiting with diarrhoea.",
+      "usage": "For people aged 15 years and over and adults, 2 tablets per dose, 3 times a day after meals. Leave an interval of at least 4 hours between doses. Do not keep taking it for 3 days or more.",
+      "caution": "This medicine must not be taken by women who are or may be pregnant, by breastfeeding women, by newborn babies, by children aged 7 years and under, or by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people who have had an allergic reaction to a medicine (rash, redness, itching) and people with diarrhoea accompanied by fever should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Diarrhoea, diarrhoea with abdominal pain, loose stools",
+        "Check with a pharmacist": "Age 7 years and under; pregnancy or breastfeeding; diarrhoea with fever"
+      }
+    },
+    {
+      "fp": "fc29d5ecc507c0b9",
+      "title": "Multivitamin Tablet",
+      "efficacy": "This medicine is used to supply vitamins B1, B2, B6, C, D and E in physical fatigue, during pregnancy and breastfeeding, when strength is low during or after illness, during growth periods and in old age, to prevent poor development of bones and teeth and rickets, and for beriberi, eye strain, neuralgia, muscle pain, joint pain (such as low back pain and stiff shoulders) and angular stomatitis.",
+      "usage": "For children aged 8 years and over and adults, 1 tablet per dose, once a day.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, by people with hypercalcaemia (too much calcium in the blood), sarcoidosis (a systemic inflammatory disease of unknown cause), kidney disease or kidney stones, by infants under 12 months of age, or by people who have had hypersensitivity or an allergy to soybean oil or who are hypersensitive to soy or peanuts. Before taking it, infants under 1 year of age and children who get a lot of sunlight and eat a normal diet should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Vitamin B, C, D and E supply; bone and tooth development; neuralgia and joint pain",
+        "Check with a pharmacist": "Infants under 12 months; soy or peanut allergy; kidney disease or stones"
+      }
+    },
+    {
+      "fp": "fdb802f5a7fbb675",
+      "title": "Anti-inflammatory Enzyme Enteric-coated Tablet",
+      "efficacy": "This medicine is used to relieve inflammatory swelling, such as swelling after surgery or injury and swelling from milk stasis.",
+      "usage": "For adults, on the first day 2 tablets per dose, 4 times a day; after that, as a maintenance dose, 1 tablet per dose, 4 times a day.",
+      "caution": "This medicine must not be taken by people with hereditary problems such as galactose intolerance, Lapp lactase deficiency or glucose-galactose malabsorption. Before taking it, people with a blood clotting disorder, people with severe liver or kidney impairment, and women who are or may be pregnant should consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral enteric-coated tablet",
+        "Use": "Inflammatory swelling after surgery or injury, and swelling from milk stasis",
+        "Check with a pharmacist": "Blood clotting disorders; severe liver or kidney disease; pregnancy"
+      }
+    },
+    {
+      "fp": "fe5fce148b700dcf",
+      "title": "Analgesic Tablet for Neuralgia and Back Pain",
+      "efficacy": "This medicine is used for neuralgia, low back pain and stiff shoulders.",
+      "usage": "For adults, 1 to 2 tablets per dose, 2 times a day, taken when pain or an attack occurs.",
+      "caution": "Before taking this medicine, consult a doctor or pharmacist in the following cases: a person with an allergic constitution or who has had allergic symptoms (fever, rash, joint pain, asthma, itching); an infant, young child or child aged 14 years and under who has, or is suspected of having, chickenpox or influenza; a person with liver, kidney or thyroid disease, diabetes or high blood pressure; a person who is physically weak or has a high fever; an older person; a woman who is or may be pregnant; or a breastfeeding woman.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Neuralgia, low back pain, stiff shoulders",
+        "Check with a pharmacist": "Age 14 years and under; chickenpox or influenza; drug allergy"
+      }
+    },
+    {
+      "fp": "ff6fc6dd21f9c66b",
+      "title": "Cold Relief Soft Capsule",
+      "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+      "usage": "For people aged 15 years and over and adults, 2 capsules per dose, 3 times a day; for children aged 8 years and over to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+      "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Very rarely, serious skin reactions that can be fatal, such as acute generalised exanthematous pustulosis, Stevens-Johnson syndrome and toxic epidermal necrolysis, have been reported. If a skin rash or any other sign of a hypersensitivity reaction appears after taking this medicine, stop taking it and consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches",
+        "Check with a pharmacist": "Under 8 years; regular alcohol use; skin rash after taking"
+      }
+    },
+    {
+      "fp": "6e83fe17cbff2978",
+      "title": "Anti-inflammatory Analgesic Soft Capsule",
+      "efficacy": "This medicine is used for fever and pain due to a cold, low back pain, period pain, rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), pain after surgery, headache, migraine, toothache, muscle pain, neuralgia, ankylosing spondylitis, acute gout and psoriasis-related joint disease.",
+      "usage": "For adults, for rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic disease, acute gout and psoriatic arthritis, 1 to 3 capsules (200 to 600 mg) per dose, 3 to 4 times a day, up to a maximum of 16 capsules (3200 mg) a day. For juvenile rheumatoid arthritis, 30 to 40 mg per kg of body weight a day in 3 to 4 divided doses. For mild to moderate pain or a cold, adults take 1 to 2 capsules (200 to 400 mg) per dose, 3 to 4 times a day. For migraine, adults take 1 to 2 capsules per dose. See the approved product information for the remaining dosing details.",
+      "caution": "This medicine must not be taken by people who are hypersensitive to it, or who have a gastrointestinal ulcer, gastrointestinal bleeding, a severe blood disorder, severe liver impairment, severe kidney impairment, severe heart failure, severe high blood pressure or bronchial asthma; people who have had asthma, urticaria or an allergic reaction caused by aspirin or another anti-inflammatory painkiller; people with pain occurring before or after coronary artery bypass surgery; women in the last 3 months of pregnancy; breastfeeding women; or people receiving high-dose methotrexate as cancer treatment. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral soft capsule",
+        "Use": "Arthritis, gout; fever and pain from a cold; headache, toothache, muscle pain",
+        "Check with a pharmacist": "Aspirin or NSAID allergy; stomach ulcer; heart, liver or kidney disease; pregnancy"
+      }
+    },
+    {
+      "fp": "ee38780c244cde1b",
+      "title": "Anti-inflammatory Analgesic Tablet",
+      "efficacy": "This medicine is used to relieve mild to moderate pain such as muscle pain, neuralgia, pain after injury or surgery, headache, toothache and earache.",
+      "usage": "For adults, 1 to 2 tablets (125 to 250 mg) per dose, 3 times a day.",
+      "caution": "This medicine must not be taken by people with peptic ulcer; people in whom a medicine has caused stomach or duodenal upset; people who are hypersensitive to this medicine; people who have had asthma, urticaria or an allergic reaction to aspirin or another non-steroidal anti-inflammatory painkiller (including COX-2 inhibitors); people being treated for pain occurring before or after coronary artery bypass graft (CABG) surgery; women who are or may be pregnant; or people with severe liver impairment, severe kidney impairment, severe heart failure or Crohn's disease. Before taking it, consult a doctor or pharmacist.",
+      "summaryTable": {
+        "Category": "OTC medicine - oral tablet",
+        "Use": "Mild to moderate pain: muscle pain, neuralgia, headache, toothache, earache",
+        "Check with a pharmacist": "Aspirin or NSAID allergy; peptic ulcer; heart, liver or kidney disease; pregnancy"
+      }
+    }
+  ]
+}
