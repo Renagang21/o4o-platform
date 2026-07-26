@@ -59,6 +59,10 @@ export const SUPPLIER_REGULATED_CATEGORIES_LOAD_FAILED = 'SUPPLIER_REGULATED_CAT
 /** WO-O4O-NETURE-SUPPLIER-LIBRARY-LOAD-ERROR-CONTRACT-V1 */
 export const SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED = 'SUPPLIER_LIBRARY_ITEMS_LOAD_FAILED';
 
+/** WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1 */
+export const SUPPLIER_SPOT_POLICIES_LOAD_FAILED = 'SUPPLIER_SPOT_POLICIES_LOAD_FAILED';
+export const SUPPLIER_SPOT_POLICIES_FORBIDDEN = 'SUPPLIER_SPOT_POLICIES_FORBIDDEN';
+
 /** 자료 목록 + 총 건수. total 로 조회 범위(limit) 밖 존재 여부를 판단한다. */
 export interface SupplierLibraryItemsResult {
   items: SupplierLibraryItem[];
@@ -1203,14 +1207,31 @@ export const supplierApi = {
   },
 
   /** 상품별 스팟 정책 목록 */
+  /**
+   * WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인 — spot-price-policy.controller.ts:61-75 / service.ts:56):
+   *   200 + []      정상 "정책 없음". offer 미존재·타인 offer 도 동일하게 [] 다
+   *                 (`repo.find({ offerId, supplierId })` — **404 개념이 없다**)
+   *   403           supplier 권한 없음 (`user.supplierId` 부재)
+   *   500           서버 오류
+   * 따라서 not-found 상태는 만들지 않고, 403 만 별도 코드로 구분한다.
+   */
   async listSpotPolicies(offerId: string): Promise<SpotPricePolicy[]> {
+    let response;
     try {
-      const response = await api.get(`/neture/supplier/spot-policies/offer/${offerId}`);
-      return response.data?.data || [];
+      response = await api.get(`/neture/supplier/spot-policies/offer/${offerId}`);
     } catch (error) {
-      console.warn('[Supplier API] Failed to list spot policies:', error);
-      return [];
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      console.warn('[Supplier API] Failed to list spot policies:', extractApiError(error));
+      throw new Error(status === 403 ? SUPPLIER_SPOT_POLICIES_FORBIDDEN : SUPPLIER_SPOT_POLICIES_LOAD_FAILED);
     }
+    const result = response.data;
+    if (!result?.success || !Array.isArray(result.data)) {
+      console.warn('[Supplier API] Unexpected spot policies payload shape');
+      throw new Error(SUPPLIER_SPOT_POLICIES_LOAD_FAILED);
+    }
+    return result.data as SpotPricePolicy[];
   },
 
   /** 스팟 정책 수정 (DRAFT만) */

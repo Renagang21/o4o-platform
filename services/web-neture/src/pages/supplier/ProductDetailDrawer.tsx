@@ -15,6 +15,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { X, Pencil, Trash2, ImagePlus, Loader2, Sparkles, Plus, ChevronDown, ChevronRight } from 'lucide-react';
 import { supplierApi, type SupplierProduct, productApi, type ProductImage, type CategoryTreeItem, type BrandItem, type SpotPricePolicy } from '../../lib/api';
+import { SUPPLIER_SPOT_POLICIES_FORBIDDEN } from '../../lib/api/supplier';
 import { ProductForm, type ProductFormData, CategorySelect } from '../../components/product';
 import { RichTextEditor, ContentRenderer, type MediaInsert } from '@o4o/content-editor';
 // WO-NETURE-PRODUCT-DRAWER-FORM-STANDARD-COMPLIANCE-V1: O4O Form Standard primitives
@@ -173,8 +174,11 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const [showImagePicker, setShowImagePicker] = useState(false);
 
   // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 state
-  const [spotPolicies, setSpotPolicies] = useState<SpotPricePolicy[]>([]);
+  // WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1:
+  //   null = 아직 못 불러옴. 정상 "정책 없음"([]) 과 타입 수준에서 구분한다.
+  const [spotPolicies, setSpotPolicies] = useState<SpotPricePolicy[] | null>(null);
   const [spotLoading, setSpotLoading] = useState(false);
+  const [spotError, setSpotError] = useState<null | 'load' | 'forbidden'>(null);
   const [spotFormOpen, setSpotFormOpen] = useState(false);
   const [spotForm, setSpotForm] = useState({ policyName: '', spotPrice: '', startAt: '', endAt: '' });
   const [spotSaving, setSpotSaving] = useState(false);
@@ -387,11 +391,37 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   };
 
   // WO-NETURE-SPOT-PRICE-POLICY-FOUNDATION-V1: 스팟 정책 로드
+  // WO-O4O-NETURE-SUPPLIER-SPOT-POLICY-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패는 throw 된다. "정책 없음" 으로 표시하지 않고 지속 오류 상태로 분리한다.
+  //   초기 조회 / 생성 후 / 상태 변경 후 3개 지점이 이 함수를 공유한다.
+  //   keepExisting=true 면 mutation 후 재조회 실패 시 기존 목록을 비우지 않는다.
+  const spotReqRef = useRef(0);
+  const loadSpotPolicies = useCallback(async (offerId: string, keepExisting = false) => {
+    const reqId = ++spotReqRef.current;
+    setSpotLoading(true);
+    setSpotError(null);
+    try {
+      const rows = await supplierApi.listSpotPolicies(offerId);
+      if (reqId !== spotReqRef.current) return; // stale 응답이 새 offer 를 덮어쓰지 않게 한다
+      setSpotPolicies(rows);
+    } catch (e: any) {
+      if (reqId !== spotReqRef.current) return;
+      if (!keepExisting) setSpotPolicies(null);
+      setSpotError(e?.message === SUPPLIER_SPOT_POLICIES_FORBIDDEN ? 'forbidden' : 'load');
+    } finally {
+      if (reqId === spotReqRef.current) setSpotLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (!product?.id || !open) return;
-    setSpotLoading(true);
-    supplierApi.listSpotPolicies(product.id).then(setSpotPolicies).finally(() => setSpotLoading(false));
-  }, [product?.id, open]);
+    // offer 전환·재오픈 시 이전 데이터·오류를 먼저 초기화한다.
+    spotReqRef.current++;
+    setSpotPolicies(null);
+    setSpotError(null);
+    setSpotFormOpen(false);
+    loadSpotPolicies(product.id);
+  }, [product?.id, open, loadSpotPolicies]);
 
   // WO-O4O-NETURE-SUPPLIER-PRODUCT-SERVICE-SPECIFIC-PRICING-FLOW-V1: 서비스별 공급가 로드
   useEffect(() => {
@@ -430,8 +460,9 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (result.success) {
       setSpotFormOpen(false);
       setSpotForm({ policyName: '', spotPrice: '', startAt: '', endAt: '' });
-      const updated = await supplierApi.listSpotPolicies(product.id);
-      setSpotPolicies(updated);
+      // 생성은 성공했다. 후속 재조회가 실패해도 mutation 을 실패로 뒤집지 않고
+      // 기존 목록을 유지한 채 정책 영역만 오류 상태로 전환한다.
+      await loadSpotPolicies(product.id, true);
     } else {
       toast.error(result.error || '스팟 정책 생성 실패');
     }
@@ -442,8 +473,7 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
     if (!product?.id) return;
     const result = await supplierApi.changeSpotPolicyStatus(policyId, status);
     if (result.success) {
-      const updated = await supplierApi.listSpotPolicies(product.id);
-      setSpotPolicies(updated);
+      await loadSpotPolicies(product.id, true);
     } else {
       toast.error(result.error || '상태 변경 실패');
     }
@@ -1741,14 +1771,31 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
             <Section title="스팟 가격 정책">
               {spotLoading ? (
                 <div className="flex items-center gap-2 text-xs text-slate-400"><Loader2 className="w-3 h-3 animate-spin" /> 로딩 중...</div>
-              ) : spotPolicies.length === 0 && !spotFormOpen ? (
+              ) : spotError ? (
+                /* 지속 오류 — "정책 없음" 문구는 노출하지 않는다. 토스트로 대체하지 않는다. */
+                <div className="text-center py-3">
+                  <p className="text-xs text-slate-600 mb-2">
+                    {spotError === 'forbidden'
+                      ? '이 상품의 스팟 정책을 볼 권한이 없습니다.'
+                      : '스팟 정책을 불러오지 못했습니다.'}
+                  </p>
+                  {spotError === 'load' && product?.id && (
+                    <button
+                      onClick={() => loadSpotPolicies(product.id)}
+                      className="text-xs text-slate-600 underline hover:text-slate-800 font-medium"
+                    >
+                      다시 시도
+                    </button>
+                  )}
+                </div>
+              ) : (spotPolicies?.length ?? 0) === 0 && !spotFormOpen ? (
                 <div className="text-center py-3">
                   <p className="text-xs text-slate-400 mb-2">등록된 스팟 정책이 없습니다</p>
                   <button onClick={() => setSpotFormOpen(true)} className="text-xs text-blue-600 hover:text-blue-700 font-medium">+ 스팟 정책 추가</button>
                 </div>
               ) : (
                 <>
-                  {spotPolicies.map((p) => {
+                  {(spotPolicies ?? []).map((p) => {
                     const now = new Date();
                     const isExpired = p.status === 'ACTIVE' && new Date(p.endAt) < now;
                     const statusLabel = isExpired ? '만료' : p.status === 'DRAFT' ? '초안' : p.status === 'ACTIVE' ? '활성' : '취소';
