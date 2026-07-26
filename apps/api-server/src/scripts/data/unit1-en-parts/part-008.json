@@ -1,0 +1,245 @@
+{
+ "batch": 8,
+ "groups": [
+  {
+   "fp": "19593a1bc15c9187",
+   "title": "Cold Relief Tablet",
+   "efficacy": "This medicine is used to relieve the symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 1 tablet 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches", "Check with a pharmacist": "Under 15 years; regular alcohol use" }
+  },
+  {
+   "fp": "2002a72faabc129f",
+   "title": "Cold Relief Tablet",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 1 tablet 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches", "Check with a pharmacist": "Under 15 years; regular alcohol use" }
+  },
+  {
+   "fp": "225967966ea1c4f0",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for people aged 8 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: runny nose, congestion, sneezing, sore throat, fever, aches", "Check with a pharmacist": "Under 8 years; regular alcohol use" }
+  },
+  {
+   "fp": "238782df589f567d",
+   "title": "Bile Secretion Support Tablet",
+   "efficacy": "This medicine is used as supportive treatment for liver disease caused by insufficient bile secretion and for biliary tract (bile duct, gallbladder) disease, and for chronic conditions related to it.",
+   "usage": "For adults, 1/2 tablet to 1 tablet 3 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have severe biliary obstruction, fulminant hepatitis or radiolucent calcified gallstones. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Supportive treatment for liver and biliary tract disease", "Check with a pharmacist": "Severe biliary obstruction; fulminant hepatitis; calcified gallstones" }
+  },
+  {
+   "fp": "245f8128f2dcaa25",
+   "title": "Antispasmodic Antacid Tablet",
+   "efficacy": "This medicine is used for stomach pain, abdominal pain, colic, excess stomach acid and heartburn.",
+   "usage": "For adults (aged 15 years and over), 2 tablets 2 to 3 times a day; for people aged 8 years to under 15 years, 1 tablet 2 to 3 times a day, after or between meals. When taken 2 or more times a day, leave an interval of at least 4 hours.",
+   "caution": "Do not take if you are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Stomach and abdominal pain, colic, excess acid, heartburn", "Check with a pharmacist": "Age 7 years or under; galactose intolerance" }
+  },
+  {
+   "fp": "27fcdb0c3e305ca2",
+   "title": "Anti-inflammatory Analgesic Soft Capsule",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery", "Check with a pharmacist": "Maximum 1200 mg a day; gastrointestinal bleeding" }
+  },
+  {
+   "fp": "286ec5bde2dde5e5",
+   "title": "Laxative Enteric-coated Tablet",
+   "efficacy": "This medicine is used for constipation and for relief of the loss of appetite, abdominal bloating, abnormal intestinal fermentation and haemorrhoids that accompany constipation.",
+   "usage": "For people aged 15 years and over and adults, 1 to 2 tablets once a day at bedtime (on an empty stomach). Start with the smallest amount and increase or decrease it gradually while watching the shape and condition of the stool.",
+   "caution": "Do not take if you have an acute abdominal condition (appendicitis, intestinal bleeding, ulcerative colitis and similar), intestinal obstruction, or galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Constipation and related bloating, poor appetite and haemorrhoids", "Check with a pharmacist": "Under 15 years; acute abdominal disease; bowel obstruction" }
+  },
+  {
+   "fp": "2f29c50d46e8295b",
+   "title": "Analgesic Antipyretic Soft Capsule",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache, joint pain, neuralgia, low back pain, muscle pain, stiff shoulders, bruise pain, fracture pain and sprain pain.",
+   "usage": "For people aged 15 years and over or adults, 1 to 2 capsules per dose; for people aged 11 years to under 15 years, 1 capsule per dose, 1 to 3 times a day, leaving an interval of at least 4 hours and avoiding an empty stomach. For people aged 8 years to under 11 years, 1 capsule per dose, 1 to 2 times a day, leaving an interval of at least 6 hours and avoiding an empty stomach.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Headache, toothache, sore throat, joint and muscle pain", "Check with a pharmacist": "Under 8 years; at least 4 hours between doses; regular alcohol use" }
+  },
+  {
+   "fp": "32e772221dc4ec72",
+   "title": "Analgesic Antipyretic Soft Capsule",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache, joint pain, neuralgia, low back pain, muscle pain, stiff shoulders and bruise pain.",
+   "usage": "For people aged 15 years and over and adults, 1 capsule 1 to 3 times a day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Headache, toothache, sore throat, joint pain, neuralgia, muscle pain", "Check with a pharmacist": "Under 15 years; at least 4 hours between doses" }
+  },
+  {
+   "fp": "367e03e27aa7530b",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for people over 7 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches", "Check with a pharmacist": "Age 7 years or under; regular alcohol use" }
+  },
+  {
+   "fp": "3762f278443606a9",
+   "title": "Cold Relief Tablet",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches", "Check with a pharmacist": "Under 15 years; regular alcohol use" }
+  },
+  {
+   "fp": "38f0499b68ea7cfa",
+   "title": "Anti-inflammatory Analgesic Tablet",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+   "usage": "For adults, 1 tablet (300 mg) 2 to 4 times a day. Do not exceed 4 tablets (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery", "Check with a pharmacist": "Maximum 1200 mg a day; gastrointestinal bleeding" }
+  },
+  {
+   "fp": "3a563fb4e45d75ce",
+   "title": "Digestive Enzyme Enteric-coated Tablet",
+   "efficacy": "This medicine is used for indigestion, loss of appetite, overeating, a feeling of heaviness, promotion of digestion, and a feeling of fullness in the stomach caused by indigestion.",
+   "usage": "For people aged 15 years and over, 2 tablets 3 times a day after meals.",
+   "caution": "Do not take if you are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Indigestion, loss of appetite, overeating, stomach fullness", "Check with a pharmacist": "Age 7 years or under; galactose intolerance" }
+  },
+  {
+   "fp": "438146e6ef747d3b",
+   "title": "Calcium Antacid Tablet",
+   "efficacy": "This medicine is used for the antacid action and symptom relief of gastric and duodenal ulcer, gastritis and excess stomach acid, and for calcium supplementation.",
+   "usage": "For gastric or duodenal ulcer, gastritis and excess stomach acid, 2 to 10 tablets (1 to 5 g) a day in 3 to 4 divided doses; for calcium supplementation, 3 to 6 tablets (1.5 to 3 g) a day in 1 to 2 divided doses. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not exceed a maximum of 15 tablets (7.5 g) a day. Do not take if you have severe high blood calcium or severe high urine calcium, or hyperparathyroidism. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Antacid for ulcer, gastritis and excess acid; calcium supplementation", "Check with a pharmacist": "Maximum 15 tablets a day; high blood calcium" }
+  },
+  {
+   "fp": "44f3afc1d17c5898",
+   "title": "Antihistamine Decongestant Tablet",
+   "efficacy": "This medicine is used to relieve sneezing, runny nose, nasal congestion and watery eyes caused by a head cold and by allergic or vasomotor rhinitis.",
+   "usage": "For adults, 1 tablet per dose; for children aged 12 to 14 years, 1/2 tablet per dose, 3 times a day after each meal.",
+   "caution": "If a severe skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking it and consult a doctor or pharmacist. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis", "Check with a pharmacist": "Serious skin reactions" }
+  },
+  {
+   "fp": "4b40d7e3a890c09b",
+   "title": "Acetaminophen Tablet",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "For children aged 12 years and over and adults, 1 to 2 tablets 3 to 4 times a day, every 4 to 6 hours as needed. Do not exceed 4 g (8 tablets) a day. Take the lowest effective dose for the shortest possible time.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Fever and pain from a cold, headache, neuralgia, muscle and joint pain", "Check with a pharmacist": "Under 12 years; maximum 4 g a day; regular alcohol use" }
+  },
+  {
+   "fp": "4f1314e945facee7",
+   "title": "Cold Relief Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For adults, 2 capsules per dose; for people aged 11 years to under 15 years, 4/3 capsule per dose; for people over 7 years to under 11 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches", "Check with a pharmacist": "Age 7 years or under; regular alcohol use" }
+  },
+  {
+   "fp": "58b580af8a49016e",
+   "title": "Anti-inflammatory Analgesic Soft Capsule",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis, painful swelling or inflammation after trauma or surgery, and infections accompanied by inflammation, pain and fever.",
+   "usage": "For adults, 1 tablet (300 mg) 2 to 4 times a day. Do not exceed 4 tablets (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery", "Check with a pharmacist": "Maximum 1200 mg a day; gastrointestinal bleeding" }
+  },
+  {
+   "fp": "5c12f2d4ae61a4d3",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold such as runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain.",
+   "usage": "For people aged 15 years and over and adults, 1 capsule 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches", "Check with a pharmacist": "Under 15 years; regular alcohol use" }
+  },
+  {
+   "fp": "5c69da5df63c319b",
+   "title": "Acetaminophen Tablet",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, headache, neuralgia, muscle pain, period pain, sprain pain, toothache, joint pain and rheumatic pain.",
+   "usage": "For children aged 12 years and over and adults, 1 to 2 tablets 3 to 4 times a day (every 4 to 6 hours) as needed. Do not exceed 4 g (8 tablets) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Fever and pain from a cold, headache, neuralgia, muscle and joint pain", "Check with a pharmacist": "Under 12 years; maximum 4 g a day; regular alcohol use" }
+  },
+  {
+   "fp": "5f3922a71d3304c0",
+   "title": "Mucolytic Capsule",
+   "efficacy": "This medicine is used as a mucolytic and expectorant in acute and chronic respiratory disease.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 3 times a day. For acute respiratory disease, do not take it continuously for 10 days or more.",
+   "caution": "Do not take if you are hypersensitive to this medicine, or have liver cirrhosis, cystathionine synthase deficiency, peptic ulcer or severe renal impairment. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Mucolytic and expectorant in acute and chronic respiratory disease", "Check with a pharmacist": "Liver cirrhosis, peptic ulcer, severe renal impairment" }
+  },
+  {
+   "fp": "634271c6ed75f9db",
+   "title": "Antihistamine Tablet for Skin Symptoms",
+   "efficacy": "This medicine is used for urticaria, eczema, itching and dermatitis caused by lacquer and similar plants.",
+   "usage": "For adults and people aged 15 years and over, 1 tablet 3 times a day after meals.",
+   "caution": "Do not take if you are pregnant or may be pregnant, are breastfeeding, are a child under 15 years, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Urticaria, eczema, itching, plant dermatitis", "Check with a pharmacist": "Under 15 years; pregnancy, breastfeeding; galactose intolerance" }
+  },
+  {
+   "fp": "67186868f6a9b6d9",
+   "title": "Expectorant Capsule",
+   "efficacy": "This medicine is used for difficulty bringing up phlegm in acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis and cystic fibrosis.",
+   "usage": "For acute disease, adults take 1 capsule (200 mg) 3 times a day and children aged 6 to 14 years take 1 capsule (200 mg) 2 times a day, before meals with a small amount of water. For chronic disease, adults take 1 capsule (200 mg) 2 times a day and children aged 6 to 14 years take 1/2 capsule (100 mg) 3 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, are an infant under 2 years, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Difficulty bringing up phlegm in bronchitis, asthma, laryngitis, sinusitis", "Check with a pharmacist": "Under 2 years; gastric or duodenal ulcer; galactose intolerance" }
+  },
+  {
+   "fp": "6a3acb45cbcae5ef",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for people over 7 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches", "Check with a pharmacist": "Age 7 years or under; regular alcohol use" }
+  },
+  {
+   "fp": "6dce7282014895b9",
+   "title": "Periodontal Support Capsule",
+   "efficacy": "This medicine is used as supportive treatment for gingivitis after periodontal treatment and for mild to moderate periodontitis.",
+   "usage": "For adults, 1 capsule 3 times a day after meals.",
+   "caution": "Do not take if you are a child under 15 years, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Supportive treatment for gingivitis and mild to moderate periodontitis", "Check with a pharmacist": "Under 15 years; galactose intolerance" }
+  },
+  {
+   "fp": "73ff75cd3c4e7019",
+   "title": "Tonic Oral Liquid for Asthenia",
+   "efficacy": "This medicine is used as supportive treatment for asthenia.",
+   "usage": "For adults, 1 sachet (1 g) 3 times a day; for children aged 6 years and over, 1 sachet (1 g) 2 times a day, diluted in water.",
+   "caution": "Do not give to young children under 6 years, and do not take if you are pregnant or breastfeeding. Keep to the stated directions and amount.",
+   "summaryTable": { "Category": "OTC medicine - oral liquid", "Use": "Supportive treatment for asthenia", "Check with a pharmacist": "Under 6 years; pregnancy, breastfeeding" }
+  },
+  {
+   "fp": "7871cbc9dbe87de0",
+   "title": "Antihistamine Decongestant Tablet",
+   "efficacy": "This medicine is used to relieve sneezing, runny nose, nasal congestion and watery eyes caused by a head cold and by allergic or vasomotor rhinitis.",
+   "usage": "For adults, 1 tablet per dose; for children aged 12 to 14 years, 1/2 tablet per dose, 3 times a day after each meal.",
+   "caution": "If a severe skin reaction such as acute generalised exanthematous pustulosis occurs, stop taking it and consult a doctor or pharmacist. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Sneezing, runny nose, nasal congestion and watery eyes from a cold or rhinitis", "Check with a pharmacist": "Serious skin reactions" }
+  },
+  {
+   "fp": "7bbe429d3e1607c1",
+   "title": "Laxative Enteric-coated Tablet",
+   "efficacy": "This medicine is used to relieve constipation and the loss of appetite, abdominal bloating, abnormal intestinal fermentation and haemorrhoids that accompany constipation.",
+   "usage": "For people aged 15 years and over and adults, 2 tablets per dose; for people aged 11 years to under 15 years, 1 to 2 tablets per dose; for people aged 7 years to under 11 years, 1 tablet per dose, once a day at bedtime (on an empty stomach). Start with the smallest amount.",
+   "caution": "Do not take if you have an acute abdominal condition or intestinal obstruction, are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Constipation and related bloating, poor appetite and haemorrhoids", "Check with a pharmacist": "Age 7 years or under; acute abdominal disease; bowel obstruction" }
+  },
+  {
+   "fp": "7e30b7fa3d56e4f5",
+   "title": "Intestinal Adsorbent Powder",
+   "efficacy": "This medicine is used for acute and chronic enteritis, acute and chronic diarrhoea, acute dysentery, and abnormal intestinal fermentation of various causes.",
+   "usage": "For adults, 2 g 3 times a day, with 4 g for the first dose. For young children, 1 g 3 times a day.",
+   "caution": "Do not take if you have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral powder", "Use": "Enteritis, diarrhoea, dysentery, abnormal intestinal fermentation", "Check with a pharmacist": "Galactose intolerance and related genetic problems" }
+  },
+  {
+   "fp": "80052e09957a501e",
+   "title": "Analgesic Antipyretic Tablet",
+   "efficacy": "This medicine is used for headache, neuralgia, muscle pain, period pain, sprain pain, fever and pain caused by a cold, toothache, joint pain and rheumatic pain.",
+   "usage": "For adults, 2 tablets every 6 hours, not exceeding a maximum of 8 tablets a day. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause liver damage. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Headache, neuralgia, muscle pain, period pain, fever and pain from a cold", "Check with a pharmacist": "Maximum 8 tablets a day; 6-hour interval; regular alcohol use" }
+  }
+ ]
+}
