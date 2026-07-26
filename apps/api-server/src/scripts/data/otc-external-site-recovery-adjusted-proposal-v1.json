@@ -1,0 +1,407 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-PROFESSIONAL-USE-SEPARATION-AUDIT-V1",
+ "artifact": "adjusted-shard-proposal",
+ "agent": "da",
+ "readOnly": true,
+ "dbWrite": 0,
+ "basedOn": {
+  "approvedSsot": "otc-external-site-recovery-approved-ssot-v1.json",
+  "commit": "172a792fd",
+  "note": "승인 SSOT 원본은 수정하지 않았다. 본 파일은 전문용 분리 후 조정 제안이며 확정 SSOT 가 아니다."
+ },
+ "separation": {
+  "cutaneous": 162,
+  "PRODUCIBLE_STORE": {
+   "fingerprints": 19,
+   "masters": 83
+  },
+  "HOLD_PROFESSIONAL_USE": {
+   "fingerprints": 5,
+   "masters": 79
+  },
+  "splitRequiredFps": [],
+  "multiPurposeMasters": 41,
+  "v2AppliedIntersection": 0
+ },
+ "before": {
+  "fingerprints": 47,
+  "masters": 278
+ },
+ "after": {
+  "fingerprints": 42,
+  "masters": 199,
+  "writePlan": {
+   "ko_4T": 796,
+   "en_2T": 398,
+   "total": 1194
+  }
+ },
+ "shards": {
+  "ga": {
+   "before": {
+    "fingerprints": 17,
+    "masters": 93,
+    "routes": {
+     "cutaneous": 35,
+     "nasal": 28,
+     "oromucosal": 23,
+     "rectal": 7
+    }
+   },
+   "after": {
+    "fingerprints": 15,
+    "masters": 68,
+    "routes": {
+     "nasal": 28,
+     "oromucosal": 23,
+     "rectal": 7,
+     "cutaneous": 10
+    }
+   },
+   "removed": {
+    "fingerprints": 2,
+    "masters": 25
+   },
+   "holdFingerprints": [
+    "b8249e326b64aafe",
+    "c33442be59bb49d4"
+   ],
+   "fingerprintList": [
+    "0725bc544733daa0",
+    "0fbbd83554c92419",
+    "16e36e242f2eda86",
+    "2ffe5962b373d734",
+    "327a62979c86a281",
+    "48ac7e9d44f41e70",
+    "4c7b09b53d9fde22",
+    "83e7f3c1cbf46c85",
+    "87d4e23259cc5609",
+    "8ce5fa989d99722a",
+    "928c8196af34f386",
+    "a40fbda6ff3ddafc",
+    "a559e9d5d38949c9",
+    "bf23174cc4e8cd4e",
+    "f57c37aaa7295e50"
+   ],
+   "masterIds": [
+    "0070d541-ab09-45d6-b9b2-321f01475530",
+    "05e08f01-93c6-4191-b519-b674ca85f65c",
+    "093ad715-60d2-458e-94a7-f95d84460247",
+    "0cb37bc4-fc67-4091-98e2-7b65410e7dd0",
+    "0cc1defb-12d6-46d7-89ea-71c531e8494c",
+    "10b8a7e7-e8a0-418a-be43-8cf86b674b70",
+    "1811d0ef-3be0-45ec-a3db-c1f2e596cfa6",
+    "1d5f3248-2c6f-44fd-8606-fd298aecc468",
+    "1e7af619-5fc8-4205-93b8-531950ac50eb",
+    "1eba2c64-726d-466c-b18d-546d3b6bbd77",
+    "1f117065-6140-4c7c-8ac7-01e8678f4f6a",
+    "27971914-a53f-48e9-835c-e2237a272c85",
+    "2de944fa-a5ea-4c07-8266-57b31642ef4c",
+    "2f527e3d-eb18-49e0-a48f-b41a8d799b02",
+    "3395e3f3-1793-4907-ae47-338e199eedad",
+    "3c8015ed-84d3-44f3-a204-8d8992fa9def",
+    "3e53fefd-9773-4e75-b82c-4cda27fa67fa",
+    "4c5cd989-19a0-4509-af11-65e80abbc740",
+    "4d29c563-3458-4477-9b49-2afe5a10d75f",
+    "4d730f7c-b127-41d4-a8b7-1c1a2db3419e",
+    "4e072d5b-0c4e-4a5f-bda1-d20c7a213f5a",
+    "4ed16ee2-09d3-47fc-b4c6-9f4cbbd15236",
+    "5679aaf4-038e-441f-b509-1ad7b088510e",
+    "60cfd041-1023-49c3-9703-c5411622ed6f",
+    "60d3489e-302d-458e-abd9-546f45c52a2c",
+    "646f937d-7fcc-41a6-b65f-c5d64e1ac090",
+    "6e3e1d48-cc88-4920-aa1f-5577ac0e8863",
+    "706a2af3-43e3-42ee-9901-1007ed88e097",
+    "73645c5d-5a75-4ffb-aee0-0d470cdc0456",
+    "7381113d-6166-4cff-94a1-d52262162669",
+    "74ef5f66-1425-42ca-976a-3eb2ac5e89c5",
+    "772a9b9f-7b63-46d9-8f88-a8c3d61c71f5",
+    "866c9c3c-31a9-4424-9576-84f5ea7c8df7",
+    "8f0ce217-9132-4a60-afa8-115c00f4244f",
+    "90d93273-2fa9-4f70-baac-5daf932d2996",
+    "92b941d3-1d89-455b-8730-e53038d6ab9e",
+    "96f5bff8-f27e-4a9f-a516-b18ad62dea50",
+    "9b5e5610-e47a-4c04-bec0-0e826c61bd69",
+    "9c4a2690-8485-4521-9588-05a75b35ced2",
+    "9cbca7cc-0f39-4fb8-a8cb-bdfc13d09732",
+    "9ffaadb7-b659-4efc-8609-6b493247baab",
+    "a05acb48-61e7-4238-9edc-35aba039525e",
+    "aa1325a1-b874-4aae-b2eb-bfa05bf284d7",
+    "b1364f52-052b-42c7-9bb6-f9b484294d6d",
+    "b22b8c69-ad5a-42bb-a3ac-cdd5562fff22",
+    "b2e46c18-3a43-4210-b4bf-1a1f6a4f3eff",
+    "b32bdf03-fd90-4770-993d-ae698f20dfe7",
+    "b7e28924-e1b8-4c35-ad66-29740801b49d",
+    "b9c25295-7b4d-4745-96b7-9d11520ad123",
+    "bad373ce-504c-4d93-b0af-ff9345522d00",
+    "be4cb45c-f932-4b42-8c06-f170cf3a2927",
+    "c2b719f6-bb36-4ddb-8a28-0a56e9187a89",
+    "c3180457-951f-472c-ac65-9e8da17acbf1",
+    "ca48d3d8-1971-412c-884a-5b312e392bb7",
+    "d022f273-0825-49ae-9278-3ad4a8e71398",
+    "d32bcde0-472a-415a-bc4c-30713aac1114",
+    "dd88ca1e-b760-4b1b-bdff-16c77eef8e2f",
+    "dde76973-f8ea-4ee6-ac6a-35e85933172e",
+    "e3c0a1fa-1b2c-4d63-8c66-ddec47d3b692",
+    "e523aabc-49b7-4fd9-92b3-05ee3837a92c",
+    "ecf64de8-d927-4c47-9fef-2153c1bf5960",
+    "f02bc0d8-e3d0-4a54-91a8-a8864f248c70",
+    "f2490938-9f5d-4e26-baaa-e6e96a56f654",
+    "f40ee97a-6735-424c-97b2-fc0d7682902d",
+    "f6e58ad6-b5b1-45d3-9b79-d72f59dd9289",
+    "f7afaac7-b7b1-4c59-8fda-c054d8d94f10",
+    "f9db9f8a-beb8-4325-b9f6-d877a73328b9",
+    "fe63f9f0-7185-4d2c-826e-19bf0155ac29"
+   ],
+   "writePlan": {
+    "ko_4T": 272,
+    "en_2T": 136,
+    "total": 408
+   }
+  },
+  "na": {
+   "before": {
+    "fingerprints": 16,
+    "masters": 93,
+    "routes": {
+     "cutaneous": 54,
+     "oromucosal": 25,
+     "nasal": 8,
+     "vaginal": 6
+    }
+   },
+   "after": {
+    "fingerprints": 15,
+    "masters": 85,
+    "routes": {
+     "oromucosal": 25,
+     "vaginal": 6,
+     "nasal": 8,
+     "cutaneous": 46
+    }
+   },
+   "removed": {
+    "fingerprints": 1,
+    "masters": 8
+   },
+   "holdFingerprints": [
+    "fb12df089a70fd23"
+   ],
+   "fingerprintList": [
+    "0449c842ca60275e",
+    "0548673b6342d37d",
+    "147589e5395c02b3",
+    "23cfa962c99265dc",
+    "2c7041478b086ec1",
+    "439fec45992950e2",
+    "7467c6a54c7b3780",
+    "7ce90f7c5de9d9ca",
+    "81bcb25bc8996ebc",
+    "8955dac8b3b283a4",
+    "9820f7ca39e6d4a9",
+    "bbdfc3e0e88941b5",
+    "bfffd6d59d93a7b2",
+    "c94884c1baa9d39a",
+    "e53d1d3d07348854"
+   ],
+   "masterIds": [
+    "04a5c6eb-9f30-4928-93a0-09510d806a6f",
+    "0a1045b9-e4eb-401d-bde2-b6d36038eeaf",
+    "0bc5623b-6a85-474f-8177-6c129e435e87",
+    "0e0593bd-b76e-461a-bc2f-fcab488a996b",
+    "1491b231-9d2b-4ce4-b235-627e599acf8f",
+    "17626dde-4144-4ead-9e4c-94c0d7270cb7",
+    "1bd6eb12-d3eb-4e85-87ec-0d0b272de8a4",
+    "1cd816b9-958b-4876-bc31-05ff1456ff10",
+    "1ceca61b-642e-43d6-8d2a-b87d1cbc46bb",
+    "1cfcedc9-fa39-41aa-a001-3d35f5b3be92",
+    "21dc8e59-5f54-4a3a-808a-160d96387cb6",
+    "228d16ae-9405-492d-b3db-429f237d41f4",
+    "24061e43-c8af-4973-80c9-8b2db014f7fd",
+    "283a0ea3-daae-46d4-be97-1cbdbf725f0c",
+    "2a2c7dd4-324f-4e49-8094-4481da4abaa8",
+    "31b8a6df-d3f4-482b-8d09-dbb4281b0859",
+    "31f5b881-d646-4283-9062-2f92b8c8bdde",
+    "37673490-c608-47d4-a645-181fd63a6ef0",
+    "3c114e54-2043-4851-9fbc-33874b80ddb9",
+    "3d046541-5f0f-4bc3-a52b-0a1d214f1c91",
+    "43278f94-40aa-4c08-81b1-dee27b6d2d61",
+    "46b9e4f9-f9be-40aa-902f-9d53b38c05ce",
+    "4ae805dd-790c-4e9f-bfb1-41c1ed7e547d",
+    "50292a59-daad-4873-9519-5e98bc2b5198",
+    "560f60d7-81fc-4917-a4e6-eb7903784822",
+    "5616faa0-93ae-4847-9ab4-c304213eb1ff",
+    "57e2bbc5-fa86-4d11-a535-ea01943b58bd",
+    "59afc574-347b-4321-b83d-2a5692654347",
+    "5a9c9d70-fa15-4e1d-97db-a4867331f335",
+    "5b82e03f-895e-4577-aebe-f04df0516d96",
+    "5d1455b0-4e75-4ed0-8541-a2c26aa6f9ed",
+    "5f4284cb-8d6a-4943-9283-5e17ba13165c",
+    "5f82a1ed-f1a4-45a9-a1a3-3e26ec8e63a8",
+    "63415649-db4a-4574-88c5-22551264f108",
+    "65d7e7ed-04f3-407f-85cb-d87d5fd04878",
+    "69ad9e07-f9c2-4aa5-8cf7-c276415ece0b",
+    "6b38ac24-ae13-4b90-a78c-a861a0e15af0",
+    "6db12979-f3a1-4435-9b00-cbadb99db64d",
+    "6e1b0bf1-61f1-42d7-800b-639a1d20854c",
+    "77d22483-23b1-4895-99f5-a374296c5a48",
+    "7a855192-1364-453f-9ea7-9230dd18f110",
+    "7bec3010-37ce-421e-bb62-3e74a2813c58",
+    "7d552d92-4c12-4cb1-8162-145d005cffc7",
+    "7e682cd6-9b82-4364-9567-d6071d0745d1",
+    "7ec28363-1a9e-4597-8733-9cd3b4113507",
+    "80a9f65f-b68a-4fc8-a540-e0ed27f275de",
+    "81cbb3ce-3f93-4cfa-a056-847d408f8214",
+    "8264275e-fb87-43db-9dcf-4ffe87f32e10",
+    "85bd6a1c-792c-462a-8654-a11b6a9698f7",
+    "85e2b8b6-5ca5-4a42-aa12-ac62beef2973",
+    "86adea79-662a-405f-988d-9bf30c23ed75",
+    "8de321d5-dc28-45f0-8cc5-f487bfac9e9e",
+    "92078978-fab4-4550-be3f-ab6b7882c12d",
+    "941ab40b-d560-4a59-92f8-92d1388e6b36",
+    "94bd651d-96eb-4e05-9853-d114baaba07f",
+    "952cd8e1-408f-48b9-aa0d-f3cfab333b5f",
+    "977ad73a-cf3d-47a3-8a23-9297feab6bce",
+    "983ee894-ec41-4541-8ac1-671bda4447e5",
+    "a048f1fc-34fb-4376-a541-2e3d3690f2cd",
+    "a05d5fdd-fdd4-4dfc-a63e-f8cdff3aa8b7",
+    "a21556f2-c110-4c8b-aadb-cfc15508f59c",
+    "ad05266f-43e2-4466-bb40-63b23c074f5b",
+    "ae1339d7-ba7d-44be-bca5-cea4f40af6d9",
+    "b38dfc35-4e5f-4ecd-9aca-60e887de63ee",
+    "b64ed072-33b5-4185-9b28-66eb475f889d",
+    "b78d016d-7575-4595-892a-77b3275b8eda",
+    "b9b7585b-829b-4278-a2d8-179f5e84794c",
+    "bd0f4825-c9f9-4677-a2b4-240d1b14717b",
+    "bdd0573f-cf3d-4e19-addf-471ef142f290",
+    "c195142b-f4f1-42f6-adfd-fe8e9adc959b",
+    "c45561e5-a270-4c76-9a0c-d2e67497574f",
+    "d003ca26-59d3-4f63-8972-51def1ec89bd",
+    "d34c46a8-9b83-4aaf-beeb-593716b6068b",
+    "d52a1b77-490d-4e33-a20f-51516e350b2b",
+    "d5be6180-e625-4f6d-8b9f-f24539536470",
+    "d7c8c7c6-6d32-4f47-a419-76316e9f6397",
+    "de3722f3-ec93-457d-b5dd-283adb511cf9",
+    "e67daf96-94dd-470c-94c9-b7f3a4aae13e",
+    "e6d23996-96cf-420f-9e79-d1af6e012595",
+    "eb8b011f-2eeb-470e-97a7-360b36e750ba",
+    "eec62504-2934-43c2-a173-f48275e3d59d",
+    "f2c4f58e-193f-4295-bc23-fab4ce5f4c1c",
+    "f8509446-2ebd-456b-bf9c-ed994544a14c",
+    "f95c8d0a-fe16-4a5f-a7a9-4b6657c69c18",
+    "ff6e3572-a389-40f0-8d12-d83db929b36b"
+   ],
+   "writePlan": {
+    "ko_4T": 340,
+    "en_2T": 170,
+    "total": 510
+   }
+  },
+  "da": {
+   "before": {
+    "fingerprints": 14,
+    "masters": 92,
+    "routes": {
+     "cutaneous": 73,
+     "oromucosal": 10,
+     "nasal": 9
+    }
+   },
+   "after": {
+    "fingerprints": 12,
+    "masters": 46,
+    "routes": {
+     "oromucosal": 10,
+     "nasal": 9,
+     "cutaneous": 27
+    }
+   },
+   "removed": {
+    "fingerprints": 2,
+    "masters": 46
+   },
+   "holdFingerprints": [
+    "322aa970abb2f06a",
+    "63fab529380d7f94"
+   ],
+   "fingerprintList": [
+    "179a84e50851476e",
+    "226ed9e7ea262cc5",
+    "669f08b0f6d9e5c8",
+    "6a906ce032efce01",
+    "6d62bb8a8f4d1db6",
+    "8779fbb9d4a756b6",
+    "95dce4317d7f2195",
+    "991af01cd7f711c1",
+    "a6e5feb00896dbbc",
+    "b0e419e6d0f26902",
+    "c6ffa7174fdaaac6",
+    "f6849bd5d25bcd25"
+   ],
+   "masterIds": [
+    "0b1571b9-3691-43a9-bf37-f320bf3c94d8",
+    "1f8a51e9-62b3-4ef8-bb14-b4cd538eda57",
+    "281e52af-6233-40f7-8583-d94460d5a66f",
+    "29bb9baa-47b9-4936-be2a-c01852072f79",
+    "2e1f8f26-8693-46eb-9ff6-c9a9bd0a12ec",
+    "3109cab4-dab0-4926-a2c7-d0f109ef3c6e",
+    "359d5dc7-7098-46c1-bf9d-04c4828e29f3",
+    "3760a9b3-5b9c-46e5-929c-147be407ac81",
+    "3d66ab68-742b-441a-a110-d04257759ecd",
+    "4126d181-8079-45b6-b30c-83f6095ee399",
+    "49c587e0-e0b3-4451-829c-7b4e245691ea",
+    "4cc94392-e3c0-429c-8189-90b9fd43a442",
+    "500e1de7-8ef0-4fcd-86eb-abc4fd2d8e58",
+    "5df070b1-a312-46ed-a011-bdaf96e3fc8a",
+    "62793c6d-2962-4419-bf2c-18b8443039f8",
+    "7641d1e2-1187-4402-bf63-e5d234d81241",
+    "77738f5f-9c3f-4da9-96e3-3dde2e65afd8",
+    "7c39e20c-35dd-4e7a-877e-401d0a838f59",
+    "7edb3e6c-cb56-4137-81dd-181ac8b439f0",
+    "83cfb999-c59a-45d1-ac7f-ca1f1fa914b9",
+    "845d95ea-28bb-4c40-b1df-43a9391e6ca6",
+    "8a103510-8d7a-41e8-87de-97c145b6bb0d",
+    "8fe8e571-5de5-4f98-9361-91c0daf3a1a4",
+    "9bb48725-f3bb-4f88-89d9-378f370bf64e",
+    "9d3751c9-5f3a-42cf-9ed8-9f0763836920",
+    "9f72eb53-bf09-4323-b406-b329e1c30163",
+    "aba5eb97-7bce-41b6-9767-c5fd627ec31d",
+    "ad188c1b-64bf-4c88-9f9b-82651a608510",
+    "b2d5e0d5-4312-465c-8008-451484ea7e8e",
+    "b83977da-b829-4daa-84b9-c7136b7a358b",
+    "b88412d0-7bf4-419f-bfe5-421258dddec3",
+    "c2d6ec69-ab2a-4014-bc4c-3a6a2e25462a",
+    "c2e08c66-f1ee-4bad-a181-2b0231aea58f",
+    "d639de39-3738-4a9f-af10-86d93531810f",
+    "d876fff1-7caf-45bb-8d93-9d8989c3a8b9",
+    "d93a8b52-5958-43fb-8a99-ab97dde9d85f",
+    "db6de469-88eb-447b-a590-b3ef09b9ee49",
+    "e51707d5-167b-48ff-a5ec-9b2b4d56d93e",
+    "ea0d06b8-bb38-49be-835c-350bd08d210b",
+    "ea64ca90-38a1-4aef-80a8-9d082ad41f24",
+    "ec87b2ba-3368-4242-a4c7-c8ded4bf7b88",
+    "f27d9dad-73d0-4123-a037-a4bb9a408af0",
+    "f3464467-b23b-4b70-86e6-4b890d0e3c31",
+    "f413b774-0bbd-41ce-ac4b-ab78f6a9d7a1",
+    "fc62004d-8813-4a02-9cce-f8ed4a3fc4c4",
+    "fe8fc27a-bcab-4281-9405-f94b270ed83c"
+   ],
+   "writePlan": {
+    "ko_4T": 184,
+    "en_2T": 92,
+    "total": 276
+   }
+  }
+ },
+ "gates": {
+  "판정합 == cutaneous 162": true,
+  "근거 결손 0": true,
+  "fp 혼재 해소(전체 HOLD 승격)": true,
+  "기존 oromucosal/nasal/rectal/vaginal 불변": true,
+  "조정 후 shard fp 교집합 0": true,
+  "조정 후 shard master 교집합 0": true,
+  "V2 LIVE 2,509 교집합 0": true,
+  "DB write 0": true
+ },
+ "allGatesPass": true
+}

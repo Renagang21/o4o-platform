@@ -1,0 +1,4554 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-PROFESSIONAL-USE-SEPARATION-AUDIT-V1",
+ "agent": "da",
+ "readOnly": true,
+ "dbWrite": 0,
+ "approvedSsot": "otc-external-site-recovery-approved-ssot-v1.json",
+ "approvalCommit": "172a792fd",
+ "adapterCommit": "cfc34ef18",
+ "scope": "cutaneous 162 master — route 재판정 아님, 콘텐츠 생산 적합성 분리",
+ "markers": {
+  "professional": [
+   {
+    "code": "SURGEON_HAND",
+    "label": "수술자 손 소독",
+    "pattern": "수술자(?:의)?\\s*손|수술\\s*시\\s*수술자|수술\\s*전\\s*손|손\\s*소독[^.]{0,30}수술|수술[^.]{0,20}손\\s*소독"
+   },
+   {
+    "code": "SCRUB",
+    "label": "스크럽·브러시 세정",
+    "pattern": "스크\\s?럽|scrub|브러시|솔을?\\s*사용하여\\s*문지"
+   },
+   {
+    "code": "SURGICAL_SITE",
+    "label": "수술부위 피부 소독",
+    "pattern": "수술\\s*부위|수술부위|수술\\s*전\\s*피부|술전\\s*피부|수술\\s*예정\\s*부위|수술\\s*절개"
+   },
+   {
+    "code": "APPLICATOR",
+    "label": "수술부위 어플리케이터",
+    "pattern": "어플리케이터|어플리케타|applicator"
+   },
+   {
+    "code": "ASEPTIC",
+    "label": "무균술·수술 준비",
+    "pattern": "무균\\s*(?:조작|술|적|상태)|멸균\\s*장갑|수술실|수술\\s*준비|외과적\\s*손\\s*소독"
+   },
+   {
+    "code": "PROCEDURE_PRE",
+    "label": "시술 전 처치",
+    "pattern": "시술\\s*전|처치\\s*전\\s*피부|주사\\s*부위\\s*소독|카테터\\s*삽입\\s*부위|천자\\s*부위"
+   },
+   {
+    "code": "MEDICAL_STAFF",
+    "label": "의료진 전용",
+    "pattern": "의료진|의료\\s*종사자|의료인|병원\\s*내\\s*사용|의료기관에서만"
+   }
+  ],
+  "storeSignals": [
+   {
+    "code": "WOUND",
+    "pattern": "찰과상|열상|상처|베인|긁힌|화상"
+   },
+   {
+    "code": "AFFECTED_AREA",
+    "pattern": "환부|患部|질환\\s*부위"
+   },
+   {
+    "code": "SKIN_ANTISEPSIS",
+    "pattern": "피부\\s*소독|피부의?\\s*살균|소독\\s*및\\s*세정"
+   },
+   {
+    "code": "HYGIENE_HAND",
+    "pattern": "위생\\s*(?:적)?\\s*손\\s*소독|일상\\s*(?:적)?\\s*손\\s*씻기"
+   }
+  ]
+ },
+ "totals": {
+  "cutaneous": 162,
+  "PRODUCIBLE_STORE": {
+   "fingerprints": 19,
+   "masters": 83
+  },
+  "HOLD_PROFESSIONAL_USE": {
+   "fingerprints": 5,
+   "masters": 79
+  },
+  "splitRequiredFps": [],
+  "multiPurposeMasters": 41,
+  "v2AppliedIntersection": 0
+ },
+ "reasonBreakdown": {
+  "SURGEON_HAND": 38,
+  "SURGICAL_SITE": 49,
+  "APPLICATOR": 38,
+  "SCRUB": 8,
+  "ASEPTIC": 3
+ },
+ "gates": {
+  "판정합 == cutaneous 162": true,
+  "근거 결손 0": true,
+  "fp 혼재 해소(전체 HOLD 승격)": true,
+  "기존 oromucosal/nasal/rectal/vaginal 불변": true,
+  "조정 후 shard fp 교집합 0": true,
+  "조정 후 shard master 교집합 0": true,
+  "V2 LIVE 2,509 교집합 0": true,
+  "DB write 0": true
+ },
+ "allGatesPass": true,
+ "masters": [
+  {
+   "masterId": "04a5c6eb-9f30-4928-93a0-09510d806a6f",
+   "name": "세네풀에스액",
+   "shard": "na",
+   "fp": "0449c842ca60275e",
+   "gencode": "D19300CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 베인상처, 창상(상처), 긁힌 상처면의 살균소독, 치질의 경우 항문 살균소독에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 뿌리거나 가아제 또는 탈지면에 적셔서 바릅니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "7ec28363-1a9e-4597-8733-9cd3b4113507",
+   "name": "세네풀에스액",
+   "shard": "na",
+   "fp": "0449c842ca60275e",
+   "gencode": "D19300CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 베인상처, 창상(상처), 긁힌 상처면의 살균소독, 치질의 경우 항문 살균소독에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 뿌리거나 가아제 또는 탈지면에 적셔서 바릅니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1cfcedc9-fa39-41aa-a001-3d35f5b3be92",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "24061e43-c8af-4973-80c9-8b2db014f7fd",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5f4284cb-8d6a-4943-9283-5e17ba13165c",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "7e682cd6-9b82-4364-9567-d6071d0745d1",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a21556f2-c110-4c8b-aadb-cfc15508f59c",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d003ca26-59d3-4f63-8972-51def1ec89bd",
+   "name": "현대물파스에프",
+   "shard": "na",
+   "fp": "0548673b6342d37d",
+   "gencode": "A98800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 삠, 타박상, 근육통, 관절통, 골절통, 요통, 어깨결림, 신경통, 류마티스통증의 진통ㆍ소염과 피부 가려움, 벌레물린데, 동창에 사용합니다.",
+    "dosage": "1일 1~수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "0070d541-ab09-45d6-b9b2-321f01475530",
+   "name": "콜로덤에스액",
+   "shard": "ga",
+   "fp": "0725bc544733daa0",
+   "gencode": "D60800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 티눈, 굳은살, 사마귀에 사용합니다.",
+    "dosage": "1일 1~3회 환부(질환 부위)에 바릅니다.이 약을 사용 시 질환부위에 하얀 필름층이 형성될 수 있으므로 재 적용시 이를 문지르거나 벗겨내어 제거하고 사용하고, 3~4일간 사용한 후 더운 물에 환부(질환 부위)를 담가 부드러워진 각질을 벗겨냅니다.이 약의 1일 최대 사용량은 2g이며 치료기간은 보통 1주일 이상 사용하지 않습니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9ffaadb7-b659-4efc-8609-6b493247baab",
+   "name": "콜로덤에스액",
+   "shard": "ga",
+   "fp": "0725bc544733daa0",
+   "gencode": "D60800CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 티눈, 굳은살, 사마귀에 사용합니다.",
+    "dosage": "1일 1~3회 환부(질환 부위)에 바릅니다.이 약을 사용 시 질환부위에 하얀 필름층이 형성될 수 있으므로 재 적용시 이를 문지르거나 벗겨내어 제거하고 사용하고, 3~4일간 사용한 후 더운 물에 환부(질환 부위)를 담가 부드러워진 각질을 벗겨냅니다.이 약의 1일 최대 사용량은 2g이며 치료기간은 보통 1주일 이상 사용하지 않습니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "29bb9baa-47b9-4936-be2a-c01852072f79",
+   "name": "벌무덴리니멘트",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "3109cab4-dab0-4926-a2c7-d0f109ef3c6e",
+   "name": "모스쿨액",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "8fe8e571-5de5-4f98-9361-91c0daf3a1a4",
+   "name": "벌무덴리니멘트",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9d3751c9-5f3a-42cf-9ed8-9f0763836920",
+   "name": "모스쿨액",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ea0d06b8-bb38-49be-835c-350bd08d210b",
+   "name": "모스쿨액",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f413b774-0bbd-41ce-ac4b-ab78f6a9d7a1",
+   "name": "모스쿨액",
+   "shard": "da",
+   "fp": "179a84e50851476e",
+   "gencode": "341900CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "4cc94392-e3c0-429c-8189-90b9fd43a442",
+   "name": "동성미녹시딜액3%",
+   "shard": "da",
+   "fp": "226ed9e7ea262cc5",
+   "gencode": "196105CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 남성형 탈모증(안드로젠탈모증) 및 여성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "남성은 모발과 두피를 완전히 건조시킨 후, 이 약 0.5~1 mL를 1일 2회(아침, 저녁), 최소 4개월 동안, 환부에만 바르고, 하루 총 투여량이 2 mL를 초과하지 마십시오. 여성은 모발과 두피를 완전히 건조시킨 후, 이 약 0.5 mL를 1일 2회(아침, 저녁), 최소 4개월 동안, 환부에만 바르고, 1일 총 투여량이 1.3 mL를 초과하지 마십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b88412d0-7bf4-419f-bfe5-421258dddec3",
+   "name": "동성미녹시딜액3%",
+   "shard": "da",
+   "fp": "226ed9e7ea262cc5",
+   "gencode": "196105CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 남성형 탈모증(안드로젠탈모증) 및 여성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "남성은 모발과 두피를 완전히 건조시킨 후, 이 약 0.5~1 mL를 1일 2회(아침, 저녁), 최소 4개월 동안, 환부에만 바르고, 하루 총 투여량이 2 mL를 초과하지 마십시오. 여성은 모발과 두피를 완전히 건조시킨 후, 이 약 0.5 mL를 1일 2회(아침, 저녁), 최소 4개월 동안, 환부에만 바르고, 1일 총 투여량이 1.3 mL를 초과하지 마십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "3d046541-5f0f-4bc3-a52b-0a1d214f1c91",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "50292a59-daad-4873-9519-5e98bc2b5198",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "560f60d7-81fc-4917-a4e6-eb7903784822",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "57e2bbc5-fa86-4d11-a535-ea01943b58bd",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "59afc574-347b-4321-b83d-2a5692654347",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6b38ac24-ae13-4b90-a78c-a861a0e15af0",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6db12979-f3a1-4435-9b00-cbadb99db64d",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "7d552d92-4c12-4cb1-8162-145d005cffc7",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "952cd8e1-408f-48b9-aa0d-f3cfab333b5f",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "977ad73a-cf3d-47a3-8a23-9297feab6bce",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a048f1fc-34fb-4376-a541-2e3d3690f2cd",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b78d016d-7575-4595-892a-77b3275b8eda",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "bdd0573f-cf3d-4e19-addf-471ef142f290",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d52a1b77-490d-4e33-a20f-51516e350b2b",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d5be6180-e625-4f6d-8b9f-f24539536470",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d7c8c7c6-6d32-4f47-a419-76316e9f6397",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "de3722f3-ec93-457d-b5dd-283adb511cf9",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e6d23996-96cf-420f-9e79-d1af6e012595",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f2c4f58e-193f-4295-bc23-fab4ce5f4c1c",
+   "name": "큐앤큐니트로푸라존거즈",
+   "shard": "na",
+   "fp": "2c7041478b086ec1",
+   "gencode": "A51702CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 화상 또는 외상에 의한 2차 세균감염에 사용합니다.",
+    "dosage": "환부의 크기에 따라 적당히 절단하여 1일 1~3회 환부에 부착합니다. 증상에 따라 적절히 증감합니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "0b215102-ec69-44be-b5ca-0f855925e4fb",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "11e5c946-cd01-4911-a9ad-dff869c66a5d",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "152884d6-f897-461b-b3e6-f1877b7ed6a6",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "17eead64-41bc-4c0b-be86-3dce24d06069",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1c067424-691b-4318-9972-9dbe1e40c920",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "254779ce-c9e2-4371-98be-f64875752f20",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "31548265-072d-4d6b-b7c1-2287aece4577",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "4586179a-a6ba-46cb-bec7-beab0d1f0792",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "4b29262a-9ea8-4b5a-971a-4237985b05b5",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "4ee0953c-3a9c-46bb-8277-760d035bf525",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "51bb46ef-f82a-480b-8439-5c0c197291bb",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "572aab4b-be34-4708-849f-488ac84db62e",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "593e2738-a847-4ceb-941a-9e18ada2687a",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5e0f0bde-1336-4436-978f-f89c2594f7af",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6320f524-a072-478f-8da4-2fa0a796071f",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6a0f0dbf-57f3-4902-bbcb-87874e55a29e",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6f25bc21-2b0b-4d14-b3b5-32a1bdfe0ae5",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6f9cd70c-16da-419b-8521-987639f05839",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "791d2d46-8f6f-4389-90fc-b3e3c687dffd",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "7e9e3a0f-e4d9-49b4-8d4d-0cfc06a4701b",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "80086eb0-8c3e-469a-acea-f2f09884fd2d",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "8042ce8b-1528-48ae-99f9-0713fd909759",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9ade7f6f-615a-4262-ad13-ef3fddb776e9",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9bdc703e-bb7f-4220-bd0c-b64f13a705ea",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9f4293e9-8e48-4a3f-b813-04bf106be01b",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a07ad8aa-29cf-4891-9f88-a2d9679e267a",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ab61e846-b7ee-4e76-a6f5-79c3a1b19083",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b248aebc-7f98-4c28-962d-076bddf89ca5",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b6a5b51d-3d18-40bb-9c8d-7718b626accb",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "bcf86cb8-9768-4ee1-bd1f-ba1aeda3cdbf",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "bf36ba44-ac3b-4a3a-88d5-aeb489914a82",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "c143b168-876e-4fca-9e0a-9c4d6320aace",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "c614d7ab-6242-431c-ad70-88fc359115d2",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "cde625d2-b05a-43c4-b205-e83b48e1e995",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d77ae6e3-908e-404a-881d-e1e0a98650f5",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e902489f-111b-44d7-957a-86ed65bf563d",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e94d627b-0833-486c-b031-a8e30e45e15d",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f1d59bc2-0737-44d9-8892-4125f9211abb",
+   "name": "비디클로라프렙외용액",
+   "shard": "da",
+   "fp": "322aa970abb2f06a",
+   "gencode": "E13200CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "APPLICATOR"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅"
+    },
+    {
+     "code": "APPLICATOR",
+     "label": "수술부위 어플리케이터",
+     "section": "용법·용량",
+     "quote": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술 전 환자의 피부소독 또는 주사기 바늘, 카테터 삽입 전 환자의 피부 소독에 사용합니다.",
+    "dosage": "이 약은 다음과 같은 순서대로 사용합니다. 어플리케이터의 포장을 벗기고 스폰지가 아래를 향하도록 잡습니다. 어플리케이터의 스폰지 부분을 만지지 않습니다. 앰플이 부서져 약액이 나올 수 있도록 어플리케이터를 한 번만 꽉 눌러 쥐고, 부서진 앰플은 어플리케이터 안에 남아 있게 합니다. 26 ml는 손잡이의 레버를 꽉 눌러 쥐고 그 외 제품은 양 날개를 꽉 눌러 쥡니다. 스폰지를 빠르게 적시기 위해 날개를 반복해서 쥐거나 눌러대지 않습니다. 피부 위에 액이 보일 때까지 처치 부위에 대고 스폰지를 눌렀다 놓았다 하면서 스폰지를 적시고 처치 부위를 약액으로 완전히 젖게 합니다. 건조한 수술 부위(예: 복부 또는 팔)에는 피부 위에 액이 보이면 해당 부위 처치를 위해 부드럽게 앞뒤로 30초 동안 문지릅니다. 습한 수술"
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "941ab40b-d560-4a59-92f8-92d1388e6b36",
+   "name": "엘-크라넬알파액0.025%(알파트라디올)",
+   "shard": "na",
+   "fp": "439fec45992950e2",
+   "gencode": "A21301CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 경증 여성형 탈모증(안드로젠탈모증), 경증 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "1회 3 mL씩, 1일 1회 어플리케이터를 이용하여 질환부위에 바른 후 약 1분간 마사지하여 약이 잘 흡수되도록 합니다. 증상의 개선이 관찰되면 2~3일에 1회로 사용횟수를 줄일 수 있습니다. 이 약은 외용제로서 두피에만 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a05d5fdd-fdd4-4dfc-a63e-f8cdff3aa8b7",
+   "name": "엘-크라넬알파액0.025%(알파트라디올)",
+   "shard": "na",
+   "fp": "439fec45992950e2",
+   "gencode": "A21301CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 경증 여성형 탈모증(안드로젠탈모증), 경증 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "1회 3 mL씩, 1일 1회 어플리케이터를 이용하여 질환부위에 바른 후 약 1분간 마사지하여 약이 잘 흡수되도록 합니다. 증상의 개선이 관찰되면 2~3일에 1회로 사용횟수를 줄일 수 있습니다. 이 약은 외용제로서 두피에만 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "eec62504-2934-43c2-a173-f48275e3d59d",
+   "name": "엘-크라넬알파액0.025%(알파트라디올)",
+   "shard": "na",
+   "fp": "439fec45992950e2",
+   "gencode": "A21301CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 경증 여성형 탈모증(안드로젠탈모증), 경증 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "1회 3 mL씩, 1일 1회 어플리케이터를 이용하여 질환부위에 바른 후 약 1분간 마사지하여 약이 잘 흡수되도록 합니다. 증상의 개선이 관찰되면 2~3일에 1회로 사용횟수를 줄일 수 있습니다. 이 약은 외용제로서 두피에만 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1d5f3248-2c6f-44fd-8606-fd298aecc468",
+   "name": "두두엔액",
+   "shard": "ga",
+   "fp": "48ac7e9d44f41e70",
+   "gencode": "D59000CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b9c25295-7b4d-4745-96b7-9d11520ad123",
+   "name": "두두엔액",
+   "shard": "ga",
+   "fp": "48ac7e9d44f41e70",
+   "gencode": "D59000CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "fe63f9f0-7185-4d2c-826e-19bf0155ac29",
+   "name": "두두엔액",
+   "shard": "ga",
+   "fp": "48ac7e9d44f41e70",
+   "gencode": "D59000CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1811d0ef-3be0-45ec-a3db-c1f2e596cfa6",
+   "name": "버래물액",
+   "shard": "ga",
+   "fp": "4c7b09b53d9fde22",
+   "gencode": "A93200CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 1~수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다.사용 전에 잘 흔들어 사용하십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "27971914-a53f-48e9-835c-e2237a272c85",
+   "name": "버래물액",
+   "shard": "ga",
+   "fp": "4c7b09b53d9fde22",
+   "gencode": "A93200CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 1~수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다.사용 전에 잘 흔들어 사용하십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "646f937d-7fcc-41a6-b65f-c5d64e1ac090",
+   "name": "버래물액",
+   "shard": "ga",
+   "fp": "4c7b09b53d9fde22",
+   "gencode": "A93200CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 1~수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다.사용 전에 잘 흔들어 사용하십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "90d93273-2fa9-4f70-baac-5daf932d2996",
+   "name": "버래물액",
+   "shard": "ga",
+   "fp": "4c7b09b53d9fde22",
+   "gencode": "A93200CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 1~수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다.사용 전에 잘 흔들어 사용하십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d022f273-0825-49ae-9278-3ad4a8e71398",
+   "name": "버래물액",
+   "shard": "ga",
+   "fp": "4c7b09b53d9fde22",
+   "gencode": "A93200CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기에 사용합니다.",
+    "dosage": "1일 1~수회(여러 차례) 환부(질환 부위)에 적당량을 바릅니다.사용 전에 잘 흔들어 사용하십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "19ecf1dc-090c-4728-bb03-de49be136515",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "47441a0a-3f22-4fa8-88c7-0aeed188c64c",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9d4c391d-e342-481f-8a15-fdf216b8c0fe",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a0fbc562-772c-4333-8329-7f427ba22f59",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b8e4ce56-b0e8-428f-bccb-9807c321a83d",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f06d24db-f614-4279-a927-ef717ef62f69",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f5b96b61-dacc-4893-b605-7267e6fcee2b",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "fa8a15c0-698a-4a94-8e00-ccb457cde846",
+   "name": "큐앤큐헥시딘스크랍",
+   "shard": "da",
+   "fp": "63fab529380d7f94",
+   "gencode": "131311CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND",
+    "SCRUB",
+    "SURGICAL_SITE"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다."
+    },
+    {
+     "code": "SCRUB",
+     "label": "스크럽·브러시 세정",
+     "section": "용법·용량",
+     "quote": "용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술전 살균소독(수술자 및 보건위생 종사자의 손소독)에 사용합니다.",
+    "dosage": "이 약의 약액이 흡수된 스폰지를 수술부위 또는 손과 팔꿈치까지 적용하여 3분간 손으로 문지릅니다. 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지르고, 필요에 따라 솔을 사용하여 문지릅니다. 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 완전히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "3760a9b3-5b9c-46e5-929c-147be407ac81",
+   "name": "무조멘액",
+   "shard": "da",
+   "fp": "669f08b0f6d9e5c8",
+   "gencode": "D51600CSI",
+   "suffix": "CSI",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 무좀, 완선(사타구니백선), 체부백선에 사용합니다.",
+    "dosage": "1일 2~3회 적당량을 환부(질환 부위)에 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "8a103510-8d7a-41e8-87de-97c145b6bb0d",
+   "name": "무조멘액",
+   "shard": "da",
+   "fp": "669f08b0f6d9e5c8",
+   "gencode": "D51600CSI",
+   "suffix": "CSI",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 무좀, 완선(사타구니백선), 체부백선에 사용합니다.",
+    "dosage": "1일 2~3회 적당량을 환부(질환 부위)에 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "0b1571b9-3691-43a9-bf37-f320bf3c94d8",
+   "name": "동성미녹시딜액5%",
+   "shard": "da",
+   "fp": "6a906ce032efce01",
+   "gencode": "196104CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "모발과 두피를 완전히 건조시킨 후, 이 약 0.5~1 mL를 1일 2회(아침, 저녁), 최소 4개월 동안 환부에만 바르고, 하루 총 투여량이 2 mL를 초과하지 마십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5df070b1-a312-46ed-a011-bdaf96e3fc8a",
+   "name": "동성미녹시딜액5%",
+   "shard": "da",
+   "fp": "6a906ce032efce01",
+   "gencode": "196104CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "모발과 두피를 완전히 건조시킨 후, 이 약 0.5~1 mL를 1일 2회(아침, 저녁), 최소 4개월 동안 환부에만 바르고, 하루 총 투여량이 2 mL를 초과하지 마십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d639de39-3738-4a9f-af10-86d93531810f",
+   "name": "동성미녹시딜액5%",
+   "shard": "da",
+   "fp": "6a906ce032efce01",
+   "gencode": "196104CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 남성형 탈모증(안드로젠탈모증)의 치료에 사용합니다.",
+    "dosage": "모발과 두피를 완전히 건조시킨 후, 이 약 0.5~1 mL를 1일 2회(아침, 저녁), 최소 4개월 동안 환부에만 바르고, 하루 총 투여량이 2 mL를 초과하지 마십시오."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5616faa0-93ae-4847-9ab4-c304213eb1ff",
+   "name": "솔트액",
+   "shard": "na",
+   "fp": "7ce90f7c5de9d9ca",
+   "gencode": "392700CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 긁힌 상처, 베인 상처, 창상면의 살균 및 소독에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 거즈 또는 탈지면에 적셔서 바릅니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b38dfc35-4e5f-4ecd-9aca-60e887de63ee",
+   "name": "솔트액",
+   "shard": "na",
+   "fp": "7ce90f7c5de9d9ca",
+   "gencode": "392700CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 긁힌 상처, 베인 상처, 창상면의 살균 및 소독에 사용합니다.",
+    "dosage": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 거즈 또는 탈지면에 적셔서 바릅니다."
+   },
+   "storeSignals": [
+    "WOUND",
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "0a1045b9-e4eb-401d-bde2-b6d36038eeaf",
+   "name": "버물리에스액",
+   "shard": "na",
+   "fp": "81bcb25bc8996ebc",
+   "gencode": "B04700CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5a9c9d70-fa15-4e1d-97db-a4867331f335",
+   "name": "버물리에스액",
+   "shard": "na",
+   "fp": "81bcb25bc8996ebc",
+   "gencode": "B04700CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "77d22483-23b1-4895-99f5-a374296c5a48",
+   "name": "버물리에스액",
+   "shard": "na",
+   "fp": "81bcb25bc8996ebc",
+   "gencode": "B04700CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+    "dosage": "1일 수회 환부에 적당량을 바릅니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "500e1de7-8ef0-4fcd-86eb-abc4fd2d8e58",
+   "name": "코네티비나거즈",
+   "shard": "da",
+   "fp": "8779fbb9d4a756b6",
+   "gencode": "530095CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 상처의 조직 재생 촉진에 사용합니다.",
+    "dosage": "1일 1~2회 상처 부위에 적용합니다."
+   },
+   "storeSignals": [
+    "WOUND"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ad188c1b-64bf-4c88-9f9b-82651a608510",
+   "name": "코네티비나거즈(히알루론산나트륨)",
+   "shard": "da",
+   "fp": "8779fbb9d4a756b6",
+   "gencode": "530095CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 상처의 조직 재생 촉진에 사용합니다.",
+    "dosage": "1일 1~2회 상처 부위에 적용합니다."
+   },
+   "storeSignals": [
+    "WOUND"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d93a8b52-5958-43fb-8a99-ab97dde9d85f",
+   "name": "코네티비나거즈(히알루론산나트륨)",
+   "shard": "da",
+   "fp": "8779fbb9d4a756b6",
+   "gencode": "530095CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 상처의 조직 재생 촉진에 사용합니다.",
+    "dosage": "1일 1~2회 상처 부위에 적용합니다."
+   },
+   "storeSignals": [
+    "WOUND"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "db6de469-88eb-447b-a590-b3ef09b9ee49",
+   "name": "코네티비나거즈(히알루론산나트륨)",
+   "shard": "da",
+   "fp": "8779fbb9d4a756b6",
+   "gencode": "530095CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 상처의 조직 재생 촉진에 사용합니다.",
+    "dosage": "1일 1~2회 상처 부위에 적용합니다."
+   },
+   "storeSignals": [
+    "WOUND"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ec87b2ba-3368-4242-a4c7-c8ded4bf7b88",
+   "name": "코네티비나거즈(히알우론산나트륨)",
+   "shard": "da",
+   "fp": "8779fbb9d4a756b6",
+   "gencode": "530095CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 상처의 조직 재생 촉진에 사용합니다.",
+    "dosage": "1일 1~2회 상처 부위에 적용합니다."
+   },
+   "storeSignals": [
+    "WOUND"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "281e52af-6233-40f7-8583-d94460d5a66f",
+   "name": "목앤스프레이",
+   "shard": "da",
+   "fp": "95dce4317d7f2195",
+   "gencode": "D50600CSI",
+   "suffix": "CSI",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 목(인후)의 염증으로 인한 목의 통증, 목의 부종, 목의 불쾌감, 목이 쉼, 구내염에 사용합니다.",
+    "dosage": "1일 수회 적당량을 환부에 분사 도포합니다. 목의 염증에 사용하는 경우 용기의 분사구가 목의 환부를 향하게 하고 가볍게 숨을 내쉬면서 1회 3~4번 분사하고, 1일 3~5회 사용합니다. 처음 사용하는 경우 약액이 나올 때까지 4~5회 분사 후 사용합니다. 호흡을 들이마실 때 이 약을 사용하면 약액이 기관지 또는 폐로 들어갈 수 있으므로, 용기 분사구를 목의 환부로 향하게 하고 ‘아’하고 목소리를 내면서(가볍게 숨을 내쉬면서) 분사합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "62793c6d-2962-4419-bf2c-18b8443039f8",
+   "name": "목앤스프레이",
+   "shard": "da",
+   "fp": "95dce4317d7f2195",
+   "gencode": "D50600CSI",
+   "suffix": "CSI",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 목(인후)의 염증으로 인한 목의 통증, 목의 부종, 목의 불쾌감, 목이 쉼, 구내염에 사용합니다.",
+    "dosage": "1일 수회 적당량을 환부에 분사 도포합니다. 목의 염증에 사용하는 경우 용기의 분사구가 목의 환부를 향하게 하고 가볍게 숨을 내쉬면서 1회 3~4번 분사하고, 1일 3~5회 사용합니다. 처음 사용하는 경우 약액이 나올 때까지 4~5회 분사 후 사용합니다. 호흡을 들이마실 때 이 약을 사용하면 약액이 기관지 또는 폐로 들어갈 수 있으므로, 용기 분사구를 목의 환부로 향하게 하고 ‘아’하고 목소리를 내면서(가볍게 숨을 내쉬면서) 분사합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "2e1f8f26-8693-46eb-9ff6-c9a9bd0a12ec",
+   "name": "헥시탄0.5%액(클로르헥시딘글루콘산염액)",
+   "shard": "da",
+   "fp": "991af01cd7f711c1",
+   "gencode": "131317CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외), 의료용구의 소독, 가구, 기구 등의 소독, 피부의 창상부위 소독에 사용합니다.",
+    "dosage": "용도에 따라 원액 및 다음의 농도로 희석하여 사용하십시오.손 및 피부 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외) 시 0.1 ~ 0.5% 수용액, 의료용구의 소독 시 0.1 ~ 0.5% 수용액, 가구, 기구 등의 소독, 피부의 창상부위 소독 시 0.05% 수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "7641d1e2-1187-4402-bf63-e5d234d81241",
+   "name": "헥시탄0.5%액(클로르헥시딘글루콘산염액)",
+   "shard": "da",
+   "fp": "991af01cd7f711c1",
+   "gencode": "131317CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외), 의료용구의 소독, 가구, 기구 등의 소독, 피부의 창상부위 소독에 사용합니다.",
+    "dosage": "용도에 따라 원액 및 다음의 농도로 희석하여 사용하십시오.손 및 피부 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외) 시 0.1 ~ 0.5% 수용액, 의료용구의 소독 시 0.1 ~ 0.5% 수용액, 가구, 기구 등의 소독, 피부의 창상부위 소독 시 0.05% 수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "83cfb999-c59a-45d1-ac7f-ca1f1fa914b9",
+   "name": "헥시탄0.5%액(클로르헥시딘글루콘산염액)",
+   "shard": "da",
+   "fp": "991af01cd7f711c1",
+   "gencode": "131317CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외), 의료용구의 소독, 가구, 기구 등의 소독, 피부의 창상부위 소독에 사용합니다.",
+    "dosage": "용도에 따라 원액 및 다음의 농도로 희석하여 사용하십시오.손 및 피부 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외) 시 0.1 ~ 0.5% 수용액, 의료용구의 소독 시 0.1 ~ 0.5% 수용액, 가구, 기구 등의 소독, 피부의 창상부위 소독 시 0.05% 수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d876fff1-7caf-45bb-8d93-9d8989c3a8b9",
+   "name": "헥시탄0.5%액(클로르헥시딘글루콘산염액)",
+   "shard": "da",
+   "fp": "991af01cd7f711c1",
+   "gencode": "131317CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외), 의료용구의 소독, 가구, 기구 등의 소독, 피부의 창상부위 소독에 사용합니다.",
+    "dosage": "용도에 따라 원액 및 다음의 농도로 희석하여 사용하십시오.손 및 피부 소독(보건위생종사자 및 수술 시 수술자의 손 소독, 수술부위 피부의 소독은 제외) 시 0.1 ~ 0.5% 수용액, 의료용구의 소독 시 0.1 ~ 0.5% 수용액, 가구, 기구 등의 소독, 피부의 창상부위 소독 시 0.05% 수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "01833688-4b53-4da3-bcbb-cf7b679e8e79",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "02e2a85b-afea-415b-bff8-e5cd91ff2ab0",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "06bc047c-831a-41dc-ba79-9f320e18762c",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "07c8d335-ad25-4342-89ee-7bec9de1ce43",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "21143559-d2fd-459c-ba32-56f152506b5f",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "26c20d76-e6be-4456-b08a-c17c80a9a5d2",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "2ef21cd9-de40-4656-9757-d3775a659c8b",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5da90ac1-c15c-4ee3-968c-58f469b96194",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "5ed47233-eaff-4514-8892-099e0df15c49",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6892bb1e-3ac8-4df7-aed4-876ef581b9ad",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "6c0ea945-3a1b-4cc0-a1cc-b7cd50ac085e",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a36c79aa-e717-4331-999a-2241850c42e0",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "addd5be6-e0fc-4602-a15b-b82e77ddc1d8",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b602a298-aec5-4fc7-98b6-36fda4b1a870",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b7869fc5-2c96-400b-8030-e3049413e8f6",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "c23854cd-fe7f-417e-8b62-4ce812215253",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "c4ac15ed-027e-4af4-b440-4f750fd08a7b",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ccf1fb57-a259-43f0-b75b-57608d7992d3",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e6c75dd3-f054-47ff-bb97-bfbdf9b929a2",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e98247de-065f-4ddf-b44e-b61ac45f3274",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f64fc2ea-910e-4e07-8d3a-ac58c6171b77",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f8d9dff8-ae86-4ff0-a9bd-f41f9bca6485",
+   "name": "소프타-맨액",
+   "shard": "ga",
+   "fp": "b8249e326b64aafe",
+   "gencode": "A42000CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다."
+    },
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "용법·용량",
+     "quote": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술시 및 위생 목적의 손소독에 사용합니다.",
+    "dosage": "이 약은 희석하지 않고 원액 그대로 사용합니다.수술시 수술자의 손 소독에 사용할 경우 이 약 5 mL를 손바닥에 취하여 양쪽 손과 팔(팔꿈치까지)에 골고루 묻혀준 후 3분 이상 문지르면서 건조시키고, 이것을 2회 실시합니다.위생 목적의 손 소독에 사용할 경우 이 약 3 mL를 손바닥에 취하여 양쪽 손에 골고루 묻혀준 후 30초 동안 문지르면서 건조시킵니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "228d16ae-9405-492d-b3db-429f237d41f4",
+   "name": "일동엑소데릴액(나프티핀염산염)",
+   "shard": "na",
+   "fp": "bfffd6d59d93a7b2",
+   "gencode": "198701CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 백선(족부백선, 수부백선, 고부백선(완선), 체부백선), 피부칸디다증, 어루러기, 조갑(손톱, 발톱) 진균증에 사용합니다.",
+    "dosage": "피부진균증에 사용하는 경우 1일 1회(가능하면 취침시) 환부를 깨끗이 닦고 완전히 건조시킨 후 환부 및 그 주위의 피부에 얇게 바르고 부드럽게 문지르십시오.조갑(손톱, 발톱) 진균증에 사용하는 경우 손톱, 발톱을 짧게 깎고, 1일 1회(가능하면 취침시) 또는 필요에 따라 1일 2회(아침, 저녁) 얇게 바릅니다. 재발 방지를 위해 모든 증상이 소실된 후에도 약 2주간 더 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "3c114e54-2043-4851-9fbc-33874b80ddb9",
+   "name": "나프졸액1%(나프티핀염산염)",
+   "shard": "na",
+   "fp": "bfffd6d59d93a7b2",
+   "gencode": "198701CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 백선(족부백선, 수부백선, 고부백선(완선), 체부백선), 피부칸디다증, 어루러기, 조갑(손톱, 발톱) 진균증에 사용합니다.",
+    "dosage": "피부진균증에 사용하는 경우 1일 1회(가능하면 취침시) 환부를 깨끗이 닦고 완전히 건조시킨 후 환부 및 그 주위의 피부에 얇게 바르고 부드럽게 문지르십시오.조갑(손톱, 발톱) 진균증에 사용하는 경우 손톱, 발톱을 짧게 깎고, 1일 1회(가능하면 취침시) 또는 필요에 따라 1일 2회(아침, 저녁) 얇게 바릅니다. 재발 방지를 위해 모든 증상이 소실된 후에도 약 2주간 더 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "46b9e4f9-f9be-40aa-902f-9d53b38c05ce",
+   "name": "나프졸액1%(나프티핀염산염)",
+   "shard": "na",
+   "fp": "bfffd6d59d93a7b2",
+   "gencode": "198701CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 백선(족부백선, 수부백선, 고부백선(완선), 체부백선), 피부칸디다증, 어루러기, 조갑(손톱, 발톱) 진균증에 사용합니다.",
+    "dosage": "피부진균증에 사용하는 경우 1일 1회(가능하면 취침시) 환부를 깨끗이 닦고 완전히 건조시킨 후 환부 및 그 주위의 피부에 얇게 바르고 부드럽게 문지르십시오.조갑(손톱, 발톱) 진균증에 사용하는 경우 손톱, 발톱을 짧게 깎고, 1일 1회(가능하면 취침시) 또는 필요에 따라 1일 2회(아침, 저녁) 얇게 바릅니다. 재발 방지를 위해 모든 증상이 소실된 후에도 약 2주간 더 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "65d7e7ed-04f3-407f-85cb-d87d5fd04878",
+   "name": "일동엑소데릴액(나프티핀염산염)",
+   "shard": "na",
+   "fp": "bfffd6d59d93a7b2",
+   "gencode": "198701CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 백선(족부백선, 수부백선, 고부백선(완선), 체부백선), 피부칸디다증, 어루러기, 조갑(손톱, 발톱) 진균증에 사용합니다.",
+    "dosage": "피부진균증에 사용하는 경우 1일 1회(가능하면 취침시) 환부를 깨끗이 닦고 완전히 건조시킨 후 환부 및 그 주위의 피부에 얇게 바르고 부드럽게 문지르십시오.조갑(손톱, 발톱) 진균증에 사용하는 경우 손톱, 발톱을 짧게 깎고, 1일 1회(가능하면 취침시) 또는 필요에 따라 1일 2회(아침, 저녁) 얇게 바릅니다. 재발 방지를 위해 모든 증상이 소실된 후에도 약 2주간 더 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "80a9f65f-b68a-4fc8-a540-e0ed27f275de",
+   "name": "일동엑소데릴액(나프티핀염산염)",
+   "shard": "na",
+   "fp": "bfffd6d59d93a7b2",
+   "gencode": "198701CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 백선(족부백선, 수부백선, 고부백선(완선), 체부백선), 피부칸디다증, 어루러기, 조갑(손톱, 발톱) 진균증에 사용합니다.",
+    "dosage": "피부진균증에 사용하는 경우 1일 1회(가능하면 취침시) 환부를 깨끗이 닦고 완전히 건조시킨 후 환부 및 그 주위의 피부에 얇게 바르고 부드럽게 문지르십시오.조갑(손톱, 발톱) 진균증에 사용하는 경우 손톱, 발톱을 짧게 깎고, 1일 1회(가능하면 취침시) 또는 필요에 따라 1일 2회(아침, 저녁) 얇게 바릅니다. 재발 방지를 위해 모든 증상이 소실된 후에도 약 2주간 더 사용합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "8c3702cf-425a-4c57-9903-2bd717c56246",
+   "name": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+   "shard": "ga",
+   "fp": "c33442be59bb49d4",
+   "gencode": "382201CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "ASEPTIC"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구,"
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수"
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "효능·효과",
+     "quote": "부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다."
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "용법·용량",
+     "quote": "% 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다.",
+    "dosage": "손 및 피부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수술부위의 점막소독, 피부 점막의 창상부위 소독 시 0.01~0.05 % 수용액을 사용합니다.의료용구의 소독 시 0.05~0.2 % 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독에는 0.2~0.5 %수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "a79d53d0-1bab-4de9-bbe4-a8f443c9a846",
+   "name": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+   "shard": "ga",
+   "fp": "c33442be59bb49d4",
+   "gencode": "382201CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "ASEPTIC"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구,"
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수"
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "효능·효과",
+     "quote": "부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다."
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "용법·용량",
+     "quote": "% 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다.",
+    "dosage": "손 및 피부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수술부위의 점막소독, 피부 점막의 창상부위 소독 시 0.01~0.05 % 수용액을 사용합니다.의료용구의 소독 시 0.05~0.2 % 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독에는 0.2~0.5 %수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "b7a3a8ab-b96e-43ac-9d8b-67014c4b7e4a",
+   "name": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+   "shard": "ga",
+   "fp": "c33442be59bb49d4",
+   "gencode": "382201CLQ",
+   "suffix": "CLQ",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGICAL_SITE",
+    "ASEPTIC"
+   ],
+   "multiPurpose": true,
+   "evidence": [
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구,"
+    },
+    {
+     "code": "SURGICAL_SITE",
+     "label": "수술부위 피부 소독",
+     "section": "용법·용량",
+     "quote": "부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수"
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "효능·효과",
+     "quote": "부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다."
+    },
+    {
+     "code": "ASEPTIC",
+     "label": "무균술·수술 준비",
+     "section": "용법·용량",
+     "quote": "% 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독"
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 손 및 피부의 소독, 수술부위의 피부소독, 수술부위의 점막소독, 피부 및 점막의 창상부위 소독, 의료 용구의 소독, 수술실 병실 가구, 기구, 물품 등의 소독에 사용합니다.",
+    "dosage": "손 및 피부의 소독 시 0.05~0.2 % 수용액으로 약 5분간 씻어낸 후 멸균 거즈 또는 헝겊으로 깨끗이 닦습니다.수술부위의 피부소독 시 수술할 피부면을 0.1 % 수용액으로 약 5분간 씻어 낸 후 0.2 % 수용액을 바릅니다.수술부위의 점막소독, 피부 점막의 창상부위 소독 시 0.01~0.05 % 수용액을 사용합니다.의료용구의 소독 시 0.05~0.2 % 수용액에 10~15분간 담급니다. 다만 결핵환자와 관련된 소독에는 0.2~0.5 % 수용액을 사용합니다.수술실 병실 가구, 기구, 물품 등의 소독 시 0.05~0.2 % 수용액을 사용하고, 다만 결핵환자와 관련된 소독에는 0.2~0.5 %수용액을 사용합니다."
+   },
+   "storeSignals": [
+    "SKIN_ANTISEPSIS"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1cd816b9-958b-4876-bc31-05ff1456ff10",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "31f5b881-d646-4283-9062-2f92b8c8bdde",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "69ad9e07-f9c2-4aa5-8cf7-c276415ece0b",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "ad05266f-43e2-4466-bb40-63b23c074f5b",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "c45561e5-a270-4c76-9a0c-d2e67497574f",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "d34c46a8-9b83-4aaf-beeb-593716b6068b",
+   "name": "라이센드플러스액",
+   "shard": "na",
+   "fp": "c94884c1baa9d39a",
+   "gencode": "A07600CLQ",
+   "suffix": "CLQ",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 머릿니, 사면발이, 몸이의 감염증치료에 사용합니다.",
+    "dosage": "반드시 건조 모발에 사용하십시오.완전히 도포가 된 후 10분간 방치한 후 따뜻한 물을 이용하여 충분히 거품을 내어준 후 깨끗이 행굽니다.10분 이상은 사용하지 마십시오.약물을 사용 후 모발에 남아있는 죽은 머리이나 석캐는 반드시 석캐제거용 빗(참빗)을 이용하여 제거합니다.모발 길이에 따른 사용량은 허가사항을 참고하십시오.한번 사용 후 완치가 되지 않았을 경우 10일 후에 다시 사용하십시오."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "49c587e0-e0b3-4451-829c-7b4e245691ea",
+   "name": "스웨트롤패드액(글리코피롤레이트)",
+   "shard": "da",
+   "fp": "f6849bd5d25bcd25",
+   "gencode": "167005CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 안면 다한증(땀과다증)에 사용합니다.",
+    "dosage": "성인은 1일 1회, 이 약 1매를 눈, 코, 입을 제외한 안면 환부(질환 부위)에 가볍게 5회 정도 문지릅니다.이 약은 적용하기 전에 환부를 깨끗이 씻고 충분히 건조시켜야 하며, 적용 후 4시간 이내에는 환부를 씻지 말아야 합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e51707d5-167b-48ff-a5ec-9b2b4d56d93e",
+   "name": "스웨트롤패드액(글리코피롤레이트)",
+   "shard": "da",
+   "fp": "f6849bd5d25bcd25",
+   "gencode": "167005CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 안면 다한증(땀과다증)에 사용합니다.",
+    "dosage": "성인은 1일 1회, 이 약 1매를 눈, 코, 입을 제외한 안면 환부(질환 부위)에 가볍게 5회 정도 문지릅니다.이 약은 적용하기 전에 환부를 깨끗이 씻고 충분히 건조시켜야 하며, 적용 후 4시간 이내에는 환부를 씻지 말아야 합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f27d9dad-73d0-4123-a037-a4bb9a408af0",
+   "name": "스웨트롤패드액(글리코피롤레이트)",
+   "shard": "da",
+   "fp": "f6849bd5d25bcd25",
+   "gencode": "167005CDS",
+   "suffix": "CDS",
+   "verdict": "PRODUCIBLE_STORE",
+   "reasons": [],
+   "multiPurpose": false,
+   "evidence": [],
+   "officialExcerpt": {
+    "indication": "이 약은 안면 다한증(땀과다증)에 사용합니다.",
+    "dosage": "성인은 1일 1회, 이 약 1매를 눈, 코, 입을 제외한 안면 환부(질환 부위)에 가볍게 5회 정도 문지릅니다.이 약은 적용하기 전에 환부를 깨끗이 씻고 충분히 건조시켜야 하며, 적용 후 4시간 이내에는 환부를 씻지 말아야 합니다."
+   },
+   "storeSignals": [
+    "AFFECTED_AREA"
+   ],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "1e075484-1750-467b-8d1d-21796045a1bc",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "53e84987-7b69-4fdc-882f-18d30f33ef5b",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "55d78e28-0303-43e4-a6b9-ac8f38560a63",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "63a727e7-8d3b-4087-980d-8b7b27bd6760",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9e58ba8f-b9cd-4328-a2f9-e30fdc0217d6",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "9e6b220f-7dbb-4084-b761-655cbbd145a9",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "e5010810-056e-4932-a8c8-485c8336269f",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  },
+  {
+   "masterId": "f44ffe86-90e9-4b4d-bcff-54fa48321c86",
+   "name": "큐앤큐포비돈요오드스크랍(대)",
+   "shard": "na",
+   "fp": "fb12df089a70fd23",
+   "gencode": "216232CDS",
+   "suffix": "CDS",
+   "verdict": "HOLD_PROFESSIONAL_USE",
+   "reasons": [
+    "SURGEON_HAND"
+   ],
+   "multiPurpose": false,
+   "evidence": [
+    {
+     "code": "SURGEON_HAND",
+     "label": "수술자 손 소독",
+     "section": "효능·효과",
+     "quote": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다."
+    }
+   ],
+   "officialExcerpt": {
+    "indication": "이 약은 수술자의 손 및 팔의 살균소독에 사용합니다.",
+    "dosage": "약액이 흡수된 스폰지를 손과 팔꿈치까지 적용하여 5분간 손으로 문지릅니다.필요에 따라 솔을 사용하고, 손톱, 표피, 손가락 사이의 부위를 특히 주의하여 문지릅니다.이후 따뜻한 물로 씻어내고 다시 반복하여 3분간 씻고 물로 깨끗이 세척한 후 천천히 말립니다."
+   },
+   "storeSignals": [],
+   "sourceMissing": false
+  }
+ ]
+}
