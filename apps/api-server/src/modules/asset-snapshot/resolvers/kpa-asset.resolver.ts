@@ -31,7 +31,7 @@
  * into the standard ResolvedContent format.
  */
 
-import { DataSource } from 'typeorm';
+import { DataSource, In } from 'typeorm';
 import { CmsContent } from '@o4o-apps/cms-core/entities';
 import type { ContentResolver, ResolvedContent } from '@o4o/asset-copy-core';
 
@@ -78,7 +78,19 @@ export class KpaAssetResolver implements ContentResolver {
    */
   private async resolveCms(id: string): Promise<ResolvedContent | null> {
     const repo = this.dataSource.getRepository(CmsContent);
-    const content = await repo.findOne({ where: { id, status: 'published' } });
+    // WO-O4O-KPA-CONTENT-ACCESS-AND-COPY-POLICY-FINAL-ALIGNMENT-V1 (보완):
+    //   cms_contents 는 **서비스 공용 테이블**이고 serviceKey 로 소유 서비스를 구분한다
+    //   ('kpa' | 'kpa-society' | 'glycopharm' | 'neture' | null=global).
+    //   serviceKey 게이트가 없어 **다른 서비스의 published CMS 를 ID 만 알면 KPA 매장 사본으로
+    //   복사**할 수 있었다(프로덕션 실증: GlycoPharm·Neture 콘텐츠가 201 로 복사됨).
+    //   KPA 범위 = 기존 목록 계약과 동일한 키 집합으로 강제한다:
+    //     - HUB 목록(cmsApi.getContents 기본) : serviceKey='kpa'
+    //     - Home/공용 조회(ContentQueryService): serviceKey IN ('kpa-society','kpa')
+    //   global(null) 은 두 목록 어디에도 노출되지 않으므로 복사 대상에서 제외한다
+    //   (목록에 없는 자산이 복사되는 우회를 다시 만들지 않기 위함).
+    const content = await repo.findOne({
+      where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) },
+    });
     if (!content) return null;
 
     return {
@@ -182,6 +194,14 @@ export class KpaAssetResolver implements ContentResolver {
          --   serviceKey/scope/source 게이트가 없어 **다른 서비스의 활성 미디어도 ID 만 알면
          --   KPA 매장 사본으로 복사**할 수 있었다(서비스 간 자산 격리 부재).
          --   HUB 조회(HubContentQueryService.querySignageMedia) 및 공개 상세 API 와 동일 기준으로 맞춘다.
+         --
+         --   source='store' 를 제외하는 이유 (의도된 정책 — 본 resolver 가 새로 정한 것이 아니라
+         --   기존 HUB 공유 계약을 그대로 따른 것):
+         --     store = **개별 매장이 직접 올린 매장 전용 자산**이다. HUB 공유 대상은
+         --     hq(본사) · supplier(공급자) · community(회원 공개) 3종이며,
+         --     HubContentQueryService.querySignageMedia 와 공개 목록·상세 API 모두 이 3종만 노출한다.
+         --     따라서 한 매장의 자산이 다른 매장으로 재복사되지 않는다(매장 간 자산 유출 차단).
+         --     resolveBlog/resolvePop 이 author_role='store' 를 배제했던 것과 동일한 원칙이다.
          AND "serviceKey" = 'kpa-society'
          AND "scope" = 'global'
          AND "source" IN ('hq', 'supplier', 'community')

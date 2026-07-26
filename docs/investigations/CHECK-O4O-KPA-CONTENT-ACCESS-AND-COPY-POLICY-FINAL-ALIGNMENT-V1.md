@@ -86,9 +86,59 @@ AND "source" IN ('hq', 'supplier', 'community')
 
 기준 출처: `HubContentQueryService.querySignageMedia` 및 공개 상세 API(`/public/media/:id`) — 셋이 일치한다.
 
-### 콘텐츠
+#### `source='store'` 제외는 **의도된 정책** (현행 유지, 명문화 완료)
 
-`kpa_contents` 는 **KPA 전용 테이블**로 서비스 식별 컬럼이 없다(전수 확인). 격리가 구조적으로 내재되어 별도 필터가 불필요하다. `cms_contents` 는 `resolveCms` 가 `status='published'` 로 게이트하며 service_key 정합은 기존 결정대로 listing 단이 담당한다(인터페이스 확장 필요 — 별도 WO).
+| 항목 | 내용 |
+|------|------|
+| `store` 의 의미 | **개별 매장이 직접 올린 매장 전용 자산** |
+| HUB 공유 대상 | `hq`(본사) · `supplier`(공급자) · `community`(회원 공개) **3종** |
+| 기존 계약 | `HubContentQueryService.querySignageMedia` · 공개 목록 API · 공개 상세 API **모두 이 3종만 노출** |
+| 판단 | 본 resolver 가 새 정책을 정한 것이 아니라 **기존 HUB 공유 계약을 그대로 따른 것**이다. 한 매장의 자산이 다른 매장으로 재복사되면 매장 간 자산 유출이 되므로 **제외가 옳다 → 현행 유지** |
+| 선례 | `resolveBlog`/`resolvePop` 도 `author_role='store'` 를 배제했다("매장 직접 작성 자산은 HUB 가져가기 대상 아님") — 동일 원칙 |
+
+→ WO 분기 중 **"개별 매장 제작 자산이므로 다른 매장 재복사 금지 → 현행 유지"** 에 해당한다. 코드 주석에도 근거를 남겼다.
+
+> 참고(별개 사안): Home 최신글의 사이니지 config 는 `sources: ['hq','store']` 로 **HUB 계약과 다르다**
+> (store 포함 / supplier·community 제외). 이는 복사 게이트가 아니라 **Home 노출 범위 설정**이며
+> 선행 CHECK(FINAL-STABILIZATION §3-2)에서 정책 판단 항목으로 보고했다. 본 WO 에서 변경하지 않았다.
+
+### 콘텐츠 (`kpa_contents`)
+
+**KPA 전용 테이블**로 서비스 식별 컬럼이 없다(전수 확인). 격리가 구조적으로 내재되어 별도 필터가 불필요하다.
+
+### CMS (`cms_contents`) — ⚠️ **보완 조사에서 격리 부재 발견 → 수정** (§5-1)
+
+초판에서는 "service_key 정합은 listing 단 담당" 으로 남겼으나, **재확인 결과 실제로 차단되지 않았다.**
+
+| 항목 | 확인 |
+|------|------|
+| 테이블 성격 | **서비스 공용** — `@Entity('cms_contents')`, 4개 서비스가 공유 |
+| 범위 필드 | **있음** — `serviceKey: string \| null` (`'kpa'` / `'glycopharm'` / `'neture'` / `null`=global) |
+| `resolveCms` 기존 게이트 | `{ id, status: 'published' }` — **serviceKey 없음** |
+| 차단 여부 | ❌ **차단되지 않음** |
+
+**프로덕션 실증 (수정 전):** KPA `/assets/copy` 에 다른 서비스의 published CMS ID 를 직접 전달
+
+```
+assetType='cms', id=857ac192…(GlycoPharm) → 201 CREATED "서비스 이용 안내"
+assetType='cms', id=548219c3…(Neture)     → 201 CREATED "네뚜레 플랫폼 오픈 안내"
+```
+
+→ 다른 서비스의 운영 콘텐츠가 KPA 매장 자료함으로 그대로 복사됐다. (생성된 사본 2건은 즉시 삭제 — §13)
+
+**최소 수정:** `resolveCms` 에 **기존 목록 계약과 동일한 키 집합**으로 범위 강제.
+
+```ts
+where: { id, status: 'published', serviceKey: In(['kpa', 'kpa-society']) }
+```
+
+| 근거 | 값 |
+|------|-----|
+| HUB 목록(`cmsApi.getContents` 기본) | `serviceKey='kpa'` |
+| Home·공용 조회(`ContentQueryService` KPA config) | `serviceKey IN ('kpa-society','kpa')` |
+| `global(null)` | **제외** — 두 목록 어디에도 노출되지 않으므로 복사 대상이 아니다. 포함하면 "목록에 없는 자산이 복사되는" 우회를 다시 만들게 된다 |
+
+새 필드·테이블·migration 없이 **기존 구조 안의 WHERE 조건 1개** 추가다.
 
 ---
 
@@ -152,7 +202,7 @@ AND "source" IN ('hq', 'supplier', 'community')
 | 파일 | 변경 |
 |------|------|
 | [routes/kpa/kpa.routes.ts](../../apps/api-server/src/routes/kpa/kpa.routes.ts) | 상세 접근 가드 추가 |
-| [modules/asset-snapshot/resolvers/kpa-asset.resolver.ts](../../apps/api-server/src/modules/asset-snapshot/resolvers/kpa-asset.resolver.ts) | content status 게이트 · signage 서비스 격리 · blog/pop/qr 분기·resolver 제거 · 헤더/주석 정합 |
+| [modules/asset-snapshot/resolvers/kpa-asset.resolver.ts](../../apps/api-server/src/modules/asset-snapshot/resolvers/kpa-asset.resolver.ts) | content status 게이트 · signage 서비스 격리 · blog/pop/qr 분기·resolver 제거 · 헤더/주석 정합 · **(보완) resolveCms serviceKey 범위 강제 · store 제외 근거 명문화** |
 | [routes/o4o-store/controllers/asset-snapshot.controller.ts](../../apps/api-server/src/routes/o4o-store/controllers/asset-snapshot.controller.ts) | **주석만** — allowlist 와 실제 생성 가능 타입의 차이 명시(코드 무변경) |
 | [pages/CommunityHomePage.tsx](../../services/web-kpa-society/src/pages/CommunityHomePage.tsx) | 최신글 오류/0건 구분 + 다시 시도 |
 
@@ -222,8 +272,10 @@ AND "source" IN ('hq', 'supplier', 'community')
 |----|------|--------|------|
 | `6b38210d-3943-49f8-b7e2-86cfdef1bde8` | content 복사 허용 검증 | renagang21 매장 | `DELETE` **200 `deleted:true`** |
 | `a4832d66-31d0-41c5-80a3-975d2bac0319` | signage 복사 허용 검증 | 동일 | `DELETE` **200 `deleted:true`** |
+| `04966e5a-1059-4044-94f7-827e501891d2` | **CMS 격리 실증**(GlycoPharm "서비스 이용 안내" 유출 사본) | 동일 | `DELETE` **200 `deleted:true`** |
+| `af1e668b-f88a-44c5-8216-791c2690ae67` | **CMS 격리 실증**(Neture "네뚜레 플랫폼 오픈 안내" 유출 사본) | 동일 | `DELETE` **200 `deleted:true`** |
 
-재조회 시 두 ID **부재**(`stillPresent: 0`). **신규 콘텐츠·픽스처는 생성하지 않았다**(기존 draft `7d81c00e…` 를 읽기 전용으로 사용, 변경·삭제 없음).
+재조회 시 4개 ID 모두 **부재**(`stillPresent: 0`). **신규 콘텐츠·픽스처는 생성하지 않았다**(기존 draft `7d81c00e…`, 타 서비스 CMS 원본은 읽기 전용 참조 — 원본 변경·삭제 0).
 
 ---
 
