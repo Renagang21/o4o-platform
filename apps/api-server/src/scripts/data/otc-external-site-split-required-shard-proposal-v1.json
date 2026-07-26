@@ -1,0 +1,218 @@
+{
+  "wo": "WO-O4O-OTC-EXTERNAL-SITE-SPLIT-REQUIRED-AUDIT-V1",
+  "artifact": "shard-proposal",
+  "status": "PROPOSAL — 승인 전 생산 금지",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "sourceAudit": "otc-external-site-split-required-audit-v1.json",
+  "disjointness": {
+    "externalLive199": 0,
+    "externalLiveFp": 0,
+    "v2Live2509": 0
+  },
+  "totals": {
+    "fingerprints": 24,
+    "masters": 90
+  },
+  "writePlan": {
+    "perMaster": {
+      "ko": 4,
+      "en": 2,
+      "total": 6
+    },
+    "byShard": {
+      "ga": {
+        "masters": 30,
+        "ko": 120,
+        "en": 60,
+        "total": 180
+      },
+      "na": {
+        "masters": 29,
+        "ko": 116,
+        "en": 58,
+        "total": 174
+      },
+      "da": {
+        "masters": 31,
+        "ko": 124,
+        "en": 62,
+        "total": 186
+      }
+    },
+    "total": 540
+  },
+  "shards": {
+    "ga": {
+      "fingerprints": 8,
+      "masters": 30,
+      "routes": {
+        "oromucosal": 14,
+        "cutaneous": 12,
+        "nasal": 4
+      },
+      "writePlan": {
+        "masters": 30,
+        "ko": 120,
+        "en": 60,
+        "total": 180
+      },
+      "fingerprintList": [
+        "2526b93ea9dec5b2",
+        "528ed2e352d1d33a",
+        "77089a1a69412620",
+        "b35d32f09515eb53",
+        "bbaeec985b456243",
+        "cdc48ab3b4fe2182",
+        "d042b01dea09a60b",
+        "e0b2b9a6866af538"
+      ],
+      "masterIds": [
+        "023b2f73-22e2-4baf-b85c-097485f6a79a",
+        "0531127f-1721-4d36-87a8-61b9bf6be841",
+        "0fa8f1fb-cd23-4ab5-b96f-bf1dd70c0696",
+        "142bdf5b-ef64-4b4e-88d9-2a14f60bba29",
+        "1b118095-fcf3-44f2-94eb-5e1e94b5ea27",
+        "29ecee44-2d47-4fbb-a734-ce107ff57e75",
+        "393a0d70-2e0b-49b4-8117-81039e7ae52e",
+        "3a1c4ce1-4835-401e-bf35-14e7e09c9e53",
+        "3beac9bb-5bd1-48ca-8f41-b6fcfbe5d198",
+        "3cba2dde-312a-46ab-b96c-08de4ff4f16c",
+        "3cdf7e83-81bf-4abf-af78-6b0054813abd",
+        "40814c82-fd8f-43a4-b3bf-2c2f7ce12ec1",
+        "4c2a8f97-35d3-40c3-80ff-7d685e0a278a",
+        "4d89f0e5-3790-4f36-ac9c-b76fc6715cfa",
+        "63052ee0-68c2-4854-8056-7ec065362024",
+        "763c407e-eca7-45d7-8c48-12cc7178fafb",
+        "783c2bc6-393a-4b87-9d23-c5dc7fb75c38",
+        "7bedc09d-17c7-4887-b01a-3808983511f8",
+        "843df76a-bf7c-4fee-b0b9-b3a1bf4f6eb3",
+        "8ca0652f-e065-4943-aa1e-3113dc1854cd",
+        "9cda2dc3-7ade-461d-b58e-1cdbc74077ae",
+        "9e0328ae-bee2-4ef8-83a1-8e5e4ecb47d2",
+        "a98d110c-2406-42c5-a30c-05aa854ebae0",
+        "ab85e777-0a84-43c4-9ff2-13f51eb4b274",
+        "bebfbe88-0ae8-425b-9aa5-66ea81338d36",
+        "bfea74fa-2ed2-4e44-a2da-8428eb4f5a98",
+        "c3146f80-309c-4aed-b0d9-d74be046bb4a",
+        "c4f295c9-bd49-4774-b0e3-1deb317d4c01",
+        "d88da076-c347-4efb-8b08-4acbc5eb62d8",
+        "fd1391f7-7227-4523-91ac-ada22d7322b5"
+      ]
+    },
+    "na": {
+      "fingerprints": 8,
+      "masters": 29,
+      "routes": {
+        "nasal": 17,
+        "cutaneous": 12
+      },
+      "writePlan": {
+        "masters": 29,
+        "ko": 116,
+        "en": 58,
+        "total": 174
+      },
+      "fingerprintList": [
+        "0907ff943f6a69e4",
+        "11f2e48a4efddea6",
+        "5d90ec32341c4178",
+        "6a5d3be191d4d343",
+        "6b276f42889d5b24",
+        "816ccd8ad5da208d",
+        "e8dbae3422058feb",
+        "eb0ab47f77953574"
+      ],
+      "masterIds": [
+        "01b0fc51-21f1-4407-b4c9-763929186f74",
+        "2258fcf6-50ec-4560-9840-395ab4a5f195",
+        "3582d121-b301-4fe8-aa81-db9734af3b68",
+        "4b57079c-5092-4d4a-9549-8942e348f1fd",
+        "511bda45-7ab2-4865-b523-d5cc7baae451",
+        "524b9ebf-eacc-46ae-874a-309aa982298a",
+        "53bf09d3-4db0-437b-be42-a40ff481791b",
+        "5883bdc4-d216-4761-bf26-344e33a38783",
+        "6bafcc4a-140c-4250-a171-cc2c9ad5780b",
+        "6ed17f27-0bb3-45d6-a9d4-e75d08629e7a",
+        "7b999112-5540-4a65-b204-ff15b902c460",
+        "7c1c18fe-2bc3-4f31-ace2-a6597092f72d",
+        "7c3c9d6d-d87b-41b0-a1d0-9dcd5eac0e25",
+        "8327b234-9576-4c72-b81f-b3b51aa093f8",
+        "8b5780c7-b9e9-4d0c-963c-cb282ef762fc",
+        "9346b5c5-7b87-42ae-835f-7931307b4927",
+        "a1752eff-3474-4ae8-9261-d15779a98ace",
+        "a894c62b-6fd4-4523-a223-fa06179d74cc",
+        "af09d8f9-0f7d-45f4-8f14-6cf5da863048",
+        "b0c9d418-3428-4ef3-bb07-b5a49f770d40",
+        "b6571882-a74b-4b62-ba8a-9acf9cc48aa8",
+        "cdd7919a-0a93-444e-a22c-3cd658211697",
+        "d791912b-493d-4ecd-8971-31b269ff5218",
+        "e1ae3d5c-d58d-46c8-a61f-8dfbce364726",
+        "e6ae9778-6546-4390-b0c3-c0143aaca276",
+        "e8f61ba0-57cf-413e-96f0-a3f446dabf1e",
+        "ea85c731-4267-44db-aaf8-a2c3ed36254b",
+        "ee0ff3aa-a4c7-4e11-9815-98e3c611ed99",
+        "f2e83503-8679-4359-af14-6faa92009573"
+      ]
+    },
+    "da": {
+      "fingerprints": 8,
+      "masters": 31,
+      "routes": {
+        "nasal": 12,
+        "cutaneous": 11,
+        "oromucosal": 8
+      },
+      "writePlan": {
+        "masters": 31,
+        "ko": 124,
+        "en": 62,
+        "total": 186
+      },
+      "fingerprintList": [
+        "00a36b436551aeb3",
+        "084758525da2e342",
+        "55f92d8f906d25b5",
+        "5b9c7d2ba806a631",
+        "70ba981268c59142",
+        "af9070c9a5340012",
+        "de42704ea8479161",
+        "edf31c359bf60006"
+      ],
+      "masterIds": [
+        "03f4ec8e-f655-4626-adcc-69c6cdd9a0e6",
+        "129b8938-cfa0-40d8-925c-85467be4ac3e",
+        "1413aa0b-a438-484f-a4cd-2a6e12dec879",
+        "17e2a303-dad2-4d7e-8c74-2a565c28669d",
+        "1f1b6c59-5cfe-42d7-9479-f7546e8aa320",
+        "24af99e3-d0c5-4fe1-90fc-ad6bd6d038fc",
+        "3416fc83-2b27-4dc2-9656-62612d0d025b",
+        "361241dc-502f-4af5-9ad2-15df8a1f33b3",
+        "4058d092-3b40-4f12-99e4-da629d737084",
+        "46357438-486f-4b8a-ad6c-dc50e5488e1b",
+        "55dec47a-bee7-4b33-98a7-064cbc4c44ca",
+        "639296c1-0035-4479-a40e-f10f1aa8f007",
+        "63c9d8c3-150d-40d3-9c92-edc6b4d14222",
+        "6992b4c5-27a6-4101-892b-54815c20a99c",
+        "6d6292b5-c9d5-4de3-8644-e412fd0dde5b",
+        "884b5871-23bc-4e58-b2f7-72504a94eea6",
+        "885e2d5e-7527-46e2-88fb-5d1b620a8bd5",
+        "8de15bd1-4880-42f9-aafb-0cda0683152e",
+        "914fdc30-e4c5-4470-b476-8b284183dc1b",
+        "9b2ef7ad-0c29-4b07-b7ce-e9c299a186a7",
+        "a44487a5-c7a1-46e8-9664-b8e3aaa7e8e8",
+        "a639c6e7-9cdd-4dfd-a07c-fe9f4cb97262",
+        "b9d0c3c1-ec5b-498e-ab97-50a5ac0d3ab3",
+        "bc1babb1-0fdc-44f5-8208-da7fe27c0813",
+        "c78eaceb-87af-45d2-b4ae-5863a8d14100",
+        "d0cf584b-8962-4c31-adb1-52e603a087fe",
+        "ee1fce74-d9c5-496c-b1d2-bc463e327dd7",
+        "f18469c3-54d0-4ba0-a2c3-25927e0f625b",
+        "f3529bcf-6bc0-4e9e-b089-34a04791bec6",
+        "f8b104ee-d8b6-48c2-96d0-09ad37325674",
+        "fdaeafdf-8511-4de1-ac97-b7a3f140e595"
+      ]
+    }
+  }
+}
