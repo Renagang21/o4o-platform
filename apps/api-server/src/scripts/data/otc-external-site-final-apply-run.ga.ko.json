@@ -1,0 +1,147 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "shard": "ga",
+ "lang": "ko",
+ "writeOwner": "agent-da",
+ "groups": 15,
+ "writeActual": 272,
+ "writeExpected": 272,
+ "match": true,
+ "per": [
+  {
+   "fp": "83e7f3c1cbf46c85",
+   "size": 9,
+   "deprecated": 9,
+   "inserted": 9,
+   "flipped": 9,
+   "audited": 9,
+   "t": 36
+  },
+  {
+   "fp": "87d4e23259cc5609",
+   "size": 9,
+   "deprecated": 9,
+   "inserted": 9,
+   "flipped": 9,
+   "audited": 9,
+   "t": 36
+  },
+  {
+   "fp": "a40fbda6ff3ddafc",
+   "size": 7,
+   "deprecated": 7,
+   "inserted": 7,
+   "flipped": 7,
+   "audited": 7,
+   "t": 28
+  },
+  {
+   "fp": "16e36e242f2eda86",
+   "size": 6,
+   "deprecated": 6,
+   "inserted": 6,
+   "flipped": 6,
+   "audited": 6,
+   "t": 24
+  },
+  {
+   "fp": "bf23174cc4e8cd4e",
+   "size": 6,
+   "deprecated": 6,
+   "inserted": 6,
+   "flipped": 6,
+   "audited": 6,
+   "t": 24
+  },
+  {
+   "fp": "2ffe5962b373d734",
+   "size": 5,
+   "deprecated": 5,
+   "inserted": 5,
+   "flipped": 5,
+   "audited": 5,
+   "t": 20
+  },
+  {
+   "fp": "4c7b09b53d9fde22",
+   "size": 5,
+   "deprecated": 5,
+   "inserted": 5,
+   "flipped": 5,
+   "audited": 5,
+   "t": 20
+  },
+  {
+   "fp": "0fbbd83554c92419",
+   "size": 4,
+   "deprecated": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "audited": 4,
+   "t": 16
+  },
+  {
+   "fp": "8ce5fa989d99722a",
+   "size": 4,
+   "deprecated": 4,
+   "inserted": 4,
+   "flipped": 4,
+   "audited": 4,
+   "t": 16
+  },
+  {
+   "fp": "48ac7e9d44f41e70",
+   "size": 3,
+   "deprecated": 3,
+   "inserted": 3,
+   "flipped": 3,
+   "audited": 3,
+   "t": 12
+  },
+  {
+   "fp": "0725bc544733daa0",
+   "size": 2,
+   "deprecated": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "audited": 2,
+   "t": 8
+  },
+  {
+   "fp": "327a62979c86a281",
+   "size": 2,
+   "deprecated": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "audited": 2,
+   "t": 8
+  },
+  {
+   "fp": "928c8196af34f386",
+   "size": 2,
+   "deprecated": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "audited": 2,
+   "t": 8
+  },
+  {
+   "fp": "a559e9d5d38949c9",
+   "size": 2,
+   "deprecated": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "audited": 2,
+   "t": 8
+  },
+  {
+   "fp": "f57c37aaa7295e50",
+   "size": 2,
+   "deprecated": 2,
+   "inserted": 2,
+   "flipped": 2,
+   "audited": 2,
+   "t": 8
+  }
+ ]
+}

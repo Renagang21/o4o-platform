@@ -1,0 +1,30 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "shard": "da",
+ "dbWrite": 0,
+ "metrics": {
+  "targetMasters": 46,
+  "expected": 46,
+  "koAuthoredCanonical": 46,
+  "enCanonical": 46,
+  "easyDeprecated": 46,
+  "easyStillCanonical": 0,
+  "needsReviewLeft": 0,
+  "auditKo": 46,
+  "canonicalDup": 0,
+  "sourceRefLeak": 0,
+  "enHangul": 0
+ },
+ "checks": {
+  "KO canonical == master 수": true,
+  "EN canonical == master 수": true,
+  "easy_drug deprecated == master 수": true,
+  "easy_drug ko canonical 잔존 0": true,
+  "needs_review 잔존 0": true,
+  "audit == master 수": true,
+  "canonicalDup 0": true,
+  "sourceRef 충돌 0(대상 밖 유출)": true,
+  "EN 한글 잔존 0": true
+ },
+ "allPass": true
+}

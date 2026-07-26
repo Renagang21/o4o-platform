@@ -45,11 +45,28 @@ import {
 } from './otc-v2-store-leaflet-runner.shared.js';
 
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
-const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
+export const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const SSOT_PATH = path.join(DATA_DIR, 'otc-external-site-recovery-approved-ssot-v1.json');
 const AUDIT_PATH = path.join(DATA_DIR, 'otc-external-site-recovery-audit-v1.json');
 const V2_SSOT_PATH = path.join(DATA_DIR, 'otc-remaining-shard-assignment-ssot-v2.json');
 const LEDGER_PATH = path.join(DATA_DIR, 'otc-v2-recovery-apply-order.json');
+
+/** 최종 생산 승인 SSOT — 전문용 분리 반영본. **생산 입력은 이 파일만** 쓴다. */
+export const FINAL_SSOT_PATH = path.join(DATA_DIR, 'otc-external-site-final-approved-ssot-v1.json');
+export const FINAL_APPROVAL_COMMIT = '51cea451a';
+export const FINAL_LEDGER_PATH = path.join(DATA_DIR, 'otc-external-site-final-apply-order.json');
+export const AUTHORED_SOURCE_V2 = 'mfds_drug_otc';
+export const WO_PROD = 'WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1';
+
+/** WO 확정 최종 대상 — 실측과 불일치하면 중지. */
+export const FINAL_EXPECTED = {
+  total: { fp: 42, master: 199, ko: 796, en: 398, write: 1194 },
+  shards: {
+    ga: { fp: 15, master: 68, ko: 272, en: 136, total: 408 },
+    na: { fp: 15, master: 85, ko: 340, en: 170, total: 510 },
+    da: { fp: 12, master: 46, ko: 184, en: 92, total: 276 },
+  },
+} as const;
 
 export const TRACK = 'external-site-recovery';
 const WO = 'WO-O4O-OTC-EXTERNAL-SITE-RECOVERABLE-V2-RUNNER-ADAPTER-V1';
@@ -194,6 +211,87 @@ export function admissionCheckRecovery(g: V2Group, byMaster: Map<string, Approve
     if (pat && !pat.test(m.evidence)) bad.push(`근거↔route 불합치 ${id}(${m.route})`);
   }
   return [...new Set(bad)];
+}
+
+// ════════════════════════════════════════════════════════════════════════════════
+// 3-B. 최종 승인 SSOT 로더 + admission (생산 입력 전용)
+// ════════════════════════════════════════════════════════════════════════════════
+export interface FinalMaster extends ApprovedMaster {
+  professionalUseVerdict: string | null;
+  storeSignals?: string[];
+}
+export interface FinalShard {
+  shard: string; groups: V2Group[]; byMaster: Map<string, FinalMaster>;
+  declared: { fp: number; master: number; routes: Record<string, number> };
+}
+
+function readFinalSsot(): any {
+  const j = JSON.parse(fs.readFileSync(FINAL_SSOT_PATH, 'utf8'));
+  if (j.status !== 'APPROVED_FOR_PRODUCTION') throw new Error(`최종 SSOT status=${j.status} — 생산 불가`);
+  if (j.allGatesPass !== true) throw new Error('최종 SSOT allGatesPass=false');
+  if (j.totals?.fingerprints !== FINAL_EXPECTED.total.fp || j.totals?.masters !== FINAL_EXPECTED.total.master) {
+    throw new Error(`최종 SSOT 총계 ${j.totals?.fingerprints}fp/${j.totals?.masters}m != 승인 42/199`);
+  }
+  return j;
+}
+
+/** 최종 승인 SSOT → 생산 그룹. V1 SSOT·조정 proposal 은 생산 입력으로 쓰지 않는다. */
+export function loadFinalShard(shard: string): FinalShard {
+  const j = readFinalSsot();
+  const s = j.shards?.[shard];
+  if (!s) throw new Error(`shard '${shard}' 없음`);
+  const mine: FinalMaster[] = (j.masters as FinalMaster[]).filter((m) => m.shard === shard);
+  const byMaster = new Map(mine.map((m) => [m.masterId, m]));
+  const byFp = new Map<string, FinalMaster[]>();
+  for (const m of mine) { if (!byFp.has(m.fp)) byFp.set(m.fp, []); byFp.get(m.fp)!.push(m); }
+  const groups: V2Group[] = [...byFp.entries()].map(([fp, arr]) => ({
+    fp, gencode: arr[0].gencode, route: arr[0].route,
+    form: ROUTE_LABEL_KO[arr[0].route] || arr[0].route,
+    size: arr.length, masterIds: arr.map((x) => x.masterId).sort(),
+  })).sort((a, b) => b.size - a.size || (a.fp < b.fp ? -1 : a.fp > b.fp ? 1 : 0));
+
+  const exp = FINAL_EXPECTED.shards[shard as keyof typeof FINAL_EXPECTED.shards];
+  if (groups.length !== s.fingerprints || groups.length !== exp.fp) {
+    throw new Error(`${shard} fp 실측 ${groups.length} != SSOT ${s.fingerprints} / WO ${exp.fp}`);
+  }
+  const mSum = groups.reduce((t, g) => t + g.size, 0);
+  if (mSum !== s.masters || mSum !== exp.master) {
+    throw new Error(`${shard} master 실측 ${mSum} != SSOT ${s.masters} / WO ${exp.master}`);
+  }
+  const fpSet = new Set<string>(s.fingerprintList);
+  for (const g of groups) if (!fpSet.has(g.fp)) throw new Error(`${shard} fp ${g.fp} fingerprintList 밖`);
+  return { shard, groups, byMaster, declared: { fp: s.fingerprints, master: s.masters, routes: s.routes } };
+}
+
+/**
+ * 최종 admission — 회수 트랙 게이트 + 전문용 판정 게이트.
+ * cutaneous 는 PRODUCIBLE_STORE 만 허용하고, 어떤 경로든 HOLD_PROFESSIONAL_USE 는 차단한다.
+ */
+export function admissionCheckFinal(g: V2Group, byMaster: Map<string, FinalMaster>): string[] {
+  const bad = admissionCheckRecovery(g, byMaster as unknown as Map<string, ApprovedMaster>);
+  for (const id of g.masterIds) {
+    const m = byMaster.get(id);
+    if (!m) continue;
+    if (m.professionalUseVerdict === 'HOLD_PROFESSIONAL_USE') bad.push(`전문용 보류 대상 혼입 ${id}`);
+    if (m.route === 'cutaneous' && m.professionalUseVerdict !== 'PRODUCIBLE_STORE') {
+      bad.push(`cutaneous 인데 PRODUCIBLE_STORE 아님(${m.professionalUseVerdict}) ${id}`);
+    }
+  }
+  return [...new Set(bad)];
+}
+
+/** 최종 트랙 전용 순서 원장 — V2 READY·V1 회수 원장과 모두 분리. */
+export function finalLedger(): ApplyLedger {
+  if (fs.existsSync(FINAL_LEDGER_PATH)) return readLedger(FINAL_LEDGER_PATH);
+  const status: ApplyLedger['status'] = {};
+  for (const s of RECOVERY_ORDER) status[s] = { koApplied: false, enApplied: false, independentVerified: false };
+  return { wo: WO_PROD, order: [...RECOVERY_ORDER], status };
+}
+export function writeFinalLedger(l: ApplyLedger): void {
+  fs.writeFileSync(FINAL_LEDGER_PATH, JSON.stringify(l, null, 1) + '\n', 'utf8');
+}
+export function finalOrderBlockers(shard: string, l: ApplyLedger = finalLedger()): string[] {
+  return recoveryOrderBlockers(shard, l);
 }
 
 // ════════════════════════════════════════════════════════════════════════════════

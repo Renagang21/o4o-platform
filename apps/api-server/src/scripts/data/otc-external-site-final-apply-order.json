@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "order": [
+  "ga",
+  "na",
+  "da"
+ ],
+ "status": {
+  "ga": {
+   "koApplied": true,
+   "enApplied": true,
+   "independentVerified": true,
+   "note": "독립검증 9/9 PASS · 408T"
+  },
+  "na": {
+   "koApplied": true,
+   "enApplied": true,
+   "independentVerified": true,
+   "note": "독립검증 9/9 PASS · 510T"
+  },
+  "da": {
+   "koApplied": true,
+   "enApplied": true,
+   "independentVerified": true,
+   "note": "독립검증 9/9 PASS · 276T"
+  }
+ }
+}

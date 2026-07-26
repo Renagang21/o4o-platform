@@ -1,0 +1,187 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "shard": "na",
+ "note": "EN authored from the official MFDS e-drug-info Korean source. No new medical facts. All doses, ages, frequencies and durations preserved. Route verbs follow the recovery route profile; oral verbs are not used.",
+ "groups": [
+  {
+   "fp": "bbdfc3e0e88941b5",
+   "title": "Anti-inflammatory Gargle",
+   "efficacy": "This medicine is used to relieve inflammation from gingivitis, stomatitis, thrush, before and after tooth extraction, pharyngitis, tonsillitis, and oral mucositis caused by physical factors such as radiotherapy and intubation.",
+   "usage": "Gargle with 15 mL 2 to 3 times a day, either undiluted or diluted with a small amount of water. Do not use continuously for more than 7 days without the guidance of a doctor. Adjust appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before using this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Do not use in people hypersensitive to this medicine or in children aged 12 years or under. People hypersensitive to Yellow No. 4 (tartrazine) should consult a doctor or pharmacist. After gargling, spit the liquid out and do not use it internally. If you are using an antipyretic analgesic, consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Gingivitis, stomatitis, thrush, pharyngitis, tonsillitis, oral mucositis",
+    "Check with a pharmacist": "Children 12 years or under; regular alcohol use; tartrazine sensitivity"
+   }
+  },
+  {
+   "fp": "2c7041478b086ec1",
+   "title": "Medicated Dressing for Infected Wounds",
+   "efficacy": "This medicine is used for secondary bacterial infection following a burn or an external injury.",
+   "usage": "Cut to a suitable size for the affected area and attach it to the affected area 1 to 3 times a day. Adjust appropriately according to symptoms.",
+   "caution": "Do not use in anyone hypersensitive to this medicine or with such a history. Before use, people with kidney disorder, pregnant women and breastfeeding women should consult a doctor or pharmacist. A breastfeeding woman should not use it on the breast area.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Secondary bacterial infection of burns and external injuries",
+    "Check with a pharmacist": "Kidney disorder, pregnancy, breastfeeding"
+   }
+  },
+  {
+   "fp": "0548673b6342d37d",
+   "title": "Topical Analgesic Liniment",
+   "efficacy": "This medicine is used for pain relief and reduction of inflammation in sprains, bruises, muscle pain, joint pain, fracture pain, low back pain, stiff shoulders, neuralgia and rheumatic pain, and for itchy skin, insect bites and chilblains.",
+   "usage": "Apply an appropriate amount to the affected area 1 or several times a day.",
+   "caution": "Do not use in anyone hypersensitive to this medicine, in infants aged 30 months or under, or around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer and similar plants, on wounds or on sensitive skin. People hypersensitive to this medicine or to cosmetics, those with an allergic constitution, those with severe weeping or erosion of the skin, people with circulatory disorder or diabetes, children, pregnant women or women who may be pregnant, and breastfeeding women should consult a doctor or pharmacist. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. For external use only.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Sprains, bruises, muscle and joint pain, neuralgia, itching, insect bites",
+    "Check with a pharmacist": "Infants aged 30 months or under; wounds, eyes, mucous membranes; diabetes"
+   }
+  },
+  {
+   "fp": "8955dac8b3b283a4",
+   "title": "Vaginal Antiseptic Wash",
+   "efficacy": "This medicine is used for candidal vaginitis, trichomonal vaginitis, vaginitis from non-specific and mixed infection, preparation before obstetric and gynaecological surgery, antiseptic vaginal washing, local washing and deodorising.",
+   "usage": "Dilute 30 mL of povidone-iodine 10% (available iodine 1%) solution in about 1 L of warm water and wash inside and outside the vagina 1 to 2 times a day. For antiseptic vaginal washing, local washing and deodorising, wash 1 to 2 times a week.",
+   "caution": "Do not use in people hypersensitive to this medicine, people with thyroid dysfunction (especially nodular goitre, endemic goitre or Hashimoto thyroiditis), renal failure, newborns and infants under 6 months, people with dermatitis herpetiformis, or patients before or after radioactive iodine treatment. Before use, seriously ill patients such as those with burns, people with thyroid disease or a history of renal failure, pregnant women or women who may be pregnant, and breastfeeding women should consult a doctor or pharmacist. Do not use in the eyes and do not use it internally. Avoid contact with the eyes.",
+   "summaryTable": {
+    "Category": "OTC medicine - vaginal",
+    "Use": "Vaginitis; antiseptic vaginal washing, local washing and deodorising",
+    "Check with a pharmacist": "Thyroid disease, renal failure, pregnancy, breastfeeding, infants under 6 months"
+   }
+  },
+  {
+   "fp": "c94884c1baa9d39a",
+   "title": "Topical Treatment for Head Lice",
+   "efficacy": "This medicine is used to treat infestation with head lice, pubic lice and body lice.",
+   "usage": "Always use on dry hair. After applying it completely, leave it for 10 minutes, then work up a good lather with warm water and rinse thoroughly. Do not leave it on for more than 10 minutes. After use, remove any dead lice and nits remaining in the hair with a fine-toothed nit comb. Refer to the approved product information for the amount to use according to hair length. If a single use does not clear the infestation, use again after 10 days.",
+   "caution": "Take care that this medicine does not get into the eyes. When used for a child, use under the supervision of a guardian. If there are open wounds, cuts or sore areas, consult a doctor or pharmacist. Take care to avoid contact with the eyes, nose, mouth, vagina and other mucous membranes; if it accidentally gets into the eyes, wash them out immediately and thoroughly with plenty of water. For external use only.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Head lice, pubic lice and body lice",
+    "Check with a pharmacist": "Open wounds or sore areas; contact with eyes and mucous membranes"
+   }
+  },
+  {
+   "fp": "bfffd6d59d93a7b2",
+   "title": "Topical Antifungal Solution",
+   "efficacy": "This medicine is used for tinea (tinea pedis, tinea manuum, tinea cruris and tinea corporis), cutaneous candidiasis, pityriasis versicolor and fungal infection of the nails.",
+   "usage": "For fungal skin infection, once a day (preferably at bedtime), clean and completely dry the affected area, then apply a thin layer to the affected area and the surrounding skin and rub in gently. For fungal nail infection, cut the fingernails or toenails short and apply a thin layer once a day (preferably at bedtime), or 2 times a day (morning and evening) if needed. To prevent recurrence, continue for about 2 more weeks after all symptoms have cleared.",
+   "caution": "Do not use in anyone hypersensitive to this medicine. Before use, pregnant women or women who may be pregnant, breastfeeding women and children should consult a doctor or pharmacist. Do not use an occlusive dressing or wrap unless directed by a doctor. Do not use acidic soap in cases of candidiasis. For external use only. Do not use on acute inflammation or open wounds. Take care to avoid contact with the eyes, nose, mouth and other mucous membranes. Consult a doctor when using it together with other topical medicines.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Tinea, cutaneous candidiasis, pityriasis versicolor, fungal nail infection",
+    "Check with a pharmacist": "Pregnancy, breastfeeding, children; open wounds, acute inflammation"
+   }
+  },
+  {
+   "fp": "7467c6a54c7b3780",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by acute rhinitis, allergic rhinitis or sinusitis.",
+   "usage": "For adults and children aged 7 years and over, spray 1 to 2 puffs into the nostril per application. Leave an interval of at least 3 hours and do not exceed 6 times a day.",
+   "caution": "Do not use in people hypersensitive to this medicine, in infants under 7 years, or in people using an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and similar) or within 2 weeks of stopping one. Before use, consult a doctor or pharmacist if you have an allergic constitution, are pregnant or may be pregnant, or have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, or if you smoke or have asthma, chronic bronchitis, emphysema, a cough with a lot of phlegm, a cough lasting or recurring for more than 1 week, or a chronic cough.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 7 years; MAO inhibitor use; heart disease, thyroid disease, glaucoma"
+   }
+  },
+  {
+   "fp": "147589e5395c02b3",
+   "title": "Oral Rinse for Mouth Inflammation",
+   "efficacy": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for sterilisation and disinfection after periodontal membrane surgery.",
+   "usage": "Rinse the mouth with 15 mL for about 1 minute, 2 times a day. For denture-related stomatitis, soak and clean the denture for 15 minutes 2 times a day. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use for a long period because it may upset the normal bacterial balance in the mouth. Do not use in anyone who has experienced hypersensitivity to this medicine. People with allergic disease such as asthma, or with such a history or family history, pregnant women, breastfeeding women and children should consult a doctor or pharmacist. Use only as a mouth rinse and do not use it internally.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Denture inflammation, oral candidiasis, gingivitis, pharyngitis, aphthous stomatitis",
+    "Check with a pharmacist": "Asthma or allergic disease, pregnancy, breastfeeding, children"
+   }
+  },
+  {
+   "fp": "439fec45992950e2",
+   "title": "Topical Solution for Hair Loss",
+   "efficacy": "This medicine is used to treat mild female pattern hair loss (androgenetic alopecia) and mild male pattern hair loss (androgenetic alopecia).",
+   "usage": "Apply 3 mL to the affected area once a day using the applicator, then massage for about 1 minute so that the medicine is absorbed well. Once improvement is seen, the frequency may be reduced to once every 2 to 3 days. This is an external preparation and is used on the scalp only.",
+   "caution": "Do not use in people hypersensitive to this medicine, in children and adolescents under 18 years, or in pregnant women, women who may be pregnant and breastfeeding women. Do not use in the eyes or on mucous membranes. If you use it for more than 1 year, decide with your doctor.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Mild female and male pattern hair loss",
+    "Check with a pharmacist": "Under 18 years; pregnancy, breastfeeding; use beyond 1 year"
+   }
+  },
+  {
+   "fp": "81bcb25bc8996ebc",
+   "title": "Topical Cream for Itchy Skin",
+   "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, dermatitis caused by lacquer and similar plants, itching, insect bites, urticaria and chilblains.",
+   "usage": "Apply an appropriate amount to the affected area several times a day.",
+   "caution": "Do not use in infants aged 30 months or under, or around the eyes, on mucous membranes, on eczema, on wounds or on sensitive skin. Before use, consult a doctor or pharmacist if you are hypersensitive to this medicine or to cosmetics, have an allergic constitution, have severe weeping, erosion or inflammation, for children, if you have circulatory disorder or diabetes, or if you are pregnant, may be pregnant or are breastfeeding. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria, chilblains",
+    "Check with a pharmacist": "Infants aged 30 months or under; wounds, eyes, mucous membranes; diabetes"
+   }
+  },
+  {
+   "fp": "0449c842ca60275e",
+   "title": "Antiseptic Solution for Minor Wounds",
+   "efficacy": "This medicine is used for sterilisation and disinfection of cuts, wounds and grazed skin, and for disinfection of the anal area in haemorrhoids.",
+   "usage": "Spray onto the affected area several times a day, or soak gauze or absorbent cotton and apply it to the affected area.",
+   "caution": "Before use, consult a doctor or pharmacist if you have experienced an allergic reaction to a medicine or cosmetic (rash, redness, itching, dermatitis caused by lacquer and similar plants), have an allergic constitution, have a widespread affected area, or have a severe wound or severe burn. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. For external use only. Avoid contact with the eyes; if it gets into the eyes, wash them out immediately with water. If there is no improvement after 5 to 6 days of use, stop use and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Disinfection of cuts, wounds and grazes; anal area in haemorrhoids",
+    "Check with a pharmacist": "Widespread area, severe wounds or burns, allergic constitution"
+   }
+  },
+  {
+   "fp": "23cfa962c99265dc",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For adults and people aged 7 years and over, apply 2 puffs per application within a limit of 6 times a day; for children aged 2 years to under 7 years, apply 1 puff per application within a limit of 6 times a day, into both nostrils. Leave an interval of at least 3 hours. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use in people hypersensitive to this medicine or with such a history, or in infants under 2 years. Before use, consult a doctor or pharmacist if you are pregnant or may be pregnant, have an allergic constitution, have experienced medicine-related allergic symptoms such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching, or if you have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, or if you smoke or have asthma, chronic bronchitis, emphysema, a cough with a lot of phlegm, a cough lasting or recurring for more than 1 week, or a chronic cough.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 2 years; heart disease, thyroid disease, glaucoma, pregnancy"
+   }
+  },
+  {
+   "fp": "7ce90f7c5de9d9ca",
+   "title": "Antiseptic Solution for Minor Wounds",
+   "efficacy": "This medicine is used for sterilisation and disinfection of grazes, cuts and wound surfaces.",
+   "usage": "Soak gauze or absorbent cotton with an appropriate amount and apply it to the affected area several times a day.",
+   "caution": "Before use, consult a doctor or pharmacist if you are hypersensitive to medicines or cosmetics, have an allergic constitution, have a widespread affected area, or have a severe wound or severe burn. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. For external use only. Avoid contact with the eyes; if it gets into the eyes, wash them out immediately with cold water.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Disinfection of grazes, cuts and wound surfaces",
+    "Check with a pharmacist": "Widespread area, severe wounds or burns, allergic constitution"
+   }
+  },
+  {
+   "fp": "9820f7ca39e6d4a9",
+   "title": "Anti-inflammatory Mouth Rinse",
+   "efficacy": "This medicine is used to relieve inflammation of the mouth and throat such as gingivitis, stomatitis and pharyngitis, and inflammation after conservative dental treatment or tooth extraction.",
+   "usage": "Rinse the mouth or gargle with 15 mL 2 to 3 times a day, either undiluted or diluted with a small amount of water, then spit it out.",
+   "caution": "Do not use in people hypersensitive to this medicine, or in people hypersensitive to aspirin or other non-steroidal anti-inflammatory analgesics or with such a history. Before use, pregnant women or women who may be pregnant, breastfeeding women and children should consult a doctor or pharmacist. Do not use it together with another anti-inflammatory analgesic while using this medicine.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Gingivitis, stomatitis, pharyngitis; after dental treatment or tooth extraction",
+    "Check with a pharmacist": "Aspirin or NSAID sensitivity; pregnancy, breastfeeding, children"
+   }
+  },
+  {
+   "fp": "e53d1d3d07348854",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For people aged 7 years and over and adults, spray 1 to 2 puffs into the nostril per application. Leave an interval of at least 3 hours and do not exceed 6 times a day.",
+   "caution": "Do not use in people hypersensitive to this medicine, in infants under 7 years, or in people using an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and similar) or within 2 weeks of stopping one. Before use, consult a doctor or pharmacist if you have an allergic constitution, have experienced medicine-related allergic symptoms such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching, or if you have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, are pregnant or may be pregnant, or if you smoke or have asthma or chronic bronchitis.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 7 years; MAO inhibitor use; heart disease, thyroid disease, glaucoma"
+   }
+  }
+ ]
+}

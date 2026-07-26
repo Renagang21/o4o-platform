@@ -1,0 +1,187 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "shard": "ga",
+ "note": "EN authored from the official MFDS e-drug-info Korean source. No new medical facts. All doses, ages, frequencies and durations preserved. Route verbs follow the recovery route profile; oral verbs are not used.",
+ "groups": [
+  {
+   "fp": "83e7f3c1cbf46c85",
+   "title": "Oral Antiseptic Rinse",
+   "efficacy": "This medicine is used for disinfection inside the mouth and for disinfection and sterilisation after tooth extraction or oral surgery.",
+   "usage": "Rinse the mouth with an appropriate amount 2 to 3 times a day. For disinfection inside the mouth, dilute this medicine 2.5-fold before use.",
+   "caution": "Do not use in infants aged 30 months or under. Before use, children and anyone with severe soreness inside the mouth should consult a doctor or pharmacist. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. Use this medicine only as a mouth rinse and do not use it internally. After tooth extraction or other oral wounds, avoid vigorous rinsing because clot formation may be impaired. If symptoms do not improve after several days of use, stop use immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Disinfection inside the mouth; after tooth extraction or oral surgery",
+    "Check with a pharmacist": "Infants aged 30 months or under; severe soreness inside the mouth"
+   }
+  },
+  {
+   "fp": "87d4e23259cc5609",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For adolescents aged 12 years and over and adults, spray 1 puff into each nostril 1 to 3 times a day. Leave an interval of at least 8 hours between applications.",
+   "caution": "Do not use in people who are hypersensitive to this medicine, children under 12 years, people who have had surgery exposing the dura mater or trans-sphenoidal hypophysectomy, people with closed-angle glaucoma, dry rhinitis or atrophic rhinitis, phaeochromocytoma or benign prostatic hyperplasia. Before use, consult a doctor or pharmacist if you have a constitution prone to urticaria, contact dermatitis, migraine or food allergy, have experienced allergic symptoms such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching, or if you have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, or are pregnant, may be pregnant, or are breastfeeding.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 12 years; glaucoma, heart disease, thyroid disease, pregnancy"
+   }
+  },
+  {
+   "fp": "a40fbda6ff3ddafc",
+   "title": "Rectal Enema for Constipation",
+   "efficacy": "This medicine is used for constipation.",
+   "usage": "For children aged 3 years and over and adults, instil 5 mL into the rectum once; if an adult sees no effect, the same amount may be used once more. For children under 3 years, use about 1/2 of the liquid. Open the cap and press before use so that a drop of the liquid appears at the tip, which makes insertion into the anus easier.",
+   "caution": "Do not use if you are pregnant or may be pregnant, are elderly, or have severe abdominal pain, nausea, vomiting, haemorrhoidal bleeding or heart disease. Before use, anyone who is hypersensitive to propylene glycol or has experienced such hypersensitivity should consult a doctor or pharmacist. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. Do not use continuously. Use only as an enema.",
+   "summaryTable": {
+    "Category": "OTC medicine - rectal",
+    "Use": "Constipation",
+    "Check with a pharmacist": "Pregnancy, elderly, severe abdominal pain, haemorrhoidal bleeding, heart disease"
+   }
+  },
+  {
+   "fp": "16e36e242f2eda86",
+   "title": "Oral Rinse for Mouth Inflammation",
+   "efficacy": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for sterilisation and disinfection after periodontal membrane surgery.",
+   "usage": "Rinse the mouth with 15 mL for about 1 minute, 2 times a day. For denture-related stomatitis, soak and clean the denture for 15 minutes 2 times a day. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use for a long period because it may upset the normal bacterial balance in the mouth. Do not use in anyone who has experienced hypersensitivity to this medicine. People with allergic disease such as asthma, or with such a history or family history, pregnant women, breastfeeding women and children should consult a doctor or pharmacist. Use only as a mouth rinse and do not use it internally.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Denture inflammation, oral candidiasis, gingivitis, pharyngitis, aphthous stomatitis",
+    "Check with a pharmacist": "Asthma or allergic disease, pregnancy, breastfeeding, children"
+   }
+  },
+  {
+   "fp": "bf23174cc4e8cd4e",
+   "title": "Oral Rinse for Mouth Inflammation",
+   "efficacy": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for sterilisation and disinfection after periodontal membrane surgery.",
+   "usage": "Rinse the mouth with 15 mL for about 1 minute, 2 times a day. For denture-related stomatitis, soak and clean the denture for 15 minutes 2 times a day. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use for a long period because it may upset the normal bacterial balance in the mouth. Do not use in anyone hypersensitive to this medicine. People with allergic disease such as asthma or a history of it, pregnant women, breastfeeding women and children under 18 years should consult a doctor or pharmacist. Because it may upset the normal bacterial balance in the mouth, do not normally use for more than 10 days. Use only as a mouth rinse and do not use it internally. It may cause staining of oral surfaces such as the tooth surface, prostheses and the back of the tongue.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Denture inflammation, oral candidiasis, gingivitis, pharyngitis, aphthous stomatitis",
+    "Check with a pharmacist": "Under 18 years, asthma or allergic disease, pregnancy, breastfeeding"
+   }
+  },
+  {
+   "fp": "2ffe5962b373d734",
+   "title": "Nasal Moisturising Spray",
+   "efficacy": "This medicine is used as supportive treatment for damage to a dry nasal mucosa.",
+   "usage": "For children and adults, spray 1 to 2 puffs (5 to 10 mg) into the left and right nostril per application, 3 to 4 times a day. When using for the first time, prime the pump several times until the liquid is delivered.",
+   "caution": "Do not use in anyone hypersensitive to this medicine. Use this medicine only on the nasal mucosa; do not use it internally or in the eyes or ears. To prevent contamination, avoid sharing it with others as far as possible. When used for a child, use under the supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Supportive care for a dry, damaged nasal mucosa",
+    "Check with a pharmacist": "Hypersensitivity to this medicine"
+   }
+  },
+  {
+   "fp": "4c7b09b53d9fde22",
+   "title": "Topical Lotion for Itchy Skin",
+   "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, dermatitis caused by lacquer and similar plants, itching, insect bites and urticaria.",
+   "usage": "Apply an appropriate amount to the affected area 1 or several times a day. Shake well before use.",
+   "caution": "Do not use in infants aged 30 months or under, or on wounds, around the eyes or on mucous membranes. Before use, consult a doctor or pharmacist if you are hypersensitive to this medicine or to cosmetics, have an allergic constitution, have severe weeping or erosion of the skin, or for children. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. This medicine is for external use only. If there is no improvement after 5 to 6 days of use, stop use immediately and consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria",
+    "Check with a pharmacist": "Infants aged 30 months or under; wounds, eyes, mucous membranes"
+   }
+  },
+  {
+   "fp": "0fbbd83554c92419",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For people aged 12 years and over and adults, spray 1 puff into each nostril within a limit of 3 times a day, leaving an interval of at least 8 hours between applications.",
+   "caution": "Do not use in people hypersensitive to this medicine or with such a history, children under 12 years, people who have had surgery exposing the dura mater or trans-sphenoidal hypophysectomy, people with closed-angle glaucoma, dry rhinitis or atrophic rhinitis, phaeochromocytoma or benign prostatic hyperplasia. Before use, consult a doctor or pharmacist if you have experienced hypersensitivity or an allergic reaction to propylene glycol, have an allergic constitution, have experienced medicine-related allergic symptoms such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching, or if you have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, or are pregnant or may be pregnant.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 12 years; glaucoma, heart disease, thyroid disease, pregnancy"
+   }
+  },
+  {
+   "fp": "8ce5fa989d99722a",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For adolescents aged 12 years and over and adults, spray 1 puff into each nostril within a limit of 3 times a day. Leave an interval of at least 8 hours between applications.",
+   "caution": "Do not use in people hypersensitive to this medicine, children under 12 years, people using an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and similar) or within 2 weeks of stopping one, people who have had surgery exposing the dura mater or trans-sphenoidal hypophysectomy, or people with closed-angle glaucoma, dry rhinitis or atrophic rhinitis, phaeochromocytoma or benign prostatic hyperplasia. Before use, consult a doctor or pharmacist if you have a constitution prone to urticaria, contact dermatitis, migraine or food allergy, or have experienced allergic symptoms such as fever, rash, redness, swelling or irritation.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 12 years; MAO inhibitor use; glaucoma, prostate enlargement"
+   }
+  },
+  {
+   "fp": "48ac7e9d44f41e70",
+   "title": "Topical Cream for Itchy Skin",
+   "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, itching, insect bites and urticaria.",
+   "usage": "Apply an appropriate amount to the affected area several times a day.",
+   "caution": "Do not use in people hypersensitive to this medicine, infants aged 30 months or under, or people with skin infections (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice), eczematous otitis externa with a perforated eardrum, ulcers (except Behcet disease), deep second-degree or worse burns and frostbite, perioral dermatitis, acne vulgaris or rosacea. Do not use on eczema accompanied by skin infection, on wounds or on sensitive skin. Before use, consult a doctor or pharmacist if you are pregnant, may be pregnant or are breastfeeding, for children and elderly people, if you have an allergic constitution, or if weeping, erosion or inflammation is severe.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria",
+    "Check with a pharmacist": "Skin infection, wounds, infants aged 30 months or under, pregnancy"
+   }
+  },
+  {
+   "fp": "0725bc544733daa0",
+   "title": "Topical Solution for Corns and Warts",
+   "efficacy": "This medicine is used for corns, calluses and warts.",
+   "usage": "Apply to the affected area 1 to 3 times a day. A white film may form on the affected area, so when reapplying, rub or peel it off first. After 3 to 4 days of use, soak the affected area in warm water and peel away the softened hardened skin. The maximum amount per day is 2 g and treatment is normally not continued for more than 1 week.",
+   "caution": "Do not use if you have a hypersensitivity reaction to salicylic acid or lactic acid, in infants and children, in people with kidney disorder, or in breastfeeding women, pregnant women or women who may be pregnant who need regular treatment of large areas of skin. Do not use on the face, the female genitals, around the eyes or on mucous membranes. Keep to the stated directions and amount. This medicine is for external use only. Take care that it does not get onto normal skin around the affected area. Avoid contact with the eyes; if it gets into the eyes, wash it out immediately with water. Consult a doctor or pharmacist if you are receiving methotrexate or a sulfonylurea.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Corns, calluses and warts",
+    "Check with a pharmacist": "Kidney disorder, pregnancy, breastfeeding, methotrexate or sulfonylurea use"
+   }
+  },
+  {
+   "fp": "327a62979c86a281",
+   "title": "Oral Rinse for Mouth Inflammation",
+   "efficacy": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for sterilisation and disinfection after periodontal membrane surgery.",
+   "usage": "Rinse the mouth with 15 mL for about 1 minute, 2 times a day. For denture-related stomatitis, soak and clean the denture for 15 minutes 2 times a day. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use for a long period because it may upset the normal bacterial balance in the mouth. Do not use in anyone hypersensitive to this medicine. People with allergic disease such as asthma or a history of it, pregnant women, breastfeeding women and children under 18 years should consult a doctor or pharmacist. Because it may upset the normal bacterial balance in the mouth, do not normally use for more than 10 days. Use only as a mouth rinse and do not use it internally. It may cause staining of oral surfaces such as the tooth surface, prostheses and the back of the tongue.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Denture inflammation, oral candidiasis, gingivitis, pharyngitis, aphthous stomatitis",
+    "Check with a pharmacist": "Under 18 years, asthma or allergic disease, pregnancy, breastfeeding"
+   }
+  },
+  {
+   "fp": "928c8196af34f386",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For people aged 12 years and over and adults, spray 1 puff into the nostril 1 to 3 times a day. Adjust appropriately according to age and symptoms, but do not exceed 3 times a day. Leave an interval of at least 8 hours between each application.",
+   "caution": "Do not use in people hypersensitive to this medicine or with such a history, children under 12 years, or people using an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and similar) or within 2 weeks of stopping one. Before use, consult a doctor or pharmacist if you have urticaria or an allergic constitution, have had allergic symptoms from a medicine such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching, or if you have high blood pressure, heart disease, diabetes, thyroid disease or glaucoma, are pregnant or may be pregnant, are breastfeeding, or smoke or have asthma, chronic bronchitis or emphysema.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 12 years; MAO inhibitor use; heart disease, thyroid disease, glaucoma"
+   }
+  },
+  {
+   "fp": "a559e9d5d38949c9",
+   "title": "Nasal Saline Spray",
+   "efficacy": "This medicine is used for moisturising and washing in nasal congestion (rhinitis) and inflammation of the nasal mucosa.",
+   "usage": "For infants, children and adults, spray 1 to 2 puffs into each nostril per application, and use several times a day if needed.",
+   "caution": "Do not use in anyone hypersensitive to this medicine. Use this medicine only in the nose; do not use it internally or in the eyes or ears. To prevent contamination, avoid sharing it with others as far as possible. When used for a child, use under the supervision of a guardian.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Moisturising and washing for nasal congestion and inflamed nasal mucosa",
+    "Check with a pharmacist": "Hypersensitivity to this medicine"
+   }
+  },
+  {
+   "fp": "f57c37aaa7295e50",
+   "title": "Nasal Drops for a Dry Nose",
+   "efficacy": "This medicine is used to relieve symptoms of a dry nasal mucosa.",
+   "usage": "For adults, instil 2 drops into each nostril as needed according to symptoms. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not use in anyone hypersensitive to this medicine or to benzalkonium chloride, with symptoms such as rash, redness, swelling or irritation. Before use, anyone hypersensitive to nasal preparations should consult a doctor or pharmacist. Use this medicine only in the nose.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Relief of a dry nasal mucosa",
+    "Check with a pharmacist": "Hypersensitivity to this medicine or benzalkonium chloride"
+   }
+  }
+ ]
+}

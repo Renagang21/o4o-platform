@@ -1,0 +1,151 @@
+{
+ "wo": "WO-O4O-OTC-EXTERNAL-SITE-FINAL-APPLY-SUPPORT-AND-PRODUCTION-V1",
+ "shard": "da",
+ "note": "EN authored from the official MFDS e-drug-info Korean source. No new medical facts. All doses, ages, frequencies and durations preserved. Route verbs follow the recovery route profile; oral verbs are not used.",
+ "groups": [
+  {
+   "fp": "a6e5feb00896dbbc",
+   "title": "Nasal Wash Spray",
+   "efficacy": "This medicine is used to wash the nasal cavity when the nose is blocked by nasal secretions or purulent discharge, and to add moisture to the nasal mucosa in a dry environment.",
+   "usage": "Use 2 to 3 times a day in the following order. Point the nozzle to the right and insert it into the right nostril, aiming the nozzle towards the right ear. Press the nozzle gently (1 to 2 presses) so that the spray fills the nasal cavity and sinuses. Then aim the nozzle towards the left ear and repeat in the left nostril. If needed, breathe out gently through the nose after finishing. Use this medicine in the nose only.",
+   "caution": "Do not use in people hypersensitive to this medicine, when the nose is completely blocked, or in people with an ear infection. Before use, people hypersensitive to nasal preparations and anyone who has recently had nasal surgery or has a nasal lesion should consult a doctor or pharmacist. Use this medicine in the nose only.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Washing the nasal cavity; moisturising a dry nasal mucosa",
+    "Check with a pharmacist": "Completely blocked nose, ear infection, recent nasal surgery"
+   }
+  },
+  {
+   "fp": "179a84e50851476e",
+   "title": "Topical Cream for Itchy Skin",
+   "efficacy": "This medicine is used for eczema, dermatitis, prickly heat, dermatitis caused by lacquer and similar plants, itching, insect bites and urticaria.",
+   "usage": "Apply an appropriate amount to the affected area several times a day.",
+   "caution": "Do not use in infants aged 30 months or under. Before use, consult a doctor or pharmacist if you are hypersensitive to this medicine or to cosmetics, have an allergic constitution, have severe weeping or erosion of the skin, or for children. Keep to the stated directions and amount. When used for a child, use under the supervision of a guardian. For external use only. Avoid contact with the eyes; if it gets into the eyes, wash them out immediately with water.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Eczema, dermatitis, prickly heat, itching, insect bites, urticaria",
+    "Check with a pharmacist": "Infants aged 30 months or under; severe weeping or erosion"
+   }
+  },
+  {
+   "fp": "c6ffa7174fdaaac6",
+   "title": "Anti-inflammatory Gargle",
+   "efficacy": "This medicine is used to relieve inflammation from gingivitis, stomatitis, thrush, before and after tooth extraction, pharyngitis, tonsillitis, and oral mucositis caused by physical factors such as radiotherapy and intubation.",
+   "usage": "Gargle with 15 mL 2 to 3 times a day, either undiluted or diluted with a small amount of water. Do not use continuously for more than 7 days without the guidance of a doctor. It may be adjusted appropriately according to age and symptoms.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before using this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Do not use in people hypersensitive to this medicine or in children aged 12 years or under. Before use, anyone who has experienced hypersensitivity or an allergic reaction to Yellow No. 4 (tartrazine) should consult a doctor or pharmacist. After gargling, spit the liquid out and do not use it internally.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Gingivitis, stomatitis, thrush, pharyngitis, tonsillitis, oral mucositis",
+    "Check with a pharmacist": "Children 12 years or under; regular alcohol use; tartrazine sensitivity"
+   }
+  },
+  {
+   "fp": "8779fbb9d4a756b6",
+   "title": "Wound Healing Dressing",
+   "efficacy": "This medicine is used to promote tissue regeneration in wounds.",
+   "usage": "Apply to the wound area 1 to 2 times a day.",
+   "caution": "Do not use in anyone hypersensitive to this medicine. For a chronic ulcer, the wound area must be cleaned surgically or enzymatically before treatment, and necrotic tissue and foreign material must be removed.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Promoting tissue regeneration in wounds",
+    "Check with a pharmacist": "Chronic ulcer requiring wound cleaning beforehand"
+   }
+  },
+  {
+   "fp": "6d62bb8a8f4d1db6",
+   "title": "Anti-inflammatory Mouth Rinse",
+   "efficacy": "This medicine is used to relieve inflammation of the mouth and throat such as gingivitis, stomatitis and pharyngitis, and inflammation after conservative dental treatment or tooth extraction.",
+   "usage": "Rinse the mouth or gargle with 15 mL 2 to 3 times a day, either undiluted or diluted with a small amount of water, then spit it out.",
+   "caution": "Do not use in people hypersensitive to this medicine, in people who have had an allergic reaction (asthma, urticaria or rhinitis) to aspirin or another non-steroidal anti-inflammatory analgesic or with such a history, or in the third trimester of pregnancy. Before use, pregnant women or women who may be pregnant, breastfeeding women and children should consult a doctor or pharmacist. Do not use it together with another anti-inflammatory analgesic.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Gingivitis, stomatitis, pharyngitis; after dental treatment or tooth extraction",
+    "Check with a pharmacist": "Aspirin or NSAID allergy; third trimester of pregnancy; breastfeeding"
+   }
+  },
+  {
+   "fp": "991af01cd7f711c1",
+   "title": "Antiseptic Solution for Hands and Skin",
+   "efficacy": "This medicine is used for disinfection of the hands and skin (excluding hand disinfection for health and hygiene workers and for operators during surgery, and disinfection of the skin at a surgical site), disinfection of medical devices, disinfection of furniture and equipment, and disinfection of wound areas of the skin.",
+   "usage": "Use undiluted or diluted to the following concentrations according to the purpose. For disinfection of the hands and skin (excluding hand disinfection for health and hygiene workers and for operators during surgery, and disinfection of the skin at a surgical site), use a 0.1 to 0.5% aqueous solution; for disinfection of medical devices, use a 0.1 to 0.5% aqueous solution; for disinfection of furniture and equipment and for disinfection of wound areas of the skin, use a 0.05% aqueous solution.",
+   "caution": "Do not use in anyone who has experienced hypersensitivity to this medicine, and do not use it on the brain, spinal cord, ear (inner, middle or outer ear), or on mucosal surfaces such as the vagina, bladder and mouth, or in the eyes. People hypersensitive to other medicines and people with allergic disease such as asthma, or with such a history or family history, should consult a doctor or pharmacist. For external use only; do not use it internally and do not inject it. When using it over a wide area or for a long period, take care not to inhale the vapour. Contact with the eyes may damage the cornea, so avoid getting it into the eyes.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Disinfection of hands, skin, wound areas, medical devices, furniture and equipment",
+    "Check with a pharmacist": "Asthma or allergic disease; avoid mucous membranes and eyes"
+   }
+  },
+  {
+   "fp": "6a906ce032efce01",
+   "title": "Topical Solution for Male Pattern Hair Loss",
+   "efficacy": "This medicine is used to treat male pattern hair loss (androgenetic alopecia).",
+   "usage": "After the hair and scalp are completely dry, apply 0.5 to 1 mL of this medicine to the affected area only, 2 times a day (morning and evening), for at least 4 months. Do not exceed a total of 2 mL per day.",
+   "caution": "Do not use in people hypersensitive to this medicine, in female patients, in patients under 18 years, in people with cardiovascular disease (coronary artery disease, arrhythmia, congestive heart failure, heart valve disease, treated or untreated high blood pressure, low blood pressure), in hair loss without a genetic cause, sudden patchy hair loss, scalp abnormality (redness, inflammation, infection, irritation or pain, psoriasis, sunburn), hair loss of unknown cause, patients who have shaved the scalp, patients who did not tolerate the 2% strength well, or patients with myocardial infarction or a history of it.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Male pattern hair loss (androgenetic alopecia)",
+    "Check with a pharmacist": "Under 18 years; cardiovascular disease; scalp abnormality; women"
+   }
+  },
+  {
+   "fp": "f6849bd5d25bcd25",
+   "title": "Medicated Pad for Facial Sweating",
+   "efficacy": "This medicine is used for facial hyperhidrosis (excessive sweating).",
+   "usage": "For adults, once a day, rub 1 pad of this medicine gently about 5 times over the affected area of the face, avoiding the eyes, nose and mouth. Before use, wash the affected area clean and dry it thoroughly, and do not wash the affected area within 4 hours after use.",
+   "caution": "Do not use in people hypersensitive to this medicine or to anticholinergic medicines, in people with glaucoma, or in pregnant women, women who may be pregnant and breastfeeding women. Before use, consult a doctor or pharmacist if you have obstructive urinary tract disease (bladder neck obstruction due to prostate enlargement), obstructive gastrointestinal disease, paralytic ileus, intestinal atony (in elderly or frail patients), cardiovascular insufficiency, severe ulcerative colitis or associated toxic megacolon, or myasthenia gravis. Avoid the eyes, and the mucous membranes of the nose and mouth, and broken skin.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Facial hyperhidrosis (excessive sweating)",
+    "Check with a pharmacist": "Glaucoma, pregnancy, breastfeeding, urinary or bowel obstruction, myasthenia gravis"
+   }
+  },
+  {
+   "fp": "226ed9e7ea262cc5",
+   "title": "Topical Solution for Hair Loss",
+   "efficacy": "This medicine is used to treat male pattern hair loss (androgenetic alopecia) and female pattern hair loss (androgenetic alopecia).",
+   "usage": "For men, after the hair and scalp are completely dry, apply 0.5 to 1 mL of this medicine to the affected area only, 2 times a day (morning and evening), for at least 4 months, and do not exceed a total of 2 mL per day. For women, after the hair and scalp are completely dry, apply 0.5 mL of this medicine to the affected area only, 2 times a day (morning and evening), for at least 4 months, and do not exceed a total of 1.3 mL per day.",
+   "caution": "Do not use in people hypersensitive to this medicine, in patients under 18 years, in pregnant women, women who may be pregnant and breastfeeding women, in people with cardiovascular disease (coronary artery disease, arrhythmia, congestive heart failure, heart valve disease, treated or untreated high blood pressure, low blood pressure), in hair loss without a genetic cause, sudden patchy hair loss, scalp abnormality (redness, inflammation, infection, irritation or pain, psoriasis, sunburn), hair loss of unknown cause, patients who have shaved the scalp, hair loss related to childbirth, or patients with myocardial infarction or a history of it.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Male and female pattern hair loss (androgenetic alopecia)",
+    "Check with a pharmacist": "Under 18 years; pregnancy, breastfeeding; cardiovascular disease"
+   }
+  },
+  {
+   "fp": "669f08b0f6d9e5c8",
+   "title": "Topical Antifungal Solution",
+   "efficacy": "This medicine is used for athlete's foot, tinea cruris (jock itch) and tinea corporis.",
+   "usage": "Apply an appropriate amount to the affected area 2 to 3 times a day.",
+   "caution": "Do not use on or around the eyes, on mucous membranes (for example inside the mouth, inside the nose or the vagina), on the genital or vulval area, on eczema, or on an affected area with severe weeping, erosion, cracking or wounds, or in infants aged 2 years or under. People hypersensitive to this medicine or to cosmetics, people with an allergic constitution, people whose affected area is on the face or is widespread, and people whose affected area is festering should consult a doctor or pharmacist.",
+   "summaryTable": {
+    "Category": "OTC medicine - skin, external",
+    "Use": "Athlete's foot, tinea cruris, tinea corporis",
+    "Check with a pharmacist": "Infants 2 years or under; face or widespread area; festering skin"
+   }
+  },
+  {
+   "fp": "95dce4317d7f2195",
+   "title": "Throat Spray for Sore Throat",
+   "efficacy": "This medicine is used for throat pain, throat swelling, throat discomfort and hoarseness caused by inflammation of the throat, and for stomatitis.",
+   "usage": "Spray an appropriate amount onto the affected area several times a day. For inflammation of the throat, point the nozzle towards the affected part of the throat and, breathing out gently, spray 3 to 4 times per application, 3 to 5 times a day. When using it for the first time, prime it 4 to 5 times until the liquid comes out. If used while breathing in, the liquid may enter the bronchi or lungs, so point the nozzle towards the affected part of the throat and spray while saying 'ah' and breathing out gently.",
+   "caution": "Before use, consult a doctor or pharmacist if you have severe soreness inside the mouth, are hypersensitive to this medicine, have an allergic constitution, or are hypersensitive to propylene glycol. Keep to the stated directions and amount. Use it for application to the throat only and do not use it internally. When used for a child, use under the supervision of a guardian. Take care that the liquid does not get into the eyes. For a certain time after using this medicine, the alcohol level may exceed the threshold used to judge drink-driving.",
+   "summaryTable": {
+    "Category": "OTC medicine - mouth and throat",
+    "Use": "Sore throat, throat swelling and discomfort, hoarseness, stomatitis",
+    "Check with a pharmacist": "Severe soreness inside the mouth; propylene glycol sensitivity"
+   }
+  },
+  {
+   "fp": "b0e419e6d0f26902",
+   "title": "Nasal Decongestant Spray",
+   "efficacy": "This medicine is used to relieve nasal congestion, runny nose, sneezing and a heavy feeling in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+   "usage": "For people aged 12 years and over and adults, spray 1 puff into the nostril 1 to 3 times a day. Adjust appropriately according to age and symptoms, but do not exceed 3 times a day. Leave an interval of at least 8 hours between each application.",
+   "caution": "Do not use in children under 12 years, in people hypersensitive to this medicine or with such a history, or in people using an MAO inhibitor (antidepressant, antipsychotic, mood stabiliser, antiparkinson medicine and similar) or within 2 weeks of stopping one. Before use, consult a doctor or pharmacist if you have a constitution prone to urticaria, contact dermatitis, migraine or food allergy, or have had allergic symptoms from a medicine such as fever, rash, redness, swelling, irritation, joint pain, asthma or itching.",
+   "summaryTable": {
+    "Category": "OTC medicine - nasal",
+    "Use": "Nasal congestion, runny nose and sneezing from a cold, allergic rhinitis or sinusitis",
+    "Check with a pharmacist": "Under 12 years; MAO inhibitor use; allergic constitution"
+   }
+  }
+ ]
+}
