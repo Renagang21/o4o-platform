@@ -5,6 +5,25 @@
  */
 import { api } from '../apiClient';
 
+/**
+ * WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+ *
+ * 조회 실패를 null 로 삼키면 화면에서 "정상 미존재" 와 구분되지 않는다.
+ * 실패는 고정 코드로 throw 하고 서버 원문은 console 로만 남긴다.
+ * (supplier.ts 의 동일 패턴 — extractApiError 는 그쪽 모듈 전용이라 순환을 피해 여기 별도 정의)
+ */
+export const STORE_ORDER_NOT_FOUND = 'STORE_ORDER_NOT_FOUND';
+export const STORE_ORDER_LOAD_FAILED = 'STORE_ORDER_LOAD_FAILED';
+export const STORE_SHIPMENT_ORDER_NOT_FOUND = 'STORE_SHIPMENT_ORDER_NOT_FOUND';
+export const STORE_SHIPMENT_LOAD_FAILED = 'STORE_SHIPMENT_LOAD_FAILED';
+
+function describeApiError(error: any): string {
+  const data = error?.response?.data;
+  if (typeof data?.error === 'string') return data.error;
+  if (data?.error && typeof data.error === 'object') return data.error.code || data.error.message || 'UNKNOWN_ERROR';
+  return error?.message || 'UNKNOWN_ERROR';
+}
+
 // ==================== Store Order Types ====================
 
 // IR-NETURE-B2B-DIRECT-SHIPPING-ORDER-FLOW-AUDIT-V1 Phase 3
@@ -358,26 +377,61 @@ export const storeApi = {
     }
   },
 
+  /**
+   * WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인 — seller.controller.ts:293):
+   *   200 + data:null  → 주문은 존재하나 배송 미생성(정상)
+   *   200 + data:{...} → 배송 정보 존재
+   *   404 ORDER_NOT_FOUND → 주문 미존재 또는 타인 소유
+   *   401 → 미인증. 403 경로는 없다. 500 → 서버 오류
+   */
   async getShipment(orderId: string): Promise<Shipment | null> {
+    let response;
     try {
-      const response = await api.get(`/neture/seller/orders/${orderId}/shipment`);
-      const result = response.data;
-      return result.data || null;
+      response = await api.get(`/neture/seller/orders/${encodeURIComponent(orderId)}/shipment`);
     } catch (error) {
-      console.warn('[Store API] Failed to fetch shipment:', error);
-      return null;
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      console.warn('[Store API] Failed to fetch shipment:', describeApiError(error));
+      throw new Error(status === 404 ? STORE_SHIPMENT_ORDER_NOT_FOUND : STORE_SHIPMENT_LOAD_FAILED);
     }
+    if (response.data?.success !== true) {
+      console.warn('[Store API] Unexpected shipment payload shape');
+      throw new Error(STORE_SHIPMENT_LOAD_FAILED);
+    }
+    const data = response.data.data;
+    if (data === null || data === undefined) return null;
+    if (typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Store API] Unexpected shipment payload shape');
+      throw new Error(STORE_SHIPMENT_LOAD_FAILED);
+    }
+    return data as Shipment;
   },
 
-  async getOrderById(id: string): Promise<StoreOrder | null> {
+  /**
+   * WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+   *
+   * backend 계약(정적 확인 — seller.controller.ts:265 / neture.service.ts:760):
+   *   정상이면 항상 200 + 객체. **정상 null 상태가 없다.**
+   *   404 ORDER_NOT_FOUND → 주문 미존재 또는 타인 소유(존재 은닉)
+   *   401 → 미인증. 403 경로는 없다. 500 → 서버 오류
+   * 따라서 반환 타입에서 null 을 제거하고 실패는 고정 코드로 throw 한다.
+   */
+  async getOrderById(id: string): Promise<StoreOrder> {
+    let response;
     try {
-      const response = await api.get(`/neture/seller/orders/${id}`);
-      const result = response.data;
-      return result.data || null;
+      response = await api.get(`/neture/seller/orders/${encodeURIComponent(id)}`);
     } catch (error) {
-      console.warn('[Store API] Failed to fetch order:', error);
-      return null;
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      console.warn('[Store API] Failed to fetch order:', describeApiError(error));
+      throw new Error(status === 404 ? STORE_ORDER_NOT_FOUND : STORE_ORDER_LOAD_FAILED);
     }
+    const data = response.data?.data;
+    if (response.data?.success !== true || !data || typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Store API] Unexpected order payload shape');
+      throw new Error(STORE_ORDER_LOAD_FAILED);
+    }
+    return data as StoreOrder;
   },
 
   // ── Store Product Library (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) ──

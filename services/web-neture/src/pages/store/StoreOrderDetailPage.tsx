@@ -12,12 +12,22 @@
  * - 재주문 기능
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Package, Truck, Store, RefreshCw, Globe, Phone, ExternalLink } from 'lucide-react';
 import { storeApi, sellerApi, getTrackingUrl, SHIPMENT_STATUS_LABELS } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem, Shipment } from '../../lib/api';
+import { STORE_ORDER_NOT_FOUND, STORE_SHIPMENT_ORDER_NOT_FOUND } from '../../lib/api/store';
 import { storeCart } from '../../lib/api/storeCart';
+
+/**
+ * WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+ *   주문: 정상 null 상태가 없으므로 not-found(404) 와 error 만 구분한다.
+ *   배송: 200 + null 이 정상 미출고이므로 none 을 별도 상태로 둔다.
+ *         error 상태에서는 실제 배송 유무를 알 수 없어 "배송 정보 없음" 으로 표시하지 않는다.
+ */
+type OrderLoadState = 'loading' | 'error' | 'not-found' | 'success';
+type ShipmentLoadState = 'idle' | 'loading' | 'none' | 'success' | 'error' | 'order-not-found';
 
 // ============================================================================
 // Status
@@ -129,27 +139,65 @@ export default function StoreOrderDetailPage() {
 
   const [order, setOrder] = useState<StoreOrder | null>(null);
   const [loading, setLoading] = useState(true);
-  const [notFound, setNotFound] = useState(false);
+  const [orderState, setOrderState] = useState<OrderLoadState>('loading');
+  const [shipmentState, setShipmentState] = useState<ShipmentLoadState>('idle');
   const [reordering, setReordering] = useState(false);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [shipment, setShipment] = useState<Shipment | null>(null);
 
-  useEffect(() => {
+  // WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+  //   주문 조회와 배송 조회를 분리한다. 배송 실패가 주문 본문을 가리지 않고,
+  //   조회 장애가 "주문을 찾을 수 없습니다" 로 위장하지 않는다.
+  //   reqRef: route 전환 시 오래된 응답이 새 주문 화면을 덮어쓰지 못하게 한다.
+  const reqRef = useRef(0);
+
+  const loadShipment = useCallback(async (targetId: string, seq: number) => {
+    setShipmentState('loading');
+    try {
+      const data = await storeApi.getShipment(targetId);
+      if (reqRef.current !== seq) return;
+      setShipment(data);
+      setShipmentState(data ? 'success' : 'none');
+    } catch (e) {
+      if (reqRef.current !== seq) return;
+      setShipment(null);
+      setShipmentState(
+        (e as Error)?.message === STORE_SHIPMENT_ORDER_NOT_FOUND ? 'order-not-found' : 'error',
+      );
+    }
+  }, []);
+
+  const loadOrder = useCallback(async () => {
     if (!id) return;
+    const seq = ++reqRef.current;
     setLoading(true);
-    Promise.all([
-      storeApi.getOrderById(id),
-      storeApi.getShipment(id),
-    ]).then(([orderResult, shipmentResult]) => {
-      if (orderResult) {
-        setOrder(orderResult);
-      } else {
-        setNotFound(true);
-      }
-      setShipment(shipmentResult);
+    setOrderState('loading');
+    setOrder(null);
+    setShipment(null);
+    setShipmentState('idle');
+    try {
+      const orderData = await storeApi.getOrderById(id);
+      if (reqRef.current !== seq) return;
+      setOrder(orderData);
+      setOrderState('success');
+    } catch (e) {
+      if (reqRef.current !== seq) return;
+      setOrderState((e as Error)?.message === STORE_ORDER_NOT_FOUND ? 'not-found' : 'error');
       setLoading(false);
-    });
-  }, [id]);
+      return;
+    }
+    await loadShipment(id, seq);
+    if (reqRef.current !== seq) return;
+    setLoading(false);
+  }, [id, loadShipment]);
+
+  useEffect(() => {
+    loadOrder();
+  }, [loadOrder]);
+
+  const retryShipment = useCallback(() => {
+    if (id) loadShipment(id, reqRef.current);
+  }, [id, loadShipment]);
 
   // Supplier info from first item
   const supplierName = order?.items?.[0]?.supplier_name || null;
@@ -211,8 +259,26 @@ export default function StoreOrderDetailPage() {
     );
   }
 
-  // Not found
-  if (notFound || !order) {
+  // Error — 조회 실패. not-found 와 구분해 다시 시도를 제공한다.
+  if (orderState === 'error') {
+    return (
+      <div style={styles.page}>
+        <div style={styles.empty}>
+          <Package size={48} color="#cbd5e1" />
+          <h3 style={styles.emptyTitle}>주문 정보를 불러오지 못했습니다</h3>
+          <p style={styles.emptyText}>잠시 후 다시 시도해 주세요.</p>
+          <button onClick={loadOrder} style={styles.retryButton}>다시 시도</button>
+          <Link to="/store/orders" style={styles.backLink}>
+            <ArrowLeft size={16} /> 주문 목록으로 돌아가기
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Not found — 미존재·타인 주문(404). 다시 시도 대상이 아니다.
+  // 배송 조회의 404 도 같은 의미이므로 이 화면으로 통합한다.
+  if (orderState === 'not-found' || shipmentState === 'order-not-found' || !order) {
     return (
       <div style={styles.page}>
         <div style={styles.empty}>
@@ -325,7 +391,19 @@ export default function StoreOrderDetailPage() {
       )}
 
       {/* Shipment Tracking (WO-O4O-SHIPMENT-ENGINE-V1) */}
-      {shipment && (
+      {/* WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1:
+          배송 조회 실패는 "배송 정보 없음" 이 아니다. 섹션을 숨기지 않고 오류를 지속 표시한다. */}
+      {shipmentState === 'error' && (
+        <SectionCard icon={<Truck size={18} color="#6366f1" />} title="배송 추적">
+          <div style={styles.shipmentError}>
+            <p style={styles.shipmentErrorTitle}>배송 정보를 불러오지 못했습니다.</p>
+            <p style={styles.shipmentErrorText}>잠시 후 다시 시도해 주세요.</p>
+            <button onClick={retryShipment} style={styles.retryButton}>다시 시도</button>
+          </div>
+        </SectionCard>
+      )}
+
+      {shipmentState === 'success' && shipment && (
         <SectionCard icon={<Truck size={18} color="#6366f1" />} title="배송 추적">
           <div style={styles.shipmentGrid}>
             <div style={styles.shipmentItem}>
@@ -621,6 +699,48 @@ const styles: Record<string, React.CSSProperties> = {
     color: '#334155',
     marginTop: 16,
     marginBottom: 16,
+  },
+  // WO-O4O-NETURE-STORE-ORDER-DETAIL-LOAD-ERROR-CONTRACT-V1
+  emptyText: {
+    fontSize: 14,
+    color: '#64748b',
+    margin: 0,
+    marginTop: -8,
+    marginBottom: 12,
+    wordBreak: 'keep-all' as const,
+  },
+  retryButton: {
+    padding: '8px 16px',
+    borderRadius: 8,
+    border: '1px solid #e2e8f0',
+    backgroundColor: '#fff',
+    color: '#475569',
+    fontSize: 14,
+    cursor: 'pointer',
+  },
+  shipmentError: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'flex-start',
+    gap: 6,
+    padding: 16,
+    borderRadius: 8,
+    border: '1px solid #fecaca',
+    backgroundColor: '#fef2f2',
+  },
+  shipmentErrorTitle: {
+    fontSize: 14,
+    fontWeight: 600,
+    color: '#b91c1c',
+    margin: 0,
+    wordBreak: 'keep-all' as const,
+  },
+  shipmentErrorText: {
+    fontSize: 13,
+    color: '#7f1d1d',
+    margin: 0,
+    marginBottom: 6,
+    wordBreak: 'keep-all' as const,
   },
   loading: {
     textAlign: 'center' as const,
