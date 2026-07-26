@@ -1,0 +1,277 @@
+{
+ "batch": 10,
+ "groups": [
+  {
+   "fp": "065297c32f7a2a71",
+   "title": "Antispasmodic Analgesic Tablet",
+   "efficacy": "This medicine is used for paroxysmal pain of gastrointestinal disease and for functional disorders and spasmodic pain of the biliary and urinary systems.",
+   "usage": "For adults, 1 to 2 tablets 3 times a day. Do not exceed a maximum of 6 tablets a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Spasmodic pain of the gastrointestinal, biliary and urinary systems", "Check with a pharmacist": "Maximum 6 tablets a day; regular alcohol use" }
+  },
+  {
+   "fp": "07947b7fa7e36113",
+   "title": "Antihistamine Soft Capsule",
+   "efficacy": "This medicine is used for allergic rhinitis and chronic idiopathic urticaria.",
+   "usage": "For adults and children aged 12 years and over, 1 capsule once a day. Children aged 6 to under 12 years weighing 30 kg or more take 1 capsule once a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are a child under 6 years, are pregnant or breastfeeding, or have galactose intolerance and related genetic problems. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Allergic rhinitis, chronic idiopathic urticaria", "Check with a pharmacist": "Under 6 years; pregnancy, breastfeeding; galactose intolerance" }
+  },
+  {
+   "fp": "07e64a3d4ffe9995",
+   "title": "Vitamin Supplement Soft Capsule",
+   "efficacy": "This medicine is used for physical fatigue, and during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For adults, 1 capsule once a day.",
+   "caution": "Taking 5000 IU or more of vitamin A a day may cause congenital malformation. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Vitamin A above 5000 IU a day in pregnancy" }
+  },
+  {
+   "fp": "09e19421bbba5914",
+   "title": "Children's Ibuprofen Syrup",
+   "efficacy": "This medicine is used to reduce fever caused by acute upper respiratory tract infection.",
+   "usage": "For children aged 6 months and over, 0.4 to 0.6 mL/kg (5 to 7 mg/kg) per dose, every 4 to 6 hours as needed, not exceeding 4 doses a day (28 mg/kg). For children weighing 30 kg or less, do not exceed a maximum of 25 mL (300 mg) a day. Refer to the approved product information for the recommended amount by age group.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral syrup", "Use": "Fever from acute upper respiratory tract infection in children", "Check with a pharmacist": "Under 6 months; maximum 4 doses a day" }
+  },
+  {
+   "fp": "0a67337d3c29b870",
+   "title": "Vitamin Supplement Tablet",
+   "efficacy": "This medicine is used during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For people aged 8 years and over and adults, 1 tablet 2 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are an infant under 3 months, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Under 3 months; galactose intolerance" }
+  },
+  {
+   "fp": "0bcc85d8d8a5d8d6",
+   "title": "Ibuprofen Soft Capsule",
+   "efficacy": "This medicine is used for fever and pain caused by a cold, low back pain, period pain, rheumatoid arthritis and related joint conditions.",
+   "usage": "For rheumatoid arthritis, osteoarthritis, ankylosing spondylitis, soft tissue injury, non-articular rheumatic disease, acute gout or psoriatic arthritis, adults take 1/2 capsule to 1.5 capsules (200 to 600 mg) 3 to 4 times a day, up to a maximum of 8 capsules (3200 mg) a day. For juvenile rheumatoid arthritis, take 30 to 40 mg per kg of body weight a day in 3 to 4 divided doses. For mild to moderate pain or a cold, adults take 1/2 capsule to 1 capsule (200 to 400 mg) 3 to 4 times a day. For migraine, adults start with 1/2 capsule.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Arthritis, fever and pain, period pain, migraine", "Check with a pharmacist": "Maximum 3200 mg a day; gastrointestinal bleeding" }
+  },
+  {
+   "fp": "0cca229fe473a0e3",
+   "title": "Expectorant Soft Capsule",
+   "efficacy": "This medicine is used for phlegm and for a cough caused by phlegm.",
+   "usage": "For adults and children aged 15 years and over, 2 capsules per dose; for children aged 8 to 14 years, 1 capsule per dose, 3 times a day after meals.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have a gastric or duodenal ulcer, or are a child under 8 years. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Phlegm and cough caused by phlegm", "Check with a pharmacist": "Under 8 years; gastric or duodenal ulcer" }
+  },
+  {
+   "fp": "0eb02aaabc884cd8",
+   "title": "Analgesic Antipyretic Tablet",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache, joint pain and neuralgia.",
+   "usage": "For people aged 15 years and over, 1 tablet per dose; for people aged 8 years to under 15 years, 1/2 tablet per dose, 3 times a day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Headache, toothache, sore throat, earache, joint pain, neuralgia", "Check with a pharmacist": "Under 8 years; at least 4 hours between doses" }
+  },
+  {
+   "fp": "10f6a8cf3b4298da",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used for sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain in a cold.",
+   "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for people over 7 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: sore throat, cough, phlegm, chills, fever, aches", "Check with a pharmacist": "Age 7 years or under; regular alcohol use" }
+  },
+  {
+   "fp": "12d405de2ed4393c",
+   "title": "Vitamin E Soft Capsule",
+   "efficacy": "This medicine is used to supply vitamin E in older age and for peripheral circulatory disorder and shoulder and neck stiffness at the menopause.",
+   "usage": "For people aged 8 years and over and adults, 1 capsule 2 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to soybean oil, soya or peanut, are an infant under 12 months, or have a severe condition as stated in the approved information. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Vitamin E supply; peripheral circulatory disorder; menopausal stiffness", "Check with a pharmacist": "Under 12 months; soya or peanut allergy" }
+  },
+  {
+   "fp": "1370404655b37734",
+   "title": "Laxative Enteric-coated Tablet",
+   "efficacy": "This medicine is used for constipation and for the loss of appetite, abdominal bloating and abnormal intestinal fermentation that accompany constipation.",
+   "usage": "For people aged 15 years and over, 1 to 2 tablets 3 times a day after meals. Leave an interval of at least 4 hours between doses. Start with the smallest amount and increase or decrease it gradually while watching the shape and condition of the stool.",
+   "caution": "Do not take if you have an acute abdominal condition (appendicitis, intestinal bleeding, ulcerative colitis and similar) or intestinal obstruction. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Constipation and related bloating and poor appetite", "Check with a pharmacist": "Under 15 years; acute abdominal disease; bowel obstruction" }
+  },
+  {
+   "fp": "143911c46c90628b",
+   "title": "Anti-inflammatory Analgesic Soft Capsule",
+   "efficacy": "This medicine is used as supportive treatment for chronic polyarthritis, rheumatoid arthritis, arthropathy, ankylosing spondylitis and painful swelling or inflammation after trauma or surgery.",
+   "usage": "For adults, 1 capsule (300 mg) 2 to 4 times a day. Do not exceed 4 capsules (1200 mg) a day.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic, as it may cause gastrointestinal bleeding. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Arthritis, ankylosing spondylitis, pain and swelling after trauma or surgery", "Check with a pharmacist": "Maximum 1200 mg a day; gastrointestinal bleeding" }
+  },
+  {
+   "fp": "15e4fdf2e2572559",
+   "title": "Motion Sickness Tablet",
+   "efficacy": "This medicine is used to prevent and relieve dizziness, vomiting and headache caused by motion sickness.",
+   "usage": "To prevent motion sickness, people aged 15 years and over take 1 tablet 30 minutes to 1 hour before travel. If symptoms appear, an additional single dose may be taken, leaving an interval of at least 4 hours, up to a limit of 3 doses a day.",
+   "caution": "Do not take if you are breastfeeding or are a child. Before taking it, consult a doctor or pharmacist if you have experienced hypersensitivity to a medicine.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Prevention and relief of motion sickness", "Check with a pharmacist": "Children; breastfeeding; maximum 3 doses a day" }
+  },
+  {
+   "fp": "1712582dba889311",
+   "title": "Cough and Phlegm Capsule",
+   "efficacy": "This medicine is used for cough and phlegm.",
+   "usage": "For people aged 15 years and over and adults, 2 capsules 3 times a day after meals.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are pregnant or may be pregnant, or are an infant under 3 months. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Cough and phlegm", "Check with a pharmacist": "Under 3 months; pregnancy" }
+  },
+  {
+   "fp": "17d8f62d3fe611e4",
+   "title": "Acid Reducer Tablet",
+   "efficacy": "This medicine is used to relieve heartburn associated with excess stomach acid.",
+   "usage": "For adults and people aged 15 years and over, 1 tablet per dose. Do not take more than 2 tablets within 24 hours.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to other H2 receptor antagonists, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Heartburn associated with excess stomach acid", "Check with a pharmacist": "Under 15 years; galactose intolerance" }
+  },
+  {
+   "fp": "18d945eaefdae2b9",
+   "title": "Analgesic Antipyretic Soft Capsule",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache and joint pain.",
+   "usage": "For people aged 15 years and over and adults, 1 capsule 1 to 3 times a day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Headache, toothache, sore throat, earache, joint pain", "Check with a pharmacist": "Under 15 years; at least 4 hours between doses" }
+  },
+  {
+   "fp": "1a1a3ec2e978c66d",
+   "title": "Children's Ibuprofen Syrup",
+   "efficacy": "This medicine is used to reduce fever caused by acute upper respiratory tract infection.",
+   "usage": "For children aged 6 months and over, 0.4 to 0.6 mL/kg (5 to 7 mg/kg) per dose, every 4 to 6 hours as needed, not exceeding 4 doses a day (28 mg/kg). For children weighing 30 kg or less, do not exceed a maximum of 25 mL (300 mg) a day. If the body weight is known it is more appropriate to dose by weight, so refer to the approved product information for the recommended amount by age group.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral syrup", "Use": "Fever from acute upper respiratory tract infection in children", "Check with a pharmacist": "Under 6 months; maximum 4 doses a day" }
+  },
+  {
+   "fp": "1b50f52e12cb7be3",
+   "title": "Carnitine Tablet",
+   "efficacy": "This medicine is used for primary and secondary carnitine deficiency and for myocardial metabolic disorder caused by ischaemic heart disease such as angina and acute myocardial infarction.",
+   "usage": "For adults, 2 to 3 g a day in 2 to 3 divided doses. Adjust appropriately according to age and symptoms.",
+   "caution": "Do not take if you are hypersensitive to this medicine. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Carnitine deficiency; myocardial metabolic disorder", "Check with a pharmacist": "Hypersensitivity to this medicine" }
+  },
+  {
+   "fp": "1ba50b81cd241644",
+   "title": "Anti-inflammatory Enzyme Enteric-coated Tablet",
+   "efficacy": "This medicine is used to relieve inflammatory swelling after surgery or injury and in milk stasis.",
+   "usage": "For adults, 2 tablets 4 times a day on the first day, then a maintenance dose of 1 tablet 4 times a day.",
+   "caution": "Do not take if you have galactose intolerance, Lapp lactase deficiency, or a genetic problem such as glucose-galactose malabsorption. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Inflammatory swelling after surgery or injury; milk stasis", "Check with a pharmacist": "Galactose intolerance and related genetic problems" }
+  },
+  {
+   "fp": "1d65168ceb85bcf6",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules per dose; for people aged 8 years to under 15 years, 1 capsule per dose, 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches", "Check with a pharmacist": "Under 8 years; regular alcohol use" }
+  },
+  {
+   "fp": "20d28c2f47a2116b",
+   "title": "Vitamin Supplement Soft Capsule",
+   "efficacy": "This medicine is used for physical fatigue, and during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For people aged 8 years and over and adults, 2 capsules 2 times a day.",
+   "caution": "Taking 5000 IU or more of vitamin A a day may cause congenital malformation. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Vitamin A above 5000 IU a day in pregnancy" }
+  },
+  {
+   "fp": "21d6b1704f22271b",
+   "title": "Caffeine Tablet for Drowsiness",
+   "efficacy": "This medicine is used for drowsiness.",
+   "usage": "For adults, 2 to 6 tablets (100 to 300 mg) 1 to 3 times a day by mouth. Adjust appropriately according to age and symptoms.",
+   "caution": "Before taking it, people hypersensitive to Yellow No. 5 and people with a gastric ulcer or a history of it should consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Drowsiness", "Check with a pharmacist": "Gastric ulcer; tartrazine sensitivity" }
+  },
+  {
+   "fp": "23893574ac5b1654",
+   "title": "Vitamin Supplement Tablet",
+   "efficacy": "This medicine is used for physical fatigue, and during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For people aged 15 years and over and adults, 1 tablet once a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to soya or peanut, or are hypersensitive to soybean oil or have experienced such hypersensitivity. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Soya, peanut or soybean oil allergy" }
+  },
+  {
+   "fp": "23cfa4ab4ea065dc",
+   "title": "Vitamin Supplement Tablet",
+   "efficacy": "This medicine is used for physical fatigue, and during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For people aged 12 years and over and adults, take 1 tablet 2 times a day, or 2 tablets once a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are an infant under 3 months, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Under 3 months; galactose intolerance" }
+  },
+  {
+   "fp": "25c02b62bd2485d4",
+   "title": "Vitamin Supplement Soft Capsule",
+   "efficacy": "This medicine is used for physical fatigue, during pregnancy and breastfeeding and during or after illness when strength is reduced, and to supply vitamins in older age.",
+   "usage": "For adults and children aged 12 years and over, 1 capsule 2 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine or to soybean oil, soya or peanut, or are an infant under 12 months. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Under 12 months; soya or peanut allergy" }
+  },
+  {
+   "fp": "270fcd99942f1638",
+   "title": "Analgesic Antipyretic Tablet",
+   "efficacy": "This medicine is used for pain relief in headache, toothache, pain after tooth extraction, sore throat, earache, joint pain and neuralgia.",
+   "usage": "For people aged 15 years and over and adults, 1 tablet up to 3 times a day, avoiding an empty stomach. Leave an interval of at least 4 hours between doses.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Headache, toothache, sore throat, earache, joint pain, neuralgia", "Check with a pharmacist": "Under 15 years; at least 4 hours between doses" }
+  },
+  {
+   "fp": "2ab296a540ab85fb",
+   "title": "Antidiarrhoeal Capsule",
+   "efficacy": "This medicine is used for diarrhoea, diarrhoea with abdominal pain, a feeling of heaviness, loose stools and vomiting with diarrhoea.",
+   "usage": "For adults, 2 capsules 3 times a day after meals. Do not take it continuously for 3 days or more.",
+   "caution": "Do not take if you are pregnant or may be pregnant, are breastfeeding, are a newborn, or are a child aged 7 years or under. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral capsule", "Use": "Diarrhoea, loose stools, abdominal pain with diarrhoea", "Check with a pharmacist": "Age 7 years or under; pregnancy, breastfeeding; use beyond 3 days" }
+  },
+  {
+   "fp": "2b43a909a80072c3",
+   "title": "Antispasmodic Antacid Tablet",
+   "efficacy": "This medicine is used for stomach pain, abdominal pain, colic, excess stomach acid and heartburn.",
+   "usage": "For adults, 2 tablets 2 to 3 times a day; for people aged 8 to 14 years, 1 tablet 2 to 3 times a day, after or between meals. When taken 2 or more times a day, leave an interval of at least 4 hours.",
+   "caution": "Do not take if you are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Stomach and abdominal pain, colic, excess acid, heartburn", "Check with a pharmacist": "Age 7 years or under; galactose intolerance" }
+  },
+  {
+   "fp": "2cc5d7542615e5df",
+   "title": "Analgesic Tablet for Neuralgia",
+   "efficacy": "This medicine is used for neuralgia, low back pain and stiff shoulders.",
+   "usage": "For adults, 1 to 2 tablets 2 times a day, when pain or an attack occurs.",
+   "caution": "Before taking it, consult a doctor or pharmacist if you have an allergic constitution or have experienced allergic symptoms from a medicine such as fever, rash, joint pain or asthma.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Neuralgia, low back pain, stiff shoulders", "Check with a pharmacist": "Allergic constitution; medicine-related allergic symptoms" }
+  },
+  {
+   "fp": "2e85360b3e34d089",
+   "title": "Vitamin Supplement Tablet",
+   "efficacy": "This medicine is used for physical fatigue, during pregnancy and breastfeeding and during or after illness when strength is reduced, during growth, and in older age.",
+   "usage": "For children aged 8 years and over and adults, 1 tablet once a day after a meal.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are an infant under 3 months, or have high blood calcium (excess calcium in the blood). Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Physical fatigue; growth; reduced strength in pregnancy and illness", "Check with a pharmacist": "Under 3 months; high blood calcium" }
+  },
+  {
+   "fp": "2ebb0051036400d8",
+   "title": "Digestive Enzyme Enteric-coated Tablet",
+   "efficacy": "This medicine is used for indigestion, loss of appetite, overeating, a feeling of heaviness, promotion of digestion and stomach fullness caused by indigestion.",
+   "usage": "For people aged 15 years and over and adults, 2 tablets 3 times a day after meals.",
+   "caution": "Do not take if you are a child aged 7 years or under, or have galactose intolerance, Lapp lactase deficiency or a related genetic problem. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral enteric-coated tablet", "Use": "Indigestion, loss of appetite, overeating, stomach fullness", "Check with a pharmacist": "Age 7 years or under; galactose intolerance" }
+  },
+  {
+   "fp": "3394e81d5d7f4b82",
+   "title": "Antacid Tablet",
+   "efficacy": "This medicine is used for excess stomach acid, heartburn, stomach discomfort, stomach fullness, a feeling of heaviness, nausea, vomiting and stomach pain.",
+   "usage": "For adults, 1 tablet 3 times a day.",
+   "caution": "Do not take if you are hypersensitive to this medicine, are receiving dialysis, or have high blood magnesium or high blood phosphate. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Excess acid, heartburn, stomach discomfort and fullness, nausea", "Check with a pharmacist": "Dialysis; high blood magnesium or phosphate" }
+  },
+  {
+   "fp": "34d40367e5451cf0",
+   "title": "Vitamin Supplement Tablet",
+   "efficacy": "This medicine is used for physical fatigue, and during pregnancy and breastfeeding and during or after illness when strength is reduced.",
+   "usage": "For people aged 8 years and over and adults, 1 tablet once a day after a meal.",
+   "caution": "Do not take if you are hypersensitive to this medicine, have high blood calcium, sarcoidosis, kidney disease or kidney stones, or are an infant under 3 months. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral tablet", "Use": "Physical fatigue; reduced strength in pregnancy, breastfeeding and illness", "Check with a pharmacist": "Under 3 months; high blood calcium; kidney disease or stones" }
+  },
+  {
+   "fp": "366d6aa1eb96e818",
+   "title": "Cold Relief Soft Capsule",
+   "efficacy": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills, fever, headache, joint pain and muscle pain).",
+   "usage": "For people aged 15 years and over and adults, 2 capsules 3 times a day, 30 minutes after meals.",
+   "caution": "Anyone who regularly drinks 3 or more glasses of alcohol a day should consult a doctor or pharmacist before taking this medicine or any other antipyretic analgesic. Before taking it, consult a doctor or pharmacist.",
+   "summaryTable": { "Category": "OTC medicine - oral soft capsule", "Use": "Cold symptoms: runny nose, congestion, sore throat, cough, fever, aches", "Check with a pharmacist": "Under 15 years; regular alcohol use" }
+  }
+ ]
+}
