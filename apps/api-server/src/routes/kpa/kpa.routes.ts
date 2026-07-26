@@ -1564,10 +1564,16 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           // WO-O4O-KPA-CONTENT-REUSABLE-POLICY-LIST-DETAIL-PARITY-V1:
           //   reusable_policy 누락으로 목록·Drawer·자료실의 restricted 판정이 항상 false 였다
           //   (상세는 SELECT * 라 정확). 서버 복사 게이트는 기존 그대로이고 응답 필드만 맞춘다.
+          // WO-O4O-KPA-RESOURCE-LIST-SOURCE-URL-PAYLOAD-PARITY-V1:
+          //   source_url 누락으로 자료실 행 버튼('파일 링크 복사')이 항상
+          //   "복사할 파일 링크가 없습니다" 로 실패했다(상세에는 존재 → Drawer 다운로드는 정상).
+          //   source_file_name 도 함께 반환한다 — 목록 카드의 파일 유형 배지가 확장자로
+          //   판정되므로(getFileType), source_url 만 넣으면 배지가 뜨면서 '기타' 로 오표시된다.
+          //   응답 필드 추가(additive)만이며 조회 조건·권한·복사 게이트는 무변경이다.
           `SELECT c.id, c.title, c.summary, c.category, c.tags, c.status,
                   c.source_type, c.usage_type, c.thumbnail_url, c.created_by, c.created_at, c.updated_at,
                   c.content_type, c.sub_type, c.like_count, c.view_count, c.author_name,
-                  c.reusable_policy
+                  c.reusable_policy, c.source_url, c.source_file_name
            FROM kpa_contents c ${where}
            ORDER BY ${orderBy}
            LIMIT $${idx} OFFSET $${idx + 1}`,
