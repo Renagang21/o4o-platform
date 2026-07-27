@@ -56,16 +56,21 @@ export default function SupplierSupplyOffersPage() {
           </Link>
         </div>
 
-        {/* 판매자 모집 (준비 중) */}
-        <div className="rounded-lg border border-dashed border-slate-300 bg-slate-50 p-5">
+        {/* 판매자 모집 */}
+        <div className="rounded-lg border border-slate-200 bg-white p-5">
           <div className="flex items-center gap-2 mb-1">
-            <Users className="w-5 h-5 text-slate-400" />
-            <h2 className="font-semibold text-slate-600">판매자 모집</h2>
-            <span className="text-[11px] px-1.5 py-0.5 rounded bg-slate-200 text-slate-500">준비 중</span>
+            <Users className="w-5 h-5 text-blue-600" />
+            <h2 className="font-semibold text-slate-800">판매자 모집</h2>
           </div>
-          <p className="text-sm text-slate-500">
-            등록된 제품에 대해 판매자(파트너)를 모집하는 전용 흐름은 후속 단계에서 제공됩니다.
+          <p className="text-sm text-slate-600 mb-3">
+            등록된 제품에 대해 판매자(파트너)를 모집하고, 모집 상태·신청 현황·서비스 노출 승인을 관리합니다.
           </p>
+          <Link
+            to="/supplier/recruitments"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
+          >
+            판매자 모집 현황으로 이동 <ArrowRight className="w-4 h-4" />
+          </Link>
         </div>
       </div>
 

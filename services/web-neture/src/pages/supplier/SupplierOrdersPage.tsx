@@ -175,8 +175,9 @@ export default function SupplierOrdersPage() {
       </div>
       )}
 
-      {/* 주문 처리 workspace 진입 — WO-O4O-NETURE-SUPPLIER-ORDER-WORKSPACE-IA-LINK-V1 */}
-      <Link to="/supplier/orders" style={styles.fulfillCard}>
+      {/* 주문 처리 workspace 진입 — WO-O4O-NETURE-SUPPLIER-OFFER-AND-ORDER-NAVIGATION-DEAD-END-CLOSE-V1:
+          자기참조(/supplier/orders) 제거 → 실제 주문 처리 목록(/account/supplier/orders)으로 연결 */}
+      <Link to="/account/supplier/orders" style={styles.fulfillCard}>
         <div style={styles.fulfillIcon}>
           <Truck size={24} style={{ color: '#2563eb' }} />
         </div>
