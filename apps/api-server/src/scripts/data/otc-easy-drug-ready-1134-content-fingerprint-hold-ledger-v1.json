@@ -1,0 +1,16 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-CONTENT-FINGERPRINT-GLOBAL-REAPPROVAL-V1",
+  "total": 0,
+  "byType": {
+    "HOLD_SOURCE": 0,
+    "HOLD_ROUTE": 0,
+    "HOLD_IDENTITY": 0,
+    "HOLD_COMPOSER_CONTRACT": 0
+  },
+  "holds": {
+    "HOLD_SOURCE": [],
+    "HOLD_ROUTE": [],
+    "HOLD_IDENTITY": [],
+    "HOLD_COMPOSER_CONTRACT": []
+  }
+}

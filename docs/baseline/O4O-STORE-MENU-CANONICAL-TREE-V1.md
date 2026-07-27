@@ -60,7 +60,7 @@
 
 | # | 항목명 | HUB 진열 | 매장 제작 | 매장 가져가기 | 저장 대상 후보 | 기존 구현 | 후속 구현 |
 |---|--------|:--------:|:---------:|:-------------:|--------------|----------|----------|
-| 1 | **상품 상세정보** | HubB2BCatalogPage (KPA/Glyco) | StoreProductInfoCreatorPage (KPA) | 부분 | `store_execution_assets` / `kpa_store_contents` | 부분 (KPA 단독) | 필요 |
+| 1 | **상품 상세정보** | HubB2BCatalogPage (KPA/Glyco) | **StoreHandledProductsPage (KPA)** — 상품 선택 후 STORE 설명서 조회·QR·다국어. 매장 자체 보완 설명 = StoreProductDescriptionsPage(`product_ai_contents`). ~~StoreProductInfoCreatorPage~~ = 은퇴 대상 (아래 정정 노트) | 부분 (읽기 전용 조회 + 매장 보완) | **읽기 = `shared_product_descriptions`(STORE)** / 매장 보완 = `product_ai_contents` | 부분 (KPA 단독) | 은퇴 게이트 진행 중 |
 | 2 | **POP** | StoreHubSignageLibrary 내 | StorePopPage (KPA) | ✅ `assetType='signage'` | `store_execution_assets` | 정렬 (KPA 중심) | 일부 |
 | 3 | **QR-code** | 독립 진열 화면 부재 | StoreQRPage (KPA) | 부분 (library 참조) | `store_execution_assets` + URL | 부분 (KPA 단독) | 필요 |
 | 4 | **블로그** | 진열 화면 부재 | PharmacyBlogPage (KPA, direct) | ❌ Hub→Store 흐름 없음 | `kpa_store_contents` / staff_blog_posts | 미구현 (KPA 직접 작성만) | **필요 (HUB ↔ 매장 흐름 신설)** |
@@ -76,13 +76,28 @@
 - 매장 가져가기 흐름 (HUB → 내 매장 사본 복사)
 - 출처 표시 (§5 참조)
 
+### 2.3 정정 노트 — 상품 상세정보 canonical 역할 (2026-07-27)
+
+> **변경 사유:** §2.1 #1 · §3 "상품 상세정보" 의 매장 측 구현이 `StoreProductInfoCreatorPage` / `store_execution_assets(category='product-info')` 로 기재되어 있었으나, 조사 결과 해당 화면은 **상품 비결속 자유 HTML 노트 + 생산 소비처 0** (canonical 부적합) 으로 확정됨.
+>
+> **선행 근거:**
+> - [`IR-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-ROLE-AND-REACHABILITY-AUDIT-V1`](../investigations/IR-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-ROLE-AND-REACHABILITY-AUDIT-V1.md) (판정 D)
+> - [`DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1`](../design/DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1.md) (handled-products 중심 확정)
+>
+> **정정 내용:**
+> - "상품 상세정보" canonical = `/store/handled-products` 에서 **상품 선택 후 활용** (별도 사이드바 메뉴 신설 안 함).
+> - 주요 액션 = 매장용 STORE 상세설명서 보기(`shared_product_descriptions`, 읽기 전용) · 다국어 · 상품 QR · (필요 시) 매장 자체 설명 작성.
+> - 매장 자체 설명 = `StoreProductDescriptionsPage` / `product_ai_contents` (POP·태블릿 소비처 보유).
+> - `StoreProductInfoCreatorPage` / `store_execution_assets(product-info)` = **deprecated**, 운영 데이터 확인 후 은퇴 ([`IR-O4O-KPA-STORE-PRODUCT-INFO-RETIREMENT-DATA-GATE-V1`](../investigations/IR-O4O-KPA-STORE-PRODUCT-INFO-RETIREMENT-DATA-GATE-V1.md)).
+> - `store_execution_assets` 테이블 자체는 다른 category 공용 → 삭제 대상 아님.
+
 ---
 
 ## 3. HUB ↔ 내 매장 메뉴 매핑표
 
 | 매장 HUB 항목 | 내 매장 메뉴 | 매장 활용 방식 | 가져가기 방식 | 현재 구현 상태 | 정렬 판정 | 후속 작업 |
 |--------------|-------------|--------------|--------------|--------------|:--------:|----------|
-| 상품 상세정보 (HUB B2B Catalog) | 내 상품 상세 | 내 매장 상품 페이지에 표시 / 인쇄물 활용 | snapshot copy (`assetType='product'` 표준화 필요) | KPA 단독 (60%) | 부분 정렬 | W4 |
+| 상품 상세정보 (HUB B2B Catalog) | **매장 경영활용 제품 (handled-products)** | 상품 선택 후 STORE 상세설명서 보기 / 다국어 / 상품 QR / (필요 시) 매장 자체 설명 작성 | O4O STORE 설명서 = 읽기 전용 조회(복사 안 함) · 매장 보완 = `product_ai_contents` | KPA 단독 (60%) | 부분 정렬 | W4 |
 | POP (HUB Signage 내 일부) | 내 매장 POP | 매장 인쇄 / 디스플레이 / 캠페인 | `assetSnapshotApi.copy({ assetType:'signage' })` 일부 + library 참조 | KPA 90%+ | **정렬** | W7 출처 통일 |
 | QR-code (HUB 진열 부재) | 내 매장 QR | 매장 안내 / 랜딩 / 설문 진입 | library 참조 (snapshot 표준화 필요) | KPA 단독 (90%) | 부분 정렬 | W5 |
 | 블로그 (HUB 진열 부재) | 내 매장 블로그 | 매장 블로그 게시 / SEO / 고객 안내 | **흐름 부재 — 신설 필요** | KPA 단독 direct only (70%) | **미정렬** | W3 |

@@ -1,0 +1,142 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-CONTENT-FINGERPRINT-GLOBAL-REAPPROVAL-V1",
+  "agent": "la",
+  "status": "APPROVED_FOR_PRODUCTION",
+  "liveDbWrite": 0,
+  "fingerprintDefinition": {
+    "kind": "content",
+    "axes": [
+      "gencode(candidate-linking)",
+      "route",
+      "효능·효과(원문 정규화 해시)",
+      "용법·용량(원문 정규화 해시)",
+      "경고(원문 정규화 해시)",
+      "사용상 주의사항(원문 정규화 해시)",
+      "이상반응(원문 정규화 해시)",
+      "상호작용(원문 정규화 해시)"
+    ],
+    "excluded": [
+      "저장방법(consumer-irrelevant, WO 축 목록 밖)"
+    ],
+    "formula": "H([gencode, route, H(norm(효능·효과)), H(norm(용법·용량)), H(norm(경고)), H(norm(사용상 주의사항)), H(norm(이상반응)), H(norm(상호작용))].join(\"|\"))",
+    "stricterThan": "fingerprintV2 — cau 가 이상반응을 누락했으나 본 fp 는 6개 섹션 개별 해시 전부 포함"
+  },
+  "sourceRefPolicy": {
+    "namespace": "otc-v3-content-leaflet:",
+    "formula": "uuid(md5('otc-v3-content-leaflet:' + contentFp))",
+    "distinctFrom": "fpToUuidV2(otc-v2-leaflet: gencode 기반) — 반드시 다름",
+    "liveConflict": 0,
+    "dupInNew": 0,
+    "sharedAcrossFp": 0
+  },
+  "supersedesCommit": "0b7b25447",
+  "supersededReason": "GENCODE_DOES_NOT_GUARANTEE_CONTENT_HOMOGENEITY",
+  "supersedes": {
+    "file": "otc-easy-drug-ready-1134-approved-for-production-ssot-v1.json",
+    "note": "기존 gencode-fp 5-unit 원장은 SUPERSEDED_PENDING_REAPPROVAL. 본 SSOT 로 대체."
+  },
+  "population": {
+    "declared": 1134,
+    "reproduced": 1134,
+    "producibleMasters": 1134,
+    "holdMasters": 0
+  },
+  "contentFingerprints": {
+    "count": 214,
+    "byRoute": [
+      {
+        "route": "ophthalmic",
+        "fp": 26,
+        "masters": 253
+      },
+      {
+        "route": "oral",
+        "fp": 131,
+        "masters": 540
+      },
+      {
+        "route": "oromucosal",
+        "fp": 2,
+        "masters": 14
+      },
+      {
+        "route": "topical",
+        "fp": 55,
+        "masters": 327
+      }
+    ]
+  },
+  "routeUnits": [
+    {
+      "unit": "ophthalmic-unit-1",
+      "route": "ophthalmic",
+      "fpCount": 26,
+      "masterCount": 253
+    },
+    {
+      "unit": "oral-unit-1",
+      "route": "oral",
+      "fpCount": 65,
+      "masterCount": 270
+    },
+    {
+      "unit": "oral-unit-2",
+      "route": "oral",
+      "fpCount": 66,
+      "masterCount": 270
+    },
+    {
+      "unit": "oromucosal-unit-1",
+      "route": "oromucosal",
+      "fpCount": 2,
+      "masterCount": 14
+    },
+    {
+      "unit": "topical-unit-1",
+      "route": "topical",
+      "fpCount": 55,
+      "masterCount": 327
+    }
+  ],
+  "expectedWrite": {
+    "masters": 1134,
+    "ko": 4536,
+    "en": 2268,
+    "total": 6804
+  },
+  "safetySectionCoverage": {
+    "producible": 1134,
+    "withAdverse": 1116,
+    "withWarn": 123,
+    "withInteraction": 473,
+    "withPrecaution": 1080
+  },
+  "composerRequiredUpgrade": {
+    "required": true,
+    "reason": "buildGroupKo(otc-v2 shared runner)는 효능·효과/용법·용량/사용상 주의사항 3섹션만 방출 — 경고·이상반응·상호작용을 탈락. LIVE apply 전 composer 가 6섹션 전부 보존하도록 상향 필수.",
+    "contractFile": "otc-easy-drug-ready-1134-composer-safety-section-contract-v1.json"
+  },
+  "snapshot": {
+    "source": "unit-ledger snapshotTime",
+    "time": "2026-07-27 04:57:37.694901+00",
+    "xmin": null
+  },
+  "gates": {
+    "1_reproduce_1134": true,
+    "2_outside_baseline_0": true,
+    "3_approved_plus_hold_eq_1134": true,
+    "4_intra_fp_axis_mismatch_0": true,
+    "5_master_in_multi_fp_0": true,
+    "6_fp_split_across_units_0": true,
+    "7_representative_infoloss_0": true,
+    "8_union_merge_0": true,
+    "9_safety_missing_in_approved_0": true,
+    "10_existing_authored_canonical_0": true,
+    "11_existing_live_intersection_0": true,
+    "12_new_sourceref_dup_conflict_0": true,
+    "13_canonical_dup_0": true,
+    "14_db_write_0": true,
+    "15_two_x_byte_identical": true
+  },
+  "gatePass": true
+}

@@ -1,0 +1,62 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-CONTENT-FINGERPRINT-GLOBAL-REAPPROVAL-V1",
+  "principle": "route별 설명서는 원문에 존재하는 모든 안전 섹션을 보존한다. 없는 섹션만 생략한다.",
+  "mandatorySections": [
+    "효능·효과",
+    "용법·용량"
+  ],
+  "safetySectionsMustPreserveIfPresent": [
+    "경고",
+    "사용상 주의사항",
+    "이상반응",
+    "상호작용"
+  ],
+  "currentComposerDefect": {
+    "file": "src/scripts/otc-v2-store-leaflet-runner.shared.ts",
+    "officialAxes_cau": "[경고, 사용상 주의사항, 상호작용] — 이상반응 누락",
+    "buildGroupKo": "효능·효과/용법·용량/사용상 주의사항 3섹션만 방출 — 경고·이상반응·상호작용 탈락"
+  },
+  "requiredComposerBehavior": [
+    "효능·효과: 원문 보존",
+    "용법·용량: 원문 수치(1회량/1일 횟수/간격/기간/연령) 전량 보존",
+    "경고: 존재 시 별도 섹션으로 방출",
+    "사용상 주의사항: 존재 시 방출(금기 내용 포함)",
+    "이상반응: 존재 시 별도 섹션으로 방출 — 현행 탈락 결함의 핵심",
+    "상호작용: 존재 시 별도 섹션으로 방출",
+    "매장 약사 문의 안내 유지"
+  ],
+  "perRouteSafetyPresence": [
+    {
+      "route": "ophthalmic",
+      "masters": 253,
+      "withWarn": 3,
+      "withPrecaution": 253,
+      "withAdverse": 253,
+      "withInteraction": 21
+    },
+    {
+      "route": "oral",
+      "masters": 540,
+      "withWarn": 112,
+      "withPrecaution": 492,
+      "withAdverse": 528,
+      "withInteraction": 410
+    },
+    {
+      "route": "oromucosal",
+      "masters": 14,
+      "withWarn": 8,
+      "withPrecaution": 8,
+      "withAdverse": 14,
+      "withInteraction": 8
+    },
+    {
+      "route": "topical",
+      "masters": 327,
+      "withWarn": 0,
+      "withPrecaution": 327,
+      "withAdverse": 321,
+      "withInteraction": 34
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-CONTENT-FINGERPRINT-GLOBAL-REAPPROVAL-V1",
+  "agent": "la",
+  "mode": "READ-ONLY re-approval census",
+  "liveDbWrite": 0,
+  "rootCause": "기존 승인(0b7b25447)은 fp=gencode 를 content 동질성 지표로 사용했으나, 동일 gencode master 들의 e약은요 공식 원문(특히 이상반응·소아 용법·연령)이 상이. 게다가 officialAxes.cau 가 이상반응을 누락하여 fingerprintV2 조차 불충분.",
+  "resolution": "6개 공식 content 섹션 전부를 개별 정규화 해시로 포함하는 신규 content fingerprint 도입. 대표 1건 = 그룹 전원 byte-identical 보장.",
+  "numbers": {
+    "declared": 1134,
+    "reproduced": 1134,
+    "producibleMasters": 1134,
+    "holdMasters": 0,
+    "holdByType": {
+      "HOLD_SOURCE": 0,
+      "HOLD_ROUTE": 0,
+      "HOLD_IDENTITY": 0,
+      "HOLD_COMPOSER_CONTRACT": 0
+    },
+    "contentFingerprints": 214,
+    "routeUnits": 5,
+    "expectedWrite": {
+      "masters": 1134,
+      "ko": 4536,
+      "en": 2268,
+      "total": 6804
+    },
+    "safety": {
+      "withAdverse": 1116,
+      "withWarn": 123,
+      "withInteraction": 473,
+      "withPrecaution": 1080
+    },
+    "intraFpAxisMismatch": 0,
+    "masterInMultiFp": 0,
+    "fpSplitAcrossUnits": 0,
+    "multiGencodeFp": 0,
+    "multiRouteFp": 0,
+    "existingAuthoredKo": 0,
+    "existingEnCanonical": 0,
+    "easyKoNot1": 0,
+    "canonicalDup": 0,
+    "newSourceRef": {
+      "dup": 0,
+      "sharedAcrossFp": 0,
+      "liveConflict": 0
+    }
+  },
+  "gates": {
+    "1_reproduce_1134": true,
+    "2_outside_baseline_0": true,
+    "3_approved_plus_hold_eq_1134": true,
+    "4_intra_fp_axis_mismatch_0": true,
+    "5_master_in_multi_fp_0": true,
+    "6_fp_split_across_units_0": true,
+    "7_representative_infoloss_0": true,
+    "8_union_merge_0": true,
+    "9_safety_missing_in_approved_0": true,
+    "10_existing_authored_canonical_0": true,
+    "11_existing_live_intersection_0": true,
+    "12_new_sourceref_dup_conflict_0": true,
+    "13_canonical_dup_0": true,
+    "14_db_write_0": true,
+    "15_two_x_byte_identical": true
+  },
+  "gatePass": true,
+  "supersedesCommit": "0b7b25447",
+  "supersededReason": "GENCODE_DOES_NOT_GUARANTEE_CONTENT_HOMOGENEITY",
+  "artifacts": [
+    "otc-easy-drug-ready-1134-content-fingerprint-reapproval-ssot-v1.json",
+    "otc-easy-drug-ready-1134-content-fingerprint-unit-ledger-v1.json",
+    "otc-easy-drug-ready-1134-content-fingerprint-hold-ledger-v1.json",
+    "otc-easy-drug-ready-1134-composer-safety-section-contract-v1.json",
+    "otc-easy-drug-ready-1134-content-fingerprint-reapproval-check-v1.json"
+  ]
+}
