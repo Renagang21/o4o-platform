@@ -160,3 +160,66 @@ WO-O4O-KPA-STORE-PRODUCT-INFO-INTO-PRODUCTION-MATERIALS-V1
 - 코드 0 / DB write 0 / migration 0 / route·메뉴 0 / 배포 0 — read-only 준수.
 - 다른 세션 WIP(OTC, operator SupplierContentApprovalPage) 미접촉.
 - 산출물: 본 문서. path-specific commit `docs(kpa): audit store product info creator role` + push.
+
+---
+
+## 11. 정정·재조정 (ADDENDUM, 2026-07-27) — §7 판정 C 보류
+
+> 승인된 방향: **중단·판정 재조정**. 본 addendum 은 코드 변경 없이 판정만 재조정한다.
+
+### 11.1 정정 사유 — canonical baseline 미참조
+
+본 IR §7 은 **canonical 메뉴트리 SSOT 를 참조하지 않고** "ProductionMaterialEditor 상위집합" 이라는 코드 관찰만으로 흡수(C) 를 판정했다. 이는 거버넌스 계층 누락이다.
+
+`docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` §2.1 표준 6항목 표 **1행**:
+
+| # | 항목명 | 매장 제작 | 저장 대상 후보 | 기존 구현 | 후속 구현 |
+|---|--------|----------|----------------|----------|----------|
+| 1 | **상품 상세정보** | **StoreProductInfoCreatorPage (KPA)** | `store_execution_assets` / `kpa_store_contents` | 부분(KPA 단독) | **필요** |
+
+- 후속 WO §9.1 W4 = `WO-O4O-OPERATOR-PRODUCT-DETAIL-PUBLISHING-V1` — **상품 상세정보 매장 측 확장**.
+- 즉 baseline 은 이 페이지를 표준항목 #1 의 **매장 제작 구현 슬롯으로 예약**하고, **은퇴가 아니라 확장 대상**으로 명시한다.
+- CLAUDE.md 우선순위 체인 순위 5(Store Menu Canonical Tree)는 SSOT 로 영역 판정에 우선 → 코드상 중복이어도 **단독 은퇴는 baseline 위반**.
+
+### 11.2 동시 세션 IR 과의 관계
+
+동시 세션이 본 IR(commit 545158231) **이후** `IR-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-ROLE-AND-REACHABILITY-AUDIT-V1`(commit 88cf303df)을 커밋, 동일 근거(canonical 슬롯 예약)로 **판정 D(후속 설계)** — "read-only IR 로 단독 폐기(C) 확정 불가, baseline 갱신 동반 별도 설계 WO 필요."
+
+### 11.3 재조정된 판정 — **보류 → D 우선**
+
+- §7 의 **C(흡수·은퇴) 판정을 보류**한다. 코드 레벨 관찰(ProductInfoCreator ⊂ ProductionMaterialEditor, 데이터는 통합 피드로 소비)은 **사실로 유지**되나, 이는 **은퇴를 정당화하지 않는다.**
+- 재조정 결론 = **D(후속 설계)**: StoreProductInfoCreatorPage 는 canonical 슬롯 #1 예약분이며 W4 확장 예정. **삭제·redirect 금지.**
+
+### 11.4 재조정으로 드러난 핵심 미결 쟁점 (설계 WO 대상)
+
+본 IR §4~§5 는 정규 "상품 상세설명" 담당을 **StoreProductDescriptionsPage(product_ai_contents)** 로 서술했으나, **canonical 트리 §2.1 #1 은 "상품 상세정보" 매장 제작 슬롯을 StoreProductInfoCreatorPage(store_execution_assets) 로 배정**한다. 두 페이지의 슬롯 소유권이 baseline 과 코드 관찰 사이에서 엇갈린다. → 이것이 설계 WO 가 먼저 해소할 쟁점이다:
+
+```text
+canonical 슬롯 #1 "상품 상세정보" 매장 제작을
+(a) StoreProductInfoCreatorPage 로 유지·확장(W4) 할지
+(b) StoreProductDescriptionsPage 로 재지정하고 product-info 를 은퇴(C 축소)할지
+→ baseline 갱신을 동반해 확정.
+```
+
+### 11.5 redirect 단독도 지금은 보류
+
+파일을 보존한 채 route 만 redirect 해도, `/store/execution/product-info` 가 담당하도록 **예약된 "상품 상세정보 매장 제작" 슬롯을 사실상 제작 자료 목록으로 전환**하는 것이다. 사용자 동선과 역할 계약이 바뀌므로 **baseline 충돌은 그대로 남는다.** → 삭제뿐 아니라 **redirect 단독도 보류**한다.
+
+### 11.6 후속 설계 판정 — 이미 완료됨 (동시 세션)
+
+권장했던 "canonical 슬롯 #1 역할 재판정 설계"는 동시 세션이 **이미 산출**했다:
+`docs/design/DESIGN-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-V1.md` (commit 777263362, WO-O4O-KPA-STORE-PRODUCT-DETAIL-INFORMATION-CANONICAL-ROLE-DESIGN-V1).
+
+설계 최종 판정:
+
+- canonical **"상품 상세정보" = handled-products 중심 통합**(STORE 설명서 조회·다국어·QR). ProductInfoCreator 가 아니다.
+- **StoreProductDescriptions(product_ai_contents) = 역할 한정 유지** — "상품별 매장 자체 보완 설명" (상품 결속 + 소비처 보유).
+- **StoreProductInfoCreator = 은퇴(A/B)** — 상품 비결속(§6.1 위반) + 생산 소비처 0(§6.3 위반). 대체 기능(product_ai_contents)이 상위 호환.
+- baseline `O4O-STORE-MENU-CANONICAL-TREE-V1 §2.1 #1` = **정정 필요**(handled-products + product_ai_contents 로, ProductInfoCreator 는 은퇴 표기) → 별도 승인 WO.
+
+### 11.7 본 IR §7 판정 C 의 최종 위치
+
+- 결과(ProductInfoCreator 은퇴)는 설계에서 **재확인**됐다 — 본 IR §7 의 관찰(열등 중복)은 유효했다.
+- 다만 **경로가 달라졌다**: 원래 제안한 "삭제+redirect(→production-materials)" 가 아니라, 설계의 은퇴 시퀀스(후속-1 baseline 정정 → 후속-2 프로덕션 row read-only 확인 게이팅 → 후속-3/4 route 제거)를 따른다.
+- 따라서 **`WO-O4O-KPA-STORE-PRODUCT-INFO-INTO-PRODUCTION-MATERIALS-V1` 는 폐기**(설계의 은퇴 시퀀스로 대체). redirect→production-materials 도 채택 안 됨(은퇴 대상은 handled-products 동선으로 흡수, 자유노트 역할은 product_ai_contents 가 담당).
+- 코드·DB·route·메뉴 변경 0 유지 — 실제 은퇴 구현은 설계 §11 후속 WO 범위.
