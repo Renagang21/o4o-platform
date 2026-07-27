@@ -4,7 +4,10 @@
 > (IR 묶음 2 — 운영자 상품·오퍼 관리 흐름의 load-error 계약화)
 > 선행 조사: `docs/investigations/IR-O4O-NETURE-LOAD-ERROR-CONTRACT-FINAL-VALIDATION-V1.md`
 > 자매 작업: `CHECK-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1` (묶음 1)
-> 상태: **구현·typecheck 완료 → main push → Web 배포 → 프로덕션 smoke**
+> 상태: **PARTIAL — API 계약 3/3 완료, 소비 화면 2/3 완료**
+> 잔여: `AllProductsOverviewPage.tsx` 오류 UX (동시 세션 DataTable 마이그레이션 커밋 후 마감 필요).
+>   현재 `main`은 `getSupplyProducts` throw 를 `catch { setProducts([]) }` 로 받아 "공급 가능 상품 없음" 으로 표시 →
+>   크래시 없이 안전 저하되나, **오류 vs 정상 0건 분리라는 WO 목표는 이 화면에서 미달성.**
 > 작업일: 2026-07-27
 
 ---
