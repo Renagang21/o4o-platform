@@ -232,15 +232,28 @@ export interface ListingChannelSetting {
 
 /**
  * 상품의 채널별 설정 조회
+ *
+ * WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1:
+ *   백엔드 GET /listings/:id/channels 는 { id, organization_id, service_key } 로 listing 을 조회하고
+ *   service_key 미전달 시 'kpa-society' 로 기본값을 잡는다(resolveServiceKeyFromQuery).
+ *   organization_product_listings.service_key 는 한 매장 안에서도 복수 값을 가지므로
+ *   해당 row 의 실제 service_key 를 전달해야 404 NOT_FOUND 가 되지 않는다.
  */
 export async function getListingChannels(
-  listingId: string
+  listingId: string,
+  serviceKey?: string
 ): Promise<{ success: boolean; data: ListingChannelSetting[] }> {
-  return apiClient.get(`/pharmacy/products/listings/${listingId}/channels`);
+  return apiClient.get(
+    `/pharmacy/products/listings/${listingId}/channels`,
+    serviceKey ? { service_key: serviceKey } : undefined
+  );
 }
 
 /**
  * 상품의 채널별 설정 저장
+ *
+ * WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1:
+ *   PUT 은 body 에서 service_key 를 읽는다(resolveServiceKeyFromBody). 조회와 동일 계약.
  */
 export async function updateListingChannels(
   listingId: string,
@@ -249,7 +262,11 @@ export async function updateListingChannels(
     isVisible: boolean;
     salesLimit?: number | null;
     displayOrder?: number;
-  }>
+  }>,
+  serviceKey?: string
 ): Promise<{ success: boolean; data: { updated: number } }> {
-  return apiClient.put(`/pharmacy/products/listings/${listingId}/channels`, { channels });
+  return apiClient.put(`/pharmacy/products/listings/${listingId}/channels`, {
+    channels,
+    ...(serviceKey ? { service_key: serviceKey } : {}),
+  });
 }

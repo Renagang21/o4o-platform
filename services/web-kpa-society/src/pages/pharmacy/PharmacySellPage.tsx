@@ -85,6 +85,7 @@ function ListingsTab() {
   const [loading, setLoading] = useState(true);
   const [channelFilter, setChannelFilter] = useState<ChannelType | 'ALL'>(initialChannel);
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const updateChannelFilter = useCallback((value: ChannelType | 'ALL') => {
     setChannelFilter(value);
@@ -117,10 +118,18 @@ function ListingsTab() {
 
   const handleToggleActive = async (listing: ProductListing) => {
     try {
-      await updateListing(listing.id, { isActive: !listing.is_active });
+      setActionError(null);
+      // WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1:
+      //   백엔드는 { id, organization_id, service_key } 로 row 를 지목하며 미전달 시 'kpa-society' 기본값.
+      //   진열 row 는 한 매장 안에서도 service_key 가 복수(neture/kpa/kpa-groupbuy…)이므로 실제 값을 보낸다.
+      await updateListing(listing.id, {
+        isActive: !listing.is_active,
+        service_key: listing.service_key,
+      });
       await loadData();
     } catch (e: any) {
       console.error('Failed to toggle listing:', e);
+      setActionError(e?.message || '진열 상태를 변경하지 못했습니다.');
     }
   };
 
@@ -145,6 +154,20 @@ function ListingsTab() {
               disabled={ch.status !== 'APPROVED'}
             />
           ))}
+        </div>
+      )}
+
+      {actionError && (
+        <div style={{
+          marginBottom: 16,
+          padding: '10px 14px',
+          borderRadius: 8,
+          border: '1px solid #FECACA',
+          backgroundColor: '#FEF2F2',
+          color: '#991B1B',
+          fontSize: '0.85rem',
+        }}>
+          {actionError}
         </div>
       )}
 
@@ -264,7 +287,11 @@ function ListingsTab() {
 
               {/* Channel Settings Panel */}
               {expandedId === listing.id && (
-                <ChannelSettingsPanel listingId={listing.id} onClose={() => setExpandedId(null)} />
+                <ChannelSettingsPanel
+                  listingId={listing.id}
+                  serviceKey={listing.service_key}
+                  onClose={() => setExpandedId(null)}
+                />
               )}
             </div>
           ))}
@@ -277,33 +304,48 @@ function ListingsTab() {
 /**
  * Channel Settings Panel (per listing)
  */
-function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClose: () => void }) {
+function ChannelSettingsPanel({
+  listingId,
+  serviceKey,
+  onClose,
+}: {
+  listingId: string;
+  serviceKey?: string;
+  onClose: () => void;
+}) {
   const [settings, setSettings] = useState<ListingChannelSetting[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [saveResult, setSaveResult] = useState<{ ok: boolean; message: string } | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
     setLoading(true);
-    getListingChannels(listingId)
+    setLoadError(null);
+    // WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1: row 의 실제 service_key 로 지목
+    getListingChannels(listingId, serviceKey)
       .then(result => {
         if (cancelled) return;
         setSettings(result.data || []);
         setLoading(false);
       })
-      .catch(() => {
+      .catch((e: any) => {
         if (cancelled) return;
+        console.error('Failed to load channel settings:', e);
+        setLoadError(e?.message || '채널 설정을 불러오지 못했습니다.');
         setLoading(false);
       });
     return () => { cancelled = true; };
-  }, [listingId]);
+  }, [listingId, serviceKey]);
 
   const handleToggleVisible = (idx: number) => {
     setSettings(prev => prev.map((s, i) =>
       i === idx ? { ...s, isVisible: !s.isVisible } : s
     ));
     setDirty(true);
+    setSaveResult(null);
   };
 
   const handleSalesLimitChange = (idx: number, value: string) => {
@@ -313,6 +355,7 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
       i === idx ? { ...s, salesLimit: parsed } : s
     ));
     setDirty(true);
+    setSaveResult(null);
   };
 
   const handleDisplayOrderChange = (idx: number, value: string) => {
@@ -322,11 +365,14 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
       i === idx ? { ...s, displayOrder: parsed } : s
     ));
     setDirty(true);
+    setSaveResult(null);
   };
 
   const handleSave = async () => {
     try {
       setSaving(true);
+      setSaveResult(null);
+      // WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1: row 의 실제 service_key 로 지목
       await updateListingChannels(
         listingId,
         settings.map(s => ({
@@ -334,11 +380,14 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
           isVisible: s.isVisible,
           salesLimit: s.salesLimit,
           displayOrder: s.displayOrder ?? 0,
-        }))
+        })),
+        serviceKey
       );
       setDirty(false);
+      setSaveResult({ ok: true, message: '채널 설정을 저장했습니다.' });
     } catch (e: any) {
       console.error('Failed to save channel settings:', e);
+      setSaveResult({ ok: false, message: e?.message || '채널 설정을 저장하지 못했습니다.' });
     } finally {
       setSaving(false);
     }
@@ -365,6 +414,22 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
         fontSize: '0.875rem',
       }}>
         채널 설정을 불러오는 중...
+      </div>
+    );
+  }
+
+  if (loadError) {
+    return (
+      <div style={{
+        padding: 20,
+        border: '1px solid #FECACA',
+        borderTop: 'none',
+        borderRadius: '0 0 8px 8px',
+        backgroundColor: '#FEF2F2',
+        color: '#991B1B',
+        fontSize: '0.875rem',
+      }}>
+        {loadError}
       </div>
     );
   }
@@ -516,7 +581,17 @@ function ChannelSettingsPanel({ listingId, onClose }: { listingId: string; onClo
       </div>
 
       {/* Save Button */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 12, gap: 8 }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', marginTop: 12, gap: 8 }}>
+        {saveResult && (
+          <span style={{
+            marginRight: 'auto',
+            fontSize: '0.82rem',
+            fontWeight: 500,
+            color: saveResult.ok ? '#047857' : '#991B1B',
+          }}>
+            {saveResult.message}
+          </span>
+        )}
         <button
           onClick={onClose}
           style={{
