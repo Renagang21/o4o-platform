@@ -128,20 +128,27 @@ commit `d038acba9`. V4 의 `PartnerContentsPage` 를 포함해 파트너 목록�
 | 6 | 명세·상태 변경·다운로드 | ⚠️ 미실측 — 호출 함수 무변경 |
 | 7 | 파트너 3종 데스크톱·모바일 렌더 | ✅ 데스크톱 전환 + 모바일 카드 유지(코드 확인) |
 | 8 | inline style 제거 | ⚠️ `ReferralLinksPage` 는 표를 `DataTable` 로 옮겼으나 **페이지 전체 inline style 은 잔존** — 컬럼 render 가 기존 `styles.*` 를 그대로 재사용 |
-| 9 | 배포 | 진행 |
-| 10 | 브라우저 smoke | **미수행** — 자동화 프로필 타 세션 점유 |
+| 9 | 배포 | V5·V6 커밋 자동 트리거(`Deploy Web Services`) |
+| 10 | 브라우저 smoke | V5: `AiCost`·`OperatorContactMessages` PASS, `SupplierSettlements` 렌더 PASS(live 0건), `ReferralLinks` 계정 갭. V6: 배포 후 3종 smoke |
 
 ## 5. 잔여
 
 | 순위 | 대상 | 건수 |
 |:---:|------|:---:|
-| 1 | 확장 제약 해소된 나머지(`SupplierSettlements`·`AiCost`·`CategoryManagement`·`OperatorContactMessages`) | 4 |
-| 2 | 주문·상품 목록 5종 | 5 |
+| 1 | ~~확장 제약 해소된 나머지~~ → V5 전환 완료(`SupplierSettlements`·`AiCost`·`OperatorContactMessages`), `CategoryManagement` HOLD | 0(+1 HOLD) |
+| 2 | ~~주문 목록 3종~~ → V6 전환 완료(`SupplierOrdersListPage`·`OrdersManagementPage`·`StoreOrdersPage`) / 상품 목록 2종 보류(inline 편집기·row-click 드릴다운) | 2(HOLD) |
 | 3 | 사용자·플랫폼·기타 | 4 |
 | 4 | `ReferralLinksPage` 페이지 단위 inline style 제거 | 1 |
 
-**neture 진행률:** 실제 마크업 47건 중 전환 누계 **11건**(V2 1 · V3 3 · V4 1 · 본 WO 6),
-즉시 가능 잔여 **13건**, 부적합 후보 16건.
+**neture 진행률:** 실제 마크업 47건 중 전환 누계 **17건**(V2 1 · V3 3 · V4 1 · 본 WO 6 · V5 3 · V6 3),
+즉시 가능 잔여 **7건**, 부적합/HOLD 후보 16건.
+
+**V5 (확장 잔여 전환):** `SupplierSettlementsPage`·`AiCostPage`·`OperatorContactMessagesPage` 데스크톱 표 → `DataTable`.
+`CategoryManagementPage` 는 트리 구조라 HOLD(표 강제 부적합). `ReferralLinksPage` 표는 전환하되 페이지 inline style 잔존.
+
+**V6 (주문 목록 동형 묶음):** `SupplierOrdersListPage`(공급자 주문·상태전진 액션)·`OrdersManagementPage`(운영자 주문)·`StoreOrdersPage`(매장 주문·재주문 액션)
+데스크톱 표 → `DataTable`. 모바일 카드·툴바·필터·페이지네이션·행 액션 유지, 백엔드 계약 무변경.
+상품 목록(`SupplierProductsList` inline 가격 편집기, `AllProductsOverview`/`RecruitingProducts` row-click 드릴다운)은 동형성 미달로 보류.
 
 ## 6. 커밋
 
