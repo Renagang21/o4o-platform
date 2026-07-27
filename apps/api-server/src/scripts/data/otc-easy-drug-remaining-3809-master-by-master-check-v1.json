@@ -1,0 +1,120 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-3809-MASTER-BY-MASTER-PRODUCTION-QUEUE-AND-EXCEPTION-HANDOFF-DESIGN-V1",
+  "agent": "la",
+  "mode": "READ-ONLY master-by-master census/design",
+  "liveDbWrite": 0,
+  "snapshot": {
+    "source": "REPEATABLE READ READ ONLY snapshot",
+    "note": "snapshot 시각/xmin 은 CHECK 참조(byte-identity 위해 데이터 파일 제외)"
+  },
+  "reproduction": {
+    "basis": "otc-easy-drug-marketed-scope-baseline-census.ts 로직 VERBATIM 재현(AUTHORED_SOURCES 4종 포함)",
+    "productionTargets": 4943,
+    "ready": 1134,
+    "remaining": 3809,
+    "holdCounts": {
+      "HOLD_IDENTITY": 3246,
+      "READY": 1134,
+      "HOLD_ROUTE": 536,
+      "HOLD_SOURCE": 27
+    },
+    "readyMatchesLedger": true,
+    "readyRemainingIntersection": 0
+  },
+  "classification": {
+    "total": 3809,
+    "byBucket": {
+      "READY_MASTER_PRODUCTION": 2496,
+      "EXCEPTION": 1047,
+      "EXCLUDE_CONFIRMED": 266
+    },
+    "agentGa": {
+      "total": 2496,
+      "byRoute": {
+        "oral": 1436,
+        "topical": 797,
+        "ophthalmic": 231,
+        "vaginal": 23,
+        "oromucosal": 9
+      },
+      "byRouteSource": {
+        "dosage_text": 2496
+      }
+    },
+    "agentNa": {
+      "total": 1047,
+      "byCategory": {
+        "EXCEPTION_IDENTITY": 610,
+        "EXCEPTION_ROUTE": 413,
+        "EXCEPTION_SOURCE": 24
+      },
+      "byCode": {
+        "IDENTITY_CONFLICT": 610,
+        "ROUTE_UNRESOLVED": 216,
+        "ROUTE_CONFLICT": 197,
+        "SOURCE_EFFICACY_MISSING": 24
+      },
+      "reentryPotential": 1023
+    },
+    "exclude": {
+      "total": 266,
+      "byCode": {
+        "EXCLUDE_EXPORT": 263,
+        "EXCLUDE_NONSALE": 3
+      }
+    }
+  },
+  "v4SourceRef": {
+    "namespace": "otc-v4-master-leaflet:",
+    "formula": "uuid(md5('otc-v4-master-leaflet:' + masterId))",
+    "distinctFrom": [
+      "fpToUuidV2(otc-v2-leaflet: gencode)",
+      "contentFpToUuid(otc-v3-content-leaflet: content fp)"
+    ],
+    "scope": "agent-ga READY_MASTER_PRODUCTION master 만",
+    "count": 2496,
+    "dup": 0,
+    "liveConflict": 0
+  },
+  "numbers": {
+    "remaining": 3809,
+    "ga": 2496,
+    "na": 1047,
+    "exclude": 266,
+    "sum": 3809,
+    "reentryPotential": 1023,
+    "pilot": 100
+  },
+  "gates": {
+    "1_reproduce_remaining_3809": true,
+    "2_reproduce_hold_identity_3246": true,
+    "3_reproduce_hold_route_536": true,
+    "4_reproduce_hold_source_27": true,
+    "5_hold_sum_eq_3809": true,
+    "6_ready_1134_matches_ledger": true,
+    "7_ready_remaining_intersection_0": true,
+    "8_classified_all_3809": true,
+    "9_ga_plus_na_plus_exclude_eq_3809": true,
+    "10_no_master_in_multiple_queues": true,
+    "11_ga_all_have_source_and_route": true,
+    "12_v4_sourceref_dup_0": true,
+    "13_v4_sourceref_live_conflict_0": true,
+    "14_ga_no_existing_canonical": true,
+    "15_db_write_0": true,
+    "16_two_x_byte_identical": true
+  },
+  "gatePass": true,
+  "artifacts": [
+    "otc-easy-drug-remaining-3809-master-by-master-census-v1.json",
+    "otc-easy-drug-remaining-3809-agent-ga-ready-queue-v1.json",
+    "otc-easy-drug-remaining-3809-agent-na-exception-queue-v1.json",
+    "otc-easy-drug-remaining-3809-exclude-ledger-v1.json",
+    "otc-easy-drug-remaining-3809-v4-sourceref-ledger-v1.json",
+    "otc-easy-drug-remaining-3809-master-by-master-check-v1.json"
+  ],
+  "designDocs": [
+    "otc-easy-drug-remaining-3809-reentry-contract-v1.md",
+    "otc-easy-drug-remaining-3809-transaction-strategy-v1.md",
+    "otc-easy-drug-remaining-3809-followup-agent-requests-v1.md"
+  ]
+}

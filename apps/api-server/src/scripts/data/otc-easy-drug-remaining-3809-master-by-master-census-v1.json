@@ -1,0 +1,266 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-3809-MASTER-BY-MASTER-PRODUCTION-QUEUE-AND-EXCEPTION-HANDOFF-DESIGN-V1",
+  "agent": "la",
+  "mode": "READ-ONLY census/design",
+  "liveDbWrite": 0,
+  "determinism": "no wall-clock in file · single REPEATABLE READ READ ONLY snapshot · arrays sorted by masterId",
+  "model": {
+    "unit": "1 master(제품별 독립)",
+    "grounding": "master 자기 e약은요 공식 원문만",
+    "sourceRefNamespace": "otc-v4-master-leaflet:",
+    "failureIsolation": "한 master 실패 → 예외 큐 이동(DB write 0), 배치 계속",
+    "groupingIsPostOptimizationOnly": true
+  },
+  "reproduction": {
+    "basis": "otc-easy-drug-marketed-scope-baseline-census.ts 로직 VERBATIM 재현(AUTHORED_SOURCES 4종 포함)",
+    "productionTargets": 4943,
+    "ready": 1134,
+    "remaining": 3809,
+    "holdCounts": {
+      "HOLD_IDENTITY": 3246,
+      "READY": 1134,
+      "HOLD_ROUTE": 536,
+      "HOLD_SOURCE": 27
+    },
+    "readyMatchesLedger": true,
+    "readyRemainingIntersection": 0
+  },
+  "perMasterClassification": {
+    "total": 3809,
+    "byBucket": {
+      "READY_MASTER_PRODUCTION": 2496,
+      "EXCEPTION": 1047,
+      "EXCLUDE_CONFIRMED": 266
+    },
+    "agentGa": {
+      "total": 2496,
+      "byRoute": {
+        "oral": 1436,
+        "topical": 797,
+        "ophthalmic": 231,
+        "vaginal": 23,
+        "oromucosal": 9
+      },
+      "byRouteSource": {
+        "dosage_text": 2496
+      }
+    },
+    "agentNa": {
+      "total": 1047,
+      "byCategory": {
+        "EXCEPTION_IDENTITY": 610,
+        "EXCEPTION_ROUTE": 413,
+        "EXCEPTION_SOURCE": 24
+      },
+      "byCode": {
+        "IDENTITY_CONFLICT": 610,
+        "ROUTE_UNRESOLVED": 216,
+        "ROUTE_CONFLICT": 197,
+        "SOURCE_EFFICACY_MISSING": 24
+      },
+      "reentryPotential": 1023
+    },
+    "exclude": {
+      "total": 266,
+      "byCode": {
+        "EXCLUDE_EXPORT": 263,
+        "EXCLUDE_NONSALE": 3
+      }
+    }
+  },
+  "v4SourceRef": {
+    "namespace": "otc-v4-master-leaflet:",
+    "formula": "uuid(md5('otc-v4-master-leaflet:' + masterId))",
+    "distinctFrom": [
+      "fpToUuidV2(otc-v2-leaflet: gencode)",
+      "contentFpToUuid(otc-v3-content-leaflet: content fp)"
+    ],
+    "scope": "agent-ga READY_MASTER_PRODUCTION master 만",
+    "count": 2496,
+    "dup": 0,
+    "liveConflict": 0
+  },
+  "handoffSchema": {
+    "gaToNa": {
+      "description": "agent-ga 가 master 처리 중 예외 발생 시 agent-na 로 넘기는 handoff 레코드",
+      "fields": {
+        "masterId": "uuid",
+        "name": "string",
+        "batchId": "string",
+        "occurredAtSourceRef": "otc-v4-master-leaflet:<masterId>",
+        "exceptionCategory": "EXCEPTION_IDENTITY|EXCEPTION_ROUTE|EXCEPTION_SOURCE|EXCEPTION_COMPOSER|EXCEPTION_PROFESSIONAL",
+        "exceptionCode": "string(WO §exception codes)",
+        "detail": "string",
+        "officialSectionPresence": "{효능·효과,용법·용량,경고,사용상 주의사항,이상반응,상호작용}:0|1",
+        "gencode": "string|null",
+        "gencodeCount": "number",
+        "dbWriteAttempted": "false(불변)"
+      }
+    },
+    "naToGa": {
+      "description": "agent-na 가 예외를 해소하고 agent-ga 로 재진입시키는 return 레코드",
+      "fields": {
+        "masterId": "uuid",
+        "resolvedBy": "agent-na",
+        "resolution": "ROUTE_RESOLVED|IDENTITY_DISAMBIGUATED|COMPOSER_PROFILE_ADDED|OPERATOR_APPROVED|REJECTED",
+        "resolvedRoute": "string|null",
+        "resolvedRouteSource": "operator|source_text|form|gencode",
+        "canonicalGencode": "string|null",
+        "reentryAllowed": "boolean",
+        "note": "string",
+        "dbWrite": "false(불변)"
+      }
+    },
+    "batchExecutionLedger": {
+      "description": "배치 실행 결과 원장(생산 세션에서 기록 — 본 설계 세션은 스키마만)",
+      "fields": {
+        "batchId": "string",
+        "queue": "agent-ga",
+        "masterIdsIn": "uuid[]",
+        "perMaster": "[{masterId, outcome: CREATED|SKIPPED|HANDED_OFF_NA|FAILED, sourceRef, koWrites, enWrites, exceptionCode?}]",
+        "singleWriteOwner": "agent-ga(생산 세션) — na 는 DB write 안함",
+        "txStrategy": "per-master savepoint(문서 참조)",
+        "totals": "{created, skipped, handedOff, failed}"
+      }
+    }
+  },
+  "pilot": {
+    "size": 100,
+    "selection": "agent-ga READY route 라운드로빈 → masterId 정렬 최대 100",
+    "masterIds": [
+      "0015084b-d47e-4107-bc0b-52a8f612aa47",
+      "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "003431b9-ebb0-4e19-86b1-fd30dfcaa1f7",
+      "00421b9b-e8a2-49a2-b45a-00a7e45b3643",
+      "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "006431c2-1586-4799-9582-52971293424a",
+      "00715e89-8b9e-418c-97de-199ee077a9fe",
+      "007b4844-d219-48c8-ab84-ec3c7b682fca",
+      "008ca661-455a-482b-a89f-5b68a23857dc",
+      "00b01fa6-bc5c-4cbb-851b-40f48786333b",
+      "01129495-6dbb-4cf6-bc44-0425d1a7fad6",
+      "011ee863-0947-4669-a4d1-32263a9914ad",
+      "012979ab-ca63-4fda-b210-3e8e1e64577e",
+      "01398122-2790-4db7-84af-ddb1354d3f47",
+      "01628248-a3df-43b2-b959-fd76cff8301d",
+      "017425ec-6996-453b-a054-d23168684cbd",
+      "01a30c7b-69dd-49c8-a737-b927182ade72",
+      "01a6bba3-a1c7-472e-9f23-48922e87df31",
+      "01c4c33f-3e2a-40a8-b411-2bfcc22340ab",
+      "01e30acc-fc34-413b-ac71-9507e55dde13",
+      "01e59591-8415-4be1-8cc2-3ed5ae35def3",
+      "02241d64-4d7c-43e8-bb7b-04413a4be730",
+      "0232a1ca-4306-4957-bb2f-32e27f1bdc7a",
+      "023baa9e-75c6-409d-8bf4-f4d3c03336f6",
+      "0276936b-97e9-4996-8a85-b6b2b73d0216",
+      "0281fa88-04b2-434a-a165-df0a620d6605",
+      "028647fb-2dc8-47f8-8705-62888a711859",
+      "02d2542b-ae0b-4ecf-a811-fa3772df2505",
+      "03455a80-d779-4a79-8739-e680c107d686",
+      "03605844-c52a-47e4-ab8b-d5316b80844a",
+      "0362e7db-96be-4679-a653-cb5b25bfff68",
+      "0374e2e2-aa44-41ea-8cec-eadaad4afcf5",
+      "0387acb0-0124-4d94-aac9-eec014044567",
+      "03a1e771-3d79-4e25-b558-4217d158a751",
+      "03ba696d-3887-427c-a061-0e086a392363",
+      "03dabf65-bb27-43ab-aa1f-640cfa06e729",
+      "040a2801-e3ba-4c2a-b5c4-af3f470bd5fb",
+      "041ff4d1-fb33-4935-ae05-f34c47861682",
+      "049e9890-870d-4d8e-9103-b2581f92f327",
+      "04af1af7-4e1c-411b-99e9-220f78ad9085",
+      "050466a4-e581-493b-bc95-f075739fad7c",
+      "050d6101-93ac-4fbf-a1d0-244a616ec9af",
+      "0510ba3d-5bf8-442a-ba46-ee28159f7b25",
+      "051e3b29-4694-4c56-bd53-5623712312b4",
+      "0578b7b0-60c0-49a0-b7d4-11053b0f0477",
+      "05c3daa1-b851-40c5-af11-925797d30e8b",
+      "06525b1b-0071-4f2e-b762-5c288d9760b2",
+      "06d10c1c-c401-4723-af6c-744b86a51057",
+      "06eb72a2-904a-4767-a144-edef3617ba21",
+      "06ec5495-87d4-48c7-8f6d-d0e3bab05a83",
+      "095a26a9-c107-424f-9d7c-f6cc64f9e5db",
+      "09cb8666-4ae2-4c15-956c-db2d05d0aaf1",
+      "0b464d01-650c-47b5-b0cd-91a3efbc4a08",
+      "0b486f63-8cf0-46fb-8626-250593c9cd5a",
+      "0b4d72b4-d0de-48ee-b2b5-5495ed404c9d",
+      "0d13bf48-d2e7-4d78-9801-7c3e7ee945bd",
+      "0d835f40-c055-452c-a74d-be81275152ba",
+      "0eb6a193-ebc4-41e6-a4d7-cd6135455ce4",
+      "0f30d9a2-2345-44e0-8d4b-d90f6bf8382b",
+      "1056dfb2-543b-4a26-ae0a-4839f41f2743",
+      "105bda3d-ca30-49b5-a734-e0844adf9fbf",
+      "10810b4a-880c-4901-9830-5f46a3e7da91",
+      "1095c58a-103d-4072-a63c-8ef8034c9fc8",
+      "1109bc5c-f4b1-4d3b-8bd8-338011b82480",
+      "11153c58-5ba5-49e7-80a4-61437fdba280",
+      "11420178-cb5e-4940-b531-064d48eef3f0",
+      "127a2a07-5856-4ff2-98b4-1b33d8b4dcee",
+      "132fa5d0-aeae-430c-b823-5d432de95de1",
+      "14c98ced-8e13-4c1d-951b-785a740b6f5c",
+      "15659f7d-a331-4fa8-9c15-f112fa8c5626",
+      "18b1f604-15e3-46f3-8b0f-0118328454eb",
+      "18cfff0c-9dd2-408d-b1b4-2e7055da9c88",
+      "19310902-ccf2-4cdb-8262-dfe21426941f",
+      "1b620862-f431-4d20-9ad1-03e6772c2e1e",
+      "2e1674c0-c159-432a-a093-08aa86325d83",
+      "34769bbf-07af-4c0d-b78b-62716f7305b7",
+      "34ddfb7d-5840-4021-9131-1779a21f0b63",
+      "3be2690e-81a1-45ab-b1c4-e55adc82094c",
+      "3f2124f2-cf55-40a0-9b7a-4eb15aa07c48",
+      "5e141c2d-c307-476f-a35e-b64825ec6a34",
+      "73a9e389-a4f6-4f25-86bd-96249b7ed6ed",
+      "769360f2-24a9-4ebe-9f19-489105c3e7a4",
+      "7b713090-5d8a-489d-b5ab-62790ef20632",
+      "9e4b4850-4528-4e50-852e-5580d0576dd4",
+      "b1a5757a-7182-4fb0-814a-7e4a4dbb7e73",
+      "b5176c31-0a93-43f9-b9fb-499a441f7d8e",
+      "b6452374-5897-4717-a410-b5129fe18adc",
+      "b94f231f-f346-410b-be3f-0f14569b5fe2",
+      "bd038d0f-b43f-45fa-afb7-7fa837408557",
+      "bf5895ed-951b-4f46-8853-053c60104648",
+      "c238504d-6876-45b4-92c0-abdd3a529d9d",
+      "c94c613a-6ae2-4529-ba85-edf2c7640de5",
+      "d2c39b0d-51f7-4c13-8ec9-31914348df0d",
+      "df036d69-16c0-4b70-be60-902e3b82dfc5",
+      "f0a99b56-ea6a-4739-9298-bb58efc9e220",
+      "f0b7f809-b274-4117-9b33-df1a3ed5e9b1",
+      "f1558fec-b45a-46a0-b18b-6910bd188ec7",
+      "f3fee482-04dd-47db-b71a-365ce4dc49c9",
+      "f4fca7c6-0da3-415d-9e9d-54352c252752",
+      "f7d943df-bd87-4816-a314-4283dea86047"
+    ]
+  },
+  "reentryContract": {
+    "forwardWhen": "agent-ga master 처리 중 EXCEPTION_* 발생",
+    "returnWhen": "agent-na resolution ∈ {ROUTE_RESOLVED, IDENTITY_DISAMBIGUATED, COMPOSER_PROFILE_ADDED, OPERATOR_APPROVED} 이고 reentryAllowed=true",
+    "terminalWhen": "resolution=REJECTED 또는 EXCEPTION_SOURCE(원문 부재) 또는 EXCLUDE_CONFIRMED",
+    "invariant": "na 는 DB write 0 · 재진입 후 write owner 는 항상 agent-ga",
+    "docs": [
+      "otc-easy-drug-remaining-3809-reentry-contract-v1.md",
+      "otc-easy-drug-remaining-3809-transaction-strategy-v1.md"
+    ]
+  },
+  "gates": {
+    "1_reproduce_remaining_3809": true,
+    "2_reproduce_hold_identity_3246": true,
+    "3_reproduce_hold_route_536": true,
+    "4_reproduce_hold_source_27": true,
+    "5_hold_sum_eq_3809": true,
+    "6_ready_1134_matches_ledger": true,
+    "7_ready_remaining_intersection_0": true,
+    "8_classified_all_3809": true,
+    "9_ga_plus_na_plus_exclude_eq_3809": true,
+    "10_no_master_in_multiple_queues": true,
+    "11_ga_all_have_source_and_route": true,
+    "12_v4_sourceref_dup_0": true,
+    "13_v4_sourceref_live_conflict_0": true,
+    "14_ga_no_existing_canonical": true,
+    "15_db_write_0": true,
+    "16_two_x_byte_identical": true
+  },
+  "gatePass": true,
+  "snapshot": {
+    "source": "REPEATABLE READ READ ONLY snapshot",
+    "note": "snapshot 시각/xmin 은 CHECK 참조(byte-identity 위해 데이터 파일 제외)"
+  }
+}
