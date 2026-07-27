@@ -218,7 +218,23 @@ CORS 제약 없이 확인했고, 배포 후 프로덕션 번들로 재실행했�
 
 ### 11.5 unified `fulfillmentUrl`
 
-__UNIFIED__
+**런타임 실측 불가 — 검증 계정 2개(`Neture 공급자`, `Neture 공급자2`) 모두 unified 주문 0건.**
+
+```
+GET /neture/supplier/orders/unified?limit=50 → 200, orders 0건 (양 계정 동일)
+```
+
+주문 생성은 §18(테스트 데이터 생성 금지)·운영 데이터 보호 원칙에 걸리므로 하지 않았다.
+대신 다음으로 계약을 확인했다.
+
+| 확인 수단 | 결과 |
+|-----------|:---:|
+| 소스 diff — `fulfillmentUrl` 생성부가 canonical 경로 단일 | PASS (`grep` 결과 account 경로 0) |
+| 처리 불가 주문 `fulfillmentUrl: null` 분기 (`:206`) | 무변경 확인 |
+| `tsconfig.build.json` 타입체크 | PASS |
+| api-server 배포 성공 + `/health` 200 | PASS |
+
+→ **실주문 확보 후 런타임 값 재확인이 필요**하며 §18 후속 항목 4에 기록했다.
 
 ## 12. 반응형
 
@@ -236,14 +252,36 @@ CTA 잘림 없음, 필터·상태 변경 버튼 접근 가능, 기존 대비 ove
 
 | 항목 | 값 |
 |------|-----|
-| commit | __COMMIT__ |
-| detect-changes | __DETECT__ |
-| web-neture | __WEB__ |
-| api-server | __API__ |
+| commit | `bc36b21f6` |
+| detect-changes | **web-neture · api-server 양쪽 모두 감지** — push 한 번에 `Deploy Web Services`(30267929866) + `Deploy API Server`(30267929820) 두 워크플로 자동 트리거 |
+| web-neture | run 30267929866 — `deploy-neture` **success** (타 3서비스 skipped) · revision `neture-web-01348-7k4` → **`neture-web-01349-v2n`** |
+| api-server | run 30267929820 — **success** · revision `o4o-core-api-02972-pwz` → **`o4o-core-api-02973-54w`** · `/health` 200 |
+
+api-server 파이프라인의 표준 마이그레이션 단계는 정상 통과했다. **본 WO 가 추가한 migration 은 없다.**
 
 ## 14. 프로덕션 smoke
 
-__PRODSMOKE__
+배포된 프로덕션 번들 기준으로 §11 전 항목을 재실행 — **전 항목 PASS** (배포 전 결과와 동일).
+
+| 구간 | 결과 |
+|------|:---:|
+| 15.1 주문 허브 (CTA·문구·legacy CTA 0·CTA 이동) | 6/6 PASS |
+| 15.2 처리 목록 (렌더·필터·검색·링크·NEXT_STATUS) | 9/9 PASS |
+| 15.3 주문 상세 (도달·권한) | 2/2 PASS |
+| 16 legacy 회귀 (목록·상세 redirect 없음) | 4/4 PASS |
+| 12 guard (5 route 착지 일치·루프 0) | 5/5 PASS |
+
+**텔레메트리**: page error **0** · 운영 주문 mutation 요청 **0**.
+
+console error 4건은 **존재하지 않는 합성 주문 ID 상세를 의도적으로 방문**해 발생한 API 404 뿐이다.
+별도 probe 로 실제 route 3종을 합성 ID 없이 방문했을 때 **4xx/5xx 0건**임을 확인했다:
+
+```
+/supplier/orders          → 4xx/5xx 0건
+/supplier/orders/manage   → 4xx/5xx 0건
+/account/supplier/orders  → 4xx/5xx 0건
+합성 ID 상세               → 404 1건 (GET /neture/supplier/orders/1111...  — 존재하지 않는 주문, 예상된 응답)
+```
 
 ## 15. DB · migration · 운영 mutation
 
@@ -286,4 +324,5 @@ pnpm-lock.yaml
 | 1 | `/account/supplier/*` 전체 redirect 및 `SupplierAccountLayout` 정리 — 별도 WO (본 WO §18 제외) |
 | 2 | account 대시보드(`SupplierAccountDashboardPage`)의 주문 링크도 canonical 로 이관할지 판단 — legacy 트리 유지 정책과 함께 결정 |
 | 3 | 처리목록 → 상세 → **처리목록** 복귀 UX (현재는 허브 복귀) — 신규 UX 변경이라 별도 WO |
-| 4 | 검증 계정에 주문 실데이터 0건 — 실주문 확보 후 상태 전이·배송 처리 회귀 재확인 |
+| 4 | 검증 계정 2개 모두 주문 실데이터 0건 — 실주문 확보 후 **unified `fulfillmentUrl` 런타임 값**, 상태 전이·배송 처리 회귀 재확인 |
+| 5 | `/supplier/orders/manage` 진입 시 사이드바가 상위 `주문 현황` 항목을 활성 표시한다(별도 메뉴를 만들지 않는 §10 정책의 결과). 필요 시 활성 표시 규칙만 후속 조정 |
