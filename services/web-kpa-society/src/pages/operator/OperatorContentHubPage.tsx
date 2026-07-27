@@ -20,6 +20,7 @@ import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { toast } from '@o4o/error-handling';
+import { ConfirmActionDialog } from '@o4o/ui';
 // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1:
 //   콘텐츠 등록 모달의 JSON textarea → canonical RichTextEditor (body HTML 저장).
 //   O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1 §3.2 "RichTextEditor 기반" 준수.
@@ -95,6 +96,9 @@ export default function OperatorContentHubPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [currentPage, setCurrentPage] = useState(1);
   const [deleting, setDeleting] = useState<string | null>(null);
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   window.confirm(파괴적 삭제) → ConfirmActionDialog(danger). 대상 보관 후 확인 시 삭제 실행.
+  const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
   const [copying, setCopying] = useState<string | null>(null);
   // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
   const [guideOpen, setGuideOpen] = useState(false);
@@ -143,8 +147,10 @@ export default function OperatorContentHubPage() {
   const handleSearch = () => { setSearchTerm(searchInput); setCurrentPage(1); };
 
   // ─── Delete ───────────────────────────────────────────────────────────────
-  const handleDelete = async (item: ContentItem) => {
-    if (!window.confirm(`"${item.title}"을 삭제하시겠습니까?`)) return;
+  const handleDelete = (item: ContentItem) => setDeleteTarget(item);
+  const confirmDelete = async () => {
+    const item = deleteTarget;
+    if (!item) return;
     setDeleting(item.id);
     try {
       await apiFetch(`/api/v1/kpa/contents/${item.id}`, { method: 'DELETE' });
@@ -154,6 +160,7 @@ export default function OperatorContentHubPage() {
       toast.error(e?.message || '삭제에 실패했습니다');
     } finally {
       setDeleting(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -707,6 +714,17 @@ export default function OperatorContentHubPage() {
 
       {/* WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1 */}
       <ContentCreationGuideModal open={guideOpen} onClose={() => setGuideOpen(false)} mode="operator" />
+
+      <ConfirmActionDialog
+        open={!!deleteTarget}
+        title="콘텐츠 삭제"
+        message={deleteTarget ? `"${deleteTarget.title}"을(를) 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다.` : ''}
+        variant="danger"
+        confirmText="삭제"
+        loading={!!deleting}
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteTarget(null)}
+      />
     </div>
   );
 }

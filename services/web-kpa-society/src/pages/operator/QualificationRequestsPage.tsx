@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileCheck, Trash2 } from 'lucide-react';
-import { RowActionMenu, ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
+import { RowActionMenu, ActionBar, BaseDetailDrawer, BulkResultModal, ConfirmActionDialog } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -127,6 +127,9 @@ export default function QualificationRequestsPage() {
   const [selectedRequest, setSelectedRequest] = useState<QualificationRequest | null>(null);
   const [reviewNote, setReviewNote] = useState('');
   const [reviewing, setReviewing] = useState(false);
+  const [deleteRequest, setDeleteRequest] = useState<
+    { mode: 'single'; id: string } | { mode: 'bulk'; count: number } | null
+  >(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const batch = useBatchAction();
@@ -176,22 +179,34 @@ export default function QualificationRequestsPage() {
     }
   };
 
-  const handleDelete = useCallback(async (id: string) => {
-    if (!window.confirm('이 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.')) return;
-    setError(null);
-    try {
-      await qualificationApi.deleteRequest(id);
-      setSuccess('삭제되었습니다.');
-      setSelectedIds(prev => { const next = new Set(prev); next.delete(id); return next; });
-      await load();
-    } catch (err: any) {
-      setError(err?.response?.data?.error || '삭제에 실패했습니다.');
-    }
-  }, [load]);
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   window.confirm(단건/일괄 삭제) → ConfirmActionDialog(danger). 삭제 대상(단건 id / 일괄)을
+  //   상태에 보관 후 확인 시 실행. batch.executeBatch 계약 불변.
+  const handleDelete = useCallback((id: string) => {
+    setDeleteRequest({ mode: 'single', id });
+  }, []);
 
-  const handleBulkDelete = useCallback(async () => {
+  const handleBulkDelete = useCallback(() => {
     if (selectedIds.size === 0) return;
-    if (!window.confirm(`선택한 ${selectedIds.size}건의 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.`)) return;
+    setDeleteRequest({ mode: 'bulk', count: selectedIds.size });
+  }, [selectedIds]);
+
+  const confirmDelete = useCallback(async () => {
+    const req = deleteRequest;
+    setDeleteRequest(null);
+    if (!req) return;
+    if (req.mode === 'single') {
+      setError(null);
+      try {
+        await qualificationApi.deleteRequest(req.id);
+        setSuccess('삭제되었습니다.');
+        setSelectedIds(prev => { const next = new Set(prev); next.delete(req.id); return next; });
+        await load();
+      } catch (err: any) {
+        setError(err?.response?.data?.error || '삭제에 실패했습니다.');
+      }
+      return;
+    }
     const ids = [...selectedIds];
     const result = await batch.executeBatch(
       (batchIds) => qualificationApi.batchDeleteRequests(batchIds),
@@ -202,7 +217,7 @@ export default function QualificationRequestsPage() {
       setSuccess(`${ids.length}건 삭제가 완료되었습니다.`);
       await load();
     }
-  }, [selectedIds, batch, load]);
+  }, [deleteRequest, selectedIds, batch, load]);
 
   const columns: ListColumnDef<QualificationRequest>[] = [
     {
@@ -476,6 +491,20 @@ export default function QualificationRequestsPage() {
           </div>
         )}
       </BaseDetailDrawer>
+
+      <ConfirmActionDialog
+        open={!!deleteRequest}
+        title={deleteRequest?.mode === 'bulk' ? '신청 이력 일괄 삭제' : '신청 이력 삭제'}
+        message={
+          deleteRequest?.mode === 'bulk'
+            ? `선택한 ${deleteRequest.count}건의 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.`
+            : '이 신청 이력을 삭제하시겠습니까?\n승인된 자격 및 역할은 유지됩니다.'
+        }
+        variant="danger"
+        confirmText="삭제"
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteRequest(null)}
+      />
     </div>
   );
 }

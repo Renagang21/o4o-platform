@@ -35,6 +35,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, Send, ArrowLeft, Link as LinkIcon, FileText, Search, CheckCircle2 } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ConfirmActionDialog } from '@o4o/ui';
 import {
   createOperatorQrTemplate,
   getOperatorQrTemplate,
@@ -75,6 +76,9 @@ export default function OperatorQrWritePage() {
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   발행 확인 window.confirm → ConfirmActionDialog. 저장/상태검사 후 대상 id 보관, 확인 시 발행.
+  const [pendingPublishId, setPendingPublishId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Load existing template for edit mode
@@ -175,10 +179,16 @@ export default function OperatorQrWritePage() {
       toast.info('이미 발행된 QR 템플릿입니다');
       return;
     }
-    if (!window.confirm('지금 발행하시겠습니까? 발행 즉시 KPA 매장 HUB 에 노출됩니다.')) return;
+    setPendingPublishId(saved.id);
+  };
+
+  const confirmPublish = async () => {
+    const id = pendingPublishId;
+    setPendingPublishId(null);
+    if (!id) return;
     setIsPublishing(true);
     try {
-      const published = await publishOperatorQrTemplate(saved.id);
+      const published = await publishOperatorQrTemplate(id);
       setTemplate(published);
       toast.success('QR 템플릿이 발행되었습니다');
     } catch (e: any) {
@@ -451,6 +461,16 @@ export default function OperatorQrWritePage() {
           onClose={() => setShowPicker(false)}
         />
       )}
+
+      <ConfirmActionDialog
+        open={!!pendingPublishId}
+        title="QR 템플릿 발행"
+        message="지금 발행하시겠습니까? 발행 즉시 KPA 매장 HUB 에 노출됩니다."
+        confirmText="발행"
+        loading={isPublishing}
+        onConfirm={confirmPublish}
+        onClose={() => setPendingPublishId(null)}
+      />
     </div>
   );
 }

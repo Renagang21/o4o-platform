@@ -728,7 +728,10 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
               color: '#64748b',
             }}
           >
-            상세 가이드: <code>docs/guides/O4O-SUPPLY-CATALOG-APPROVAL-FLOW-GUIDE-V1.md</code>
+            {/* WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+                내부 저장소 문서 경로(raw path) 사용자 노출 제거 → 사용자용 안내 문구로 대체.
+                공유 모듈(KPA/GlycoPharm/Cosmetics/Neture operator 공통) — 정적 안내 텍스트, 회귀 위험 없음. */}
+            공급 상품 승인 흐름은 위 안내를 참고하세요. 추가 문의는 플랫폼 운영팀에 요청할 수 있습니다.
           </div>
         </div>
       </BaseDetailDrawer>

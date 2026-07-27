@@ -14,6 +14,7 @@
 
 import { useState, useEffect } from 'react';
 import { toast } from '@o4o/error-handling';
+import { ConfirmActionDialog } from '@o4o/ui';
 import { colors } from '../../../styles/theme';
 import {
   eventOfferAdminApi,
@@ -26,6 +27,13 @@ import {
 
 type StatusFilter = 'all' | 'visible' | 'hidden';
 
+// WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+//   확인 다이얼로그 대상 액션 디스크립터.
+type PendingAction =
+  | { kind: 'remove'; product: EventOfferAdminProduct }
+  | { kind: 'approve'; item: PendingListing }
+  | { kind: 'reject'; item: PendingListing };
+
 // WO-O4O-EVENT-OFFER-CORE-REFORM-V1: 상태별 배지 정의
 const STATUS_BADGE: Record<string, { label: string; bg: string; color: string }> = {
   pending:  { label: '대기중', bg: '#FEF3C7', color: '#D97706' },
@@ -36,7 +44,10 @@ const STATUS_BADGE: Record<string, { label: string; bg: string; color: string }>
 };
 
 const PAGE_TEXT = {
-  title: '이벤트 관리',
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   사이드바 '이벤트 오퍼 승인' + KPI '이벤트 오퍼 승인 대기' 와 도메인 토큰('이벤트 오퍼') 정합.
+  //   페이지는 등록+표시관리+승인 범위이므로 '승인'으로 축소하지 않고 '관리' 유지.
+  title: '이벤트 오퍼 관리',
   subtitle: '서비스에 노출할 이벤트를 등록하고 표시 상태를 관리합니다.',
   addButtonLabel: '이벤트 추가',
   cancelLabel: '취소',
@@ -107,6 +118,8 @@ export function EventOfferManagePage() {
 
   // 액션 로딩 (row ID별)
   const [actionLoading, setActionLoading] = useState<Record<string, boolean>>({});
+  // 확인 다이얼로그 대상 액션(제외/승인/반려)
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
 
   // 통계
   const [stats, setStats] = useState<EventOfferAdminStats | null>(null);
@@ -227,9 +240,10 @@ export function EventOfferManagePage() {
     }
   };
 
-  const handleRemove = async (product: EventOfferAdminProduct) => {
-    if (actionLoading[product.id]) return;
-    if (!window.confirm(PAGE_TEXT.confirmRemove(product.title))) return;
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   window.confirm(제외/승인) · window.prompt(반려 사유) → ConfirmActionDialog 로 통일.
+  //   대상 액션을 상태에 보관 후 확인 시 실행. 반려는 requireReason 로 사유 필수.
+  const executeRemove = async (product: EventOfferAdminProduct) => {
     setRowLoading(product.id, true);
     try {
       await eventOfferAdminApi.removeProduct(product.id);
@@ -263,9 +277,7 @@ export function EventOfferManagePage() {
     }
   };
 
-  const handleApprove = async (item: PendingListing) => {
-    if (actionLoading[item.id]) return;
-    if (!window.confirm(PAGE_TEXT.confirmApprove(item.productName))) return;
+  const executeApprove = async (item: PendingListing) => {
     setRowLoading(item.id, true);
     try {
       await eventOfferAdminApi.approveProduct(item.id);
@@ -281,18 +293,10 @@ export function EventOfferManagePage() {
     }
   };
 
-  const handleReject = async (item: PendingListing) => {
-    if (actionLoading[item.id]) return;
-    const reason = window.prompt(PAGE_TEXT.rejectReasonPrompt);
-    if (reason === null) return;
-    const trimmed = reason.trim();
-    if (!trimmed) {
-      toast.error(PAGE_TEXT.rejectReasonPrompt);
-      return;
-    }
+  const executeReject = async (item: PendingListing, reason: string) => {
     setRowLoading(item.id, true);
     try {
-      await eventOfferAdminApi.rejectProduct(item.id, trimmed);
+      await eventOfferAdminApi.rejectProduct(item.id, reason);
       setPendingListings(prev => prev.filter(p => p.id !== item.id));
       toast.success(PAGE_TEXT.toastRejected(item.productName));
     } catch (err: any) {
@@ -301,6 +305,29 @@ export function EventOfferManagePage() {
     } finally {
       setRowLoading(item.id, false);
     }
+  };
+
+  // 확인 다이얼로그 대상 액션(제외=danger / 승인=default / 반려=danger+사유필수)
+  const handleRemove = (product: EventOfferAdminProduct) => {
+    if (actionLoading[product.id]) return;
+    setPendingAction({ kind: 'remove', product });
+  };
+  const handleApprove = (item: PendingListing) => {
+    if (actionLoading[item.id]) return;
+    setPendingAction({ kind: 'approve', item });
+  };
+  const handleReject = (item: PendingListing) => {
+    if (actionLoading[item.id]) return;
+    setPendingAction({ kind: 'reject', item });
+  };
+
+  const confirmPendingAction = async (reason?: string) => {
+    const action = pendingAction;
+    setPendingAction(null);
+    if (!action) return;
+    if (action.kind === 'remove') await executeRemove(action.product);
+    else if (action.kind === 'approve') await executeApprove(action.item);
+    else await executeReject(action.item, (reason ?? '').trim());
   };
 
   const handleRefreshStats = async () => {
@@ -707,6 +734,31 @@ export function EventOfferManagePage() {
           </div>
         </>
       )}
+
+      <ConfirmActionDialog
+        open={!!pendingAction}
+        title={
+          pendingAction?.kind === 'remove'
+            ? '이벤트 오퍼 제외'
+            : pendingAction?.kind === 'approve'
+              ? '이벤트 오퍼 승인'
+              : '이벤트 오퍼 반려'
+        }
+        message={
+          pendingAction?.kind === 'remove'
+            ? PAGE_TEXT.confirmRemove(pendingAction.product.title)
+            : pendingAction?.kind === 'approve'
+              ? PAGE_TEXT.confirmApprove(pendingAction.item.productName)
+              : PAGE_TEXT.rejectReasonPrompt
+        }
+        variant={pendingAction?.kind === 'approve' ? 'default' : 'danger'}
+        confirmText={
+          pendingAction?.kind === 'remove' ? '제외' : pendingAction?.kind === 'approve' ? '승인' : '반려'
+        }
+        requireReason={pendingAction?.kind === 'reject'}
+        onConfirm={confirmPendingAction}
+        onClose={() => setPendingAction(null)}
+      />
     </div>
   );
 }

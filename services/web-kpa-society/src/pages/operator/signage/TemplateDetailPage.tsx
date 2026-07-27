@@ -7,6 +7,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, LayoutTemplate, Pencil, Save, X, Trash2 } from 'lucide-react';
+import { ConfirmActionDialog } from '@o4o/ui';
 import {
   fetchTemplate,
   updateTemplate,
@@ -39,6 +40,10 @@ export default function TemplateDetailPage() {
   // Edit mode state
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   window.confirm(템플릿 삭제) → ConfirmActionDialog(danger).
+  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [editName, setEditName] = useState('');
   const [editDescription, setEditDescription] = useState('');
   const [editWidth, setEditWidth] = useState('');
@@ -131,15 +136,17 @@ export default function TemplateDetailPage() {
     }
   };
 
-  const handleDelete = async () => {
+  const confirmDelete = async () => {
     if (!templateId) return;
-    if (!confirm('이 템플릿을 삭제하시겠습니까?')) return;
     setError(null);
+    setIsDeleting(true);
     try {
       await deleteTemplate(templateId);
       navigate('/operator/signage/templates');
     } catch (err: any) {
       setError(err?.message || '템플릿 삭제에 실패했습니다');
+      setIsDeleting(false);
+      setDeleteOpen(false);
     }
   };
 
@@ -200,7 +207,7 @@ export default function TemplateDetailPage() {
               <button onClick={enterEditMode} className="flex items-center gap-1.5 px-4 py-2 border border-slate-200 rounded-lg text-sm hover:bg-slate-50">
                 <Pencil className="w-4 h-4" /> 수정
               </button>
-              <button onClick={handleDelete} className="flex items-center gap-1.5 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50">
+              <button onClick={() => setDeleteOpen(true)} className="flex items-center gap-1.5 px-4 py-2 border border-red-200 text-red-600 rounded-lg text-sm hover:bg-red-50">
                 <Trash2 className="w-4 h-4" /> 삭제
               </button>
             </>
@@ -340,6 +347,17 @@ export default function TemplateDetailPage() {
           <img src={template.thumbnailUrl} alt={template.name} className="max-w-md rounded-lg border border-slate-200" />
         </div>
       )}
+
+      <ConfirmActionDialog
+        open={deleteOpen}
+        title="템플릿 삭제"
+        message="이 템플릿을 삭제하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        variant="danger"
+        confirmText="삭제"
+        loading={isDeleting}
+        onConfirm={confirmDelete}
+        onClose={() => setDeleteOpen(false)}
+      />
     </div>
   );
 }

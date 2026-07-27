@@ -23,6 +23,7 @@ import { toast } from '@o4o/error-handling';
 import { AlertTriangle } from 'lucide-react';
 import { DataTable } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import { ConfirmActionDialog } from '@o4o/ui';
 import { getAccessToken } from '../../contexts/AuthContext';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
@@ -173,6 +174,7 @@ export default function OperatorStoreDetailPage() {
   const [channelsLoading, setChannelsLoading] = useState(true);
   const [channelsError, setChannelsError] = useState<string | null>(null);
   const [channelActionLoading, setChannelActionLoading] = useState<string | null>(null);
+  const [terminateTarget, setTerminateTarget] = useState<string | null>(null);
 
   // ── 기능 capability (섹션) ──
   const [capabilities, setCapabilities] = useState<CapabilityData[]>([]);
@@ -291,9 +293,17 @@ export default function OperatorStoreDetailPage() {
     }
   };
 
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   채널 영구 종료(되돌릴 수 없음)의 window.confirm → ConfirmActionDialog(danger).
+  //   TERMINATED 만 확인 게이트 대상, 나머지 전이는 즉시 적용.
   const handleChannelStatusChange = async (channelId: string, newStatus: string) => {
     if (!storeId) return;
-    if (newStatus === 'TERMINATED' && !window.confirm('이 채널을 영구 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다.')) return;
+    if (newStatus === 'TERMINATED') { setTerminateTarget(channelId); return; }
+    await applyChannelStatus(channelId, newStatus);
+  };
+
+  const applyChannelStatus = async (channelId: string, newStatus: string) => {
+    if (!storeId) return;
     setChannelActionLoading(channelId);
     try {
       await apiFetch(`/api/v1/operator/stores/${storeId}/channels/${channelId}/status`, {
@@ -311,6 +321,13 @@ export default function OperatorStoreDetailPage() {
     } finally {
       setChannelActionLoading(null);
     }
+  };
+
+  const confirmTerminate = async () => {
+    const id = terminateTarget;
+    if (!id) return;
+    setTerminateTarget(null);
+    await applyChannelStatus(id, 'TERMINATED');
   };
 
   // ─── Column defs ───
@@ -538,6 +555,17 @@ export default function OperatorStoreDetailPage() {
           </>
         )}
       </div>
+
+      <ConfirmActionDialog
+        open={!!terminateTarget}
+        title="채널 영구 종료"
+        message="이 채널을 영구 종료하시겠습니까? 이 작업은 되돌릴 수 없습니다."
+        variant="danger"
+        confirmText="영구 종료"
+        loading={!!channelActionLoading}
+        onConfirm={confirmTerminate}
+        onClose={() => setTerminateTarget(null)}
+      />
     </div>
   );
 }

@@ -59,7 +59,9 @@ export default function ProductApplicationManagementPage() {
     <ProductApplicationManagementConsole
       api={api}
       config={{
-        title: '상품 판매 신청 관리',
+        // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+        //   사이드바 '공급 상품 신청 승인' + KPI '공급 상품 신청 대기' 와 도메인 토큰('공급 상품 신청') 정합.
+        title: '공급 상품 신청 관리',
         description: '약국이 약국 HUB에서 신청한 B2B 상품을 승인하거나 거절합니다.',
         orgLabel: '약국',
         accent: 'blue',

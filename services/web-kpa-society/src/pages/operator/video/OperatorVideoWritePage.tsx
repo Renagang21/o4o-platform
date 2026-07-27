@@ -23,6 +23,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Loader2, AlertCircle, Save, Send, ArrowLeft } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { ConfirmActionDialog } from '@o4o/ui';
 import {
   createOperatorVideoPost,
   getOperatorVideoPost,
@@ -45,6 +46,9 @@ export default function OperatorVideoWritePage() {
   const [isLoading, setIsLoading] = useState(!isNew);
   const [isSaving, setIsSaving] = useState(false);
   const [isPublishing, setIsPublishing] = useState(false);
+  // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+  //   발행 확인 window.confirm → ConfirmActionDialog. 저장/상태검사 후 대상 id 보관, 확인 시 발행.
+  const [pendingPublishId, setPendingPublishId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -116,10 +120,16 @@ export default function OperatorVideoWritePage() {
       toast.info('이미 발행된 동영상입니다');
       return;
     }
-    if (!window.confirm('지금 발행하시겠습니까? 발행 즉시 KPA 매장 HUB 에 노출됩니다.')) return;
+    setPendingPublishId(saved.id);
+  };
+
+  const confirmPublish = async () => {
+    const id = pendingPublishId;
+    setPendingPublishId(null);
+    if (!id) return;
     setIsPublishing(true);
     try {
-      const published = await publishOperatorVideoPost(saved.id);
+      const published = await publishOperatorVideoPost(id);
       setPost(published);
       toast.success('동영상이 발행되었습니다');
     } catch (e: any) {
@@ -274,6 +284,16 @@ export default function OperatorVideoWritePage() {
           />
         </div>
       </div>
+
+      <ConfirmActionDialog
+        open={!!pendingPublishId}
+        title="동영상 발행"
+        message="지금 발행하시겠습니까? 발행 즉시 KPA 매장 HUB 에 노출됩니다."
+        confirmText="발행"
+        loading={isPublishing}
+        onConfirm={confirmPublish}
+        onClose={() => setPendingPublishId(null)}
+      />
     </div>
   );
 }

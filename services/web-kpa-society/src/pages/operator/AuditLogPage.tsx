@@ -39,28 +39,62 @@ interface AuditLog {
 
 // ─── Labels ──────────────────────────────────────────────────
 
+// WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+//   ACTION_LABELS 커버리지를 api-server 가 실제 emit 하는 action_type 전수(16키)로 확장.
+//   추정 등록 금지 — 각 키는 코드 emitter 확인분(member.controller / kpa.routes writeAuditLog /
+//   pharmacy-store-config / pharmacy-products / pharmacy-info). 미매핑 키는 render 에서 raw key fallback.
 const ACTION_LABELS: Record<string, string> = {
+  // member
   MEMBER_STATUS_CHANGED: '회원 상태 변경',
   MEMBER_ROLE_CHANGED: '회원 역할 변경',
-  APPLICATION_REVIEWED: '신청서 검토',
+  MEMBER_INFO_UPDATED: '회원 정보 수정',
+  // content
   CONTENT_CREATED: '콘텐츠 생성',
   CONTENT_UPDATED: '콘텐츠 수정',
   CONTENT_DELETED: '콘텐츠 삭제',
+  CONTENT_HARD_DELETED: '콘텐츠 영구 삭제',
+  CONTENT_BATCH_PUBLISHED: '콘텐츠 일괄 발행',
+  CONTENT_BATCH_ARCHIVED: '콘텐츠 일괄 보관',
+  CONTENT_BATCH_HARD_DELETED: '콘텐츠 일괄 영구 삭제',
+  // course / resource
+  COURSE_HARD_DELETED: '강의 영구 삭제',
+  RESOURCE_STATUS_CHANGED: '자료 상태 변경',
+  RESOURCE_DELETED: '자료 삭제',
+  // store / pharmacy
+  STOREFRONT_CONFIG_UPDATED: '매장 설정 변경',
+  PHARMACY_INFO_UPDATED: '약국 정보 수정',
+  // legacy (retired flow — 잔존 로그 3건 라벨 유지)
+  APPLICATION_REVIEWED: '신청서 검토',
 };
 
 const TARGET_LABELS: Record<string, string> = {
   member: '회원',
   application: '신청서',
   content: '콘텐츠',
+  kpa_content: '콘텐츠',
+  course: '강의',
+  resource: '자료',
+  pharmacy: '약국',
+  storefront: '매장',
 };
 
 const ACTION_COLORS: Record<string, string> = {
   MEMBER_STATUS_CHANGED: 'bg-blue-100 text-blue-800',
   MEMBER_ROLE_CHANGED: 'bg-purple-100 text-purple-800',
-  APPLICATION_REVIEWED: 'bg-green-100 text-green-800',
+  MEMBER_INFO_UPDATED: 'bg-sky-100 text-sky-800',
   CONTENT_CREATED: 'bg-emerald-100 text-emerald-800',
   CONTENT_UPDATED: 'bg-yellow-100 text-yellow-800',
   CONTENT_DELETED: 'bg-red-100 text-red-800',
+  CONTENT_HARD_DELETED: 'bg-red-200 text-red-900',
+  CONTENT_BATCH_PUBLISHED: 'bg-blue-100 text-blue-800',
+  CONTENT_BATCH_ARCHIVED: 'bg-gray-200 text-gray-700',
+  CONTENT_BATCH_HARD_DELETED: 'bg-red-200 text-red-900',
+  COURSE_HARD_DELETED: 'bg-red-200 text-red-900',
+  RESOURCE_STATUS_CHANGED: 'bg-amber-100 text-amber-800',
+  RESOURCE_DELETED: 'bg-red-100 text-red-800',
+  STOREFRONT_CONFIG_UPDATED: 'bg-slate-100 text-slate-700',
+  PHARMACY_INFO_UPDATED: 'bg-slate-100 text-slate-700',
+  APPLICATION_REVIEWED: 'bg-green-100 text-green-800',
 };
 
 // ─── Component ───────────────────────────────────────────────

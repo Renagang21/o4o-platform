@@ -380,22 +380,25 @@ function buildConfig(
       link: '/operator/forum-requests',
     },
     {
+      // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+      //   KPI 용어를 도착 화면 H1 + 사이드바('공지사항/뉴스') 와 정합. route 불변.
       key: 'content',
-      label: '콘텐츠 발행 대기',
+      label: '공지사항/뉴스 발행 대기',
       value: contentDraftCount,
       status: contentDraftCount > 0 ? 'warning' : 'neutral',
       link: '/operator/content',
     },
     {
+      // 사이드바 'HQ 미디어' + 화면 'HQ 미디어 관리' 와 정합 (route hq-media).
       key: 'signage-media',
-      label: '사이니지 미디어 대기',
+      label: 'HQ 미디어 검수 대기',
       value: signageMediaPendingCount,
       status: signageMediaPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/signage/hq-media',
     },
     {
       key: 'signage-playlists',
-      label: '사이니지 플레이리스트 대기',
+      label: 'HQ 플레이리스트 검수 대기',
       value: signagePlaylistPendingCount,
       status: signagePlaylistPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/signage/hq-playlists',
@@ -411,7 +414,7 @@ function buildConfig(
     },
     {
       key: 'product-applications',
-      label: '상품 신청 대기',
+      label: '공급 상품 신청 대기',
       value: productApplicationPendingCount,
       status: productApplicationPendingCount > 0 ? 'warning' : 'neutral',
       link: '/operator/product-applications',
@@ -555,7 +558,7 @@ function buildConfig(
   if (contentDraftCount > 0) {
     actionQueue.push({
       id: 'aq-content',
-      label: '콘텐츠 발행 대기',
+      label: '공지사항/뉴스 발행 대기',
       count: contentDraftCount,
       link: '/operator/content',
     });
@@ -563,7 +566,7 @@ function buildConfig(
   if (signageMediaPendingCount > 0) {
     actionQueue.push({
       id: 'aq-signage-media',
-      label: '사이니지 미디어 확인',
+      label: 'HQ 미디어 검수',
       count: signageMediaPendingCount,
       link: '/operator/signage/hq-media',
     });
@@ -571,7 +574,7 @@ function buildConfig(
   if (signagePlaylistPendingCount > 0) {
     actionQueue.push({
       id: 'aq-signage-playlists',
-      label: '사이니지 플레이리스트 확인',
+      label: 'HQ 플레이리스트 검수',
       count: signagePlaylistPendingCount,
       link: '/operator/signage/hq-playlists',
     });
@@ -587,7 +590,7 @@ function buildConfig(
   if (productApplicationPendingCount > 0) {
     actionQueue.push({
       id: 'aq-product-applications',
-      label: '상품 신청 검토',
+      label: '공급 상품 신청 검토',
       count: productApplicationPendingCount,
       link: '/operator/product-applications',
     });

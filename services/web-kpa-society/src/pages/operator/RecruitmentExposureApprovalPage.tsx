@@ -12,6 +12,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RecruitmentExposureConsole, type RecruitmentExposureItem } from '@o4o/operator-ux-core';
+import { toast } from '@o4o/error-handling';
 import { apiClient } from '../../api/client';
 
 const BASE = '/operator/recruitment-exposure';
@@ -65,7 +66,9 @@ export default function RecruitmentExposureApprovalPage() {
         await apiClient.patch(`${BASE}/${id}/${action}`, { note });
         await load();
       } catch {
-        window.alert('처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+        // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
+        //   단순 처리 오류 → 브라우저 기본 alert 대신 toast.
+        toast.error('처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
       }
       setBusyId(null);
     },
