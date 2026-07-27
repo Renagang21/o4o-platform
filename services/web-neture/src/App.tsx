@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -231,8 +231,10 @@ const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierPr
 const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
 
 // Supplier Account
-const SupplierAccountDashboardPage = lazy(() => import('./pages/account/SupplierAccountDashboardPage'));
-const SupplierProductsListPage = lazy(() => import('./pages/account/SupplierProductsListPage'));
+// WO-O4O-NETURE-SUPPLIER-ACCOUNT-ROUTE-LEGACY-REDIRECT-V1:
+// SupplierAccountDashboardPage / SupplierProductsListPage 는 route 가 redirect 로 전환되어
+// 마운트 지점이 사라졌다. 컴포넌트 파일 자체는 후속 데드코드 정리(A 버킷) 대상으로 남겨 두고,
+// 여기서는 unused import 만 제거한다(noUnusedLocals).
 const SupplierOrdersListPage = lazy(() => import('./pages/account/SupplierOrdersListPage'));
 const SupplierOrderDetailPage = lazy(() => import('./pages/account/SupplierOrderDetailPage'));
 const SupplierInventoryPage = lazy(() => import('./pages/account/SupplierInventoryPage'));
@@ -662,6 +664,19 @@ function SeoWatcher() {
   return null;
 }
 
+/**
+ * WO-O4O-NETURE-SUPPLIER-ACCOUNT-ROUTE-LEGACY-REDIRECT-V1
+ * legacy `/account/supplier/orders/:id` → canonical `/supplier/orders/:id`.
+ * 문자열 ":id" 를 그대로 보내지 않도록 param 을 실제 값으로 치환하고,
+ * 추가 query 는 불필요하게 제거하지 않는다(§10). id 가 없으면 처리 목록 허브로 안전 복귀한다.
+ */
+function LegacySupplierOrderRedirect() {
+  const { id } = useParams();
+  const { search } = useLocation();
+  if (!id) return <Navigate to="/supplier/orders" replace />;
+  return <Navigate to={`/supplier/orders/${id}${search}`} replace />;
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -860,12 +875,16 @@ function App() {
                 <SupplierAccountLayout />
               </SupplierRoute>
             }>
-              <Route path="/account/supplier" element={<SupplierAccountDashboardPage />} />
-              <Route path="/account/supplier/products" element={<SupplierProductsListPage />} />
-              <Route path="/account/supplier/orders" element={<SupplierOrdersListPage />} />
-              <Route path="/account/supplier/orders/:id" element={<SupplierOrderDetailPage />} />
-              <Route path="/account/supplier/inventory" element={<SupplierInventoryPage />} />
-              <Route path="/account/supplier/settlements" element={<SupplierSettlementsPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-ACCOUNT-ROUTE-LEGACY-REDIRECT-V1:
+                  legacy 트리를 canonical /supplier/* 로 통합. 북마크·직접 URL 보존을 위해
+                  삭제 대신 redirect 하며, guard(SupplierRoute)는 source 에도 그대로 유지한다.
+                  정적 route 는 target 화면이 query 를 소비하지 않아(useSearchParams 0) query 를 전달하지 않는다. */}
+              <Route path="/account/supplier" element={<Navigate to="/supplier/dashboard" replace />} />
+              <Route path="/account/supplier/products" element={<Navigate to="/supplier/products" replace />} />
+              <Route path="/account/supplier/orders" element={<Navigate to="/supplier/orders/manage" replace />} />
+              <Route path="/account/supplier/orders/:id" element={<LegacySupplierOrderRedirect />} />
+              <Route path="/account/supplier/inventory" element={<Navigate to="/supplier/inventory" replace />} />
+              <Route path="/account/supplier/settlements" element={<Navigate to="/supplier/settlements" replace />} />
             </Route>
 
             {/* ================================================================
