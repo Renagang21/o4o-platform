@@ -174,7 +174,47 @@ console.error|warn                            -> 5건 (전부 사용자 안내 s
 
 ## 11. 브라우저 오류 smoke
 
-<!-- FILLED_AFTER_DEPLOY -->
+배포: commit `015e71128` 포함 `Deploy Web Services (Cloud Run)` **success** (`ca035f9e1` 기준 — 병렬 세션 push 로 중간 run 이 concurrency 취소되어, 내 커밋을 포함한 후속 run 성공을 확인 후 실행).
+Playwright(chromium) + **request abort** 로 실패 재현 — 요청이 서버에 도달하지 않으므로 **운영 데이터 변경 0**.
+매장 owner 계정 사용(자격증명 환경변수 주입).
+
+### 11.1 PharmacySellPage `/store/commerce/products/b2c`
+
+| # | 시나리오 | 결과 |
+|---|---------|------|
+| 1a | 정상 | 오류문구 없음, 빈 상태 문구 없음(데이터 있음) |
+| **1b** | `/pharmacy/products/listings` 차단 | **오류문구 표시 / 빈 상태 문구 미표시 / `다시 시도` 노출** |
+| 1c | 차단 해제 후 `다시 시도` | 오류 사라짐, 정상 복귀 |
+| **1d** | `/store-hub/channels` 만 차단 | **채널 오류 인라인 표시 + 상품 목록 영역은 정상 유지** (필수/보조 분리 실증) |
+
+### 11.2 StoreRecruitmentApplicationsPage `/store/commerce/recruitment-applications`
+
+| # | 시나리오 | 결과 |
+|---|---------|------|
+| 2a | 정상 | 빈 상태 문구 `신청한 판매자 모집이 없습니다` |
+| **2b** | `/partner/applications/mine` 차단 | **오류문구 표시 / 빈 상태 위장 없음(false) / `다시 시도` 노출** |
+| 2c | 차단 해제 후 `다시 시도` | 오류 사라짐 + 빈 상태 정상 복귀 |
+
+### 11.3 ProductMarketingPage `/store/commerce/products/:id/marketing`
+
+| # | 시나리오 | 결과 |
+|---|---------|------|
+| 3a | 정상 | 화면 렌더, 오류문구 없음 |
+| **3b** | `/…/marketing` 차단 | **오류문구 + `다시 시도` 표시, 구 문구(`데이터를 불러올 수 없습니다`) 미표시** |
+| 3c | 차단 해제 후 `다시 시도` | 오류 사라짐 + 화면 복귀 |
+
+### 11.4 StoreAssetsPage `/store/content` — publish 토글 실패
+
+| # | 시나리오 | 결과 |
+|---|---------|------|
+| 4a | 정상 진입 | 토글 가능 자산 2건 (`button[title="클릭하여 상태 변경"]`) |
+| **4b** | `PATCH /kpa/store-assets/{id}/publish` 차단 후 클릭 | **오류배너 표시** / **상태 라벨 유지(`초안` → `초안`)** / **버튼 disabled 해제(재시도 가능)** / 배너 `닫기` 동작 |
+
+> 1차 시도에서 4b 가 false 로 나온 것은 셀렉터를 상태 토글이 아닌 **필터 칩**에 맞춘 스크립트 오류였고,
+> 실제 토글 컨트롤(`button[title="클릭하여 상태 변경"]`)로 다시 실행해 위 결과를 확인했다.
+
+**미실행:** unlink 실패 / publish 일괄 실패 — 테스트 매장에 연결된 마케팅 자산·다중 선택 대상이 없어 UI 상 재현 불가.
+해당 경로는 코드상 조회 실패 경로와 동일한 패턴(pending → 실패 시 상태 미갱신 + 배너)이며 typecheck·build 로만 검증했다.
 
 ---
 
