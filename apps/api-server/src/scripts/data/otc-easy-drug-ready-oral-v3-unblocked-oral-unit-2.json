@@ -1,0 +1,42 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "da",
+  "unit": "oral-unit-2",
+  "route": "oral",
+  "status": "UNBLOCKED",
+  "blockedBy": "oral-unit-1 (선행 unit)",
+  "unblockedAt": "2026-07-27",
+  "unblockReason": "oral-unit-1 LIVE apply GREEN — KO 1,080T + EN 540T = 1,620T 커밋, postVerify PASS(fail 0), canonicalDup 0, 공식 6섹션 보존 199/199, unit 간 격리 확인.",
+  "fpCount": 66,
+  "masterCount": 270,
+  "expectedWrite": {
+    "koPerMaster": 4,
+    "enPerMaster": 2,
+    "koTotal": 1080,
+    "enTotal": 540,
+    "grandTotal": 1620
+  },
+  "preApplyLedger": "otc-easy-drug-ready-oral-v3-preapply-ready-oral-unit-2.json",
+  "preApplyStatus": "PRE_APPLY_READY",
+  "dryRunDigestMd5": "b208727afb9be3bf317aea35d26ef3f2",
+  "currentDbState": {
+    "verifiedAt": "2026-07-27 (oral-unit-1 apply 직후)",
+    "easyCanonicalKept": 270,
+    "authoredRows": 0,
+    "auditRows": 0,
+    "note": "oral-unit-1 apply 로 인한 변경 0 — 착수 전제 그대로 유지"
+  },
+  "remainingPreconditions": [
+    "LIVE apply 승인 WO 발급 (unit-2 범위 명시)",
+    "apply 러너 APPLY_ALLOWED_UNITS 에 oral-unit-2 추가 (현재 oral-unit-1 단독 화이트리스트 — 승인 없이는 exit 3)",
+    "confirm env 토큰: OTC_V3_APPLY_KO_ORAL_UNIT_2=CONFIRM / OTC_V3_APPLY_EN_ORAL_UNIT_2=CONFIRM",
+    "착수 직전 dry-run 재실행 → digest b208727afb9be3bf317aea35d26ef3f2 동일 확인"
+  ],
+  "executionContract": {
+    "writeOwner": "단일 write-owner 세션 지정 필요",
+    "order": "KO LIVE apply → KO postVerify → EN LIVE apply → 독립검증",
+    "runner": "otc-easy-drug-ready-oral-v3-apply.da.ts --unit oral-unit-2 --apply --confirm --lang ko|en",
+    "postVerifier": "otc-easy-drug-ready-oral-v3-postverify.da.ts --unit oral-unit-2 --lang both"
+  },
+  "note": "본 WO 는 oral-unit-1 단독 승인 범위이므로 unit-2 에 대한 DB write 는 수행하지 않았다. write 0."
+}

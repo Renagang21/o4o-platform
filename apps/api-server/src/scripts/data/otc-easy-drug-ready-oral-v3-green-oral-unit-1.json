@@ -1,0 +1,109 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "readinessWo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "readinessCommit": "e808b9952",
+  "approvalSsot": "otc-easy-drug-ready-1134-content-fingerprint-reapproval-ssot-v1.json",
+  "agent": "da",
+  "writeOwner": "agent-da (단일 DB write-owner)",
+  "unit": "oral-unit-1",
+  "route": "oral",
+  "status": "GREEN",
+  "appliedAt": "2026-07-27",
+  "fpCount": 65,
+  "masterCount": 270,
+  "preflight": {
+    "mainSynced": true,
+    "headCommit": "3302d79e6",
+    "readinessCommitAncestor": true,
+    "woArtifactsUnchangedSinceReadiness": true,
+    "otherSessionLiveWrite": 0,
+    "dryRunDigestMd5": "d9c3d4cd25f7976efa350ae88259580a",
+    "dryRunDigestMatchesLedger": true,
+    "rollbackTestDigestMd5": "4a9127b867af37bdafc0dcc969596013",
+    "rollbackTestDigestMatchesLedger": true,
+    "existingAuthoredCanonical": 0,
+    "v3SourceRefLiveConflict": 0
+  },
+  "applied": {
+    "ko": {
+      "fpCommitted": 65,
+      "fpTotal": 65,
+      "written": 1080,
+      "expected": 1080,
+      "planDigestMd5": "a35b6ca48b8f408c10da0b23227e8147"
+    },
+    "en": {
+      "fpCommitted": 65,
+      "fpTotal": 65,
+      "written": 540,
+      "expected": 540,
+      "planDigestMd5": "4a2772900304ce8d23d3552cd84073bb"
+    },
+    "totalWritten": 1620,
+    "totalExpected": 1620,
+    "writeMatchesForecast": true
+  },
+  "postVerify": {
+    "pass": true,
+    "failCount": 0,
+    "ko": {
+      "canonicalExactlyOne": 270,
+      "canonicalDup": 0,
+      "authoredCanonical": 270,
+      "easyDeprecated": 270,
+      "easyCanonicalLeft": 0,
+      "sourceRefScope": 270,
+      "sourceRefOutside": 0,
+      "audit": 270,
+      "contentMismatchFps": 0
+    },
+    "en": {
+      "canonicalExactlyOne": 270,
+      "canonicalDup": 0,
+      "authoredCanonical": 270,
+      "sourceRefScope": 270,
+      "sourceRefOutside": 0,
+      "contentMismatchFps": 0,
+      "hangulFps": 0
+    },
+    "sourcePreservation": {
+      "fpChecked": 65,
+      "safetySectionsExpected": 199,
+      "safetySectionsFound": 199,
+      "numericMissingFps": 0,
+      "note": "공식 KO source dump(1차 소스) ↔ DB 저장 canonical 직접 대조"
+    },
+    "isolation": {
+      "otherUnit": "oral-unit-2",
+      "otherMasters": 270,
+      "easyCanonicalKept": 270,
+      "authoredRows": 0,
+      "auditRows": 0
+    }
+  },
+  "independentRawSql": {
+    "appliedMasters": 270,
+    "distinctSourceRefs": 65,
+    "koCanonicalAuthored": 270,
+    "enCanonicalAuthored": 270,
+    "koEasyDeprecated": 270,
+    "forbiddenTableOrComment": 0,
+    "enHangulResidue": 0,
+    "pharmacistNoticeKo": 270,
+    "pharmacistNoticeEn": 270
+  },
+  "stopConditionsChecked": {
+    "existingAuthoredCanonical": "NOT_TRIGGERED (0)",
+    "v3SourceRefConflict": "NOT_TRIGGERED (0)",
+    "forecastVsActualWriteMismatch": "NOT_TRIGGERED (1620==1620)",
+    "officialSixSectionPreservationFail": "NOT_TRIGGERED (199/199 · 수치누락 0)",
+    "canonicalDup": "NOT_TRIGGERED (ko 0 / en 0)",
+    "otherUnitOrExistingLiveChanged": "NOT_TRIGGERED (oral-unit-2 무변경)",
+    "independentVerifyFail": "NOT_TRIGGERED (postverify PASS)",
+    "otherSessionDbWrite": "NOT_TRIGGERED (baseline 불변)"
+  },
+  "notes": [
+    "audit metadata.wo 는 rollback-test 검증본 VERBATIM 유지(READINESS WO), 실행 WO 는 productionWo 로 병기.",
+    "verify.da.ts(readiness 독립 검증자) 는 §C 에서 pre-apply baseline(전 0)을 단언하므로 apply 후 §C 6건 fail 은 설계상 기대값이며, 실측치(easy_canon 270 · authored_ko_canon 270 · en_authored_row 270 · v3ref_row 540 · wo_audit 270) 는 unit-1 적용 + unit-2 미적용 상태와 정확히 일치. §A/B/D/E/F 는 전부 PASS."
+  ]
+}
