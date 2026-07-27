@@ -1,0 +1,127 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-FINAL-APPROVAL-AND-EXECUTION-ORDER-V1",
+  "artifact": "approved-for-production-ssot",
+  "status": "APPROVED_FOR_PRODUCTION",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "baseCommit": "14e9424e8",
+  "sourceProposalSsot": "otc-easy-drug-ready-1134-final-approval-ssot-v1.json",
+  "fingerprintDefinition": "표준코드 일반명코드(성분명코드) gencode. READY 는 master당 유일. 동일 gencode=동일 authored 설명서.",
+  "approvalSnapshot": {
+    "time": "2026-07-27 04:57:37.694901+00",
+    "xmin": "4051337"
+  },
+  "fixedPopulation": {
+    "total": 1134,
+    "byRoute": {
+      "oral": 540,
+      "topical": 327,
+      "ophthalmic": 253,
+      "oromucosal": 14
+    },
+    "expectedWrite": {
+      "ko": 4536,
+      "en": 2268,
+      "total": 6804
+    },
+    "writePerMaster": 6
+  },
+  "reproduction": {
+    "baselineReady": 1134,
+    "baselineIncomplete": 4943,
+    "holdDistribution": {
+      "HOLD_IDENTITY": 3246,
+      "READY": 1134,
+      "HOLD_ROUTE": 536,
+      "HOLD_SOURCE": 27
+    },
+    "drift": 0,
+    "remaining": 1134
+  },
+  "routeSummary": [
+    {
+      "route": "oral",
+      "masters": 540,
+      "fingerprints": 101,
+      "expectedWrite": 3240
+    },
+    {
+      "route": "topical",
+      "masters": 327,
+      "fingerprints": 37,
+      "expectedWrite": 1962
+    },
+    {
+      "route": "ophthalmic",
+      "masters": 253,
+      "fingerprints": 12,
+      "expectedWrite": 1518
+    },
+    {
+      "route": "oromucosal",
+      "masters": 14,
+      "fingerprints": 2,
+      "expectedWrite": 84
+    }
+  ],
+  "routeApproval": [
+    {
+      "route": "oral",
+      "masters": 540,
+      "fingerprints": 101,
+      "expectedWrite": 3240,
+      "approval": "APPROVED",
+      "units": 2
+    },
+    {
+      "route": "topical",
+      "masters": 327,
+      "fingerprints": 37,
+      "expectedWrite": 1962,
+      "approval": "APPROVED",
+      "units": 1
+    },
+    {
+      "route": "ophthalmic",
+      "masters": 253,
+      "fingerprints": 12,
+      "expectedWrite": 1518,
+      "approval": "APPROVED",
+      "units": 1
+    },
+    {
+      "route": "oromucosal",
+      "masters": 14,
+      "fingerprints": 2,
+      "expectedWrite": 84,
+      "approval": "APPROVED",
+      "units": 1
+    }
+  ],
+  "gates": {
+    "g1_total1134Reproduced": true,
+    "g1_baselineReady": 1134,
+    "g1b_baselineIncomplete": true,
+    "g2_driftZero": true,
+    "g2_remaining": 1134,
+    "g3_routeSum1134": true,
+    "g3_routeMatchesFixed": true,
+    "g4_unitSum1134": true,
+    "g5_unitMasterIntersection0": 0,
+    "g6_fingerprintSplit0": 0,
+    "g7_existingLiveIntersection0": 0,
+    "g8_authoredCanonicalHeld0": 0,
+    "g9_sourceRefConflict0": 0,
+    "g9b_sourceRefMissing0": 0,
+    "g10_canonicalDup0": 0,
+    "g11_dbWrite": 0,
+    "g12_outsideBaseline0": 0
+  },
+  "allGreen": true,
+  "outputs": {
+    "unitLedger": "otc-easy-drug-ready-1134-unit-ledger-v1.json",
+    "executionOrder": "otc-easy-drug-ready-1134-execution-order-v1.json",
+    "verificationBaseline": "otc-easy-drug-ready-1134-verification-baseline-v1.json"
+  }
+}

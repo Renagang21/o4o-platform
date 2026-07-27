@@ -1,0 +1,97 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-FINAL-APPROVAL-AND-EXECUTION-ORDER-V1",
+  "artifact": "execution-order",
+  "baseCommit": "14e9424e8",
+  "snapshotTime": "2026-07-27 04:57:37.694901+00",
+  "snapshotXmin": "4051337",
+  "singleWriteOwnerRule": [
+    "준비(select/generate/Guard/dry-run 검증 문서화)는 병렬 가능.",
+    "LIVE apply 는 반드시 한 시점에 한 명(single write-owner)만 수행.",
+    "이전 unit 이 GREEN(독립검증 통과) 이 된 뒤 다음 write-owner 에게 인계.",
+    "한 fingerprint(gencode) 를 여러 unit 으로 분할 금지 — 동일 콘텐츠 이중 생산 방지.",
+    "HOLD_IDENTITY/HOLD_ROUTE/HOLD_SOURCE 편입 금지. baseline READY 1,134 밖 master 편입 금지."
+  ],
+  "executionSequence": [
+    {
+      "step": 1,
+      "unit": "oral-unit-1",
+      "route": "oral",
+      "writeOwner": "agent-da",
+      "masterCount": 270,
+      "fpCount": 50,
+      "expectedWrite": 1620,
+      "status": "APPROVED",
+      "handoffCondition": "start (no predecessor)"
+    },
+    {
+      "step": 2,
+      "unit": "oral-unit-2",
+      "route": "oral",
+      "writeOwner": "agent-da",
+      "masterCount": 270,
+      "fpCount": 51,
+      "expectedWrite": 1620,
+      "status": "APPROVED",
+      "handoffCondition": "이전 step(oral-unit-1) GREEN 후 인계"
+    },
+    {
+      "step": 3,
+      "unit": "topical-unit-1",
+      "route": "topical",
+      "writeOwner": "agent-na",
+      "masterCount": 327,
+      "fpCount": 37,
+      "expectedWrite": 1962,
+      "status": "APPROVED",
+      "handoffCondition": "이전 step(oral-unit-2) GREEN 후 인계"
+    },
+    {
+      "step": 4,
+      "unit": "ophthalmic-unit-1",
+      "route": "ophthalmic",
+      "writeOwner": "agent-ga",
+      "masterCount": 253,
+      "fpCount": 12,
+      "expectedWrite": 1518,
+      "status": "APPROVED",
+      "handoffCondition": "이전 step(topical-unit-1) GREEN 후 인계"
+    },
+    {
+      "step": 5,
+      "unit": "oromucosal-unit-1",
+      "route": "oromucosal",
+      "writeOwner": "agent-na",
+      "masterCount": 14,
+      "fpCount": 2,
+      "expectedWrite": 84,
+      "status": "APPROVED",
+      "handoffCondition": "이전 step(ophthalmic-unit-1) GREEN 후 인계"
+    }
+  ],
+  "writeOwnerHandoffTable": [
+    {
+      "owner": "agent-da",
+      "units": [
+        "oral-unit-1",
+        "oral-unit-2"
+      ]
+    },
+    {
+      "owner": "agent-na",
+      "units": [
+        "topical-unit-1",
+        "oromucosal-unit-1"
+      ]
+    },
+    {
+      "owner": "agent-ga",
+      "units": [
+        "ophthalmic-unit-1"
+      ]
+    },
+    {
+      "owner": "agent-ra",
+      "role": "승인 SSOT·원장·독립검증 지원 (write 수행 안 함)"
+    }
+  ]
+}

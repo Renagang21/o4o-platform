@@ -1,0 +1,25 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-FINAL-APPROVAL-AND-EXECUTION-ORDER-V1",
+  "artifact": "verification-baseline",
+  "baseCommit": "14e9424e8",
+  "snapshotTime": "2026-07-27 04:57:37.694901+00",
+  "snapshotXmin": "4051337",
+  "independentVerification": {
+    "criteria": [
+      "unit 완료 후: 해당 unit masterIds 전부 STORE canonical ko(authored) AND en(authored) 존재.",
+      "각 master canonicalDup 0 (master,lang 당 canonical STORE 1개).",
+      "grounding source = mfds_easy_drug canonical ko 원문 보존(수정/삭제 없음).",
+      "unit write 수 = masterCount×6 (KO 4 + EN 2) 와 일치(초과 write 0).",
+      "manifest ID 독립검증 — 전역 LIVE 카운트가 아니라 unit masterId 원장으로 대조."
+    ]
+  },
+  "existingLiveInvariantBaseline": {
+    "snapshotTime": "2026-07-27 04:57:37.694901+00",
+    "snapshotXmin": "4051337",
+    "otcAuthoredCompleteNow_koAndEn": "authKoNow∩authEnNow 는 본 스냅샷 기준 불변 기준선 — 생산은 이 집합을 감소시키지 않는다(기존 완료 훼손 0).",
+    "ready1134ExistingLiveIntersection": 0,
+    "ready1134AuthoredCanonicalHeld": 0,
+    "note": "READY 1,134 는 스냅샷 시점 authored 미보유(기존 LIVE 교집합 0). 생산은 신규 추가만."
+  },
+  "reproducibility": "ledger/unit/order/verify 파일은 snapshotTime/xmin 제외 시 2회 실행 byte-identical."
+}
