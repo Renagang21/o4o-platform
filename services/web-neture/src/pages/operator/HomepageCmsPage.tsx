@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
-import { Plus, Pencil, Trash2, Eye, EyeOff, ArrowUp, ArrowDown, X, Image } from 'lucide-react';
+import { Plus, Pencil, Trash2, Eye, EyeOff, ArrowUp, ArrowDown, X, Image, AlertTriangle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { homepageCmsApi, type CmsContent } from '../../lib/api/content';
 
@@ -35,6 +35,7 @@ export default function HomepageCmsPage() {
   const [tab, setTab] = useState<Section>('hero');
   const [items, setItems] = useState<CmsContent[]>([]);
   const [loading, setLoading] = useState(false);
+  const [loadError, setLoadError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [form, setForm] = useState<FormData>(emptyForm);
@@ -42,9 +43,16 @@ export default function HomepageCmsPage() {
 
   const loadItems = useCallback(async () => {
     setLoading(true);
-    const data = await homepageCmsApi.getContents(tab);
-    setItems(data);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const data = await homepageCmsApi.getContents(tab);
+      setItems(data);
+    } catch {
+      // 조회 실패는 정상 0건과 분리 — 기존 데이터를 비우지 않고 오류만 표면화
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [tab]);
 
   useEffect(() => { loadItems(); }, [loadItems]);
@@ -165,6 +173,18 @@ export default function HomepageCmsPage() {
       {/* Content list */}
       {loading ? (
         <div className="text-center py-12 text-gray-500">로딩 중...</div>
+      ) : loadError ? (
+        <div className="text-center py-16 bg-red-50 rounded-xl border border-red-200">
+          <AlertTriangle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <p className="text-red-700 font-medium mb-1">홈페이지 콘텐츠를 불러오지 못했습니다.</p>
+          <p className="text-sm text-red-500 mb-4">잠시 후 다시 시도해 주세요.</p>
+          <button
+            onClick={() => loadItems()}
+            className="px-4 py-2 text-sm font-medium bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-100"
+          >
+            다시 시도
+          </button>
+        </div>
       ) : items.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
           <Image className="w-12 h-12 text-gray-300 mx-auto mb-4" />

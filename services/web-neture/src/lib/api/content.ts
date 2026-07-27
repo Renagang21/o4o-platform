@@ -5,6 +5,35 @@
  */
 import { api } from '../apiClient';
 
+/**
+ * WO-O4O-NETURE-OPERATOR-HOMEPAGE-CMS-AND-CONTENT-ASSETS-LOAD-ERROR-CONTRACT-V1 (IR 묶음 3)
+ *
+ * 운영자 홈페이지 CMS·콘텐츠 자산 조회 실패(4xx/5xx/네트워크/깨진 payload)를
+ * "정상 빈 콘텐츠·0 KPI" 로 삼키지 않는다.
+ * 실패 시 고정 코드 throw(서버 원문은 console.warn 으로만 로깅), 정상 0건·0 KPI(200+success:true)만 성공 통과.
+ *
+ * Backend 계약(read-only 확인):
+ *   `GET /neture/admin/homepage-contents?section=` → `200 { success:true, data:[] }` (400 잘못된 section / 500 오류 / 401·403 scope)
+ *   `GET /dashboard/assets?dashboardId=`           → `200 { success:true, data:[] }` (미프로비전도 200 빈배열 = 정상 / 500 오류)
+ *   `GET /dashboard/assets/kpi?dashboardId=`       → `200 { success:true, data:{...0...} }` (0 KPI = 정상 / 500 오류)
+ *   `GET /neture/content`                          → `200 { success:true, data:[], pagination }` (500 오류)
+ *
+ * 의도된 fail-open(본 계약 대상 아님, 유지): getHeroSlides/getAds/getLogos(공개 홈 섹션),
+ *   trackView(조회수), getCopiedSourceIds/getSupplierSignal(배지·시그널성 조회).
+ * mutation(create/update/delete/publish/archive/status 등)은 본 계약 대상이 아니며 기존 fail 처리를 유지한다.
+ */
+export const OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED = 'OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED';
+export const CONTENT_ASSETS_LOAD_FAILED = 'CONTENT_ASSETS_LOAD_FAILED';
+export const CONTENT_ASSET_KPI_LOAD_FAILED = 'CONTENT_ASSET_KPI_LOAD_FAILED';
+export const CMS_CONTENTS_LOAD_FAILED = 'CMS_CONTENTS_LOAD_FAILED';
+
+function describeApiError(error: any): string {
+  const data = error?.response?.data;
+  if (typeof data?.error === 'string') return data.error;
+  if (data?.error && typeof data.error === 'object') return data.error.code || data.error.message || 'UNKNOWN_ERROR';
+  return error?.message || 'UNKNOWN_ERROR';
+}
+
 // ==================== CMS Content Types ====================
 
 export interface CmsContent {
@@ -70,25 +99,39 @@ export const contentAssetApi = {
   async listAssets(dashboardId: string, params?: {
     status?: 'draft' | 'active' | 'archived';
     sort?: DashboardSortType;
-  }): Promise<{ success: boolean; data: DashboardAsset[] }> {
+  }): Promise<DashboardAsset[]> {
+    let response;
     try {
       const queryParams = new URLSearchParams({ dashboardId });
       if (params?.status) queryParams.set('status', params.status);
       if (params?.sort) queryParams.set('sort', params.sort);
-      const response = await api.get(`/dashboard/assets?${queryParams.toString()}`);
-      return response.data;
-    } catch {
-      return { success: false, data: [] };
+      response = await api.get(`/dashboard/assets?${queryParams.toString()}`);
+    } catch (error) {
+      console.warn('[Content Asset API] Failed to list assets:', describeApiError(error));
+      throw new Error(CONTENT_ASSETS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Content Asset API] Unexpected assets payload shape');
+      throw new Error(CONTENT_ASSETS_LOAD_FAILED);
+    }
+    return result.data;
   },
 
-  async getKpi(dashboardId: string): Promise<{ success: boolean; data: DashboardKpi }> {
+  async getKpi(dashboardId: string): Promise<DashboardKpi> {
+    let response;
     try {
-      const response = await api.get(`/dashboard/assets/kpi?dashboardId=${encodeURIComponent(dashboardId)}`);
-      return response.data;
-    } catch {
-      return { success: false, data: { totalAssets: 0, activeAssets: 0, recentViewsSum: 0, topRecommended: null } };
+      response = await api.get(`/dashboard/assets/kpi?dashboardId=${encodeURIComponent(dashboardId)}`);
+    } catch (error) {
+      console.warn('[Content Asset API] Failed to fetch KPI:', describeApiError(error));
+      throw new Error(CONTENT_ASSET_KPI_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !result.data || typeof result.data !== 'object') {
+      console.warn('[Content Asset API] Unexpected KPI payload shape');
+      throw new Error(CONTENT_ASSET_KPI_LOAD_FAILED);
+    }
+    return result.data;
   },
 
   async updateAsset(id: string, data: {
@@ -134,6 +177,7 @@ export const cmsApi = {
     page?: number;
     limit?: number;
   }): Promise<{ data: CmsContent[]; pagination: { page: number; limit: number; total: number; totalPages: number } }> {
+    let response;
     try {
       const searchParams = new URLSearchParams();
       if (params?.type) searchParams.append('type', params.type);
@@ -141,16 +185,17 @@ export const cmsApi = {
       if (params?.page) searchParams.append('page', String(params.page));
       if (params?.limit) searchParams.append('limit', String(params.limit));
       const qs = searchParams.toString();
-      const response = await api.get(`/neture/content${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return {
-        data: result.data || [],
-        pagination: result.pagination || { page: 1, limit: 12, total: 0, totalPages: 0 },
-      };
+      response = await api.get(`/neture/content${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[CMS API] Failed to fetch contents:', error);
-      return { data: [], pagination: { page: 1, limit: 12, total: 0, totalPages: 0 } };
+      console.warn('[CMS API] Failed to fetch contents:', describeApiError(error));
+      throw new Error(CMS_CONTENTS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data) || !result.pagination) {
+      console.warn('[CMS API] Unexpected contents payload shape');
+      throw new Error(CMS_CONTENTS_LOAD_FAILED);
+    }
+    return { data: result.data, pagination: result.pagination };
   },
 
   async getContentById(id: string): Promise<CmsContent> {
@@ -204,11 +249,19 @@ export const homepageCmsApi = {
 
   // --- Admin CRUD ---
   async getContents(section: string): Promise<CmsContent[]> {
+    let res;
     try {
-      const res = await api.get(`/neture/admin/homepage-contents?section=${section}`);
-      const result = res.data;
-      return result.data || [];
-    } catch { return []; }
+      res = await api.get(`/neture/admin/homepage-contents?section=${section}`);
+    } catch (error) {
+      console.warn('[Homepage CMS API] Failed to fetch contents:', describeApiError(error));
+      throw new Error(OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED);
+    }
+    const result = res.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Homepage CMS API] Unexpected contents payload shape');
+      throw new Error(OPERATOR_HOMEPAGE_CONTENTS_LOAD_FAILED);
+    }
+    return result.data;
   },
 
   async createContent(section: string, data: {

@@ -18,6 +18,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
+import { AlertTriangle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { useAuth } from '../../contexts/AuthContext';
 import { contentAssetApi, type DashboardAsset, type DashboardSortType, type DashboardKpi } from '../../lib/api';
@@ -88,9 +89,11 @@ export default function MyContentPage() {
   const { user } = useAuth();
   const [assets, setAssets] = useState<DashboardAsset[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(false);
   const [filter, setFilter] = useState<StatusFilter>('all');
   const [sort, setSort] = useState<DashboardSortType>('recent');
   const [kpi, setKpi] = useState<DashboardKpi | null>(null);
+  const [kpiError, setKpiError] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editTitle, setEditTitle] = useState('');
   const [editDescription, setEditDescription] = useState('');
@@ -108,13 +111,18 @@ export default function MyContentPage() {
 
   const dashboardId = user?.id;
 
-  // KPI 로드
-  useEffect(() => {
+  // KPI 로드 — 목록과 독립 영역. 실패는 실제 0 KPI 와 분리(오류만 표면화, 기존 KPI 유지)
+  const loadKpi = useCallback(() => {
     if (!dashboardId) return;
+    setKpiError(false);
     contentAssetApi.getKpi(dashboardId)
-      .then(res => setKpi(res.data))
-      .catch(() => {});
+      .then(setKpi)
+      .catch(() => setKpiError(true));
   }, [dashboardId]);
+
+  useEffect(() => {
+    loadKpi();
+  }, [loadKpi]);
 
   // 판매자 행동 신호: 세션 1회 조회
   useEffect(() => {
@@ -129,11 +137,13 @@ export default function MyContentPage() {
     if (!dashboardId) return;
     try {
       setLoading(true);
-      const res = await contentAssetApi.listAssets(dashboardId, { sort });
-      setAssets(res.data || []);
+      setLoadError(false);
+      const data = await contentAssetApi.listAssets(dashboardId, { sort });
+      setAssets(data);
     } catch (err) {
+      // 조회 실패는 정상 0건과 분리 — 기존 목록을 비우지 않고 오류만 표면화
       console.warn('Failed to load dashboard assets:', err);
-      setAssets([]);
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -345,8 +355,20 @@ export default function MyContentPage() {
         <p className="text-gray-500 mt-1">허브에서 가져온 콘텐츠를 관리하세요.</p>
       </div>
 
-      {/* KPI 미니 대시보드 */}
-      {kpi && (
+      {/* KPI 미니 대시보드 — 목록과 독립. 오류 시 0 지표를 노출하지 않고 오류만 표시 */}
+      {kpiError ? (
+        <div className="flex items-center justify-between gap-3 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">
+          <span className="flex items-center gap-2 text-sm text-red-700 font-medium">
+            <AlertTriangle className="w-4 h-4" /> 콘텐츠 현황을 불러오지 못했습니다.
+          </span>
+          <button
+            onClick={loadKpi}
+            className="px-3 py-1.5 text-xs font-medium bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-100 whitespace-nowrap"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : kpi && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="bg-white border border-gray-200 rounded-xl p-4 flex flex-col items-center gap-1">
             <span className="text-2xl font-bold text-gray-900">{kpi.totalAssets}</span>
@@ -445,7 +467,19 @@ export default function MyContentPage() {
         </div>
       </div>
 
-      {filteredAssets.length === 0 ? (
+      {loadError ? (
+        <div className="text-center py-16 bg-red-50 rounded-lg border border-red-200">
+          <AlertTriangle className="w-10 h-10 text-red-400 mx-auto mb-3" />
+          <p className="text-lg text-red-700 font-medium mb-1">콘텐츠 자산을 불러오지 못했습니다.</p>
+          <p className="text-gray-500 mb-6">잠시 후 다시 시도해 주세요.</p>
+          <button
+            onClick={() => loadAssets()}
+            className="inline-block px-6 py-3 bg-white border border-red-300 text-red-700 rounded-lg font-medium hover:bg-red-100 transition-colors"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : filteredAssets.length === 0 ? (
         <div className="text-center py-16 bg-gray-50 rounded-lg">
           <p className="text-xl text-gray-500 mb-2">
             {assets.length === 0 ? '아직 가져온 콘텐츠가 없습니다' : '해당 조건에 맞는 콘텐츠가 없습니다'}

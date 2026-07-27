@@ -11,7 +11,7 @@
  * - 리스트: "사용 중" 상태 표시는 유지
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, FileText, Bell } from 'lucide-react';
 import { cmsApi, contentAssetApi, type CmsContent } from '../../lib/api';
@@ -45,24 +45,25 @@ export default function ContentListPage() {
       .catch(() => {});
   }, [user?.id]);
 
-  useEffect(() => {
-    const fetchContents = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const result = await cmsApi.getContents({ sort, page: currentPage, limit: PAGE_SIZE });
-        setContents(result.data);
-        setTotalPages(result.pagination.totalPages);
-        setTotalItems(result.pagination.total);
-      } catch (err) {
-        setError((err as Error).message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContents();
+  // 조회 실패는 정상 0건과 분리 — error 상태로 표면화, 재시도는 현재 정렬·페이지 보존
+  const fetchContents = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await cmsApi.getContents({ sort, page: currentPage, limit: PAGE_SIZE });
+      setContents(result.data);
+      setTotalPages(result.pagination.totalPages);
+      setTotalItems(result.pagination.total);
+    } catch (err) {
+      setError((err as Error).message);
+    } finally {
+      setLoading(false);
+    }
   }, [sort, currentPage]);
+
+  useEffect(() => {
+    fetchContents();
+  }, [fetchContents]);
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
@@ -85,7 +86,13 @@ export default function ContentListPage() {
   if (error) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <p className="text-red-600">Error loading contents: {error}</p>
+        <p className="text-red-600 font-medium mb-4">콘텐츠를 불러오지 못했습니다.</p>
+        <button
+          onClick={() => fetchContents()}
+          className="px-5 py-2.5 text-sm font-medium bg-white border border-red-300 text-red-700 rounded-lg hover:bg-red-50"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }
