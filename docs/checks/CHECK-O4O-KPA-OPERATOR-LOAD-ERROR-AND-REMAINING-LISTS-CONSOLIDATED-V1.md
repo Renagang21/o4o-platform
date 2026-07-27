@@ -76,4 +76,12 @@
 
 ## 7. 배포 / smoke
 
-- (배포 모니터링 및 실브라우저 smoke 결과 기록 — 진행 중)
+- CI: `Deploy Web Services (Cloud Run)` run `30233611988` (headSha `883834a32`) → `deploy-kpa-society: success` (전체 GREEN).
+- 실브라우저 smoke (배포본 `kpa-society-web-3e3aws7zqa-du.a.run.app`, KPA admin/operator `sohae2100` 로그인):
+  - **AnalyticsPage** (`/operator/analytics`): 요약 KPI(5/5/0) · AI 인사이트 · 액션별 요약 · 일별 추이 · 최근 액션 이력 **DataTable** 정상. 페이지네이션 `1/5`(이전 disabled) → 다음 클릭 `2/5`(이전 enabled) 정상 동작. ✓
+  - **CommunityManagementPage** (`/operator/community` = "Home 편집"): Hero 광고 탭 **DataTable**(액션/미리보기/제목/기간/순서/상태) + 정상 빈 상태("등록된 광고가 없습니다") + "광고 추가" CTA. 스폰서 탭 전환 → 다른 컬럼 셋(액션/로고/이름/링크/순서/상태) + "스폰서 추가" CTA, **이전 탭 데이터 잔존 없음**. ✓
+  - **OperatorStoreDetailPage** (`/operator/stores/{id}`): 매장 정보 카드 정상 로드. **채널 섹션이 실제 백엔드 500(`GET .../{id}/channels`)을 섹션 레벨 오류 "Failed to fetch store channels" + 다시 시도로 표면화 — 화면 전체 차단 없음, 빈 목록 위장 없음.** 다시 시도 클릭 시 **채널 섹션만 독립 재조회**(다른 섹션 무영향). 기능(Capabilities) 10개 카드 정상(빈 위장 없음), 매장 상품 DataTable 정상 빈 상태. → **item 3 조회 계약 분리가 실장애 상황에서 그대로 동작함을 라이브 입증.** ✓
+- item 4(silent-catch 4파일)는 실패 유발이 어려운 방어 경로로, typecheck·build GREEN 으로 검증(계약 무변경, 실패 시 오류+재시도/주석 부기).
+
+### 부수 관찰 (WO 범위 외 — 개방/변경 안 함)
+- 배포본에서 `GET /api/v1/operator/stores/{id}/channels` 가 KPA operator 스코프로 **500** 반환(테스트 약국 `c92b857f…`). 프론트 계약은 정상 동작(섹션 오류+재시도)하므로 화면 회귀는 없음. 백엔드 채널 조회 실패는 별도 조사 대상(본 WO는 프론트 조회 실패 계약 범위 — 백엔드 무변경).
