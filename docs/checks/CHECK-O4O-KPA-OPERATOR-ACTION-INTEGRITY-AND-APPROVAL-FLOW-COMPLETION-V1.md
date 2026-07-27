@@ -104,10 +104,14 @@ ready      t          (null)     7
 ## 10. 배포 / smoke
 
 - 타입체크: **web-kpa-society / glycopharm-web / k-cosmetics / api-server 4/4 GREEN**(tsc --noEmit).
-- 배포: (아래 §11 커밋 push → CI `Deploy API Server (Cloud Run)` + `Deploy Web Services (Cloud Run)` 자동 트리거)
-- 실브라우저 smoke(sohae2100 = kpa:operator/admin): (배포 후 기재)
+- 배포: 커밋 `d4278b519` push → CI `Deploy API Server (Cloud Run)` + `Deploy Web Services (Cloud Run)` 둘 다 **completed / success (GREEN)**.
+- 실브라우저 smoke(sohae2100 = kpa:admin+operator, kpa-society-web 프로덕션):
+  - **Scope 1 GREEN** — `/operator/approvals` 렌더 확인: heading "공급자 콘텐츠 승인", entity_type 탭(전체/공급자 자료/사이니지 캠페인), 상태 필터(대기중/승인됨/반려됨/전체), DataTable 6컬럼(액션/유형/제목·상세/요청자/생성일/상태), 정상 empty state("대기 중인 승인 요청이 없습니다" = 200 빈배열, 에러 아님). 사이드바 `승인` 그룹에 메뉴 항목 `공급자 콘텐츠 승인 → /operator/approvals` 노출. 신규 엔드포인트 401/403/500 없음.
+  - **Scope 5 GREEN** — `/operator/members`: 계정 역할 관리자(kpa:admin)/운영자/매장운영 확인, `가입 신청서`(Applications) 탭 **노출**(admin 양성 케이스). 탭 클릭 시 상태 필터+테이블+empty state 정상 로드, 에러 없음. (operator-only 음성 케이스는 전용 계정 부재로 코드 게이팅 정적 검증 — `canReviewApplications` = admin 역할 OR membershipRole==='admin'.)
+  - **Scope 2/7** — 편집한 `OperatorStoreDetailPage` 렌더 무회귀 확인(매장 정보 / 채널 상태 / 기능 Capabilities 10 토글 / 매장 상품). refetch-after-mutation(`await loadCapabilities()` / `await loadChannels()`)은 mutation 핸들러 내부 — 실제 토글은 **프로덕션 write**(CLAUDE.md §0 승인 필요)이므로 실행하지 않고 코드 정적 검증. 결정적 변경(optimistic set 직후 서버 재조회)으로 판정.
+  - 잔여 콘솔 401은 legal/policy 미게시(`/legal/documents/published/terms|privacy`, `/public/services/.../policies/*`)로 본 WO 범위 밖 기존 상태.
 
 ## 11. 커밋 SHA
 
-- 구현 커밋: (path-specific commit 후 기재)
+- 구현 커밋: `d4278b519` (push 완료 `9deddc501..d4278b519`, CI 배포 GREEN). 본 CHECK §10/§11 smoke·SHA 확정은 후속 path-specific 커밋.
 - 변경 파일: 신규 1(SupplierContentApprovalPage) + 프론트 8 + 백엔드 2 + 본 CHECK.
