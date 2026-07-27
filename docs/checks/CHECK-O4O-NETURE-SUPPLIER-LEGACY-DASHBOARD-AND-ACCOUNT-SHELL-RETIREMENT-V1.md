@@ -208,13 +208,32 @@ partner/seller · admin-without-supplier 는 **실계정이 없어 코드 경로
 
 | 항목 | 값 |
 |------|-----|
-| commit | __COMMIT__ |
-| 배포 run | __RUN__ |
-| Cloud Run revision | __REV__ |
+| commit | `4f0f7ba3f` |
+| push run (30275474288) | **cancelled** — 병렬 세션의 후속 push 로 concurrency 취소 |
+| 후속 push run (30275476358, sha `c5809eb58`) | `deploy-neture` **skipped** — detect-changes 가 tip 커밋 기준으로만 판정하는 알려진 동작(해당 커밋은 kpa-society 변경) |
+| 명시 재배포 | `gh workflow run deploy-web-services.yml --ref main -f service=neture` → run **30275542436** (`workflow_dispatch`) |
+| 배포 SHA | `ca035f9e1` — `git merge-base --is-ancestor 4f0f7ba3f ca035f9e1` = **YES** |
+| 결과 | `detect-changes` success · `deploy-neture` **success** (타 3서비스 skipped) |
+| Cloud Run revision | `neture-web-01351-xfm` → **`neture-web-01352-mb5`** (트래픽 100%) |
+
+> 본 커밋의 자체 push run 이 concurrency 로 취소되고, 뒤이은 push 는 tip 커밋이 neture 를 건드리지 않아
+> `deploy-neture` 가 skip 되었다. 두 경로 모두로는 배포되지 않으므로 **명시 dispatch 로 재배포**했다.
 
 ## 14. 프로덕션 smoke
 
-__PRODSMOKE__
+배포된 프로덕션 번들(`neture-web-01352-mb5`) 기준으로 §9~§11 전 항목 재실행 — **30/30 PASS**, 배포 전 결과와 동일.
+
+| 구간 | 결과 |
+|------|:---:|
+| legacy redirect 6 route × (착지 · blank/404 아님 · route error 0) | 18/18 PASS |
+| `replace` 뒤로가기 · 동적 id · query 보존 · `":id"` 미사용 · 새로고침 | 5/5 PASS |
+| canonical 회귀 6 route + 처리목록 UI | 7/7 PASS |
+| 반응형 4 화면 × 3 뷰포트 | 회귀 0 |
+
+**텔레메트리**: page error **0** · 운영 mutation 요청 **0** · redirect loop **0**.
+
+console error 3건은 존재하지 않는 합성 주문 id(`test-id-1234`, UUID 형식 아님) 상세를 의도적으로
+3회 방문해 발생한 API 400 뿐이다(선행 CHECK 와 동일 패턴). 실제 legacy redirect 경로 자체의 4xx/5xx 는 0건이다.
 
 ## 15. DB · migration · 운영 mutation
 
