@@ -207,13 +207,39 @@ route syntax · `Navigate`/`useParams` import · unused import · dynamic id 보
 
 | 항목 | 값 |
 |------|-----|
-| commit | __COMMIT__ |
-| 배포 run | __RUN__ |
-| Cloud Run revision | __REV__ |
+| commit | `db23c2d0d` |
+| 배포 SHA | `f7e391d63` — `git merge-base --is-ancestor db23c2d0d f7e391d63` = **YES** (본 변경 포함) |
+| 배포 run | 30270281524 — `deploy-neture` **success** (타 3서비스 skipped) |
+| Cloud Run revision | `neture-web-01349-v2n` → **`neture-web-01350-jht`** (트래픽 100%) |
+
+> push 시점에 병렬 세션이 공유 `main` 을 먼저 push 하면서 본 커밋이 함께 올라갔다
+> (`git push` 결과 `Everything up-to-date`). `db23c2d0d` 가 `origin/main` ancestor 임을 확인했다.
 
 ## 14. 프로덕션 smoke
 
-__PRODSMOKE__
+배포된 프로덕션 번들 기준으로 §10~§12 전 항목 재실행 — **30/30 PASS, 배포 전 결과와 동일**.
+
+| 구간 | 결과 |
+|------|:---:|
+| legacy redirect 6 route × (착지 · blank/404 아님 · route error 0) | 18/18 PASS |
+| `replace` 뒤로가기 · 동적 id · query 보존 · `":id"` 미사용 · 새로고침 | 5/5 PASS |
+| canonical 회귀 6 route + 처리목록 UI | 7/7 PASS |
+| 반응형 4 화면 × 3 뷰포트 | 회귀 0 |
+
+**텔레메트리**: page error **0** · 운영 mutation 요청 **0** · redirect loop **0**.
+
+console error 3건은 **존재하지 않는 합성 주문 id(`test-id-1234`, UUID 형식 아님)** 상세를
+의도적으로 3회 방문해 발생한 API 400 뿐이다. §13.2 “route redirect 성공과 데이터 404/400 은 분리” 에 해당한다.
+별도 probe 로 legacy redirect 5개(정적 route)를 확인한 결과 **4xx/5xx 0건**:
+
+```
+/account/supplier             → 4xx/5xx 0건
+/account/supplier/products    → 4xx/5xx 0건
+/account/supplier/orders      → 4xx/5xx 0건
+/account/supplier/inventory   → 4xx/5xx 0건
+/account/supplier/settlements → 4xx/5xx 0건
+합성 id 상세                   → 400 1건 (GET /neture/supplier/orders/test-id-1234 — 존재하지 않는 주문)
+```
 
 ## 15. DB · migration · 운영 mutation
 
