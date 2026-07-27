@@ -9,7 +9,8 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
-import { Package, Search, RefreshCw, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { Package, Search, RefreshCw, ChevronLeft, ChevronRight, X, AlertTriangle } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { operatorSupplyApi, type OperatorSupplyProduct } from '../../lib/api';
 
 const PAGE_SIZE = 20;
@@ -30,6 +31,9 @@ const DIST_LABELS: Record<string, string> = {
 export default function AllProductsOverviewPage() {
   const [products, setProducts] = useState<OperatorSupplyProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패를 "공급 가능 상품 없음" 으로 삼키지 않고 별도 상태로 분리.
+  const [loadError, setLoadError] = useState(false);
   const [search, setSearch] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
   const [page, setPage] = useState(1);
@@ -37,11 +41,13 @@ export default function AllProductsOverviewPage() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const data = await operatorSupplyApi.getSupplyProducts();
       setProducts(data);
     } catch {
-      setProducts([]);
+      // 실패를 0건으로 오인시키지 않는다. 기존 목록은 blank 하지 않고 에러만 표면화.
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -72,6 +78,96 @@ export default function AllProductsOverviewPage() {
     rejected: products.filter(p => p.supplyStatus === 'rejected').length,
   }), [products]);
 
+  const columns: ListColumnDef<OperatorSupplyProduct>[] = [
+    {
+      key: 'image',
+      header: '',
+      system: true,
+      width: '48px',
+      render: (_v, p) => (
+        p.primaryImageUrl ? (
+          <img src={p.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
+        ) : (
+          <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
+            <Package className="w-5 h-5 text-slate-400" />
+          </div>
+        )
+      ),
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      render: (_v, p) => (
+        <>
+          <p className="font-medium text-slate-800">{p.name}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{p.barcode || p.id.slice(0, 8)}</p>
+        </>
+      ),
+    },
+    {
+      key: 'supplierName',
+      header: '공급자',
+      render: (_v, p) => <span className="text-slate-600">{p.supplierName}</span>,
+    },
+    {
+      key: 'distributionType',
+      header: '유통',
+      align: 'center',
+      render: (_v, p) => (
+        <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
+          {DIST_LABELS[p.distributionType || ''] || p.distributionType || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'priceGeneral',
+      header: '공급가',
+      align: 'right',
+      render: (_v, p) => (
+        <span className="text-slate-700">
+          {p.priceGeneral ? `₩${p.priceGeneral.toLocaleString()}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'consumerReferencePrice',
+      header: '소비자가',
+      align: 'right',
+      render: (_v, p) => (
+        <span className="text-slate-500">
+          {p.consumerReferencePrice ? `₩${p.consumerReferencePrice.toLocaleString()}` : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'approvalStatus',
+      header: '승인',
+      align: 'center',
+      render: (_v, p) => (
+        <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
+          p.approvalStatus === 'APPROVED' ? 'bg-green-50 text-green-700' :
+          p.approvalStatus === 'PENDING' ? 'bg-amber-50 text-amber-700' :
+          'bg-slate-100 text-slate-600'
+        }`}>
+          {p.approvalStatus === 'APPROVED' ? '승인' : p.approvalStatus === 'PENDING' ? '대기' : p.approvalStatus || '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'supplyStatus',
+      header: '공급 상태',
+      align: 'center',
+      render: (_v, p) => {
+        const sc = STATUS_CONFIG[p.supplyStatus] || STATUS_CONFIG.available;
+        return (
+          <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${sc.cls}`}>
+            {sc.label}
+          </span>
+        );
+      },
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
@@ -88,7 +184,9 @@ export default function AllProductsOverviewPage() {
         </button>
       </div>
 
-      {/* KPI Cards */}
+      {/* KPI Cards — WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+          조회 실패 시 0으로 보이는 KPI 를 숨긴다(정상 0건과 혼동 방지). */}
+      {!loadError && (
       <div className="grid grid-cols-5 gap-3 mb-6">
         {[
           { key: '', label: '전체', count: statusCounts.all, cls: 'text-slate-900' },
@@ -107,6 +205,7 @@ export default function AllProductsOverviewPage() {
           </button>
         ))}
       </div>
+      )}
 
       {/* Search + Count */}
       <div className="flex items-center gap-3 mb-4">
@@ -120,106 +219,65 @@ export default function AllProductsOverviewPage() {
             className="w-full pl-10 pr-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-        <span className="text-sm text-slate-500">총 {filtered.length}건</span>
+        <span className="text-sm text-slate-500">
+          {loadError ? '불러오기 실패' : `총 ${filtered.length}건`}
+        </span>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase border-b border-slate-200">
-              <th className="px-4 py-3 font-medium w-12"></th>
-              <th className="px-4 py-3 font-medium">상품명</th>
-              <th className="px-4 py-3 font-medium">공급자</th>
-              <th className="px-4 py-3 font-medium text-center">유통</th>
-              <th className="px-4 py-3 font-medium text-right">공급가</th>
-              <th className="px-4 py-3 font-medium text-right">소비자가</th>
-              <th className="px-4 py-3 font-medium text-center">승인</th>
-              <th className="px-4 py-3 font-medium text-center">공급 상태</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
-            ) : paged.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">
-                {search || statusFilter ? '조건에 맞는 상품이 없습니다.' : '현재 공개·활성 상태인 공급 가능 상품이 없습니다.'}
-              </td></tr>
-            ) : paged.map((p) => {
-              const sc = STATUS_CONFIG[p.supplyStatus] || STATUS_CONFIG.available;
-              return (
-                <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailProduct(p)}>
-                  <td className="px-4 py-3">
-                    {p.primaryImageUrl ? (
-                      <img src={p.primaryImageUrl} alt="" className="w-10 h-10 rounded object-cover" />
-                    ) : (
-                      <div className="w-10 h-10 rounded bg-slate-100 flex items-center justify-center">
-                        <Package className="w-5 h-5 text-slate-400" />
-                      </div>
-                    )}
-                  </td>
-                  <td className="px-4 py-3">
-                    <p className="font-medium text-slate-800">{p.name}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{p.barcode || p.id.slice(0, 8)}</p>
-                  </td>
-                  <td className="px-4 py-3 text-slate-600">{p.supplierName}</td>
-                  <td className="px-4 py-3 text-center">
-                    <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700">
-                      {DIST_LABELS[p.distributionType || ''] || p.distributionType || '-'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right text-slate-700">
-                    {p.priceGeneral ? `₩${p.priceGeneral.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-right text-slate-500">
-                    {p.consumerReferencePrice ? `₩${p.consumerReferencePrice.toLocaleString()}` : '-'}
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${
-                      p.approvalStatus === 'APPROVED' ? 'bg-green-50 text-green-700' :
-                      p.approvalStatus === 'PENDING' ? 'bg-amber-50 text-amber-700' :
-                      'bg-slate-100 text-slate-600'
-                    }`}>
-                      {p.approvalStatus === 'APPROVED' ? '승인' : p.approvalStatus === 'PENDING' ? '대기' : p.approvalStatus || '-'}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-center">
-                    <span className={`inline-block px-2 py-0.5 rounded text-xs font-medium ${sc.cls}`}>
-                      {sc.label}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-            <span className="text-xs text-slate-500">
-              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length}
-            </span>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => setPage(p => Math.max(1, p - 1))}
-                disabled={page <= 1}
-                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
-              >
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-sm text-slate-600 px-2">{page} / {totalPages}</span>
-              <button
-                onClick={() => setPage(p => Math.min(totalPages, p + 1))}
-                disabled={page >= totalPages}
-                className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
-              >
-                <ChevronRight className="w-4 h-4" />
-              </button>
-            </div>
+      {loading ? (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden px-4 py-12 text-center text-slate-400">불러오는 중...</div>
+      ) : loadError ? (
+        <div className="bg-white rounded-xl shadow-sm overflow-hidden px-4 py-16 text-center">
+          <div className="flex flex-col items-center text-slate-500">
+            <AlertTriangle size={40} className="mb-3 text-red-300" />
+            <p className="text-sm font-medium text-slate-700">공급 가능 상품을 불러오지 못했습니다</p>
+            <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+            <button
+              onClick={fetchProducts}
+              className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+            >
+              다시 시도
+            </button>
           </div>
-        )}
-      </div>
+        </div>
+      ) : (
+        <>
+          <DataTable<OperatorSupplyProduct>
+            columns={columns}
+            data={paged}
+            rowKey={(p) => p.id}
+            emptyMessage={search || statusFilter ? '조건에 맞는 상품이 없습니다.' : '현재 공개·활성 상태인 공급 가능 상품이 없습니다.'}
+            onRowClick={(p) => setDetailProduct(p)}
+          />
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="bg-white rounded-xl shadow-sm mt-3 flex items-center justify-between px-4 py-3">
+              <span className="text-xs text-slate-500">
+                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                  disabled={page <= 1}
+                  className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm text-slate-600 px-2">{page} / {totalPages}</span>
+                <button
+                  onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                  disabled={page >= totalPages}
+                  className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
 
       {/* Detail Panel (right slide) */}
       {detailProduct && (
