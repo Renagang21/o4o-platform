@@ -19,6 +19,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Download, Languages, X, Loader2, Search } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { Pagination } from '@o4o/operator-ux-core';
 import {
   listMlcHub,
   importMlcFromHub,
@@ -134,9 +135,15 @@ export function HubMultilingualContentLibraryPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       <header className="mb-6 pb-5 border-b-2 border-slate-200">
         <h1 className="text-2xl font-bold text-slate-900">매장 HUB 다국어 상품 콘텐츠</h1>
+        {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 사본 정책 안내 표준화.
+            ⚠ 다른 HUB 자원(블로그/POP/QR/동영상/사이니지)과 정책이 다르다 —
+            backend import 가 (organization_id, target_kind, target_id, content_key) 기준
+            ON CONFLICT DO UPDATE 이므로 **새 사본이 아니라 기존 사본을 덮어쓴다**.
+            따라서 "새 사본이 생성됩니다" 문구를 쓰지 않는다. */}
         <p className="mt-1.5 text-sm text-slate-500">
           외국인 고객에게 QR 또는 타블렛으로 보여줄 수 있는 다국어 상품 안내 자료입니다.
-          가져오면 내 약국 콘텐츠로 복사되어 이후 원본과 분리됩니다.
+          가져온 자료는 내 매장의 독립 사본으로 저장되어 이후 원본과 분리됩니다.
+          같은 상품에 다시 가져오면 새 사본이 생기지 않고 기존 사본이 원본의 최신 내용으로 덮어쓰기 됩니다.
         </p>
       </header>
 
@@ -192,12 +199,9 @@ export function HubMultilingualContentLibraryPage() {
             </div>
           )}
 
+          {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-2): 수제 이전/다음 → 표준 Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-6">
-              <button disabled={page <= 1} onClick={() => setPage((p) => Math.max(1, p - 1))} className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50">이전</button>
-              <span className="text-sm text-slate-500">{page} / {totalPages}</span>
-              <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50">다음</button>
-            </div>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
           )}
         </>
       )}

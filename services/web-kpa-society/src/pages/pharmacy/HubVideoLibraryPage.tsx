@@ -162,8 +162,8 @@ export function HubVideoLibraryPage() {
       {
         key: 'title',
         header: '제목',
-        sortable: true,
-        sortAccessor: (item) => item.title,
+        // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3): 현재 페이지만 정렬되는 UI 제거.
+        //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
         render: (_v, item) => (
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
@@ -194,8 +194,6 @@ export function HubVideoLibraryPage() {
         key: 'createdAt',
         header: '게시일',
         width: '110px',
-        sortable: true,
-        sortAccessor: (item) => new Date(item.createdAt).getTime(),
         render: (_v, item) => (
           <span className="text-xs text-slate-500">
             {new Date(item.createdAt).toLocaleDateString('ko-KR')}
@@ -298,7 +296,9 @@ export function HubVideoLibraryPage() {
       {slug && items.length > 0 && (
         <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
           <ExternalLink className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+          {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 값 복사형 사본 정책 안내 */}
           <span>
+            가져온 자료는 내 매장의 독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 새로운 사본이 생성됩니다.{' '}
             가져온 동영상은{' '}
             <button
               onClick={() => navigate('/store/content/video')}

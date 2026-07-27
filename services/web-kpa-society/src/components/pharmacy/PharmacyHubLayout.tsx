@@ -28,6 +28,7 @@ import {
   QrCode,
   Video,
   MonitorSmartphone,
+  Languages,
   type LucideIcon,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
@@ -70,6 +71,13 @@ const HUB_MENU_GROUPS: HubMenuGroup[] = [
     { label: '이벤트·특가', path: '/store-hub/event-offers', icon: Megaphone, description: '진행 중 이벤트·특가 상품 · 신청', showEventBadge: true, accent: true },
     // WO-O4O-EVENT-OFFER-TO-CART-PHASE1A-FOLLOWUP-V1: 이벤트오퍼 담기 → 장바구니 확인
     { label: '장바구니', path: '/store-hub/cart', icon: ShoppingCart, description: '장바구니에 담은 상품 확인 · 수량 조정' },
+    // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-4): 메뉴 부재 해소.
+    //   /store-hub/multilingual-product-contents 는 다른 HUB 화면과 동일한 "운영자 원본 → 내 매장 사본"
+    //   가져오기 화면(listMlcHub + importMlcFromHub)이므로 매장 HUB 사이드바가 정위치다.
+    //   가져오기 대상이 매장 상품(local/listing)이라 '약국 상품·거래' 그룹에 두되,
+    //   카탈로그→이벤트→장바구니 구매 흐름을 끊지 않도록 그룹 끝에 배치한다.
+    //   (별개 화면 /store/products/multilingual/* 은 매장 소유 저작 경로로 그대로 유지 — 중복 아님.)
+    { label: '다국어 상품 콘텐츠', path: '/store-hub/multilingual-product-contents', icon: Languages, description: '운영자 발행 다국어 상품 안내 · 내 매장 상품에 연결' },
   ]},
   { label: '약국 경영지원', items: [
     // WO-O4O-STORE-HUB-BLOG-CONTENT-IMPORT-V1: 매장 HUB 블로그 진열 + 가져가기

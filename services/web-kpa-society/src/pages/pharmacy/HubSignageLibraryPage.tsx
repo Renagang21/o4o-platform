@@ -100,6 +100,10 @@ export function HubSignageLibraryPage() {
   // Drawer for row click detail
   const [selectedItem, setSelectedItem] = useState<HubContentItemResponse | null>(null);
 
+  // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6):
+  //   가져오기 직후 "가져온 사본 확인" 경로 안내. 단건은 사본 제목, 일괄은 건수를 보여준다.
+  const [imported, setImported] = useState<{ count: number; title?: string } | null>(null);
+
   // Batch hook for bulk add
   const batch = useBatchAction();
 
@@ -178,13 +182,16 @@ export function HubSignageLibraryPage() {
   // Single add (row drawer 또는 row action용)
   const handleCopySingle = useCallback(async (item: HubContentItemResponse) => {
     try {
-      await assetSnapshotApi.copy({
+      const res = await assetSnapshotApi.copy({
         sourceService: 'kpa',
         sourceAssetId: item.id,
         assetType: 'signage',
       });
       toast.success(`"${item.title}" 이(가) 내 약국에 추가되었습니다.`);
       setSelectedItem(null);
+      // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6): 사본 확인 경로 안내.
+      //   개별 snapshot 상세 route 는 존재하지 않으므로 canonical 목록 화면으로 보낸다.
+      setImported({ count: 1, title: res?.data?.title || item.title });
     } catch (e: any) {
       const msg = e?.message || '';
       if (msg.includes('DUPLICATE') || msg.includes('already') || e?.code === 'DUPLICATE_SNAPSHOT') {
@@ -237,8 +244,18 @@ export function HubSignageLibraryPage() {
     const result = await batch.executeBatch(batchAddItems, ids);
     if (result.successCount > 0) {
       setSelectedIds(new Set());
+      // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6):
+      //   일괄은 개별 사본을 지목하지 않고 자료함 전체 목록으로 안내한다.
+      setImported({ count: result.successCount });
     }
   }, [selectedIds, batch, batchAddItems]);
+
+  // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6):
+  //   가져온 사본은 기존 canonical 관리 화면에서 확인한다(신규 화면 없음).
+  //   미디어/플레이리스트 탭에 따라 대응 목록으로 보낸다.
+  const importedTargetPath = viewTab === 'playlist'
+    ? '/store/marketing/signage/playlist'
+    : '/store/marketing/signage/videos';
 
   const isLoading = viewTab === 'media' ? mediaLoading : playlistLoading;
   const currentData = viewTab === 'media' ? filteredMedia : filteredPlaylists;
@@ -254,8 +271,8 @@ export function HubSignageLibraryPage() {
     {
       key: 'title',
       header: '제목',
-      sortable: true,
-      sortAccessor: (item) => item.title,
+      // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3): 현재 페이지만 정렬되는 UI 제거.
+      //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
       render: (_v, item) => (
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
@@ -331,8 +348,6 @@ export function HubSignageLibraryPage() {
       key: 'createdAt',
       header: '등록일',
       width: '95px',
-      sortable: true,
-      sortAccessor: (item) => new Date(item.createdAt).getTime(),
       render: (_v, item) => (
         <span className="text-xs text-slate-500">
           {new Date(item.createdAt).toLocaleDateString('ko-KR')}
@@ -476,6 +491,32 @@ export function HubSignageLibraryPage() {
             onRowClick={(row) => setSelectedItem(row)}
           />
 
+          {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6): 가져오기 직후 사본 확인 경로 */}
+          {imported && (
+            <div className="mt-4 flex flex-wrap items-center gap-3 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-sm text-emerald-900">
+              <span className="text-base shrink-0">✅</span>
+              <span className="flex-1 min-w-0">
+                {imported.count === 1 && imported.title
+                  ? `“${imported.title}” 을(를) 내 약국 사본으로 가져왔습니다.`
+                  : `${imported.count}개 항목을 내 약국 사본으로 가져왔습니다.`}
+              </span>
+              <Link
+                to={importedTargetPath}
+                className="shrink-0 px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-xs font-medium hover:bg-emerald-700 no-underline"
+              >
+                {viewTab === 'playlist' ? '내 약국 플레이리스트에서 보기 →' : '내 약국 사이니지 자료함에서 보기 →'}
+              </Link>
+              <button
+                type="button"
+                onClick={() => setImported(null)}
+                className="shrink-0 p-1 rounded text-emerald-700 hover:bg-emerald-100"
+                aria-label="안내 닫기"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
+
           {/* Pagination
               WO-O4O-KPA-STORE-HUB-STANDARD-TABLE-AND-SIGNAGE-MENU-IA-V1: 수제 이전/다음 → 표준 Pagination.
               sourceFilter !== 'all' 은 클라이언트 필터링이라 서버 페이지 이동을 노출하지 않는 기존 조건 유지. */}
@@ -490,10 +531,15 @@ export function HubSignageLibraryPage() {
         </>
       )}
 
-      {/* Guide notice */}
+      {/* Guide notice
+          WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 값 복사형 사본 정책 안내 추가.
+            asset-snapshot 의 (organization_id, source_asset_id, asset_type) UNIQUE 제약은
+            DropUniqueConstraintAssetSnapshots20260920000000 으로 제거됐다 → 재추가 시 새 사본이 생성된다.
+            (화면의 DUPLICATE_SNAPSHOT catch 분기는 해당 migration 이후 dead path 이나 방어적으로 유지한다.) */}
       <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
         <span className="text-lg shrink-0">💡</span>
         <span>
+          가져온 자료는 내 매장의 독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 새로운 사본이 생성됩니다.{' '}
           추가한 콘텐츠는{' '}
           <Link to="/store/marketing/signage" className="text-blue-600 underline underline-offset-2">
             디지털사이니지 운영 화면

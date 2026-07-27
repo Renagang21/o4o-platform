@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 import { Download, X, ExternalLink, FileText, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BaseDetailDrawer, BulkResultModal } from '@o4o/ui';
-import { DataTable, useBatchAction } from '@o4o/operator-ux-core';
+import { DataTable, Pagination, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { hubContentApi } from '../../api/hubContent';
 import type { HubContentItemResponse } from '@o4o/types/hub-content';
@@ -181,8 +181,10 @@ export function HubBlogLibraryPage() {
       {
         key: 'title',
         header: '제목',
-        sortable: true,
-        sortAccessor: (item) => item.title,
+        // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3):
+        //   서버 정렬 파라미터가 없어(DataTable manualSort 미사용) 현재 페이지만 정렬됐고,
+        //   헤더는 전체 정렬처럼 보여 오인을 유발했다 → 정렬 UI 제거(WO §5 선택지 B).
+        //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
         render: (_v, item) => (
           <div className="flex items-center gap-2 min-w-0">
             <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
@@ -213,8 +215,6 @@ export function HubBlogLibraryPage() {
         key: 'createdAt',
         header: '게시일',
         width: '110px',
-        sortable: true,
-        sortAccessor: (item) => new Date(item.createdAt).getTime(),
         render: (_v, item) => (
           <span className="text-xs text-slate-500">
             {new Date(item.createdAt).toLocaleDateString('ko-KR')}
@@ -323,27 +323,10 @@ export function HubBlogLibraryPage() {
             onRowClick={(row) => setSelectedItem(row)}
           />
 
-          {/* Pagination */}
+          {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-1): 수제 이전/다음 → 표준 Pagination.
+              POP/QR/동영상/사이니지는 이미 이관 완료였고 블로그만 잔존해 있었다. */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-center gap-4 mt-4">
-              <button
-                disabled={page <= 1}
-                onClick={() => setPage((p) => Math.max(1, p - 1))}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                이전
-              </button>
-              <span className="text-sm text-slate-500">
-                {page} / {totalPages}
-              </span>
-              <button
-                disabled={page >= totalPages}
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 text-sm border border-slate-300 rounded-md disabled:opacity-40 hover:bg-slate-50"
-              >
-                다음
-              </button>
-            </div>
+            <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
           )}
         </>
       )}
@@ -352,7 +335,10 @@ export function HubBlogLibraryPage() {
       {slug && items.length > 0 && (
         <div className="flex items-start gap-3 mt-8 p-5 bg-blue-50/60 border border-blue-100 rounded-xl text-sm text-slate-600 leading-relaxed">
           <ExternalLink className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
+          {/* WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-5): 사본 정책 안내 표준화.
+              blog staff import 는 매번 store_blog_posts 사본을 INSERT 한다(중복 차단 없음) → 값 복사형 문구. */}
           <span>
+            가져온 자료는 내 매장의 독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 새로운 사본이 생성됩니다.{' '}
             가져온 블로그는{' '}
             <button
               onClick={() => navigate('/store/content/blog')}

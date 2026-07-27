@@ -214,8 +214,8 @@ export function HubB2BCatalogPage() {
       {
         key: 'name',
         header: '상품명',
-        sortable: true,
-        sortAccessor: (row) => row.name || '',
+        // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3): 현재 페이지만 정렬되는 UI 제거.
+        //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
         render: (_v, row) => (
           <div style={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 0 }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -238,8 +238,6 @@ export function HubB2BCatalogPage() {
         key: 'supplierName',
         header: '공급자',
         width: '150px',
-        sortable: true,
-        sortAccessor: (row) => row.supplierName || '',
         render: (_v, row) => (
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             {row.supplierLogoUrl ? (

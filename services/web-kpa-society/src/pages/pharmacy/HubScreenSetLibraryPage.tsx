@@ -219,8 +219,8 @@ export function HubScreenSetLibraryPage() {
     {
       key: 'name',
       header: '콘텐츠명',
-      sortable: true,
-      sortAccessor: (item) => item.name,
+      // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3): 현재 목록만 정렬되는 UI 제거.
+      //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
       render: (_v, item) => (
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
@@ -260,8 +260,8 @@ export function HubScreenSetLibraryPage() {
     {
       key: 'name',
       header: '콘텐츠명',
-      sortable: true,
-      sortAccessor: (item) => item.name,
+      // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-3): 현재 목록만 정렬되는 UI 제거.
+      //   서버 정렬 도입 시 manualSort + sortKey/sortDirection/onSort 로 재도입할 것.
       render: (_v, item) => (
         <div className="flex items-center gap-2 min-w-0">
           <div className="w-7 h-7 rounded flex items-center justify-center bg-slate-100 shrink-0 text-slate-400">
