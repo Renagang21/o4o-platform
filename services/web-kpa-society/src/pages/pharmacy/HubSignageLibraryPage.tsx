@@ -163,6 +163,10 @@ export function HubSignageLibraryPage() {
   // Tab/filter change → clear selection
   useEffect(() => {
     setSelectedIds(new Set());
+    // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-6):
+    //   가져오기 안내 배너의 링크 대상은 현재 viewTab 에서 파생된다.
+    //   탭을 바꾼 뒤에도 배너가 남으면 다른 자료함으로 잘못 안내하므로 함께 해제한다.
+    setImported(null);
   }, [viewTab, sourceFilter]);
 
   // Producer filtering (client-side)
