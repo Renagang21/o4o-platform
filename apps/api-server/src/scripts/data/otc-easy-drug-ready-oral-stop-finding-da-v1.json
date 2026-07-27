@@ -1,0 +1,43 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-FINAL-READINESS-V1",
+  "agent": "agent-da",
+  "baseCommit": "0b7b25447",
+  "outcome": "STOP",
+  "stopCondition": "fp 내부 안전축 충돌 (필수 게이트 '안전지문 mismatch 0' 실패)",
+  "liveDbWrite": 0,
+  "verificationMode": "READ-ONLY reproduce/diagnose only (dry-run/apply 미수행)",
+  "reproduction": {
+    "oralUnit1": { "declaredFp": 50, "declaredMaster": 270, "derivedFp": 50, "derivedMaster": 270, "fpMatch": true, "memberMismatch": 0, "sourceRefPreexisting": 0, "easyKoCanonical1": 270, "existingAuthoredKo": 0, "existingEnCanonical": 0 },
+    "oralUnit2": { "declaredFp": 51, "declaredMaster": 270, "derivedFp": 51, "derivedMaster": 270, "fpMatch": true, "memberMismatch": 0, "sourceRefPreexisting": 0, "easyKoCanonical1": 270, "existingAuthoredKo": 0, "existingEnCanonical": 0 },
+    "canonicalDup": 0,
+    "unitMasterIntersection": 0,
+    "unitFpIntersection": 0,
+    "note": "reproduce/count/intersection/sourceRef/existing-authored 게이트는 전부 GREEN. 유일 실패 게이트 = fp 내부 안전지문 mismatch."
+  },
+  "safetyFingerprintMismatch": {
+    "rawMismatchFp": { "oralUnit1": 6, "oralUnit2": 11, "total": 17 },
+    "substantiveFp": 7,
+    "cosmeticFp": 10,
+    "substantive": [
+      { "unit": "oral-unit-1", "fp": "172806ATB", "drug": "이부프로펜정", "size": 48, "axis": ["dose", "age"], "detail": "일부 master 원문은 소아(6/10/14세) 용법·연령 포함, 일부는 성인 전용. dose set {400,600,3200mg} vs {6~3200mg 전량}." },
+      { "unit": "oral-unit-1", "fp": "C07400ACS", "drug": "비타민A 연질캡슐", "size": 2, "axis": ["age", "indication"], "detail": "쎌업(만8세 이상 어린이 및 성인) vs 홈타민에이(성인). 효능 키워드 79% 일치 — 서로 다른 제품군." },
+      { "unit": "oral-unit-2", "fp": "A18600ACS", "drug": "우루사 연질캡슐", "size": 5, "axis": ["age", "indication"], "detail": "성인 대상 유무 상이, 효능 키워드 62% 일치." },
+      { "unit": "oral-unit-2", "fp": "130501ATB", "drug": "세티리진정", "size": 38, "axis": ["age", "indication"], "detail": "6세 소아 용법 포함/미포함 상이, 효능 키워드 67% 일치." },
+      { "unit": "oral-unit-2", "fp": "A76900ACS", "drug": "코엔큐/웰리드 연질캡슐", "size": 4, "axis": ["age"], "detail": "연령 표기 상이 + 웰리드(다른 제품) 혼입." },
+      { "unit": "oral-unit-2", "fp": "260300ATB", "drug": "트리페린정 등", "size": 9, "axis": ["age"], "detail": "어린이 연령 키워드 유무만 상이(효능 100% 일치) — 경계선(주로 원문 완전성 차이)." },
+      { "unit": "oral-unit-2", "fp": "271400ASS", "drug": "현탁액", "size": 4, "axis": ["dose"], "detail": "투여 부피 5mL 포함/미포함 상이." }
+    ],
+    "rootCause": "동일 gencode 그룹 내 제품은 실제 성분·함량·제형이 동일하나, 각 master 의 mfds_easy_drug 공식 원문 TEXT 가 완전성·표현에서 상이(소아 용법·연령·효능 목록 포함 정도가 제각각). 라 SSOT 의 fp=gencode 모델이 전제한 '동일 gencode = 동일 authored 설명서' 불변식이 실데이터에서 성립하지 않음.",
+    "impact": "fp 당 대표 1건 authored KO/EN 을 그룹 전체에 적용하면, 대표에 없는 소아 용법·연령·효능이 있는 master 는 자기 공식 원문과 불일치하는 설명서를 받게 됨(과대/과소 표기). CLAUDE.md 콘텐츠 불변원칙 '제품별 공식 원문 grounding' 및 '효능·용법·안전정보가 다르면 혼합 금지, 제품별 분리' 위반."
+  },
+  "recommendation": {
+    "primary": "라 에이전트 재승인 필요 — 아래 중 택1: (A) 렌더링 단위를 fp→master 로 전환(각 master 자기 공식 원문 grounding, sourceRef 는 fp 유지 가능) 후 재승인, (B) 안전지문 상이 fp 를 별도 subgroup 으로 분리(fingerprint 분할은 본 WO 금지이므로 SSOT 상위 재구성 필요), (C) 안전지문 mismatch fp 를 READY 에서 HOLD 로 강등하고 잔여만 생산.",
+    "note": "본 WO 는 'fingerprint 분할 금지' + '승인 SSOT 수정 금지' 이므로 agent-da 단독으로 (A)/(B)/(C) 결정·실행 불가. 즉시 보고 후 상위 재승인 대기."
+  },
+  "artifactsProduced": [
+    "src/scripts/otc-easy-drug-ready-oral-reproduce.da.ts (READ-ONLY 재현 probe)",
+    "src/scripts/otc-easy-drug-ready-oral-safetydiff.da.ts (READ-ONLY 원문 차이 진단)",
+    "src/scripts/otc-easy-drug-ready-oral-safetyclass.da.ts (READ-ONLY 의약학 substantive/cosmetic 분류)",
+    "src/scripts/data/otc-easy-drug-ready-oral-stop-finding-da-v1.json (본 STOP 보고)"
+  ]
+}
