@@ -83,7 +83,7 @@ interface SummaryShape {
     forcedExpirySoon: number;
   };
   recentActivity: Array<{
-    type: 'member_join' | 'application' | 'org_join';
+    type: 'member_join' | 'org_join';
     label: string;
     timestamp: string;
     status: string;
@@ -130,7 +130,8 @@ async function fetchSummaryShape(
     membershipPendingCount,
     forcedExpirySoonCount,
     recentMemberRows,
-    recentApplicationRows,
+    // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: kpa_applications recentActivity 제거(dead flow).
+    //   recentActivity 는 kpa_members + kpa_approval_requests 로 정상 조립(구조 의존 없음).
     recentOrgJoinRows,
   ] = await Promise.all([
     contentService.listForHome(['notice', 'news'], 5),
@@ -198,12 +199,6 @@ async function fetchSummaryShape(
       ORDER BY m.created_at DESC LIMIT 10
     `).catch(() => []),
     dataSource.query(`
-      SELECT a.id, u.name as applicant_name, a.status, a.created_at
-      FROM kpa_applications a
-      LEFT JOIN users u ON u.id = a.user_id
-      ORDER BY a.created_at DESC LIMIT 5
-    `).catch(() => []),
-    dataSource.query(`
       SELECT r.id, r.requester_name AS name,
              r.payload->>'request_type' AS request_type, r.status, r.created_at
       FROM kpa_approval_requests r
@@ -218,14 +213,6 @@ async function fetchSummaryShape(
     recentActivity.push({
       type: 'member_join',
       label: `${r.name || '(이름 없음)'} ${typeLabel} 가입`,
-      timestamp: r.created_at,
-      status: r.status,
-    });
-  }
-  for (const r of (recentApplicationRows as any[]) || []) {
-    recentActivity.push({
-      type: 'application',
-      label: `${r.applicant_name || '(이름 없음)'} 입회 신청`,
       timestamp: r.created_at,
       status: r.status,
     });

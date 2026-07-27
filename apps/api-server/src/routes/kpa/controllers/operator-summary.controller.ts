@@ -18,7 +18,8 @@ import { asyncHandler } from '../../../middleware/error-handler.js';
 import { KPA_SCOPE_CONFIG } from '@o4o/security-core';
 import { createMembershipScopeGuard } from '../../../common/middleware/membership-guard.middleware.js';
 import { KpaMember } from '../entities/kpa-member.entity.js';
-import { KpaApplication } from '../entities/kpa-application.entity.js';
+// WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: KpaApplication(dead flow) import 제거.
+//   recentActivity·pendingApprovals 를 canonical(kpa_members / kpa_approval_requests)로 정합.
 // WO-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-FOUNDATION-V1:
 //   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Foundation.
 //   /operator/dashboard 재도입 — 기존 /operator/summary 와 병행 운영, frontend Adapter WO 단계에서 전환.
@@ -95,7 +96,6 @@ export function createOperatorSummaryController(
       forcedExpirySoonCount,
       // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: recentActivity
       recentMemberRows,
-      recentApplicationRows,
       recentOrgJoinRows,
     ] = await Promise.all([
       contentService.listForHome(['notice', 'news'], 5),
@@ -178,12 +178,6 @@ export function createOperatorSummaryController(
         ORDER BY m.created_at DESC LIMIT 10
       `).catch(() => []),
       dataSource.query(`
-        SELECT a.id, u.name as applicant_name, a.status, a.created_at
-        FROM kpa_applications a
-        LEFT JOIN users u ON u.id = a.user_id
-        ORDER BY a.created_at DESC LIMIT 5
-      `).catch(() => []),
-      dataSource.query(`
         SELECT r.id, r.requester_name AS name,
                r.payload->>'request_type' AS request_type, r.status, r.created_at
         FROM kpa_approval_requests r
@@ -203,16 +197,7 @@ export function createOperatorSummaryController(
         status: r.status,
       });
     }
-    // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
-    //   약국 서비스 별도 신청 폐지 → recentActivity 의 pharmacy_request 항목 제거.
-    for (const r of (recentApplicationRows as any[]) || []) {
-      recentActivity.push({
-        type: 'application',
-        label: `${r.applicant_name || '(이름 없음)'} 입회 신청`,
-        timestamp: r.created_at,
-        status: r.status,
-      });
-    }
+    // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: kpa_applications recentActivity 제거(dead flow).
     for (const r of (recentOrgJoinRows as any[]) || []) {
       recentActivity.push({
         type: 'org_join',
@@ -317,18 +302,17 @@ export function createOperatorSummaryController(
    */
   router.get('/district-summary', asyncHandler(async (req: Request, res: Response) => {
     const memberRepo = dataSource.getRepository(KpaMember);
-    const appRepo = dataSource.getRepository(KpaApplication);
 
     const limit = Math.min(parseInt(req.query.limit as string) || 10, 50);
 
     // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE1-V1: unified table only
+    // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: pendingApprovals 를 kpa_applications(dead) →
+    //   canonical kpa_approval_requests(entity_type='membership', status='pending') 승인 대기로 정합.
     const [
       totalMembers,
-      pendingApprovals,
       pendingJoinUnifiedRows,
     ] = await Promise.all([
       memberRepo.count({ where: { status: 'active' } }),
-      appRepo.count({ where: { status: 'submitted' } }),
       dataSource.query(`
         SELECT id, entity_type, organization_id, status, requester_id, requester_name, requester_email, created_at
         FROM kpa_approval_requests
@@ -346,7 +330,7 @@ export function createOperatorSummaryController(
       data: {
         kpis: {
           totalMembers,
-          pendingApprovals,
+          pendingApprovals: pendingTotal,
         },
         pendingRequests: {
           total: pendingTotal,

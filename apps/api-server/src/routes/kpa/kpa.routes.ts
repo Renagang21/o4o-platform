@@ -54,7 +54,8 @@ import { SignageQueryService } from '../../modules/signage/index.js';
 import { ForumQueryService } from '../../modules/forum/index.js';
 import { createOrganizationController } from './controllers/organization.controller.js';
 import { createMemberController } from './controllers/member.controller.js';
-import { createApplicationController } from './controllers/application.controller.js';
+// WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: KpaApplication(범용 신청) dead flow 폐기 —
+//   회원 승인 canonical 경로(/members)만 유지. application.controller 삭제(소비처 0, 데이터 0).
 import { createOperatorSummaryController } from './controllers/operator-summary.controller.js';
 import { createEventOfferOperatorController } from './controllers/event-offer-operator.controller.js';
 // WO-O4O-SELLER-RECRUITMENT-EXPOSURE-OPERATOR-UI-V1: 판매자 모집 노출 승인 (kpa-society 고정 proxy)
@@ -216,7 +217,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // ============================================================================
   router.use('/organizations', createOrganizationController(dataSource, coreRequireAuth as any, requireKpaScope));
   router.use('/members', createMemberController(dataSource, coreRequireAuth as any, requireKpaScope));
-  router.use('/applications', createApplicationController(dataSource, coreRequireAuth as any, requireKpaScope));
+  // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: '/applications' 마운트 제거(dead flow).
 
   // Admin Force Asset routes (WO-KPA-A-ASSET-CONTROL-EXTENSION-V2)
   router.use('/admin/force-assets', createAdminForceAssetController(dataSource, coreRequireAuth as any, requireKpaScope));

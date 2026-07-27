@@ -1,11 +1,13 @@
 /**
- * MemberManagementPage - KPA-a 회원 관리 (thin wrapper) + 가입 신청 (외부)
+ * MemberManagementPage - KPA-a 회원 관리 (thin wrapper)
  *
  * WO-O4O-KPA-OPERATOR-MEMBER-MANAGEMENT-WRAPPER-MIGRATION-V1:
- *   1427줄 자체 구현 → OperatorMembersConsolePage thin wrapper + 외부 ApplicationsTab.
+ *   1427줄 자체 구현 → OperatorMembersConsolePage thin wrapper.
  *   기존 회원 관리 동작(승인/반려/정지/복원/탈퇴 + 활동 유형/추가 권한 컬럼 + 약국 정보
- *   Drawer + KpaEditUserModal) 전부 보존. ApplicationsTab(가입 신청 검토)은
- *   wrapper 가 표현 불가하므로 외부 outer tab 으로 분리 렌더.
+ *   Drawer + KpaEditUserModal) 전부 보존.
+ * WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1:
+ *   가입 신청서(KpaApplication) outer tab·ApplicationsTab 제거 — dead flow(데이터 0·소비처 0).
+ *   회원 승인 canonical 경로만 유지.
  *
  * Boundary:
  *   - 회원 list/stats: GET  /kpa/members          (KpaMember entity, 응답 shape 어댑터로 변환)
@@ -15,20 +17,14 @@
  *   - 소프트 탈퇴:      PATCH /kpa/members/:id/status  status=withdrawn (bulk)
  */
 
-import { useState, useEffect, useMemo, useRef } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef } from 'react';
 import { toast } from '@o4o/error-handling';
 import {
   CheckCircle,
-  XCircle,
   UserCheck,
   UserX,
-  Loader2,
-  AlertCircle,
-  RefreshCw,
   ShieldAlert,
 } from 'lucide-react';
-import { ConfirmActionDialog } from '@o4o/ui';
 import {
   KpaEditUserModal,
   type ApiRequestFn,
@@ -42,14 +38,12 @@ import {
 } from '@o4o/operator-core-ui/modules/members';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getBusinessEntityTypeLabel } from '@o4o/types';
-import { ACTIVITY_TYPE_LABELS, useAuth } from '../../contexts/AuthContext';
-import { ROLES } from '../../lib/role-constants';
+import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
 import { apiClient, coreApiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
 
 type MemberStatus = 'pending' | 'active' | 'suspended' | 'rejected' | 'withdrawn';
-type ApplicationStatus = 'submitted' | 'approved' | 'rejected' | 'cancelled';
 
 interface KpaMemberRaw {
   id: string;
@@ -81,24 +75,6 @@ interface KpaUserData extends UserData {
   business_info: KpaMemberForEdit['business_info'];
   joined_at: string | null;
   kpa_user_id: string;
-}
-
-interface KpaApplication {
-  id: string;
-  user_id: string;
-  type: string;
-  status: ApplicationStatus;
-  note: string | null;
-  review_comment: string | null;
-  created_at: string;
-  user?: { name?: string; email?: string };
-}
-
-interface ApplicationStats {
-  submitted: number;
-  approved: number;
-  rejected: number;
-  cancelled: number;
 }
 
 interface BatchResultShape {
@@ -140,13 +116,6 @@ function formatDate(dateStr: string | null | undefined): string {
   if (!dateStr) return '-';
   return new Date(dateStr).toLocaleDateString('ko-KR');
 }
-
-const appStatusConfig: Record<ApplicationStatus, { label: string; color: string; bg: string }> = {
-  submitted: { label: '대기', color: 'text-amber-700', bg: 'bg-amber-50' },
-  approved: { label: '승인', color: 'text-green-700', bg: 'bg-green-50' },
-  rejected: { label: '반려', color: 'text-red-700', bg: 'bg-red-50' },
-  cancelled: { label: '취소', color: 'text-slate-500', bg: 'bg-slate-100' },
-};
 
 function kpaMemberToUserData(m: KpaMemberRaw): KpaUserData {
   return {
@@ -205,35 +174,9 @@ async function fanOutStatusBatch(
 // ─── Component ───────────────────────────────────────────────
 
 export default function MemberManagementPage() {
-  // outer tab — 회원 관리 vs 가입 신청서 (외부 렌더링)
-  // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1 deeplink 호환:
-  //   /operator/members?tab=applications | status-pending(=wrapper inner 'pending') 만 의미 보존.
-  const [searchParams] = useSearchParams();
-
-  // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1 (Scope 5):
-  //   가입 신청서(KpaApplication) 검토는 백엔드가 requireScope('kpa:admin') 로 admin 전용이다
-  //   (/applications/admin/all · /admin/stats · /:id/review 전부). 그런데 이 탭이 kpa:operator 에게도
-  //   노출돼 클릭 시 전부 403 이 되는 죽은 동선이었다. 정책 확장이 아니라 UI 를 기존 백엔드 계약에 정렬한다.
-  const { user } = useAuth();
-  const canReviewApplications = !!user && (
-    user.roles.includes(ROLES.KPA_ADMIN) ||
-    user.roles.includes(ROLES.PLATFORM_SUPER_ADMIN) ||
-    user.membershipRole === 'admin'
-  );
-
-  const initialOuter =
-    canReviewApplications && searchParams.get('tab') === 'applications' ? 'applications' : 'members';
-  const [outerView, setOuterView] = useState<'members' | 'applications'>(initialOuter);
-
-  const [appStats, setAppStats] = useState<ApplicationStats | null>(null);
-  const reloadAppStats = () => {
-    // admin 전용 stats — operator 는 403 이므로 호출 자체를 생략한다(죽은 요청/콘솔 403 제거).
-    if (!canReviewApplications) return;
-    apiClient.get<{ data: ApplicationStats }>('/applications/admin/stats')
-      .then((r) => setAppStats(r.data))
-      .catch(() => {});
-  };
-  useEffect(() => { reloadAppStats(); }, [canReviewApplications]);
+  // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1:
+  //   가입 신청서(KpaApplication) outer tab·deeplink(?tab=applications)·stats 제거 — dead flow.
+  //   회원 승인 canonical 화면만 유지. (?tab=applications 딥링크는 아래 wrapper 가 무시하고 회원 목록 렌더.)
 
   // member.id → user_id 매핑 — wrapper 의 password modal 이 user.id (=member.id) 만
   // 넘기는데, /operator/members/:userId 는 실제 users.id 가 필요하므로 list/listAll 시점에 적재.
@@ -353,38 +296,9 @@ export default function MemberManagementPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
-      {/* Outer view toggle: 회원 관리 (wrapper) vs 가입 신청서 (ApplicationsTab 외부) */}
-      <div className="mb-6 flex items-center gap-2 border-b border-slate-200">
-        <button
-          type="button"
-          onClick={() => setOuterView('members')}
-          className={
-            outerView === 'members'
-              ? 'px-4 py-2 -mb-px text-sm font-medium border-b-2 border-primary-600 text-primary-700'
-              : 'px-4 py-2 -mb-px text-sm font-medium text-slate-500 hover:text-slate-700'
-          }
-        >
-          회원 관리
-        </button>
-        {canReviewApplications && (
-          <button
-            type="button"
-            onClick={() => setOuterView('applications')}
-            className={
-              outerView === 'applications'
-                ? 'px-4 py-2 -mb-px text-sm font-medium border-b-2 border-primary-600 text-primary-700'
-                : 'px-4 py-2 -mb-px text-sm font-medium text-slate-500 hover:text-slate-700'
-            }
-          >
-            가입 신청서 {appStats?.submitted ? `(${appStats.submitted})` : ''}
-          </button>
-        )}
-      </div>
-
-      {canReviewApplications && outerView === 'applications' ? (
-        <ApplicationsTab onReviewComplete={reloadAppStats} />
-      ) : (
-        <OperatorMembersConsolePage
+      {/* WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: 가입 신청서(ApplicationsTab) outer tab 제거 —
+          회원 승인 canonical 화면(OperatorMembersConsolePage)만 렌더. */}
+      <OperatorMembersConsolePage
           serviceKey="kpa-society"
           client={client}
           title="회원 관리"
@@ -517,7 +431,6 @@ export default function MemberManagementPage() {
             },
           ]}
         />
-      )}
     </div>
   );
 }
@@ -720,193 +633,3 @@ function KpaDrawerSections({ user }: { user: KpaUserData }) {
     </div>
   );
 }
-
-// ─── ApplicationsTab (외부 유지 — wrapper 가 표현 불가한 영역) ──
-
-function ApplicationsTab({ onReviewComplete }: { onReviewComplete: () => void }) {
-  const [apps, setApps] = useState<KpaApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [statusFilter, setStatusFilter] = useState<string>('submitted');
-  const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const [reviewComment, setReviewComment] = useState('');
-  const [reviewTarget, setReviewTarget] = useState<string | null>(null);
-  const [pendingReview, setPendingReview] = useState<{ id: string; status: 'approved' | 'rejected' } | null>(null);
-
-  const fetchApps = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const reqParams: Record<string, string | number | boolean | undefined> = { page, limit: 20 };
-      if (statusFilter) reqParams.status = statusFilter;
-      const res = await apiClient.get<{ data: KpaApplication[]; total: number; totalPages: number }>(
-        '/applications/admin/all', reqParams,
-      );
-      setApps(res.data);
-      setTotalPages(res.totalPages);
-    } catch (e: any) {
-      setError(e.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    void fetchApps();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [page, statusFilter]);
-
-  function requestReview(appId: string, status: 'approved' | 'rejected') {
-    setPendingReview({ id: appId, status });
-  }
-
-  async function executeReview() {
-    if (!pendingReview) return;
-    setActionLoading(pendingReview.id);
-    try {
-      await apiClient.patch(`/applications/${pendingReview.id}/review`, {
-        status: pendingReview.status, review_comment: reviewComment || undefined,
-      });
-      setReviewTarget(null);
-      setReviewComment('');
-      setPendingReview(null);
-      await fetchApps();
-      onReviewComplete();
-    } catch (e: any) {
-      toast.error(e.message || '처리에 실패했습니다.');
-    } finally {
-      setActionLoading(null);
-    }
-  }
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-20 text-slate-400">
-        <Loader2 className="w-5 h-5 animate-spin mr-2" />신청 목록을 불러오는 중...
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 text-red-500">
-        <AlertCircle className="w-6 h-6 mb-2" />
-        <p className="text-sm">{error}</p>
-        <button onClick={fetchApps} className="mt-3 text-sm text-blue-600 hover:underline">다시 시도</button>
-      </div>
-    );
-  }
-
-  return (
-    <div>
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-slate-100">
-        <select
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
-          className="text-sm border border-slate-300 rounded-md px-3 py-1.5 bg-white"
-        >
-          <option value="">전체</option>
-          <option value="submitted">대기</option>
-          <option value="approved">승인</option>
-          <option value="rejected">반려</option>
-          <option value="cancelled">취소</option>
-        </select>
-        <button onClick={fetchApps} className="text-sm text-slate-500 hover:text-slate-700">
-          <RefreshCw className="w-4 h-4" />
-        </button>
-      </div>
-
-      <div className="overflow-x-auto">
-      <table className="w-full text-sm min-w-[680px]">
-        <thead>
-          <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase">
-            <th className="px-4 py-3 font-medium">신청자</th>
-            <th className="px-4 py-3 font-medium">이메일</th>
-            <th className="px-4 py-3 font-medium">유형</th>
-            <th className="px-4 py-3 font-medium">신청일</th>
-            <th className="px-4 py-3 font-medium">상태</th>
-            <th className="px-4 py-3 font-medium">메모</th>
-            <th className="px-4 py-3 font-medium">액션</th>
-          </tr>
-        </thead>
-        <tbody className="divide-y divide-slate-100">
-          {apps.length === 0 ? (
-            <tr><td colSpan={7} className="px-4 py-12 text-center text-slate-400">
-              {statusFilter === 'submitted' ? '대기 중인 신청이 없습니다.' : '신청 내역이 없습니다.'}
-            </td></tr>
-          ) : apps.map((app) => {
-            const sc = appStatusConfig[app.status];
-            return (
-              <tr key={app.id} className="hover:bg-slate-50">
-                <td className="px-4 py-3 font-medium text-slate-900">{app.user?.name || '-'}</td>
-                <td className="px-4 py-3 text-slate-600">{app.user?.email || '-'}</td>
-                <td className="px-4 py-3 text-slate-600">
-                  {app.type === 'membership' ? '회원가입' : app.type === 'service' ? '서비스' : app.type}
-                </td>
-                <td className="px-4 py-3 text-slate-500">{formatDate(app.created_at)}</td>
-                <td className="px-4 py-3">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${sc.color} ${sc.bg}`}>{sc.label}</span>
-                </td>
-                <td className="px-4 py-3 text-slate-500 max-w-[160px] truncate" title={app.note || ''}>{app.note || '-'}</td>
-                <td className="px-4 py-3">
-                  {app.status === 'submitted' ? (
-                    actionLoading === app.id ? (
-                      <Loader2 className="w-4 h-4 animate-spin text-slate-400" />
-                    ) : reviewTarget === app.id ? (
-                      <div className="flex flex-col gap-1">
-                        <input
-                          type="text"
-                          value={reviewComment}
-                          onChange={(e) => setReviewComment(e.target.value)}
-                          placeholder="코멘트 (선택)"
-                          className="text-xs border border-slate-300 rounded px-2 py-1 w-36"
-                        />
-                        <div className="flex gap-1">
-                          <button onClick={() => requestReview(app.id, 'approved')} className="px-2 py-0.5 text-xs bg-green-600 text-white rounded hover:bg-green-700">승인</button>
-                          <button onClick={() => requestReview(app.id, 'rejected')} className="px-2 py-0.5 text-xs bg-red-500 text-white rounded hover:bg-red-600">반려</button>
-                          <button onClick={() => { setReviewTarget(null); setReviewComment(''); }} className="px-2 py-0.5 text-xs text-slate-500 hover:underline">취소</button>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="flex gap-1">
-                        <button onClick={() => requestReview(app.id, 'approved')} className="p-1 text-green-600 hover:bg-green-50 rounded" title="승인"><CheckCircle className="w-4 h-4" /></button>
-                        <button onClick={() => setReviewTarget(app.id)} className="p-1 text-red-500 hover:bg-red-50 rounded" title="반려"><XCircle className="w-4 h-4" /></button>
-                      </div>
-                    )
-                  ) : (
-                    <span className="text-xs text-slate-400">{app.review_comment ? `"${app.review_comment}"` : '-'}</span>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      </div>
-
-      {totalPages > 1 && (
-        <div className="flex items-center justify-center gap-2 py-4 border-t border-slate-100">
-          <button disabled={page <= 1} onClick={() => setPage((p) => p - 1)} className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-40">이전</button>
-          <span className="text-sm text-slate-600">{page} / {totalPages}</span>
-          <button disabled={page >= totalPages} onClick={() => setPage((p) => p + 1)} className="px-3 py-1 text-sm border border-slate-300 rounded-md disabled:opacity-40">다음</button>
-        </div>
-      )}
-
-      <ConfirmActionDialog
-        open={!!pendingReview}
-        onClose={() => setPendingReview(null)}
-        onConfirm={executeReview}
-        title={pendingReview?.status === 'approved' ? '가입 승인 확인' : '가입 반려 확인'}
-        message={pendingReview?.status === 'approved'
-          ? '이 가입 신청을 승인하시겠습니까?'
-          : '이 가입 신청을 반려하시겠습니까?'}
-        confirmText={pendingReview?.status === 'approved' ? '승인' : '반려'}
-        variant={pendingReview?.status === 'rejected' ? 'danger' : 'default'}
-        loading={!!actionLoading}
-      />
-    </div>
-  );
-}
-
