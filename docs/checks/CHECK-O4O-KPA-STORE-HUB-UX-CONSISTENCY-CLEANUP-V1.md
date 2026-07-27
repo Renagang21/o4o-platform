@@ -192,13 +192,166 @@ WO §16 완료 기준 중 다음이 충족된다.
 
 ---
 
-## 7. 다음 단계
+## 7. 승인된 범위
 
-1. 본 §5 범위 승인
-2. A 군 구현 → KPA typecheck/build
-3. 배포 → 프로덕션 smoke (10화면 렌더 + 홈 피드 + 메뉴 + 가져오기 안내)
-4. 본 문서에 구현 결과·변경 파일·smoke 결과 추가 후 commit/push
+사용자 확정: **A-1 ~ A-7 만 구현. B-1 ~ B-5 는 별도 WO 로 분리.**
+B-2 는 `WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1` 로 후속 진행.
 
 ---
 
-*조사 완료: 2026-07-27 — 구현 미착수*
+# 구현 결과
+
+## 8. 조사 표 정정 (§3)
+
+구현 중 확인한 사실로 조사 표 1건을 정정한다.
+
+| 항목 | 조사 시 기재 | 실제 |
+|------|--------------|------|
+| `/store-hub/signage` 가져온 사본 확인 경로 | ✗ 없음 (토스트만) | **정적 안내는 있었다** — `/store/marketing/signage` 링크가 하단에 상시 노출. 없던 것은 **가져오기 직후의 확인 CTA** 였다. A-6 는 이 부분만 보강했다. |
+
+## 9. 변경 내역 (11파일 · KPA 프론트 전용)
+
+| 항목 | 파일 | 내용 |
+|------|------|------|
+| **A-1** | `HubBlogLibraryPage.tsx` | 수제 이전/다음 → 표준 `Pagination`. POP/QR/동영상/사이니지는 기이관 상태였고 블로그만 잔존 |
+| **A-2** | `HubMultilingualContentLibraryPage.tsx` | 수제 이전/다음 → 표준 `Pagination` |
+| **A-3** | `HubBlog·Pop·Qr·Video·Signage·ScreenSet·B2BCatalogPage.tsx` + `StoreHubLatestFeed.tsx` | `sortable`/`sortAccessor` 제거. 재도입 조건(`manualSort`+`onSort`)을 주석에 명시 |
+| **A-4** | `PharmacyHubLayout.tsx` | '다국어 상품 콘텐츠' 메뉴 추가 (`약국 상품·거래` 그룹 끝 — 구매 흐름 3항목을 끊지 않는 위치) |
+| **A-5** | `HubBlog·Pop·Qr·Video·SignageLibraryPage.tsx` + `HubMultilingualContentLibraryPage.tsx` | 사본 정책 안내 표준화 (아래 §9.1) |
+| **A-6** | `HubSignageLibraryPage.tsx` | 가져오기 직후 확인 배너 + canonical 목록 링크. 탭 전환 시 배너 해제 |
+| **A-7** | `StoreHubLatestFeed.tsx` | 블로그 → 최신 콘텐츠 / 태블렛 화면 → 최신 디지털 자료 / 다국어 → 홈 미포함 |
+
+commit: `a71de1f64` (A-1~A-7) · `c5809eb58` (A-6 후속 — 탭 전환 시 배너 해제)
+
+### 9.1 A-5 — 실제 중복 정책이 3갈래였다
+
+WO 는 문구를 2종으로 상정했으나, backend 를 확인하니 **3갈래**였고 그중 하나는 WO 의 어느 문구와도 맞지 않았다.
+
+| 자원 | backend 실제 동작 | 근거 | 적용 문구 |
+|------|-------------------|------|-----------|
+| 블로그 / POP / QR / 동영상 | 매번 사본 **INSERT** (중복 차단 없음. `existingBase` 조회는 slug 충돌 회피용) | [blog.controller.ts:499](../../apps/api-server/src/routes/o4o-store/controllers/blog.controller.ts#L499) | "…독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 **새로운 사본이 생성됩니다**." |
+| 사이니지 (asset-snapshot) | 매번 새 snapshot. UNIQUE 제약이 **제거됨** | [DropUniqueConstraintAssetSnapshots20260920000000](../../apps/api-server/src/database/migrations/20260920000000-DropUniqueConstraintAssetSnapshots.ts) | 위와 동일 (값 복사형) |
+| 다국어 상품 콘텐츠 | `ON CONFLICT (organization_id, target_kind, target_id, content_key) DO UPDATE` → **덮어쓰기** | [multilingual-product-content.controller.ts:669-682](../../apps/api-server/src/routes/o4o-store/controllers/multilingual-product-content.controller.ts#L669-L682) | "…같은 상품에 다시 가져오면 **새 사본이 생기지 않고 기존 사본이 원본의 최신 내용으로 덮어쓰기** 됩니다." |
+
+- **사이니지에 "중복 추가되지 않을 수 있습니다" 를 쓰지 않았다.** WO 는 사이니지를 중복 차단형으로 상정했으나, UNIQUE 제약이 이미 제거되어 실제로는 새 사본이 생긴다. 화면의 `DUPLICATE_SNAPSHOT` catch 분기는 해당 migration 이후 dead path 이며, 방어적으로 유지하되 안내 문구는 실제 동작을 따랐다.
+- QR 은 사본마다 매장 slug 가 새로 발급되므로 그 점을 문구에 포함했다.
+
+### 9.2 A-7 — 홈 3영역 의미 유지
+
+```text
+새로 공급 가능한 상품   ← 상품 Offer                                    (4행, 변경 없음)
+최신 콘텐츠             ← 콘텐츠 허브 + CMS + 블로그                      (4행 유지)
+최신 디지털 자료         ← POP + QR + 동영상 + 사이니지 + 태블렛 화면       (5행 유지)
+다국어 상품 콘텐츠       ← 홈 미포함
+```
+
+- **행 수를 늘리지 않았다.** 소스만 추가해 최신순으로 경쟁시키고 기존 `PREVIEW_ROWS`(4) / `PREVIEW_ROWS_DIGITAL`(5) 를 그대로 유지했다.
+- 태블렛 화면은 공통 `/hub/contents` 에 없어 **전용 HUB API `listOperatorTemplates()` 를 읽기 전용으로 호출**해 병합했다 → **backend 변경 0**. 실패 시 `try/catch` 로 해당 자원만 조용히 제외하고 섹션 전체를 오류로 만들지 않는다.
+- 콘텐츠 섹션이 혼합 소스가 되어, 행 클릭 대상을 항목별 `route` 로 분기하고 헤더의 '전체 보기' 도 `콘텐츠 / 블로그` 2개로 나눴다(디지털 자료 섹션과 동일 패턴).
+
+## 10. 게이트 · 배포
+
+| 항목 | 결과 |
+|------|------|
+| KPA `tsc --noEmit` | **PASS** (exit 0) |
+| `npm run build` | **PASS** (exit 0, built in 21.88s) |
+| 배포 workflow | `deploy-web-services.yml` run `30275476358` — **success** |
+| detect-changes | `deploy-kpa-society` 만 선택 / glycopharm·k-cosmetics·neture **skipped** |
+| 리비전 | `kpa-society-web-01728-f65` |
+
+> 로컬 메모리 여유가 0.2GB 까지 떨어져 `tsc`/`vite` 가 기동 단계에서 OOM 으로 죽는 일이 있었다.
+> 병렬 세션 프로세스는 건드리지 않고 재시도만으로 통과시켰다 (typecheck 2회차, build 1회차 성공).
+
+## 11. 프로덕션 smoke — 10화면
+
+계정: 약국 경영자 `renagang21@gmail.com` / 조직 `테스트 약국 매장`. read-only(가져오기·저장 mutation 없음).
+
+| 화면 | h1 | console error | HTTP 4xx/5xx | 정렬 헤더 | 수제 pager |
+|------|-----|:---:|:---:|:---:|:---:|
+| `/store-hub` | 약국 운영 허브 | 0 | 0 | **0** | **0** |
+| `/store-hub/content` | 약국에서 바로 쓰는 콘텐츠 | 0 | 0 | **0** | **0** |
+| `/store-hub/blog` | 매장 HUB 블로그 | 0 | 0 | **0** | **0** |
+| `/store-hub/pop` | 매장 HUB POP | 0 | 0 | **0** | **0** |
+| `/store-hub/qr` | 매장 HUB QR-code | 0 | 0 | **0** | **0** |
+| `/store-hub/video` | 매장 HUB 동영상 | 0 | 0 | **0** | **0** |
+| `/store-hub/signage` | 플랫폼 디지털사이니지 | 0 | 0 | **0** | **0** |
+| `/store-hub/screen-set` | 태블렛 화면 (HUB) | 0 | 0 | **0** | **0** |
+| `/store-hub/multilingual-product-contents` | 매장 HUB 다국어 상품 콘텐츠 | 0 | 0 | **0** | **0** |
+| `/store-hub/b2b` | 상품 카탈로그 | 0 | 0 | **0** | **0** |
+
+**A-3 PASS** — 10화면 전부 `th[aria-sort]` / 정렬 버튼 0개.
+**A-1·A-2 PASS** — 수제 이전/다음 잔여 0.
+
+### A-4 메뉴 (PASS)
+
+```text
+사이드바: 홈 / 상품 카탈로그 / 이벤트·특가 / 장바구니 / 다국어 상품 콘텐츠
+          / 블로그 / POP / QR-code / 동영상 / 사이니지 콘텐츠 / 태블렛 화면 / 콘텐츠 가져오기
+메뉴 클릭 → https://kpa-society.co.kr/store-hub/multilingual-product-contents  ✅
+```
+
+### A-7 홈 (PASS)
+
+```text
+섹션      : 새로 공급 가능한 상품 / 새로운 콘텐츠 / 새로운 디지털 자료   (3영역 유지)
+전체 보기 : 콘텐츠 · 블로그 · POP · QR 템플릿 · 동영상 · 사이니지 · 태블렛 화면   (7개)
+```
+
+### A-5 문구 (부분 실증)
+
+| 화면 | 실렌더 | 사유 |
+|------|:------:|------|
+| 블로그 | ✅ 값 복사형 문구 노출 | 운영자 published 블로그 **1건** 존재 |
+| 사이니지 | ✅ 값 복사형 문구 노출 | 안내가 상시 노출 구조 |
+| 다국어 | ✅ 덮어쓰기 문구 노출 | 안내가 헤더에 상시 노출 |
+| POP · QR · 동영상 | **미노출** | **원본 0건** — 안내가 `slug && items.length > 0` 조건부 footer 라 렌더되지 않음 |
+
+프로덕션 원본 건수 (read-only 확인):
+
+```sql
+store_blog_posts   (operator, published) → kpa 1건
+store_pops         (operator)            → 0건
+store_videos       (operator)            → 0건
+operator_qr_templates                    → 0건
+store_tablet_screen_sets (operator 원본)  → 0건
+```
+
+→ **POP/QR/동영상의 문구 미노출은 구현 누락이 아니라 데이터 부재**다. 코드 반영은 커밋 `a71de1f64` diff 로 확인되며, 동일 조건부 구조를 쓰는 블로그가 실제로 렌더된 것으로 패턴이 실증된다.
+→ 같은 이유로 **홈 '최신 디지털 자료' 의 태블렛 화면 행도 실증되지 않았다**(원본 0건). 편입 자체는 섹션 헤더의 '태블렛 화면 전체 보기' 링크 노출로 확인된다.
+
+## 12. 완료 기준 대조 (WO §16)
+
+| 기준 | 결과 |
+|------|------|
+| 검색 UI 와 실제 서버 결과 일치 | ✅ 검색 UI 를 새로 추가하지 않았으므로 불일치 없음 (B-1 분리) |
+| 현재 페이지만 정렬하는 오해 제거 | ✅ 10화면 실측 0 |
+| 태블렛 화면 HUB 표준 페이지네이션 | ⏭ **B-2 로 분리** (`WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1`) |
+| 홈 피드 자원 분류 확정 | ✅ 3영역 유지 + 행 수 유지 |
+| 다국어 상품 콘텐츠 메뉴 위치 확정 | ✅ 매장 HUB 사이드바, 클릭 진입 실측 |
+| 중복 가져오기 안내 정합 | ✅ 실제 정책 3갈래에 맞춰 분기 (§9.1) |
+| 빈 상태·오류·성공 안내 정비 | ✅ A-6 확인 배너 + A-5 문구 |
+| 기존 가져오기·사본 계약 무변경 | ✅ backend·DB·API 무변경 |
+| KPA typecheck/build PASS | ✅ |
+| 프로덕션 smoke PASS | ✅ (§11, 일부 항목 데이터 부재로 미실증 — 정직 보고) |
+| CHECK 작성 · path-specific commit/push | ✅ |
+
+## 13. 범위 제외 확인
+
+```text
+B-1 공통 HUB 검색 API 확장      — 미착수
+B-2 태블렛 화면 서버 페이지네이션 — 미착수 (후속 WO)
+B-3 사이니지 출처 필터 서버 이관  — 미착수
+B-4 이미 가져온 항목 표시        — 미착수
+B-5 F2 / F3 / N-5               — 미착수 (기록만)
+GP/KCos                         — 무변경 (코드·배포 모두)
+backend / DB / migration        — 무변경
+데이터 계약                      — 무변경
+```
+
+병렬 세션이 동시 수정 중이던 파일(`PharmacySellPage.tsx`, `ProductMarketingPage.tsx`,
+`StoreAssetsPage.tsx`, `StoreRecruitmentApplicationsPage.tsx`, `web-neture/**`, `apps/api-server/**`)은
+**커밋에 포함하지 않았다** — pathspec 으로 A군 11파일만 지정해 커밋했다.
+
+---
+
+*조사: 2026-07-27 · 구현·배포·smoke 완료: 2026-07-27*
