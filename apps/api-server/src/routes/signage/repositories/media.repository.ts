@@ -1,6 +1,7 @@
 import { DataSource, Repository } from 'typeorm';
 import { SignageMedia } from '@o4o-apps/digital-signage-core/entities';
 import type { MediaQueryDto, ScopeFilter } from '../dto/index.js';
+import { SignageMediaUsageService, type MediaUsageResult } from '../services/media-usage.service.js';
 
 export class SignageMediaRepository {
   private mediaRepo: Repository<SignageMedia>;
@@ -107,42 +108,68 @@ export class SignageMediaRepository {
   }
 
   /**
-   * Hard delete media — WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+   * Hard delete media — WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1
    *
-   * Cascade (auto by FK):
-   *   signage_playlist_items (onDelete: CASCADE)
-   *   signage_media_tags     (onDelete: CASCADE)
+   * 사용처 가드 기반 안전 삭제. CASCADE 를 삭제 정책으로 쓰지 않고, 사용 중이면 차단한다.
    *
-   * Manual cleanup before delete:
-   *   o4o_asset_snapshots.source_asset_id — no FK constraint, orphan-safe cleanup
+   * TOCTOU 방지를 위해 단일 트랜잭션에서:
+   *   1. media 행 SELECT ... FOR UPDATE (락)
+   *   2. 사용처 재계산 (동일 트랜잭션 executor) — 사용 중이면 아무것도 삭제하지 않고 409 반환
+   *   3. tags 정리 (명시적; FK CASCADE 와 중복이나 순서 보장)
+   *   4. orphan snapshot 만 정리 — store_playlist_items 가 참조하지 않는 것만
+   *      (사용 중이 아님이 재확인됐으므로 이 미디어의 signage snapshot 은 전부 orphan)
+   *   5. media 물리 삭제 (직접 참조 playlist item 0 개 확인됨 → CASCADE 로 사라지는 실사용 항목 없음)
    *
-   * Not cleaned (acceptable orphans):
-   *   signage_analytics.entityId — loose reference, historical data retention
+   * 참고(삭제 대상 아님): signage_analytics.entityId (loose ref, 이력 보존),
+   *   signage_forced_content (video_url 독립), signage_schedules (playlist 참조).
+   *
+   * 파일 스토리지: 현재 미디어는 URL 기반(youtube/vimeo) 또는 외부 버킷 참조이며
+   *   기존 삭제 경로에 스토리지 물리 삭제가 없다. atomicity 리스크 회피를 위해 추가하지 않는다.
    */
   async hardDeleteMedia(
     id: string,
     scope: ScopeFilter,
-  ): Promise<{ deleted: boolean; code?: string }> {
-    const media = await this.mediaRepo.findOne({
-      where: {
-        id,
-        serviceKey: scope.serviceKey,
-        ...(scope.organizationId && { organizationId: scope.organizationId }),
-      },
-      withDeleted: true,
+  ): Promise<{ deleted: boolean; code?: string; usage?: MediaUsageResult }> {
+    const usageService = new SignageMediaUsageService(this.dataSource);
+
+    return this.dataSource.transaction(async (manager) => {
+      // 1. media 행 락 (soft-deleted 포함, deletedAt 미필터). serviceKey/org scope 준수.
+      const lockRows: Array<{ id: string }> = await manager.query(
+        `SELECT id FROM signage_media
+          WHERE id = $1 AND "serviceKey" = $2
+            ${scope.organizationId ? 'AND "organizationId" = $3' : ''}
+          FOR UPDATE`,
+        scope.organizationId ? [id, scope.serviceKey, scope.organizationId] : [id, scope.serviceKey],
+      );
+      if (!lockRows || lockRows.length === 0) {
+        return { deleted: false, code: 'MEDIA_NOT_FOUND' };
+      }
+
+      // 2. 트랜잭션 내부 사용처 재계산 (TOCTOU 방지)
+      const usage = await usageService.computeUsage(id, manager);
+      if (usage.inUse) {
+        return { deleted: false, code: 'SIGNAGE_MEDIA_IN_USE', usage };
+      }
+
+      // 3. 태그 정리 (명시적)
+      await manager.query(`DELETE FROM signage_media_tags WHERE "mediaId" = $1`, [id]);
+
+      // 4. orphan snapshot 만 정리 (참조 중 snapshot 은 위 가드로 이미 차단됨 → 여기선 전부 orphan)
+      await manager.query(
+        `DELETE FROM o4o_asset_snapshots s
+          WHERE s.source_asset_id = $1
+            AND s.asset_type = 'signage'
+            AND NOT EXISTS (
+              SELECT 1 FROM store_playlist_items spi WHERE spi.snapshot_id = s.id
+            )`,
+        [id],
+      );
+
+      // 5. media 물리 삭제
+      await manager.query(`DELETE FROM signage_media WHERE id = $1`, [id]);
+
+      return { deleted: true };
     });
-    if (!media) return { deleted: false, code: 'MEDIA_NOT_FOUND' };
-
-    // Clean up orphan asset snapshots (no FK — must be manual)
-    await this.dataSource.query(
-      `DELETE FROM o4o_asset_snapshots WHERE source_asset_id = $1`,
-      [id],
-    );
-
-    // Physical delete — playlist_items and media_tags cascade automatically
-    await this.mediaRepo.delete({ id });
-
-    return { deleted: true };
   }
 
   async findMediaLibrary(

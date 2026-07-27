@@ -344,6 +344,23 @@ export class SignageGlobalContentController {
 
       const result = await this.service.deleteCommunityMedia(id, userId, scope);
       if (!result.deleted) {
+        // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 4): 사용 중 409
+        if (result.code === 'SIGNAGE_MEDIA_IN_USE') {
+          res.status(409).json({
+            success: false,
+            code: 'SIGNAGE_MEDIA_IN_USE',
+            error: '사용 중인 사이니지 미디어는 삭제할 수 없습니다. 먼저 모든 사용처에서 연결을 제거하세요.',
+            usage: result.usage
+              ? {
+                  hqPlaylists: result.usage.directPlaylistUsageCount,
+                  storePlaylists: result.usage.storePlaylistUsageCount,
+                  stores: result.usage.storeCount,
+                  detail: result.usage.usages,
+                }
+              : undefined,
+          });
+          return;
+        }
         const status = result.code === 'NOT_FOUND' ? 404 : result.code === 'NOT_OWNER' ? 403 : 400;
         res.status(status).json({ success: false, error: result.code });
         return;

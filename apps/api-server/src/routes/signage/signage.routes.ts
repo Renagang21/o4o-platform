@@ -244,8 +244,13 @@ export function createSignageRoutes(dataSource: DataSource): Router {
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
   router.delete('/hq/playlists/:id', requireSignageOperator, playlistCtrl.hardDeletePlaylist);
 
+  // GET /api/signage/:serviceKey/hq/media/:id/usage - Media usage lookup (Operator only)
+  // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 3)
+  router.get('/hq/media/:id/usage', requireSignageOperator, mediaCtrl.getMediaUsage);
+
   // DELETE /api/signage/:serviceKey/hq/media/:id - Hard delete HQ media (Operator only)
   // WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+  // + WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 4/5): 사용 중 409 차단
   router.delete('/hq/media/:id', requireSignageOperator, mediaCtrl.hardDeleteMedia);
 
   // ========== Forced Content Routes (WO-KPA-SIGNAGE-FORCED-CONTENT-IMPLEMENTATION-V1) ==========

@@ -1,6 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import type { DataSource } from 'typeorm';
 import { SignageMediaService } from '../services/media.service.js';
+import type { MediaUsageResult } from '../services/media-usage.service.js';
 import { extractScope, extractUserId } from './signage-helpers.js';
 import type {
   CreateMediaDto,
@@ -13,6 +14,16 @@ export class SignageMediaController {
 
   constructor(dataSource: DataSource) {
     this.service = new SignageMediaService(dataSource);
+  }
+
+  /** 409 응답용 사용처 요약 페이로드 (WO Scope 4). */
+  static toUsagePayload(usage: MediaUsageResult) {
+    return {
+      hqPlaylists: usage.directPlaylistUsageCount,
+      storePlaylists: usage.storePlaylistUsageCount,
+      stores: usage.storeCount,
+      detail: usage.usages,
+    };
   }
 
   getMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -103,13 +114,47 @@ export class SignageMediaController {
     }
   };
 
-  /** WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1 */
+  /**
+   * 미디어 사용처 조회
+   * WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 3)
+   */
+  getMediaUsage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+      const scope = extractScope(req);
+      const { id } = req.params;
+
+      const usage = await this.service.getMediaUsage(id, scope);
+      if (!usage) {
+        res.status(404).json({ success: false, error: 'Media not found', code: 'MEDIA_NOT_FOUND' });
+        return;
+      }
+
+      res.json({ success: true, data: usage });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  /**
+   * WO-KPA-SOCIETY-OPERATOR-SIGNAGE-CONTENT-HARD-DELETE-POLICY-V1
+   * + WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 4/5):
+   *   사용 중이면 409 SIGNAGE_MEDIA_IN_USE — 아무것도 삭제하지 않고 사용처 요약 반환.
+   */
   hardDeleteMedia = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
       const scope = extractScope(req);
       const { id } = req.params;
 
       const result = await this.service.hardDeleteMedia(id, scope);
+      if (result.code === 'SIGNAGE_MEDIA_IN_USE') {
+        res.status(409).json({
+          success: false,
+          code: 'SIGNAGE_MEDIA_IN_USE',
+          error: '사용 중인 사이니지 미디어는 삭제할 수 없습니다. 먼저 모든 사용처에서 연결을 제거하세요.',
+          usage: result.usage ? SignageMediaController.toUsagePayload(result.usage) : undefined,
+        });
+        return;
+      }
       if (!result.deleted) {
         res.status(404).json({ success: false, error: 'Media not found', code: result.code || 'MEDIA_NOT_FOUND' });
         return;

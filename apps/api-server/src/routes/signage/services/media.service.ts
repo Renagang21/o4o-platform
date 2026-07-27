@@ -1,5 +1,6 @@
 import type { DataSource } from 'typeorm';
 import { SignageMediaRepository } from '../repositories/media.repository.js';
+import { SignageMediaUsageService, type MediaUsageResult } from './media-usage.service.js';
 import { toMediaResponse } from './signage-formatters.js';
 import type {
   CreateMediaDto,
@@ -37,9 +38,24 @@ function extractEmbedId(sourceType: 'youtube' | 'vimeo', url: string): string | 
 
 export class SignageMediaService {
   private repository: SignageMediaRepository;
+  private usageService: SignageMediaUsageService;
 
   constructor(dataSource: DataSource) {
     this.repository = new SignageMediaRepository(dataSource);
+    this.usageService = new SignageMediaUsageService(dataSource);
+  }
+
+  /**
+   * 미디어 사용처 조회 (WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1)
+   * scope 내 미디어인지 먼저 확인 후 사용처를 계산한다.
+   */
+  async getMediaUsage(
+    id: string,
+    scope: ScopeFilter,
+  ): Promise<MediaUsageResult | null> {
+    const media = await this.repository.findMediaById(id, scope);
+    if (!media) return null;
+    return this.usageService.computeUsage(id);
   }
 
   async getMedia(id: string, scope: ScopeFilter): Promise<MediaResponseDto | null> {
@@ -132,7 +148,7 @@ export class SignageMediaService {
   async hardDeleteMedia(
     id: string,
     scope: ScopeFilter,
-  ): Promise<{ deleted: boolean; code?: string }> {
+  ): Promise<{ deleted: boolean; code?: string; usage?: MediaUsageResult }> {
     return this.repository.hardDeleteMedia(id, scope);
   }
 

@@ -16,6 +16,7 @@ import { Film, RefreshCw, Plus, Trash2, Search, Eye } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
+import MediaDeleteDialog from './MediaDeleteDialog';
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL || '';
 const SERVICE_KEY = 'kpa-society';
@@ -62,12 +63,9 @@ const mediaActionPolicy = defineActionPolicy<MediaItem>('kpa:signage:hq-media', 
       label: '삭제',
       variant: 'danger',
       divider: true,
-      confirm: (row) => ({
-        title: '미디어 완전 삭제',
-        message: `"${row.name}"\n\n삭제 시 연결된 플레이리스트 항목도 함께 제거됩니다.\n이 작업은 되돌릴 수 없습니다.`,
-        variant: 'danger' as const,
-        confirmText: '완전 삭제',
-      }),
+      // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1:
+      //   정적 confirm 대신 사용처 선조회 다이얼로그(MediaDeleteDialog)로 처리한다.
+      //   (사용 중이면 확인창이 아니라 사용처 경고를 띄우기 위함)
     },
   ],
 });
@@ -86,6 +84,7 @@ export default function HqMediaPage() {
   const [showForm, setShowForm] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [deleteTarget, setDeleteTarget] = useState<MediaItem | null>(null);
   const batch = useBatchAction();
 
   // Create form
@@ -301,7 +300,7 @@ export default function HqMediaPage() {
         <RowActionMenu
           actions={buildRowActions(mediaActionPolicy, row, {
             view: () => navigate(`/operator/signage/hq-media/${row.id}`),
-            delete: () => deleteOne(row.id).then(fetchMedia).catch((err: any) => setError(err?.message || '삭제 실패')),
+            delete: () => setDeleteTarget(row),
           }, { icons: MEDIA_ACTION_ICONS })}
         />
       ),
@@ -525,6 +524,17 @@ export default function HqMediaPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* ── 삭제 안전 다이얼로그 (사용처 선조회) ── */}
+      {deleteTarget && (
+        <MediaDeleteDialog
+          media={{ id: deleteTarget.id, name: deleteTarget.name }}
+          apiFetch={apiFetch}
+          serviceKey={SERVICE_KEY}
+          onClose={() => setDeleteTarget(null)}
+          onDeleted={() => { setDeleteTarget(null); fetchMedia(); }}
+        />
       )}
     </>
   );

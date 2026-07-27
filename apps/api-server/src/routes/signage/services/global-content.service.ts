@@ -2,6 +2,7 @@ import type { DataSource } from 'typeorm';
 import { SignageGlobalContentRepository } from '../repositories/global-content.repository.js';
 import { SignagePlaylistRepository } from '../repositories/playlist.repository.js';
 import { SignageMediaRepository } from '../repositories/media.repository.js';
+import { SignageMediaUsageService, type MediaUsageResult } from './media-usage.service.js';
 import {
   toGlobalPlaylistResponse,
   toGlobalMediaResponse,
@@ -24,11 +25,13 @@ export class SignageGlobalContentService {
   private repository: SignageGlobalContentRepository;
   private playlistRepository: SignagePlaylistRepository;
   private mediaRepository: SignageMediaRepository;
+  private usageService: SignageMediaUsageService;
 
   constructor(dataSource: DataSource) {
     this.repository = new SignageGlobalContentRepository(dataSource);
     this.playlistRepository = new SignagePlaylistRepository(dataSource);
     this.mediaRepository = new SignageMediaRepository(dataSource);
+    this.usageService = new SignageMediaUsageService(dataSource);
   }
 
   async getGlobalPlaylists(
@@ -153,7 +156,7 @@ export class SignageGlobalContentService {
     id: string,
     userId: string,
     scope: ScopeFilter,
-  ): Promise<{ deleted: boolean; code?: string }> {
+  ): Promise<{ deleted: boolean; code?: string; usage?: MediaUsageResult }> {
     const globalScope: ScopeFilter = {
       serviceKey: scope.serviceKey,
       organizationId: undefined,
@@ -163,6 +166,14 @@ export class SignageGlobalContentService {
     if (!media) return { deleted: false, code: 'NOT_FOUND' };
     if ((media as any).source !== 'community') return { deleted: false, code: 'NOT_COMMUNITY' };
     if ((media as any).createdByUserId !== userId) return { deleted: false, code: 'NOT_OWNER' };
+
+    // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 4):
+    //   soft delete 라도 playlist resolve 가 deletedAt 를 필터하면 재생에서 사라지므로
+    //   사용 중이면 차단한다. (row/snapshot 은 그대로 두어 dangling 은 생기지 않음)
+    const usage = await this.usageService.computeUsage(id);
+    if (usage.inUse) {
+      return { deleted: false, code: 'SIGNAGE_MEDIA_IN_USE', usage };
+    }
 
     await this.mediaRepository.softDeleteMedia(id, globalScope);
     return { deleted: true };

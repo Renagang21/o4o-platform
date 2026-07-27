@@ -24,6 +24,7 @@ import { Router } from 'express';
 import type { Request, Response, RequestHandler } from 'express';
 import type { DataSource } from 'typeorm';
 import { extractYouTubeVideoId, getYouTubeThumbnail } from '@o4o/types/signage';
+import { SignageMediaUsageService } from '../../signage/services/media-usage.service.js';
 
 const SERVICE_KEY = 'kpa-society';
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -88,6 +89,9 @@ export function createSupplierSignageMediaController(
 ): Router {
   const router = Router();
   router.use(requireAuth);
+
+  // WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 7): 사용처 가드
+  const usageService = new SignageMediaUsageService(dataSource);
 
   /** neture_suppliers ACTIVE 확인 (supplier-screen-set.controller 패턴 재사용) */
   async function requireSupplier(req: AuthedRequest, res: Response): Promise<string | null> {
@@ -276,10 +280,48 @@ export function createSupplierSignageMediaController(
 
   // DELETE /:id — soft delete. active 는 먼저 보관해야 함
   //   (캠페인 my-media 조회가 deletedAt 을 보지 않으므로, active 상태 직삭제를 막아 정합 유지)
+  //   WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (Scope 7):
+  //     소유권 가드 유지 + 게시 상태 가드(DELETE_BLOCKED_ACTIVE) 유지 + 사용처 가드 추가.
+  //     active 가 아니어도 HQ/매장에서 사용 중이면 SIGNAGE_MEDIA_IN_USE(409) 로 차단한다.
+  //     (공급자 미디어 사본은 Full Copy snapshot 이라 원본 soft delete 로 매장 사본이 깨지지 않지만,
+  //      직접 참조 사용처가 있으면 재생에서 사라지므로 동일 가드를 적용한다.)
   router.delete('/:id', async (req, res) => {
     const userId = await requireSupplier(req as AuthedRequest, res); if (!userId) return;
     if (!UUID_RE.test(req.params.id)) { res.status(400).json({ success: false, error: 'Invalid id', code: 'VALIDATION_ERROR' }); return; }
     try {
+      // 소유권 + 존재 확인 (OWN_WHERE 에 deletedAt IS NULL 포함 → 이미 삭제된 건 404)
+      const owned = await dataSource.query(
+        `SELECT id, status FROM signage_media WHERE id = $1 AND ${OWN_WHERE.replace('$OWNER', '$2')} LIMIT 1`,
+        [req.params.id, userId],
+      );
+      if (!owned?.[0]) {
+        res.status(404).json({ success: false, error: 'Not found', code: 'SIGNAGE_MEDIA_NOT_FOUND' });
+        return;
+      }
+
+      // 사용처 가드 (active 여부와 무관하게 우선 차단)
+      const usage = await usageService.computeUsage(req.params.id);
+      if (usage.inUse) {
+        res.status(409).json({
+          success: false,
+          code: 'SIGNAGE_MEDIA_IN_USE',
+          error: '사용 중인 사이니지 미디어는 삭제할 수 없습니다. 먼저 모든 사용처에서 연결을 제거하세요.',
+          usage: {
+            hqPlaylists: usage.directPlaylistUsageCount,
+            storePlaylists: usage.storePlaylistUsageCount,
+            stores: usage.storeCount,
+            detail: usage.usages,
+          },
+        });
+        return;
+      }
+
+      // 게시 상태 가드 (기존 계약 유지)
+      if (owned[0].status === 'active') {
+        res.status(409).json({ success: false, error: '게시 중인 사이니지는 먼저 보관해야 삭제할 수 있습니다.', code: 'DELETE_BLOCKED_ACTIVE' });
+        return;
+      }
+
       const upd = await dataSource.query(
         `UPDATE signage_media SET "deletedAt" = NOW(), "updatedAt" = NOW()
          WHERE id = $1 AND ${OWN_WHERE.replace('$OWNER', '$2')} AND status <> 'active'
@@ -288,11 +330,6 @@ export function createSupplierSignageMediaController(
       );
       const row = Array.isArray(upd?.[0]) ? upd[0][0] : upd?.[0];
       if (!row) {
-        const active = await dataSource.query(
-          `SELECT id FROM signage_media WHERE id = $1 AND ${OWN_WHERE.replace('$OWNER', '$2')} AND status = 'active' LIMIT 1`,
-          [req.params.id, userId],
-        );
-        if (active?.[0]) { res.status(409).json({ success: false, error: '게시 중인 사이니지는 먼저 보관해야 삭제할 수 있습니다.', code: 'DELETE_BLOCKED_ACTIVE' }); return; }
         res.status(404).json({ success: false, error: 'Not found', code: 'SIGNAGE_MEDIA_NOT_FOUND' });
         return;
       }
