@@ -18,7 +18,7 @@
 
 **참조 경로 (삭제가 깨뜨릴 수 있는 것):**
 - **FK 직접**: `signage_playlist_items."mediaId"` → `signage_media.id` (`onDelete CASCADE`) — hard delete 시 playlist item 이 조용히 사라짐.
-- **FK 직접**: `signage_media_tags."mediaId"` → `signage_media.id` (`onDelete CASCADE`) — 태그, 차단 사유 아님.
+- **태그**: `signage_media.tags`(`text[]` 컬럼)에 저장 — 별도 `signage_media_tags` 테이블은 migration `20260417100000` 에서 **DROP**(dead table). 차단 사유 아님, media row 삭제로 함께 제거.
 - **비-FK snapshot**: `store_playlist_items.snapshot_id` → `o4o_asset_snapshots.id` (**FK 없음**). snapshot 은 `source_asset_id = mediaId AND asset_type='signage'` 로 원본 미디어에 느슨하게 연결(FK 없음). 이 snapshot 을 삭제하면 `store_playlist_items.snapshot_id` 가 **dangling** 되어 매장 재생이 깨짐.
 
 → **차단 대상 2경로**: (A) FK 직접 playlist item, (B) snapshot 을 참조 중인 store_playlist_items.
@@ -167,17 +167,35 @@ DELETE FROM o4o_asset_snapshots s
 ## 11. 배포 & 검증
 
 - **Typecheck**: api-server `tsc -p tsconfig.build.json` **exit 0** (기존 `src/scripts/**` 오류는 build 에서 exclude 되어 무관). web-kpa-society `tsc --noEmit` **exit 0**.
-- **배포**: push `55e3ea14f` → CI `Deploy API Server (Cloud Run)` + `CI Pipeline` 트리거 (in_progress).
-- **실브라우저 smoke**: 배포 완료 후 KPA 운영자 로그인 → `/operator/signage/hq-media` 삭제 다이얼로그 usage 조회·경고·미사용 삭제 확인 예정 (아래 §11-a 갱신).
+- **배포**: push `55e3ea14f`(구현) → `c963a3dba`(smoke 중 발견한 버그 수정) → CI `Deploy API Server (Cloud Run)` + `Deploy Web Services (Cloud Run)` 모두 **success**.
 
-### 11-a. Smoke 결과
-_(배포 완료 후 갱신)_
+### 11-a. Smoke 중 발견·수정한 버그 (배포 검증의 실효성)
+
+최초 배포(`55e3ea14f`) 후 실브라우저 smoke 에서 `GET /hq/media/:id/usage` 가 **HTTP 500** 반환:
+```
+{"success":false,"error":{"code":"INTERNAL_ERROR","message":"relation \"signage_media_tags\" does not exist"}}
+```
+원인: `signage_media_tags` 테이블은 migration `20260417100000-DropSignageDeadTables` 에서 **dead table 로 DROP** 되었고, 태그는 `signage_media.tags`(`text[]`) 컬럼에 저장된다. 최초 구현이 존재하지 않는 테이블을 조회/삭제.
+- 영향: usage API 500 + hard delete 트랜잭션이 태그 DELETE 에서 실패했을 것.
+- 수정(`c963a3dba`): usage 의 tagCount 를 `array_length(tags,1)` 로 계산, hard delete 의 `signage_media_tags` DELETE 제거(태그는 media row 삭제로 함께 제거).
+> 정적 typecheck 만으로는 못 잡는 런타임 스키마 계약 위반을 실브라우저 smoke 가 포착 — CLAUDE.md §8 절차의 실효성 확인.
+
+### 11-b. Smoke 결과 (재배포 `c963a3dba` 후, 프로덕션)
+
+KPA 운영자 로그인 → `/operator/signage/hq-media` (미디어 5건):
+
+1. **usage API 200** — media `bbfdb8b8…` → `inUse:true, directPlaylistUsageCount:1`, HQ 플레이리스트 "테스트 플레이리스트" 참조. 500 재현 없음.
+2. **삭제 다이얼로그(사용 중)** — 제목 "삭제할 수 없는 미디어", 경고 문구, 카운트(HQ 1 / 매장 0 / 매장 0), HQ 플레이리스트 목록 표시. **강제 삭제 버튼 없음, "닫기"만** — Scope 8 충족.
+3. **사용처 이동** — "테스트 플레이리스트" 링크 클릭 → 실재 화면 `/operator/signage/hq-playlists/64bcf16f…` 로 이동, 해당 미디어가 항목 2번으로 표시 + "항목 제거" 버튼 제공. **가상 route 없음** — Scope 9 충족.
+4. **파괴적 쓰기 미수행** — 사용 중 미디어는 409 로 차단되어 실제 삭제 발생 0. 미사용 미디어 강제 삭제로 프로덕션 데이터를 지우지 않음(승인 범위 밖 destructive write 회피).
 
 ---
 
 ## 12. Commit
 
-- `55e3ea14f` — feat(signage): guard media deletion against HQ/store playlist usage — WO-O4O-KPA-SIGNAGE-MEDIA-USAGE-GUARD-AND-SAFE-DELETE-V1 (11 files, +617/−76)
+- `55e3ea14f` — feat(signage): guard media deletion against HQ/store playlist usage (11 files, +617/−76)
+- `68a3d4089` — docs(check): 본 CHECK 문서
+- `c963a3dba` — fix(signage): use signage_media.tags column, not dropped signage_media_tags table (smoke 중 발견한 500 버그 수정, 2 files)
 
 **변경 파일:**
 - `apps/api-server/src/routes/signage/services/media-usage.service.ts` (신규)
