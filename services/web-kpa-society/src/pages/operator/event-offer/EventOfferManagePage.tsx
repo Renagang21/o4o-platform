@@ -117,6 +117,7 @@ export function EventOfferManagePage() {
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 목록
   const [pendingListings, setPendingListings] = useState<PendingListing[]>([]);
   const [pendingLoading, setPendingLoading] = useState(false);
+  const [pendingError, setPendingError] = useState<string | null>(null);
 
   useEffect(() => {
     loadProducts();
@@ -249,11 +250,14 @@ export function EventOfferManagePage() {
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 로딩/액션
   const loadPending = async () => {
     setPendingLoading(true);
+    setPendingError(null);
     try {
       const res = await eventOfferAdminApi.getPendingListings(1, 50);
       if (res?.data) setPendingListings(res.data);
     } catch (err: any) {
-      // permission 에러는 loadProducts에서 처리되므로 여기선 silent
+      // permission 에러는 loadProducts 가 permissionDenied 로 처리(이 섹션은 !permissionDenied 게이트).
+      // 그 외 네트워크/서버 실패는 조용히 삼키지 않고 섹션 오류 + 재시도로 표면화한다.
+      setPendingError('승인 대기 목록을 불러오지 못했습니다.');
     } finally {
       setPendingLoading(false);
     }
@@ -425,7 +429,7 @@ export function EventOfferManagePage() {
           )}
 
           {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 승인 대기 목록 */}
-          {(pendingLoading || pendingListings.length > 0) && (
+          {(pendingLoading || pendingError || pendingListings.length > 0) && (
             <div style={styles.pendingCard}>
               <div style={styles.pendingHeader}>
                 <h2 style={styles.pendingTitle}>
@@ -438,6 +442,21 @@ export function EventOfferManagePage() {
               </div>
               {pendingLoading ? (
                 <div style={styles.loadingText}>불러오는 중...</div>
+              ) : pendingError ? (
+                // 조회 실패를 빈 목록으로 위장하지 않는다 — 오류 + 재시도
+                <div style={{ ...styles.emptyOffersText, color: colors.error }}>
+                  {pendingError}
+                  <button
+                    onClick={() => void loadPending()}
+                    style={{
+                      display: 'block', margin: '12px auto 0', padding: '6px 16px',
+                      fontSize: 12, color: '#dc2626', background: 'transparent',
+                      border: '1px solid #fca5a5', borderRadius: 8, cursor: 'pointer',
+                    }}
+                  >
+                    다시 시도
+                  </button>
+                </div>
               ) : pendingListings.length === 0 ? (
                 <div style={styles.emptyOffersText}>{PAGE_TEXT.pendingEmpty}</div>
               ) : (

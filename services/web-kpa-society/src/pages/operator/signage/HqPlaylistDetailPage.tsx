@@ -115,6 +115,7 @@ export default function HqPlaylistDetailPage() {
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [hqMediaList, setHqMediaList] = useState<HqMediaItem[]>([]);
   const [isLoadingMedia, setIsLoadingMedia] = useState(false);
+  const [hqMediaError, setHqMediaError] = useState<string | null>(null);
   const [mediaSearch, setMediaSearch] = useState('');
   const [addingMediaId, setAddingMediaId] = useState<string | null>(null);
 
@@ -234,10 +235,15 @@ export default function HqPlaylistDetailPage() {
 
   const fetchHqMedia = useCallback(async () => {
     setIsLoadingMedia(true);
+    setHqMediaError(null);
     try {
       const data = await apiFetch(`/api/signage/${SERVICE_KEY}/media?source=hq&limit=200`);
       setHqMediaList(data.data || data.media || []);
-    } catch { /* silent */ }
+    } catch {
+      // 조회 실패를 'HQ 미디어 없음'으로 위장하지 않는다 — 피커에 오류 + 재시도 표시
+      setHqMediaList([]);
+      setHqMediaError('HQ 미디어를 불러오지 못했습니다.');
+    }
     finally { setIsLoadingMedia(false); }
   }, [apiFetch]);
 
@@ -524,6 +530,16 @@ export default function HqPlaylistDetailPage() {
               {isLoadingMedia ? (
                 <div className="flex items-center justify-center py-12">
                   <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                </div>
+              ) : hqMediaError ? (
+                <div className="text-center py-12 text-red-600">
+                  <p className="text-sm">{hqMediaError}</p>
+                  <button
+                    onClick={() => fetchHqMedia()}
+                    className="mt-3 px-4 py-1.5 text-xs text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+                  >
+                    다시 시도
+                  </button>
                 </div>
               ) : filteredHqMedia.length === 0 ? (
                 <p className="text-center py-12 text-sm text-slate-400">

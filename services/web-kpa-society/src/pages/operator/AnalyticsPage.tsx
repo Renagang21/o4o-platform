@@ -2,11 +2,23 @@
  * OperatorAnalyticsPage — 운영 액션 분석
  *
  * WO-O4O-AUDIT-ANALYTICS-LAYER-V1
+ * WO-O4O-AI-OPERATOR-INSIGHT-V1 — rule-based operator insight
+ * WO-O4O-KPA-OPERATOR-LOAD-ERROR-AND-REMAINING-LISTS-CONSOLIDATED-V1:
+ *   - 최근 액션 이력 raw <table> → 공용 DataTable
+ *   - 조회 실패와 데이터 0건 분리 (3계층 독립 오류)
+ *       · 필수 요약(KPI/액션별/일별) 실패 → 집계 영역 오류 + 재시도
+ *       · 액션 이력 실패 → 해당 섹션 경고 + 재시도 (빈 목록으로 위장 금지)
+ *       · AI 인사이트 실패 → 전체 화면 미차단, 보조 섹션 오류
+ *   - 페이지 전체 inline style → Tailwind / O4O 토큰
+ *   - 집계·액션 로그 API 계약과 계산 로직은 불변
  *
  * action_logs 기반 운영자 액션 통계 및 이력 조회.
  */
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react';
+import { AlertTriangle } from 'lucide-react';
+import { DataTable } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { ApiClient } from '../../api/client';
 
 /** Platform-level API client (not scoped to /kpa) */
@@ -47,18 +59,36 @@ const ACTION_LABELS: Record<string, string> = {
   'kpa.operator.pharmacy_reject': '약국 거부',
 };
 
+const getActionLabel = (key: string) => ACTION_LABELS[key] || key.split('.').pop() || key;
+
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
+};
+
+const formatDateTime = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return `${d.toLocaleDateString('ko-KR')} ${d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`;
+};
+
 export default function AnalyticsPage() {
   const [days, setDays] = useState(30);
+
+  // ── 필수 요약 (KPI / 액션별 / 일별) ──
   const [summary, setSummary] = useState<ActionSummary[]>([]);
   const [daily, setDaily] = useState<DailyCount[]>([]);
   const [totals, setTotals] = useState({ total: 0, success_count: 0, failure_count: 0 });
+  const [summaryLoading, setSummaryLoading] = useState(true);
+  const [summaryError, setSummaryError] = useState<string | null>(null);
+
+  // ── 액션 이력 (독립 섹션) ──
   const [actions, setActions] = useState<ActionLog[]>([]);
   const [actionsPage, setActionsPage] = useState(1);
   const [actionsTotalPages, setActionsTotalPages] = useState(1);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [actionsLoading, setActionsLoading] = useState(true);
+  const [actionsError, setActionsError] = useState<string | null>(null);
 
-  // AI Insight (WO-O4O-AI-OPERATOR-INSIGHT-V1)
+  // ── AI 인사이트 (보조 섹션) ──
   const [insight, setInsight] = useState<{
     summary: string;
     warnings: string[];
@@ -66,11 +96,12 @@ export default function AnalyticsPage() {
     metrics: { approvalRate: number; rejectionRate: number; totalActions: number; avgDaily: number };
   } | null>(null);
   const [insightLoading, setInsightLoading] = useState(false);
+  const [insightError, setInsightError] = useState<string | null>(null);
 
   const loadSummary = useCallback(async () => {
     try {
-      setLoading(true);
-      setError(null);
+      setSummaryLoading(true);
+      setSummaryError(null);
       const res: any = await platformApi.get('/operator/analytics/summary', {
         serviceKey: SERVICE_KEY, days,
       });
@@ -81,33 +112,40 @@ export default function AnalyticsPage() {
         setTotals(data.totals || { total: 0, success_count: 0, failure_count: 0 });
       }
     } catch (err: any) {
-      setError(err.message || '통계를 불러올 수 없습니다.');
+      setSummaryError(err.message || '통계를 불러올 수 없습니다.');
     } finally {
-      setLoading(false);
+      setSummaryLoading(false);
     }
   }, [days]);
 
   const loadActions = useCallback(async () => {
     try {
+      setActionsLoading(true);
+      setActionsError(null);
       const res: any = await platformApi.get('/operator/analytics/actions', {
         serviceKey: SERVICE_KEY, page: actionsPage, limit: 20,
       });
       setActions(res?.data || []);
       setActionsTotalPages(res?.pagination?.totalPages || 1);
-    } catch {
-      // silent
+    } catch (err: any) {
+      // 조회 실패를 빈 목록으로 위장하지 않는다 — 섹션 경고 + 재시도
+      setActionsError(err?.message || '액션 이력을 불러올 수 없습니다.');
+    } finally {
+      setActionsLoading(false);
     }
   }, [actionsPage]);
 
   const loadInsight = useCallback(async () => {
     try {
       setInsightLoading(true);
+      setInsightError(null);
       const res: any = await platformApi.get('/operator/analytics/insight', {
         serviceKey: SERVICE_KEY, days,
       });
       setInsight(res?.data || null);
-    } catch {
-      // silent — insight is supplementary
+    } catch (err: any) {
+      // 보조 섹션 — 전체 화면을 막지 않고 인사이트 카드에만 오류 표시
+      setInsightError(err?.message || 'AI 인사이트를 불러올 수 없습니다.');
     } finally {
       setInsightLoading(false);
     }
@@ -117,106 +155,145 @@ export default function AnalyticsPage() {
   useEffect(() => { loadActions(); }, [loadActions]);
   useEffect(() => { loadInsight(); }, [loadInsight]);
 
-  const formatDate = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return d.toLocaleDateString('ko-KR', { month: '2-digit', day: '2-digit' });
-  };
-
-  const formatDateTime = (dateStr: string) => {
-    const d = new Date(dateStr);
-    return `${d.toLocaleDateString('ko-KR')} ${d.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}`;
-  };
-
-  const getActionLabel = (key: string) => ACTION_LABELS[key] || key.split('.').pop() || key;
+  const actionColumns: ListColumnDef<ActionLog>[] = useMemo(() => [
+    {
+      key: 'created_at',
+      header: '일시',
+      width: '160px',
+      render: (_v, a) => <span className="text-slate-700">{formatDateTime(a.created_at)}</span>,
+    },
+    {
+      key: 'action_key',
+      header: '액션',
+      render: (_v, a) => <span className="text-slate-700">{getActionLabel(a.action_key)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '90px',
+      render: (_v, a) => (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[0.6875rem] font-semibold ${
+            a.status === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'
+          }`}
+        >
+          {a.status === 'success' ? '성공' : '실패'}
+        </span>
+      ),
+    },
+    {
+      key: 'meta',
+      header: '상세',
+      width: '200px',
+      render: (_v, a) => (
+        <span className="text-xs text-slate-400 truncate block max-w-[200px]">
+          {a.meta?.targetId ? `ID: ${String(a.meta.targetId).slice(0, 8)}...` : '-'}
+        </span>
+      ),
+    },
+  ], []);
 
   return (
-    <div style={{ padding: 24, maxWidth: 1100, margin: '0 auto' }}>
-      <h1 style={{ fontSize: '1.5rem', fontWeight: 700, marginBottom: 8 }}>운영 액션 분석</h1>
-      <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: 24 }}>
-        운영자 승인/거절 등 액션 이력을 분석합니다.
-      </p>
+    <div className="p-6 max-w-[1100px] mx-auto">
+      <h1 className="text-2xl font-bold text-slate-900 mb-2">운영 액션 분석</h1>
+      <p className="text-sm text-slate-500 mb-6">운영자 승인/거절 등 액션 이력을 분석합니다.</p>
 
       {/* Period Filter */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
-        {[7, 14, 30, 90].map(d => (
+      <div className="flex gap-2 mb-6">
+        {[7, 14, 30, 90].map((d) => (
           <button
             key={d}
             onClick={() => setDays(d)}
-            style={{
-              padding: '6px 16px', borderRadius: 6, border: '1px solid #e2e8f0',
-              fontSize: '0.8125rem', cursor: 'pointer',
-              backgroundColor: days === d ? '#1e40af' : '#fff',
-              color: days === d ? '#fff' : '#475569',
-            }}
+            className={`px-4 py-1.5 rounded-md border text-[0.8125rem] transition-colors ${
+              days === d
+                ? 'bg-blue-800 border-blue-800 text-white'
+                : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+            }`}
           >
             {d}일
           </button>
         ))}
       </div>
 
-      {/* AI Insight Card (WO-O4O-AI-OPERATOR-INSIGHT-V1) */}
+      {/* AI Insight Card — 보조 섹션 (실패해도 전체 화면 미차단) */}
       {insightLoading ? (
-        <div style={{ padding: 16, marginBottom: 24, background: '#f0f9ff', borderRadius: 8, border: '1px solid #bae6fd', color: '#0369a1', fontSize: '0.8125rem' }}>
+        <div className="px-4 py-4 mb-6 bg-sky-50 border border-sky-200 rounded-lg text-sky-700 text-[0.8125rem]">
           인사이트 분석 중...
         </div>
-      ) : insight && (
-        <div style={{ padding: 20, marginBottom: 24, background: '#f0f9ff', borderRadius: 8, border: '1px solid #bae6fd' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-            <h3 style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600, color: '#0c4a6e' }}>AI 운영 인사이트</h3>
-            <button onClick={loadInsight} style={{ padding: '4px 10px', fontSize: '0.75rem', border: '1px solid #7dd3fc', borderRadius: 4, background: 'transparent', color: '#0369a1', cursor: 'pointer' }}>새로고침</button>
+      ) : insightError ? (
+        <div className="px-4 py-3 mb-6 bg-sky-50 border border-sky-200 rounded-lg flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-sky-800 text-[0.8125rem]">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>{insightError}</span>
           </div>
-          <p style={{ margin: '0 0 8px', fontSize: '0.8125rem', color: '#0f172a' }}>{insight.summary}</p>
+          <button
+            onClick={loadInsight}
+            className="px-2.5 py-1 text-xs border border-sky-300 rounded bg-transparent text-sky-700 hover:bg-sky-100 shrink-0"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : insight && (
+        <div className="p-5 mb-6 bg-sky-50 border border-sky-200 rounded-lg">
+          <div className="flex justify-between items-center mb-3">
+            <h3 className="text-sm font-semibold text-sky-900">AI 운영 인사이트</h3>
+            <button
+              onClick={loadInsight}
+              className="px-2.5 py-1 text-xs border border-sky-300 rounded bg-transparent text-sky-700 hover:bg-sky-100"
+            >
+              새로고침
+            </button>
+          </div>
+          <p className="mb-2 text-[0.8125rem] text-slate-900">{insight.summary}</p>
           {insight.warnings.map((w, i) => (
-            <div key={`w-${i}`} style={{ padding: '6px 10px', marginBottom: 4, background: '#fef3c7', borderRadius: 4, fontSize: '0.8125rem', color: '#92400e' }}>
+            <div key={`w-${i}`} className="px-2.5 py-1.5 mb-1 bg-amber-100 rounded text-[0.8125rem] text-amber-800">
               &#9888; {w}
             </div>
           ))}
           {insight.recommendations.map((r, i) => (
-            <div key={`r-${i}`} style={{ padding: '6px 10px', marginBottom: 4, background: '#ecfdf5', borderRadius: 4, fontSize: '0.8125rem', color: '#065f46' }}>
+            <div key={`r-${i}`} className="px-2.5 py-1.5 mb-1 bg-emerald-50 rounded text-[0.8125rem] text-emerald-800">
               &#128161; {r}
             </div>
           ))}
         </div>
       )}
 
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: 60, color: '#94a3b8' }}>불러오는 중...</div>
-      ) : error ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#dc2626' }}>
-          {error}
-          <button onClick={loadSummary} style={{ display: 'block', margin: '12px auto', padding: '6px 16px', borderRadius: 6, border: '1px solid #dc2626', background: 'transparent', color: '#dc2626', cursor: 'pointer' }}>
-            다시 시도
-          </button>
-        </div>
+      {/* 집계 영역 (KPI + 액션별 + 일별) — 필수 요약 */}
+      {summaryLoading ? (
+        <div className="text-center py-16 text-slate-400">불러오는 중...</div>
+      ) : summaryError ? (
+        <SectionError message={summaryError} onRetry={loadSummary} />
       ) : (
         <>
           {/* KPI Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 16, marginBottom: 24 }}>
-            <div style={{ padding: 20, background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4 }}>총 액션 수</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#0f172a' }}>{totals.total}</div>
+          <div className="grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-4 mb-6">
+            <div className="p-5 bg-white rounded-lg border border-slate-200">
+              <div className="text-xs text-slate-500 mb-1">총 액션 수</div>
+              <div className="text-2xl font-bold text-slate-900">{totals.total}</div>
             </div>
-            <div style={{ padding: 20, background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4 }}>성공</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#16a34a' }}>{totals.success_count}</div>
+            <div className="p-5 bg-white rounded-lg border border-slate-200">
+              <div className="text-xs text-slate-500 mb-1">성공</div>
+              <div className="text-2xl font-bold text-green-600">{totals.success_count}</div>
             </div>
-            <div style={{ padding: 20, background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0' }}>
-              <div style={{ fontSize: '0.75rem', color: '#64748b', marginBottom: 4 }}>실패</div>
-              <div style={{ fontSize: '1.5rem', fontWeight: 700, color: '#dc2626' }}>{totals.failure_count}</div>
+            <div className="p-5 bg-white rounded-lg border border-slate-200">
+              <div className="text-xs text-slate-500 mb-1">실패</div>
+              <div className="text-2xl font-bold text-red-600">{totals.failure_count}</div>
             </div>
           </div>
 
           {/* Action Summary */}
           {summary.length > 0 && (
-            <div style={{ marginBottom: 24, background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 20 }}>
-              <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 12 }}>액션별 요약</h2>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            <div className="mb-6 bg-white rounded-lg border border-slate-200 p-5">
+              <h2 className="text-base font-semibold mb-3">액션별 요약</h2>
+              <div className="flex flex-col gap-2">
                 {summary.map((item, i) => (
-                  <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '8px 12px', background: '#f8fafc', borderRadius: 6 }}>
-                    <span style={{ fontSize: '0.8125rem', color: '#334155' }}>{getActionLabel(item.action_key)}</span>
-                    <div style={{ display: 'flex', gap: 12, alignItems: 'center' }}>
-                      <span style={{ fontSize: '0.75rem', color: item.status === 'success' ? '#16a34a' : '#dc2626' }}>{item.status}</span>
-                      <span style={{ fontSize: '0.875rem', fontWeight: 600, color: '#0f172a' }}>{item.count}</span>
+                  <div key={i} className="flex justify-between items-center px-3 py-2 bg-slate-50 rounded-md">
+                    <span className="text-[0.8125rem] text-slate-700">{getActionLabel(item.action_key)}</span>
+                    <div className="flex gap-3 items-center">
+                      <span className={`text-xs ${item.status === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+                        {item.status}
+                      </span>
+                      <span className="text-sm font-semibold text-slate-900">{item.count}</span>
                     </div>
                   </div>
                 ))}
@@ -226,98 +303,82 @@ export default function AnalyticsPage() {
 
           {/* Daily Trend */}
           {daily.length > 0 && (
-            <div style={{ marginBottom: 24, background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 20 }}>
-              <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 12 }}>일별 추이 (최근 {days}일)</h2>
-              <div style={{ display: 'flex', gap: 2, alignItems: 'flex-end', height: 100 }}>
+            <div className="mb-6 bg-white rounded-lg border border-slate-200 p-5">
+              <h2 className="text-base font-semibold mb-3">일별 추이 (최근 {days}일)</h2>
+              <div className="flex gap-0.5 items-end h-[100px]">
                 {daily.slice().reverse().map((d, i) => {
-                  const maxCount = Math.max(...daily.map(x => x.count), 1);
+                  const maxCount = Math.max(...daily.map((x) => x.count), 1);
                   const height = Math.max((d.count / maxCount) * 80, 4);
                   return (
-                    <div key={i} style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2 }}>
-                      <div style={{ width: '100%', maxWidth: 24, height, background: '#3b82f6', borderRadius: 2 }} title={`${formatDate(d.date)}: ${d.count}건`} />
+                    <div key={i} className="flex-1 flex flex-col items-center gap-0.5">
+                      <div
+                        className="w-full max-w-[24px] bg-blue-500 rounded-sm"
+                        style={{ height }}
+                        title={`${formatDate(d.date)}: ${d.count}건`}
+                      />
                     </div>
                   );
                 })}
               </div>
             </div>
           )}
-
-          {/* Recent Actions */}
-          <div style={{ background: '#fff', borderRadius: 8, border: '1px solid #e2e8f0', padding: 20 }}>
-            <h2 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 12 }}>최근 액션 이력</h2>
-            {actions.length === 0 ? (
-              <div style={{ textAlign: 'center', padding: 40, color: '#94a3b8' }}>기록된 액션이 없습니다.</div>
-            ) : (
-              <>
-                <div style={{ overflowX: 'auto' }}>
-                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.8125rem' }}>
-                    <thead>
-                      <tr style={{ borderBottom: '2px solid #e2e8f0' }}>
-                        <th style={thStyle}>일시</th>
-                        <th style={thStyle}>액션</th>
-                        <th style={thStyle}>상태</th>
-                        <th style={thStyle}>상세</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {actions.map(action => (
-                        <tr key={action.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                          <td style={tdStyle}>{formatDateTime(action.created_at)}</td>
-                          <td style={tdStyle}>{getActionLabel(action.action_key)}</td>
-                          <td style={tdStyle}>
-                            <span style={{
-                              padding: '2px 8px', borderRadius: 4, fontSize: '0.6875rem', fontWeight: 600,
-                              backgroundColor: action.status === 'success' ? '#d1fae5' : '#fee2e2',
-                              color: action.status === 'success' ? '#065f46' : '#991b1b',
-                            }}>
-                              {action.status === 'success' ? '성공' : '실패'}
-                            </span>
-                          </td>
-                          <td style={{ ...tdStyle, fontSize: '0.75rem', color: '#94a3b8', maxWidth: 200, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {action.meta?.targetId ? `ID: ${action.meta.targetId.slice(0, 8)}...` : '-'}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-                {actionsTotalPages > 1 && (
-                  <div style={{ display: 'flex', justifyContent: 'center', gap: 16, marginTop: 16 }}>
-                    <button
-                      onClick={() => setActionsPage(p => Math.max(1, p - 1))}
-                      disabled={actionsPage <= 1}
-                      style={{ ...pageBtn, opacity: actionsPage <= 1 ? 0.4 : 1 }}
-                    >
-                      이전
-                    </button>
-                    <span style={{ fontSize: '0.8125rem', color: '#64748b', padding: '6px 0' }}>{actionsPage} / {actionsTotalPages}</span>
-                    <button
-                      onClick={() => setActionsPage(p => p + 1)}
-                      disabled={actionsPage >= actionsTotalPages}
-                      style={{ ...pageBtn, opacity: actionsPage >= actionsTotalPages ? 0.4 : 1 }}
-                    >
-                      다음
-                    </button>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
         </>
       )}
+
+      {/* Recent Actions — 독립 섹션 */}
+      <div className="bg-white rounded-lg border border-slate-200 p-5">
+        <h2 className="text-base font-semibold mb-3">최근 액션 이력</h2>
+        {actionsError ? (
+          <SectionError message={actionsError} onRetry={loadActions} compact />
+        ) : (
+          <>
+            <DataTable<ActionLog>
+              columns={actionColumns}
+              data={actions}
+              rowKey="id"
+              loading={actionsLoading}
+              emptyMessage="기록된 액션이 없습니다."
+              tableId="operator-analytics-actions"
+            />
+            {actionsTotalPages > 1 && (
+              <div className="flex justify-center gap-4 mt-4">
+                <button
+                  onClick={() => setActionsPage((p) => Math.max(1, p - 1))}
+                  disabled={actionsPage <= 1}
+                  className="px-3.5 py-1.5 text-[0.8125rem] font-medium text-slate-600 bg-white border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50"
+                >
+                  이전
+                </button>
+                <span className="text-[0.8125rem] text-slate-500 py-1.5">{actionsPage} / {actionsTotalPages}</span>
+                <button
+                  onClick={() => setActionsPage((p) => p + 1)}
+                  disabled={actionsPage >= actionsTotalPages}
+                  className="px-3.5 py-1.5 text-[0.8125rem] font-medium text-slate-600 bg-white border border-slate-200 rounded-md disabled:opacity-40 hover:bg-slate-50"
+                >
+                  다음
+                </button>
+              </div>
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 }
 
-const thStyle: React.CSSProperties = {
-  padding: '10px 12px', textAlign: 'left', fontWeight: 600, color: '#475569', whiteSpace: 'nowrap',
-};
+// ─── 공통 섹션 오류 UI (조회 실패 ≠ 데이터 0건) ───
 
-const tdStyle: React.CSSProperties = {
-  padding: '10px 12px', color: '#334155',
-};
-
-const pageBtn: React.CSSProperties = {
-  padding: '6px 14px', fontSize: '0.8125rem', fontWeight: 500, color: '#475569',
-  backgroundColor: '#fff', border: '1px solid #e2e8f0', borderRadius: 6, cursor: 'pointer',
-};
+function SectionError({ message, onRetry, compact }: { message: string; onRetry: () => void; compact?: boolean }): ReactNode {
+  return (
+    <div className={`text-center ${compact ? 'py-10' : 'py-16'} text-red-600`}>
+      <AlertTriangle className="w-6 h-6 mx-auto mb-2" />
+      <p className="text-sm">{message}</p>
+      <button
+        onClick={onRetry}
+        className="mt-3 px-4 py-1.5 text-xs text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+      >
+        다시 시도
+      </button>
+    </div>
+  );
+}

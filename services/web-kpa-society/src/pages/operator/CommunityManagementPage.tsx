@@ -7,14 +7,23 @@
  *   - 이미지 입력: URL 직접 입력 → 미디어 라이브러리 선택 + URL fallback
  * WO-KPA-A-HOME-FOOTER-LINKS-MANAGEMENT-V1:
  *   - 4th tab: 하단 링크 (community_quick_links CRUD)
+ * WO-O4O-KPA-OPERATOR-LOAD-ERROR-AND-REMAINING-LISTS-CONSOLIDATED-V1:
+ *   - 광고/스폰서/하단 링크 raw <table> → 공용 DataTable
+ *   - 수정/삭제 액션 → RowActionMenu (추가 CTA는 상단에 직접 노출 유지)
+ *   - 탭 전환 시 이전 탭의 데이터/오류가 잘못 남지 않도록 정리
+ *   - 조회 실패 시 재시도 제공
+ *   - 페이지 전체 inline style → Tailwind / O4O 토큰
+ *   - API/CRUD/정렬/활성 상태 계약은 불변
  *
  * 4 tabs: Hero 광고 | 페이지 광고 | 스폰서 | 하단 링크
  * CRUD for community_ads, community_sponsors, community_quick_links
  */
 
-import { useState, useEffect, useCallback } from 'react';
-import { ConfirmActionDialog } from '@o4o/ui';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { ConfirmActionDialog, RowActionMenu } from '@o4o/ui';
 import { toast } from '@o4o/error-handling';
+import { DataTable, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
+import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
   Image,
   Plus,
@@ -39,6 +48,50 @@ import MediaPickerModal from '../../components/common/MediaPickerModal';
 
 type Tab = 'hero' | 'page' | 'sponsors' | 'quickLinks';
 
+// 수정/삭제 공용 행 액션 정책 (삭제 확인은 페이지 레벨 ConfirmActionDialog 유지)
+const rowActionPolicy = defineActionPolicy<{ id: string }>('kpa:community', {
+  inlineMax: 2,
+  rules: [
+    { key: 'edit', label: '수정' },
+    { key: 'delete', label: '삭제', variant: 'danger' },
+  ],
+});
+
+const rowActionIcons = {
+  edit: <Edit3 size={14} />,
+  delete: <Trash2 size={14} />,
+};
+
+function renderRowActions<T extends { id: string }>(
+  row: T,
+  onEdit: (item: T) => void,
+  onDelete: (id: string) => void,
+) {
+  return (
+    <RowActionMenu
+      actions={buildRowActions(
+        rowActionPolicy,
+        row,
+        { edit: () => onEdit(row), delete: () => onDelete(row.id) },
+        { icons: rowActionIcons },
+      )}
+      inlineMax={rowActionPolicy.inlineMax}
+    />
+  );
+}
+
+function StatusBadge({ active }: { active: boolean }) {
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 rounded text-[0.6875rem] font-semibold ${
+        active ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'
+      }`}
+    >
+      {active ? '활성' : '비활성'}
+    </span>
+  );
+}
+
 export default function CommunityManagementPage() {
   const [tab, setTab] = useState<Tab>('hero');
   const [ads, setAds] = useState<CommunityAdFull[]>([]);
@@ -50,8 +103,12 @@ export default function CommunityManagementPage() {
   const [editItem, setEditItem] = useState<any>(null);
 
   const fetchData = useCallback(async () => {
+    // 탭 전환 시 이전 탭의 데이터/오류가 잘못 남지 않도록 정리
     setLoading(true);
     setError(null);
+    setAds([]);
+    setSponsors([]);
+    setQuickLinks([]);
     try {
       if (tab === 'sponsors') {
         const res = await communityManageApi.listSponsors();
@@ -109,21 +166,98 @@ export default function CommunityManagementPage() {
 
   const addButtonLabel = tab === 'sponsors' ? '스폰서 추가' : tab === 'quickLinks' ? '링크 추가' : '광고 추가';
 
+  // ─── Column defs ───
+
+  const adColumns: ListColumnDef<CommunityAdFull>[] = useMemo(() => [
+    {
+      key: 'imageUrl', header: '미리보기', width: '90px',
+      render: (_v, ad) => <img src={ad.imageUrl} alt="" className="w-[60px] h-9 object-cover rounded" />,
+    },
+    { key: 'title', header: '제목', render: (_v, ad) => <span className="text-slate-700">{ad.title}</span> },
+    {
+      key: 'period', header: '기간', width: '180px',
+      render: (_v, ad) => (
+        <span className="text-slate-600 text-xs">
+          {ad.startDate || ad.endDate
+            ? `${ad.startDate?.slice(0, 10) ?? '~'} ~ ${ad.endDate?.slice(0, 10) ?? ''}`
+            : '상시'}
+        </span>
+      ),
+    },
+    { key: 'displayOrder', header: '순서', width: '70px', align: 'center', render: (_v, ad) => ad.displayOrder },
+    { key: 'isActive', header: '상태', width: '80px', align: 'center', render: (_v, ad) => <StatusBadge active={ad.isActive} /> },
+    {
+      key: '_actions', header: '액션', width: '60px', align: 'center', system: true,
+      render: (_v, ad) => renderRowActions(ad, openEdit, handleDelete),
+    },
+  ], []);
+
+  const sponsorColumns: ListColumnDef<CommunitySponsorFull>[] = useMemo(() => [
+    {
+      key: 'logoUrl', header: '로고', width: '100px',
+      render: (_v, s) => <img src={s.logoUrl} alt={s.name} className="h-7 max-w-[80px] object-contain" />,
+    },
+    { key: 'name', header: '이름', render: (_v, s) => <span className="text-slate-700">{s.name}</span> },
+    {
+      key: 'linkUrl', header: '링크', width: '90px',
+      render: (_v, s) => s.linkUrl
+        ? <a href={s.linkUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 text-xs">링크</a>
+        : <span className="text-slate-400">-</span>,
+    },
+    { key: 'displayOrder', header: '순서', width: '70px', align: 'center', render: (_v, s) => s.displayOrder },
+    { key: 'isActive', header: '상태', width: '80px', align: 'center', render: (_v, s) => <StatusBadge active={s.isActive} /> },
+    {
+      key: '_actions', header: '액션', width: '60px', align: 'center', system: true,
+      render: (_v, s) => renderRowActions(s, openEdit, handleDelete),
+    },
+  ], []);
+
+  const quickLinkColumns: ListColumnDef<CommunityQuickLinkFull>[] = useMemo(() => [
+    {
+      key: 'imageUrl', header: '아이콘', width: '70px',
+      render: (_v, ql) => <img src={ql.imageUrl} alt="" className="w-9 h-9 object-cover rounded-md" />,
+    },
+    {
+      key: 'title', header: '제목',
+      render: (_v, ql) => (
+        <div>
+          <div className="text-slate-700">{ql.title}</div>
+          {ql.description && <div className="text-[0.6875rem] text-slate-400 mt-0.5">{ql.description}</div>}
+        </div>
+      ),
+    },
+    {
+      key: 'linkUrl', header: '링크', width: '90px',
+      render: (_v, ql) => (
+        <a href={ql.linkUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-blue-600 text-xs">
+          <ExternalLink size={11} /> 링크
+        </a>
+      ),
+    },
+    { key: 'openInNewTab', header: '새 탭', width: '70px', align: 'center', render: (_v, ql) => ql.openInNewTab ? '예' : '아니오' },
+    { key: 'displayOrder', header: '순서', width: '70px', align: 'center', render: (_v, ql) => ql.displayOrder },
+    { key: 'isActive', header: '상태', width: '80px', align: 'center', render: (_v, ql) => <StatusBadge active={ql.isActive} /> },
+    {
+      key: '_actions', header: '액션', width: '60px', align: 'center', system: true,
+      render: (_v, ql) => renderRowActions(ql, openEdit, handleDelete),
+    },
+  ], []);
+
   return (
-    <div style={{ padding: '24px 0' }}>
+    <div className="py-6">
       {/* Header */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 10, backgroundColor: '#dbeafe', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Monitor size={20} color="#2563eb" />
+      <div className="flex items-center gap-3 mb-6">
+        <div className="w-10 h-10 rounded-[10px] bg-blue-100 flex items-center justify-center">
+          <Monitor size={20} className="text-blue-600" />
         </div>
         <div>
-          <h1 style={{ fontSize: 20, fontWeight: 600, color: '#1e293b', margin: 0 }}>Home 편집</h1>
-          <p style={{ fontSize: 13, color: '#64748b', margin: 0 }}>Home 화면의 Hero 배너, 광고, 스폰서, 하단 링크를 관리합니다</p>
+          <h1 className="text-xl font-semibold text-slate-800 m-0">Home 편집</h1>
+          <p className="text-[0.8125rem] text-slate-500 m-0">Home 화면의 Hero 배너, 광고, 스폰서, 하단 링크를 관리합니다</p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div style={{ display: 'flex', gap: 8, marginBottom: 20, borderBottom: '1px solid #e2e8f0', paddingBottom: 0 }}>
+      <div className="flex gap-2 mb-5 border-b border-slate-200">
         {([
           { key: 'hero' as Tab, label: 'Hero 광고', icon: Image },
           { key: 'page' as Tab, label: '페이지 광고', icon: Monitor },
@@ -133,30 +267,22 @@ export default function CommunityManagementPage() {
           <button
             key={key}
             onClick={() => setTab(key)}
-            style={{
-              display: 'flex', alignItems: 'center', gap: 6,
-              padding: '10px 16px', fontSize: 13, fontWeight: tab === key ? 600 : 400,
-              color: tab === key ? '#2563eb' : '#64748b',
-              borderBottom: tab === key ? '2px solid #2563eb' : '2px solid transparent',
-              background: 'none', border: 'none', cursor: 'pointer',
-              marginBottom: -1,
-            }}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-[0.8125rem] -mb-px border-b-2 ${
+              tab === key
+                ? 'font-semibold text-blue-600 border-blue-600'
+                : 'font-normal text-slate-500 border-transparent hover:text-slate-700'
+            }`}
           >
             <Icon size={14} /> {label}
           </button>
         ))}
       </div>
 
-      {/* Action Bar */}
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 16 }}>
+      {/* Action Bar — 추가 CTA 상단 직접 노출 */}
+      <div className="flex justify-end mb-4">
         <button
           onClick={openCreate}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '8px 16px', fontSize: 13, fontWeight: 500,
-            color: 'white', backgroundColor: '#2563eb',
-            border: 'none', borderRadius: 8, cursor: 'pointer',
-          }}
+          className="flex items-center gap-1.5 px-4 py-2 text-[0.8125rem] font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700"
         >
           <Plus size={14} /> {addButtonLabel}
         </button>
@@ -164,21 +290,36 @@ export default function CommunityManagementPage() {
 
       {/* Content */}
       {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#64748b' }}>
-          <Loader2 size={24} className="animate-spin" style={{ margin: '0 auto 8px' }} />
-          <p style={{ fontSize: 13 }}>불러오는 중...</p>
+        <div className="text-center py-10 text-slate-500">
+          <Loader2 size={24} className="animate-spin mx-auto mb-2" />
+          <p className="text-[0.8125rem]">불러오는 중...</p>
         </div>
       ) : error ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#dc2626' }}>
-          <AlertCircle size={24} style={{ margin: '0 auto 8px' }} />
-          <p style={{ fontSize: 13 }}>{error}</p>
+        <div className="text-center py-10 text-red-600">
+          <AlertCircle size={24} className="mx-auto mb-2" />
+          <p className="text-[0.8125rem]">{error}</p>
+          <button
+            onClick={fetchData}
+            className="mt-3 px-4 py-1.5 text-xs text-red-600 border border-red-300 rounded-lg hover:bg-red-50"
+          >
+            다시 시도
+          </button>
         </div>
       ) : tab === 'sponsors' ? (
-        <SponsorTable sponsors={sponsors} onEdit={openEdit} onDelete={handleDelete} />
+        <DataTable<CommunitySponsorFull>
+          columns={sponsorColumns} data={sponsors} rowKey="id"
+          emptyMessage="등록된 스폰서가 없습니다." tableId="kpa-community-sponsors"
+        />
       ) : tab === 'quickLinks' ? (
-        <QuickLinkTable quickLinks={quickLinks} onEdit={openEdit} onDelete={handleDelete} />
+        <DataTable<CommunityQuickLinkFull>
+          columns={quickLinkColumns} data={quickLinks} rowKey="id"
+          emptyMessage="등록된 하단 링크가 없습니다." tableId="kpa-community-quicklinks"
+        />
       ) : (
-        <AdTable ads={ads} onEdit={openEdit} onDelete={handleDelete} />
+        <DataTable<CommunityAdFull>
+          columns={adColumns} data={ads} rowKey="id"
+          emptyMessage="등록된 광고가 없습니다." tableId="kpa-community-ads"
+        />
       )}
 
       {/* Modal */}
@@ -200,188 +341,6 @@ export default function CommunityManagementPage() {
         onConfirm={executeDelete}
         onClose={() => setDeleteTargetId(null)}
       />
-    </div>
-  );
-}
-
-// ─── Ad Table ───
-
-function AdTable({ ads, onEdit, onDelete }: {
-  ads: CommunityAdFull[];
-  onEdit: (ad: CommunityAdFull) => void;
-  onDelete: (id: string) => void;
-}) {
-  if (ads.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#94a3b8', padding: 32, fontSize: 14 }}>등록된 광고가 없습니다.</p>;
-  }
-  return (
-    <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8fafc' }}>
-            <th style={thStyle}>미리보기</th>
-            <th style={thStyle}>제목</th>
-            <th style={thStyle}>기간</th>
-            <th style={thStyle}>순서</th>
-            <th style={thStyle}>상태</th>
-            <th style={thStyle}>액션</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ads.map((ad) => (
-            <tr key={ad.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-              <td style={tdStyle}>
-                <img src={ad.imageUrl} alt="" style={{ width: 60, height: 36, objectFit: 'cover', borderRadius: 4 }} />
-              </td>
-              <td style={tdStyle}>{ad.title}</td>
-              <td style={tdStyle}>
-                {ad.startDate || ad.endDate
-                  ? `${ad.startDate?.slice(0, 10) ?? '~'} ~ ${ad.endDate?.slice(0, 10) ?? ''}`
-                  : '상시'}
-              </td>
-              <td style={tdStyle}>{ad.displayOrder}</td>
-              <td style={tdStyle}>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                  backgroundColor: ad.isActive ? '#dcfce7' : '#fee2e2',
-                  color: ad.isActive ? '#16a34a' : '#dc2626',
-                }}>
-                  {ad.isActive ? '활성' : '비활성'}
-                </span>
-              </td>
-              <td style={tdStyle}>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => onEdit(ad)} style={iconBtn}><Edit3 size={14} /></button>
-                  <button onClick={() => onDelete(ad.id)} style={{ ...iconBtn, color: '#dc2626' }}><Trash2 size={14} /></button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ─── Sponsor Table ───
-
-function SponsorTable({ sponsors, onEdit, onDelete }: {
-  sponsors: CommunitySponsorFull[];
-  onEdit: (s: CommunitySponsorFull) => void;
-  onDelete: (id: string) => void;
-}) {
-  if (sponsors.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#94a3b8', padding: 32, fontSize: 14 }}>등록된 스폰서가 없습니다.</p>;
-  }
-  return (
-    <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8fafc' }}>
-            <th style={thStyle}>로고</th>
-            <th style={thStyle}>이름</th>
-            <th style={thStyle}>링크</th>
-            <th style={thStyle}>순서</th>
-            <th style={thStyle}>상태</th>
-            <th style={thStyle}>액션</th>
-          </tr>
-        </thead>
-        <tbody>
-          {sponsors.map((s) => (
-            <tr key={s.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-              <td style={tdStyle}>
-                <img src={s.logoUrl} alt={s.name} style={{ height: 28, maxWidth: 80, objectFit: 'contain' }} />
-              </td>
-              <td style={tdStyle}>{s.name}</td>
-              <td style={tdStyle}>
-                {s.linkUrl ? (
-                  <a href={s.linkUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontSize: 12 }}>링크</a>
-                ) : '-'}
-              </td>
-              <td style={tdStyle}>{s.displayOrder}</td>
-              <td style={tdStyle}>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                  backgroundColor: s.isActive ? '#dcfce7' : '#fee2e2',
-                  color: s.isActive ? '#16a34a' : '#dc2626',
-                }}>
-                  {s.isActive ? '활성' : '비활성'}
-                </span>
-              </td>
-              <td style={tdStyle}>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => onEdit(s)} style={iconBtn}><Edit3 size={14} /></button>
-                  <button onClick={() => onDelete(s.id)} style={{ ...iconBtn, color: '#dc2626' }}><Trash2 size={14} /></button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-// ─── Quick Link Table ───
-
-function QuickLinkTable({ quickLinks, onEdit, onDelete }: {
-  quickLinks: CommunityQuickLinkFull[];
-  onEdit: (ql: CommunityQuickLinkFull) => void;
-  onDelete: (id: string) => void;
-}) {
-  if (quickLinks.length === 0) {
-    return <p style={{ textAlign: 'center', color: '#94a3b8', padding: 32, fontSize: 14 }}>등록된 하단 링크가 없습니다.</p>;
-  }
-  return (
-    <div style={{ border: '1px solid #e2e8f0', borderRadius: 12, overflow: 'hidden' }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f8fafc' }}>
-            <th style={thStyle}>아이콘</th>
-            <th style={thStyle}>제목</th>
-            <th style={thStyle}>링크</th>
-            <th style={thStyle}>새 탭</th>
-            <th style={thStyle}>순서</th>
-            <th style={thStyle}>상태</th>
-            <th style={thStyle}>액션</th>
-          </tr>
-        </thead>
-        <tbody>
-          {quickLinks.map((ql) => (
-            <tr key={ql.id} style={{ borderTop: '1px solid #e2e8f0' }}>
-              <td style={tdStyle}>
-                <img src={ql.imageUrl} alt="" style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: 6 }} />
-              </td>
-              <td style={tdStyle}>
-                <div>{ql.title}</div>
-                {ql.description && <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 2 }}>{ql.description}</div>}
-              </td>
-              <td style={tdStyle}>
-                <a href={ql.linkUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#2563eb', fontSize: 12, display: 'inline-flex', alignItems: 'center', gap: 3 }}>
-                  <ExternalLink size={11} /> 링크
-                </a>
-              </td>
-              <td style={tdStyle}>{ql.openInNewTab ? '예' : '아니오'}</td>
-              <td style={tdStyle}>{ql.displayOrder}</td>
-              <td style={tdStyle}>
-                <span style={{
-                  fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
-                  backgroundColor: ql.isActive ? '#dcfce7' : '#fee2e2',
-                  color: ql.isActive ? '#16a34a' : '#dc2626',
-                }}>
-                  {ql.isActive ? '활성' : '비활성'}
-                </span>
-              </td>
-              <td style={tdStyle}>
-                <div style={{ display: 'flex', gap: 6 }}>
-                  <button onClick={() => onEdit(ql)} style={iconBtn}><Edit3 size={14} /></button>
-                  <button onClick={() => onDelete(ql.id)} style={{ ...iconBtn, color: '#dc2626' }}><Trash2 size={14} /></button>
-                </div>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
     </div>
   );
 }
@@ -485,13 +444,19 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
   const update = (key: string, val: any) => setForm((prev) => ({ ...prev, [key]: val }));
 
   return (
-    <div style={modalOverlay} onClick={onClose}>
-      <div style={modalContent} onClick={(e) => e.stopPropagation()}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 }}>
-          <h3 style={{ fontSize: 16, fontWeight: 600, margin: 0 }}>
+    <div
+      className="fixed inset-0 bg-black/40 flex items-center justify-center z-[1000]"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl p-7 w-full max-w-[480px] max-h-[90vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex justify-between items-center mb-5">
+          <h3 className="text-base font-semibold m-0">
             {isEdit ? '수정' : '추가'} — {modalTitle}
           </h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><X size={20} /></button>
+          <button onClick={onClose} className="bg-none border-none cursor-pointer text-slate-500"><X size={20} /></button>
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -505,7 +470,7 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
                 onPickerOpen={() => setShowMediaPicker(true)}
               />
               <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} />
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+              <div className="grid grid-cols-2 gap-3">
                 <Field label="시작일" value={form.startDate} onChange={(v) => update('startDate', v)} type="date" />
                 <Field label="종료일" value={form.endDate} onChange={(v) => update('endDate', v)} type="date" />
               </div>
@@ -532,12 +497,12 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
                 onPickerOpen={() => setShowMediaPicker(true)}
               />
               <Field label="링크 URL" value={form.linkUrl} onChange={(v) => update('linkUrl', v)} required />
-              <div style={{ marginBottom: 16 }}>
-                <label style={labelStyle}>새 탭에서 열기</label>
+              <div className="mb-4">
+                <label className="block text-xs font-semibold text-slate-600 mb-1">새 탭에서 열기</label>
                 <select
                   value={form.openInNewTab ? 'true' : 'false'}
                   onChange={(e) => update('openInNewTab', e.target.value === 'true')}
-                  style={inputStyle}
+                  className="w-full px-3 py-2 text-[0.8125rem] border border-slate-200 rounded-lg outline-none box-border"
                 >
                   <option value="true">예</option>
                   <option value="false">아니오</option>
@@ -546,14 +511,14 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
             </>
           )}
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+          <div className="grid grid-cols-2 gap-3">
             <Field label="표시 순서" value={String(form.displayOrder)} onChange={(v) => update('displayOrder', v)} type="number" />
-            <div style={{ marginBottom: 16 }}>
-              <label style={labelStyle}>활성 여부</label>
+            <div className="mb-4">
+              <label className="block text-xs font-semibold text-slate-600 mb-1">활성 여부</label>
               <select
                 value={form.isActive ? 'true' : 'false'}
                 onChange={(e) => update('isActive', e.target.value === 'true')}
-                style={inputStyle}
+                className="w-full px-3 py-2 text-[0.8125rem] border border-slate-200 rounded-lg outline-none box-border"
               >
                 <option value="true">활성</option>
                 <option value="false">비활성</option>
@@ -564,12 +529,9 @@ function FormModal({ tab, editItem, onClose, onSaved }: {
           <button
             type="submit"
             disabled={saving}
-            style={{
-              width: '100%', padding: '10px 0', fontSize: 14, fontWeight: 500,
-              color: 'white', backgroundColor: saving ? '#94a3b8' : '#2563eb',
-              border: 'none', borderRadius: 8, cursor: saving ? 'default' : 'pointer',
-              marginTop: 8,
-            }}
+            className={`w-full py-2.5 text-sm font-medium text-white rounded-lg mt-2 ${
+              saving ? 'bg-slate-400 cursor-default' : 'bg-blue-600 cursor-pointer hover:bg-blue-700'
+            }`}
           >
             {saving ? '저장 중...' : isEdit ? '수정' : '추가'}
           </button>
@@ -601,51 +563,36 @@ function ImageField({ label, value, onChange, onPickerOpen }: {
   const [showUrlInput, setShowUrlInput] = useState(false);
 
   return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={labelStyle}>{label}</label>
+    <div className="mb-4">
+      <label className="block text-xs font-semibold text-slate-600 mb-1">{label}</label>
       {value && (
-        <div style={{ marginBottom: 8, position: 'relative', display: 'inline-block' }}>
+        <div className="mb-2 relative inline-block">
           <img
             src={value}
             alt="미리보기"
-            style={{ maxHeight: 80, maxWidth: '100%', borderRadius: 6, border: '1px solid #e2e8f0', objectFit: 'contain' }}
+            className="max-h-20 max-w-full rounded-md border border-slate-200 object-contain"
           />
           <button
             type="button"
             onClick={() => onChange('')}
-            style={{
-              position: 'absolute', top: -6, right: -6,
-              width: 20, height: 20, borderRadius: '50%',
-              backgroundColor: '#dc2626', color: 'white',
-              border: 'none', cursor: 'pointer', fontSize: 11,
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
+            className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-600 text-white border-none cursor-pointer text-[11px] flex items-center justify-center"
           >
             ×
           </button>
         </div>
       )}
-      <div style={{ display: 'flex', gap: 6 }}>
+      <div className="flex gap-1.5">
         <button
           type="button"
           onClick={onPickerOpen}
-          style={{
-            display: 'flex', alignItems: 'center', gap: 6,
-            padding: '7px 14px', fontSize: 12, fontWeight: 500,
-            color: '#2563eb', backgroundColor: '#eff6ff',
-            border: '1px solid #bfdbfe', borderRadius: 8, cursor: 'pointer',
-          }}
+          className="flex items-center gap-1.5 px-3.5 py-[7px] text-xs font-medium text-blue-600 bg-blue-50 border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-100"
         >
           <ImageIcon size={14} /> 미디어 라이브러리에서 선택
         </button>
         <button
           type="button"
           onClick={() => setShowUrlInput(!showUrlInput)}
-          style={{
-            padding: '7px 10px', fontSize: 11, color: '#64748b',
-            backgroundColor: '#f8fafc', border: '1px solid #e2e8f0',
-            borderRadius: 8, cursor: 'pointer',
-          }}
+          className="px-2.5 py-[7px] text-[11px] text-slate-500 bg-slate-50 border border-slate-200 rounded-lg cursor-pointer hover:bg-slate-100"
         >
           URL 직접 입력
         </button>
@@ -656,7 +603,7 @@ function ImageField({ label, value, onChange, onPickerOpen }: {
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder="https://..."
-          style={{ ...inputStyle, marginTop: 8 }}
+          className="w-full px-3 py-2 text-[0.8125rem] border border-slate-200 rounded-lg outline-none box-border mt-2"
         />
       )}
     </div>
@@ -668,42 +615,15 @@ function Field({ label, value, onChange, required, type }: {
   required?: boolean; type?: string;
 }) {
   return (
-    <div style={{ marginBottom: 16 }}>
-      <label style={labelStyle}>{label}</label>
+    <div className="mb-4">
+      <label className="block text-xs font-semibold text-slate-600 mb-1">{label}</label>
       <input
         type={type ?? 'text'}
         value={value}
         onChange={(e) => onChange(e.target.value)}
         required={required}
-        style={inputStyle}
+        className="w-full px-3 py-2 text-[0.8125rem] border border-slate-200 rounded-lg outline-none box-border"
       />
     </div>
   );
 }
-
-// ─── Shared Styles ───
-
-const thStyle: React.CSSProperties = {
-  textAlign: 'left', padding: '10px 14px', fontSize: 12, fontWeight: 600, color: '#64748b',
-};
-const tdStyle: React.CSSProperties = {
-  padding: '10px 14px', verticalAlign: 'middle',
-};
-const iconBtn: React.CSSProperties = {
-  background: 'none', border: 'none', cursor: 'pointer', color: '#64748b', padding: 4,
-};
-const modalOverlay: React.CSSProperties = {
-  position: 'fixed', inset: 0, backgroundColor: 'rgba(0,0,0,0.4)',
-  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000,
-};
-const modalContent: React.CSSProperties = {
-  backgroundColor: 'white', borderRadius: 16, padding: 28, width: '100%', maxWidth: 480,
-  maxHeight: '90vh', overflowY: 'auto',
-};
-const labelStyle: React.CSSProperties = {
-  display: 'block', fontSize: 12, fontWeight: 600, color: '#475569', marginBottom: 4,
-};
-const inputStyle: React.CSSProperties = {
-  width: '100%', padding: '8px 12px', fontSize: 13, border: '1px solid #e2e8f0',
-  borderRadius: 8, outline: 'none', boxSizing: 'border-box',
-};

@@ -74,6 +74,7 @@ export default function AiContentGenerationModal({ open, onClose, onSaved }: Pro
   useEffect(() => {
     fetchTemplates({ limit: 100, status: 'active' })
       .then(res => setTemplates(res.items))
+      // 템플릿 선택은 선택적 보조 기능 — 실패 시 템플릿 없이 직접 입력으로 진행(운영 판단 미차단).
       .catch(() => {});
   }, []);
 

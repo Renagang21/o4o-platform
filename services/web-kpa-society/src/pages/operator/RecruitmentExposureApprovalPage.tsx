@@ -25,16 +25,20 @@ export default function RecruitmentExposureApprovalPage() {
   );
   const [items, setItems] = useState<RecruitmentExposureItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
+    setError(null);
     try {
       const qs = filterStatus && filterStatus !== 'all' ? `?exposureStatus=${filterStatus}` : '';
       const res = await apiClient.get<{ success: boolean; data: RecruitmentExposureItem[] }>(`${BASE}${qs}`);
       setItems(res?.data ?? []);
     } catch {
+      // 조회 실패를 빈 목록(=승인 대상 없음)으로 위장하지 않는다 — 오류 + 재시도 노출
       setItems([]);
+      setError('노출 승인 대상을 불러오지 못했습니다.');
     }
     setLoading(false);
   }, [filterStatus]);
@@ -67,6 +71,26 @@ export default function RecruitmentExposureApprovalPage() {
     },
     [load],
   );
+
+  // 조회 실패는 빈 목록이 아니라 오류 상태로 구분 표시 (공용 콘솔 계약 미변경 — 페이지 레벨 처리)
+  if (error && !loading) {
+    return (
+      <div className="max-w-4xl p-6">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-slate-900">판매자 모집 노출 승인</h1>
+        </div>
+        <div className="py-16 text-center text-red-600 rounded-xl border border-red-200 bg-red-50">
+          <p className="text-sm">{error}</p>
+          <button
+            onClick={() => void load()}
+            className="mt-3 px-4 py-1.5 text-xs text-red-700 border border-red-300 rounded-lg hover:bg-red-100"
+          >
+            다시 시도
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <RecruitmentExposureConsole
