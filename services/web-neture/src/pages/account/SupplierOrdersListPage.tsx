@@ -15,6 +15,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingCart, ChevronLeft, ChevronRight } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi } from '../../lib/api';
 import type { SupplierOrderSummary } from '../../lib/api';
 
@@ -177,6 +178,80 @@ export default function SupplierOrdersListPage() {
     }
   }, [fetchOrders]);
 
+  // WO-O4O-NETURE-REMAINING-STANDARD-LISTS-CONSOLIDATED-BATCH-V6:
+  //   데스크톱 raw <table> → 공용 DataTable. 컬럼 render 는 기존 셀 표현/스타일 그대로 재사용.
+  //   모바일 카드 뷰(data-supplier-orders-cards)와 반응형 CSS 는 유지한다.
+  const columns: ListColumnDef<SupplierOrderSummary>[] = [
+    {
+      key: 'order_number',
+      header: '주문번호',
+      render: (_v, order) => (
+        <Link to={`/account/supplier/orders/${order.id}`} style={styles.orderNoLink}>
+          {order.order_number}
+        </Link>
+      ),
+    },
+    {
+      key: 'orderer_name',
+      header: '매장명',
+      render: (_v, order) => <span style={styles.storeNameText}>{order.orderer_name || '-'}</span>,
+    },
+    {
+      key: 'region',
+      header: '지역',
+      render: (_v, order) => <span style={styles.dimText}>{order.region || '-'}</span>,
+    },
+    {
+      key: 'orderer_phone',
+      header: '연락처',
+      render: (_v, order) => <span style={styles.dimText}>{order.orderer_phone || '-'}</span>,
+    },
+    {
+      key: 'final_amount',
+      header: '주문금액',
+      align: 'right',
+      render: (_v, order) => <span style={styles.amountText}>{formatPrice(order.final_amount)}원</span>,
+    },
+    {
+      key: 'item_count',
+      header: '제품수',
+      align: 'center',
+      render: (_v, order) => <span style={styles.itemCountBadge}>{order.item_count}개</span>,
+    },
+    {
+      key: 'created_at',
+      header: '주문일',
+      render: (_v, order) => <span style={styles.dateText}>{formatDate(order.created_at)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'center',
+      render: (_v, order) => <StatusBadge status={order.status} />,
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      align: 'center',
+      system: true,
+      render: (_v, order) => {
+        const nextStatus = NEXT_STATUS[order.status];
+        const actionLabel = NEXT_ACTION_LABEL[order.status];
+        return nextStatus && actionLabel ? (
+          <button
+            onClick={() => handleStatusChange(order.id, nextStatus)}
+            disabled={updatingId === order.id}
+            style={{ ...styles.actionButton, opacity: updatingId === order.id ? 0.5 : 1 }}
+          >
+            {updatingId === order.id ? '처리중...' : actionLabel}
+          </button>
+        ) : (
+          <span style={styles.dimText}>—</span>
+        );
+      },
+    },
+  ];
+
   return (
     <div>
       {/* Header */}
@@ -263,74 +338,13 @@ export default function SupplierOrdersListPage() {
 
       {/* Desktop Table */}
       {!loading && filteredOrders.length > 0 && (
-        <div style={styles.tableContainer} data-supplier-orders-table>
-          <table style={styles.table}>
-            <thead>
-              <tr>
-                <th style={styles.th}>주문번호</th>
-                <th style={styles.th}>매장명</th>
-                <th style={styles.th}>지역</th>
-                <th style={styles.th}>연락처</th>
-                <th style={{ ...styles.th, textAlign: 'right' }}>주문금액</th>
-                <th style={{ ...styles.th, textAlign: 'center' }}>제품수</th>
-                <th style={styles.th}>주문일</th>
-                <th style={{ ...styles.th, textAlign: 'center' }}>상태</th>
-                <th style={{ ...styles.th, textAlign: 'center' }}>관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order) => {
-                const nextStatus = NEXT_STATUS[order.status];
-                const actionLabel = NEXT_ACTION_LABEL[order.status];
-                return (
-                  <tr key={order.id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <Link to={`/account/supplier/orders/${order.id}`} style={styles.orderNoLink}>
-                        {order.order_number}
-                      </Link>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.storeNameText}>{order.orderer_name || '-'}</span>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.dimText}>{order.region || '-'}</span>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.dimText}>{order.orderer_phone || '-'}</span>
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'right' }}>
-                      <span style={styles.amountText}>{formatPrice(order.final_amount)}원</span>
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'center' }}>
-                      <span style={styles.itemCountBadge}>{order.item_count}개</span>
-                    </td>
-                    <td style={styles.td}>
-                      <span style={styles.dateText}>{formatDate(order.created_at)}</span>
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'center' }}>
-                      <StatusBadge status={order.status} />
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'center' }}>
-                      {nextStatus && actionLabel ? (
-                        <button
-                          onClick={() => handleStatusChange(order.id, nextStatus)}
-                          disabled={updatingId === order.id}
-                          style={{
-                            ...styles.actionButton,
-                            opacity: updatingId === order.id ? 0.5 : 1,
-                          }}
-                        >
-                          {updatingId === order.id ? '처리중...' : actionLabel}
-                        </button>
-                      ) : (
-                        <span style={styles.dimText}>—</span>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+        <div data-supplier-orders-table>
+          <DataTable<SupplierOrderSummary>
+            columns={columns}
+            data={filteredOrders}
+            rowKey={(o) => o.id}
+            emptyMessage="현재 주문이 없습니다."
+          />
         </div>
       )}
 

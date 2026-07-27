@@ -22,6 +22,7 @@ import {
   Loader2,
   Calendar,
 } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '@/lib/apiClient';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -179,6 +180,65 @@ export default function OrdersManagementPage() {
     }
   };
 
+  // WO-O4O-NETURE-REMAINING-STANDARD-LISTS-CONSOLIDATED-BATCH-V6:
+  //   raw <table> → 공용 DataTable. 셀 표현은 기존과 동일(아이콘·뱃지·배지 포함).
+  //   탭/검색은 상단 카드로, 페이지네이션은 목록 아래로 분리해 카드 중첩을 피한다.
+  const columns: ListColumnDef<OrderData>[] = [
+    {
+      key: 'order_number',
+      header: '주문번호',
+      render: (_v, order) => (
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
+            <ShoppingCart className="w-5 h-5 text-slate-400" />
+          </div>
+          <p className="font-medium text-slate-800">{order.order_number}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'buyer_name',
+      header: '구매자',
+      render: (_v, order) => (
+        <div>
+          <p className="text-sm text-slate-800">{order.buyer_name || '-'}</p>
+          <p className="text-xs text-slate-500">{order.buyer_email || ''}</p>
+        </div>
+      ),
+    },
+    {
+      key: 'final_amount',
+      header: '금액',
+      align: 'right',
+      render: (_v, order) => (
+        <span>
+          <span className="font-medium text-slate-800">{Number(order.final_amount).toLocaleString()}</span>
+          <span className="text-slate-400 text-xs ml-1">원</span>
+        </span>
+      ),
+    },
+    {
+      key: 'payment_status',
+      header: '결제',
+      render: (_v, order) => <PaymentBadge status={order.payment_status} />,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, order) => <OrderStatusBadge status={order.status} />,
+    },
+    {
+      key: 'created_at',
+      header: '주문일시',
+      render: (_v, order) => (
+        <div className="flex items-center gap-1 text-sm text-slate-600">
+          <Calendar className="w-3 h-3" />
+          {formatDateTime(order.created_at)}
+        </div>
+      ),
+    },
+  ];
+
   if (isLoading && orders.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -302,7 +362,7 @@ export default function OrdersManagementPage() {
         </div>
 
         {/* Search */}
-        <div className="p-4 border-b border-slate-100">
+        <div className="p-4">
           <div className="flex items-center gap-3">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -323,108 +383,66 @@ export default function OrdersManagementPage() {
             </button>
           </div>
         </div>
-
-        {/* Table or Empty */}
-        {orders.length === 0 ? (
-          <div className="text-center py-12">
-            <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
-            <p className="text-slate-500 text-lg">주문 데이터가 없습니다</p>
-          </div>
-        ) : (
-          <>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-slate-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">주문번호</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">구매자</th>
-                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">금액</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">결제</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">상태</th>
-                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">주문일시</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-slate-100">
-                  {orders.map((order) => (
-                    <tr key={order.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center">
-                            <ShoppingCart className="w-5 h-5 text-slate-400" />
-                          </div>
-                          <p className="font-medium text-slate-800">{order.order_number}</p>
-                        </div>
-                      </td>
-                      <td className="px-4 py-4">
-                        <p className="text-sm text-slate-800">{order.buyer_name || '-'}</p>
-                        <p className="text-xs text-slate-500">{order.buyer_email || ''}</p>
-                      </td>
-                      <td className="px-4 py-4 text-right">
-                        <span className="font-medium text-slate-800">{Number(order.final_amount).toLocaleString()}</span>
-                        <span className="text-slate-400 text-xs ml-1">원</span>
-                      </td>
-                      <td className="px-4 py-4">
-                        <PaymentBadge status={order.payment_status} />
-                      </td>
-                      <td className="px-4 py-4">
-                        <OrderStatusBadge status={order.status} />
-                      </td>
-                      <td className="px-4 py-4">
-                        <div className="flex items-center gap-1 text-sm text-slate-600">
-                          <Calendar className="w-3 h-3" />
-                          {formatDateTime(order.created_at)}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Pagination */}
-            {pagination.totalPages > 1 && (
-              <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
-                <p className="text-sm text-slate-500">
-                  총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
-                  {Math.min(pagination.page * pagination.limit, pagination.total)}개 표시
-                </p>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                    disabled={currentPage === 1}
-                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronLeft className="w-4 h-4" />
-                  </button>
-                  {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
-                    const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
-                    return start + i;
-                  }).filter(p => p <= pagination.totalPages).map((page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCurrentPage(page)}
-                      className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
-                        currentPage === page
-                          ? 'bg-primary-600 text-white'
-                          : 'hover:bg-slate-100 text-slate-600'
-                      }`}
-                    >
-                      {page}
-                    </button>
-                  ))}
-                  <button
-                    onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
-                    disabled={currentPage === pagination.totalPages}
-                    className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    <ChevronRight className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            )}
-          </>
-        )}
       </div>
+
+      {/* List — 공용 DataTable (탭·검색 카드와 분리) */}
+      {orders.length === 0 ? (
+        <div className="bg-white rounded-xl shadow-sm text-center py-12">
+          <AlertCircle size={48} className="mx-auto mb-4 text-slate-300" />
+          <p className="text-slate-500 text-lg">주문 데이터가 없습니다</p>
+        </div>
+      ) : (
+        <>
+          <DataTable<OrderData>
+            columns={columns}
+            data={orders}
+            rowKey={(o) => o.id}
+            emptyMessage="주문 데이터가 없습니다"
+          />
+
+          {/* Pagination */}
+          {pagination.totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 bg-white rounded-xl shadow-sm">
+              <p className="text-sm text-slate-500">
+                총 {pagination.total}개 중 {(pagination.page - 1) * pagination.limit + 1}-
+                {Math.min(pagination.page * pagination.limit, pagination.total)}개 표시
+              </p>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                {Array.from({ length: Math.min(5, pagination.totalPages) }, (_, i) => {
+                  const start = Math.max(1, Math.min(currentPage - 2, pagination.totalPages - 4));
+                  return start + i;
+                }).filter(p => p <= pagination.totalPages).map((page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={`w-8 h-8 rounded-lg text-sm font-medium transition-colors ${
+                      currentPage === page
+                        ? 'bg-primary-600 text-white'
+                        : 'hover:bg-slate-100 text-slate-600'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+                <button
+                  onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+                  disabled={currentPage === pagination.totalPages}
+                  className="p-2 rounded-lg hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

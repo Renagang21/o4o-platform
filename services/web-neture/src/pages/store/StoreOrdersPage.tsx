@@ -15,6 +15,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { ClipboardList, Search, RefreshCw, ChevronLeft, ChevronRight, Package } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { storeApi, sellerApi } from '../../lib/api';
 import type { StoreOrder, StoreOrderItem } from '../../lib/api';
 import { storeCart } from '../../lib/api/storeCart';
@@ -221,6 +222,80 @@ export default function StoreOrdersPage() {
     }
   }, [navigate]);
 
+  // WO-O4O-NETURE-REMAINING-STANDARD-LISTS-CONSOLIDATED-BATCH-V6:
+  //   데스크톱 raw <table> → 공용 DataTable. 셀 표현·스타일은 기존 그대로 재사용.
+  //   모바일 카드(data-store-orders-cards)·반응형 CSS 유지.
+  const columns: ListColumnDef<StoreOrder>[] = [
+    {
+      key: 'order_number',
+      header: '주문번호',
+      render: (_v, order) => (
+        <Link to={`/store/orders/${order.id}`} style={styles.orderLink}>
+          {order.order_number}
+        </Link>
+      ),
+    },
+    {
+      key: 'created_at',
+      header: '주문일',
+      render: (_v, order) => <span>{formatDate(order.created_at)}</span>,
+    },
+    {
+      key: 'items',
+      header: '상품',
+      render: (_v, order) => (
+        <>
+          <div style={styles.itemsSummary}>{getItemsSummary(order.items)}</div>
+          {getItemCount(order.items) > 1 && (
+            <span style={styles.itemCount}>{getItemCount(order.items)}건</span>
+          )}
+        </>
+      ),
+    },
+    {
+      key: 'total_amount',
+      header: '주문금액',
+      align: 'right',
+      render: (_v, order) => <span>₩{formatPrice(order.total_amount)}</span>,
+    },
+    {
+      key: 'shipping_fee',
+      header: '배송비',
+      align: 'right',
+      render: (_v, order) => (
+        <span style={{ color: order.shipping_fee === 0 ? '#15803d' : '#475569' }}>
+          {order.shipping_fee === 0 ? '무료' : `₩${formatPrice(order.shipping_fee)}`}
+        </span>
+      ),
+    },
+    {
+      key: 'final_amount',
+      header: '최종금액',
+      align: 'right',
+      render: (_v, order) => <span style={{ fontWeight: 600 }}>₩{formatPrice(order.final_amount)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, order) => <StatusBadge status={order.status} />,
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      system: true,
+      render: (_v, order) => (
+        <button
+          style={styles.reorderBtn}
+          onClick={() => handleReorder(order)}
+          disabled={reordering === order.id}
+        >
+          <RefreshCw size={14} />
+          <span style={{ marginLeft: 4 }}>{reordering === order.id ? '처리중' : '재주문'}</span>
+        </button>
+      ),
+    },
+  ];
+
   return (
     <div style={styles.page}>
       {/* Header */}
@@ -306,55 +381,13 @@ export default function StoreOrdersPage() {
       {/* Desktop Table */}
       {!loading && !loadError && filteredOrders.length > 0 && (
         <>
-          <div style={styles.tableWrap} data-store-orders-table>
-            <table style={styles.table}>
-              <thead>
-                <tr>
-                  <th style={styles.th}>주문번호</th>
-                  <th style={styles.th}>주문일</th>
-                  <th style={styles.th}>상품</th>
-                  <th style={{ ...styles.th, textAlign: 'right' }}>주문금액</th>
-                  <th style={{ ...styles.th, textAlign: 'right' }}>배송비</th>
-                  <th style={{ ...styles.th, textAlign: 'right' }}>최종금액</th>
-                  <th style={styles.th}>상태</th>
-                  <th style={styles.th}>관리</th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredOrders.map((order) => (
-                  <tr key={order.id} style={styles.tr}>
-                    <td style={styles.td}>
-                      <Link to={`/store/orders/${order.id}`} style={styles.orderLink}>
-                        {order.order_number}
-                      </Link>
-                    </td>
-                    <td style={styles.td}>{formatDate(order.created_at)}</td>
-                    <td style={styles.td}>
-                      <div style={styles.itemsSummary}>{getItemsSummary(order.items)}</div>
-                      {getItemCount(order.items) > 1 && (
-                        <span style={styles.itemCount}>{getItemCount(order.items)}건</span>
-                      )}
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'right' }}>₩{formatPrice(order.total_amount)}</td>
-                    <td style={{ ...styles.td, textAlign: 'right', color: order.shipping_fee === 0 ? '#15803d' : '#475569' }}>
-                      {order.shipping_fee === 0 ? '무료' : `₩${formatPrice(order.shipping_fee)}`}
-                    </td>
-                    <td style={{ ...styles.td, textAlign: 'right', fontWeight: 600 }}>₩{formatPrice(order.final_amount)}</td>
-                    <td style={styles.td}><StatusBadge status={order.status} /></td>
-                    <td style={styles.td}>
-                      <button
-                        style={styles.reorderBtn}
-                        onClick={() => handleReorder(order)}
-                        disabled={reordering === order.id}
-                      >
-                        <RefreshCw size={14} />
-                        <span style={{ marginLeft: 4 }}>{reordering === order.id ? '처리중' : '재주문'}</span>
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          <div data-store-orders-table>
+            <DataTable<StoreOrder>
+              columns={columns}
+              data={filteredOrders}
+              rowKey={(o) => o.id}
+              emptyMessage="주문 내역이 없습니다"
+            />
           </div>
 
           {/* Mobile Cards */}
