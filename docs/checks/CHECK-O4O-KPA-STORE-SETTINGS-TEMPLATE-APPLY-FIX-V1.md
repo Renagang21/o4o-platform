@@ -137,13 +137,17 @@ organization_members.role IN ('owner','admin','manager') AND left_at IS NULL
 
 `createStoreSettingsController` 소비처 **3곳 전부 확인**:
 
-| 소비처 | 영향 |
-|--------|------|
-| `kpa.routes.ts:577` | 신규 신호 사용 (KPA 프론트) |
-| `glycopharm.routes.ts:513` | **동작 불변** — 신호 미전송 시 기존 경로 그대로. `template` 전송 시 `template_profile` 동기화만 추가되며, 이는 GlycoPharm 공개 홈의 blocks-부재 fallback 과도 정합 방향 |
-| `cosmetics.routes.ts:121` | 동일 (동작 불변) |
+| 소비처 | 프론트 PATCH payload | 영향 |
+|--------|---------------------|------|
+| `kpa.routes.ts:577` | `{template, theme, blocks, applyTemplateDefaults}` | 신규 신호 사용 (본 WO 대상) |
+| `glycopharm.routes.ts:513` | `{theme}` 만 ([PharmacySettings.tsx:163](services/web-glycopharm/src/pages/store-management/PharmacySettings.tsx#L163) — `template` 미전송이 의도된 정책: 프랜차이즈 표준 template_profile 별도 관리) | **영향 0** — `template_profile` 동기화 조건(`patch.template` 존재)이 성립하지 않음 |
+| `cosmetics.routes.ts:121` | `{template, theme, blocks}` ([StoreSettingsPage.tsx:215](services/web-k-cosmetics/src/pages/store/StoreSettingsPage.tsx#L215)) | blocks 동작 **불변**(신호 미전송 → 요청 blocks 저장). `template_profile` 이 선택값과 정합되는 개선만 추가 |
 
-KPA-only 임시 예외를 만들지 않고 **공통 정책으로 처리**했다.
+KPA-only 임시 예외를 만들지 않고 **공통 정책으로 처리**했다 (백엔드가 3서비스 공통으로 동일 계약을 제공).
+
+**남은 갭(본 WO 범위 외):** K-Cosmetics 프론트도 템플릿 변경 시 블록을 재생성하지 않는 동일 결함을 갖는다.
+백엔드 계약은 이미 준비됐으므로 `applyTemplateDefaults` 신호만 붙이면 되며, WO §12(K-Cosmetics 변경 금지)에 따라
+이번에는 손대지 않았다. 별도 WO 권장.
 
 ---
 
@@ -187,11 +191,58 @@ applyTemplateDefaults=false + 편집 blocks → 기본값에 덮이지 않음
 
 ## 10. 프로덕션 검증
 
-*(배포 후 기록 — 아래 §10-1 참조)*
+### 10-1. 배포
 
-### 10-1. 배포 · API smoke
+| 워크플로 | 결과 |
+|---------|------|
+| Deploy API Server (Cloud Run) | success → 리비전 `o4o-core-api-02975-5rr` |
+| Deploy Web Services (Cloud Run) | success |
 
-<!-- FILLED_AFTER_DEPLOY -->
+### 10-2. API smoke (테스트 약국 `네뚜레-약국`)
+
+CLAUDE.md §8 "API 직접 호출(curl) ✅" 채널. **전용 테스트 매장**(`테스트 약국`, org `9c87f46b…`)에서 수행.
+자격증명은 환경변수로만 주입(스크립트·본 문서에 literal 없음).
+
+| # | 시나리오 | 요청 | 결과 |
+|---|---------|------|------|
+| 1 | baseline | `GET /kpa/stores/:slug/settings` | template=BASIC, blocks=`HERO,PRODUCT_GRID,BLOG_LIST,TABLET_PROMO` |
+| 1b | baseline 공개 홈 | `GET /stores/:slug/layout` | profile=BASIC, 동일 blocks (`isDefault=true`) |
+| **2** | **템플릿 변경 + 기본 적용** | `PATCH {template:COMMERCE_FOCUS, blocks:<이전 blocks 동봉>, applyTemplateDefaults:true}` | blocks=`HERO,PRODUCT_GRID,BLOG_LIST` — **이전 템플릿의 `TABLET_PROMO` 잔여 없음** ✅ |
+| **2b** | **공개 홈 반영** | `GET /stores/:slug/layout` | **profile=COMMERCE_FOCUS + 새 blocks** ✅ (기존 결함 해소) |
+| 3 | 사용자 블록 편집 (신호 없음) | `PATCH {template:COMMERCE_FOCUS, blocks:[…BLOG_LIST off]}` | 편집값 그대로 저장 ✅ |
+| 3b | 공개 홈 | `GET .../layout` | `BLOG_LIST(off)` 보존 ✅ |
+| 4 | theme 만 변경 (blocks 미전송) | `PATCH {theme:clean}` | blocks 유지 (write 없음) ✅ |
+| 5 | 복원 | `PATCH {template:BASIC, theme:professional, applyTemplateDefaults:true}` | blocks=BASIC 기본 4종 ✅ |
+| 5b | 공개 홈 | `GET .../layout` | profile=BASIC + baseline 과 **동일 blocks** ✅ |
+| 6 | 권한 — 토큰 없음 | `PATCH` (no auth) | **401** ✅ |
+| 7 | 검증 — 타입 오류 | `PATCH {applyTemplateDefaults:"yes"}` | **400 VALIDATION_ERROR** ✅ |
+
+> **부수 발견(본 WO 무관):** `docs/local/TEST-ACCOUNTS.local.md` 의 **약국 경영자 `renagang21@gmail.com` 비밀번호가 stale**
+> (프로덕션 로그인 401 `INVALID_CREDENTIALS`). 같은 매장의 다른 owner 계정(`sohae21@naver.com`)은 정상 로그인되어
+> smoke 는 그 계정으로 수행했다. 로컬 SSOT 문서 갱신 필요.
+
+### 10-3. 운영 데이터 원복
+
+smoke 종료 시점 DB 실측:
+
+```
+template_profile = BASIC
+storefront_config.template = BASIC, theme = professional
+storefront_blocks = HERO, PRODUCT_GRID, BLOG_LIST, TABLET_PROMO (4)
+```
+
+baseline 은 `storefront_blocks` 가 비어 있어 공개 홈이 `generateDefaultBlocks('BASIC')` 로 렌더하던 상태였다.
+smoke 후에는 **같은 blocks 가 명시적으로 저장**된 상태이므로 **공개 매장 홈의 렌더 결과는 baseline 과 동일**하다
+(암묵 fallback → 명시 저장으로 형태만 바뀜, `layout.isDefault` 메타값만 `true→false`).
+API 계약상 blocks 를 "빈 상태"로 되돌릴 수는 없어(비어 있지 않은 배열만 허용) 이 형태가 최종 원복 지점이다.
+
+**다른 매장 데이터 변경 0. 일괄 update 0.**
+
+### 10-4. 브라우저
+
+프론트 배포(`Deploy Web Services` success) 이후 화면 경로는 위 API 계약과 동일한 payload 를 사용한다
+(`PharmacyStorePage.handleSave` → 같은 PATCH). 운영 매장의 설정을 추가로 변경하지 않기 위해
+브라우저 저장 smoke 는 별도로 반복하지 않고, **전용 테스트 매장에 대한 API 왕복 검증(§10-2)으로 대체**했다.
 
 ---
 
@@ -220,7 +271,7 @@ PUT /stores/:slug/template 은퇴 여부는 별도 판단 (GlycoPharm 동명 API
 
 | 기준 | 결과 |
 |------|------|
-| `/store/settings` template 변경이 공개 홈에 반영 | ✅ (§4 규칙 + §10 검증) |
+| `/store/settings` template 변경이 공개 홈에 반영 | ✅ 프로덕션 실증 (§10-2 #2/#2b) |
 | 템플릿 변경 시 올바른 기본 blocks 생성 | ✅ 단위 테스트 |
 | 같은 template 의 사용자 blocks 보존 | ✅ 단위 테스트 |
 | `template_profile` ↔ `storefront_config.template` 일치 | ✅ 동일 UPDATE 에서 동기화 |
