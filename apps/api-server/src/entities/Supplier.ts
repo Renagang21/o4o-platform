@@ -2,7 +2,7 @@
  * Supplier Entity (Stub)
  *
  * This is a minimal stub entity to satisfy TypeScript compilation.
- * Used by SupplierEntityController and AdminSupplierController.
+ * Used by AdminSupplierController.
  *
  * @deprecated Consider migrating to a package-based supplier system
  */
