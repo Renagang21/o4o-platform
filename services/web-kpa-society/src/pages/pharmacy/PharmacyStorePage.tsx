@@ -413,7 +413,13 @@ export function PharmacyStorePage() {
             {/* Template */}
             <section style={S.section}>
               <h3 style={S.sectionTitle}>레이아웃 템플릿</h3>
-              <p style={S.sectionDesc}>기본 블록 구성 구조를 선택합니다. 변경 시 블록 목록이 재설정됩니다.</p>
+              {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1:
+                  stale 문구 정정 — 템플릿 변경 시 블록 목록은 재설정되지 않는다(setTemplate 만 수행).
+                  매장 홈은 저장된 블록 구성(storefront_blocks)을 우선 렌더한다. 기능 변경 없음. */}
+              <p style={S.sectionDesc}>
+                기본 블록 구성 구조를 선택합니다. 선택해도 위 블록 구성은 자동으로 바뀌지 않으며,
+                저장된 블록 구성이 매장 홈에 우선 적용됩니다.
+              </p>
               <div style={S.templateGrid}>
                 {TEMPLATES.map(t => (
                   <div
