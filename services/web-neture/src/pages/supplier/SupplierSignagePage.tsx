@@ -53,11 +53,17 @@ export default function SupplierSignagePage() {
   const [preview, setPreview] = useState<SupplierSignageMedia | null>(null);
   const [busyId, setBusyId] = useState<string | null>(null);
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  // WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1:
+  //   목록 조회 실패를 "정상 0건"(빈 상태) 과 구분되는 지속 오류 상태로 분리한다.
+  //   기존 목록은 비우지 않고(재조회 실패 시), 오류 패널 + 재시도로 표면화한다.
+  const [loadError, setLoadError] = useState(false);
 
   const reload = useCallback(() => {
+    setLoading(true);
+    setLoadError(false);
     fetchSupplierSignageList()
-      .then(setItems)
-      .catch((e: any) => setMessage({ type: 'error', text: e?.message || '목록을 불러오지 못했습니다.' }))
+      .then((rows) => setItems(rows))
+      .catch(() => setLoadError(true))
       .finally(() => setLoading(false));
   }, []);
 
@@ -164,10 +170,29 @@ export default function SupplierSignagePage() {
         </div>
       )}
 
+      {/* 재조회 실패 — 기존 목록은 유지하고 상단 스트립으로 알린다 (WO 묶음 4 §7) */}
+      {loadError && items.length > 0 && (
+        <div className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+          <span>목록을 새로 고치지 못했습니다. 이전 목록을 표시합니다.</span>
+          <button type="button" onClick={reload} className="shrink-0 rounded-md bg-amber-100 px-3 py-1 font-medium text-amber-800 hover:bg-amber-200">다시 시도</button>
+        </div>
+      )}
+
       {/* 목록 */}
       <div className="divide-y divide-slate-100 rounded-xl border border-slate-200 bg-white">
         {loading ? (
           <div className="py-16 text-center text-sm text-slate-400">불러오는 중…</div>
+        ) : loadError && items.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="text-sm text-slate-500">사이니지 목록을 불러오지 못했습니다.</p>
+            <button
+              type="button"
+              onClick={reload}
+              className="mt-3 rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-600 hover:bg-slate-200"
+            >
+              다시 시도
+            </button>
+          </div>
         ) : items.length === 0 ? (
           <div className="py-16 text-center text-sm text-slate-400">
             아직 만든 사이니지가 없습니다. [새 사이니지]로 시작하세요.

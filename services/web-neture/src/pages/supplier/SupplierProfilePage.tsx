@@ -9,7 +9,7 @@
  * WO-NETURE-SUPPLIER-BUSINESS-PROFILE-FORM-ALIGNMENT-V1
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   Building2,
   User,
@@ -106,6 +106,10 @@ export default function SupplierProfilePage() {
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [categoriesLoadError, setCategoriesLoadError] = useState(false);
   const [onboardingLoadError, setOnboardingLoadError] = useState(false);
+  // WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1:
+  //   기본 프로필 조회 실패를 "프로필 없음" 과 구분한다. 연결된 공급자는 항상 프로필이
+  //   존재하므로(백엔드 200-object), 조회 실패는 재시도 가능한 오류로 표면화한다.
+  const [profileLoadError, setProfileLoadError] = useState(false);
 
   // Section A: 사업자 기본정보
   const [representativeName, setRepresentativeName] = useState('');
@@ -159,9 +163,9 @@ export default function SupplierProfilePage() {
   // Pre-fill indicator
   const [prefilled, setPrefilled] = useState(false);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
+  const fetchProfile = useCallback(async () => {
       setLoading(true);
+      setProfileLoadError(false);
       // WO-O4O-NETURE-SUPPLIER-PROFILE-AUX-LOAD-ERROR-CONTRACT-V1:
       //   보조 조회 2종은 실패 시 throw 한다. 영역별로 분리해 한쪽 실패가
       //   기본 프로필이나 다른 섹션을 가리지 않게 한다.
@@ -172,6 +176,8 @@ export default function SupplierProfilePage() {
       ]);
       const data = profileRes.status === 'fulfilled' ? profileRes.value : null;
       const onboardingData = onboardingRes.status === 'fulfilled' ? onboardingRes.value : null;
+      // WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1: 프로필 조회 실패 표면화
+      setProfileLoadError(profileRes.status === 'rejected');
       setOnboardingLoadError(onboardingRes.status === 'rejected');
       if (categoriesRes.status === 'fulfilled') {
         setRegulatedCategories(categoriesRes.value);
@@ -233,9 +239,9 @@ export default function SupplierProfilePage() {
         setMailOrderSalesRegistrationNumber(onboardingData.mailOrderSalesRegistrationNumber || '');
       }
       setLoading(false);
-    };
-    fetchProfile();
   }, []);
+
+  useEffect(() => { fetchProfile(); }, [fetchProfile]);
 
   const handleSave = async () => {
     setSaving(true);
@@ -431,6 +437,21 @@ export default function SupplierProfilePage() {
     return (
       <div className="max-w-2xl mx-auto py-16 text-center">
         <p className="text-gray-500">프로필 정보를 불러오는 중...</p>
+      </div>
+    );
+  }
+
+  if (profileLoadError) {
+    return (
+      <div className="max-w-2xl mx-auto py-16 text-center">
+        <p className="text-gray-500">공급자 프로필을 불러오지 못했습니다.</p>
+        <button
+          type="button"
+          onClick={() => fetchProfile()}
+          className="mt-3 rounded-lg bg-gray-100 px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-200"
+        >
+          다시 시도
+        </button>
       </div>
     );
   }

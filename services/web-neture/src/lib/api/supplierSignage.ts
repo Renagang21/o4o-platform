@@ -63,8 +63,30 @@ async function call<T>(fn: () => Promise<{ data: any }>): Promise<T> {
   }
 }
 
-export function fetchSupplierSignageList(): Promise<SupplierSignageMedia[]> {
-  return call<SupplierSignageMedia[]>(() => api.get(BASE));
+/**
+ * WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1 (묶음 4)
+ *
+ * 조회 실패는 고정 코드로 전파한다. 서버 원문은 console 로만 남긴다.
+ * `call()` 은 4xx/5xx/네트워크 오류를 이미 throw 하지만, 200 이면서 `data` 가
+ * 배열이 아닌 경우 `undefined` 를 그대로 반환해 목록이 "정상 0건" 처럼 흐른다
+ * (소비 화면에서 `.length` 접근 시 크래시 위험). 목록 함수에서만 배열 검증을
+ * 추가한다 (공통 `call()` 은 변경하지 않는다 — supplierScreenSets.ts 와 동일 규칙).
+ */
+export const SUPPLIER_SIGNAGE_LOAD_FAILED = 'SUPPLIER_SIGNAGE_LOAD_FAILED';
+
+export async function fetchSupplierSignageList(): Promise<SupplierSignageMedia[]> {
+  let rows: SupplierSignageMedia[];
+  try {
+    rows = await call<SupplierSignageMedia[]>(() => api.get(BASE));
+  } catch (error) {
+    console.warn('[Supplier Signage API] Failed to fetch signage list:', (error as Error)?.message);
+    throw new Error(SUPPLIER_SIGNAGE_LOAD_FAILED);
+  }
+  if (!Array.isArray(rows)) {
+    console.warn('[Supplier Signage API] Unexpected signage list payload shape');
+    throw new Error(SUPPLIER_SIGNAGE_LOAD_FAILED);
+  }
+  return rows;
 }
 
 export function createSupplierSignage(input: SupplierSignageInput): Promise<SupplierSignageMedia> {

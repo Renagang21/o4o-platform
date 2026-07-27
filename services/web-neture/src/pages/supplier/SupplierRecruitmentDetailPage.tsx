@@ -9,7 +9,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Loader2 } from 'lucide-react';
-import { supplierRecruitmentApi, type RecruitmentDetail } from '../../lib/api/supplier';
+import { supplierRecruitmentApi, SUPPLIER_RECRUITMENT_NOT_FOUND, type RecruitmentDetail } from '../../lib/api/supplier';
 
 const SERVICE_LABELS: Record<string, string> = {
   glycopharm: 'GlycoPharm',
@@ -57,14 +57,25 @@ export default function SupplierRecruitmentDetailPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notFound, setNotFound] = useState(false);
+  // WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1:
+  //   404(모집 없음) 와 일시 조회 실패(500/네트워크) 를 구분한다. 전자는 "모집 없음",
+  //   후자는 재시도 가능한 오류 상태로 표면화한다.
+  const [loadError, setLoadError] = useState(false);
 
   const load = useCallback(async () => {
     if (!recruitmentId) return;
     setLoading(true);
-    const data = await supplierRecruitmentApi.getApplications(recruitmentId);
-    if (!data) setNotFound(true);
-    setDetail(data);
-    setLoading(false);
+    setNotFound(false);
+    setLoadError(false);
+    try {
+      const data = await supplierRecruitmentApi.getApplications(recruitmentId);
+      setDetail(data);
+    } catch (e: any) {
+      if (e?.message === SUPPLIER_RECRUITMENT_NOT_FOUND) setNotFound(true);
+      else setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [recruitmentId]);
 
   useEffect(() => { load(); }, [load]);
@@ -121,6 +132,17 @@ export default function SupplierRecruitmentDetailPage() {
 
   if (loading) {
     return <div className="max-w-4xl py-16 text-center text-slate-400 text-sm">불러오는 중...</div>;
+  }
+  if (loadError) {
+    return (
+      <div className="max-w-4xl py-16 text-center">
+        <p className="text-sm text-slate-500">모집 정보를 불러오지 못했습니다.</p>
+        <div className="mt-3 flex items-center justify-center gap-3">
+          <button type="button" onClick={() => load()} className="text-sm font-medium text-blue-600 hover:text-blue-800">다시 시도</button>
+          <button type="button" onClick={() => navigate('/supplier/recruitments')} className="text-sm text-slate-500 hover:text-slate-700">모집 현황으로 돌아가기</button>
+        </div>
+      </div>
+    );
   }
   if (notFound || !detail) {
     return (

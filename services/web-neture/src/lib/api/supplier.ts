@@ -75,6 +75,12 @@ export const SUPPLIER_SHIPMENT_ORDER_NOT_FOUND = 'SUPPLIER_SHIPMENT_ORDER_NOT_FO
 export const SUPPLIER_ORDER_CONDITION_LOAD_FAILED = 'SUPPLIER_ORDER_CONDITION_LOAD_FAILED';
 export const SUPPLIER_ORDER_CONDITION_NOT_FOUND = 'SUPPLIER_ORDER_CONDITION_NOT_FOUND';
 
+/** WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1 (묶음 4) */
+export const SUPPLIER_PROFILE_LOAD_FAILED = 'SUPPLIER_PROFILE_LOAD_FAILED';
+export const SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED = 'SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED';
+export const SUPPLIER_RECRUITMENT_NOT_FOUND = 'SUPPLIER_RECRUITMENT_NOT_FOUND';
+export const SUPPLIER_RECRUITMENT_APPLICATIONS_LOAD_FAILED = 'SUPPLIER_RECRUITMENT_APPLICATIONS_LOAD_FAILED';
+
 /** 자료 목록 + 총 건수. total 로 조회 범위(limit) 밖 존재 여부를 판단한다. */
 export interface SupplierLibraryItemsResult {
   items: SupplierLibraryItem[];
@@ -1324,26 +1330,46 @@ export const supplierApi = {
 // ==================== Supplier Profile API ====================
 
 export const supplierProfileApi = {
-  async getProfile(): Promise<SupplierProfile | null> {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1 (묶음 4)
+   *
+   * backend 계약(supplier-management.controller.ts): requireLinkedSupplier 뒤이므로
+   * 연결된 공급자 행은 항상 존재 → 200 + data:{...}(필드는 null 일 수 있음).
+   * 404 SUPPLIER_NOT_FOUND / 500 은 오류 조건이며 "정상 미존재" 가 아니다.
+   * getOnboarding 과 동일하게 조회 실패는 고정 코드로 throw 한다(서버 원문 미노출).
+   * 소비처(SupplierActivationGate 등)의 fail-open 은 각 화면이 catch 로 결정한다.
+   */
+  async getProfile(): Promise<SupplierProfile> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/profile');
-      const result = response.data;
-      return result.data;
+      response = await api.get('/neture/supplier/profile');
     } catch (error) {
-      console.warn('[Supplier Profile API] Failed to fetch profile:', error);
-      return null;
+      console.warn('[Supplier Profile API] Failed to fetch profile:', extractApiError(error));
+      throw new Error(SUPPLIER_PROFILE_LOAD_FAILED);
     }
+    const data = response.data?.data;
+    if (data === null || data === undefined || typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Supplier Profile API] Unexpected profile payload shape');
+      throw new Error(SUPPLIER_PROFILE_LOAD_FAILED);
+    }
+    return data as SupplierProfile;
   },
 
-  async getCompleteness(): Promise<ProfileCompleteness | null> {
+  /** WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1: 조회 실패는 고정 코드로 throw. */
+  async getCompleteness(): Promise<ProfileCompleteness> {
+    let response;
     try {
-      const response = await api.get('/neture/supplier/profile/completeness');
-      const result = response.data;
-      return result.data;
+      response = await api.get('/neture/supplier/profile/completeness');
     } catch (error) {
-      console.warn('[Supplier Profile API] Failed to fetch completeness:', error);
-      return null;
+      console.warn('[Supplier Profile API] Failed to fetch completeness:', extractApiError(error));
+      throw new Error(SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED);
     }
+    const data = response.data?.data;
+    if (data === null || data === undefined || typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Supplier Profile API] Unexpected completeness payload shape');
+      throw new Error(SUPPLIER_PROFILE_COMPLETENESS_LOAD_FAILED);
+    }
+    return data as ProfileCompleteness;
   },
 
   async updateProfile(data: {
@@ -1737,15 +1763,29 @@ export const supplierRecruitmentApi = {
     return rows as SupplierRecruitment[];
   },
 
-  // WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1
-  async getApplications(recruitmentId: string): Promise<RecruitmentDetail | null> {
+  /**
+   * WO-O4O-NETURE-SUPPLIER-REMAINING-LOAD-ERROR-CONTRACT-V1 (묶음 4)
+   *
+   * backend 계약(partner-recruitment.controller.ts): 404 NOT_FOUND(모집 미존재/타인 소유)
+   * 와 500 INTERNAL_ERROR 를 구분한다. 200 은 항상 RecruitmentDetail 객체(신청 0건이면
+   * applications:[]) → 200+null 성공 상태는 없다.
+   * 404 는 전용 코드로, 그 외 조회 실패는 LOAD_FAILED 로 throw 해 화면이
+   * "모집 없음" 과 "일시 오류(재시도)" 를 구분하게 한다.
+   */
+  async getApplications(recruitmentId: string): Promise<RecruitmentDetail> {
+    let response;
     try {
-      const response = await api.get(`/neture/partner/recruitments/${recruitmentId}/applications`);
-      return response.data?.data ?? null;
+      response = await api.get(`/neture/partner/recruitments/${recruitmentId}/applications`);
     } catch (error) {
-      console.warn('[Supplier Recruitment API] Failed to fetch applications:', error);
-      return null;
+      console.warn('[Supplier Recruitment API] Failed to fetch applications:', extractApiError(error));
+      throw new Error(isNotFound(error) ? SUPPLIER_RECRUITMENT_NOT_FOUND : SUPPLIER_RECRUITMENT_APPLICATIONS_LOAD_FAILED);
     }
+    const data = response.data?.data;
+    if (data === null || data === undefined || typeof data !== 'object' || Array.isArray(data)) {
+      console.warn('[Supplier Recruitment API] Unexpected applications payload shape');
+      throw new Error(SUPPLIER_RECRUITMENT_APPLICATIONS_LOAD_FAILED);
+    }
+    return data as RecruitmentDetail;
   },
 
   // 기존 승인/반려 엔드포인트 재사용 (ownership + C bridge backend 처리)
