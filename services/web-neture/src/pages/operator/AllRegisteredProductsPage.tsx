@@ -11,7 +11,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react';
 import {
   Package, Search, RefreshCw, ChevronLeft, ChevronRight,
   X, Eye, EyeOff, FileText, FileSearch, Tag, Trash2,
-  CheckCircle, XCircle,
+  CheckCircle, XCircle, AlertTriangle,
 } from 'lucide-react';
 import { toast, parseApiError } from '@o4o/error-handling';
 import { ContentRenderer } from '@o4o/content-editor';
@@ -224,6 +224,9 @@ export default function AllRegisteredProductsPage() {
   const [offers, setOffers] = useState<AllRegisteredOffer[]>([]);
   const [kpi, setKpi] = useState<AllOffersKpi | null>(null);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패를 "등록된 상품 없음" 으로 삼키지 않고 별도 상태로 분리.
+  const [loadError, setLoadError] = useState(false);
   const [search, setSearch] = useState('');
   const [distFilter, setDistFilter] = useState('');
   const [activeFilter, setActiveFilter] = useState('');
@@ -278,6 +281,7 @@ export default function AllRegisteredProductsPage() {
 
   const fetchOffers = useCallback(async (p = page) => {
     setLoading(true);
+    setLoadError(false);
     try {
       const result = await operatorAllOffersApi.getAll({
         page: p,
@@ -295,7 +299,10 @@ export default function AllRegisteredProductsPage() {
       setTotalPages(result.pagination.totalPages);
       setTotal(result.pagination.total);
     } catch {
-      setOffers([]);
+      // 실패를 0건으로 오인시키지 않는다. 기존 목록/KPI 는 blank 하지 않고 에러만 표면화.
+      // mutation(승인/반려/토글/삭제) 성공 후 재조회 실패 시에도 mutation 성공 toast 는 그대로 두고
+      // 목록 영역만 에러 표시(데이터 [] 로 밀지 않음).
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -960,6 +967,21 @@ export default function AllRegisteredProductsPage() {
       })()}
 
       {/* Table — WO-O4O-NETURE-OPERATOR-PRODUCTS-LIST-MIGRATE-TO-BASETABLE-V1 */}
+      {/* WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+          조회 실패 시 목록(0건처럼 보이는)·페이지네이션을 숨기고 전용 에러 패널 + 재시도만 노출. */}
+      {loadError ? (
+        <div className="bg-white rounded-lg border border-slate-200 flex flex-col items-center py-20 text-slate-500">
+          <AlertTriangle size={48} className="mb-4 text-red-300" />
+          <p className="text-sm font-medium text-slate-700">상품 목록을 불러오지 못했습니다</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <button
+            onClick={() => fetchOffers(page)}
+            className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : (
       <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
         <DataTable<AllRegisteredOffer>
           columns={columns}
@@ -1007,6 +1029,7 @@ export default function AllRegisteredProductsPage() {
           </div>
         )}
       </div>
+      )}
 
       {/* WO-NETURE-OPERATOR-PRODUCT-LIST-DESCRIPTION-COLUMNS-APPLY-V1: Preview modals */}
       {shortPreviewOffer && (

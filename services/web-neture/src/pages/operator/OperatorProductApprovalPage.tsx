@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect } from 'react';
-import { CheckCircle, XCircle, Trash2 } from 'lucide-react';
+import { CheckCircle, XCircle, Trash2, AlertTriangle } from 'lucide-react';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import { DataTable, useBatchAction, defineActionPolicy, buildRowActions } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
@@ -133,6 +133,9 @@ function toDrawerProduct(p: AdminProduct): SupplierProduct {
 export default function OperatorProductApprovalPage() {
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패를 "등록된 상품 없음" 으로 삼키지 않고 별도 상태로 분리.
+  const [loadError, setLoadError] = useState(false);
   const [statusFilter, setStatusFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -172,9 +175,17 @@ export default function OperatorProductApprovalPage() {
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
-    const data = await operatorProductApi.getProducts();
-    setProducts(data || []);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const data = await operatorProductApi.getProducts();
+      setProducts(data);
+    } catch {
+      // 실패를 0건으로 오인시키지 않는다. 기존 목록은 blank 하지 않고 에러만 표면화.
+      // mutation 성공 후 재조회 실패 시에도 mutation 성공은 그대로 두고 목록 영역만 에러 표시.
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => {
@@ -411,6 +422,22 @@ export default function OperatorProductApprovalPage() {
         compact
       />
 
+      {/* WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-V1:
+          조회 실패 시 통계/목록(0건처럼 보이는)을 숨기고 전용 에러 패널 + 재시도만 노출. */}
+      {loadError ? (
+        <div className="flex flex-col items-center py-20 text-slate-500 bg-white rounded-lg border border-slate-200">
+          <AlertTriangle size={48} className="mb-4 text-red-300" />
+          <p className="text-sm font-medium text-slate-700">상품 목록을 불러오지 못했습니다</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <button
+            onClick={() => loadProducts()}
+            className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+          >
+            다시 시도
+          </button>
+        </div>
+      ) : (
+      <>
       {/* Stats Cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
@@ -497,6 +524,8 @@ export default function OperatorProductApprovalPage() {
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
       />
+      </>
+      )}
 
       {/* Reject Modal */}
       {rejectTarget && (
