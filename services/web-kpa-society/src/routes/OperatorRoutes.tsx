@@ -55,6 +55,8 @@ import OperatorGuideContentsPage from '../pages/operator/OperatorGuideContentsPa
 import CollaborationRequestsPage from '../pages/operator/CollaborationRequestsPage';
 // WO-O4O-OPERATOR-APPROVALS-SELLER-RECRUITMENT-EXPOSURE-MENU-REMODEL-V1
 import RecruitmentExposureApprovalPage from '../pages/operator/RecruitmentExposureApprovalPage';
+// WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1: 공급자 콘텐츠 승인
+import SupplierContentApprovalPage from '../pages/operator/SupplierContentApprovalPage';
 // WO-O4O-SURVEY-POINT-REWARD-PHASE1-V1
 import OperatorSurveyListPage from '../pages/operator/survey/OperatorSurveyListPage';
 import OperatorSurveyCreatePage from '../pages/operator/survey/OperatorSurveyCreatePage';
@@ -163,6 +165,9 @@ export function OperatorRoutes() {
 
           {/* 상품 판매 신청 관리 (WO-O4O-PRODUCT-APPROVAL-WORKFLOW-V1) */}
           <Route path="product-applications" element={<ProductApplicationManagementPage />} />
+
+          {/* 공급자 콘텐츠 승인 (WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1) */}
+          <Route path="approvals" element={<SupplierContentApprovalPage />} />
 
           {/* 이벤트 오퍼 승인 관리 (WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1) */}
           <Route path="event-offers" element={<EventOfferManagePage />} />

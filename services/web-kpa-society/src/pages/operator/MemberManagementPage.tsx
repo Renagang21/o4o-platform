@@ -42,7 +42,8 @@ import {
 } from '@o4o/operator-core-ui/modules/members';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { getBusinessEntityTypeLabel } from '@o4o/types';
-import { ACTIVITY_TYPE_LABELS } from '../../contexts/AuthContext';
+import { ACTIVITY_TYPE_LABELS, useAuth } from '../../contexts/AuthContext';
+import { ROLES } from '../../lib/role-constants';
 import { apiClient, coreApiClient } from '../../api/client';
 
 // ─── Types ───────────────────────────────────────────────────
@@ -208,16 +209,31 @@ export default function MemberManagementPage() {
   // WO-O4O-KPA-MEMBER-REGISTRATION-NOTIFICATION-PHASE1-V1 deeplink 호환:
   //   /operator/members?tab=applications | status-pending(=wrapper inner 'pending') 만 의미 보존.
   const [searchParams] = useSearchParams();
-  const initialOuter = searchParams.get('tab') === 'applications' ? 'applications' : 'members';
+
+  // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1 (Scope 5):
+  //   가입 신청서(KpaApplication) 검토는 백엔드가 requireScope('kpa:admin') 로 admin 전용이다
+  //   (/applications/admin/all · /admin/stats · /:id/review 전부). 그런데 이 탭이 kpa:operator 에게도
+  //   노출돼 클릭 시 전부 403 이 되는 죽은 동선이었다. 정책 확장이 아니라 UI 를 기존 백엔드 계약에 정렬한다.
+  const { user } = useAuth();
+  const canReviewApplications = !!user && (
+    user.roles.includes(ROLES.KPA_ADMIN) ||
+    user.roles.includes(ROLES.PLATFORM_SUPER_ADMIN) ||
+    user.membershipRole === 'admin'
+  );
+
+  const initialOuter =
+    canReviewApplications && searchParams.get('tab') === 'applications' ? 'applications' : 'members';
   const [outerView, setOuterView] = useState<'members' | 'applications'>(initialOuter);
 
   const [appStats, setAppStats] = useState<ApplicationStats | null>(null);
   const reloadAppStats = () => {
+    // admin 전용 stats — operator 는 403 이므로 호출 자체를 생략한다(죽은 요청/콘솔 403 제거).
+    if (!canReviewApplications) return;
     apiClient.get<{ data: ApplicationStats }>('/applications/admin/stats')
       .then((r) => setAppStats(r.data))
       .catch(() => {});
   };
-  useEffect(() => { reloadAppStats(); }, []);
+  useEffect(() => { reloadAppStats(); }, [canReviewApplications]);
 
   // member.id → user_id 매핑 — wrapper 의 password modal 이 user.id (=member.id) 만
   // 넘기는데, /operator/members/:userId 는 실제 users.id 가 필요하므로 list/listAll 시점에 적재.
@@ -350,20 +366,22 @@ export default function MemberManagementPage() {
         >
           회원 관리
         </button>
-        <button
-          type="button"
-          onClick={() => setOuterView('applications')}
-          className={
-            outerView === 'applications'
-              ? 'px-4 py-2 -mb-px text-sm font-medium border-b-2 border-primary-600 text-primary-700'
-              : 'px-4 py-2 -mb-px text-sm font-medium text-slate-500 hover:text-slate-700'
-          }
-        >
-          가입 신청서 {appStats?.submitted ? `(${appStats.submitted})` : ''}
-        </button>
+        {canReviewApplications && (
+          <button
+            type="button"
+            onClick={() => setOuterView('applications')}
+            className={
+              outerView === 'applications'
+                ? 'px-4 py-2 -mb-px text-sm font-medium border-b-2 border-primary-600 text-primary-700'
+                : 'px-4 py-2 -mb-px text-sm font-medium text-slate-500 hover:text-slate-700'
+            }
+          >
+            가입 신청서 {appStats?.submitted ? `(${appStats.submitted})` : ''}
+          </button>
+        )}
       </div>
 
-      {outerView === 'applications' ? (
+      {canReviewApplications && outerView === 'applications' ? (
         <ApplicationsTab onReviewComplete={reloadAppStats} />
       ) : (
         <OperatorMembersConsolePage

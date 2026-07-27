@@ -156,8 +156,16 @@ export function ProductApplicationManagementConsole({ api, config }: ProductAppl
     setActionLoading(actionTargetId);
     await executeAction(async () => {
       if (pendingAction === OperatorActionType.APPROVE) {
-        await api.approve(actionTargetId);
-        setToastMsg({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
+        // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+        //   승인 커밋과 매장 진열 활성은 분리 트랜잭션(SAVEPOINT)이라 부분 실패가 가능하다.
+        //   listingActivated 로 실제 결과를 분기해 "진열 생성"을 조건 없이 단언하지 않는다.
+        const result = await api.approve(actionTargetId);
+        const listingActivated = result && typeof result === 'object' ? (result as { listingActivated?: boolean }).listingActivated : undefined;
+        if (listingActivated === false) {
+          setToastMsg({ type: 'error', message: `"${app.product_name}" 승인은 완료됐지만 매장 진열 활성화에 실패했습니다. 진열 상태를 확인해주세요.` });
+        } else {
+          setToastMsg({ type: 'success', message: `"${app.product_name}" 승인 완료. 매장 진열 상품이 생성되었습니다.` });
+        }
       } else {
         await api.reject(actionTargetId, reason || undefined);
         setToastMsg({ type: 'success', message: `"${app.product_name}" 거절 처리되었습니다.` });

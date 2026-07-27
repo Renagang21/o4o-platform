@@ -194,9 +194,15 @@ export class ProductApprovalV2Service {
             [approval.offer_id, approval.organization_id, approval.service_key],
           );
           await manager.query('RELEASE SAVEPOINT upsert_listing');
-        } catch {
+        } catch (err: any) {
           await manager.query('ROLLBACK TO SAVEPOINT upsert_listing');
           // listing 생성/활성 실패해도 approval 승인은 유지(best-effort).
+          // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+          //   부분 실패를 조용히 삼키지 않는다 — 서버 로그로 남기고, 응답의 listing(=미활성/null)으로
+          //   컨트롤러가 listingActivated=false 를 합성해 프론트가 "승인됐으나 진열 미활성"을 표면화한다.
+          console.error(
+            `[ProductApprovalV2] listing UPSERT failed after approval commit — approvalId=${approvalId}, offerId=${approval.offer_id}, org=${approval.organization_id}: ${err?.message || err}`,
+          );
         }
         listing = await txListingRepo.findOne({ where: listingWhere });
       } else {

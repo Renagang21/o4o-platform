@@ -69,10 +69,20 @@ export interface ProductApplicationAiSummary {
  * service 측이 구현해 주입하는 어댑터. 각 메서드는 해당 서비스 client + 정확한 경로로 호출하고,
  * 실패 시 throw(메시지) 한다. 반환은 정규화된 형태(아래 타입)만 의존한다.
  */
+/**
+ * WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+ *   승인 결과 정규화. 백엔드는 approval 커밋과 매장 진열(OPL) 활성화를 SAVEPOINT 로 분리하므로
+ *   "승인은 됐으나 진열 활성 실패"가 발생할 수 있다. 이를 성공으로 위장하지 않도록
+ *   listingActivated 를 콘솔까지 전달해 토스트 문구를 분기한다. 필드 부재 시 undefined.
+ */
+export interface ProductApproveResult {
+  listingActivated?: boolean;
+}
+
 export interface ProductApplicationsApi {
   list(params: ProductApplicationListParams): Promise<ProductApplicationListResult>;
   stats(): Promise<ProductApplicationStats>;
-  approve(id: string): Promise<unknown>;
+  approve(id: string): Promise<ProductApproveResult | void>;
   reject(id: string, reason?: string): Promise<unknown>;
   batchApprove(ids: string[]): Promise<unknown>;
   batchReject(ids: string[], reason?: string): Promise<unknown>;

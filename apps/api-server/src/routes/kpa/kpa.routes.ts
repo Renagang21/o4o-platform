@@ -1016,11 +1016,15 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
     if (filterType === 'all' || filterType === 'content') {
       tasks.push((async () => {
+        // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+        //   read-compat — 'ready' 포함. 저장 표준(WO-O4O-CONTENT-SAVE-MEANS-READY-GLOBAL-STANDARD-V1)
+        //   상 기본 저장 status 는 'ready'('저장=즉시 사용 가능')인데 홈 피드는 'published' 만 읽어
+        //   저장 즉시 노출돼야 할 콘텐츠가 피드에서 사라졌다. 쓰기 어휘는 그대로 두고 읽기만 정렬한다.
         const rows: any[] = await dataSource.query(
           `SELECT c.id, c.title, c.created_at,
                   COALESCE(c.author_name, u.name) AS author_name
            FROM kpa_contents c LEFT JOIN users u ON c.created_by = u.id
-           WHERE c.status = 'published' AND c.is_deleted = false
+           WHERE c.status IN ('ready', 'published') AND c.is_deleted = false
              AND (c.sub_type IS NULL OR c.sub_type != 'resource')
            ORDER BY c.created_at DESC LIMIT $1`,
           [perLimit],
@@ -1042,7 +1046,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
           `SELECT c.id, c.title, c.created_at,
                   COALESCE(c.author_name, u.name) AS author_name
            FROM kpa_contents c LEFT JOIN users u ON c.created_by = u.id
-           WHERE c.status = 'published' AND c.is_deleted = false
+           WHERE c.status IN ('ready', 'published') AND c.is_deleted = false
              AND c.sub_type = 'resource'
            ORDER BY c.created_at DESC LIMIT $1`,
           [perLimit],

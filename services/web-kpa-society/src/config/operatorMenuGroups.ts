@@ -41,6 +41,10 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     // WO-KPA-LMS-INSTRUCTOR-APPROVAL-RELOCATE-V1: 자격 신청 관리 → lms 그룹으로 이동
     // WO-O4O-KPA-PRODUCT-APPLICATIONS-MENU-EXPOSURE-V1: GP/KCos 와 메뉴명 정렬
     { label: '공급 상품 신청 승인', path: '/operator/product-applications' },
+    // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+    //   공급자 CMS→HUB 콘텐츠 승인 + 사이니지 캠페인 요청 승인 (백엔드 kpa:operator 는 이미 존재,
+    //   진입 화면만 부재였음 → 운영자 콘솔에 화면 연결).
+    { label: '공급자 콘텐츠 승인', path: '/operator/approvals' },
     // WO-O4O-EVENT-OFFER-OPERATOR-APPROVAL-KPA-V1: 이벤트 오퍼 승인 관리
     { label: '이벤트 오퍼 승인', path: '/operator/event-offers' },
     // WO-O4O-KPA-SELLER-RECRUITMENT-OPERATOR-APPROVAL-FLOW-RESTORE-V1:

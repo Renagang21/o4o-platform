@@ -276,9 +276,13 @@ export default function OperatorStoreDetailPage() {
         method: 'PUT',
         body: JSON.stringify({ capabilities: [{ key: capKey, enabled: !currentEnabled }] }),
       });
+      // 낙관적 갱신으로 즉시 반영하되, 서버 상태로 재조회하여 실제 결과와 동기화한다.
+      // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+      //   mutation 성공 후 목록을 서버에서 refetch — 낙관적 값이 서버 실제 상태와 어긋날 여지 제거.
       setCapabilities((prev) =>
         prev.map((c) => (c.key === capKey ? { ...c, enabled: !currentEnabled } : c)),
       );
+      await loadCapabilities();
     } catch (err: any) {
       // 토글 실패는 사용자에게 toast 로 알린다 (조용히 무시 금지)
       toast.error(err?.message || '기능 상태 변경에 실패했습니다.');
@@ -296,9 +300,12 @@ export default function OperatorStoreDetailPage() {
         method: 'PUT',
         body: JSON.stringify({ status: newStatus }),
       });
+      // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+      //   낙관적 갱신 후 서버 상태로 refetch — 채널 상태가 서버 실제 전이 결과와 일치하도록 동기화.
       setChannels((prev) =>
         prev.map((c) => (c.id === channelId ? { ...c, status: newStatus } : c)),
       );
+      await loadChannels();
     } catch (err: any) {
       toast.error(err?.message || '상태 변경에 실패했습니다.');
     } finally {

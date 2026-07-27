@@ -44,7 +44,12 @@ const productApplicationsApi: ProductApplicationsApi = {
     } catch (err) { throw toError(err); }
   },
   async approve(id) {
-    try { return (await api.patch(`${BASE}/${id}/approve`, {})).data; } catch (err) { throw toError(err); }
+    // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+    //   응답 envelope 의 listingActivated 를 콘솔까지 정규화 전달 (진열 활성 부분 실패 표면화).
+    try {
+      const body = (await api.patch(`${BASE}/${id}/approve`, {})).data;
+      return { listingActivated: body?.data?.listingActivated };
+    } catch (err) { throw toError(err); }
   },
   async reject(id, reason) {
     try { return (await api.patch(`${BASE}/${id}/reject`, { reason: reason || undefined })).data; } catch (err) { throw toError(err); }

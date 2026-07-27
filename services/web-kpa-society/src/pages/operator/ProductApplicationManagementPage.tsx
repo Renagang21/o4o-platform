@@ -34,7 +34,12 @@ const api: ProductApplicationsApi = {
     const res = await apiClient.get<{ success: boolean; data: ProductApplicationStats }>(`${BASE}/stats`);
     return res.data;
   },
-  approve: (id) => apiClient.patch(`${BASE}/${id}/approve`, {}),
+  // WO-O4O-KPA-OPERATOR-ACTION-INTEGRITY-AND-APPROVAL-FLOW-COMPLETION-V1:
+  //   승인 응답의 listingActivated 를 콘솔까지 정규화 전달 (진열 활성 부분 실패 표면화).
+  approve: async (id) => {
+    const res = await apiClient.patch<{ success: boolean; data?: { listingActivated?: boolean } }>(`${BASE}/${id}/approve`, {});
+    return { listingActivated: res?.data?.listingActivated };
+  },
   reject: (id, reason) => apiClient.patch(`${BASE}/${id}/reject`, { reason: reason || undefined }),
   batchApprove: (ids) => apiClient.post(`${BASE}/batch-approve`, { ids }),
   batchReject: (ids, reason) => apiClient.post(`${BASE}/batch-reject`, { ids, reason }),
