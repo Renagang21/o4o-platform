@@ -1,0 +1,599 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MARKETED-SCOPE-BASELINE-CENSUS-V1",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "status": "BASELINE_CENSUS",
+  "determinism": "no wall-clock in file · single REPEATABLE READ READ ONLY snapshot · arrays sorted",
+  "snapshotNote": "동시 세션이 easy→authored 를 활발히 생산 중. EASY_DRUG_REGISTERED(deprecated 포함)는 안정적, COMPLETED/INCOMPLETE 는 스냅샷 시점 값. (스냅샷 시각/xmin 은 CHECK 참조 — byte-identity 위해 파일에서 제외)",
+  "definitions": {
+    "otcUniverse": "product_masters JOIN product_drug_extensions(drug_category='otc', deleted_at IS NULL)",
+    "easyDrugRegistered": "shared_product_descriptions STORE source_type='mfds_easy_drug' 모든 status(canonical/deprecated/candidate)",
+    "authoredComplete": "STORE canonical ko AND en, source_type IN {mfds_drug_otc, mfds_drug_otc_nutrition_combo, o4o_drug_otc_topical, nutrition_combo}",
+    "o4oEvidence": "organization_product_listings(is_active) ∪ supplier_product_offers(is_active,!deleted) ∪ store_products(is_active), master 연결 + OTC 교집합",
+    "excludeConfirmed": "제품명 수출/군납/비매품 키워드 ∪ 비소매 대용량 포장 ∪ 표준코드 전량 취소(isCancelled)"
+  },
+  "requiredPopulations": {
+    "p1_OTC_TOTAL_AUTHORIZED": 57572,
+    "p2_EASY_DRUG_REGISTERED": 19385,
+    "p3_EASY_DRUG_REGISTERED_COMPLETED": 14442,
+    "p4_EASY_DRUG_REGISTERED_INCOMPLETE": 4943,
+    "p5_NON_EASY_WITH_O4O_EVIDENCE": 0,
+    "p6_NON_EASY_NO_MARKET_EVIDENCE": 32385,
+    "p7_EXCLUDE_CONFIRMED": 2869,
+    "aux_NON_EASY_ALREADY_PRODUCED": 2933
+  },
+  "easyDrugRegisteredBreakdown": {
+    "byDescriptionStatus_distinctMasters": {
+      "candidate": 254,
+      "canonical": 4943,
+      "deprecated": 14188
+    },
+    "note": "canonical=아직 raw easy(미전환) · deprecated=authored 전환 완료 · candidate=미승격. 세 status 합집합 distinct = EASY_DRUG_REGISTERED.",
+    "sourceCandidatesMfdsEasyDrugInfoRows": 4757,
+    "sourceNote": "원천 product_candidates(MFDS_EASY_DRUG_INFO) 는 승격 후 정리되어 설명서 원장보다 적음. 설명서 source_type 이 더 완전한 등록 원장."
+  },
+  "completionDetail": {
+    "authoredCompleteMasters": 17375,
+    "complete_and_easyRegistered": 14442,
+    "complete_not_easy_producedFromOfficialSource": 2933,
+    "authoredKoCanonicalSources_distinctMasters": {
+      "mfds_drug_otc_nutrition_combo": 3545,
+      "o4o_drug_otc_topical": 2532,
+      "mfds_drug_otc": 11298
+    }
+  },
+  "o4oEvidence": {
+    "OPL_active_otc_masters": 5,
+    "SPO_active_otc_masters": 0,
+    "store_products_active_otc_masters": 0,
+    "union_distinct_otc_masters": 5,
+    "union_nonEasy_otc_masters": 0,
+    "store_local_products": {
+      "rows": 43,
+      "active": 10,
+      "with_barcode": 2,
+      "note": "store_local_products 는 master_id 없음(barcode only) → OTC master 귀속 불가. 실제 활성 10행 중 barcode 2건뿐. per-master 근거로 미인정."
+    },
+    "finding": "store_products/supplier_product_offers 테이블 0행, OPL 20행(전부 pending·is_active) 중 OTC 5건 전부 e약은요 등록. → 비-easy O4O 취급 근거 = 0."
+  },
+  "completionRates": {
+    "a_byTotalAuthorized": {
+      "numerator_completed": 17375,
+      "denominator": 57572,
+      "rate": "30.18%",
+      "note": "전체 허가(57,572) 기준 — 실제 생산 대상이 아닌 품목까지 분모에 포함(폐기 권고 지표)"
+    },
+    "b_byEasyDrugRegistered": {
+      "numerator_completed": 14442,
+      "denominator": 19385,
+      "rate": "74.50%",
+      "note": "e약은요 등록(19,385, deprecated 포함) 기준"
+    },
+    "c_byEasyPlusO4oEvidence": {
+      "numerator_completed": 17375,
+      "denominator": 22318,
+      "rate": "77.85%",
+      "note": "e약은요 등록 + O4O 실제 취급 예외 + 이미 생산된 non-easy(허가원문 authored) 기준 = 실질 생산 대상 분모"
+    }
+  },
+  "productionTarget": {
+    "denominator_realistic": 19385,
+    "remaining_open_targets": 4943,
+    "remaining_breakdown": {
+      "easyIncomplete": 4943,
+      "nonEasyWithEvidence": 0
+    },
+    "excludedFromBulk_candidates": 35254,
+    "excludedFromBulk_note": "EXCLUDED_FROM_BULK_PRODUCTION. e약은요 미등록·O4O 취급 근거 없음. 신규 허가/재공급/취급 근거 확인 시 개별 복원 가능."
+  },
+  "remainingHoldDistribution": {
+    "scope": "생산 대상(EASY_DRUG_REGISTERED_INCOMPLETE + NON_EASY_WITH_O4O_EVIDENCE) 만",
+    "counts": {
+      "HOLD_IDENTITY": 3246,
+      "READY": 1134,
+      "HOLD_ROUTE": 536,
+      "HOLD_SOURCE": 27
+    },
+    "reasons": {
+      "HOLD_ROUTE": {
+        "external_site_ambiguous(CLQ)": 221,
+        "external_site_ambiguous(CDS)": 144,
+        "external_site_ambiguous(CSI)": 49,
+        "suffix_not_allowlisted(CSP)": 38,
+        "suffix_not_allowlisted(AXS)": 15,
+        "suffix_not_allowlisted(CIS)": 12,
+        "suffix_not_allowlisted(CSS)": 11,
+        "suffix_not_allowlisted(ACM)": 8,
+        "suffix_not_allowlisted(CAE)": 8,
+        "suffix_not_allowlisted(API)": 7,
+        "suffix_not_allowlisted(ATT)": 7,
+        "suffix_not_allowlisted(CGL)": 6,
+        "suffix_not_allowlisted(CPD)": 6,
+        "suffix_not_allowlisted(ATC)": 2,
+        "suffix_not_allowlisted(CEM)": 2
+      },
+      "READY": {
+        "gencode=228633COS,route=ophthalmic": 115,
+        "gencode=179901CPL,route=topical": 76,
+        "gencode=172806ATB,route=oral": 48,
+        "gencode=228648COS,route=ophthalmic": 42,
+        "gencode=130501ATB,route=oral": 38,
+        "gencode=228651COS,route=ophthalmic": 36,
+        "gencode=363700CCM,route=topical": 33,
+        "gencode=166502ATB,route=oral": 32,
+        "gencode=180147COS,route=ophthalmic": 32,
+        "gencode=185401ATB,route=oral": 24,
+        "gencode=244301ATB,route=oral": 24,
+        "gencode=179903CPL,route=topical": 22,
+        "gencode=C02600CPL,route=topical": 22,
+        "gencode=136601ATB,route=oral": 18,
+        "gencode=A18500CCM,route=topical": 17,
+        "gencode=166501ATB,route=oral": 14,
+        "gencode=229102COM,route=topical": 12,
+        "gencode=102935CCM,route=topical": 11,
+        "gencode=136603ATB,route=oral": 11,
+        "gencode=105201ASS,route=oral": 10,
+        "gencode=105230ASS,route=oral": 10,
+        "gencode=186102CPL,route=topical": 10,
+        "gencode=306400ACH,route=oral": 10,
+        "gencode=A02500ACS,route=oral": 10,
+        "gencode=118601ATB,route=oral": 9,
+        "gencode=166201ACH,route=oral": 9,
+        "gencode=170932CCM,route=topical": 9,
+        "gencode=214005CPC,route=topical": 9,
+        "gencode=244302ATB,route=oral": 9,
+        "gencode=260300ATB,route=oral": 9,
+        "gencode=C36300ACH,route=oral": 9,
+        "gencode=244305ATB,route=oral": 8,
+        "gencode=425400ASS,route=oral": 8,
+        "gencode=A87803AMS,route=oromucosal": 8,
+        "gencode=101804ACH,route=oral": 7,
+        "gencode=104601ACS,route=oral": 7,
+        "gencode=276100ATB,route=oral": 7,
+        "gencode=339900CPO,route=topical": 7,
+        "gencode=A52200COS,route=ophthalmic": 7,
+        "gencode=C36200ACH,route=oral": 7,
+        "gencode=C79700CLT,route=topical": 7,
+        "gencode=161902CPO,route=topical": 6,
+        "gencode=227736ATD,route=oromucosal": 6,
+        "gencode=331800COS,route=ophthalmic": 6,
+        "gencode=A06300ACS,route=oral": 6,
+        "gencode=A24400CCM,route=topical": 6,
+        "gencode=A53600COM,route=topical": 6,
+        "gencode=B97100CPL,route=topical": 6,
+        "gencode=C18600ACS,route=oral": 6,
+        "gencode=101430ATR,route=oral": 5,
+        "gencode=101839ASY,route=oral": 5,
+        "gencode=102935COM,route=topical": 5,
+        "gencode=105203ATB,route=oral": 5,
+        "gencode=123804ACH,route=oral": 5,
+        "gencode=146431ASS,route=oral": 5,
+        "gencode=153101ACH,route=oral": 5,
+        "gencode=177932CCM,route=topical": 5,
+        "gencode=179632CCM,route=topical": 5,
+        "gencode=216134COS,route=ophthalmic": 5,
+        "gencode=243302COM,route=topical": 5,
+        "gencode=375800ATB,route=oral": 5,
+        "gencode=461101ACH,route=oral": 5,
+        "gencode=A04400ATB,route=oral": 5,
+        "gencode=A11800CCM,route=topical": 5,
+        "gencode=A18600ACS,route=oral": 5,
+        "gencode=B02501CPC,route=topical": 5,
+        "gencode=104303ATB,route=oral": 4,
+        "gencode=172837ASY,route=oral": 4,
+        "gencode=199501ATB,route=oral": 4,
+        "gencode=268600ACH,route=oral": 4,
+        "gencode=271400ASS,route=oral": 4,
+        "gencode=272400ATB,route=oral": 4,
+        "gencode=285400ASS,route=oral": 4,
+        "gencode=300800ATB,route=oral": 4,
+        "gencode=303300ACS,route=oral": 4,
+        "gencode=306700ACS,route=oral": 4,
+        "gencode=308000ATE,route=oral": 4,
+        "gencode=346500COM,route=topical": 4,
+        "gencode=367902CPL,route=topical": 4,
+        "gencode=A13100ALQ,route=oral": 4,
+        "gencode=A15900CCM,route=topical": 4,
+        "gencode=A54200CPO,route=topical": 4,
+        "gencode=A76900ACS,route=oral": 4,
+        "gencode=139503ACS,route=oral": 3,
+        "gencode=142301ACS,route=oral": 3,
+        "gencode=179901CPO,route=topical": 3,
+        "gencode=235733CCM,route=topical": 3,
+        "gencode=246501ATB,route=oral": 3,
+        "gencode=252500ATB,route=oral": 3,
+        "gencode=A25800COS,route=ophthalmic": 3,
+        "gencode=A63400ATB,route=oral": 3,
+        "gencode=A75800COS,route=ophthalmic": 3,
+        "gencode=A86000ACS,route=oral": 3,
+        "gencode=B52200ATB,route=oral": 3,
+        "gencode=B59100ATB,route=oral": 3,
+        "gencode=B90300CPO,route=topical": 3,
+        "gencode=C18900ATB,route=oral": 3,
+        "gencode=C75600COM,route=topical": 3,
+        "gencode=142301ATB,route=oral": 2,
+        "gencode=172835ASY,route=oral": 2,
+        "gencode=180137COS,route=ophthalmic": 2,
+        "gencode=185102ACH,route=oral": 2,
+        "gencode=227703ATB,route=oral": 2,
+        "gencode=241002ACS,route=oral": 2,
+        "gencode=270500ACH,route=oral": 2,
+        "gencode=279200ACH,route=oral": 2,
+        "gencode=341700CPO,route=topical": 2,
+        "gencode=343900CCM,route=topical": 2,
+        "gencode=530094CCM,route=topical": 2,
+        "gencode=A03000ATB,route=oral": 2,
+        "gencode=A07000ACS,route=oral": 2,
+        "gencode=A20000ATB,route=oral": 2,
+        "gencode=A56900ATB,route=oral": 2,
+        "gencode=B29400ACS,route=oral": 2,
+        "gencode=C07400ACS,route=oral": 2,
+        "gencode=C72800ATB,route=oral": 2,
+        "gencode=D11200ATB,route=oral": 2,
+        "gencode=D12500ATB,route=oral": 2,
+        "gencode=D22400ACS,route=oral": 2,
+        "gencode=117801ATE,route=oral": 1,
+        "gencode=130501ACS,route=oral": 1,
+        "gencode=142334ASY,route=oral": 1,
+        "gencode=172802ACS,route=oral": 1,
+        "gencode=172802ATB,route=oral": 1,
+        "gencode=179733CCM,route=topical": 1,
+        "gencode=180138COS,route=ophthalmic": 1,
+        "gencode=202704ATB,route=oral": 1,
+        "gencode=214035CCM,route=topical": 1,
+        "gencode=227730ASS,route=oral": 1,
+        "gencode=235731CCM,route=topical": 1,
+        "gencode=267200ASY,route=oral": 1,
+        "gencode=273500ATE,route=oral": 1,
+        "gencode=276100ATE,route=oral": 1,
+        "gencode=301600ATB,route=oral": 1,
+        "gencode=303403ATR,route=oral": 1,
+        "gencode=303600ATE,route=oral": 1,
+        "gencode=419500ATB,route=oral": 1,
+        "gencode=487401ACH,route=oral": 1,
+        "gencode=A33901ACE,route=oral": 1,
+        "gencode=A33903ACE,route=oral": 1,
+        "gencode=A34700COS,route=ophthalmic": 1,
+        "gencode=A53100ATB,route=oral": 1,
+        "gencode=A80800ACS,route=oral": 1,
+        "gencode=B04300ALQ,route=oral": 1,
+        "gencode=B65200ATB,route=oral": 1,
+        "gencode=B67900ATB,route=oral": 1,
+        "gencode=C92800ATB,route=oral": 1,
+        "gencode=D01700CCM,route=topical": 1,
+        "gencode=D05300ATB,route=oral": 1,
+        "gencode=D10900ACS,route=oral": 1,
+        "gencode=D15000ATB,route=oral": 1,
+        "gencode=D51002ATB,route=oral": 1
+      },
+      "HOLD_IDENTITY": {
+        "general_name_code_absent": 2502,
+        "general_name_code_ambiguous(2)": 387,
+        "general_name_code_ambiguous(3)": 194,
+        "general_name_code_ambiguous(27)": 114,
+        "general_name_code_ambiguous(7)": 37,
+        "general_name_code_ambiguous(4)": 12
+      },
+      "HOLD_SOURCE": {
+        "source_axis_missing(indication)": 17,
+        "easy_content_parse_fail": 7,
+        "source_axis_missing(dosage)": 3
+      }
+    }
+  },
+  "nextLargeProductionCandidates": [
+    {
+      "route": "oral",
+      "masters": 540
+    },
+    {
+      "route": "topical",
+      "masters": 327
+    },
+    {
+      "route": "ophthalmic",
+      "masters": 253
+    },
+    {
+      "route": "oromucosal",
+      "masters": 14
+    }
+  ],
+  "exclusionDiagnostics": {
+    "excludeConfirmed_reason_counts": {
+      "export_or_nonretail_keyword": 2839,
+      "bulk_package": 30,
+      "multi_reason": 0,
+      "standard_code_all_cancelled": 0
+    },
+    "note": "이 카운트는 EXCLUDE_CONFIRMED population(미완료·비-easy·비-evidence) 내부 사유 분해. 완료/생산대상 master 에는 EXCLUDE 를 적용하지 않는다."
+  },
+  "gates": {
+    "g1_otcTotalReproduced": 57572,
+    "g2_populationSumEqualsUniverse": true,
+    "g2_populationSum": 57572,
+    "g3_easyRegSubtotal": true,
+    "g4_masterDuplicates": 0,
+    "g5_completeHasKoAndEn": true,
+    "g6_canonicalDup": 0,
+    "g7_needsReview": 0,
+    "g8_nonDrugSourceExcluded": "authored 완료 소스에 o4o_hff_generated/supplier/manual 미포함 · OTC drug_category 로 모집단 한정",
+    "g9_evidenceExceptionOnlyWithRealEvidence": true,
+    "g10_excludeConfirmedNotProduced": true,
+    "g11_completedNoNeedsReview": true,
+    "g12_dbWrite": 0,
+    "holdSumEqualsProductionTarget": true
+  },
+  "priorProductionCrossCheck": {
+    "priorCensus": "otc-remaining-full-corpus-census-v2.json (동일 에이전트 라, 08:49 스냅샷)",
+    "note": "V2 는 08:49 스냅샷으로 authoredComplete=7,636·easyOnly=10,969 였음. 본 census 는 이후 스냅샷으로 동시 생산이 진행되어 completed 증가·easyIncomplete 감소. 구조/판정 키는 동일, 절대값만 스냅샷 차이. 기존 LIVE 완료 master 는 authored canonical 로 전량 포착(누락 0)."
+  },
+  "samples": {
+    "easyIncomplete_holdRoute": [
+      {
+        "id": "0015084b-d47e-4107-bc0b-52a8f612aa47",
+        "name": "자모",
+        "suffix": "AXS",
+        "reason": "suffix_not_allowlisted(AXS)"
+      },
+      {
+        "id": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+        "name": "지노베타딘질좌제(포비돈요오드)",
+        "suffix": "CSP",
+        "reason": "suffix_not_allowlisted(CSP)"
+      },
+      {
+        "id": "01833688-4b53-4da3-bcbb-cf7b679e8e79",
+        "name": "소프타-맨액",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "028647fb-2dc8-47f8-8705-62888a711859",
+        "name": "파라멜액(L-아스파르트산-L-오르니틴)",
+        "suffix": "ACM",
+        "reason": "suffix_not_allowlisted(ACM)"
+      },
+      {
+        "id": "02e2a85b-afea-415b-bff8-e5cd91ff2ab0",
+        "name": "소프타-맨액",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "0374e2e2-aa44-41ea-8cec-eadaad4afcf5",
+        "name": "자모",
+        "suffix": "AXS",
+        "reason": "suffix_not_allowlisted(AXS)"
+      },
+      {
+        "id": "03a1e771-3d79-4e25-b558-4217d158a751",
+        "name": "자모",
+        "suffix": "AXS",
+        "reason": "suffix_not_allowlisted(AXS)"
+      },
+      {
+        "id": "03a20337-efc0-4604-887e-7ce2c9cdeb02",
+        "name": "둘코락스좌약(비사코딜)",
+        "suffix": "CSP",
+        "reason": "suffix_not_allowlisted(CSP)"
+      },
+      {
+        "id": "042bd399-345f-4031-8f65-d56f069566d8",
+        "name": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+        "suffix": "CSI",
+        "reason": "external_site_ambiguous(CSI)"
+      },
+      {
+        "id": "0510ba3d-5bf8-442a-ba46-ee28159f7b25",
+        "name": "큐앤큐포비돈탈지면볼(소)",
+        "suffix": "CDS",
+        "reason": "external_site_ambiguous(CDS)"
+      },
+      {
+        "id": "053d7657-f18e-4c05-ac2f-630d703dd736",
+        "name": "헥시타놀이티2%액",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "05e04772-83f9-4cc5-9ba4-12ae1cc3e4f1",
+        "name": "그린포비돈요오드액(수출명:GreenPovidone-IodineTopicalSolution)",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "0640e641-5b5d-488a-a87a-b7a9879d37ca",
+        "name": "헥시덱스-4액(클로르헥시딘글루콘산염액)",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "0641e186-1477-4803-84ca-f27eafc0308f",
+        "name": "드리클로액(염화알루미늄수화물)",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "06525b1b-0071-4f2e-b762-5c288d9760b2",
+        "name": "몽푸로겔",
+        "suffix": "CGL",
+        "reason": "suffix_not_allowlisted(CGL)"
+      },
+      {
+        "id": "06bc047c-831a-41dc-ba79-9f320e18762c",
+        "name": "소프타-맨액",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "06d10c1c-c401-4723-af6c-744b86a51057",
+        "name": "누코미트액(아세틸시스테인)",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "077dfd6f-65f9-4891-8a32-2d4c3b495b19",
+        "name": "대한관류용멸균증류수",
+        "suffix": "CIS",
+        "reason": "suffix_not_allowlisted(CIS)"
+      },
+      {
+        "id": "07c8d335-ad25-4342-89ee-7bec9de1ce43",
+        "name": "소프타-맨액",
+        "suffix": "CLQ",
+        "reason": "external_site_ambiguous(CLQ)"
+      },
+      {
+        "id": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+        "name": "푸레파인마일드좌제",
+        "suffix": "CSP",
+        "reason": "suffix_not_allowlisted(CSP)"
+      }
+    ],
+    "nonEasyWithEvidence": [],
+    "excludeConfirmed": [
+      {
+        "id": "001bb93f-b3b1-49d7-886c-72af9cb26097",
+        "name": "디펜롱액(리도카인(수출명:LIDOLONG))",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "001e1021-7ae3-44ec-b49e-f9d30ea6e088",
+        "name": "오세라티정(세라티오펩티다제)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "003b77ff-26d3-40ad-a6bd-a995cc30e95b",
+        "name": "테르핀크림(테르비나핀염산염)(수출명:트리제놀크림)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "0056dc06-c3be-4bfd-8664-2153996071f6",
+        "name": "마더스염화리소짐정90밀리그램(염화리소짐)(수출명:MothersLysozymetablet90mg)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "00843bf6-9c8a-4fdf-b8b6-593cbffe602e",
+        "name": "한림피브이에이점안액(폴리비닐알코올)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "00b0e804-22dd-4531-b8ef-26443962f130",
+        "name": "알젠탈정400밀리그램(알벤다졸)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "00da86a1-2e31-496c-bacb-74907520bf07",
+        "name": "아겔레스-브이연질캅셀(수출명:ACTOVITsoftcapsuleREVITONsoftcapsule)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "00f523ca-8a11-44fd-a086-20aa2934134a",
+        "name": "퓨어에이드드라이아이릴리프티얼스루브리칸트점안액(수출용)(수출명:유니클리어드라이아이릴리프티얼스점안액)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "010a7ecd-7b43-4f1e-aa85-354aee5c868e",
+        "name": "알마겐현탁액(알마게이트)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "010b6a21-8515-492e-8926-83d59ed304ff",
+        "name": "신신페인릴리프패취(수출용)(수출명:1.SINSINPAINRELIEFPATCH2.SINTOKUSENPLASTER3.MUSCLE&JOINTMUSCLEACHERELIEFPAINPATCH4.PAINRELIEVINGPATCH)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "011083a7-cc41-4ba8-bf8f-57524d96667e",
+        "name": "트로우민정(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01274505-028c-44b0-a792-d35949bf6248",
+        "name": "소브딘캡슐(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01283cd8-14c5-4ca8-960c-f3ae27cde150",
+        "name": "유디카정(우루소데스옥시콜린산)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "0135743e-9dc0-48d3-a8d0-a4c8ed31f22d",
+        "name": "키로민정(은행엽엑스)(수출명:GINKONRENEGIKONXELL)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "014a8906-4e77-4627-8a6a-8e28aa69ca6e",
+        "name": "레가론정(카르두스마리아누스엑스)(수출명:부광실리마린정35밀리그람헤파라이프정)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01678a76-a4ec-4d51-a832-5a34b0096f96",
+        "name": "알안탁정(알디옥사)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01718bd8-ce23-45f4-a288-dddc839e1bd4",
+        "name": "뉴젠팜실리마린정100밀리그램(밀크시슬엑스)(수출명:실리마린정100밀리그램비마리비정뉴젠실리마린정)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01888890-b988-40c3-9c8e-0beb253bb592",
+        "name": "기화행소탕(혼합단미엑스산)1095g",
+        "kw": false,
+        "bulk": true,
+        "cancelled": false
+      },
+      {
+        "id": "01924ac2-6334-471b-8c9d-6a5e9456b165",
+        "name": "페인핫카타플라스마(수출명:PainReliefHotPatch)(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      },
+      {
+        "id": "01a10cb2-0448-4f52-9b72-113ddb101bd3",
+        "name": "시리아민연질캡슐(수출용)",
+        "kw": true,
+        "bulk": false,
+        "cancelled": false
+      }
+    ]
+  }
+}

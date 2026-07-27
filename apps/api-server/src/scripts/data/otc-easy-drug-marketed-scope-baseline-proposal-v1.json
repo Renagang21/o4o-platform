@@ -1,0 +1,53 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MARKETED-SCOPE-BASELINE-CENSUS-V1",
+  "artifact": "production-scope-baseline-proposal",
+  "status": "PROPOSAL",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "sourceCensus": "otc-easy-drug-marketed-scope-baseline-census-v1.json",
+  "principle": [
+    "설명서 대량 생산 분모 = 전체 허가(57,572) 아님",
+    "기본 생산 대상 = e약은요 등록(19,385, deprecated 포함) ∪ 비-easy O4O 실제 취급 근거",
+    "이미 생산된 non-easy(허가원문 authored, NON_EASY_ALREADY_PRODUCED)는 완료로 인정",
+    "e약은요 미등록 + O4O 취급 근거 없음 = EXCLUDED_FROM_BULK_PRODUCTION (영구 제외 아님, 개별 복원 가능)",
+    "HOLD_ROUTE 878 등 잔여는 생산 대상(easyIncomplete) 안에 포함되는 것만 이후 진행"
+  ],
+  "proposedProductionScope": {
+    "denominator": 19385,
+    "completed": 17375,
+    "remainingOpen": 4943,
+    "remainingReady": 1134,
+    "remainingHold": 3809
+  },
+  "excludedFromBulkProduction": {
+    "NON_EASY_NO_MARKET_EVIDENCE": 32385,
+    "EXCLUDE_CONFIRMED": 2869,
+    "restorationRule": "e약은요 신규 등록 또는 O4O 실제 취급 근거(OPL/SPO/store_products active) 확인 시 개별 생산 대상으로 복원"
+  },
+  "holdDistribution": {
+    "HOLD_IDENTITY": 3246,
+    "READY": 1134,
+    "HOLD_ROUTE": 536,
+    "HOLD_SOURCE": 27
+  },
+  "nextLargeProductionCandidates": [
+    {
+      "route": "oral",
+      "masters": 540
+    },
+    {
+      "route": "topical",
+      "masters": 327
+    },
+    {
+      "route": "ophthalmic",
+      "masters": 253
+    },
+    {
+      "route": "oromucosal",
+      "masters": 14
+    }
+  ],
+  "decisionForOperator": "전체 허가 기준 진행률(폐기 권고). 실제 목표 분모 = e약은요 등록 + O4O 예외. HOLD_ROUTE census 재개는 생산 대상 내 HOLD_ROUTE 로 한정."
+}
