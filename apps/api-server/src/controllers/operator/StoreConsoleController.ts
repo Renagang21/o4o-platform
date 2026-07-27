@@ -303,13 +303,14 @@ export class StoreConsoleController {
         return;
       }
 
+      // organization_channels 스키마에는 approved_by 컬럼이 없다 (approved_at 만 존재).
+      // 이전 쿼리의 oc.approved_by / LEFT JOIN users 는 존재하지 않는 컬럼을 참조해
+      // "column oc.approved_by does not exist" 로 500 을 유발했다. 실제 스키마에 맞춰 정정.
       const channels = await AppDataSource.query(
         `SELECT oc.id, oc.channel_type, oc.status,
-                oc.approved_at, oc.approved_by,
-                oc.created_at, oc.updated_at,
-                u.name as approved_by_name
+                oc.approved_at,
+                oc.created_at, oc.updated_at
          FROM organization_channels oc
-         LEFT JOIN users u ON oc.approved_by = u.id
          WHERE oc.organization_id = $1
          ORDER BY oc.channel_type ASC`,
         [storeId]
@@ -322,8 +323,7 @@ export class StoreConsoleController {
           channelType: c.channel_type,
           status: c.status,
           approvedAt: c.approved_at,
-          approvedBy: c.approved_by,
-          approvedByName: c.approved_by_name,
+          approvedByName: null,
           createdAt: c.created_at,
           updatedAt: c.updated_at,
         })),
