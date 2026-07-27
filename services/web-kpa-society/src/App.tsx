@@ -1066,12 +1066,11 @@ function App() {
             <Route path="settings" element={<PharmacyStorePage />} />
             {/* WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1: layout integrated into /store/settings */}
             <Route path="settings/layout" element={<Navigate to="/store/settings" replace />} />
-            {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1: 은퇴 보류(판정 B).
-                /store/settings 의 템플릿 선택은 storefront_config.template 만 쓰고 블록을 재생성하지 않아
-                매장 홈에 반영되지 않는다. 이 화면은 organizations.template_profile 을 쓰는 유일한 경로이며,
-                blocks 미저장 매장(프로덕션 17개 중 16개)에서 실제로 적용되는 유일한 템플릿 변경 수단이다.
-                canonical 화면이 템플릿을 실제 적용하게 된 뒤 별도 WO 로 은퇴한다.
-                CHECK: docs/checks/CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1.md */}
+            {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1: 은퇴 선행 조건 해소됨.
+                /store/settings 가 템플릿 변경 시 기본 블록 재생성 + template_profile 동기화를 수행하므로
+                이 화면의 고유 기능(=template_profile 을 쓰는 유일한 경로)은 사라졌다.
+                본 WO 범위에서는 삭제하지 않고 유지하며, 후속 은퇴 WO 에서 제거 + /store/settings redirect 한다.
+                CHECK: docs/checks/CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1.md */}
             <Route path="settings/template" element={<PharmacyTemplatePage />} />
           </Route>
 

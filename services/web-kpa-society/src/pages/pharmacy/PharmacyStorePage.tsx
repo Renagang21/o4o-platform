@@ -3,6 +3,11 @@
  *   WO-O4O-KPA-STORE-SETTINGS-NAME-ALIGNMENT-V1: 라벨 '매장 설정' → '매장 홈 디자인' 정합.
  *   URL(/store/settings)·기능 불변. 매장 기본정보는 /store/info(약국 정보) 별도.
  *
+ * WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+ *   템플릿 선택이 실제 공개 매장 홈에 반영되도록 수정. 템플릿 카드를 고르면
+ *   `applyTemplateDefaults` 를 예약하고, 저장 시 서버가 해당 템플릿의 기본 블록을 생성해
+ *   storefront_blocks + template_profile 을 함께 갱신한다(프론트에 블록 생성 로직 복제 없음).
+ *
  * WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1
  *
  * 공통 Store Settings API 사용 + 블록 기반 레이아웃 편집 + 실제 iframe 미리보기
@@ -88,6 +93,11 @@ export function PharmacyStorePage() {
   const [theme, setTheme] = useState<StoreTheme>('professional');
   const [blocks, setBlocks] = useState<StoreBlock[]>([]);
   const [isDefaultLayout, setIsDefaultLayout] = useState(false);
+  // WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+  //   템플릿 카드를 실제로 선택했을 때만 true. 저장 시 서버가 이 신호로만 기본 블록을 재생성한다
+  //   (blocks 내용 비교 휴리스틱 금지). 사용자가 블록을 직접 편집하면 다시 false 로 내려
+  //   "사용자 편집 우선" 정책을 지킨다.
+  const [applyTemplateDefaults, setApplyTemplateDefaults] = useState(false);
 
   // UI state
   const [previewWidth, setPreviewWidth] = useState<PreviewWidth>('wide');
@@ -164,6 +174,8 @@ export function PharmacyStorePage() {
   }, []);
 
   // ── Block editing (from LayoutBuilderPage) ────────────────────────────────
+  // WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+  //   블록을 직접 편집하면 템플릿 기본값 적용 예약을 취소한다(사용자 편집 우선).
   const moveBlock = (index: number, dir: -1 | 1) => {
     if (!isOwner) return;
     const target = index + dir;
@@ -171,6 +183,7 @@ export function PharmacyStorePage() {
     const updated = [...blocks];
     [updated[index], updated[target]] = [updated[target], updated[index]];
     setBlocks(updated);
+    setApplyTemplateDefaults(false);
   };
 
   const toggleBlock = (index: number) => {
@@ -178,6 +191,7 @@ export function PharmacyStorePage() {
     const updated = [...blocks];
     updated[index] = { ...updated[index], enabled: !updated[index].enabled };
     setBlocks(updated);
+    setApplyTemplateDefaults(false);
   };
 
   const updateBlockConfig = (index: number, key: string, value: number) => {
@@ -185,6 +199,14 @@ export function PharmacyStorePage() {
     const updated = [...blocks];
     updated[index] = { ...updated[index], config: { ...(updated[index].config ?? {}), [key]: value } };
     setBlocks(updated);
+    setApplyTemplateDefaults(false);
+  };
+
+  // 템플릿 카드 선택 — 저장 시 해당 템플릿의 기본 블록 구성으로 재설정되도록 예약한다.
+  const selectTemplate = (next: StoreTemplate) => {
+    if (!isOwner || next === template) return;
+    setTemplate(next);
+    setApplyTemplateDefaults(true);
   };
 
   const getBlockMeta = (type: StoreBlockType) => {
@@ -200,11 +222,24 @@ export function PharmacyStorePage() {
     setSaveState('saving');
     setError(null);
     try {
-      await apiClient.patch(`/stores/${encodeURIComponent(slug)}/settings`, {
+      // WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+      //   applyTemplateDefaults=true 면 서버가 템플릿 기본 blocks 를 생성해 저장하고
+      //   template_profile 까지 동기화한다. 응답의 최종 settings 로 화면 state 를 맞춘다.
+      const res = await apiClient.patch<{
+        success: boolean;
+        data: { settings: StoreSettings };
+      }>(`/stores/${encodeURIComponent(slug)}/settings`, {
         template,
         theme,
         blocks,
+        applyTemplateDefaults,
       });
+      if (res?.data?.settings) {
+        setTemplate(res.data.settings.template);
+        setTheme(res.data.settings.theme);
+        setBlocks(res.data.settings.blocks ?? []);
+      }
+      setApplyTemplateDefaults(false);
       setSaveState('saved');
       setIsDefaultLayout(false);
       // 저장된 결과를 미리보기(실제 공개 매장 홈)에 반영하기 위해 iframe 새로고침
@@ -215,7 +250,7 @@ export function PharmacyStorePage() {
       setError(e.message || '저장에 실패했습니다');
       setTimeout(() => setSaveState('idle'), 3000);
     }
-  }, [slug, template, theme, blocks, saveState]);
+  }, [slug, template, theme, blocks, applyTemplateDefaults, saveState]);
 
   // ── Access denied (근무약사) ──────────────────────────────────────────────
   if (!isOwner) {
@@ -413,13 +448,18 @@ export function PharmacyStorePage() {
             {/* Template */}
             <section style={S.section}>
               <h3 style={S.sectionTitle}>레이아웃 템플릿</h3>
-              {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-DUPLICATE-RETIREMENT-V1:
-                  stale 문구 정정 — 템플릿 변경 시 블록 목록은 재설정되지 않는다(setTemplate 만 수행).
-                  매장 홈은 저장된 블록 구성(storefront_blocks)을 우선 렌더한다. 기능 변경 없음. */}
+              {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+                  템플릿을 바꾸고 저장하면 서버가 해당 템플릿의 기본 블록 구성으로 재설정한다. */}
               <p style={S.sectionDesc}>
-                기본 블록 구성 구조를 선택합니다. 선택해도 위 블록 구성은 자동으로 바뀌지 않으며,
-                저장된 블록 구성이 매장 홈에 우선 적용됩니다.
+                기본 블록 구성 구조를 선택합니다. 다른 템플릿을 선택하고 저장하면
+                위 블록 구성이 해당 템플릿의 기본값으로 재설정됩니다.
               </p>
+              {applyTemplateDefaults && (
+                <div style={S.infoNotice}>
+                  저장하면 위 블록 구성이 <b>{TEMPLATES.find(t => t.id === template)?.name}</b> 기본 구성으로 재설정됩니다.
+                  블록을 직접 편집하면 편집한 구성이 그대로 저장됩니다.
+                </div>
+              )}
               <div style={S.templateGrid}>
                 {TEMPLATES.map(t => (
                   <div
@@ -429,7 +469,7 @@ export function PharmacyStorePage() {
                       borderColor: template === t.id ? colors.primary : colors.neutral200,
                       backgroundColor: template === t.id ? colors.primary + '08' : colors.white,
                     }}
-                    onClick={() => isOwner && setTemplate(t.id)}
+                    onClick={() => selectTemplate(t.id)}
                   >
                     <div style={S.templateInfo}>
                       <h4 style={S.templateName}>{t.name}</h4>

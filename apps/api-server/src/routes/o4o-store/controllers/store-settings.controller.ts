@@ -14,15 +14,22 @@
  * Data source:
  *   - organizations.storefront_config  (JSONB, canonical)
  *   - organizations.storefront_blocks  (JSONB, legacy block override)
- *   - organizations.template_profile   (VARCHAR, deprecated fallback)
+ *   - organizations.template_profile   (VARCHAR, deprecated fallback — 아래 참조)
  *   - organization_channels            (rows, channel list)
+ *
+ * WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+ *   PATCH 에 optional `applyTemplateDefaults` 추가(additive, 미전송 시 기존 동작 불변).
+ *   true 면 대상 템플릿의 기본 blocks 를 서버에서 생성해 storefront_blocks 에 반영한다.
+ *   또한 template 이 변경되면 template_profile 을 같은 값으로 동기화한다 —
+ *   공개 매장 홈이 storefront_blocks 부재 시 template_profile 로 기본 blocks 를 만들기 때문에,
+ *   두 필드가 갈라지면 canonical 화면의 템플릿 선택이 매장 홈에 반영되지 않는다.
+ *   template_profile 은 소비처 전환이 끝날 때까지 호환 필드로 동기화만 유지한다(삭제 아님).
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 import {
-  StoreTemplate,
   StoreTheme,
   StoreBlock,
   StorefrontConfig,
@@ -33,56 +40,13 @@ import {
   VALID_BLOCK_TYPES,
   VALID_CHANNEL_TYPES,
 } from '../store-settings.types.js';
-
-// ── Default Blocks per Template ───────────────────────────────────────────────
-
-function generateDefaultBlocks(template: StoreTemplate): StoreBlock[] {
-  switch (template) {
-    case 'COMMERCE_FOCUS':
-      return [
-        { type: 'HERO', enabled: true },
-        { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } },
-        { type: 'BLOG_LIST', enabled: true, config: { limit: 3 } },
-      ];
-    case 'CONTENT_FOCUS':
-      return [
-        { type: 'HERO', enabled: true },
-        { type: 'BLOG_LIST', enabled: true, config: { limit: 3 } },
-        { type: 'INFO_SECTION', enabled: true },
-        { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } },
-      ];
-    case 'MINIMAL':
-      return [
-        { type: 'HERO', enabled: true },
-        { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } },
-      ];
-    case 'BASIC':
-    default:
-      return [
-        { type: 'HERO', enabled: true },
-        { type: 'PRODUCT_GRID', enabled: true, config: { limit: 4 } },
-        { type: 'BLOG_LIST', enabled: true, config: { limit: 3 } },
-        { type: 'TABLET_PROMO', enabled: true },
-      ];
-  }
-}
-
-// Legacy template_profile name → StoreTemplate mapping
-const LEGACY_TEMPLATE_MAP: Record<string, StoreTemplate> = {
-  standard: 'BASIC',
-  compact: 'MINIMAL',
-  visual: 'CONTENT_FOCUS',
-  minimal: 'MINIMAL',
-  BASIC: 'BASIC',
-  COMMERCE_FOCUS: 'COMMERCE_FOCUS',
-  CONTENT_FOCUS: 'CONTENT_FOCUS',
-  MINIMAL: 'MINIMAL',
-};
-
-function normalizeTemplate(raw: string | null | undefined): StoreTemplate {
-  if (!raw) return 'BASIC';
-  return LEGACY_TEMPLATE_MAP[raw] ?? 'BASIC';
-}
+// WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+//   템플릿 기본 blocks 생성 + 저장 시 blocks 결정 규칙을 순수 모듈로 분리(단위 테스트 대상).
+import {
+  generateDefaultBlocks,
+  normalizeTemplate,
+  resolveTemplateAndBlocks,
+} from '../store-settings-template.js';
 
 // ── Channel Config Validators ─────────────────────────────────────────────────
 
@@ -259,6 +223,11 @@ export function createStoreSettingsController(
         res.status(400).json({ success: false, error: { code: 'INVALID_THEME', message: `theme must be one of: ${VALID_THEMES.join(', ')}` } });
         return;
       }
+      // WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1: 명시 신호만 신뢰(휴리스틱 금지)
+      if (patch.applyTemplateDefaults !== undefined && typeof patch.applyTemplateDefaults !== 'boolean') {
+        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'applyTemplateDefaults must be boolean' } });
+        return;
+      }
       if (patch.blocks !== undefined) {
         if (!Array.isArray(patch.blocks) || patch.blocks.length === 0) {
           res.status(400).json({ success: false, error: { code: 'INVALID_BLOCKS', message: 'blocks must be a non-empty array' } });
@@ -280,32 +249,56 @@ export function createStoreSettingsController(
       const existing: StorefrontConfig = org.storefront_config ?? {};
       const updated: StorefrontConfig = { ...existing };
 
-      if (patch.template !== undefined) updated.template = patch.template;
+      // WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1:
+      //   저장 전 상태(현재 template/blocks)를 기준으로 최종 template·blocks 를 결정한다.
+      //   applyTemplateDefaults=true 인 경우에만 요청 blocks 대신 템플릿 기본 blocks 를 쓴다.
+      const current = buildSettingsData(org, []);
+      const resolved = resolveTemplateAndBlocks({
+        currentTemplate: current.settings.template,
+        currentBlocks: current.settings.blocks,
+        patchTemplate: patch.template,
+        patchBlocks: patch.blocks,
+        applyTemplateDefaults: patch.applyTemplateDefaults,
+      });
+
+      if (patch.template !== undefined) updated.template = resolved.template;
       if (patch.theme !== undefined) updated.theme = patch.theme;
-      if (patch.blocks !== undefined) {
+      if (resolved.blocksChanged) {
         // blocks = full replace
-        updated.blocks = patch.blocks;
+        updated.blocks = resolved.blocks;
       }
       // WO-O4O-STORE-HOME-DESIGN-UNUSED-FIELDS-CLEANUP-V1:
       //   components/customizations 고아 필드 제거 — 수용/병합 로직 삭제(미참조·데이터 0).
 
-      // Write storefront_config; if blocks changed also sync storefront_blocks for backward compat
-      if (patch.blocks !== undefined) {
-        await dataSource.query(
-          `UPDATE organizations SET storefront_config = $1::jsonb, storefront_blocks = $2::jsonb, "updatedAt" = NOW()
-           WHERE id = $3`,
-          [JSON.stringify(updated), JSON.stringify(patch.blocks), org.id],
-        );
-      } else {
-        await dataSource.query(
-          `UPDATE organizations SET storefront_config = $1::jsonb, "updatedAt" = NOW()
-           WHERE id = $2`,
-          [JSON.stringify(updated), org.id],
-        );
+      // Write storefront_config (+ storefront_blocks / template_profile 동기화)
+      const setClauses: string[] = ['storefront_config = $1::jsonb'];
+      const params: any[] = [JSON.stringify(updated)];
+      if (resolved.blocksChanged) {
+        params.push(JSON.stringify(resolved.blocks));
+        setClauses.push(`storefront_blocks = $${params.length}::jsonb`);
       }
+      if (patch.template !== undefined) {
+        // 공개 매장 홈의 blocks 부재 fallback 이 template_profile 이므로 canonical 과 일치시킨다.
+        params.push(resolved.template);
+        setClauses.push(`template_profile = $${params.length}`);
+      }
+      setClauses.push('"updatedAt" = NOW()');
+      params.push(org.id);
+      await dataSource.query(
+        `UPDATE organizations SET ${setClauses.join(', ')} WHERE id = $${params.length}`,
+        params,
+      );
 
       const channels = await fetchChannels(org.id);
-      const data = buildSettingsData({ ...org, storefront_config: updated, storefront_blocks: patch.blocks ?? org.storefront_blocks }, channels);
+      const data = buildSettingsData(
+        {
+          ...org,
+          storefront_config: updated,
+          storefront_blocks: resolved.blocksChanged ? resolved.blocks : org.storefront_blocks,
+          template_profile: patch.template !== undefined ? resolved.template : org.template_profile,
+        },
+        channels,
+      );
       data.slug = slug;
 
       res.json({ success: true, data });
