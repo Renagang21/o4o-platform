@@ -1,0 +1,86 @@
+{
+  "unit": "topical-unit-1",
+  "batch": 5,
+  "items": [
+    {
+      "fp": "5977ae9e432f874b",
+      "howItWorks": "Relieves pain and inflammation on affected area",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of sprains, bruises, muscle pain, back pain, stiff shoulders, neuralgia, rheumatic pain, and chilblains.",
+      "usage": "Remove the vinyl film from the medicated surface and attach to the affected area 1 to 2 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on infants under 30 months of age, eczema, dermatitis caused by lacquer, etc., or on wound areas.\n\nBefore using this medicine, those who have experienced allergic symptoms (rash, redness, itching, dermatitis caused by lacquer, etc.) to medicines or cosmetics, those with an allergic constitution, patients with severe moisture (dampness) or erosion (rawness), and children should consult a doctor or pharmacist.\n\nStrictly observe the prescribed dosage and administration.\n\nWhen administering to children, administer under the guidance and supervision of a guardian.\n\nIf there is no improvement in symptoms after 5 to 6 days of use, immediately stop use and consult a doctor or pharmacist.\n\nUse this medicine for external use only.",
+      "adverse": "If rash, redness (congested and reddened), itching, etc. appear, immediately stop use and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "5f95d7eb011585db",
+      "howItWorks": "Treats secondarily infected skin disease and burns",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin diseases (eczema, contact dermatitis, seborrheic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo (skin chafing), exfoliative dermatitis, itching, psoriasis (dry scale disease)) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the diseased area 1 to 3 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients who are hypersensitive to this medicine or who have experienced it, patients who are hypersensitive to or have experienced aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin, neomycin, etc. or bacitracin, patients with bacterial (tuberculosis, syphilis, etc.), fungal (candidiasis, tinea, etc.), spirochete, yeast, viral (herpes zoster, herpes simplex, chickenpox, vaccinia, etc.), or animal (scabies, pubic lice, etc.) skin infections, patients with eczematous otitis externa with tympanic membrane perforation, ulcers (excluding Behcet's disease), burns and frostbite of second-degree deep (unexposed) or worse, perioral dermatitis, acne vulgaris, or rosacea (strawberry nose).\n\nBefore using this medicine, pregnant women or women who may be pregnant, nursing mothers, and infants and children should consult a doctor or pharmacist.\n\nStrictly observe the prescribed dosage and administration.\n\nWhen administering to children, administer under the guidance and supervision of a guardian.\n\nDo not use for ophthalmic (eye) use.\n\nDo not use for purposes other than treatment, such as after makeup or shaving.\n\nDo not use the occlusive dressing method without a doctor's supervision.",
+      "adverse": "If impetigo contagiosa (crusted sore disease), folliculitis, viral infection, boils, skin irritation, stinging pain, fever, burning sensation, itching, rash, redness (congested and reddened), flushing, edema, papules, vesicles (blisters), skin dryness, pustular dermatitis, prickly heat, wound worsening, pressure sores, pustulosis, hypersensitivity, skin discoloration, hypertrichosis (excessive hair), acneiform eruption, hypopigmentation, perioral dermatitis, allergic contact dermatitis, skin maceration, secondary infection, skin atrophy, striae, elevated intraocular pressure when used on eyelid skin, glaucoma (blurred vision), etc. appear, immediately stop use and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "8dd57e6a3c93952b",
+      "howItWorks": "Treats secondarily infected skin disease and burns",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin diseases (eczema, contact dermatitis, seborrheic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo (skin chafing), exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the affected area 1 to 3 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients hypersensitive to this medicine or aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin, neomycin, etc. or bacitracin, patients with skin infections (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice), eczematous otitis externa with tympanic membrane perforation, ulcers (excluding Behcet's disease), burns and frostbite of second-degree deep or worse, perioral dermatitis, acne vulgaris, or rosacea. Before using this medicine, pregnant women or women who may be pregnant, nursing mothers, infants and children, and patients or those who have experienced hypersensitivity to propylene glycol should consult a doctor or pharmacist. Strictly observe the prescribed dosage and administration. Do not use for a long term. When symptoms improve, stop use as soon as possible. When administering to children, administer under the guidance and supervision of a guardian. Do not use for ophthalmic use. Do not use for purposes other than treatment, such as after makeup or shaving. Do not use the occlusive dressing method without a doctor's supervision.",
+      "adverse": "If impetigo contagiosa, folliculitis, viral infection, boils, skin irritation, stinging pain, fever, burning sensation, itching, rash, redness, flushing, edema, papules, vesicles, skin dryness, pustular dermatitis, prickly heat, wound worsening, pressure sores, pustulosis, hypersensitivity, skin discoloration, hypertrichosis, acneiform eruption, hypopigmentation, perioral dermatitis, allergic contact dermatitis, skin maceration, secondary infection, skin atrophy, striae, elevated intraocular pressure when used on eyelid skin, glaucoma (blurred vision), etc. appear, immediately stop use and consult a doctor or pharmacist. Systemic absorption may cause reversible suppression of the hypothalamic-pituitary-adrenal axis, Cushing's syndrome, hyperglycemia, diabetes, etc.",
+      "interaction": ""
+    },
+    {
+      "fp": "ba494936b626420a",
+      "howItWorks": "Treats fungal skin infections including tinea and candidiasis",
+      "efficacy": "This medicine is used for dermatophyte skin fungal infections (tinea pedis, tinea cruris, tinea corporis) and tinea versicolor caused by Pityrosporum orbiculare, and cutaneous candidiasis.",
+      "usage": "Apply to the affected area (diseased area) 1 to 2 times a day. The treatment period according to the disease is: for tinea pedis (athlete's foot) once a day for 1 week, for interdigital (between-toes) type tinea pedis (athlete's foot) twice a day for 1 week, for plantar (sole) type tinea pedis (athlete's foot) twice a day for 2 weeks, for tinea corporis and tinea cruris (jock itch) 1 to 2 weeks, for cutaneous candidiasis 1 to 2 weeks, and for tinea versicolor 2 weeks.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients hypersensitive to this medicine, pregnant women or women who may be pregnant, nursing mothers, or children. Do not use the occlusive dressing method or wrapping method unless directed by a doctor. In the case of candidiasis, do not use acidic soap. Use this medicine for external use only. Do not use for ophthalmic use on the cornea or conjunctiva; if it accidentally gets into the eye, this medicine may irritate the eye and, in rare cases, may worsen a latent fungal (mold) infection, so wash it out completely with plenty of water. Do not use on nails, scalp, around the mouth, or the genital area. If symptoms do not improve even after the treatment period, consult a doctor or pharmacist.",
+      "adverse": "If hypersensitivity reaction accompanied by rash, excessive irritation, skin hives, redness, rash, erythema, itching, irritation, localized contact dermatitis, skin peeling, wound scabbing, pigmentation abnormality, stinging pain, burning sensation, etc. appear, immediately stop use and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "c96dc78a9786276e",
+      "howItWorks": "Treats corticoid-responsive secondarily infected skin disease",
+      "efficacy": "This medicine is used for secondarily infected skin diseases that respond to corticoids.",
+      "usage": "Apply a thin layer of an appropriate amount to the affected area (diseased area) 2 to 4 times a day. The treatment period of this medicine is limited to within 7 days.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients hypersensitive to this medicine, patients with skin infections (skin tuberculosis, syphilis, candidiasis, tinea, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pubic lice), eczematous otitis externa with tympanic membrane perforation, ulcers (excluding Behcet's disease), burns and frostbite of second-degree deep or worse, perioral dermatitis, acne vulgaris, rosacea, infants and children, or around the eyes. Before using this medicine, pregnant women or women who may be pregnant and nursing mothers should consult a doctor or pharmacist. Strictly observe the prescribed dosage and administration. Use this medicine for external use only and do not use internally. Do not use for purposes other than treatment, such as after makeup or shaving. Do not use the occlusive dressing method without a doctor's supervision.",
+      "adverse": "If impetigo contagiosa (crusted sore disease), folliculitis, candidiasis, tinea, boils, skin irritation, stinging pain (piercing-like pain), persistent pain, fever, burning sensation, rash, redness (congested and reddened), flushing, itching, skin dryness, pustular dermatitis, allergic contact dermatitis, prickly heat, wound worsening, pressure sores, swelling, secondary infection, decreased pigmentation, or maceration appear, immediately stop use and consult a doctor or pharmacist. When used on eyelid skin, elevated intraocular pressure, glaucoma, blurred vision or other visual impairment, and due to systemic absorption reversible Cushing's syndrome, hyperglycemia, diabetes, and visual impairment, etc. may appear.",
+      "interaction": ""
+    },
+    {
+      "fp": "cfbf19c113771fc0",
+      "howItWorks": "Treats herpes simplex virus infection",
+      "efficacy": "This medicine is used for herpes simplex (blister) virus infections (including initial and recurrent genital herpes (blisters) and cold sores (blisters)).",
+      "usage": "Apply to the affected area (diseased area) 5 times a day at intervals of about 4 hours.\n\nTreatment should continue for 5 days, and if not cured after 5 days of use, it may be used for an additional 5 days.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients hypersensitive to this medicine, nursing mothers, or children.\n\nBefore using this medicine, patients with immunodeficiency such as AIDS or bone marrow transplant, patients hypersensitive to propylene glycol or those who have experienced allergic reactions, and pregnant women or women who may be pregnant should consult a doctor or pharmacist.\n\nStart treatment as early as possible, and in recurrent cases, start when prodromal symptoms or lesions first appear.\n\nStrictly observe the prescribed dosage and administration.\n\nDo not use this medicine for the purpose of preventing infection of others or preventing recurrent herpes simplex (blister) infections.\n\nDo not use as a base for diluting this medicine or mixing other medicines.\n\nUse this medicine for external use only.\n\nDo not use for ophthalmic use on the cornea or mucous membranes.\n\nTo prevent this medicine from spreading to other parts of the body or infecting others, apply while wearing a finger cot or rubber gloves.",
+      "adverse": "Discomfort such as tenderness, temporary burning sensation, mild pain including stinging pain, and contact dermatitis, erythematous rash, eczema, allergic reactions, and occasionally irritation at the application site, itching, vulvitis, facial edema, skin discoloration, hives, rash, vesicular rash, skin peeling, etc. may appear.",
+      "interaction": "Patients who have been administered probenecid should consult a doctor or pharmacist."
+    },
+    {
+      "fp": "e37c29e14fb90cd1",
+      "howItWorks": "Relieves joint and muscle pain and inflammation",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of degenerative arthritis (osteoarthritis), periarthritis of the shoulder, tendinitis and tenosynovitis, peritendinitis, epicondylitis of the humerus (tennis elbow, etc.), muscle pain, and post-traumatic swelling and pain.",
+      "usage": "After removing the release paper from the medicated surface, attach to the affected area 2 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on those who have experienced hypersensitivity and photosensitivity to this medicine, those who have experienced asthma when using aspirin or non-steroidal anti-inflammatory analgesics, those who have experienced hypersensitivity to medicines with cross-hypersensitivity reactions to this medicine (tiaprofenic acid, fenofibrate, bezafibrate, ciprofibrate, oxybenzone), pregnant women who are 6 months or more into pregnancy, or children under 15 years of age. Before using this medicine, patients with bronchial asthma and pregnant women and nursing mothers should consult a doctor or pharmacist. While using this medicine or for up to 2 weeks after use, regardless of the weather, avoid outdoor activities, and when going out in daily life, cover the application area of this medicine with clothing, sunglasses, a hat, sunscreen, etc. to avoid exposure to ultraviolet rays. Do not use on the eyes, mucous membranes, damaged skin, eczema, rash areas, athlete's foot, or tinea. Do not use the occlusive dressing method.",
+      "adverse": "If shock symptoms (rarely hypersensitivity-like symptoms such as hives, difficulty breathing, facial swelling, etc.), asthma attack, bubbling sounds, wheezing, difficulty breathing, occasionally contact dermatitis such as redness, rash, itching, blisters, maceration, irritation and swelling, skin dryness and pigmentation, etc. appear, immediately stop use and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "08751fddf67664fa",
+      "howItWorks": "Relieves joint and muscle pain and inflammation",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of degenerative arthritis (osteoarthritis), periarthritis of the shoulder, tendinitis (tendon inflammation) and tenosynovitis (tendon sheath inflammation), peritendinitis (tendon surrounding inflammation), epicondylitis of the humerus (upper arm bone) (tennis elbow, etc.), muscle pain, and post-traumatic (post-injury) swelling and pain.",
+      "usage": "Remove the release paper from the medicated surface and attach to the affected area 2 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on patients with hypersensitivity and photosensitivity to this medicine, aspirin asthma (asthma attacks caused by non-steroidal anti-inflammatory analgesics, etc.), hypersensitivity to components that may cause cross-hypersensitivity reactions (tiaprofenic acid, fenofibrate, bezafibrate, ciprofibrate, oxybenzone), pregnant women who are 6 months or more into pregnancy, children under 15 years of age, or on the eyes, mucous membranes, athlete's foot, or tinea. Before using this medicine, patients with bronchial asthma, pregnant women or nursing mothers, and use on damaged skin and mucous membranes, eczema or rash areas should consult a doctor or pharmacist. While using this medicine or for up to 2 weeks after use, regardless of the weather, avoid outdoor activities, and when going out in daily life, cover the application area of this medicine with clothing, sunglasses, a hat, sunscreen, etc. to avoid exposure to ultraviolet rays. Do not use the occlusive dressing method.",
+      "adverse": "If rarely shock, anaphylactoid symptoms (hives, difficulty breathing, facial swelling and other hypersensitivity-like symptoms), asthma attack (dry rales (bubbling sounds), wheezing (rasping breath), difficulty breathing), occasionally contact dermatitis such as redness (congested and reddened), rash, itching, blisters, maceration, irritation and swelling (edema), skin dryness and pigmentation, etc. appear, immediately stop use and consult a doctor or pharmacist.",
+      "interaction": ""
+    }
+  ]
+}

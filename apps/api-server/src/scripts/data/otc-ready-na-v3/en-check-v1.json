@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "na",
+  "mode": "EN assemble + verify",
+  "dbWrite": 0,
+  "units": [
+    {
+      "unit": "topical-unit-1",
+      "route": "topical",
+      "scaffold": 55,
+      "translated": 55,
+      "koreanResidueFps": 0,
+      "routeVerbFps": 0,
+      "numericLossFps": 0,
+      "missingFieldFps": 0,
+      "presenceParityFps": 0,
+      "enBuildFile": "src/scripts/data/otc-ready-na-v3/en-build-topical-unit-1.json",
+      "enBuildMd5": "b8dfe1f07224688c6a7ae133d44af32d"
+    },
+    {
+      "unit": "oromucosal-unit-1",
+      "route": "oromucosal",
+      "scaffold": 2,
+      "translated": 2,
+      "koreanResidueFps": 0,
+      "routeVerbFps": 0,
+      "numericLossFps": 0,
+      "missingFieldFps": 0,
+      "presenceParityFps": 0,
+      "enBuildFile": "src/scripts/data/otc-ready-na-v3/en-build-oromucosal-unit-1.json",
+      "enBuildMd5": "8789f3be17349020d3ab5db292bd37bc"
+    }
+  ],
+  "anomalies": [],
+  "pass": true
+}

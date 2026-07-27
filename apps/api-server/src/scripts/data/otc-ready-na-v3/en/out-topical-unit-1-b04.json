@@ -1,0 +1,86 @@
+{
+  "unit": "topical-unit-1",
+  "batch": 4,
+  "items": [
+    {
+      "fp": "e6658ec269d94eb0",
+      "howItWorks": "Relieves pain and inflammation of veins and injuries",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of varicose edema (swelling), superficial (on the surface) phlebitis, accidental trauma (wounds), sports injuries (bruises), and tenosynovitis (inflammation of the tendon sheath).",
+      "usage": "Apply a thin layer to the wounded or infected area several times a day, then gently rub it into the skin.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients hypersensitive to this medicine or to salicylates, patients 4 weeks before their due date, on mucous membrane areas, or on open wound areas.\n\nBefore using this medicine, newborns and children, patients with renal (kidney) failure, women who are pregnant or may be pregnant, and nursing mothers should consult a doctor or pharmacist.\n\nStrictly follow the prescribed usage and dosage.\n\nWhen administering to children, administer under the guidance and supervision of a guardian.\n\nBe careful not to let it get into the eyes; if it does get into the eyes, rinse thoroughly with water.\n\nDo not apply over too wide an area.\n\nFor external use only.\n\nIf there is no improvement in symptoms after about 5 to 6 days of use, stop use immediately and consult a doctor or pharmacist.",
+      "adverse": "If, rarely, dermatitis, contact allergy, tinnitus (ringing in the ears) accompanied by hearing impairment, nosebleeds, nausea, vomiting, itching, and dryness of the skin and mucous membranes occur, stop use immediately and consult a doctor or pharmacist.",
+      "interaction": "When used together with other anticoagulants (e.g., coumarin, aspirin, dipyridamole, dextran, streptokinase, etc.), bleeding may increase, so consult a doctor or pharmacist."
+    },
+    {
+      "fp": "fc57fdcf597150dc",
+      "howItWorks": "Treats herpes simplex virus infections",
+      "efficacy": "This medicine is used for herpes simplex virus infections (including initial and recurrent genital herpes and cold sores).",
+      "usage": "Apply to the affected area (diseased site) 2 to 5 times a day at 4-hour intervals for 1 week. If there is no effect after 1 week of use or if symptoms worsen, switch to another treatment method.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients hypersensitive to this medicine or those with a history of hypersensitivity, patients with chemical intolerance, nursing mothers, or children. Patients with immune deficiency such as AIDS patients or bone marrow transplant patients, pregnant women, and nursing mothers should consult a doctor or pharmacist. Begin treatment as early as possible, and in recurrent cases, begin when prodromal symptoms or lesions (painful sites) first appear. Strictly follow the prescribed usage and dosage. Do not use this medicine for the purpose of preventing infection to others or preventing recurrent herpes simplex (blister) infections. Do not use this medicine as a base for diluting it or mixing it with other medicines. This medicine is for external use only. Do not use it for ophthalmic purposes on the cornea or mucous membranes. To prevent this medicine from spreading to other parts of the body or infecting others, apply it while wearing a finger cot or rubber gloves.",
+      "adverse": "Discomfort such as tenderness (pain when pressed), transient burning sensation, mild pain including stinging, and contact dermatitis, erythematous rash, eczema, allergic reactions, and occasionally irritation at the application site, itching, vulvitis, facial edema, skin depigmentation, urticaria, rash, vesicular rash, erythema, and itching may occur.",
+      "interaction": "If you are taking (using) probenecid, consult a doctor or pharmacist."
+    },
+    {
+      "fp": "0994fa8b47cf9e56",
+      "howItWorks": "Relieves inflammation of chronic gingivitis and stomatitis",
+      "efficacy": "This medicine is used for the relief of inflammation caused by chronic desquamative gingivitis, intractable stomatitis accompanied by erosion or ulcers, and glossitis.",
+      "usage": "Apply an appropriate amount to the affected area 1 to several times a day. The amount may be adjusted appropriately according to age and symptoms.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients hypersensitive to this medicine, patients with tuberculous, viral, or other suppurative infections of the oral cavity, syphilis, chickenpox, mycosis, bacterial skin infection, perioral dermatitis, rosacea, or gingivitis due to vitamin C deficiency. Before using this medicine, pregnant women or women who may be pregnant, infants and children, and the elderly should consult a doctor or pharmacist. Do not eat food immediately after use. Do not use for ophthalmic purposes.",
+      "adverse": "If fungal and bacterial infections of the oral cavity or, rarely, allergic skin reactions occur, stop use immediately and consult a doctor or pharmacist. Mild discomfort such as a numb sensation in the oral cavity, abnormality or diminishment of taste, and a foreign-body sensation at the application site may occur.",
+      "interaction": ""
+    },
+    {
+      "fp": "3ce69dd6bd00bcc9",
+      "howItWorks": "Relieves pain and inflammation of joints and muscles",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of degenerative arthritis (osteoarthritis), periarthritis of the shoulder, tendinitis (inflammation of the tendon) and tenosynovitis (inflammation of the tendon sheath), peritendinitis (inflammation around the tendon), humeral epicondylitis (tennis elbow, etc.), muscle pain, and post-traumatic swelling and pain.",
+      "usage": "Attach 1 patch at a time, 2 times a day, after removing the release (peel-off) paper from the medicated surface.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients with a history of hypersensitivity to this medicine, its ingredients, or other felbinac preparations, patients with asthma or a history thereof to aspirin or other non-steroidal anti-inflammatory analgesics, patients with a history of urticaria or acute rhinitis to aspirin or other non-steroidal anti-inflammatory analgesics, or pregnant women, women who may be pregnant, and nursing mothers. Do not use on damaged skin, mucous membranes, eczema, or rash areas. Before using this medicine, patients with bronchial asthma and children should consult a doctor or pharmacist.",
+      "adverse": "Occasionally, itching, erythema (red spots), redness (flushing and reddening), dermatitis (rash, eczema), contact dermatitis, and rarely irritation or blisters may occur. If these symptoms occur severely, stop use.",
+      "interaction": ""
+    },
+    {
+      "fp": "5370e882c88314de",
+      "howItWorks": "Treats secondarily infected corticosteroid-responsive skin disease",
+      "efficacy": "This medicine is used for the initial treatment of corticosteroid-responsive skin diseases secondarily infected by neomycin-sensitive bacteria (dermatitis, infected wounds).",
+      "usage": "Apply an appropriate amount to the affected area (diseased site) 1 to 2 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients hypersensitive to this medicine or to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin, neomycin, or to bacitracin; patients with skin infections (skin tuberculosis, syphilis, candidiasis, ringworm, herpes zoster, herpes simplex, chickenpox, vaccinia, scabies, pediculosis pubis), eczematous otitis externa with tympanic membrane perforation, ulcers (excluding Behcet's disease), second-degree deep or worse burns and frostbite, perioral dermatitis, common acne, rosacea patients, or patients with wounds on the breast area. Before using this medicine, pregnant women or women who may be pregnant, nursing mothers, and infants and children should consult a doctor or pharmacist. Do not use on or around the eyes. Strictly follow the prescribed usage and dosage. When administering to children, administer under the guidance and supervision of a guardian. Do not use for ophthalmic purposes. If it gets into the eyes, wash immediately with water, and if symptoms are severe, receive treatment from an ophthalmologist. Do not use for purposes other than treatment, such as after applying makeup or shaving. Do not use the occlusive dressing technique without a doctor's supervision.",
+      "adverse": "If impetigo contagiosa, folliculitis, viral infections, boils, skin irritation, stinging, fever, burning sensation, rash, redness, flushing, itching, edema, papules, vesicles, dry skin, pustular dermatitis, allergic contact dermatitis, secondary infection, skin roughness, heat rash, wound worsening, pressure ulcers, pustulosis (pus blisters), increased intraocular pressure when used on the eyelid skin, glaucoma (blurred vision, vision impairment), or Cushing's syndrome, hyperglycemia, diabetes, and vision impairment due to systemic absorption occur, stop use immediately and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "9bb6c377eef493a1",
+      "howItWorks": "Relieves pain and inflammation of muscles and joints",
+      "efficacy": "This medicine is used for the analgesic and anti-inflammatory relief of bruises, sprains, low back (waist) pain, stiff shoulders, muscle pain, and joint pain.",
+      "usage": "Peel off the release (peel-off) paper from the medicated surface and attach to the affected area (diseased site) 1 to 3 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine on infants 30 months or younger, or on eczema, dermatitis due to lacquer, etc., or wound areas.\n\nBefore using this medicine, those with a history of allergic reactions to this medicine or cosmetics, those with an allergic constitution, patients with severe moisture retention or erosion (rawness), children, pregnant women or women who may be pregnant, and nursing mothers should consult a doctor or pharmacist.\n\nStrictly follow the prescribed usage and dosage.\n\nWhen administering to children, administer under the guidance and supervision of a guardian.\n\nThis medicine is for external use only.\n\nDo not warm the diseased area with a heater or electric blanket, etc.\n\nIf symptoms do not improve after 5 to 6 days of use, consult a doctor or pharmacist.",
+      "adverse": "If rash, redness (flushing and reddening), itching, pain, etc. occur, stop use immediately and consult a doctor or pharmacist.",
+      "interaction": ""
+    },
+    {
+      "fp": "ea4d0fa1c9a9d8a7",
+      "howItWorks": "Treats chronic venous insufficiency and vein inflammation",
+      "efficacy": "This medicine is used for chronic venous insufficiency and the resulting inflammation (subcutaneous inflammation) and acute vein inflammation (superficial phlebitis, acute vein inflammation due to perfusion or sclerosis).",
+      "usage": "Apply a small amount to the affected area 2 to 4 times a day, then gently massage.",
+      "warning": "",
+      "precaution": "Do not use on mucous membrane areas, eczema, or exposed wounds. Before using this medicine, pregnant women or women who may be pregnant and nursing mothers should consult a doctor or pharmacist. Strictly follow the prescribed usage and dosage. When administering to children, administer under the guidance and supervision of a guardian. Avoid exposure to sunlight after use.",
+      "adverse": "",
+      "interaction": ""
+    },
+    {
+      "fp": "245edc538ef98748",
+      "howItWorks": "Treats secondarily infected allergic or inflammatory skin disease",
+      "efficacy": "This medicine is used for secondarily infected allergic or inflammatory skin diseases (eczema, contact dermatitis, seborrheic dermatitis, atopic dermatitis, photodermatitis, lichen simplex chronicus, intertrigo, exfoliative dermatitis, itching, psoriasis) and first-degree burns.",
+      "usage": "Apply an appropriate amount to the diseased area 1 to 3 times a day.",
+      "warning": "",
+      "precaution": "Do not use this medicine in patients hypersensitive to this medicine or those with a history of hypersensitivity; skin infections caused by bacteria (tuberculosis, syphilis, etc.), fungi (candidiasis, ringworm, etc.), Spirochaeta, yeast, viruses (herpes zoster, herpes simplex, chickenpox, vaccinia, etc.), or animals (scabies, pediculosis pubis, etc.); eczematous otitis externa with tympanic membrane perforation; ulcers (excluding Behcet's disease); second-degree deep or worse burns and frostbite; perioral dermatitis; common acne; rosacea patients; or those hypersensitive to or with a history of hypersensitivity to aminoglycoside antibiotics such as streptomycin, kanamycin, gentamicin, neomycin, or to bacitracin.\n\nBefore using this medicine, those with a history of hypersensitivity or allergic reactions to propylene glycol, pregnant women or women who may be pregnant, nursing mothers, and infants and children should consult a doctor or pharmacist.\n\nStrictly follow the prescribed usage and dosage.\n\nWhen using on children, use under the guidance and supervision of a guardian.\n\nAvoid long-term or large-quantity use and the occlusive dressing technique.\n\nDo not use for ophthalmic purposes.\n\nDo not use for purposes other than treatment, such as after applying makeup or shaving.\n\nIf there is no improvement in symptoms after 3 to 4 weeks of treatment, stop use immediately and consult a doctor or pharmacist.",
+      "adverse": "If bacterial skin infections (impetigo contagiosa, folliculitis, etc.), viral infections, folliculitis, boils, skin irritation, stinging, fever, burning sensation, itching, rash and redness, flushing, dry skin, pustular dermatitis, heat rash, wound worsening, pressure ulcers, pustulosis, hypersensitivity, skin discoloration, hypertrichosis, acneiform eruption, hypopigmentation, perioral dermatitis, allergic contact dermatitis, skin rawness, secondary infection, skin atrophy, striae, etc. occur, stop use immediately and consult a doctor or pharmacist.",
+      "interaction": ""
+    }
+  ]
+}

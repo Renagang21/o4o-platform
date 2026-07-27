@@ -1,0 +1,30 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "na",
+  "mode": "independent PRE_APPLY verify + READY ledger",
+  "dbWrite": 0,
+  "port": 5470,
+  "routeIntersection": 0,
+  "units": [
+    {
+      "unit": "topical-unit-1",
+      "route": "topical",
+      "status": "PRE_APPLY_READY",
+      "masterCount": 327,
+      "fpCount": 55,
+      "writePlanTotal": 1962,
+      "ledgerFile": "src/scripts/data/otc-ready-na-v3/preapply-ready-topical-unit-1.json"
+    },
+    {
+      "unit": "oromucosal-unit-1",
+      "route": "oromucosal",
+      "status": "PRE_APPLY_READY",
+      "masterCount": 14,
+      "fpCount": 2,
+      "writePlanTotal": 84,
+      "ledgerFile": "src/scripts/data/otc-ready-na-v3/preapply-ready-oromucosal-unit-1.json"
+    }
+  ],
+  "anomalies": [],
+  "pass": true
+}

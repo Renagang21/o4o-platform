@@ -1,0 +1,61 @@
+{
+  "batch": 8,
+  "batches": [
+    {
+      "unit": "topical-unit-1",
+      "batch": 1,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b01.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b01.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 2,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b02.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b02.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 3,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b03.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b03.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 4,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b04.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b04.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 5,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b05.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b05.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 6,
+      "count": 8,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b06.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b06.json"
+    },
+    {
+      "unit": "topical-unit-1",
+      "batch": 7,
+      "count": 7,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-topical-unit-1-b07.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-topical-unit-1-b07.json"
+    },
+    {
+      "unit": "oromucosal-unit-1",
+      "batch": 1,
+      "count": 2,
+      "taskFile": "src/scripts/data/otc-ready-na-v3/en/task-oromucosal-unit-1-b01.json",
+      "outFile": "src/scripts/data/otc-ready-na-v3/en/out-oromucosal-unit-1-b01.json"
+    }
+  ]
+}

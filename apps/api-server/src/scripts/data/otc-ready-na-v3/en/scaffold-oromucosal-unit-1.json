@@ -1,0 +1,45 @@
+{
+  "unit": "oromucosal-unit-1",
+  "route": "oromucosal",
+  "count": 2,
+  "items": [
+    {
+      "fp": "6ac6d622f0258b39",
+      "route": "oromucosal",
+      "gencode": "A87803AMS",
+      "form": "껌",
+      "enForm": "gum",
+      "enTitle": "gum (A87803AMS)",
+      "category": "General medicine · gum",
+      "whyThisOne": "Products with the same general-name code (A87803AMS) share ingredient, strength and form. Check by ingredient and strength, not by product name.",
+      "officialDosage": "성인은 하루 20개비 이하를 피우는 흡연자에게는 2 mg 껌이 권장되며, 하루 20개비를 초과하여 피우는 심한 흡연가이거나 2 mg 용량으로 실패하였을 때 4 mg 껌이 권장됩니다.\n\n흡연 충동이 있을 때마다 다음의",
+      "presence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      }
+    },
+    {
+      "fp": "b22ecff7ba810d79",
+      "route": "oromucosal",
+      "gencode": "227736ATD",
+      "form": "구강용해필름",
+      "enForm": "orally disintegrating film",
+      "enTitle": "orally disintegrating film (227736ATD)",
+      "category": "General medicine · orally disintegrating film",
+      "whyThisOne": "Products with the same general-name code (227736ATD) share ingredient, strength and form. Check by ingredient and strength, not by product name.",
+      "officialDosage": "성인은 1회 2~4매를 식후 또는 자기 전에 필요시 혀 위에 놓고 녹여서 복용합니다.1일 8매를 초과하여 복용하지 않아야 하며, 녹은 후에는 입안에 머금지 않고 바로 삼키도록 합니다.",
+      "presence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 0,
+        "이상반응": 1,
+        "상호작용": 0
+      }
+    }
+  ]
+}

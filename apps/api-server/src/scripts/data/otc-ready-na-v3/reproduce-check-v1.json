@@ -1,0 +1,90 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "na",
+  "mode": "READ-ONLY reproduce + KO generate",
+  "ledgerCommit": "00851d237",
+  "dbWrite": 0,
+  "port": 5470,
+  "units": [
+    {
+      "unit": "topical-unit-1",
+      "route": "topical",
+      "declared": {
+        "fpCount": 55,
+        "masterCount": 327
+      },
+      "reproduced": {
+        "fpCount": 55,
+        "masterCount": 327,
+        "holds": 0
+      },
+      "midAssignMismatch": 0,
+      "intraFpMismatch": 0,
+      "refLedgerMismatch": 0,
+      "refDup": 0,
+      "existingAuthoredKo": 0,
+      "existingEnCanonical": 0,
+      "easyNot1": 0,
+      "koAnomalyFps": 0,
+      "safetyCoverage": {
+        "warn": 0,
+        "precaution": 55,
+        "adverse": 53,
+        "interaction": 8
+      },
+      "buildFile": "src/scripts/data/otc-ready-na-v3/build-topical-unit-1.json",
+      "buildFileMd5": "aa60e11e5cbb85dfe65155541c680aad"
+    },
+    {
+      "unit": "oromucosal-unit-1",
+      "route": "oromucosal",
+      "declared": {
+        "fpCount": 2,
+        "masterCount": 14
+      },
+      "reproduced": {
+        "fpCount": 2,
+        "masterCount": 14,
+        "holds": 0
+      },
+      "midAssignMismatch": 0,
+      "intraFpMismatch": 0,
+      "refLedgerMismatch": 0,
+      "refDup": 0,
+      "existingAuthoredKo": 0,
+      "existingEnCanonical": 0,
+      "easyNot1": 0,
+      "koAnomalyFps": 0,
+      "safetyCoverage": {
+        "warn": 1,
+        "precaution": 1,
+        "adverse": 2,
+        "interaction": 1
+      },
+      "buildFile": "src/scripts/data/otc-ready-na-v3/build-oromucosal-unit-1.json",
+      "buildFileMd5": "920de1092f587d88a934e820a52235b7"
+    }
+  ],
+  "routeIntersection": 0,
+  "liveRefConflict": 0,
+  "anomalies": [],
+  "pass": true,
+  "contentSections": [
+    "효능·효과",
+    "용법·용량",
+    "경고",
+    "사용상 주의사항",
+    "이상반응",
+    "상호작용"
+  ],
+  "mandatorySections": [
+    "효능·효과",
+    "용법·용량"
+  ],
+  "safetySections": [
+    "경고",
+    "사용상 주의사항",
+    "이상반응",
+    "상호작용"
+  ]
+}

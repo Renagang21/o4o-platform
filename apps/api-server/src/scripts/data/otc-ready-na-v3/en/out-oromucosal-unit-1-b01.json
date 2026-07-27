@@ -1,0 +1,26 @@
+{
+  "unit": "oromucosal-unit-1",
+  "batch": 1,
+  "items": [
+    {
+      "fp": "6ac6d622f0258b39",
+      "howItWorks": "Smoking cessation aid that reduces cigarette use",
+      "efficacy": "This medicine is used as a smoking cessation aid to reduce the amount of smoking and to help you quit cigarettes.",
+      "usage": "For adults, the 2 mg gum is recommended for smokers who smoke 20 cigarettes a day or fewer, and the 4 mg gum is recommended for heavy smokers who smoke more than 20 cigarettes a day or when the 2 mg dose has failed.\n\nEach time you have the urge to smoke, use the following",
+      "warning": "It may stick to dental prosthetics and dentures, and in rare cases may damage them.",
+      "precaution": "Patients with hypersensitivity to this medicine, unstable angina, worsening angina, those who have had a myocardial infarction within the last 3 months, the late stage after acute infarction, severe (serious symptoms) cardiac arrhythmia, systemic hypertension, peripheral vascular disease, acute stroke, cerebrovascular disease, pregnant women or women who may be pregnant and breastfeeding women, children and adolescents under 18 years of age, non-smokers and occasional smokers must not use this medicine.\n\nBefore using this medicine, consult a doctor or pharmacist if you have gastritis, gastric ulcer and duodenal ulcer, occlusive (closed and blocked) arterial disease, stable angina, heart failure, decompensated heart failure, myocardial infarction, cardiac arrhythmia, vasospasm, uncontrolled hypertension, arterial vascular bypass graft, angioplasty, are elderly, have renal failure, hepatic failure, diabetes, hyperthyroidism, pheochromocytoma, are a smoker with dentures, or have epilepsy and a history of seizures.\n\nChewing quickly may occasionally cause unpleasant symptoms, so chew slowly.\n\nUsing several pieces of this medicine at the same time may cause symptoms of serious overdose, so do not chew several pieces at the same time.",
+      "adverse": "If headache, dizziness (giddiness), sleep disturbance, anxiety, emotional instability, agitation, abnormal dreams, drowsy confusion (mind being hazy and faint), restlessness (fidgeting), difficulty concentrating, fatigue, migraine, spasm (contraction and relaxation), lower limb (leg) cramps, seizures, changes in blood pressure, hypertension, palpitations (throbbing), reversible (recoverable) atrial fibrillation, atrial arrhythmia, nausea, vomiting, upper abdominal pain, abdominal pain (pain in the abdominal region), indigestion, flatulence (abdominal distension), gastrointestinal disorders such as gastric ulcer, dysphagia (difficulty swallowing), thirst (dry mouth), abnormal bowel movements, constipation, diarrhea, increased appetite, cold and influenza symptoms, cough, pharyngitis, rhinitis (nasal inflammation), sinusitis, upper respiratory symptoms, bronchitis, dyspnea, allergy, skin rash, herpes eruption, itching, urticaria, acne, erythema (red spots), taste disturbance (inability to taste properly), visual disturbance, irritation (pain) of the oral cavity (inside the mouth) and pharynx (throat), pain of the jaw joint and muscles, gingivitis (gum inflammation), dysmenorrhea, myalgia, arthralgia, toothache, back pain, chest pain, pain, earache, facial flushing, localized edema (swelling), weight gain, thyroid dysfunction, lymph node pain, cystitis, increased sweating, hiccups, angioedema (swelling) or the like occur, stop use immediately and consult a doctor or pharmacist.",
+      "interaction": "Consult a doctor or pharmacist when using this together with paracetamol, caffeine, imipramine, oxazepam, pentazocine, propranolol, theophylline, warfarin, estrogen, lignocaine, phenacetin, insulin, adrenergic antagonists (prazosin, labetalol, etc.), flecainide, adrenergic agonists (isoprenaline, phenylephrine), propoxyphene, furosemide diuretics, H2 antagonists, beta blockers, tacrine, clozapine, ropinirole, olanzapine, clomipramine, or fluvoxamine."
+    },
+    {
+      "fp": "b22ecff7ba810d79",
+      "howItWorks": "Relieves gas-related abdominal bloating and fullness",
+      "efficacy": "This medicine is used to relieve abdominal pressure, abdominal distension and fullness caused by gas in the gastrointestinal tract.",
+      "usage": "For adults, place 2 to 4 films on the tongue to dissolve and take after meals or before bedtime as needed. Do not take more than 8 films a day, and after it has dissolved, do not hold it in the mouth but swallow it right away.",
+      "warning": "",
+      "precaution": "",
+      "adverse": "If loose stools, abdominal discomfort, diarrhea, abdominal pain, vomiting, nausea, a feeling of abdominal heaviness, loss of appetite occasionally occur, or headache rarely occurs, stop taking it immediately and consult a doctor or pharmacist.",
+      "interaction": ""
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "na",
+  "unit": "oromucosal-unit-1",
+  "route": "oromucosal",
+  "status": "PRE_APPLY_READY",
+  "masterCount": 14,
+  "fpCount": 2,
+  "writePlan": {
+    "koPerMaster": 4,
+    "enPerMaster": 2,
+    "koTotal": 56,
+    "enTotal": 28,
+    "grandTotal": 84
+  },
+  "dbSlot": {
+    "easyc": 14,
+    "authko": 0,
+    "authen": 0,
+    "total": 14
+  },
+  "v3SourceRefLiveRows": 0,
+  "gates": {
+    "sourceRefDerivedMismatch": 0,
+    "koHtmlGate": 0,
+    "enHtmlGate": 0,
+    "presenceMismatch": 0,
+    "easyAnchor": true,
+    "existingAuthoredKo": 0,
+    "existingAuthoredEn": 0
+  },
+  "liveApply": "LOCKED (--apply --confirm + per-route confirm env 미설정 — 이 WO 는 LIVE apply 금지)",
+  "fingerprints": [
+    {
+      "fp": "6ac6d622f0258b39",
+      "gencode": "A87803AMS",
+      "route": "oromucosal",
+      "T": 8,
+      "sourceRef": "1c2949d8-bbd8-c6be-3a7f-7cd78b9cb964",
+      "sourceRefDerivedOk": true,
+      "koHtmlMd5": "943954e091b7d6e0d032522c28c11d80",
+      "enHtmlMd5": "2fe5d273dea5229cbfb3aaeff0da2d62",
+      "errs": []
+    },
+    {
+      "fp": "b22ecff7ba810d79",
+      "gencode": "227736ATD",
+      "route": "oromucosal",
+      "T": 6,
+      "sourceRef": "87c69452-c185-4bbe-6600-a42ca6649d4e",
+      "sourceRefDerivedOk": true,
+      "koHtmlMd5": "45c5bc1c55d4b2b26772bd97fb0bc4c5",
+      "enHtmlMd5": "2c90d79e27cf92850f69df95c20d64ed",
+      "errs": []
+    }
+  ]
+}
