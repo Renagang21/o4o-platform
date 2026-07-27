@@ -8,6 +8,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Megaphone } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierRecruitmentApi, type SupplierRecruitment } from '../../lib/api/supplier';
 
 const SERVICE_LABELS: Record<string, string> = {
@@ -71,6 +72,111 @@ export default function SupplierRecruitmentsPage() {
     await load();
   };
 
+  const columns: ListColumnDef<SupplierRecruitment>[] = [
+    {
+      key: 'product',
+      header: '제품',
+      render: (_v, r) => <span className="font-medium text-slate-800">{r.productName}</span>,
+    },
+    {
+      key: 'service',
+      header: '대상 서비스',
+      render: (_v, r) => <span className="text-slate-600">{SERVICE_LABELS[r.serviceId] || r.serviceId || '-'}</span>,
+    },
+    {
+      key: 'commission',
+      header: '수수료율',
+      render: (_v, r) => <span className="text-slate-600">{r.commissionRate ? `${r.commissionRate}%` : '-'}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      render: (_v, r) => {
+        const badge = STATUS_BADGE[r.status] || { label: r.status, cls: 'bg-gray-100 text-gray-600' };
+        return <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>;
+      },
+    },
+    {
+      key: 'exposure',
+      header: '노출 승인',
+      render: (_v, r) => {
+        const exposure = EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus, cls: 'bg-gray-100 text-gray-600' };
+        return (
+          <>
+            <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exposure.cls}`}>{exposure.label}</span>
+            {r.exposureStatus === 'rejected' && r.exposureReviewNote && (
+              <div className="text-xs text-slate-400 mt-0.5 max-w-[180px] truncate" title={r.exposureReviewNote}>{r.exposureReviewNote}</div>
+            )}
+          </>
+        );
+      },
+    },
+    {
+      key: 'total',
+      header: '신청',
+      align: 'center',
+      render: (_v, r) => <span className="text-slate-700">{r.applications.total}</span>,
+    },
+    {
+      key: 'pending',
+      header: '대기',
+      align: 'center',
+      render: (_v, r) =>
+        r.applications.pending > 0
+          ? <span className="text-amber-700 font-medium">{r.applications.pending}</span>
+          : <span className="text-slate-400">0</span>,
+    },
+    {
+      key: 'approved',
+      header: '승인',
+      align: 'center',
+      render: (_v, r) =>
+        r.applications.approved > 0
+          ? <span className="text-emerald-700 font-medium">{r.applications.approved}</span>
+          : <span className="text-slate-400">0</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '생성일',
+      render: (_v, r) => <span className="text-slate-400 text-xs">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</span>,
+    },
+    {
+      key: 'detail',
+      header: '상세',
+      align: 'center',
+      render: (_v, r) => (
+        <div className="whitespace-nowrap space-x-3">
+          <button
+            type="button"
+            onClick={() => navigate(`/supplier/recruitments/${r.id}`)}
+            className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+          >
+            신청자 보기
+          </button>
+          {r.status === 'recruiting' ? (
+            <button
+              type="button"
+              disabled={closingId === r.id}
+              onClick={() => handleClose(r.id)}
+              className="text-slate-500 hover:text-red-600 text-sm font-medium disabled:opacity-50"
+            >
+              마감
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={closingId === r.id}
+              onClick={() => handleReopen(r.id)}
+              className="text-slate-500 hover:text-emerald-600 text-sm font-medium disabled:opacity-50"
+            >
+              재개
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-5xl">
       <div className="mb-6">
@@ -115,86 +221,11 @@ export default function SupplierRecruitmentsPage() {
           </button>
         </div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200 bg-white">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b border-slate-100 bg-slate-50 text-left text-xs font-medium text-slate-500">
-                <th className="px-4 py-3">제품</th>
-                <th className="px-4 py-3">대상 서비스</th>
-                <th className="px-4 py-3">수수료율</th>
-                <th className="px-4 py-3">상태</th>
-                <th className="px-4 py-3">노출 승인</th>
-                <th className="px-4 py-3 text-center">신청</th>
-                <th className="px-4 py-3 text-center">대기</th>
-                <th className="px-4 py-3 text-center">승인</th>
-                <th className="px-4 py-3">생성일</th>
-                <th className="px-4 py-3 text-center">상세</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {rows.map((r) => {
-                const badge = STATUS_BADGE[r.status] || { label: r.status, cls: 'bg-gray-100 text-gray-600' };
-                const exposure = EXPOSURE_BADGE[r.exposureStatus] || { label: r.exposureStatus, cls: 'bg-gray-100 text-gray-600' };
-                return (
-                  <tr key={r.id} className="hover:bg-slate-50">
-                    <td className="px-4 py-3 font-medium text-slate-800">{r.productName}</td>
-                    <td className="px-4 py-3 text-slate-600">{SERVICE_LABELS[r.serviceId] || r.serviceId || '-'}</td>
-                    <td className="px-4 py-3 text-slate-600">{r.commissionRate ? `${r.commissionRate}%` : '-'}</td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${badge.cls}`}>{badge.label}</span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${exposure.cls}`}>{exposure.label}</span>
-                      {r.exposureStatus === 'rejected' && r.exposureReviewNote && (
-                        <div className="text-xs text-slate-400 mt-0.5 max-w-[180px] truncate" title={r.exposureReviewNote}>{r.exposureReviewNote}</div>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-center text-slate-700">{r.applications.total}</td>
-                    <td className="px-4 py-3 text-center">
-                      {r.applications.pending > 0
-                        ? <span className="text-amber-700 font-medium">{r.applications.pending}</span>
-                        : <span className="text-slate-400">0</span>}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      {r.applications.approved > 0
-                        ? <span className="text-emerald-700 font-medium">{r.applications.approved}</span>
-                        : <span className="text-slate-400">0</span>}
-                    </td>
-                    <td className="px-4 py-3 text-slate-400 text-xs">{new Date(r.createdAt).toLocaleDateString('ko-KR')}</td>
-                    <td className="px-4 py-3 text-center whitespace-nowrap space-x-3">
-                      <button
-                        type="button"
-                        onClick={() => navigate(`/supplier/recruitments/${r.id}`)}
-                        className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                      >
-                        신청자 보기
-                      </button>
-                      {r.status === 'recruiting' ? (
-                        <button
-                          type="button"
-                          disabled={closingId === r.id}
-                          onClick={() => handleClose(r.id)}
-                          className="text-slate-500 hover:text-red-600 text-sm font-medium disabled:opacity-50"
-                        >
-                          마감
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          disabled={closingId === r.id}
-                          onClick={() => handleReopen(r.id)}
-                          className="text-slate-500 hover:text-emerald-600 text-sm font-medium disabled:opacity-50"
-                        >
-                          재개
-                        </button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <DataTable<SupplierRecruitment>
+          columns={columns}
+          data={rows}
+          rowKey={(r) => r.id}
+        />
       )}
     </div>
   );

@@ -20,6 +20,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Edit2, Trash2, DollarSign, Package, X, Check, AlertCircle, RefreshCw } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   supplierCommissionApi,
   supplierApi,
@@ -167,6 +168,94 @@ export default function SupplierPartnerCommissionsPage() {
     }
     fetchData();
   };
+
+  const columns: ListColumnDef<SupplierPartnerCommission>[] = [
+    {
+      key: 'product',
+      header: '제품',
+      align: 'left',
+      render: (_v, c) => (
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Package size={14} style={{ color: '#64748b', flexShrink: 0 }} />
+          <div>
+            <div style={{ fontWeight: 500, color: '#1E293B', fontSize: '14px' }}>
+              {c.product_name}
+            </div>
+            <div style={{ fontSize: '12px', color: '#94a3b8' }}>{c.barcode}</div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'commission_per_unit',
+      header: '단위당 수수료',
+      align: 'right',
+      render: (_v, c) => (
+        <span style={{ fontWeight: 600, color: '#1E293B' }}>
+          {Number(c.commission_per_unit).toLocaleString()}원
+        </span>
+      ),
+    },
+    {
+      key: 'start_date',
+      header: '적용 시작일',
+      align: 'left',
+      render: (_v, c) => (
+        <span style={{ fontSize: '13px', color: '#475569' }}>
+          {c.start_date.split('T')[0]}
+        </span>
+      ),
+    },
+    {
+      key: 'end_date',
+      header: '적용 종료일',
+      align: 'left',
+      render: (_v, c) => (
+        <span style={{ fontSize: '13px', color: '#475569' }}>
+          {c.end_date ? c.end_date.split('T')[0] : '-'}
+        </span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'left',
+      render: (_v, c) => {
+        const cfg = STATUS_CONFIG[getStatus(c)];
+        return (
+          <span style={{
+            display: 'inline-block', padding: '4px 10px', borderRadius: '9999px',
+            fontSize: '12px', fontWeight: 600, color: cfg.color, backgroundColor: cfg.bg,
+          }}>
+            {cfg.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'actions',
+      header: '작업',
+      align: 'center',
+      render: (_v, c) => (
+        <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
+          <button
+            onClick={() => openEditForm(c)}
+            style={actionBtnStyle}
+            title="수정"
+          >
+            <Edit2 size={14} />
+          </button>
+          <button
+            onClick={() => handleDelete(c.id)}
+            style={{ ...actionBtnStyle, color: '#dc2626' }}
+            title="삭제"
+          >
+            <Trash2 size={14} />
+          </button>
+        </div>
+      ),
+    },
+  ];
 
   return (
     <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '32px 24px' }}>
@@ -363,77 +452,12 @@ export default function SupplierPartnerCommissionsPage() {
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="supplier-commission-table" style={{
-            backgroundColor: '#FFFFFF', borderRadius: '12px', border: '1px solid #e2e8f0', overflow: 'hidden',
-          }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-              <thead>
-                <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                  <th style={thStyle}>제품</th>
-                  <th style={{ ...thStyle, textAlign: 'right' }}>단위당 수수료</th>
-                  <th style={thStyle}>적용 시작일</th>
-                  <th style={thStyle}>적용 종료일</th>
-                  <th style={thStyle}>상태</th>
-                  <th style={{ ...thStyle, textAlign: 'center' }}>작업</th>
-                </tr>
-              </thead>
-              <tbody>
-                {commissions.map((c) => {
-                  const status = getStatus(c);
-                  const cfg = STATUS_CONFIG[status];
-                  return (
-                    <tr key={c.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                      <td style={tdStyle}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <Package size={14} style={{ color: '#64748b', flexShrink: 0 }} />
-                          <div>
-                            <div style={{ fontWeight: 500, color: '#1E293B', fontSize: '14px' }}>
-                              {c.product_name}
-                            </div>
-                            <div style={{ fontSize: '12px', color: '#94a3b8' }}>{c.barcode}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td style={{ ...tdStyle, textAlign: 'right', fontWeight: 600, color: '#1E293B' }}>
-                        {Number(c.commission_per_unit).toLocaleString()}원
-                      </td>
-                      <td style={{ ...tdStyle, fontSize: '13px', color: '#475569' }}>
-                        {c.start_date.split('T')[0]}
-                      </td>
-                      <td style={{ ...tdStyle, fontSize: '13px', color: '#475569' }}>
-                        {c.end_date ? c.end_date.split('T')[0] : '-'}
-                      </td>
-                      <td style={tdStyle}>
-                        <span style={{
-                          display: 'inline-block', padding: '4px 10px', borderRadius: '9999px',
-                          fontSize: '12px', fontWeight: 600, color: cfg.color, backgroundColor: cfg.bg,
-                        }}>
-                          {cfg.label}
-                        </span>
-                      </td>
-                      <td style={{ ...tdStyle, textAlign: 'center' }}>
-                        <div style={{ display: 'flex', justifyContent: 'center', gap: '4px' }}>
-                          <button
-                            onClick={() => openEditForm(c)}
-                            style={actionBtnStyle}
-                            title="수정"
-                          >
-                            <Edit2 size={14} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(c.id)}
-                            style={{ ...actionBtnStyle, color: '#dc2626' }}
-                            title="삭제"
-                          >
-                            <Trash2 size={14} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+          <div className="supplier-commission-table">
+            <DataTable<SupplierPartnerCommission>
+              columns={columns}
+              data={commissions}
+              rowKey={(c) => c.id}
+            />
           </div>
 
           {/* Mobile Cards */}
@@ -495,21 +519,6 @@ export default function SupplierPartnerCommissionsPage() {
 // ============================================================================
 // Styles
 // ============================================================================
-
-const thStyle: React.CSSProperties = {
-  padding: '12px 16px',
-  textAlign: 'left',
-  fontSize: '12px',
-  fontWeight: 600,
-  color: '#64748b',
-  textTransform: 'uppercase',
-  letterSpacing: '0.05em',
-};
-
-const tdStyle: React.CSSProperties = {
-  padding: '14px 16px',
-  fontSize: '14px',
-};
 
 const actionBtnStyle: React.CSSProperties = {
   display: 'inline-flex',

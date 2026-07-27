@@ -6,6 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { adminMasterApi, type AdminMaster } from '../../lib/api';
 import ProductDescriptionCurationModal from './ProductDescriptionCurationModal';
 
@@ -103,6 +104,62 @@ export default function AdminMasterManagementPage() {
     );
   });
 
+  const columns: ListColumnDef<AdminMaster>[] = [
+    {
+      key: 'barcode',
+      header: '바코드',
+      align: 'left',
+      render: (_value, m) => <span className="text-sm font-mono text-slate-700">{m.barcode}</span>,
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      align: 'left',
+      render: (_value, m) => <p className="font-medium text-slate-800">{m.name || '(이름 없음)'}</p>,
+    },
+    {
+      key: 'brandName',
+      header: '브랜드',
+      align: 'left',
+      render: (_value, m) => <span className="text-sm text-slate-600">{m.brandName || '-'}</span>,
+    },
+    {
+      key: 'category',
+      header: '카테고리',
+      align: 'left',
+      render: (_value, m) => <span className="text-sm text-slate-600">{m.category?.name || '-'}</span>,
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      align: 'left',
+      render: (_value, m) => (
+        <span className="text-sm text-slate-500">{new Date(m.createdAt).toLocaleDateString('ko-KR')}</span>
+      ),
+    },
+    {
+      key: 'actions',
+      header: '관리',
+      align: 'center',
+      render: (_value, m) => (
+        <div className="whitespace-nowrap">
+          <button
+            onClick={() => handleEdit(m)}
+            className="text-blue-500 hover:text-blue-700 font-medium text-sm"
+          >
+            수정
+          </button>
+          <button
+            onClick={() => setCurationMaster({ id: m.id, name: m.name })}
+            className="ml-3 text-emerald-600 hover:text-emerald-700 font-medium text-sm"
+          >
+            설명 정비
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
       <div className="flex justify-between items-start">
@@ -167,59 +224,20 @@ export default function AdminMasterManagementPage() {
         />
       </div>
 
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        {loading ? (
+      {loading ? (
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
           <div className="flex items-center justify-center py-16">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
           </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-16 text-slate-400">
-            {masters.length === 0 ? '등록된 Master가 없습니다' : '검색 결과가 없습니다'}
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">바코드</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">상품명</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">브랜드</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">카테고리</th>
-                <th className="text-left px-6 py-4 text-sm font-medium text-slate-500">등록일</th>
-                <th className="text-center px-6 py-4 text-sm font-medium text-slate-500">관리</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filtered.map((m) => (
-                <tr key={m.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4 text-sm font-mono text-slate-700">{m.barcode}</td>
-                  <td className="px-6 py-4">
-                    <p className="font-medium text-slate-800">{m.name || '(이름 없음)'}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{m.brandName || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-600">{m.category?.name || '-'}</td>
-                  <td className="px-6 py-4 text-sm text-slate-500">
-                    {new Date(m.createdAt).toLocaleDateString('ko-KR')}
-                  </td>
-                  <td className="px-6 py-4 text-center whitespace-nowrap">
-                    <button
-                      onClick={() => handleEdit(m)}
-                      className="text-blue-500 hover:text-blue-700 font-medium text-sm"
-                    >
-                      수정
-                    </button>
-                    <button
-                      onClick={() => setCurationMaster({ id: m.id, name: m.name })}
-                      className="ml-3 text-emerald-600 hover:text-emerald-700 font-medium text-sm"
-                    >
-                      설명 정비
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
+        </div>
+      ) : (
+        <DataTable<AdminMaster>
+          columns={columns}
+          data={filtered}
+          rowKey={(m) => m.id}
+          emptyMessage={masters.length === 0 ? '등록된 Master가 없습니다' : '검색 결과가 없습니다'}
+        />
+      )}
 
       {/* Edit Modal */}
       {editModal && (

@@ -13,6 +13,7 @@
 import { useState, useEffect, useMemo, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { Package, Plus, Search, ToggleLeft, ToggleRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { supplierApi, supplierProfileApi, type SupplierProduct } from '../../lib/api';
 
 // ============================================================================
@@ -267,79 +268,91 @@ function ProductTable({
   togglingId: string | null;
   supplierStatus?: string;
 }) {
+  // WO-O4O-NETURE-REMAINING-STANDARD-LISTS-FINAL-CONSOLIDATED-BATCH-V7:
+  //   데스크톱 raw <table> → 공용 DataTable. 인라인 가격 편집(InlinePrice)은 셀 내부 유지.
+  //   행 클릭 드릴다운 없음(기존 <tr> 무 onClick) → onRowClick 미지정. 정렬 미지정(행 순서 고정 → 편집 상태 무손실).
+  const columns: ListColumnDef<SupplierProduct>[] = [
+    {
+      key: '_thumb',
+      header: '',
+      system: true,
+      width: '56px',
+      render: (_v, p) => <ProductThumbnail src={p.primaryImageUrl} />,
+    },
+    {
+      key: 'name',
+      header: '상품명',
+      render: (_v, p) => (
+        <>
+          <div className="font-medium text-slate-800 truncate max-w-[200px]">
+            {p.masterName || p.name || '-'}
+          </div>
+          <div className="text-xs text-slate-400 font-mono mt-0.5">{p.barcode}</div>
+        </>
+      ),
+    },
+    { key: 'brandName', header: '브랜드', render: (_v, p) => <span className="text-slate-600">{p.brandName || '-'}</span> },
+    { key: 'category', header: '카테고리', render: (_v, p) => <span className="text-slate-600">{p.categoryName || p.category || '-'}</span> },
+    { key: 'specification', header: '규격', render: (_v, p) => <span className="text-slate-500 text-xs">{p.specification || '-'}</span> },
+    {
+      key: 'priceGeneral',
+      header: '공급가',
+      align: 'right',
+      // 즉시 편집 컨트롤 — 셀 클릭이 (미래의) 행 클릭으로 버블링되지 않도록 계약 표시
+      onCellClick: () => {},
+      render: (_v, p) => (
+        <span className="font-mono text-slate-800">
+          <InlinePrice value={p.priceGeneral} productId={p.id} onSave={onSavePrice} />
+        </span>
+      ),
+    },
+    {
+      key: 'consumerReferencePrice',
+      header: '소비자참고가',
+      align: 'right',
+      render: (_v, p) => <span className="font-mono text-slate-500">{formatPrice(p.consumerReferencePrice)}</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      align: 'center',
+      render: (_v, p) => <StatusBadge product={p} supplierStatus={supplierStatus} />,
+    },
+    {
+      key: '_actions',
+      header: '관리',
+      system: true,
+      align: 'center',
+      width: '80px',
+      onCellClick: () => {},
+      render: (_v, p) => {
+        const isToggling = togglingId === p.id;
+        if (p.approvalStatus !== 'APPROVED') return null;
+        return (
+          <button
+            onClick={() => onToggleActive(p.id, p.isActive)}
+            disabled={isToggling}
+            className="p-1 rounded hover:bg-slate-100 disabled:opacity-50"
+            title={p.isActive ? '비활성화' : '활성화'}
+          >
+            {p.isActive ? (
+              <ToggleRight size={22} className="text-green-600" />
+            ) : (
+              <ToggleLeft size={22} className="text-slate-400" />
+            )}
+          </button>
+        );
+      },
+    },
+  ];
+
   return (
-    <div className="bg-white rounded-xl border border-slate-200 overflow-x-auto">
-      <table className="w-full border-collapse text-sm">
-        <thead>
-          <tr className="bg-slate-50 border-b border-slate-200">
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-[56px]" />
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">상품명</th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">브랜드</th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">카테고리</th>
-            <th className="text-left px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">규격</th>
-            <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">공급가</th>
-            <th className="text-right px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">소비자참고가</th>
-            <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">상태</th>
-            <th className="text-center px-4 py-3 text-xs font-semibold text-slate-500 uppercase tracking-wider w-[80px]">관리</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) => {
-            const isToggling = togglingId === p.id;
-            return (
-              <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50/50">
-                {/* Image */}
-                <td className="px-4 py-3">
-                  <ProductThumbnail src={p.primaryImageUrl} />
-                </td>
-                {/* Product Name */}
-                <td className="px-4 py-3">
-                  <div className="font-medium text-slate-800 truncate max-w-[200px]">
-                    {p.masterName || p.name || '-'}
-                  </div>
-                  <div className="text-xs text-slate-400 font-mono mt-0.5">{p.barcode}</div>
-                </td>
-                {/* Brand */}
-                <td className="px-4 py-3 text-slate-600">{p.brandName || '-'}</td>
-                {/* Category */}
-                <td className="px-4 py-3 text-slate-600">{p.categoryName || p.category || '-'}</td>
-                {/* Spec */}
-                <td className="px-4 py-3 text-slate-500 text-xs">{p.specification || '-'}</td>
-                {/* Price General (inline edit) */}
-                <td className="px-4 py-3 text-right font-mono text-slate-800">
-                  <InlinePrice value={p.priceGeneral} productId={p.id} onSave={onSavePrice} />
-                </td>
-                {/* Consumer Price */}
-                <td className="px-4 py-3 text-right font-mono text-slate-500">
-                  {formatPrice(p.consumerReferencePrice)}
-                </td>
-                {/* Status */}
-                <td className="px-4 py-3 text-center">
-                  <StatusBadge product={p} supplierStatus={supplierStatus} />
-                </td>
-                {/* Actions */}
-                <td className="px-4 py-3 text-center">
-                  {p.approvalStatus === 'APPROVED' && (
-                    <button
-                      onClick={() => onToggleActive(p.id, p.isActive)}
-                      disabled={isToggling}
-                      className="p-1 rounded hover:bg-slate-100 disabled:opacity-50"
-                      title={p.isActive ? '비활성화' : '활성화'}
-                    >
-                      {p.isActive ? (
-                        <ToggleRight size={22} className="text-green-600" />
-                      ) : (
-                        <ToggleLeft size={22} className="text-slate-400" />
-                      )}
-                    </button>
-                  )}
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
+    <DataTable<SupplierProduct>
+      columns={columns}
+      data={products}
+      rowKey={(p) => p.id}
+      emptyMessage="등록된 상품이 없습니다."
+    />
   );
 }
 

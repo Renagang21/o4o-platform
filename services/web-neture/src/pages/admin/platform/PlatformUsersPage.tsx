@@ -11,6 +11,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Search, Info } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { platformAdminApi, type PlatformUser } from '../../../lib/api/platform';
 
 function fmtDate(iso: string | null | undefined): string {
@@ -40,6 +41,64 @@ const STATUS_OPTIONS = [
 ];
 
 const LIMIT = 20;
+
+const columns: ListColumnDef<PlatformUser>[] = [
+  {
+    key: 'nameEmail',
+    header: '이름 / 이메일',
+    align: 'left',
+    render: (_value, u) => (
+      <>
+        <div className="font-medium text-slate-800">{u.name || '-'}</div>
+        <div className="text-xs text-slate-400">{u.email}</div>
+      </>
+    ),
+  },
+  {
+    key: 'roles',
+    header: '역할',
+    align: 'left',
+    render: (_value, u) => (
+      <div className="flex flex-wrap gap-1">
+        {u.roles.length === 0
+          ? <span className="text-xs text-slate-400">일반 사용자</span>
+          : u.roles.map((r) => (
+              <span key={r} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
+                {ROLE_LABEL[r] || r}
+              </span>
+            ))}
+      </div>
+    ),
+  },
+  {
+    key: 'status',
+    header: '상태',
+    align: 'left',
+    render: (_value, u) => <span className="text-slate-500">{u.status}</span>,
+  },
+  {
+    key: 'isActive',
+    header: '활성',
+    align: 'left',
+    render: (_value, u) => (
+      u.isActive
+        ? <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">활성</span>
+        : <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">비활성</span>
+    ),
+  },
+  {
+    key: 'createdAt',
+    header: '가입일',
+    align: 'left',
+    render: (_value, u) => <span className="text-slate-500">{fmtDate(u.createdAt)}</span>,
+  },
+  {
+    key: 'lastLoginAt',
+    header: '최근 로그인',
+    align: 'left',
+    render: (_value, u) => <span className="text-slate-500">{fmtDate(u.lastLoginAt)}</span>,
+  },
+];
 
 export default function PlatformUsersPage() {
   const [users, setUsers] = useState<PlatformUser[]>([]);
@@ -121,49 +180,12 @@ export default function PlatformUsersPage() {
         <div className="text-center py-16 text-sm text-slate-400">조건에 맞는 사용자가 없습니다.</div>
       ) : (
         <>
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="bg-slate-50 text-slate-500 text-xs">
-                  <th className="text-left px-4 py-3 font-semibold">이름 / 이메일</th>
-                  <th className="text-left px-4 py-3 font-semibold">역할</th>
-                  <th className="text-left px-4 py-3 font-semibold">상태</th>
-                  <th className="text-left px-4 py-3 font-semibold">활성</th>
-                  <th className="text-left px-4 py-3 font-semibold">가입일</th>
-                  <th className="text-left px-4 py-3 font-semibold">최근 로그인</th>
-                </tr>
-              </thead>
-              <tbody>
-                {users.map((u) => (
-                  <tr key={u.id} className="border-t border-slate-100">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-slate-800">{u.name || '-'}</div>
-                      <div className="text-xs text-slate-400">{u.email}</div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex flex-wrap gap-1">
-                        {u.roles.length === 0
-                          ? <span className="text-xs text-slate-400">일반 사용자</span>
-                          : u.roles.map((r) => (
-                              <span key={r} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                                {ROLE_LABEL[r] || r}
-                              </span>
-                            ))}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{u.status}</td>
-                    <td className="px-4 py-3">
-                      {u.isActive
-                        ? <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">활성</span>
-                        : <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">비활성</span>}
-                    </td>
-                    <td className="px-4 py-3 text-slate-500">{fmtDate(u.createdAt)}</td>
-                    <td className="px-4 py-3 text-slate-500">{fmtDate(u.lastLoginAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <DataTable<PlatformUser>
+            columns={columns}
+            data={users}
+            rowKey={(u) => u.id}
+            emptyMessage="조건에 맞는 사용자가 없습니다."
+          />
 
           {/* pagination */}
           <div className="flex items-center justify-between mt-4 text-sm text-slate-500">

@@ -9,6 +9,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { KeyRound, UserX, UserCheck, X } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
 import { platformAdminApi, type PlatformAccount } from '../../../lib/api/platform';
 
@@ -78,6 +79,76 @@ export default function PlatformAccountsPage() {
     }
   };
 
+  const columns: ListColumnDef<PlatformAccount>[] = [
+    {
+      key: 'name',
+      header: '이름 / 이메일',
+      align: 'left',
+      render: (_v, a) => (
+        <>
+          <div className="font-medium text-slate-800">{a.name}</div>
+          <div className="text-xs text-slate-400">{a.email}</div>
+        </>
+      ),
+    },
+    {
+      key: 'roles',
+      header: '역할',
+      align: 'left',
+      render: (_v, a) => (
+        <div className="flex flex-wrap gap-1">
+          {a.roles.map((r) => (
+            <span key={r} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
+              {ROLE_LABEL[r] || r}
+            </span>
+          ))}
+        </div>
+      ),
+    },
+    {
+      key: 'isActive',
+      header: '상태',
+      align: 'left',
+      render: (_v, a) => (
+        a.isActive
+          ? <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">활성</span>
+          : <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">비활성</span>
+      ),
+    },
+    {
+      key: 'lastLoginAt',
+      header: '최근 로그인',
+      align: 'left',
+      render: (_v, a) => <span className="text-slate-500">{fmtDate(a.lastLoginAt)}</span>,
+    },
+    {
+      key: 'actions',
+      header: '관리',
+      align: 'right',
+      render: (_v, a) => (
+        <div className="flex items-center justify-end gap-2">
+          <button
+            onClick={() => { setPwTarget(a); setPwValue(''); }}
+            className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
+          >
+            <KeyRound className="w-3.5 h-3.5" /> 비밀번호
+          </button>
+          <button
+            disabled={busyId === a.id}
+            onClick={() => handleToggle(a)}
+            className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 ${
+              a.isActive
+                ? 'text-rose-600 border-rose-200 hover:bg-rose-50'
+                : 'text-emerald-600 border-emerald-200 hover:bg-emerald-50'
+            }`}
+          >
+            {a.isActive ? <><UserX className="w-3.5 h-3.5" /> 비활성</> : <><UserCheck className="w-3.5 h-3.5" /> 활성</>}
+          </button>
+        </div>
+      ),
+    },
+  ];
+
   return (
     <div>
       <h1 className="text-xl font-bold text-slate-900 mb-1">플랫폼 계정 관리</h1>
@@ -93,65 +164,12 @@ export default function PlatformAccountsPage() {
       ) : accounts.length === 0 ? (
         <div className="text-center py-16 text-sm text-slate-400">관리자 계정이 없습니다.</div>
       ) : (
-        <div className="overflow-x-auto rounded-xl border border-slate-200">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 text-xs">
-                <th className="text-left px-4 py-3 font-semibold">이름 / 이메일</th>
-                <th className="text-left px-4 py-3 font-semibold">역할</th>
-                <th className="text-left px-4 py-3 font-semibold">상태</th>
-                <th className="text-left px-4 py-3 font-semibold">최근 로그인</th>
-                <th className="text-right px-4 py-3 font-semibold">관리</th>
-              </tr>
-            </thead>
-            <tbody>
-              {accounts.map((a) => (
-                <tr key={a.id} className="border-t border-slate-100">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-slate-800">{a.name}</div>
-                    <div className="text-xs text-slate-400">{a.email}</div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
-                      {a.roles.map((r) => (
-                        <span key={r} className="px-2 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-600">
-                          {ROLE_LABEL[r] || r}
-                        </span>
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    {a.isActive
-                      ? <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">활성</span>
-                      : <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">비활성</span>}
-                  </td>
-                  <td className="px-4 py-3 text-slate-500">{fmtDate(a.lastLoginAt)}</td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center justify-end gap-2">
-                      <button
-                        onClick={() => { setPwTarget(a); setPwValue(''); }}
-                        className="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50"
-                      >
-                        <KeyRound className="w-3.5 h-3.5" /> 비밀번호
-                      </button>
-                      <button
-                        disabled={busyId === a.id}
-                        onClick={() => handleToggle(a)}
-                        className={`inline-flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium rounded-lg border disabled:opacity-50 ${
-                          a.isActive
-                            ? 'text-rose-600 border-rose-200 hover:bg-rose-50'
-                            : 'text-emerald-600 border-emerald-200 hover:bg-emerald-50'
-                        }`}
-                      >
-                        {a.isActive ? <><UserX className="w-3.5 h-3.5" /> 비활성</> : <><UserCheck className="w-3.5 h-3.5" /> 활성</>}
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <DataTable<PlatformAccount>
+          columns={columns}
+          data={accounts}
+          rowKey={(r) => r.id}
+          emptyMessage="관리자 계정이 없습니다."
+        />
       )}
 
       {/* 비밀번호 재설정 modal */}

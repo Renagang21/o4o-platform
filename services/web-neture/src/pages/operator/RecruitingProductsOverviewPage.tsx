@@ -10,6 +10,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Package, Search, RefreshCw, Users, ChevronLeft, ChevronRight, X, Star, ToggleLeft, ToggleRight } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { api } from '../../lib/api';
 
 const PAGE_SIZE = 20;
@@ -107,6 +108,80 @@ export default function RecruitingProductsOverviewPage() {
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
+  const columns: ListColumnDef<RecruitingProduct>[] = [
+    {
+      key: 'name', header: '상품명',
+      render: (_v, p) => (
+        <>
+          <p className="font-medium text-slate-800">{p.name}</p>
+          <p className="text-xs text-slate-400 mt-0.5">{p.sku}</p>
+        </>
+      ),
+    },
+    {
+      key: 'pharmacy_name', header: '조직/공급사',
+      render: (_v, p) => <span className="text-slate-600">{p.pharmacy_name || '-'}</span>,
+    },
+    {
+      key: 'category', header: '카테고리', align: 'center',
+      render: (_v, p) => (
+        <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
+          {CATEGORY_LABELS[p.category] || p.category}
+        </span>
+      ),
+    },
+    {
+      key: 'price', header: '가격', align: 'right',
+      render: (_v, p) => (
+        p.sale_price ? (
+          <div>
+            <span className="text-slate-400 line-through text-xs">₩{p.price.toLocaleString()}</span>
+            <span className="text-slate-800 font-medium ml-1">₩{p.sale_price.toLocaleString()}</span>
+          </div>
+        ) : (
+          <span className="text-slate-800 font-medium">₩{p.price.toLocaleString()}</span>
+        )
+      ),
+    },
+    {
+      key: 'stock_quantity', header: '재고', align: 'center',
+      render: (_v, p) => <span className="text-slate-600">{p.stock_quantity}</span>,
+    },
+    {
+      key: 'status', header: '상태', align: 'center', onCellClick: () => {},
+      render: (_v, p) => (
+        <button
+          onClick={() => toggleRecruiting(p)}
+          disabled={mutating === p.id}
+          className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium transition-colors ${
+            p.is_partner_recruiting ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+          } disabled:opacity-50`}
+          title={p.is_partner_recruiting ? '모집 중단' : '모집 시작'}
+        >
+          {p.is_partner_recruiting ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
+          {p.is_partner_recruiting ? '모집중' : '중단'}
+        </button>
+      ),
+    },
+    {
+      key: 'is_featured', header: '추천', align: 'center', onCellClick: () => {},
+      render: (_v, p) => (
+        <button
+          onClick={() => toggleFeatured(p)}
+          disabled={mutating === p.id}
+          className="p-1 rounded hover:bg-amber-50 disabled:opacity-50 transition-colors"
+          title={p.is_featured ? '추천 해제' : '추천 설정'}
+        >
+          <Star className={`w-4 h-4 ${p.is_featured ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
+        </button>
+      ),
+    },
+    {
+      key: 'created_at', header: '등록일',
+      render: (_v, p) => <span className="text-slate-500 text-xs">{new Date(p.created_at).toLocaleDateString('ko-KR')}</span>,
+    },
+  ];
+
   return (
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* Header */}
@@ -178,99 +253,37 @@ export default function RecruitingProductsOverviewPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-lg border border-slate-200 overflow-hidden">
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="bg-slate-50 text-left text-xs text-slate-500 uppercase border-b border-slate-200">
-              <th className="px-4 py-3 font-medium">상품명</th>
-              <th className="px-4 py-3 font-medium">조직/공급사</th>
-              <th className="px-4 py-3 font-medium text-center">카테고리</th>
-              <th className="px-4 py-3 font-medium text-right">가격</th>
-              <th className="px-4 py-3 font-medium text-center">재고</th>
-              <th className="px-4 py-3 font-medium text-center">상태</th>
-              <th className="px-4 py-3 font-medium text-center">추천</th>
-              <th className="px-4 py-3 font-medium">등록일</th>
-            </tr>
-          </thead>
-          <tbody>
-            {loading ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">불러오는 중...</td></tr>
-            ) : paged.length === 0 ? (
-              <tr><td colSpan={8} className="px-4 py-12 text-center text-slate-400">
-                {search || categoryFilter ? '조건에 맞는 상품이 없습니다.' : '모집 중인 상품이 없습니다.'}
-              </td></tr>
-            ) : paged.map((p) => (
-              <tr key={p.id} className="border-b border-slate-100 hover:bg-slate-50 cursor-pointer" onClick={() => setDetailProduct(p)}>
-                <td className="px-4 py-3">
-                  <p className="font-medium text-slate-800">{p.name}</p>
-                  <p className="text-xs text-slate-400 mt-0.5">{p.sku}</p>
-                </td>
-                <td className="px-4 py-3 text-slate-600">{p.pharmacy_name || '-'}</td>
-                <td className="px-4 py-3 text-center">
-                  <span className="inline-block px-2 py-0.5 rounded text-xs font-medium bg-slate-100 text-slate-600">
-                    {CATEGORY_LABELS[p.category] || p.category}
-                  </span>
-                </td>
-                <td className="px-4 py-3 text-right">
-                  {p.sale_price ? (
-                    <div>
-                      <span className="text-slate-400 line-through text-xs">₩{p.price.toLocaleString()}</span>
-                      <span className="text-slate-800 font-medium ml-1">₩{p.sale_price.toLocaleString()}</span>
-                    </div>
-                  ) : (
-                    <span className="text-slate-800 font-medium">₩{p.price.toLocaleString()}</span>
-                  )}
-                </td>
-                <td className="px-4 py-3 text-center text-slate-600">{p.stock_quantity}</td>
-                <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => toggleRecruiting(p)}
-                    disabled={mutating === p.id}
-                    className={`inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium transition-colors ${
-                      p.is_partner_recruiting ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
-                    } disabled:opacity-50`}
-                    title={p.is_partner_recruiting ? '모집 중단' : '모집 시작'}
-                  >
-                    {p.is_partner_recruiting ? <ToggleRight className="w-3.5 h-3.5" /> : <ToggleLeft className="w-3.5 h-3.5" />}
-                    {p.is_partner_recruiting ? '모집중' : '중단'}
-                  </button>
-                </td>
-                <td className="px-4 py-3 text-center" onClick={(e) => e.stopPropagation()}>
-                  <button
-                    onClick={() => toggleFeatured(p)}
-                    disabled={mutating === p.id}
-                    className="p-1 rounded hover:bg-amber-50 disabled:opacity-50 transition-colors"
-                    title={p.is_featured ? '추천 해제' : '추천 설정'}
-                  >
-                    <Star className={`w-4 h-4 ${p.is_featured ? 'text-amber-500 fill-amber-500' : 'text-slate-300'}`} />
-                  </button>
-                </td>
-                <td className="px-4 py-3 text-slate-500 text-xs">
-                  {new Date(p.created_at).toLocaleDateString('ko-KR')}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {loading ? (
+        <div className="bg-white rounded-lg border border-slate-200 px-4 py-12 text-center text-slate-400">불러오는 중...</div>
+      ) : (
+        <>
+          <DataTable<RecruitingProduct>
+            columns={columns}
+            data={paged}
+            rowKey={(p) => p.id}
+            onRowClick={(p) => setDetailProduct(p)}
+            emptyMessage={search || categoryFilter ? '조건에 맞는 상품이 없습니다.' : '모집 중인 상품이 없습니다.'}
+          />
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-            <span className="text-xs text-slate-500">
-              {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length}
-            </span>
-            <div className="flex items-center gap-1">
-              <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40">
-                <ChevronLeft className="w-4 h-4" />
-              </button>
-              <span className="text-sm text-slate-600 px-2">{page} / {totalPages}</span>
-              <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40">
-                <ChevronRight className="w-4 h-4" />
-              </button>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-between px-4 py-3 mt-3 bg-white rounded-lg border border-slate-200">
+              <span className="text-xs text-slate-500">
+                {(page - 1) * PAGE_SIZE + 1}–{Math.min(page * PAGE_SIZE, filtered.length)} / {filtered.length}
+              </span>
+              <div className="flex items-center gap-1">
+                <button onClick={() => setPage(p => Math.max(1, p - 1))} disabled={page <= 1} className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40">
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm text-slate-600 px-2">{page} / {totalPages}</span>
+                <button onClick={() => setPage(p => Math.min(totalPages, p + 1))} disabled={page >= totalPages} className="p-1.5 rounded hover:bg-slate-100 disabled:opacity-40">
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </>
+      )}
 
       {/* Detail Panel */}
       {detailProduct && (
