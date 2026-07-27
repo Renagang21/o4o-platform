@@ -19,6 +19,7 @@
  */
 
 import { useState, useEffect, useCallback } from 'react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   operatorContactApi,
   type OperatorContactMessage,
@@ -61,7 +62,6 @@ export default function OperatorContactMessagesPage() {
   const [error, setError] = useState<string | null>(null);
   const [contactTypeFilter, setContactTypeFilter] = useState<ContactTypeFilter>('');
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
   const [markingRead, setMarkingRead] = useState(false);
 
   const load = useCallback(async (page = 1) => {
@@ -123,6 +123,76 @@ export default function OperatorContactMessagesPage() {
     { value: 'resolved', label: '완료' },
   ];
 
+  // WO-O4O-NETURE-EXPANDABLE-AND-REMAINING-LISTS-STANDARDIZATION-BATCH-V5:
+  //   수동 <table> + expandedId → 공용 DataTable 확장 API (uncontrolled).
+  //   본문 미리보기는 확장행으로 이전. 상태는 read-only 표시(운영자 개별 변경 불가).
+  const columns: ListColumnDef<OperatorContactMessage>[] = [
+    {
+      key: 'contactType',
+      header: '유형',
+      width: '90px',
+      render: (_v, m) => (
+        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[m.contactType] || 'bg-slate-100 text-slate-600'}`}>
+          {typeLabels[m.contactType] || m.contactType}
+        </span>
+      ),
+    },
+    {
+      key: 'name',
+      header: '이름',
+      minWidth: 100,
+      render: (_v, m) => <span className="text-sm text-slate-800 font-medium">{m.name}</span>,
+    },
+    {
+      key: 'email',
+      header: '이메일',
+      minWidth: 160,
+      render: (_v, m) => <span className="text-sm text-slate-600">{m.email}</span>,
+    },
+    {
+      key: 'phone',
+      header: '연락처',
+      width: '130px',
+      render: (_v, m) => <span className="text-sm text-slate-600">{m.phone || '-'}</span>,
+    },
+    {
+      key: 'subject',
+      header: '제목',
+      minWidth: 200,
+      render: (_v, m) => (
+        <span className="block text-sm text-slate-700 max-w-[260px] truncate" title={m.subject}>{m.subject}</span>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '80px',
+      render: (_v, m) => (
+        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[m.status] || 'bg-slate-100 text-slate-600'}`}>
+          {statusLabels[m.status] || m.status}
+        </span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: '150px',
+      render: (_v, m) => <span className="text-xs text-slate-500 whitespace-nowrap">{formatDate(m.createdAt)}</span>,
+    },
+  ];
+
+  const renderExpandedRow = (m: OperatorContactMessage) => (
+    <div className="space-y-2 text-sm text-slate-700">
+      <div>
+        <span className="text-xs text-slate-500 mr-2">본문 미리보기:</span>
+        <span className="whitespace-pre-wrap">{m.messagePreview || '-'}</span>
+      </div>
+      <p className="text-xs text-slate-400">
+        ※ 개별 상세 / 상태 변경 / 메모 작성은 관리자 화면(/admin/contact-messages)에서 처리합니다.
+      </p>
+    </div>
+  );
+
   return (
     <div className="max-w-6xl mx-auto px-4 py-8 space-y-6">
       <div>
@@ -170,78 +240,22 @@ export default function OperatorContactMessagesPage() {
       </div>
 
       {/* List */}
-      <div className="bg-white rounded-xl border border-slate-100 shadow-sm overflow-hidden">
-        {loading ? (
-          <div className="flex items-center justify-center py-16">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
-          </div>
-        ) : error ? (
-          <div className="text-center py-16 text-red-500 text-sm">{error}</div>
-        ) : messages.length === 0 ? (
-          <div className="text-center py-16 text-slate-400 text-sm">
-            조건에 맞는 문의가 없습니다.
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead className="bg-slate-50 border-b border-slate-100">
-              <tr>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">유형</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이름</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">이메일</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">연락처</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">제목</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">상태</th>
-                <th className="text-left px-4 py-3 text-xs font-medium text-slate-500 uppercase">등록일</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {messages.map((m) => {
-                const isOpen = expandedId === m.id;
-                return (
-                  <>
-                    <tr
-                      key={m.id}
-                      className="hover:bg-slate-50 cursor-pointer"
-                      onClick={() => setExpandedId(isOpen ? null : m.id)}
-                    >
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${typeColors[m.contactType] || 'bg-slate-100 text-slate-600'}`}>
-                          {typeLabels[m.contactType] || m.contactType}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-sm text-slate-800 font-medium">{m.name}</td>
-                      <td className="px-4 py-3 text-sm text-slate-600">{m.email}</td>
-                      <td className="px-4 py-3 text-sm text-slate-600">{m.phone || '-'}</td>
-                      <td className="px-4 py-3 text-sm text-slate-700 max-w-[260px] truncate" title={m.subject}>{m.subject}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${statusColors[m.status] || 'bg-slate-100 text-slate-600'}`}>
-                          {statusLabels[m.status] || m.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3 text-xs text-slate-500 whitespace-nowrap">{formatDate(m.createdAt)}</td>
-                    </tr>
-                    {isOpen && (
-                      <tr key={`${m.id}-expand`} className="bg-slate-50">
-                        <td colSpan={7} className="px-4 py-4 text-sm text-slate-700">
-                          <div className="space-y-2">
-                            <div>
-                              <span className="text-xs text-slate-500 mr-2">본문 미리보기:</span>
-                              <span className="whitespace-pre-wrap">{m.messagePreview || '-'}</span>
-                            </div>
-                            <p className="text-xs text-slate-400">
-                              ※ 개별 상세 / 상태 변경 / 메모 작성은 관리자 화면(/admin/contact-messages)에서 처리합니다.
-                            </p>
-                          </div>
-                        </td>
-                      </tr>
-                    )}
-                  </>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
+      {loading ? (
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm flex items-center justify-center py-16">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600"></div>
+        </div>
+      ) : error ? (
+        <div className="bg-white rounded-xl border border-slate-100 shadow-sm text-center py-16 text-red-500 text-sm">{error}</div>
+      ) : (
+        <DataTable<OperatorContactMessage>
+          columns={columns}
+          data={messages}
+          rowKey={(m) => m.id}
+          emptyMessage="조건에 맞는 문의가 없습니다."
+          expandable
+          renderExpandedRow={renderExpandedRow}
+        />
+      )}
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (

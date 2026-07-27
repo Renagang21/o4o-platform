@@ -3,8 +3,10 @@
  *
  * Work Order: WO-O4O-PARTNER-HUB-CORE-V1
  * Refined: WO-O4O-PARTNER-HUB-REFINEMENT-V1
+ * Style finish: WO-O4O-NETURE-EXPANDABLE-AND-REMAINING-LISTS-STANDARDIZATION-BATCH-V5
+ *   styles.* inline 객체 제거 → Tailwind / O4O 토큰. 데스크톱 DataTable · 모바일 카드 구조 유지.
  *
- * Desktop: Table (Product | Store | Referral URL | Created date | Actions)
+ * Desktop: DataTable (Product | Store | Referral URL | Created date | Actions)
  * Mobile: Card list
  */
 
@@ -13,6 +15,11 @@ import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import { Link2, Copy, Check, ExternalLink } from 'lucide-react';
 import { partnerAffiliateApi } from '../../lib/api/index.js';
 import type { ReferralLink } from '../../lib/api/index.js';
+
+// 링크 액션 버튼 — 데스크톱/모바일 공용 (인라인 스타일 대신 Tailwind).
+// Copy 는 '복사됨' 상태 피드백이 있는 주 CTA 라 인라인 유지(RowActionMenu 미적용).
+const actionBtnBase =
+  'inline-flex items-center gap-1 px-3 py-1.5 rounded-md text-[13px] font-semibold cursor-pointer transition-colors';
 
 export default function ReferralLinksPage() {
   const [links, setLinks] = useState<ReferralLink[]>([]);
@@ -45,9 +52,19 @@ export default function ReferralLinksPage() {
     window.open(buildUrl(link), '_blank', 'noopener,noreferrer');
   }, [buildUrl]);
 
-  // WO-O4O-DATATABLE-EXPANDABLE-ROW-AND-NETURE-LISTS-STANDARDIZATION-V1:
-  //   raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
-  //   Copy 는 '복사됨' 상태 피드백이 있는 주 CTA 라 인라인 유지(RowActionMenu 미적용).
+  const copyBtnClass = (isCopied: boolean) =>
+    `${actionBtnBase} ${
+      isCopied
+        ? 'border border-green-600 bg-green-100 text-green-800'
+        : 'border border-blue-600 bg-white text-blue-600 hover:bg-blue-50'
+    }`;
+
+  const openBtnClass = `${actionBtnBase} border border-slate-200 bg-white text-slate-600 hover:bg-slate-50`;
+
+  const urlCodeClass =
+    'text-xs text-slate-600 bg-slate-100 px-2 py-1 rounded break-all';
+
+  // WO-…-V1: raw <table> → 표준 DataTable 컬럼. 표시 내용 동일.
   const columns: ListColumnDef<ReferralLink>[] = [
     {
       key: 'product_name',
@@ -55,9 +72,9 @@ export default function ReferralLinksPage() {
       minWidth: 180,
       render: (_v, link) => (
         <div>
-          <div style={{ fontWeight: 500, color: '#1e293b' }}>{link.product_name}</div>
+          <div className="font-medium text-slate-800">{link.product_name}</div>
           {link.commission_per_unit != null && (
-            <div style={{ fontSize: '12px', color: '#16a34a', marginTop: '2px' }}>
+            <div className="text-xs text-green-600 mt-0.5">
               커미션 ₩{link.commission_per_unit.toLocaleString()}/개
             </div>
           )}
@@ -68,15 +85,20 @@ export default function ReferralLinksPage() {
       key: 'store_slug',
       header: 'Store',
       width: '140px',
-      render: (_v, link) => <span style={{ color: '#64748b', fontSize: '13px' }}>{link.store_slug || '-'}</span>,
+      render: (_v, link) => <span className="text-[13px] text-slate-500">{link.store_slug || '-'}</span>,
     },
-    { key: 'referral_url', header: 'Referral URL', minWidth: 200, render: (_v, link) => <code style={styles.urlCode}>{buildUrl(link)}</code> },
+    {
+      key: 'referral_url',
+      header: 'Referral URL',
+      minWidth: 200,
+      render: (_v, link) => <code className={urlCodeClass}>{buildUrl(link)}</code>,
+    },
     {
       key: 'created_at',
       header: 'Created',
       width: '120px',
       render: (_v, link) => (
-        <span style={{ color: '#64748b', fontSize: '13px', whiteSpace: 'nowrap' }}>
+        <span className="text-[13px] text-slate-500 whitespace-nowrap">
           {new Date(link.created_at).toLocaleDateString('ko-KR')}
         </span>
       ),
@@ -90,16 +112,12 @@ export default function ReferralLinksPage() {
       render: (_v, link) => {
         const isCopied = copiedId === link.id;
         return (
-          <div style={{ display: 'flex', justifyContent: 'center', gap: '6px' }}>
-            <button
-              onClick={() => handleCopy(link)}
-              style={{ ...styles.actionBtn, ...(isCopied ? styles.actionBtnDone : {}) }}
-              title="URL 복사"
-            >
+          <div className="flex justify-center gap-1.5">
+            <button onClick={() => handleCopy(link)} className={copyBtnClass(isCopied)} title="URL 복사">
               {isCopied ? <Check size={14} /> : <Copy size={14} />}
               {isCopied ? '복사됨' : 'Copy'}
             </button>
-            <button onClick={() => handleOpen(link)} style={styles.actionBtnOpen} title="URL 열기">
+            <button onClick={() => handleOpen(link)} className={openBtnClass} title="URL 열기">
               <ExternalLink size={14} />
               Open
             </button>
@@ -110,26 +128,25 @@ export default function ReferralLinksPage() {
   ];
 
   return (
-    <div style={styles.container}>
-      <div style={styles.header}>
-        <h1 style={styles.title}>My Links</h1>
-        <p style={styles.subtitle}>생성한 Referral 링크를 관리하고 공유하세요</p>
+    <div className="max-w-[1000px] mx-auto px-5 py-8">
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold text-slate-900 m-0">My Links</h1>
+        <p className="text-sm text-slate-500 mt-1">생성한 Referral 링크를 관리하고 공유하세요</p>
       </div>
 
       {loading ? (
-        <p style={styles.emptyText}>불러오는 중...</p>
+        <p className="text-sm text-slate-500">불러오는 중...</p>
       ) : links.length === 0 ? (
-        <div style={styles.emptyState}>
-          <Link2 size={40} style={{ color: '#94a3b8' }} />
-          <p style={styles.emptyText}>생성된 Referral 링크가 없습니다.</p>
-          <p style={styles.emptyHint}>Products에서 제품을 선택하여 링크를 생성하세요.</p>
+        <div className="text-center py-16 flex flex-col items-center gap-2">
+          <Link2 size={40} className="text-slate-400" />
+          <p className="text-sm text-slate-500 m-0">생성된 Referral 링크가 없습니다.</p>
+          <p className="text-[13px] text-slate-400 m-0">Products에서 제품을 선택하여 링크를 생성하세요.</p>
         </div>
       ) : (
         <>
           {/* Desktop Table */}
-          <div className="referral-links-table" style={styles.tableWrap}>
-            {/* WO-…-V1: raw <table> → 표준 DataTable (데스크톱 표만, 모바일 카드 뷰 유지).
-                복사는 '복사됨' 상태 피드백이 있는 주 CTA 라 인라인 유지. */}
+          <div className="referral-links-table">
+            {/* WO-…-V1: raw <table> → 표준 DataTable (데스크톱 표만, 모바일 카드 뷰 유지). */}
             <DataTable<ReferralLink>
               columns={columns}
               data={links}
@@ -139,39 +156,36 @@ export default function ReferralLinksPage() {
           </div>
 
           {/* Mobile Cards */}
-          <div className="referral-links-cards" style={{ display: 'none' }}>
+          <div className="referral-links-cards">
             {links.map((link) => {
               const url = buildUrl(link);
               const isCopied = copiedId === link.id;
               return (
-                <div key={link.id} style={styles.card}>
-                  <div style={styles.cardInfo}>
-                    <h3 style={styles.cardName}>{link.product_name}</h3>
-                    <p style={styles.cardMeta}>
+                <div
+                  key={link.id}
+                  className="flex justify-between items-center flex-wrap gap-4 bg-white rounded-xl border border-slate-200 px-5 py-4"
+                >
+                  <div className="flex-1 min-w-[200px]">
+                    <h3 className="text-[15px] font-semibold text-slate-900 mb-1">{link.product_name}</h3>
+                    <p className="text-[13px] text-slate-500 mb-2">
                       가격: ₩{link.price_general.toLocaleString()}
                       {link.commission_per_unit != null && (
                         <> · 커미션: ₩{link.commission_per_unit.toLocaleString()}/개</>
                       )}
                     </p>
-                    <div style={styles.urlRow}>
-                      <code style={styles.urlCode}>{url}</code>
+                    <div className="mb-1">
+                      <code className={urlCodeClass}>{url}</code>
                     </div>
-                    <p style={styles.cardDate}>
+                    <p className="text-xs text-slate-400 mt-1">
                       생성일: {new Date(link.created_at).toLocaleDateString('ko-KR')}
                     </p>
                   </div>
-                  <div style={styles.cardActions}>
-                    <button
-                      onClick={() => handleCopy(link)}
-                      style={{
-                        ...styles.actionBtn,
-                        ...(isCopied ? styles.actionBtnDone : {}),
-                      }}
-                    >
+                  <div className="flex gap-2 shrink-0">
+                    <button onClick={() => handleCopy(link)} className={copyBtnClass(isCopied)}>
                       {isCopied ? <Check size={14} /> : <Copy size={14} />}
                       {isCopied ? '복사됨' : 'URL 복사'}
                     </button>
-                    <button onClick={() => handleOpen(link)} style={styles.actionBtnOpen}>
+                    <button onClick={() => handleOpen(link)} className={openBtnClass}>
                       <ExternalLink size={14} />
                       열기
                     </button>
@@ -181,8 +195,9 @@ export default function ReferralLinksPage() {
             })}
           </div>
 
-          {/* Responsive CSS */}
+          {/* Responsive CSS — 데스크톱/모바일 뷰 전환만 담당 (inline style 대신 클래스 기반) */}
           <style>{`
+            .referral-links-cards { display: none; }
             @media (max-width: 768px) {
               .referral-links-table { display: none !important; }
               .referral-links-cards { display: flex !important; flex-direction: column; gap: 12px; }
@@ -193,151 +208,3 @@ export default function ReferralLinksPage() {
     </div>
   );
 }
-
-const styles: Record<string, React.CSSProperties> = {
-  container: {
-    maxWidth: '1000px',
-    margin: '0 auto',
-    padding: '32px 20px',
-  },
-  header: {
-    marginBottom: '24px',
-  },
-  title: {
-    fontSize: '24px',
-    fontWeight: 700,
-    color: '#0f172a',
-    margin: 0,
-  },
-  subtitle: {
-    fontSize: '14px',
-    color: '#64748b',
-    margin: '4px 0 0 0',
-  },
-  tableWrap: {
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    overflow: 'hidden',
-  },
-  table: {
-    width: '100%',
-    borderCollapse: 'collapse' as const,
-  },
-  th: {
-    padding: '12px 16px',
-    fontSize: '12px',
-    fontWeight: 600,
-    color: '#64748b',
-    textTransform: 'uppercase' as const,
-    letterSpacing: '0.05em',
-    borderBottom: '1px solid #e2e8f0',
-    backgroundColor: '#f8fafc',
-    textAlign: 'left' as const,
-  },
-  tr: {
-    borderBottom: '1px solid #f1f5f9',
-  },
-  td: {
-    padding: '14px 16px',
-    fontSize: '14px',
-    color: '#1e293b',
-  },
-  urlCode: {
-    fontSize: '12px',
-    color: '#475569',
-    backgroundColor: '#f1f5f9',
-    padding: '4px 8px',
-    borderRadius: '4px',
-    wordBreak: 'break-all' as const,
-  },
-  actionBtn: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '6px 12px',
-    borderRadius: '6px',
-    border: '1px solid #2563eb',
-    backgroundColor: '#fff',
-    color: '#2563eb',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-  },
-  actionBtnDone: {
-    backgroundColor: '#dcfce7',
-    borderColor: '#16a34a',
-    color: '#166534',
-  },
-  actionBtnOpen: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    gap: '4px',
-    padding: '6px 12px',
-    borderRadius: '6px',
-    border: '1px solid #e2e8f0',
-    backgroundColor: '#fff',
-    color: '#475569',
-    fontSize: '13px',
-    fontWeight: 600,
-    cursor: 'pointer',
-    textDecoration: 'none',
-  },
-  card: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: '12px',
-    border: '1px solid #e2e8f0',
-    padding: '16px 20px',
-    gap: '16px',
-    flexWrap: 'wrap' as const,
-  },
-  cardInfo: {
-    flex: 1,
-    minWidth: '200px',
-  },
-  cardName: {
-    fontSize: '15px',
-    fontWeight: 600,
-    color: '#0f172a',
-    margin: '0 0 4px 0',
-  },
-  cardMeta: {
-    fontSize: '13px',
-    color: '#64748b',
-    margin: '0 0 8px 0',
-  },
-  urlRow: {
-    marginBottom: '4px',
-  },
-  cardDate: {
-    fontSize: '12px',
-    color: '#94a3b8',
-    margin: '4px 0 0 0',
-  },
-  cardActions: {
-    display: 'flex',
-    gap: '8px',
-    flexShrink: 0,
-  },
-  emptyState: {
-    textAlign: 'center' as const,
-    padding: '60px 20px',
-    display: 'flex',
-    flexDirection: 'column' as const,
-    alignItems: 'center',
-    gap: '8px',
-  },
-  emptyText: {
-    color: '#64748b',
-    fontSize: '14px',
-    margin: 0,
-  },
-  emptyHint: {
-    color: '#94a3b8',
-    fontSize: '13px',
-    margin: 0,
-  },
-};

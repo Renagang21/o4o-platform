@@ -10,6 +10,7 @@
 
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   DollarSign,
   TrendingUp,
@@ -185,93 +186,94 @@ function SummaryCard({
 }
 
 // 서비스별 비용 테이블
+// WO-O4O-NETURE-EXPANDABLE-AND-REMAINING-LISTS-STANDARDIZATION-BATCH-V5:
+//   실제 목록(서비스별 비용)만 공용 DataTable 로 전환. 요약/분포/추이 차트는 리포트 레이아웃이라 유지.
+//   집계 값(요청수·비용·평균·준수율) 계산 로직은 변경하지 않고 표시만 옮긴다.
 function ServiceCostTable({ data }: { data: ServiceCostData[] }) {
   const sortedData = [...data].sort((a, b) => b.cost - a.cost);
 
+  const columns: ListColumnDef<ServiceCostData>[] = [
+    {
+      key: 'serviceName',
+      header: '서비스',
+      minWidth: 160,
+      render: (_v, service) => <div className="font-medium text-gray-900">{service.serviceName}</div>,
+    },
+    {
+      key: 'requests',
+      header: '요청 수',
+      align: 'right',
+      width: '100px',
+      render: (_v, service) => <span className="text-gray-600">{formatNumber(service.requests)}</span>,
+    },
+    {
+      key: 'cost',
+      header: '총 비용',
+      align: 'right',
+      width: '110px',
+      render: (_v, service) => <span className="font-medium text-gray-900">{formatCost(service.cost)}</span>,
+    },
+    {
+      key: 'avgCost',
+      header: '평균 비용',
+      align: 'right',
+      width: '110px',
+      render: (_v, service) => {
+        const levelInfo = getCostLevelInfo(getCostLevel(service.avgCost));
+        return (
+          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${levelInfo.bgColor} ${levelInfo.color}`}>
+            {formatCost(service.avgCost)}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'packageCompliance',
+      header: '패키지 준수율',
+      align: 'right',
+      width: '150px',
+      render: (_v, service) => (
+        <div className="flex items-center justify-end gap-2">
+          <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div
+              className={`h-full rounded-full ${
+                service.packageCompliance >= 100
+                  ? 'bg-green-500'
+                  : service.packageCompliance >= 70
+                    ? 'bg-amber-500'
+                    : 'bg-red-500'
+              }`}
+              style={{ width: `${Math.min(service.packageCompliance, 100)}%` }}
+            />
+          </div>
+          <span
+            className={`text-xs font-medium ${
+              service.packageCompliance >= 100
+                ? 'text-green-600'
+                : service.packageCompliance >= 70
+                  ? 'text-amber-600'
+                  : 'text-red-600'
+            }`}
+          >
+            {service.packageCompliance}%
+          </span>
+        </div>
+      ),
+    },
+  ];
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-      <div className="p-4 border-b border-gray-100">
-        <h3 className="font-semibold text-gray-900 flex items-center gap-2">
-          <Building2 className="w-5 h-5 text-gray-400" />
-          서비스별 비용
-        </h3>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-gray-50">
-            <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                서비스
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                요청 수
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                총 비용
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                평균 비용
-              </th>
-              <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                패키지 준수율
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-100">
-            {sortedData.map((service) => {
-              const costLevel = getCostLevel(service.avgCost);
-              const levelInfo = getCostLevelInfo(costLevel);
-              return (
-                <tr key={service.serviceId} className="hover:bg-gray-50">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-gray-900">{service.serviceName}</div>
-                  </td>
-                  <td className="px-4 py-3 text-right text-gray-600">
-                    {formatNumber(service.requests)}
-                  </td>
-                  <td className="px-4 py-3 text-right font-medium text-gray-900">
-                    {formatCost(service.cost)}
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <span
-                      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${levelInfo.bgColor} ${levelInfo.color}`}
-                    >
-                      {formatCost(service.avgCost)}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      <div className="w-16 h-2 bg-gray-200 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full rounded-full ${
-                            service.packageCompliance >= 100
-                              ? 'bg-green-500'
-                              : service.packageCompliance >= 70
-                                ? 'bg-amber-500'
-                                : 'bg-red-500'
-                          }`}
-                          style={{ width: `${Math.min(service.packageCompliance, 100)}%` }}
-                        />
-                      </div>
-                      <span
-                        className={`text-xs font-medium ${
-                          service.packageCompliance >= 100
-                            ? 'text-green-600'
-                            : service.packageCompliance >= 70
-                              ? 'text-amber-600'
-                              : 'text-red-600'
-                        }`}
-                      >
-                        {service.packageCompliance}%
-                      </span>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+    <div>
+      <h3 className="font-semibold text-gray-900 flex items-center gap-2 mb-3">
+        <Building2 className="w-5 h-5 text-gray-400" />
+        서비스별 비용
+      </h3>
+      <DataTable<ServiceCostData>
+        columns={columns}
+        data={sortedData}
+        rowKey={(s) => s.serviceId}
+        emptyMessage="서비스별 비용 내역이 없습니다."
+      />
     </div>
   );
 }

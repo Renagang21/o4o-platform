@@ -13,7 +13,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ArrowLeft, DollarSign, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowLeft, DollarSign } from 'lucide-react';
+import { DataTable, type ListColumnDef } from '@o4o/operator-ux-core';
 import {
   supplierApi,
   type Settlement,
@@ -128,12 +129,8 @@ export default function SupplierSettlementsPage() {
     setDetail(null);
   };
 
-  const handleToggleDetail = async (id: string) => {
-    if (expandedId === id) {
-      setExpandedId(null);
-      setDetail(null);
-      return;
-    }
+  // 상세 로드 — 확장 시 해당 정산의 연결 주문을 조회한다.
+  const openDetail = async (id: string) => {
     setExpandedId(id);
     setLoadingDetail(true);
     setDetailError(false);
@@ -147,6 +144,129 @@ export default function SupplierSettlementsPage() {
     } finally {
       setLoadingDetail(false);
     }
+  };
+
+  // WO-O4O-NETURE-EXPANDABLE-AND-REMAINING-LISTS-STANDARDIZATION-BATCH-V5:
+  //   카드 목록 + 수동 확장 → 공용 DataTable 확장 API (controlled, single-open).
+  //   상세는 단일 상태(detail)로 유지하므로 한 번에 하나만 펼친다.
+  const handleExpandChange = (next: Set<string>) => {
+    const added = [...next].find((k) => k !== expandedId);
+    if (added) {
+      openDetail(added);
+    } else {
+      setExpandedId(null);
+      setDetail(null);
+    }
+  };
+
+  const columns: ListColumnDef<Settlement>[] = [
+    {
+      key: 'period',
+      header: '정산 기간',
+      minWidth: 200,
+      render: (_v, s) => (
+        <span style={{ fontWeight: 600, color: '#1e293b' }}>{formatPeriod(s.period_start, s.period_end)}</span>
+      ),
+    },
+    {
+      key: 'total_sales',
+      header: '매출',
+      align: 'right',
+      width: '120px',
+      render: (_v, s) => <span style={{ color: '#1e293b' }}>{formatPrice(s.total_sales)}원</span>,
+    },
+    {
+      key: 'platform_fee',
+      header: '수수료',
+      align: 'right',
+      width: '140px',
+      render: (_v, s) => (
+        <span style={{ color: '#dc2626' }}>
+          -{formatPrice(s.platform_fee)}원
+          <span style={{ color: '#94a3b8', fontSize: '12px' }}> ({formatRate(s.platform_fee_rate)})</span>
+        </span>
+      ),
+    },
+    {
+      key: 'supplier_amount',
+      header: '정산금액',
+      align: 'right',
+      width: '130px',
+      render: (_v, s) => <span style={{ fontWeight: 700, color: '#1e293b' }}>{formatPrice(s.supplier_amount)}원</span>,
+    },
+    {
+      key: 'order_count',
+      header: '주문수',
+      align: 'right',
+      width: '90px',
+      render: (_v, s) => <span style={{ color: '#64748b' }}>{s.order_count}건</span>,
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: '110px',
+      align: 'center',
+      render: (_v, s) => {
+        const statusInfo = getStatus(s.status);
+        return (
+          <span style={{ ...styles.statusBadge, backgroundColor: statusInfo.bg, color: statusInfo.color }}>
+            {statusInfo.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'created_at',
+      header: '등록일',
+      width: '120px',
+      render: (_v, s) => <span style={{ color: '#94a3b8', fontSize: '13px', whiteSpace: 'nowrap' }}>{formatDate(s.created_at)}</span>,
+    },
+  ];
+
+  // 확장 상세 — 단일 상태(detail)이므로 현재 펼쳐진 행에만 대응한다.
+  const renderExpandedRow = (s: Settlement) => {
+    if (expandedId !== s.id) return null;
+    if (loadingDetail) return <p style={styles.detailLoading}>주문 정보를 불러오는 중...</p>;
+    if (detailError) {
+      return (
+        <p style={{ ...styles.detailLoading, color: '#dc2626' }}>
+          정산 상세를 불러오지 못했습니다.{' '}
+          <button
+            onClick={() => openDetail(s.id)}
+            style={{ background: 'none', border: 'none', color: '#dc2626', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
+          >
+            다시 시도
+          </button>
+        </p>
+      );
+    }
+    if (detail && detail.orders && detail.orders.length > 0) {
+      return (
+        <table style={styles.detailTable}>
+          <thead>
+            <tr>
+              <th style={styles.dtTh}>주문번호</th>
+              <th style={styles.dtTh}>주문자</th>
+              <th style={{ ...styles.dtTh, textAlign: 'right' }}>매출</th>
+              <th style={styles.dtTh}>주문일</th>
+            </tr>
+          </thead>
+          <tbody>
+            {detail.orders.map((o) => (
+              <tr key={o.order_id}>
+                <td style={styles.dtTd}>{o.order_number}</td>
+                <td style={styles.dtTd}>{o.orderer_name || '-'}</td>
+                <td style={{ ...styles.dtTd, textAlign: 'right', fontWeight: 500 }}>
+                  {formatPrice(o.supplier_sales_amount)}원
+                </td>
+                <td style={styles.dtTd}>{formatDate(o.order_date)}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      );
+    }
+    return <p style={styles.detailLoading}>연결된 주문이 없습니다.</p>;
   };
 
   return (
@@ -226,89 +346,16 @@ export default function SupplierSettlementsPage() {
           <p style={styles.emptyText}>정산 내역이 없습니다.</p>
         </div>
       ) : (
-        <div style={styles.listContainer}>
-          {settlements.map((s) => {
-            const statusInfo = getStatus(s.status);
-            const isExpanded = expandedId === s.id;
-
-            return (
-              <div key={s.id} style={styles.settlementCard}>
-                <div
-                  style={styles.settlementRow}
-                  onClick={() => handleToggleDetail(s.id)}
-                >
-                  <div style={styles.settlementMain}>
-                    <div style={styles.periodText}>{formatPeriod(s.period_start, s.period_end)}</div>
-                    <div style={styles.amountRow}>
-                      <span style={styles.amountLabel}>매출</span>
-                      <span style={styles.amountValue}>{formatPrice(s.total_sales)}원</span>
-                      <span style={styles.amountSeparator}>→</span>
-                      <span style={styles.amountLabel}>수수료 ({formatRate(s.platform_fee_rate)})</span>
-                      <span style={{ ...styles.amountValue, color: '#dc2626' }}>-{formatPrice(s.platform_fee)}원</span>
-                      <span style={styles.amountSeparator}>→</span>
-                      <span style={styles.amountLabel}>정산</span>
-                      <span style={{ ...styles.amountValue, fontWeight: 700 }}>{formatPrice(s.supplier_amount)}원</span>
-                    </div>
-                    <div style={styles.metaRow}>
-                      <span style={styles.metaText}>주문 {s.order_count}건</span>
-                      <span style={styles.metaText}>{formatDate(s.created_at)}</span>
-                    </div>
-                  </div>
-                  <div style={styles.settlementRight}>
-                    <span style={{ ...styles.statusBadge, backgroundColor: statusInfo.bg, color: statusInfo.color }}>
-                      {statusInfo.label}
-                    </span>
-                    {isExpanded ? <ChevronUp size={16} style={{ color: '#94a3b8' }} /> : <ChevronDown size={16} style={{ color: '#94a3b8' }} />}
-                  </div>
-                </div>
-
-                {/* Expanded Detail */}
-                {isExpanded && (
-                  <div style={styles.detailSection}>
-                    {loadingDetail ? (
-                      <p style={styles.detailLoading}>주문 정보를 불러오는 중...</p>
-                    ) : detailError ? (
-                      <p style={{ ...styles.detailLoading, color: '#dc2626' }}>
-                        정산 상세를 불러오지 못했습니다.{' '}
-                        <button
-                          onClick={() => { setExpandedId(null); setDetailError(false); handleToggleDetail(s.id); }}
-                          style={{ background: 'none', border: 'none', color: '#dc2626', textDecoration: 'underline', cursor: 'pointer', fontSize: 'inherit', padding: 0 }}
-                        >
-                          다시 시도
-                        </button>
-                      </p>
-                    ) : detail && detail.orders && detail.orders.length > 0 ? (
-                      <table style={styles.detailTable}>
-                        <thead>
-                          <tr>
-                            <th style={styles.dtTh}>주문번호</th>
-                            <th style={styles.dtTh}>주문자</th>
-                            <th style={{ ...styles.dtTh, textAlign: 'right' }}>매출</th>
-                            <th style={styles.dtTh}>주문일</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {detail.orders.map((o) => (
-                            <tr key={o.order_id}>
-                              <td style={styles.dtTd}>{o.order_number}</td>
-                              <td style={styles.dtTd}>{o.orderer_name || '-'}</td>
-                              <td style={{ ...styles.dtTd, textAlign: 'right', fontWeight: 500 }}>
-                                {formatPrice(o.supplier_sales_amount)}원
-                              </td>
-                              <td style={styles.dtTd}>{formatDate(o.order_date)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    ) : (
-                      <p style={styles.detailLoading}>연결된 주문이 없습니다.</p>
-                    )}
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
+        <DataTable<Settlement>
+          columns={columns}
+          data={settlements}
+          rowKey={(s) => s.id}
+          emptyMessage="정산 내역이 없습니다."
+          expandable
+          expandedRowKeys={expandedId ? new Set([expandedId]) : new Set()}
+          onExpandedRowKeysChange={handleExpandChange}
+          renderExpandedRow={renderExpandedRow}
+        />
       )}
 
       {/* Pagination */}
