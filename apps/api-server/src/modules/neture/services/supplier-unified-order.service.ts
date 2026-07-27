@@ -135,7 +135,10 @@ export class SupplierUnifiedOrderService {
       createdAt: o.created_at,
       updatedAt: o.updated_at ?? null,
       canFulfill: true,
-      fulfillmentUrl: `/account/supplier/orders/${o.id}`,
+      // WO-O4O-NETURE-SUPPLIER-ORDER-ROUTE-CANONICALIZATION-V1:
+      // read model URL 계약만 canonical 트리로 이관 (/account/supplier/orders/:id → /supplier/orders/:id).
+      // canFulfill 판정 · source · 상태 · 처리 불가 주문의 fulfillmentUrl=null 계약은 무변경.
+      fulfillmentUrl: `/supplier/orders/${o.id}`,
       readOnlyReason: null,
     }));
   }

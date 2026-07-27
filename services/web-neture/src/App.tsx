@@ -810,6 +810,10 @@ function App() {
               {/* WO-O4O-SELLER-RECRUITMENT-SUPPLIER-APPLICATION-REVIEW-V1 */}
               <Route path="/supplier/recruitments/:recruitmentId" element={<SupplierRecruitmentDetailPage />} />
               <Route path="/supplier/orders" element={<SupplierOrdersPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-ORDER-ROUTE-CANONICALIZATION-V1:
+                  실제 주문 처리 목록의 canonical 진입. 컴포넌트는 legacy /account 트리의
+                  SupplierOrdersListPage 를 그대로 재사용한다(신규 목록/API/상태머신 생성 없음). */}
+              <Route path="/supplier/orders/manage" element={<SupplierOrdersListPage />} />
               <Route path="/supplier/orders/:id" element={<SupplierOrderDetailPage />} />
               <Route path="/supplier/inventory" element={<SupplierInventoryPage />} />
               <Route path="/supplier/settlements" element={<SupplierSettlementsPage />} />

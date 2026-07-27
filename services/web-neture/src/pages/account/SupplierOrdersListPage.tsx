@@ -186,7 +186,7 @@ export default function SupplierOrdersListPage() {
       key: 'order_number',
       header: '주문번호',
       render: (_v, order) => (
-        <Link to={`/account/supplier/orders/${order.id}`} style={styles.orderNoLink}>
+        <Link to={`/supplier/orders/${order.id}`} style={styles.orderNoLink}>
           {order.order_number}
         </Link>
       ),
@@ -359,7 +359,7 @@ export default function SupplierOrdersListPage() {
                 <div key={order.id} style={styles.mobileCard}>
                   <div style={styles.mobileCardTop}>
                     <div>
-                      <Link to={`/account/supplier/orders/${order.id}`} style={styles.mobileOrderNo}>
+                      <Link to={`/supplier/orders/${order.id}`} style={styles.mobileOrderNo}>
                         {order.order_number}
                       </Link>
                       <span style={styles.mobileStoreName}>{order.orderer_name || '-'}</span>

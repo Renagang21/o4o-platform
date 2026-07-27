@@ -176,13 +176,15 @@ export default function SupplierOrdersPage() {
       )}
 
       {/* 주문 처리 workspace 진입 — WO-O4O-NETURE-SUPPLIER-OFFER-AND-ORDER-NAVIGATION-DEAD-END-CLOSE-V1:
-          자기참조(/supplier/orders) 제거 → 실제 주문 처리 목록(/account/supplier/orders)으로 연결 */}
-      <Link to="/account/supplier/orders" style={styles.fulfillCard}>
+          자기참조(/supplier/orders) 제거 → 실제 주문 처리 목록으로 연결
+          WO-O4O-NETURE-SUPPLIER-ORDER-ROUTE-CANONICALIZATION-V1:
+          연결 대상을 legacy /account/supplier/orders → canonical /supplier/orders/manage 로 이관 */}
+      <Link to="/supplier/orders/manage" style={styles.fulfillCard}>
         <div style={styles.fulfillIcon}>
           <Truck size={24} style={{ color: '#2563eb' }} />
         </div>
         <div style={{ flex: 1 }}>
-          <p style={styles.fulfillTitle}>주문 처리 · 배송 workspace 열기</p>
+          <p style={styles.fulfillTitle}>주문 처리 · 배송 관리</p>
           <p style={styles.fulfillText}>
             Neture 주문의 주문 확인 · 배송 준비 · 송장 등록 · 배송 완료를 처리합니다.
             <br />
