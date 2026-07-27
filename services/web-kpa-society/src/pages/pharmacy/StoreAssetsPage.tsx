@@ -7,6 +7,12 @@
  *
  * Data fetching and API calls remain here.
  * Policy, filtering, sorting, and rendering delegated to StoreAssetsPanel.
+ *
+ * WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
+ *   게시 상태 변경(단건/일괄) 실패를 catch 에서 삼켜 사용자가 성공 여부를 알 수 없던 문제 수정.
+ *   조회 오류는 StoreAssetsPanel 의 error 계약(오류 + 다시 시도)이 이미 처리하므로 그대로 두고,
+ *   mutation 오류만 래퍼 상단 인라인 배너로 안내한다(공통 패키지 미변경).
+ *   실패 시 publishStatus 는 갱신하지 않으므로 기존 상태가 그대로 보존된다.
  */
 
 import { useState, useCallback, useEffect } from 'react';
@@ -25,6 +31,8 @@ export default function StoreAssetsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1: 게시 상태 변경 실패 안내(조회 error 와 분리)
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const fetchItems = useCallback(async () => {
     setLoading(true);
@@ -52,6 +60,7 @@ export default function StoreAssetsPage() {
     const nextStatus = cycle[(currentIdx + 1) % cycle.length];
 
     setUpdatingId(item.id);
+    setActionError(null);
     try {
       const res = await storeAssetControlApi.updatePublishStatus(item.id, nextStatus);
       setAllItems(prev =>
@@ -60,7 +69,8 @@ export default function StoreAssetsPage() {
         ),
       );
     } catch {
-      // Silently fail — user can retry
+      // 실패 시 publishStatus 를 갱신하지 않아 이전 상태가 그대로 유지된다(성공으로 표시하지 않음).
+      setActionError('게시 상태를 변경하지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setUpdatingId(null);
     }
@@ -71,6 +81,7 @@ export default function StoreAssetsPage() {
   }, [navigate]);
 
   const handleBulkStatusChange = useCallback(async (ids: string[], status: AssetPublishStatus) => {
+    setActionError(null);
     const results = await Promise.allSettled(
       ids.map(id => storeAssetControlApi.updatePublishStatus(id, status)),
     );
@@ -82,10 +93,50 @@ export default function StoreAssetsPage() {
         prev.map(it => succeededIds.has(it.id) ? { ...it, publishStatus: status } : it),
       );
     }
+    // 부분 실패도 조용히 넘기지 않는다 — 실패한 항목은 이전 상태가 유지된 채 건수를 안내한다.
+    const failedCount = ids.length - succeededIds.size;
+    if (failedCount > 0) {
+      setActionError(
+        `${failedCount}건의 게시 상태를 변경하지 못했습니다. 해당 항목은 이전 상태로 남아 있습니다.`,
+      );
+    }
   }, []);
 
   return (
     <>
+      {actionError && (
+        <div
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: 12,
+            margin: '0 0 12px',
+            padding: '10px 14px',
+            borderRadius: 8,
+            border: '1px solid #FECACA',
+            backgroundColor: '#FEF2F2',
+            color: '#991B1B',
+            fontSize: '0.85rem',
+          }}
+        >
+          <span>{actionError}</span>
+          <button
+            type="button"
+            onClick={() => setActionError(null)}
+            style={{
+              border: 'none',
+              background: 'transparent',
+              color: '#991B1B',
+              cursor: 'pointer',
+              fontSize: '0.8rem',
+              flexShrink: 0,
+            }}
+          >
+            닫기
+          </button>
+        </div>
+      )}
       <StoreAssetsPanel
         items={allItems}
         loading={loading}

@@ -36,6 +36,11 @@ export function ProductMarketingPage() {
   const navigate = useNavigate();
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
+  //   조회/연결 해제 실패를 silent catch 로 삼키던 문제 수정. 실패와 "자산 없음" 을 분리하고 재시도를 제공한다.
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [unlinkingId, setUnlinkingId] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // WO-O4O-AI-AUTO-POP-BUILDER-V1: POP 편집 페이지로 이동
   // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1:
@@ -73,13 +78,18 @@ export function ProductMarketingPage() {
   const fetchData = useCallback(async () => {
     if (!productId) return;
     setLoading(true);
+    setLoadError(null);
     try {
       const res = await getProductMarketing(productId);
       if (res.success && res.data) {
         setData(res.data);
+      } else {
+        // success=false 도 실패로 취급한다(이전에는 조용히 통과해 빈 화면처럼 보였다).
+        setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
       }
     } catch {
-      // silent
+      // 재조회 실패 시 기존 data 는 유지한다.
+      setLoadError('마케팅 자산 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     } finally {
       setLoading(false);
     }
@@ -122,12 +132,21 @@ export function ProductMarketingPage() {
   };
 
   const handleUnlink = async (linkId: string) => {
-    if (!productId) return;
+    if (!productId || unlinkingId) return;
+    setUnlinkingId(linkId);
+    setActionError(null);
     try {
       const res = await unlinkProductMarketingAsset(productId, linkId);
-      if (res.success) fetchData();
+      if (res.success) {
+        await fetchData();
+      } else {
+        // 실패 시 목록에서 제거하지 않아 기존 연결 상태가 그대로 유지된다.
+        setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+      }
     } catch {
-      // silent
+      setActionError('연결을 해제하지 못했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setUnlinkingId(null);
     }
   };
 
@@ -137,6 +156,22 @@ export function ProductMarketingPage() {
         <div style={styles.loadingState}>
           <RefreshCw size={24} style={{ color: colors.neutral300 }} />
           <p style={{ color: colors.neutral500, fontSize: '14px', marginTop: '12px' }}>불러오는 중...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // 조회 실패 + 표시할 데이터 없음 → 오류 상태(재시도). "자산이 없음" 과 구분한다.
+  if (!data && loadError) {
+    return (
+      <div style={styles.container}>
+        <div style={styles.loadingState}>
+          <Link2 size={48} style={{ color: '#FCA5A5' }} />
+          <p style={{ color: '#991B1B', fontSize: '15px', fontWeight: 600, marginTop: '12px' }}>
+            마케팅 자산 정보를 불러오지 못했습니다.
+          </p>
+          <p style={{ color: colors.neutral500, fontSize: '13px', marginTop: '4px' }}>잠시 후 다시 시도해 주세요.</p>
+          <button type="button" onClick={() => void fetchData()} style={styles.retryBtn}>다시 시도</button>
         </div>
       </div>
     );
@@ -212,6 +247,22 @@ export function ProductMarketingPage() {
         </div>
       </div>
 
+      {/* WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1: 재조회 실패 — 기존 내용 유지 + 안내·재시도 */}
+      {loadError && (
+        <div style={styles.inlineError}>
+          <span>최신 마케팅 자산 정보를 불러오지 못했습니다. 아래는 마지막으로 불러온 내용입니다.</span>
+          <button type="button" onClick={() => void fetchData()} style={styles.inlineErrorBtn}>다시 시도</button>
+        </div>
+      )}
+
+      {/* mutation 실패 안내 — 연결 상태는 변경되지 않았음 */}
+      {actionError && (
+        <div style={styles.inlineError}>
+          <span>{actionError}</span>
+          <button type="button" onClick={() => setActionError(null)} style={styles.inlineErrorBtn}>닫기</button>
+        </div>
+      )}
+
       {/* QR Assets */}
       <div style={styles.section}>
         <div style={styles.sectionHeader}>
@@ -248,7 +299,12 @@ export function ProductMarketingPage() {
                     {link && (
                       <button
                         onClick={() => handleUnlink(link.id)}
-                        style={styles.unlinkBtn}
+                        disabled={unlinkingId === link.id}
+                        style={{
+                          ...styles.unlinkBtn,
+                          opacity: unlinkingId === link.id ? 0.5 : 1,
+                          cursor: unlinkingId === link.id ? 'not-allowed' : 'pointer',
+                        }}
                         title="연결 해제"
                       >
                         <Trash2 size={13} />
@@ -300,7 +356,12 @@ export function ProductMarketingPage() {
                     {link && (
                       <button
                         onClick={() => handleUnlink(link.id)}
-                        style={styles.unlinkBtn}
+                        disabled={unlinkingId === link.id}
+                        style={{
+                          ...styles.unlinkBtn,
+                          opacity: unlinkingId === link.id ? 0.5 : 1,
+                          cursor: unlinkingId === link.id ? 'not-allowed' : 'pointer',
+                        }}
                         title="연결 해제"
                       >
                         <Trash2 size={13} />
@@ -503,5 +564,39 @@ const styles: Record<string, React.CSSProperties> = {
     cursor: 'pointer',
     border: 'none',
     backgroundColor: 'transparent',
+  },
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1
+  inlineError: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: '12px',
+    marginBottom: '16px',
+    padding: '10px 14px',
+    borderRadius: '8px',
+    border: '1px solid #FECACA',
+    backgroundColor: '#FEF2F2',
+    color: '#991B1B',
+    fontSize: '13px',
+  },
+  inlineErrorBtn: {
+    flexShrink: 0,
+    border: '1px solid #FCA5A5',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#991B1B',
+    fontSize: '12px',
+    padding: '4px 12px',
+    cursor: 'pointer',
+  },
+  retryBtn: {
+    marginTop: '16px',
+    border: '1px solid #FCA5A5',
+    borderRadius: '6px',
+    backgroundColor: '#fff',
+    color: '#991B1B',
+    fontSize: '13px',
+    padding: '8px 18px',
+    cursor: 'pointer',
   },
 };

@@ -35,6 +35,33 @@ const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: stri
   glycopharm: { text: '혈당관리', color: '#059669', bg: '#D1FAE5' },
 };
 
+// WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
+//   기존 actionError 배너와 같은 인라인 오류 스타일(신규 디자인 시스템 도입 없음).
+const INLINE_ERROR_BOX: React.CSSProperties = {
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+  gap: 12,
+  marginBottom: 16,
+  padding: '10px 14px',
+  borderRadius: 8,
+  border: '1px solid #FECACA',
+  backgroundColor: '#FEF2F2',
+  color: '#991B1B',
+  fontSize: '0.85rem',
+};
+
+const INLINE_ERROR_BTN: React.CSSProperties = {
+  flexShrink: 0,
+  border: '1px solid #FCA5A5',
+  borderRadius: 6,
+  backgroundColor: '#fff',
+  color: '#991B1B',
+  fontSize: '0.8rem',
+  padding: '4px 12px',
+  cursor: 'pointer',
+};
+
 export function PharmacySellPage() {
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px' }}>
@@ -86,6 +113,12 @@ function ListingsTab() {
   const [channelFilter, setChannelFilter] = useState<ChannelType | 'ALL'>(initialChannel);
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  // WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1:
+  //   조회 실패가 console 에만 남고 "진열 상품이 없습니다" 빈 상태로 보이던 문제 수정.
+  //   핵심(상품 목록) 실패 = 페이지 오류 상태 / 보조(채널 개요) 실패 = 인라인 안내로 분리한다.
+  const [listingsError, setListingsError] = useState<string | null>(null);
+  const [channelsError, setChannelsError] = useState<string | null>(null);
+  const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const updateChannelFilter = useCallback((value: ChannelType | 'ALL') => {
     setChannelFilter(value);
@@ -97,19 +130,31 @@ function ListingsTab() {
   }, [setSearchParams]);
 
   const loadData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const [listingsResult, channelsResult] = await Promise.all([
-        getListings(),
-        fetchChannelOverview(),
-      ]);
-      setListings(listingsResult.data || []);
-      setChannels(channelsResult || []);
-    } catch (e: any) {
-      console.error('Failed to load listings:', e);
-    } finally {
-      setLoading(false);
+    setLoading(true);
+    setListingsError(null);
+    setChannelsError(null);
+    // Promise.all 은 한쪽 실패로 둘 다 버려지므로, 필수/보조 실패를 분리하기 위해 allSettled 사용.
+    const [listingsResult, channelsResult] = await Promise.allSettled([
+      getListings(),
+      fetchChannelOverview(),
+    ]);
+
+    if (listingsResult.status === 'fulfilled') {
+      setListings(listingsResult.value.data || []);
+    } else {
+      // 실패 시 기존 목록을 지우지 않는다(재조회 실패면 직전 목록 유지).
+      console.error('Failed to load listings:', listingsResult.reason);
+      setListingsError('판매 상품 정보를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.');
     }
+
+    if (channelsResult.status === 'fulfilled') {
+      setChannels(channelsResult.value || []);
+    } else {
+      console.error('Failed to load channel overview:', channelsResult.reason);
+      setChannelsError('채널 정보를 불러오지 못했습니다. 채널 필터가 표시되지 않을 수 있습니다.');
+    }
+
+    setLoading(false);
   }, []);
 
   useEffect(() => {
@@ -117,6 +162,8 @@ function ListingsTab() {
   }, [loadData]);
 
   const handleToggleActive = async (listing: ProductListing) => {
+    if (togglingId) return; // 중복 제출 방지
+    setTogglingId(listing.id);
     try {
       setActionError(null);
       // WO-O4O-KPA-LISTING-CHANNEL-UPDATE-404-MINIMAL-FIX-V1:
@@ -128,8 +175,11 @@ function ListingsTab() {
       });
       await loadData();
     } catch (e: any) {
+      // 실패 시 loadData 를 호출하지 않아 기존 진열 상태가 그대로 유지된다.
       console.error('Failed to toggle listing:', e);
       setActionError(e?.message || '진열 상태를 변경하지 못했습니다.');
+    } finally {
+      setTogglingId(null);
     }
   };
 
@@ -171,8 +221,45 @@ function ListingsTab() {
         </div>
       )}
 
+      {/* 재조회 실패인데 기존 목록이 남아 있는 경우 — 목록 유지 + 안내·재시도 */}
+      {!loading && listingsError && listings.length > 0 && (
+        <div style={INLINE_ERROR_BOX}>
+          <span>최신 판매 상품 정보를 불러오지 못했습니다. 아래는 마지막으로 불러온 내용입니다.</span>
+          <button type="button" onClick={() => void loadData()} style={INLINE_ERROR_BTN}>다시 시도</button>
+        </div>
+      )}
+
+      {/* WO-O4O-KPA-STORE-SILENT-ERROR-UX-STANDARDIZATION-V1: 보조 데이터(채널) 실패 — 상품 목록은 유지 */}
+      {!loading && channelsError && (
+        <div style={INLINE_ERROR_BOX}>
+          <span>{channelsError}</span>
+          <button type="button" onClick={() => void loadData()} style={INLINE_ERROR_BTN}>다시 시도</button>
+        </div>
+      )}
+
       {loading ? (
         <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>불러오는 중...</div>
+      ) : listingsError && listings.length === 0 ? (
+        /* 핵심 데이터 실패 + 표시할 목록 없음 → 오류 상태. "진열 상품이 없습니다" 와 구분한다. */
+        <div style={{
+          textAlign: 'center',
+          padding: 60,
+          backgroundColor: '#FEF2F2',
+          border: '1px solid #FECACA',
+          borderRadius: 8,
+        }}>
+          <p style={{ fontSize: '1.05rem', fontWeight: 600, color: '#991B1B' }}>
+            판매 상품 정보를 불러오지 못했습니다.
+          </p>
+          <p style={{ fontSize: '0.875rem', marginTop: 8, color: '#B91C1C' }}>잠시 후 다시 시도해 주세요.</p>
+          <button
+            type="button"
+            onClick={() => void loadData()}
+            style={{ ...INLINE_ERROR_BTN, marginTop: 16, padding: '8px 18px', fontSize: '0.875rem' }}
+          >
+            다시 시도
+          </button>
+        </div>
       ) : listings.length === 0 ? (
         <div style={{
           textAlign: 'center',
@@ -270,17 +357,21 @@ function ListingsTab() {
                   </span>
                   <button
                     onClick={() => handleToggleActive(listing)}
+                    disabled={togglingId !== null}
                     style={{
                       padding: '6px 14px',
                       fontSize: '0.8rem',
                       border: '1px solid #D1D5DB',
                       borderRadius: 6,
                       backgroundColor: '#fff',
-                      cursor: 'pointer',
+                      cursor: togglingId !== null ? 'not-allowed' : 'pointer',
+                      opacity: togglingId !== null ? 0.6 : 1,
                       color: '#374151',
                     }}
                   >
-                    {listing.is_active ? '비활성화' : '활성화'}
+                    {togglingId === listing.id
+                      ? '변경 중...'
+                      : listing.is_active ? '비활성화' : '활성화'}
                   </button>
                 </div>
               </div>
