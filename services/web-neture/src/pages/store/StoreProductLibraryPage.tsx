@@ -44,6 +44,8 @@ function OfferModal({
   master,
   offers,
   loading,
+  error,
+  onRetry,
   onSelect,
   onShowCondition,
   onClose,
@@ -51,6 +53,8 @@ function OfferModal({
   master: StoreProductSearchResult;
   offers: StoreOfferItem[];
   loading: boolean;
+  error: boolean;
+  onRetry: () => void;
   onSelect: (offerId: string) => void;
   onShowCondition: (supplierId: string, supplierName: string) => void;
   onClose: () => void;
@@ -83,6 +87,19 @@ function OfferModal({
         <div className="px-5 py-4 max-h-80 overflow-y-auto">
           {loading ? (
             <div className="text-center py-8 text-slate-400 text-sm">공급자 정보 로딩 중...</div>
+          ) : error ? (
+            <div className="text-center py-8">
+              <p className="text-sm font-medium text-slate-700">공급자 정보를 불러오지 못했습니다</p>
+              <p className="text-xs mt-1 text-slate-400">
+                공급자가 없는 것이 아니라 조회에 실패했습니다. 다시 시도해주세요.
+              </p>
+              <button
+                onClick={onRetry}
+                className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+              >
+                다시 시도
+              </button>
+            </div>
           ) : offers.length === 0 ? (
             <div className="text-center py-8 text-slate-400 text-sm">
               현재 이용 가능한 공급자가 없습니다
@@ -158,6 +175,9 @@ export default function StoreProductLibraryPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
+  // WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1:
+  //   검색 실패를 "검색 결과 없음" 으로 삼키지 않고 별도 상태로 분리. 재시도는 현재 q/category/brand/page 보존.
+  const [searchError, setSearchError] = useState(false);
 
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
@@ -167,6 +187,8 @@ export default function StoreProductLibraryPage() {
   const [selectedMaster, setSelectedMaster] = useState<StoreProductSearchResult | null>(null);
   const [offers, setOffers] = useState<StoreOfferItem[]>([]);
   const [offersLoading, setOffersLoading] = useState(false);
+  // 오퍼 조회 실패는 "공급자 없음(정상 0건)" 과 구분한다. 실패 시 진열 액션을 숨기고 재시도를 노출.
+  const [offersError, setOffersError] = useState(false);
 
   // Message
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -183,18 +205,28 @@ export default function StoreProductLibraryPage() {
 
   const doSearch = useCallback(async (p: number) => {
     setLoading(true);
-    const res = await storeApi.searchProducts({
-      q: query.trim() || undefined,
-      categoryId: categoryId || undefined,
-      brandId: brandId || undefined,
-      page: p,
-      limit: 20,
-    });
-    setResults(res.data);
-    setTotal(res.meta.total);
-    setTotalPages(res.meta.totalPages);
-    setPage(p);
-    setLoading(false);
+    setSearchError(false);
+    try {
+      const res = await storeApi.searchProducts({
+        q: query.trim() || undefined,
+        categoryId: categoryId || undefined,
+        brandId: brandId || undefined,
+        page: p,
+        limit: 20,
+      });
+      setResults(res.data);
+      setTotal(res.meta.total);
+      setTotalPages(res.meta.totalPages);
+      setPage(p);
+    } catch {
+      // 실패를 "검색 결과 없음" 으로 오인시키지 않는다. 결과/총계는 초기화하고 에러만 표면화.
+      setResults([]);
+      setTotal(0);
+      setTotalPages(0);
+      setSearchError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [query, categoryId, brandId]);
 
   useEffect(() => { doSearch(1); }, []);
@@ -209,10 +241,20 @@ export default function StoreProductLibraryPage() {
       return;
     }
 
-    // Load offers
+    // Load offers — 이전 오퍼/에러 상태를 초기화하여 master 전환 시 잔상 방지
     setSelectedMaster(master);
+    setOffers([]);
+    setOffersError(false);
     setOffersLoading(true);
-    const offerList = await storeApi.getMasterOffers(master.id);
+    let offerList: StoreOfferItem[];
+    try {
+      offerList = await storeApi.getMasterOffers(master.id);
+    } catch {
+      // 오퍼 조회 실패는 "공급자 없음" 이 아니다. 모달에 에러+재시도를 노출하고 진열 액션은 숨긴다.
+      setOffersError(true);
+      setOffersLoading(false);
+      return;
+    }
     setOffers(offerList);
     setOffersLoading(false);
 
@@ -221,6 +263,10 @@ export default function StoreProductLibraryPage() {
       await handleSelectOffer(offerList[0].id);
       setSelectedMaster(null);
     }
+  };
+
+  const retryOffers = () => {
+    if (selectedMaster) handleListProduct(selectedMaster);
   };
 
   const handleSelectOffer = async (offerId: string) => {
@@ -315,7 +361,7 @@ export default function StoreProductLibraryPage() {
           ))}
         </select>
         <span className="flex items-center text-sm text-slate-500">
-          {total}개 상품
+          {searchError ? '검색 실패' : `${total}개 상품`}
         </span>
       </div>
 
@@ -323,6 +369,18 @@ export default function StoreProductLibraryPage() {
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="text-slate-400 text-sm">검색 중...</div>
+        </div>
+      ) : searchError ? (
+        <div className="flex flex-col items-center py-16 text-slate-500">
+          <Package size={48} className="mb-4 opacity-40 text-red-300" />
+          <p className="text-sm font-medium text-slate-700">상품을 검색하지 못했습니다</p>
+          <p className="text-xs mt-1 text-slate-400">검색 결과가 없는 것이 아니라 조회에 실패했습니다. 다시 시도해주세요.</p>
+          <button
+            onClick={() => doSearch(page)}
+            className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+          >
+            다시 시도
+          </button>
         </div>
       ) : results.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-slate-400">
@@ -395,7 +453,7 @@ export default function StoreProductLibraryPage() {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!searchError && totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-4">
           <button
             onClick={() => doSearch(page - 1)}
@@ -423,6 +481,8 @@ export default function StoreProductLibraryPage() {
           master={selectedMaster}
           offers={offers}
           loading={offersLoading}
+          error={offersError}
+          onRetry={retryOffers}
           onSelect={handleSelectOffer}
           onShowCondition={(supplierId, supplierName) => setConditionTarget({ id: supplierId, name: supplierName })}
           onClose={() => setSelectedMaster(null)}

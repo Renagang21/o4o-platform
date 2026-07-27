@@ -18,6 +18,23 @@ export const STORE_ORDER_LOAD_FAILED = 'STORE_ORDER_LOAD_FAILED';
 export const STORE_SHIPMENT_ORDER_NOT_FOUND = 'STORE_SHIPMENT_ORDER_NOT_FOUND';
 export const STORE_SHIPMENT_LOAD_FAILED = 'STORE_SHIPMENT_LOAD_FAILED';
 
+/**
+ * WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1
+ *
+ * 매장 상품 탐색·진열 흐름의 조회 실패를 빈 결과([]/0건)로 삼키면
+ * "정상 검색 0건" 과 구분되지 않는다. 실패는 고정 코드로 throw 한다.
+ *
+ * backend 계약(store-product-library.controller.ts, 정적 확인):
+ *   GET /store/products/search            → 200 { success, data:[], meta } (정상 0건도 200 빈 배열)
+ *   GET /store/products/master/:id/offers → 200 { success, data:[] } (master 미존재도 404 아닌 빈 배열)
+ *   GET /store/products                   → 200 { success, data:[], meta }
+ *   403 → requireStoreOwner 실패(권한 없음 — 정상 빈 결과 아님, 실패로 표면화)
+ *   404 경로 없음. 401 → 미인증(refresh). 500 → 서버 오류
+ */
+export const STORE_PRODUCT_SEARCH_LOAD_FAILED = 'STORE_PRODUCT_SEARCH_LOAD_FAILED';
+export const STORE_MASTER_OFFERS_LOAD_FAILED = 'STORE_MASTER_OFFERS_LOAD_FAILED';
+export const STORE_LISTINGS_LOAD_FAILED = 'STORE_LISTINGS_LOAD_FAILED';
+
 function describeApiError(error: any): string {
   const data = error?.response?.data;
   if (typeof data?.error === 'string') return data.error;
@@ -452,35 +469,58 @@ export const storeApi = {
 
   // ── Store Product Library (WO-O4O-STORE-PRODUCT-LIBRARY-INTEGRATION-V1) ──
 
+  /**
+   * WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1
+   * 검색 실패를 빈 결과로 삼키지 않는다. 실패는 STORE_PRODUCT_SEARCH_LOAD_FAILED 로 throw.
+   */
   async searchProducts(params?: {
     q?: string; categoryId?: string; brandId?: string; page?: number; limit?: number;
   }): Promise<StoreProductSearchResponse> {
+    const sp = new URLSearchParams();
+    if (params?.q) sp.set('q', params.q);
+    if (params?.categoryId) sp.set('categoryId', params.categoryId);
+    if (params?.brandId) sp.set('brandId', params.brandId);
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.limit) sp.set('limit', String(params.limit));
+    const qs = sp.toString();
+
+    let response;
     try {
-      const sp = new URLSearchParams();
-      if (params?.q) sp.set('q', params.q);
-      if (params?.categoryId) sp.set('categoryId', params.categoryId);
-      if (params?.brandId) sp.set('brandId', params.brandId);
-      if (params?.page) sp.set('page', String(params.page));
-      if (params?.limit) sp.set('limit', String(params.limit));
-      const qs = sp.toString();
-      const response = await api.get(`/store/products/search${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/store/products/search${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[Store API] searchProducts error:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Store API] Failed to search products:', describeApiError(error));
+      throw new Error(STORE_PRODUCT_SEARCH_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Store API] Unexpected product search payload shape');
+      throw new Error(STORE_PRODUCT_SEARCH_LOAD_FAILED);
+    }
+    return {
+      data: result.data,
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
+  /**
+   * WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1
+   * 공급자 오퍼 조회 실패를 빈 목록으로 삼키지 않는다. 실패는 STORE_MASTER_OFFERS_LOAD_FAILED 로 throw.
+   * (master 미존재는 backend 가 404 아닌 빈 배열로 반환 — 정상 0건으로 취급)
+   */
   async getMasterOffers(masterId: string): Promise<StoreOfferItem[]> {
+    let response;
     try {
-      const response = await api.get(`/store/products/master/${masterId}/offers`);
-      const result = response.data;
-      return result.data || [];
+      response = await api.get(`/store/products/master/${masterId}/offers`);
     } catch (error) {
-      console.warn('[Store API] getMasterOffers error:', error);
-      return [];
+      console.warn('[Store API] Failed to fetch master offers:', describeApiError(error));
+      throw new Error(STORE_MASTER_OFFERS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Store API] Unexpected master offers payload shape');
+      throw new Error(STORE_MASTER_OFFERS_LOAD_FAILED);
+    }
+    return result.data;
   },
 
   async createListing(data: { offerId: string; price?: number | null }): Promise<{ success: boolean; data?: any; message?: string; error?: string }> {
@@ -495,19 +535,33 @@ export const storeApi = {
     }
   },
 
+  /**
+   * WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1
+   * 진열 목록 조회 실패를 "진열된 제품 0개" 로 삼키지 않는다.
+   * 실패는 STORE_LISTINGS_LOAD_FAILED 로 throw.
+   */
   async getMyListings(params?: { page?: number; limit?: number }): Promise<StoreListingsResponse> {
+    const sp = new URLSearchParams();
+    if (params?.page) sp.set('page', String(params.page));
+    if (params?.limit) sp.set('limit', String(params.limit));
+    const qs = sp.toString();
+
+    let response;
     try {
-      const sp = new URLSearchParams();
-      if (params?.page) sp.set('page', String(params.page));
-      if (params?.limit) sp.set('limit', String(params.limit));
-      const qs = sp.toString();
-      const response = await api.get(`/store/products${qs ? `?${qs}` : ''}`);
-      const result = response.data;
-      return { data: result.data || [], meta: result.meta || { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      response = await api.get(`/store/products${qs ? `?${qs}` : ''}`);
     } catch (error) {
-      console.warn('[Store API] getMyListings error:', error);
-      return { data: [], meta: { page: 1, limit: 20, total: 0, totalPages: 0 } };
+      console.warn('[Store API] Failed to fetch listings:', describeApiError(error));
+      throw new Error(STORE_LISTINGS_LOAD_FAILED);
     }
+    const result = response.data;
+    if (result?.success !== true || !Array.isArray(result.data)) {
+      console.warn('[Store API] Unexpected listings payload shape');
+      throw new Error(STORE_LISTINGS_LOAD_FAILED);
+    }
+    return {
+      data: result.data,
+      meta: result.meta || { page: 1, limit: 20, total: result.data.length, totalPages: 1 },
+    };
   },
 
   async updateListing(id: string, data: { isActive?: boolean; price?: number | null }): Promise<{ success: boolean; data?: any; error?: string }> {

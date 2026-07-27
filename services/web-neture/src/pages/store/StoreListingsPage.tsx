@@ -30,6 +30,9 @@ export default function StoreListingsPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
+  // WO-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패를 "진열된 제품 0개" 로 삼키지 않고 별도 상태로 분리. 재시도는 마지막 page 보존.
+  const [loadError, setLoadError] = useState(false);
 
   // Inline edit state
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -43,12 +46,19 @@ export default function StoreListingsPage() {
 
   const fetchListings = useCallback(async (p: number) => {
     setLoading(true);
-    const res = await storeApi.getMyListings({ page: p, limit: 20 });
-    setListings(res.data);
-    setTotal(res.meta.total);
-    setTotalPages(res.meta.totalPages);
-    setPage(p);
-    setLoading(false);
+    setLoadError(false);
+    try {
+      const res = await storeApi.getMyListings({ page: p, limit: 20 });
+      setListings(res.data);
+      setTotal(res.meta.total);
+      setTotalPages(res.meta.totalPages);
+      setPage(p);
+    } catch {
+      // 실패를 0건으로 오인시키지 않는다. 기존 목록/페이지 상태는 건드리지 않고 에러만 표면화.
+      setLoadError(true);
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   useEffect(() => { fetchListings(1); }, []);
@@ -103,7 +113,7 @@ export default function StoreListingsPage() {
             내 매장 제품
           </h1>
           <p className="text-slate-500 mt-1">
-            진열된 제품 {total}개
+            {loadError ? '진열 목록을 불러오지 못했습니다' : `진열된 제품 ${total}개`}
           </p>
         </div>
         <button
@@ -132,6 +142,18 @@ export default function StoreListingsPage() {
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="text-slate-400 text-sm">로딩 중...</div>
+        </div>
+      ) : loadError ? (
+        <div className="flex flex-col items-center py-16 text-slate-500">
+          <Package size={48} className="mb-4 opacity-40 text-red-300" />
+          <p className="text-sm font-medium text-slate-700">진열 목록을 불러오지 못했습니다</p>
+          <p className="text-xs mt-1 text-slate-400">네트워크 또는 서버 오류일 수 있습니다. 잠시 후 다시 시도해주세요.</p>
+          <button
+            onClick={() => fetchListings(page)}
+            className="mt-4 px-4 py-2 bg-slate-100 hover:bg-slate-200 rounded-lg text-sm font-medium text-slate-700"
+          >
+            다시 시도
+          </button>
         </div>
       ) : listings.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-slate-400">
@@ -252,7 +274,7 @@ export default function StoreListingsPage() {
       )}
 
       {/* Pagination */}
-      {totalPages > 1 && (
+      {!loadError && totalPages > 1 && (
         <div className="flex items-center justify-center gap-2 pt-4">
           <button
             onClick={() => fetchListings(page - 1)}
