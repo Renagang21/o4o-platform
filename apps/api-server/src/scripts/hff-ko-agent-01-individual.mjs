@@ -35,10 +35,16 @@ const APPLY = process.argv.includes('--apply');
 const CONFIRM = process.env.HFF_AGENT1_APPLY_CONFIRM === 'YES';
 const PORT = parseInt(process.env.PROXY_PORT ?? '5463', 10);
 const DATA_DIR = 'apps/api-server/src/scripts/data';
-const MANIFEST = `${DATA_DIR}/hff-ko-agent-01-test-100.json`;
-const HOLDS = `${DATA_DIR}/hff-ko-agent-01-test-100-holds.jsonl`;
-const RESULTS = `${DATA_DIR}/hff-ko-agent-01-test-100-results.json`;
-const ROLLBACK = `${DATA_DIR}/hff-ko-agent-01-test-100-rollback-manifest.json`;
+// BATCH: 산출물 basename 선택자. 기본 'test-100'(하위호환). 500 구간 = '00001-00500'.
+//   생성 로직/계약은 불변 — 경로·기대수량만 파라미터화(additive).
+const BATCH = process.env.HFF_BATCH ?? 'test-100';
+const EXPECT = process.env.HFF_EXPECT ? parseInt(process.env.HFF_EXPECT, 10) : null;
+const BASE = `${DATA_DIR}/hff-ko-agent-01-${BATCH}`;
+const MANIFEST = `${BASE}.json`;
+const HOLDS = `${BASE}-holds.jsonl`;
+const RESULTS = `${BASE}-results.json`;
+const ROLLBACK = `${BASE}-rollback-manifest.json`;
+const FAILED = `${BASE}-failed-system.jsonl`;
 const SOURCE_LABEL = 'MFDS_HEALTH_FUNCTIONAL_FOOD';
 const SPD_SOURCE_TYPE = 'o4o_hff_generated';
 const REGULATORY_TYPE = '건강기능식품';
@@ -172,7 +178,8 @@ function composeKo(row) {
 async function main() {
   if (APPLY && !CONFIRM) throw new Error('APPLY_BLOCKED: --apply 는 HFF_AGENT1_APPLY_CONFIRM=YES 필요');
   const manifest = JSON.parse(fs.readFileSync(MANIFEST, 'utf8'));
-  if (manifest.length !== 100) throw new Error(`manifest 100 아님: ${manifest.length}`);
+  if (!Array.isArray(manifest) || manifest.length === 0) throw new Error(`manifest 비정상: ${manifest?.length}`);
+  if (EXPECT != null && manifest.length !== EXPECT) throw new Error(`manifest 기대수량 불일치: ${manifest.length} != ${EXPECT}`);
 
   const client = new pg.Client({ host: '127.0.0.1', port: PORT, user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', ssl: false });
   await client.connect();
@@ -195,6 +202,7 @@ async function main() {
   const samples = [];
   const DUMP = process.env.HFF_DUMP_SAMPLES === 'YES';
   const holdLines = [];
+  const failedLines = [];
   const rollback = { createdMasters: [], createdSpd: [], candidateLinks: [], outcomes: [] };
   const t0 = Date.now();
   const startedAt = new Date().toISOString();
@@ -242,7 +250,7 @@ async function main() {
                   await qr.query(
                     `INSERT INTO product_masters (id, barcode, regulatory_type, regulatory_name, name, manufacturer_name, mfds_permit_number, is_mfds_verified, status, tags, created_at, updated_at)
                      VALUES ($1,NULL,$2,$3,$3,$4,$5,true,'ACTIVE',$6::jsonb,now(),now())`,
-                    [mid, REGULATORY_TYPE, flat(row.name), flat(row.maker), row.stmt, JSON.stringify(['import:mfds-hff', 'wo:hff-ko-agent-01-test-100'])]);
+                    [mid, REGULATORY_TYPE, flat(row.name), flat(row.maker), row.stmt, JSON.stringify(['import:mfds-hff', `wo:hff-ko-agent-01-${BATCH}`])]);
                   rollback.createdMasters.push(mid);
                   dbWrites++;
                 }
@@ -276,18 +284,25 @@ async function main() {
       status = 'FAILED_SYSTEM'; reason = 'UNEXPECTED'; detail = String(e.message || e); failed++;
     }
     results.push({ index: m.index, candidateId: m.candidateId, statementNo: m.statementNo, productName: m.productName, productMasterId: masterId, status, reason, detail, ms: Date.now() - pStart });
+    if (status === 'FAILED_SYSTEM') {
+      failedLines.push(JSON.stringify({
+        index: m.index, candidateId: m.candidateId, statementNo: m.statementNo, productName: m.productName,
+        productMasterId: masterId, failReason: reason, failDetail: detail,
+      }));
+    }
   }
 
   const elapsed = Date.now() - t0;
   fs.writeFileSync(RESULTS, JSON.stringify({ startedAt, finishedAt: new Date().toISOString(), mode: APPLY ? 'apply' : 'dry-run', elapsedMs: elapsed, counts: { created, skipped, held, failed }, dbWrites, results }, null, 1));
   fs.writeFileSync(HOLDS, holdLines.join('\n') + (holdLines.length ? '\n' : ''));
+  fs.writeFileSync(FAILED, failedLines.join('\n') + (failedLines.length ? '\n' : ''));
   if (APPLY) fs.writeFileSync(ROLLBACK, JSON.stringify(rollback, null, 1));
-  if (DUMP) fs.writeFileSync(`${DATA_DIR}/hff-ko-agent-01-test-100-samples.json`, JSON.stringify(samples, null, 1));
+  if (DUMP) fs.writeFileSync(`${BASE}-samples.json`, JSON.stringify(samples, null, 1));
 
   const holdByReason = {};
   for (const l of holdLines) { const r = JSON.parse(l).holdReason; holdByReason[r] = (holdByReason[r] || 0) + 1; }
   console.log('JSON_REPORT_BEGIN');
-  console.log(JSON.stringify({ mode: APPLY ? 'apply' : 'dry-run', counts: { created, skipped, held, failed }, dbWrites, holdByReason, elapsedMs: elapsed, avgMs: Math.round(elapsed / 100) }, null, 2));
+  console.log(JSON.stringify({ mode: APPLY ? 'apply' : 'dry-run', counts: { created, skipped, held, failed }, dbWrites, holdByReason, elapsedMs: elapsed, avgMs: Math.round(elapsed / manifest.length) }, null, 2));
   console.log('JSON_REPORT_END');
   await client.end();
 }

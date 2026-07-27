@@ -1,0 +1,4002 @@
+[
+ {
+  "index": 1,
+  "candidateId": "d98f8f91-8a48-4bb6-a317-5f4b260928f0",
+  "statementNo": "11111111114001",
+  "productName": "TEST(건기전문제조)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 2,
+  "candidateId": "673ef957-df69-4c3b-b841-689c2d6469b8",
+  "statementNo": "11111111115001",
+  "productName": "TEST(건기벤처제조)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 3,
+  "candidateId": "327fbba9-3456-4b37-b744-1f075782ee3e",
+  "statementNo": "20040015039105",
+  "productName": "고려홍삼골드플러스",
+  "productMasterId": "641d10fa-0ae2-4ba9-8da0-315fcf81e681",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 4,
+  "candidateId": "6f6402e8-7e90-4812-9601-ba373c3d4772",
+  "statementNo": "20040015039106",
+  "productName": "아이사랑비타민",
+  "productMasterId": "481e39a2-b2e5-49c3-b1dd-8be7f7dc61db",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 5,
+  "candidateId": "c27e1996-5dd7-4779-90aa-72a45ccc28ee",
+  "statementNo": "20040015039107",
+  "productName": "그린아센스",
+  "productMasterId": "dff67a29-ab5e-4257-880c-6ab66261969d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 6,
+  "candidateId": "bc6077df-ad7f-4ed5-a8d7-f4e5e3fa9a2a",
+  "statementNo": "20040015039113",
+  "productName": "고려홍삼정플러스",
+  "productMasterId": "e372eac2-73a5-4c49-b056-492e001a7682",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 7,
+  "candidateId": "7c5e1607-8e33-4580-84da-0f0b1772da33",
+  "statementNo": "20040015039114",
+  "productName": "고려홍삼정골드",
+  "productMasterId": "d5275e5e-a132-44f0-ba92-af44a2b60871",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 8,
+  "candidateId": "d11f38d6-06ae-4d32-8fab-aa4266c814b1",
+  "statementNo": "20040015039115",
+  "productName": "고려홍삼정수",
+  "productMasterId": "33cd9f4f-ae38-4ad8-8138-e89f7a27484e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 9,
+  "candidateId": "4816e639-3433-437d-9951-a7716bed4f5f",
+  "statementNo": "20040015039116",
+  "productName": "홍삼정",
+  "productMasterId": "4b6d7600-1c0a-46bc-83d9-224e4b1f5469",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 10,
+  "candidateId": "a9e049bc-0ff8-47cb-965a-e1d003ed8b0d",
+  "statementNo": "20040015039117",
+  "productName": "고려홍삼농축액",
+  "productMasterId": "8aad0d7c-59ee-46b6-a226-1768290f7a84",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 11,
+  "candidateId": "3cff381f-12f6-4f0b-a636-3e5e7b338a06",
+  "statementNo": "20040015039119",
+  "productName": "고려홍삼정",
+  "productMasterId": "f6089a67-b5e7-4715-b673-4d7759bbe659",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 12,
+  "candidateId": "d9705d18-802a-4ca9-85f9-e6fe83d8cc77",
+  "statementNo": "20040015039120",
+  "productName": "인삼농축액",
+  "productMasterId": "4a54f7a7-42d1-47af-9172-8aba465c4294",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 13,
+  "candidateId": "a599f7b7-54e3-4d6e-ae90-4ac00ce0fb36",
+  "statementNo": "20040015039121",
+  "productName": "고려인삼차",
+  "productMasterId": "09b6345e-7a15-483a-9ecb-c90087803a9b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 14,
+  "candidateId": "d5dff8f7-5401-47e4-a48e-1da8444d20b2",
+  "statementNo": "20040015039122",
+  "productName": "고려홍삼차",
+  "productMasterId": "e32bb2fb-31e7-4148-969d-0343f9a3a3a2",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 15,
+  "candidateId": "ddc33eb6-222f-4bc3-8b51-74eb0b00cfe2",
+  "statementNo": "20040015039123",
+  "productName": "고려홍삼골드",
+  "productMasterId": "bf1a36ac-7afd-4193-8a84-c37416df0c89",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 16,
+  "candidateId": "241c3130-c8e2-4e9c-ab89-629b3619f5ac",
+  "statementNo": "20040015039130",
+  "productName": "천하무적키즈왕홍삼",
+  "productMasterId": "0894c84c-82b4-4452-8d10-e41be232c98a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 17,
+  "candidateId": "446c0dc2-ef0b-4da3-81db-15c1f171eb51",
+  "statementNo": "20040015039135",
+  "productName": "고려홍삼정오리지널",
+  "productMasterId": "9ad3234b-6491-4e8f-a4bf-5925795d427d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 18,
+  "candidateId": "5330adf4-9b1c-4248-88e9-809260bb6efe",
+  "statementNo": "20040015039136",
+  "productName": "홍삼정골드",
+  "productMasterId": "ec749afd-0150-4846-9c39-ab18439d644c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 19,
+  "candidateId": "ddad3b6a-39db-4d0c-8d3f-dbf0fbff5674",
+  "statementNo": "20040015039140",
+  "productName": "홍삼원마일드",
+  "productMasterId": "311f80b0-1c90-4cd4-8202-a1b4f57ebb16",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 20,
+  "candidateId": "fe3dfbed-13a1-47f5-bf85-cbd210451f91",
+  "statementNo": "20040015039141",
+  "productName": "키토산한국보건영",
+  "productMasterId": "6f1f5357-7458-492e-af16-5a51754093e0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 21,
+  "candidateId": "0dc898f8-d00b-45b5-9c5b-aa211c7ddee5",
+  "statementNo": "20040015039144",
+  "productName": "진홍삼농축액",
+  "productMasterId": "eaa66151-5b29-4102-afa0-592521911667",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 22,
+  "candidateId": "bcfd6718-11a6-4cec-8025-690cb31298b5",
+  "statementNo": "20040015039145",
+  "productName": "효(孝)삼정",
+  "productMasterId": "620988bb-ecca-4824-a581-6746be70c445",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 23,
+  "candidateId": "319fa864-3462-49c8-84e4-4cc23185c444",
+  "statementNo": "20040015039146",
+  "productName": "토코한국보건영",
+  "productMasterId": "c6c53029-b553-45d4-b1f6-d43c408b8894",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 24,
+  "candidateId": "5ee9df91-5091-4676-b593-3eb689ac1feb",
+  "statementNo": "20040015039147",
+  "productName": "엑스-팻다이어트",
+  "productMasterId": "14e8b878-7fa8-45cb-bd95-bb957c2c69c0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 25,
+  "candidateId": "b1acefd4-42db-49fe-a794-bc8702250ef8",
+  "statementNo": "20040015039148",
+  "productName": "팻빼로",
+  "productMasterId": "31816168-9e0a-4cc6-a26f-387cc2996544",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 26,
+  "candidateId": "8ce4fafd-d5f3-42cc-a458-92b287b0dfe2",
+  "statementNo": "20040015039149",
+  "productName": "고려홍삼정진",
+  "productMasterId": "ab480a8d-5abe-455a-8b8d-0f4e45d9a67e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 27,
+  "candidateId": "cc7fb122-3a23-4507-903c-e7966c9272eb",
+  "statementNo": "20040015039150",
+  "productName": "팻빼로플러스",
+  "productMasterId": "63fcd1bd-7cba-4d0e-801b-00df4b09295d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 28,
+  "candidateId": "0b982460-80c0-49b9-b07b-4f1a5582ce2f",
+  "statementNo": "20040015039151",
+  "productName": "해포린(HEPOLIN)",
+  "productMasterId": "9c145baf-edbe-4c2a-8b7b-8a314fe144cf",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 29,
+  "candidateId": "988c1e53-a34a-4664-a94a-d4ccb4617757",
+  "statementNo": "20040015039152",
+  "productName": "고려인삼정캡슐플러스",
+  "productMasterId": "d17774df-0a5e-462a-a7b0-cb1923b727d3",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 30,
+  "candidateId": "88ff66cc-f124-4e22-918f-f6c6c6042d2d",
+  "statementNo": "20040015039153",
+  "productName": "고려인삼정",
+  "productMasterId": "419adc99-bb36-4b2a-aa7f-60da75503ae3",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 31,
+  "candidateId": "0ad80448-c263-4c28-8b33-840104465827",
+  "statementNo": "20040015039154",
+  "productName": "고려홍삼정 힐링타임",
+  "productMasterId": "415b3510-da75-41a0-b875-48d53da5b42b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 32,
+  "candidateId": "eb2b4c80-2a94-4a56-bc62-8a3a5e256597",
+  "statementNo": "20040015039158",
+  "productName": "한국익간보",
+  "productMasterId": "e6d66029-aa04-48e9-af1f-93b6fe0ab082",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 33,
+  "candidateId": "62f571a0-f9a2-4333-87f0-db2b936ea32e",
+  "statementNo": "20040015039163",
+  "productName": "프락토골드",
+  "productMasterId": "392f5319-cd85-44ef-9d97-bd109b4040f1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 34,
+  "candidateId": "5d32d84d-c631-4fb0-bb77-8c1d05dc5354",
+  "statementNo": "20040015039164",
+  "productName": "수익강고려태극삼캡슐",
+  "productMasterId": "299923e5-c49c-4dab-8190-5647f1c16c6d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 35,
+  "candidateId": "f7b65374-1698-4a3b-94bb-7d786dbdd557",
+  "statementNo": "20040015039166",
+  "productName": "굿라인-디",
+  "productMasterId": "6af942b4-4813-46ca-9437-a34c57d819a1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 36,
+  "candidateId": "da8cdf31-ee44-4fee-9d87-ae0292e9328e",
+  "statementNo": "20040015039173",
+  "productName": "한국활혈보",
+  "productMasterId": "299107e5-137c-4707-b167-8bc74a0e3932",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 37,
+  "candidateId": "e148452b-b3d2-4e98-8f05-4411444ffe8c",
+  "statementNo": "20040015039177",
+  "productName": "고려홍삼정시그니처",
+  "productMasterId": "e6ba08f6-dcc9-4e3c-9cb9-0e781f7f3906",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 38,
+  "candidateId": "d70a27e7-dab5-4923-aa38-7153d5a7c4d1",
+  "statementNo": "20040015039184",
+  "productName": "히어로키드골드",
+  "productMasterId": "41199df8-f9b0-4277-b001-89f7f378e67c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 39,
+  "candidateId": "ac7d9766-f689-455c-9cd7-a4d002b92e58",
+  "statementNo": "20040015039189",
+  "productName": "한국이간보플러스",
+  "productMasterId": "b7afdf2b-9aff-440b-a7ce-5b614abde022",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 40,
+  "candidateId": "8b2e5d06-64ad-480a-bd01-5565f35c19bb",
+  "statementNo": "20040015039194",
+  "productName": "한창락 프리미엄",
+  "productMasterId": "5da12691-2d58-4007-a83b-2ffc4bc103e0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 41,
+  "candidateId": "d2841baa-788f-414c-9220-e03286714b1c",
+  "statementNo": "20040015039200",
+  "productName": "고려삼플레티늄사포닌",
+  "productMasterId": "7b79f2bd-3cfd-468a-8ab4-cbfa44a766b1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 42,
+  "candidateId": "67beef65-e9fd-47bf-80ff-ef315cb484cb",
+  "statementNo": "20040015039201",
+  "productName": "고려태극삼플레티늄사포닌",
+  "productMasterId": "6d589b04-c1f6-42ee-80bc-348f8d797a85",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 43,
+  "candidateId": "81a0c26a-5ae5-4fb7-8b92-c32a5db93e8e",
+  "statementNo": "20040015039202",
+  "productName": "고려홍삼정데일리파워스틱",
+  "productMasterId": "794e9b77-cd71-4279-bb01-f4e39ca9ee38",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 44,
+  "candidateId": "e15478e9-79c2-407c-b552-8de57a4eebbb",
+  "statementNo": "20040015039205",
+  "productName": "고려홍삼정프리미엄골드",
+  "productMasterId": "59c9590b-8cee-4743-8d18-3baf88d8ec02",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 45,
+  "candidateId": "f4dfe899-f653-4050-bf09-c2ffe798828c",
+  "statementNo": "20040015039207",
+  "productName": "고려홍삼정에브리웰빙",
+  "productMasterId": "09043574-908b-4060-a68e-b727396fa915",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 46,
+  "candidateId": "5ea14515-43fc-435b-9015-6b21114fe2c0",
+  "statementNo": "20040015039208",
+  "productName": "6년근고려홍삼정헬스올데이",
+  "productMasterId": "e3e23565-1b41-4704-9fc1-2d35a10e77e8",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 47,
+  "candidateId": "638699bf-3e35-49ad-9eb1-bbbec3938cb6",
+  "statementNo": "20040015039211",
+  "productName": "편안하게",
+  "productMasterId": "9628b604-fb19-4d4d-8179-6e99504ec77b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 48,
+  "candidateId": "9566e620-f17e-40a3-83a4-74da8006d1e8",
+  "statementNo": "20040015039214",
+  "productName": "바이오관절",
+  "productMasterId": "72f0c65f-16b6-41b2-bc5d-e06857f60b42",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 49,
+  "candidateId": "ffcbe88f-222d-44ff-b3ba-e3e3166b7341",
+  "statementNo": "20040015039215",
+  "productName": "바이오아이즈",
+  "productMasterId": "a7b4fbe4-aebd-4364-ab8a-8c8fe449a4be",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 50,
+  "candidateId": "e7474762-b5aa-48b6-8027-66c8329a30b5",
+  "statementNo": "20040015039216",
+  "productName": "바이오리버",
+  "productMasterId": "e526e675-ee07-43ae-b48d-c7ccb063c5f1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 51,
+  "candidateId": "6d983728-eb8a-4025-a8ce-78891c77f959",
+  "statementNo": "20040015039217",
+  "productName": "6년근 황실 고려홍삼정 캡슐 플래티늄",
+  "productMasterId": "041ff6c9-9a0e-48cd-847f-9ce5a7807e62",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 52,
+  "candidateId": "2b504301-84b0-4e2d-906d-c1e0c56dbb37",
+  "statementNo": "20040015039218",
+  "productName": "화이트닝글루타치온365",
+  "productMasterId": "0cdd8283-c5b5-430c-9101-11fc06aca8ff",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 53,
+  "candidateId": "72e30f26-abb0-47aa-8002-a58c48f339a1",
+  "statementNo": "20040015039220",
+  "productName": "고려홍삼정진캡슐",
+  "productMasterId": "564573a3-3d93-4e45-b69a-49c72113762b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 54,
+  "candidateId": "6cc32416-6742-45fa-bbb4-3a98c03cd2f8",
+  "statementNo": "20040015039221",
+  "productName": "진사포닌캡슐",
+  "productMasterId": "96300798-8422-4840-a856-4ae15d97a217",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 55,
+  "candidateId": "1aeee3af-596d-442d-a957-c56727de7630",
+  "statementNo": "20040015039222",
+  "productName": "천 사포닌정",
+  "productMasterId": "e3a7f699-f6e7-4dd3-a9c8-b33305df06a7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 56,
+  "candidateId": "48b8e657-616d-4683-b6e6-f040909f5e56",
+  "statementNo": "20040015039223",
+  "productName": "지 사포닌정",
+  "productMasterId": "66f424e1-e0ae-483c-9901-3075262215b1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 57,
+  "candidateId": "f37c4fd6-7fa5-49af-9df1-ebb6bde78211",
+  "statementNo": "20040015039224",
+  "productName": "조인트솔루션",
+  "productMasterId": "2b059787-8d72-48e0-bdac-f2b53e9fd170",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 58,
+  "candidateId": "f0559f09-a612-4b8e-8732-83c34d229d75",
+  "statementNo": "20040015039225",
+  "productName": "고려홍삼정 프리미엄파워스틱",
+  "productMasterId": "f2ba8d4b-1986-4509-b7f1-756f6e575f5f",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 59,
+  "candidateId": "52af96f3-34b8-4f3b-b8c4-e4b662d10c9f",
+  "statementNo": "20040015039228",
+  "productName": "고려홍삼차560 ",
+  "productMasterId": "69452731-7a63-4137-86aa-c8086513b6bf",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 60,
+  "candidateId": "a547c69f-1b94-4ca6-817a-a25be23f9688",
+  "statementNo": "20040015039229",
+  "productName": "알지쓰리고려흑삼분말캡슐",
+  "productMasterId": "dafd4fc3-7749-43c7-8049-893b77370eca",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 61,
+  "candidateId": "c8072d48-2083-423b-8a52-134ef09518d8",
+  "statementNo": "20040015039230",
+  "productName": "알지쓰리고려흑삼정플러스캡슐",
+  "productMasterId": "ff546e01-68b9-480e-aca8-ca505b6db0ef",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 62,
+  "candidateId": "a76245e9-3430-4036-8ad2-481e77eedc7c",
+  "statementNo": "20040015039231",
+  "productName": "알지쓰리고려흑삼정캡슐",
+  "productMasterId": "cc4afd26-7af8-4d05-b4b9-7ddad0bc396c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 63,
+  "candidateId": "6581cf0a-3b19-4403-b127-47c4ccf14d42",
+  "statementNo": "20040015039233",
+  "productName": "홍삼침향단프리미엄",
+  "productMasterId": "7e299a8d-63e0-4096-8205-f37a351eef2a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 64,
+  "candidateId": "7f250c8d-2aaa-4c28-ba87-36d87688f8b0",
+  "statementNo": "20040015039235",
+  "productName": "진사포닌캡슐프리미엄",
+  "productMasterId": "d7f17426-428a-4ae9-b141-08383d45b839",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 65,
+  "candidateId": "9ad824fc-ca10-4543-8d17-0e9c28ff3625",
+  "statementNo": "20040015039236",
+  "productName": "울트라레드진생동충하초캡슐",
+  "productMasterId": "977d6733-36c5-404c-9d36-cf63a0fd4bd1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 66,
+  "candidateId": "869054c7-b061-4f4b-9125-8afb4d239a85",
+  "statementNo": "20040015039237",
+  "productName": "천궁침",
+  "productMasterId": "4c59fac6-c75c-46f6-8908-756deec9e193",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 67,
+  "candidateId": "38e08752-de8b-4a01-81d9-80454da01c47",
+  "statementNo": "20040015039238",
+  "productName": "전통 우황청심원",
+  "productMasterId": "ae26be7a-032b-46d9-9163-2b2e9921531d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 68,
+  "candidateId": "1bb81ef5-baf6-4343-b577-4611fdc16f1a",
+  "statementNo": "20040015039239",
+  "productName": "티-관절&연골건강",
+  "productMasterId": "692bfd37-86c0-401b-aeed-4463a04baf67",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 69,
+  "candidateId": "da3ab6a2-ddf5-4dec-b8f2-adbdf882117e",
+  "statementNo": "2004001503924",
+  "productName": "고려홍삼성분액골드",
+  "productMasterId": "9cd22266-0344-4e5a-b5a9-92acde4791e4",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 70,
+  "candidateId": "f0a88060-7ba3-4c74-b341-b4cd0e6ef862",
+  "statementNo": "20040015039240",
+  "productName": "황제황비액",
+  "productMasterId": "fcf5451c-835a-4da9-ad12-a3d59a7b6b29",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 71,
+  "candidateId": "94f79c11-0a32-41ef-a5b6-141c8a26ae1c",
+  "statementNo": "20040015039241",
+  "productName": "편안하루 365 플러스",
+  "productMasterId": "80923c6a-b191-49ac-9a02-0ba307f3df18",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 72,
+  "candidateId": "33586fab-bfb2-4177-9282-608371438648",
+  "statementNo": "20040015039242",
+  "productName": "데일리프리미엄스틱",
+  "productMasterId": "0c3c63c6-ebc6-4b05-8049-c51f359869ca",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 73,
+  "candidateId": "bf00e355-d0b1-4f83-9565-9eeded5e649b",
+  "statementNo": "20040015039243",
+  "productName": "Pro-forpatec",
+  "productMasterId": "dec7ae14-0808-42e3-a53d-158c29c33ccf",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 74,
+  "candidateId": "858a6250-552c-4fad-8743-ad596418ce20",
+  "statementNo": "20040015039247",
+  "productName": "삼비천 프리미엄",
+  "productMasterId": "a8bcf478-1631-4898-a861-db936d6ea810",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 75,
+  "candidateId": "f52be334-5200-4be3-992e-9900a2988c42",
+  "statementNo": "20040015039249",
+  "productName": "동결건조태극삼농축액분말(원료)",
+  "productMasterId": "a8ff4dac-cc70-48aa-b24e-6b3be40d22cb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 76,
+  "candidateId": "94c51ff1-e8d2-444d-ab6c-281837938509",
+  "statementNo": "20040015039250",
+  "productName": "동결건조홍삼농축액분말(원료)",
+  "productMasterId": "02dc5b27-15fb-4951-abcd-e2cd2e7786d0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 77,
+  "candidateId": "f9db5619-4f2c-4132-8b82-65ff7bb8a727",
+  "statementNo": "20040015039251",
+  "productName": "태극인삼분말프리미엄",
+  "productMasterId": "03562553-50f4-4782-a5e8-b20afc3e7999",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 78,
+  "candidateId": "b8a076c2-cc32-43d6-a191-f01fbead8e9b",
+  "statementNo": "20040015039252",
+  "productName": "태극인삼분말",
+  "productMasterId": "a43c77c6-7f2b-4395-bd6b-75ee84c659d7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 79,
+  "candidateId": "d7ae71cb-e558-4f08-a2d8-3f8ce6c7a91f",
+  "statementNo": "20040015039253",
+  "productName": "고려태극삼액정",
+  "productMasterId": "04763c5a-f09c-4a2a-a9b7-9a32b8bc71e1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 80,
+  "candidateId": "70dacbb3-4fed-4908-9d50-67d9791dac50",
+  "statementNo": "20040015039254",
+  "productName": "태극삼액정프리미엄",
+  "productMasterId": "182855c9-9a2e-4fc5-844b-a0feff2530e8",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 81,
+  "candidateId": "09f995c5-edf6-43e6-9cdf-eab1cde6f5df",
+  "statementNo": "20040015039255",
+  "productName": "황활력삼",
+  "productMasterId": "59c390bf-f757-48ea-b087-8cad8aac88ab",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 82,
+  "candidateId": "fb6bdef4-4246-4edd-a7ec-2f718f421735",
+  "statementNo": "20040015039256",
+  "productName": "활력삼프리미엄",
+  "productMasterId": "70565b86-a3a7-4309-802e-dac146f1cee5",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 83,
+  "candidateId": "e06d679d-0e65-417e-a95d-e79d71087350",
+  "statementNo": "20040015039257",
+  "productName": "닥터삼프리미엄",
+  "productMasterId": "679030d8-94c4-454f-ae1c-0f0205333ff8",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 84,
+  "candidateId": "348d941c-a7d4-4a87-9227-bd33748a1965",
+  "statementNo": "20040015039258",
+  "productName": "활력삼",
+  "productMasterId": "3ccab9e6-97c1-474b-87b4-66a4c007a12c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 85,
+  "candidateId": "db4a797a-2df9-424a-8f72-9b18b0c90cd2",
+  "statementNo": "20040015039259",
+  "productName": "활력삼분말캡슐프리미엄",
+  "productMasterId": "d10b3a3b-318a-4290-8bfd-0437bb178e27",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 86,
+  "candidateId": "05e7fcfc-ee00-42a5-9f85-e61384a96788",
+  "statementNo": "20040015039260",
+  "productName": "활력삼분말캡슐",
+  "productMasterId": "dbb35458-2a36-4664-8018-478546d8e685",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 87,
+  "candidateId": "a920b57c-3160-47f3-918f-f0a8e181ba20",
+  "statementNo": "20040015039261",
+  "productName": "메가 비타민A 알파",
+  "productMasterId": "1b5db9d6-42c2-4273-ae4a-81f4ea771235",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 88,
+  "candidateId": "f4315710-5168-4916-90c9-9c0120cd6703",
+  "statementNo": "20040015039262",
+  "productName": "메가바타민B플러스알파",
+  "productMasterId": "2f289fae-1e01-464e-99c9-486ff4b111da",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 89,
+  "candidateId": "a93efc82-1210-43db-a13e-71a4c063a650",
+  "statementNo": "20040015039263",
+  "productName": "메가 비타민D 알파",
+  "productMasterId": "12e82cd9-4914-49c4-bc85-d389b54801fd",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 90,
+  "candidateId": "634feb16-e44f-410e-b575-79a4d2b4ebaa",
+  "statementNo": "20040015039264",
+  "productName": "진세노 오구",
+  "productMasterId": "31932c77-7927-4d0e-aae9-a1fc2ad69316",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 91,
+  "candidateId": "27caebd4-9749-4d10-b3bc-3a22447cbb25",
+  "statementNo": "20040015039265",
+  "productName": "태극삼스틱",
+  "productMasterId": "bc183927-c728-41ee-92bd-947aadc462d5",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 92,
+  "candidateId": "b4c8a778-839e-45c2-91e7-f58688a7e058",
+  "statementNo": "20040015039266",
+  "productName": "건미의고려인삼",
+  "productMasterId": "cfd79a8f-e824-4b13-a0d3-4a811b6f6c6d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 93,
+  "candidateId": "91a5c271-1ab0-4006-8220-1e8cd90f4584",
+  "statementNo": "20040015039267",
+  "productName": "고려홍삼농축액분말100%캡슐",
+  "productMasterId": "792f69ff-927b-4d00-9ade-9638d5178b80",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 94,
+  "candidateId": "5e646596-0714-440e-aa9c-7f1d139c05bd",
+  "statementNo": "20040015039268",
+  "productName": "고려홍삼시그니처",
+  "productMasterId": "3ad1fe02-28d3-40a4-a98f-00e610d8bf91",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 95,
+  "candidateId": "c1284cef-143f-4270-a81b-e6c532410a62",
+  "statementNo": "20040015039269",
+  "productName": "고려홍삼농축액100%",
+  "productMasterId": "16ee2518-737b-4c7a-b98b-302096dfab25",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 96,
+  "candidateId": "f1a5a681-ae60-4655-8a16-e483f8f669ca",
+  "statementNo": "2004001503927",
+  "productName": "고려홍삼정프리미엄 ",
+  "productMasterId": "8f741750-9f81-43a9-9191-70a892cc18aa",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 97,
+  "candidateId": "50c52350-f5e1-4e8f-8eef-921937e70612",
+  "statementNo": "20040015039270",
+  "productName": "고려홍삼분말100%캡슐",
+  "productMasterId": "6b419182-9467-4f2a-804a-cb5d79f1ebd0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 98,
+  "candidateId": "0fe052c1-dbd9-4c1b-ab91-dfa7f4efdf8a",
+  "statementNo": "20040015039271",
+  "productName": "밸런스업 태극삼 진액",
+  "productMasterId": "920a42ff-d0d7-4e58-b634-92ea10a1df37",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 99,
+  "candidateId": "014cd347-4d17-4c43-a3d3-929939748711",
+  "statementNo": "20040015039272",
+  "productName": "홍삼정 에브리원 퍼플",
+  "productMasterId": "73fff930-c382-4c24-b1d2-acfb9cbd35e9",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 100,
+  "candidateId": "4c5f7d9c-f500-4195-be2e-fa51ae99563f",
+  "statementNo": "20040015039273",
+  "productName": "태극 비타민C 3000",
+  "productMasterId": "673bcdb3-d4d4-48ee-bc0d-4ec3dd1889e7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 101,
+  "candidateId": "6b6efdc1-ca7a-4d19-9edd-04ac7158754f",
+  "statementNo": "20040015039274",
+  "productName": "삼비천",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 102,
+  "candidateId": "71c7f398-0a53-4919-9ab7-979430214ced",
+  "statementNo": "20040015039276",
+  "productName": "꿀생강홍삼차",
+  "productMasterId": "79319fe0-3004-4774-99d2-4b6c8917caf7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 103,
+  "candidateId": "d533d106-9849-4a91-8d7c-244dad17ba27",
+  "statementNo": "2004001503928",
+  "productName": "황제의기",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 104,
+  "candidateId": "6239b577-e821-4644-bf11-970d7f68144d",
+  "statementNo": "2004001503932",
+  "productName": "로우펫식이섬유플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 105,
+  "candidateId": "4848cc77-bbf6-48f7-a9ed-0d7e20ecff9e",
+  "statementNo": "2004001503939",
+  "productName": "고려홍삼차골드",
+  "productMasterId": "6262198d-2f1c-4e99-a050-94876264c73b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 106,
+  "candidateId": "4a27578f-c496-44dd-befc-a8928aebbc78",
+  "statementNo": "2004001503940",
+  "productName": "고려인삼차골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 107,
+  "candidateId": "0996fa10-a3ca-495c-8ac1-348771c39ce0",
+  "statementNo": "2004001503943",
+  "productName": "글루코사민100",
+  "productMasterId": "c9386fc0-d60f-44d4-8bec-d61fb92f6d85",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 108,
+  "candidateId": "701840f8-d4c1-476c-9b08-a61c587cd06f",
+  "statementNo": "2004001503948",
+  "productName": "고려홍삼사포닌골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 109,
+  "candidateId": "fc26564d-eb0e-4d85-b9e8-845f4f50ed80",
+  "statementNo": "2004001503949",
+  "productName": "천지양뿌리깊은홍삼정마일드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 110,
+  "candidateId": "c9a9172c-23ea-417f-a6ac-9d349468f70d",
+  "statementNo": "200400150395",
+  "productName": "영양칼슘비타민",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 111,
+  "candidateId": "b14903ff-b891-4abd-9a98-4ab653e4109c",
+  "statementNo": "2004001503952",
+  "productName": "고삼력홍삼캡슐골드32",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 112,
+  "candidateId": "32e14ede-7b1c-450c-9e9e-c01255098a85",
+  "statementNo": "2004001503953",
+  "productName": "고삼력홍삼캡슐32-오리지널",
+  "productMasterId": "b84bfc46-e7b4-4072-a0fd-3122267c0f80",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 113,
+  "candidateId": "681eed0c-751c-4a6b-af72-cc0380079487",
+  "statementNo": "2004001503956",
+  "productName": "밝은사랑비타민A",
+  "productMasterId": "02633053-8243-4c20-837a-712770139364",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 114,
+  "candidateId": "748a7909-7672-4c45-9924-cb685e9ec392",
+  "statementNo": "2004001503957",
+  "productName": "고려인삼분말캡슐",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 115,
+  "candidateId": "b663b465-cdfe-4304-afaa-2e1403841b36",
+  "statementNo": "2004001503959",
+  "productName": "고려홍삼분말캡슐",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 116,
+  "candidateId": "ab8460bf-f83b-4c24-b8af-8e5532765b01",
+  "statementNo": "200400150396",
+  "productName": "해조칼슘비타민",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 117,
+  "candidateId": "9bfeace8-00a1-4ac0-983f-2373f60e1132",
+  "statementNo": "2004001503961",
+  "productName": "고려인삼분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 118,
+  "candidateId": "97a86c53-5951-4fe3-9d6d-ed8fcd966ef4",
+  "statementNo": "2004001503967",
+  "productName": "고려홍삼분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 119,
+  "candidateId": "fad4c5ee-3045-4d05-baf5-33c59d59a3bb",
+  "statementNo": "2004001503980",
+  "productName": "홍삼청(紅蔘靑)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 120,
+  "candidateId": "b468329b-5790-49c8-bf08-c77fdb799afe",
+  "statementNo": "2004001503990",
+  "productName": "뷰티케어와이",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 121,
+  "candidateId": "34eaadd8-12eb-46d1-8861-98558aabcc4c",
+  "statementNo": "2004001503998",
+  "productName": "뉴참미인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 122,
+  "candidateId": "c9283abf-e8af-4b56-a05e-4b2e1151cce6",
+  "statementNo": "2004001505519",
+  "productName": "고센난황레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 123,
+  "candidateId": "d8600cef-bf8f-4beb-b042-2381c2f8a354",
+  "statementNo": "2004001505541",
+  "productName": "GL-40E난황레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 124,
+  "candidateId": "1746aa3e-3738-4034-9b69-e98c96f28178",
+  "statementNo": "2004001505543",
+  "productName": "올데이 난황레시틴플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 125,
+  "candidateId": "f1dc3285-6663-4d6d-93f4-b3d589a95b27",
+  "statementNo": "2004001505549",
+  "productName": "오르난황레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 126,
+  "candidateId": "77c0e772-70ad-4c2d-ade8-a083a5ca4ce4",
+  "statementNo": "2004001505572",
+  "productName": "레시틴플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 127,
+  "candidateId": "58b89fec-15fe-4850-bbfb-48bce982c9c8",
+  "statementNo": "2004001505574",
+  "productName": "브레인레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 128,
+  "candidateId": "9496de05-e807-461d-9175-3b9acc29000c",
+  "statementNo": "2004001505575",
+  "productName": "젬무브 생생 기억력 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 129,
+  "candidateId": "73ae6c71-99c1-4dc6-94ee-9d49030d72a3",
+  "statementNo": "2004001505576",
+  "productName": "오메가레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 130,
+  "candidateId": "1c0cf0e6-8e79-46f2-9138-205a2d91dcc6",
+  "statementNo": "2004001505578",
+  "productName": "뉴파워레시틴 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 131,
+  "candidateId": "b456e2dd-6f41-4367-b502-1343f45c3089",
+  "statementNo": "2004001505579",
+  "productName": "에임헬스난황레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 132,
+  "candidateId": "5ea1ada9-3a70-4c9c-a62f-d0f89eff5cb1",
+  "statementNo": "2004001505582",
+  "productName": "난황레시틴(PL60)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 133,
+  "candidateId": "3cce370f-09f9-42b0-9557-bc598da9bb8d",
+  "statementNo": "2004001505583",
+  "productName": "브레인홍삼 에브리데이 난황레시틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 134,
+  "candidateId": "97e706f1-04d9-47fb-9325-3b0178ab5d41",
+  "statementNo": "20040015070116",
+  "productName": "프로바이오틱스 지엔엘",
+  "productMasterId": "55a172a8-e7bf-431b-8d8b-c92c60191158",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 135,
+  "candidateId": "4b5975c9-0c61-4b06-9acd-aa2ed4081281",
+  "statementNo": "20040015070125",
+  "productName": "프로바이오틱스우먼",
+  "productMasterId": "e870ead8-b553-4e14-ac4d-b467ba4fff47",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 136,
+  "candidateId": "5b055df3-8614-417e-bcaf-957d038052bd",
+  "statementNo": "20040015070130",
+  "productName": "포거트(Fourgurt)",
+  "productMasterId": "c1144b3a-7351-4cf4-8cf4-a9c90356cbed",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 137,
+  "candidateId": "c526466d-a142-45fd-977b-68431eed9264",
+  "statementNo": "20040015070142",
+  "productName": "지근억영양철분비타민",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 138,
+  "candidateId": "36328908-a011-4507-b70a-34f4c8afd035",
+  "statementNo": "20040015070151",
+  "productName": "하이락비피더스",
+  "productMasterId": "03775778-3caf-456d-a995-36588655e7c6",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 139,
+  "candidateId": "5d0c2689-5f7c-4284-850c-46e557c90958",
+  "statementNo": "20040015070161",
+  "productName": "닥터지 프로바이오틱스 유산균 프리미엄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 140,
+  "candidateId": "d9007a4d-98a8-441c-a5ae-4e17c08fc7a8",
+  "statementNo": "20040015070176",
+  "productName": "프로바이오베베",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 141,
+  "candidateId": "29e7d28d-f951-41cb-95df-26eec0c51f0f",
+  "statementNo": "20040015070178",
+  "productName": "프로바이오썬",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 142,
+  "candidateId": "413d81b1-6d39-425c-ab43-c73821a6e8dc",
+  "statementNo": "20040015070181",
+  "productName": "프로바이오에프",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 143,
+  "candidateId": "79f7ef3b-3518-43e6-830c-e01a35d86709",
+  "statementNo": "20040015070212",
+  "productName": "프로바이오틱스 생(生)유산균 세븐원",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 144,
+  "candidateId": "5f578f19-b134-4643-964b-30aba32b4a6d",
+  "statementNo": "20040015070224",
+  "productName": "닥터에디션 아이비에스",
+  "productMasterId": "12fe5636-a32b-4cbf-92ac-9e2c751d793a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 145,
+  "candidateId": "2d459c28-cea3-40e8-87fe-afa126df175c",
+  "statementNo": "20040015070229",
+  "productName": "지근억비피더스프로G",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 146,
+  "candidateId": "dd174718-d872-47e3-bab4-d18b60c6b5a1",
+  "statementNo": "20040015070246",
+  "productName": "비피러스블로썸All",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 147,
+  "candidateId": "d730847e-4ed5-431b-8543-13cee715fd35",
+  "statementNo": "20040015070252",
+  "productName": "닥터지비피더스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 148,
+  "candidateId": "fc5452cb-a42b-41f2-9783-96323b1f4e57",
+  "statementNo": "20040015070262",
+  "productName": "엔바이탈프로바이오틱스8",
+  "productMasterId": "b494a3b8-e137-4293-af97-c5338f3b382b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 149,
+  "candidateId": "648f452e-21be-4f5c-9e0c-25c4781e71c5",
+  "statementNo": "20040015070264",
+  "productName": "유산균 락티스 비에이치10",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 150,
+  "candidateId": "a7c84762-029d-44e5-89f4-495fc3151376",
+  "statementNo": "20040015070265",
+  "productName": "유산균 써모필러스 비에이치05",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 151,
+  "candidateId": "d8ca3461-5702-4dcf-922d-36438b026b27",
+  "statementNo": "20040015070271",
+  "productName": "유산균 루테리 비에이치11",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 152,
+  "candidateId": "371e2db9-ab8c-4f6d-9a39-fa680e651afb",
+  "statementNo": "20040015070275",
+  "productName": "비피더스균 브레브 비에이치12",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 153,
+  "candidateId": "68cf3e79-559d-41e3-ad26-ef3a30b381d8",
+  "statementNo": "20040015070280",
+  "productName": "유산균 페칼리스 비에이치16",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 154,
+  "candidateId": "14b8dfbc-b7a3-40f3-925d-dc1187a16ca2",
+  "statementNo": "20040015070281",
+  "productName": "유산균 가세리 휴민디",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 155,
+  "candidateId": "a6e023cc-9c78-4855-9cd2-aff2a8882ce8",
+  "statementNo": "20040015070282",
+  "productName": "유산균 헬베티쿠스 비에이치14",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 156,
+  "candidateId": "a297663f-140c-46a8-9301-ebc4bae652da",
+  "statementNo": "20040015070283",
+  "productName": "유산균 살리바리우스 휴민유(HHuMin-U)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 157,
+  "candidateId": "d339455d-2045-46a9-b1c4-3bd65dad5c0d",
+  "statementNo": "200400150703",
+  "productName": "지근억비피더스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 158,
+  "candidateId": "25a888fa-0141-4ea2-bc6e-a8fbf3ae98a6",
+  "statementNo": "20040015070303",
+  "productName": "아쿠아프로젝트",
+  "productMasterId": "cec20e7c-5075-4f8c-9227-f21b72941d80",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 159,
+  "candidateId": "969223ac-9958-44aa-9be5-ee30f6ef0566",
+  "statementNo": "20040015070309",
+  "productName": "더팜 이지바울 베베키즈",
+  "productMasterId": "c07fe444-081e-47a7-912f-6428721a1b5c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 160,
+  "candidateId": "f24ba675-53ec-47c3-b807-18c811d8beba",
+  "statementNo": "20040015070310",
+  "productName": "더팜 이지바울 골드",
+  "productMasterId": "c618b6be-8049-4d8c-b7ad-4da1314aea49",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 161,
+  "candidateId": "f2234dc6-79f5-488f-a5f9-119c5cfc3620",
+  "statementNo": "20040015070311",
+  "productName": "더팜뉴바이오틱스베이비",
+  "productMasterId": "6f3cb06a-7709-4802-ab6b-dbf6581aa1da",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 162,
+  "candidateId": "ee7cd9c5-70a1-4ddb-a7aa-0adbbe074b54",
+  "statementNo": "20040015070342",
+  "productName": "패밀리바이옴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 163,
+  "candidateId": "32232756-b8e9-4f65-8fcd-0263a82533ce",
+  "statementNo": "20040015070343",
+  "productName": "베이비바이옴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 164,
+  "candidateId": "6f297ef2-e4f4-444e-9a28-0788c1418fcd",
+  "statementNo": "20040015070347",
+  "productName": "엑티바이옴MVP",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 165,
+  "candidateId": "5e179896-9697-4848-a7c2-5fff4d20fc83",
+  "statementNo": "20040015070349",
+  "productName": "우먼케어플러스",
+  "productMasterId": "02808912-bade-46ee-9abf-46633360439a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 166,
+  "candidateId": "44cfbacd-b754-4778-94b3-6602527b84dc",
+  "statementNo": "20040015070354",
+  "productName": "닥터지바이옴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 167,
+  "candidateId": "7ec3f333-39ea-4176-86c1-e467babab0c5",
+  "statementNo": "20040015070356",
+  "productName": "이든메가바이오틱스M(엠)1",
+  "productMasterId": "a2782fab-4e69-45d7-9794-6a48b8acda7d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 168,
+  "candidateId": "72efcbb2-e41b-4e1f-9ca7-317546094b24",
+  "statementNo": "20040015070357",
+  "productName": "이든포스트바이오틱스M(엠)2",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 169,
+  "candidateId": "7aa57805-8dfa-42c9-b429-1d68e411dea2",
+  "statementNo": "20040015070360",
+  "productName": "비피더스균 롱검 라포(RAPO)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 170,
+  "candidateId": "b2cf1a8c-867d-43a0-8adf-3fca79997dd2",
+  "statementNo": "20040015070361",
+  "productName": "유산균 헬베티쿠스 것(GUT)10",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 171,
+  "candidateId": "0978fbe9-82ac-4659-908f-14271233dc2c",
+  "statementNo": "20040015070374",
+  "productName": "닥터에디션 키즈프로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 172,
+  "candidateId": "4ab85e38-2cf7-4c40-b313-79adf913a067",
+  "statementNo": "20040015070375",
+  "productName": "닥터에디션 앤토프로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 173,
+  "candidateId": "6c0aef1d-d336-4bb4-a97a-90597edc5b49",
+  "statementNo": "20040015070376",
+  "productName": "닥터에디션 이지프로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 174,
+  "candidateId": "980ddbc6-497a-4cdb-91b9-3ec49ae6d591",
+  "statementNo": "20040015070386",
+  "productName": "비피젠 퓨어 비피더스 키즈",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 175,
+  "candidateId": "02618aee-fd71-4b9f-a99a-2bf87e0b87c9",
+  "statementNo": "20040015070387",
+  "productName": "비피젠 퓨어 비피더스 프리미엄",
+  "productMasterId": "3de6b062-4c63-468b-88b2-f6c28d93ac17",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 176,
+  "candidateId": "cbd379ca-d8a8-4c02-a108-b484712eceda",
+  "statementNo": "20040015070388",
+  "productName": "소프트모닝",
+  "productMasterId": "6bcd4dfb-39f0-48f8-a356-0263f7777073",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 177,
+  "candidateId": "e9d21703-28d4-4266-ae50-a9b3511f0b67",
+  "statementNo": "200400150704",
+  "productName": "지근억비피더스베이비",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 178,
+  "candidateId": "1b164f8b-feac-430c-8906-1b7c92938cd2",
+  "statementNo": "20040015070401",
+  "productName": "유산균 퍼멘텀 비에이치03",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 179,
+  "candidateId": "6f326e67-0d88-4ec2-902a-a2da0e6fd5fb",
+  "statementNo": "20040015070403",
+  "productName": "바이탈C 스틱",
+  "productMasterId": "94701a56-719f-457b-9936-379a38ca84e4",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 180,
+  "candidateId": "fc027cf2-0315-4cb9-bca2-3a546902cb10",
+  "statementNo": "20040015070407",
+  "productName": "비피더스 프로바이오틱스",
+  "productMasterId": "cb27e5b9-ca2c-4b22-aa5c-038a57b91850",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 181,
+  "candidateId": "d98636bf-7935-444f-9fcb-9a6bdc5d5904",
+  "statementNo": "20040015070408",
+  "productName": "마이해빗 리포좀 비타민 C+D",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 182,
+  "candidateId": "e75a357c-d450-4657-84fb-f9d4acba4af1",
+  "statementNo": "20040015070409",
+  "productName": "100억 라이브 비피더스(Ten Billion Live Bifidus)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 183,
+  "candidateId": "703dfc32-5c4f-400b-945c-e9f739026f5c",
+  "statementNo": "20040015070412",
+  "productName": "장건강엔 더 착한 유산균 비피더스",
+  "productMasterId": "52663d3c-1af7-4c0e-b7f7-cc2ca8386fc7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 184,
+  "candidateId": "40651bfe-6b3a-49fe-856f-853bc86df182",
+  "statementNo": "20040015070414",
+  "productName": "히알비피더스바이오틱스 골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 185,
+  "candidateId": "6d8eb88c-9341-405c-82ac-c431bb6eea67",
+  "statementNo": "20040015070416",
+  "productName": "비피젠 퓨어 비피더스 골드(BIFIGEN Pure Bifidus Gold)",
+  "productMasterId": "9a9ac247-cec3-4f3d-b997-9fde6d35f90e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 186,
+  "candidateId": "e2d307cf-eaa1-4c65-97ca-537a6e66b9f2",
+  "statementNo": "20040015070417",
+  "productName": "이로운 비피더스 유산균",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 187,
+  "candidateId": "0f8c3ba1-b200-4eda-894c-d5c976aa0ec4",
+  "statementNo": "20040015070419",
+  "productName": "비피맥스 프리미엄 비피더스 100억 XOS 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 188,
+  "candidateId": "b23407f1-80a1-4898-9c6e-c74ff2b4ea73",
+  "statementNo": "20040015070420",
+  "productName": "유산균람노써스비에이치09(BH09)분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 189,
+  "candidateId": "dfddd0fd-1882-4afd-bbba-05dde0455610",
+  "statementNo": "20040015070421",
+  "productName": "비피더스균비피덤비지엔포(BGN4)분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 190,
+  "candidateId": "d9f11da8-4218-4bb1-8c68-54dc878b3683",
+  "statementNo": "20040015070422",
+  "productName": "비피더스균락티스에이디011(AD011)분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 191,
+  "candidateId": "df2f4f29-c84f-478d-9a8c-de74700f98e7",
+  "statementNo": "20040015070423",
+  "productName": "비피더스균롱검보리(BORI)분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 192,
+  "candidateId": "ec22d3ab-3464-4c57-b510-29c2b70396c9",
+  "statementNo": "20040015070424",
+  "productName": "비피더스균롱검라포(RAPO)분말",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 193,
+  "candidateId": "99ab021c-be69-441f-b235-e25a46b2a2d0",
+  "statementNo": "20040015070428",
+  "productName": "혈당&유산균 비피더스 당장큐",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 194,
+  "candidateId": "278fb308-7e88-4083-803e-d9c747543925",
+  "statementNo": "20040015070429",
+  "productName": "이든마이크로바이옴프로젝트970",
+  "productMasterId": "cc749cb3-c495-4f07-9422-35d53375ce56",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 195,
+  "candidateId": "1d48e90e-58d0-4b07-84d9-211a7854e89c",
+  "statementNo": "20040015070430",
+  "productName": "나우그린 프리미엄 비피더스 100",
+  "productMasterId": "4b58c4ea-faf0-48e6-8c89-9e02439fa9ef",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 196,
+  "candidateId": "9f33ca12-cf32-4f78-89ab-c39ae2c355ec",
+  "statementNo": "20040015070431",
+  "productName": "비피맥스 프리미엄 비피더스 100억 XOS제로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 197,
+  "candidateId": "e65a762c-d468-4fe2-954d-f8336c6a30a4",
+  "statementNo": "20040015070433",
+  "productName": "비피젠 퓨어 비피더스 주니어(BIFIGEN Pure Bifidus Junior)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 198,
+  "candidateId": "d3f803ba-6868-4ff8-9597-394d2b41035e",
+  "statementNo": "20040015070434",
+  "productName": "비피젠 프리미엄 실버",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 199,
+  "candidateId": "06a31c8a-80bf-4f09-8ad9-65bac7bae8e2",
+  "statementNo": "20040015070435",
+  "productName": "레디케어 BGN4 +",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 200,
+  "candidateId": "6d0403a1-626f-4c72-9dcd-793ffb50b616",
+  "statementNo": "20040015070436",
+  "productName": "비피도 3종 혼합 유산균 비아이-2500",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 201,
+  "candidateId": "e5bada72-7596-441c-b642-781a5ce22d03",
+  "statementNo": "20040015070437",
+  "productName": "비피도 3종 혼합 유산균 비아이-3000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 202,
+  "candidateId": "8d8fed59-bc8f-4b54-a17b-5e585215889b",
+  "statementNo": "20040015070438",
+  "productName": "비피도 3종 혼합 유산균 비아이-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 203,
+  "candidateId": "22527efd-478e-420b-a0e8-86431a1ba887",
+  "statementNo": "20040015070439",
+  "productName": "비피더스균 AD011-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 204,
+  "candidateId": "967984c5-1eae-4967-8d51-cbc4addc774d",
+  "statementNo": "20040015070441",
+  "productName": "유산균 플란타룸 ND88-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 205,
+  "candidateId": "7b5f7a42-171d-49ae-9422-8a647143f6e1",
+  "statementNo": "20040015070442",
+  "productName": "유산균 플란타룸 ND88-3000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 206,
+  "candidateId": "9b78de39-d850-4280-8cfe-4c8a50b36b83",
+  "statementNo": "20040015070443",
+  "productName": "유산균 플란타룸 ND88-1000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 207,
+  "candidateId": "f48d8e85-62a6-4444-b997-a5fa86486c12",
+  "statementNo": "20040015070444",
+  "productName": "비피더스균 AD011-3000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 208,
+  "candidateId": "ea39dea5-1ef5-4949-ba7e-57326529fb4b",
+  "statementNo": "20040015070445",
+  "productName": "비피더스균 AD011-1000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 209,
+  "candidateId": "dfc0f491-4883-4da6-9612-0b42b11ead29",
+  "statementNo": "20040015070446",
+  "productName": "비피도 3종 혼합 유산균 비아이-1000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 210,
+  "candidateId": "902c41c2-64bc-4cd8-b003-bcf88a68a358",
+  "statementNo": "20040015070447",
+  "productName": "비피도9종혼합유산균비피락-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 211,
+  "candidateId": "9d32723c-51c0-41f1-9369-14738a57da2f",
+  "statementNo": "20040015070448",
+  "productName": "비피도6종혼합균LAC-1000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 212,
+  "candidateId": "3d3bc2f4-8126-433f-8b8b-126443ef65dc",
+  "statementNo": "20040015070449",
+  "productName": "비피도6종혼합균LAC-3000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 213,
+  "candidateId": "cd86720f-1867-4b39-9886-3e074ae7b030",
+  "statementNo": "2004001507045",
+  "productName": "비아이혼합유산균",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 214,
+  "candidateId": "e44d5ce3-e9c6-42bf-a458-537d9e527d4b",
+  "statementNo": "20040015070450",
+  "productName": "비피도6종혼합균LAC-2500",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 215,
+  "candidateId": "2668b1b8-5915-4cec-a57e-004a56a5bb8a",
+  "statementNo": "20040015070451",
+  "productName": "비피도6종혼합균LAC-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 216,
+  "candidateId": "ef31d2e5-936e-450d-8507-5f9b81d72ea0",
+  "statementNo": "20040015070452",
+  "productName": "비피도9종혼합유산균비피락-3000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 217,
+  "candidateId": "6d3b1279-a355-4fbf-ac18-00f75702f8da",
+  "statementNo": "20040015070453",
+  "productName": "비피도9종혼합유산균비피락-2500",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 218,
+  "candidateId": "70b84db9-4feb-4949-ab5c-8c947b961802",
+  "statementNo": "20040015070460",
+  "productName": "유산균N굿바이옴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 219,
+  "candidateId": "26c69a99-6908-441a-994e-a16881942a10",
+  "statementNo": "20040015070461",
+  "productName": "비피유 비피더스 면역플러스 프로바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 220,
+  "candidateId": "01d99c65-241d-4c47-a2fe-9c1ce7c494bd",
+  "statementNo": "20040015070463",
+  "productName": "라이프닝 밸런스 바이옴 프로바이오틱스 (Lifening Balance Biome Probiotics)",
+  "productMasterId": "169062bc-9b0c-46d3-853f-f9dc20e4efc6",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 221,
+  "candidateId": "8bdf2470-408e-4835-9450-234f3e9d1699",
+  "statementNo": "20040015070468",
+  "productName": "비피더스균BGN4-1000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 222,
+  "candidateId": "1b167d85-3204-444c-ba6c-4e5a77b46e18",
+  "statementNo": "20040015070469",
+  "productName": "비피더스균BGN4-2000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 223,
+  "candidateId": "54287a0b-5291-4055-9f5d-08a0552ab9da",
+  "statementNo": "2004001507047",
+  "productName": "비피더스균 락티스 에이디011",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 224,
+  "candidateId": "11040bdb-fb68-4c58-825e-0b25b24bffc9",
+  "statementNo": "20040015070471",
+  "productName": "비피더스4종혼합유산균-6000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 225,
+  "candidateId": "4e38735c-ca81-414d-a985-c3cd8b2096dd",
+  "statementNo": "20040015070472",
+  "productName": "비피더스4종프라임-6000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 226,
+  "candidateId": "df7900b4-7a4c-40e2-ada9-b7dc18feb4cc",
+  "statementNo": "20040015070474",
+  "productName": "온가족 유산균 비피더스 프리미엄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 227,
+  "candidateId": "9f39ac42-40f6-4490-9f25-7280089a0c18",
+  "statementNo": "20040015070475",
+  "productName": "라이프닝 밸런스 바이옴(Lifening Balance Biome)",
+  "productMasterId": "2459c1ee-874a-42bb-bfdf-3d71b1b12a70",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 228,
+  "candidateId": "c7928cf5-4f4e-4a23-8435-00cf5476d2f5",
+  "statementNo": "20040015070477",
+  "productName": "비피더스4종KIDS혼합유산균-5000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 229,
+  "candidateId": "109b12fa-7cf5-4ead-9cfd-3065d9a19f59",
+  "statementNo": "20040015070478",
+  "productName": "프로바이오틱스 골드",
+  "productMasterId": "0d30ae52-5259-4fa3-a3bc-d2b6a06f2121",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 230,
+  "candidateId": "8c0fbb23-c19a-4316-9ed5-fddefa12b44f",
+  "statementNo": "20040015070479",
+  "productName": "프로바이오틱스 키즈 맥스",
+  "productMasterId": "3fe7cbbf-9057-405e-9004-66d11a1e8520",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 231,
+  "candidateId": "828cfb8c-5f97-4921-8a2c-a989588b389f",
+  "statementNo": "20040015070480",
+  "productName": "비피 밸런스 프리미엄",
+  "productMasterId": "d8fd329f-6e2d-4777-a2cb-06d9e32940b7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 232,
+  "candidateId": "430d63d6-c96b-401d-82a2-3f433b0c2dea",
+  "statementNo": "20040015070482",
+  "productName": "비피더스 유산균",
+  "productMasterId": "23bc2ebd-b1d6-43ef-9759-de1442f48bdd",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 233,
+  "candidateId": "6be3818a-d8ad-439a-81b7-de9f4b0c4071",
+  "statementNo": "20040015070483",
+  "productName": "포키유 비피밸런스 키즈",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 234,
+  "candidateId": "ccb41213-4ea2-4b2a-9402-e9ef2f259cf4",
+  "statementNo": "20040015070484",
+  "productName": "유산균 헬베티쿠스 에이디 031",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 235,
+  "candidateId": "4ef8155e-44ef-440e-8bf0-7a2653d0e09c",
+  "statementNo": "20040015070485",
+  "productName": "비피도 3종 혼합 유산균 비아이-4000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 236,
+  "candidateId": "707eed78-6e82-4ecf-b229-161476873272",
+  "statementNo": "20040015070486",
+  "productName": "온가족 유산균 비피더스 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 237,
+  "candidateId": "1d72a0f2-3085-4381-95e3-3a50ee0827f0",
+  "statementNo": "20040015070487",
+  "productName": "닥터파이토 비피아이 유산균",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 238,
+  "candidateId": "b456e92a-d6ad-4d52-8a21-f8b74ec3882a",
+  "statementNo": "20040015070488",
+  "productName": "마이 100억 라이브 비피락토",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 239,
+  "candidateId": "f95809b0-8872-4b64-96b9-9ebb0846e786",
+  "statementNo": "20040015070489",
+  "productName": "오뮬라(OMULA)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 240,
+  "candidateId": "8ae7b5d5-c918-4986-9fe1-c5c10812d9f9",
+  "statementNo": "20040015070491",
+  "productName": "장건강 유산균 비피더스",
+  "productMasterId": "0d0bc42f-3fd6-4ab1-b4e0-1e3e4b25c9df",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 241,
+  "candidateId": "e63ee633-3ee2-4e94-aadb-765ec445fb32",
+  "statementNo": "20040015070492",
+  "productName": "비피더스 4종 혼합유산균 IBS-6000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 242,
+  "candidateId": "3b7eacc5-f58c-4d1e-b147-3a2bd850d29c",
+  "statementNo": "20040015070496",
+  "productName": "바로바이오틱스 kids 비피더스 50억",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 243,
+  "candidateId": "0e3ae600-b676-4080-a833-d71f9f75b55c",
+  "statementNo": "20040015070497",
+  "productName": "비피맥스 프리미엄 비피더스 100억 XOS",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 244,
+  "candidateId": "cd5f82fe-3f17-464f-b104-2fe4780c3b44",
+  "statementNo": "20040015070498",
+  "productName": "잘크톤 장건강N 프로바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 245,
+  "candidateId": "3f0e9880-a010-42af-8b2f-ae3d7ddd5981",
+  "statementNo": "20040015070500",
+  "productName": "하이락 비피더스 베이직",
+  "productMasterId": "78633285-1f49-446d-9dcd-738fb6ec4212",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 246,
+  "candidateId": "59d46d58-26f9-4f03-9e31-7ec3b6c6b35b",
+  "statementNo": "20040015070501",
+  "productName": "엘포틴 프로 포커스",
+  "productMasterId": "a4ffdcac-8d67-477e-994a-8f470b70fc11",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 247,
+  "candidateId": "58054be8-f99b-4bd2-866c-fd5072479a2b",
+  "statementNo": "20040015070504",
+  "productName": "비피락토 4종키즈(KIDS) 혼합유산균-6000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 248,
+  "candidateId": "f7e99023-2e02-4bd2-91fc-c7c220f0005a",
+  "statementNo": "20040015070505",
+  "productName": "마이핏 ORIGIN 100억 비피더스 프리미엄",
+  "productMasterId": "c61d7dc1-d104-405e-bf19-085171fd49f4",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 249,
+  "candidateId": "161dbc27-5626-4988-b3a5-c0984ab38377",
+  "statementNo": "2004001507051",
+  "productName": "유산균 애시도필러스 비에프8401(BF8401)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 250,
+  "candidateId": "43aec465-7ee7-4e83-bf23-e3c58692f339",
+  "statementNo": "2004001507069",
+  "productName": "유산균 카제이 아이비에스 041",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 251,
+  "candidateId": "ba8f7d85-5390-46b2-a739-9bda30aa9393",
+  "statementNo": "2004001507070",
+  "productName": "유산균 플란타룸 ND88",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 252,
+  "candidateId": "c011ac91-e082-49bc-aafb-ee0e63034c29",
+  "statementNo": "2004001507071",
+  "productName": "유산균 퍼멘텀 오케이",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 253,
+  "candidateId": "5afdf6cc-dfcb-4141-904b-0f24fa18f943",
+  "statementNo": "2004001507072",
+  "productName": "유산균 불가리쿠스 비에이치 04",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 254,
+  "candidateId": "ae8f06d3-91ef-4fe0-9758-9e180f15541a",
+  "statementNo": "2004001507079",
+  "productName": "비피더스균 인판티스 비에이치07",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 255,
+  "candidateId": "bc3f7673-bcef-472b-bf24-459343a25d2e",
+  "statementNo": "200400150708",
+  "productName": "비피더스균 비피덤 비지엔4",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 256,
+  "candidateId": "707d665b-35f4-4fa3-bd79-b8dec286730b",
+  "statementNo": "2004001507086",
+  "productName": "유산균 파라카제이 오케이",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 257,
+  "candidateId": "51852a54-1985-4433-8aac-c8e3926a0bae",
+  "statementNo": "2004001507087",
+  "productName": "유산균 람노써스 비에이치 09",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 258,
+  "candidateId": "3907f590-1078-4c29-8203-7eef3b94cc04",
+  "statementNo": "200400150709",
+  "productName": "비피더스균 롱검 보리",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 259,
+  "candidateId": "d7a12f58-d909-4413-98a3-e94a29eb0a39",
+  "statementNo": "2004001507094",
+  "productName": "유산균 파라카제이 씨에이치 88",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 260,
+  "candidateId": "cf089f4c-35e2-4240-9abf-4a65d30fc45a",
+  "statementNo": "2004001507225",
+  "productName": "파워그린",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 261,
+  "candidateId": "15c10cfd-eaaa-4475-84bf-3c7ec1cc93ad",
+  "statementNo": "2004001507230",
+  "productName": "구구팔팔다이어트",
+  "productMasterId": "21219b49-a6b6-4087-bcab-d78728522d07",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 262,
+  "candidateId": "3888b3fd-5356-4135-86de-3488af7afdf5",
+  "statementNo": "2004001507231",
+  "productName": "턴유슬림",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 263,
+  "candidateId": "0a870dc1-fd9a-480e-a393-77b830f6f96e",
+  "statementNo": "2004001507232",
+  "productName": "해피플러스핏",
+  "productMasterId": "0921c9e1-d6f4-4391-9d42-d6e614ba1280",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 264,
+  "candidateId": "fdf827d0-e7e3-4642-85ba-9fafe2f36d2a",
+  "statementNo": "2004001507233",
+  "productName": "해피플러스센스",
+  "productMasterId": "60588b52-c0cd-46d9-b965-01a92e79f521",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 265,
+  "candidateId": "d9a9f5a9-73ab-49b4-90eb-4e9e7a122ec3",
+  "statementNo": "2004001507234",
+  "productName": "엑티브아연",
+  "productMasterId": "b8c60260-def0-40f4-bb3e-4eaa13743675",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 266,
+  "candidateId": "65145061-aece-4286-a0f8-9f1bd7f1d538",
+  "statementNo": "2004001507235",
+  "productName": "지대로 슬림 다이어트",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 267,
+  "candidateId": "b5d6929f-8652-495b-b63d-92b93d0fd276",
+  "statementNo": "2004001507236",
+  "productName": "슬림굿",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 268,
+  "candidateId": "593932f3-7f66-47ee-a062-002b4d194dff",
+  "statementNo": "2004001507237",
+  "productName": "엑티브 플러스",
+  "productMasterId": "3f46ee03-f190-4177-a225-00742f4a73ea",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 269,
+  "candidateId": "8b4bb9ba-7a61-41bb-b217-3fa52f54bd1d",
+  "statementNo": "2004001507238",
+  "productName": "프리미엄 아연 마그네슘 비타민D",
+  "productMasterId": "716906e9-e80d-4ddd-98f5-c0d8cac44465",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 270,
+  "candidateId": "e5589598-8207-4c9a-a203-a49604341c44",
+  "statementNo": "2004001507239",
+  "productName": "프로폴리스정골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 271,
+  "candidateId": "f85ae443-3d96-4d78-a6fa-26f56e388624",
+  "statementNo": "2004001507240",
+  "productName": "본추관절정",
+  "productMasterId": "97aaeffe-084a-48ae-ac7a-a28f1c1597d1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 272,
+  "candidateId": "471c00cb-376d-4a8c-a54f-1897d3302a68",
+  "statementNo": "2004001507241",
+  "productName": "프리미엄프로폴리스정",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 273,
+  "candidateId": "ce24568c-eb8d-4b07-9c31-ec05e19afd88",
+  "statementNo": "2004001507242",
+  "productName": "프리미엄골드 아연 마그네슘 비타민D",
+  "productMasterId": "8e28de12-8dd2-4fa9-8502-1efeaffa367f",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 274,
+  "candidateId": "49719f11-3fb4-4cf1-96c5-0bd20338d9f0",
+  "statementNo": "20040015073100",
+  "productName": "장박사플러스",
+  "productMasterId": "b9f9e626-2d03-42d7-b70a-f05ad82063ff",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 275,
+  "candidateId": "5ae8d80b-eb6f-4598-b1b2-70062535c660",
+  "statementNo": "20040015073101",
+  "productName": "장앤정 프리미엄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 276,
+  "candidateId": "7003a204-ad73-4103-8928-cab416450179",
+  "statementNo": "20040015073102",
+  "productName": "압토솔 대장프로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 277,
+  "candidateId": "62d70127-4fc9-4ce4-b475-13e0a78fc129",
+  "statementNo": "20040015073103",
+  "productName": "경성 장쾌환",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 278,
+  "candidateId": "5c779b89-f0f0-4df3-9d14-229c2636e49f",
+  "statementNo": "2004001507362",
+  "productName": "간건강앤 간박사",
+  "productMasterId": "54692f2f-276c-4d51-b011-e3ef1ba6deed",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 279,
+  "candidateId": "abfd2966-3103-42d1-8efd-a351805a4cda",
+  "statementNo": "2004001507370",
+  "productName": "엘의힘",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 280,
+  "candidateId": "71f8a74d-bab7-4ac1-8be5-4e9ad8435ce8",
+  "statementNo": "2004001507374",
+  "productName": "면역단RG 30",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 281,
+  "candidateId": "7d9e2c3f-ff58-4641-a162-e512d5638ef0",
+  "statementNo": "2004001507377",
+  "productName": "장박사플러스식이섬유",
+  "productMasterId": "e4792ef2-0269-4f84-baec-a2a48bf9e029",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 282,
+  "candidateId": "ec5ac80b-18c5-438e-963e-9fffef938825",
+  "statementNo": "2004001507378",
+  "productName": "경성제약 장박사",
+  "productMasterId": "81442035-a040-44d0-bb53-8d2ea4ec425d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 283,
+  "candidateId": "cc015930-d4be-4dcb-a80d-b9e7d1257506",
+  "statementNo": "2004001507383",
+  "productName": "Dr. Milagro's good gut",
+  "productMasterId": "cb1dbd31-2487-41c3-aaa2-de13b0265856",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 284,
+  "candidateId": "d346295c-cdc8-43a9-b1e2-4095b2531cd6",
+  "statementNo": "2004001507385",
+  "productName": "장건강 혈당청",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 285,
+  "candidateId": "3dbe08b9-5a9f-4eda-8244-f5bd58ce9298",
+  "statementNo": "2004001507387",
+  "productName": "관절박사 MSM",
+  "productMasterId": "a97c788d-3138-42c9-b8cb-00c37f8f9d85",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 286,
+  "candidateId": "99fc6bd3-8cff-4f55-93fc-0087fa4b58d7",
+  "statementNo": "2004001507388",
+  "productName": "변할지도",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 287,
+  "candidateId": "5cc6c5a0-8ab3-4aed-9f12-89fffc1a51a1",
+  "statementNo": "2004001507391",
+  "productName": "활력진귀환",
+  "productMasterId": "472700d9-8aaa-4673-bab5-bdde079348e1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 288,
+  "candidateId": "9e3d119c-3e73-4185-b32f-a7342e5a6609",
+  "statementNo": "2004001507392",
+  "productName": "Dr. 장프로",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 289,
+  "candidateId": "d95ef8d9-3059-4977-a323-ad6fe5cd9605",
+  "statementNo": "2004001507393",
+  "productName": "경성제약 역시 쾌장군 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 290,
+  "candidateId": "36c8c6ff-1bda-48a6-83f1-92b1c227c62b",
+  "statementNo": "2004001507394",
+  "productName": "프리미엄 장앤정",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 291,
+  "candidateId": "36aec050-3bfe-4a73-a5b2-55502253f82e",
+  "statementNo": "2004001507395",
+  "productName": "세이브 플러스 골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 292,
+  "candidateId": "fbd9a2a3-035b-445b-bad1-aea2b8757ab4",
+  "statementNo": "2004001507396",
+  "productName": "비너스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 293,
+  "candidateId": "be7f7f40-fe9a-421f-a258-433ce0f44c1b",
+  "statementNo": "2004001507397",
+  "productName": "더맥스쎌파워",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 294,
+  "candidateId": "fe379a6c-4438-4a7e-8efa-c9b28bf71fce",
+  "statementNo": "2004001507398",
+  "productName": "미전수",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 295,
+  "candidateId": "689089b1-0d74-4711-9599-c8b288bd6445",
+  "statementNo": "2004001507399",
+  "productName": "홍삼담은 경성대보환",
+  "productMasterId": "b29fdc40-1867-4b92-a608-9e468e8b4365",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 296,
+  "candidateId": "9bde3edf-79f4-49b1-a083-fd3843d72a72",
+  "statementNo": "2004001508122",
+  "productName": "화진어랑골드 셀레늄",
+  "productMasterId": "0b10e7c5-c6e3-4f2c-81eb-a61c2ed72ecc",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 297,
+  "candidateId": "a78d438e-029b-412c-92ea-a0a7facfda8a",
+  "statementNo": "2004001508124",
+  "productName": "화진옥타코사놀365",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 298,
+  "candidateId": "70bd870e-4300-450f-ae2a-7cf24c2b29d2",
+  "statementNo": "2004001508125",
+  "productName": "화진감마리놀렌산366",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 299,
+  "candidateId": "c6b9c022-2c52-4319-a65d-e2f51ef60b80",
+  "statementNo": "2004001508126",
+  "productName": "화진글루코사민골드",
+  "productMasterId": "8e4c3bc9-74d3-4579-8623-cff10b4e8b82",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 300,
+  "candidateId": "2e27e720-0fce-4be3-a4b8-e9574f4ffcb6",
+  "statementNo": "2004001508129",
+  "productName": "화진홍삼제품암행어사",
+  "productMasterId": "fa74f9a3-60ec-495c-91f7-378da9a51ec6",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 301,
+  "candidateId": "5c0bae31-188f-4727-acc3-b06b48577241",
+  "statementNo": "2004001508130",
+  "productName": "화진 프로폴리스골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 302,
+  "candidateId": "99809cb4-0676-4610-8e3f-66c703c112d8",
+  "statementNo": "2004001508131",
+  "productName": "화진키토올리고당골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 303,
+  "candidateId": "dd3bbbf1-eae3-4fef-9a6e-389f1c9c9935",
+  "statementNo": "2004001508132",
+  "productName": "화진홍삼겔",
+  "productMasterId": "84b826c2-bfac-496b-996f-006f583c1c8e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 304,
+  "candidateId": "4d343032-db0e-4944-bb27-b759743c8ed3",
+  "statementNo": "2004001508133",
+  "productName": "화진다이어트 가르시니아슬림골드",
+  "productMasterId": "cfce3415-18c8-43cc-aee6-adc3eff34570",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 305,
+  "candidateId": "64c96008-171e-49ea-825c-78379cc15bde",
+  "statementNo": "2004001508134",
+  "productName": "옥타코사놀 프리미엄",
+  "productMasterId": "3b0e38f8-dc5a-4cfc-93bc-8301268cab09",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 306,
+  "candidateId": "000cd314-d67a-4d64-91ba-66c86176e794",
+  "statementNo": "2004001508135",
+  "productName": "히알루론산프리미엄 골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 307,
+  "candidateId": "1cecf65b-aa55-4ac1-9542-2468925103a7",
+  "statementNo": "2004001508136",
+  "productName": "셀렌 프리미엄",
+  "productMasterId": "fddec508-ab6a-4ea6-af3d-f299d4d80970",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 308,
+  "candidateId": "1d91f44a-0e6d-4913-bfcc-da3159410322",
+  "statementNo": "2004001508137",
+  "productName": "화진 글루콘산칼슘.비타민",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 309,
+  "candidateId": "880b3598-8174-4be3-9ef4-b785eab0d645",
+  "statementNo": "2004001508138",
+  "productName": "화지인 홍국",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 310,
+  "candidateId": "a943a84a-34c2-4f1b-a2ef-5d101676e090",
+  "statementNo": "2004001508140",
+  "productName": "스피루리나 프리미엄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 311,
+  "candidateId": "0920275a-8b7b-4b8c-8f22-72a5e1ae9ade",
+  "statementNo": "2004001508141",
+  "productName": "프로폴리스 스프레이",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 312,
+  "candidateId": "9848d115-6063-4d9d-9a47-6b90755c87eb",
+  "statementNo": "2004001508142",
+  "productName": "알로에 프리미엄",
+  "productMasterId": "3e3d8016-5348-4369-a4e0-232c4e20fb0a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 313,
+  "candidateId": "2994c540-77bb-448c-bae8-a3299c2043d9",
+  "statementNo": "2004001508143",
+  "productName": "화진튼튼이 홍삼키즈",
+  "productMasterId": "63e86205-e369-40d8-9669-0f51f9ae2e44",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 314,
+  "candidateId": "e194a7da-5302-4ee2-95d5-8e2f66485e73",
+  "statementNo": "2004001508144",
+  "productName": "베지 오메가-3",
+  "productMasterId": "77aa0101-9fe0-43a3-a784-d4662d7192dd",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 315,
+  "candidateId": "58a0f1f0-1a12-45c7-84ed-015d4532d51f",
+  "statementNo": "2004001508145",
+  "productName": "아스타 아이",
+  "productMasterId": "5c3ac173-56b9-4f1e-b30e-865040b504ae",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 316,
+  "candidateId": "c49b8a4a-ff95-475e-a38f-a655ad59b597",
+  "statementNo": "2004001508146",
+  "productName": "글루코사민 플러스 오메가3",
+  "productMasterId": "07875cbd-b053-4c78-baeb-d06df3f1c215",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 317,
+  "candidateId": "9f5232d4-2618-459d-bb9d-1d4df530a8a9",
+  "statementNo": "2004001508147",
+  "productName": "오메가3맥스",
+  "productMasterId": "3bb24957-ffda-44cc-a397-c974336f5c33",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 318,
+  "candidateId": "b3762a86-ab8b-4484-a30a-d6d5ba525ef1",
+  "statementNo": "2004001508148",
+  "productName": "화진홍삼겔플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 319,
+  "candidateId": "28c20656-4ce7-4ddc-b924-d387770e8fd6",
+  "statementNo": "2004001508149",
+  "productName": "옴므테리어 홍삼플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 320,
+  "candidateId": "3b751d89-f932-4255-90c8-f1f86c13fad4",
+  "statementNo": "2004001508150",
+  "productName": "유산균2b",
+  "productMasterId": "85ce63ab-6f66-4d7a-9f91-2d25016a56bd",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 321,
+  "candidateId": "12a1aaec-6ac9-4d1c-a430-3a3b1de7a742",
+  "statementNo": "2004001508151",
+  "productName": "비타츄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 322,
+  "candidateId": "1e95b03a-c21c-4e6b-8f65-b172f4aab016",
+  "statementNo": "2004001508152",
+  "productName": "아스오메가 플러스",
+  "productMasterId": "b3db1597-ca4e-440b-8429-79c93ba9025d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 323,
+  "candidateId": "c58a6be3-8978-40c0-8b9e-f65e144cf427",
+  "statementNo": "2004001508153",
+  "productName": "라인 핏",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 324,
+  "candidateId": "08d7f30f-dfd1-43ba-8224-927f4b6006e3",
+  "statementNo": "2004001508154",
+  "productName": "화진글루코사민골드 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 325,
+  "candidateId": "a1a016a2-7e3c-4c9d-a907-85740fa092c9",
+  "statementNo": "20040015081547",
+  "productName": "아반바슈퍼로얄레드칸",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 326,
+  "candidateId": "acfe9167-8549-4e8f-bf86-f674868fd65e",
+  "statementNo": "20040015081548",
+  "productName": "헤파케어",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 327,
+  "candidateId": "2250d675-c32d-495e-b2df-34b362022fda",
+  "statementNo": "2004001508155",
+  "productName": "화진 쏘팔HLJG0701",
+  "productMasterId": "f9165a0e-5230-4e75-943c-9bc5334dbf75",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 328,
+  "candidateId": "f632a125-1c35-48a9-9734-4dfb2af04e13",
+  "statementNo": "2004001508156",
+  "productName": "화진멀티비타민",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 329,
+  "candidateId": "ea16093b-e1cf-4c34-886e-a4880d34dd90",
+  "statementNo": "2004001508157",
+  "productName": "제라 굿",
+  "productMasterId": "d0120a73-28fc-4526-b362-21e5a5d9b235",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 330,
+  "candidateId": "ad10eaa6-0d85-426a-9053-5156c6b152ce",
+  "statementNo": "2004001508158",
+  "productName": "간편한 밀크씨슬",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 331,
+  "candidateId": "ff96cf93-fe58-4667-ad81-e63beca6f715",
+  "statementNo": "2004001508159",
+  "productName": "화진홍삼젤리플러스",
+  "productMasterId": "ac0ee579-b331-480d-a75d-f3d8b34346b0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 332,
+  "candidateId": "de7441c7-249a-42f1-a748-dcc94dd98d74",
+  "statementNo": "2004001508160",
+  "productName": "관절 애 탄탄 N-아세틸글루코사민",
+  "productMasterId": "a00dce5c-b8f4-44b9-8623-aceed45854c4",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 333,
+  "candidateId": "1b15f0ac-4743-476d-a9ad-dfc8cea1f46d",
+  "statementNo": "2004001508161",
+  "productName": "콜라핏",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 334,
+  "candidateId": "0ef56b28-7185-4452-9cf3-8c0a5525542a",
+  "statementNo": "2004001508162",
+  "productName": "편한 밤 되세요 테아닌",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 335,
+  "candidateId": "36828563-98c0-47bf-ac33-76f85269e856",
+  "statementNo": "2004001508163",
+  "productName": " 당 케어",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 336,
+  "candidateId": "38de6c26-ed2d-434e-8205-4c06a4fcdf41",
+  "statementNo": "2004001508164",
+  "productName": "뼈애탄탄칼슘",
+  "productMasterId": "897ee33b-56c1-42dd-bc7a-6c57ce771aa2",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 337,
+  "candidateId": "26ca8c33-f473-4e4e-b0ff-27069bbe48cf",
+  "statementNo": "2004001508165",
+  "productName": "포스트바이오틱스 B",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 338,
+  "candidateId": "ade3ee54-ab2a-4cf8-ab09-cd942f39df06",
+  "statementNo": "2004001508166",
+  "productName": "포스트바이오틱스 P",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 339,
+  "candidateId": "7728f891-7d9b-4246-bfa0-13f54580c966",
+  "statementNo": "2004001508167",
+  "productName": "포스트바이오틱스A",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 340,
+  "candidateId": "d6e56c47-5c34-4b9f-82bc-dd16f76d65b4",
+  "statementNo": "2004001508168",
+  "productName": "포스트바이오틱스 BB",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 341,
+  "candidateId": "144c98c4-5043-4958-8577-a7c0cacaa174",
+  "statementNo": "2004001508169",
+  "productName": "포스트바이오틱스 L",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 342,
+  "candidateId": "012a853f-dd34-4583-a0a3-0b3791352c34",
+  "statementNo": "2004001508170",
+  "productName": "암행어사 홍삼출두",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 343,
+  "candidateId": "e2983f99-af8e-4d89-94af-a27eda1c8c45",
+  "statementNo": "2004001508171",
+  "productName": "피부 애 히알루론산",
+  "productMasterId": "4c838bf2-835a-404c-b44e-2f82ff1b5f8f",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 344,
+  "candidateId": "86a83c61-e763-42a9-9d19-b7a90b48b314",
+  "statementNo": "200400150831000",
+  "productName": "눈건강 루테인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 345,
+  "candidateId": "fa1472e6-7559-4a05-aaba-3139c8c40d7d",
+  "statementNo": "200400150831004",
+  "productName": "에브리데이 비타민D 4000IU",
+  "productMasterId": "f73c6fcb-13d3-49ac-b7d8-4fb9b6ab601d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 346,
+  "candidateId": "736c66c7-dcf9-4e59-9c7b-34c50fc342b1",
+  "statementNo": "200400150831005",
+  "productName": "빵순이를 위한 다이어트 ",
+  "productMasterId": "561ad326-0b2f-49d6-b9b6-ab82d4893433",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 347,
+  "candidateId": "6b24be95-2acf-4662-af18-162dae9d0e72",
+  "statementNo": "200400150831006",
+  "productName": "메가골드프리미엄 ",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 348,
+  "candidateId": "3dce88cf-13ef-4cd6-b7a5-e0ce3a881bb7",
+  "statementNo": "200400150831008",
+  "productName": "뼈건강 칼슘+마그네슘+비타민D ",
+  "productMasterId": "41b3d7d1-e607-45f1-b36f-17d15294f512",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 349,
+  "candidateId": "d69549c2-c2fa-45a3-af51-1f0a975a92b3",
+  "statementNo": "200400150831009",
+  "productName": "맑은세상 비타민A",
+  "productMasterId": "183d1b67-7252-4a71-adbe-35dd23cae20d",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 350,
+  "candidateId": "b14fab92-a75b-4c9b-98bf-c5f1de84c9a2",
+  "statementNo": "200400150831010",
+  "productName": "눈편한 루테인",
+  "productMasterId": "8d750527-d842-4bcd-a761-b97d97618ffb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 351,
+  "candidateId": "4d6f729f-9bcc-4e5d-a149-95b5db22af8c",
+  "statementNo": "200400150831014",
+  "productName": "간 건강엔 밀크씨슬 & 8종기능성",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 352,
+  "candidateId": "512c0bd4-b3f7-4b4b-af67-f862d55ded5a",
+  "statementNo": "200400150831015",
+  "productName": "선택하라 루테인오메가3",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 353,
+  "candidateId": "31608ae0-70d6-4ca6-a475-de764ce43744",
+  "statementNo": "200400150831016",
+  "productName": "보령 당헬프",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 354,
+  "candidateId": "4fb7fc52-72bc-46ee-a347-c583ce3c6de7",
+  "statementNo": "200400150831020",
+  "productName": "에브리데이 프로바이오틱스",
+  "productMasterId": "23bd28b3-c178-46a1-9f87-bbd1701c32cb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 355,
+  "candidateId": "55d1f5dc-b980-4c36-8ca0-3eec18b74b1c",
+  "statementNo": "200400150831021",
+  "productName": "로하비 프리미엄 마그네슘 이엑스",
+  "productMasterId": "116a058a-581c-49a1-9739-ab3f8b967a47",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 356,
+  "candidateId": "7a7894ec-9857-49b5-baaa-28ad5a70b1d3",
+  "statementNo": "200400150831022",
+  "productName": "가르시니아",
+  "productMasterId": "09d95eab-ae1b-421e-a4cc-b9e275522c4c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 357,
+  "candidateId": "77be081d-61f6-4ef3-902a-9077f874d676",
+  "statementNo": "200400150831023",
+  "productName": "로하비 프리미엄 밀크씨슬 이엑스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 358,
+  "candidateId": "ebb9c4a8-6dfa-4e7a-9d73-9736f9585120",
+  "statementNo": "200400150831024",
+  "productName": "로하비 프리미엄 징코그린 이엑스",
+  "productMasterId": "c725633a-7c9d-4902-83d8-40e9ddc3ed01",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 359,
+  "candidateId": "6def81fd-3e85-4095-9db7-e1bd8613cbf4",
+  "statementNo": "200400150831026",
+  "productName": "슈퍼프리바이오틱스 프락토올리고당",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 360,
+  "candidateId": "549c931f-5d74-4790-9dd3-c04bd57c2b92",
+  "statementNo": "200400150831027",
+  "productName": "플래티넘블랙커런트",
+  "productMasterId": "aa5fff90-7feb-4f72-b910-948e1b836dd6",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 361,
+  "candidateId": "29b4dfdf-b3f1-43dc-81aa-f46f883b8822",
+  "statementNo": "200400150831028",
+  "productName": "플래티넘비타민D4000IU",
+  "productMasterId": "20355aa5-5762-4130-9cb5-8a792591c18e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 362,
+  "candidateId": "e4be8a9d-96dc-41f0-a926-0617a4b5a61c",
+  "statementNo": "200400150831029",
+  "productName": "선택하라더블다이어트가르시니아녹차",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 363,
+  "candidateId": "433fddff-5731-40d0-99f4-47e7f08c94f5",
+  "statementNo": "20040015083103",
+  "productName": "철맥",
+  "productMasterId": "73e15bd4-8030-4831-a1b0-5e52e70a9fea",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 364,
+  "candidateId": "35235a4a-b751-4af3-80df-bb7f068d9dc6",
+  "statementNo": "200400150831030",
+  "productName": "프리바이오틱스 프락토올리고당",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 365,
+  "candidateId": "1c408c8f-f75e-4d3a-baa6-d05697fb17cf",
+  "statementNo": "200400150831031",
+  "productName": "에이스 마그네슘",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 366,
+  "candidateId": "7eef8ce6-e397-42af-a602-c16deac165a2",
+  "statementNo": "200400150831032",
+  "productName": "락티브 메가타민 비타민B 컴플렉스",
+  "productMasterId": "bd0f80d6-e6c5-4dbe-ba9c-44033838a538",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 367,
+  "candidateId": "f95e1bd1-35eb-4288-a682-bb31b1991f46",
+  "statementNo": "200400150831033",
+  "productName": "맨파워88",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 368,
+  "candidateId": "494078c6-9c5e-455c-9f7e-feb958b3b87f",
+  "statementNo": "200400150831035",
+  "productName": "닥터헬스케어",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 369,
+  "candidateId": "266efed6-2c88-49f0-8605-c876d914094b",
+  "statementNo": "200400150831036",
+  "productName": "본D 황정맥스",
+  "productMasterId": "1c6edacd-fbf4-49c9-aa5e-9d1f9f493938",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 370,
+  "candidateId": "11f48678-a576-4162-b40d-342f2c071d93",
+  "statementNo": "200400150831039",
+  "productName": "플래티넘마그네슘315",
+  "productMasterId": "24664d13-52b2-4387-a6a1-7a0fc67a1e3a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 371,
+  "candidateId": "11370681-6745-4ff2-a824-628df7c346c7",
+  "statementNo": "200400150831041",
+  "productName": "베타카로틴아연비타민D골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 372,
+  "candidateId": "97112854-cd95-4cfd-ab01-800a213ff016",
+  "statementNo": "200400150831042",
+  "productName": "자연가득칼슘마그네슘비타민D아연",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 373,
+  "candidateId": "615c727f-ee2b-4eae-9a0b-2f5a95c35e88",
+  "statementNo": "200400150831043",
+  "productName": "자연가득 전립쏘팔메토",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 374,
+  "candidateId": "d4cb7ae3-128b-4a2d-bbe3-9628bbf6669d",
+  "statementNo": "200400150831044",
+  "productName": "로하비프리미엄루테인오메가3이엑스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 375,
+  "candidateId": "ca2423ef-6d2e-4986-8c69-5718d1b1adac",
+  "statementNo": "200400150831045",
+  "productName": "MSM식물성골드",
+  "productMasterId": "5f548760-e028-4515-b051-17850b1711cc",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 376,
+  "candidateId": "7eeec09b-1f78-4670-b2fb-403a653b878b",
+  "statementNo": "200400150831046",
+  "productName": "슈퍼파워혈당케어",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 377,
+  "candidateId": "b6bf525d-ae8b-46f8-9a47-8e2c9bb63c2a",
+  "statementNo": "200400150831047",
+  "productName": "티베이직플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 378,
+  "candidateId": "65fd5370-9ddd-41c1-831c-58e55f21b0d5",
+  "statementNo": "200400150831048",
+  "productName": "눈건강촉촉플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 379,
+  "candidateId": "0008570c-919f-453d-90d9-4509e84e2646",
+  "statementNo": "200400150831049",
+  "productName": "보령 혈앤당-Ⅲ",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 380,
+  "candidateId": "da4eb15e-5d93-418d-83d4-6cf6ede77b92",
+  "statementNo": "200400150831051",
+  "productName": "선택하라 비타민D 3000IU",
+  "productMasterId": "f3582552-470b-4992-9e23-cae678f8c07f",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 381,
+  "candidateId": "235029d5-505c-4e40-a1d1-3dbd869080f3",
+  "statementNo": "200400150831053",
+  "productName": "연세 프로 순식물성MSM 365케어",
+  "productMasterId": "3c886ff5-bf34-40c9-993a-b2673d6bc128",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 382,
+  "candidateId": "fcb3ccdc-e6df-4f1d-a0ba-88988e1cade6",
+  "statementNo": "200400150831055",
+  "productName": "영웅제약 아연365",
+  "productMasterId": "388b541e-3829-486e-b8e5-7154802d2af5",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 383,
+  "candidateId": "fe5e18c4-3ace-4f63-9fc9-1d01d8944c60",
+  "statementNo": "200400150831057",
+  "productName": "진력단",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 384,
+  "candidateId": "5f98757e-6d6a-4586-a237-216a56a041fb",
+  "statementNo": "200400150831058",
+  "productName": "루테인오메가플러스D&E",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 385,
+  "candidateId": "2bfd944c-40d3-4249-aa7b-d52fe79c20f8",
+  "statementNo": "200400150831060",
+  "productName": "로하비프리미엄코엔자임Q10이엑스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 386,
+  "candidateId": "4c7bbc84-b3a8-4ec0-be87-2eba3e0270b0",
+  "statementNo": "200400150831061",
+  "productName": "콜레로뺄래 레드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 387,
+  "candidateId": "3901e9ee-d2d3-41ed-8122-e926a3db2ef3",
+  "statementNo": "200400150831062",
+  "productName": "가르시니아팻프리HCA",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 388,
+  "candidateId": "44ad3df6-4efd-44a9-9196-85622c63df1d",
+  "statementNo": "200400150831063",
+  "productName": "프리미엄 비타민D 3000IU",
+  "productMasterId": "69a043be-75f4-48fa-8851-55b325d7ab6e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 389,
+  "candidateId": "46441013-8605-46db-8f77-72e308838516",
+  "statementNo": "200400150831066",
+  "productName": "나다운날",
+  "productMasterId": "5da9fb09-4f5b-4df5-9493-0885aa798507",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 390,
+  "candidateId": "90454880-9020-4a6d-ae5c-eef19d98904a",
+  "statementNo": "200400150831068",
+  "productName": "일동 에버그린",
+  "productMasterId": "b0ecc61c-8b96-430b-a919-136e3b0f1487",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 391,
+  "candidateId": "9320181b-7021-4b15-ae82-9827c11e88a3",
+  "statementNo": "200400150831069",
+  "productName": "플랜씨",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 392,
+  "candidateId": "e39bcfb8-8f27-4e81-89af-0ed1a36930c0",
+  "statementNo": "200400150831070",
+  "productName": "삼성 눈헬스케어",
+  "productMasterId": "80da6f7a-108f-4b99-80c6-c13ce4a3637b",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 393,
+  "candidateId": "7082cd0c-b126-43c5-9f5a-fa934460a794",
+  "statementNo": "200400150831072",
+  "productName": "플랜브이",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 394,
+  "candidateId": "65309d42-e559-4427-a3a7-880155e71211",
+  "statementNo": "200400150831073",
+  "productName": "한미 프로메가맥스골드",
+  "productMasterId": "1dc0495e-ce05-4f41-b4ef-4c5cf8e00377",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 395,
+  "candidateId": "d3879fc9-3b1c-4355-892d-35dbaddcbad6",
+  "statementNo": "200400150831074",
+  "productName": "활력삼",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 396,
+  "candidateId": "ec0ce7bf-0acc-420e-bb76-be3956b9430b",
+  "statementNo": "200400150831078",
+  "productName": "미라클파워맥스골드",
+  "productMasterId": "9e96aed4-fd7a-4575-b0b3-1b75ccaed9cc",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 397,
+  "candidateId": "7d2cce3a-86b1-450d-a784-7939b0b76dd0",
+  "statementNo": "200400150831079",
+  "productName": "삼성 건강프로젝트 혈행솔루션",
+  "productMasterId": "86dedec4-8637-4105-8a98-4c11bc3625b3",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 398,
+  "candidateId": "0a416aec-53ed-4fc6-811f-37fae6f50c6a",
+  "statementNo": "200400150831080",
+  "productName": "하루한방(one punch) 쏘팔메토",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 399,
+  "candidateId": "8dfe52e6-0469-48dc-8389-b6ae7a4495a2",
+  "statementNo": "200400150831081",
+  "productName": "프리바이오틱스아연",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 400,
+  "candidateId": "409f47a5-43d5-4d55-a5c8-c5cb2723e34f",
+  "statementNo": "200400150831086",
+  "productName": "멀티비타민 프리미엄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 401,
+  "candidateId": "1f7b98fa-1755-415c-896b-8607eeab6a90",
+  "statementNo": "200400150831088",
+  "productName": "선택하라 프리바이오틱스 장건강 솔루션 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 402,
+  "candidateId": "f280e261-423e-4c73-a995-287518bd9b91",
+  "statementNo": "200400150831089",
+  "productName": "보령 프리바이오틱스 프로바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 403,
+  "candidateId": "71264176-e802-486f-8ea4-449c4c2f754f",
+  "statementNo": "200400150831090",
+  "productName": "웰빙낫도",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 404,
+  "candidateId": "fc2702ee-8cc8-4dda-bf07-c9ba07080ecc",
+  "statementNo": "200400150831091",
+  "productName": "Inner Gram Vita collagen",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 405,
+  "candidateId": "9dd67be3-378a-46bf-ad58-f9fb6c8a6213",
+  "statementNo": "200400150831092",
+  "productName": "프리미엄프리바이오틱스 FOS 4000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 406,
+  "candidateId": "af121566-ae53-4d75-b7bb-5d44315d21a3",
+  "statementNo": "200400150831093",
+  "productName": "칼슘프리미엄비타민미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 407,
+  "candidateId": "5c87de9b-bbed-494d-bd67-9a1171ea55be",
+  "statementNo": "200400150831094",
+  "productName": "더셀 엠에스엠 관절튼튼",
+  "productMasterId": "35f0ef38-c996-4fbb-8464-01b811d04bb2",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 408,
+  "candidateId": "919ecd6a-ca75-4c52-bf22-6496fe3db13c",
+  "statementNo": "200400150831096",
+  "productName": "쏘팔메토07",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 409,
+  "candidateId": "a4a8b80b-3955-4765-89ee-34547c280397",
+  "statementNo": "200400150831099",
+  "productName": "365올퀸",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 410,
+  "candidateId": "2b10ffca-a42a-48d6-b5ad-9d0e7d64be97",
+  "statementNo": "200400150831100",
+  "productName": "보간해소",
+  "productMasterId": "e1eecdd3-bf5d-4336-aaa6-0bb13ea3827a",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 411,
+  "candidateId": "3ab38e40-1595-4a02-8116-f4e4b7774027",
+  "statementNo": "200400150831101",
+  "productName": "올인원 멀티비타민미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 412,
+  "candidateId": "e40bd532-c260-488b-a21d-81bf992004c4",
+  "statementNo": "200400150831102",
+  "productName": "투컷 가르시니아녹차다이어트",
+  "productMasterId": "ef530302-7a61-4bec-a0e1-c83bf805a232",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 413,
+  "candidateId": "5895a10d-fdb7-4f7b-8c1b-8a73b2ea5c61",
+  "statementNo": "200400150831104",
+  "productName": "비타할로 건강한 간을위한 밀크씨슬 플러스",
+  "productMasterId": "f8908d0c-7815-4fc4-9d28-9eae4728dca6",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 414,
+  "candidateId": "f03ed8dd-ff4b-491b-bbae-068d463d7106",
+  "statementNo": "200400150831106",
+  "productName": "비타할로 건강한 눈을위한 루테인 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 415,
+  "candidateId": "5ecef5ad-c797-4791-9955-1996efdf6f44",
+  "statementNo": "200400150831108",
+  "productName": "눈에좋은루테인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 416,
+  "candidateId": "9269ee09-f3a9-4ac2-98bc-51810c7a013e",
+  "statementNo": "200400150831109",
+  "productName": "루테인 아스타잔틴 헤마토코쿠스",
+  "productMasterId": "e8cbd45f-cb27-4ddc-9dd1-53e7728e5a72",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 417,
+  "candidateId": "9e597657-c1c6-44f1-8853-9de0c4339068",
+  "statementNo": "200400150831110",
+  "productName": "비타할로 오메가3 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 418,
+  "candidateId": "e1226c07-99ea-4b53-be55-4ac966a81b87",
+  "statementNo": "200400150831111",
+  "productName": "비타할로 남성용 멀티비타민 플러스 미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 419,
+  "candidateId": "5baeec15-c66d-42ba-8864-0f4186896a89",
+  "statementNo": "200400150831112",
+  "productName": "비타할로 엽산",
+  "productMasterId": "a1faa997-1018-434c-a8e1-f9baadf332bb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 420,
+  "candidateId": "f647eebe-17d2-45be-89a4-c6759a4eebfc",
+  "statementNo": "200400150831113",
+  "productName": "간에좋은밀크씨슬",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 421,
+  "candidateId": "bb717b7f-7188-4f6c-aa16-d53896d78959",
+  "statementNo": "200400150831114",
+  "productName": "비타할로 멀티비타민 플러스 미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 422,
+  "candidateId": "7aa13c49-b922-4eb0-9a07-15373718f31f",
+  "statementNo": "200400150831116",
+  "productName": "비타할로 여성용 멀티비타민 플러스 미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 423,
+  "candidateId": "06ea2b2f-819e-4050-94a6-9c1f765d4cc2",
+  "statementNo": "200400150831117",
+  "productName": "프리미엄 프로바이오틱스 앤 프리바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 424,
+  "candidateId": "8e7abc4a-ac75-4bd4-bf70-35c9c80b5350",
+  "statementNo": "200400150831118",
+  "productName": "슬림핏 비움 차전자피 & 가르시니아",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 425,
+  "candidateId": "a0cd69ca-4852-4f5c-885f-990ae816d717",
+  "statementNo": "200400150831119",
+  "productName": "로하비 프리미엄 쏘팔메토 이엑스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 426,
+  "candidateId": "220cd6ab-1ed7-4a89-b7ed-60e2eaa6e347",
+  "statementNo": "200400150831120",
+  "productName": "철분",
+  "productMasterId": "72c619e5-907b-41e9-8465-552259cd1661",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 427,
+  "candidateId": "14d77d3d-0f8c-4f2b-9435-b7fee28f86d5",
+  "statementNo": "200400150831121",
+  "productName": "링즈캡슐",
+  "productMasterId": "99193482-d144-468d-9f1f-18fc99a4f306",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 428,
+  "candidateId": "434bc0b3-3b09-4dee-bcab-101239451c4a",
+  "statementNo": "200400150831122",
+  "productName": "비타할로 히알루론산",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 429,
+  "candidateId": "343f84f8-d8df-4d52-99c9-b69a5a6e6633",
+  "statementNo": "200400150831123",
+  "productName": "킹맨",
+  "productMasterId": "09d3061e-8b70-45da-8335-ff751a8ba2f3",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 430,
+  "candidateId": "f9cfb37d-3bd7-40b6-9893-d2b5dca7730e",
+  "statementNo": "200400150831127",
+  "productName": "스텐업Ⅱ(S10-UP Ⅱ)플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 431,
+  "candidateId": "e2d51ed0-b5cc-4560-b8f6-58aa342dcd41",
+  "statementNo": "200400150831128",
+  "productName": "남자의 하루",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 432,
+  "candidateId": "fd7c99b8-69af-450c-a4d8-11d82548550f",
+  "statementNo": "200400150831129",
+  "productName": "여자의 하루",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 433,
+  "candidateId": "fed90363-d953-4ade-bb64-90315b810fca",
+  "statementNo": "200400150831130",
+  "productName": "인제 로얄 칼슘.비타민.미네랄",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 434,
+  "candidateId": "b633390b-85da-41c7-9b35-ae43aeb06050",
+  "statementNo": "200400150831132",
+  "productName": "요미핏",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 435,
+  "candidateId": "b2424985-8b85-463b-8f4c-9ed2b348b412",
+  "statementNo": "200400150831133",
+  "productName": "눈부신 날",
+  "productMasterId": "649dec1f-5426-4a86-9ed0-87dbc0781ca7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 436,
+  "candidateId": "8da39497-d3c0-4193-9429-1dead6528031",
+  "statementNo": "200400150831135",
+  "productName": "간절한 날",
+  "productMasterId": "0b578078-1703-4053-a14e-f480f7270f12",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 437,
+  "candidateId": "7d0caa51-ed81-4f7a-ae04-bd2b3714602d",
+  "statementNo": "200400150831136",
+  "productName": "루테인 아스타잔틴",
+  "productMasterId": "f4884cb0-103f-4169-8f09-0ff147baffcb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 438,
+  "candidateId": "4c18ee56-96a8-4610-91c4-b3429db0ed14",
+  "statementNo": "200400150831138",
+  "productName": "쏘팔메토 HMYH",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 439,
+  "candidateId": "edf8d2a6-2c59-41a7-b17b-3e8eb320ba45",
+  "statementNo": "200400150831139",
+  "productName": "당헬스케어",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 440,
+  "candidateId": "abef0939-7960-4ba2-b99b-e9269373ee46",
+  "statementNo": "200400150831140",
+  "productName": "고려홍삼골드캅셀",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 441,
+  "candidateId": "600f4789-889f-453f-b6cf-a964139592eb",
+  "statementNo": "200400150831141",
+  "productName": "간에는 밀크씨슬",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 442,
+  "candidateId": "af842044-f09b-49af-b530-73d16c7608c0",
+  "statementNo": "200400150831143",
+  "productName": "가르시니아 콤비",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 443,
+  "candidateId": "3bdcd254-ab63-497e-b7d3-3c4365e7d773",
+  "statementNo": "200400150831144",
+  "productName": "정직한 가르시니아 2800 플러스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 444,
+  "candidateId": "7dd47940-3697-4913-a4b7-fc61a11ea1ef",
+  "statementNo": "200400150831145",
+  "productName": "오메가-3탑",
+  "productMasterId": "7450162a-7a39-470c-a8c5-1db90c21f676",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 445,
+  "candidateId": "4dd3c916-71ba-40cd-9ddb-7dfbdb5a386b",
+  "statementNo": "200400150831146",
+  "productName": "식물성 MSM 진생골드",
+  "productMasterId": "7be7a6c7-5d36-4e5c-a376-e5aa992ed08e",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 446,
+  "candidateId": "99738ed4-b40f-4c4b-996e-b557d53a63a1",
+  "statementNo": "200400150831147",
+  "productName": "선택하라 눈건강 루테인11",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 447,
+  "candidateId": "008d93c8-6f97-4350-bfd8-1b04df4cb7fc",
+  "statementNo": "200400150831148",
+  "productName": "알티지 오메가3 위드 클렌즈",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 448,
+  "candidateId": "39173a0a-5aa6-477b-8ff0-ed740b91a1b0",
+  "statementNo": "200400150831149",
+  "productName": " 네이처드림 혈행에 좋은 알티지 오메가3 골드",
+  "productMasterId": "6f4f370d-0c46-4abe-b9e8-afaacc0b098c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 449,
+  "candidateId": "545501ac-cd36-48c2-a888-432907c70c44",
+  "statementNo": "200400150831151",
+  "productName": "성일건강 간에 좋은 밀크씨슬 실리마린",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 450,
+  "candidateId": "9828925c-e256-48cb-8625-9180c78fd25f",
+  "statementNo": "200400150831153",
+  "productName": "알티지 오메가3 위드 루테인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 451,
+  "candidateId": "930d2278-1f42-4765-839f-b5cdd7cbd001",
+  "statementNo": "200400150831154",
+  "productName": "알티지 트루 오메가3",
+  "productMasterId": "8505329c-61a8-4c4d-97a5-f6decbc82193",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 452,
+  "candidateId": "d6c0501f-a503-4c5a-b924-779d347a429d",
+  "statementNo": "200400150831155",
+  "productName": "알티지 오메가3 위드 메모리",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 453,
+  "candidateId": "5a039e5a-00b7-4ae6-98b3-dfa661e4ac98",
+  "statementNo": "200400150831156",
+  "productName": "와이즈 알티지 오메가3 루테인 비타민D",
+  "productMasterId": "ec558d0d-d2d7-48e3-8906-cde2d149649c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 454,
+  "candidateId": "355b72f6-1bc0-44b2-814e-58f8c1fa588d",
+  "statementNo": "200400150831157",
+  "productName": "프리미엄 루테인오메가3",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 455,
+  "candidateId": "4177c141-16f4-4e3a-bdfd-f37b5b72e711",
+  "statementNo": "200400150831161",
+  "productName": "성일건강 눈.혈행개선에 좋은 루테인 오메가3 비타민D",
+  "productMasterId": "cdd2b797-149d-4bc0-a530-86a8fbfd87f7",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 456,
+  "candidateId": "95d7e6a5-ffba-438f-87e7-4da29b11c0c0",
+  "statementNo": "200400150831163",
+  "productName": "영웅제약 눈건강프로젝트2.0",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 457,
+  "candidateId": "6cbfccac-07f6-441e-b9e3-26974c0c6b27",
+  "statementNo": "200400150831164",
+  "productName": "한빛임페리얼골드칼슘",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 458,
+  "candidateId": "8e78254a-fef1-4b88-81d9-b6d4c841a1e4",
+  "statementNo": "200400150831165",
+  "productName": "알티지 오메가3 루테인 비타민D",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 459,
+  "candidateId": "707a604c-247c-4ec2-983a-2941c0e322d9",
+  "statementNo": "200400150831166",
+  "productName": "눈건강 루테인지아잔틴",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 460,
+  "candidateId": "3cb10be6-40e2-41a7-a89e-b00573666bc2",
+  "statementNo": "200400150831168",
+  "productName": "유산균엔 19종 락토사랑",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 461,
+  "candidateId": "68004048-8dae-4fe7-964a-06d87e720a80",
+  "statementNo": "200400150831170",
+  "productName": "슈퍼 프리바이오틱스 4000",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 462,
+  "candidateId": "95d930c8-d00f-4c51-b7cf-a2cfab957ffa",
+  "statementNo": "200400150831172",
+  "productName": "루테인사랑",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 463,
+  "candidateId": "29c694bb-8e12-4809-9459-32c465ad6420",
+  "statementNo": "200400150831173",
+  "productName": "하루습관 액티브 마그네슘",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 464,
+  "candidateId": "175642cb-4633-436c-8a3a-3bebba5948ce",
+  "statementNo": "200400150831174",
+  "productName": "하비탈출",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 465,
+  "candidateId": "ab9add9b-dc45-403f-95a2-b2fbdea6a1f6",
+  "statementNo": "200400150831176",
+  "productName": "일양 아이크린 골드",
+  "productMasterId": "eb1623db-933e-49d3-afc0-28f81d72e098",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 466,
+  "candidateId": "bd3ee30a-91fa-4fe1-bf00-e4c8defc010d",
+  "statementNo": "200400150831179",
+  "productName": "라인앤데이 올인원 다이어트 가르시니아 골드",
+  "productMasterId": "856cb116-6209-44c3-a24d-ca2d850dd5e1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 467,
+  "candidateId": "23b07dab-6c55-4dd4-89a0-a8dcd6db1452",
+  "statementNo": "200400150831180",
+  "productName": "올인원 다이어트 포스콜리",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 468,
+  "candidateId": "b3f70d78-205f-4dc4-9f9f-7b3dd5f4c491",
+  "statementNo": "200400150831182",
+  "productName": "비타민D 2000IU",
+  "productMasterId": "83404975-c3ad-428f-a39a-ad7d06e4b3dc",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 469,
+  "candidateId": "4cdb141d-d436-42de-8c0e-6b92789c8c85",
+  "statementNo": "200400150831183",
+  "productName": "맨즈88-파워업",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 470,
+  "candidateId": "3eab096e-b07b-4b7d-87c8-7da818cc0b2a",
+  "statementNo": "200400150831184",
+  "productName": "힘쎈365-스트롱맨",
+  "productMasterId": "f4f6a252-7d43-4725-b6fd-3e7ba9f835f0",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 471,
+  "candidateId": "2cef7366-0347-4b31-b7c5-9e406380c480",
+  "statementNo": "200400150831188",
+  "productName": "종합비타민 멀티미네랄15",
+  "productMasterId": "5bee5b37-d3fd-4241-aa17-472364e199d1",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 472,
+  "candidateId": "c13c14de-6bee-4c9c-9d02-778b0950985a",
+  "statementNo": "200400150831190",
+  "productName": "라인앤데이 올인원 다이어트 키토산",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 473,
+  "candidateId": "aac914ac-a58b-4097-8f9c-1f16d9aa5c87",
+  "statementNo": "200400150831191",
+  "productName": "닥터스 픽 가르시니아",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 474,
+  "candidateId": "2c8ceb7a-903b-4cc1-8231-b8488578a5eb",
+  "statementNo": "200400150831192",
+  "productName": "플래티넘 rTG알티지 오메가3",
+  "productMasterId": "c86ce243-50e1-45f2-87ba-6f1489a86d09",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 475,
+  "candidateId": "36cc1702-9083-4c5a-a834-200051a34293",
+  "statementNo": "200400150831195",
+  "productName": "루테인지아잔틴 오메가",
+  "productMasterId": "f621c8c5-1773-4819-b7b6-fea42720c6dd",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 476,
+  "candidateId": "2a17a710-d54b-4213-a597-ee2a375efeca",
+  "statementNo": "200400150831197",
+  "productName": "라인 앤 데이 올인원 다이어트 가르시니아 ",
+  "productMasterId": "98c512f6-8cc1-45e2-85cd-585e0e8fe118",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 477,
+  "candidateId": "fa15d67f-6e14-40fc-bb9e-750ed5d466e7",
+  "statementNo": "200400150831198",
+  "productName": "라인 앤 데이 올인원 다이어트 CLA",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 478,
+  "candidateId": "12e5a36e-2c30-4f51-a4b6-d9f84827b3f8",
+  "statementNo": "200400150831199",
+  "productName": "버닝타임 CLA",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 479,
+  "candidateId": "1f02a9ce-db18-4a02-96e4-df22624cefd0",
+  "statementNo": "200400150831200",
+  "productName": "컷아웃 가르시니아",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 480,
+  "candidateId": "93d3b202-d48d-4074-b0ec-537312144015",
+  "statementNo": "200400150831201",
+  "productName": "씨골드(SEAGOLD)",
+  "productMasterId": "7e16751b-8a9a-4a7e-aa11-fb1b58345007",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 481,
+  "candidateId": "512bdc0c-feed-4e70-948d-a1ddb3a6f2ea",
+  "statementNo": "200400150831203",
+  "productName": "닥터 프리바이오틱스 365",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 482,
+  "candidateId": "3749f7c5-512c-4e32-9164-516b7fe2ca52",
+  "statementNo": "200400150831207",
+  "productName": "카타드라이(CATADRY)",
+  "productMasterId": "842bca8f-b21d-4a0e-b1f5-4de97f84cf26",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 483,
+  "candidateId": "5b78e56d-197a-4031-ad9d-1fa5b641300f",
+  "statementNo": "200400150831208",
+  "productName": "건강한 간 리버-골드(Liver Gold)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 484,
+  "candidateId": "35bf86d1-ddaa-46c1-a7e9-eb069008e3c8",
+  "statementNo": "200400150831211",
+  "productName": "산도리깨 루테인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 485,
+  "candidateId": "42a1ac08-405a-43d9-abb3-a11f1e3d22a4",
+  "statementNo": "200400150831213",
+  "productName": "영웅제약 지맥스파워",
+  "productMasterId": "fad89e64-8a1c-4900-9a64-d780cbe56212",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 486,
+  "candidateId": "97991299-8a3c-4cb2-ba91-4aec605af28d",
+  "statementNo": "200400150831214",
+  "productName": "토노 베타카로틴",
+  "productMasterId": "9c04912e-7e30-44d0-b008-b4fa1977646c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 487,
+  "candidateId": "44046c9d-95d4-4d22-a544-b0be2f8322ed",
+  "statementNo": "200400150831215",
+  "productName": "네이처드림 혈행에 좋은 알티지 오메가3",
+  "productMasterId": "ee0ea218-59a8-4706-8f47-f7bafb530b32",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 488,
+  "candidateId": "448a8e57-ba92-4a09-9bf0-05f9990988e4",
+  "statementNo": "200400150831217",
+  "productName": "매일습관 오메가3",
+  "productMasterId": "c4b43679-8e0a-4587-a4e5-3eb2d6bd6836",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 489,
+  "candidateId": "4faff6dd-6491-4dda-88f5-2d69591cbf12",
+  "statementNo": "200400150831218",
+  "productName": "장앤바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 490,
+  "candidateId": "52e652dd-c76b-4b8e-8680-2fd58bc422df",
+  "statementNo": "200400150831219",
+  "productName": "매일습관 N-아세틸글루코사민",
+  "productMasterId": "1796b13b-15c3-4f8d-8e64-36e2590444eb",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 491,
+  "candidateId": "4aea09e0-2fd2-4261-940d-e7b10233f6ed",
+  "statementNo": "200400150831220",
+  "productName": "한미 조인트 서포트 글루코사민365",
+  "productMasterId": "9d4bd896-874c-4d9e-9eb3-10218983ee5c",
+  "candidateStatus": "approved_new_master"
+ },
+ {
+  "index": 492,
+  "candidateId": "26225f45-8bb9-4226-8cb5-5cbeb29042bb",
+  "statementNo": "200400150831221",
+  "productName": "매일습관 프리바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 493,
+  "candidateId": "ce2378c3-c5c7-4841-8f32-57f62d990b96",
+  "statementNo": "200400150831223",
+  "productName": "보스바디(BOSS BODY)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 494,
+  "candidateId": "86b66efb-59f3-4557-922a-550c4bea1bc1",
+  "statementNo": "200400150831224",
+  "productName": "헬스리버 헤파케어골드",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 495,
+  "candidateId": "4aba2077-b89d-4a6a-a0be-130c51cf20e4",
+  "statementNo": "200400150831225",
+  "productName": "매일습관 쏘팔메토",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 496,
+  "candidateId": "791a3466-ca10-4c7c-92a5-c389dc4af518",
+  "statementNo": "200400150831226",
+  "productName": "매일습관 밀크씨슬",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 497,
+  "candidateId": "6197109f-60ed-46fc-a2d0-1b232f49511d",
+  "statementNo": "200400150831227",
+  "productName": "보스키즈(BOSS Kids)",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 498,
+  "candidateId": "2c7104d7-9437-4970-a2e7-bee2359b2155",
+  "statementNo": "200400150831228",
+  "productName": "매일습관 루테인",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 499,
+  "candidateId": "22b7c73e-b105-44b3-bbb9-fd2a7fb7c1d2",
+  "statementNo": "200400150831229",
+  "productName": "매일습관 프로바이오틱스",
+  "productMasterId": null,
+  "candidateStatus": "pending"
+ },
+ {
+  "index": 500,
+  "candidateId": "8b17edb0-3065-469e-b0fe-fe854fbba544",
+  "statementNo": "200400150831230",
+  "productName": "네이처팩토리 비타민D(칼슘+마그네슘+아연)",
+  "productMasterId": "ebcd313d-0db1-4ed1-98c7-da9b03ca73ef",
+  "candidateStatus": "approved_new_master"
+ }
+]
