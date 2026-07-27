@@ -21,7 +21,8 @@
  *   POP / QR 코드 / 블로그 / 상품 상세설명
  *
  * 디지털 사이니지는 의도적으로 제외 (KPA Signage 구조 freeze 보호).
- * 상품 정보 제작(product-info-creator)도 본 모달 범위 외.
+ * 상품 상세정보 canonical 은 handled-products 중심으로 통합됨 — 구형 ProductInfoCreator(product-info-creator)는 은퇴
+ *   (WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1). 따라서 본 모달 범위 외.
  *
  * 수신측(StorePopPage / StoreQRPage / StoreProductDescriptionsPage / PharmacyBlogPage)은
  * source.items.length === 0 일 때 early return 으로 메뉴 직접 진입과 동일하게 동작한다.

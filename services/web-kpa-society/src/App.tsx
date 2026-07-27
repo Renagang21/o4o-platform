@@ -255,7 +255,6 @@ const StoreHandledProductsPage = lazy(() => import('./pages/pharmacy/StoreHandle
 // WO-O4O-PRODUCT-QR-CONTENT-FLOW-MINIMAL-V1: 상품별 다국어 QR 콘텐츠 저작 (한/중 HTML + publicKey QR)
 const StoreProductMultilingualContentPage = lazy(() => import('./pages/pharmacy/StoreProductMultilingualContentPage'));
 const StoreTabletDisplaysPage = lazy(() => import('./pages/pharmacy/StoreTabletDisplaysPage'));
-const StoreProductInfoCreatorPage = lazy(() => import('./pages/pharmacy/StoreProductInfoCreatorPage'));
 // Pharmacy specific (not in barrel)
 const StoreOrderWorktablePage = lazy(() => import('./pages/pharmacy/StoreOrderWorktablePage').then(m => ({ default: m.StoreOrderWorktablePage })));
 const SignagePlaybackPage = lazy(() => import('./pages/pharmacy/SignagePlaybackPage').then(m => ({ default: m.SignagePlaybackPage })));
@@ -1003,8 +1002,8 @@ function App() {
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
             <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
             <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
-            {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-MENU-V1: 상품 정보 제작 (placeholder) */}
-            <Route path="execution/product-info" element={<StoreProductInfoCreatorPage />} />
+            {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1: 구형 상품 정보 제작 화면 은퇴 (prod row 0). canonical "상품 상세정보" = handled-products 중심. 구 URL/북마크 대비 redirect 유지. */}
+            <Route path="execution/product-info" element={<Navigate to="/store/handled-products" replace />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />
             <Route path="commerce/order-worktable" element={<StoreOrderWorktablePage />} />
             <Route path="commerce/orders" element={<StoreOrdersPage />} />
