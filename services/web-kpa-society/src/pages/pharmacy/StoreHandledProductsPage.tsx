@@ -14,8 +14,8 @@
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Package, RefreshCw, Search, Boxes, X, Trash2, FileText, Loader2, QrCode, PlusCircle, ClipboardList, Languages } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { Pagination } from '@o4o/operator-ux-core';
 import { fetchHandledProducts, removeHandledProducts, type HandledProduct } from '../../api/handledProducts';
@@ -76,6 +76,7 @@ function parsePage(v: string | null): number {
 
 export default function StoreHandledProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
 
   // ─── URL Query ↔ 상태 동기화(검색어 / 페이지 / 페이지당 건수) ────────────
   const initialSearch = searchParams.get('q') ?? '';
@@ -336,6 +337,20 @@ export default function StoreHandledProductsPage() {
                 <FileText size={13} />
                 매장용 상세설명서 보기
               </button>
+              {/* WO-O4O-KPA-STORE-MULTILINGUAL-PRODUCT-CONTENT-ENTRY-LINK-V1: 기존 다국어 상품콘텐츠 저작 화면 진입점 연결.
+                  handledProducts sourceType('local'|'listing')·sourceId 를 route param(targetKind·targetId)에 그대로 전달. */}
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(
+                    `/store/products/multilingual/${singleSelected.sourceType}/${singleSelected.sourceId}?name=${encodeURIComponent(singleSelected.name)}`,
+                  )
+                }
+                style={styles.langBtn}
+              >
+                <Languages size={13} />
+                다국어 콘텐츠
+              </button>
               {/* WO-O4O-KPA-STORE-PRODUCT-QR-ALWAYS-AVAILABLE-V1: 상품 기준 고정 QR 출력(다국어 무관 항상 사용). */}
               <button type="button" onClick={() => openProductQr(singleSelected)} style={styles.mlcBtn}>
                 <QrCode size={13} />
@@ -531,6 +546,7 @@ const styles: Record<string, CSSProperties> = {
   // WO-...-STANDARD-TABLE-V1: Selection ActionBar 액션 버튼
   importBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F0FDF4', border: '1px solid #86EFAC', borderRadius: '6px', fontSize: '12px', color: '#15803D', cursor: 'pointer', whiteSpace: 'nowrap' },
   mlcBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#F5F3FF', border: '1px solid #C4B5FD', borderRadius: '6px', fontSize: '12px', color: '#6D28D9', cursor: 'pointer', whiteSpace: 'nowrap' },
+  langBtn: { display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', background: '#EEF2FF', border: '1px solid #A5B4FC', borderRadius: '6px', fontSize: '12px', color: '#4338CA', cursor: 'pointer', whiteSpace: 'nowrap' },
   empty: { padding: '40px 12px', textAlign: 'center', color: colors.neutral400, fontSize: '13px' },
   footnote: { marginTop: '14px', fontSize: '12px', color: colors.neutral500, lineHeight: 1.7, padding: '10px 12px', background: colors.neutral100, borderRadius: '6px' },
 };
