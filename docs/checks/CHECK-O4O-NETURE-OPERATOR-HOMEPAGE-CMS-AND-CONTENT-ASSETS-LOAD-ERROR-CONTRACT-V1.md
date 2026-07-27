@@ -149,9 +149,17 @@ pnpm --filter @o4o/web-neture build                                → EXIT=0 (b
 - 운영 write 0: mutation 미실행, GET 계약만 변경.
 
 ### 7.3 배포
-- 커밋: (본 문서 §8)
-- 배포 run / revision: (배포 후 기록)
-- 엔드포인트 게이팅: (배포 후 401 확인 기록)
+- 커밋: `aa8d258b6` (6 files, +353/-54)
+- 배포 run: `30231522846` (Deploy Web Services) — `detect-changes` ✓ → `deploy-neture` ✓ 2m15s (job 89871367594)
+- 리비전: `neture-web-01343-g4q`
+- 엔드포인트 게이팅(미인증 — 실 HTTP 오류로 catch→throw 경로 확인, 200-empty 아님):
+```text
+GET /neture/admin/homepage-contents?section=hero  -> 401
+GET /dashboard/assets?dashboardId=test             -> 401
+GET /dashboard/assets/kpi?dashboardId=test         -> 401
+GET /neture/content?limit=1  (optionalAuth)        -> 200  (정상 성공 경로)
+```
+- 실브라우저 smoke: 로컬 Playwright 프로파일 점유 가능성으로 강제 종료 없이 엔드포인트 게이팅 + 코드 경로로 대체 검증(묶음 1/2 동일 방식).
 
 ---
 
