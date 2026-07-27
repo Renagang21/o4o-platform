@@ -108,12 +108,85 @@ function specLines(rawBase) {
   return s.split(/\n|(?<=[.。])\s+/).map((x) => x.replace(/\s+/g, ' ').trim()).filter((x) => x.length >= 3).slice(0, 6);
 }
 
+/* ── 공식 주의사항(INTAKE_HINT1) 파서 ───────────────────────────────────────────
+   WO-O4O-HFF-KO-FIRST-10000-INTAKE-HINT-AND-DESIGN-TARGETED-BACKFILL-V1 (보정 A)
+   기존에는 `IFTKN_ATNT_MATR_CN` 을 읽었으나 이 키는 HFF 후보 전량 공란이라
+   generic fallback 만 노출됐다. 실제 공식 주의사항은 `INTAKE_HINT1` 에 있다.
+   원문을 **의미 보존**한 채 가독 단위로만 분리한다(문구 추가·강화·삭제 0).
+   ※ 본 파서는 backfill 러너(hff-ko-first-10000-targeted-backfill.mjs)와 동일 로직이다. */
+const MARKER_LEAD = /^(?:[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽]\s*|\([가-힣]\)\s*|\d+\s*[).]\s*|[-·•‐‑–—]\s*)+/;
+
+function splitHintLine(line) {
+  const marks = [
+    /(?=[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳])/,
+    /(?=[⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽])/,
+    /(?=\([가-힣]\)\s)/,
+    /(?=(?:^|\s)\d+\s*[).]\s)/,
+  ];
+  for (const re of marks) {
+    const parts = line.split(re).map((x) => x.trim()).filter(Boolean);
+    if (parts.length >= 2) return parts;
+  }
+  return [line];
+}
+
+/** INTAKE_HINT1 → {status:'NONE'|'OK'|'HOLD', blocks:[{header|null, items[]}]} */
+function parseIntakeHint(raw) {
+  const text = norm(raw);
+  const meaningful = text.replace(/[\s\-·•‐‑–—.,:;()　]/g, '');
+  if (!text || meaningful.length < 4 || /^(?:없음|해당\s*없음|해당사항\s*없음)$/.test(text.trim())) return { status: 'NONE', blocks: [] };
+  const flatText = flat(raw);
+  const rawAll = [];
+  const bodyToItems = (body) => {
+    const out = [];
+    for (const line of body.split(/\n+/)) {
+      const t = line.trim();
+      if (!t) continue;
+      for (const piece of splitHintLine(t)) {
+        const cl = piece.replace(MARKER_LEAD, '').replace(/\s+/g, ' ').trim();
+        if (cl.replace(/[\s.,:;()]/g, '').length >= 1) out.push(cl);
+      }
+    }
+    rawAll.push(...out);
+    return [...new Set(out)];
+  };
+  const blocks = [];
+  if (/\[[^\]]{1,40}\]/.test(text)) {
+    for (const seg of text.split(/(?=\[[^\]]{1,40}\])/)) {
+      const m = seg.match(/^\[([^\]]{1,40})\]/);
+      const items = bodyToItems(m ? seg.slice(m[0].length) : seg);
+      if (items.length) blocks.push({ header: m ? m[1].trim() : null, items });
+    }
+  } else {
+    const items = bodyToItems(text);
+    if (items.length) blocks.push({ header: null, items });
+  }
+  if (!blocks.length) return { status: 'NONE', blocks: [] };
+  const bad = blocks.flatMap((b) => b.items).filter((i) => !flatText.includes(i));
+  if (bad.length) {
+    const lines = text.split(/\n+/).map((x) => x.trim()).filter((x) => x.replace(/[\s.,:;()]/g, '').length >= 2);
+    const safe = [...new Set(lines)].filter((l) => flatText.includes(l));
+    if (!safe.length || safe.length !== new Set(lines).size) return { status: 'HOLD', blocks: [], reason: 'HINT_GROUNDING_FAIL' };
+    return { status: 'OK', blocks: [{ header: null, items: safe }] };
+  }
+  const strip = (s) => s.replace(/[\s\[\]()①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽.,:;·•\-]/g, '');
+  const covered = strip(blocks.map((b) => b.header ?? '').join('') + rawAll.join('')).length;
+  const total = strip(flatText).length;
+  if (total > 0 && covered / total < 0.9) return { status: 'HOLD', blocks: [], reason: 'HINT_UNDER_EXTRACTION' };
+  return { status: 'OK', blocks };
+}
+
+/** blocks → 계약(CR-020) 내 보조 정보 카드. 1개면 그리드 빈 칸을 피해 단독 카드. */
+function blocksToCards(blocks, liFn, escFn) {
+  const card = (b) => `<div class="sd-item">${b.header ? `<span class="sd-tag">${escFn(b.header)}</span>` : ''}<ul>${liFn(b.items)}</ul></div>`;
+  return blocks.length >= 2 ? `<div class="sd-core">${blocks.map(card).join('')}</div>` : card(blocks[0]);
+}
+
 /** 결정적 ko 설명서 렌더 + 검증. 반환: {status, ko, fidelityFail, reason, detail} */
 function composeKo(row) {
   const name = flat(row.name);
   const fnRaw = row.mainfnctn;
   const srvRaw = row.srvuse;
-  const attnRaw = row.attention;
   const baseRaw = row.basestandard;
 
   if (!name) return { status: 'HOLD', reason: 'PRODUCT_NAME_MISSING', detail: '제품명 없음' };
@@ -133,42 +206,40 @@ function composeKo(row) {
 
   const intake = intakeChips(srvRaw);
   const specs = specLines(baseRaw);
-  const attn = flat(attnRaw);
+  const hint = parseIntakeHint(row.intakehint1);
+  if (hint.status === 'HOLD') return { status: 'HOLD', reason: hint.reason, detail: 'INTAKE_HINT1 파싱이 원문을 충실히 담지 못함' };
 
   const li = (arr) => arr.map((x) => `<li>${esc(x)}</li>`).join('');
   const badges = `<span class="sd-badge">건강기능식품</span>` +
     (intake.chips.filter((c) => /1일/.test(c)).map((c) => `<span class="sd-badge">${esc(c)}</span>`).join(''));
 
-  let funcHtml;
-  if (groups.length) {
-    funcHtml = groups.map((g) => `<li><b>${esc(g.header)}</b><ul class="sd-why">${li(g.items)}</ul></li>`).join('');
-  } else {
-    funcHtml = li(allFns);
-  }
+  // 다기능성 상위 목록은 계약 어휘 밖(sd-func)이라 무스타일이었다 → sd-core > sd-item 으로 정비.
+  const funcSection = groups.length
+    ? blocksToCards(groups.map((g) => ({ header: g.header, items: g.items })), li, esc)
+    : `<ul class="sd-why">${li(allFns)}</ul>`;
 
   const specHtml = specs.length
     ? specs.map((x) => `<div class="sd-item">${esc(x)}</div>`).join('')
     : `<div class="sd-item">공식 기준·규격은 제품 표시사항을 확인하십시오.</div>`;
 
   const chipsHtml = (intake.chips.length ? intake.chips : ['제품 표시사항 참고']).map((c) => `<span class="sd-tag">${esc(c)}</span>`).join('');
-  const cautionHtml = attn ? esc(attn) : '섭취 전 제품 표시사항의 주의사항을 확인하십시오.';
+  // 공식 원문이 없으면 섹션 자체를 렌더하지 않는다 — 빈 카드·일괄 경고 삽입 0.
+  const hintSection = hint.status === 'OK' ? `\n  <h2>섭취 시 참고사항</h2>${blocksToCards(hint.blocks, li, esc)}` : '';
 
   const ko = `<div class="sd-card sd-theme-green"><div class="sd-hero">
   <div class="sd-badges">${badges}</div>
   <h1>${esc(name)}</h1><p class="sd-meta">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>
   <div class="sd-body"><p class="sd-intro">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>
-  <h2>주요 기능성</h2><ul class="${groups.length ? 'sd-func' : 'sd-why'}">${funcHtml}</ul>
-  <h2>기능성 상세</h2><ul class="sd-why">${li(allFns)}</ul>
-  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class="sd-intake"><span class="sd-chips">${chipsHtml}</span><p class="sd-meta">${esc(intake.raw)}</p></div>
-  <h2>섭취 시 주의사항</h2><div class="sd-note">${cautionHtml}</div>
+  <h2>주요 기능성</h2>${funcSection}
+  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class="sd-intake"><span class="sd-chips">${chipsHtml}</span><p class="sd-meta">${esc(intake.raw)}</p></div>${hintSection}
   <h2>확인 가능한 기준·규격 정보</h2><div class="sd-spec">${specHtml}</div>
-  <h2>매장 전문가 문의 안내</h2><p class="sd-who">섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div>
-  <div class="sd-foot"><b>섭취 시 주의사항</b> · ${cautionHtml}</div></div>`;
+  <h2>매장 전문가 문의 안내</h2><div class="sd-cta"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>
+  <div class="sd-foot">제품 표시사항을 함께 확인하십시오.</div></div>`;
 
   // 구조 검증
   const plain = ko.replace(/<[^>]+>/g, '').replace(/\s+/g, ' ').trim();
   if (plain.length < 60) return { status: 'HOLD', reason: 'BODY_TOO_SHORT', detail: `본문 ${plain.length}자` };
-  const need = ['주요 기능성', '섭취량 및 섭취방법', '섭취 시 주의사항', '확인 가능한 기준', '매장 전문가 문의'];
+  const need = ['주요 기능성', '섭취량 및 섭취방법', '확인 가능한 기준', '매장 전문가 문의'];
   const missing = need.filter((h) => !ko.includes(h));
   if (missing.length) return { status: 'HOLD', reason: 'SECTION_MISSING', detail: missing.join(',') };
 
@@ -193,7 +264,7 @@ async function main() {
       raw_payload::jsonb->'source'->>'MAIN_FNCTN' mainFnctn,
       raw_payload::jsonb->'source'->>'SRV_USE' srvUse,
       raw_payload::jsonb->'source'->>'BASE_STANDARD' baseStandard,
-      raw_payload::jsonb->'source'->>'IFTKN_ATNT_MATR_CN' attention,
+      raw_payload::jsonb->'source'->>'INTAKE_HINT1' intakeHint1,
       raw_payload::jsonb->'source'->>'ENTRPS' maker
     FROM product_candidates WHERE id = ANY($1) AND deleted_at IS NULL`, [ids]);
   const byId = new Map(src.rows.map((r) => [r.id, r]));
@@ -234,7 +305,7 @@ async function main() {
               index: m.index, candidateId: m.candidateId, statementNo: row.stmt, productName: row.name, productMasterId: master,
               holdReason: comp.reason, holdDetail: comp.detail,
               mainFnctn: flat(row.mainfnctn).slice(0, 300), srvUse: flat(row.srvuse).slice(0, 200),
-              baseStandard: flat(row.basestandard).slice(0, 200), attention: flat(row.attention).slice(0, 200),
+              baseStandard: flat(row.basestandard).slice(0, 200), intakeHint1: flat(row.intakehint1).slice(0, 200),
             }));
           } else {
             // CREATE
