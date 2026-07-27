@@ -37,8 +37,8 @@ export { TabletRequestsPage } from './TabletRequestsPage';
 // WO-STORE-BLOG-CHANNEL-V1: 매장 블로그 관리
 export { PharmacyBlogPage } from './PharmacyBlogPage';
 
-// WO-STORE-TEMPLATE-PROFILE-V1: 스토어 템플릿 선택
-export { PharmacyTemplatePage } from './PharmacyTemplatePage';
+// WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-PAGE-RETIREMENT-V1:
+//   PharmacyTemplatePage(WO-STORE-TEMPLATE-PROFILE-V1) 은퇴 — 템플릿 선택은 PharmacyStorePage(/store/settings)로 통합.
 
 // WO-STORE-BLOCK-ENGINE-V1: 스토어 블록 레이아웃 빌더
 export { LayoutBuilderPage } from './LayoutBuilderPage';

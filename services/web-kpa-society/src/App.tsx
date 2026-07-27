@@ -205,7 +205,6 @@ const StoreMultilingualContentsMyPage = lazy(() => import('./pages/pharmacy/Stor
 const PharmacySellPage = lazy(() => import('./pages/pharmacy/PharmacySellPage').then(m => ({ default: m.PharmacySellPage })));
 const TabletRequestsPage = lazy(() => import('./pages/pharmacy/TabletRequestsPage').then(m => ({ default: m.TabletRequestsPage })));
 const PharmacyBlogPage = lazy(() => import('./pages/pharmacy/PharmacyBlogPage').then(m => ({ default: m.PharmacyBlogPage })));
-const PharmacyTemplatePage = lazy(() => import('./pages/pharmacy/PharmacyTemplatePage').then(m => ({ default: m.PharmacyTemplatePage })));
 const StoreChannelsPage = lazy(() => import('./pages/pharmacy/StoreChannelsPage').then(m => ({ default: m.StoreChannelsPage })));
 // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1: 온라인 판매(seller) 주문 관리
 const OnlineSalesOrdersPage = lazy(() => import('./pages/pharmacy/OnlineSalesOrdersPage').then(m => ({ default: m.OnlineSalesOrdersPage })));
@@ -1066,12 +1065,10 @@ function App() {
             <Route path="settings" element={<PharmacyStorePage />} />
             {/* WO-STORE-COMMON-SETTINGS-KPA-MIGRATION-V1: layout integrated into /store/settings */}
             <Route path="settings/layout" element={<Navigate to="/store/settings" replace />} />
-            {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1: 은퇴 선행 조건 해소됨.
-                /store/settings 가 템플릿 변경 시 기본 블록 재생성 + template_profile 동기화를 수행하므로
-                이 화면의 고유 기능(=template_profile 을 쓰는 유일한 경로)은 사라졌다.
-                본 WO 범위에서는 삭제하지 않고 유지하며, 후속 은퇴 WO 에서 제거 + /store/settings redirect 한다.
-                CHECK: docs/checks/CHECK-O4O-KPA-STORE-SETTINGS-TEMPLATE-APPLY-FIX-V1.md */}
-            <Route path="settings/template" element={<PharmacyTemplatePage />} />
+            {/* WO-O4O-KPA-STORE-SETTINGS-TEMPLATE-PAGE-RETIREMENT-V1: PharmacyTemplatePage 은퇴.
+                템플릿 선택은 /store/settings 에 통합됨(APPLY-FIX-V1 로 실제 적용까지 정합).
+                과거 북마크 보호를 위해 route 는 유지하고 canonical 화면으로 1홉 redirect 한다. */}
+            <Route path="settings/template" element={<Navigate to="/store/settings" replace />} />
           </Route>
 
           {/* Store Home (WO-STORE-TEMPLATE-PROFILE-V1) — public, block-based storefront */}
