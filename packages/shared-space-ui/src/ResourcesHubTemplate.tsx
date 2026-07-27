@@ -46,6 +46,8 @@ import {
   Plus,
   Heart,
   Copy,
+  AlertTriangle,
+  RotateCw,
 } from 'lucide-react';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -286,6 +288,10 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   const [items, setItems] = useState<ResourcesHubItem[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-RESOURCES-HUB-TEMPLATE-LOAD-ERROR-CONTRACT-V1:
+  //   조회 실패(fetchItems throw)를 정상 0건과 분리한다. 이전에는 catch → setItems([]) 로
+  //   장애가 "등록된 자료가 없습니다" 로 표시되어 오류/빈 상태가 구분되지 않았다.
+  const [loadError, setLoadError] = useState(false);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
   const [searchInput, setSearchInput] = useState('');
@@ -306,6 +312,7 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
 
   const loadData = useCallback(async () => {
     setLoading(true);
+    setLoadError(false);
     try {
       const res = await config.fetchItems({
         page: currentPage,
@@ -316,9 +323,9 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
       setTotal(res.total);
       setTotalPages(res.totalPages);
     } catch {
-      setItems([]);
-      setTotal(0);
-      setTotalPages(1);
+      // 오류를 정상 0건으로 뒤집지 않는다. 서버 원문은 노출하지 않고 일반 오류만 표면화.
+      // §7: mutation 후 재조회 실패 시 기존 목록을 []로 비우지 않는다 (loadError 만 세팅).
+      setLoadError(true);
     } finally {
       setLoading(false);
     }
@@ -817,8 +824,8 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
         />
       </div>
 
-      {/* Result count */}
-      {!loading && (
+      {/* Result count — 조회 오류로 목록이 없을 때는 stale 카운트를 숨긴다 */}
+      {!loading && !(loadError && items.length === 0) && (
         <div style={st.resultInfo}>
           {searchQuery ? `검색 결과 ${total}건` : `총 ${total}개의 자료`}
         </div>
@@ -841,8 +848,33 @@ export function ResourcesHubTemplate({ config }: { config: ResourcesHubConfig })
             {config.loadingMessage ?? '자료를 불러오는 중...'}
           </p>
         </div>
+      ) : loadError && items.length === 0 ? (
+        // 조회 오류 + 표시할 데이터 없음 → 빈 상태 문구 대신 오류 패널 (재시도는 현재 검색·페이지 보존)
+        <div style={st.center}>
+          <AlertTriangle size={32} color="#DC2626" />
+          <p style={{ color: '#B91C1C', fontWeight: 600, marginTop: 12 }}>
+            자료를 불러오지 못했습니다.
+          </p>
+          <button onClick={() => loadData()} style={st.retryBtn}>
+            <RotateCw size={14} />
+            다시 시도
+          </button>
+        </div>
       ) : (
         <>
+          {/* §7: 재조회 실패했지만 기존 목록이 있으면 데이터를 유지하고 상단에 오류 스트립만 노출 */}
+          {loadError && items.length > 0 && (
+            <div style={st.errorStrip}>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                <AlertTriangle size={14} color="#B91C1C" />
+                목록을 새로 불러오지 못했습니다. 이전 목록을 표시합니다.
+              </span>
+              <button onClick={() => loadData()} style={st.retryBtnSm}>
+                <RotateCw size={12} />
+                다시 시도
+              </button>
+            </div>
+          )}
           {/* Desktop: Table */}
           <div className="hidden md:block">
             <BaseTable<ResourcesHubItem>
@@ -1169,6 +1201,47 @@ const st: Record<string, React.CSSProperties> = {
     fontSize: 12,
     fontWeight: 500,
     textDecoration: 'none',
+  },
+  retryBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 16,
+    padding: '8px 16px',
+    background: '#fff',
+    border: '1px solid #FCA5A5',
+    color: '#B91C1C',
+    borderRadius: 8,
+    fontSize: 13,
+    fontWeight: 500,
+    cursor: 'pointer',
+  },
+  errorStrip: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: 12,
+    padding: '10px 14px',
+    background: '#FEF2F2',
+    border: '1px solid #FECACA',
+    borderRadius: 8,
+    marginBottom: 12,
+    fontSize: 13,
+    color: '#B91C1C',
+  },
+  retryBtnSm: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: 4,
+    padding: '4px 12px',
+    background: '#fff',
+    border: '1px solid #FCA5A5',
+    color: '#B91C1C',
+    borderRadius: 6,
+    fontSize: 12,
+    fontWeight: 500,
+    cursor: 'pointer',
+    whiteSpace: 'nowrap',
   },
   drawerMeta: {
     display: 'flex',
