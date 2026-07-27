@@ -151,8 +151,9 @@ export class SignageMediaRepository {
         return { deleted: false, code: 'SIGNAGE_MEDIA_IN_USE', usage };
       }
 
-      // 3. 태그 정리 (명시적)
-      await manager.query(`DELETE FROM signage_media_tags WHERE "mediaId" = $1`, [id]);
+      // 3. 태그는 signage_media.tags(jsonb 컬럼)에 저장되며 별도 테이블이 없다.
+      //    (signage_media_tags 는 migration 20260417100000 에서 dead table 로 DROP 됨)
+      //    → media row 삭제로 함께 제거되므로 별도 정리 불필요.
 
       // 4. orphan snapshot 만 정리 (참조 중 snapshot 은 위 가드로 이미 차단됨 → 여기선 전부 orphan)
       await manager.query(

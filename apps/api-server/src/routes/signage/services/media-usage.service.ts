@@ -150,9 +150,12 @@ export class SignageMediaUsageService {
     );
     const snapshotCount = Number(snapCountRows?.[0]?.cnt ?? 0);
 
-    // 태그 수 (참고용, 차단 사유 아님)
+    // 태그 수 (참고용, 차단 사유 아님).
+    //   태그는 signage_media.tags(text[] 배열) 컬럼에 저장된다.
+    //   (별도 signage_media_tags 테이블은 migration 20260417100000 에서 DROP 됨)
     const tagCountRows: Array<{ cnt: string | number }> = await db.query(
-      `SELECT COUNT(*)::int AS cnt FROM signage_media_tags WHERE "mediaId" = $1`,
+      `SELECT COALESCE(array_length(tags, 1), 0)::int AS cnt
+         FROM signage_media WHERE id = $1`,
       [mediaId],
     );
     const tagCount = Number(tagCountRows?.[0]?.cnt ?? 0);
