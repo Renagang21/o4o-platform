@@ -1,0 +1,28 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "fp": 26,
+  "masters": 253,
+  "gencodeMismatch": 0,
+  "easyNot1": 0,
+  "authoredConflict": 0,
+  "enExists": 0,
+  "refConflict": 0,
+  "v2Collide": 0,
+  "canonicalDup": 0,
+  "gates": {
+    "253/26 재현": true,
+    "gencode 일치": true,
+    "기존 easy ko canonical 정확히 1": true,
+    "기존 authored ko 슬롯 충돌 0": true,
+    "기존 en canonical 0": true,
+    "V3 sourceRef LIVE 충돌 0": true,
+    "V3 sourceRef ≠ V2 namespace": true,
+    "canonical dup 0": true
+  },
+  "blockers": [],
+  "writePlan": {
+    "ko_4T": 1012,
+    "en_2T": 506,
+    "total": 1518
+  }
+}

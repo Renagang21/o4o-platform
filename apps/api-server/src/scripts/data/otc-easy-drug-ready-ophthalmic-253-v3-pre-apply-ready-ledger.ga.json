@@ -1,0 +1,44 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "가 (write-owner ophthalmic-unit-1)",
+  "unit": "ophthalmic-unit-1",
+  "route": "ophthalmic",
+  "model": "content-fingerprint-v3",
+  "status": "PRE_APPLY_READY",
+  "liveDbWrite": false,
+  "supersedes": {
+    "model": "gencode-fingerprint",
+    "reason": "gencode 단독 fp 가 제품별 공식 원문 동질성을 보장하지 못해 폐기(commit 0b7b25447). V3 는 6섹션 content-fingerprint 로 재승인(agent 라, commit 00851d237)."
+  },
+  "reproduce": { "fingerprints": 26, "masters": 253, "masterDup": 0, "fpReproduced": 26 },
+  "authoredSource": "mfds_drug_otc",
+  "sourceRefNamespace": "otc-v3-content-leaflet",
+  "writePlan": { "perMaster": 6, "ko_4T": 1012, "en_2T": 506, "total": 1518 },
+  "gates": {
+    "preflight": { "passed": true, "blockers": [] },
+    "dryRunByteIdentical": true,
+    "rollbackNetZero": true,
+    "independentVerify": true
+  },
+  "dbSnapshotPreApply": { "easyKoCanonical": 253, "v3AuthoredKoCanonical": 0, "enCanonical": 0, "v3SourceRefRows": 0, "woAudit": 0 },
+  "applyLock": {
+    "doubleGate": true,
+    "gate1Env": "V3_APPLY_GATE1",
+    "gate2Env": "V3_APPLY_GATE2",
+    "note": "본 WO 는 PRE_APPLY READY 까지만. LIVE apply 는 별도 승인 WO 에서만. 게이트 토큰 값은 문서/원장에 기재하지 않는다."
+  },
+  "artifacts": {
+    "contract": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-contract.ga.ts",
+    "composer": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-composer.ga.ts",
+    "enConfig": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-en-config.ga.ts",
+    "validate": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-validate.ga.ts",
+    "executor": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-executor.ga.ts",
+    "verify": "apps/api-server/src/scripts/otc-easy-drug-ready-ophthalmic-253-v3-verify.ga.ts",
+    "officialSource": "apps/api-server/src/scripts/data/otc-easy-drug-ready-ophthalmic-253-v3-official-source-v1.json",
+    "dryRunManifest": "apps/api-server/src/scripts/data/otc-easy-drug-ready-ophthalmic-253-v3-dryrun-manifest.ga.json",
+    "preflightReport": "apps/api-server/src/scripts/data/otc-easy-drug-ready-ophthalmic-253-v3-preflight.ga.json",
+    "rollbackReport": "apps/api-server/src/scripts/data/otc-easy-drug-ready-ophthalmic-253-v3-rollback-test.ga.json",
+    "verifyReport": "apps/api-server/src/scripts/data/otc-easy-drug-ready-ophthalmic-253-v3-verify.ga.json"
+  },
+  "sharedFilesModified": 0
+}

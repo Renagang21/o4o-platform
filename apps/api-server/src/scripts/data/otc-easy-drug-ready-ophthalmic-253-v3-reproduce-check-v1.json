@@ -1,0 +1,62 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "ga",
+  "unit": "ophthalmic-unit-1",
+  "mode": "READ-ONLY reproduce",
+  "liveDbWrite": 0,
+  "ledger": {
+    "fpCount": 26,
+    "masterCount": 253
+  },
+  "numbers": {
+    "derivedMasters": 253,
+    "missingMasters": 0,
+    "dupMasters": 0,
+    "fpGroups": 26,
+    "fpAssignmentMismatch": 0,
+    "fpSizeMismatch": 0,
+    "fpNotInLedger": 0,
+    "ledgerFpNotDerived": 0,
+    "intraFpMismatch": 0,
+    "multiGencodeFp": 0,
+    "multiRouteFp": 0,
+    "refMismatch": 0,
+    "refDup": 0,
+    "refSharedAcrossFp": 0,
+    "liveRefConflict": 0,
+    "existingAuthoredKoCanon": 0,
+    "existingAuthoredKoAny": 0,
+    "existingEnCanon": 0,
+    "easyAnchorMissing": 0
+  },
+  "safetyPresence": {
+    "withWarn": 1,
+    "withPrecaution": 26,
+    "withAdverse": 26,
+    "withInteraction": 4
+  },
+  "anomalies": [],
+  "anomalyCount": 0,
+  "gates": {
+    "reproduce_253_masters": true,
+    "reproduce_26_fp": true,
+    "fp_assignment_match": true,
+    "fp_size_match": true,
+    "intra_fp_6section_byte_identical": true,
+    "union_merge_0": true,
+    "sourceref_match_ledger": true,
+    "sourceref_dup_0": true,
+    "sourceref_cross_fp_unique": true,
+    "sourceref_live_conflict_0": true,
+    "existing_authored_ko_canonical_0": true,
+    "existing_authored_ko_any_0": true,
+    "existing_en_canonical_0": true,
+    "easy_anchor_all_present": true,
+    "no_anomaly": true
+  },
+  "gatePass": true,
+  "artifacts": [
+    "otc-easy-drug-ready-ophthalmic-253-v3-official-source-v1.json",
+    "otc-easy-drug-ready-ophthalmic-253-v3-reproduce-check-v1.json"
+  ]
+}

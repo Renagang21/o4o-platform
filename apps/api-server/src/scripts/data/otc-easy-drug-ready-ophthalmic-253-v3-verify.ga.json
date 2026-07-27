@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "verifier": "independent (executor 미import)",
+  "liveDbWrite": false,
+  "v1_reproduce": true,
+  "v2_sourceRef": true,
+  "v3_htmlHash": {
+    "ko": 26,
+    "en": 26
+  },
+  "v5_writePlan": {
+    "ko_4T": 1012,
+    "en_2T": 506,
+    "total": 1518,
+    "perMaster": 6
+  },
+  "v6_db": {
+    "easy_ko": 253,
+    "v3_ko": 0,
+    "en_canon": 0,
+    "v3_ref_rows": 0,
+    "wo_audit": 0
+  },
+  "pass": true,
+  "failures": []
+}

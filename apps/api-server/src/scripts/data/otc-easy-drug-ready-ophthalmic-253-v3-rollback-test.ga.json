@@ -1,0 +1,31 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "mode": "rollback-test",
+  "liveDbWrite": false,
+  "koWriteInTx": 1012,
+  "enWriteInTx": 506,
+  "expected": {
+    "ko": 1012,
+    "en": 506,
+    "total": 1518
+  },
+  "before": {
+    "spd_all": 253,
+    "ko_canon": 253,
+    "en_canon": 0,
+    "audit": 0
+  },
+  "inTx": {
+    "spd_all": 759,
+    "ko_canon": 253,
+    "en_canon": 253,
+    "audit": 253
+  },
+  "after": {
+    "spd_all": 253,
+    "ko_canon": 253,
+    "en_canon": 0,
+    "audit": 0
+  },
+  "netZero": true
+}

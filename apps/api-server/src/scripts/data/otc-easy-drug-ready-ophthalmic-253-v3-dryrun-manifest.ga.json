@@ -1,0 +1,721 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "unit": "ophthalmic-unit-1",
+  "route": "ophthalmic",
+  "model": "content-fingerprint-v3",
+  "authoredSource": "mfds_drug_otc",
+  "sourceRefNamespace": "otc-v3-content-leaflet",
+  "liveDbWrite": false,
+  "processed": {
+    "fingerprints": 26,
+    "masters": 253
+  },
+  "writePlan": {
+    "ko_4T": 1012,
+    "en_2T": 506,
+    "total": 1518,
+    "perMaster": 6
+  },
+  "fingerprints": [
+    {
+      "fp": "09eeda83ab2b42b3",
+      "gencode": "A52200COS",
+      "route": "ophthalmic",
+      "size": 7,
+      "sourceRef": "696d2d67-de51-5543-94f9-399367ab0692",
+      "masterIds": [
+        "62cb7cbf-0c7e-4b31-a926-f15850de7f94",
+        "77b36af5-ab70-4e99-838b-7c65b368e761",
+        "a4f61659-9bac-443c-91c8-09aee9f3baf5",
+        "a96c928c-d382-4e6d-9a1f-8d3e8ff6e1de",
+        "af6fd28a-b2b1-44d9-8ed8-30f49f6e4f89",
+        "f2fba806-593a-4399-8e59-5eedd10078eb",
+        "f7a81717-7fec-45b1-9381-5d0f4b039b80"
+      ],
+      "koHtmlHash": "f6e7bdc3010c8670",
+      "enHtmlHash": "f38e104a6a941cbf",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 28,
+      "en_2T": 14
+    },
+    {
+      "fp": "286d1815a2bc15f0",
+      "gencode": "180147COS",
+      "route": "ophthalmic",
+      "size": 32,
+      "sourceRef": "6aa01234-47db-56bd-87a1-f4260daef7b4",
+      "masterIds": [
+        "014c50ad-1921-4cd2-ab5a-ea75ef8d8842",
+        "09c4ae52-6199-4f6a-b964-863575c56860",
+        "10b8556e-98e9-4854-9c11-8aa78af528d0",
+        "2247a8f6-75a6-40ce-a654-47757aa4a11e",
+        "2cbfdf18-0bb5-4098-90a8-f6fa16aecc60",
+        "34bde82e-a7d4-4370-b2b7-78d5b8d4173c",
+        "3d077076-45b6-45b9-9cd5-25597fb22e86",
+        "3ea4adaf-bd76-4d0c-9fdd-45689b9e2485",
+        "46d2dd94-1a3c-4ba4-a555-dbb625e64f0b",
+        "593fad53-d971-4e6b-8cd6-9be277b7c759",
+        "5d0b5811-1ce9-4a74-ada0-c26658b05e79",
+        "63f30663-e532-4dd6-9bd9-d0926b79a5c2",
+        "647fefb6-89ab-47a2-98c5-6ff2c6bb8237",
+        "66ae4058-66f7-409b-a93d-57ef37b91a22",
+        "6e271426-c615-4d84-a741-b8e778836194",
+        "7f1d9992-21fd-42a3-92bd-3f30d05a43d4",
+        "82647fd3-63ec-4c0e-81b1-339f6917cb11",
+        "864d8e84-2852-4b57-be74-cc95cc0510d8",
+        "94608f02-040c-4089-9b33-0ce386890fbb",
+        "952a5833-c109-4da7-b599-bafb2454c6c4",
+        "95694097-091f-4546-a588-d05055a16fcc",
+        "99364e4d-07ba-446b-b297-7c29d2083040",
+        "99697aec-af12-416f-b19d-028c35857f61",
+        "9a2580f4-5d01-46aa-bd7c-b6cc262683f6",
+        "ad01c26e-c15f-4718-9e22-9e365e92c9fd",
+        "b68d9318-9736-4d47-92d9-27a61d21586c",
+        "bc7689b8-bb7d-4c77-82fa-c0221039e244",
+        "bd27910d-bc14-4503-82a9-c7f53ff1a9e6",
+        "bf14abc1-d31c-4c7a-98a9-e7627d4c06cd",
+        "ca0d1ab1-7b71-438f-92c0-e3c51c37c28d",
+        "ea28c472-6e88-4bfe-8f59-362c3f257b6a",
+        "f311e941-406a-4724-ac3c-fc2fa8a89289"
+      ],
+      "koHtmlHash": "a540dd2b68f9ba37",
+      "enHtmlHash": "1a40c402741f9a45",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 128,
+      "en_2T": 64
+    },
+    {
+      "fp": "29f3432132be76aa",
+      "gencode": "216134COS",
+      "route": "ophthalmic",
+      "size": 5,
+      "sourceRef": "8cf82a2e-dbca-3ee0-38dd-d6de31402bad",
+      "masterIds": [
+        "11c5077d-1556-493f-abb4-24d20f2c4ef7",
+        "1cf62c25-a41c-45e9-b052-9adfd2d4d221",
+        "23256575-504e-4f4e-aab8-c312d8727df8",
+        "31caa2a7-a7c9-40b6-bed5-755bc763d20a",
+        "5626a9ba-b28e-4067-b3a4-48e8eb47d80d"
+      ],
+      "koHtmlHash": "9455080f14cf8618",
+      "enHtmlHash": "b43077fcfa4da056",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 20,
+      "en_2T": 10
+    },
+    {
+      "fp": "46fbd4f65c479db0",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 8,
+      "sourceRef": "c2a7cc69-b43a-756c-7fdc-50dc34204304",
+      "masterIds": [
+        "09394a9d-674f-4264-9bd0-c67fb53b39b9",
+        "84870f37-3efd-41f7-93b1-147acbeeefbf",
+        "a9083c3b-1dbb-48fa-b10d-01d60ec591a1",
+        "c08c3041-3977-4f6f-a0b8-cdd591cf1622",
+        "c0f459c4-3e0d-4c2b-8085-70a20cc20e29",
+        "e623d874-d373-424d-bd00-9838b9d2f5b9",
+        "efaf6fc2-3d8c-480d-95e4-0794fceb2c83",
+        "f92ba1bc-ab3c-4af7-810b-609cc98c45ee"
+      ],
+      "koHtmlHash": "b967b4d8fddb52a4",
+      "enHtmlHash": "3dac2b1383887053",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 32,
+      "en_2T": 16
+    },
+    {
+      "fp": "47270aa7c15ad043",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "380d8d5b-e706-6413-b077-4ab62244d63d",
+      "masterIds": [
+        "1ac00324-22c7-4a05-9e45-d1cc6577b44f",
+        "87b0bc1c-0620-46f8-817c-6fab469e2450",
+        "f8acc880-da39-4464-b676-2573fe049bf4"
+      ],
+      "koHtmlHash": "004c5c50ad6a1364",
+      "enHtmlHash": "0abf37b42a0bd013",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "5543f595156851aa",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "1377cbca-c8e4-4fa4-676d-f9e028c86d95",
+      "masterIds": [
+        "57f31494-901a-40af-bb56-5505551c1ff2",
+        "5adf64b0-d830-4e80-9dda-e2d65108e3e0",
+        "fe3bc397-07ec-4ab3-aeed-684c1df71abe"
+      ],
+      "koHtmlHash": "8a53b41763dd9943",
+      "enHtmlHash": "b5007815c885c281",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "58a15dc514769a8a",
+      "gencode": "180138COS",
+      "route": "ophthalmic",
+      "size": 1,
+      "sourceRef": "feec4669-ec91-8a0e-1f32-319fd5ffd2f4",
+      "masterIds": [
+        "1773f9af-eac0-4205-ae34-5c86ba1e7367"
+      ],
+      "koHtmlHash": "d526ca545220dca4",
+      "enHtmlHash": "dd14de65d5ee0172",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 4,
+      "en_2T": 2
+    },
+    {
+      "fp": "6719ba1ecdd10aa9",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 7,
+      "sourceRef": "ea524580-c920-3f8e-f021-540f6ec35960",
+      "masterIds": [
+        "2993f959-4941-4ec5-b668-a4eaef10eef6",
+        "578b7645-63ff-4722-b707-5b92bba1cd7f",
+        "5a41a98d-63f6-40fa-8483-994c732e68eb",
+        "72550298-f4fa-41da-a62e-42e65b221f0f",
+        "80c86fdd-0928-45c0-a3d7-9aa1b6622ce5",
+        "9ca24ee5-2674-4dc8-97fc-004a16f9ecf0",
+        "caa7adf1-cfc5-426f-ac37-588c301e2104"
+      ],
+      "koHtmlHash": "9d910cd0ae1578f6",
+      "enHtmlHash": "bb0b64800a9b5fe7",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ],
+      "ko_4T": 28,
+      "en_2T": 14
+    },
+    {
+      "fp": "6c0640ca18e5053d",
+      "gencode": "A75800COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "dc9cbeee-53ef-93fc-966d-d9af1359b264",
+      "masterIds": [
+        "2762e42d-0060-4e80-98a7-e9ebebdbbcdf",
+        "46485b5b-9f41-4d17-a40b-5ec6dff3d4bf",
+        "580d86f1-d40a-4dd1-a1cd-bb1cecd308c1"
+      ],
+      "koHtmlHash": "14aa4e6e8ed1ddc7",
+      "enHtmlHash": "0854c9f8a388c383",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "76e2996f2a1ecd8a",
+      "gencode": "A34700COS",
+      "route": "ophthalmic",
+      "size": 1,
+      "sourceRef": "cfda317e-3b4f-f257-0548-07d9eadd97db",
+      "masterIds": [
+        "67a6c33b-b750-471b-a3e5-64cc4d39fcfb"
+      ],
+      "koHtmlHash": "185b37c2e8ebb1ad",
+      "enHtmlHash": "44b268b8b9748128",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 4,
+      "en_2T": 2
+    },
+    {
+      "fp": "7ca0760c03dbca9d",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 8,
+      "sourceRef": "51a4d066-c41c-637f-e388-5c6a862dff50",
+      "masterIds": [
+        "23674969-1dce-4a59-9b9c-6fd3ed89a6bd",
+        "25a7a967-3a63-4e35-9d2a-1c5a8a301f83",
+        "3e31e3e8-947c-4051-a0b5-ac77ae8c35d0",
+        "79375a96-bdf4-4ddc-8d3e-ee616d59ac03",
+        "7bfd241e-5cac-44d9-91a2-e29c3bd1c8b9",
+        "7c9d9d70-35d9-4b16-8fa5-f26bb1b41ea9",
+        "922deb62-c457-4d73-839c-7f599c23ec3d",
+        "af0eab48-36f4-45e1-b197-adc25bcc5100"
+      ],
+      "koHtmlHash": "cb9daaf6ebe2fe6b",
+      "enHtmlHash": "3dac2b1383887053",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 32,
+      "en_2T": 16
+    },
+    {
+      "fp": "80ff29f78c5c8c9a",
+      "gencode": "228633COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "3e100c61-a736-d5d8-a179-bcbcd0a8f8e6",
+      "masterIds": [
+        "1b1a3208-a212-4e1f-8fd1-8b06e14e3b0f",
+        "44ca793e-768c-421f-8465-cb1a652cf47c",
+        "73dd233f-1f38-4d9f-a765-df64e270fded"
+      ],
+      "koHtmlHash": "84b03195b2db26f0",
+      "enHtmlHash": "b2016685c6bcd4bb",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "94ccadff122bbcab",
+      "gencode": "180137COS",
+      "route": "ophthalmic",
+      "size": 2,
+      "sourceRef": "07397e33-3434-3f51-b300-9b4375c988e7",
+      "masterIds": [
+        "13b76585-37d2-4115-b8c1-412be5fff8d5",
+        "548ccbed-60f4-47a9-a893-574cbe008c47"
+      ],
+      "koHtmlHash": "a93b62bd646e156e",
+      "enHtmlHash": "3e2e02c06a324d28",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 8,
+      "en_2T": 4
+    },
+    {
+      "fp": "9dba4a694da86090",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 8,
+      "sourceRef": "7c14498e-5a9a-76da-a8fc-526e64671064",
+      "masterIds": [
+        "08cd0fdb-7de8-4b1b-b967-bc85b96cfa2a",
+        "13b6fd2a-1dd1-40a5-bb56-69e79883c731",
+        "50fe59a7-30b1-49e9-9f01-65fb2f14390b",
+        "654cf30f-12cc-4383-bb93-6b972b45ce91",
+        "71189be6-20a8-485c-ab28-03bf017af808",
+        "85dd9220-48eb-40f5-8bd8-2c2536122425",
+        "8b4f75de-11d3-4cdd-b938-c61f750043c2",
+        "b5e607ea-306f-465b-89c7-9bf5c08ab19d"
+      ],
+      "koHtmlHash": "21a7dbe3a741d366",
+      "enHtmlHash": "f6c43918bf4949c2",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ],
+      "ko_4T": 32,
+      "en_2T": 16
+    },
+    {
+      "fp": "a694cf00621d64b7",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 6,
+      "sourceRef": "40868c9d-9a61-72c5-152b-d592b89fa99d",
+      "masterIds": [
+        "6c965cce-f155-4ab2-813b-e29d700a86ef",
+        "7413c54c-fcf8-45e6-9838-b9056633c352",
+        "97838188-a19b-4f7a-b726-2fe3b53c422c",
+        "a7203e6e-62da-4d17-8695-6cfceadc5533",
+        "ae5d12ef-4a00-4da3-93cc-fecfcb18fe5f",
+        "e4df566f-5407-4617-95e0-c6536b3cebcb"
+      ],
+      "koHtmlHash": "c7df2ce32f508631",
+      "enHtmlHash": "b20709ffb445e179",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 24,
+      "en_2T": 12
+    },
+    {
+      "fp": "ab1970701df3c680",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 10,
+      "sourceRef": "ac3419cf-8eae-cb30-7353-49b37dd44a99",
+      "masterIds": [
+        "11669d4e-e320-4fd9-abd5-c334b4822f7c",
+        "37f9bbdf-51fd-4f0e-aaaf-3fd3238648d5",
+        "3bd263f4-088b-4eca-8424-caa03c5c8893",
+        "3e806602-8e82-41b3-92db-10455234949a",
+        "60bb73a7-5a74-445e-b305-b015570ef42b",
+        "8537f703-ca80-4435-94a6-15adb2b6951e",
+        "853dea88-2168-4f35-a1d8-61d092d1b16e",
+        "9f17e85d-d25a-4a12-9e7f-6416a2ed4117",
+        "e9dc9037-a82b-4bff-851b-a89f982e0951",
+        "fe2b5d54-6d09-47e8-913c-722debec07b8"
+      ],
+      "koHtmlHash": "b0ad987d10996d7f",
+      "enHtmlHash": "308a703e308fc243",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 40,
+      "en_2T": 20
+    },
+    {
+      "fp": "af2a870f1fb0b0d8",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 6,
+      "sourceRef": "7463de9b-ba03-c9e6-e2d6-b441eb567e05",
+      "masterIds": [
+        "2ca542cd-9fbf-47eb-898f-2eb66d1f9117",
+        "3dfb70db-62d3-426f-acae-36b3f6b38016",
+        "a02b24ec-fea9-4195-a2ac-33313a8cbd91",
+        "c5b5331a-aae3-447a-a44b-60f665d1352d",
+        "e0904671-26a0-44b6-aa82-d76aac9898a8",
+        "f85e6101-99e3-407f-944c-c5f239b2ac86"
+      ],
+      "koHtmlHash": "c95fb27c801cac81",
+      "enHtmlHash": "7c90dbcbac28d756",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 24,
+      "en_2T": 12
+    },
+    {
+      "fp": "b497101eb4bc556d",
+      "gencode": "A25800COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "f88af144-e5c8-2096-78c0-bdd9efceb804",
+      "masterIds": [
+        "5db215b2-b2eb-49dd-9714-451e6b1252a3",
+        "8c5b1cad-3e15-4f02-b870-f6e4c83dc458",
+        "ea0e1422-edab-4c04-a6bf-c850ff86442b"
+      ],
+      "koHtmlHash": "8804478036dc0013",
+      "enHtmlHash": "92bf49a18eb8d7c4",
+      "presentSafety": [
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "bfdd82670eb5efc3",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "949031aa-6161-1486-db9b-f9073bbb8c95",
+      "masterIds": [
+        "115f5314-fd57-4b29-b3f3-b534e6078a24",
+        "19495bca-b1e5-4bd6-bf84-e7803d869408",
+        "24efcc49-b6f2-4450-bb34-3a07ddfbc22c"
+      ],
+      "koHtmlHash": "6372a044347fc62e",
+      "enHtmlHash": "3dac2b1383887053",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "caf50c897dd15a11",
+      "gencode": "331800COS",
+      "route": "ophthalmic",
+      "size": 4,
+      "sourceRef": "cd4293d6-8acd-731a-14fe-3852b1c61367",
+      "masterIds": [
+        "395071a2-1752-40b9-a816-6d8e180bc18f",
+        "afb1cf24-cc05-43f1-8b9c-be1cfc501fc9",
+        "f35adec4-8e10-4b75-a3be-6adbd0954067",
+        "fee0aa51-51c5-4293-8f66-a5c551b67efc"
+      ],
+      "koHtmlHash": "344734e603bcde13",
+      "enHtmlHash": "31e58b9ae5566a3c",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 16,
+      "en_2T": 8
+    },
+    {
+      "fp": "d274d7256f243712",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "d0dea241-f46f-7a3f-605d-8797ba1ab24b",
+      "masterIds": [
+        "06e0fdd5-78ea-4107-a0dd-43d223ef28d0",
+        "7879f4a7-5467-4341-b571-219a8526bf17",
+        "f7fcc8bc-cd2b-4eb7-b35e-dede5e9b9f46"
+      ],
+      "koHtmlHash": "f9d3f44e8b05637b",
+      "enHtmlHash": "c32ca0301a45b86f",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "dbb5a148e9d0da1a",
+      "gencode": "228648COS",
+      "route": "ophthalmic",
+      "size": 7,
+      "sourceRef": "b9704e8d-34d2-7d4a-ce70-3056411bdce1",
+      "masterIds": [
+        "0d39f3a6-adf1-4e49-b937-83cca5f8dee7",
+        "15a5a306-455c-4523-aa97-ac5c0097fd3b",
+        "55f69bc0-91a6-41d1-9821-81fe7df51211",
+        "79c43e6f-ae0e-40e9-9e2a-17285f52b842",
+        "84b41746-93d8-4110-acee-b32544d4577e",
+        "8b963686-dcc4-452b-9268-77deca38ea15",
+        "9249f081-7f45-4406-897c-590e9b8c4f89"
+      ],
+      "koHtmlHash": "2f1b1107274a87e2",
+      "enHtmlHash": "364ec29de482a396",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 28,
+      "en_2T": 14
+    },
+    {
+      "fp": "dc87ca1dbe081aa2",
+      "gencode": "331800COS",
+      "route": "ophthalmic",
+      "size": 2,
+      "sourceRef": "2deee197-9381-aff8-5d1c-0498b159c3db",
+      "masterIds": [
+        "7a333c4b-c64b-4c1c-9437-700ce710e345",
+        "b94530c7-8c80-4f38-a2ba-e9db87e08273"
+      ],
+      "koHtmlHash": "d3c5c093dfc86260",
+      "enHtmlHash": "e8e13bea425743b8",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 8,
+      "en_2T": 4
+    },
+    {
+      "fp": "e85a9d4b46d958df",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "e12b1a7b-80e4-ce49-137f-5ff5a10a8df4",
+      "masterIds": [
+        "0664b268-6f11-4cbe-9389-db5395d2a436",
+        "53d2280e-3fe0-4300-a6cb-d48771d06d08",
+        "ca33065c-c477-4ed2-9a77-2bf170cd1d90"
+      ],
+      "koHtmlHash": "7e9e8bcacdb62d53",
+      "enHtmlHash": "309688f52fda26c3",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    },
+    {
+      "fp": "ef8402ed8ec4bc6b",
+      "gencode": "228633COS",
+      "route": "ophthalmic",
+      "size": 112,
+      "sourceRef": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+      "masterIds": [
+        "0157611a-578f-4340-a050-0de0f3411e30",
+        "02fc72e0-83ce-41dd-9b07-09ed1869608c",
+        "03b61040-7839-49e4-b789-d9b5629a083d",
+        "0819760f-01fc-4514-aa83-f6400b0e556b",
+        "0c3d3ab3-da39-4ae9-9ccd-a39897a60edb",
+        "0def6434-9b1e-40ba-8b6e-b547bef93228",
+        "10d6a1c1-a5d5-47b2-961f-cc909277d471",
+        "116295b0-8f72-494b-92e1-b440cfa2e1e0",
+        "12290db1-8d6c-485c-aa5d-6af33251a91f",
+        "14db70c3-963a-479e-9a35-158b2a68f96c",
+        "16e2270b-c0ef-46f9-aa86-3db35fbabc86",
+        "17228f71-d9d0-48cb-9296-ff01b3db14af",
+        "190d28d3-136f-4de3-994f-89cf8be8da10",
+        "1dd47e87-c660-42c8-9319-76ac2e78a31d",
+        "21bf01f7-f622-4576-b9b0-593de3cc02d9",
+        "26ca1060-6dc6-4604-8cc7-147c866c6487",
+        "2753c630-9742-4df8-932d-14b52f5f2ace",
+        "295233f0-c670-4935-bcc0-0c867160dede",
+        "29df0123-c0df-4309-b3e2-fb90285e5542",
+        "2e0b4520-3564-4fda-b5ee-5bd5da822171",
+        "2f9cfa73-e1fc-4342-aed7-d97c35e74939",
+        "35520759-a9bb-4ba8-b808-ebfa16690808",
+        "361b315f-a1f6-4b9a-9c83-bb247f0b9503",
+        "3af82ce7-249b-4383-acb9-5beba5782cc2",
+        "3dbb8284-9733-4497-a4f3-0bc43a1ac1ba",
+        "404aa175-a768-4526-aae5-f34f4aefea3a",
+        "407d901f-23be-441a-b4d1-12786a2a8a9a",
+        "436eb224-fda6-472a-9099-9f5440425b6c",
+        "4720c38a-4163-44bf-a29d-483693aa97e0",
+        "48ef0fe9-63a9-491d-b492-16537fe6df96",
+        "4904401d-b171-47ad-89c9-0549fd3fdbc5",
+        "4a308f8c-4fb6-4458-a7d9-415a5401f877",
+        "4b11f23a-411c-4645-b085-5054258e2ea7",
+        "4cd91feb-e134-42a4-8355-67e44894a7e7",
+        "4f995c2b-2615-46c3-b942-55e2eae276ea",
+        "5111af99-2cf1-429d-87e4-27410638623c",
+        "53aa5342-bdec-4292-a3b9-ea57363db5b8",
+        "54793a71-f4c8-463e-99b0-8be6f6a00953",
+        "5c6408b3-85e0-428d-9392-52e829869572",
+        "5d4fd3d4-706e-4c60-adb1-dff5243e5e30",
+        "5eb162f8-5f71-4ac6-b6cb-c9012cc134fd",
+        "5fcc1926-ae21-480c-acc6-394e61c6c8fc",
+        "621143a6-41d4-4567-a79f-788bc0d86a3a",
+        "66424a91-0e3a-496f-8018-e8bf1c12006b",
+        "6bea61ae-6cf6-4793-b01b-c8b18d14b9f3",
+        "6f782ce7-5488-4829-9ab4-c69aa1e82482",
+        "7214fb5e-7e32-4191-b81c-327c7d6d9146",
+        "737107d0-3000-4094-ba88-9f8a28f58c88",
+        "7474bf05-8fd0-4899-92da-13df757ba8ff",
+        "7b2db206-c323-4e1b-bb67-da6a59d25273",
+        "7cee397e-b98f-4ab1-90da-9ea6372f9d2b",
+        "8045ca3b-97d8-4a24-99b4-8e469a255cc4",
+        "822e0943-e927-4a98-bc6b-f1284cd04172",
+        "82b38ee1-903c-4846-93b7-923e90154cfa",
+        "82cbaa55-2533-4874-8247-b1b5f2459369",
+        "854a529c-cab8-4e85-9591-b006f1a129c7",
+        "868eb9c7-a575-44b0-b092-e30e6888d482",
+        "876c1a95-2aa4-4a8d-9286-1710235f8ed7",
+        "89def203-a510-4dc9-9795-b2b336fa1f15",
+        "8b8efa6a-8124-4bfd-bc25-16b171e2b778",
+        "8ea1d99f-6b89-459e-a150-e943f40647b0",
+        "91b311a7-7aa2-4355-9355-3d1b9c5d9b3e",
+        "9769e340-aa29-4ec7-8ff6-879016f3d72b",
+        "98162b00-5209-4dd9-9718-5190220d9a5e",
+        "9e6fd3ca-b955-428e-b7e7-29998c9db058",
+        "9f44bcc1-30a1-42d8-a87f-e2ed95ca15b7",
+        "a0fbc0ba-0538-447e-bb9a-3e76d8cfe580",
+        "a1b590a9-804a-4e7f-a6cb-58aba7429a7a",
+        "a3dad1c3-69fc-4e05-894c-a3d209d9c0db",
+        "a6a228a2-1730-4b1b-b1a1-33cd497ac329",
+        "a7ed478c-5322-4d4b-93d2-95c40255df06",
+        "acb53f38-0196-4d8c-82fe-dbad405cba33",
+        "ae22bfba-8efa-4767-aed1-c073c44b68d2",
+        "b048f6e3-4f48-4f49-b173-77c8a2a0aa06",
+        "b4e61f99-4cd5-41d0-a605-673cb5717400",
+        "b67168f7-9518-4e70-bc35-429d699b0b2b",
+        "b6e1997a-cd68-4475-9f77-5b0fcaf1a7fc",
+        "b75152e6-d5ef-402c-9627-4a90ff326e57",
+        "b83864f5-b17b-48f9-ae11-0a48a8cadcde",
+        "ba284fa9-63f9-4e20-b05c-58ce85e78bed",
+        "bb070381-b52e-4aee-919e-44c4682f3571",
+        "bbecdeb6-5ffb-46cb-b5f9-272abd66764d",
+        "befbf958-c63c-4e26-a1b9-56e7331d109c",
+        "c207db47-4176-47e3-a192-d5e3cb5a7bdc",
+        "c611d9ac-1ba9-458a-a2f8-7e1499d323e8",
+        "c97c6d50-fab1-40c0-bcf3-560ccadf5bea",
+        "ca18cd01-d047-48b6-8d63-dbb5107db63e",
+        "cb7750fc-f15a-41bb-bc1a-b58bbf8fec6f",
+        "cc385010-3915-4db6-a2c1-c90d5b834d4c",
+        "ce373ee1-48aa-4ce7-93e8-947b780b2528",
+        "d14567dd-c38e-4329-b019-c7a7c5e7995a",
+        "d29b029e-eda8-4e90-8424-68e149fb3588",
+        "d346ecb6-64da-4f77-afe3-d75edf5ce04d",
+        "d3e67d7f-f961-4724-9a26-8502794e03f8",
+        "d475cae1-2426-42c7-af29-861235baaee0",
+        "d7465d62-d5ec-4e63-8125-f9c560ba182a",
+        "d7a97c81-95ae-4b09-86eb-0ed28c2181de",
+        "d7b460be-3cf3-41d2-869f-a8dc5484eff3",
+        "dd03be67-2786-44c4-8271-cac5908bee5e",
+        "de9f557e-f3dd-4b3b-a4b0-2fc2f77e1abc",
+        "e4120c06-bd62-4978-9015-81be7ab4ed67",
+        "e75bd0a9-ce21-48bd-a640-6e84a0f2d319",
+        "e78747cc-e7d0-4964-a615-c783484f2321",
+        "edb430b8-7ced-4c45-a309-b71b1a66197a",
+        "f07c9b56-cb1b-43c4-9bec-1c5b0f9f1140",
+        "f0cca1aa-feed-4f9d-8e24-1f5be57e281c",
+        "f2aaa5f8-0658-4ab4-bf22-d9fee0143fbe",
+        "f4d64f5b-6283-42e2-a882-214fe177d0ba",
+        "f6ff4669-f836-414f-b89a-ae7d9cea057f",
+        "f7547fc8-f180-4c13-861a-3e58e76de675",
+        "f7a4ed69-64a3-4b5a-814e-c26b0d9b2a5a",
+        "fbabdc78-7914-4202-aaf7-35a23c7f564d"
+      ],
+      "koHtmlHash": "c7f46a88b6dcd82e",
+      "enHtmlHash": "225e4504dd787b9a",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응"
+      ],
+      "ko_4T": 448,
+      "en_2T": 224
+    },
+    {
+      "fp": "fb48c83e85ad84eb",
+      "gencode": "228651COS",
+      "route": "ophthalmic",
+      "size": 3,
+      "sourceRef": "4ee6d7ce-86f9-4b84-4238-8461e0d11e5c",
+      "masterIds": [
+        "8331d493-962d-4c85-b2b8-5f6b2a634e80",
+        "c8e3ebb3-35fb-429e-aa40-33cadb67739c",
+        "eb1696c0-42bc-490b-92d7-eb6feac166f7"
+      ],
+      "koHtmlHash": "32e5a24c1c050dc9",
+      "enHtmlHash": "fe734e21d185c3c0",
+      "presentSafety": [
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ],
+      "ko_4T": 12,
+      "en_2T": 6
+    }
+  ]
+}
