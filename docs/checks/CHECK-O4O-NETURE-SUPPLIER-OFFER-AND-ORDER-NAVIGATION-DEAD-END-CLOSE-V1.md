@@ -78,12 +78,23 @@
 공통 role constants 변경 0 · DB write 0 · migration 0 · 운영 주문 mutation 0 · dependency 추가 0
 ```
 
-## 6. 후속 (범위 밖 · 별도 버킷)
+## 6. 배포·smoke (게이팅 검증)
+
+- **배포:** CI/CD "Deploy Web Services (Cloud Run)" run 30245798457 — `detect-changes` → web-neture만 스코프, `deploy-neture` **success** (2m15s), 나머지 skipped. commit `cefb11c24` 기준.
+- **production 라이브:** `GET https://neture.co.kr/supplier/supply-offers` = HTTP 200. 최신 Ready 리비전 = `neture-web-01348-7k4` (트래픽 100%).
+- **브라우저 smoke:** Playwright 프로파일이 사용자 Chrome 세션에 점유 중 → WO 지침("강제 종료 안 함")에 따라 **게이팅 검증으로 대체** (배포 소스 = 로컬 build 동일 소스).
+- **번들 게이팅 결과** (배포와 동일 build 산출물 `dist/assets`):
+  - `SupplierSupplyOffersPage-*.js` → `/supplier/recruitments` CTA **포함**. 제거된 stub 문구("판매자(파트너)를 모집하는 전용 흐름은 후속…") = 전 청크에서 **0**.
+  - SupplierOrdersPage fulfill CTA("주문 확인 · 배송 준비…") 인접 target = `to:"/account/supplier/orders"` (자기참조 `/supplier/orders` **소멸**).
+
+→ 준비 중 stub 0 · 자기참조 CTA 0 · 실제 유통(판매자 모집 현황)·주문 처리 목록 도달 확정.
+
+## 7. 후속 (범위 밖 · 별도 버킷)
 
 - **B 라우트트리 정합**: `/supplier/*` ↔ `/account/supplier/*` 이중 주문 화면(운영 허브 vs 처리 목록) 통합은 별도 WO. 본 WO는 CTA를 실제 처리 목록으로 연결하는 최소 안전 변경만 수행.
 - 오퍼 모드 선택 전용 화면(WO-O4O-NETURE-SUPPLIER-OFFER-MODE-SELECTION-V1)은 원 파일 헤더가 예약한 후속.
 
-## 7. commit 범위
+## 8. commit 범위
 
 path-specific stage + `git commit -m <msg> -- <paths>`. 대상 3파일:
 `SupplierSupplyOffersPage.tsx` / `SupplierOrdersPage.tsx` / 본 CHECK. `git diff --cached --name-only`로 타 세션 staged 파일(otc-*/hff-*/pnpm-lock) 혼입 0 사전 확인.
