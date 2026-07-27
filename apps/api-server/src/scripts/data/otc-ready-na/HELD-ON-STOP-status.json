@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-327-OROMUCOSAL-14-FINAL-READINESS-V1",
+  "agent": "na",
+  "state": "WAIT_FOR_REAPPROVAL (HELD-ON-STOP / BLOCKED_FOR_REAPPROVAL)",
+  "baseCommit": "0b7b25447",
+  "approvedSsotRetired": "commit 0b7b25447 READY 1,134 approved-for-production SSOT + unit ledger 는 생산 입력에서 배제됨. gencode 단독 fingerprint 가 제품별 공식 원문 동질성을 보장하지 못함(경구·외용·구강점막 공통). 신규 content fingerprint 승인 SSOT 전달 전까지 저작·EN·dry-run·rollback 재개 금지.",
+  "reason": "fp(=gencode) 내부 안전축 충돌 + 공식 이상반응 결손 — 승인 SSOT의 gencode 단독 fingerprint 및 대표 master 1건 grounding 방식이 안전정보 약화를 유발. waiver 불허 결정됨.",
+  "units": {
+    "topical-unit-1": {
+      "state": "BLOCKED_FOR_REAPPROVAL",
+      "population": { "fpCount": 37, "masterCount": 327, "fixed": true },
+      "finding": "동일 gencode 내부에서 금기·주의 범위 상이. 예: 363700CCM(33m) 일부 master 원문에 제2도 심재성 화상·동상·입주위피부염·보통여드름 금기 존재, 다른 master 원문에는 부재 → 대표 1건 grounding 시 금기 누락.",
+      "exactSafetyMismatchGencodes": 8,
+      "resolution": "안전축 포함 fingerprint로 재분할 (라 재승인 SSOT). 모집단 masterId 고정."
+    },
+    "oromucosal-unit-1": {
+      "state": "BLOCKED_FOR_REAPPROVAL",
+      "population": { "fpCount": 2, "masterCount": 14, "fixed": true },
+      "finding": "공식 안전정보가 [이상반응] 헤더 하위에 존재(예: 가스제로구강필름 227736ATD)하나, 공용 composeKo caution=[경고]+[사용상 주의사항]+[상호작용]만 취해 이상반응 전량 누락.",
+      "resolution": "구강점막 전용 composer/profile에서 경고+사용상 주의사항+이상반응+상호작용을 모두 caution grounding에 포함. 공식 원문 보존만, 신규 의료사실 생성 금지."
+    }
+  },
+  "liveApply": "LOCKED — 재승인 전까지 금지",
+  "dbWrite": 0,
+  "evidence": [
+    "otc-ready-na-reproduce.ts (read-only 재현·게이트)",
+    "pre-apply-topical-unit1.json",
+    "pre-apply-oromucosal-unit1.json"
+  ],
+  "waitingOn": "라 에이전트: WO-O4O-OTC-EASY-DRUG-TOPICAL-OROMUCOSAL-SAFETY-FINGERPRINT-REAPPROVAL-V1 → superseding approval SSOT + 신규 fp/unit ledger + safety-section composer contract. 이후 명시적 재개 요청 대기.",
+  "doNotTouch": [
+    "otc-easy-drug-ready-1134-approved-for-production-ssot-v1.json",
+    "otc-easy-drug-ready-1134-unit-ledger-v1.json",
+    "otc-v2-store-leaflet-runner.shared.ts"
+  ]
+}

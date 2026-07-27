@@ -1,0 +1,68 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-327-OROMUCOSAL-14-FINAL-READINESS-V1",
+  "agent": "na",
+  "artifact": "pre-apply-reproduce",
+  "route": "oromucosal",
+  "unit": "oromucosal-unit-1",
+  "approvedSsotStatus": "APPROVED_FOR_PRODUCTION",
+  "baseCommit": "14e9424e8",
+  "proxyPort": 5470,
+  "readOnly": true,
+  "dbWrite": 0,
+  "counts": {
+    "fp": 2,
+    "master": 14,
+    "expectedWriteKo": 56,
+    "expectedWriteEn": 28,
+    "expectedWriteTotal": 84
+  },
+  "gates": {
+    "g1_fpMasterMatchSsot": true,
+    "g3_fingerprintSplit0": true,
+    "g4_routeAllMatch": true,
+    "g5_officialSourceMissing0": true,
+    "g6_safetyFpMismatch0": true,
+    "g7_authoredCanonicalHeld0": true,
+    "g8_sourceRefExactly1": true,
+    "g9_canonicalDup0": true
+  },
+  "stop": [
+    "4d69a93d-c458-4a10-b658-36f0dcbe7ce1 주의 결손",
+    "91789311-a884-4bc0-a6ad-411760df97d0 주의 결손",
+    "9ffbfef4-bc79-4e8c-9a26-fcb17bd3dc58 주의 결손",
+    "ab17b02a-684e-45d7-a01b-f8dd56ec6050 주의 결손",
+    "d8e9569c-3379-4009-88d9-b9042e898b95 주의 결손",
+    "f9a82e3a-5fe3-4a55-9814-4426e0b3b6c4 주의 결손"
+  ],
+  "allGreen": false,
+  "fpGroups": [
+    {
+      "gencode": "A87803AMS",
+      "fp": "53cc845294178465",
+      "size": 8,
+      "masterIds": [
+        "05a48eb0-2d06-4b51-98a8-3cef294ac3df",
+        "16f5a50d-1661-4c05-be16-d0af4c0a147c",
+        "4b7181a4-5993-4d21-bfe7-cf4bbb0ce29e",
+        "519d501a-9cfb-4d69-84e4-94b05ece8ef7",
+        "8a017009-354c-4071-aa33-ed28d42f0c32",
+        "b0615452-a0e4-4b67-820c-10210f6c6795",
+        "c4643ce7-b3ac-4bc3-86c8-44460b7a1a4a",
+        "fbe9bd32-b076-49ad-842b-65b971cd918b"
+      ]
+    },
+    {
+      "gencode": "227736ATD",
+      "fp": "d6a0785fdee2decf",
+      "size": 6,
+      "masterIds": [
+        "4d69a93d-c458-4a10-b658-36f0dcbe7ce1",
+        "91789311-a884-4bc0-a6ad-411760df97d0",
+        "9ffbfef4-bc79-4e8c-9a26-fcb17bd3dc58",
+        "ab17b02a-684e-45d7-a01b-f8dd56ec6050",
+        "d8e9569c-3379-4009-88d9-b9042e898b95",
+        "f9a82e3a-5fe3-4a55-9814-4426e0b3b6c4"
+      ]
+    }
+  ]
+}

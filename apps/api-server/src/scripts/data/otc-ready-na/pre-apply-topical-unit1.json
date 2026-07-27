@@ -1,0 +1,636 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-327-OROMUCOSAL-14-FINAL-READINESS-V1",
+  "agent": "na",
+  "artifact": "pre-apply-reproduce",
+  "route": "topical",
+  "unit": "topical-unit-1",
+  "approvedSsotStatus": "APPROVED_FOR_PRODUCTION",
+  "baseCommit": "14e9424e8",
+  "proxyPort": 5470,
+  "readOnly": true,
+  "dbWrite": 0,
+  "counts": {
+    "fp": 37,
+    "master": 327,
+    "expectedWriteKo": 1308,
+    "expectedWriteEn": 654,
+    "expectedWriteTotal": 1962
+  },
+  "gates": {
+    "g1_fpMasterMatchSsot": true,
+    "g3_fingerprintSplit0": true,
+    "g4_routeAllMatch": true,
+    "g5_officialSourceMissing0": true,
+    "g6_safetyFpMismatch0": false,
+    "g7_authoredCanonicalHeld0": true,
+    "g8_sourceRefExactly1": true,
+    "g9_canonicalDup0": true
+  },
+  "stop": [
+    "fp 243302COM 안전지문 mismatch (axMd5 2종)",
+    "fp 243302COM fingerprintV2 불균일 (2종)",
+    "fp 363700CCM 안전지문 mismatch (axMd5 9종)",
+    "fp 363700CCM fingerprintV2 불균일 (9종)",
+    "fp 179901CPL 안전지문 mismatch (axMd5 4종)",
+    "fp 179901CPL fingerprintV2 불균일 (4종)",
+    "fp 102935CCM 안전지문 mismatch (axMd5 2종)",
+    "fp 102935CCM fingerprintV2 불균일 (2종)",
+    "fp A18500CCM 안전지문 mismatch (axMd5 2종)",
+    "fp A18500CCM fingerprintV2 불균일 (2종)",
+    "fp 179903CPL 안전지문 mismatch (axMd5 3종)",
+    "fp 179903CPL fingerprintV2 불균일 (3종)",
+    "fp C02600CPL 안전지문 mismatch (axMd5 2종)",
+    "fp C02600CPL fingerprintV2 불균일 (2종)",
+    "fp A24400CCM 안전지문 mismatch (axMd5 2종)",
+    "fp A24400CCM fingerprintV2 불균일 (2종)"
+  ],
+  "allGreen": false,
+  "fpGroups": [
+    {
+      "gencode": "179901CPL",
+      "fp": "90aa00de5711e7d5",
+      "size": 76,
+      "masterIds": [
+        "0459da26-8c62-4546-8801-6fe33290ec2d",
+        "0873a237-7dee-46c4-85e9-b1b76af4b360",
+        "0efd29e7-0d4e-4713-80d5-93e5aab2a21f",
+        "11b27dae-0913-49c9-8c44-64078a13d0dc",
+        "11bf1871-5aff-48ad-adc3-42725d1e36de",
+        "154b86cc-796e-4197-9b08-f8118eda4683",
+        "18a7e2ac-d7c9-44bf-8ff4-54b94bcb4845",
+        "2071f6ce-8b6a-4498-9cf9-e0aeb411309c",
+        "2a83f9aa-776e-4989-a59d-94d6c87d5340",
+        "2e4db210-b984-430c-b602-671b76b39f70",
+        "3151e1e7-a319-4299-8e0d-dad374618302",
+        "321d0a48-32d2-44c2-9977-2511f29708e1",
+        "329e66c2-ce3c-4db9-877f-3767a72e60d8",
+        "3513d46f-f9b2-4d70-9349-2c6985786eed",
+        "3b99b5a6-2617-46c7-802f-59368c114048",
+        "3c8feb5c-7605-47aa-9309-a48364e47055",
+        "4318e392-221e-4be0-a7a8-35eaf26cb887",
+        "4bf9253b-6dff-49d0-8f81-11c7bdcf0807",
+        "4c1e398a-0b23-42df-9c3f-698acf6942f5",
+        "4c6b18f3-6a8e-4abb-9065-b7e549b8be00",
+        "4ca4d8f6-fb76-4db7-8960-f8307313d24e",
+        "4da20862-7d38-48b3-bf2c-c598dc69a6dc",
+        "4dadb463-e5c4-4ce6-be33-2836ffb11f05",
+        "54b626e1-b650-4faa-bcc6-8377ba609789",
+        "580257d0-d319-430e-885b-969015eb774c",
+        "5b38a75f-7d56-4352-bc4b-ab29e8e3aaac",
+        "5b4df775-13f7-4a02-aa83-4d26d6a54391",
+        "604752dc-aaa9-4906-b51a-9311bc1e6186",
+        "6308f405-dffe-432f-bcc3-ed1c44e9511a",
+        "64e0a0f8-6195-48d2-b187-55042ef5ee67",
+        "6f64e3e2-e6e5-4e1b-b8ed-44daa59bc527",
+        "6fc4c6ea-080c-4180-8aa4-097bd7de41a8",
+        "75d965ce-a44a-408e-8049-51c21cb7271a",
+        "75eb7b8e-5acf-45ef-9e99-8c914aeb7b21",
+        "75eb88da-5ebe-4757-be1d-d8f33387d424",
+        "793070cd-4bc8-462b-8580-bc4d3e5d398c",
+        "7cd16256-3248-470a-9833-ddd2e2a48333",
+        "7f5c621b-88c2-4473-8b68-605622ac4f3f",
+        "83200660-7027-4bfb-8213-aeee6eccd73a",
+        "867481e0-e512-410c-aee3-6561e32659ea",
+        "8afdcb0b-c007-4b18-8c48-d58e1e06650b",
+        "8c3e1d8e-4d48-4a5d-980e-df62b4ed34c0",
+        "90e3fb69-8236-4bd3-8fc2-f4eaa4929b24",
+        "912599a6-5c9b-47e1-8415-e315b7462bcc",
+        "91b6454d-dd7f-4bbd-86d2-4961bf12c432",
+        "922a64e0-7265-407d-b52a-15af0a8d982a",
+        "95343c7c-efa8-4121-9c20-e698cda9232f",
+        "9e8f9bce-2d71-4054-b0a6-470664a00406",
+        "a3d5e5ec-60ae-4710-a969-32e6f648f74b",
+        "a6318652-2886-4734-a32b-807998a49b3f",
+        "acc75137-1dc1-4bd9-8c93-78baef827a36",
+        "b46fc848-17fa-47f3-a8d8-51f15079ae92",
+        "b918068f-5b8f-4273-8f53-bb60521007b6",
+        "ba91e3d6-2fcd-46b3-8acc-eb9b785c31f0",
+        "bdac5985-048d-4996-94ab-0f66897dd9c6",
+        "bf5bed17-a058-4543-ab40-027c200021f1",
+        "c17ac427-8332-4e04-a9a0-228b82ffe47c",
+        "c292fa2f-9018-46d7-9f71-2f25f7cc1255",
+        "c6be7072-53c4-4bb6-9fe4-f286d71f208c",
+        "c7f57385-b7f8-4312-950c-46e048f8e218",
+        "cd09cc65-e2bb-4e4a-9523-17f273cf80b0",
+        "d14e08f0-1be8-4450-a21a-b279c12e1ee2",
+        "daf65ab4-5fe5-4dda-9268-d8bda931b483",
+        "dc9f7912-e970-49c5-b0db-cb2ce338a7fc",
+        "ddab2c15-0ba9-435c-aa73-0fc01d8a3c5d",
+        "dfcfd03b-aa48-4016-add4-83c858109d41",
+        "e209da8e-5279-42f8-a3a9-2c27d0e167dd",
+        "e52a7753-89b8-4821-a5c0-4c8113e6298c",
+        "e69493e0-d83c-4764-b865-302ba97c55b4",
+        "e7c6064b-39f5-4ec5-b730-71ae1863de77",
+        "e8b31c21-c387-4734-9c50-5fefddb5d29c",
+        "f15572fe-bc58-41ef-a249-f9d413a6e8ba",
+        "f72ca6b9-4a78-4145-a074-3bf9bc3ed028",
+        "f82c66b5-5bb4-4fb9-9a04-3eed2c74e506",
+        "fe2fa7be-494f-4a87-a12e-7e9d63f2bcfc",
+        "ff7f23ae-0a25-42d0-907c-5d86b32bbb22"
+      ]
+    },
+    {
+      "gencode": "363700CCM",
+      "fp": "ed8e327c990bf92a",
+      "size": 33,
+      "masterIds": [
+        "03b9eb6b-76dd-4e51-87de-97bd095b43ac",
+        "05870ec0-c8d1-40ad-9c86-1614bfcd9411",
+        "06ca7613-9d4c-45a9-bbab-20298098c4e4",
+        "1356cfb3-c388-4d3b-a347-e510d6f205bb",
+        "23896acd-2d41-4681-91c2-b6863767e965",
+        "24ffa7ea-0829-414e-b3e4-9914b082f2a4",
+        "264381fa-1462-4087-b489-b283d4f08141",
+        "399d5e39-9ec4-429d-8feb-74d773646ab5",
+        "4ee491da-67ad-4c94-af22-b55b9252c72d",
+        "4f2416b8-fbbb-4bcf-85ca-a188cbff64f9",
+        "5761c646-1289-4d34-ac80-f75c08a50322",
+        "597d12f6-4bf5-4acf-8258-7a05803f67d2",
+        "5c68d825-0583-4b27-88ad-850ade41c027",
+        "6af26f82-2759-46de-a56e-f1f1b0309226",
+        "7b0ea37f-6df5-4949-93d9-e17a23501f84",
+        "7b5a1270-fc0f-45b4-b78c-63eb28f78aa4",
+        "7b984a53-683e-414b-8239-c9962e921108",
+        "7e0587ef-2068-4039-bec0-d3638cab0c1b",
+        "7e9269d9-1760-4ee4-a6c5-0a34e44e431f",
+        "85b586cc-5827-4911-b0bf-af326dea2efa",
+        "91985096-51e7-4a62-8e1c-85dea5da4d53",
+        "92358a5a-9ce0-428e-aa18-13a18ec8f03f",
+        "a9541229-a816-4b68-99fe-9db579271a04",
+        "ab15d88d-d1e0-473a-a908-8bf47ac74716",
+        "ae0fc998-f1d7-4c0f-aa06-8b92920ad6ec",
+        "b4b9e896-f284-41f9-8657-cee04d4beb94",
+        "b981ef42-ef79-4ed1-9b3c-0cb0ba265760",
+        "bffecde3-9b8a-4799-aeac-99178af22984",
+        "d630e238-2703-445d-8094-863f198a37c2",
+        "dad538b8-e346-4e61-836a-646808594422",
+        "e028ec5c-61a8-4987-be9b-cccd04997047",
+        "f1711150-e799-495d-bf5b-9328275fd104",
+        "f6dd76e5-73dc-46d3-be63-59a645f989f0"
+      ]
+    },
+    {
+      "gencode": "179903CPL",
+      "fp": "bfeb7c853216772e",
+      "size": 22,
+      "masterIds": [
+        "08a1eb4a-ecdf-4e16-aebc-2d44360f38c2",
+        "0a09da22-724f-4e39-b53c-73b9ac3c7d1a",
+        "0ac4339a-c2ac-4bae-bb52-ab1394700645",
+        "18c66c4a-44fc-4adc-8081-6c497554cbce",
+        "25409b2d-1f38-4091-9471-63c478000598",
+        "2abe6255-7fa3-493e-9caf-1cd92cf62e11",
+        "3cd8759f-6484-485a-849c-eca9f345ef98",
+        "3f3ea654-60a1-4599-99a7-2f0fe1448d4e",
+        "46e9c2ac-36f6-491d-80d6-06250126f0bd",
+        "4c45bb90-c414-4272-9c4f-f6f967b75983",
+        "613f77c9-c93a-41af-b9da-be2e9524371a",
+        "69665b0d-f2d2-4207-9c8d-ea70926efc94",
+        "6acdff05-4343-4263-a642-5163b7d277e4",
+        "6b4721d4-2394-449b-b3fe-e5969db2e363",
+        "84e6a53f-a10d-40c8-b6ae-539e8880ee6b",
+        "8adea964-5cd3-4f12-9b47-8e941e0c459d",
+        "95058867-4705-4365-969f-12f91424e3d4",
+        "ad6d6526-c08d-4c8f-8cea-8b397334af3a",
+        "b37a986a-6a34-4911-96f9-d790888cf75f",
+        "c5f46f55-34f4-4f7e-8804-d1716418beeb",
+        "f8ac0612-5e07-48da-8f71-0f3d80b791a8",
+        "fcfd175d-2e87-4ee3-9dc1-1afde80dd1d2"
+      ]
+    },
+    {
+      "gencode": "C02600CPL",
+      "fp": "2bdfd8f9b780e13e",
+      "size": 22,
+      "masterIds": [
+        "0b4c7a2a-a3fb-4087-85b8-8679b54ea35c",
+        "0d718a37-b5b0-4618-a238-945941b7f38c",
+        "13bd64d5-e772-48db-90f5-ec667cae5958",
+        "268b155c-3b22-4ed7-b04e-91c53f3be902",
+        "2c340b03-e853-4ecd-99c4-db2ef7090a6e",
+        "375025be-b973-4abf-ae6c-a5a9861ff082",
+        "696224dd-64c9-4153-abe9-9726ed61bb39",
+        "77de6f82-2ed1-44b5-b9d4-c69b127558b8",
+        "7e26b399-f811-4e13-a4bd-3bbca844bc73",
+        "7f77a85d-a4ed-4ae0-99c7-fc00c7528243",
+        "819532a3-2b55-4bff-9cb0-dbc2e965f33a",
+        "8f208eb2-220d-49df-acc4-dae45e05cbc7",
+        "9a91ea96-8f81-425c-ac5c-3411ffc0cfc2",
+        "af59fdfe-5581-40c3-837d-cf08f822517e",
+        "ca790fe7-c9d0-4cdc-851c-431f52e77a75",
+        "d461d02d-6e20-4f4d-91a8-4dbb79ae1aab",
+        "e4cc6eec-8574-43d1-9931-eadd3bea7716",
+        "e65e3193-276c-4880-8a44-827d633de13f",
+        "e718a360-18da-41da-ae68-5f28343d72b1",
+        "f7069d99-f899-4a01-8405-eb526abcdac1",
+        "f9ea60fc-856c-408e-b4eb-9dbb6225a59f",
+        "fc081388-0e4a-49be-83b2-c34cf02e98fb"
+      ]
+    },
+    {
+      "gencode": "A18500CCM",
+      "fp": "deed12bd6db1dc13",
+      "size": 17,
+      "masterIds": [
+        "0570aab6-8854-4e6b-a296-a4eb0eccd5a9",
+        "0ae72113-ab03-446f-9315-329d3d46ceaa",
+        "0c5bd1e7-e9b1-4317-8d01-ac659adf0826",
+        "34402ee1-6c7f-4985-a5ad-b81e8d64fce4",
+        "45eee762-ab53-433f-87ad-ff887cd41e96",
+        "6d543e35-c392-4f16-91b1-394c599f2e64",
+        "6e0808e3-1fb8-48ef-a9e2-97e7175b2351",
+        "792b1f74-a00b-4af2-8a5a-6629b0ec91ed",
+        "7c29790a-e420-4c20-9974-b44b0c75969e",
+        "7d8f1fd8-79a3-4963-b3f3-e8fb246dc6d9",
+        "93c4a770-f4d3-431c-819a-093b266514d0",
+        "9fa2aa0e-1699-4d7c-ae28-c837ba8dbb55",
+        "b1e8cadf-0479-4823-90a7-a71bad4bfbf3",
+        "b733a790-f6fc-459e-b193-6e04dbdb71e5",
+        "eee65444-8a3c-4b6d-a21f-8b6e75aebe1b",
+        "f77ae63d-b12d-4a7e-8114-a5be87d5209c",
+        "fb345d57-7458-498f-a548-1b37b6cd36a9"
+      ]
+    },
+    {
+      "gencode": "229102COM",
+      "fp": "c8c3e80363eef807",
+      "size": 12,
+      "masterIds": [
+        "10e79a6f-d5f4-4efd-aa9b-e8acb85c307f",
+        "247ce9d1-a57c-4911-b606-8a0ca8396fec",
+        "4ad88ce8-26e5-4f9c-a3ed-05a9e141d394",
+        "62493476-3642-438d-8693-cdba5fe65ba1",
+        "781b9cc3-271c-4601-9368-f83400c544bc",
+        "7b7bd123-0369-41e4-9343-05a2ca7cfa1e",
+        "93b5f548-3aed-4f01-a309-9cfaa15d69c6",
+        "b1b07e2e-16d8-4ca9-9951-b03d1445ffbf",
+        "ba48d6c8-2c1a-4f87-bb41-462480dd7d30",
+        "c7c67ad1-82ca-435d-97ad-c3f61d2302a3",
+        "d2e68185-1b3d-4ed3-b057-68c48a09624a",
+        "ed3a4db2-799c-4415-9916-61fb85046775"
+      ]
+    },
+    {
+      "gencode": "102935CCM",
+      "fp": "e213d1537cdb0c4d",
+      "size": 11,
+      "masterIds": [
+        "04a22963-d358-4eef-9933-5d383f7514c8",
+        "15a03bf5-3fea-4daa-a7d2-ecc5f1b3a7d2",
+        "1780308a-e326-4017-b4b7-2ab0582cc09f",
+        "22cb0c27-0562-429a-81cf-95fd6c9451ff",
+        "366bd722-9e4b-4b11-82be-db6ff175c9e8",
+        "672380a5-2bc9-4ca0-82ff-56fca8398a0a",
+        "6e487b49-2d3b-432f-a529-b6f71ae45bd4",
+        "8822b7e6-a2b8-4fb8-b303-f0f87bf5fa59",
+        "d8b29cbe-846b-4243-8a34-d86668930ee7",
+        "e895534b-8558-43ef-aeed-f57b038f113f",
+        "f65641d0-cc73-4cb4-a363-f8a8c8533648"
+      ]
+    },
+    {
+      "gencode": "186102CPL",
+      "fp": "93b1ed6f3689728a",
+      "size": 10,
+      "masterIds": [
+        "022ba77b-40a2-4824-8b89-c546ecca5440",
+        "2a558270-466a-4093-b170-0ab8723c0a7d",
+        "37b84660-393d-4eb2-8d6c-b021cc6e089b",
+        "59705c46-93f6-4e33-9131-4fa5298f8dd6",
+        "64e6c921-7a72-4caf-a58e-ccf4cb40e771",
+        "834d1552-840b-40d7-b57a-660b3058b451",
+        "9e5c3cb3-e137-449c-8d24-c399e0f316f3",
+        "c2f547b7-d9b5-41d2-97de-056649b1ee55",
+        "d245c65f-2f4e-4cc0-b19f-926224351097",
+        "f0e41562-77df-4a01-b4e4-1d7a4450a727"
+      ]
+    },
+    {
+      "gencode": "170932CCM",
+      "fp": "6aaa417c49fc4e5f",
+      "size": 9,
+      "masterIds": [
+        "0fecc7ed-d15f-4287-bb08-ecb5228b15cb",
+        "3fbfcc28-1969-4f5a-95dd-0f5f63d08f79",
+        "52847605-3594-4aae-ac4f-a08cecb42a16",
+        "73a8ada9-dc22-4dae-ad6e-52a6b8dce165",
+        "a21b9cb9-a5e5-4b82-a6e3-3e3173c4929b",
+        "a553c395-c19d-418f-ada9-4dea3c0fc707",
+        "ad5428e3-f4a7-41ce-bd07-e20e521f94d6",
+        "c2a13cc2-4c32-454d-82e7-573b013ac0b4",
+        "da2c45a1-4df9-49d8-9294-62144a895d92"
+      ]
+    },
+    {
+      "gencode": "214005CPC",
+      "fp": "92de9d7a820786e0",
+      "size": 9,
+      "masterIds": [
+        "10334b2a-b0f2-40ba-964e-a181dbd5b933",
+        "173981d9-8efe-42de-bf0e-9d77b798b491",
+        "2bd06a0c-0626-4b0b-9fda-9b3f11b520dd",
+        "2eb309de-514f-46f8-8688-2ba93460b2e3",
+        "627e2415-6b64-4dae-a5af-f70f94a8b392",
+        "65d2365b-cace-4dda-ba1f-118d8f7427cb",
+        "c8f239ac-f21c-4b3a-bea8-f8c554918c46",
+        "ecca7453-1f91-45b0-89d9-6d77307232f3",
+        "f9663cd4-1e63-466a-896c-fdf4d087c252"
+      ]
+    },
+    {
+      "gencode": "339900CPO",
+      "fp": "b93e33575060c339",
+      "size": 7,
+      "masterIds": [
+        "0a723b54-77fe-4f12-b1bb-6629956ccf1d",
+        "408d4877-a61d-4466-83d8-b06d268d984a",
+        "4c702025-228f-4226-a447-f070d8ad8b50",
+        "4fcadea5-5e3f-4923-936e-c3c16b792692",
+        "760f7d3e-e48f-4058-a99a-092eee5a912d",
+        "ad217225-d429-41f6-99d6-b2dd2ab690ac",
+        "eb13b28a-01e4-422d-9ac5-8ada22733d93"
+      ]
+    },
+    {
+      "gencode": "C79700CLT",
+      "fp": "f414cb0daebf945f",
+      "size": 7,
+      "masterIds": [
+        "210cce94-ef60-46c3-8048-fe3bcc0e5175",
+        "2b194edf-d432-497d-b7ee-b514565110d5",
+        "4a768955-bcc7-433a-8cca-b5827a05a7b3",
+        "9b3862fb-28d9-4759-9954-6869426c8d1b",
+        "be5ce58b-50a2-48a5-a047-4c33727b1c4f",
+        "bea07f21-3b34-43a6-819b-2cddcf5b992e",
+        "c0d3bdf5-3b5e-401c-8632-6092423e826c"
+      ]
+    },
+    {
+      "gencode": "161902CPO",
+      "fp": "f9dac3808544ca45",
+      "size": 6,
+      "masterIds": [
+        "18bebe2a-4faf-4106-b0be-65495083463e",
+        "5b89655f-a014-4afb-a76e-ef9ae54ac460",
+        "8b34e3ff-4ae1-49e4-b63b-42e94ade9522",
+        "a9d8306b-af63-4df3-a0cf-26c963d3bc22",
+        "aec124aa-e35a-43d1-bb99-b6d70f093cac",
+        "cc307f53-9a99-48b4-9cbc-0cc8ce723b66"
+      ]
+    },
+    {
+      "gencode": "A24400CCM",
+      "fp": "65bdf10106a8fd92",
+      "size": 6,
+      "masterIds": [
+        "30ee0c37-1334-4603-a072-ffe3a3602806",
+        "3216902a-eb36-4b5a-91c0-9b674e6cc970",
+        "a4be03b2-7f6e-4167-ae63-c6cca442b35f",
+        "b18c3502-1b93-423a-a04e-5b4a8f4766bc",
+        "f4017659-57f0-47f6-b1b0-2890f43f96dd",
+        "fac5816c-4849-4d90-b755-e792249059d4"
+      ]
+    },
+    {
+      "gencode": "A53600COM",
+      "fp": "5bf7fb0743cbc625",
+      "size": 6,
+      "masterIds": [
+        "0341ef45-bb72-46a5-8294-91fea619b3c0",
+        "08753087-405c-45c4-bbaa-9749f45abf7f",
+        "3d44f8b9-43b1-4263-a9c9-ef45fcfc7b3f",
+        "87081eff-3b2d-412d-a969-d36803e16a1a",
+        "e93b1547-0977-4f5b-9969-8119d3a49620",
+        "f2c2bb52-9482-456d-8fdd-72f713c1a5a2"
+      ]
+    },
+    {
+      "gencode": "B97100CPL",
+      "fp": "901ecb2cf1352952",
+      "size": 6,
+      "masterIds": [
+        "03e4196d-8f3d-4ddf-baee-6f4a2e51b596",
+        "62b3e1d5-f130-42f3-aa2e-be6626c00f69",
+        "62f6ae1b-380a-4953-957d-0688f94d106f",
+        "90359178-1c3b-4078-89c5-9a907a24859c",
+        "e9fe9cf2-7a9b-497e-a168-3ed8397ca3b0",
+        "ec2a65ec-f311-4372-8fb3-3e87cf7af7f5"
+      ]
+    },
+    {
+      "gencode": "102935COM",
+      "fp": "88b827caea42dbc6",
+      "size": 5,
+      "masterIds": [
+        "04fc0891-77e8-445e-a28c-fc8acf549046",
+        "3888cee6-c052-42f6-b0f1-e87393f0bf7e",
+        "59fd4fbb-097b-474e-b30d-27b588420735",
+        "777c2a8c-b3e2-4cb5-aec2-7709e861aa81",
+        "d72646f8-4f4d-434c-81e3-b696fb278e14"
+      ]
+    },
+    {
+      "gencode": "177932CCM",
+      "fp": "53552a5bdfa4f5b6",
+      "size": 5,
+      "masterIds": [
+        "53767ecf-4eb6-4636-bb35-a111f43a3abf",
+        "812889e3-f148-4b82-9fb9-769f7bcfebe6",
+        "8c453a6c-49a3-4f73-8ff4-481838a60870",
+        "98049cb6-876d-4bb5-bada-e808fa7fc84d",
+        "e6613a04-b8d3-493a-846a-c5291c49b31c"
+      ]
+    },
+    {
+      "gencode": "179632CCM",
+      "fp": "8b3de31e6949c5e2",
+      "size": 5,
+      "masterIds": [
+        "0d44c65b-f24b-4cad-91d8-600419db19ee",
+        "636aa5e5-051a-4fca-b890-acf85868d15c",
+        "6af6898b-a051-4293-84b8-e4773eea6406",
+        "b22da632-a1ca-45bb-8ad8-6b2bddeec0ad",
+        "e1460162-bd6b-4c5a-b340-3582211c92a3"
+      ]
+    },
+    {
+      "gencode": "243302COM",
+      "fp": "ea8fabb31c5d71b5",
+      "size": 5,
+      "masterIds": [
+        "005aeac2-e9b3-4b32-9c28-ba82f23b5286",
+        "5de945aa-fb28-4f1f-8bac-c91f29883c2e",
+        "ac94455e-eaa2-424f-8ea4-9b0f580635b8",
+        "c75dc3ff-2321-4bce-98d0-97b2e0e5286b",
+        "d464c874-853b-42b9-add0-533624f19c76"
+      ]
+    },
+    {
+      "gencode": "A11800CCM",
+      "fp": "a0818c99680b4519",
+      "size": 5,
+      "masterIds": [
+        "03c241dc-2b99-48c1-89e5-b27716d0432e",
+        "226cad9b-01e9-408d-9e17-53630ca974c2",
+        "3dd3f116-be52-456e-8e0e-f749071f5d1b",
+        "955ad880-6c71-494b-ad24-f87f5d4a2af9",
+        "cae7b85c-8bba-4572-b341-f08919c5f37f"
+      ]
+    },
+    {
+      "gencode": "B02501CPC",
+      "fp": "8f011fe6d03c7762",
+      "size": 5,
+      "masterIds": [
+        "2a4260c0-01d2-45cb-b9a4-6fa230cb6e59",
+        "50217ed1-9404-4ebb-8f38-9366612c36ad",
+        "a5f3791b-8649-4b67-a178-311dcef18723",
+        "cba9f82d-a8c6-4284-b95d-58b00d8e67f6",
+        "db184ed0-3903-4471-b659-4cc74715a65d"
+      ]
+    },
+    {
+      "gencode": "346500COM",
+      "fp": "da82fc18a7a0dddc",
+      "size": 4,
+      "masterIds": [
+        "5f40d666-b488-4f21-93ee-287d8ab837da",
+        "69fa39e2-8f66-4dc2-93b4-4d51391e06ae",
+        "a23f2a24-0488-4f7f-8867-088e8c817f88",
+        "b043918a-cead-4a58-9bfa-5379622e2e1f"
+      ]
+    },
+    {
+      "gencode": "367902CPL",
+      "fp": "ffa10399301f974f",
+      "size": 4,
+      "masterIds": [
+        "87fa0084-c01d-4d0b-bae0-d41d2c02fcc1",
+        "acbf0bc6-1a4f-4c31-99c6-dc1b121e7e19",
+        "cde0fc02-9e43-4bfe-9510-8a4b15aa553b",
+        "dd3e4fce-9ebc-4da9-a1b7-dd8c3446e189"
+      ]
+    },
+    {
+      "gencode": "A15900CCM",
+      "fp": "a366eb5337fc09f1",
+      "size": 4,
+      "masterIds": [
+        "0833820a-604a-48f1-a4f2-32813ee47a2d",
+        "466131d1-741d-40c9-b942-61a3e7dbd4c7",
+        "67913ec8-0772-4620-bd5f-c70ee2267397",
+        "c85d11b0-2df7-4b5b-ab97-5ca476bbf9ed"
+      ]
+    },
+    {
+      "gencode": "A54200CPO",
+      "fp": "b6366b73b857d194",
+      "size": 4,
+      "masterIds": [
+        "919c9210-002b-4a36-9625-cb4e04b4d952",
+        "db2b0107-1f52-40ca-abf2-2e81171a8d79",
+        "decc18c8-8ce4-4a48-a777-ef07c8697f5a",
+        "fff01f34-5701-4340-b991-7c85bfefadcc"
+      ]
+    },
+    {
+      "gencode": "179901CPO",
+      "fp": "34cee8679109e969",
+      "size": 3,
+      "masterIds": [
+        "15b35f5a-5956-4805-a79d-192a52eb7433",
+        "2841c5eb-7bf1-4601-a6b4-110330de5da8",
+        "966f5fc3-941d-4f79-8b1d-5e6418a69d61"
+      ]
+    },
+    {
+      "gencode": "235733CCM",
+      "fp": "8de04d6f293a8cc4",
+      "size": 3,
+      "masterIds": [
+        "094dcce6-0a11-4ff9-a32c-5f04ddfc6f23",
+        "581c03a7-1c6a-4ca7-a907-a50647787c90",
+        "ec6cbcde-f3cd-42b6-89f6-b5c0098f0b98"
+      ]
+    },
+    {
+      "gencode": "B90300CPO",
+      "fp": "9320eeee52caf9cd",
+      "size": 3,
+      "masterIds": [
+        "01857732-146d-461a-8f4e-842b7352625a",
+        "93bf0c73-1697-4292-9513-7fd8c23dd930",
+        "a5813067-060e-43f6-95cb-6d98ecdc6258"
+      ]
+    },
+    {
+      "gencode": "C75600COM",
+      "fp": "b160556c2f945498",
+      "size": 3,
+      "masterIds": [
+        "6eaaa047-02a9-4970-8895-29b6217a5acd",
+        "ba819a7d-773c-4f92-a9ba-62b09bdfeea8",
+        "f06c8ede-7930-49f6-a691-231450c5bdc0"
+      ]
+    },
+    {
+      "gencode": "341700CPO",
+      "fp": "3354a72a6b0e2ae9",
+      "size": 2,
+      "masterIds": [
+        "099d4a04-a988-44c5-8680-4d8737a66035",
+        "a20ecd23-1049-4c30-befe-a078982456a9"
+      ]
+    },
+    {
+      "gencode": "343900CCM",
+      "fp": "ab273dbf700577c8",
+      "size": 2,
+      "masterIds": [
+        "0f9364dc-3054-4801-b55f-c24164213f77",
+        "55b428f2-31ce-4b91-8438-00988c5cc26f"
+      ]
+    },
+    {
+      "gencode": "530094CCM",
+      "fp": "6d44a29095059ea7",
+      "size": 2,
+      "masterIds": [
+        "600c4acb-5675-4b48-80ef-62d5bfc87d16",
+        "e096759d-9e95-4e03-921d-a34ad7c6903c"
+      ]
+    },
+    {
+      "gencode": "179733CCM",
+      "fp": "bc0165cae33e4d4a",
+      "size": 1,
+      "masterIds": [
+        "6fe76e9c-7ae9-4a63-9375-7e9ad25f0f0e"
+      ]
+    },
+    {
+      "gencode": "214035CCM",
+      "fp": "c75c3ccb389bd2cc",
+      "size": 1,
+      "masterIds": [
+        "1944a184-0144-492d-bee8-90555f9095ae"
+      ]
+    },
+    {
+      "gencode": "235731CCM",
+      "fp": "178f705236c218e7",
+      "size": 1,
+      "masterIds": [
+        "195260ef-9e31-4f9d-9566-44b10fd60bd7"
+      ]
+    },
+    {
+      "gencode": "D01700CCM",
+      "fp": "dec3d2f5fb8491da",
+      "size": 1,
+      "masterIds": [
+        "eff533e3-18e8-4f21-89ac-ccbc58b7a891"
+      ]
+    }
+  ]
+}

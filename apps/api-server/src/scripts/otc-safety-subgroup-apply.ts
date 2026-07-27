@@ -16,7 +16,8 @@ import path from 'node:path';
 import { buildDrugOtcConsumerHtml } from '../modules/neture/drug-import/drug-otc-description-consumer-html.js';
 import { buildDrugOtcEnConsumerHtml, type DrugOtcEnTranslation } from '../modules/neture/drug-import/drug-otc-en-consumer-html.js';
 
-const ENV_PATH = 'C:\\Users\\sohae\\o4o-platform\\apps\\api-server\\.env';
+const ENV_CANDIDATES = ['C:\\Users\\sohae\\o4o-platform\\apps\\api-server\\.env', path.resolve(process.cwd(), '.env')];
+const ENV_PATH = ENV_CANDIDATES.find((p) => existsSync(p)) ?? ENV_CANDIDATES[0];
 const readPw = (): string => readFileSync(ENV_PATH, 'utf8').match(/^DB_PASSWORD=(.*)$/m)![1].trim();
 const DATA_DIR = path.resolve(process.cwd(), 'src/scripts/data');
 const AUTHOR_DIR = path.resolve(DATA_DIR, 'otc-safety-subgroup-authoring');
