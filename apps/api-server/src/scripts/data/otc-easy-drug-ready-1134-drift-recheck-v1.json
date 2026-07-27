@@ -1,0 +1,92 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-DRIFT-RECHECK-AND-FINAL-APPROVAL-SSOT-V1",
+  "agent": "la",
+  "readOnly": true,
+  "dbWrite": 0,
+  "status": "DRIFT_RECHECK",
+  "determinism": "no wall-clock in ledger fields · arrays sorted · single REPEATABLE READ READ ONLY snapshot",
+  "fixedCriteria": {
+    "officialDenominator_easyDrugRegistered": 19385,
+    "officialComplete": 14442,
+    "officialIncomplete": 4943,
+    "officialCompletionRate": "74.50%",
+    "referenceRate_notOfficial": "77.85%",
+    "nonEasyNotFutureBulkTarget": true
+  },
+  "baselineReproduction": {
+    "source": "otc-easy-drug-marketed-scope-baseline-census-v1 (READY masterId 원장 미보존 → 결정론적 재구성)",
+    "method": "easyReg ∩ NOT baseline-complete(created_at<=BASELINE_TS) ∩ classifyHold==READY (baseline census VERBATIM)",
+    "baselineTs": "2026-07-27 03:46:25.177729+00",
+    "baselineIncompleteReproduced": 4943,
+    "baselineHoldDistribution": {
+      "HOLD_IDENTITY": 3246,
+      "READY": 1134,
+      "HOLD_ROUTE": 536,
+      "HOLD_SOURCE": 27
+    },
+    "baselineReadyReproduced": 1134,
+    "expected": 1134,
+    "reproductionOk": true
+  },
+  "driftRecheck": {
+    "scope": "baseline READY 1,134 ONLY (HOLD_IDENTITY/HOLD_ROUTE/HOLD_SOURCE 범위 밖)",
+    "alreadyCompletedDrift": 0,
+    "remainingReady": 1134,
+    "driftNote": "ALREADY_COMPLETED_DRIFT = baseline 스냅샷 이후 타 세션이 authored ko+en canonical 완료한 master"
+  },
+  "remainingReadyByRoute": {
+    "oral": 540,
+    "topical": 327,
+    "ophthalmic": 253,
+    "oromucosal": 14
+  },
+  "remainingReadyBySuffix": {
+    "ATB": 327,
+    "COS": 253,
+    "CPL": 140,
+    "CCM": 106,
+    "ACS": 69,
+    "ACH": 68,
+    "ASS": 42,
+    "COM": 35,
+    "CPO": 25,
+    "CPC": 14,
+    "ASY": 13,
+    "AMS": 8,
+    "ATE": 8,
+    "CLT": 7,
+    "ATD": 6,
+    "ATR": 6,
+    "ALQ": 5,
+    "ACE": 2
+  },
+  "approvalSummary": {
+    "approvedMasters": 1134,
+    "writePerMaster": 6,
+    "expectedWrite": 6804,
+    "productionUnitsTotal": 5,
+    "snapshotTime": "2026-07-27 04:42:58.731171+00",
+    "snapshotXmin": "4051158"
+  },
+  "gates": {
+    "g1_baselineReadyReproduced": 1134,
+    "g1_baselineReadyExpected": 1134,
+    "g1_reproductionOk": true,
+    "g2_baselineIncompleteCount": 4943,
+    "g2_baselineIncompleteExpected": 4943,
+    "g2_baselineIncompleteOk": true,
+    "g3_driftPlusRemainingEqualsBaseline": true,
+    "g3_driftCount": 0,
+    "g3_remainingCount": 1134,
+    "g4_noAlreadyCompleteInApproval": 0,
+    "g5_allApprovedWithinBaselineReady": true,
+    "g6_routeApprovalSumEqualsRemaining": true,
+    "g7_expectedWriteConsistent": true,
+    "g8_dbWrite": 0
+  },
+  "outputs": {
+    "latestStateLedger": "otc-easy-drug-ready-1134-latest-state-ledger-v1.json",
+    "alreadyCompletedDrift": "otc-easy-drug-ready-1134-already-completed-drift-v1.json",
+    "finalApprovalSsot": "otc-easy-drug-ready-1134-final-approval-ssot-v1.json"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-1134-DRIFT-RECHECK-AND-FINAL-APPROVAL-SSOT-V1",
+  "artifact": "already-completed-drift-ledger",
+  "baselineTs": "2026-07-27 03:46:25.177729+00",
+  "snapshotTime": "2026-07-27 04:42:58.731171+00",
+  "snapshotXmin": "4051158",
+  "count": 0,
+  "note": "baseline READY 였으나 스냅샷 시점 authored ko+en canonical 완료됨(타 세션 생산). 승인/재생산 대상에서 제외.",
+  "masters": []
+}
