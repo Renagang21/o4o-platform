@@ -136,14 +136,15 @@ mutation 성공→실패 뒤집힘 0 · 기존 데이터 [] 로 밀림 0 · unha
 
 ### 5.3 프로덕션 smoke
 
-- 배포: (아래 배포 run 기록)
+- 배포: `Deploy Web Services (Cloud Run)` run `30229072238` — `deploy-neture` ✅ (2m26s).
+  신 revision `neture-web-01340-fb2` LIVE.
 - **엔드포인트 오류 게이팅 확인** (미인증 직접 호출, o4o-core-api):
   | 엔드포인트 | HTTP |
   |-----------|------|
-  | `GET /api/v1/neture/operator/products` | (기록) |
-  | `GET /api/v1/neture/operator/all-offers` | (기록) |
-  | `GET /api/v1/neture/operator/supply-products` | (기록) |
-  세 엔드포인트가 실패를 실 HTTP 오류로 반환(200-빈-결과 아님)임을 확인 → 신 코드의 `catch → throw` 경로가
+  | `GET /api/v1/neture/operator/products` | `401` |
+  | `GET /api/v1/neture/operator/all-offers` | `401` |
+  | `GET /api/v1/neture/operator/supply-products` | `401` |
+  세 엔드포인트가 실패를 실 HTTP 오류(401)로 반환(200-빈-결과 아님)임을 확인 → 신 코드의 `catch → throw` 경로가
   정상 empty(200 빈 배열)와 분리됨을 뒷받침.
 - **실 브라우저 합성 주입 smoke: 미수행(환경 차단).** Playwright 영속 프로파일이 사용자 Chrome 세션에 점유되어
   브라우저 기동 불가. 사용자 세션 강제 종료 지양. 프론트 계약은 §5.1·§5.2·엔드포인트 게이팅으로 검증.
