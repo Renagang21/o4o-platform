@@ -6,16 +6,23 @@
 
 ---
 
-## 1. `AllProductsOverviewPage` 최종 판정 — **마감 완료 (커밋)**
+## 1. `AllProductsOverviewPage` 최종 판정 — **orphan 재확인 → dead code 제거**
 
 - 동시 세션 커밋 `513b8a22c` 는 **docs-only** (load-error CHECK). 해당 화면 코드 미변경.
-- 동시 load-error 세션은 `d8d44734b` 에서 **AllRegisteredProductsPage · OperatorProductApprovalPage** 만 커밋하고,
-  CHECK 를 **PARTIAL(`2413dbf43`)** 로 정정하며 이 화면을 **명시적으로 인계**함
-  ("동시 세션 DataTable 마이그레이션 커밋 후 마감 필요"). → **중지 조건 #1(타 세션 수정 중) 미해당.**
-- 작업 트리의 병합본은 이미 **DataTable + load-error 계약** 이 정합적으로 병합된 상태 → 그대로 마감.
-- 마감 내용: raw `<table>` → 공유 `DataTable`(8열), row-click drilldown(onRowClick→상세 슬라이드),
-  load-error 시 KPI 숨김 + "불러오기 실패" 라벨 + AlertTriangle + 다시 시도 (오류 vs 정상 0건 분리 — load-error WO 목표를 이 마지막 소비 화면에서 달성).
-- 검증: typecheck + vite build GREEN. 커밋 `fcfd6aeb0`.
+- 동시 load-error 세션은 `d8d44734b` 에서 **AllRegisteredProductsPage · OperatorProductApprovalPage** 를 커밋하고,
+  CHECK 를 **PARTIAL(`2413dbf43`)** 로 정정하며 이 파일을 인계함.
+- **라우팅 검증(smoke 준비 중) 결과 결정적 사실 발견:** `AllProductsOverviewPage` 는 **importer 0건**
+  (App.tsx · 메뉴/nav/JSON 어디에도 미참조). 실제 라이브 화면은 **`AllRegisteredProductsPage`**
+  (`/operator/all-registered-products` 마운트)이고, `/admin/all-products`·`/operator/all-products`·`/operator/supply`
+  는 모두 그쪽으로 **redirect**. 즉 `AllProductsOverviewPage` 는 **superseded orphan**.
+- 라이브 화면 `AllRegisteredProductsPage` 는 이미 `d8d44734b` 에서 **DataTable + load-error 계약**
+  (loadError·AlertTriangle·다시 시도) 보유 → load-error WO 목표는 **라이브 화면에서 이미 달성**.
+  PARTIAL 노트가 가리킨 orphan 파일은 실 소비 화면이 아니었음(오귀속).
+- **처리(정정):** V7 에서 held → finalize(`fcfd6aeb0`) 했으나 대상이 도달 불가 화면이었음.
+  orphan(소비처 0건 재확인)이므로 **dead code 로 제거**(item 4 기준 적용). 도달 불가 화면의 DataTable 사본을 유지하지 않음.
+- 검증: 제거 후 web-neture vite build GREEN. 제거 커밋 `1bd1f06d2` (finalize `fcfd6aeb0` 정정).
+  → **item 1 = 사용자 화면 잔여 없음(라이브 화면은 이미 표준+계약 충족, orphan 제거).**
+  브라우저 smoke 는 대상 라우트가 없어 불가 — 라이브 화면(`all-registered-products`)이 표준 준수하는 것이 실질 검증.
 
 ## 2. Operator notification 정책 — **판정만 보고 (미변경, HOLD)**
 
@@ -59,7 +66,7 @@
 
 | 범주 | 잔여 |
 |------|------|
-| 사용자 화면 | 없음 (즉시 전환 가능 목록 0 — V7 24건 누계 종료, AllProductsOverview 마감으로 확정) |
+| 사용자 화면 | 없음 (V7 24건 누계 종료. AllProductsOverview 는 orphan 으로 제거 — 라이브 화면 AllRegisteredProducts 는 이미 표준+계약 충족) |
 | 권한 정책 | notification 서비스 개방 = 전용 정책 WO 로 이월(구현 아님). super_admin break-glass 감사 = Frozen Core 후속 후보 |
 | 코드 정리 | SupplierEntityController 제거 완료. 나머지 2 후보는 live → 보존(잔여 아님) |
 | 구조상 의도적 제외 | 트리/리포트/에디터형 화면, Frozen Core 미들웨어, 교차서비스 가드 개방 |
@@ -80,7 +87,10 @@ CLAUDE.md §13 (KPA = 공통 구조 reference implementation) 기준, Neture 에
 
 ## 8. 커밋·배포
 
-- `fcfd6aeb0` — AllProductsOverviewPage 마감 (web-neture)
+- `fcfd6aeb0` — AllProductsOverviewPage finalize (web-neture) — **`1bd1f06d2` 로 정정(orphan 제거)**
+- `1bd1f06d2` — 위 orphan(AllProductsOverviewPage) dead code 제거 (web-neture)
 - `2abe26218` — SupplierEntityController 제거 (api-server)
-- `<이 CHECK 커밋 SHA>`
-- 배포: push 후 CI detect-changes (web-neture + api-server). 배포 run/revision 은 push 후 기록.
+- `a3365797a` — 본 CHECK 최초 작성
+- 본 CHECK 갱신(item 1 정정 + 커밋 기록) 커밋은 이 커밋 자신.
+- 배포: push 후 CI detect-changes (web-neture + api-server). web-neture 는 `1bd1f06d2` 배포로 최종 상태 확정.
+  라이브 화면 `AllRegisteredProductsPage` 는 이번 WO 미변경(이미 표준+계약 충족) → 회귀 위험 없음.
