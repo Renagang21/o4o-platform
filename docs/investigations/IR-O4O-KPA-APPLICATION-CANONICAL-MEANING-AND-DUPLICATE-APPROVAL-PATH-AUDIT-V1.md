@@ -128,7 +128,7 @@ canonical 온보딩 = `PATCH /api/v1/kpa/members/:id/status` (status `active`) �
 ## 13. IR commit SHA
 
 - 문서: `docs/investigations/IR-O4O-KPA-APPLICATION-CANONICAL-MEANING-AND-DUPLICATE-APPROVAL-PATH-AUDIT-V1.md`
-- commit: (아래 커밋 후 기입)
+- commit: `0372396da`
 
 ---
 
