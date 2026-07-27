@@ -122,7 +122,22 @@ rg "PharmacyTemplatePage|settings/template" services/web-kpa-society
 
 ## 7. browser smoke
 
-<!-- FILLED_AFTER_DEPLOY -->
+배포: `Deploy Web Services (Cloud Run)` **success** (commit `c85dc0a04`).
+Playwright(chromium) 로 `https://kpa-society.co.kr` 실측. 매장 owner 계정 사용(자격증명은 환경변수 주입).
+WO §12 에 따라 **저장(write) 없이 이동·조회 중심**.
+
+| # | 시나리오 | 결과 |
+|---|---------|------|
+| 1 | store-owner 로그인 | ✅ → `/store` 랜딩 |
+| 2 | `/store/settings` 진입 | ✅ `/store/settings` 유지 |
+| 2b | canonical 화면 요소 렌더 | ✅ `매장 홈 디자인` / `레이아웃 템플릿` / `테마` / `블록 구성` / `선택됨` 배지 **모두 표시** (현재 템플릿·테마·블록 정상) |
+| 3 | `/store/settings/template` 직접 입력 | ✅ **`/store/settings` 로 redirect** |
+| 3b | redirect 후 canonical 화면 렌더 | ✅ `매장 홈 디자인` 표시 |
+| 3c | 구형 화면 잔여 | ✅ 구형 제목 `스토어 템플릿` **미노출(false)** |
+| 4 | 뒤로가기 | ✅ 1회 → `/store/settings`, 2회 → `/store` — **legacy URL 로 되돌아가지 않음(loop 없음)** |
+| 5 | 콘솔 에러 | ✅ **0건** |
+
+`replace` redirect 가 히스토리에서 legacy 엔트리를 대체함을 뒤로가기 2회로 실증했다.
 
 ---
 
