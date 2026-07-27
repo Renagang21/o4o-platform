@@ -1,0 +1,137 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT2-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "readinessWo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "globalReapprovalCommit": "00851d237",
+  "readinessCommit": "e808b9952",
+  "unit1GreenCommit": "9080ac994",
+  "approvalSsot": "otc-easy-drug-ready-1134-content-fingerprint-reapproval-ssot-v1.json",
+  "agent": "da",
+  "writeOwner": "agent-da (단일 DB write-owner)",
+  "unit": "oral-unit-2",
+  "route": "oral",
+  "status": "GREEN",
+  "appliedAt": "2026-07-27",
+  "supersedes": "otc-easy-drug-ready-oral-v3-unblocked-oral-unit-2.json (UNBLOCKED)",
+  "fpCount": 66,
+  "masterCount": 270,
+  "preflightGates": {
+    "1_unit1_green": "PASS (ledger GREEN · postVerify 재실행 PASS)",
+    "2_unit2_unblocked": "PASS (UNBLOCKED · PRE_APPLY_READY · 미반영)",
+    "3_single_write_owner": "PASS (agent-da)",
+    "4_other_session_live_write": 0,
+    "5_proxy_and_env": "PASS",
+    "6_approval_ssot_unit_ledger_immutable": "PASS (00851d237 이후 변경 0)",
+    "7_dry_run_digest": "b208727afb9be3bf317aea35d26ef3f2 (선언값과 일치)",
+    "8_en_payload_ko_dump_immutable": "PASS (e808b9952 이후 변경 0)",
+    "9_existing_authored_ko_en_canonical": 0,
+    "10_easy_ko_canonical": 270,
+    "11_v3_sourceref_preconflict": 0,
+    "12_unit1_green_baseline": "PASS (postVerify fail 0)",
+    "13_canonical_dup": 0,
+    "extra_rollback_test_digest": "49b02ec1697cdc3373561c4a5eb3d524 (readiness 원장과 동일)"
+  },
+  "applied": {
+    "ko": {
+      "fpCommitted": 66,
+      "fpTotal": 66,
+      "written": 1080,
+      "expected": 1080,
+      "planDigestMd5": "04f5de138c954907b0925265ab66ef68"
+    },
+    "en": {
+      "fpCommitted": 66,
+      "fpTotal": 66,
+      "written": 540,
+      "expected": 540,
+      "planDigestMd5": "b1573be8961795a522ab4ccb7bc2dd15"
+    },
+    "totalWritten": 1620,
+    "totalExpected": 1620,
+    "writeMatchesForecast": true
+  },
+  "koPostVerify": {
+    "pass": true,
+    "authoredKoCanonical": 270,
+    "easyDeprecated": 270,
+    "easyCanonicalLeft": 0,
+    "audit": 270,
+    "enCanonicalAtKoStage": 0,
+    "sourceRefScope": 270,
+    "sourceRefLeak": 0,
+    "canonicalDup": 0
+  },
+  "enPreconditions": {
+    "koAuthoredCanonical": 270,
+    "sourceRefAnchorMatch": "66/66",
+    "enCanonicalBefore": 0
+  },
+  "postVerify": {
+    "pass": true,
+    "failCount": 0,
+    "ko": {
+      "canonicalExactlyOne": 270,
+      "canonicalDup": 0,
+      "authoredCanonical": 270,
+      "easyDeprecated": 270,
+      "easyCanonicalLeft": 0,
+      "sourceRefScope": 270,
+      "sourceRefOutside": 0,
+      "audit": 270,
+      "contentMismatchFps": 0
+    },
+    "en": {
+      "canonicalExactlyOne": 270,
+      "canonicalDup": 0,
+      "authoredCanonical": 270,
+      "sourceRefScope": 270,
+      "sourceRefOutside": 0,
+      "contentMismatchFps": 0,
+      "hangulFps": 0
+    },
+    "sourcePreservation": {
+      "fpChecked": 66,
+      "safetySectionsExpected": 196,
+      "safetySectionsFound": 196,
+      "numericMissingFps": 0,
+      "note": "공식 KO source dump(1차 소스) ↔ DB 저장 canonical 직접 대조 — 경고·사용상 주의사항·이상반응·상호작용 보존"
+    },
+    "isolation": {
+      "otherUnit": "oral-unit-1",
+      "peerState": "applied",
+      "koAuthoredCanonical": 270,
+      "enAuthoredCanonical": 270,
+      "easyDeprecated": 270,
+      "easyCanonicalLeft": 0,
+      "auditThisWo": 0
+    }
+  },
+  "scopePostVerify": {
+    "unit1Unchanged": "PASS (postVerify fail 0 · content hash 불변 · audit 270 유지)",
+    "otherRoutes": {
+      "units": ["ophthalmic-unit-1", "oromucosal-unit-1", "topical-unit-1"],
+      "masters": 594,
+      "auditFromThisTrack": 0,
+      "oralV3SourceRefRows": 0,
+      "authoredKoCanonical": 0,
+      "easyCanonicalIntact": 594
+    },
+    "v1v2LiveChanged": 0,
+    "auditOutsideOralTrack": 0
+  },
+  "stopConditionsChecked": {
+    "unit1GreenMismatch": "NOT_TRIGGERED",
+    "unit2ExistingAuthoredCanonical": "NOT_TRIGGERED (0)",
+    "ssotLedgerPayloadDigestChanged": "NOT_TRIGGERED (전부 불변)",
+    "forecastVsActualWriteMismatch": "NOT_TRIGGERED (1620==1620)",
+    "officialSixSectionPreservationFail": "NOT_TRIGGERED (196/196 · 수치누락 0)",
+    "canonicalDupOrSourceRefConflict": "NOT_TRIGGERED (dup 0 · leak 0)",
+    "unit1OrOtherUnitChanged": "NOT_TRIGGERED",
+    "transactionPostVerifyIndependentVerifyFail": "NOT_TRIGGERED (전부 PASS)",
+    "otherSessionLiveWrite": "NOT_TRIGGERED"
+  },
+  "notes": [
+    "apply 러너 화이트리스트에 oral-unit-2 를 승인 WO 기반으로 추가(PRODUCTION_WO_BY_UNIT). unit별 승인 WO 가 audit metadata.productionWo 로 기록된다.",
+    "postverify 의 isolation 게이트를 상대 unit 상태 자동판별(fresh/applied/partial)로 정정 — 종전 게이트는 상대 unit 미적용을 전제해 unit-1 GREEN 상태를 오탐했다. 데이터 이상 아님.",
+    "postverify 의 PRODUCTION_WO 를 unit별 맵으로 정정 — 종전 unit-1 WO 하드코딩으로 unit-2 audit 이 0 으로 오독됐다. 데이터 이상 아님."
+  ]
+}

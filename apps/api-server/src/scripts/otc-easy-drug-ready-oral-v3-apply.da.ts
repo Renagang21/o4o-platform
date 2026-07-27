@@ -31,10 +31,15 @@ const SOURCE_TYPE = 'mfds_drug_otc';
 const EASY_SOURCE = 'mfds_easy_drug';
 const AUTHORED = ['mfds_drug_otc', 'nutrition_combo'];
 const WO = 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1';
-// LIVE apply 승인 WO(oral-unit-1 단독). audit metadata.wo 는 rollback-test 검증본 VERBATIM 유지 →
+// LIVE apply 승인 WO(unit별). audit metadata.wo 는 rollback-test 검증본 VERBATIM 유지 →
 // 독립 검증자(verify.da.ts)의 wo_audit 대조축 불변. 실행 WO 는 productionWo 로 병기한다.
-const PRODUCTION_WO = 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1';
-const APPLY_ALLOWED_UNITS = ['oral-unit-1']; // 승인 WO 범위 밖 unit 은 강제중지(exit 3)
+const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
+  'oral-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+  'oral-unit-2': 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT2-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+};
+// 승인 WO 가 있는 unit 만 LIVE 허용 — 그 외는 강제중지(exit 3)
+const APPLY_ALLOWED_UNITS = Object.keys(PRODUCTION_WO_BY_UNIT);
+let PRODUCTION_WO = PRODUCTION_WO_BY_UNIT['oral-unit-1'];
 
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
 const has = (n: string): boolean => process.argv.includes(n);
@@ -222,13 +227,15 @@ async function applyFp(ds: any, sg: Sg, lang: 'ko' | 'en'): Promise<any> {
 async function main(): Promise<void> {
   const unit = arg('--unit');
   if (!unit) { console.error('--unit oral-unit-1|oral-unit-2 필요'); process.exit(2); }
+  // audit metadata.productionWo = 해당 unit 의 승인 WO (rollback-test 포함 전 모드 일관)
+  if (PRODUCTION_WO_BY_UNIT[unit]) PRODUCTION_WO = PRODUCTION_WO_BY_UNIT[unit];
   const mode = has('--rollback-test') ? 'rollback-test' : (has('--apply') && has('--confirm') ? 'APPLY' : 'dry-run');
 
   // ── LIVE apply 3중 게이트: --apply --confirm + per-unit·per-lang confirm env + unit 화이트리스트 ──
   const applyLang = (arg('--lang') || '') as 'ko' | 'en';
   if (mode === 'APPLY') {
     if (!APPLY_ALLOWED_UNITS.includes(unit)) {
-      console.error(`STOP: unit ${unit} 은 승인 WO(${PRODUCTION_WO}) 범위 밖 — LIVE apply 금지`); process.exit(3);
+      console.error(`STOP: unit ${unit} 은 승인 WO 없음 — LIVE apply 금지 (허용: ${APPLY_ALLOWED_UNITS.join(', ')})`); process.exit(3);
     }
     if (applyLang !== 'ko' && applyLang !== 'en') { console.error('LIVE apply 는 --lang ko|en 필수 (KO 선행 → EN)'); process.exit(3); }
     const tok = `OTC_V3_APPLY_${applyLang.toUpperCase()}_${unit.replace(/-/g, '_').toUpperCase()}`;

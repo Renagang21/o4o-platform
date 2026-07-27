@@ -1,0 +1,71 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT2-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "da",
+  "recordType": "execution-state-block",
+  "note": "승인 선언(reapproval SSOT) · unit 대상 · fingerprint 원장은 **수정하지 않는다**. 본 파일은 실행 상태만 기록한다.",
+  "route": "oral",
+  "status": "COMPLETE",
+  "completedAt": "2026-07-27",
+  "globalReapprovalCommit": "00851d237",
+  "readinessCommit": "e808b9952",
+  "track": {
+    "contentFp": 131,
+    "masters": 540,
+    "units": [
+      { "unit": "oral-unit-1", "fp": 65, "masters": 270, "status": "GREEN", "ko": 1080, "en": 540, "total": 1620, "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1" },
+      { "unit": "oral-unit-2", "fp": 66, "masters": 270, "status": "GREEN", "ko": 1080, "en": 540, "total": 1620, "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT2-CONTENT-FP-V3-FINAL-PRODUCTION-V1" }
+    ],
+    "writeTotals": { "ko": 2160, "en": 1080, "total": 3240 }
+  },
+  "trackVerify": {
+    "verifier": "otc-easy-drug-ready-oral-v3-track-verify.da.ts (독립 코드경로 · read-only)",
+    "pass": true,
+    "failCount": 0,
+    "targetMasters": 540,
+    "contentFp": 131,
+    "koAuthoredCanonical": 540,
+    "enCanonical": 540,
+    "easyDeprecated": 540,
+    "easyStillCanonical": 0,
+    "auditKo": 540,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "distinctSourceRefsUsed": 131,
+    "v3Rows": 1080,
+    "storedContentHashMismatch": 0,
+    "officialSixSectionsMismatch": 0,
+    "enHangul": 0,
+    "auditOutsideOralTrack": 0
+  },
+  "officialSixSectionPreservation": {
+    "unit1": { "expected": 199, "found": 199 },
+    "unit2": { "expected": 196, "found": 196 },
+    "total": { "expected": 395, "found": 395 },
+    "numericMissingFps": 0
+  },
+  "routeStatus": {
+    "oral": { "status": "COMPLETE", "fp": 131, "masters": 540, "applied": 3240 },
+    "ophthalmic": { "unit": "ophthalmic-unit-1", "status": "NOT_STARTED", "fp": 26, "masters": 253, "dbUnchanged": true },
+    "oromucosal": { "unit": "oromucosal-unit-1", "status": "NOT_STARTED", "fp": 2, "masters": 14, "dbUnchanged": true },
+    "topical": { "unit": "topical-unit-1", "status": "UNBLOCKED", "fp": 55, "masters": 327, "dbUnchanged": true }
+  },
+  "nextHandoff": {
+    "unit": "topical-unit-1",
+    "status": "UNBLOCKED",
+    "unblockedAt": "2026-07-27",
+    "unblockReason": "oral route V3 COMPLETE (540/540 master · 3,240T LIVE · 독립검증 fail 0 · 타 route write 0). 선행 route 종료로 다음 write-owner 인계 가능.",
+    "fpCount": 55,
+    "masterCount": 327,
+    "expectedWrite": { "koPerMaster": 4, "enPerMaster": 2, "koTotal": 1308, "enTotal": 654, "grandTotal": 1962 },
+    "currentDbState": { "easyCanonicalIntact": 327, "authoredKoCanonical": 0, "auditFromOralTrack": 0 },
+    "remainingPreconditions": [
+      "topical 전용 readiness (fp 재현 · KO 6섹션 합성 · EN 저작 · dry-run 2회 byte-identical · rollback-test residue 0 · 독립검증) — oral 과 별개 산출물 필요",
+      "LIVE apply 승인 WO 발급 (topical-unit-1 범위 명시)",
+      "apply 러너 화이트리스트에 topical-unit-1 추가 (현재 oral-unit-1/2 만 허용 — 그 외 exit 3)",
+      "confirm env 토큰: OTC_V3_APPLY_KO_TOPICAL_UNIT_1 / OTC_V3_APPLY_EN_TOPICAL_UNIT_1 = CONFIRM",
+      "단일 DB write-owner 지정"
+    ],
+    "note": "본 WO 는 oral-unit-2 단독 승인 범위이므로 topical 대상 DB write 0. na 형제 러너(otc-v3-topical-oromucosal-apply.na.ts)가 별도로 존재하므로 write-owner 중복 지정 금지."
+  },
+  "dbWriteThisWo": { "oralUnit2": 1620, "otherUnits": 0, "otherRoutes": 0 }
+}

@@ -18,7 +18,11 @@ const ENV_PATH = path.resolve(process.cwd(), '.env');
 const readPw = (): string => readFileSync(ENV_PATH, 'utf8').match(/^DB_PASSWORD=(.*)$/m)![1].trim();
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
 const READINESS_WO = 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1';
-const PRODUCTION_WO = 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1';
+// unit별 승인(실행) WO — audit metadata.productionWo 대조축. apply 러너의 PRODUCTION_WO_BY_UNIT 과 동일해야 한다.
+const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
+  'oral-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+  'oral-unit-2': 'WO-O4O-OTC-EASY-DRUG-READY-ORAL-UNIT2-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+};
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
 const port = (): number => { const a = arg('--port'); return a ? parseInt(a, 10) : 5442; };
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
@@ -27,6 +31,8 @@ const rd = (f: string): any => JSON.parse(readFileSync(path.join(DATA, f), 'utf8
 async function main(): Promise<void> {
   const unit = arg('--unit') || 'oral-unit-1';
   const lang = (arg('--lang') || 'both') as 'ko' | 'en' | 'both';
+  const PRODUCTION_WO = PRODUCTION_WO_BY_UNIT[unit];
+  if (!PRODUCTION_WO) { console.error(`unknown unit ${unit}`); process.exit(2); }
   const ko = rd(`otc-easy-drug-ready-oral-v3-build-${unit}.json`);
   const en = rd(`otc-easy-drug-ready-oral-v3-en-build-${unit}.json`);
   const enByFp: Record<string, any> = Object.fromEntries(en.fingerprints.map((f: any) => [f.fp, f]));
@@ -144,16 +150,33 @@ async function main(): Promise<void> {
       if (secFound !== secExpected) fails.push(`preserve safetySections ${secFound}!=${secExpected}`);
     }
 
-    // 범위 격리: 다른 unit(oral-unit-2) 무변경 — easy canonical 유지 · authored/V3ref 0
+    // ── 범위 격리: 상대 unit 이 이 실행으로 변경되지 않았는가 ──
+    // 상대 unit 은 (a) 미적용(fresh) 또는 (b) 이미 GREEN(applied) 두 상태 중 하나다. 상태를 실측 판별한 뒤
+    // 각 상태의 불변식을 검증한다. 그 중간값(부분 적용)은 곧바로 FAIL — 실제 이상이다.
+    const N = otherIds.length;
     const iso = (await ds.query(`SELECT
       (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)) "easyCanon",
-      (SELECT count(*)::int FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND source_type IN ('mfds_drug_otc','nutrition_combo') AND description_type='STORE' AND deleted_at IS NULL) "authoredRows",
-      (SELECT count(*)::int FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND (metadata->>'productionWo')=$2) "auditRows"
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)) "koAuthoredCanonical",
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.description_type='STORE' AND s.language='en' AND s.deleted_at IS NULL)) "enAuthoredCanonical",
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL)) "easyDeprecated",
+      (SELECT count(*)::int FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND (metadata->>'productionWo')=$2) "auditThisWo"
       `, [otherIds, PRODUCTION_WO]))[0];
-    notes.isolation = { otherUnit, otherMasters: otherIds.length, ...iso };
-    if (iso.easyCanon !== otherIds.length) fails.push(`isolation ${otherUnit} easyCanon=${iso.easyCanon}!=${otherIds.length}`);
-    if (iso.authoredRows !== 0) fails.push(`isolation ${otherUnit} authoredRows=${iso.authoredRows}`);
-    if (iso.auditRows !== 0) fails.push(`isolation ${otherUnit} auditRows=${iso.auditRows}`);
+    const peerState = iso.koAuthoredCanonical === 0 ? 'fresh' : (iso.koAuthoredCanonical === N ? 'applied' : 'partial');
+    notes.isolation = { otherUnit, otherMasters: N, peerState, ...iso };
+    // 공통: 이번 unit 의 승인 WO 로 상대 unit 에 남긴 audit 은 언제나 0 이어야 한다(= 이번 실행이 상대를 건드리지 않음)
+    if (iso.auditThisWo !== 0) fails.push(`isolation ${otherUnit} auditThisWo=${iso.auditThisWo} (이번 WO 가 상대 unit 을 변경)`);
+    if (peerState === 'fresh') {
+      if (iso.easyCanon !== N) fails.push(`isolation ${otherUnit}(fresh) easyCanon=${iso.easyCanon}!=${N}`);
+      if (iso.enAuthoredCanonical !== 0) fails.push(`isolation ${otherUnit}(fresh) enAuthoredCanonical=${iso.enAuthoredCanonical}`);
+      if (iso.easyDeprecated !== 0) fails.push(`isolation ${otherUnit}(fresh) easyDeprecated=${iso.easyDeprecated}`);
+    } else if (peerState === 'applied') {
+      // 이미 GREEN 인 상대 unit: GREEN 불변식이 그대로 유지되어야 한다
+      if (iso.enAuthoredCanonical !== N) fails.push(`isolation ${otherUnit}(applied) enAuthoredCanonical=${iso.enAuthoredCanonical}!=${N}`);
+      if (iso.easyDeprecated !== N) fails.push(`isolation ${otherUnit}(applied) easyDeprecated=${iso.easyDeprecated}!=${N}`);
+      if (iso.easyCanon !== 0) fails.push(`isolation ${otherUnit}(applied) easyCanonLeft=${iso.easyCanon}`);
+    } else {
+      fails.push(`isolation ${otherUnit} peerState=partial (koAuthoredCanonical=${iso.koAuthoredCanonical}/${N})`);
+    }
   } finally { await ds.destroy(); }
 
   const out = { ...notes, pass: fails.length === 0, failCount: fails.length, fails };
