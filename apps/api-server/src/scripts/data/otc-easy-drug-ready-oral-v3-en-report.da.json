@@ -1,0 +1,13 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "da",
+  "unitFilter": "ALL",
+  "fpProcessed": 131,
+  "tmFilled": 794,
+  "missingSentences": 0,
+  "anomalyFps": 0,
+  "coverageComplete": true,
+  "validationClean": true,
+  "missingSample": [],
+  "anomalies": []
+}

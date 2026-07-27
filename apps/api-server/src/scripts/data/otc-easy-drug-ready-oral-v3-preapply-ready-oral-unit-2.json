@@ -1,0 +1,45 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-ORAL-540-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "agent": "da",
+  "unit": "oral-unit-2",
+  "route": "oral",
+  "status": "PRE_APPLY_READY",
+  "fpCount": 66,
+  "masterCount": 270,
+  "writeContract": {
+    "koPerMaster": 4,
+    "enPerMaster": 2,
+    "koTotal": 1080,
+    "enTotal": 540,
+    "grandTotal": 1620
+  },
+  "dryRun": {
+    "pass": true,
+    "koWritePlan": 1080,
+    "enWritePlan": 540,
+    "anomalies": 0,
+    "enHeldPendingKo": 66,
+    "planDigestMd5Run1": "b208727afb9be3bf317aea35d26ef3f2",
+    "planDigestMd5Run2": "b208727afb9be3bf317aea35d26ef3f2",
+    "byteIdentical": true
+  },
+  "rollbackTest": {
+    "pass": true,
+    "passed": 66,
+    "failed": 0,
+    "txWrittenThenRolledBack": 1620,
+    "residue": {
+      "authoredrows": 0,
+      "v3refrows": 0,
+      "easydeprecated": 0,
+      "auditrows": 0
+    },
+    "residueClean": true,
+    "planDigestMd5": "49b02ec1697cdc3373561c4a5eb3d524"
+  },
+  "liveApply": {
+    "locked": true,
+    "gate": "OTC_V3_APPLY_KO_ORAL_UNIT_2=CONFIRM + EN 동일 + WO 범위 밖 강제중지(exit 3)"
+  },
+  "ready": true
+}
