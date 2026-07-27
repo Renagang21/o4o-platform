@@ -69,8 +69,31 @@
 
 ## 배포·smoke
 
-- (아래 배포 로그 기재)
+**커밋:** `a09dc82e2` (main)
+
+**배포 리비전 (Cloud Run · asia-northeast3):**
+
+| 서비스 | 리비전 |
+|--------|--------|
+| neture-web | `neture-web-01345-5kp` |
+| glycopharm-web | `glycopharm-web-01171-fx5` |
+| k-cosmetics-web | `k-cosmetics-web-00919-9ls` |
+| kpa-society-web | `kpa-society-web-01714-29j` |
+
+> deploy-neture 는 1차에 Docker Hub `node:20-alpine` pull i/o timeout(인프라 flake, 코드 무관)으로 실패 → `--failed` 재실행 성공. 나머지 3개는 동일 커밋 1차 성공.
+
+**smoke (엔드포인트 게이팅 — 정상 경로 무손상 확인):**
+
+| 대상 | 코드 |
+|------|:---:|
+| `/api/v1/neture/content?type=resource` | 200 |
+| `/api/v1/glycopharm/contents?sub_type=resource` | 200 |
+| `/api/v1/cosmetics/contents` | 200 |
+| `/api/v1/kpa/contents?sub_type=resource` | 200 |
+| neture/glyco/kcos/kpa `/resources` 앱 루트 | 200 |
+
+> 4개 자료실 엔드포인트 모두 정상 200 → 내 변경(throw 경로에만 반응)이 정상 조회를 오류 상태로 오판하지 않음을 확인. 오류 상태 자체는 throw(500/네트워크) 강제 주입이 필요하나 프로덕션에 비파괴적으로 유발 불가 + Playwright 영속 프로파일 점유 가능성 → 시리즈 표준대로 게이팅 + 빌드타임 typecheck 로 코드 경로 확정. (KPA 첫 curl 의 404 는 `/kpa` 누락한 경로 오타였고 정정 후 200.)
 
 ---
 
-*판정: PASS (구현 완료)*
+*판정: PASS (구현 완료 · 4앱 배포 · smoke 정상 경로 무손상)*
