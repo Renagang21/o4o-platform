@@ -7,7 +7,7 @@
  * 구조:
  * 1. Neture 메인 (/) - NetureLayout: 홍보 + 광고 + 활동 + 커뮤니티 미리보기 + 진입
  * 2. Supplier Space (/supplier/*) - SupplierSpaceLayout: 공급자 운영 공간
- * 2a. Supplier Account (/account/supplier/*) - SupplierAccountLayout: 공급자 계정 대시보드
+ * 2a. Supplier Account (/account/supplier/*) - legacy redirect 전용 (SupplierRoute + Navigate, layout 없음)
  * 3. Partner Space (/partner/*) - PartnerSpaceLayout: 파트너 협업 공간
  * 3a. Partner Account (/account/partner/*) - PartnerAccountLayout: 파트너 계정 대시보드
  * 4. o4o 공통 영역 (/o4o/*) - MainLayout: 플랫폼 소개
@@ -15,7 +15,7 @@
  */
 
 import { lazy, Suspense, useEffect, useRef } from 'react';
-import { BrowserRouter, Routes, Route, Navigate, useNavigate, useLocation, useParams } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, Outlet, useNavigate, useLocation, useParams } from 'react-router-dom';
 // WO-O4O-STORE-PRODUCTS-QUERYCLIENT-PROVIDER-ALIGN-V1
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
@@ -37,7 +37,6 @@ import MainLayout from './components/layouts/MainLayout';
 import SupplierOpsLayout from './components/layouts/SupplierOpsLayout';
 import OperatorLayoutWrapper from './components/layouts/OperatorLayoutWrapper';
 import AdminLayoutWrapper from './components/layouts/AdminLayoutWrapper';
-import SupplierAccountLayout from './components/layouts/SupplierAccountLayout';
 import PartnerAccountLayout from './components/layouts/PartnerAccountLayout';
 import AdminVaultLayout from './components/layouts/AdminVaultLayout';
 import { RoleGuard, OperatorRoute, AdminRoute, PlatformRoute, SupplierRoute } from './components/auth/RoleGuard';
@@ -231,10 +230,10 @@ const SupplierProductImportPage = lazy(() => import('./pages/supplier/SupplierPr
 const SupplierProductLibraryPage = lazy(() => import('./pages/supplier/SupplierProductLibraryPage'));
 
 // Supplier Account
-// WO-O4O-NETURE-SUPPLIER-ACCOUNT-ROUTE-LEGACY-REDIRECT-V1:
-// SupplierAccountDashboardPage / SupplierProductsListPage 는 route 가 redirect 로 전환되어
-// 마운트 지점이 사라졌다. 컴포넌트 파일 자체는 후속 데드코드 정리(A 버킷) 대상으로 남겨 두고,
-// 여기서는 unused import 만 제거한다(noUnusedLocals).
+// WO-O4O-NETURE-SUPPLIER-LEGACY-DASHBOARD-AND-ACCOUNT-SHELL-RETIREMENT-V1:
+// SupplierAccountDashboardPage / SupplierProductsListPage 는 route redirect 전환으로
+// 마운트가 사라졌고, 본 WO 에서 파일까지 제거했다(importer 0 확인).
+// 아래 4개는 canonical /supplier/* 에서 재사용 중이므로 유지한다.
 const SupplierOrdersListPage = lazy(() => import('./pages/account/SupplierOrdersListPage'));
 const SupplierOrderDetailPage = lazy(() => import('./pages/account/SupplierOrderDetailPage'));
 const SupplierInventoryPage = lazy(() => import('./pages/account/SupplierInventoryPage'));
@@ -866,13 +865,20 @@ function App() {
             </Route>
 
             {/* ================================================================
-                Supplier Account (/account/supplier/*)
+                Supplier Account (/account/supplier/*) — legacy redirect 전용
                 WO-O4O-SUPPLIER-DASHBOARD-PAGE-V1
                 WO-O4O-AUTH-RBAC-STABILIZATION-V1: SupplierRoute guard 추가
+                WO-O4O-NETURE-SUPPLIER-LEGACY-DASHBOARD-AND-ACCOUNT-SHELL-RETIREMENT-V1:
+                  SupplierAccountLayout 은퇴. redirect 만 남은 경로에 legacy sidebar/shell 을
+                  렌더할 이유가 없고, 접근 계약은 다음과 같이 그대로 보존된다.
+                    - source: SupplierRoute (SUPPLIER_ROLES + neture membership) — 무변경
+                    - target: SupplierSpaceLayout 이 SUPPLIER_ACCESS_ROLES 재검증 + 동일 403 UI 수행
+                  즉 SUPPLIER_ROLES 에만 속하는 partner/seller 는 이전에도 legacy layout 403 이었고,
+                  이제 canonical 로 redirect 된 뒤 동일 403 을 본다(권한 확대·축소 0).
             ================================================================ */}
             <Route element={
               <SupplierRoute>
-                <SupplierAccountLayout />
+                <Outlet />
               </SupplierRoute>
             }>
               {/* WO-O4O-NETURE-SUPPLIER-ACCOUNT-ROUTE-LEGACY-REDIRECT-V1:
@@ -1211,8 +1217,11 @@ function App() {
             <Route path="/workspace/admin/*" element={<Navigate to="/admin" replace />} />
             <Route path="/workspace/operator" element={<Navigate to="/operator" replace />} />
 
-            {/* Legacy supplier/partner 리다이렉트 */}
-            <Route path="/supplier/dashboard" element={<Navigate to="/supplier" replace />} />
+            {/* WO-O4O-NETURE-SUPPLIER-LEGACY-DASHBOARD-AND-ACCOUNT-SHELL-RETIREMENT-V1:
+                죽은 legacy redirect `/supplier/dashboard → /supplier` 제거.
+                동일 path 가 위 SupplierSpaceLayout 블록에 SupplierDashboardPage 로 이미 선언돼 있어
+                랭킹 동점 시 선언 순서상 항상 그쪽이 승리했다(실행된 적 없는 정의).
+                제거 후 `/supplier/dashboard` 실행 route 는 1개다. */}
             </Routes>
           </Suspense>
         </BrowserRouter>
