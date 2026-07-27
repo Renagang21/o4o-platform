@@ -1,0 +1,198 @@
+/**
+ * WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1 — LIVE apply 사후검증(na)
+ *
+ * apply 러너와 별개 커넥션·별개 코드경로에서 unit 의 LIVE 상태를 재확인한다. **read-only(SELECT) 전용.**
+ * 검증 SQL 은 oral GREEN 검증본(otc-easy-drug-ready-oral-v3-postverify.da.ts) VERBATIM — route 별 대상만 교체.
+ *   KO: master별 canonical 정확히 1 · authored canonical=T · easy deprecated=T · easy canonical 잔존 0 · canonicalDup 0
+ *       · sourceRef scope=T · sourceRef 범위밖 행 0 · audit canonical_replaced=T
+ *   EN: master별 en canonical 정확히 1 · canonicalDup 0 · sourceRef scope=T · 범위밖 0 · EN 한글 0
+ *   공식 6섹션 보존: 저장 canonical content == build html md5(KO/EN) +
+ *       **공식 원문(build.officialSections) ↔ DB 저장본 직접 대조** (경고/사용상 주의사항/이상반응/상호작용
+ *       present 섹션이 저장본 헤딩으로 존재 · 효능·효과/용법·용량 수치 전량 잔존)
+ *   범위 격리: 이 unit 외 전 unit(oral-unit-1 · oral-unit-2 · ophthalmic-unit-1 · oromucosal-unit-1) 무변경
+ *
+ * Usage(apps/api-server): ../../node_modules/.bin/tsx src/scripts/otc-v3-topical-postverify.na.ts --unit topical-unit-1 --lang ko|en|both [--port 5472]
+ */
+import { readFileSync } from 'node:fs';
+import crypto from 'node:crypto';
+import path from 'node:path';
+
+const ENV_PATH = path.resolve(process.cwd(), '.env');
+const readPw = (): string => readFileSync(ENV_PATH, 'utf8').match(/^DB_PASSWORD=(.*)$/m)![1].trim();
+const DATA = path.resolve(process.cwd(), 'src/scripts/data');
+const NA = path.join(DATA, 'otc-ready-na-v3');
+const READINESS_WO = 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1';
+// unit별 승인(실행) WO — audit metadata.productionWo 대조축. apply 러너의 PRODUCTION_WO_BY_UNIT 과 동일해야 한다.
+const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
+  'topical-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+};
+const PEER_UNITS = ['oral-unit-1', 'oral-unit-2', 'ophthalmic-unit-1', 'oromucosal-unit-1'];
+const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
+const port = (): number => { const a = arg('--port'); return a ? parseInt(a, 10) : 5472; };
+const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');
+const rd = (f: string): any => JSON.parse(readFileSync(path.join(DATA, f), 'utf8'));
+const rdNa = (f: string): any => JSON.parse(readFileSync(path.join(NA, f), 'utf8'));
+
+async function main(): Promise<void> {
+  const unit = arg('--unit') || 'topical-unit-1';
+  const lang = (arg('--lang') || 'both') as 'ko' | 'en' | 'both';
+  const PRODUCTION_WO = PRODUCTION_WO_BY_UNIT[unit];
+  if (!PRODUCTION_WO) { console.error(`unknown unit ${unit}`); process.exit(2); }
+  const ko = rdNa(`build-${unit}.json`);
+  const en = rdNa(`en-build-${unit}.json`);
+  const enByFp: Record<string, any> = Object.fromEntries(en.fingerprints.map((f: any) => [f.fp, f]));
+  // peer 대상은 승인 SSOT(unit ledger) 에서 직접 읽는다 — 이 unit 의 build 산출물과 무관한 독립 축
+  const ledger = rd('otc-easy-drug-ready-1134-content-fingerprint-unit-ledger-v1.json');
+  const unitsById: Record<string, any> = Object.fromEntries(ledger.units.map((u: any) => [u.unit, u]));
+  const peers = PEER_UNITS.filter((u) => u !== unit);
+
+  const allIds: string[] = ko.fingerprints.flatMap((f: any) => f.masterIds);
+  const allRefs: string[] = ko.fingerprints.map((f: any) => f.sourceRef);
+  const T = allIds.length;
+
+  const { DataSource } = await import('typeorm');
+  const ds = new DataSource({ type: 'postgres', host: '127.0.0.1', port: port(), username: 'o4o_api', password: readPw(), database: 'o4o_platform', entities: [], synchronize: false, logging: ['error'], extra: { statement_timeout: 900000 } });
+  await ds.initialize();
+  const fails: string[] = [];
+  const notes: any = { wo: PRODUCTION_WO, unit, lang, fpCount: ko.fingerprints.length, masterCount: T };
+  try {
+    if (lang === 'ko' || lang === 'both') {
+      const k = (await ds.query(`SELECT
+        count(*) FILTER (WHERE canoncnt=1)::int canon1,
+        count(*) FILTER (WHERE canoncnt>1)::int "canonicalDup",
+        count(*) FILTER (WHERE authored_canon)::int authored,
+        count(*) FILTER (WHERE dep_easy)::int "easyDeprecated",
+        count(*) FILTER (WHERE easy_left)::int "easyCanonLeft"
+        FROM (SELECT mid,
+          (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL) canoncnt,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.deleted_at IS NULL) authored_canon,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL) dep_easy,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL) easy_left
+          FROM unnest($1::uuid[]) mid) t`, [allIds]))[0];
+      const kScope = (await ds.query(`SELECT count(DISTINCT master_id)::int m FROM shared_product_descriptions WHERE source_ref_id=ANY($1::uuid[]) AND status='canonical' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL`, [allRefs]))[0];
+      const kOutside = (await ds.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE source_ref_id=ANY($1::uuid[]) AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL AND NOT master_id=ANY($2::uuid[])`, [allRefs, allIds]))[0];
+      const audit = (await ds.query(`SELECT count(*)::int n FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND event_type='canonical_replaced' AND (metadata->>'wo')=$2 AND (metadata->>'productionWo')=$3`, [allIds, READINESS_WO, PRODUCTION_WO]))[0];
+      notes.ko = { ...k, sourceRefScope: kScope.m, sourceRefOutside: kOutside.n, audit: audit.n, expected: T };
+      if (k.canon1 !== T) fails.push(`ko canon1=${k.canon1}!=${T}`);
+      if (k.canonicalDup !== 0) fails.push(`ko canonicalDup=${k.canonicalDup}`);
+      if (k.authored !== T) fails.push(`ko authoredCanonical=${k.authored}!=${T}`);
+      if (k.easyDeprecated !== T) fails.push(`ko easyDeprecated=${k.easyDeprecated}!=${T}`);
+      if (k.easyCanonLeft !== 0) fails.push(`ko easyCanonicalLeft=${k.easyCanonLeft}`);
+      if (kScope.m !== T) fails.push(`ko sourceRefScope=${kScope.m}!=${T}`);
+      if (kOutside.n !== 0) fails.push(`ko sourceRefOutside=${kOutside.n}`);
+      if (audit.n !== T) fails.push(`ko audit=${audit.n}!=${T}`);
+
+      // 공식 6섹션 보존: 저장 content == build koHtml (fp별 md5 대조)
+      let contentMismatch = 0;
+      for (const f of ko.fingerprints) {
+        const rows = await ds.query(`SELECT md5(content) h, count(*)::int n FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND COALESCE(language,'ko')='ko' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND deleted_at IS NULL GROUP BY 1`, [f.masterIds]);
+        if (rows.length !== 1 || rows[0].h !== md5(f.koHtml) || rows[0].n !== f.masterIds.length) contentMismatch++;
+      }
+      notes.ko.contentMismatchFps = contentMismatch;
+      if (contentMismatch !== 0) fails.push(`ko contentMismatchFps=${contentMismatch}`);
+    }
+
+    if (lang === 'en' || lang === 'both') {
+      const e = (await ds.query(`SELECT count(*) FILTER (WHERE encanon=1)::int canon1, count(*) FILTER (WHERE encanon>1)::int "canonicalDup",
+        count(*) FILTER (WHERE authored_canon)::int authored
+        FROM (SELECT mid,
+          (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND s.language='en' AND s.deleted_at IS NULL) encanon,
+          EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE' AND s.language='en' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.deleted_at IS NULL) authored_canon
+          FROM unnest($1::uuid[]) mid) t`, [allIds]))[0];
+      const eScope = (await ds.query(`SELECT count(DISTINCT master_id)::int m FROM shared_product_descriptions WHERE source_ref_id=ANY($1::uuid[]) AND status='canonical' AND language='en' AND deleted_at IS NULL`, [allRefs]))[0];
+      const eOutside = (await ds.query(`SELECT count(*)::int n FROM shared_product_descriptions WHERE source_ref_id=ANY($1::uuid[]) AND language='en' AND deleted_at IS NULL AND NOT master_id=ANY($2::uuid[])`, [allRefs, allIds]))[0];
+      notes.en = { ...e, sourceRefScope: eScope.m, sourceRefOutside: eOutside.n, expected: T };
+      if (e.canon1 !== T) fails.push(`en canon1=${e.canon1}!=${T}`);
+      if (e.canonicalDup !== 0) fails.push(`en canonicalDup=${e.canonicalDup}`);
+      if (e.authored !== T) fails.push(`en authoredCanonical=${e.authored}!=${T}`);
+      if (eScope.m !== T) fails.push(`en sourceRefScope=${eScope.m}!=${T}`);
+      if (eOutside.n !== 0) fails.push(`en sourceRefOutside=${eOutside.n}`);
+
+      let enMismatch = 0, hangul = 0, hangulDb = 0;
+      for (const f of ko.fingerprints) {
+        const eb = enByFp[f.fp];
+        const rows = await ds.query(`SELECT md5(content) h, count(*)::int n, bool_or(content ~ '[가-힣]') hg FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND status='canonical' AND description_type='STORE' AND language='en' AND source_type IN ('mfds_drug_otc','nutrition_combo') AND deleted_at IS NULL GROUP BY 1`, [f.masterIds]);
+        if (rows.length !== 1 || rows[0].h !== md5(eb.enHtml) || rows[0].n !== f.masterIds.length) enMismatch++;
+        if (rows.length === 1 && rows[0].hg) hangulDb++;
+        if (/[가-힣]/.test(eb.enHtml)) hangul++;
+      }
+      notes.en.contentMismatchFps = enMismatch; notes.en.hangulFps = hangul; notes.en.hangulFpsDb = hangulDb;
+      if (enMismatch !== 0) fails.push(`en contentMismatchFps=${enMismatch}`);
+      if (hangul !== 0) fails.push(`en hangulFps=${hangul}`);
+      if (hangulDb !== 0) fails.push(`en hangulFpsDb=${hangulDb}`);
+    }
+
+    // 공식 6섹션 보존(1차 소스 직접 대조): KO source dump 의 present 안전섹션이 DB 저장본에 헤딩으로 존재 ·
+    // 효능·효과/용법·용량 수치 전량 잔존. build 산출물이 아니라 **공식 원문 dump ↔ DB** 를 직접 잇는다.
+    if (lang === 'ko' || lang === 'both') {
+      const SAFETY = ['경고', '사용상 주의사항', '이상반응', '상호작용'];
+      const blank = (s: any): boolean => !s || !String(s).replace(/<[^>]*>/g, '').replace(/\s|&nbsp;/g, '').trim();
+      const nums = (s: any): string[] => (String(s).replace(/<[^>]*>/g, ' ').match(/\d+(?:\.\d+)?/g) || []);
+      let secExpected = 0, secFound = 0, numMissFps = 0, dumpMissing = 0, variantFps = 0;
+      for (const f of ko.fingerprints) {
+        // na 트랙은 공식 원문을 build 산출물에 embed 한다(officialSections) — da 의 별도 source dump 와 동일 역할
+        const sec = f.officialSections;
+        if (!sec || !Object.keys(sec).length) { dumpMissing++; continue; }
+        const rows = await ds.query(`SELECT DISTINCT content FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND COALESCE(language,'ko')='ko' AND status='canonical' AND source_type='mfds_drug_otc' AND description_type='STORE' AND deleted_at IS NULL`, [f.masterIds]);
+        if (rows.length !== 1) { variantFps++; continue; }
+        const html: string = rows[0].content;
+        for (const s of SAFETY) {
+          if (blank(sec[s])) continue;
+          secExpected++;
+          if (html.includes(`<h2>${s}</h2>`)) secFound++;
+          else fails.push(`preserve fp ${f.fp} 안전섹션 '${s}' 저장본 누락`);
+        }
+        for (const s of ['효능·효과', '용법·용량']) {
+          if (blank(sec[s])) continue;
+          const miss = [...new Set(nums(sec[s]))].filter((n) => !html.includes(n));
+          if (miss.length) { numMissFps++; fails.push(`preserve fp ${f.fp} '${s}' 수치 누락 ${miss.slice(0, 5).join(',')}`); }
+        }
+      }
+      notes.sourcePreservation = { fpChecked: ko.fingerprints.length, officialSectionsMissingFps: dumpMissing, variantFps,
+        safetySectionsExpected: secExpected, safetySectionsFound: secFound, numericMissingFps: numMissFps };
+      if (dumpMissing !== 0) fails.push(`preserve officialSectionsMissingFps=${dumpMissing}`);
+      if (variantFps !== 0) fails.push(`preserve DB content variant fps=${variantFps}`);
+      if (secFound !== secExpected) fails.push(`preserve safetySections ${secFound}!=${secExpected}`);
+    }
+
+    // ── 범위 격리: 이 unit 외 전 unit 이 이 실행으로 변경되지 않았는가 ──
+    // peer 는 (a) 미적용(fresh) 또는 (b) 이미 GREEN(applied) 두 상태 중 하나다. 상태를 실측 판별한 뒤
+    // 각 상태의 불변식을 검증한다. 그 중간값(부분 적용)은 곧바로 FAIL — 실제 이상이다.
+    notes.isolation = {};
+    for (const otherUnit of peers) {
+      const otherIds: string[] = unitsById[otherUnit].masterIds;
+      const N = otherIds.length;
+      const iso = (await ds.query(`SELECT
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)) "easyCanon",
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)) "koAuthoredCanonical",
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='canonical' AND s.source_type IN ('mfds_drug_otc','nutrition_combo') AND s.description_type='STORE' AND s.language='en' AND s.deleted_at IS NULL)) "enAuthoredCanonical",
+      (SELECT count(*)::int FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug' AND s.description_type='STORE' AND s.deleted_at IS NULL)) "easyDeprecated",
+      (SELECT count(*)::int FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[]) AND (metadata->>'productionWo')=$2) "auditThisWo",
+      (SELECT count(*)::int FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND source_ref_id=ANY($3::uuid[]) AND deleted_at IS NULL) "thisUnitRefRows"
+      `, [otherIds, PRODUCTION_WO, allRefs]))[0];
+      const peerState = iso.koAuthoredCanonical === 0 ? 'fresh' : (iso.koAuthoredCanonical === N ? 'applied' : 'partial');
+      notes.isolation[otherUnit] = { otherMasters: N, peerState, ...iso };
+      // 공통: 이번 unit 의 승인 WO·sourceRef 가 peer 에 남긴 흔적은 언제나 0 이어야 한다
+      if (iso.auditThisWo !== 0) fails.push(`isolation ${otherUnit} auditThisWo=${iso.auditThisWo} (이번 WO 가 상대 unit 을 변경)`);
+      if (iso.thisUnitRefRows !== 0) fails.push(`isolation ${otherUnit} topical V3 sourceRef 행=${iso.thisUnitRefRows}`);
+      if (peerState === 'fresh') {
+        if (iso.easyCanon !== N) fails.push(`isolation ${otherUnit}(fresh) easyCanon=${iso.easyCanon}!=${N}`);
+        if (iso.enAuthoredCanonical !== 0) fails.push(`isolation ${otherUnit}(fresh) enAuthoredCanonical=${iso.enAuthoredCanonical}`);
+        if (iso.easyDeprecated !== 0) fails.push(`isolation ${otherUnit}(fresh) easyDeprecated=${iso.easyDeprecated}`);
+      } else if (peerState === 'applied') {
+        // 이미 GREEN 인 상대 unit: GREEN 불변식이 그대로 유지되어야 한다
+        if (iso.enAuthoredCanonical !== N) fails.push(`isolation ${otherUnit}(applied) enAuthoredCanonical=${iso.enAuthoredCanonical}!=${N}`);
+        if (iso.easyDeprecated !== N) fails.push(`isolation ${otherUnit}(applied) easyDeprecated=${iso.easyDeprecated}!=${N}`);
+        if (iso.easyCanon !== 0) fails.push(`isolation ${otherUnit}(applied) easyCanonLeft=${iso.easyCanon}`);
+      } else {
+        fails.push(`isolation ${otherUnit} peerState=partial (koAuthoredCanonical=${iso.koAuthoredCanonical}/${N})`);
+      }
+    }
+  } finally { await ds.destroy(); }
+
+  const out = { ...notes, pass: fails.length === 0, failCount: fails.length, fails };
+  console.log(JSON.stringify(out, null, 2));
+  console.log(`\n=== POSTVERIFY ${unit} lang=${lang} · PASS=${out.pass} · fails=${out.failCount} ===`);
+  if (!out.pass) process.exit(2);
+}
+main().catch((e) => { console.error('FATAL', e instanceof Error ? e.message : e); process.exit(1); });

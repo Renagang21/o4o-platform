@@ -1,0 +1,95 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "na",
+  "role": "single DB write-owner",
+  "unit": "topical-unit-1",
+  "route": "topical",
+  "status": "GREEN",
+  "readinessWo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "basis": {
+    "approvalSsotCommit": "00851d237",
+    "approvalStatus": "APPROVED_FOR_PRODUCTION",
+    "readinessCommit": "bb2e79a22",
+    "oralRouteCompleteCommit": "3f200900a"
+  },
+  "target": { "masterCount": 327, "contentFp": 55 },
+  "hashInvariance": {
+    "dryRunPlanDigestMd5": "cc29b9988da9dffa147912251e04632a",
+    "matchesReadinessLedger": true,
+    "readinessArtifactsMd5Unchanged": true,
+    "approvalSsotMd5Unchanged": true
+  },
+  "preflightGate": {
+    "runner": "otc-v3-topical-preflight-gate.na.ts",
+    "gates": 11,
+    "pass": true,
+    "failCount": 0,
+    "detail": {
+      "G1_oralRouteComplete": { "koAuthoredCanonical": 540, "enAuthoredCanonical": 540, "easyDeprecated": 540, "easyStillCanonical": 0, "auditMasters": 540 },
+      "G2_preApplyReady": "PRE_APPLY_READY 327m/55fp writePlan 1962",
+      "G3_readinessArtifactsUnchanged": true,
+      "G4_approvalSsotAndLedgerUnchanged": true,
+      "G5_easyAnchor": 327,
+      "G6_existingAuthoredCanonical": { "ko": 0, "en": 0 },
+      "G7_v3SourceRefConflict": 0,
+      "G8_canonicalDup": 0,
+      "G9_otherSessionLiveWrite": 0,
+      "G10_untouchedRoutes": { "ophthalmic": 253, "oromucosal": 14 },
+      "G11_professionalUse": 0
+    }
+  },
+  "rollbackTest": {
+    "fpPass": 55, "fpFail": 0, "txWrittenThenRolledBack": 1962,
+    "residue": { "authoredrows": 0, "v3refrows": 0, "easydeprecated": 0, "auditrows": 0 },
+    "residueClean": true,
+    "note": "LIVE apply 와 동일한 execKoFp/execEnFp 를 공유한 상태에서 재입증 — da oral GREEN 러너와 4함수 byte-identical"
+  },
+  "apply": {
+    "ko": { "fpCommitted": 55, "fpTotal": 55, "fpFailed": 0, "written": 1308, "expected": 1308, "planDigestMd5": "66e7cf6cd1c14d5f735fec500035f851" },
+    "en": { "fpCommitted": 55, "fpTotal": 55, "fpFailed": 0, "written": 654, "expected": 654, "planDigestMd5": "f592123d325fc0b38d11cba4955640f9" },
+    "totalWritten": 1962,
+    "expectedTotal": 1962,
+    "match": true
+  },
+  "postVerify": {
+    "runner": "otc-v3-topical-postverify.na.ts",
+    "pass": true, "failCount": 0,
+    "ko": { "canon1": 327, "canonicalDup": 0, "authored": 327, "easyDeprecated": 327, "easyCanonLeft": 0, "sourceRefScope": 327, "sourceRefOutside": 0, "audit": 327, "contentMismatchFps": 0 },
+    "en": { "canon1": 327, "canonicalDup": 0, "authored": 327, "sourceRefScope": 327, "sourceRefOutside": 0, "contentMismatchFps": 0, "hangulFps": 0, "hangulFpsDb": 0 },
+    "sourcePreservation": { "fpChecked": 55, "officialSectionsMissingFps": 0, "variantFps": 0, "safetySectionsExpected": 116, "safetySectionsFound": 116, "numericMissingFps": 0 }
+  },
+  "independentVerify": {
+    "runner": "otc-v3-topical-track-verify.na.ts",
+    "pass": true, "failCount": 0,
+    "targetMasters": 327,
+    "contentFp": 55,
+    "koAuthoredCanonical": 327,
+    "enCanonical": 327,
+    "easyDeprecated": 327,
+    "easyStillCanonical": 0,
+    "auditKo": 327,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "storedContentHashMismatch": 0,
+    "officialSixSectionsMismatch": 0,
+    "enHangul": 0,
+    "professionalUseWritten": 0,
+    "measuredWrite": 1962
+  },
+  "scopePostCheck": {
+    "oralV3_540_unchanged": { "koAuthoredCanonical": 540, "enCanonical": 540, "easyDeprecated": 540, "thisWoAudit": 0, "topicalSourceRefRows": 0, "oralV3Rows": 1080 },
+    "ophthalmic_253_write": 0,
+    "oromucosal_14_write": 0,
+    "v1v2LiveUnchanged": { "thisWoAuditOutsideTarget": 0 },
+    "topicalMeasuredWrite": 1962
+  },
+  "corrections": [
+    {
+      "what": "track-verify §C 가 효능·효과/용법·용량까지 공식 라벨 헤딩을 요구 → 110 false fail",
+      "why": "composer 계약상 안전 4섹션만 공식 라벨 유지, 효능·용법은 '한눈에 보기'/'사용 안내' 로 소비자 친화 재구성(보존 판정축 = 원문 수치 전량 잔존)",
+      "verdict": "검증기 오류 — 데이터 이상 아님. 계약축(안전=헤딩 116/116, 효능·용법=수치 130/130)으로 정정 후 PASS"
+    }
+  ],
+  "nextUnit": { "unit": "ophthalmic-unit-1", "route": "ophthalmic", "masterCount": 253, "status": "UNBLOCKED" },
+  "invariants": "승인 SSOT · V3 unit ledger · readiness 산출물 미수정(실행 상태만 별도 파일로 기록) · 기존 GREEN 파일 미접촉 · pnpm-lock.yaml/.env 미접촉"
+}

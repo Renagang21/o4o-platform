@@ -1,0 +1,32 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "na",
+  "recordType": "next-unit-state",
+  "unit": "ophthalmic-unit-1",
+  "route": "ophthalmic",
+  "status": "UNBLOCKED",
+  "masterCount": 253,
+  "contentFp": 26,
+  "unblockedBy": "topical-unit-1 GREEN (1,962T LIVE · 독립검증 fails 0)",
+  "currentDbState": {
+    "easyCanonical": 253,
+    "koAuthoredCanonical": 0,
+    "enAuthoredCanonical": 0,
+    "easyDeprecated": 0,
+    "thisTrackWrite": 0,
+    "note": "미착수(fresh) 상태 실측 확인 — topical LIVE apply 로 인한 write 0"
+  },
+  "prerequisitesForProduction": [
+    "V3 content-fingerprint 기준 ophthalmic 전용 build/en-build 산출물 + PRE_APPLY READY (readiness WO 필요 — 현재 미보유)",
+    "dry-run x2 byte-identical + rollback-test residue 0",
+    "apply 러너 PRODUCTION_WO_BY_UNIT 화이트리스트에 ophthalmic-unit-1 승인 WO 등재",
+    "per-unit·per-lang confirm env"
+  ],
+  "note": "UNBLOCKED = 선행 unit 의존이 해소되었다는 뜻이며, 그 자체로 LIVE apply 승인은 아니다. 별도 readiness/production WO 필요.",
+  "routeLedgerState": {
+    "oral": "COMPLETE (540 master · 3,240T)",
+    "topical": "COMPLETE (unit-1 327 master · 1,962T)",
+    "ophthalmic": "UNBLOCKED (253 master · 미착수)",
+    "oromucosal": "PRE_APPLY_READY (14 master · 84T · 미착수)"
+  }
+}
