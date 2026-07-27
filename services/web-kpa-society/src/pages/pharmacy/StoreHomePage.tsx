@@ -19,6 +19,14 @@
  *     "매장 제작 자료"(/store/library/production-materials) 단일 링크로 교체
  *   - 각 step 에 1줄 안내 추가 (제작 vs 배포·운영 의미 명료화)
  *   - Step 3 사이니지·채널 관리 링크는 변경 없음 (배포/운영 성격 유지)
+ *
+ * WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1:
+ *   - 홈 CTA 명칭·route 를 현재 사이드바(storeMenuConfig KPA)·canonical 진입점에 정합.
+ *   - Step 1: "상품 관리" → "O4O 제품"(라벨 정합) + "매장 경영활용 제품"(/store/handled-products) 분리(§6.3).
+ *   - Step 3: "사이니지" legacy redirect 경유 제거(/marketing/signage → 직접 /marketing/signage/playlist),
+ *     "채널 관리"(/store/channels redirect) → "판매 설정"(직접 /store/online-sales/settings),
+ *     "태블렛 화면 제작"(/store/commerce/tablet-displays) 추가 — §6.5 태블렛·온라인 판매 채널 활용.
+ *   - 재설계·KPI·API·데이터·store-ui-core 변경 없음.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -35,6 +43,8 @@ import {
   Tablet as TabletIcon,
   AlertCircle,
   FileEdit,
+  Store,
+  Settings,
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { Card } from '@o4o/ui';
@@ -285,17 +295,22 @@ export function StoreHomePage() {
             <h2 className="text-[15px] font-semibold text-slate-800 m-0 mb-3">실행 흐름</h2>
             <div className="flex flex-col">
 
-              {/* Step 1: 상품 선택 */}
+              {/* Step 1: 상품 선택 (WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1 §6.3:
+                  O4O 제품(공급·주문 카탈로그) / 매장 경영활용 제품(설명·QR 활용) 진입 분리) */}
               <div className="py-3">
                 <div className="flex items-center gap-2 mb-1">
                   <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-primary text-[11px] font-bold text-white flex-shrink-0">1</span>
                   <span className="text-[13px] font-semibold text-primary tracking-wide">상품 선택</span>
                 </div>
-                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">매장에서 진열·판매할 상품을 선택합니다.</p>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">판매할 O4O 제품을 찾거나, 매장에서 경영에 활용할 제품을 등록·관리합니다.</p>
                 <div className="flex flex-wrap gap-2 pl-[30px]">
                   <Link to="/store/commerce/products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                     <Package size={16} className="text-violet-600" />
-                    <span>상품 관리</span>
+                    <span>O4O 제품</span>
+                  </Link>
+                  <Link to="/store/handled-products" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <Store size={16} className="text-emerald-600" />
+                    <span>매장 경영활용 제품</span>
                   </Link>
                 </div>
               </div>
@@ -326,15 +341,21 @@ export function StoreHomePage() {
                   <span className="inline-flex items-center justify-center w-[22px] h-[22px] rounded-full bg-violet-600 text-[11px] font-bold text-white flex-shrink-0">3</span>
                   <span className="text-[13px] font-semibold text-violet-600 tracking-wide">매장에 적용하기</span>
                 </div>
-                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 매장 채널·사이니지에 배포·운영합니다.</p>
+                <p className="text-[12px] text-slate-500 m-0 mb-2.5 pl-[30px]">제작한 자료를 사이니지·태블렛·온라인 판매 등 매장 채널에 배포·운영합니다.</p>
                 <div className="flex flex-wrap gap-2 pl-[30px]">
-                  <Link to="/store/marketing/signage" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                  {/* WO-O4O-KPA-STORE-HOME-CTA-AND-MENU-ALIGNMENT-V1 §6.2: legacy redirect 경유 제거 —
+                      최종 canonical route(/marketing/signage/playlist, /online-sales/settings)로 직접 이동. */}
+                  <Link to="/store/marketing/signage/playlist" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
                     <Monitor size={16} className="text-primary" />
                     <span>사이니지</span>
                   </Link>
-                  <Link to="/store/channels" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
-                    <BarChart3 size={16} className="text-violet-600" />
-                    <span>채널 관리</span>
+                  <Link to="/store/commerce/tablet-displays" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <TabletIcon size={16} className="text-violet-600" />
+                    <span>태블렛 화면 제작</span>
+                  </Link>
+                  <Link to="/store/online-sales/settings" className="inline-flex items-center gap-1.5 px-3.5 py-1.5 border border-slate-200 rounded-lg bg-slate-50 no-underline text-[13px] font-medium text-slate-700 transition-colors hover:border-primary">
+                    <Settings size={16} className="text-emerald-600" />
+                    <span>판매 설정</span>
                   </Link>
                 </div>
               </div>
