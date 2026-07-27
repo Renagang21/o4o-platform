@@ -174,34 +174,10 @@ export async function cancelProductByOfferId(offerId: string): Promise<{ success
   return apiClient.delete(`/pharmacy/products/by-offer/${offerId}`);
 }
 
-/**
- * 상품 판매 신청 (레거시 — 수동 입력)
- */
-/**
- * WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
- *   service_key 파라미터 제거 — 서비스 경계는 요청 경로(/api/v1/kpa/*)가 결정하고
- *   backend 가 마운트 serviceKey 에서 도출한다. 클라이언트가 보낸 값은 400 SERVICE_KEY_MISMATCH.
- */
-export async function applyProduct(params: {
-  externalProductId: string;
-  productName: string;
-  productMetadata?: Record<string, unknown>;
-}): Promise<{ success: boolean; data: ProductApplication }> {
-  return apiClient.post('/pharmacy/products/apply', params);
-}
-
-/**
- * 내 신청 목록 조회
- */
-export async function getApplications(params?: {
-  status?: string;
-  page?: number;
-  limit?: number;
-  // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
-  //   service_key 제거 — backend 가 마운트에서 도출하며 query 값은 무시한다.
-}): Promise<PaginatedResponse<ProductApplication>> {
-  return apiClient.get('/pharmacy/products/applications', params);
-}
+// WO-O4O-KPA-LEGACY-MANUAL-PRODUCT-APPLICATION-REMOVE-AND-LISTING-MANAGEMENT-PRESERVE-V1:
+//   구형 수동 판매 신청(applyProduct: externalProductId 자유입력 → 항상 400 MISSING_PARAM)과
+//   그 신청 내역 조회(getApplications)는 소비 화면 제거와 함께 삭제했다.
+//   상품 추가의 canonical 경로는 카탈로그 기반 applyBySupplyProductId(offer.id) 이다.
 
 /**
  * 승인된 상품 목록

@@ -1,35 +1,25 @@
 /**
- * PharmacySellPage - 약국 상품 판매 관리
+ * PharmacySellPage - 약국 상품 진열 관리
  *
  * WO-PHARMACY-PRODUCT-LISTING-APPROVAL-PHASE1-V1
  * WO-PHARMACY-PRODUCT-CHANNEL-MANAGEMENT-V1 (채널 설정, 필터)
- *
- * 두 개 탭:
- * 1. 판매 등록 신청 — 상품 판매 신청 및 신청 내역 확인
- * 2. 내 매장 진열 상품 — 승인된 상품의 매장 진열 관리 + 채널 설정
+ * WO-O4O-KPA-LEGACY-MANUAL-PRODUCT-APPLICATION-REMOVE-AND-LISTING-MANAGEMENT-PRESERVE-V1:
+ *   깨진 구형 수동 판매 신청(externalProductId 자유입력 → 항상 400) 탭 제거.
+ *   진열 관리·채널 설정 편집기(탭2)만 보존해 단일 목적 화면으로 축소.
+ *   새 상품 추가는 매장 HUB 카탈로그(/store-hub/b2b · applyBySupplyProductId)로 일원화.
  */
 
 import { useState, useEffect, useCallback } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import {
-  applyProduct,
-  getApplications,
   getListings,
   updateListing,
   getListingChannels,
   updateListingChannels,
 } from '../../api/pharmacyProducts';
-import type { ProductApplication, ProductListing, ListingChannelSetting } from '../../api/pharmacyProducts';
+import type { ProductListing, ListingChannelSetting } from '../../api/pharmacyProducts';
 import { fetchChannelOverview } from '../../api/storeHub';
 import type { ChannelOverview, ChannelType } from '../../api/storeHub';
-
-type TabId = 'applications' | 'listings';
-
-const STATUS_LABELS: Record<string, { text: string; color: string; bg: string }> = {
-  pending: { text: '심사 중', color: '#B45309', bg: '#FEF3C7' },
-  approved: { text: '승인', color: '#047857', bg: '#D1FAE5' },
-  rejected: { text: '거절', color: '#DC2626', bg: '#FEE2E2' },
-};
 
 const CHANNEL_LABELS: Record<string, string> = {
   B2C: '온라인 스토어',
@@ -37,13 +27,6 @@ const CHANNEL_LABELS: Record<string, string> = {
   TABLET: '태블릿',
   SIGNAGE: '사이니지',
 };
-
-const SERVICE_KEY_OPTIONS = [
-  { value: 'kpa', label: '일반 B2B' },
-  { value: 'kpa-groupbuy', label: 'KPA 이벤트' },
-  { value: 'cosmetics', label: '화장품 서비스' },
-  { value: 'glycopharm', label: '혈당관리 서비스' },
-] as const;
 
 const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: string }> = {
   kpa: { text: 'B2B', color: '#2563EB', bg: '#DBEAFE' },
@@ -53,336 +36,45 @@ const SERVICE_KEY_LABELS: Record<string, { text: string; color: string; bg: stri
 };
 
 export function PharmacySellPage() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const initialTab: TabId = searchParams.get('tab') === 'listings' ? 'listings' : 'applications';
-  const [activeTab, setActiveTab] = useState<TabId>(initialTab);
-
-  const handleTabChange = (tab: TabId) => {
-    setActiveTab(tab);
-    setSearchParams(
-      tab === 'applications' ? {} : { tab },
-      { replace: true },
-    );
-  };
-
   return (
     <div style={{ maxWidth: 960, margin: '0 auto', padding: '32px 16px' }}>
       {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <Link to="/store/products" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
-          &larr; 상품 관리
-        </Link>
-        <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>
-          상품 판매 관리
-        </h1>
-        <p style={{ color: '#64748B', fontSize: '0.95rem' }}>
-          매장에서 판매할 상품을 신청하고, 승인된 상품을 진열 관리합니다.
-        </p>
-      </div>
-
-      {/* Tabs */}
-      <div style={{ display: 'flex', gap: 0, borderBottom: '2px solid #E5E7EB', marginBottom: 24 }}>
-        {([
-          { id: 'applications' as TabId, label: '판매 등록 신청' },
-          { id: 'listings' as TabId, label: '내 매장 진열 상품' },
-        ]).map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => handleTabChange(tab.id)}
-            style={{
-              padding: '12px 24px',
-              fontSize: '0.95rem',
-              fontWeight: activeTab === tab.id ? 600 : 400,
-              color: activeTab === tab.id ? '#2563EB' : '#6B7280',
-              background: 'none',
-              border: 'none',
-              borderBottom: activeTab === tab.id ? '2px solid #2563EB' : '2px solid transparent',
-              marginBottom: -2,
-              cursor: 'pointer',
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === 'applications' && <ApplicationsTab />}
-      {activeTab === 'listings' && <ListingsTab />}
-    </div>
-  );
-}
-
-/**
- * Tab 1: 판매 등록 신청
- */
-function ApplicationsTab() {
-  const [applications, setApplications] = useState<ProductApplication[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({ externalProductId: '', productName: '', serviceKey: 'kpa' });
-  const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const loadApplications = useCallback(async () => {
-    try {
-      setLoading(true);
-      const result = await getApplications();
-      setApplications(result.data || []);
-    } catch (e: any) {
-      console.error('Failed to load applications:', e);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    loadApplications();
-  }, [loadApplications]);
-
-  const handleApply = async () => {
-    if (!formData.externalProductId.trim() || !formData.productName.trim()) {
-      setError('상품 ID와 상품명을 입력해주세요.');
-      return;
-    }
-
-    try {
-      setSubmitting(true);
-      setError(null);
-      // WO-O4O-STORE-HUB-PRODUCT-APPLY-APPROVAL-GATE-PARITY-V1 (HUB-P0-04):
-      //   service_key 전송 제거 — 서비스 경계는 요청 경로가 결정한다.
-      await applyProduct({
-        externalProductId: formData.externalProductId.trim(),
-        productName: formData.productName.trim(),
-      });
-      setFormData({ externalProductId: '', productName: '', serviceKey: 'kpa' });
-      setShowForm(false);
-      await loadApplications();
-    } catch (e: any) {
-      setError(e.message || '신청에 실패했습니다.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  return (
-    <div>
-      {/* New Application Button */}
-      <div style={{ marginBottom: 20, display: 'flex', justifyContent: 'flex-end' }}>
-        <button
-          onClick={() => setShowForm(!showForm)}
+      <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+        <div>
+          <Link to="/store/products" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
+            &larr; 상품 관리
+          </Link>
+          <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>
+            상품 진열 관리
+          </h1>
+          <p style={{ color: '#64748B', fontSize: '0.95rem' }}>
+            취급 중인 상품의 매장 진열과 채널별 노출을 관리합니다. 새 상품은 매장 HUB 카탈로그에서 추가하세요.
+          </p>
+        </div>
+        <Link
+          to="/store-hub/b2b"
           style={{
             padding: '10px 20px',
             backgroundColor: '#2563EB',
             color: '#fff',
-            border: 'none',
             borderRadius: 6,
             fontSize: '0.9rem',
             fontWeight: 500,
-            cursor: 'pointer',
+            textDecoration: 'none',
+            whiteSpace: 'nowrap',
           }}
         >
-          {showForm ? '취소' : '+ 판매 신청'}
-        </button>
+          + HUB에서 상품 추가
+        </Link>
       </div>
 
-      {/* Application Form */}
-      {showForm && (
-        <div style={{
-          padding: 20,
-          border: '1px solid #E5E7EB',
-          borderRadius: 8,
-          backgroundColor: '#F9FAFB',
-          marginBottom: 24,
-        }}>
-          <h3 style={{ fontSize: '1rem', fontWeight: 600, marginBottom: 16, color: '#0F172A' }}>
-            상품 판매 신청
-          </h3>
-
-          {error && (
-            <div style={{ padding: '10px 14px', backgroundColor: '#FEE2E2', color: '#DC2626', borderRadius: 6, marginBottom: 12, fontSize: '0.875rem' }}>
-              {error}
-            </div>
-          )}
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: 4 }}>
-                상품 ID (외부 참조)
-              </label>
-              <input
-                type="text"
-                value={formData.externalProductId}
-                onChange={e => setFormData(prev => ({ ...prev, externalProductId: e.target.value }))}
-                placeholder="예: PROD-001"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: 6,
-                  fontSize: '0.9rem',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: 4 }}>
-                상품명
-              </label>
-              <input
-                type="text"
-                value={formData.productName}
-                onChange={e => setFormData(prev => ({ ...prev, productName: e.target.value }))}
-                placeholder="예: 타이레놀 500mg"
-                style={{
-                  width: '100%',
-                  padding: '10px 12px',
-                  border: '1px solid #D1D5DB',
-                  borderRadius: 6,
-                  fontSize: '0.9rem',
-                  boxSizing: 'border-box',
-                }}
-              />
-            </div>
-
-            <div>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 500, color: '#374151', marginBottom: 8 }}>
-                서비스 영역
-              </label>
-              <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
-                {SERVICE_KEY_OPTIONS.map(opt => (
-                  <label
-                    key={opt.value}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 6,
-                      padding: '8px 14px',
-                      border: formData.serviceKey === opt.value ? '2px solid #2563EB' : '1px solid #D1D5DB',
-                      borderRadius: 8,
-                      backgroundColor: formData.serviceKey === opt.value ? '#EFF6FF' : '#fff',
-                      cursor: 'pointer',
-                      fontSize: '0.875rem',
-                      fontWeight: formData.serviceKey === opt.value ? 600 : 400,
-                      color: formData.serviceKey === opt.value ? '#2563EB' : '#374151',
-                    }}
-                  >
-                    <input
-                      type="radio"
-                      name="serviceKey"
-                      value={opt.value}
-                      checked={formData.serviceKey === opt.value}
-                      onChange={e => setFormData(prev => ({ ...prev, serviceKey: e.target.value }))}
-                      style={{ display: 'none' }}
-                    />
-                    {opt.label}
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 4 }}>
-              <button
-                onClick={handleApply}
-                disabled={submitting}
-                style={{
-                  padding: '10px 24px',
-                  backgroundColor: submitting ? '#9CA3AF' : '#2563EB',
-                  color: '#fff',
-                  border: 'none',
-                  borderRadius: 6,
-                  fontSize: '0.9rem',
-                  fontWeight: 500,
-                  cursor: submitting ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {submitting ? '신청 중...' : '신청하기'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Applications List */}
-      {loading ? (
-        <div style={{ textAlign: 'center', padding: 40, color: '#9CA3AF' }}>불러오는 중...</div>
-      ) : applications.length === 0 ? (
-        <div style={{
-          textAlign: 'center',
-          padding: 60,
-          color: '#9CA3AF',
-          backgroundColor: '#F9FAFB',
-          borderRadius: 8,
-        }}>
-          <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>신청 내역이 없습니다</p>
-          <p style={{ fontSize: '0.875rem', marginTop: 8 }}>상품 판매 신청을 시작해보세요.</p>
-        </div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-          {applications.map(app => {
-            const statusInfo = STATUS_LABELS[app.status] || STATUS_LABELS.pending;
-            return (
-              <div
-                key={app.id}
-                style={{
-                  padding: '16px 20px',
-                  border: '1px solid #E5E7EB',
-                  borderRadius: 8,
-                  backgroundColor: '#fff',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}
-              >
-                <div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4 }}>
-                    <span style={{ fontWeight: 600, color: '#0F172A' }}>
-                      {app.product_name}
-                    </span>
-                    {app.service_key && SERVICE_KEY_LABELS[app.service_key] && (
-                      <span style={{
-                        padding: '2px 8px',
-                        borderRadius: 4,
-                        fontSize: '0.7rem',
-                        fontWeight: 500,
-                        color: SERVICE_KEY_LABELS[app.service_key].color,
-                        backgroundColor: SERVICE_KEY_LABELS[app.service_key].bg,
-                      }}>
-                        {SERVICE_KEY_LABELS[app.service_key].text}
-                      </span>
-                    )}
-                  </div>
-                  <div style={{ fontSize: '0.8rem', color: '#9CA3AF' }}>
-                    ID: {app.external_product_id} &middot; {new Date(app.requested_at).toLocaleDateString('ko-KR')}
-                  </div>
-                  {app.status === 'rejected' && app.reject_reason && (
-                    <div style={{ fontSize: '0.8rem', color: '#DC2626', marginTop: 4 }}>
-                      거절 사유: {app.reject_reason}
-                    </div>
-                  )}
-                </div>
-                <span style={{
-                  padding: '4px 12px',
-                  borderRadius: 99,
-                  fontSize: '0.8rem',
-                  fontWeight: 500,
-                  color: statusInfo.color,
-                  backgroundColor: statusInfo.bg,
-                }}>
-                  {statusInfo.text}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <ListingsTab />
     </div>
   );
 }
 
 /**
- * Tab 2: 내 매장 진열 상품
+ * 내 매장 진열 상품 — 승인된 상품의 매장 진열 관리 + 채널 설정
  */
 function ListingsTab() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -468,8 +160,24 @@ function ListingsTab() {
         }}>
           <p style={{ fontSize: '1.1rem', fontWeight: 500 }}>진열 상품이 없습니다</p>
           <p style={{ fontSize: '0.875rem', marginTop: 8 }}>
-            상품 판매가 승인되면 여기에 표시됩니다.
+            매장 HUB 카탈로그에서 상품을 추가하면 여기에 표시됩니다.
           </p>
+          <Link
+            to="/store-hub/b2b"
+            style={{
+              display: 'inline-block',
+              marginTop: 16,
+              padding: '8px 18px',
+              backgroundColor: '#2563EB',
+              color: '#fff',
+              borderRadius: 6,
+              fontSize: '0.85rem',
+              fontWeight: 500,
+              textDecoration: 'none',
+            }}
+          >
+            HUB에서 상품 추가
+          </Link>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

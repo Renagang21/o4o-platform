@@ -338,7 +338,7 @@ export function PharmacyB2BPage() {
       {/* 상품 도메인 서브 네비게이션 */}
       <div style={styles.productNav}>
         <Link to="/store/products" style={styles.productNavActive}>B2B 구매</Link>
-        <Link to="/store/products/b2c" style={styles.productNavLink}>판매 신청</Link>
+        <Link to="/store/products/b2c" style={styles.productNavLink}>진열 관리</Link>
       </div>
 
       {/* 공급유형 탭 */}

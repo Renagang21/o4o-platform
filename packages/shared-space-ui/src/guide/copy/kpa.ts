@@ -362,7 +362,7 @@ export const kpaGuideUsageProps: GuideUsagePageProps = {
         },
         {
           label: '소매가 및 채널 설정',
-          detail: 'B2C 탭(/store/commerce/products/b2c)에서 소매가를 입력하고 채널별 노출을 구성합니다.',
+          detail: '진열 관리 화면(/store/commerce/products/b2c)에서 소매가를 입력하고 채널별 노출을 구성합니다.',
         },
       ],
     },
@@ -575,7 +575,7 @@ export const kpaGuideFeaturesProps: GuideFeaturesPageProps = {
         { label: '매장 운영 이용 방법', route: '/guide/features/store' },
         { label: '운영 홈', route: '/store' },
         { label: '상품 구성', route: '/store/commerce/products' },
-        { label: 'B2C 가격 설정', route: '/store/commerce/products/b2c' },
+        { label: '진열 관리', route: '/store/commerce/products/b2c' },
         { label: '채널 진열', route: '/store/channels' },
         { label: '고객 요청 관리', route: '/store/requests' },
         { label: '주문 관리', route: '/store/commerce/orders' },
@@ -1734,7 +1734,7 @@ export const kpaGuideForStoreOwnerProps: GuideUsagePageProps = {
       items: [
         { label: '상품 마스터', detail: '/store/my-products — 취급 상품 정보·가격·재고' },
         { label: 'B2B 발주', detail: '/store/commerce/products — 공급자 카탈로그 조회·주문' },
-        { label: 'B2C 판매', detail: '/store/commerce/products/b2c — 온라인 스토어' },
+        { label: '진열 관리', detail: '/store/commerce/products/b2c — 진열·채널 노출 설정' },
         { label: '주문 관리', detail: '/store/commerce/order-worktable — 주문 상태·배송' },
       ],
     },
