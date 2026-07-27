@@ -4,11 +4,14 @@
 > (IR 묶음 2 — 운영자 상품·오퍼 관리 흐름의 load-error 계약화)
 > 선행 조사: `docs/investigations/IR-O4O-NETURE-LOAD-ERROR-CONTRACT-FINAL-VALIDATION-V1.md`
 > 자매 작업: `CHECK-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1` (묶음 1)
-> 상태: **PARTIAL — API 계약 3/3 완료, 소비 화면 2/3 완료**
-> 잔여: `AllProductsOverviewPage.tsx` 오류 UX (동시 세션 DataTable 마이그레이션 커밋 후 마감 필요).
->   현재 `main`은 `getSupplyProducts` throw 를 `catch { setProducts([]) }` 로 받아 "공급 가능 상품 없음" 으로 표시 →
->   크래시 없이 안전 저하되나, **오류 vs 정상 0건 분리라는 WO 목표는 이 화면에서 미달성.**
-> 작업일: 2026-07-27
+> 상태: **PASS — API 계약 3/3 완료, 소비 화면 3/3 완료** (2026-07-27 마감, WO-...-CLOSEOUT-V1)
+> 잔여 해소: `AllProductsOverviewPage.tsx` 는 라우트 검증 결과 **0 importer 데드코드**로 확인되어
+>   동시 세션이 제거함(`1bd1f06d2`, WO-...-REMAINING-GAPS-CLOSE-AND-KPA-HANDOFF-V1). 라이브 운영자 상품 화면은
+>   `AllRegisteredProductsPage`(`/operator/all-registered-products`)이며, `/operator/supply`·`/operator/all-products`·
+>   `/admin/all-products` 는 전부 여기로 `<Navigate replace>`. 이 화면은 이미 load-error 계약(loadError/AlertTriangle/다시 시도)을
+>   보유(`d8d44734b`). 따라서 오류 vs 정상 0건 분리는 **모든 라이브 화면에서 충족** — 3번째 "잔여"는 마감 대상이 아니라 제거 대상이었음.
+>   상세는 §11-A 참조.
+> 작업일: 2026-07-27 (초기) · 2026-07-27 (CLOSEOUT)
 
 ---
 
@@ -170,3 +173,40 @@ mutation 성공→실패 뒤집힘 0 · 기존 데이터 [] 로 밀림 0 · unha
 - **안전성:** `operator.ts`(getSupplyProducts throw) 는 커밋되지만, `origin/main` 의 AllProductsOverviewPage 는 이미
   `catch { setProducts([]) }` 를 보유 → 신 throw 를 crash 없이 흡수(구 삼킴 동작으로 graceful degrade). 3개 API 계약은
   모두 상륙, 소비 화면은 2/3 상륙 + 1/3(overview)은 동시 세션 커밋에 위임.
+
+---
+
+## 11-A. CLOSEOUT (2026-07-27 · WO-O4O-NETURE-OPERATOR-PRODUCTS-AND-OFFERS-LOAD-ERROR-CONTRACT-CLOSEOUT-V1)
+
+**결론: 잔여 1건은 마감이 아니라 제거로 해소됨. 묶음 2 = PASS / 완료.**
+
+### 조사 (§3 먼저 확인)
+
+CLOSEOUT WO 는 `AllProductsOverviewPage.tsx` 에 DataTable 마이그레이션이 상륙했으면 error-contract 를 마감하도록 지시했으나,
+현재 `main` 조사 결과 **파일 자체가 존재하지 않는다.**
+
+- `git log` : `fcfd6aeb0` (finalize — DataTable + load-error contract) → `1bd1f06d2` (**remove orphaned, superseded, 0 importers**).
+- `1bd1f06d2` (WO-...-REMAINING-GAPS-CLOSE-AND-KPA-HANDOFF-V1) 이 라우트 검증 중 이 페이지가 **어느 곳에서도 import 되지 않는 도달 불가 데드코드**임을 확인하고 355줄 삭제.
+- 현재 `grep AllProductsOverviewPage` = 0 hit. `grep getSupplyProducts` = **정의(operator.ts:139) 1건 · 소비처 0건** (오펀이 유일 소비처였음).
+
+### 라이브 화면 = AllRegisteredProductsPage (계약 이미 충족)
+
+- 라우트: `/operator/supply` · `/operator/all-products` · `/admin/all-products` → 전부 `/operator/all-registered-products` 로 `<Navigate replace>` (App.tsx:1012,1124-1126).
+- `AllRegisteredProductsPage` 로드 함수(283-307): `setLoadError(false)` 시작 → `operatorAllOffersApi.getAll()`(묶음 2 API 3/3 완료, `OPERATOR_ALL_OFFERS_LOAD_FAILED`) → **`catch { setLoadError(true) }` (throw 를 `setProducts([])` 로 삼키지 않음)** → `finally setLoading(false)`. 오류 UI = `loadError ?` 분기(972) + AlertTriangle(974) + 다시 시도(981).
+- 즉 loading / error / success+0건 / success+데이터 분리는 라이브 화면에서 이미 성립.
+
+### 검증
+
+| 항목 | 결과 |
+|------|:---:|
+| 오펀 제거가 프로덕션에 반영 (`1bd1f06d2` ⊂ 배포 커밋 `a09dc82e2` = neture-web-01345-5kp) | ✅ (`merge-base --is-ancestor` YES · 배포 커밋에서 파일 ABSENT) |
+| web-neture typecheck | EXIT 0 |
+| web-neture build | EXIT 0 (13.21s) |
+| 라이브 화면·리다이렉트 SPA 200 (`/operator/all-registered-products`, `/operator/supply`) | 200 / 200 |
+| operator all-offers 엔드포인트 게이팅 (`/api/v1/neture/operator/all-offers`) | 401 (라이브·게이트, 404/500 아님) |
+| 운영 write | 0 (조사·문서만, mutation 미실행) |
+| 코드 변경 | 없음 (구현 대상 파일 부재 · 라이브 화면 이미 준수) |
+
+### 판정
+
+CLOSEOUT WO §14 완료 기준 "AllProductsOverviewPage 가 main 에서 throw 를 `[]` 로 삼키지 않음" 은 **파일 부재로 자명 충족**, 오류/정상 0건 분리·다시 시도·조건 유지·KPI·pagination 게이트는 **라이브 소비 화면(AllRegisteredProductsPage)에서 이미 충족**. 코드 변경 없이 문서만 PARTIAL → PASS 로 마감. 배포 리비전 `neture-web-01345-5kp`(오펀 제거 반영). 묶음 2 = 완료.
