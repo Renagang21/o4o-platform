@@ -118,12 +118,25 @@ export const STORE_LISTINGS_LOAD_FAILED       = 'STORE_LISTINGS_LOAD_FAILED';
 | 재시도 후 성공 | 정상 반환 | 결과/목록 정상 렌더 |
 | 정상 0건(`200 []`) | 성공 통과 | "검색 결과 없음"/"공급자 없음"/"진열 0개" (정상 empty) |
 
-### 5.3 프로덕션 smoke (실 브라우저)
+### 5.3 프로덕션 smoke
 
-- 라우트: `/store/manage/products`, `/store/manage/products/library` (실존 확인). WO 문구의
-  `/store/products`·`/store/product-library`·`/store/handled-products` 는 근사 표기이며,
+- 라우트: `/store/manage/products`, `/store/manage/products/library` (실존 확인, `App.tsx:917-918`).
+  WO 문구의 `/store/products`·`/store/product-library`·`/store/handled-products` 는 근사 표기이며,
   `handled-products` 는 neture 라우트에 **부재**(KPA 개념) — 기록만.
-- (배포 후 아래 결과 채움)
+- 배포: `Deploy Web Services (Cloud Run)` run `30227646921` — `deploy-neture` ✅ (2m29s).
+  신 revision `neture-web-01337-pgm` LIVE.
+- **엔드포인트 오류 게이팅 확인** (미인증 직접 호출, o4o-core-api):
+  | 엔드포인트 | HTTP |
+  |-----------|------|
+  | `GET /api/v1/store/products/search?q=test` | `401` |
+  | `GET /api/v1/store/products/master/:id/offers` | `401` |
+  | `GET /api/v1/store/products` | `401` |
+  세 엔드포인트 모두 실패를 **실 HTTP 오류(401)** 로 반환 — 200-빈-결과가 아니다. 신 코드의
+  `catch → throw *_LOAD_FAILED` 경로가 정상 empty(200 빈 배열)와 확실히 분리됨을 뒷받침한다.
+- **실 브라우저 합성 주입 smoke: 미수행(환경 차단).** Playwright 영속 프로파일
+  (`C:\Users\home\.playwright-o4o-profile`)이 사용자의 다른 Chrome 세션에 점유되어 브라우저 기동 불가.
+  사용자 세션을 강제 종료하지 않기 위해 미실행. 프론트 계약은 §5.1(typecheck/build)·§5.2(코드 경로)·
+  위 엔드포인트 게이팅으로 검증. 로그인 상태 화면 합성 주입은 프로파일 해제 후 재실행 가능.
 
 ---
 
@@ -134,4 +147,6 @@ export const STORE_LISTINGS_LOAD_FAILED       = 'STORE_LISTINGS_LOAD_FAILED';
   - `services/web-neture/src/pages/store/StoreListingsPage.tsx`
   - `services/web-neture/src/pages/store/StoreProductLibraryPage.tsx`
   - `docs/checks/CHECK-O4O-NETURE-STORE-PRODUCT-DISCOVERY-AND-LISTINGS-LOAD-ERROR-CONTRACT-V1.md`
-- commit / push / `neture-web` 배포 / smoke 결과: (아래 채움)
+- commit `b9b9c9667` → main push 완료.
+- `neture-web` 배포 완료 (revision `neture-web-01337-pgm`).
+- smoke: 배포·엔드포인트 게이팅 확인 완료 / 실 브라우저 합성 주입은 프로파일 점유로 미수행(§5.3).
