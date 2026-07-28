@@ -70,14 +70,56 @@ export interface OperatorTemplateDetail {
   blocks: ScreenBlock[];
 }
 
-/** 운영자 원본 목록(검색 + 템플릿 필터). */
-export async function listOperatorTemplates(params?: { q?: string; templateKey?: string }): Promise<OperatorTemplateListItem[]> {
+/** 서버 페이지네이션 메타(WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1). */
+export interface HubPagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+/** 페이지네이션 목록 응답(데이터 + 메타). */
+export interface HubPagedResult<T> {
+  items: T[];
+  pagination: HubPagination;
+}
+
+/** 목록 쿼리(검색 · 템플릿 필터 · 페이지). */
+export interface HubListParams {
+  q?: string;
+  templateKey?: string;
+  page?: number;
+  limit?: number;
+}
+
+function buildListQuery(params?: HubListParams): string {
   const qs = new URLSearchParams();
   if (params?.q) qs.set('q', params.q);
   if (params?.templateKey) qs.set('templateKey', params.templateKey);
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  const res = await request<{ success: boolean; data: OperatorTemplateListItem[] }>(`${BASE}/templates${suffix}`);
+  if (params?.page) qs.set('page', String(params.page));
+  if (params?.limit) qs.set('limit', String(params.limit));
+  return qs.toString() ? `?${qs.toString()}` : '';
+}
+
+/**
+ * 운영자 원본 목록(검색 + 템플릿 필터) — 배열 반환(호환).
+ * StoreHubLatestFeed(최근 소수만 사용)가 이 배열 계약을 소비하므로 유지한다.
+ * 전체 목록·페이지네이션은 listOperatorTemplatesPaged 를 사용한다.
+ */
+export async function listOperatorTemplates(params?: { q?: string; templateKey?: string }): Promise<OperatorTemplateListItem[]> {
+  const res = await request<{ success: boolean; data: OperatorTemplateListItem[] }>(`${BASE}/templates${buildListQuery(params)}`);
   return res.data ?? [];
+}
+
+/** 운영자 원본 목록(페이지네이션) — HubScreenSetLibraryPage 용. */
+export async function listOperatorTemplatesPaged(params?: HubListParams): Promise<HubPagedResult<OperatorTemplateListItem>> {
+  const res = await request<{ success: boolean; data: OperatorTemplateListItem[]; pagination?: HubPagination }>(`${BASE}/templates${buildListQuery(params)}`);
+  const limit = params?.limit ?? 20;
+  const page = params?.page ?? 1;
+  return {
+    items: res.data ?? [],
+    pagination: res.pagination ?? { page, limit, total: (res.data ?? []).length, totalPages: 1 },
+  };
 }
 
 /** 운영자 원본 상세 + blocks. */
@@ -133,14 +175,21 @@ export interface SupplierTemplateDetail {
   blocks: ScreenBlock[];
 }
 
-/** 공급자 제공 원본 목록(검색 + 템플릿 필터). 매장 유형 부적격 시 서버가 빈 배열 반환. */
+/** 공급자 제공 원본 목록(검색 + 템플릿 필터) — 배열 반환(호환). 매장 유형 부적격 시 서버가 빈 배열 반환. */
 export async function listSupplierTemplates(params?: { q?: string; templateKey?: string }): Promise<SupplierTemplateListItem[]> {
-  const qs = new URLSearchParams();
-  if (params?.q) qs.set('q', params.q);
-  if (params?.templateKey) qs.set('templateKey', params.templateKey);
-  const suffix = qs.toString() ? `?${qs.toString()}` : '';
-  const res = await request<{ success: boolean; data: SupplierTemplateListItem[] }>(`${BASE}/supplier-templates${suffix}`);
+  const res = await request<{ success: boolean; data: SupplierTemplateListItem[] }>(`${BASE}/supplier-templates${buildListQuery(params)}`);
   return res.data ?? [];
+}
+
+/** 공급자 제공 원본 목록(페이지네이션) — HubScreenSetLibraryPage 용. 매장 유형 부적격 시 total=0. */
+export async function listSupplierTemplatesPaged(params?: HubListParams): Promise<HubPagedResult<SupplierTemplateListItem>> {
+  const res = await request<{ success: boolean; data: SupplierTemplateListItem[]; pagination?: HubPagination }>(`${BASE}/supplier-templates${buildListQuery(params)}`);
+  const limit = params?.limit ?? 20;
+  const page = params?.page ?? 1;
+  return {
+    items: res.data ?? [],
+    pagination: res.pagination ?? { page, limit, total: (res.data ?? []).length, totalPages: 1 },
+  };
 }
 
 /** 공급자 제공 원본 상세 + blocks. 비약국 의약품 세트는 403(MEDICATION_PHARMACY_ONLY). */

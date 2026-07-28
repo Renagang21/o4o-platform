@@ -1577,23 +1577,34 @@ export function createStoreTabletRoutes(
   // GET /screen-set-hub/templates — 목록(검색 q + 템플릿 필터 templateKey)
   router.get('/screen-set-hub/templates', withStoreAuth(async (req, res, _organizationId) => {
     try {
+      // WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1: 구 LIMIT 200 무고지 절단 제거 → page/limit 서버 페이지네이션.
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+      const offset = (page - 1) * limit;
       const params: any[] = [OPERATOR_TEMPLATE_SERVICE_KEY];
       const where: string[] = [OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')];
       const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
       if (q) { params.push(`%${q}%`); where.push(`name ILIKE $${params.length}`); }
       const tk = typeof req.query.templateKey === 'string' ? req.query.templateKey : '';
       if (tk) { params.push(tk); where.push(`COALESCE(template_key, 'corner_information_basic_v1') = $${params.length}`); }
+      const whereSql = where.join(' AND ');
+      // 목록 SQL 과 COUNT SQL 에 동일 조건(q·templateKey 포함) 적용 — 운영자 원본은 SQL 밖 후처리 필터가 없어 DB COUNT 가 정확.
+      const countRows = await dataSource.query(
+        `SELECT COUNT(*)::int AS total FROM store_tablet_screen_sets s WHERE ${whereSql}`,
+        params,
+      );
+      const total = countRows?.[0]?.total ?? 0;
       const rows = await dataSource.query(
         `SELECT id, name, COALESCE(template_key, 'corner_information_basic_v1') AS "templateKey",
                 created_at AS "createdAt", updated_at AS "updatedAt",
                 (SELECT COUNT(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
          FROM store_tablet_screen_sets s
-         WHERE ${where.join(' AND ')}
+         WHERE ${whereSql}
          ORDER BY updated_at DESC
-         LIMIT 200`,
-        params,
+         LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,
+        [...params, limit, offset],
       );
-      res.json({ success: true, data: rows });
+      res.json({ success: true, data: rows, pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-set-hub/templates error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch operator templates', code: 'INTERNAL_ERROR' });
@@ -1728,8 +1739,12 @@ export function createStoreTabletRoutes(
   // GET /screen-set-hub/supplier-templates — 목록(대상 매장 유형 일치 + 의약품 가드)
   router.get('/screen-set-hub/supplier-templates', withStoreAuth(async (req, res, organizationId) => {
     try {
+      // WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1: 구 LIMIT 200 무고지 절단 제거 → page/limit 서버 페이지네이션.
+      const page = Math.max(1, parseInt(req.query.page as string) || 1);
+      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+      const offset = (page - 1) * limit;
       const storeType = await resolveStoreHubType(organizationId);
-      if (!storeType) { res.json({ success: true, data: [] }); return; } // 매장이 아닌 조직 → 대상 제외
+      if (!storeType) { res.json({ success: true, data: [], pagination: { page, limit, total: 0, totalPages: 1 } }); return; } // 매장이 아닌 조직 → 대상 제외
       const targetIn = storeType === 'pharmacy' ? ['pharmacy', 'all'] : ['non_pharmacy', 'all'];
       const params: any[] = [SUPPLIER_HUB_SERVICE_KEY, targetIn];
       const where: string[] = [SUPPLIER_HUB_WHERE.replace('$SVC', '$1'), `hub_target_store_type = ANY($2)`];
@@ -1739,7 +1754,9 @@ export function createStoreTabletRoutes(
       if (sup) { params.push(sup); where.push(`supplier_id = $${params.length}`); }
       const tk = typeof req.query.templateKey === 'string' ? req.query.templateKey : '';
       if (tk) { params.push(tk); where.push(`COALESCE(template_key, 'corner_information_basic_v1') = $${params.length}`); }
-      const rows = await dataSource.query(
+      // 대상 매장 유형 일치 세트 전량(정렬 유지). 의약품 게이트는 SQL 밖(블록 분석)이라 DB COUNT/OFFSET 로는
+      //   비약국 노출수와 안전히 일치하지 않는다(WO §13) → 게이트 적용 후 메모리 페이지네이션으로 total 정합 보장.
+      const allRows = await dataSource.query(
         `SELECT s.id, s.name, s.supplier_id AS "supplierId",
                 (SELECT representative_name FROM neture_suppliers ns WHERE ns.id = s.supplier_id) AS "supplierName",
                 s.hub_target_store_type AS "hubTargetStoreType",
@@ -1748,22 +1765,23 @@ export function createStoreTabletRoutes(
                 (SELECT COUNT(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount"
          FROM store_tablet_screen_sets s
          WHERE ${where.join(' AND ')}
-         ORDER BY s.updated_at DESC
-         LIMIT 200`,
+         ORDER BY s.updated_at DESC`,
         params,
       );
       // 비약국: 의약품/미분류 세트 제외(약국은 전부 접근 가능). 목록 단계 의약품 필터.
-      let visible = rows;
-      if (storeType !== 'pharmacy' && rows.length) {
+      let visible = allRows;
+      if (storeType !== 'pharmacy' && allRows.length) {
         const filtered: any[] = [];
-        for (const r of rows) {
+        for (const r of allRows) {
           const blocks = await dataSource.query(`SELECT block_type AS "blockType", config FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [r.id]);
           const med = await analyzeScreenSetMedication(dataSource, blocks);
           if (medicationStoreAccessAllowed(med, storeType)) filtered.push(r);
         }
         visible = filtered;
       }
-      res.json({ success: true, data: visible });
+      const total = visible.length;
+      const pageRows = visible.slice(offset, offset + limit);
+      res.json({ success: true, data: pageRows, pagination: { page, limit, total, totalPages: Math.max(1, Math.ceil(total / limit)) } });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-set-hub/supplier-templates error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch supplier templates', code: 'INTERNAL_ERROR' });

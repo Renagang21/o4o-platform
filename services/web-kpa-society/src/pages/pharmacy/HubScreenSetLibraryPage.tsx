@@ -24,14 +24,14 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MonitorSmartphone, Download, X, Search, Store, Truck } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { DataTable } from '@o4o/operator-ux-core';
+import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import {
-  listOperatorTemplates,
+  listOperatorTemplatesPaged,
   getOperatorTemplate,
   importOperatorTemplate,
-  listSupplierTemplates,
+  listSupplierTemplatesPaged,
   getSupplierTemplate,
   importSupplierTemplate,
   type OperatorTemplateListItem,
@@ -54,6 +54,8 @@ const TEMPLATE_FILTERS = [
 ];
 
 type SourceTab = 'operator' | 'supplier';
+
+const PAGE_LIMIT = 20;
 
 function targetLabel(t: SupplierHubTargetStoreType): string {
   if (t === 'pharmacy') return '약국';
@@ -82,6 +84,11 @@ export function HubScreenSetLibraryPage() {
   const [q, setQ] = useState('');
   const [templateFilter, setTemplateFilter] = useState('');
   const [storeSlug, setStoreSlug] = useState<string | null>(null);
+  // WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1: 서버 페이지네이션 상태(운영자/공급자 탭 공통).
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_LIMIT));
 
   // 상세/미리보기 패널
   const [detail, setDetail] = useState<DetailState | null>(null);
@@ -107,25 +114,35 @@ export function HubScreenSetLibraryPage() {
     setIsLoading(true);
     setError(null);
     try {
-      const params = { q: q.trim() || undefined, templateKey: templateFilter || undefined };
+      const params = { q: q.trim() || undefined, templateKey: templateFilter || undefined, page, limit: PAGE_LIMIT };
       if (source === 'operator') {
-        setOperatorItems(await listOperatorTemplates(params));
+        const res = await listOperatorTemplatesPaged(params);
+        setOperatorItems(res.items);
+        setTotal(res.pagination.total);
       } else {
-        setSupplierItems(await listSupplierTemplates(params));
+        const res = await listSupplierTemplatesPaged(params);
+        setSupplierItems(res.items);
+        setTotal(res.pagination.total);
       }
     } catch (e: any) {
       setError(e?.message || '태블렛 화면을 불러올 수 없습니다');
     } finally {
       setIsLoading(false);
     }
-  }, [q, templateFilter, source]);
+  }, [q, templateFilter, source, page]);
 
   useEffect(() => { void loadData(); }, [loadData]);
 
-  // 소스 전환 시 열린 상세를 닫는다(축 혼동 방지).
+  // 검색어/템플릿 필터 변경 → 1페이지로(§8). 값 변경과 같은 렌더 배치라 loadData 는 1회만 실행.
+  const handleSearchChange = useCallback((value: string) => { setQ(value); setPage(1); }, []);
+  const handleTemplateFilterChange = useCallback((value: string) => { setTemplateFilter(value); setPage(1); }, []);
+
+  // 소스 전환 시 열린 상세를 닫고 1페이지로 초기화한다(§7, 축 혼동 방지).
   const switchSource = useCallback((next: SourceTab) => {
     if (next === source) return;
     setSource(next);
+    setPage(1);
+    setTotal(0);
     setDetail(null);
     setScreen(null);
     setImported(null);
@@ -342,14 +359,14 @@ export function HubScreenSetLibraryPage() {
           <Search className="w-4 h-4 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
           <input
             value={q}
-            onChange={(e) => setQ(e.target.value)}
+            onChange={(e) => handleSearchChange(e.target.value)}
             placeholder="콘텐츠명 검색"
             className="pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
         </div>
         <select
           value={templateFilter}
-          onChange={(e) => setTemplateFilter(e.target.value)}
+          onChange={(e) => handleTemplateFilterChange(e.target.value)}
           aria-label="템플릿 필터"
           className="px-2 py-1.5 rounded-lg border border-slate-200 text-sm"
         >
@@ -381,6 +398,11 @@ export function HubScreenSetLibraryPage() {
           tableId="store-hub-screen-set-supplier"
           onRowClick={(row) => void openSupplierDetail(row)}
         />
+      )}
+
+      {/* 표준 Pagination — 구 LIMIT 200 무고지 절단 제거(WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1). 한 페이지 이하면 컴포넌트가 자체적으로 미노출. */}
+      {totalPages > 1 && (
+        <Pagination page={page} totalPages={totalPages} onPageChange={setPage} total={total} />
       )}
 
       {/* 상세 · 미리보기 · 가져오기 패널 */}
