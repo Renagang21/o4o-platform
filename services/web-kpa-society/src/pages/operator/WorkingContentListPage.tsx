@@ -16,6 +16,7 @@ import {
   type WorkingContentItem,
 } from '../../api/workingContent';
 import { toast } from '@o4o/error-handling';
+import { ConfirmActionDialog } from '@o4o/ui';
 
 export default function WorkingContentListPage() {
   const navigate = useNavigate();
@@ -25,6 +26,10 @@ export default function WorkingContentListPage() {
   const [search, setSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
+  //   window.confirm → ConfirmActionDialog. dialog open 시점의 대상(id+title)을 고정.
+  const [deleteTarget, setDeleteTarget] = useState<WorkingContentItem | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const loadData = useCallback(async () => {
     setIsLoading(true);
@@ -42,14 +47,20 @@ export default function WorkingContentListPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const handleDelete = async (id: string, title: string) => {
-    if (!window.confirm(`"${title}" 콘텐츠를 삭제하시겠습니까?`)) return;
+  // 확인 UI 와 mutation executor 분리. 취소는 mutation 을 실행하지 않는다.
+  const confirmDelete = async () => {
+    const target = deleteTarget;
+    if (!target || deleting) return;
+    setDeleting(true);
     try {
-      await deleteWorkingContent(id);
+      await deleteWorkingContent(target.id);
       toast.success('콘텐츠가 삭제되었습니다');
+      setDeleteTarget(null);
       loadData();
     } catch (e: any) {
       toast.error(e?.message || '삭제에 실패했습니다');
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -151,7 +162,7 @@ export default function WorkingContentListPage() {
                     <Edit3 className="w-4 h-4" />
                   </button>
                   <button
-                    onClick={() => handleDelete(item.id, item.title)}
+                    onClick={() => setDeleteTarget(item)}
                     className="p-2 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-500"
                     title="삭제"
                   >
@@ -186,6 +197,19 @@ export default function WorkingContentListPage() {
           )}
         </>
       )}
+
+      {/* WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
+          삭제 확인 → 고정된 대상으로 confirmDelete 실행. 실행 중(deleting) 재확인/닫힘 방지. */}
+      <ConfirmActionDialog
+        open={!!deleteTarget}
+        title="콘텐츠 삭제"
+        message={deleteTarget ? `"${deleteTarget.title}" 콘텐츠를 삭제하시겠습니까?` : ''}
+        variant="danger"
+        confirmText="삭제"
+        loading={deleting}
+        onConfirm={confirmDelete}
+        onClose={() => { if (!deleting) setDeleteTarget(null); }}
+      />
     </div>
   );
 }

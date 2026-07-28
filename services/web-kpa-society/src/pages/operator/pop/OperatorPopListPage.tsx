@@ -21,7 +21,7 @@ import { useState, useEffect, useCallback, useMemo, type ReactNode } from 'react
 import { useNavigate } from 'react-router-dom';
 import { Edit3, Trash2, Send, Archive, Plus } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
-import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
+import { ActionBar, BulkResultModal, RowActionMenu, ConfirmActionDialog } from '@o4o/ui';
 import { DataTable, defineActionPolicy, buildRowActions, useBatchAction } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import {
@@ -56,6 +56,11 @@ const popActionPolicy = defineActionPolicy<OperatorPopPost>('kpa:operator-pop', 
       label: '발행',
       variant: 'primary',
       visible: (p) => p.status !== 'published',
+      confirm: {
+        title: 'POP 발행',
+        message: '이 POP 을 발행하시겠습니까? 발행 즉시 매장 HUB 에 노출됩니다.',
+        confirmText: '발행',
+      },
     },
     {
       key: 'archive',
@@ -132,8 +137,8 @@ export default function OperatorPopListPage() {
   }, [page, statusFilter]);
 
   // ── Single row actions ──
+  // 확인은 popActionPolicy.publish.confirm (RowActionMenu → ConfirmActionDialog) 가 담당.
   const handlePublish = useCallback(async (post: OperatorPopPost) => {
-    if (!window.confirm(`"${post.title}" POP 을 발행하시겠습니까? 발행 즉시 매장 HUB 에 노출됩니다.`)) return;
     setActionLoading(post.id);
     try {
       await publishOperatorPopPost(post.id);
@@ -183,6 +188,11 @@ export default function OperatorPopListPage() {
   );
 
   type BulkOp = 'publish' | 'archive' | 'delete';
+  // WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
+  //   확인 UI 를 runBulk 에서 분리. dialog open 시점의 target IDs 를 고정(pendingBulk.ids)해
+  //   selection 이 바뀌어도 저장된 대상으로만 실행한다.
+  type BulkConfirmState = { op: BulkOp; ids: string[]; title: string; message: string; variant?: 'default' | 'danger' | 'warning'; confirmText: string };
+  const [pendingBulk, setPendingBulk] = useState<BulkConfirmState | null>(null);
   const batchPopOp = useCallback(
     async (
       ids: string[],
@@ -208,10 +218,10 @@ export default function OperatorPopListPage() {
     [],
   );
 
+  // runBulk 은 이미 확인된 작업만 실행한다 (확인 UI/window.confirm 미포함).
   const runBulk = useCallback(
-    async (ids: string[], op: BulkOp, opts?: { confirm?: string }) => {
+    async (ids: string[], op: BulkOp) => {
       if (ids.length === 0) return;
-      if (opts?.confirm && !window.confirm(opts.confirm)) return;
       const result = await batch.executeBatch(batchPopOp, ids, { op });
       if (result.successCount > 0) {
         setSelectedIds(new Set());
@@ -221,24 +231,44 @@ export default function OperatorPopListPage() {
     [batch, batchPopOp, loadData],
   );
 
-  const handleBulkPublish = useCallback(
-    () => runBulk(selectedDraftOrArchivedIds, 'publish'),
-    [runBulk, selectedDraftOrArchivedIds],
-  );
-  const handleBulkArchive = useCallback(
-    () => runBulk(selectedNotArchivedIds, 'archive', {
-      confirm: `선택한 ${selectedNotArchivedIds.length}개 POP 을 보관하시겠습니까?`,
-    }),
-    [runBulk, selectedNotArchivedIds],
-  );
-  const handleBulkDelete = useCallback(
-    () => runBulk(
-      items.filter((p) => selectedIds.has(p.id)).map((p) => p.id),
-      'delete',
-      { confirm: `선택한 ${selectedIds.size}개 POP 을 삭제하시겠습니까? 되돌릴 수 없습니다.` },
-    ),
-    [runBulk, items, selectedIds],
-  );
+  // 확인 대상 IDs 를 dialog open 시점에 고정 → 이후 selection 변경과 무관하게 실행.
+  const handleBulkPublish = useCallback(() => {
+    const ids = selectedDraftOrArchivedIds;
+    if (ids.length === 0) return;
+    setPendingBulk({
+      op: 'publish', ids,
+      title: '일괄 발행',
+      message: `선택한 ${ids.length}개 POP 을 발행하시겠습니까? 발행 즉시 매장 HUB 에 노출됩니다.`,
+      confirmText: '발행',
+    });
+  }, [selectedDraftOrArchivedIds]);
+  const handleBulkArchive = useCallback(() => {
+    const ids = selectedNotArchivedIds;
+    if (ids.length === 0) return;
+    setPendingBulk({
+      op: 'archive', ids,
+      title: '일괄 보관',
+      message: `선택한 ${ids.length}개 POP 을 보관하시겠습니까?`,
+      confirmText: '보관',
+    });
+  }, [selectedNotArchivedIds]);
+  const handleBulkDelete = useCallback(() => {
+    const ids = items.filter((p) => selectedIds.has(p.id)).map((p) => p.id);
+    if (ids.length === 0) return;
+    setPendingBulk({
+      op: 'delete', ids,
+      title: '일괄 삭제',
+      message: `선택한 ${ids.length}개 POP 을 삭제하시겠습니까? 되돌릴 수 없습니다.`,
+      variant: 'danger',
+      confirmText: '삭제',
+    });
+  }, [items, selectedIds]);
+  const handleConfirmBulk = useCallback(async () => {
+    const pending = pendingBulk;
+    if (!pending) return;
+    await runBulk(pending.ids, pending.op);
+    setPendingBulk(null);
+  }, [pendingBulk, runBulk]);
 
   // ── Columns ──
   const columns: ListColumnDef<OperatorPopPost>[] = useMemo(() => [
@@ -413,6 +443,19 @@ export default function OperatorPopListPage() {
             onClose={() => batch.clearResult()}
             result={batch.result}
             onRetry={() => batch.retryFailed()}
+          />
+
+          {/* WO-O4O-KPA-OPERATOR-RUNBULK-CONFIRM-FLOW-STANDARDIZATION-V1:
+              일괄 확인 → 고정된 target IDs 로 runBulk 실행. 실행 중(batch.loading) 재확인/닫힘 방지. */}
+          <ConfirmActionDialog
+            open={!!pendingBulk}
+            title={pendingBulk?.title ?? ''}
+            message={pendingBulk?.message ?? ''}
+            variant={pendingBulk?.variant}
+            confirmText={pendingBulk?.confirmText}
+            loading={batch.loading}
+            onConfirm={handleConfirmBulk}
+            onClose={() => { if (!batch.loading) setPendingBulk(null); }}
           />
 
           <DataTable<OperatorPopPost>
