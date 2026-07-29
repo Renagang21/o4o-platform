@@ -3,7 +3,7 @@
 > WO: `WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1`
 > 근거 IR: `docs/investigations/IR-O4O-STORE-HUB-END-TO-END-CURRENT-STATE-AUDIT-V1.md` (HUB-P2-07 — 태블렛 화면 HUB 목록 `LIMIT 200` 고정, 페이지네이션·total 없음)
 > 선행: `WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1` (commit a71de1f64 / c5809eb58 / CHECK c07bf6c3b)
-> 상태: **DONE** · 배포(commit 4ef0d2f80) + 프로덕션 API smoke 완료(2026-07-29)
+> 상태: **DONE** · 배포(commit 4ef0d2f80) + 프로덕션 API·브라우저 DOM smoke 완료(2026-07-29)
 > 일자: 2026-07-29
 
 ---
@@ -171,10 +171,22 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 - **판정**: 응답 구조(`success`+`data` 배열+`pagination` 메타) · `total` · limit 클램프(≤100) · 범위초과 page 방어 · 필터 무해성 모두 확인. **HTTP 4xx/5xx 0건.**
 - **빈 상태**: 현행 프로덕션에 운영자·공급자 게시 원본 **0건**(`total:0`). `totalPages:1` → 프론트 `{totalPages > 1 && <Pagination/>}` 조건상 Pagination 미노출이 정상. 빈 상태·미노출 계약 확인. **§11 지침대로 테스트 원본 생성하지 않음.**
 
+### 브라우저 DOM smoke (§11) — 완료 2026-07-29
+
+- 로그인: 로그인 화면 "🧪 체험용 약국 경영자 계정" → `/store` (매장 "테스트 약국 매장", 약국 유형, 진열 20/QR 27).
+- `/store-hub/screen-set` **정상 렌더**: 헤딩 "태블렛 화면 (HUB)" · 운영자/공급자 탭 · 검색 입력 · 템플릿 필터(4종) · DataTable.
+- **탭 전환**: 운영자(컬럼 콘텐츠명/출처/템플릿/수정일) ↔ 공급자(콘텐츠명/공급자/게시 대상/템플릿/수정일) 정상. 각 빈 상태 문구 표시.
+- **네트워크 트레이스**(page=1 리셋 동선 실증, 전부 200):
+  - `templates?page=1&limit=20` → 200 (운영자 초기)
+  - `supplier-templates?page=1&limit=20` → 200 (공급자 탭)
+  - `supplier-templates?q=테스트검색&page=1&limit=20` → 200 (검색 → page=1)
+  - `supplier-templates?q=테스트검색&templateKey=product_focus&page=1&limit=20` → 200 (템플릿 필터 → page=1)
+- **Pagination 렌더 조건**: total=0 → `{totalPages > 1 && …}` 미노출 확인.
+- **console error 0 · HTTP 4xx/5xx 0.**
+
 ### 데이터 부재로 미실증 가능 항목
 
-- 실제 다중 페이지 이동(원본 201+ 필요) — 프로덕션 원본 0건이라 실증 불가. API `total=0` 로 확정.
-- 프론트 `/store-hub/screen-set` 브라우저 DOM 렌더(운영자/공급자 탭·검색 입력·Pagination 노출) — 프로필 락으로 이번엔 API 계약 검증으로 대체. 프론트 변경은 isolated typecheck PASS + 검증된 `HubVideoLibraryPage` 페이지네이션 패턴 복제로 렌더 리스크 낮음. 데이터 유입 후(원본 21+ 게시 시) 브라우저 페이지 이동 실증 권장.
+- 실제 다중 페이지 이동(원본 21+ 필요) — 프로덕션 원본 0건이라 실증 불가. API `total=0` 로 확정. 데이터 유입 후 페이지 이동 실증 권장(코드는 검증된 `HubVideoLibraryPage` 패턴 복제).
 
 ---
 
@@ -202,7 +214,7 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 - [x] KPA 외 서비스 변경 0
 - [x] DB migration 0
 - [x] typecheck(변경 파일) PASS
-- [x] 배포 및 smoke — API 직접 호출 실증(프로덕션, 상단 표). 브라우저 DOM 렌더는 프로필 락으로 데이터 유입 후 권장
+- [x] 배포 및 smoke — API 직접 호출 + 브라우저 DOM 렌더 실증(프로덕션, 상단 표·트레이스). 다중 페이지 이동만 원본 0건으로 미실증
 - [x] CHECK commit/push
 
 ---
