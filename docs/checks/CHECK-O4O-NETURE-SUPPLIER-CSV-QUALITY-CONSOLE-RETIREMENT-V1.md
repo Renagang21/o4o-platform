@@ -95,12 +95,17 @@ cloud-sql-proxy(read-only, o4o_api) 로 `o4o_platform` 재확인. write 0.
 | route/menu type error | 0 |
 | backend 변경 | 없음 → API build 생략 |
 
-## 12. 브라우저 smoke (§16) — 배포 후 기록 예정
+## 12. 브라우저 smoke (§16) — 2026-07-29 배포 후 수행
 
-- `/operator/supplier-quality` → `/operator/suppliers` replace (404/blank/loop 0)
-- `/admin/supplier-quality` → `/admin/supplier-governance` replace (404/blank/loop 0)
-- operator/admin 메뉴에 공급자 품질 0 · 공급자 승인/상태 관리 정상
-- console error 0 · HTTP 4xx/5xx 0 · 운영 mutation 0
+배포: 커밋 `cbd6b6f82` → GitHub Actions "Deploy Web Services" success (neture-web). Neture admin 로그인 후 관측.
+
+| 관측 | 결과 |
+|------|:----:|
+| 비로그인 `/operator/supplier-quality` → 로그인(`/`) (auth guard 유지, 권한 확대 0) | ✅ |
+| 로그인 `/operator/supplier-quality` → `/operator/suppliers` replace (heading "공급자 승인", 404/blank/loop 0) | ✅ |
+| 로그인 `/admin/supplier-quality` → `/admin/supplier-governance` replace (heading "공급자 상태 관리", 404/blank/loop 0) | ✅ |
+| operator/admin 메뉴에 공급자 품질 0 · 공급자 승인/상태 관리 정상 | ✅ |
+| console error 0 (redirect flow) · 운영 mutation 0 | ✅ |
 
 ## 13. DB·migration·운영 mutation
 
