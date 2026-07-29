@@ -204,7 +204,51 @@ rg "ai-contents|productAiContent|getProductAiContents|saveProductAiContent" \
 
 ## 10. §15 프로덕션 smoke
 
-(배포 후 기록 — 아래 §10.1~§10.3)
+배포: GitHub Actions `Deploy API Server` run 30432565393 **success** ·
+`Deploy Web Services` run 30432565400 **success**
+(detect-changes → kpa-society / glycopharm / k-cosmetics 3종 모두 deploy success).
+커밋 `513cc64f4` 가 `origin/main` 의 조상임 확인.
+
+### 10.1 KPA — `/store/marketing/product-descriptions` (약국 경영자 계정) — **PASS**
+
+| 항목 | 결과 |
+|---|---|
+| 페이지 로드 | ✅ 매장 자체 상품 8건 렌더 |
+| `ai-contents` 요청 | ✅ **0건** (403 도 0건) |
+| 목록 API | `200 GET /api/v1/store/local-products?page=1&limit=100&activeOnly=true` |
+| 저장 없음 상태 | ✅ `저장된 상세 설명이 없습니다.` |
+| 안내 문구 | ✅ "이 화면의 상세설명은 **매장 자체 상품에 저장**되며 …" |
+| 저장 | ✅ `200 PUT /api/v1/store/local-products/{id}` |
+| 새로고침 지속성 | ✅ 본문 유지 + `저장: 2026. 7. 29. 오후 4:57:58` |
+| DB 반영 | ✅ `store_local_products.detail_html = '<p>…스모크 검증 문장</p>'` |
+| 타 필드 보존 | ✅ `description` / `summary` 유지 (usage_info·caution_info 는 원래 NULL) |
+
+**원복**: 대상 상품(`cd3a2b29…7923`) 의 원래 값은 `detail_html = NULL` 이었고,
+앱의 부분 업데이트 API 로 `detailHtml: ''` 를 전송해 **NULL 로 복구 완료** (직접 DB write 0).
+복구 후 `detail_html` 이 비어있지 않은 로컬 상품 **0건** 재확인.
+
+### 10.2 GlycoPharm — `/store/library/product-descriptions` — **PASS**
+
+페이지 로드 ✅ (내 약국 상품 8건) · `ai-contents` 요청 **0건** ·
+`200 GET /api/v1/store/local-products` · `저장된 상세 설명이 없습니다.` ·
+"약국" 문구 축 유지 확인.
+
+### 10.3 K-Cosmetics — `/store/library/product-descriptions` — **PASS**
+
+페이지 로드 ✅ (내 매장 상품 2건) · `ai-contents` 요청 **0건** ·
+`200 GET /api/v1/store/local-products` · "매장" 문구 축 유지 확인.
+(K-Cosmetics 는 테스트 계정 SSOT 에 매장 계정이 없어 운영자 계정으로 화면 진입만 검증했다.
+`403 GET /api/v1/cosmetics/store-hub/capabilities` 는 계정 역할에서 오는 선행 사항으로 본 WO 범위 밖.)
+
+### 10.4 smoke 중 발견·수정한 결함 — 빈 편집기 저장
+
+KPA 저장 smoke 의 원복 과정에서, RichTextEditor 가 빈 문서를 `<p></p>` 로 내보내
+`content.trim()` 가드를 통과해 **빈 markup 이 `detail_html` 에 저장**되는 것을 확인했다.
+
+수정: 3서비스 `handleSave` 에 `normalizeEditorHtml()` 추가 —
+`<br>` / `&nbsp;` / 빈 `<p></p>` 를 제거해 실질 내용이 없으면 빈 값으로 취급하고
+기존 "내용을 입력하세요" 가드로 흡수한다. 저장 의미·삭제 정책은 변경하지 않는다.
+프로덕션에 남은 `<p></p>` 값은 위 §10.1 원복으로 제거되었다.
 
 ---
 

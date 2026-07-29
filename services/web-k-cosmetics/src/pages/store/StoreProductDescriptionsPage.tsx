@@ -122,9 +122,23 @@ export default function StoreProductDescriptionsPage() {
     toast.success('자료 내용을 편집기에 채웠습니다');
   };
 
+  /**
+   * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+   *   RichTextEditor 는 빈 문서를 `<p></p>` / `<p><br></p>` 로 내보낸다.
+   *   그대로 저장하면 detail_html 에 빈 markup 이 쌓이므로 빈 값으로 정규화한다.
+   */
+  const normalizeEditorHtml = (html: string): string => {
+    const stripped = html
+      .replace(/<br\s*\/?>/gi, '')
+      .replace(/&nbsp;/gi, ' ')
+      .replace(/<p>\s*<\/p>/gi, '')
+      .trim();
+    return stripped === '' ? '' : html.trim();
+  };
+
   const handleSave = async () => {
     if (!selectedId) return;
-    const trimmed = content.trim();
+    const trimmed = normalizeEditorHtml(content);
     if (!trimmed) {
       toast.error('내용을 입력하세요');
       return;
