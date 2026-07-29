@@ -34,8 +34,6 @@ import { EventOfferManagePage } from '../pages/operator/event-offer';
 import OperatorForumPage from '../pages/operator/OperatorForumPage';
 import OperatorContentHubPage from '../pages/operator/OperatorContentHubPage';
 import OperatorContentDetailPage from '../pages/operator/OperatorContentDetailPage';
-import WorkingContentListPage from '../pages/operator/WorkingContentListPage';
-import WorkingContentEditPage from '../pages/operator/WorkingContentEditPage';
 // ContentHubPage import removed (WO-KPA-SIGNAGE-UI-RESTRUCTURE-V1) — community-only page, no operator route
 // Signage Operator Console (WO-O4O-SIGNAGE-CONSOLE-V1)
 import HqMediaPage from '../pages/operator/signage/HqMediaPage';
@@ -148,10 +146,6 @@ export function OperatorRoutes() {
           {/* 자료 등록/수정 (WO-KPA-RESOURCE-HUB-RESTRUCTURE-V1) */}
           <Route path="resources/new" element={<OperatorContentHubPage />} />
           <Route path="resources/:id/edit" element={<OperatorContentDetailPage />} />
-
-          {/* 내 콘텐츠 (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1) */}
-          <Route path="working-content" element={<WorkingContentListPage />} />
-          <Route path="working-content/:id" element={<WorkingContentEditPage />} />
 
           {/* 게시판 (WO-KPA-A-PLACEHOLDER-PAGES-IMPLEMENTATION: KPA-a operator 전용) */}
           <Route path="forum" element={<OperatorForumPage />} />

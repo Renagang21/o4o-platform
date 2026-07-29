@@ -11,7 +11,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Plus, Search, RefreshCw, Pencil, Trash2, Copy, Tag,
+  Plus, Search, RefreshCw, Pencil, Trash2, Tag,
   FileText, ChevronRight, Loader2, AlertCircle, Lightbulb,
 } from 'lucide-react';
 // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1: 콘텐츠 제작 가이드(공통 모달, operator 모드)
@@ -99,7 +99,6 @@ export default function OperatorContentHubPage() {
   // WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
   //   window.confirm(파괴적 삭제) → ConfirmActionDialog(danger). 대상 보관 후 확인 시 삭제 실행.
   const [deleteTarget, setDeleteTarget] = useState<ContentItem | null>(null);
-  const [copying, setCopying] = useState<string | null>(null);
   // WO-O4O-KPA-OPERATOR-DOCS-CONTENT-CREATION-GUIDE-MODAL-V1
   const [guideOpen, setGuideOpen] = useState(false);
 
@@ -161,19 +160,6 @@ export default function OperatorContentHubPage() {
     } finally {
       setDeleting(null);
       setDeleteTarget(null);
-    }
-  };
-
-  // ─── Copy to Store ────────────────────────────────────────────────────────
-  const handleCopyToStore = async (item: ContentItem) => {
-    setCopying(item.id);
-    try {
-      await apiFetch(`/api/v1/kpa/contents/${item.id}/copy-to-store`, { method: 'POST', body: '{}' });
-      toast.success('내 공간에 복사되었습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '복사에 실패했습니다');
-    } finally {
-      setCopying(null);
     }
   };
 
@@ -366,17 +352,8 @@ export default function OperatorContentHubPage() {
       align: 'right',
       render: (_v, item) => {
         const isDeleting = deleting === item.id;
-        const isCopying = copying === item.id;
         return (
           <div className="flex items-center justify-end gap-1">
-            <button
-              onClick={() => handleCopyToStore(item)}
-              disabled={isCopying}
-              title="내 공간에 복사"
-              className="p-1.5 rounded-lg hover:bg-blue-50 text-blue-500 disabled:opacity-40"
-            >
-              {isCopying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
-            </button>
             <button
               onClick={() => openEdit(item)}
               title="수정"

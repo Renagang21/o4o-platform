@@ -9,7 +9,7 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Tag, FileText, Loader2, AlertCircle,
-  Sparkles, Copy, CheckCircle2, ExternalLink,
+  Sparkles, CheckCircle2, ExternalLink,
 } from 'lucide-react';
 import { BlockRenderer } from '@o4o/block-renderer';
 // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 우선 렌더
@@ -70,7 +70,6 @@ export default function OperatorContentDetailPage() {
   const [aiLoading, setAiLoading] = useState<'summarize' | 'extract' | 'tag' | null>(null);
   const [keyPoints, setKeyPoints] = useState<string[]>([]);
   const [suggestedTags, setSuggestedTags] = useState<string[]>([]);
-  const [isCopying, setIsCopying] = useState(false);
 
   useEffect(() => {
     if (!id) return;
@@ -130,20 +129,6 @@ export default function OperatorContentDetailPage() {
     }
   };
 
-  // ─── Copy to Store ────────────────────────────────────────────────────────
-  const handleCopyToStore = async () => {
-    if (!id) return;
-    setIsCopying(true);
-    try {
-      await apiFetch(`/api/v1/kpa/contents/${id}/copy-to-store`, { method: 'POST', body: '{}' });
-      toast.success('내 공간에 복사되었습니다');
-    } catch (e: any) {
-      toast.error(e?.message || '복사에 실패했습니다');
-    } finally {
-      setIsCopying(false);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
@@ -192,15 +177,6 @@ export default function OperatorContentDetailPage() {
             )}
           </div>
         </div>
-        {/* 내 공간에 복사 */}
-        <button
-          onClick={handleCopyToStore}
-          disabled={isCopying}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium disabled:opacity-50"
-        >
-          {isCopying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Copy className="w-4 h-4" />}
-          내 공간에 복사
-        </button>
       </div>
 
       <div className="grid grid-cols-3 gap-6">

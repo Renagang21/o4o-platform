@@ -127,7 +127,6 @@ import { createMypageController } from './controllers/mypage.controller.js';
 import { createMeContextController } from './controllers/me-context.controller.js'; // WO-KPA-LOGIN-LATENCY-CLEANUP-V1
 import { createQualificationController } from './controllers/qualification.controller.js'; // WO-O4O-QUALIFICATION-SYSTEM-V1
 import { createInstructorDashboardController } from './controllers/instructor-dashboard.controller.js'; // WO-O4O-INSTRUCTOR-DASHBOARD-V1
-import { createWorkingContentController } from './controllers/working-content.controller.js';
 import { execute } from '@o4o/ai-core';
 import { buildConfigResolver } from '../../utils/ai-config-resolver.js';
 import {
@@ -247,11 +246,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   // OPERATOR ROUTES — requireKpaScope('kpa:operator') enforced
   // WO-KPA-A-ADMIN-OPERATOR-REALIGNMENT-V1: Operations/Content → Operator
   // ============================================================================
-
-  // WorkingContent CRUD + Publish (WO-O4O-STORE-CONTENT-USAGE-RECOMPOSE-V1)
-  // MUST be registered BEFORE operator summary controller (Express route ordering:
-  // summary controller's requireKpaScope('kpa:operator') middleware intercepts all /operator/* requests)
-  router.use('/operator/working-contents', createWorkingContentController(dataSource, coreRequireAuth as any));
 
   // Operator Summary routes (운영자 실사용 화면 1단계)
   router.use('/operator', createOperatorSummaryController(dataSource, {
@@ -2052,47 +2046,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
         const suggestedTags = content.category ? [content.category, ...existingTags] : existingTags;
         res.json({ success: true, data: { suggestedTags: [...new Set(suggestedTags)].slice(0, 8) } });
       }
-    }));
-
-    // ── Copy to Store ──────────────────────────────────────────────────────
-    //
-    // @deprecated WO-O4O-CONTENT-HUB-ASSET-SNAPSHOT-WIRING-V1
-    //   사용자 경로의 "내 자료함 가져가기"는 표준 자료함(o4o_asset_snapshots) 시스템으로 이전됨.
-    //   콘텐츠 허브의 ContentListPage / ContentDocumentsPage 는 이제
-    //   `POST /assets/copy { sourceAssetId, assetType: 'content' }` 를 호출한다.
-    //
-    //   본 엔드포인트(kpa_working_contents 저장 경로)는 운영자(operator)의 working copy
-    //   편집/발행 흐름(WorkingContentListPage, WorkingContentEditPage)에서 여전히 사용되므로
-    //   당장 제거하지 않는다. 후속 WO에서 운영자 경로 통합 후 deprecate 종료.
-
-    // POST /contents/:id/copy-to-store
-    contentRouter.post('/:id/copy-to-store', authenticate, asyncHandler(async (req: Request, res: Response) => {
-      const userId = (req as any).user?.id;
-      const [content] = await dataSource.query(
-        `SELECT * FROM kpa_contents WHERE id = $1 AND is_deleted = false LIMIT 1`,
-        [req.params.id]
-      );
-      if (!content) {
-        res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: '콘텐츠를 찾을 수 없습니다' } });
-        return;
-      }
-      // 완전 독립 복사 — 원본과 분리, sync 없음
-      // WO-O4O-KPA-QR-CONTENT-RICH-EDITOR-ADOPTION-V1: body(HTML) 도 함께 복사 (유실 방지)
-      const [saved] = await dataSource.query(
-        `INSERT INTO kpa_working_contents (source_content_id, owner_id, title, edited_blocks, body, tags, category)
-         VALUES ($1,$2,$3,$4,$5,$6,$7)
-         RETURNING *`,
-        [
-          content.id,
-          userId,
-          content.title,
-          JSON.stringify(content.blocks),
-          content.body || null,
-          JSON.stringify(Array.isArray(content.tags) ? content.tags : []),
-          content.category,
-        ]
-      );
-      res.status(201).json({ success: true, data: saved });
     }));
 
     router.use('/contents', contentRouter);
