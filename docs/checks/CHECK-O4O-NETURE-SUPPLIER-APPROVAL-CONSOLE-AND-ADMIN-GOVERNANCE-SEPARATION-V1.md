@@ -87,14 +87,17 @@ FROM neture_settlements WHERE supplier_id = $1 AND status IN ('calculated','appr
 
 ---
 
-## 5. 프로덕션 read-only smoke (§14)
+## 5. 프로덕션 read-only smoke (§14) — 2026-07-29 수행
 
-배포 후 아래 read-only 검증 수행 (프로덕션 공급자 상태 변경 없음):
+배포: **API `o4o-core-api-02985-sc2` (serving) · neture-web 재배포 success** (커밋 cb4dbf9d7).
+프로덕션 공급자 상태는 변경하지 않음 (read-only).
 
-- [ ] `/admin/admin-suppliers` → `/admin/supplier-governance` redirect 동작
-- [ ] governance 목록 ACTIVE/INACTIVE 만 노출, 8개 컬럼 렌더
-- [ ] `/operator/suppliers` PENDING 승인/거절 유지, 비활성화 액션 미노출
-- [ ] 비활성화 다이얼로그 사유 필수(빈 사유 확인 불가), 취소=변경 0
-- [ ] (관측) 진행 주문/미정산 보유 공급자 비활성화 시 409 차단 메시지
+| 검증 | 방법 | 결과 |
+|------|------|:----:|
+| `GET /neture/admin/suppliers/governance` 배포됨 | 무인증 probe → `401`(NOT 404) | ✅ |
+| `POST /neture/admin/suppliers/:id/deactivate` 배포됨 | 무인증 probe → `401`(NOT 404) | ✅ |
+| `POST /neture/admin/suppliers/:id/reactivate` 배포됨 (신규) | 무인증 probe → `401`(NOT 404) | ✅ |
+| neture-web 번들에 `/admin/supplier-governance` 라우트 + redirect | 배포 index chunk grep: `supplier-governance`×3, `admin-suppliers`×1, `AdminSupplierGovernance`×2 | ✅ |
+| 구 `AdminSupplierApprovalPage` 제거 반영 | 배포 번들 grep: `AdminSupplierApproval` 0건 | ✅ |
 
-> smoke 결과는 배포 후 본 문서 §5 체크박스와 커밋 로그에 기록한다.
+**브라우저 UI smoke (로그인 후 화면 관측):** 로컬 Playwright 프로필이 타 Chrome 세션 점유로 실행 불가 → HTTP/번들 레벨 read-only 검증으로 대체. 로그인 화면 관측 항목(redirect 시각 확인 / 8컬럼 렌더 / operator 비활성화 미노출 / 사유 필수 다이얼로그 취소=변경 0)은 브라우저 가용 시 후속 관측 권장. 라우트·엔드포인트·번들 반영은 위 표로 확인됨.
