@@ -1,0 +1,173 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-MASTER-BY-MASTER-PILOT-100-PRODUCTION-V1",
+  "kind": "expansion-verdict",
+  "agent": "ga",
+  "note": "WO §15 EXP-01~EXP-11. 성공률은 확대 차단 요소가 아니다(WO 명시). 모든 근거는 원장/독립검증 산출물에서 기계 판독.",
+  "successRate": {
+    "green": 80,
+    "target": 100,
+    "rate": 0.8,
+    "blocksExpansion": false
+  },
+  "byStratum": {
+    "A_NORMAL": {
+      "total": 70,
+      "green": 70,
+      "exception": 0,
+      "skip": 0
+    },
+    "B_BOUNDARY": {
+      "total": 20,
+      "green": 10,
+      "exception": 10,
+      "skip": 0
+    },
+    "C_SOURCE_COMPOSER": {
+      "total": 10,
+      "green": 0,
+      "exception": 10,
+      "skip": 0
+    }
+  },
+  "byRouteProduced": {
+    "oral": 38,
+    "ophthalmic": 11,
+    "topical": 26,
+    "vaginal": 2,
+    "oromucosal": 3
+  },
+  "byExceptionCode": {
+    "ROUTE_UNRESOLVED": 6,
+    "ROUTE_CONFLICT": 4,
+    "SOURCE_EFFICACY_MISSING": 10
+  },
+  "items": [
+    {
+      "id": "EXP-01",
+      "name": "실패 제품 DB write 0 (제품별 격리)",
+      "pass": true,
+      "evidence": {
+        "exception": 20,
+        "writeActualSum": 0,
+        "residueDirty": 0
+      }
+    },
+    {
+      "id": "EXP-02",
+      "name": "실패 후 다음 제품 생산 계속 (중단 0)",
+      "pass": true,
+      "evidence": {
+        "processed": 100,
+        "target": 100,
+        "green": 80,
+        "exception": 20,
+        "skip": 0
+      }
+    },
+    {
+      "id": "EXP-03",
+      "name": "재실행 시 완료 제품 중복 반영 0",
+      "pass": true,
+      "evidence": {
+        "rerunWrite": 0,
+        "rerunSkip": 80,
+        "rerunGreen": 0
+      }
+    },
+    {
+      "id": "EXP-04",
+      "name": "독립검증(별개 코드경로) 전 항목 PASS",
+      "pass": true,
+      "evidence": {
+        "checks": 24,
+        "failed": 0,
+        "codePath": "otc-v4-pilot-100-independent-verify.ga.ts (생산 실행기와 분리 · contract/composer 미import · 원장 SSOT 재계산 · DB 원문 재파싱)"
+      }
+    },
+    {
+      "id": "EXP-05",
+      "name": "제품별 write 계약 준수 (GREEN×6T)",
+      "pass": true,
+      "evidence": {
+        "koWrite": 320,
+        "enWrite": 160,
+        "write": 480,
+        "expected": 480
+      }
+    },
+    {
+      "id": "EXP-06",
+      "name": "sourceRef 결정성·유일성 (V4 namespace, 중복·누수 0)",
+      "pass": true,
+      "evidence": {
+        "checks": [
+          "C-03b",
+          "C-04",
+          "C-07"
+        ]
+      }
+    },
+    {
+      "id": "EXP-07",
+      "name": "공식 6섹션·수치 보존 (KO/EN)",
+      "pass": true,
+      "evidence": {
+        "checks": [
+          "C-09",
+          "C-11"
+        ]
+      }
+    },
+    {
+      "id": "EXP-08",
+      "name": "기존 LIVE 자산 불변 (READY 1,134 · V1/V2/V3)",
+      "pass": true,
+      "evidence": {
+        "checks": [
+          "C-12",
+          "C-12b",
+          "C-13"
+        ]
+      }
+    },
+    {
+      "id": "EXP-09",
+      "name": "예외 원장이 나 에이전트 인수 가능(17 필드 완비 · 중복 0)",
+      "pass": true,
+      "evidence": {
+        "total": 20,
+        "byCode": {
+          "ROUTE_UNRESOLVED": 6,
+          "ROUTE_CONFLICT": 4,
+          "SOURCE_EFFICACY_MISSING": 10
+        },
+        "schema": "otc-v4-master-by-master-exception-handoff v1"
+      }
+    },
+    {
+      "id": "EXP-10",
+      "name": "체크포인트·중단복구 동작 (10~20 master 단위)",
+      "pass": true,
+      "evidence": {
+        "checkpoints": 10
+      }
+    },
+    {
+      "id": "EXP-11",
+      "name": "시스템 중지 조건(SYS-01~SYS-12) 발생 0",
+      "pass": true,
+      "evidence": {
+        "run1Pass": true,
+        "rerunPass": true,
+        "independentFailed": 0
+      }
+    }
+  ],
+  "verdict": "APPROVED_FOR_PILOT_500",
+  "nextScope": {
+    "batch": 500,
+    "populationRemaining": 3729,
+    "writeOwner": "agent-ga",
+    "prerequisite": "동일 실행기·동일 계약. TM 확장(신규 문장) 및 route composer 미지원 섹션은 제품별 예외로 격리."
+  }
+}

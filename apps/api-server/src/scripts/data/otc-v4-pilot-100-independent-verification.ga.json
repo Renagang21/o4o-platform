@@ -1,0 +1,221 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-MASTER-BY-MASTER-PILOT-100-PRODUCTION-V1",
+  "kind": "independent-verification",
+  "codePath": "otc-v4-pilot-100-independent-verify.ga.ts (생산 실행기와 분리 · contract/composer 미import · 원장 SSOT 재계산 · DB 원문 재파싱)",
+  "agent": "ga",
+  "readOnly": true,
+  "port": 5495,
+  "runStart": "2026-07-29T07:45:46.360Z",
+  "summary": {
+    "checks": 24,
+    "failed": 0,
+    "pass": true,
+    "green": 80,
+    "exception": 20,
+    "skip": 0,
+    "dbAuthoredKo": 80,
+    "dbAuthoredEn": 80
+  },
+  "checks": [
+    {
+      "id": "C-01",
+      "name": "pilot 대상 master 수",
+      "pass": true,
+      "actual": 100,
+      "expected": 100
+    },
+    {
+      "id": "C-02",
+      "name": "GREEN+EXCEPTION+SKIP 합계",
+      "pass": true,
+      "actual": 100,
+      "expected": 100,
+      "detail": {
+        "green": 80,
+        "exception": 20,
+        "skip": 0
+      }
+    },
+    {
+      "id": "C-03",
+      "name": "결과 원장 중복 master",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-03b",
+      "name": "sourceRef 독립 재계산 불일치",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-04",
+      "name": "V4 sourceRef pilot 범위 밖 점유",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-05",
+      "name": "GREEN KO/EN canonical·audit·sourceRef 정합 위반",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-06",
+      "name": "예외(실패) 제품 DB 잔여물·write",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-07",
+      "name": "V4 sourceRef 다중 master 점유",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-08",
+      "name": "canonical 중복(master×language)",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-09",
+      "name": "공식 6섹션 보존·수치 보존 위반",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-10",
+      "name": "저장 content hash ≠ payload/원장",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-11",
+      "name": "EN 한글·route 동사·수치 위반",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": []
+    },
+    {
+      "id": "C-12",
+      "name": "READY 1,134 pilot 교집합",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-12b",
+      "name": "READY 1,134 실행 이후 변경 row",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": {
+        "checked": 0,
+        "runStart": "2026-07-29T07:45:46.360Z"
+      }
+    },
+    {
+      "id": "C-13",
+      "name": "pilot 밖 authored STORE row 실행 이후 변경",
+      "pass": true,
+      "actual": 0,
+      "expected": 0,
+      "detail": {
+        "runStart": "2026-07-29T07:45:46.360Z"
+      }
+    },
+    {
+      "id": "C-14",
+      "name": "batch audit 범위 밖",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-14b",
+      "name": "batch audit 건수 = GREEN 수",
+      "pass": true,
+      "actual": 80,
+      "expected": 80
+    },
+    {
+      "id": "C-15",
+      "name": "원장 GREEN 수 = DB authored KO/EN canonical master 수",
+      "pass": true,
+      "actual": {
+        "green": 80,
+        "ko": 80,
+        "en": 80
+      },
+      "expected": {
+        "green": 80,
+        "ko": 80,
+        "en": 80
+      }
+    },
+    {
+      "id": "C-15b",
+      "name": "원장 writeActual 합계 = 계약(GREEN×6)",
+      "pass": true,
+      "actual": 480,
+      "expected": 480
+    },
+    {
+      "id": "C-16",
+      "name": "재실행 신규 write",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-16b",
+      "name": "재실행 SKIP_ALREADY_COMPLETE",
+      "pass": true,
+      "actual": 80,
+      "expected": 80
+    },
+    {
+      "id": "C-16c",
+      "name": "재실행 예외 원장 run1 과 동일",
+      "pass": true,
+      "actual": true,
+      "expected": true,
+      "detail": {
+        "run1": 20,
+        "rerun": 20
+      }
+    },
+    {
+      "id": "C-16d",
+      "name": "재실행 중복 예외 row",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    },
+    {
+      "id": "C-16e",
+      "name": "재실행 상태 결정성(GREEN→SKIP, EXCEPTION→EXCEPTION)",
+      "pass": true,
+      "actual": 0,
+      "expected": 0
+    }
+  ]
+}
