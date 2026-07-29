@@ -130,16 +130,25 @@ inactive OPL 403 / `supplier_product_offers` 경유 미사용 / 미인증 403 /
 
 ## 6. 프로덕션 smoke
 
-계정: `sohae21@naver.com` (공급자 링크 ACTIVE + 매장 소속 겸업)
-대상 master: `0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d` (해당 조직 active OPL 보유)
+배포: GitHub Actions `Deploy API Server (Cloud Run)` run **30429431476** success
+(migration step 포함 — 본 WO 는 신규 migration 0, 기존 이력만 확인).
+본 커밋 `eaefd70d1` 는 배포 head `18d1bcef0` 의 조상임을 `git merge-base --is-ancestor` 로 확인.
 
-| # | 요청 | 기대 | 결과 |
+계정: `sohae21@naver.com` (user `52a4c1e6-…`, 공급자 링크 ACTIVE + 매장 소속 겸업)
+- active OPL master: `0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d` (org `9c87f46b-…`, `is_active=true`)
+- active OPL 없는 master: `f6b37061-9dbc-4263-bb3b-308d21f1d5d9` (실재 master)
+
+| # | 요청 | 기대 | 실제 |
 |---|------|------|------|
-| 1 | `GET /api/v1/products/{master}/pop/A4` | 403 해소 | (배포 후 기록) |
-| 2 | active OPL 없는 master 의 POP | 403 유지 | (배포 후 기록) |
-| 3 | `PUT /api/v1/products/{master}/ai-contents/product_description` | 403 유지 | (배포 후 기록) |
-| 4 | `GET /api/v1/products/{master}/ai-contents` | 403 유지 | (배포 후 기록) |
-| 5 | `product_ai_contents` / `product_ai_tags` row 수 | 변동 없음 | (배포 후 기록) |
+| 1 | `GET /api/v1/products/{active-OPL master}/pop/A4` | 403 해소 | **200 `application/pdf` 3,294B** ✅ |
+| 2 | `GET /api/v1/products/{no-OPL master}/pop/A4` | 403 유지 | **403 `PRODUCT_ACCESS_DENIED`** ✅ |
+| 3 | `PUT /api/v1/products/{master}/ai-contents/product_description` | 403 유지 | **403 `PRODUCT_ACCESS_DENIED`** ✅ |
+| 4 | `GET /api/v1/products/{master}/ai-contents` | 403 유지 | **403 `PRODUCT_ACCESS_DENIED`** ✅ |
+| 5 | `product_ai_contents` / `product_ai_tags` row 수 | 변동 없음 | **0 / 0 (smoke 전후 동일)** ✅ |
+
+→ 완료 기준 **"POP PDF 의 `PRODUCT_ACCESS_DENIED` 403 해소" 충족**.
+동시에 write(3) · manage_read(4) 는 동일 계정·동일 master 에서 **여전히 403** 으로,
+확대 범위가 `render_read` 에 한정되었음이 프로덕션에서 확인되었다.
 
 ---
 

@@ -255,7 +255,7 @@ deleteTag(tagId, productId)  → tagRepo.delete({ id: tagId, productId })
 | # | 항목 | 상태 |
 |:-:|------|------|
 | 1 | 배포 + migration 적용 확인 | ✅ 완료 (§9.1) |
-| 1-a | **P1 — 공급자 링크 보유 매장 사용자의 `render_read` 상실** (§9.3) | **사용자 결정 대기** |
+| 1-a | **P1 — 공급자 링크 보유 매장 사용자의 `render_read` 상실** (§9.3) | ✅ **해소** — [`WO-…-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1`](CHECK-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1.md) (선택지 B) |
 | 2 | 후속 `WO-2 O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1` — 매장 상품 설명 화면 정상화 | 미착수 |
 | 3 | `product_ai_tags` UNIQUE 여부 | **보류** — 중복 허용 계약 확정 전 추가 금지 |
 | 4 | KPA `StoreProductionMaterialsPage` + `SelectContentsForProductionModal` dead code 삭제 | 미승인 |
@@ -315,11 +315,17 @@ contents=0  tags=0  orphan_contents=0  orphan_tags=0
 | A (현행 유지) | 공급자 링크 보유자는 매장 축 미평가 | 겸업 사용자의 POP PDF 상실. 현재 offer 0행이므로 사실상 공급자 전원 |
 | B (권장) | `render_read` 에 한해 공급자 축 실패 시 매장 축으로 fallthrough | 겸업 사용자가 자기 매장 진열 상품의 POP 를 다시 사용. 권한 확대는 "active OPL 보유" 범위로 한정 |
 
-→ **미결. 사용자 결정 후 별도 변경으로 처리한다.**
+→ ~~미결. 사용자 결정 후 별도 변경으로 처리한다.~~
+**해소 (2026-07-29).** 사용자가 **B** 를 선택하여
+`WO-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1` 로 처리 완료.
+공급자 관계와 매장 관계를 **독립적으로** 평가하되 확대 범위는 `render_read` 한정.
+프로덕션 재smoke: 동일 계정·동일 master 의 POP PDF **200 (`application/pdf`)**,
+`write` · `manage_read` 는 **403 유지**.
+→ [`CHECK-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1`](CHECK-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1.md)
 
 ### 9.4 브라우저 smoke 불가 사유 (재확인)
 
 - 공급자 축 200 경로: `supplier_product_offers` **0행** → WO §18 "프로덕션에 테스트 offer 를 임의 생성하지 않는다" 로 불가
-- 매장 `render_read` 200 경로: §9.3 사유로 불가
+- 매장 `render_read` 200 경로: §9.3 사유로 불가 → **후속 WO 에서 해소되어 실계정 200 확인됨**
 - `platform:super_admin` 축: 보유자 2명이 실 운영 계정 (CLAUDE.md §15)
 - → 위 3개 축은 [`product-ai-global-access.spec.ts`](../../apps/api-server/src/__tests__/security/product-ai-global-access.spec.ts) fixture 테스트로 검증했다.
