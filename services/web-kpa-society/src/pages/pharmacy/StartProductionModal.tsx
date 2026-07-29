@@ -9,8 +9,8 @@
  *   - targets: PRODUCTION_TARGET_CATALOG (4개 제작 대상)
  *   - getTemplates: getTemplatesForTarget (KPA template registry)
  *
- * 기존 사용처(StoreProductionMaterialsPage, StoreLibraryContentsPage)는
- * import 경로와 props(open, source, onClose, onAiAction) 변경 없이 동작한다.
+ * 활성 사용처: StoreLibraryContentsPage (KPA 자료함 > 콘텐츠).
+ * (WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: StoreProductionMaterialsPage 는 삭제됨.)
  */
 
 import {

@@ -3,11 +3,14 @@
  *
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-UNIFY-V1
  *
- * "내 자료함" 에서 시작하는 두 진입 흐름이 공유하는 카탈로그:
- *   1. StartProductionModal — 자료 선택 후 진입 (source.items 채워짐)
- *   2. ProductionTypeSelectorModal — 자료 없이 곧장 유형 선택 (source.items 비어 있음)
+ * "내 자료함" 제작 진입이 공유하는 카탈로그:
+ *   - StartProductionModal — 자료 선택 후 진입 (source.items 채워짐)
  *
- * 두 모달의 target/route 정의 중복을 제거하고, router state payload 를 표준화한다.
+ * target/route 정의 중복을 제거하고, router state payload 를 표준화한다.
+ *
+ * WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 C):
+ *   자료 없이 유형만 고르던 ProductionTypeSelectorModal 은 활성 진입점 0 으로 삭제되었다.
+ *   제작 시작 진입은 "자료함 > 콘텐츠에서 자료 선택 후 시작" 단일 흐름으로 수렴한다.
  *
  * 4유형 화이트리스트 고정: POP / QR 코드 / 블로그 / 상품 상세설명
  * 디지털 사이니지는 의도적 제외 (KPA Signage 구조 freeze 보호).

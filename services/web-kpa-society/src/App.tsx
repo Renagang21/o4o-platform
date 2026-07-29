@@ -240,8 +240,11 @@ const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuil
 const StoreLibraryContentsPage = lazy(() => import('./pages/pharmacy/StoreLibraryContentsPage'));
 const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibraryResourcesPage'));
 // WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1:
-//   StoreProductionMaterialsPage lazy import 제거 — list route 가 redirect 로 바뀌어 활성 참조 0.
-//   파일은 보존한다(삭제 시 SelectContentsForProductionModal 이 함께 고아가 되어 범위가 넓어짐).
+//   KPA 의 제작 자료 목록은 자료함 > 콘텐츠(/store/library/contents)로 통합되어 별도 list 화면이 없다.
+// WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 C):
+//   위 통합으로 고아가 된 StoreProductionMaterialsPage / SelectContentsForProductionModal /
+//   ProductionTypeSelectorModal 3개 파일을 삭제했다(활성 참조 0). GlycoPharm·K-Cosmetics 는
+//   list route 가 살아 있어 각 서비스 자체 파일을 그대로 사용한다.
 // WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 (:id/edit 딥링크 전용)
 const ProductionMaterialEditorPage = lazy(() => import('./pages/pharmacy/ProductionMaterialEditorPage'));
 const StoreProductDescriptionsPage = lazy(() => import('./pages/pharmacy/StoreProductDescriptionsPage'));

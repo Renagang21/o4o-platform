@@ -164,7 +164,9 @@ export default function StoreProductDescriptionsPage() {
         ),
       );
       // GlycoPharm 사용자-facing 문구: "내 약국"
-      toast.success('내 약국 상품 설명이 저장되었습니다');
+      // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 B): 용어 정렬 — 이 목록은
+      // store_local_products(매장 자체 상품) 이다. KPA canonical 문구와 통일.
+      toast.success('상품 설명이 저장되었습니다');
     } catch (e: any) {
       // 작성 내용을 초기화하지 않는다.
       setSaveError(e?.message || '상품 설명을 저장하지 못했습니다. 작성한 내용은 유지됩니다.');
@@ -234,7 +236,7 @@ export default function StoreProductDescriptionsPage() {
       <div style={styles.layout}>
         {/* 상품 목록 */}
         <aside style={styles.sidebar}>
-          <h2 style={styles.sidebarTitle}>내 약국 상품 ({products.length})</h2>
+          <h2 style={styles.sidebarTitle}>매장 자체 상품 ({products.length})</h2>
           {loading ? (
             <p style={styles.sidebarEmpty}>불러오는 중...</p>
           ) : listError ? (
