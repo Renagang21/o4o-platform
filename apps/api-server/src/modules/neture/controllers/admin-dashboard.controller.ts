@@ -126,7 +126,9 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
           key: 'pending-suppliers',
           label: '공급사 승인 대기',
           status: (pendingSuppliers > 0 ? 'partial' : 'configured') as 'partial' | 'configured',
-          link: '/admin/admin-suppliers',
+          // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1:
+          // stale redirect hop 제거 — /admin/admin-suppliers 는 canonical /admin/supplier-governance 로 redirect.
+          link: '/admin/supplier-governance',
         },
         {
           key: 'pending-regs',
@@ -163,7 +165,7 @@ export function createAdminDashboardController(dataSource: DataSource): Router {
       const structureActions = [
         { id: 'manage-users', label: '사용자 관리', link: '/admin/users', icon: 'users' },
         { id: 'manage-operators', label: '운영자 관리', link: '/admin/operators', icon: 'shield' },
-        { id: 'manage-suppliers', label: '공급사 승인', link: '/admin/admin-suppliers', icon: 'store' },
+        { id: 'manage-suppliers', label: '공급사 승인', link: '/admin/supplier-governance', icon: 'store' },
         { id: 'manage-settlements', label: '정산 관리', link: '/admin/settlements', icon: 'dollar-sign' },
         { id: 'manage-commissions', label: '커미션 관리', link: '/admin/commissions', icon: 'percent' },
         { id: 'manage-roles', label: '역할 관리', link: '/admin/roles', icon: 'key' },

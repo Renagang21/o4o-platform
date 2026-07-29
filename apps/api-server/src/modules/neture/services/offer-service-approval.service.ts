@@ -627,9 +627,12 @@ export class OfferServiceApprovalService {
       // targetUrl: schema 변경 없이 metadata에 포함(공급자 제품 목록). 라우트 설계 영향 없음.
       const targetUrl = '/supplier/products';
 
+      // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1:
+      // serviceKey 누락 defect 수정 — serviceKey=NULL 이면 serviceKey 필터 소비처에서
+      // 미노출될 수 있으므로 'neture' 명시(라우트/스키마 무변경, 컬럼 값만 보정).
       await this.dataSource.query(
-        `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "isRead", "createdAt")
-         VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, false, NOW())`,
+        `INSERT INTO notifications (id, "userId", channel, type, title, message, metadata, "serviceKey", "isRead", "createdAt")
+         VALUES (gen_random_uuid(), $1, 'in_app', 'custom', $2, $3, $4, 'neture', false, NOW())`,
         [userId, title, message, JSON.stringify({ offerId, status, productName, targetUrl })],
       );
     } catch (err) {

@@ -1197,7 +1197,9 @@ function App() {
             <Route path="/workspace/supplier/dashboard" element={<Navigate to="/supplier" replace />} />
             <Route path="/workspace/supplier/products" element={<Navigate to="/supplier/products" replace />} />
             <Route path="/workspace/supplier/orders" element={<Navigate to="/supplier/orders" replace />} />
-            <Route path="/workspace/supplier/requests" element={<Navigate to="/supplier/requests" replace />} />
+            {/* WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1:
+                dangling redirect 제거 — `/supplier/requests` route 부재(404 fallback 없음 → blank).
+                하위 catch-all `/workspace/supplier/*` → `/supplier` (line below) 가 안전하게 흡수. */}
             <Route path="/workspace/supplier/library" element={<Navigate to="/supplier/library" replace />} />
             <Route path="/workspace/supplier/profile" element={<Navigate to="/mypage/business-profile" replace />} />
             <Route path="/workspace/supplier/*" element={<Navigate to="/supplier" replace />} />

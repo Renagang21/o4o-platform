@@ -12,6 +12,7 @@ import logger from '../../../utils/logger.js';
 import { roleAssignmentService } from '../../auth/services/role-assignment.service.js';
 import { ServiceMembership } from '../../auth/entities/ServiceMembership.js';
 import { organizationOpsService } from '../../organization/services/organization-ops.service.js';
+import { notificationService } from '../../../services/NotificationService.js';
 
 /**
  * NetureSupplierService
@@ -150,6 +151,18 @@ export class NetureSupplierService {
       // WO-O4O-NETURE-SUPPLIER-DEPRECATION-V1 Phase 5-B: read name from org
       const org = await this.getOrgData(supplier.organizationId);
       logger.info(`[NetureSupplierService] Supplier approved: ${supplierId} by ${approvedByUserId}`);
+
+      // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1 (H):
+      // 승인 전이 성공 후 공급자 본인에게 알림(fire-and-forget). 승인으로 supplier 역할을
+      // 부여받았으므로 targetUrl 은 guard 통과하는 canonical /supplier/dashboard 로 지정.
+      await this.notifySupplierAccount(
+        supplier.userId,
+        '공급자 승인 완료',
+        `${org?.name ? `[${org.name}] ` : ''}공급자 승인이 완료되었습니다. 이제 공급자 공간을 이용할 수 있습니다.`,
+        '/supplier/dashboard',
+        { supplierId: supplier.id, status: supplier.status },
+      );
+
       return {
         success: true,
         data: { id: supplier.id, name: org?.name ?? '', status: supplier.status, approvedBy: supplier.approvedBy, approvedAt: supplier.approvedAt },
@@ -189,6 +202,20 @@ export class NetureSupplierService {
 
       const org = await this.getOrgData(supplier.organizationId);
       logger.info(`[NetureSupplierService] Supplier rejected: ${supplierId} by ${rejectedByUserId}`);
+
+      // WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1 (H):
+      // 반려 전이 성공 후 신청자 본인에게 알림(fire-and-forget). 반려로 supplier 역할이
+      // 제거되므로 /supplier/* deep link 는 guard 에서 막힌다 → guard-safe 한 프로필 경로로 이동.
+      await this.notifySupplierAccount(
+        supplier.userId,
+        '공급자 승인 반려',
+        reason
+          ? `공급자 승인 요청이 반려되었습니다. 사유: ${reason}`
+          : '공급자 승인 요청이 반려되었습니다. 정보를 보완한 뒤 다시 신청할 수 있습니다.',
+        '/mypage/business-profile',
+        { supplierId: supplier.id, status: supplier.status, reason: reason ?? null },
+      );
+
       return {
         success: true,
         data: { id: supplier.id, name: org?.name ?? '', status: supplier.status, rejectedReason: supplier.rejectedReason },
@@ -196,6 +223,34 @@ export class NetureSupplierService {
     } catch (error) {
       logger.error('[NetureSupplierService] Error rejecting supplier:', error);
       throw error;
+    }
+  }
+
+  /**
+   * WO-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFECT-CLOSEOUT-V1 (H):
+   * 공급자 계정 상태전이(승인/반려) 알림 — 단일 수신자(공급자 본인) scope, serviceKey='neture'.
+   * canonical notificationService 재사용(SSE emit 포함). 알림 실패가 상태전이 결과에 영향을 주지
+   * 않도록 fire-and-forget + try/catch. userId 없으면 no-op.
+   */
+  private async notifySupplierAccount(
+    userId: string | null | undefined,
+    title: string,
+    message: string,
+    targetUrl: string,
+    metadata: Record<string, unknown>,
+  ): Promise<void> {
+    if (!userId) return;
+    try {
+      await notificationService.createNotification({
+        userId,
+        type: 'custom',
+        title,
+        message,
+        serviceKey: 'neture',
+        metadata: { ...metadata, targetUrl },
+      });
+    } catch (err) {
+      logger.warn('[NetureSupplierService] Failed to send supplier account notification', err);
     }
   }
 
