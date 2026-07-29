@@ -27,6 +27,8 @@ import type { ProductAccessMode } from '../../modules/store-ai/utils/product-acc
 
 const MASTER_A = '11111111-1111-4111-8111-111111111111';
 const MASTER_B = '22222222-2222-4222-8222-222222222222';
+/** 실재하지만 어떤 조직도 진열(active OPL)하지 않은 master */
+const MASTER_NO_OPL = '44444444-4444-4444-8444-444444444444';
 /** product_masters 에 존재하지 않는 ID (store_local_products.id 를 흉내낸다) */
 const LOCAL_PRODUCT_ID = '33333333-3333-4333-8333-333333333333';
 
@@ -37,6 +39,8 @@ const USER_SUPPLIER_A = 'user-supplier-a';
 const USER_SUPPLIER_B = 'user-supplier-b';
 const USER_SUPPLIER_PENDING = 'user-supplier-pending';
 const USER_STORE_OWNER = 'user-store-owner';
+/** 겸업 — 공급자 링크(ACTIVE) + 매장 소속을 동시에 보유 */
+const USER_SUPPLIER_AND_STORE = 'user-supplier-and-store';
 
 const ORG_STORE = 'org-store-1';
 const ORG_OTHER = 'org-store-2';
@@ -67,17 +71,21 @@ const FIXTURE: Fixture = {
     [USER_SUPPLIER_A]: { id: 'supplier-a', status: 'ACTIVE' },
     [USER_SUPPLIER_B]: { id: 'supplier-b', status: 'ACTIVE' },
     [USER_SUPPLIER_PENDING]: { id: 'supplier-p', status: 'PENDING' },
+    [USER_SUPPLIER_AND_STORE]: { id: 'supplier-x', status: 'ACTIVE' },
   },
   offers: {
     'supplier-a': [MASTER_A],
     'supplier-b': [MASTER_B],
     'supplier-p': [MASTER_A],
+    // 겸업 사용자의 자기 offer 는 MASTER_B — 매장이 진열한 MASTER_A 와 다르다
+    'supplier-x': [MASTER_B],
   },
   orgs: {
     [USER_STORE_OWNER]: ORG_STORE,
+    [USER_SUPPLIER_AND_STORE]: ORG_STORE,
   },
   listings: [{ organizationId: ORG_STORE, masterId: MASTER_A, isActive: true }],
-  masters: [MASTER_A, MASTER_B],
+  masters: [MASTER_A, MASTER_B, MASTER_NO_OPL],
 };
 
 interface QueryLogEntry {
@@ -225,15 +233,79 @@ describe('resolveGlobalProductResourceAccess — 전역 ProductMaster 자원 접
       expect(read.result.allowed).toBe(true);
     });
 
-    it('타 공급자 master 접근 시 매장 축으로 승격되지 않는다', async () => {
-      // 공급자 B 가 동시에 매장 소속이어도 offer 불일치 시점에 판정이 종료되어야 한다
+    it.each(['write', 'manage_read'] as ProductAccessMode[])(
+      '타 공급자 master + %s 는 매장 관계를 평가하지 않고 즉시 종료',
+      async (mode) => {
+        // 공급자 B 가 동시에 매장 소속이어도 write/manage_read 는 offer 불일치 시점에 종료된다
+        const fixture: Fixture = {
+          ...FIXTURE,
+          orgs: { ...FIXTURE.orgs, [USER_SUPPLIER_B]: ORG_STORE },
+        };
+        const { result, queries } = await resolve(USER_SUPPLIER_B, MASTER_A, mode, fixture);
+        expect(result.allowed).toBe(false);
+        expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
+        expect(queries.some((q) => /organization_members/.test(q.sql))).toBe(false);
+      },
+    );
+  });
+
+  /**
+   * WO-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1
+   * 공급자 관계와 매장 관계는 독립적으로 평가된다. 확대 범위는 render_read 로 한정한다.
+   */
+  describe('겸업 사용자 — 공급자 링크 + 매장 소속', () => {
+    it('자기 offer master + render_read → 공급자로 허용, 매장 관계는 조회조차 하지 않는다', async () => {
+      const { result, queries } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_B, 'render_read');
+      expect(result.allowed).toBe(true);
+      expect(result.actorType).toBe('supplier');
+      expect(result.grantReason).toBe('OWN_SUPPLIER_OFFER');
+      expect(queries.some((q) => /organization_members/.test(q.sql))).toBe(false);
+    });
+
+    it('타 supplier master + active OPL + render_read → 매장 관계로 허용', async () => {
+      const { result } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'render_read');
+      expect(result.allowed).toBe(true);
+      expect(result.actorType).toBe('store');
+      expect(result.grantReason).toBe('ACTIVE_ORGANIZATION_LISTING');
+      expect(result.organizationId).toBe(ORG_STORE);
+    });
+
+    it('타 supplier master + active OPL 없음 + render_read → 403', async () => {
+      const { result } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_NO_OPL, 'render_read');
+      expect(result.allowed).toBe(false);
+      expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
+    });
+
+    it('타 supplier master + active OPL + write → 403 (fallthrough 금지)', async () => {
+      const { result, queries } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'write');
+      expect(result.allowed).toBe(false);
+      expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
+      expect(queries.some((q) => /organization_/.test(q.sql))).toBe(false);
+    });
+
+    it('타 supplier master + active OPL + manage_read → 403 (fallthrough 금지)', async () => {
+      const { result, queries } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'manage_read');
+      expect(result.allowed).toBe(false);
+      expect(result.denyReason).toBe('NO_RELATION_TO_MASTER');
+      expect(queries.some((q) => /organization_/.test(q.sql))).toBe(false);
+    });
+
+    it('타 조직이 진열한 master 는 겸업 사용자에게도 render_read 거부', async () => {
       const fixture: Fixture = {
         ...FIXTURE,
-        orgs: { ...FIXTURE.orgs, [USER_SUPPLIER_B]: ORG_STORE },
+        listings: [{ organizationId: ORG_OTHER, masterId: MASTER_A, isActive: true }],
       };
-      const { result, queries } = await resolve(USER_SUPPLIER_B, MASTER_A, 'render_read', fixture);
+      const { result } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'render_read', fixture);
       expect(result.allowed).toBe(false);
-      expect(queries.some((q) => /organization_members/.test(q.sql))).toBe(false);
+    });
+
+    it('inactive OPL 은 겸업 사용자에게도 render_read 거부', async () => {
+      const fixture: Fixture = {
+        ...FIXTURE,
+        listings: [{ organizationId: ORG_STORE, masterId: MASTER_A, isActive: false }],
+      };
+      const { result } = await resolve(USER_SUPPLIER_AND_STORE, MASTER_A, 'render_read', fixture);
+      expect(result.allowed).toBe(false);
     });
   });
 

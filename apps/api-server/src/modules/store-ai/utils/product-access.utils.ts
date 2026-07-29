@@ -19,6 +19,11 @@
  *   3. active OPL(organization_id + master_id) 보유 매장 → 'render_read' 만 허용
  *   4. 그 외                         → 거부
  *
+ * WO-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1:
+ *   한 사용자가 공급자 관계와 매장 관계를 동시에 보유할 수 있으므로 두 관계를 **독립적으로**
+ *   평가한다. 공급자 관계가 해당 master 와 무관해도 'render_read' 에 한해 매장 관계 판정을
+ *   계속한다. 'write' / 'manage_read' 는 공급자 관계 실패 시 즉시 종료한다 (확대 없음).
+ *
  * 내부 자동 생성·임포트(스케줄러·시드 스크립트)는 HTTP 계층을 거치지 않고 서비스를 직접
  * 호출하므로 본 가드의 대상이 아니다.
  *
@@ -76,6 +81,13 @@ export interface GlobalProductResourceAccess {
   /** 공급자로 허용된 경우의 neture_suppliers.id. 그 외 null */
   supplierId: string | null;
   productMasterId: string;
+  /**
+   * 허용된 경우 **최종적으로 권한을 부여한 관계**.
+   * 겸업 사용자(공급자 링크 + 매장 소속)가 매장 관계로 허용된 경우
+   * `'ACTIVE_ORGANIZATION_LISTING'` 이며 `actorType` 도 `'store'` 이다.
+   * 공급자 링크를 보유했다는 이유로 공급자 축으로 기록하지 않는다.
+   */
+  grantReason?: 'PLATFORM_SUPER_ADMIN' | 'OWN_SUPPLIER_OFFER' | 'ACTIVE_ORGANIZATION_LISTING';
   /** 거부 사유 코드 (로깅·디버깅용, 응답 본문에 그대로 노출하지 않는다) */
   denyReason?:
     | 'NO_USER'
@@ -122,7 +134,12 @@ export async function resolveGlobalProductResourceAccess(
     [userId, GLOBAL_PRODUCT_ADMIN_ROLES],
   );
   if (adminRows.length > 0) {
-    return { ...base, allowed: true, actorType: 'platform_admin' };
+    return {
+      ...base,
+      allowed: true,
+      actorType: 'platform_admin',
+      grantReason: 'PLATFORM_SUPER_ADMIN',
+    };
   }
 
   // 2. 공급자 — 자기 offer 에 연결된 master 만.
@@ -149,16 +166,28 @@ export async function resolveGlobalProductResourceAccess(
           denyReason: 'WRITE_REQUIRES_ACTIVE_SUPPLIER',
         };
       }
-      return { ...base, allowed: true, actorType: 'supplier', supplierId };
+      return {
+        ...base,
+        allowed: true,
+        actorType: 'supplier',
+        supplierId,
+        grantReason: 'OWN_SUPPLIER_OFFER',
+      };
     }
-    // 자기 상품이 아니면 다른 공급자의 master 이므로 여기서 종료 (매장 축으로 승격 금지)
-    return {
-      ...base,
-      allowed: false,
-      actorType: 'none',
-      supplierId,
-      denyReason: 'NO_RELATION_TO_MASTER',
-    };
+    // WO-O4O-PRODUCT-AI-RENDER-READ-MULTI-ACTOR-FALLTHROUGH-V1:
+    // 한 사용자가 공급자 관계와 매장 관계를 **동시에** 보유할 수 있다.
+    // 공급자 관계 실패를 매장 권한으로 '승격'하는 것이 아니라, 두 관계를 **독립적으로** 평가한다.
+    // 단, 확대 범위는 'render_read' 로 한정한다 — write / manage_read 는 여기서 즉시 종료한다.
+    if (mode !== 'render_read') {
+      return {
+        ...base,
+        allowed: false,
+        actorType: 'none',
+        supplierId,
+        denyReason: 'NO_RELATION_TO_MASTER',
+      };
+    }
+    // → 아래 매장 관계 판정을 계속한다.
   }
 
   // 3. 매장 — active OPL 기반 **렌더 조회 전용**.
@@ -197,7 +226,15 @@ export async function resolveGlobalProductResourceAccess(
     };
   }
 
-  return { ...base, allowed: true, actorType: 'store', organizationId };
+  // 겸업 사용자(공급자 링크 보유)가 여기까지 온 경우에도 **최종 허용 관계는 매장**이므로
+  // actorType='store' / grantReason='ACTIVE_ORGANIZATION_LISTING' 로 기록한다 (§7).
+  return {
+    ...base,
+    allowed: true,
+    actorType: 'store',
+    organizationId,
+    grantReason: 'ACTIVE_ORGANIZATION_LISTING',
+  };
 }
 
 /**
