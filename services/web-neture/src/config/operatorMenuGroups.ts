@@ -96,7 +96,7 @@ export const UNIFIED_MENU: Partial<Record<OperatorGroupKey, UnifiedMenuItem[]>> 
     { label: 'AI 운영', path: '/operator/ai-operations' },
     { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
     { label: '운영 분석', path: '/operator/analytics' },
-    { label: '공급자 품질', path: '/operator/supplier-quality' },
+    // WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: '공급자 품질'(/operator/supplier-quality) 은퇴 — CSV batch 품질 전용, 데이터 0
     { label: 'AI 관리', path: '/admin/ai-admin', adminOnly: true },
     { label: 'AI 카드 규칙', path: '/admin/ai-card-rules', adminOnly: true },
     { label: 'AI 비즈팩', path: '/admin/ai-business-pack', adminOnly: true },
@@ -204,44 +204,10 @@ export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuIte
   };
 }
 
-// ─── Legacy export (하위호환, deprecated) ───
-/** @deprecated Use UNIFIED_MENU + filterMenuByRole instead */
-export const OPERATOR_MENU_ITEMS: Partial<Record<OperatorGroupKey, OperatorMenuItem[]>> = {
-  dashboard: [
-    { label: '대시보드', path: '/operator', exact: true },
-    { label: 'Action Queue', path: '/operator/actions' },
-  ],
-  users: [{ label: '회원 관리', path: '/operator/members' }],
-  approvals: [
-    { label: '가입 승인', path: '/operator/applications' },
-    { label: '유통참여형 펀딩', path: '/operator/market-trial' },
-  ],
-  // WO-NETURE-OPERATOR-PRODUCTS-UNIFIED-LIST-FINAL-V1: Products 영역 단일 통합
-  products: [
-    { label: '상품 관리', path: '/operator/all-registered-products' },
-    // WO-NETURE-CURATION-PHASE1-DECISION-PRESSURE-REMOVE-V1
-  ],
-  stores: [{ label: '매장 관리', path: '/operator/stores' }],
-  orders: [{ label: '주문 관리', path: '/operator/orders' }],
-  content: [{ label: '홈페이지 CMS', path: '/operator/homepage-cms' }],
-  // WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: signage 그룹 제거
-  forum: [
-    { label: '포럼 신청', path: '/operator/community' },
-    { label: '삭제 요청', path: '/operator/forum-delete-requests' },
-    { label: '포럼 분석', path: '/operator/forum-analytics' },
-  ],
-  analytics: [
-    { label: 'AI 리포트', path: '/operator/ai-report' },
-    { label: 'AI 카드 리포트', path: '/operator/ai-card-report' },
-    { label: 'AI 운영', path: '/operator/ai-operations' },
-    { label: 'Asset Quality', path: '/operator/ai/asset-quality' },
-    { label: '운영 분석', path: '/operator/analytics' },
-    { label: '공급자 품질', path: '/operator/supplier-quality' },
-  ],
-  system: [
-    { label: '알림 설정', path: '/operator/settings/notifications' },
-  ],
-};
+// ─── Legacy export (제거됨) ───
+// WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1:
+//   deprecated `OPERATOR_MENU_ITEMS` (하위호환 배열) 는 web-neture 내 runtime consumer 0 (활성 메뉴 = UNIFIED_MENU
+//   via OperatorLayoutWrapper, admin = getAdminMenu). DEAD 상수로 확정되어 은퇴 대상('공급자 품질' 잔존 포함) → 전체 제거.
 
 // ─── Neture Operator Domain IA — WO-O4O-NETURE-OPERATOR-DOMAIN-IA-META-ADD-V1 ───
 //

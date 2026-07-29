@@ -445,10 +445,7 @@ const RoleManagementPage = lazy(() =>
 const OperatorAnalyticsPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.OperatorAnalyticsPage }))
 );
-// WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
-const SupplierQualityPage = lazy(() =>
-  import('./pages/operator').then((m) => ({ default: m.SupplierQualityPage }))
-);
+// WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: SupplierQualityPage 은퇴 (CSV batch 품질 전용, 데이터 0 · 생산 경로 은퇴 완료). route 는 canonical 로 redirect.
 // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
 const CategoryMappingRulesPage = lazy(() =>
   import('./pages/operator').then((m) => ({ default: m.CategoryMappingRulesPage }))
@@ -1051,7 +1048,8 @@ function App() {
               {/* WO-O4O-NETURE-DIGITAL-SIGNAGE-REMOVAL-V1: /admin/signage/* 제거 (Neture signage 미대상) */}
               <Route path="/admin/homepage-cms" element={<HomepageCmsPage />} />
               <Route path="/admin/analytics" element={<OperatorAnalyticsPage />} />
-              <Route path="/admin/supplier-quality" element={<SupplierQualityPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → governance canonical */}
+              <Route path="/admin/supplier-quality" element={<Navigate to="/admin/supplier-governance" replace />} />
               <Route path="/admin/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               <Route path="/admin/roles" element={<RoleManagementPage />} />
               {/* WO-CLEANUP-2: /admin/market-trial → /operator/market-trial redirect */}
@@ -1170,7 +1168,8 @@ function App() {
               {/* Guide Contents (WO-O4O-OPERATOR-GUIDE-CONTENTS-CORE-EXTRACTION-V1) */}
               <Route path="/operator/guide-contents" element={<OperatorGuideContentsPage />} />
               <Route path="/operator/analytics" element={<OperatorAnalyticsPage />} />
-              <Route path="/operator/supplier-quality" element={<SupplierQualityPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: CSV 품질 콘솔 은퇴 → 공급자 승인 canonical */}
+              <Route path="/operator/supplier-quality" element={<Navigate to="/operator/suppliers" replace />} />
               <Route path="/operator/category-mapping-rules" element={<CategoryMappingRulesPage />} />
               <Route path="/operator/market-trial" element={<MarketTrialApprovalsPage />} />
               <Route path="/operator/market-trial/:id" element={<MarketTrialApprovalDetailPage />} />

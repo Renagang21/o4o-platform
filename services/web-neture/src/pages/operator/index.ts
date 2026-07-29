@@ -42,7 +42,6 @@ export { default as OperatorActionQueuePage } from './OperatorActionQueuePage';
 export { default as OperatorProductApprovalPage } from './OperatorProductApprovalPage';
 // WO-O4O-OPERATOR-PRODUCT-CANDIDATE-REVIEW-UI-V1 (Phase 5)
 export { default as ProductCandidateReviewPage } from './ProductCandidateReviewPage';
-// WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
-export { default as SupplierQualityPage } from './SupplierQualityPage';
+// WO-O4O-NETURE-SUPPLIER-CSV-QUALITY-CONSOLE-RETIREMENT-V1: SupplierQualityPage 은퇴 (barrel export 제거)
 // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
 export { default as CategoryMappingRulesPage } from './CategoryMappingRulesPage';
