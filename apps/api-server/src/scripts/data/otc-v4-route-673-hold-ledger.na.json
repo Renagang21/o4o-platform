@@ -1,0 +1,4663 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-EXCEPTION-673-BULK-RESOLUTION-V1",
+  "producer": "agent-na",
+  "liveDbWrite": 0,
+  "kind": "route-hold-ledger",
+  "total": 138,
+  "byClassification": {
+    "HOLD_UNRESOLVED": 35,
+    "ROUTE_SOURCE_CONFLICT": 31,
+    "REQUIRES_ROUTE_PROFILE": 26,
+    "TRUE_MULTI_ROUTE": 46
+  },
+  "mappableToExistingProfile": [
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "resolvedRoute": "nasal",
+      "mappableTo": "topical"
+    }
+  ],
+  "rows": [
+    {
+      "masterId": "00551806-bd1d-4c74-b606-56b60fe1e283",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "03a20337-efc0-4604-887e-7ce2c9cdeb02",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 nasal → nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "077dfd6f-65f9-4891-8a32-2d4c3b495b19",
+      "productName": "대한관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "productName": "푸레파인마일드좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal"
+        ],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD01"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0b7e6fad-1120-42e3-986c-d9760e87f68d",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0e2086c3-b129-4dcf-8faf-c67d235cb579",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0e8c8a1c-6bc7-4529-9ac4-42c6802d5b45",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0f13048a-58c7-4fa8-9c14-b880c17abab8",
+      "productName": "복합써스펜좌약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC N02 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "N02BE51"
+          ],
+          "route": "oral",
+          "basis": "ATC N02 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "productName": "헤모렉스에스좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "12f3507e-fedd-4f00-b210-0467deebb691",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "15e043a6-b27b-451a-a054-6d71faeb8eba",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "1796beb4-079f-4878-aa1b-f74ab7450619",
+      "productName": "대한관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "productName": "포스테리산좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "vaginal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AX"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "productName": "오라칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 nasal → nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "productName": "포스테리산좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "vaginal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AX"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2478b2ee-3807-4879-804b-79999ef7d5ac",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "24e37de3-d414-452f-b530-2ff9b15013aa",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "28158f9d-6aba-4912-a784-10feaa77fe4d",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "28f68a84-db96-43ac-bc9c-6ccb4264d64f",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "297f80ae-abe1-4bf6-bc9f-eb5548a021bc",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2a6baf5d-53e2-4437-8c87-37f0811a1717",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "productName": "렉센엔좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2c2ee843-1539-4f6c-8b44-f8fb350d9c49",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "2cf7c9db-4316-46f8-a735-83759c1b23eb",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "365136fa-fd7e-4d01-bf63-97e257e5cac6",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3653eb12-eb2d-4344-8d37-1bfce061d5cd",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "37b1bacc-dc04-4adc-a3d9-118d26f5e6aa",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "productName": "푸레파인마일드좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal"
+        ],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD01"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3877c15c-ee9b-4276-b314-cce91ac5470c",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "38c4e1df-bdad-43d6-9124-1e8626d2d429",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3d08147d-5701-4d5b-8196-27627716c1e6",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 nasal → nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "4367f387-328a-4266-becb-a110e0e1649b",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "444e477a-2b0b-44ed-828e-217efa1879a9",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "45867269-1354-485a-8a72-fa9ffb84ecc9",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "효능 원문 부위 단일",
+      "decisionDetail": "효능 축 → nasal",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "4a001867-2ae3-4ddd-881d-cd1c7cdf9efa",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "4ff66b7d-5501-4f43-b839-908b492e8cf7",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "514655f8-44de-4e14-99dc-fffcc87922b2",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "productName": "포스테리산좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "vaginal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AX"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "524b23f7-8dce-49d9-a2e5-483b384c50b2",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 oral vs ATC R01 비강용 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "R01B"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5979759d-898f-44ed-9383-fdfd39e38510",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "59c6037b-c217-4f90-aab0-e8a1d817b15e",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 nasal → nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5dcb1988-6227-4f23-966f-3f8620c3e330",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "productName": "프라맥스에스좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "62ee507e-5275-4117-950f-10f5eda04873",
+      "productName": "성광관장약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG04"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "637bf823-834c-41bf-9d08-14b9863d390d",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "productName": "푸레파인마일드좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal"
+        ],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD01"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "67133531-11d2-47ab-9356-35e91749a530",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "6dea0670-6e70-453f-9676-b34d3d515172",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "7149ae65-32e3-4893-968a-6ae120fbb356",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "71c77407-1b9d-4290-bf8b-880fa0a8dd38",
+      "productName": "대한관류용멸균생리식염수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플/주사 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "7bb597b1-31d1-428f-8ed2-5659171780d2",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 oral vs ATC R01 비강용 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "R01B"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "7c0aa6fc-393e-4668-9581-19566f9a9e04",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "7d07633a-7a4b-475e-b3a1-4415eb73a57a",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "823d0370-dc22-42ff-a792-8174ac9c97ab",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "8246bf93-27e1-453f-a333-2f85257d8939",
+      "productName": "성광관장약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG04"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "8281f7f7-55b0-4633-8c8a-4ae859f601ae",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "82aad70c-f415-4770-a91d-7b60a12ef7e4",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "8447ff23-b556-4101-b4aa-e64d86cac39f",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "855cfb76-f494-43e4-8386-305435d7c452",
+      "productName": "대한관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "86e3c078-318a-4a15-ac5e-e73749de46de",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 oral vs ATC R01 비강용 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "R01B"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "87bbc7ac-3b82-4b10-8342-c564a26cc203",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "87e84cba-3e78-432c-82f5-206454ef4b9e",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "88e31467-fbd0-461d-9cd7-103e17f25116",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 oral vs ATC R01 비강용 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "R01B"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "8e936824-6699-4e1e-bf47-a11d5d95fded",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "929bdcf8-d8ad-458d-ac23-10e4b38ac8bf",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "946932f6-cbb5-478c-934c-ae22f0771202",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 oral vs ATC R01 비강용 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "R01B"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
+      "productName": "복합써스펜좌약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC N02 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "N02BE51"
+          ],
+          "route": "oral",
+          "basis": "ATC N02 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "a168a838-742d-4281-b9ae-1e0df32792ab",
+      "productName": "성광관장약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG04"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "a2fd894d-3d94-4c5c-aece-97e814b729f7",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "a39b5bfb-c189-422f-a572-147f8791a717",
+      "productName": "복합써스펜좌약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC N02 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "N02BE51"
+          ],
+          "route": "oral",
+          "basis": "ATC N02 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "a6675c37-9332-4e08-a4ce-c599eda85d7a",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ac38a363-e135-4586-8438-25c26908c7ab",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "productName": "렉센엔좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "b4f5f937-fff6-4ce6-b715-c8f0d828e821",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "b76afa12-a19d-4fc0-8922-f574080b4320",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "b9559edf-261b-4bc9-8fd4-b8f334a9c223",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ba781a45-5268-4737-87ac-50b7fab86a9b",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "bd4cd564-cb7d-4d4b-9308-6e4d16823f3b",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "bd942a0c-fa97-40f7-b0b3-f4f7580e36bb",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "c260cb10-8e40-4d66-ba0b-2e560e695a3b",
+      "productName": "복합써스펜좌약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC N02 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "N02BE51"
+          ],
+          "route": "oral",
+          "basis": "ATC N02 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "c5406795-ba3c-4dcf-a350-81b9aed4bb89",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "c54e263e-8462-420b-8991-55877de140e7",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "c883ecd6-668e-4097-bfca-95acd5e1026a",
+      "productName": "대한관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "c889f3c7-ab54-4403-b12c-bb0cdba4896f",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "productName": "헤모렉스에스좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ce58947e-a3bb-46f5-896f-bdabcd9fd987",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d1842f85-271c-4be8-a943-9500aa044ba6",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d1faae5d-0181-4ebd-a764-4c527575013a",
+      "productName": "뷰티스홈15%겔",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "oromucosal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "V07AT"
+          ],
+          "route": null,
+          "basis": "ATC V07 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d64b331f-239b-43ad-ba4d-aaac93001c84",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d64e6e1e-fb7c-4d39-9a7f-190b008e03d4",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e0e1c75e-aa0f-4070-a186-45560d0c2819",
+      "productName": "성광관장약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG04"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e118f024-834b-4afb-a4e2-acd856620e9d",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "효능 원문 부위 단일",
+      "decisionDetail": "효능 축 → nasal",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e23b3fb9-4969-482d-a2ad-6ac60cf7f712",
+      "productName": "중외관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
+      "productName": "둘코락스좌약(비사코딜)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC A06 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": "oral",
+          "basis": "제형구분 정/산제/포"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AB02"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "e768360a-49e1-4404-bece-ce7f8a27b6bf",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "eb3d566f-7b06-46a0-8f19-725e346cf73c",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "보조 축 간 상충",
+      "decisionDetail": "rectal(기타 섹션 부위·동사) vs oral(ATC A06 전신·경구 계열)",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal"
+        ],
+        "atc": {
+          "codes": [
+            "A06AG01"
+          ],
+          "route": "oral",
+          "basis": "ATC A06 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 복수 후보 → 효능·ATC·제형 교차 단일화",
+      "decisionDetail": "용법 nasal/topical 중 교차 일치 nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal",
+          "topical"
+        ],
+        "effectText": [
+          "nasal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f124170d-0907-4bc6-9a24-a867b827b34d",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f1e7fc1d-4314-448d-b460-8b0506fbb7ec",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f2d70957-3c30-4b46-a407-bb216a079778",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "classification": "TRUE_MULTI_ROUTE",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문에 복수 투여 경로 실재",
+      "decisionDetail": "용법 축 vaginal/oromucosal/topical — 단일 route composer 강제 편입 금지",
+      "evidence": {
+        "dosageText": [
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "effectText": [
+          "oromucosal"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/통 route 힌트 없음"
+        },
+        "otherSections": [
+          "ophthalmic",
+          "vaginal",
+          "oromucosal",
+          "topical"
+        ],
+        "atc": {
+          "codes": [
+            "D08AE02"
+          ],
+          "route": "topical",
+          "basis": "ATC D08 피부과용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f41f13a6-8873-49c1-9e78-ef6d57ecfa74",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "productName": "프라맥스에스좌제",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "rectal",
+      "mappableToExistingProfile": null,
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 rectal → rectal",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [
+          "rectal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "C05AD07"
+          ],
+          "route": null,
+          "basis": "ATC C05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "f8f86b4e-d524-471b-8908-284dfdb8a15d",
+      "productName": "대한염화나트륨액",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [
+          "inhalation",
+          "oromucosal",
+          "topical"
+        ],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개/앰플 route 힌트 없음"
+        },
+        "otherSections": [],
+        "atc": {
+          "codes": [
+            "B05CB01"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ff0a33e3-8aea-462c-8873-9cc3813f53df",
+      "productName": "중외관류용멸균증류수",
+      "classification": "HOLD_UNRESOLVED",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "근거 축 전무",
+      "decisionDetail": "용법·효능·제형·기타섹션·ATC 어디에서도 route 근거 미검출",
+      "evidence": {
+        "dosageText": [],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "B05CX"
+          ],
+          "route": null,
+          "basis": "ATC B05 route 특정 불가"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
+      "productName": "복합써스펜좌약",
+      "classification": "ROUTE_SOURCE_CONFLICT",
+      "resolvedRoute": null,
+      "mappableToExistingProfile": null,
+      "decisionBasis": "원문 route 와 ATC 상충",
+      "decisionDetail": "원문 rectal vs ATC N02 전신·경구 계열 — 임의 선택 금지",
+      "evidence": {
+        "dosageText": [
+          "rectal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "rectal",
+          "topical",
+          "oral"
+        ],
+        "atc": {
+          "codes": [
+            "N02BE51"
+          ],
+          "route": "oral",
+          "basis": "ATC N02 전신·경구 계열"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "productName": "오트리잘비강분무액(염화나트륨)(소아용)15mL",
+      "classification": "REQUIRES_ROUTE_PROFILE",
+      "resolvedRoute": "nasal",
+      "mappableToExistingProfile": "topical",
+      "decisionBasis": "용법 원문 부위·동사 단일",
+      "decisionDetail": "용법 축 nasal → nasal",
+      "evidence": {
+        "dosageText": [
+          "nasal"
+        ],
+        "effectText": [],
+        "form": {
+          "route": null,
+          "basis": "제형구분 개 route 힌트 없음"
+        },
+        "otherSections": [
+          "nasal"
+        ],
+        "atc": {
+          "codes": [
+            "R01AX10"
+          ],
+          "route": "nasal",
+          "basis": "ATC R01 비강용"
+        },
+        "officialSourcePresent": true,
+        "atcMultiple": false
+      }
+    }
+  ]
+}

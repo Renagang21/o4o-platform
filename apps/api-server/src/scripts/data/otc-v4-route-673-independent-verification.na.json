@@ -1,0 +1,170 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-EXCEPTION-673-BULK-RESOLUTION-V1",
+  "kind": "independent-verification",
+  "agent": "na",
+  "verifiedAt": "2026-07-29T21:10:05.947Z",
+  "independence": "판정기 미import · 별개 섹션 파서 · 별개 부위 어휘 · 별개 ATC 매핑 · 별개 검증 SQL",
+  "liveDbWrite": 0,
+  "dbGates": 5,
+  "counts": {
+    "input": 673,
+    "byClassification": {
+      "HOLD_UNRESOLVED": 35,
+      "RECOVERABLE_ROUTE_CONFIRMED": 535,
+      "ROUTE_SOURCE_CONFLICT": 31,
+      "REQUIRES_ROUTE_PROFILE": 26,
+      "TRUE_MULTI_ROUTE": 46
+    },
+    "recoverable": 535,
+    "hold": 138
+  },
+  "gatesTotal": 20,
+  "gatesPassed": 20,
+  "verdict": "PASS",
+  "gates": [
+    {
+      "id": "RV-01",
+      "gate": "입력 673",
+      "expected": "673",
+      "actual": "673",
+      "pass": true
+    },
+    {
+      "id": "RV-02",
+      "gate": "master 중복 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-03",
+      "gate": "분류 합계 = 673",
+      "expected": "673",
+      "actual": "673",
+      "pass": true
+    },
+    {
+      "id": "RV-04",
+      "gate": "인계 원장 route 대상과 동일 집합",
+      "expected": "누락 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "RV-05",
+      "gate": "기존 GREEN 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-06",
+      "gate": "source terminal 24 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-07",
+      "gate": "exclude 266 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-08",
+      "gate": "agent-ga 재투입 원장 = RECOVERABLE 수",
+      "expected": "535",
+      "actual": "535",
+      "pass": true
+    },
+    {
+      "id": "RV-09",
+      "gate": "HOLD 원장 = 비-RECOVERABLE 수",
+      "expected": "138",
+      "actual": "138",
+      "pass": true
+    },
+    {
+      "id": "RV-10",
+      "gate": "RECOVERABLE 은 전부 composer 지원 route",
+      "expected": "위반 0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-11",
+      "gate": "REQUIRES_ROUTE_PROFILE 은 전부 미지원 route",
+      "expected": "위반 0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-12",
+      "gate": "제품명 단독 확정 0",
+      "expected": "productNameUsedInDecision 전건 false",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-13",
+      "gate": "근거 없는 route 확정 0",
+      "expected": "위반 0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-14",
+      "gate": "TRUE_MULTI_ROUTE 는 route 강제 병합 0",
+      "expected": "resolvedRoute 전건 null",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-15",
+      "gate": "ROUTE_SOURCE_CONFLICT 는 임의 선택 0",
+      "expected": "resolvedRoute 전건 null",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "RV-16",
+      "gate": "READ ONLY 트랜잭션 실측",
+      "expected": "on",
+      "actual": "on",
+      "pass": true
+    },
+    {
+      "id": "RV-17",
+      "gate": "RECOVERABLE route 가 독자 어휘 실측으로 지지됨",
+      "expected": "미지지 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "RV-18",
+      "gate": "RECOVERABLE 전건 공식 원문 존재",
+      "expected": "부재 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "RV-19",
+      "gate": "RECOVERABLE 에 전문의약품 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "RV-20",
+      "gate": "RECOVERABLE 은 아직 authored canonical 미보유",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    }
+  ]
+}
