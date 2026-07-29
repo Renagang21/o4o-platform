@@ -1,0 +1,15 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "mode": "rekey",
+  "policy": "유사도>=0.98 + 유일 후보 + 수치집합 동일 3중 조건. 원문 제어문자/오탈자를 제출측이 교정·누락한 경우를 되돌린다.",
+  "pendingBefore": 1,
+  "applied": 0,
+  "unresolved": 1,
+  "appliedDetail": [],
+  "unresolvedDetail": [
+    {
+      "ko": "이 약은 멀미에 의한 어지러움·구토·두통의 예방 및 완화에 사용합니다.",
+      "reason": "유사 후보 없음"
+    }
+  ]
+}

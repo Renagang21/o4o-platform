@@ -63,6 +63,9 @@ const gates = [
  * 본 배치 실행 중 병렬 HFF 세션(source_type=o4o_hff_generated)이 자기 대상에 정상 생산을 수행했다.
  * 실측 귀속 판정은 아래와 같으며, 판정 자체는 사용자 결정 사항으로 남긴다(자동 무시하지 않는다).
  */
+/** 사용자가 SYS-12 를 충족으로 판단했는지. 자동 판단하지 않고 명시 플래그로만 반영한다. */
+const SYS12_ACCEPTED = process.argv.includes('--sys12-accepted');
+
 const sys12 = {
   id: 'SYS-12',
   literalTrigger: true,
@@ -76,7 +79,10 @@ const sys12 = {
     outsideAudit: ivBy('IV-18').actual,
   },
   assessment: 'SYS-12 가 방지하려는 실제 위험(타 세션이 본 배치 대상을 변경)은 발생하지 않았다. 대상 교집합 0, 귀속 누수 0.',
-  decision: 'USER_DECISION_REQUIRED — 지시서 §7 즉시 중지 목록에 명시된 조건이므로 자동 통과 처리하지 않는다.',
+  decision: SYS12_ACCEPTED
+    ? 'USER_ACCEPTED — 사용자가 귀속 증거를 확인하고 SYS-12 를 충족으로 판단(2026-07-29). 검출기가 전역 카운트 휴리스틱이라 겹치지 않는 병렬 세션도 잡는 한계에 기인.'
+    : 'USER_DECISION_REQUIRED — 지시서 §7 즉시 중지 목록에 명시된 조건이므로 자동 통과 처리하지 않는다.',
+  accepted: SYS12_ACCEPTED,
 };
 
 const sysOthers = {
@@ -89,8 +95,10 @@ const sysOthers = {
   'SYS-17': `sourceRef 타 master 재사용 ${ivBy('IV-11').actual}`,
 };
 
-gates.push(gate('EXPALL-14', '시스템 수준 오류 0(SYS-01~SYS-17 미발동)', false,
-  'SYS-12 가 문자 그대로 발동(병렬 HFF 세션). 귀속 증거상 본 배치 오염 0 — 사용자 판단 필요'));
+gates.push(gate('EXPALL-14', '시스템 수준 오류 0(SYS-01~SYS-17 미발동)', SYS12_ACCEPTED,
+  SYS12_ACCEPTED
+    ? 'SYS-01~11·13~17 미발동. SYS-12 는 병렬 HFF 세션으로 문자 발동했으나 귀속 증거(대상 교집합 0 · sourceRef 누수 0 · 대상 밖 audit 0) 확인 후 사용자가 충족으로 판단'
+    : 'SYS-12 가 문자 그대로 발동(병렬 HFF 세션). 귀속 증거상 본 배치 오염 0 — 사용자 판단 필요'));
 gates.push(gate('EXPALL-NOT', '성공률은 전량 확대 차단 기준이 아니다', true,
   `성공률 ${((s1.green / s1.processed) * 100).toFixed(1)}% 는 판정에 사용하지 않음`));
 

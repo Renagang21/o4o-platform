@@ -1,0 +1,606 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "producer": "agent-ga",
+  "consumer": "agent-na",
+  "liveDbWrite": 0,
+  "batchId": "otc-v4-next2000",
+  "schema": "otc-v4-master-by-master-exception-handoff v1",
+  "total": 12,
+  "byExceptionCode": {
+    "ROUTE_CONFLICT": 12
+  },
+  "invariantCheck": {
+    "allFailedWriteZero": true,
+    "residueDirty": 0
+  },
+  "rows": [
+    {
+      "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "productCode": "200902501",
+      "productName": "오라칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "214703CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "4b4b11da-09fd-37fe-ca2e-4f03621ea1eb",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2072f867-2b0b-464e-91f4-b241adb0ff57 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "productCode": "200410068",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "228731CSI",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "4b3eab21-1ad4-f947-f5aa-97ba52881fba",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 20abc6bc-7ed9-4aed-b2b9-dde701fe0052 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "21143559-d2fd-459c-ba32-56f152506b5f",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "00d54918-5b05-5dc8-12f7-a125c05e908f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 21143559-d2fd-459c-ba32-56f152506b5f --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:21143559-d2fd-459c-ba32-56f152506b5f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "productCode": "201501926",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b1cf99a8317302736cfc6efb6592f91e",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "D52600CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "1c3afff9-3788-e043-a763-4b3fb0d8ed07",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 248b57da-3ae1-435f-8dbc-ba6a392030b0 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "productCode": "201702575",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "71b0d3ca-42fa-c5b8-d8f7-c7bdd479989c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 25de2536-53f8-41b4-afee-63a8ed2e0cb7 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "26c20d76-e6be-4456-b08a-c17c80a9a5d2",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "12f13adf-a98a-7030-f4d8-844aef97f1be",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26c20d76-e6be-4456-b08a-c17c80a9a5d2 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26c20d76-e6be-4456-b08a-c17c80a9a5d2",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "28158f9d-6aba-4912-a784-10feaa77fe4d",
+      "productCode": "201605110",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "214703CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "839a4da8-a4bf-8076-b519-9045f2d2e3eb",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 28158f9d-6aba-4912-a784-10feaa77fe4d --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:28158f9d-6aba-4912-a784-10feaa77fe4d",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "28f68a84-db96-43ac-bc9c-6ccb4264d64f",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "72721182-6576-9607-86fa-0a1d9a1dbb97",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 28f68a84-db96-43ac-bc9c-6ccb4264d64f --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:28f68a84-db96-43ac-bc9c-6ccb4264d64f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "2a6baf5d-53e2-4437-8c87-37f0811a1717",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "2b7407d7-6c54-ed9c-37bd-e7811e882d1a",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2a6baf5d-53e2-4437-8c87-37f0811a1717 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2a6baf5d-53e2-4437-8c87-37f0811a1717",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "2cf7c9db-4316-46f8-a735-83759c1b23eb",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "214703CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "e42fcfe5-27eb-6cec-8b88-3e572c0fd3ad",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2cf7c9db-4316-46f8-a735-83759c1b23eb --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2cf7c9db-4316-46f8-a735-83759c1b23eb",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "2cfabfd5-1910-4059-b620-4ed9440ef416",
+      "productCode": "201501926",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b1cf99a8317302736cfc6efb6592f91e",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "D52600CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b8e83155-a150-b28d-99e0-9c13682e4f42",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2cfabfd5-1910-4059-b620-4ed9440ef416 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2cfabfd5-1910-4059-b620-4ed9440ef416",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "2d3f2117-adb4-4451-a5d5-171d1cfca6fc",
+      "productCode": "200908760",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "a563b204a0ae9e18f937881ca6f4ce2c",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131315CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "1dc50cb4-eddf-505f-872d-698f86dfc951",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2d3f2117-adb4-4451-a5d5-171d1cfca6fc --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2d3f2117-adb4-4451-a5d5-171d1cfca6fc",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    }
+  ]
+}

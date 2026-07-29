@@ -1,0 +1,550 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "oral-verb-audit",
+  "liveDbWrite": 0,
+  "rule": "KO 경구동사 없음 + EN 경구동사 있음 → 원문에 없는 투여 방식 도입",
+  "tmTotal": 2546,
+  "hits": 44,
+  "hitsAffectingNonOralOnly": 42,
+  "byRoute": {
+    "topical": 34,
+    "vaginal": 1,
+    "oral": 2,
+    "ophthalmic": 7
+  },
+  "detail": [
+    {
+      "ko": "15세 미만의 소아는 이 약을 사용하지 마십시오.얼굴, 눈 주위, 점막, 긁힌 상처 등의 흠집, 균열 부위, 부스럼 딱지 같이 피부가 떨어져 나간 곳, 염증부위(짓무름, 빨갛게 부어오른 곳)에 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 과민증 환자는 의사 또는 약사와 상",
+      "en": "Children under 15 years of age must not use this medicine. Do not use it on the face, around the eyes, on mucous membranes, on breaks in the skin such as scratc",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "1일 1~4회 환부에 바르고 부드럽게 문지릅니다.필요시 거즈를 덮을 수 있습니다.전염성 농가진인 경우 다른 정상 피부가 오염되지 않도록 주의하면서 가피(부스럼, 딱지)를 제거한 후 바르는 것이 바람직합니다.",
+      "en": "Apply it to the affected area and rub it in gently 1 to 4 times a day. If necessary, the area may be covered with gauze. In the case of contagious impetigo, it ",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "taking"
+      ]
+    },
+    {
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 소아, 약 또는 화장품에 과민증 환자, 알레르기 체질, 습윤(습기 참)이나 미란(짓무름)이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하",
+      "en": "Do not use this medicine in infants aged 30 months or younger.Before using this medicine, children, patients with hypersensitivity to medicines or cosmetics, th",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 이 약 또는 화장품에 과민증 환자, 알레르기 체질인 환자, 심한 습윤(습기 참)이나 미란(짓무름) 환자, 소아는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지",
+      "en": "Do not use this medicine in infants 30 months of age or younger. Before using this medicine, patients with hypersensitivity to this medicine or to cosmetics, pa",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈주위, 점막, 습진, 상처 부위, 민감한 피부에 이 약을 사용하지 마십시오.특히, 벗겨진 피부 표면 또는 물집이 있는 부위에 다량을 사용하지 마십시오.이 약을 사용하기 전에 이 약 또는 화장품에 알레르기(발진·발적, 가려움, 옻 등에 의한 피부염 등), 알레르기 체질, 습윤(",
+      "en": "Do not use this medicine on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin. In particular, do not use large amounts on abra",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 4,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈주위, 점막, 습진, 상처부위, 민감한 피부 등에 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상(발진·발적, 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체질, 습윤이나 짓무름, 염증이 심한 사람은 의사 또는 약사와 상의하십시오.5~",
+      "en": "Do not use it on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin.Before using this medicine, those who have experienced alle",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "만 7세 미만의 어린이 및 만 2세 미만의 영아, 이 약에 과민증 환자 또는 경험자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함한 약에 의한 알레르기 증상 경험자, 임부, 임신하고 있을 가능성이 있는 여성, 프로펠렌글리콜 과민증 환자 또는 경",
+      "en": "Children under 7 years of age and infants under 2 years of age, and patients with hypersensitivity to this medicine or a history of it, must not use this medici",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "면봉이나 깨끗한 손으로 소량을 덜어 통증 부위에 바르십시오.20분 이상 기다려도 통증이 계속되는 경우에는 추가로 이 약을 바를 수 있으며, 그 후에는 3시간 이상 간격을 두고 바르십시오.",
+      "en": "Using a cotton swab or clean hands, take a small amount and apply it to the painful area. If the pain continues after waiting 20 minutes or more, this medicine ",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "생후 1개월 미만의 소아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질인 환자, 약이나 화장품에 과민증, 습윤(습기 참)이나 염증이 심한 환자, 6세 미만의 영아 및 유아는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호",
+      "en": "Do not use this medicine on children under 1 month of age. Before using this medicine, patients with an allergic constitution, patients hypersensitive to medici",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "생후 1개월 미만의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 알레르기 증상(발진, 발적, 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체질, 습윤(습기 참)이나 염증이 심한 환자, 영ㆍ유아는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 ",
+      "en": "Infants under 1 month of age must not use this medicine. Before using this medicine, people who have experienced allergic symptoms to a medicine or cosmetic (ra",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "성교 10분~1시간 전에 질 깊숙이 좌약 1개를 삽입하고, 이 약 삽입 후 1시간 내에 성교를 하지 못하거나 성교를 반복할 때에는 다시 1개를 삽입합니다.",
+      "en": "Insert 1 suppository deep into the vagina 10 minutes to 1 hour before sexual intercourse; if intercourse does not take place within 1 hour after inserting this ",
+      "section": "용법·용량",
+      "routes": [
+        "vaginal"
+      ],
+      "masters": 4,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "소화불량, 비타민류 및 광물질 등의 흡착에 의해 영양장해가 일어날 수 있으므로 주의하십시오.",
+      "en": "Take care, as indigestion may occur and as the adsorption of vitamins, minerals and the like may cause nutritional disturbance.",
+      "section": "이상반응",
+      "routes": [
+        "oral"
+      ],
+      "masters": 5,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "수두, 무좀, 백선 또는 화농이 있는 환부, 안점막 등의 점막, 얼굴의 광범위한 부위에는 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 알레르기 경험자, 환부가 광범위, 습윤 또는 짓무름이 심한 환자, 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십",
+      "en": "Do not use it on affected areas with chickenpox, athlete's foot, ringworm, or suppuration, on mucous membranes such as the conjunctiva of the eye, or on extensi",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "수두, 무좀ㆍ백선 등 또는 화농되어 있는 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품에 등에 의한 알레르기 증상이 나타난 적이 있는 환자, 알레르기 체질인 환자, 습윤이나 미란이 심한 환자, 환부가 광범위한 환자, 프로필렌글리콜에 과민증인 환자는 의사 또는 ",
+      "en": "Do not use this medicine on areas with chickenpox, athlete's foot, ringworm, or suppuration.Before using this medicine, patients who have experienced allergic s",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약 또는 기타의 아미드계 국소마취제에 과민증, 환부(질환 부위)에 2차 감염이 있는 환자, 3개월 이하의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 약 또는 화장품에 알레르기 증상(발진, 발적, 가려움증, 옻 등에 의한 피",
+      "en": "Patients hypersensitive to this medicine or to other amide local anesthetics, patients with a secondary infection at the affected area (the diseased site), and ",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 5,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약 또는 폴리에칠렌글리콜을 함유하는 다른 연고제에 과민증 환자 및 경험자, 신질환 환자, 임부 또는 임신하고 있을 가능성이 있는 부인, 수유부는 이 약을 사용하지 마십시오.이 약은 외용으로만 사용하십시오.눈, 코 등의 점막 표면에 사용하지 마십시오.이 약을 얼굴에 사용하는 경우에는 ",
+      "en": "Patients with or with a history of hypersensitivity to this medicine or to other ointments containing polyethylene glycol, patients with kidney disease, pregnan",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 12세 미만의 어린이는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 알레르기 체질, 약에 의한 알레르기 경험자(예 : 발열, 발진·발적(충혈되어 붉어짐), 부종(부기), 자극감, 관절통,",
+      "en": "Patients with or with a history of hypersensitivity to this medicine and children under 12 years of age must not use this medicine. Before using this medicine, ",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 7세 미만의 어린이 및 만 2세 미만의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함하는 약에 의한 알레르기 증상 경험자, 프로필렌글리콜 과민증 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 ",
+      "en": "Patients who are hypersensitive to this medicine or have experienced such hypersensitivity, children under 7 years of age, and infants under 2 years of age must",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 7세 미만의 어린이 및 만 2세 미만의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함한 약에 의한 알레르기 증상 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 고혈압, 심장질환, 당뇨병, 갑",
+      "en": "Patients with or with a history of hypersensitivity to this medicine, children under 7 years of age, and infants under 2 years of age must not use this medicine",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 4,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자 및 경험자는 이 약을 사용하지 마십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 점안용으로만 사용하십시오.최초 사용 시 1~2방울은 점안하지 말고 버리십시오.이 약은 개봉한 후에는 1회만 사용하십시오.용",
+      "en": "Patients hypersensitive to this medicine and those who have experienced it must not use this medicine. Follow the prescribed dosage and administration carefully",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 6개월 미만의 영아, 헤파린에 과민반응, 출혈경향 및 저혈소판증이 있는 경우, 절개되거나 아물지 않은 상처, 점막 및/또는 화농성 감염 부위, 임산부에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 수유부, 2세 미만 영아는 의사 또는 약사와 상의하십시오.눈",
+      "en": "Patients with hypersensitivity to this medicine, infants under 6 months of age, cases of hypersensitivity reactions to heparin, a bleeding tendency, or thromboc",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 프로필렌글리콜 과민증 환자 또는 경험자는 의사 ",
+      "en": "Patients with hypersensitivity to this medicine, patients with thyroid dysfunction, children under 6 years of age, and those during radioactive iodine treatment",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "swallowed",
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 프로필렌글리콜 과민증 환자 또는 경험자는 의사 ",
+      "en": "Patients who are hypersensitive to this medicine, patients with thyroid dysfunction, and children under 6 years of age must not use this medicine, and it must n",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 8,
+      "matched": [
+        "swallowed"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 뇌, 척수, 귀(내이, 중이, 외이), 질, 방광, 구강 등의 점막면, 눈, 미란(짓무름) 또는 화농성인 환부에 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상 경험자, 알레르기 체질, 광범위한 환부, 심한 상처, 심한 화상, 분만",
+      "en": "Patients hypersensitive to this medicine must not use it, and do not use it on the mucosal surfaces of the brain, spinal cord, ear (inner ear, middle ear, outer",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 상처 또는 염증이 있는 두피 및 심한 미란(짓무름) 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 프로필렌글리콜에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.이 약은 외용으",
+      "en": "Do not use this medicine on patients hypersensitive to it, or on a scalp with wounds or inflammation, or on areas with severe erosion. Before using this medicin",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 5,
+      "matched": [
+        "taking"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 세균(결핵, 매독 등), 진균(곰팡이)(칸디다증, 백선 등), 스피로헤타속, 효모, 바이러스(대상포진(물집), 단순포진(물집), 수두, 종두증 등), 동물(옴, 사면발이 등)성 피부감염증, 고막 천공(뚫림)이 있는 습진성 외이도(바깥귀길)염, 궤양(베체트병제외),",
+      "en": "Patients who are hypersensitive to this medicine, patients with bacterial (tuberculosis, syphilis, etc.), fungal (mold) (candidiasis, tinea, etc.), spirochetal,",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 수두, 무좀·백선 등 또는 화농(곪음)이 있는 질환 부위, 눈 또는 눈 주위, 점막에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 과민증 환자, 습윤이나 짓무름, 염증이 심한 사람, 질환 부위가 넓은 사람, 임부 또는 임신하고 있을 가능성",
+      "en": "Patients who are hypersensitive to this medicine must not use it, and it must not be used on chickenpox, athlete's foot or tinea and the like, on diseased areas",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 여성, 18세 미만 환자, 심혈관계 질환(관상동맥 질환, 부정맥, 울혈심부전, 심장판막 질환, 치료받거나 혹은 치료받지 않은 고혈압, 저혈압), 유전적 요인이 없는 탈모, 갑작스런 부분적 탈모, 두피의 이상(홍반, 염증, 감염, 자극 또는 통증, 건선, 일광화상)",
+      "en": "Patients hypersensitive to this medicine, women, patients under 18 years of age, patients with cardiovascular disease (coronary artery disease, arrhythmia, cong",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유ㆍ소아는 이 약을 사용하지 마십시오.눈이나 눈 주위, 점막(구강(입안), 비강(코안), 질 등), 음낭, 외음부 등, 습진, 습윤(습기 참), 짓무름, 갈라짐이나 외상(상처)이 심한 환부(질환부위), 손톱",
+      "en": "Patients hypersensitive to this medicine, pregnant women or women who may be pregnant and breastfeeding women, and infants and young children must not use this ",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아 및 소아는 이 약을 사용하지 마십시오.눈이나 눈 주위, 점막(입안, 코안, 질), 음낭, 외음부, 습진, 습윤(습기 참), 짓무름, 갈라짐이나 외상(상처)이 심한 질환 부위, 손톱, 두피에 사용하지 마",
+      "en": "Patients who are hypersensitive to this medicine, women who are pregnant or may be pregnant, breastfeeding women, and infants and children must not use this med",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아, 소아, 눈, 눈 주위, 점막(입안, 코안, 질), 음부, 외음부, 습진, 습기참, 짓무름, 갈라짐 또는 상처가 심한 질환 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 알",
+      "en": "Do not use this medicine in patients with hypersensitivity to this medicine, pregnant women or women who may be pregnant and breastfeeding women, infants, or ch",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 4,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임신 3기는 사용하지 마십시오.눈, 눈 주위에는 사용하지 마십시오.이 약을 사용하기 전에 임부(꼭 필요한 경우의 임신 1기와 2기), 약물 또는 화장품 등에 의해 알레르기 증상의 병력이 있는 환자, 습윤이나 짓무름이 심한 사람, 프로필렌글리콜에 과민증 환자 또는 ",
+      "en": "Patients with hypersensitivity to this medicine and women in the third trimester of pregnancy must not use it. Do not use it on the eyes or around the eyes. Bef",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 5,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 피부감염증(결핵, 매독, 대상포진, 단순포진, 수두, 종두증), 고막 천공(뚫림)이 있는 습진성 외이도(바깥귀길)염, 궤양(베체트병 제외), 제2도 심재성(드러나지 않는) 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사, 매독, 결핵, 피부 백신 반응이 있",
+      "en": "Do not use this medicine in patients hypersensitive to it, in patients with skin infections (tuberculosis, syphilis, herpes zoster, herpes simplex, chickenpox, ",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 11,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 눈의 통증이 심한 사람, 지금까지 안약에 의한 알레르기 증상(눈의 충혈, 가려움, 부종, 발진, 충혈되어 붉어짐 등) 경험자, 녹내장 환자는 의사 또는 약사와 상의하십시오.증상이 악화되거나 3일 이상 증상이 지속되",
+      "en": "Patients hypersensitive to this medicine must not use it. Before using this medicine, people with severe eye pain, those who have previously experienced allergi",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 6,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 눈의 통증이 심한 환자, 지금까지 안약에 의한 알레르기 증상(예: 눈의 충혈, 가려움, 부종, 발진, 충혈되어 붉어짐 등) 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 사용",
+      "en": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, patients with severe eye pain and people who have so far",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 5,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증, 6개월 미만의 영아, 헤파린 과민증, 출혈경향 및 저혈소판증 환자, 절개되거나 아물지 않은 상처, 점막 또는 화농성 감염 부위, 임산부에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 수유부, 2세 미만 영아는 의사 또는 약사와 상의하십시오.눈 주위와 점막에는 적",
+      "en": "People with hypersensitivity to this medicine, infants under 6 months of age, patients with hypersensitivity to heparin, a bleeding tendency, or thrombocytopeni",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약은 위내시경 검사 시 장내기포제거와 복부(배부분) X선 촬영 시 장내가스제거, 위장관내 가스로 인한 복부팽만감 및 공기연하증(공기삼킴증) 등)의 개선에 사용합니다.",
+      "en": "This medicine is used to remove bubbles in the intestine for a gastroscopy, to remove gas in the intestine for an abdominal X-ray, and to improve abdominal dist",
+      "section": "효능·효과",
+      "routes": [
+        "oral"
+      ],
+      "masters": 2,
+      "matched": [
+        "swallowing"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 안약에 의한 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장 환자는 이 약을 사용하지 마십시오.이 약 사용에 의해 눈의 침침함이 개선되지 않는 경우, 2주 정도 사용하여도 증상이 좋아지지 않을",
+      "en": "Before using this medicine, people with severe eye pain, people who have experienced an allergic reaction to eye drops (redness of the eyes, itching, edema (swe",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장, 의사의 치료를 받고 있는 환자는 의사 또는 약사와 상의하십시오.용기의 끝이 눈꺼풀 및 속눈썹에 닿으면 눈곱이나 곰팡이 등에 의해 약액이 오염 ",
+      "en": "Before using this medicine, people with severe eye pain, people who have experienced allergic reactions (redness of the eye, itching, swelling, rash, redness fr",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 4,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 발진, 발적, 가려움증 등 약이나 화장품 등에 의한 알레르기 증상 경험자, 습기 참 혹은 짓무름이 심한 환자는 의사 또는 약사와 상의하십시오.5~6일 동안 사용하여도 증상이 개선되지 않는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.이 약은 ",
+      "en": "Before using this medicine, those who have experienced allergic symptoms such as rash, redness or itching from medicines or cosmetics, and patients with severe ",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 5,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 심한 눈의 통증, 안약에 의한 알레르기 증상(예를 들어 눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등)경험자, 녹내장 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 사용할 경우 보호자의 지도 감독하에 사용하십시",
+      "en": "Before using this medicine, people with severe eye pain, people who have experienced allergic symptoms from eye drops (for example, redness of the eyes, itching",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 약에 과민증 환자, 알레르기 체질인 환자, 구강내 짓무름이 심한 사람, 프로필렌글리콜에 과민증 또는 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.목구멍의 도포용으로 사용하고 ",
+      "en": "Before using this medicine, patients with hypersensitivity to medicines, patients with an allergic constitution, people with severe rawness inside the mouth, an",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 이 약에 또는 설파제에 과민증 환자, 눈의 통증이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.장기간 계속하여 사용하지 마십시오.이 약은 점안용으로만 사용하십시오.다래끼인 경우 눈꺼풀을 비비거나 그 외 눈에 자극을 가하지 않도록 ",
+      "en": "Before using this medicine, patients hypersensitive to this medicine or to sulfonamides and patients with severe eye pain should consult a doctor or pharmacist.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "ophthalmic"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "전염성농가진, 모낭염 등과 같은 세균성 및 바이러스성 감염증이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.모낭염, 부스럼, 피부자극, 찌르는 것 같은 아픔, 발열, 지속적 자극감, 발진이나 충혈되어 붉어지는 발적, 홍조, 가려움, 피부건조, 농포성 피부염",
+      "en": "If bacterial or viral infections such as impetigo contagiosa or folliculitis occur, stop using this medicine immediately and consult a doctor or pharmacist. If ",
+      "section": "이상반응",
+      "routes": [
+        "topical"
+      ],
+      "masters": 3,
+      "matched": [
+        "take"
+      ]
+    }
+  ]
+}

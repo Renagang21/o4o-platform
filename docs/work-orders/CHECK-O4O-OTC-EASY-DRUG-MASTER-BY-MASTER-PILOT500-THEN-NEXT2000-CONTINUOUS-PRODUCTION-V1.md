@@ -116,7 +116,7 @@ preflight 예측(416 생산 / 84 예외)과 **코드별로 정확히 일치**했
 | **EXPALL-14** | **시스템 수준 오류 0 (SYS-01~17)** | **미충족 — SYS-12** |
 | EXPALL-NOT | 성공률은 차단 기준 아님 | 준수 (판정에 미사용) |
 
-**verdict: `PENDING_USER_DECISION_SYS12`**
+**verdict: `APPROVED_FOR_REMAINING_ALL`** (SYS-12 사용자 판단 반영 후 · 아래 상세)
 
 ### SYS-12 상세
 
@@ -164,9 +164,121 @@ prep · source · tm · tm-shard0~5 · ko-payload · en-payload · author-report
 
 ---
 
-## 7. 다음 단계
+## 7. SYS-12 판단 결과
 
-1. **SYS-12 판단** (사용자) → 통과 시 EXPALL-14 충족 → `APPROVED_FOR_REMAINING_ALL`
-2. 다음 2,000 master 자동 선정 (LIVE DB 기준, 결정론적, 2회 생성 byte-identical)
-3. checkpoint 100~250 단위 생산 → 독립검증
-4. 예외 원장 병합 (pilot 100 예외 20 + pilot 500 예외 84 + 2,000 예외) → agent-na 인계
+사용자가 귀속 증거(대상 교집합 0 · sourceRef 누수 0 · 대상 밖 audit 0)를 확인하고 **SYS-12 를 충족으로 판단**했다.
+자동 통과가 아니라 `--sys12-accepted` 명시 플래그로만 반영되며, 판단 근거와 결정이 verdict 산출물에 기록된다.
+
+→ EXPALL-14 충족 → **`APPROVED_FOR_REMAINING_ALL`** → 2단계 착수.
+
+---
+
+## 8. 2단계 — 다음 2,000 생산 결과
+
+### 8-1. 선정 (별도 Queue WO 없음)
+
+`otc-v4-next2000-select.ga.ts` 가 pilot 500 종료 시점 LIVE DB 에서 결정론적으로 선정.
+
+모집단은 **재도출하지 않고 agent-la 확립 분류 원장을 재사용**했다(분모 정의 발산 방지):
+ga-ready 2,496 ∪ na-exception 1,047 − pilot100 100 − pilot500 500 = **2,943 후보** (exclude-ledger 266 은 제외 집합).
+
+| 항목 | 값 |
+|---|---|
+| 적격 (LIVE 실측 통과) | 2,943 |
+| 생산 가능 | 2,350 |
+| **선정** | **2,000** |
+| 생산 예상 | 1,962 (A_NORMAL) |
+| 예외 격리 표본 | 38 (ROUTE_CONFLICT) |
+| route | oral 1,000(상한 50% 적중) / topical 683 / ophthalmic 249 / vaginal 18 / oromucosal 12 |
+| 재현성 | **2회 실행 byte-identical** (prep·source·ledger md5 동일) |
+| 교집합 | pilot100 0 · pilot500 0 · EXCLUDE 0 |
+
+> 판단 기록: 생산 가능 후보는 2,350 이지만 oral 상한(50%)을 지키면 1,962 가 한계다. 남은 38칸을 oral 추가가 아니라
+> **예외 격리 시험 표본**으로 채웠다(WO §4 의 "unresolved·source 결손 대상도 예외 격리 시험에 포함 가능" 적용).
+> 생산량 극대화를 우선하려면 38건을 oral 생산분으로 바꿀 수 있다.
+
+### 8-2. 저작
+
+| 단계 | 결과 |
+|---|---|
+| KO 저작 | **1,962 / 1,962**, blocked 0 |
+| EN 번역메모리 | **2,546 / 2,546** — 기존 검증본에서 **1,250 자동 승계**(pilot500 1,095 · pilot100 132 · oral V3 23), 신규 번역 1,296 |
+| EN 조립 | **1,962 / 1,962**, blocked 0 |
+| route 가드 면제 | 207 (전부 해당 섹션 공식 원문에 경구 동사 실재 확인, 전건 기록) |
+
+번역은 agent-ga 6대 병렬(216씩) + 교정 2라운드. 병합·apply 는 단일 세션 단독.
+
+### 8-3. 생산 (LIVE)
+
+| 항목 | 값 |
+|---|---|
+| target / processed | 2,000 / **2,000** (중단 0) |
+| GREEN | **1,962** |
+| EXCEPTION | **38** (전부 ROUTE_CONFLICT) |
+| SKIP | 0 |
+| koWrite / enWrite / 총 write | 7,848 / 3,924 / **11,772 T** |
+| expectedWrite | 11,772 (**정확 일치**) |
+| checkpoint | 10회 (200건 주기) |
+| failedMasterResidueDirty | **0** |
+
+**재실행 멱등**: SKIP **1,962** · 신규 GREEN 0 · 신규 write **0** · 예외 38 불변.
+
+### 8-4. 독립검증 — **24 / 24 PASS**
+
+pilot 500 검증기와 동일 계약에 더해 **선행 GREEN 496건(pilot100 80 + pilot500 416) 불변**과
+**선행 배치 교집합 0(pilot100 100 + pilot500 500)** 을 판정 대상에 포함했다.
+
+---
+
+## 9. 원장 덮어쓰기 사고와 구조적 고정
+
+**사고**: pilot 500 멱등 재실행(전량 SKIP)이 무접미 `green-ledger.ga.json` 을 GREEN 0 으로 덮어썼다.
+그 결과 2단계 기준선 스냅샷이 선행 GREEN 을 496 이 아니라 80 으로 잘못 잡았다. (1차 스냅샷 `.apply-run1` 참조로 즉시 정정)
+
+**고정**: 실행 결과 원장을 **run 별 불변 파일**로 남기도록 실행기를 변경했다.
+
+- `x.ga.json` → `x.run-<startedAt>.ga.json` 를 함께 기록
+- 무접미 파일은 "최신 실행" 편의 사본일 뿐 정본이 아니다
+- 후속 배치가 선행 GREEN 을 참조할 때는 **반드시 run 별 파일**을 쓴다
+- 실측 확인: LIVE apply(`run-20260729T154307`)의 GREEN 1,962 원장이 재실행(`run-20260729T160610`)에 덮이지 않고 보존됨
+
+---
+
+## 10. 누적 예외 원장 (agent-na 인계)
+
+`otc-v4-exception-consolidate.ga.ts` → `otc-v4-exception-consolidated-na.ga.json`
+
+| 배치 | 예외 |
+|---|---|
+| pilot 100 | 20 |
+| pilot 500 | 84 |
+| next 2,000 | 38 |
+| **합계** | **142** |
+
+원인별 그룹: **route 118** (ROUTE_CONFLICT 62 · ROUTE_UNRESOLVED 56) · **source 24** (SOURCE_EFFICACY_MISSING 24)
+재투입 가능: 118 / terminal(원문 부재): 24
+
+불변식 확인: 전건 `dbWriteActual=0` · 중복 masterId **0** · 필수필드 누락 **0** · 합계 일치.
+각 배치의 정본은 **run 별 불변 파일**에서 취했다(무접미 파일 미사용).
+
+---
+
+## 11. 누적 현황
+
+| 배치 | GREEN | 예외 |
+|---|:---:|:---:|
+| pilot 100 | 80 | 20 |
+| pilot 500 | 416 | 84 |
+| next 2,000 | 1,962 | 38 |
+| **누적 V4 GREEN** | **2,458** | **142** |
+
+공식 미완료: pilot 500 종료 시점 3,313 → **1,351** (= 3,313 − 1,962)
+이 1,351 에는 기존 예외와 이번 38건이 포함된다.
+
+---
+
+## 12. 다음 단계 (마감 순서)
+
+1. **정상 잔여 전량 생산** — 별도 준비 WO 없이 동일 파이프라인으로 확대
+2. **누적 예외 142건을 agent-na 가 원인별 일괄 정리** (route 118 / source 24)
+3. **복구된 대상 최종 생산** — agent-ga 정본 실행기 재투입 (sourceRef 는 masterRefV4 로 동일 결정)

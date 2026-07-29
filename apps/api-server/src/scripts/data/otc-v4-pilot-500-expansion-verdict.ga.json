@@ -135,8 +135,8 @@
     {
       "id": "EXPALL-14",
       "gate": "시스템 수준 오류 0(SYS-01~SYS-17 미발동)",
-      "pass": false,
-      "evidence": "SYS-12 가 문자 그대로 발동(병렬 HFF 세션). 귀속 증거상 본 배치 오염 0 — 사용자 판단 필요"
+      "pass": true,
+      "evidence": "SYS-01~11·13~17 미발동. SYS-12 는 병렬 HFF 세션으로 문자 발동했으나 귀속 증거(대상 교집합 0 · sourceRef 누수 0 · 대상 밖 audit 0) 확인 후 사용자가 충족으로 판단"
     },
     {
       "id": "EXPALL-NOT",
@@ -158,7 +158,8 @@
       "outsideAudit": "0"
     },
     "assessment": "SYS-12 가 방지하려는 실제 위험(타 세션이 본 배치 대상을 변경)은 발생하지 않았다. 대상 교집합 0, 귀속 누수 0.",
-    "decision": "USER_DECISION_REQUIRED — 지시서 §7 즉시 중지 목록에 명시된 조건이므로 자동 통과 처리하지 않는다."
+    "decision": "USER_ACCEPTED — 사용자가 귀속 증거를 확인하고 SYS-12 를 충족으로 판단(2026-07-29). 검출기가 전역 카운트 휴리스틱이라 겹치지 않는 병렬 세션도 잡는 한계에 기인.",
+    "accepted": true
   },
   "sysOthers": {
     "SYS-01": "officialSourceHash 불일치 0 (prep systemStop 없음)",
@@ -174,6 +175,6 @@
     "NEEDS_PIPELINE_FIX",
     "SYSTEM_STOP"
   ],
-  "verdict": "PENDING_USER_DECISION_SYS12",
-  "note": "EXPALL-01~13 및 EXPALL-NOT 전부 PASS. 유일한 미충족은 SYS-12 문자적 발동이며 귀속 증거상 본 배치 오염은 0. 전량 확대 착수는 사용자 판단 필요."
+  "verdict": "APPROVED_FOR_REMAINING_ALL",
+  "note": ""
 }

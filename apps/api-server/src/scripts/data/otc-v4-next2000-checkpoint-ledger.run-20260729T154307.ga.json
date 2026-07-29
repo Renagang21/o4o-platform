@@ -1,0 +1,107 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 200,
+      "lastMasterId": "39f9104a-c3b3-4855-96aa-08e04e25ebc1",
+      "green": 179,
+      "exception": 21,
+      "skip": 0,
+      "writeActual": 1074,
+      "at": "2026-07-29T15:44:28.505Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 400,
+      "lastMasterId": "4a3a0310-815d-4acf-ba57-34abaee8cacf",
+      "green": 367,
+      "exception": 33,
+      "skip": 0,
+      "writeActual": 2202,
+      "at": "2026-07-29T15:45:52.872Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 600,
+      "lastMasterId": "5b99c0a4-f8ea-4131-80d2-67f1a690081b",
+      "green": 562,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 3372,
+      "at": "2026-07-29T15:47:20.409Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 800,
+      "lastMasterId": "6dbf9ba0-9ffa-4133-bcca-5c695c80b2a1",
+      "green": 762,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 4572,
+      "at": "2026-07-29T15:49:37.938Z"
+    },
+    {
+      "checkpoint": 5,
+      "processed": 1000,
+      "lastMasterId": "80550086-7934-4dfd-8fcf-1f5f57df7e7a",
+      "green": 962,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 5772,
+      "at": "2026-07-29T15:52:10.075Z"
+    },
+    {
+      "checkpoint": 6,
+      "processed": 1200,
+      "lastMasterId": "92327104-22cd-487e-a62b-1c4aa50b83fa",
+      "green": 1162,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 6972,
+      "at": "2026-07-29T15:54:40.086Z"
+    },
+    {
+      "checkpoint": 7,
+      "processed": 1400,
+      "lastMasterId": "a507da7d-3056-4826-8467-4913fa3905f1",
+      "green": 1362,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 8172,
+      "at": "2026-07-29T15:57:11.612Z"
+    },
+    {
+      "checkpoint": 8,
+      "processed": 1600,
+      "lastMasterId": "b6eff554-260b-4f31-b3f2-e33d0d9930ab",
+      "green": 1562,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 9372,
+      "at": "2026-07-29T15:59:43.346Z"
+    },
+    {
+      "checkpoint": 9,
+      "processed": 1800,
+      "lastMasterId": "d4d6083f-fc45-4678-bd9b-b6b63156543c",
+      "green": 1762,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 10572,
+      "at": "2026-07-29T16:02:16.416Z"
+    },
+    {
+      "checkpoint": 10,
+      "processed": 2000,
+      "lastMasterId": "ffdd839d-6c77-484e-8517-eceea55b53ee",
+      "green": 1962,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 11772,
+      "at": "2026-07-29T16:04:53.433Z"
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "tm-shard-filled",
+  "shard": 7,
+  "total": 1,
+  "note": "구분자 문자 변형(U+0387 ↔ U+00B7)으로 exact-match 병합이 실패한 1건을 원문 key 로 재귀속. 번역 출처=shard4. 내용 변경 없음.",
+  "entries": {
+    "이 약은 멀미에 의한 어지러움·구토·두통의 예방 및 완화에 사용합니다.": "This medicine is used for the prevention and relief of dizziness, vomiting and headache caused by motion sickness."
+  }
+}

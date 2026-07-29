@@ -1,0 +1,754 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "producer": "agent-ga",
+  "consumer": "agent-na",
+  "liveDbWrite": 0,
+  "batchId": "otc-v4-next2000",
+  "schema": "otc-v4-master-by-master-exception-handoff v1",
+  "total": 15,
+  "byExceptionCode": {
+    "ROUTE_CONFLICT": 6,
+    "TRANSLATION_VALIDATION_FAILED": 9
+  },
+  "invariantCheck": {
+    "allFailedWriteZero": true,
+    "residueDirty": 0
+  },
+  "rows": [
+    {
+      "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "productCode": "200902501",
+      "productName": "오라칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "214703CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "4b4b11da-09fd-37fe-ca2e-4f03621ea1eb",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2072f867-2b0b-464e-91f4-b241adb0ff57 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "productCode": "200410068",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "228731CSI",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "4b3eab21-1ad4-f947-f5aa-97ba52881fba",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 20abc6bc-7ed9-4aed-b2b9-dde701fe0052 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "21143559-d2fd-459c-ba32-56f152506b5f",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "00d54918-5b05-5dc8-12f7-a125c05e908f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 21143559-d2fd-459c-ba32-56f152506b5f --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:21143559-d2fd-459c-ba32-56f152506b5f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "productCode": "201501926",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b1cf99a8317302736cfc6efb6592f91e",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "D52600CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "1c3afff9-3788-e043-a763-4b3fb0d8ed07",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 248b57da-3ae1-435f-8dbc-ba6a392030b0 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "2569759e-8499-425b-8b00-4014a42b1deb",
+      "productCode": "201701182",
+      "productName": "임팩타민케어정",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "d3bff8476d6d42daf317b8de238d38fd",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "370d5e4e-c906-f7dc-4ab1-6bdf1b8c4f2e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2569759e-8499-425b-8b00-4014a42b1deb --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2569759e-8499-425b-8b00-4014a42b1deb",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "259e0652-0a56-4625-ab49-4643d6e7c16b",
+      "productCode": "201802270",
+      "productName": "내간애액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "38056293fb48ea078143a8d43d7771a1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "2ea44284-1c40-c3e8-feef-6749114c28cc",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 259e0652-0a56-4625-ab49-4643d6e7c16b --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:259e0652-0a56-4625-ab49-4643d6e7c16b",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "25dc0a81-e2fe-45b5-bcb2-7c19635832bb",
+      "productCode": "202400775",
+      "productName": "태전위산",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "dd87f10b775ccae41d90c635fde159c2",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "052f156f-5fd0-6342-6ff5-03e0bb2e3d49",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 25dc0a81-e2fe-45b5-bcb2-7c19635832bb --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:25dc0a81-e2fe-45b5-bcb2-7c19635832bb",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "productCode": "201702575",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "71b0d3ca-42fa-c5b8-d8f7-c7bdd479989c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 25de2536-53f8-41b4-afee-63a8ed2e0cb7 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "26327d0c-9e4f-44d3-9359-d477f01ec3f6",
+      "productCode": "202002848",
+      "productName": "캐롤키즈노즈시럽",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "bf0c954a295e135428a2f6cbfb2a396a",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "9585689a-304c-c850-5ff9-b9d454193d1e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26327d0c-9e4f-44d3-9359-d477f01ec3f6 --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26327d0c-9e4f-44d3-9359-d477f01ec3f6",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "2655f1c6-d86d-43fd-bc87-aef04ca9df31",
+      "productCode": "202204272",
+      "productName": "챔프콜드시럽",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "5286e6bf2e519359c4e9934cbf405f2f",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "92335beb-8108-e173-f56e-8d195f0e58b4",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 2655f1c6-d86d-43fd-bc87-aef04ca9df31 --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:2655f1c6-d86d-43fd-bc87-aef04ca9df31",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "266d62e2-a171-441a-90b4-07b985f1a348",
+      "productCode": "202008429",
+      "productName": "에프쿨시럽",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "1bfb6c7d443a65dfdc2c026dd3ec487a",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "e248599e-b830-47f2-9724-2e9d8757748d",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 266d62e2-a171-441a-90b4-07b985f1a348 --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:266d62e2-a171-441a-90b4-07b985f1a348",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "26b9701a-1b1c-420c-8507-7add5274574c",
+      "productCode": "201402165",
+      "productName": "진감수액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8eb1ac3a474416eb11139b612117dbbc",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "3684bcba-4c8c-d403-90e2-32b8d4ca422f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26b9701a-1b1c-420c-8507-7add5274574c --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26b9701a-1b1c-420c-8507-7add5274574c",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "26be33e5-4e03-416c-9ad7-68e79cbefe67",
+      "productCode": "202501821",
+      "productName": "써스펜키즈시럽(아세트아미노펜)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "b946ce26905f349d1d109ddcf5b089b9",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "3cdad82e-8c43-441f-0ced-ab2c232b6f40",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26be33e5-4e03-416c-9ad7-68e79cbefe67 --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26be33e5-4e03-416c-9ad7-68e79cbefe67",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    },
+    {
+      "masterId": "26c20d76-e6be-4456-b08a-c17c80a9a5d2",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "12f13adf-a98a-7030-f4d8-844aef97f1be",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26c20d76-e6be-4456-b08a-c17c80a9a5d2 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26c20d76-e6be-4456-b08a-c17c80a9a5d2",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "26e62185-65ec-48ed-8f5d-ef0de9afaa37",
+      "productCode": "202004867",
+      "productName": "돌체락원스산",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "TRANSLATION_VALIDATION_FAILED",
+      "failedStage": "translate",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "e74bcb8a2c9b793ade49ae62aaffa106",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0a9117b3-ced4-b026-5d77-d5b2f4d88333",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "EN 번역메모리 문장 보강 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-next2000-executor.ga.ts --only 26e62185-65ec-48ed-8f5d-ef0de9afaa37 --rollback-test --port 5503",
+      "detail": "EN payload 미생성",
+      "batchId": "otc-v4-next2000",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:26e62185-65ec-48ed-8f5d-ef0de9afaa37",
+      "stratum": "A_NORMAL",
+      "expectedExceptionCode": null
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 80,
+      "lastMasterId": "2dabaef7-70ac-4f7b-a924-c255c7340685",
+      "green": 0,
+      "exception": 12,
+      "skip": 0,
+      "writeActual": 0,
+      "at": "2026-07-29T15:42:57.119Z"
+    }
+  ]
+}

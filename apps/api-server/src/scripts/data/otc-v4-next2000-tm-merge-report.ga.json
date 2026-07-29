@@ -1,0 +1,341 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "mode": "merge",
+  "before": 2546,
+  "applied": 44,
+  "skippedExisting": 1307,
+  "after": 2546,
+  "pendingAfter": 0,
+  "rejected": 3,
+  "rejectedDetail": [
+    {
+      "shard": 4,
+      "ko": "수유부, 만 3세 미만의 영·유아는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등) 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 녹내장(눈의 통증, 눈의 침침함 등), 배뇨장애, 폐기종 혹은 만성 기관지염과 같은 호흡기질환 환자는 의사 또는 약사와 상의하십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약 복용 후 졸음이 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오.정해진 용법과 용량을 잘 지키십시오",
+      "reason": "TM 미등록 문장(대상 밖)"
+    },
+    {
+      "shard": 5,
+      "ko": "수유부, 만 3세 미만의 영·유아는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 약에 의한 알레르기 증상(예: 발진, 충혈되어 붉어짐, 가려움 등) 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 녹내장(눈의 통증, 눈의 침침함 등), 배뇨장애, 폐기종 혹은 만성기관지염과 같은 호흡기 질환 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.복용 후 졸음이 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오.",
+      "reason": "TM 미등록 문장(대상 밖)"
+    },
+    {
+      "shard": 5,
+      "ko": "위장관폐쇄가 있거나, 장폐색으로 의심되는 증상이 있는 환자, 급성 복통이 있거나 궤양성 대장염이 있는 환자, 이 약의 구성성분에 과민성이 있는 환자, 열성 설사 환자, 소아는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 고혈압약이나 류마티스약 등 다른 약을 일상적으로 복용하는 환자, 당뇨병 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 고령자는 의사 또는 약사와 상의하십시오.2~3일 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.이 약은 변을 검게 착색시킬 수 있습니다.이 약의 투여로 인해 변비가 발생할 수 있습니다.",
+      "reason": "TM 미등록 문장(대상 밖)"
+    }
+  ],
+  "overwriteFrom": 8,
+  "overwritten": 44,
+  "overwrittenDetail": [
+    {
+      "shard": 8,
+      "ko": "15세 미만의 소아는 이 약을 사용하지 마십시오.얼굴, 눈 주위, 점막, 긁힌 상처 등의 흠집, 균열 부위, 부스럼 딱지 같이 피부가 떨어져 나간 곳, 염증부위(짓무름, 빨갛게 부",
+      "before": "Children under 15 years of age must not use this medicine. Do not use it on the face, around the eyes, on mucous membranes, on breaks in the skin such as scratc",
+      "after": "Children under 15 years of age must not use this medicine. Do not use it on the face, around the eyes, on mucous membranes, on breaks in the skin such as scratc"
+    },
+    {
+      "shard": 8,
+      "ko": "1일 1~4회 환부에 바르고 부드럽게 문지릅니다.필요시 거즈를 덮을 수 있습니다.전염성 농가진인 경우 다른 정상 피부가 오염되지 않도록 주의하면서 가피(부스럼, 딱지)를 제거한 후",
+      "before": "Apply it to the affected area and rub it in gently 1 to 4 times a day. If necessary, the area may be covered with gauze. In the case of contagious impetigo, it ",
+      "after": "Apply it to the affected area and rub it in gently 1 to 4 times a day. If necessary, the area may be covered with gauze. In the case of contagious impetigo, it "
+    },
+    {
+      "shard": 8,
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 소아, 약 또는 화장품에 과민증 환자, 알레르기 체질, 습윤(습기 참)이나 미란(짓무름)이 심한 환자는 의",
+      "before": "Do not use this medicine in infants aged 30 months or younger.Before using this medicine, children, patients with hypersensitivity to medicines or cosmetics, th",
+      "after": "Do not use this medicine in infants aged 30 months or younger.Before using this medicine, children, patients with hypersensitivity to medicines or cosmetics, th"
+    },
+    {
+      "shard": 8,
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 이 약 또는 화장품에 과민증 환자, 알레르기 체질인 환자, 심한 습윤(습기 참)이나 미란(짓무름) 환자, ",
+      "before": "Do not use this medicine in infants 30 months of age or younger. Before using this medicine, patients with hypersensitivity to this medicine or to cosmetics, pa",
+      "after": "Do not use this medicine in infants 30 months of age or younger. Before using this medicine, patients with hypersensitivity to this medicine or to cosmetics, pa"
+    },
+    {
+      "shard": 8,
+      "ko": "눈 또는 눈주위, 점막, 습진, 상처 부위, 민감한 피부에 이 약을 사용하지 마십시오.특히, 벗겨진 피부 표면 또는 물집이 있는 부위에 다량을 사용하지 마십시오.이 약을 사용하기 ",
+      "before": "Do not use this medicine on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin. In particular, do not use large amounts on abra",
+      "after": "Do not use this medicine on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin. In particular, do not use large amounts on abra"
+    },
+    {
+      "shard": 8,
+      "ko": "눈 또는 눈주위, 점막, 습진, 상처부위, 민감한 피부 등에 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상(발진·발적, 가려움, 옻 등에 의한 피",
+      "before": "Do not use it on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin.Before using this medicine, those who have experienced alle",
+      "after": "Do not use it on the eyes or around the eyes, on mucous membranes, eczema, wounds, or sensitive skin.Before using this medicine, those who have experienced alle"
+    },
+    {
+      "shard": 8,
+      "ko": "만 7세 미만의 어린이 및 만 2세 미만의 영아, 이 약에 과민증 환자 또는 경험자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함한 약에",
+      "before": "Children under 7 years of age and infants under 2 years of age, and patients with hypersensitivity to this medicine or a history of it, must not use this medici",
+      "after": "Children under 7 years of age and infants under 2 years of age, and patients with hypersensitivity to this medicine or a history of it, must not use this medici"
+    },
+    {
+      "shard": 8,
+      "ko": "면봉이나 깨끗한 손으로 소량을 덜어 통증 부위에 바르십시오.20분 이상 기다려도 통증이 계속되는 경우에는 추가로 이 약을 바를 수 있으며, 그 후에는 3시간 이상 간격을 두고 바르",
+      "before": "Using a cotton swab or clean hands, take a small amount and apply it to the painful area. If the pain continues after waiting 20 minutes or more, this medicine ",
+      "after": "Using a cotton swab or clean hands, scoop out a small amount and apply it to the painful area. If the pain continues after waiting 20 minutes or more, this medi"
+    },
+    {
+      "shard": 8,
+      "ko": "생후 1개월 미만의 소아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질인 환자, 약이나 화장품에 과민증, 습윤(습기 참)이나 염증이 심한 환자, 6세 미만의 영",
+      "before": "Do not use this medicine on children under 1 month of age. Before using this medicine, patients with an allergic constitution, patients hypersensitive to medici",
+      "after": "Do not use this medicine on children under 1 month of age. Before using this medicine, patients with an allergic constitution, patients hypersensitive to medici"
+    },
+    {
+      "shard": 8,
+      "ko": "생후 1개월 미만의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 알레르기 증상(발진, 발적, 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체",
+      "before": "Infants under 1 month of age must not use this medicine. Before using this medicine, people who have experienced allergic symptoms to a medicine or cosmetic (ra",
+      "after": "Infants under 1 month of age must not use this medicine. Before using this medicine, people who have experienced allergic symptoms to a medicine or cosmetic (ra"
+    },
+    {
+      "shard": 8,
+      "ko": "성교 10분~1시간 전에 질 깊숙이 좌약 1개를 삽입하고, 이 약 삽입 후 1시간 내에 성교를 하지 못하거나 성교를 반복할 때에는 다시 1개를 삽입합니다.",
+      "before": "Insert 1 suppository deep into the vagina 10 minutes to 1 hour before sexual intercourse; if intercourse does not take place within 1 hour after inserting this ",
+      "after": "Insert 1 suppository deep into the vagina 10 minutes to 1 hour before sexual intercourse; if intercourse does not occur within 1 hour after inserting this medic"
+    },
+    {
+      "shard": 8,
+      "ko": "소화불량, 비타민류 및 광물질 등의 흡착에 의해 영양장해가 일어날 수 있으므로 주의하십시오.",
+      "before": "Take care, as indigestion may occur and as the adsorption of vitamins, minerals and the like may cause nutritional disturbance.",
+      "after": "Be careful, as indigestion may occur and as the adsorption of vitamins, minerals and the like may cause nutritional disturbance."
+    },
+    {
+      "shard": 8,
+      "ko": "수두, 무좀, 백선 또는 화농이 있는 환부, 안점막 등의 점막, 얼굴의 광범위한 부위에는 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 알레르기 경험자, 환부가 광범위",
+      "before": "Do not use it on affected areas with chickenpox, athlete's foot, ringworm, or suppuration, on mucous membranes such as the conjunctiva of the eye, or on extensi",
+      "after": "Do not use it on affected areas with chickenpox, athlete's foot, ringworm, or suppuration, on mucous membranes such as the conjunctiva of the eye, or on extensi"
+    },
+    {
+      "shard": 8,
+      "ko": "수두, 무좀ㆍ백선 등 또는 화농되어 있는 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품에 등에 의한 알레르기 증상이 나타난 적이 있는 환자, 알레르기 체",
+      "before": "Do not use this medicine on areas with chickenpox, athlete's foot, ringworm, or suppuration.Before using this medicine, patients who have experienced allergic s",
+      "after": "Do not use this medicine on areas with chickenpox, athlete's foot, ringworm, or suppuration.Before using this medicine, patients who have experienced allergic s"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약 또는 기타의 아미드계 국소마취제에 과민증, 환부(질환 부위)에 2차 감염이 있는 환자, 3개월 이하의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임",
+      "before": "Patients hypersensitive to this medicine or to other amide local anesthetics, patients with a secondary infection at the affected area (the diseased site), and ",
+      "after": "Patients hypersensitive to this medicine or to other amide local anesthetics, patients with a secondary infection at the affected area (the diseased site), and "
+    },
+    {
+      "shard": 8,
+      "ko": "이 약 또는 폴리에칠렌글리콜을 함유하는 다른 연고제에 과민증 환자 및 경험자, 신질환 환자, 임부 또는 임신하고 있을 가능성이 있는 부인, 수유부는 이 약을 사용하지 마십시오.이 ",
+      "before": "Patients with or with a history of hypersensitivity to this medicine or to other ointments containing polyethylene glycol, patients with kidney disease, pregnan",
+      "after": "Patients with or with a history of hypersensitivity to this medicine or to other ointments containing polyethylene glycol, patients with kidney disease, pregnan"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 12세 미만의 어린이는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 알레르기 체",
+      "before": "Patients with or with a history of hypersensitivity to this medicine and children under 12 years of age must not use this medicine. Before using this medicine, ",
+      "after": "Patients with or with a history of hypersensitivity to this medicine and children under 12 years of age must not use this medicine. Before using this medicine, "
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 7세 미만의 어린이 및 만 2세 미만의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함하는 약",
+      "before": "Patients who are hypersensitive to this medicine or have experienced such hypersensitivity, children under 7 years of age, and infants under 2 years of age must",
+      "after": "Patients who are hypersensitive to this medicine or have experienced such hypersensitivity, children under 7 years of age, and infants under 2 years of age must"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자 또는 경험자, 만 7세 미만의 어린이 및 만 2세 미만의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 비염용 분무제를 포함한 약에",
+      "before": "Patients with or with a history of hypersensitivity to this medicine, children under 7 years of age, and infants under 2 years of age must not use this medicine",
+      "after": "Patients with or with a history of hypersensitivity to this medicine, children under 7 years of age, and infants under 2 years of age must not use this medicine"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자 및 경험자는 이 약을 사용하지 마십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 점안용으로만 사",
+      "before": "Patients hypersensitive to this medicine and those who have experienced it must not use this medicine. Follow the prescribed dosage and administration carefully",
+      "after": "Patients hypersensitive to this medicine and those who have experienced it must not use this medicine. Follow the prescribed dosage and administration carefully"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 6개월 미만의 영아, 헤파린에 과민반응, 출혈경향 및 저혈소판증이 있는 경우, 절개되거나 아물지 않은 상처, 점막 및/또는 화농성 감염 부위, 임산부에는 이",
+      "before": "Patients with hypersensitivity to this medicine, infants under 6 months of age, cases of hypersensitivity reactions to heparin, a bleeding tendency, or thromboc",
+      "after": "Patients with hypersensitivity to this medicine, infants under 6 months of age, cases of hypersensitivity reactions to heparin, a bleeding tendency, or thromboc"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자",
+      "before": "Patients with hypersensitivity to this medicine, patients with thyroid dysfunction, children under 6 years of age, and those during radioactive iodine treatment",
+      "after": "Patients with hypersensitivity to this medicine, patients with thyroid dysfunction, children under 6 years of age, and those during radioactive iodine treatment"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자",
+      "before": "Patients who are hypersensitive to this medicine, patients with thyroid dysfunction, and children under 6 years of age must not use this medicine, and it must n",
+      "after": "Patients who are hypersensitive to this medicine, patients with thyroid dysfunction, and children under 6 years of age must not use this medicine, and it must n"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 뇌, 척수, 귀(내이, 중이, 외이), 질, 방광, 구강 등의 점막면, 눈, 미란(짓무름) 또는 화농성인 환부에 사용하지 마십시오.이 약을 사용하기 전에 약",
+      "before": "Patients hypersensitive to this medicine must not use it, and do not use it on the mucosal surfaces of the brain, spinal cord, ear (inner ear, middle ear, outer",
+      "after": "Patients hypersensitive to this medicine must not use it, and do not use it on the mucosal surfaces of the brain, spinal cord, ear (inner ear, middle ear, outer"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 상처 또는 염증이 있는 두피 및 심한 미란(짓무름) 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 ",
+      "before": "Do not use this medicine on patients hypersensitive to it, or on a scalp with wounds or inflammation, or on areas with severe erosion. Before using this medicin",
+      "after": "Do not use this medicine on patients hypersensitive to it, or on a scalp with wounds or inflammation, or on areas with severe erosion. Before using this medicin"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 세균(결핵, 매독 등), 진균(곰팡이)(칸디다증, 백선 등), 스피로헤타속, 효모, 바이러스(대상포진(물집), 단순포진(물집), 수두, 종두증 등), 동물(",
+      "before": "Patients who are hypersensitive to this medicine, patients with bacterial (tuberculosis, syphilis, etc.), fungal (mold) (candidiasis, tinea, etc.), spirochetal,",
+      "after": "Patients who are hypersensitive to this medicine, patients with bacterial (tuberculosis, syphilis, etc.), fungal (mold) (candidiasis, tinea, etc.), spirochetal,"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 수두, 무좀·백선 등 또는 화농(곪음)이 있는 질환 부위, 눈 또는 눈 주위, 점막에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 ",
+      "before": "Patients who are hypersensitive to this medicine must not use it, and it must not be used on chickenpox, athlete's foot or tinea and the like, on diseased areas",
+      "after": "Patients who are hypersensitive to this medicine must not use it, and it must not be used on chickenpox, athlete's foot or tinea and the like, on diseased areas"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 여성, 18세 미만 환자, 심혈관계 질환(관상동맥 질환, 부정맥, 울혈심부전, 심장판막 질환, 치료받거나 혹은 치료받지 않은 고혈압, 저혈압), 유전적 요인",
+      "before": "Patients hypersensitive to this medicine, women, patients under 18 years of age, patients with cardiovascular disease (coronary artery disease, arrhythmia, cong",
+      "after": "Patients hypersensitive to this medicine, women, patients under 18 years of age, patients with cardiovascular disease (coronary artery disease, arrhythmia, cong"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유ㆍ소아는 이 약을 사용하지 마십시오.눈이나 눈 주위, 점막(구강(입안), 비강(코안), 질 등),",
+      "before": "Patients hypersensitive to this medicine, pregnant women or women who may be pregnant and breastfeeding women, and infants and young children must not use this ",
+      "after": "Patients hypersensitive to this medicine, pregnant women or women who may be pregnant and breastfeeding women, and infants and young children must not use this "
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아 및 소아는 이 약을 사용하지 마십시오.눈이나 눈 주위, 점막(입안, 코안, 질), 음낭, 외음",
+      "before": "Patients who are hypersensitive to this medicine, women who are pregnant or may be pregnant, breastfeeding women, and infants and children must not use this med",
+      "after": "Patients who are hypersensitive to this medicine, women who are pregnant or may be pregnant, breastfeeding women, and infants and children must not use this med"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아, 소아, 눈, 눈 주위, 점막(입안, 코안, 질), 음부, 외음부, 습진, 습기참, 짓무름, ",
+      "before": "Do not use this medicine in patients with hypersensitivity to this medicine, pregnant women or women who may be pregnant and breastfeeding women, infants, or ch",
+      "after": "Do not use this medicine in patients with hypersensitivity to this medicine, pregnant women or women who may be pregnant and breastfeeding women, infants, or ch"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 임신 3기는 사용하지 마십시오.눈, 눈 주위에는 사용하지 마십시오.이 약을 사용하기 전에 임부(꼭 필요한 경우의 임신 1기와 2기), 약물 또는 화장품 등에",
+      "before": "Patients with hypersensitivity to this medicine and women in the third trimester of pregnancy must not use it. Do not use it on the eyes or around the eyes. Bef",
+      "after": "Patients with hypersensitivity to this medicine and women in the third trimester of pregnancy must not use it. Do not use it on the eyes or around the eyes. Bef"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 피부감염증(결핵, 매독, 대상포진, 단순포진, 수두, 종두증), 고막 천공(뚫림)이 있는 습진성 외이도(바깥귀길)염, 궤양(베체트병 제외), 제2도 심재성(",
+      "before": "Do not use this medicine in patients hypersensitive to it, in patients with skin infections (tuberculosis, syphilis, herpes zoster, herpes simplex, chickenpox, ",
+      "after": "Do not use this medicine in patients hypersensitive to it, in patients with skin infections (tuberculosis, syphilis, herpes zoster, herpes simplex, chickenpox, "
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 눈의 통증이 심한 사람, 지금까지 안약에 의한 알레르기 증상(눈의 충혈, 가려움, 부종, 발진, 충혈되어 ",
+      "before": "Patients hypersensitive to this medicine must not use it. Before using this medicine, people with severe eye pain, those who have previously experienced allergi",
+      "after": "Patients hypersensitive to this medicine must not use it. Before using this medicine, people with severe eye pain, those who have previously experienced allergi"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 눈의 통증이 심한 환자, 지금까지 안약에 의한 알레르기 증상(예: 눈의 충혈, 가려움, 부종, 발진, 충혈",
+      "before": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, patients with severe eye pain and people who have so far",
+      "after": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, patients with severe eye pain and people who have so far"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증, 6개월 미만의 영아, 헤파린 과민증, 출혈경향 및 저혈소판증 환자, 절개되거나 아물지 않은 상처, 점막 또는 화농성 감염 부위, 임산부에는 이 약을 사용하지 마십",
+      "before": "People with hypersensitivity to this medicine, infants under 6 months of age, patients with hypersensitivity to heparin, a bleeding tendency, or thrombocytopeni",
+      "after": "People with hypersensitivity to this medicine, infants under 6 months of age, patients with hypersensitivity to heparin, a bleeding tendency, or thrombocytopeni"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약은 위내시경 검사 시 장내기포제거와 복부(배부분) X선 촬영 시 장내가스제거, 위장관내 가스로 인한 복부팽만감 및 공기연하증(공기삼킴증) 등)의 개선에 사용합니다.",
+      "before": "This medicine is used to remove bubbles in the intestine for a gastroscopy, to remove gas in the intestine for an abdominal X-ray, and to improve abdominal dist",
+      "after": "This medicine is used to remove bubbles in the intestine for a gastroscopy, to remove gas in the intestine for an abdominal X-ray, and to improve abdominal dist"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 안약에 의한 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장 환자는 이 약을 사용하지",
+      "before": "Before using this medicine, people with severe eye pain, people who have experienced an allergic reaction to eye drops (redness of the eyes, itching, edema (swe",
+      "after": "Before using this medicine, people with severe eye pain, people who have experienced an allergic reaction to eye drops (redness of the eyes, itching, edema (swe"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장, 의사의 치료를 받고 있는 환자는 의",
+      "before": "Before using this medicine, people with severe eye pain, people who have experienced allergic reactions (redness of the eye, itching, swelling, rash, redness fr",
+      "after": "Before using this medicine, people with severe eye pain, people who have experienced allergic reactions (redness of the eye, itching, swelling, rash, redness fr"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 발진, 발적, 가려움증 등 약이나 화장품 등에 의한 알레르기 증상 경험자, 습기 참 혹은 짓무름이 심한 환자는 의사 또는 약사와 상의하십시오.5~6일 동안 ",
+      "before": "Before using this medicine, those who have experienced allergic symptoms such as rash, redness or itching from medicines or cosmetics, and patients with severe ",
+      "after": "Before using this medicine, those who have experienced allergic symptoms such as rash, redness or itching from medicines or cosmetics, and patients with severe "
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 심한 눈의 통증, 안약에 의한 알레르기 증상(예를 들어 눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등)경험자, 녹내장 환자는 의사 또는 약사",
+      "before": "Before using this medicine, people with severe eye pain, people who have experienced allergic symptoms from eye drops (for example, redness of the eyes, itching",
+      "after": "Before using this medicine, people with severe eye pain, people who have experienced allergic symptoms from eye drops (for example, redness of the eyes, itching"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 약에 과민증 환자, 알레르기 체질인 환자, 구강내 짓무름이 심한 사람, 프로필렌글리콜에 과민증 또는 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용",
+      "before": "Before using this medicine, patients with hypersensitivity to medicines, patients with an allergic constitution, people with severe rawness inside the mouth, an",
+      "after": "Before using this medicine, patients with hypersensitivity to medicines, patients with an allergic constitution, people with severe rawness inside the mouth, an"
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 이 약에 또는 설파제에 과민증 환자, 눈의 통증이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.장기간 계속하여 사용하지 마",
+      "before": "Before using this medicine, patients hypersensitive to this medicine or to sulfonamides and patients with severe eye pain should consult a doctor or pharmacist.",
+      "after": "Before using this medicine, patients hypersensitive to this medicine or to sulfonamides and patients with severe eye pain should consult a doctor or pharmacist."
+    },
+    {
+      "shard": 8,
+      "ko": "전염성농가진, 모낭염 등과 같은 세균성 및 바이러스성 감염증이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.모낭염, 부스럼, 피부자극, 찌르는 것 같",
+      "before": "If bacterial or viral infections such as impetigo contagiosa or folliculitis occur, stop using this medicine immediately and consult a doctor or pharmacist. If ",
+      "after": "If bacterial or viral infections such as impetigo contagiosa or folliculitis occur, stop using this medicine immediately and consult a doctor or pharmacist. If "
+    }
+  ],
+  "numericExemptions": 5,
+  "numericExemptionPolicy": "1일/1회 관용 1 · 제N도/N차성 서수 N 만 면제. 해당 숫자가 문장 내 다른 용도로 쓰이면 면제 없음. 용량·연령 실수치는 면제 대상 아님.",
+  "numericExemptionDetail": [
+    {
+      "shard": 8,
+      "ko": "이 약 또는 기타의 아미드계 국소마취제에 과민증, 환부(질환 부위)에 2차 감염이 있는 환자, 3개월 이하의 영아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 약",
+      "en": "Patients hypersensitive to this medicine or to other amide local anesthetics, patients with a secondary infection at the",
+      "exempted": [
+        "2"
+      ]
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 세균(결핵, 매독 등), 진균(곰팡이)(칸디다증, 백선 등), 스피로헤타속, 효모, 바이러스(대상포진(물집), 단순포진(물집), 수두, 종두증 등), 동물(옴, 사면발이 등)성 피부감염증, 고",
+      "en": "Patients who are hypersensitive to this medicine, patients with bacterial (tuberculosis, syphilis, etc.), fungal (mold) ",
+      "exempted": [
+        "2"
+      ]
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 임신 3기는 사용하지 마십시오.눈, 눈 주위에는 사용하지 마십시오.이 약을 사용하기 전에 임부(꼭 필요한 경우의 임신 1기와 2기), 약물 또는 화장품 등에 의해 알레르기 증상의 병력이 있는 ",
+      "en": "Patients with hypersensitivity to this medicine and women in the third trimester of pregnancy must not use it. Do not us",
+      "exempted": [
+        "3",
+        "1",
+        "2"
+      ]
+    },
+    {
+      "shard": 8,
+      "ko": "이 약에 과민증 환자, 피부감염증(결핵, 매독, 대상포진, 단순포진, 수두, 종두증), 고막 천공(뚫림)이 있는 습진성 외이도(바깥귀길)염, 궤양(베체트병 제외), 제2도 심재성(드러나지 않는) 이상의 화상 및 동상",
+      "en": "Do not use this medicine in patients hypersensitive to it, in patients with skin infections (tuberculosis, syphilis, her",
+      "exempted": [
+        "2"
+      ]
+    },
+    {
+      "shard": 8,
+      "ko": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 안약에 의한 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장 환자는 이 약을 사용하지 마십시오.이 약 사용에 의해 눈의 ",
+      "en": "Before using this medicine, people with severe eye pain, people who have experienced an allergic reaction to eye drops (",
+      "exempted": [
+        "1"
+      ]
+    }
+  ]
+}
