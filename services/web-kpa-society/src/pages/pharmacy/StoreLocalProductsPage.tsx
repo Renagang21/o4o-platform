@@ -306,10 +306,13 @@ export default function StoreLocalProductsPage() {
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
-            매장 경영활용 제품
+            매장 자체 상품
             <span className="text-base font-normal text-slate-400">({total})</span>
           </h1>
-          {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 자체 제품' → '매장 경영활용 제품' */}
+          {/* WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1: '매장 자체 제품' → '매장 경영활용 제품'
+              WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 사이드바 메뉴 복원으로
+              '매장 경영활용 제품'(/store/handled-products, 통합 읽기 조회)과 화면 제목이 충돌 →
+              이 화면(store_local_products 등록·수정 원본)은 메뉴 라벨과 동일한 '매장 자체 상품'으로 정정. */}
           <p className="text-sm text-slate-500 mt-1">
             O4O 제품이 아니더라도 매장이 직접 등록해 타블렛 전시·매장 안내·콘텐츠 제작 등 경영 활동에 활용하는 제품입니다. 결제/주문 시스템과 연결되지 않습니다.
           </p>
@@ -387,7 +390,7 @@ export default function StoreLocalProductsPage() {
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <ShoppingBag className="w-16 h-16 text-slate-200 mx-auto mb-4" />
           <h3 className="text-lg font-medium text-slate-800 mb-2">
-            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 경영활용 제품이 없습니다'}
+            {debouncedSearch ? '검색 결과가 없습니다' : '등록된 매장 자체 상품이 없습니다'}
           </h3>
           <p className="text-slate-500 mb-6">
             {debouncedSearch
@@ -571,7 +574,7 @@ function ProductFormModal({
         {/* Header */}
         <div className="flex items-center justify-between px-6 py-4 border-b">
           <h2 className="text-lg font-bold text-slate-900">
-            {product ? '매장 경영활용 제품 수정' : '매장 경영활용 제품 등록'}
+            {product ? '매장 자체 상품 수정' : '매장 자체 상품 등록'}
           </h2>
           <button onClick={onClose} className="p-1 rounded-lg hover:bg-slate-100">
             <X className="w-5 h-5" />
