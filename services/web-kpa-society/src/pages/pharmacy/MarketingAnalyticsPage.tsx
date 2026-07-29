@@ -66,8 +66,11 @@ export function MarketingAnalyticsPage() {
       <div style={styles.header}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+                breadcrumb 상위를 실제 사이드바 그룹명('분석')과 일치시킨다.
+                '매장 실행'은 KPA 사이드바에 존재하지 않는 그룹명이었다. */}
             <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
-              매장 실행
+              분석
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral600, fontSize: '13px' }}>마케팅 분석</span>

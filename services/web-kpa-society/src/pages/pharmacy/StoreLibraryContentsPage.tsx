@@ -99,7 +99,9 @@ export default function StoreLibraryContentsPage() {
       <div style={styles.header}>
         <div>
           <div style={styles.breadcrumb}>
-            <span>내 자료함</span>
+            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+                실제 사이드바 그룹명은 '약국 자료함' — breadcrumb 을 일치시킨다. */}
+            <span>약국 자료함</span>
             <span style={{ color: colors.neutral300 }}>/</span>
             <span style={{ color: colors.neutral700 }}>콘텐츠</span>
           </div>

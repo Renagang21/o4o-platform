@@ -545,7 +545,9 @@ export function HubSignageLibraryPage() {
         <span>
           가져온 자료는 내 매장의 독립 사본으로 저장됩니다. 같은 자료를 다시 가져오면 새로운 사본이 생성됩니다.{' '}
           추가한 콘텐츠는{' '}
-          <Link to="/store/marketing/signage" className="text-blue-600 underline underline-offset-2">
+          {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+              legacy `/store/marketing/signage`(playlist 로 redirect) 경유 제거 → canonical 직접 연결 */}
+          <Link to="/store/marketing/signage/playlist" className="text-blue-600 underline underline-offset-2">
             디지털사이니지 운영 화면
           </Link>
           에서 플레이리스트 구성과 스케줄 적용을 할 수 있습니다.

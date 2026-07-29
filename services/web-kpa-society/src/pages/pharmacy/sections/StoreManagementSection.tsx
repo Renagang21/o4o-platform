@@ -10,7 +10,8 @@ import { useNavigate } from 'react-router-dom';
 
 const items = [
   { icon: '🏪', label: '매장 관리', desc: '테마·템플릿·컴포넌트 설정', path: '/store/settings' },
-  { icon: '🤝', label: 'B2B 구매', desc: '공급자·도매 거래', path: '/store/products' },
+  // WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: legacy `/store/products`(redirect) → canonical
+  { icon: '🤝', label: 'B2B 구매', desc: '공급자·도매 거래', path: '/store/commerce/products' },
   { icon: '🔗', label: '연결 서비스', desc: 'LMS·사이니지·커뮤니티', path: '/store/settings' },
 ];
 

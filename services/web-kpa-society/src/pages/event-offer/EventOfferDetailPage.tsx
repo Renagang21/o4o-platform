@@ -84,11 +84,13 @@ export function EventOfferDetailPage() {
   if (error || !product) {
     return (
       <div style={styles.container}>
+        {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+            legacy `/event-offers`(redirect) 경유 제거 → canonical 목록 직접 연결 */}
         <EmptyState
           icon="⚠️"
           title="상품을 찾을 수 없습니다"
           description={error || '삭제되었거나 존재하지 않는 상품입니다.'}
-          action={{ label: '목록으로', onClick: () => navigate('/event-offers') }}
+          action={{ label: '목록으로', onClick: () => navigate('/store-hub/event-offers') }}
         />
       </div>
     );
@@ -100,7 +102,7 @@ export function EventOfferDetailPage() {
         title=""
         breadcrumb={[
           { label: '홈', href: '/' },
-          { label: '이벤트', href: '/event-offers' },
+          { label: '이벤트', href: '/store-hub/event-offers' },
           { label: product.productName },
         ]}
       />

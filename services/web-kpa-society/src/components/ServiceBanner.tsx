@@ -123,11 +123,14 @@ export function ExternalServiceSection() {
           showDisclaimer={false}
           isInternal={true}
         />
+        {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+            `/hub/*` legacy redirect 는 하위 경로를 버리고 `/store-hub` 로만 보낸다
+            (= 이벤트 목록에 도달하지 못하는 사실상 데드링크) → canonical 직접 연결. */}
         <ServiceBanner
           icon={<CalendarDays size={22} />}
           title="이벤트 상품"
           description="약국 운영에 필요한 물품을 합리적인 가격에 이벤트로 제공합니다."
-          linkUrl="/hub/event-offers"
+          linkUrl="/store-hub/event-offers"
           linkText="이벤트 보기"
           variant="secondary"
           showDisclaimer={false}

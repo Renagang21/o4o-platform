@@ -486,7 +486,8 @@ export function HubB2BCatalogPage() {
         <span style={styles.noticeIcon}>💡</span>
         <span>
           상품을 선택한 뒤 "내 약국에 추가"로 한 번에 추가하거나, 각 행의 + 버튼으로 단건 추가할 수 있습니다.
-          추가된 상품은 <a href="/store/channels" style={{ color: colors.primary }}>채널 관리</a>에서 진열하면 고객에게 보여집니다.
+          {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: legacy `/store/channels`(redirect) 경유 제거 → canonical 직접 연결 */}
+          추가된 상품은 <a href="/store/online-sales/settings" style={{ color: colors.primary }}>판매 설정</a>에서 진열하면 고객에게 보여집니다.
         </span>
       </div>
 
@@ -495,8 +496,8 @@ export function HubB2BCatalogPage() {
         <div style={styles.channelCta}>
           <span style={styles.noticeIcon}>✅</span>
           <span>
-            추가된 상품은 <strong>채널에서 진열</strong>하면 고객에게 보여집니다.{' '}
-            <a href="/store/channels" style={styles.channelCtaLink}>채널 관리로 이동 →</a>
+            추가된 상품은 <strong>온라인 판매에서 진열</strong>하면 고객에게 보여집니다.{' '}
+            <a href="/store/online-sales/settings" style={styles.channelCtaLink}>판매 설정으로 이동 →</a>
           </span>
         </div>
       )}

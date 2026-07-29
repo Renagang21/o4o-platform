@@ -1,5 +1,5 @@
 /**
- * StoreProductDescriptionsPage — 매장 실행 / 상품 상세설명 (결과물 관리 전용)
+ * StoreProductDescriptionsPage — 약국 경영지원 / 상품 설명 (결과물 관리 전용)
  *
  * WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1
  * WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1:
@@ -218,9 +218,12 @@ export default function StoreProductDescriptionsPage() {
       <div style={styles.header}>
         <div>
           <div style={styles.breadcrumb}>
-            <span>매장 실행</span>
+            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+                실제 사이드바(약국 경영지원 > 상품 설명)와 그룹명·항목명을 일치시킨다.
+                '매장 실행'은 존재하지 않는 그룹명이었다. */}
+            <span>약국 경영지원</span>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral700 }}>상품 상세설명</span>
+            <span style={{ color: colors.neutral700 }}>상품 설명</span>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
             <h1 style={styles.title}>

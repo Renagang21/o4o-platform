@@ -111,12 +111,14 @@ export function ChannelLayerSection() {
           </div>
         )}
 
+        {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+            legacy `/store/channels`(redirect) 경유 제거 → canonical 판매 설정 직접 진입 */}
         <div style={channelGrid}>
           {channels.map((ch) => (
             <ChannelCard
               key={ch.id}
               channel={ch}
-              onClick={() => navigate('/store/channels')}
+              onClick={() => navigate('/store/online-sales/settings')}
             />
           ))}
         </div>

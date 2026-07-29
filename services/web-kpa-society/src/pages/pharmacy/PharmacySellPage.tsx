@@ -68,7 +68,8 @@ export function PharmacySellPage() {
       {/* Header */}
       <div style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
         <div>
-          <Link to="/store/products" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
+          {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: legacy `/store/products`(redirect) → canonical */}
+          <Link to="/store/commerce/products" style={{ color: '#6B7280', textDecoration: 'none', fontSize: '0.875rem' }}>
             &larr; 상품 관리
           </Link>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 700, color: '#0F172A', margin: '8px 0 4px' }}>

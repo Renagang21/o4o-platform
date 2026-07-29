@@ -583,11 +583,13 @@ export function StoreQRPage() {
       <div style={styles.header}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+            {/* WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1:
+                breadcrumb 상위·현재 항목을 실제 사이드바(약국 경영지원 > QR-code)와 일치시킨다. */}
             <Link to="/store" style={{ color: colors.neutral400, fontSize: '13px', textDecoration: 'none' }}>
-              매장 실행
+              약국 경영지원
             </Link>
             <span style={{ color: colors.neutral300 }}>/</span>
-            <span style={{ color: colors.neutral600, fontSize: '13px' }}>QR 코드</span>
+            <span style={{ color: colors.neutral600, fontSize: '13px' }}>QR-code</span>
           </div>
           <h1 style={styles.title}>QR 코드</h1>
           <p style={styles.subtitle}>매장에 부착·재사용할 QR 코드를 모아 출력합니다</p>
