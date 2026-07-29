@@ -14,7 +14,6 @@
  * │  /members           - 회원 관리 (승인/거절)                             │
  * │  /applications      - 신청서 처리                                     │
  * │  /join-inquiries    - 참여 문의 관리                                   │
- * │  /organization-join-requests - 조직 가입 요청 관리                      │
  * │  /forum/categories  - 포럼 카테고리 생성/수정/삭제 (구조 변경)             │
  * │  /operator/audit-logs - 감사 로그 조회                                 │
  * ├─────────────────────────────────────────────────────────────────────┤
@@ -67,7 +66,10 @@ import { createSupplierOffersController } from './controllers/supplier-offers.co
 import { createJoinInquiryAdminRoutes, createJoinInquiryPublicRoutes } from './controllers/join-inquiry.controller.js';
 // WO-O4O-KPA-CONTACT-FORM-WORKFLOW-V1
 import { createContactRequestHandler, listContactRequestsHandler, updateContactRequestStatusHandler } from './controllers/contact-request.controller.js';
-import { createOrganizationJoinRequestRoutes } from './controllers/organization-join-request.controller.js';
+// WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+//   조직 가입 요청(organization-join-requests) dead flow 은퇴 — 프로덕션 0건, 실제 create/검수 UI 부재.
+//   회원 가입/역할 변경은 canonical 회원·조직 관리(PATCH /kpa/members/:id/status)로 일원화.
+//   controller + route mount + reviewUrl 제거. 공유 OrganizationMemberService/emailService 모듈은 유지(call site만 제거).
 // WO-O4O-KPA-OPERATOR-PHARMACY-SERVICE-REQUEST-LEGACY-REMOVE-V1:
 //   약국 서비스 별도 신청(pharmacy-requests) 폐지 — 매장 운영 권한은 약국 경영자 회원 승인(Path B, member.controller)에서 자동 부여.
 //   controller/route mount 제거. 이력 보존을 위해 KpaPharmacyRequest 엔티티/마이그레이션은 유지(별도 cleanup WO).
@@ -306,9 +308,6 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   router.post('/contact-requests', createContactRequestHandler(dataSource));
   router.get('/operator/contact-requests', coreRequireAuth as any, requireKpaScope('kpa:operator'), listContactRequestsHandler(dataSource));
   router.patch('/operator/contact-requests/:id/status', coreRequireAuth as any, requireKpaScope('kpa:operator'), updateContactRequestStatusHandler(dataSource));
-
-  // Organization Join Request routes (WO-CONTEXT-JOIN-REQUEST-MVP-V1)
-  router.use('/organization-join-requests', createOrganizationJoinRequestRoutes(dataSource, coreRequireAuth as any, requireKpaScope, kpaActionLogService));
 
   // ── AI Selection Summary (WO-O4O-TABLE-STANDARD-V3) ──
   router.post('/operator/ai/summarize-selection', coreRequireAuth as any, requireKpaScope('kpa:admin') as any, asyncHandler(async (req: Request, res: Response) => {

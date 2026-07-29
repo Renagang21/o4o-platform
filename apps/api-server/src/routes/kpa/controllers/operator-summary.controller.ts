@@ -91,12 +91,13 @@ export function createOperatorSummaryController(
       // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1: 통합 승인 카운트
       instructorPendingCount,
       coursePendingCount,
-      membershipPendingCount,
+      // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+      //   membershipPendingCount(entity_type='membership') 제거 — dead 조직 가입 승인 채널(프로덕션 0건).
+      //   canonical pending 회원 = kpa_members.status='pending'.
       // WO-HUB-RISK-LOOP-COMPLETION-V1
       forcedExpirySoonCount,
       // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: recentActivity
       recentMemberRows,
-      recentOrgJoinRows,
     ] = await Promise.all([
       contentService.listForHome(['notice', 'news'], 5),
       signageService.listForHome(3, 3),
@@ -157,11 +158,6 @@ export function createOperatorSummaryController(
         SELECT COUNT(*) AS count FROM kpa_approval_requests
         WHERE entity_type = 'course' AND status = 'pending'
       `).catch(() => [{ count: '0' }]),
-      // Membership pending (kpa_approval_requests)
-      dataSource.query(`
-        SELECT COUNT(*) AS count FROM kpa_approval_requests
-        WHERE entity_type = 'membership' AND status = 'pending'
-      `),
       // WO-HUB-RISK-LOOP-COMPLETION-V1: 강제노출 만료 임박 — 테이블 미존재 시 safe fallback
       dataSource.query(`
         SELECT COUNT(*) as count FROM kpa_store_asset_controls
@@ -177,13 +173,6 @@ export function createOperatorSummaryController(
         LEFT JOIN users u ON u.id = m.user_id
         ORDER BY m.created_at DESC LIMIT 10
       `).catch(() => []),
-      dataSource.query(`
-        SELECT r.id, r.requester_name AS name,
-               r.payload->>'request_type' AS request_type, r.status, r.created_at
-        FROM kpa_approval_requests r
-        WHERE r.entity_type = 'membership'
-        ORDER BY r.created_at DESC LIMIT 5
-      `).catch(() => []),
     ]);
 
     // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: build recentActivity
@@ -198,14 +187,8 @@ export function createOperatorSummaryController(
       });
     }
     // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: kpa_applications recentActivity 제거(dead flow).
-    for (const r of (recentOrgJoinRows as any[]) || []) {
-      recentActivity.push({
-        type: 'org_join',
-        label: `${r.name || '(이름 없음)'} 조직 가입 요청`,
-        timestamp: r.created_at,
-        status: r.status,
-      });
-    }
+    // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: org_join recentActivity 제거(dead flow).
+    //   recentActivity 는 kpa_members(회원 가입) 만으로 조립.
     // Sort by timestamp descending, limit to 15
     recentActivity.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
     recentActivity.splice(15);
@@ -233,10 +216,10 @@ export function createOperatorSummaryController(
           recentPosts,
         },
         // WO-PLATFORM-APPROVAL-ENGINE-UNIFICATION-V1
+        // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: membershipPending 제거(dead flow).
         approval: {
           instructorPending: parseInt(instructorPendingCount[0]?.count || '0', 10),
           coursePending: parseInt(coursePendingCount[0]?.count || '0', 10),
-          membershipPending: parseInt(membershipPendingCount[0]?.count || '0', 10),
         },
         store: {
           forcedExpirySoon: parseInt(forcedExpirySoonCount[0]?.count || '0', 10),
@@ -253,9 +236,9 @@ export function createOperatorSummaryController(
    *   IR-O4O-KPA-OPERATOR-DASHBOARD-API-5BLOCK-UNIFICATION-V1 (Option B) Foundation.
    *
    * Cross-service 5-Block dashboard 응답 (`OperatorDashboardConfig`).
-   *   - 기존 /operator/summary 의 17 query 재사용 (3 module service + 14 raw)
-   *   - 추가 6 보조 query (members pending / event-offer pending / store stats /
-   *     product-applications pending / [admin] total members / [admin] organization-join)
+   *   - 기존 /operator/summary 의 query 재사용 (3 module service + raw)
+   *   - 추가 보조 query (members pending / event-offer pending / store stats /
+   *     product-applications pending / [admin] total members)
    *   - frontend `buildKpaOperatorConfig` 의 5-Block 조립 logic 동일 적용
    *   - isAdmin role-aware (KPI 2 / AI summary 1 / Action Queue 1 / Quick Actions 3 추가)
    *
@@ -297,8 +280,7 @@ export function createOperatorSummaryController(
    * WO-O4O-API-STRUCTURE-NORMALIZATION-PHASE2-V1
    *
    * KPA-c District Operator 전용 — adminApi 의존 제거.
-   * 동일 데이터(organizations, members, applications, join-requests)를
-   * Operator scope에서 직접 조회.
+   * canonical 데이터(kpa_members: 활성/pending)를 Operator scope에서 직접 조회.
    */
   router.get('/district-summary', asyncHandler(async (req: Request, res: Response) => {
     const memberRepo = dataSource.getRepository(KpaMember);
@@ -307,17 +289,23 @@ export function createOperatorSummaryController(
 
     // WO-KPA-AFFILIATION-TEXT-DECOUPLING-PHASE1-V1: unified table only
     // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: pendingApprovals 를 kpa_applications(dead) →
-    //   canonical kpa_approval_requests(entity_type='membership', status='pending') 승인 대기로 정합.
+    //   canonical 승인 대기로 정합.
+    // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+    //   승인 대기 source 를 dead kpa_approval_requests(entity_type='membership', 프로덕션 0건) →
+    //   canonical kpa_members.status='pending' 로 재정합. 프론트(KpaAdminDashboardPage '최근 가입 신청')는
+    //   req.requested_role/request_type/created_at 를 fallback 과 함께 렌더 → shape 호환.
     const [
       totalMembers,
       pendingJoinUnifiedRows,
     ] = await Promise.all([
       memberRepo.count({ where: { status: 'active' } }),
       dataSource.query(`
-        SELECT id, entity_type, organization_id, status, requester_id, requester_name, requester_email, created_at
-        FROM kpa_approval_requests
-        WHERE entity_type = 'membership' AND status = 'pending'
-        ORDER BY created_at ASC
+        SELECT m.id, u.name AS requester_name, u.email AS requester_email,
+               m.membership_type AS requested_role, m.status, m.created_at
+        FROM kpa_members m
+        LEFT JOIN users u ON u.id = m.user_id
+        WHERE m.status = 'pending'
+        ORDER BY m.created_at ASC
         LIMIT $1
       `, [limit]).catch(() => []),
     ]);

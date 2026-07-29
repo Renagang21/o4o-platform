@@ -5,8 +5,10 @@
  * - 콘텐츠 CRUD (news, docs, forum) AdminRoutes에서 이동
  * - members: WO-KPA-C-REQUEST-KPI-SYNC-AUDIT-V1에서 복원 (KPI → 목록 연결)
  * WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
- * - '요청 관리 (organization-requests)' 이동 주석 제거 — 실제 route 미구현이었고(dead), 조직 가입 승인은
- *   organization-join-request.controller(kpa:admin, API 유지)이며 전용 관리 UI 부재. 대시보드 광고 제거로 정리.
+ * - '요청 관리 (organization-requests)' 이동 주석 제거 — 실제 route 미구현이었고(dead).
+ * WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+ * - 구 organization-join-request.controller(조직 가입 승인 API) 은퇴 — 프로덕션 0건·전용 UI 부재.
+ *   회원 가입/역할 변경은 canonical 회원 관리(PATCH /kpa/members/:id/status)로 일원화.
  *
  * WO-O4O-OPERATOR-UX-KPA-A-PILOT-V1:
  * - /operator 루트 → 5-Block 대시보드 렌더 (Hub 기능 흡수)

@@ -53,8 +53,7 @@ const SERVICE_KEY = 'kpa-society';
 const ACTION_LABELS: Record<string, string> = {
   'kpa.operator.product_approve': '상품 승인',
   'kpa.operator.product_reject': '상품 거부',
-  'kpa.operator.org_join_approve': '조직 가입 승인',
-  'kpa.operator.org_join_reject': '조직 가입 거부',
+  // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: org_join_approve/reject 라벨 제거(dead flow).
   'kpa.operator.pharmacy_approve': '약국 승인',
   'kpa.operator.pharmacy_reject': '약국 거부',
 };

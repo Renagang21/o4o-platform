@@ -7,8 +7,8 @@
  *
  * 책임:
  *   - 기존 /operator/summary 의 17 query 동일 재사용 (3 module service + 14 raw)
- *   - 추가 6 보조 query (members pending / event-offer(organization_product_listings) pending / store stats /
- *     product-applications pending / [admin] total members / [admin] organization-join pending)
+ *   - 추가 보조 query (members pending(kpa_members.status='pending') / event-offer(organization_product_listings) pending /
+ *     store stats / product-applications pending / [admin] total members)
  *   - frontend `buildKpaOperatorConfig` (services/web-kpa-society/src/pages/operator/operatorConfig.ts) 의
  *     5-Block 조립 logic 을 backend 로 그대로 포트 — Adapter WO 단계에서 frontend 가
  *     pass-through 로 전환 가능하도록 정합.
@@ -77,13 +77,16 @@ interface SummaryShape {
   approval: {
     instructorPending: number;
     coursePending: number;
-    membershipPending: number;
+    // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+    //   membershipPending 제거 — dead 조직 가입 승인 채널(kpa_approval_requests entity_type='membership',
+    //   프로덕션 0건·INSERT 경로 부재). canonical pending 회원 = kpa_members.status='pending'
+    //   (fetchSecondaryCounts.pendingMembers) 로 이미 노출됨.
   };
   store: {
     forcedExpirySoon: number;
   };
   recentActivity: Array<{
-    type: 'member_join' | 'org_join';
+    type: 'member_join';
     label: string;
     timestamp: string;
     status: string;
@@ -127,12 +130,11 @@ async function fetchSummaryShape(
     forumPendingRequestCount,
     instructorPendingCount,
     coursePendingCount,
-    membershipPendingCount,
     forcedExpirySoonCount,
     recentMemberRows,
     // WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: kpa_applications recentActivity 제거(dead flow).
-    //   recentActivity 는 kpa_members + kpa_approval_requests 로 정상 조립(구조 의존 없음).
-    recentOrgJoinRows,
+    // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: org_join recentActivity 제거(dead flow).
+    //   recentActivity 는 kpa_members(가입) 만으로 조립.
   ] = await Promise.all([
     contentService.listForHome(['notice', 'news'], 5),
     signageService.listForHome(3, 3),
@@ -182,10 +184,6 @@ async function fetchSummaryShape(
       WHERE entity_type = 'course' AND status = 'pending'
     `).catch(() => [{ count: '0' }]),
     dataSource.query(`
-      SELECT COUNT(*) AS count FROM kpa_approval_requests
-      WHERE entity_type = 'membership' AND status = 'pending'
-    `),
-    dataSource.query(`
       SELECT COUNT(*) as count FROM kpa_store_asset_controls
       WHERE is_forced = true
         AND forced_end_at IS NOT NULL
@@ -198,13 +196,6 @@ async function fetchSummaryShape(
       LEFT JOIN users u ON u.id = m.user_id
       ORDER BY m.created_at DESC LIMIT 10
     `).catch(() => []),
-    dataSource.query(`
-      SELECT r.id, r.requester_name AS name,
-             r.payload->>'request_type' AS request_type, r.status, r.created_at
-      FROM kpa_approval_requests r
-      WHERE r.entity_type = 'membership'
-      ORDER BY r.created_at DESC LIMIT 5
-    `).catch(() => []),
   ]);
 
   const recentActivity: SummaryShape['recentActivity'] = [];
@@ -213,14 +204,6 @@ async function fetchSummaryShape(
     recentActivity.push({
       type: 'member_join',
       label: `${r.name || '(이름 없음)'} ${typeLabel} 가입`,
-      timestamp: r.created_at,
-      status: r.status,
-    });
-  }
-  for (const r of (recentOrgJoinRows as any[]) || []) {
-    recentActivity.push({
-      type: 'org_join',
-      label: `${r.name || '(이름 없음)'} 조직 가입 요청`,
       timestamp: r.created_at,
       status: r.status,
     });
@@ -253,7 +236,6 @@ async function fetchSummaryShape(
     approval: {
       instructorPending: parseInt(instructorPendingCount[0]?.count || '0', 10),
       coursePending: parseInt(coursePendingCount[0]?.count || '0', 10),
-      membershipPending: parseInt(membershipPendingCount[0]?.count || '0', 10),
     },
     store: {
       forcedExpirySoon: parseInt(forcedExpirySoonCount[0]?.count || '0', 10),
@@ -274,8 +256,8 @@ async function fetchSecondaryCounts(
   //   EventOfferService.countPendingListings 와 동일 쿼리(신규 통계 없음).
   // 상품 신청 pending = kpa_product_applications.status='pending' (operator-product-applications/stats endpoint 와 동일).
   // 매장 통계 = organization_service_enrollments service_code='kpa-society' active count (간단 통계).
-  // (admin) 전체 회원 = kpa_members count.
-  // (admin) 조직 가입 요청 pending = kpa_approval_requests entity_type='org_join' or domain-specific table.
+  // (admin) 전체 회원 = service_memberships count.
+  // (admin) pending 회원 = kpa_members.status='pending' (canonical 회원 승인 대기).
 
   const [
     pendingMembersRows,
@@ -325,9 +307,9 @@ async function fetchSecondaryCounts(
       : Promise.resolve([{ count: '0' }]),
     // WO-O4O-KPA-OPERATOR-ORGANIZATION-REQUESTS-ROLE-BOUNDARY-RESOLVE-V1:
     //   '서비스 신청'(organization_join/org_join) KPI 제거 — 해당 entity_type 은 어디서도 INSERT 되지 않아
-    //   항상 0이고(실 승인 큐는 organization-join-request.controller 의 entity_type='membership' + kpa:admin),
-    //   link /operator/organization-requests 는 실재 화면 없는 dead route 였다. 조직 가입 승인 관리 UI 부재로
-    //   재배선 불가 → 대시보드 항목 제거(관리 API 는 유지, 대시보드 광고만 제거).
+    //   항상 0이었고, link /operator/organization-requests 는 실재 화면 없는 dead route 였다.
+    //   WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: 조직 가입 승인 채널(구 organization-join-request.controller,
+    //   entity_type='membership') 자체를 은퇴 — canonical 회원 승인 = PATCH /kpa/members/:id/status.
   ]);
 
   return {
@@ -672,9 +654,9 @@ function buildConfig(
 /**
  * Fetch all KPA operator dashboard data and assemble 5-Block config.
  *
- * - `/operator/summary` 와 동일한 17 query 재사용 (3 module service + 14 raw)
- * - 추가 6 보조 query (members pending / event-offer pending / store stats /
- *   product-applications pending / [admin] total members / [admin] organization-join)
+ * - `/operator/summary` 와 동일한 query 재사용 (3 module service + raw)
+ * - 추가 보조 query (members pending / event-offer pending / store stats /
+ *   product-applications pending / [admin] total members)
  * - frontend `buildKpaOperatorConfig` 의 5-Block 조립 logic 동일 적용
  *
  * AxisNavigation axes / OperatorRoleGuideCard content 미포함 — frontend 유지 (I1/I3 정합).

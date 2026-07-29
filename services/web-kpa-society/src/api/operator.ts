@@ -54,7 +54,8 @@ interface ForumPostItem {
 
 // WO-KPA-A-OPERATOR-DASHBOARD-ENHANCEMENT-V2: 운영 이벤트 타입
 export interface RecentActivityEvent {
-  type: 'member_join' | 'pharmacy_request' | 'application' | 'org_join';
+  // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1: 'org_join' 제거(dead flow, 백엔드 미발행).
+  type: 'member_join' | 'pharmacy_request' | 'application';
   label: string;
   timestamp: string;
   status: string;

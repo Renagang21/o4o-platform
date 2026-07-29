@@ -234,7 +234,7 @@ export function isAnyManagerOrAbove(userRoles: string[]): boolean {
  *
  * @example
  * if (userRoles.includes('admin')) {
- *   logLegacyRoleUsage(userId, 'admin', 'organization-join-request.controller');
+ *   logLegacyRoleUsage(userId, 'admin', 'member.controller');
  * }
  *
  * @deprecated Remove after migration complete (Phase 7)

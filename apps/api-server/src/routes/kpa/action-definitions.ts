@@ -62,13 +62,12 @@ export const kpaActionConfig: ServiceActionConfig = {
       type: 'approval',
       title: '가입 승인 대기',
       description: '회원 가입 신청이 대기 중입니다.',
-      query: `SELECT (
-                SELECT COUNT(*) FROM kpa_approval_requests
-                WHERE status = 'pending' AND entity_type = 'membership'
-              ) + (
-                SELECT COUNT(*) FROM kpa_organization_join_requests
-                WHERE status = 'pending'
-              ) AS cnt`,
+      // WO-O4O-KPA-ORGANIZATION-JOIN-DEAD-FLOW-RETIREMENT-V1:
+      //   dead 채널 2개 term(kpa_approval_requests entity_type='membership' + orphan
+      //   kpa_organization_join_requests, 둘 다 프로덕션 0건) 제거 →
+      //   canonical pending 회원 = kpa_members.status='pending' 단일 source 로 재정합.
+      //   (orphan-table term 제거 = 물리 테이블 DROP 마이그레이션의 lockstep 선행조건)
+      query: `SELECT COUNT(*)::int AS cnt FROM kpa_members WHERE status = 'pending'`,
       actionUrl: '/operator/members',
       actionLabel: '회원 관리',
       actionType: 'NAVIGATE',
