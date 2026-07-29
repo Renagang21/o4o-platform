@@ -141,15 +141,18 @@ export class CosmeticsRepository {
     const sortField = query.sort || 'created_at';
     const sortOrder = (query.order?.toUpperCase() || 'DESC') as 'ASC' | 'DESC';
 
+    // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 F):
+    //   join + skip/take 조합에서 orderBy 는 entity property path 여야 한다(DB 컬럼명 아님).
+    //   'base_price' / 'created_at' 은 findColumnWithPropertyPath 에서 undefined → 500.
     switch (sortField) {
       case 'price':
-        qb.orderBy('product.base_price', sortOrder);
+        qb.orderBy('product.basePrice', sortOrder);
         break;
       case 'name':
         qb.orderBy('product.name', sortOrder);
         break;
       default:
-        qb.orderBy('product.created_at', sortOrder);
+        qb.orderBy('product.createdAt', sortOrder);
     }
 
     // Pagination
@@ -179,7 +182,8 @@ export class CosmeticsRepository {
       { search: searchTerm }
     );
 
-    qb.orderBy('product.created_at', 'DESC');
+    // property path 필수 (join + skip/take) — 위 findAllProducts 주석 참조
+    qb.orderBy('product.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [products, total] = await qb.getManyAndCount();

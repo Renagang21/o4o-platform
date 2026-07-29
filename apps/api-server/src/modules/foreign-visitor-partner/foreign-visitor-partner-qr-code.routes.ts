@@ -27,7 +27,10 @@ import { generateQrSvg } from '../../services/qr-print.service.js';
 import { StoreSlugService, type StoreSlugServiceKey } from '@o4o/platform-core/store-identity';
 import { StorePaidFeatureEntitlementService } from '../store-entitlement/store-paid-feature-entitlement.service.js';
 import { ForeignVisitorPartnerService } from './foreign-visitor-partner.service.js';
-import { ForeignVisitorPartnerQrCodeService } from './foreign-visitor-partner-qr-code.service.js';
+import {
+  ForeignVisitorPartnerQrCodeService,
+  hasAffiliateLanding,
+} from './foreign-visitor-partner-qr-code.service.js';
 // WO-O4O-FOREIGN-VISITOR-AFFILIATE-QR-SCAN-EVENT-V1: 익명 스캔 이벤트 기록/집계
 import { ForeignVisitorPartnerQrScanEventService, hashWithSalt } from './foreign-visitor-partner-qr-scan-event.service.js';
 import { FOREIGN_VISITOR_QR_STATUSES, type ForeignVisitorQrStatus } from './foreign-visitor-partner-qr-code.entity.js';
@@ -141,6 +144,18 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
 
       const qrCodeName = String(req.body?.qrCodeName || '').trim();
       if (!qrCodeName) return res.status(400).json({ success: false, error: 'qrCodeName is required', code: 'MISSING_QR_NAME' });
+
+      // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 A):
+      //   landing_url 은 생성 후 불변이다. 제휴 landing 라우트를 보유하지 않은 서비스로 발급하면
+      //   404 로 죽은 URL 이 QR 에 영구 각인된다 → 발급 자체를 차단한다.
+      //   (canonical landing 은 1개만 유지 — 서비스별 중복 landing/redirect 를 만들지 않는다.)
+      if (!hasAffiliateLanding(resolved.serviceKey)) {
+        return res.status(400).json({
+          success: false,
+          error: '이 서비스에서는 제휴마케팅 QR을 발급할 수 없습니다. (제휴 안내 랜딩 미제공 서비스)',
+          code: 'AFFILIATE_LANDING_UNAVAILABLE',
+        });
+      }
 
       if (!(await assertEntitled(resolved.organizationId, resolved.serviceKey))) {
         return res.status(403).json({ success: false, error: '외국인 여행객 판매지원 이용권이 필요합니다.', code: 'ENTITLEMENT_REQUIRED' });
