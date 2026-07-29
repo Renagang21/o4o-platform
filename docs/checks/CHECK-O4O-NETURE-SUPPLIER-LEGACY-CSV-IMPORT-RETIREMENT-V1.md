@@ -121,4 +121,22 @@ canonical 이 CSV 업로드를 제공하므로 판정 D(유지) 불해당.)
 
 ## 12. 배포 & 프로덕션 smoke (§18-19)
 
-(배포 후 갱신)
+- 커밋 `71718c542` → CI "Deploy Web Services (Cloud Run)" run 30418864346 → **deploy-neture success.**
+- neture-web URL: https://neture-web-3e3aws7zqa-du.a.run.app
+
+### 12-1. 프로덕션 배포 산출물 검증 (대체 채널 — CLAUDE.md §8)
+
+| 항목 | 결과 |
+|------|------|
+| `/supplier/csv-import` HTTP | **200** (SPA 서빙 — 빈 화면/404 아님) |
+| 프로덕션 entry(`index-ZIHUNod-.js`)에 `SupplierCsvImportPage` chunk 참조 | **없음 (은퇴 확인)** |
+| entry 내 redirect 대상 `supplier/products/bulk` 문자열 | **존재 (redirect 라우트 LIVE)** |
+
+레거시 페이지 chunk 는 프로덕션 번들에서 소멸했고, `/supplier/csv-import` 라우트는
+`<Navigate to="/supplier/products/bulk" replace>` 선언형 redirect(부분 실패 표면 없음)로 대체됨.
+
+### 12-2. 대화형 브라우저 redirect smoke — BLOCKED
+
+Playwright 공유 프로파일(`C:\Users\home\.playwright-o4o-profile`)을 다른 동시 세션 Chrome 이
+점유 중이어서 기동 실패(즉시 exit). 동시 세션 훼손 방지를 위해 강제 종료하지 않음.
+→ 배포 성공 + 번들 산출물 검증(12-1)으로 계약 반영 확인. 대화형 redirect smoke 는 프로파일 해제 후 후속 권장.
