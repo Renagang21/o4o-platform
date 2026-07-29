@@ -12,7 +12,12 @@
  *   template.forcedOptions 를 AiContentModal 에 templateForcedOptions 로 전달.
  *   template.systemPromptOverride 를 AiContentModal 에 templateSystemPrompt 로 전달.
  *
- * 진입: StoreLibraryContentsPage → AiContentModal.onInsert → navigate('/store/library/production-materials/new', { state })
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정 진입 계약 정정):
+ *   /store/library/production-materials/new 는 legacy redirect(→ /store/library/contents) 로 전환되어
+ *   KPA 에서 더 이상 이 화면의 진입 경로가 아니다. 아래 state 계약은 GP/KCos 및 :id/edit 모드 기준으로 유지한다.
+ *   KPA 활성 진입 = 자료함 > 콘텐츠 → execution asset 행 [편집] → /store/library/production-materials/:id/edit
+ *
+ * 진입(legacy/타 서비스): StoreLibraryContentsPage → AiContentModal.onInsert → navigate('.../production-materials/new', { state })
  * state: {
  *   generatedHtml?: string;
  *   title?: string;
@@ -23,7 +28,7 @@
  * 역할:
  *   - O4O 표준 RichTextEditor 로 AI 결과 HTML 검토/수정
  *   - 제목 입력 + 제작 유형 선택 + 저장(store_execution_assets)
- *   - 저장 후 → /store/library/production-materials 이동
+ *   - 저장 후 → /store/library/contents 이동 (canonical 결과 탐색 화면. 생성·편집 두 분기 모두 동일)
  */
 
 import { useState, useCallback, useEffect, type CSSProperties } from 'react';

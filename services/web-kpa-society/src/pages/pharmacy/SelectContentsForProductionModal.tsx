@@ -3,7 +3,11 @@
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1
  *
- * `/store/library/production-materials` 의 "새 제작 자료 만들기" CTA 클릭 시 페이지 이동 대신
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정):
+ *   유일한 소비처인 StoreProductionMaterialsPage 가 라우팅에서 제외되어 KPA 활성 사용처는 0 이다.
+ *   canonical 제작 흐름은 자료함 > 콘텐츠(StoreLibraryContentsPage) 의 StartProductionModal 이다.
+ *
+ * `/store/library/production-materials`(legacy) 의 "새 제작 자료 만들기" CTA 클릭 시 페이지 이동 대신
  * 본 모달을 연다. 모달 안에서 `/store/library/contents` 와 동일한 canonical selector 를
  * 그대로 사용 (StoreContentsSelector mode='modal').
  *

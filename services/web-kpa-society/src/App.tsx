@@ -239,9 +239,10 @@ const ProductPopBuilderPage = lazy(() => import('./pages/pharmacy/ProductPopBuil
 // WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 / 내 제작물 canonical 페이지
 const StoreLibraryContentsPage = lazy(() => import('./pages/pharmacy/StoreLibraryContentsPage'));
 const StoreLibraryResourcesPage = lazy(() => import('./pages/pharmacy/StoreLibraryResourcesPage'));
-// WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: 매장 제작 자료
-const StoreProductionMaterialsPage = lazy(() => import('./pages/pharmacy/StoreProductionMaterialsPage'));
-// WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기
+// WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1:
+//   StoreProductionMaterialsPage lazy import 제거 — list route 가 redirect 로 바뀌어 활성 참조 0.
+//   파일은 보존한다(삭제 시 SelectContentsForProductionModal 이 함께 고아가 되어 범위가 넓어짐).
+// WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 (:id/edit 딥링크 전용)
 const ProductionMaterialEditorPage = lazy(() => import('./pages/pharmacy/ProductionMaterialEditorPage'));
 const StoreProductDescriptionsPage = lazy(() => import('./pages/pharmacy/StoreProductDescriptionsPage'));
 // default-as-named (wrapper 불필요)
@@ -992,10 +993,17 @@ function App() {
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 자료함 실 페이지 (콘텐츠 / 자료) */}
             <Route path="library/contents" element={<StoreLibraryContentsPage />} />
             <Route path="library/resources" element={<StoreLibraryResourcesPage />} />
-            {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1: 매장 제작 자료 */}
-            <Route path="library/production-materials" element={<StoreProductionMaterialsPage />} />
-            {/* WO-O4O-STORE-PRODUCTION-MATERIALS-STANDARD-EDITOR-APPLY-V1: 제작 자료 편집기 */}
-            <Route path="library/production-materials/new" element={<ProductionMaterialEditorPage />} />
+            {/* WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정):
+                  list / new 는 활성 인바운드 0 인 legacy route 다.
+                  - list: 고유 검색·필터·편집 계약 없는 4소스 기술적 UNION → canonical 탐색 화면은
+                          자료함 > 콘텐츠(/store/library/contents) 가 이미 통합 표시한다.
+                  - new : list 의 CTA 에만 종속된 고아 생성 route. 신규 제작은 자료함 > 콘텐츠 /
+                          POP / QR-code / 블로그 / 상품 설명의 canonical 제작 흐름을 사용한다.
+                  과거 북마크·가이드 링크 보호를 위해 제거 대신 replace redirect(1홉) 로 수렴시킨다.
+                  GP/KCos 는 정식 '제작 자료' 메뉴를 유지하므로 각 서비스 route 무변경.
+                  IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md */}
+            <Route path="library/production-materials" element={<Navigate to="/store/library/contents" replace />} />
+            <Route path="library/production-materials/new" element={<Navigate to="/store/library/contents" replace />} />
             {/* WO-O4O-KPA-STORE-LIBRARY-EXECUTION-ASSET-EDIT-ACTION-V1: 콘텐츠형 제작 자료 단건 편집 (같은 row update, QR library_item_id 무변경) */}
             <Route path="library/production-materials/:id/edit" element={<ProductionMaterialEditorPage />} />
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}

@@ -27,6 +27,13 @@
  *     "채널 관리"(/store/channels redirect) → "판매 설정"(직접 /store/online-sales/settings),
  *     "태블렛 화면 제작"(/store/commerce/tablet-displays) 추가 — §6.5 태블렛·온라인 판매 채널 활용.
  *   - 재설계·KPI·API·데이터·store-ui-core 변경 없음.
+ *
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (위 변경 이력 주석의 계약 정정):
+ *   HOME-EXECUTION-FLOW-ALIGN-V1 항목의 "매장 제작 자료(/store/library/production-materials) 단일 링크"는
+ *   이후 CTA-AND-MENU-ALIGNMENT-V1 에서 이미 교체되어 현재 홈에는 해당 CTA 가 없다(활성 링크 0).
+ *   해당 route 는 현재 /store/library/contents 로 replace redirect 되는 legacy URL 이며,
+ *   제작 결과 확인의 canonical 진입은 Step 2 "콘텐츠 자료함"(/store/library/contents) 이다.
+ *   홈 CTA 재추가 금지.
  */
 
 import { useState, useEffect, useCallback } from 'react';

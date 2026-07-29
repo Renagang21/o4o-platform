@@ -3,8 +3,12 @@
  *
  * WO-O4O-STORE-PRODUCTION-MATERIALS-CONTENT-SELECTOR-MODAL-V1
  *
- * `/store/library/contents` 페이지와 `/store/library/production-materials`의
+ * `/store/library/contents` 페이지와 `/store/library/production-materials`(현재 legacy redirect)의
  * "새 제작 자료 만들기" 모달이 같은 selector 구조를 공유한다.
+ *
+ * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1:
+ *   KPA 활성 소비처는 `/store/library/contents` 단일. 이 selector 의 execution asset 행 [편집]
+ *   링크(`/store/library/production-materials/:id/edit`)는 canonical 딥링크로 계속 유지된다.
  *
  * WO-O4O-KPA-STORE-LIBRARY-CONTENT-ONLY-SELECTOR-V1:
  *   콘텐츠/강의 상위 전환(TopTabBar)과 LessonsSection 을 제거하고 콘텐츠 전용으로 정리한다.

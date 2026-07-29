@@ -1,6 +1,14 @@
 /**
  * StoreProductionMaterialsPage — 내 자료함 / 매장 제작 자료 (결과 저장소)
  *
+ * @deprecated WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-ENTRY-ALIGNMENT-V1 (KPA 한정)
+ *   이 화면은 더 이상 라우팅되지 않는다. /store/library/production-materials 는
+ *   /store/library/contents 로 replace redirect 되며 App.tsx 활성 참조 0 이다.
+ *   KPA 의 canonical 결과 탐색 화면 = 자료함 > 콘텐츠(StoreLibraryContentsPage) 로,
+ *   direct content 와 execution asset 을 이미 통합 표시한다.
+ *   파일은 참조용으로 보존한다(삭제 시 SelectContentsForProductionModal 이 함께 고아가 됨).
+ *   메뉴·route 로 되살리지 말 것 — GP/KCos 는 각자 자체 동명 페이지를 계속 사용한다.
+ *
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIBRARY-TAB-V1
  * WO-O4O-KPA-STORE-PRODUCTION-MATERIALS-LIST-SOURCE-ALIGN-V1:
  *   리스트 소스를 AI 저장 위치(store_execution_assets)와 정렬.
