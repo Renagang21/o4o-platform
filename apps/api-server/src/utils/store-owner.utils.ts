@@ -89,27 +89,9 @@ export async function isStoreOwner(
     return { isOwner: false, organizationId: null, memberRole: '' };
   }
 
-  // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 D):
-  //   기존 쿼리는 `LIMIT 1` 만 있고 ORDER BY 가 없어, 복수 조직에 소속된 사용자의
-  //   organizationId 가 **비결정적**이었다(같은 사용자·같은 요청이 실행마다 다른 조직을 받을 수 있음).
-  //   매장 데이터(store_local_products / store_execution_assets / QR / POP / 태블릿)는 전부 이
-  //   organizationId 로 경계가 결정되므로, 비결정성은 곧 경계 불안정이다.
-  //   → 자격 집합(role IN owner/admin/manager, 미탈퇴)은 그대로 두고 **선택 순서만 확정**한다:
-  //      is_primary(대표 조직) → 역할 강도(owner > admin > manager) → 가입 시각(먼저 가입) → id.
-  //
-  //   ⚠️ 남은 구조적 한계(본 WO 범위 외 — 후속 설계 필요):
-  //      organizations 테이블에 service_key 가 없어 "이 serviceKey 의 조직" 을 직접 특정할 수 없다.
-  //      role_assignments 는 serviceKey 로 걸러지지만 조직 선택은 서비스 무관이다.
-  //      → 다중 서비스에 매장을 가진 사용자는 서비스별 조직 분리가 보장되지 않는다.
-  //      상세: docs/investigations/IR-O4O-SHARED-OWNER-GUARD-BOUNDARY-AUDIT-V1.md
   const rows = await dataSource.query(
     `SELECT organization_id, role FROM organization_members
-     WHERE user_id = $1 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL
-     ORDER BY is_primary DESC NULLS LAST,
-              CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END,
-              joined_at ASC NULLS LAST,
-              id ASC
-     LIMIT 1`,
+     WHERE user_id = $1 AND role IN ('owner', 'admin', 'manager') AND left_at IS NULL LIMIT 1`,
     [userId]
   );
   if (rows.length > 0) {

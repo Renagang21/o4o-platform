@@ -1,8 +1,13 @@
 # IR-O4O-SHARED-OWNER-GUARD-BOUNDARY-AUDIT-V1
 
-> WO: `WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1` 범위 D
+> WO: `WO-O4O-KPA-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1` 범위 D
 > 일자: 2026-07-29
-> 성격: **감사(audit) + 부분 안전 수정**. 구조적 잔여 항목은 후속 WO 대상 (WO §7.3 허용 경로).
+> 성격: **read-only 감사(audit) 전용 — 코드 변경 0**
+>
+> ⚠️ **본 문서는 조사 결과만 기록한다.**
+> `store-owner.utils.ts` 는 KPA / GlycoPharm / K-Cosmetics 가 **공유**하는 owner guard 이며,
+> 사용자 지시에 따라 본 WO 는 **KPA 전용 파일·경로**로 범위가 축소되었다.
+> 따라서 아래 D-1(비결정성)은 **수정하지 않았다**. 공용 가드 수정은 별도 공용 정비 WO 대상이다.
 
 ---
 
@@ -37,7 +42,7 @@
 
 ## 3. 발견
 
-### D-1 (수정 완료) — 조직 선택이 **비결정적**이었다
+### D-1 (**미수정** — 공용 가드, 별도 WO) — 조직 선택이 비결정적이다
 
 ```sql
 -- 수정 전
@@ -53,7 +58,7 @@ LIMIT 1        -- ← ORDER BY 없음
 `store_tablet_displays` / POP 자산)가 이 `organizationId` 로 경계를 정하므로,
 비결정성 = 경계 불안정이다.
 
-**수정**: 자격 집합은 그대로 두고 선택 순서만 확정.
+**권고 수정안 (본 WO 에서는 적용하지 않음 — 공용 가드)**: 자격 집합은 그대로 두고 선택 순서만 확정.
 
 ```sql
 ORDER BY is_primary DESC NULLS LAST,                                  -- 대표 조직 우선
@@ -65,6 +70,15 @@ LIMIT 1
 
 `is_primary` 는 `organization_members` 에 이미 존재하는 canonical 대표조직 플래그이므로
 신규 컬럼·마이그레이션 없이 기존 의미를 존중한다. **허용 대상(자격 집합) 변화 0** — 순서만 확정.
+
+> 적용 보류 사유: 이 가드는 KPA·GlycoPharm·K-Cosmetics 3 서비스가 공유한다.
+> KPA 단독 변경이 불가능하므로 CLAUDE.md Shared Module Change Protocol 에 따라
+> 3 서비스 동시 검증이 가능한 별도 WO 에서 처리한다.
+>
+> 참고: 본 순서 확정안은 사전 검증을 마쳤다 —
+> api-server type-check(기존 `src/scripts/*` baseline 외 오류 0) 및
+> `jest src/__tests__/security` **8 suites / 185 tests PASS**.
+> 후속 WO 는 이 검증 결과를 재사용할 수 있다.
 
 ### D-2 (미수정 — 후속 WO) — 조직 선택에 **서비스 경계가 없다**
 
@@ -106,18 +120,20 @@ LIMIT 1
 
 ---
 
-## 4. 검증
+## 4. 본 WO 에서의 처리
 
-| 항목 | 결과 |
+| 항목 | 처리 |
 |------|------|
-| `pnpm --filter @o4o/api-server type-check` | `src/scripts/*` 기존 baseline 외 오류 0 |
-| `jest src/__tests__/security` | **8 suites / 185 tests PASS** (ownership · cross-service · legacy-role · store-hub-product-apply-gate 포함) |
-| 허용 actor 집합 변화 | **0** (ORDER BY 추가만) |
+| `store-owner.utils.ts` 코드 변경 | **0** (공용 가드 — KPA 단독 변경 불가) |
+| KPA 소비 경계 확인 | 완료 — KPA 매장 라우트는 `createRequireStoreOwner(dataSource, 'kpa')` 경로로 `kpa:store_owner` role + `kpa-society` active membership 을 요구한다. KPA 측 소비 계약에 결함 없음 |
+| D-1 / D-2 | 조사 기록만. 수정은 별도 공용 정비 WO |
 
 ---
 
 ## 5. 결론
 
-- D-1 비결정성은 본 WO 에서 **해소**했다 (안전·무해·즉시 이득).
-- D-2 서비스↔조직 경계는 **스키마 축 부재**가 근본 원인이며 본 WO 범위에서 안전하게 닫을 수 없다.
-  감사 결과를 확정 기록하고 후속 WO 로 분리한다.
+- **KPA 소비 경계는 정상**이다. KPA 라우트는 serviceKey 를 지정해 호출하므로
+  role·membership 이중 검증을 받는다.
+- D-1(비결정성) / D-2(서비스↔조직 축 부재)는 공용 가드 자체의 문제이며,
+  3 서비스 동시 검증이 필요하므로 **본 KPA 전용 WO 에서 수정하지 않는다**.
+- 후속 공용 정비 WO 권고 순서: D-1(순서 확정, 저위험) → D-2(스키마 축 설계, 승인 필요).

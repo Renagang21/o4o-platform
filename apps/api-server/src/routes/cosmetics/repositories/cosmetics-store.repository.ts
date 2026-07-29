@@ -49,8 +49,7 @@ export class CosmeticsStoreRepository {
       qb.andWhere('store.region = :region', { region: query.region });
     }
 
-    // property path 표기 (동일 결함 클래스 예방 — join 추가 시 즉시 500 이 되는 landmine 제거)
-    qb.orderBy('store.createdAt', 'DESC');
+    qb.orderBy('store.created_at', 'DESC');
     qb.skip(skip).take(limit);
 
     const [stores, total] = await qb.getManyAndCount();
@@ -97,8 +96,7 @@ export class CosmeticsStoreRepository {
       qb.andWhere('app.status = :status', { status: query.status });
     }
 
-    // property path 표기 (동일 결함 클래스 예방)
-    qb.orderBy('app.createdAt', 'DESC');
+    qb.orderBy('app.created_at', 'DESC');
     qb.skip(skip).take(limit);
 
     const [applications, total] = await qb.getManyAndCount();
@@ -226,14 +224,7 @@ export class CosmeticsStoreRepository {
     qb.leftJoinAndSelect('listing.product', 'product');
     qb.leftJoinAndSelect('product.brand', 'brand');
     qb.where('listing.store_id = :storeId', { storeId });
-    // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 F):
-    //   orderBy 는 **entity property path** 여야 한다(DB 컬럼명 아님).
-    //   join(leftJoinAndSelect) + skip/take 조합에서 getManyAndCount 는 distinct-id 서브쿼리 경로를
-    //   타고 createOrderByCombinedWithSelectExpression → metadata.findColumnWithPropertyPath(path)
-    //   를 호출한다. 'sort_order' / 'created_at' 는 propertyPath 가 아니므로 undefined 가 되어
-    //   `.databaseName` 접근에서 TypeError → 500. (findAllStores/findAllApplications 는 join 이 없어
-    //   같은 표기로도 우연히 동작했다 — 아래에서 함께 정정.)
-    qb.orderBy('listing.sortOrder', 'ASC').addOrderBy('listing.createdAt', 'DESC');
+    qb.orderBy('listing.sort_order', 'ASC').addOrderBy('listing.created_at', 'DESC');
     qb.skip(skip).take(limit);
 
     const [listings, total] = await qb.getManyAndCount();

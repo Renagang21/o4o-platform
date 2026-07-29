@@ -82,11 +82,7 @@ export function createStorePublicTabletRoutes(deps: {
       // Local products: Display Domain only (Checkout 진입 불가)
       // DB UNION 금지, 애플리케이션 레벨 merge
       // WO-STORE-LOCAL-PRODUCT-CONTENT-REFINEMENT-V1: 콘텐츠 블록 필드 포함
-      // usage_info, caution_info는 목록에서 제외.
-      // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 E — 정책 C):
-      //   detail_html 는 포함한다. 태블릿 상세는 별도 단건 API 없이 이 목록 응답으로 렌더되며,
-      //   연결 콘텐츠가 없을 때의 "기본 상품 설명" 이 곧 매장 canonical 설명(detail_html)이다.
-      //   (기존에는 짧은 description 만 내려가 상품 상세 설명 화면에 쓴 본문이 태블릿에 반영되지 않았다.)
+      // detail_html, usage_info, caution_info는 목록에서 제외 (상세 조회 시에만)
       // WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1:
       //   local 집합도 first active tablet 의 visible display row(disp)로 정합.
       //   - configured: disp 있는 local 만(집합 제한) + 편성 순서(disp.sort_order).
@@ -120,7 +116,7 @@ export function createStorePublicTabletRoutes(deps: {
         }
       }
       const localProducts = await dataSource.query(
-        `SELECT lp.id, lp.name, lp.description, lp.detail_html, lp.summary, lp.thumbnail_url, lp.images, lp.gallery_images,
+        `SELECT lp.id, lp.name, lp.description, lp.summary, lp.thumbnail_url, lp.images, lp.gallery_images,
                 lp.category, lp.price_display, lp.badge_type, lp.highlight_flag, lp.sort_order,
                 ${localContentSelect}
          FROM store_local_products lp

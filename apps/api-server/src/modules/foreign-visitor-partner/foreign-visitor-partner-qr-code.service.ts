@@ -7,46 +7,20 @@
  */
 import { randomBytes } from 'crypto';
 import type { DataSource, Repository } from 'typeorm';
-// WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1: 공개 도메인 SSOT
-import { getServiceOrigin } from '../../config/service-catalog.js';
 import {
   ForeignVisitorPartnerQrCode,
   type ForeignVisitorQrStatus,
 } from './foreign-visitor-partner-qr-code.entity.js';
 
-/**
- * WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 A):
- *   기존에는 서비스별 public origin 을 이 파일에 하드코딩했고 cosmetics 가
- *   `https://cosmetics.neture.co.kr` (비-canonical) 로 박혀 있었다. landing_url 은 생성 후 불변이라
- *   잘못된 도메인이 QR 에 영구히 각인된다.
- *   → 도메인 출처를 service-catalog SSOT 단일화 (POP QR 의
- *     HOTFIX-O4O-STORE-POP-PUBLIC-DOMAIN-CANONICAL-FIX-V1 과 동일 정책).
- *
- * store-owner serviceKey(role prefix) → service-catalog key 매핑.
- */
-const QR_SERVICE_TO_CATALOG_KEY: Record<string, string> = {
-  kpa: 'kpa-society',
-  glycopharm: 'glycopharm',
-  cosmetics: 'k-cosmetics',
+/** 서비스별 public web origin (landing 도메인). multilingual landing 과 동일 정책. */
+const PUBLIC_WEB_ORIGIN_BY_SERVICE: Record<string, string> = {
+  kpa: 'https://kpa-society.co.kr',
+  glycopharm: 'https://glycopharm.co.kr',
+  cosmetics: 'https://cosmetics.neture.co.kr',
 };
 
-/**
- * 제휴 QR landing(`/foreign-visitor/affiliate/:shortCode`) 을 **실제로 라우팅하는** 서비스.
- *
- * landing 화면과 파트너·QR 관리 화면은 현재 KPA-Society 에만 존재한다
- * (GlycoPharm / K-Cosmetics 는 `sales-channels/foreign-visitor` 구독 진입 화면만 보유).
- * 다른 서비스로 QR 을 발급하면 불변 landing_url 이 404 로 각인되므로 발급 자체를 막는다.
- * (죽은 URL 을 살리는 redirect·중복 landing 을 만들지 않는다 — canonical landing 1개 유지.)
- */
-export const AFFILIATE_LANDING_SERVICE_KEYS = ['kpa'] as const;
-
-export function hasAffiliateLanding(serviceKey: string): boolean {
-  return (AFFILIATE_LANDING_SERVICE_KEYS as readonly string[]).includes(serviceKey);
-}
-
 export function buildAffiliateLandingUrl(serviceKey: string, shortCode: string): string {
-  const catalogKey = QR_SERVICE_TO_CATALOG_KEY[serviceKey];
-  const origin = (catalogKey && getServiceOrigin(catalogKey)) || 'https://kpa-society.co.kr';
+  const origin = PUBLIC_WEB_ORIGIN_BY_SERVICE[serviceKey] || 'https://kpa-society.co.kr';
   return `${origin}/foreign-visitor/affiliate/${shortCode}`;
 }
 
