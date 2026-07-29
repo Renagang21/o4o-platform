@@ -170,7 +170,17 @@ drop migration 미작성(§5 HOLD) → migration 검증 N/A.
 
 ## 17. route·shell smoke (§22·§24)
 
-(배포 후 기록 — §19 참조)
+배포: Deploy API Server (Cloud Run) run 30431440426 = completed/success (커밋 b54e06d73). web deploy 미트리거(api-server만 변경 — detect-changes 정상).
+
+| 관측 | 결과 |
+|------|:----:|
+| `GET /neture/operator/supplier-quality` — retired 경로가 미존재 operator 경로와 동일 401(가드 인터셉트, 라우트 부재) | ✅ |
+| `GET /neture/operator/__nonexistent__`(비교 기준) 401 | ✅ |
+| `GET /neture/__nonexistent__`(neture 루트, 가드 없음) 404 | ✅ |
+| `/health` 200 | ✅ |
+| HTTP 5xx 0 | ✅ |
+
+판정: retired supplier-quality 경로가 dead operator 경로와 런타임상 구분 불가(둘 다 401 unauth) = 핸들러·mount 제거 확인. PART B(shell)·PART C(seller card payload)는 backend-inert + web 미배포 → route 렌더 영향 없음.
 
 ---
 
@@ -182,14 +192,12 @@ drop migration 미작성(§5 HOLD) → migration 검증 N/A.
 
 ## 19. 프로덕션 read-only smoke (§24)
 
-(배포 후 아래 표 기록)
-
 | 관측 | 결과 |
 |------|:----:|
-| `GET /neture/operator/supplier-quality` 404/미존재(은퇴 확인) | (배포 후) |
-| seller Hub 카드 정상 렌더(정본 `/store/*` payload) | (배포 후) |
-| `/supplier/settlements`·`/mypage/business-profile`·`/supplier/dashboard` 도착 route 렌더 | (배포 후) |
-| console error 0 · HTTP 5xx 0 | (배포 후) |
+| `GET /neture/operator/supplier-quality` retired(미존재 operator 경로와 동일 401, §17) | ✅ |
+| seller Hub 카드 payload — PART C 는 backend inert(네비 미소비), web 미배포 → 런타임 route 변화 없음 | ✅(inert) |
+| `/supplier/settlements`·`/mypage/business-profile`·`/supplier/dashboard` = web-neture App.tsx 기존 존재 route(코드 검증 §13), web 미배포 → 불변 | ✅ |
+| `/health` 200 · HTTP 5xx 0 | ✅ |
 | 운영 supplier/정산 상태 mutation 0 | ✅(read-only) |
 
 ---
