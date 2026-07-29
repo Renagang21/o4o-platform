@@ -254,7 +254,8 @@ deleteTag(tagId, productId)  → tagRepo.delete({ id: tagId, productId })
 
 | # | 항목 | 상태 |
 |:-:|------|------|
-| 1 | 배포 후 migration 실행 확인 (CI/CD) | §9 |
+| 1 | 배포 + migration 적용 확인 | ✅ 완료 (§9.1) |
+| 1-a | **P1 — 공급자 링크 보유 매장 사용자의 `render_read` 상실** (§9.3) | **사용자 결정 대기** |
 | 2 | 후속 `WO-2 O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1` — 매장 상품 설명 화면 정상화 | 미착수 |
 | 3 | `product_ai_tags` UNIQUE 여부 | **보류** — 중복 허용 계약 확정 전 추가 금지 |
 | 4 | KPA `StoreProductionMaterialsPage` + `SelectContentsForProductionModal` dead code 삭제 | 미승인 |
@@ -263,4 +264,62 @@ deleteTag(tagId, productId)  → tagRepo.delete({ id: tagId, productId })
 
 ## 9. 배포 / 프로덕션 확인
 
-_(배포 후 갱신)_
+커밋 `684223b53` → `Deploy API Server (Cloud Run)` **success**.
+
+### 9.1 migration 적용 확인 (read-only SELECT)
+
+```
+typeorm_migrations  id=619  timestamp=270214000000
+                    name=AddProductAiGlobalIntegrityConstraints20270214000000
+
+FK_product_ai_contents_master  f  FOREIGN KEY (product_id) REFERENCES product_masters(id) ON DELETE CASCADE
+FK_product_ai_tags_master      f  FOREIGN KEY (product_id) REFERENCES product_masters(id) ON DELETE CASCADE
+UQ_product_ai_contents_product_type  UNIQUE INDEX ON product_ai_contents (product_id, content_type)
+
+contents=0  tags=0  orphan_contents=0  orphan_tags=0
+```
+
+`product_ai_tags` UNIQUE 는 계획대로 **없음**.
+
+### 9.2 API smoke (프로덕션)
+
+미인증 — 4개 라우트 전부 `401 AUTH_REQUIRED` (가드 이전 단계에서 차단).
+
+인증 후 (`master_id = 0a47e0bc…`, 해당 매장 조직의 **active OPL 보유 master**):
+
+| 계정 | 보유 축 | ai-contents GET | ai-tags GET | pop/A4 GET | ai-contents PUT | 비UUID GET |
+|------|--------|:---:|:---:|:---:|:---:|:---:|
+| `sohae2100@gmail.com` — `kpa:operator`·`kpa:admin`·`neture:operator`·`neture:admin`, 공급자 링크 없음, active OPL 없음 | 역할만 | 403 | 403 | 403 | 403 | 403 |
+| `sohae21@naver.com` — `kpa:store_owner` + **ACTIVE 공급자 링크** + active OPL 보유 | 매장 ∩ 공급자 | 403 | 403 | **403** | 403 | 403 |
+
+- ✅ `{service}:operator` / `{service}:admin` 은 **역할만으로 전역 쓰기·조회 불가** — 정책대로 동작
+- ✅ 매장 사용자의 `write` / `manage_read` 차단 — 정책대로 동작
+- ✅ 비UUID `productId` 는 **500 이 아니라 403** — DB 조회 0회
+- ✅ smoke 의 PUT 시도 후에도 `product_ai_contents` **0행 유지** (신규 전역 row 생성 0)
+
+### 9.3 신규 실측 발견 (P1) — 공급자 링크 보유 매장 사용자는 `render_read` 를 잃는다
+
+`sohae21@naver.com` 은 **active OPL 을 보유한 매장 owner** 인데도 POP PDF 가 403 이다.
+원인은 판정 순서 §4.1-4 이다: 이 사용자는 `neture_suppliers` 링크(ACTIVE)를 갖고 있으므로 공급자 축에서 먼저 평가되고,
+해당 master 가 자기 offer 가 아니므로 `NO_RELATION_TO_MASTER` 로 **종료되어 매장 축(5단계)에 도달하지 못한다.**
+
+- 현재 `supplier_product_offers` 는 **0행**이므로, **공급자 링크를 가진 모든 사용자는 POP PDF 를 전혀 사용할 수 없다.**
+- 실측상 KPA 매장 테스트 계정 2개가 **모두** 공급자 링크를 갖고 있어(`renagang21@gmail.com`, `sohae21@naver.com`)
+  → **매장 `render_read` 200 경로는 실계정으로 smoke 할 수 없었다.** (fixture 테스트로만 검증됨)
+
+이는 "공급자 축 판정 후 매장 축으로 승격하지 않는다" 는 지정된 순서의 직접적 귀결이며,
+접근을 **넓히는** 변경이므로 **임의로 수정하지 않았다.** 정책 판단이 필요하다.
+
+| 선택지 | 내용 | 영향 |
+|:--:|------|------|
+| A (현행 유지) | 공급자 링크 보유자는 매장 축 미평가 | 겸업 사용자의 POP PDF 상실. 현재 offer 0행이므로 사실상 공급자 전원 |
+| B (권장) | `render_read` 에 한해 공급자 축 실패 시 매장 축으로 fallthrough | 겸업 사용자가 자기 매장 진열 상품의 POP 를 다시 사용. 권한 확대는 "active OPL 보유" 범위로 한정 |
+
+→ **미결. 사용자 결정 후 별도 변경으로 처리한다.**
+
+### 9.4 브라우저 smoke 불가 사유 (재확인)
+
+- 공급자 축 200 경로: `supplier_product_offers` **0행** → WO §18 "프로덕션에 테스트 offer 를 임의 생성하지 않는다" 로 불가
+- 매장 `render_read` 200 경로: §9.3 사유로 불가
+- `platform:super_admin` 축: 보유자 2명이 실 운영 계정 (CLAUDE.md §15)
+- → 위 3개 축은 [`product-ai-global-access.spec.ts`](../../apps/api-server/src/__tests__/security/product-ai-global-access.spec.ts) fixture 테스트로 검증했다.
