@@ -100,4 +100,17 @@ FROM neture_settlements WHERE supplier_id = $1 AND status IN ('calculated','appr
 | neture-web 번들에 `/admin/supplier-governance` 라우트 + redirect | 배포 index chunk grep: `supplier-governance`×3, `admin-suppliers`×1, `AdminSupplierGovernance`×2 | ✅ |
 | 구 `AdminSupplierApprovalPage` 제거 반영 | 배포 번들 grep: `AdminSupplierApproval` 0건 | ✅ |
 
-**브라우저 UI smoke (로그인 후 화면 관측):** 로컬 Playwright 프로필이 타 Chrome 세션 점유로 실행 불가 → HTTP/번들 레벨 read-only 검증으로 대체. 로그인 화면 관측 항목(redirect 시각 확인 / 8컬럼 렌더 / operator 비활성화 미노출 / 사유 필수 다이얼로그 취소=변경 0)은 브라우저 가용 시 후속 관측 권장. 라우트·엔드포인트·번들 반영은 위 표로 확인됨.
+**브라우저 UI smoke (로그인 후 화면 관측) — 2026-07-29 수행 (Neture admin `sohae2100@gmail.com`):**
+
+| 관측 항목 | 결과 |
+|-----------|:----:|
+| `/admin/admin-suppliers` 접속 → `/admin/supplier-governance` 로 redirect (최종 URL 확인) | ✅ |
+| governance 화면 heading "공급자 상태 관리" + "admin 전용 governance / 승인·거절은 운영자 승인 콘솔에서 처리" 설명 | ✅ |
+| governance 8컬럼 렌더 (상태 변경 / 공급자명 / 현재 상태 / 최근 상태 변경일 / 최근 변경자 / 최근 변경 사유 / 진행 주문 / 미정산) + KPI 전체 2/활성 2/비활성 0 | ✅ |
+| governance 목록에 ACTIVE 2건만 노출, PENDING/REJECTED 미노출 | ✅ |
+| ACTIVE 공급자 RowActionMenu → "비활성화"만 노출 (INACTIVE 시 "재활성화") | ✅ |
+| 비활성화 다이얼로그 사유 필수 — 빈 사유일 때 confirm 버튼 `disabled`, 사유 입력 시 enabled | ✅ |
+| 취소 시 목록 변경 0 (활성 2건 유지) — 프로덕션 상태 미변경 | ✅ |
+| `/operator/suppliers` heading "공급자 승인" (PENDING → ACTIVE/REJECTED) 유지, 승인대기/전체/활성/거절됨/비활성 필터 + 승인/거절 동선, **비활성화/재활성화 액션 미노출** | ✅ |
+
+프로덕션 공급자 상태는 변경하지 않음 (비활성화 다이얼로그는 취소로 종료).
