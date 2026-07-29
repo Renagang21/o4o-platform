@@ -3,7 +3,7 @@
 > WO: `WO-O4O-KPA-SCREEN-SET-HUB-SERVER-PAGINATION-V1`
 > 근거 IR: `docs/investigations/IR-O4O-STORE-HUB-END-TO-END-CURRENT-STATE-AUDIT-V1.md` (HUB-P2-07 — 태블렛 화면 HUB 목록 `LIMIT 200` 고정, 페이지네이션·total 없음)
 > 선행: `WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1` (commit a71de1f64 / c5809eb58 / CHECK c07bf6c3b)
-> 상태: **DONE (구현·isolated typecheck)** · 배포 후 smoke 별도 기록
+> 상태: **DONE** · 배포(commit 4ef0d2f80) + 프로덕션 API smoke 완료(2026-07-29)
 > 일자: 2026-07-29
 
 ---
@@ -151,15 +151,30 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 | 빈 결과 total=0 | `visible.length=0` / COUNT 0 → totalPages=1 |
 | 탭/검색/필터 변경 후 page=1 | 프론트 핸들러 |
 
-### 배포 · 프로덕션 smoke (§11)
+### 배포 · 프로덕션 smoke (§11) — 완료 2026-07-29
 
-- 배포: main push → CI(web-kpa-society + api-server). **배포 후 별도 기록.**
-- smoke 확인 항목: `/store-hub/screen-set` 렌더 · 검색 · 템플릿 필터 · 운영자/공급자 탭 · Pagination 렌더 조건 · console error 0 · HTTP 4xx/5xx 0.
-- 원본 데이터가 1페이지 이하이면 실제 페이지 이동은 실증 불가 → API 응답 구조/`total`/빈 상태/Pagination 미노출까지 확인하고 데이터 부재로 보고(테스트 원본 생성 안 함).
+- 배포: commit `4ef0d2f80` push → CI Deploy Web(run 30409411066 success) + Deploy API(run 30409411119 success). 프로덕션 반영 확인.
+- **검증 방식**: 브라우저 렌더 smoke는 playwright 전용 프로필이 동시 세션 Chrome(선점)에 락되어 있어, 그 브라우저를 강제 종료하지 않고 **CLAUDE.md §8 명시 허용 채널 "API 직접 호출"** 로 계약을 실증했다. 인증 = store-owner 세션(`sohae2100@gmail.com`, role `kpa:store_owner`, userId `cfd2a5e7…` → 매장 Sohae 약국, 약국 유형) JWT Bearer.
+- **실측 결과 (프로덕션 `o4o-core-api`)**:
+
+| 호출 | HTTP | success | data | pagination |
+|------|:----:|:-------:|:----:|-----------|
+| operator `templates?page=1&limit=20` | 200 | true | 0 | `{page:1,limit:20,total:0,totalPages:1}` |
+| supplier `supplier-templates?page=1&limit=20` | 200 | true | 0 | `{page:1,limit:20,total:0,totalPages:1}` |
+| operator `limit=500` (클램프) | 200 | true | 0 | `limit:100` (100 상한 적용) |
+| supplier `limit=500` (클램프) | 200 | true | 0 | `limit:100` |
+| operator `page=999` (범위초과) | 200 | true | 0 | `page:999,totalPages:1` (에러 없음) |
+| operator `limit=0` (하한) | 200 | true | 0 | `limit:20` (기본값) |
+| operator `q=zzznotexist` | 200 | true | 0 | 정상 |
+| operator `templateKey=some-key` | 200 | true | 0 | 정상 |
+
+- **판정**: 응답 구조(`success`+`data` 배열+`pagination` 메타) · `total` · limit 클램프(≤100) · 범위초과 page 방어 · 필터 무해성 모두 확인. **HTTP 4xx/5xx 0건.**
+- **빈 상태**: 현행 프로덕션에 운영자·공급자 게시 원본 **0건**(`total:0`). `totalPages:1` → 프론트 `{totalPages > 1 && <Pagination/>}` 조건상 Pagination 미노출이 정상. 빈 상태·미노출 계약 확인. **§11 지침대로 테스트 원본 생성하지 않음.**
 
 ### 데이터 부재로 미실증 가능 항목
 
-- 실제 다중 페이지 이동(원본 201+ 필요) — 현행 데이터량 미확인. 배포 후 API `total` 로 판단.
+- 실제 다중 페이지 이동(원본 201+ 필요) — 프로덕션 원본 0건이라 실증 불가. API `total=0` 로 확정.
+- 프론트 `/store-hub/screen-set` 브라우저 DOM 렌더(운영자/공급자 탭·검색 입력·Pagination 노출) — 프로필 락으로 이번엔 API 계약 검증으로 대체. 프론트 변경은 isolated typecheck PASS + 검증된 `HubVideoLibraryPage` 페이지네이션 패턴 복제로 렌더 리스크 낮음. 데이터 유입 후(원본 21+ 게시 시) 브라우저 페이지 이동 실증 권장.
 
 ---
 
@@ -187,7 +202,7 @@ naive DB `COUNT/OFFSET` 은 비약국 노출수와 **안전히 일치하지 않�
 - [x] KPA 외 서비스 변경 0
 - [x] DB migration 0
 - [x] typecheck(변경 파일) PASS
-- [ ] 배포 및 smoke — 별도 기록
+- [x] 배포 및 smoke — API 직접 호출 실증(프로덕션, 상단 표). 브라우저 DOM 렌더는 프로필 락으로 데이터 유입 후 권장
 - [x] CHECK commit/push
 
 ---
