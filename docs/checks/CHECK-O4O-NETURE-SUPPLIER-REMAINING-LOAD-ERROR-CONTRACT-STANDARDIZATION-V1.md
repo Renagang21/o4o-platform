@@ -51,7 +51,31 @@ AdminSupplierApprovalPage, SupplierQualityPage, RegulatedCategoriesModal, CsvImp
 - `pnpm --filter @o4o/web-neture exec tsc --noEmit -p tsconfig.json` → PASS (에러 0)
 - `pnpm --filter @o4o/web-neture build` → PASS (built in ~13s)
 
-## 7. 프로덕션 smoke
+## 7. 배포 & 프로덕션 검증
 
-(배포 후 실브라우저 합성 오류 주입: HTTP 500 / network reject / 응답 shape 오류 /
-정상 0건 / 재시도 후 성공 — 결과는 배포 완료 시 기록)
+- CI "Deploy Web Services (Cloud Run)" → deploy-neture **success** (2m15s, commit 53e2e7fcc)
+- neture-web URL: https://neture-web-3e3aws7zqa-du.a.run.app
+
+### 7-1. 실브라우저 합성 오류 smoke — BLOCKED
+
+Playwright 자동화 브라우저가 공유 프로파일(`C:\Users\home\.playwright-o4o-profile`)을
+다른 동시 세션의 Chrome 인스턴스가 점유 중이어서 기동 실패(즉시 exit). 동시 세션 작업을
+훼손하지 않기 위해 해당 Chrome 프로세스를 강제 종료하지 않음. → **대화형 오류 주입 smoke 보류.**
+
+### 7-2. 프로덕션 배포 산출물 검증 (대체 채널 — CLAUDE.md §8 코드 경로 정적 분석 + API 직접 호출)
+
+배포된 프로덕션 번들(chunk)을 직접 fetch 하여 각 화면의 신규 오류계약 문자열이
+실제 LIVE 상태임을 확인. 8/8 화면 PASS:
+
+| 화면 | 프로덕션 chunk | 확인된 신규 문자열 |
+|------|----------------|-------------------|
+| StoreDescriptionsPage + EditorDrawer | SupplierStoreDescriptionsPage-DU2tTIc1.js | "설명서를 불러오지 못했습니다" / "기존 작업 내용을 덮어쓰지 않도록 편집기를 열지 않았습니다" / "다시 시도" |
+| EventOfferPage | SupplierEventOfferPage-On8w60kN.js | "상품을 불러오지 못했습니다" / "현황을 불러오지 못했습니다" / "다시 시도" |
+| ProductLibraryPage | SupplierProductLibraryPage-8pT3OubQ.js | "상품을 검색하지 못했습니다" / "카테고리 목록을 불러오지 못했습니다" / "브랜드 목록을 불러오지 못했습니다" / "다시 시도" |
+| ProductCreatePage | SupplierProductCreatePage-BSwoh7I9.js | "카테고리 목록을 불러오지 못했습니다" / "바코드 조회에 실패" / "다시 시도" |
+| TrialListPage | index-Dj3hUNkt.js | "목록을 불러오지 못했습니다" / "다시 시도" |
+| TrialDetailPage | index-wDEQXHi7.js | "접근 권한이 없습니다"(403) / "유통참여형 펀딩을 찾을 수 없습니다"(404) / "결과를 불러오지 못했습니다"(else) / "다시 시도" |
+| TrialEditPage | index-wDEQXHi7.js | "유통참여형 펀딩을 불러오지 못했습니다" / "초안 상태의 유통참여형 펀딩만 수정" / "다시 시도" |
+
+정적 검증(tsc/build) + 배포 성공 + 번들 문자열 확인으로 계약 반영을 확인. 대화형 합성
+오류 주입 smoke 는 브라우저 프로파일 점유 해제 후 후속 수행 권장.
