@@ -3,7 +3,7 @@ import type { DataSource } from 'typeorm';
 import { ProductAiTaggingService } from '../services/product-ai-tagging.service.js';
 import type { ProductTagInput } from '../services/product-ai-tagging.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
-import { verifyProductOrgAccess } from '../utils/product-access.utils.js';
+import { verifyProductOrgAccess, productMasterExists } from '../utils/product-access.utils.js';
 
 /**
  * Product AI Tag Controller — WO-O4O-PRODUCT-AI-TAGGING-V1
@@ -13,10 +13,17 @@ import { verifyProductOrgAccess } from '../utils/product-access.utils.js';
  * POST   /:productId/ai-tags/manual       — 수동 태그 추가
  * DELETE /:productId/ai-tags/:tagId       — 태그 삭제
  *
- * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1:
- *   모든 endpoint에 organization ownership 검증 추가.
- *   자기 org product 만 AI tag 조회/재생성 가능.
- *   canonical source: organization_product_listings → supplier_product_offers.master_id
+ * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1: 모든 endpoint 에 접근 검증 추가.
+ *
+ * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1:
+ *   :productId 는 product_masters.id 전용이며, product_ai_tags 는 organization 소유가 아닌
+ *   **전역 자원**이다 (매장 사용자 쓰기 금지). 쓰기는 syncMasterTags() 를 통해
+ *   product_masters.tags 를 갱신하므로 잘못된 productId 는 전역 마스터를 오염시킨다.
+ *   §8.1/§9 ID 계약(productMasterExists → 404 PRODUCT_MASTER_NOT_FOUND)은 수동 태그 쓰기 경로에 적용됨.
+ *
+ *   ⚠ 접근 판정(verifyProductOrgAccess)은 ai-contents 와 동일하게 계약과 미정렬 상태이며
+ *     현재 모든 주체가 403 이다. 재설계는 ProductMaster 의 service scope 판정이 선행되어야 하며
+ *     중지 상태다. CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 참조.
  */
 export function createProductAiTagRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -137,6 +144,17 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
         return;
       }
 
+      // WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 §8.1:
+      // productId 는 ProductMaster ID 전용. 잘못된 ID 는 고아 태그 + product_masters.tags 오염을 만든다.
+      if (!(await productMasterExists(dataSource, productId))) {
+        res.status(404).json({
+          success: false,
+          error: 'Product master not found',
+          code: 'PRODUCT_MASTER_NOT_FOUND',
+        });
+        return;
+      }
+
       const { tag } = req.body;
 
       if (!tag || typeof tag !== 'string' || tag.trim().length === 0) {
@@ -161,6 +179,16 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
+        return;
+      }
+
+      // WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 §8.1
+      if (!(await productMasterExists(dataSource, productId))) {
+        res.status(404).json({
+          success: false,
+          error: 'Product master not found',
+          code: 'PRODUCT_MASTER_NOT_FOUND',
+        });
         return;
       }
 

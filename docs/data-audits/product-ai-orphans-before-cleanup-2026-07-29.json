@@ -1,0 +1,129 @@
+{
+  "generatedAt": "2026-07-29",
+  "wo": "WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1",
+  "purpose": "FK 적용 전 고아 행 원문 보존 (DELETE 미실행 · 승인 대기)",
+  "orphanProductIds": [
+    "fee036a0-29d2-4696-9ad6-f46b9ab3e76a",
+    "a8655c54-57a1-476c-a37a-66f694044e3d",
+    "05f8fa2f-dfef-4f79-b3e7-7bc4a10dc9bb"
+  ],
+  "orphanProductIdsFoundInStoreLocalProducts": [],
+  "productAiContents": {
+    "count": 3,
+    "rows": [
+      {
+        "id": "2010e1af-5fc9-4d59-989e-0a540e9afdfa",
+        "product_id": "fee036a0-29d2-4696-9ad6-f46b9ab3e76a",
+        "content_type": "pop_short",
+        "content": "<p>롯데 자일리톨 껌 — 충치 예방을 위한 무설탕 자일리톨 성분 함유 제품입니다.</p>",
+        "model": null,
+        "created_at": "2026-05-08T00:12:06.110Z",
+        "updated_at": "2026-05-08T00:12:06.110Z"
+      },
+      {
+        "id": "6f4804e6-dff8-4c8c-9a12-7d2c73ba0899",
+        "product_id": "fee036a0-29d2-4696-9ad6-f46b9ab3e76a",
+        "content_type": "pop_long",
+        "content": "<p>롯데 자일리톨 껌 — 충치 예방을 위한 무설탕 자일리톨 성분 함유 제품입니다.</p>",
+        "model": null,
+        "created_at": "2026-05-08T00:12:06.111Z",
+        "updated_at": "2026-05-08T00:12:06.111Z"
+      },
+      {
+        "id": "b60791db-5d29-4e3e-a642-1c8fca632916",
+        "product_id": "fee036a0-29d2-4696-9ad6-f46b9ab3e76a",
+        "content_type": "product_description",
+        "content": "<p>롯데 자일리톨 껌 — 충치 예방을 위한 무설탕 자일리톨 성분 함유 제품입니다.</p>",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-05-07T06:29:06.087Z",
+        "updated_at": "2026-05-07T06:29:06.087Z"
+      }
+    ]
+  },
+  "productAiTags": {
+    "count": 9,
+    "rows": [
+      {
+        "id": "2ca56bde-3b48-40d1-9801-a0f99c9c922c",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "글루코멘토",
+        "confidence": "0.95",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      },
+      {
+        "id": "54f42a8b-c86e-4ad3-9c39-711f8cebf1bc",
+        "product_id": "05f8fa2f-dfef-4f79-b3e7-7bc4a10dc9bb",
+        "tag": "피로회복",
+        "confidence": "0.80",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:23:57.499Z"
+      },
+      {
+        "id": "583a2b05-2aff-471d-9ea4-d2e19cc78fff",
+        "product_id": "05f8fa2f-dfef-4f79-b3e7-7bc4a10dc9bb",
+        "tag": "액상",
+        "confidence": "0.95",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:23:57.499Z"
+      },
+      {
+        "id": "79d327eb-b307-4f7b-affd-f7d6427690dd",
+        "product_id": "05f8fa2f-dfef-4f79-b3e7-7bc4a10dc9bb",
+        "tag": "뼈건강",
+        "confidence": "0.85",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:23:57.499Z"
+      },
+      {
+        "id": "7d28440b-5e4d-41a3-ba25-8ae68ff24464",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "의료기기",
+        "confidence": "0.90",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      },
+      {
+        "id": "842f57a6-558b-4545-9e6c-81ba6255fa16",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "혈당관리",
+        "confidence": "0.98",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      },
+      {
+        "id": "a34d4baf-5d7c-4564-b8ad-023af0fd4994",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "혈당측정",
+        "confidence": "0.98",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      },
+      {
+        "id": "b8aa408b-a3b6-4021-be2d-fd8a1d5f06b6",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "혈당기",
+        "confidence": "0.99",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      },
+      {
+        "id": "cd747e37-5af8-44f1-8068-9b3f4b97b468",
+        "product_id": "a8655c54-57a1-476c-a37a-66f694044e3d",
+        "tag": "당뇨관리",
+        "confidence": "0.95",
+        "source": "ai",
+        "model": "gemini-2.5-flash",
+        "created_at": "2026-03-29T04:24:25.730Z"
+      }
+    ]
+  }
+}
