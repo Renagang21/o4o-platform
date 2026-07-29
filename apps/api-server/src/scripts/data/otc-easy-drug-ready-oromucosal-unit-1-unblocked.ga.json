@@ -1,0 +1,38 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "ga",
+  "recordType": "next-unit-state",
+  "unit": "oromucosal-unit-1",
+  "route": "oromucosal",
+  "status": "UNBLOCKED",
+  "masterCount": 14,
+  "contentFp": 2,
+  "writePlan": { "perMaster": 6, "ko_4T": 56, "en_2T": 28, "total": 84 },
+  "unblockedBy": "ophthalmic-unit-1 GREEN (1,518T LIVE · 독립검증 fails 0)",
+  "currentDbState": {
+    "easyCanonical": 14,
+    "koAuthoredCanonical": 0,
+    "enAuthoredCanonical": 0,
+    "easyDeprecated": 0,
+    "thisTrackWrite": 0,
+    "note": "미착수(fresh) 실측 확인 — ophthalmic LIVE apply 로 인한 write 0"
+  },
+  "readiness": {
+    "status": "PRE_APPLY_READY",
+    "readinessCommit": "bb2e79a22",
+    "runner": "otc-v3-topical-oromucosal-apply.na.ts (agent-na 소유)"
+  },
+  "prerequisitesForProduction": [
+    "apply 러너 PRODUCTION_WO_BY_UNIT 화이트리스트에 oromucosal-unit-1 승인 WO 등재",
+    "per-unit·per-lang confirm env",
+    "선행 게이트: oral 540 COMPLETE · topical 327 GREEN · ophthalmic 253 GREEN · oromucosal 미착수"
+  ],
+  "note": "UNBLOCKED = 선행 unit 의존 해소. 그 자체로 LIVE apply 승인은 아니며 별도 production WO 필요.",
+  "routeLedgerState": {
+    "oral": "COMPLETE (540 master · 3,240T)",
+    "topical": "COMPLETE (327 master · 1,962T)",
+    "ophthalmic": "COMPLETE (253 master · 1,518T)",
+    "oromucosal": "UNBLOCKED / PRE_APPLY_READY (14 master · 84T · 미착수)"
+  },
+  "trackProgress": { "masterDone": 1120, "masterTotal": 1134, "writeDone": 6720, "writeTotal": 6804, "remaining": "oromucosal-unit-1 14 master · 84T" }
+}

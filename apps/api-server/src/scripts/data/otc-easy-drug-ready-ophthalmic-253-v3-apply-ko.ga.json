@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "productionWo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "unit": "ophthalmic-unit-1",
+  "route": "ophthalmic",
+  "mode": "APPLY",
+  "lang": "ko",
+  "startedAt": "2026-07-29T05:44:20.722Z",
+  "fpCount": 26,
+  "masterCount": 253,
+  "writeActual": 1012,
+  "writeExpected": 1012,
+  "match": true,
+  "postVerify": {
+    "authored_ko": 253,
+    "easy_deprecated": 253,
+    "easy_left": 0,
+    "audit": 253,
+    "en_canon": 0,
+    "ref_scope": 253,
+    "ref_leak": 0,
+    "canonical_dup": 0
+  },
+  "postVerifyFails": [],
+  "committed": true,
+  "pass": true
+}

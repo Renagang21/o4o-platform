@@ -33,6 +33,15 @@ const OFFICIAL_SRC = path.join(DATA_DIR, 'otc-easy-drug-ready-ophthalmic-253-v3-
 const GATE1 = 'OPHTHALMIC-UNIT-1-CONTENT-FP-V3';
 const GATE2 = 'I-UNDERSTAND-LIVE-WRITE';
 
+// ── LIVE apply 승인(production) WO — unit 화이트리스트 ────────────────────────────────
+// audit metadata.wo 는 rollback-test 검증본 VERBATIM 유지(원장 대조축 불변). 실행 WO 는 productionWo 로 병기한다
+// (na 형제 러너 규약과 동일). 승인 WO 가 등재된 unit 만 LIVE apply 가능하며, 그 외는 강제중지한다.
+const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
+  'ophthalmic-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+};
+const UNIT = 'ophthalmic-unit-1';
+const PRODUCTION_WO = PRODUCTION_WO_BY_UNIT[UNIT];
+
 type OfficialFp = { fp: string; gencode: string; officialSectionsRaw: Record<string, string> };
 
 interface PlanFp {
@@ -270,7 +279,8 @@ async function applyKoTx(client: any, p: PlanFp, html: string): Promise<number> 
           previous_status, new_status, metadata, performed_at)
        VALUES ('canonical_replaced','STORE',$1::uuid,'ko',$2::uuid,$3::uuid,'canonical','canonical',$4::jsonb, now())`,
       [mid, easyId, newId, JSON.stringify({ previousDemotedTo: 'deprecated', previousSource: 'mfds_easy_drug',
-        newSource: AUTHORED_SOURCE_V3, source_ref_id: sourceRef, fp: p.fp, gencode: p.gencode, route: p.route, wo: WO })]);
+        newSource: AUTHORED_SOURCE_V3, source_ref_id: sourceRef, fp: p.fp, gencode: p.gencode, route: p.route,
+        wo: WO, productionWo: PRODUCTION_WO })]);
     t++;
   }
   return t;
@@ -308,14 +318,161 @@ async function applyEnTx(client: any, p: PlanFp, html: string): Promise<number> 
   return t;
 }
 
-// ── LIVE apply (이중 게이트 · 본 WO 미실행) ─────────────────────────────────────────
+// ── TX 내 사후검증 (commit 전) ────────────────────────────────────────────────────
+/** KO 사후검증 — authored ko canonical / easy deprecated / easy 잔존 / audit / EN 미변경 / sourceRef 격리 / dup. */
+async function postVerifyKoTx(client: any, ids: string[], refs: string[]): Promise<{ report: Record<string, number>; fails: string[] }> {
+  const T = ids.length;
+  const r = (await client.query(`
+    SELECT
+      (SELECT count(*) FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s
+         WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE'
+           AND COALESCE(s.language,'ko')='ko' AND s.source_type=$3 AND s.deleted_at IS NULL))::int authored_ko,
+      (SELECT count(*) FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s
+         WHERE s.master_id=mid AND s.status='deprecated' AND s.source_type='mfds_easy_drug'
+           AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL))::int easy_deprecated,
+      (SELECT count(*) FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s
+         WHERE s.master_id=mid AND s.status='canonical' AND s.source_type='mfds_easy_drug'
+           AND s.description_type='STORE' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL))::int easy_left,
+      (SELECT count(*) FROM shared_product_description_audit_logs WHERE master_id=ANY($1::uuid[])
+         AND event_type='canonical_replaced' AND language='ko' AND metadata->>'productionWo'=$4)::int audit,
+      (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+         AND status='canonical' AND language='en' AND deleted_at IS NULL)::int en_canon,
+      (SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE source_ref_id=ANY($2::uuid[])
+         AND status='canonical' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL)::int ref_scope,
+      (SELECT count(*) FROM shared_product_descriptions WHERE source_ref_id=ANY($2::uuid[]) AND deleted_at IS NULL
+         AND NOT master_id=ANY($1::uuid[]))::int ref_leak,
+      (SELECT count(*) FROM (SELECT master_id, COALESCE(language,'ko') lang FROM shared_product_descriptions
+         WHERE master_id=ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND deleted_at IS NULL
+         GROUP BY 1,2 HAVING count(*)>1) d)::int canonical_dup
+  `, [ids, refs, AUTHORED_SOURCE_V3, PRODUCTION_WO])).rows[0];
+  const fails: string[] = [];
+  if (r.authored_ko !== T) fails.push(`authored KO canonical=${r.authored_ko}!=${T}`);
+  if (r.easy_deprecated !== T) fails.push(`easy deprecated=${r.easy_deprecated}!=${T}`);
+  if (r.easy_left !== 0) fails.push(`easy canonical 잔존=${r.easy_left}`);
+  if (r.audit !== T) fails.push(`audit=${r.audit}!=${T}`);
+  if (r.en_canon !== 0) fails.push(`EN canonical=${r.en_canon}!=0 (KO 단계에서 EN 변경 금지)`);
+  if (r.ref_scope !== T) fails.push(`V3 sourceRef scope=${r.ref_scope}!=${T}`);
+  if (r.ref_leak !== 0) fails.push(`sourceRef leak=${r.ref_leak}`);
+  if (r.canonical_dup !== 0) fails.push(`canonicalDup=${r.canonical_dup}`);
+  return { report: r, fails };
+}
+
+/** EN 사후검증 — en canonical / dup / sourceRef 격리. */
+async function postVerifyEnTx(client: any, ids: string[], refs: string[]): Promise<{ report: Record<string, number>; fails: string[] }> {
+  const T = ids.length;
+  const r = (await client.query(`
+    SELECT
+      (SELECT count(*) FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s
+         WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE'
+           AND s.language='en' AND s.source_type=$3 AND s.deleted_at IS NULL))::int en_authored,
+      (SELECT count(*) FROM (SELECT master_id FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[])
+         AND description_type='STORE' AND status='canonical' AND language='en' AND deleted_at IS NULL
+         GROUP BY 1 HAVING count(*)>1) d)::int en_dup,
+      (SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE source_ref_id=ANY($2::uuid[])
+         AND status='canonical' AND language='en' AND deleted_at IS NULL)::int ref_scope,
+      (SELECT count(*) FROM shared_product_descriptions WHERE source_ref_id=ANY($2::uuid[]) AND language='en'
+         AND deleted_at IS NULL AND NOT master_id=ANY($1::uuid[]))::int ref_leak,
+      (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND language='en'
+         AND status='canonical' AND source_type=$3 AND description_type='STORE' AND deleted_at IS NULL
+         AND content ~ '[가-힣]')::int en_hangul
+  `, [ids, refs, AUTHORED_SOURCE_V3])).rows[0];
+  const fails: string[] = [];
+  if (r.en_authored !== T) fails.push(`EN authored canonical=${r.en_authored}!=${T}`);
+  if (r.en_dup !== 0) fails.push(`EN canonicalDup=${r.en_dup}`);
+  if (r.ref_scope !== T) fails.push(`EN sourceRef scope=${r.ref_scope}!=${T}`);
+  if (r.ref_leak !== 0) fails.push(`EN sourceRef leak=${r.ref_leak}`);
+  if (r.en_hangul !== 0) fails.push(`EN 한글 잔존 행=${r.en_hangul}`);
+  return { report: r, fails };
+}
+
+// ── LIVE apply (승인 WO 화이트리스트 + 이중 게이트 + per-lang confirm env) ─────────────
+/**
+ * 승인 WO = WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1.
+ * 4중 게이트: --apply --lang ko|en + V3_APPLY_GATE1/GATE2 + per-lang confirm env
+ *             (V3_APPLY_KO_OPHTHALMIC_UNIT_1 / V3_APPLY_EN_OPHTHALMIC_UNIT_1 = CONFIRM)
+ *             + preflight blockers 0(KO 단계에 한함 — EN 은 KO 승격 후이므로 KO 슬롯 게이트가 반전된다).
+ * write SQL 은 rollback-test 가 검증한 applyKoTx/applyEnTx 를 **동일 함수로 공유**(계약 이탈 0).
+ * lang 단위 **단일 트랜잭션** — TX 내 사후검증 통과 시에만 COMMIT, 1건이라도 실패하면 전량 ROLLBACK.
+ */
 async function apply(): Promise<void> {
+  const lang = (process.argv[process.argv.indexOf('--lang') + 1] || '') as 'ko' | 'en';
+  if (!PRODUCTION_WO) throw new Error(`STOP: unit ${UNIT} 은 승인 WO 없음 — LIVE apply 금지`);
+  if (lang !== 'ko' && lang !== 'en') throw new Error('STOP: LIVE apply 는 --lang ko|en 필수 (KO 선행 → EN)');
   if (process.env.V3_APPLY_GATE1 !== GATE1 || process.env.V3_APPLY_GATE2 !== GATE2) {
-    throw new Error('LOCKED: --apply 는 이중 게이트(V3_APPLY_GATE1 · V3_APPLY_GATE2) 필요. 본 WO 는 PRE_APPLY READY 까지만.');
+    throw new Error('LOCKED: --apply 는 이중 게이트(V3_APPLY_GATE1 · V3_APPLY_GATE2) 필요.');
   }
-  const { blockers } = await preflight();
-  if (blockers.length) throw new Error(`LOCKED: preflight blockers 존재 → ${blockers.join(', ')}`);
-  throw new Error('LOCKED: LIVE apply 는 본 WO 범위 밖. 별도 승인 WO 에서만 실행.');
+  const tok = `V3_APPLY_${lang.toUpperCase()}_${UNIT.replace(/-/g, '_').toUpperCase()}`;
+  if (process.env[tok] !== 'CONFIRM') throw new Error(`LOCKED: per-lang confirm env(${tok}=CONFIRM) 미설정 — LIVE apply 금지`);
+
+  if (lang === 'ko') {
+    const { blockers } = await preflight();
+    if (blockers.length) throw new Error(`LOCKED: preflight blockers 존재 → ${blockers.join(', ')}`);
+  }
+
+  const { plan, htmlByFp } = buildPlan();
+  const unit = loadOphthalmicUnit();
+  const ids = unit.allMasterIds;
+  const refs = plan.map((p) => p.sourceRef);
+  const T = unit.masterCount;
+  const expected = lang === 'ko' ? T * 4 : T * 2;
+
+  const db = await connect();
+  const client = await db.pool.connect();
+  const started = new Date().toISOString();
+  let committed = false;
+  let written = 0;
+  let post: { report: Record<string, number>; fails: string[] } = { report: {}, fails: [] };
+  try {
+    if (lang === 'en') {
+      // EN 선행조건: KO authored canonical 전건 성립 + V3 sourceRef 앵커 26/26 일치
+      const pre = (await client.query(`
+        SELECT
+          (SELECT count(*) FROM unnest($1::uuid[]) mid WHERE EXISTS(SELECT 1 FROM shared_product_descriptions s
+             WHERE s.master_id=mid AND s.status='canonical' AND s.description_type='STORE'
+               AND COALESCE(s.language,'ko')='ko' AND s.source_type=$3 AND s.deleted_at IS NULL))::int ko_canon,
+          (SELECT count(DISTINCT source_ref_id) FROM shared_product_descriptions WHERE source_ref_id=ANY($2::uuid[])
+             AND status='canonical' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL)::int ref_anchor,
+          (SELECT count(*) FROM shared_product_descriptions WHERE master_id=ANY($1::uuid[]) AND description_type='STORE'
+             AND status='canonical' AND language='en' AND deleted_at IS NULL)::int en_existing
+      `, [ids, refs, AUTHORED_SOURCE_V3])).rows[0];
+      if (pre.ko_canon !== T) throw new Error(`STOP: EN 선행조건 미충족 — KO authored canonical ${pre.ko_canon}!=${T}`);
+      if (pre.ref_anchor !== refs.length) throw new Error(`STOP: V3 sourceRef 앵커 ${pre.ref_anchor}!=${refs.length}`);
+      if (pre.en_existing !== 0) throw new Error(`STOP: 기존 EN canonical ${pre.en_existing}!=0`);
+      console.log(`EN 선행조건 OK — koAuthoredCanonical=${pre.ko_canon} · sourceRef 앵커 ${pre.ref_anchor}/${refs.length} · 기존 EN canonical 0`);
+    }
+
+    await client.query('BEGIN');
+    for (const p of plan) {
+      const html = htmlByFp.get(p.fp)!;
+      written += lang === 'ko' ? await applyKoTx(client, p, html.ko) : await applyEnTx(client, p, html.en);
+    }
+    if (written !== expected) throw new Error(`STOP: writeActual ${written} != 예상 ${expected}`);
+
+    post = lang === 'ko' ? await postVerifyKoTx(client, ids, refs) : await postVerifyEnTx(client, ids, refs);
+    if (post.fails.length) throw new Error(`STOP: ${lang.toUpperCase()} 사후검증 실패 → ${post.fails.join(' | ')}`);
+
+    await client.query('COMMIT');
+    committed = true;
+  } catch (e) {
+    try { await client.query('ROLLBACK'); } catch { /* already rolled back */ }
+    client.release();
+    await db.destroy();
+    throw e;
+  }
+  client.release();
+  await db.destroy();
+
+  const report = {
+    wo: WO, productionWo: PRODUCTION_WO, unit: UNIT, route: 'ophthalmic', mode: 'APPLY', lang,
+    startedAt: started, fpCount: plan.length, masterCount: T,
+    writeActual: written, writeExpected: expected, match: written === expected,
+    postVerify: post.report, postVerifyFails: post.fails, committed, pass: committed && post.fails.length === 0,
+  };
+  fs.writeFileSync(
+    path.join(DATA_DIR, `otc-easy-drug-ready-ophthalmic-253-v3-apply-${lang}.ga.json`),
+    JSON.stringify(report, null, 2) + '\n');
+  console.log(JSON.stringify(report, null, 2));
+  console.log(`\n=== ${UNIT} APPLY ${lang.toUpperCase()} COMMIT — fp ${plan.length} · master ${T} · write ${written}/${expected} · postVerify fails ${post.fails.length} ===`);
 }
 
 // ── main ──────────────────────────────────────────────────────────────────────────

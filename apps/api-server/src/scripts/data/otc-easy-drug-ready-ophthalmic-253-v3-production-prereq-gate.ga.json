@@ -1,0 +1,65 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "ga",
+  "mode": "production-prereq-gate",
+  "liveDbWrite": false,
+  "pass": true,
+  "failCount": 0,
+  "fails": [],
+  "detail": {
+    "P1_oral": {
+      "ko_authored": 540,
+      "en_authored": 540,
+      "easy_deprecated": 540,
+      "easy_canonical": 0,
+      "this_wo_audit": 0,
+      "canonical_dup": 0
+    },
+    "P2_topical": {
+      "ko_authored": 327,
+      "en_authored": 327,
+      "easy_deprecated": 327,
+      "easy_canonical": 0,
+      "this_wo_audit": 0,
+      "canonical_dup": 0
+    },
+    "P3_readiness": {
+      "manifestMd5": "4ded10109bc96bb6ff57097f5131c7fc",
+      "expected": "4ded10109bc96bb6ff57097f5131c7fc",
+      "preApplyStatus": "PRE_APPLY_READY",
+      "writePlan": {
+        "perMaster": 6,
+        "ko_4T": 1012,
+        "en_2T": 506,
+        "total": 1518
+      }
+    },
+    "P4_P8_ophthalmic": {
+      "ko_authored": 0,
+      "en_authored": 0,
+      "easy_deprecated": 0,
+      "easy_canonical": 253,
+      "this_wo_audit": 0,
+      "canonical_dup": 0
+    },
+    "P7_v3SourceRefConflict": 0,
+    "P9_oromucosal": {
+      "ko_authored": 0,
+      "en_authored": 0,
+      "easy_deprecated": 0,
+      "easy_canonical": 14,
+      "this_wo_audit": 0,
+      "canonical_dup": 0
+    },
+    "P10_approval": {
+      "status": "APPROVED_FOR_PRODUCTION",
+      "totals": {
+        "fp": 214,
+        "masters": 1134,
+        "units": 5
+      },
+      "ophFp": 26,
+      "ophMasters": 253
+    }
+  }
+}

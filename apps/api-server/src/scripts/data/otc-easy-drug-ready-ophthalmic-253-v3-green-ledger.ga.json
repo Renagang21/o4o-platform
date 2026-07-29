@@ -1,0 +1,112 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "ga",
+  "role": "single DB write-owner",
+  "unit": "ophthalmic-unit-1",
+  "route": "ophthalmic",
+  "status": "GREEN",
+  "readinessWo": "WO-O4O-OTC-EASY-DRUG-READY-OPHTHALMIC-253-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "basis": {
+    "approvalSsotCommit": "00851d237",
+    "approvalStatus": "APPROVED_FOR_PRODUCTION",
+    "readinessCommit": "4e062dcc2",
+    "oralRouteCompleteCommit": "3f200900a",
+    "topicalGreenCommit": "196c5de65"
+  },
+  "target": { "masterCount": 253, "contentFp": 26 },
+  "hashInvariance": {
+    "dryRunManifestMd5": "4ded10109bc96bb6ff57097f5131c7fc",
+    "matchesReadinessLedger": true,
+    "readinessArtifactsUnchanged": true,
+    "approvalSsotAndUnitLedgerUnchanged": true
+  },
+  "prereqGate": {
+    "runner": "otc-v3-ophthalmic-production-prereq-gate.ga.ts",
+    "gates": 10,
+    "pass": true,
+    "failCount": 0,
+    "detail": {
+      "P1_oralComplete": { "ko": 540, "en": 540, "easyDeprecated": 540, "easyCanonical": 0 },
+      "P2_topicalGreen": { "ko": 327, "en": 327, "easyDeprecated": 327, "easyCanonical": 0 },
+      "P3_readinessDigestUnchanged": true,
+      "P4_otherSessionLiveWrite": 0,
+      "P5_existingAuthoredCanonical": { "ko": 0, "en": 0 },
+      "P6_easyKoCanonical": 253,
+      "P7_v3SourceRefConflict": 0,
+      "P8_canonicalDup": 0,
+      "P9_oromucosalWrite": 0,
+      "P10_approvalSsot": "APPROVED_FOR_PRODUCTION · ledger 214fp/1134master 불변"
+    }
+  },
+  "rollbackTest": {
+    "note": "apply 화이트리스트 해제 코드 변경 후 재실행 — LIVE apply 와 동일한 applyKoTx/applyEnTx 공유 상태에서 재입증",
+    "koWriteInTx": 1012,
+    "enWriteInTx": 506,
+    "netZero": true,
+    "before": { "spd_all": 253, "ko_canon": 253, "en_canon": 0, "audit": 0 },
+    "after": { "spd_all": 253, "ko_canon": 253, "en_canon": 0, "audit": 0 }
+  },
+  "apply": {
+    "gates": "--apply --lang + V3_APPLY_GATE1/GATE2 + per-lang confirm env + PRODUCTION_WO_BY_UNIT 화이트리스트 + preflight blockers 0",
+    "ko": { "fp": 26, "master": 253, "written": 1012, "expected": 1012, "committed": true, "postVerifyFails": 0 },
+    "en": { "fp": 26, "master": 253, "written": 506, "expected": 506, "committed": true, "postVerifyFails": 0 },
+    "totalWritten": 1518,
+    "expectedTotal": 1518,
+    "match": true,
+    "transaction": "lang 단위 단일 트랜잭션 · TX 내 사후검증 통과 시에만 COMMIT"
+  },
+  "postVerify": {
+    "ko": { "authoredKoCanonical": 253, "easyDeprecated": 253, "easyCanonicalLeft": 0, "audit": 253, "enCanonical": 0, "sourceRefScope": 253, "sourceRefLeak": 0, "canonicalDup": 0 },
+    "en": { "enAuthoredCanonical": 253, "enCanonicalDup": 0, "sourceRefScope": 253, "sourceRefLeak": 0, "enHangul": 0 }
+  },
+  "independentVerify": {
+    "runner": "otc-v3-ophthalmic-track-verify.ga.ts",
+    "pass": true,
+    "failCount": 0,
+    "targetMasters": 253,
+    "contentFp": 26,
+    "koAuthoredCanonical": 253,
+    "enCanonical": 253,
+    "easyDeprecated": 253,
+    "easyStillCanonical": 0,
+    "auditKo": 253,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "storedContentHashMismatch": 0,
+    "officialSixSectionsMismatch": 0,
+    "enHangul": 0,
+    "nonOphthalmicWritten": 0,
+    "measuredWrite": 1518
+  },
+  "ophthalmicAxis": {
+    "koNumericPreservedFps": "26/26 (효능·효과 + 용법·용량 원문 수치 전량 잔존 — 점안 횟수·방울 수·간격·기간·연령 포함)",
+    "koSafetyHeadingFps": "26/26 (경고·사용상 주의사항·이상반응·상호작용 공식 헤딩 보존)",
+    "enDropCountFps": "26/26 (missingDropCountsEn 누락 0 — '방울/적' 양쪽 인식)",
+    "enEyeSideFps": "26/26 통과 · 단 원문이 한쪽/양쪽을 명시한 fp = 0 (요구축 없음 → 공허 통과. 원문에 없는 표현을 EN 에 창작하지 않음)",
+    "enEyeCautionFps": "26/26 (요구 fp 26/26 — 콘택트렌즈·용기 끝 접촉·타 점안제 간격 중 원문에 있는 축 전량 보존)",
+    "judgmentAxisNote": "요구축 = 공식 원문에 존재하는 축만. 원문에 없는 주의를 EN 에 창작 삽입하는 것은 콘텐츠 정책 위반이므로 무조건 요구는 오판정"
+  },
+  "scopePostCheck": {
+    "oral_540_unchanged": { "ko": 540, "en": 540 },
+    "topical_327_unchanged": { "ko": 327, "en": 327 },
+    "oromucosal_14_write": 0,
+    "oromucosal_easyCanonical": 14,
+    "v1v2LiveUnchanged": { "thisWoAuditOutsideTarget": 0, "v3SourceRefLeak": 0 },
+    "ophthalmicMeasuredWrite": 1518
+  },
+  "corrections": [
+    {
+      "what": "track-verify 초판이 EN 점안 주의 3축(렌즈·용기끝·간격)을 fp 전량에 무조건 요구 → 15 false fail",
+      "why": "계약(missingEyeCautionEn)은 공식 원문 주의 문언에 해당 축이 있을 때만 요구한다. 원문에 없는 주의를 EN 에 만들어 넣는 것은 금지",
+      "verdict": "검증기 판정축 오류 — 데이터 이상 아님. 계약축(원문 존재 축만 요구)으로 정정 후 26/26 PASS. 정정 전후 DB write 0"
+    }
+  ],
+  "codeChange": {
+    "file": "otc-easy-drug-ready-ophthalmic-253-v3-executor.ga.ts",
+    "what": "apply() 하드락 해제 → PRODUCTION_WO_BY_UNIT 화이트리스트 + per-lang confirm env + TX 내 사후검증 후 COMMIT",
+    "auditMetadata": "wo 는 readiness 검증본 VERBATIM 유지, 실행 WO 는 productionWo 로 병기(na 형제 러너 규약 동일)",
+    "writeSqlUnchanged": "applyKoTx/applyEnTx 무변경 — rollback-test 검증본과 동일 함수"
+  },
+  "nextUnit": { "unit": "oromucosal-unit-1", "route": "oromucosal", "masterCount": 14, "contentFp": 2, "write": 84, "status": "UNBLOCKED" },
+  "invariants": "승인 SSOT · V3 unit ledger · readiness 산출물 미수정(실행 상태만 별도 파일로 기록) · 타 unit GREEN 파일 미접촉 · pnpm-lock.yaml/.env 미접촉"
+}
