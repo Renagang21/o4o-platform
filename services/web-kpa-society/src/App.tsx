@@ -1000,7 +1000,15 @@ function App() {
             <Route path="library/production-materials/:id/edit" element={<ProductionMaterialEditorPage />} />
             {/* WO-O4O-KPA-STORE-MATERIALS-AND-PRODUCTIONS-CANONICAL-ALIGN-V1: 내 제작물 / 상품 상세설명 */}
             <Route path="marketing/product-descriptions" element={<StoreProductDescriptionsPage />} />
-            <Route path="commerce/local-products" element={<StoreLocalProductsPage />} />
+            {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: 쓰기 화면 → 소유자 전용 가드 정렬 (읽기 전용 handled-products 와 동일 기준) */}
+            <Route
+              path="commerce/local-products"
+              element={
+                <PharmacyOwnerOnlyGuard>
+                  <StoreLocalProductsPage />
+                </PharmacyOwnerOnlyGuard>
+              }
+            />
             {/* WO-O4O-KPA-STORE-PRODUCT-INFO-CREATOR-IMMEDIATE-RETIREMENT-V1: 구형 상품 정보 제작 화면 은퇴 (prod row 0). canonical "상품 상세정보" = handled-products 중심. 구 URL/북마크 대비 redirect 유지. */}
             <Route path="execution/product-info" element={<Navigate to="/store/handled-products" replace />} />
             <Route path="commerce/tablet-displays" element={<StoreTabletDisplaysPage />} />

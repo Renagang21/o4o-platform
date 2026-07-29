@@ -275,6 +275,15 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   '매장 경영활용 제품' 화면 내부(출처 탭 전체/O4O 취급/매장 자체 + 상단 관리 버튼 + 행 관리 버튼)로 흡수.
       //   route/page/API/DB 무변경 — 기능 삭제 아님, 메뉴 노출만 정리(데드링크 0, 직접 URL 접근 유지).
       //   선행 WO-O4O-KPA-STORE-PRODUCT-MENU-IA-REORG-V1(두 메뉴를 이 그룹으로 이동).
+      // WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1 (KPA 블록 한정):
+      //   위 흡수 전제(handled-products 내부 탭·등록 버튼)가 후속
+      //   WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1 에서 제거되어
+      //   store_local_products 등록·수정 진입점이 소실됨. 그러나 데이터 축은 살아 있다
+      //   (상품 설명 100% 의존 / 태블릿 product_type='local' / QR / 다국어 targetKind='local' /
+      //    handled-products UNION). 기능 은폐 0 원칙에 따라 정식 메뉴를 복원한다.
+      //   route(/store/commerce/local-products) 무변경 — 신규 route·redirect 없음.
+      //   IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md
+      { key: 'local-products', label: '매장 자체 상품', subPath: '/commerce/local-products' },
       // WO-O4O-KPA-ONLINE-SALES-ORDER-MANAGEMENT-AND-BUYER-ORDER-RELABEL-V1:
       //   /commerce/orders 는 매장이 공급자에게 주문한 '구매/발주' 내역(buyer) → '발주 내역'으로 라벨 정비.
       //   고객에게 판매한 주문(seller)은 '온라인 판매 > 주문 관리'(/online-sales/orders)로 분리.

@@ -8,9 +8,16 @@
  *
  * WO-O4O-KPA-STORE-HANDLED-PRODUCT-REMOVE-AND-STATUS-AUDIT-V1:
  *   - '매장 경영활용에서 제거' 액션 추가(1건/다건). 상품 정보 삭제가 아니라 매장↔제품 경영활용 연결 해제.
- *   - '매장 직접 등록'(store_local_products) 정책 폐기 → 등록 버튼·로컬 탭 제거. 목록은 O4O 기반 제품만.
+ *   - 이 화면에서의 '매장 직접 등록' 진입 폐기 → 등록 버튼·로컬 탭 제거. 이 화면 목록은 O4O 기반 제품만.
  *   - '승인 대기'(opl.status DEFAULT 'pending') = 유통 승인(Neture Distribution) 잔재. 이 화면엔 승인 절차
  *     없음(등록 즉시 is_active=true) → 상태 컬럼/승인 대기 표시 제거.
+ *
+ * WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1 (정책 주석 정정):
+ *   위 '정책 폐기' 표현은 이 화면의 진입 정리를 뜻하며, store_local_products 자체의 폐기가 아니다.
+ *   해당 데이터 축은 유효하다 — 상품 설명(StoreProductDescriptionsPage 100% 의존) / 태블릿
+ *   진열(product_type='local') / QR / 다국어(targetKind='local') / handled-products UNION 소스.
+ *   등록·수정 canonical 진입점 = 사이드바 '약국 상품·거래 > 매장 자체 상품'(/store/commerce/local-products).
+ *   IR: docs/investigations/IR-O4O-KPA-STORE-HIDDEN-MANAGEMENT-ENTRY-POLICY-AUDIT-V1.md
  */
 
 import { useEffect, useMemo, useState, useCallback, type CSSProperties } from 'react';
@@ -278,7 +285,9 @@ export default function StoreHandledProductsPage() {
             <ClipboardList size={14} />
             내 등록 요청
           </button>
-          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: '매장 직접 등록'(store_local_products) 정책 폐기 → 버튼 제거. */}
+          {/* WO-...-REMOVE-AND-STATUS-AUDIT-V1: 이 화면의 '매장 직접 등록' 버튼 제거(진입 정리).
+              WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1: store_local_products 는 유효한 데이터 축이며
+              등록·수정은 '약국 상품·거래 > 매장 자체 상품' 메뉴에서 수행한다(이 화면에 버튼 재추가 금지). */}
           <button onClick={reload} style={styles.refreshBtn}>
             <RefreshCw size={14} />
             새로고침

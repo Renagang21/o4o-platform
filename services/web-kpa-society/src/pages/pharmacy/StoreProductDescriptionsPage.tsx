@@ -229,15 +229,17 @@ export default function StoreProductDescriptionsPage() {
       <div style={styles.layout}>
         {/* 상품 목록 */}
         <aside style={styles.sidebar}>
-          <h2 style={styles.sidebarTitle}>내 매장 상품 ({products.length})</h2>
+          {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
+              이 목록은 store_local_products 전량(fetchLocalProducts) → 복원된 메뉴 라벨 '매장 자체 상품'과 정렬. */}
+          <h2 style={styles.sidebarTitle}>매장 자체 상품 ({products.length})</h2>
           {loading ? (
             <p style={styles.sidebarEmpty}>불러오는 중...</p>
           ) : products.length === 0 ? (
             <div style={{ padding: '12px 4px' }}>
-              <p style={styles.sidebarEmpty}>등록된 자체 상품이 없습니다.</p>
+              <p style={styles.sidebarEmpty}>등록된 매장 자체 상품이 없습니다.</p>
               <Link to="/store/commerce/local-products" style={styles.sidebarLink}>
                 <Package size={13} />
-                상품 등록하기
+                매장 자체 상품 등록하기
               </Link>
             </div>
           ) : (

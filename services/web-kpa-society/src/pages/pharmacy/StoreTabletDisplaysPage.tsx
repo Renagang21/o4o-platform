@@ -792,8 +792,10 @@ export default function StoreTabletDisplaysPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
+          {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
+              뒤로가기가 '매장 자체 상품' 관리 화면으로 가던 잔재 정정 → 매장 홈으로 복귀. */}
           <button
-            onClick={() => navigate('/store/commerce/local-products')}
+            onClick={() => navigate('/store')}
             className="p-2 rounded-lg hover:bg-slate-100"
           >
             <ArrowLeft className="w-5 h-5 text-slate-500" />
@@ -1478,14 +1480,17 @@ export default function StoreTabletDisplaysPage() {
                         </>
                       ) : (
                         <>
-                          <p>태블렛에 진열할 매장 경영활용 제품이 없습니다.</p>
-                          <p className="mt-1">매장 경영활용 제품을 먼저 등록한 뒤 태블렛에 배치해 주세요.</p>
+                          {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
+                              local pool 빈 상태 문구를 실제 데이터 축(store_local_products = '매장 자체 상품')과
+                              복원된 메뉴 라벨에 맞춰 정정. 이동 대상 route 무변경. */}
+                          <p>태블렛에 진열할 매장 자체 상품이 없습니다.</p>
+                          <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블렛에 배치해 주세요.</p>
                           <button
                             type="button"
                             onClick={() => navigate('/store/commerce/local-products')}
                             className="mt-3 inline-flex items-center gap-1.5 px-3 py-1.5 bg-teal-600 text-white text-xs font-medium rounded-lg hover:bg-teal-700"
                           >
-                            <Plus className="w-3.5 h-3.5" /> 매장 경영활용 제품 등록
+                            <Plus className="w-3.5 h-3.5" /> 매장 자체 상품 등록
                           </button>
                         </>
                       )}
