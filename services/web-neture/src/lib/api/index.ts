@@ -143,6 +143,9 @@ export {
   PROFILE_FIELD_LABELS,
   ACTIVATION_FIELD_LABELS,
   type SupplierApproveResult,
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1
+  type SupplierGovernanceResult,
+  type GovernanceSupplier,
   type AdminProduct,
   // WO-O4O-ADMIN-PRODUCT-APPROVAL-STANDARD-LIST-ADOPTION-V1
   type AdminProductSummary,

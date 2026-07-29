@@ -345,7 +345,10 @@ const OperatorsPage = lazy(() => import('./pages/admin/OperatorsPage'));
 const AdminMemberManagementPage = lazy(() => import('./pages/admin/AdminMemberManagementPage'));
 
 // Admin Approval Pages
-const AdminSupplierApprovalPage = lazy(() => import('./pages/admin/AdminSupplierApprovalPage'));
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1:
+//   admin 공급자 화면은 승인/거절 제거 → 상태 관리(비활성화/재활성화) governance 전용으로 교체.
+//   승인·거절 canonical 은 운영자 승인 콘솔(/operator/suppliers).
+const AdminSupplierGovernancePage = lazy(() => import('./pages/admin/AdminSupplierGovernancePage'));
 const AdminProductApprovalPage = lazy(() => import('./pages/admin/AdminProductApprovalPage'));
 const AdminMasterManagementPage = lazy(() => import('./pages/admin/AdminMasterManagementPage'));
 const AdminServiceApprovalPage = lazy(() => import('./pages/admin/AdminServiceApprovalPage'));
@@ -1065,7 +1068,10 @@ function App() {
               <Route path="/admin/operators" element={<OperatorsPage />} />
               <Route path="/admin/contact-messages" element={<AdminContactMessagesPage />} />
               <Route path="/admin/service-approvals" element={<AdminServiceApprovalPage />} />
-              <Route path="/admin/admin-suppliers" element={<AdminSupplierApprovalPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
+                  구 admin 승인 화면은 governance 로 canonical redirect, 신규 상태 관리 라우트 신설 */}
+              <Route path="/admin/admin-suppliers" element={<Navigate to="/admin/supplier-governance" replace />} />
+              <Route path="/admin/supplier-governance" element={<AdminSupplierGovernancePage />} />
               <Route path="/admin/product-approvals" element={<AdminProductApprovalPage />} />
               <Route path="/admin/masters" element={<AdminMasterManagementPage />} />
               <Route path="/admin/catalog-import" element={<CatalogImportDashboardPage />} />

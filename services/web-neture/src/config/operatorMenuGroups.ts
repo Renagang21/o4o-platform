@@ -157,8 +157,9 @@ export function getAdminMenu(): Partial<Record<OperatorGroupKey, OperatorMenuIte
       { label: '문의 메시지', path: '/admin/contact-messages' },
     ],
     approvals: [
-      // admin 전용 승인 화면 (공급사 정식 승인 / 서비스 승인 등 — operator 의 "가입 승인" 과 별도 트랙)
-      { label: '공급자 승인', path: '/admin/admin-suppliers' },
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
+      //   승인/거절은 운영자 승인 콘솔(/operator/suppliers)로 이관. admin 은 상태 관리(비활성화/재활성화) governance 전용.
+      { label: '공급자 상태 관리', path: '/admin/supplier-governance' },
       { label: '서비스 승인', path: '/admin/service-approvals' },
     ],
     products: [

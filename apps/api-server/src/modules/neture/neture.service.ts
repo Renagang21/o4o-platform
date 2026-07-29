@@ -131,8 +131,21 @@ export class NetureService {
   async deactivateSupplier(
     supplierId: string,
     adminUserId: string,
-  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
-    return this.supplierService.deactivateSupplier(supplierId, adminUserId);
+    reason: string,
+  ) {
+    return this.supplierService.deactivateSupplier(supplierId, adminUserId, reason);
+  }
+
+  async reactivateSupplier(
+    supplierId: string,
+    adminUserId: string,
+    reason: string,
+  ) {
+    return this.supplierService.reactivateSupplier(supplierId, adminUserId, reason);
+  }
+
+  async getGovernanceSuppliers() {
+    return this.supplierService.getGovernanceSuppliers();
   }
 
   async getAllSuppliers(filters?: { status?: SupplierStatus }) {

@@ -181,7 +181,11 @@ export function createNeureTier1TestController(deps: Tier1TestDeps): ExpressRout
       }
 
       const { supplierId } = req.params;
-      const result = await netureService.deactivateSupplier(supplierId, adminUserId);
+      // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6: 사유 필수
+      const reason = typeof req.body?.reason === 'string' && req.body.reason.trim()
+        ? req.body.reason
+        : 'Tier1 cascade test deactivation';
+      const result = await netureService.deactivateSupplier(supplierId, adminUserId, reason);
 
       if (!result.success) {
         const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;

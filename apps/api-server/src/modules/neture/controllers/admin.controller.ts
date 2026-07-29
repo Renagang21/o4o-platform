@@ -141,9 +141,24 @@ export function createAdminController(dataSource: DataSource): Router {
   });
 
   /**
+   * GET /admin/suppliers/governance
+   * WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5
+   * 상태 관리 목록 (ACTIVE/INACTIVE 전용) — 최근 상태 변경 + 진행 주문·미정산 포함.
+   */
+  router.get('/suppliers/governance', requireAuth, requireNetureScope('neture:admin'), async (_req: AuthenticatedRequest, res: Response) => {
+    try {
+      const data = await netureService.getGovernanceSuppliers();
+      res.json({ success: true, data });
+    } catch (error) {
+      logger.error('[Neture API] Error fetching governance suppliers:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch governance suppliers' } });
+    }
+  });
+
+  /**
    * POST /admin/suppliers/:id/deactivate
-   * WO-NETURE-SUPPLIER-AND-PRODUCT-APPROVAL-BETA-V1
-   * 공급자 비활성화 (ACTIVE → INACTIVE)
+   * WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6
+   * 공급자 비활성화 (ACTIVE → INACTIVE) — admin 전용 governance. 사유 필수 + 주문/정산 가드.
    */
   router.post('/suppliers/:id/deactivate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
     try {
@@ -153,20 +168,87 @@ export function createAdminController(dataSource: DataSource): Router {
         return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
       }
 
-      const result = await netureService.deactivateSupplier(id, adminUserId);
+      const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
+
+      const result = await netureService.deactivateSupplier(id, adminUserId, reason);
+      if (!result.success) {
+        // §6: 진행 주문·미정산·정산 진행 → 409 + 건수. 강제 override 없음.
+        if (result.error === 'SUPPLIER_DEACTIVATION_BLOCKED') {
+          return res.status(409).json({
+            success: false,
+            error: {
+              code: 'SUPPLIER_DEACTIVATION_BLOCKED',
+              message: 'Supplier has in-progress orders or unsettled amounts',
+              activeOrderCount: result.guard?.activeOrderCount ?? 0,
+              unsettledCount: result.guard?.unsettledCount ?? 0,
+              settlementInProgressCount: result.guard?.settlementInProgressCount ?? 0,
+            },
+          });
+        }
+        const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
+        return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
+      }
+
+      // §9: 감사 — 연락처/토큰/전체 프로필/주문 상세는 기록하지 않는다.
+      netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.supplier_deactivate', {
+        meta: {
+          supplierId: id,
+          previousStatus: result.data?.previousStatus,
+          nextStatus: result.data?.status,
+          reason: reason.trim(),
+          affectedOrganizationId: result.data?.affectedOrganizationId ?? null,
+          actorRole: req.user?.role ?? null,
+          activeOrderCount: result.data?.guard && (result.data.guard as { activeOrderCount: number }).activeOrderCount,
+          unsettledCount: result.data?.guard && (result.data.guard as { unsettledCount: number }).unsettledCount,
+          settlementInProgressCount: result.data?.guard && (result.data.guard as { settlementInProgressCount: number }).settlementInProgressCount,
+        },
+      }).catch(() => {});
+
+      res.json({ success: true, data: { id: result.data?.id, name: result.data?.name, status: result.data?.status } });
+    } catch (error) {
+      logger.error('[Neture API] Error deactivating supplier:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to deactivate supplier' } });
+    }
+  });
+
+  /**
+   * POST /admin/suppliers/:id/reactivate
+   * WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §7
+   * 공급자 재활성화 (INACTIVE → ACTIVE) — admin 전용 governance. 사유 필수.
+   * 접근 상태만 복구하며 상품 승인·진열·게시는 자동 복구하지 않는다.
+   */
+  router.post('/suppliers/:id/reactivate', requireAuth, requireNetureScope('neture:admin'), async (req: AuthenticatedRequest, res: Response) => {
+    try {
+      const { id } = req.params;
+      const adminUserId = req.user?.id;
+      if (!adminUserId) {
+        return res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED' } });
+      }
+
+      const reason = typeof req.body?.reason === 'string' ? req.body.reason : '';
+
+      const result = await netureService.reactivateSupplier(id, adminUserId, reason);
       if (!result.success) {
         const status = result.error === 'SUPPLIER_NOT_FOUND' ? 404 : 400;
         return res.status(status).json({ success: false, error: { code: result.error, message: result.error } });
       }
 
-      netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.supplier_deactivate', {
-        meta: { supplierId: id },
+      // §9: 감사 — 연락처/토큰/전체 프로필/주문 상세는 기록하지 않는다.
+      netureActionLogService.logSuccess('neture', adminUserId, 'neture.admin.supplier_reactivate', {
+        meta: {
+          supplierId: id,
+          previousStatus: result.data?.previousStatus,
+          nextStatus: result.data?.status,
+          reason: reason.trim(),
+          affectedOrganizationId: result.data?.affectedOrganizationId ?? null,
+          actorRole: req.user?.role ?? null,
+        },
       }).catch(() => {});
 
-      res.json({ success: true, data: result.data });
+      res.json({ success: true, data: { id: result.data?.id, name: result.data?.name, status: result.data?.status } });
     } catch (error) {
-      logger.error('[Neture API] Error deactivating supplier:', error);
-      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to deactivate supplier' } });
+      logger.error('[Neture API] Error reactivating supplier:', error);
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to reactivate supplier' } });
     }
   });
 

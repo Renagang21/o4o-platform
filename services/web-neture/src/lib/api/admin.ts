@@ -139,6 +139,34 @@ export interface SupplierApproveResult {
   missingFields?: string[];
 }
 
+// WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6/§7:
+// 상태 관리(비활성화/재활성화) 결과. 409(SUPPLIER_DEACTIVATION_BLOCKED) 시 차단 건수를 함께 전달.
+export interface SupplierGovernanceResult {
+  success: boolean;
+  code?: string;
+  message?: string;
+  blocked?: {
+    activeOrderCount: number;
+    unsettledCount: number;
+    settlementInProgressCount: number;
+  };
+}
+
+// §5: 상태 관리 목록 행 (ACTIVE/INACTIVE 전용).
+export interface GovernanceSupplier {
+  id: string;
+  name: string;
+  status: string;
+  lastStatusChangedAt: string | null;
+  lastChangedBy: string | null;
+  lastChangeReason: string | null;
+  activeOrderCount: number;
+  unsettledCount: number;
+  hasActiveOrders: boolean;
+  hasUnsettled: boolean;
+  createdAt: string;
+}
+
 export const adminSupplierApi = {
   async getSuppliers(status?: string): Promise<AdminSupplier[]> {
     try {
@@ -163,6 +191,18 @@ export const adminSupplierApi = {
     }
   },
 
+  // §5: 상태 관리(governance) 목록 — ACTIVE/INACTIVE + 최근 변경/주문·정산 지표.
+  async getGovernanceSuppliers(): Promise<GovernanceSupplier[]> {
+    try {
+      const response = await api.get('/neture/admin/suppliers/governance');
+      return response.data.data || [];
+    } catch (error: any) {
+      if (error?.response?.status === 403) throw new Error('접근 권한이 없습니다');
+      console.warn('[Admin API] Failed to fetch governance suppliers:', error);
+      return [];
+    }
+  },
+
   async approveSupplier(id: string): Promise<SupplierApproveResult> {
     try {
       await api.post(`/neture/admin/suppliers/${id}/approve`);
@@ -180,11 +220,38 @@ export const adminSupplierApi = {
     } catch { return false; }
   },
 
-  async deactivateSupplier(id: string): Promise<boolean> {
+  // §6: 사유 필수. 진행 주문·미정산·정산 진행 시 backend 가 409 로 차단(강제 override 없음).
+  async deactivateSupplier(id: string, reason: string): Promise<SupplierGovernanceResult> {
     try {
-      await api.post(`/neture/admin/suppliers/${id}/deactivate`);
-      return true;
-    } catch { return false; }
+      await api.post(`/neture/admin/suppliers/${id}/deactivate`, { reason });
+      return { success: true };
+    } catch (error: any) {
+      const err = error?.response?.data?.error;
+      if (error?.response?.status === 409 && err?.code === 'SUPPLIER_DEACTIVATION_BLOCKED') {
+        return {
+          success: false,
+          code: err.code,
+          message: err.message,
+          blocked: {
+            activeOrderCount: err.activeOrderCount ?? 0,
+            unsettledCount: err.unsettledCount ?? 0,
+            settlementInProgressCount: err.settlementInProgressCount ?? 0,
+          },
+        };
+      }
+      return { success: false, code: err?.code, message: err?.message };
+    }
+  },
+
+  // §7: 재활성화(INACTIVE → ACTIVE). 사유 필수. 접근 상태만 복구.
+  async reactivateSupplier(id: string, reason: string): Promise<SupplierGovernanceResult> {
+    try {
+      await api.post(`/neture/admin/suppliers/${id}/reactivate`, { reason });
+      return { success: true };
+    } catch (error: any) {
+      const err = error?.response?.data?.error;
+      return { success: false, code: err?.code, message: err?.message };
+    }
   },
 
   async downloadDocument(id: string, documentType: 'business_registration' | 'bank_statement' | 'mail_order_report'): Promise<Blob | null> {

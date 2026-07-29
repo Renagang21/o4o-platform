@@ -1,4 +1,5 @@
 import { Repository } from 'typeorm';
+import type { EntityManager } from 'typeorm';
 import { AppDataSource } from '../../../database/connection.js';
 import {
   NetureSupplier,
@@ -243,66 +244,345 @@ export class NetureSupplierService {
     }
   }
 
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §6:
+  // 활성 공급자 비활성화 = 예외 governance (admin 전용). 진행 주문·미정산·정산 진행 중이면 차단한다.
+  // 트랜잭션 안에서 상태를 재확인(FOR UPDATE)하여 동시 요청 시 하나만 성공하고, 부분 성공을 남기지 않는다.
   async deactivateSupplier(
     supplierId: string,
     adminUserId: string,
-  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    reason: string,
+  ): Promise<{
+    success: boolean;
+    data?: Record<string, unknown>;
+    error?: string;
+    guard?: SupplierObligationGuard;
+  }> {
+    const trimmedReason = (reason ?? '').trim();
+    if (!trimmedReason) return { success: false, error: 'REASON_REQUIRED' };
+
     try {
-      const supplier = await this.supplierRepo.findOne({ where: { id: supplierId } });
-      if (!supplier) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
-      if (supplier.status !== SupplierStatus.ACTIVE) return { success: false, error: 'INVALID_STATUS' };
+      return await AppDataSource.transaction(async (manager) => {
+        // §8: lock supplier row → 동시 요청 직렬화 + 트랜잭션 내 상태 재확인
+        const lockedRows: Array<{ status: string; user_id: string | null; organization_id: string | null }> =
+          await manager.query(
+            `SELECT status, user_id, organization_id FROM neture_suppliers WHERE id = $1 FOR UPDATE`,
+            [supplierId],
+          );
+        const locked = lockedRows[0];
+        if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
+        if (locked.status !== SupplierStatus.ACTIVE) return { success: false, error: 'INVALID_STATUS' };
 
-      supplier.status = SupplierStatus.INACTIVE;
-      await this.supplierRepo.save(supplier);
-
-      const revokeResult = await AppDataSource.query(
-        `UPDATE product_approvals
-         SET approval_status = 'revoked',
-             decided_by = $2::uuid,
-             decided_at = NOW(),
-             reason = 'Supplier deactivated',
-             updated_at = NOW()
-         WHERE offer_id IN (
-           SELECT id FROM supplier_product_offers WHERE supplier_id = $1
-         )
-         AND approval_status = 'approved'`,
-        [supplierId, adminUserId],
-      );
-      const revokedCount = revokeResult?.[1] ?? 0;
-
-      await AppDataSource.query(
-        `UPDATE organization_product_listings
-         SET is_active = false, updated_at = NOW()
-         WHERE offer_id IN (
-           SELECT id FROM supplier_product_offers WHERE supplier_id = $1
-         )`,
-        [supplierId],
-      );
-
-      if (supplier.userId) {
-        const membership = await this.membershipRepo.findOne({
-          where: { userId: supplier.userId, serviceKey: 'neture' },
-        });
-        if (membership) {
-          membership.status = 'suspended';
-          await this.membershipRepo.save(membership);
+        // §6: 서버 측 주문·정산 재검증 (강제 override 없음)
+        const guard = await this.countSupplierObligations(supplierId, manager);
+        if (guard.activeOrderCount > 0 || guard.unsettledCount > 0 || guard.settlementInProgressCount > 0) {
+          return { success: false, error: 'SUPPLIER_DEACTIVATION_BLOCKED', guard };
         }
-        await roleAssignmentService.removeRole(supplier.userId, 'supplier');
-      }
 
-      // WO-O4O-NETURE-ORG-DATA-MODEL-V1: deactivate org
-      await this.setOrgActive(supplier, false);
+        await manager.query(
+          `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,
+          [supplierId, SupplierStatus.INACTIVE],
+        );
 
-      const org = await this.getOrgData(supplier.organizationId);
-      logger.info(`[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${revokedCount} approvals, deactivated listings)`);
-      return {
-        success: true,
-        data: { id: supplier.id, name: org?.name ?? '', status: supplier.status },
-      };
+        const revokeResult = await manager.query(
+          `UPDATE product_approvals
+           SET approval_status = 'revoked',
+               decided_by = $2::uuid,
+               decided_at = NOW(),
+               reason = 'Supplier deactivated',
+               updated_at = NOW()
+           WHERE offer_id IN (
+             SELECT id FROM supplier_product_offers WHERE supplier_id = $1
+           )
+           AND approval_status = 'approved'`,
+          [supplierId, adminUserId],
+        );
+        const revokedCount = revokeResult?.[1] ?? 0;
+
+        await manager.query(
+          `UPDATE organization_product_listings
+           SET is_active = false, updated_at = NOW()
+           WHERE offer_id IN (
+             SELECT id FROM supplier_product_offers WHERE supplier_id = $1
+           )`,
+          [supplierId],
+        );
+
+        if (locked.user_id) {
+          await manager.query(
+            `UPDATE service_memberships SET status = 'suspended', updated_at = NOW()
+             WHERE user_id = $1 AND service_key = 'neture'`,
+            [locked.user_id],
+          );
+        }
+
+        if (locked.organization_id) {
+          await manager.query(
+            `UPDATE organizations SET "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+            [locked.organization_id],
+          );
+        }
+
+        // RBAC SSOT (F9): role 쓰기는 roleAssignmentService 를 통해서만. 커밋 성공 후 role 회수.
+        // (트랜잭션 롤백 시 role 은 손대지 않아 부분 성공을 남기지 않는다.)
+        const org = await this.getOrgData(locked.organization_id);
+        return {
+          success: true,
+          data: {
+            id: supplierId,
+            name: org?.name ?? '',
+            status: SupplierStatus.INACTIVE,
+            previousStatus: SupplierStatus.ACTIVE,
+            affectedOrganizationId: locked.organization_id,
+            revokedApprovalCount: revokedCount,
+            userId: locked.user_id,
+            guard,
+          },
+        };
+      }).then(async (result) => {
+        if (result.success && result.data?.userId) {
+          await roleAssignmentService.removeRole(result.data.userId as string, 'supplier');
+        }
+        if (result.success) {
+          logger.info(
+            `[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${result.data?.revokedApprovalCount} approvals)`,
+          );
+        }
+        return result;
+      });
     } catch (error) {
       logger.error('[NetureSupplierService] Error deactivating supplier:', error);
       throw error;
     }
+  }
+
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §7:
+  // 재활성화 (INACTIVE → ACTIVE, admin 전용). 접근 상태만 복구한다:
+  // supplier status / organization active / service membership / supplier role.
+  // 상품 승인·매장 진열·HUB 게시 등 상거래 상태는 자동 복구하지 않는다(운영자·공급자가 재수행).
+  async reactivateSupplier(
+    supplierId: string,
+    adminUserId: string,
+    reason: string,
+  ): Promise<{ success: boolean; data?: Record<string, unknown>; error?: string }> {
+    const trimmedReason = (reason ?? '').trim();
+    if (!trimmedReason) return { success: false, error: 'REASON_REQUIRED' };
+
+    try {
+      return await AppDataSource.transaction(async (manager) => {
+        // §8: lock + 트랜잭션 내 상태 재확인 (INACTIVE 만 재활성화)
+        const lockedRows: Array<{ status: string; user_id: string | null; organization_id: string | null }> =
+          await manager.query(
+            `SELECT status, user_id, organization_id FROM neture_suppliers WHERE id = $1 FOR UPDATE`,
+            [supplierId],
+          );
+        const locked = lockedRows[0];
+        if (!locked) return { success: false, error: 'SUPPLIER_NOT_FOUND' };
+        if (locked.status !== SupplierStatus.INACTIVE) return { success: false, error: 'INVALID_STATUS' };
+
+        await manager.query(
+          `UPDATE neture_suppliers SET status = $2, updated_at = NOW() WHERE id = $1`,
+          [supplierId, SupplierStatus.ACTIVE],
+        );
+
+        if (locked.user_id) {
+          await manager.query(
+            `UPDATE service_memberships SET status = 'active', updated_at = NOW()
+             WHERE user_id = $1 AND service_key = 'neture'`,
+            [locked.user_id],
+          );
+        }
+
+        if (locked.organization_id) {
+          await manager.query(
+            `UPDATE organizations SET "isActive" = true, "updatedAt" = NOW() WHERE id = $1`,
+            [locked.organization_id],
+          );
+        }
+
+        const org = await this.getOrgData(locked.organization_id);
+        return {
+          success: true,
+          data: {
+            id: supplierId,
+            name: org?.name ?? '',
+            status: SupplierStatus.ACTIVE,
+            previousStatus: SupplierStatus.INACTIVE,
+            affectedOrganizationId: locked.organization_id,
+            userId: locked.user_id,
+          },
+        };
+      }).then(async (result) => {
+        if (result.success && result.data?.userId) {
+          // RBAC SSOT (F9): 커밋 성공 후 supplier role 복구 (assignRole 은 기존 비활성 배정을 재활성화).
+          await roleAssignmentService.assignRole({
+            userId: result.data.userId as string,
+            role: 'supplier',
+            assignedBy: adminUserId,
+          });
+        }
+        if (result.success) {
+          logger.info(`[NetureSupplierService] Supplier reactivated: ${supplierId} by ${adminUserId}`);
+        }
+        return result;
+      });
+    } catch (error) {
+      logger.error('[NetureSupplierService] Error reactivating supplier:', error);
+      throw error;
+    }
+  }
+
+  // §6: 공급자의 진행 주문·미정산·정산 진행 건수. 비활성화 차단 판단의 단일 근거.
+  // 주문 스코프는 공급자 주문 워크스페이스와 동일한 canonical join 을 사용한다.
+  private async countSupplierObligations(
+    supplierId: string,
+    manager: EntityManager,
+  ): Promise<SupplierObligationGuard> {
+    // neture_orders 비종결(created/pending_payment/paid/preparing/shipped)
+    const netureOrderRows: Array<{ c: string }> = await manager.query(
+      `SELECT COUNT(DISTINCT o.id)::text AS c
+       FROM neture_orders o
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
+       JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+       WHERE spo.supplier_id = $1
+         AND o.status IN ('created','pending_payment','paid','preparing','shipped')`,
+      [supplierId],
+    );
+    // 결제완료·미브릿지 checkout_orders (워크스페이스가 진행 주문으로 노출)
+    const checkoutRows: Array<{ c: string }> = await manager.query(
+      `SELECT COUNT(*)::text AS c
+       FROM checkout_orders co
+       WHERE co."supplierId" = $1
+         AND co."paymentStatus" = 'paid'
+         AND NOT EXISTS (
+           SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
+         )`,
+      [supplierId],
+    );
+    const unsettledRows: Array<{ c: string }> = await manager.query(
+      `SELECT COUNT(*)::text AS c FROM neture_settlements
+       WHERE supplier_id = $1 AND status IN ('pending','calculated','approved')`,
+      [supplierId],
+    );
+    const inProgressRows: Array<{ c: string }> = await manager.query(
+      `SELECT COUNT(*)::text AS c FROM neture_settlements
+       WHERE supplier_id = $1 AND status IN ('calculated','approved')`,
+      [supplierId],
+    );
+    const activeOrderCount =
+      parseInt(netureOrderRows[0]?.c ?? '0', 10) + parseInt(checkoutRows[0]?.c ?? '0', 10);
+    return {
+      activeOrderCount,
+      unsettledCount: parseInt(unsettledRows[0]?.c ?? '0', 10),
+      settlementInProgressCount: parseInt(inProgressRows[0]?.c ?? '0', 10),
+    };
+  }
+
+  // WO-O4O-NETURE-SUPPLIER-APPROVAL-CONSOLE-AND-ADMIN-GOVERNANCE-SEPARATION-V1 §5:
+  // admin 상태 관리(governance) 목록 — ACTIVE / INACTIVE 만 대상. PENDING/REJECTED 제외.
+  // 각 행에 최근 상태 변경(일시·변경자·사유)과 진행 주문·미정산 건수를 함께 제공한다.
+  async getGovernanceSuppliers(): Promise<GovernanceSupplierRow[]> {
+    const suppliers = await this.supplierRepo.find({
+      where: [{ status: SupplierStatus.ACTIVE }, { status: SupplierStatus.INACTIVE }],
+      order: { updatedAt: 'DESC' },
+    });
+    if (suppliers.length === 0) return [];
+
+    const ids = suppliers.map((s) => s.id);
+    const orgIds = suppliers.map((s) => s.organizationId).filter(Boolean) as string[];
+    const orgMap = await this.getOrgDataBatch(orgIds);
+
+    // 최근 상태 변경 로그 (deactivate/reactivate/approve). 변경자 이름/이메일 enrich.
+    const lastChangeMap = new Map<string, { at: string; byUserId: string | null; byName: string | null; reason: string | null }>();
+    try {
+      const rows: Array<{ supplier_id: string; created_at: string; user_id: string | null; reason: string | null; actor_name: string | null; actor_email: string | null }> =
+        await AppDataSource.query(
+          `SELECT DISTINCT ON (al.meta->>'supplierId')
+                  al.meta->>'supplierId' AS supplier_id,
+                  al.created_at,
+                  al.user_id,
+                  al.meta->>'reason' AS reason,
+                  u.name AS actor_name,
+                  u.email AS actor_email
+           FROM action_logs al
+           LEFT JOIN users u ON u.id = al.user_id
+           WHERE al.action_key IN ('neture.admin.supplier_deactivate','neture.admin.supplier_reactivate','neture.admin.supplier_approve')
+             AND al.meta->>'supplierId' = ANY($1::text[])
+           ORDER BY al.meta->>'supplierId', al.created_at DESC`,
+          [ids],
+        );
+      for (const r of rows) {
+        lastChangeMap.set(r.supplier_id, {
+          at: r.created_at,
+          byUserId: r.user_id,
+          byName: r.actor_name || r.actor_email || null,
+          reason: r.reason,
+        });
+      }
+    } catch (error) {
+      logger.warn('[NetureSupplierService] Governance last-change enrich failed:', error);
+    }
+
+    // 진행 주문·미정산 집계 (set-based, supplier 단위)
+    const activeOrderMap = new Map<string, number>();
+    const unsettledMap = new Map<string, number>();
+    try {
+      const netureRows: Array<{ sid: string; c: string }> = await AppDataSource.query(
+        `SELECT spo.supplier_id::text AS sid, COUNT(DISTINCT o.id)::text AS c
+         FROM neture_orders o
+         JOIN neture.neture_order_items oi ON oi.order_id = o.id
+         JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
+         WHERE spo.supplier_id = ANY($1::uuid[])
+           AND o.status IN ('created','pending_payment','paid','preparing','shipped')
+         GROUP BY spo.supplier_id`,
+        [ids],
+      );
+      for (const r of netureRows) activeOrderMap.set(r.sid, parseInt(r.c, 10));
+
+      const checkoutRows: Array<{ sid: string; c: string }> = await AppDataSource.query(
+        `SELECT co."supplierId" AS sid, COUNT(*)::text AS c
+         FROM checkout_orders co
+         WHERE co."supplierId" = ANY($1::text[])
+           AND co."paymentStatus" = 'paid'
+           AND NOT EXISTS (
+             SELECT 1 FROM neture_orders no2 WHERE no2.metadata->>'checkoutOrderId' = co.id::text
+           )
+         GROUP BY co."supplierId"`,
+        [ids],
+      );
+      for (const r of checkoutRows) {
+        activeOrderMap.set(r.sid, (activeOrderMap.get(r.sid) ?? 0) + parseInt(r.c, 10));
+      }
+
+      const settleRows: Array<{ sid: string; c: string }> = await AppDataSource.query(
+        `SELECT supplier_id::text AS sid, COUNT(*)::text AS c FROM neture_settlements
+         WHERE supplier_id = ANY($1::uuid[]) AND status IN ('pending','calculated','approved')
+         GROUP BY supplier_id`,
+        [ids],
+      );
+      for (const r of settleRows) unsettledMap.set(r.sid, parseInt(r.c, 10));
+    } catch (error) {
+      logger.warn('[NetureSupplierService] Governance obligation aggregate failed:', error);
+    }
+
+    return suppliers.map((s) => {
+      const org = s.organizationId ? orgMap.get(s.organizationId) : null;
+      const lastChange = lastChangeMap.get(s.id) ?? null;
+      const activeOrderCount = activeOrderMap.get(s.id) ?? 0;
+      const unsettledCount = unsettledMap.get(s.id) ?? 0;
+      return {
+        id: s.id,
+        name: org?.name ?? s.slug,
+        status: s.status,
+        lastStatusChangedAt: lastChange?.at ?? null,
+        lastChangedBy: lastChange?.byName ?? null,
+        lastChangeReason: lastChange?.reason ?? null,
+        activeOrderCount,
+        unsettledCount,
+        hasActiveOrders: activeOrderCount > 0,
+        hasUnsettled: unsettledCount > 0,
+        createdAt: s.createdAt,
+      };
+    });
   }
 
   async getAllSuppliers(
@@ -1256,6 +1536,28 @@ export class NetureSupplierService {
 // WO-O4O-NETURE-OPERATOR-SUPPLIER-APPROVAL-STANDARD-LIST-AND-MEMBER-IA-V1
 // getAllSuppliers() 의 enriched 결과 위에서 검색·상태필터·정렬·페이지네이션을 수행하는 순수 함수.
 // DB 비의존 → 단위 테스트 가능. (count(total)/summary/data 가 동일 배열에서 파생되어 일관성 보장)
+
+// §6: 비활성화 차단 판단 근거 (진행 주문·미정산·정산 진행 건수). 컨트롤러 409 응답 payload.
+export interface SupplierObligationGuard {
+  activeOrderCount: number;
+  unsettledCount: number;
+  settlementInProgressCount: number;
+}
+
+// §5: admin 상태 관리 목록 행 (ACTIVE/INACTIVE 전용).
+export interface GovernanceSupplierRow {
+  id: string;
+  name: string;
+  status: SupplierStatus;
+  lastStatusChangedAt: string | null;
+  lastChangedBy: string | null;
+  lastChangeReason: string | null;
+  activeOrderCount: number;
+  unsettledCount: number;
+  hasActiveOrders: boolean;
+  hasUnsettled: boolean;
+  createdAt: Date;
+}
 
 export interface SupplierListQueryParams {
   page?: number;
