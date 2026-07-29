@@ -1,27 +1,34 @@
 /**
- * Product AI Access Utilities — WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1
+ * Global Product Resource Access — WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1
  *
- * Organization ownership verification for product AI endpoints.
+ * product_ai_contents / product_ai_tags 는 organization·store·service 소유가 아닌
+ * **ProductMaster 기반 전역(플랫폼 소유) 자원**이다.
+ * 따라서 접근 판정 축은 "organization ownership" 이 아니라 **actor 와 master 와의 관계**이다.
  *
- * 현재 구현 (as-is):
- *   1. role_assignments 에 무접두 'admin'/'operator' 정확 일치 → 우회
- *   2. organization_members 로 org 해석 후 organization_product_listings JOIN 확인
- *   3. 그 외 → 403
+ * 확정 정책 (사용자 승인, 2026-07-29):
+ *   - 표준 ProductMaster 는 **전 서비스 공용**이며 service 소유권을 갖지 않는다.
+ *     → `service_products` / `organization_product_listings.service_key` / role prefix 를
+ *       ProductMaster 의 service 경계로 사용하지 않는다.
+ *   - `{service}:operator` · `{service}:admin` 은 **역할만으로 전역 쓰기 권한을 얻지 않는다.**
+ *     (suffix 든 prefix 든 role 문자열만 보고 허용하는 분기를 만들지 않는다)
+ *   - 전역 쓰기가 필요한 운영자는 `platform:super_admin` 을 사용한다.
  *
- * ⚠ WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 — 위 정책은 실제 계약과 미정렬이다.
- *   - product_ai_contents / product_ai_tags 는 organization 소유가 아닌 **전역 자원**이므로
- *     "org ownership" 자체가 올바른 판정 축이 아니다.
- *   - 무접두 'admin'/'operator' 는 RBAC SSOT 상 활성 보유자 0명 (실 역할은 '{service}:operator' 등 접두형).
- *   - 아래 OPL → supplier_product_offers JOIN 은 실데이터 0행이라 어떤 사용자도 통과하지 못한다 (dead JOIN).
- *   → 결과적으로 모든 주체가 403. 재설계에는 ProductMaster 의 service scope 판정이 선행되어야 하는데
- *     현재 product_masters 에는 service/tenant 축이 존재하지 않아 중지 상태다.
- *     상세: docs/checks/CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1.md
+ * 판정 순서:
+ *   1. platform:super_admin         → 전 모드 허용
+ *   2. 공급자 + 자기 offer.master_id → 전 모드 허용 (write 는 ACTIVE 공급자만)
+ *   3. active OPL(organization_id + master_id) 보유 매장 → 'render_read' 만 허용
+ *   4. 그 외                         → 거부
+ *
+ * 내부 자동 생성·임포트(스케줄러·시드 스크립트)는 HTTP 계층을 거치지 않고 서비스를 직접
+ * 호출하므로 본 가드의 대상이 아니다.
+ *
+ * 상세: docs/checks/CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1.md
  */
 
 import type { DataSource } from 'typeorm';
 
 /**
- * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 §8.1 — ID 계약 가드.
+ * §8.1 ID 계약 가드.
  *
  * product_ai_contents / product_ai_tags 의 product_id 는 product_masters.id 전용이다.
  * store_local_products.id 나 임의 UUID 가 전역 행으로 조용히 저장되면 고아 행이 생기고,
@@ -31,12 +38,14 @@ import type { DataSource } from 'typeorm';
  * 접근 판정(403)과는 별개의 축이며, 접근 판정 이후에 평가하여 미인가 호출자에게
  * master 존재 여부를 노출하지 않는다.
  */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export async function productMasterExists(
   dataSource: DataSource,
   productId: string,
 ): Promise<boolean> {
   // 잘못된 형식의 UUID 는 쿼리 자체가 실패하므로 사전 차단
-  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(productId ?? '')) {
+  if (!UUID_RE.test(productId ?? '')) {
     return false;
   }
   const rows = await dataSource.query(`SELECT 1 FROM product_masters WHERE id = $1 LIMIT 1`, [
@@ -45,53 +54,150 @@ export async function productMasterExists(
   return rows.length > 0;
 }
 
-// WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
-//   role_assignments 를 정확 문자열로 매칭하는 목록이다. 무접두 'super_admin' 은 역할 카탈로그에
-//   정의가 없고 보유자도 0명이라 어떤 행과도 매칭되지 않는 무효항이므로 제거(질의 결과 불변).
-//   나머지 무접두 'admin'/'operator' 는 본 WO 범위 밖이라 유지한다.
-const PLATFORM_ADMIN_ROLES = ['admin', 'operator'];
+/**
+ * 전역 상품 자원 접근 모드.
+ *
+ *   'write'       — 생성·수정·삭제. platform:super_admin | 자기 offer master 보유 ACTIVE 공급자
+ *   'manage_read' — AI contents / AI tags **관리 API 조회**. 위 주체 (공급자는 status 무관)
+ *                   → 매장은 통과하지 못한다. 전역 자원 관리 화면은 매장의 소비 대상이 아니다.
+ *   'render_read' — POP PDF 등 **렌더 소비 조회**. 위 주체 + active OPL 보유 매장
+ */
+export type ProductAccessMode = 'write' | 'manage_read' | 'render_read';
+
+/** 허용된 호출자의 성격. 거부 시 'none'. */
+export type ProductActorType = 'platform_admin' | 'supplier' | 'store' | 'none';
+
+export interface GlobalProductResourceAccess {
+  allowed: boolean;
+  actorType: ProductActorType;
+  accessMode: ProductAccessMode;
+  /** 매장 read 로 허용된 경우의 조직. 그 외 null */
+  organizationId: string | null;
+  /** 공급자로 허용된 경우의 neture_suppliers.id. 그 외 null */
+  supplierId: string | null;
+  productMasterId: string;
+  /** 거부 사유 코드 (로깅·디버깅용, 응답 본문에 그대로 노출하지 않는다) */
+  denyReason?:
+    | 'NO_USER'
+    | 'INVALID_PRODUCT_ID'
+    | 'WRITE_REQUIRES_ACTIVE_SUPPLIER'
+    | 'NO_RELATION_TO_MASTER'
+    | 'STORE_WRITE_FORBIDDEN';
+}
+
+/** 전역 상품 자원에 대한 무제한 권한. RBAC SSOT 상 정확 문자열이며 prefix 매칭하지 않는다. */
+const GLOBAL_PRODUCT_ADMIN_ROLES = ['platform:super_admin'];
 
 /**
- * Verify that the authenticated user's organization has access to the given product.
+ * 전역 상품 AI 자원(product_ai_contents / product_ai_tags / POP 렌더)에 대한 접근 판정.
  *
- * @returns { allowed: true, organizationId } on success
- *          { allowed: false, organizationId: null } on denial
+ * @param mode 'write' 는 생성·수정·삭제, 'read' 는 조회.
  */
-export async function verifyProductOrgAccess(
+export async function resolveGlobalProductResourceAccess(
   dataSource: DataSource,
   productId: string,
-  userId: string,
-): Promise<{ allowed: boolean; organizationId: string | null }> {
-  // 1. Platform admin / operator — bypass org check
+  userId: string | undefined,
+  mode: ProductAccessMode,
+): Promise<GlobalProductResourceAccess> {
+  const base = {
+    accessMode: mode,
+    organizationId: null,
+    supplierId: null,
+    productMasterId: productId,
+  } as const;
+
+  if (!userId) {
+    return { ...base, allowed: false, actorType: 'none', denyReason: 'NO_USER' };
+  }
+
+  // UUID 형식이 아니면 아래 uuid 비교 쿼리가 예외를 던져 500 이 되므로 여기서 거부한다.
+  if (!UUID_RE.test(productId ?? '')) {
+    return { ...base, allowed: false, actorType: 'none', denyReason: 'INVALID_PRODUCT_ID' };
+  }
+
+  // 1. platform:super_admin — 전역 read/write
   const adminRows = await dataSource.query(
     `SELECT 1 FROM role_assignments
      WHERE user_id = $1 AND role = ANY($2::text[]) AND is_active = true LIMIT 1`,
-    [userId, PLATFORM_ADMIN_ROLES],
+    [userId, GLOBAL_PRODUCT_ADMIN_ROLES],
   );
-  if (adminRows.length > 0) return { allowed: true, organizationId: null };
+  if (adminRows.length > 0) {
+    return { ...base, allowed: true, actorType: 'platform_admin' };
+  }
 
-  // 2. Resolve user's organization
+  // 2. 공급자 — 자기 offer 에 연결된 master 만.
+  //    neture-identity.middleware 와 동일한 해석: 링크된 공급자는 read, 쓰기는 ACTIVE 만.
+  const supplierRows = await dataSource.query(
+    `SELECT id, status FROM neture_suppliers WHERE user_id = $1 LIMIT 1`,
+    [userId],
+  );
+  if (supplierRows.length > 0) {
+    const supplierId: string = supplierRows[0].id;
+    const supplierStatus: string = supplierRows[0].status;
+    const ownRows = await dataSource.query(
+      `SELECT 1 FROM supplier_product_offers
+       WHERE supplier_id = $1 AND master_id = $2 LIMIT 1`,
+      [supplierId, productId],
+    );
+    if (ownRows.length > 0) {
+      if (mode === 'write' && supplierStatus !== 'ACTIVE') {
+        return {
+          ...base,
+          allowed: false,
+          actorType: 'none',
+          supplierId,
+          denyReason: 'WRITE_REQUIRES_ACTIVE_SUPPLIER',
+        };
+      }
+      return { ...base, allowed: true, actorType: 'supplier', supplierId };
+    }
+    // 자기 상품이 아니면 다른 공급자의 master 이므로 여기서 종료 (매장 축으로 승격 금지)
+    return {
+      ...base,
+      allowed: false,
+      actorType: 'none',
+      supplierId,
+      denyReason: 'NO_RELATION_TO_MASTER',
+    };
+  }
+
+  // 3. 매장 — active OPL 기반 **렌더 조회 전용**.
+  //    offer_id → supplier_product_offers 경유는 제거하고 opl.master_id 를 직접 사용한다.
+  if (mode !== 'render_read') {
+    return {
+      ...base,
+      allowed: false,
+      actorType: 'none',
+      denyReason: mode === 'write' ? 'STORE_WRITE_FORBIDDEN' : 'NO_RELATION_TO_MASTER',
+    };
+  }
+
   const orgRows = await dataSource.query(
     `SELECT organization_id FROM organization_members
      WHERE user_id = $1 AND left_at IS NULL LIMIT 1`,
     [userId],
   );
-  if (orgRows.length === 0) return { allowed: false, organizationId: null };
+  if (orgRows.length === 0) {
+    return { ...base, allowed: false, actorType: 'none', denyReason: 'NO_RELATION_TO_MASTER' };
+  }
   const organizationId: string = orgRows[0].organization_id;
 
-  // 3. Check product is listed in user's organization
-  //    organization_product_listings → supplier_product_offers (offer_id) → master_id = productId
   const listingRows = await dataSource.query(
-    `SELECT 1 FROM organization_product_listings opl
-     JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-     WHERE spo.master_id = $1
-       AND opl.organization_id = $2
-     LIMIT 1`,
-    [productId, organizationId],
+    `SELECT 1 FROM organization_product_listings
+     WHERE organization_id = $1 AND master_id = $2 AND is_active = true LIMIT 1`,
+    [organizationId, productId],
   );
-  if (listingRows.length > 0) return { allowed: true, organizationId };
+  if (listingRows.length === 0) {
+    return {
+      ...base,
+      allowed: false,
+      actorType: 'none',
+      organizationId,
+      denyReason: 'NO_RELATION_TO_MASTER',
+    };
+  }
 
-  return { allowed: false, organizationId };
+  return { ...base, allowed: true, actorType: 'store', organizationId };
 }
 
 /**

@@ -63,24 +63,8 @@ export class ProductAiContentService {
         return null;
       }
 
-      // upsert: 같은 product + content_type이면 교체
-      const existing = await this.contentRepo.findOne({
-        where: { productId: product.id, contentType },
-      });
-
-      if (existing) {
-        existing.content = parsed.content;
-        existing.model = result.model;
-        return await this.contentRepo.save(existing);
-      }
-
-      const entity = this.contentRepo.create({
-        productId: product.id,
-        contentType,
-        content: parsed.content,
-        model: result.model,
-      });
-      return await this.contentRepo.save(entity);
+      // upsert: 같은 product + content_type이면 교체 (전역 단일 행 계약)
+      return await this.upsertContent(product.id, contentType, parsed.content, result.model);
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
       console.error('[ProductAiContent] generation failed:', {
@@ -142,15 +126,42 @@ export class ProductAiContentService {
     content: string,
     model?: string,
   ): Promise<ProductAiContent> {
+    return this.upsertContent(productId, contentType, content, model ?? null);
+  }
+
+  /**
+   * (product_id, content_type) 전역 단일 행 upsert.
+   *
+   * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 §13:
+   *   UNIQUE(product_id, content_type) 적용 후, find→insert 사이의 동시 요청은 23505 를 유발한다.
+   *   경합에서 진 쪽은 상대가 만든 행을 다시 읽어 update 로 수렴시킨다 (최신 1개 계약 유지).
+   */
+  private async upsertContent(
+    productId: string,
+    contentType: ProductAiContentType,
+    content: string,
+    model: string | null,
+  ): Promise<ProductAiContent> {
+    const apply = (row: ProductAiContent) => {
+      row.content = content;
+      if (model) row.model = model;
+      return this.contentRepo.save(row);
+    };
+
     const existing = await this.contentRepo.findOne({ where: { productId, contentType } });
-    if (existing) {
-      existing.content = content;
-      if (model) existing.model = model;
-      return await this.contentRepo.save(existing);
+    if (existing) return await apply(existing);
+
+    try {
+      return await this.contentRepo.save(
+        this.contentRepo.create({ productId, contentType, content, model }),
+      );
+    } catch (error) {
+      const code = (error as { code?: string })?.code;
+      if (code !== '23505') throw error;
+      const winner = await this.contentRepo.findOne({ where: { productId, contentType } });
+      if (!winner) throw error;
+      return await apply(winner);
     }
-    return await this.contentRepo.save(
-      this.contentRepo.create({ productId, contentType, content, model: model ?? null }),
-    );
   }
 
   /**

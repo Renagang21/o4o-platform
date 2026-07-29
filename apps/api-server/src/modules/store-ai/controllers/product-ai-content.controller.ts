@@ -4,7 +4,10 @@ import { ProductAiContentService } from '../services/product-ai-content.service.
 import type { ProductContentInput } from '../services/product-ai-content.service.js';
 import type { ProductAiContentType } from '../entities/product-ai-content.entity.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
-import { verifyProductOrgAccess, productMasterExists } from '../utils/product-access.utils.js';
+import {
+  resolveGlobalProductResourceAccess,
+  productMasterExists,
+} from '../utils/product-access.utils.js';
 
 /**
  * Product AI Content Controller — IR-O4O-AI-CONTENT-ENGINE-IMPLEMENTATION-V1
@@ -16,19 +19,16 @@ import { verifyProductOrgAccess, productMasterExists } from '../utils/product-ac
  * GET  /:productId/ai-contents/:type              — 특정 content_type 조회
  * DELETE /:productId/ai-contents/:contentId       — AI 콘텐츠 삭제
  *
- * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1: 모든 endpoint 에 접근 검증 추가.
- *
  * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1:
- *   :productId 는 product_masters.id 전용이며, 저장 대상 product_ai_contents 는
- *   organization 소유가 아닌 **전역 자원**이다 (매장 사용자 쓰기 금지).
- *   §8.1 ID 계약(productMasterExists → 404 PRODUCT_MASTER_NOT_FOUND)은 적용됨.
+ *   :productId 는 product_masters.id **전용**이며, product_ai_contents 는 organization 소유가
+ *   아닌 **전역(플랫폼 소유) 자원**이다.
  *
- *   ⚠ 접근 판정(verifyProductOrgAccess)은 아직 계약과 정렬되지 않았다.
- *     - 우회 역할이 무접두 'admin'/'operator' 정확 일치 → 활성 보유자 0명
- *     - 소유 판정이 OPL.offer_id → supplier_product_offers JOIN → 실데이터 0행 (dead JOIN)
- *     - 공급자 축 부재
- *   → 결과적으로 현재 모든 주체가 403. 재설계는 ProductMaster 의 service scope 판정이
- *     선행되어야 하며 중지 상태다. CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 참조.
+ *   접근 판정 = resolveGlobalProductResourceAccess (actor·관계 기준, service 기준 아님)
+ *     write : platform:super_admin | 자기 offer master 보유 ACTIVE 공급자
+ *     read  : 위 + active OPL(organization_id + master_id) 보유 매장
+ *     매장 사용자의 쓰기는 금지한다 ({service}:operator/admin 도 역할만으로 허용되지 않는다).
+ *
+ *   §8.1 ID 계약: 신규 전역 행을 만드는 쓰기 경로는 master 미존재 시 404 PRODUCT_MASTER_NOT_FOUND.
  */
 
 const VALID_CONTENT_TYPES: ProductAiContentType[] = [
@@ -49,7 +49,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -85,7 +90,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -121,7 +131,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -158,7 +173,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'manage_read',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -186,7 +206,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
         return;
       }
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'manage_read',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -210,7 +235,12 @@ export function createProductAiContentRouter(dataSource: DataSource): Router {
       const { productId, contentId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;

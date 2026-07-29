@@ -3,7 +3,10 @@ import type { DataSource } from 'typeorm';
 import { ProductAiTaggingService } from '../services/product-ai-tagging.service.js';
 import type { ProductTagInput } from '../services/product-ai-tagging.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
-import { verifyProductOrgAccess, productMasterExists } from '../utils/product-access.utils.js';
+import {
+  resolveGlobalProductResourceAccess,
+  productMasterExists,
+} from '../utils/product-access.utils.js';
 
 /**
  * Product AI Tag Controller — WO-O4O-PRODUCT-AI-TAGGING-V1
@@ -13,17 +16,16 @@ import { verifyProductOrgAccess, productMasterExists } from '../utils/product-ac
  * POST   /:productId/ai-tags/manual       — 수동 태그 추가
  * DELETE /:productId/ai-tags/:tagId       — 태그 삭제
  *
- * WO-O4O-STORE-AI-PRODUCT-ORG-GUARD-V1: 모든 endpoint 에 접근 검증 추가.
- *
  * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1:
- *   :productId 는 product_masters.id 전용이며, product_ai_tags 는 organization 소유가 아닌
- *   **전역 자원**이다 (매장 사용자 쓰기 금지). 쓰기는 syncMasterTags() 를 통해
- *   product_masters.tags 를 갱신하므로 잘못된 productId 는 전역 마스터를 오염시킨다.
- *   §8.1/§9 ID 계약(productMasterExists → 404 PRODUCT_MASTER_NOT_FOUND)은 수동 태그 쓰기 경로에 적용됨.
+ *   :productId 는 product_masters.id **전용**이며, product_ai_tags 는 organization 소유가 아닌
+ *   **전역(플랫폼 소유) 자원**이다. 쓰기는 syncMasterTags() 를 통해 product_masters.tags 를
+ *   갱신하므로 잘못된 productId 는 전역 마스터를 오염시킨다.
  *
- *   ⚠ 접근 판정(verifyProductOrgAccess)은 ai-contents 와 동일하게 계약과 미정렬 상태이며
- *     현재 모든 주체가 403 이다. 재설계는 ProductMaster 의 service scope 판정이 선행되어야 하며
- *     중지 상태다. CHECK-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 참조.
+ *   접근 판정 = resolveGlobalProductResourceAccess (actor·관계 기준, service 기준 아님)
+ *     write / manage_read : platform:super_admin | 자기 offer master 보유 공급자
+ *     매장 사용자는 조회·쓰기 모두 불가 (태그 관리 API 는 매장의 소비 대상이 아니다).
+ *
+ *   §8.1/§9 ID 계약: 수동 태그 쓰기 경로는 master 미존재 시 404 PRODUCT_MASTER_NOT_FOUND.
  */
 export function createProductAiTagRouter(dataSource: DataSource): Router {
   const router = Router();
@@ -35,7 +37,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'manage_read',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -56,7 +63,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -94,7 +106,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -138,7 +155,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -176,7 +198,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;
@@ -223,7 +250,12 @@ export function createProductAiTagRouter(dataSource: DataSource): Router {
       const { productId, tagId } = req.params;
       const userId = req.user?.id as string;
 
-      const { allowed } = await verifyProductOrgAccess(dataSource, productId, userId);
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        userId,
+        'write',
+      );
       if (!allowed) {
         res.status(403).json({ success: false, error: 'Product access denied', code: 'PRODUCT_ACCESS_DENIED' });
         return;

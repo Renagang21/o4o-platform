@@ -3,6 +3,7 @@ import type { DataSource } from 'typeorm';
 import { generateProductPopPdf } from '../services/product-pop-pdf.service.js';
 import type { PopPdfLayout, PopPdfInput } from '../services/product-pop-pdf.service.js';
 import { authenticate } from '../../../middleware/auth.middleware.js';
+import { resolveGlobalProductResourceAccess } from '../utils/product-access.utils.js';
 
 /**
  * Product POP PDF Controller — WO-O4O-POP-PDF-GENERATOR-V1
@@ -12,6 +13,12 @@ import { authenticate } from '../../../middleware/auth.middleware.js';
  * Query params:
  *   ?copies=N  — 인쇄 매수 (default: layout에 따라 1/2/4)
  *   ?qrUrl=    — QR에 인코딩할 URL (선택)
+ *
+ * WO-O4O-PRODUCT-AI-CONTENT-GLOBAL-CONTRACT-AND-ACCESS-FIX-V1 §10:
+ *   :productId 는 product_masters.id 전용이며, 렌더 대상은 전역 자원(product_ai_contents)이다.
+ *   접근 판정 = 'render_read' — platform:super_admin | 자기 offer master 보유 공급자 |
+ *   active OPL(organization_id + master_id) 보유 매장.
+ *   매장 자체 상품(store_local_products) POP 는 본 라우트 범위가 아니다 (후속 WO-2).
  */
 
 const VALID_LAYOUTS: PopPdfLayout[] = ['A4', 'A5', 'A6'];
@@ -32,7 +39,23 @@ export function createProductPopPdfRouter(dataSource: DataSource): Router {
         return;
       }
 
-      // 1. Product Master 조회
+      // 0. 접근 판정 (전역 자원) — 존재 여부보다 먼저 평가하여 master 존재를 노출하지 않는다
+      const { allowed } = await resolveGlobalProductResourceAccess(
+        dataSource,
+        productId,
+        req.user?.id as string | undefined,
+        'render_read',
+      );
+      if (!allowed) {
+        res.status(403).json({
+          success: false,
+          error: 'Product access denied',
+          code: 'PRODUCT_ACCESS_DENIED',
+        });
+        return;
+      }
+
+      // 1. Product Master 조회 (local product ID 는 여기서 404)
       const productRows = await dataSource.query(
         `SELECT
            pm.id,
