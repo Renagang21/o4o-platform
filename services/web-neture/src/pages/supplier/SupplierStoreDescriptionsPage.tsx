@@ -13,6 +13,7 @@
  */
 import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { toast } from '@o4o/error-handling';
 import {
   supplierProfileApi,
   supplierApi,
@@ -43,36 +44,53 @@ function missingLabels(profile: SupplierProfile | null): string[] {
 export default function SupplierStoreDescriptionsPage() {
   const [profile, setProfile] = useState<SupplierProfile | null>(null);
   const [loading, setLoading] = useState(true);
+  // 프로필(승인 상태) 조회 실패를 '미승인'으로 오인하지 않도록 오류 상태를 분리한다.
+  const [profileError, setProfileError] = useState(false);
+  const [profileReloadKey, setProfileReloadKey] = useState(0);
 
   // authoring state (ACTIVE 전용)
   const [products, setProducts] = useState<SupplierProduct[]>([]);
   const [drafts, setDrafts] = useState<SupplierStoreDescriptionDraft[]>([]);
   const [productsLoading, setProductsLoading] = useState(false);
+  // 상품·설명서 목록 조회 실패를 '상품 0건 / 설명서 없음'으로 오인하지 않도록 분리한다.
+  const [productsError, setProductsError] = useState(false);
+  const [activeReloadKey, setActiveReloadKey] = useState(0);
   const [keyword, setKeyword] = useState('');
   const [selected, setSelected] = useState<SupplierProduct | null>(null);
 
   useEffect(() => {
     let mounted = true;
+    setLoading(true);
+    setProfileError(false);
     supplierProfileApi
       .getProfile()
       .then((p) => {
         if (mounted) setProfile(p);
       })
-      .catch(() => {})
+      .catch(() => {
+        if (mounted) {
+          setProfile(null);
+          setProfileError(true);
+        }
+      })
       .finally(() => {
         if (mounted) setLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, []);
+  }, [profileReloadKey]);
 
   const status = String(profile?.status ?? '').toUpperCase();
   const active = status === 'ACTIVE';
   const labels = missingLabels(profile);
 
   const loadDrafts = () => {
-    supplierStoreDescriptionApi.listMine().then(setDrafts).catch(() => {});
+    // 저장 후 재조회. 실패 시 기존 목록을 유지하고 사용자에게 알린다(빈 목록으로 덮어쓰지 않음).
+    supplierStoreDescriptionApi
+      .listMine()
+      .then(setDrafts)
+      .catch(() => toast.error('설명서 목록을 새로고침하지 못했습니다. 잠시 후 다시 시도해 주세요.'));
   };
 
   // ACTIVE 시 상품 목록 + 내 STORE 설명서 작업행 로드
@@ -80,20 +98,23 @@ export default function SupplierStoreDescriptionsPage() {
     if (!active) return;
     let mounted = true;
     setProductsLoading(true);
+    setProductsError(false);
     Promise.all([supplierApi.getProducts(), supplierStoreDescriptionApi.listMine()])
       .then(([prods, myDrafts]) => {
         if (!mounted) return;
         setProducts(prods);
         setDrafts(myDrafts);
       })
-      .catch(() => {})
+      .catch(() => {
+        if (mounted) setProductsError(true);
+      })
       .finally(() => {
         if (mounted) setProductsLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, [active]);
+  }, [active, activeReloadKey]);
 
   const draftByMaster = useMemo(() => {
     const m = new Map<string, SupplierStoreDescriptionDraft>();
@@ -131,6 +152,20 @@ export default function SupplierStoreDescriptionsPage() {
         <div className="flex items-center justify-center py-16">
           <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-emerald-600" />
         </div>
+      ) : profileError ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-6 text-red-900">
+          <h2 className="text-lg font-bold">공급자 정보를 불러오지 못했습니다</h2>
+          <p className="mt-2 text-sm">
+            일시적인 오류로 승인 상태를 확인할 수 없습니다. 잠시 후 다시 시도해 주세요.
+          </p>
+          <button
+            type="button"
+            onClick={() => setProfileReloadKey((k) => k + 1)}
+            className="mt-4 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white hover:bg-red-700"
+          >
+            다시 시도
+          </button>
+        </div>
       ) : active ? (
         <div className="rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between gap-3">
@@ -161,6 +196,17 @@ export default function SupplierStoreDescriptionsPage() {
           <div className="mt-3 divide-y divide-slate-100 rounded-lg border border-slate-100">
             {productsLoading ? (
               <div className="flex items-center justify-center py-12 text-sm text-slate-400">불러오는 중…</div>
+            ) : productsError ? (
+              <div className="py-12 text-center text-sm">
+                <p className="text-red-600">상품·설명서 목록을 불러오지 못했습니다.</p>
+                <button
+                  type="button"
+                  onClick={() => setActiveReloadKey((k) => k + 1)}
+                  className="mt-3 rounded-lg border border-red-300 px-4 py-1.5 text-xs font-medium text-red-700 hover:bg-red-50"
+                >
+                  다시 시도
+                </button>
+              </div>
             ) : filteredProducts.length === 0 ? (
               <div className="py-12 text-center text-sm text-slate-400">
                 {products.length === 0 ? (

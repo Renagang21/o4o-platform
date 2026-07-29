@@ -14,6 +14,7 @@
 import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { RichTextEditor, type MediaInsert } from '@o4o/content-editor';
+import { toast } from '@o4o/error-handling';
 import {
   supplierApi,
   productApi,
@@ -141,6 +142,10 @@ export default function SupplierProductCreatePage() {
 
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
+  // 필수 선택 항목(카테고리) 조회 실패를 빈 select로 방치하지 않는다 — 오류+재시도, 제출 차단.
+  const [categoriesLoading, setCategoriesLoading] = useState(true);
+  const [categoriesError, setCategoriesError] = useState(false);
+  const [categoriesReloadKey, setCategoriesReloadKey] = useState(0);
 
   // Description editor — WO-O4O-PRODUCT-IMPORT-ASSISTANT-V1: draft 초기값 지원
   const [consumerShortDesc, setConsumerShortDesc] = useState(
@@ -184,10 +189,20 @@ export default function SupplierProductCreatePage() {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  // Load categories on mount
+  // Load categories on mount (재시도 가능)
   useEffect(() => {
-    productApi.getCategories().then(setCategories);
-  }, []);
+    let cancelled = false;
+    setCategoriesLoading(true);
+    setCategoriesError(false);
+    productApi.getCategories()
+      .then((cats) => { if (!cancelled) setCategories(cats); })
+      .catch(() => {
+        // 조회 실패는 '카테고리 없음'이 아니다 — 오류 표시 후 재시도 가능.
+        if (!cancelled) { setCategories([]); setCategoriesError(true); }
+      })
+      .finally(() => { if (!cancelled) setCategoriesLoading(false); });
+    return () => { cancelled = true; };
+  }, [categoriesReloadKey]);
 
   // Auto-search from URL barcode param
   useEffect(() => {
@@ -211,17 +226,23 @@ export default function SupplierProductCreatePage() {
     setMaster(null);
     setBarcodeChecked(false);
 
-    const result = await productApi.getMasterByBarcode(bc);
-    setSearching(false);
-    setBarcodeChecked(true);
-
-    if (result) {
-      setMaster(result);
-      setForm((prev) => ({
-        ...prev,
-        marketingName: prev.marketingName || result.marketingName || result.regulatoryName || '',
-        manufacturerName: prev.manufacturerName || result.manufacturerName || '',
-      }));
+    try {
+      const result = await productApi.getMasterByBarcode(bc);
+      // 조회 성공 시에만 checked 처리(성공적으로 '없음'과 '조회 실패'를 구분).
+      setBarcodeChecked(true);
+      if (result) {
+        setMaster(result);
+        setForm((prev) => ({
+          ...prev,
+          marketingName: prev.marketingName || result.marketingName || result.regulatoryName || '',
+          manufacturerName: prev.manufacturerName || result.manufacturerName || '',
+        }));
+      }
+    } catch {
+      // 조회 실패를 '새 상품'으로 오인시키지 않는다 — checked 미설정 + 안내.
+      toast.error('바코드 조회에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+    } finally {
+      setSearching(false);
     }
   };
 
@@ -259,6 +280,7 @@ export default function SupplierProductCreatePage() {
   const validateStep = (step: number): string | null => {
     if (step === 1) {
       if (!form.marketingName.trim()) return '상품명을 입력해주세요.';
+      if (categoriesError) return '카테고리 목록을 불러오지 못했습니다. 카테고리 항목의 [다시 시도]로 목록을 불러온 뒤 진행해 주세요.';
       if (!form.categoryId) return '카테고리를 선택해주세요.';
       if (isRegulated && (!form.regulatoryType || !form.regulatoryName.trim())) {
         return '규제 카테고리 상품은 규제 유형과 규제명이 필수입니다.';
@@ -630,19 +652,35 @@ export default function SupplierProductCreatePage() {
               <label className="block text-sm font-medium text-slate-700 mb-1">
                 카테고리 <span className="text-red-500">*</span>
               </label>
+              {categoriesError ? (
+                /* 필수 선택 데이터 조회 실패 — 빈 select 대신 오류+재시도. 입력값은 유지됨. */
+                <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-3 text-sm text-red-700">
+                  <p className="font-medium">카테고리 목록을 불러오지 못했습니다.</p>
+                  <p className="mt-0.5 text-xs text-red-600">카테고리는 필수 항목입니다. 다시 시도해 주세요.</p>
+                  <button
+                    type="button"
+                    onClick={() => setCategoriesReloadKey((k) => k + 1)}
+                    className="mt-2 rounded-lg border border-red-300 bg-white px-3 py-1.5 text-sm font-medium text-red-700 hover:bg-red-100"
+                  >
+                    다시 시도
+                  </button>
+                </div>
+              ) : (
               <select
                 name="categoryId"
                 value={form.categoryId}
                 onChange={handleChange}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                disabled={categoriesLoading}
+                className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-emerald-500 disabled:opacity-60"
               >
-                <option value="">카테고리 선택</option>
+                <option value="">{categoriesLoading ? '카테고리 불러오는 중...' : '카테고리 선택'}</option>
                 {flatCats.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {'\u00A0\u00A0'.repeat(cat.depth)}{cat.name}
                   </option>
                 ))}
               </select>
+              )}
               {isRegulated && (
                 <p className="mt-1 text-sm text-amber-600">규제 카테고리 — 아래 규제 정보 입력이 필요합니다</p>
               )}

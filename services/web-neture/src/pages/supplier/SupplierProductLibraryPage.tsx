@@ -9,7 +9,8 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, Package, ArrowLeft, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Search, Package, ArrowLeft, ChevronLeft, ChevronRight, AlertTriangle } from 'lucide-react';
+import { toast } from '@o4o/error-handling';
 import {
   productApi,
   type MasterSearchResult,
@@ -46,6 +47,8 @@ export default function SupplierProductLibraryPage() {
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
+  // 검색 실패를 '검색 결과 없음(0건)'으로 오인시키지 않는다. 재시도는 검색어·필터·페이지를 유지.
+  const [searchError, setSearchError] = useState(false);
 
   // Reference data
   const [categories, setCategories] = useState<CategoryTreeItem[]>([]);
@@ -53,8 +56,13 @@ export default function SupplierProductLibraryPage() {
 
   // Load categories and brands
   useEffect(() => {
-    productApi.getCategories().then(setCategories);
-    productApi.getBrands().then(setBrands);
+    // 필터 참조 데이터 조회 실패 시 조용히 삼키지 않고 알림. 검색 자체는 필터 없이도 동작.
+    productApi.getCategories().then(setCategories).catch(() => {
+      toast.error('카테고리 목록을 불러오지 못했습니다. 필터 없이 검색은 가능합니다.');
+    });
+    productApi.getBrands().then(setBrands).catch(() => {
+      toast.error('브랜드 목록을 불러오지 못했습니다. 필터 없이 검색은 가능합니다.');
+    });
   }, []);
 
   const flatCats = flattenCategories(categories);
@@ -62,18 +70,25 @@ export default function SupplierProductLibraryPage() {
   // Search function
   const doSearch = useCallback(async (p: number) => {
     setLoading(true);
-    const res = await productApi.searchMasters({
-      q: query.trim() || undefined,
-      categoryId: categoryId || undefined,
-      brandId: brandId || undefined,
-      page: p,
-      limit: 20,
-    });
-    setResults(res.data);
-    setTotal(res.meta.total);
-    setTotalPages(res.meta.totalPages);
-    setPage(p);
-    setLoading(false);
+    setSearchError(false);
+    try {
+      const res = await productApi.searchMasters({
+        q: query.trim() || undefined,
+        categoryId: categoryId || undefined,
+        brandId: brandId || undefined,
+        page: p,
+        limit: 20,
+      });
+      setResults(res.data);
+      setTotal(res.meta.total);
+      setTotalPages(res.meta.totalPages);
+      setPage(p);
+    } catch {
+      // 조회 실패는 '0건'이 아니다 — 오류 표시 후 동일 조건으로 재시도 가능.
+      setSearchError(true);
+    } finally {
+      setLoading(false);
+    }
   }, [query, categoryId, brandId]);
 
   // Initial load
@@ -169,6 +184,19 @@ export default function SupplierProductLibraryPage() {
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="text-slate-400 text-sm">검색 중...</div>
+        </div>
+      ) : searchError ? (
+        <div className="flex flex-col items-center py-16 text-slate-500">
+          <AlertTriangle size={48} className="mb-4 text-red-400" />
+          <p className="text-sm font-medium text-slate-700">상품을 검색하지 못했습니다</p>
+          <p className="text-xs mt-1 text-slate-400">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주세요.</p>
+          <button
+            type="button"
+            onClick={() => doSearch(page)}
+            className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            다시 시도
+          </button>
         </div>
       ) : results.length === 0 ? (
         <div className="flex flex-col items-center py-16 text-slate-400">

@@ -5,7 +5,7 @@
  * 공급자 본인의 Market Trial 목록 (상태별 현황)
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
 import { getMyTrials } from '../../api/trial';
@@ -39,12 +39,19 @@ export default function SupplierTrialListPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  // 조회 실패는 '펀딩 0건'이 아니다 — 오류 표시 후 재시도 가능.
+  const load = useCallback(() => {
+    setLoading(true);
+    setError(null);
     getMyTrials()
       .then(setTrials)
       .catch(() => setError('목록을 불러오지 못했습니다.'))
       .finally(() => setLoading(false));
   }, []);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   if (loading) {
     return (
@@ -57,7 +64,10 @@ export default function SupplierTrialListPage() {
   if (error) {
     return (
       <div style={s.container}>
-        <p style={{ ...s.empty, color: '#EF4444' }}>{error}</p>
+        <div style={s.emptyBox}>
+          <p style={{ ...s.empty, color: '#EF4444' }}>{error}</p>
+          <button style={s.createBtn} onClick={load}>다시 시도</button>
+        </div>
       </div>
     );
   }

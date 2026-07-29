@@ -18,7 +18,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { GuideBackLink } from '../../components/GuideBackLink';
-import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2 } from 'lucide-react';
+import { Tag, ChevronLeft, ChevronRight, Package, Plus, X, Loader2, AlertTriangle } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { netureEventOfferApi, supplierKpaEventOfferApi } from '../../lib/api';
 import type {
@@ -162,11 +162,14 @@ export default function SupplierEventOfferPage() {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
+  // 조회 실패를 '0건'으로 오인시키지 않도록 영역별 오류 상태 분리(재시도 가능).
+  const [itemsError, setItemsError] = useState(false);
 
   // WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 제안 모달 상태
   const [proposeOpen, setProposeOpen] = useState(false);
   const [proposableOffers, setProposableOffers] = useState<ProposableOffer[]>([]);
   const [proposableLoading, setProposableLoading] = useState(false);
+  const [proposableError, setProposableError] = useState(false);
   const [proposingId, setProposingId] = useState<string | null>(null);
 
   // WO-O4O-EVENT-OFFER-MULTI-SERVICE-PROPOSAL-V1
@@ -243,14 +246,18 @@ export default function SupplierEventOfferPage() {
   // WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황
   const [myProposals, setMyProposals] = useState<MyEventOfferProposal[]>([]);
   const [proposalsLoading, setProposalsLoading] = useState(false);
+  const [proposalsError, setProposalsError] = useState(false);
 
   const loadMyProposals = useCallback(async () => {
     setProposalsLoading(true);
+    setProposalsError(false);
     try {
       const data = await supplierKpaEventOfferApi.listMyProposals();
       setMyProposals(data);
     } catch {
+      // 조회 실패는 '제안 없음'이 아니다 — 오류 표시 후 재시도 가능.
       setMyProposals([]);
+      setProposalsError(true);
     } finally {
       setProposalsLoading(false);
     }
@@ -258,6 +265,7 @@ export default function SupplierEventOfferPage() {
 
   const fetchItems = useCallback(async (p: number, status: StatusTab) => {
     setLoading(true);
+    setItemsError(false);
     try {
       const res = await netureEventOfferApi.getEnrichedOffers({ page: p, limit: 20, status });
       const body = res.data;
@@ -266,7 +274,9 @@ export default function SupplierEventOfferPage() {
       setTotalPages(body.pagination?.totalPages ?? 1);
       setPage(p);
     } catch {
+      // 조회 실패는 '오퍼 0건'이 아니다 — 오류 표시 후 재시도 가능.
       setItems([]);
+      setItemsError(true);
     } finally {
       setLoading(false);
     }
@@ -275,6 +285,7 @@ export default function SupplierEventOfferPage() {
   // WO-O4O-EVENT-OFFER-SUPPLIER-UI-V1: 제안 가능한 SPO 목록 로드
   const loadProposableOffers = useCallback(async () => {
     setProposableLoading(true);
+    setProposableError(false);
     try {
       const offers = await supplierKpaEventOfferApi.listMyOffers();
       setProposableOffers(offers);
@@ -284,7 +295,9 @@ export default function SupplierEventOfferPage() {
         ? PROPOSE_ERROR_MESSAGES[code]
         : '제안 가능한 상품을 불러오지 못했습니다.';
       toast.error(msg);
+      // 조회 실패는 '제안 가능 상품 없음'이 아니다 — 모달 안에서 오류+재시도 표시.
       setProposableOffers([]);
+      setProposableError(true);
     } finally {
       setProposableLoading(false);
     }
@@ -464,7 +477,7 @@ export default function SupplierEventOfferPage() {
       <SelectedSupplierProductBanner kind="event" />
 
       {/* WO-O4O-EVENT-OFFER-APPROVAL-PHASE1-V1: 내 제안 현황 */}
-      {(proposalsLoading || myProposals.length > 0) && (
+      {(proposalsLoading || myProposals.length > 0 || proposalsError) && (
         <div className="mb-6 rounded-xl border border-slate-200 bg-white p-5">
           <div className="flex items-center justify-between mb-3">
             <div>
@@ -473,10 +486,22 @@ export default function SupplierEventOfferPage() {
                 내가 제안한 이벤트의 승인 상태입니다. 반려된 경우 사유를 확인하세요.
               </p>
             </div>
-            <span className="text-xs text-slate-500">총 {myProposals.length}건</span>
+            {!proposalsError && <span className="text-xs text-slate-500">총 {myProposals.length}건</span>}
           </div>
           {proposalsLoading && myProposals.length === 0 ? (
             <div className="py-6 text-center text-sm text-slate-500">불러오는 중...</div>
+          ) : proposalsError ? (
+            <div className="flex flex-col items-center gap-2 py-6 text-center">
+              <AlertTriangle className="w-6 h-6 text-red-400" />
+              <p className="text-sm text-slate-600">내 제안 현황을 불러오지 못했습니다.</p>
+              <button
+                type="button"
+                onClick={loadMyProposals}
+                className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                다시 시도
+              </button>
+            </div>
           ) : (
             <ul className="divide-y divide-slate-100">
               {myProposals.map((p) => {
@@ -544,6 +569,19 @@ export default function SupplierEventOfferPage() {
       {loading ? (
         <div className="flex justify-center py-16">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600" />
+        </div>
+      ) : itemsError ? (
+        <div className="text-center py-16 text-slate-500">
+          <AlertTriangle size={40} className="mx-auto mb-3 text-red-400" />
+          <p className="font-medium text-slate-700">이벤트 오퍼 현황을 불러오지 못했습니다.</p>
+          <p className="text-sm mt-1">일시적인 오류일 수 있습니다. 잠시 후 다시 시도해 주세요.</p>
+          <button
+            type="button"
+            onClick={() => fetchItems(page, activeTab)}
+            className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            다시 시도
+          </button>
         </div>
       ) : items.length === 0 ? (
         <div className="text-center py-16 text-slate-500">
@@ -713,6 +751,19 @@ export default function SupplierEventOfferPage() {
               {proposableLoading ? (
                 <div className="flex justify-center py-12">
                   <Loader2 size={24} className="animate-spin text-indigo-600" />
+                </div>
+              ) : proposableError ? (
+                <div className="text-center py-12 text-slate-500">
+                  <AlertTriangle size={36} className="mx-auto mb-3 text-red-400" />
+                  <p className="font-medium text-sm text-slate-700">제안 가능한 상품을 불러오지 못했습니다.</p>
+                  <p className="text-xs mt-1 text-slate-400">잠시 후 다시 시도해 주세요.</p>
+                  <button
+                    type="button"
+                    onClick={loadProposableOffers}
+                    className="mt-4 rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+                  >
+                    다시 시도
+                  </button>
                 </div>
               ) : proposableOffers.length === 0 ? (
                 <div className="text-center py-12 text-slate-500">

@@ -15,7 +15,7 @@
  *   자동 복사하지 않는다. 저장·검수 요청도 언어별 독립.
  */
 import { useCallback, useEffect, useState } from 'react';
-import { X, Loader2 } from 'lucide-react';
+import { X, Loader2, AlertTriangle } from 'lucide-react';
 import { RichTextEditor } from '@o4o/content-editor';
 import { toast } from '@o4o/error-handling';
 import {
@@ -68,6 +68,9 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     user?.roles?.some((r: string) => r.includes('admin') || r.includes('operator') || r.includes('super_admin')) ?? false;
 
   const [loading, setLoading] = useState(true);
+  // 기존 작업행 조회 실패를 '신규 설명서(빈 편집기)'로 오인하지 않도록 분리. 실패 시 저장·제출 차단.
+  const [loadError, setLoadError] = useState(false);
+  const [reloadKey, setReloadKey] = useState(0);
   const [saving, setSaving] = useState(false);
   const [content, setContent] = useState('');
   const [existing, setExisting] = useState<SupplierStoreDescriptionDraft | null>(null);
@@ -91,6 +94,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
     if (!open || !product?.masterId) return;
     let mounted = true;
     setLoading(true);
+    setLoadError(false);
     setContent('');
     setExisting(null);
     setRows([]);
@@ -103,14 +107,17 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
         setRows(all);
         loadLanguageFrom(all, DEFAULT_LANG);
       })
-      .catch(() => {})
+      .catch(() => {
+        // 조회 실패를 '신규(빈 편집기)'로 오인시키지 않는다. 편집기 대신 오류+재시도 표시.
+        if (mounted) setLoadError(true);
+      })
       .finally(() => {
         if (mounted) setLoading(false);
       });
     return () => {
       mounted = false;
     };
-  }, [open, product?.masterId, loadLanguageFrom]);
+  }, [open, product?.masterId, loadLanguageFrom, reloadKey]);
 
   // 언어 전환: 미저장 변경 보호 → 해당 언어 초안 로드(캐시).
   const selectLanguage = useCallback((lang: SupportedLang) => {
@@ -237,6 +244,24 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
             <div className="flex items-center justify-center py-16">
               <Loader2 className="animate-spin text-emerald-600" />
             </div>
+          ) : loadError ? (
+            // 조회 실패 시 빈 편집기를 열지 않는다. 기존 작업본을 덮어쓸 수 있으므로 저장·제출도 차단.
+            <div className="flex flex-col items-center justify-center py-16 text-center gap-3">
+              <AlertTriangle className="w-8 h-8 text-red-400" />
+              <div>
+                <p className="text-sm font-medium text-slate-700">설명서를 불러오지 못했습니다</p>
+                <p className="text-xs text-slate-400 mt-1">
+                  기존 작업 내용을 덮어쓰지 않도록 편집기를 열지 않았습니다. 잠시 후 다시 시도해 주세요.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setReloadKey((k) => k + 1)}
+                className="rounded-lg border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+              >
+                다시 시도
+              </button>
+            </div>
           ) : (
             <>
               {/* WO-...-LANGUAGE-EDITOR-V1: 언어 탭 — 언어별 독립 작업행(자동 복사 없음). */}
@@ -309,7 +334,7 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
             {canWithdraw && (
               <button
                 onClick={doWithdraw}
-                disabled={saving || loading || withdrawing}
+                disabled={saving || loading || loadError || withdrawing}
                 className="rounded-lg border border-red-200 bg-white px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-50 shrink-0"
               >
                 {withdrawing ? '철회 중...' : '철회'}
@@ -320,14 +345,14 @@ export default function SupplierStoreDescriptionEditorDrawer({ product, open, on
           <div className="flex gap-2 shrink-0">
             <button
               onClick={() => doSave(false)}
-              disabled={saving || loading || withdrawing}
+              disabled={saving || loading || loadError || withdrawing}
               className="rounded-lg bg-slate-100 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-200 disabled:opacity-50"
             >
               {saving ? '저장 중...' : '임시저장'}
             </button>
             <button
               onClick={() => doSave(true)}
-              disabled={saving || loading || withdrawing}
+              disabled={saving || loading || loadError || withdrawing}
               className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:opacity-50"
             >
               {saving ? '처리 중...' : isRevision ? '다시 검수 요청' : '검수요청'}

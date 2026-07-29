@@ -7,7 +7,7 @@
  * - 상태별 다음 행동 안내
  */
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { getSupplierTrialResults } from '../../api/trial';
 import type { TrialResults } from '../../api/trial';
@@ -96,11 +96,17 @@ export default function SupplierTrialDetailPage() {
   const [results, setResults] = useState<TrialResults | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 404/403 은 재시도로 해결되지 않는 확정 상태 → retry 미노출.
+  // 그 외 조회 오류만 재시도 가능(false 로 표시).
+  const [canRetry, setCanRetry] = useState(false);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     if (!id) return;
+    setLoading(true);
+    setError(null);
+    setCanRetry(false);
     getSupplierTrialResults(id)
-      .then(setResults)
+      .then((r) => setResults(r))
       .catch((err) => {
         if (err?.response?.status === 403) {
           setError('접근 권한이 없습니다.');
@@ -108,10 +114,15 @@ export default function SupplierTrialDetailPage() {
           setError('유통참여형 펀딩을 찾을 수 없습니다.');
         } else {
           setError('결과를 불러오지 못했습니다.');
+          setCanRetry(true);
         }
       })
       .finally(() => setLoading(false));
   }, [id]);
+
+  useEffect(() => {
+    load();
+  }, [load]);
 
   if (loading) {
     return (
@@ -126,6 +137,9 @@ export default function SupplierTrialDetailPage() {
       <div style={s.container}>
         <button style={s.backLink} onClick={() => navigate('/supplier/market-trial')}>← 목록으로</button>
         <p style={{ ...s.muted, color: '#EF4444', marginTop: '24px' }}>{error || '알 수 없는 오류'}</p>
+        {canRetry && (
+          <button style={{ ...s.primaryBtn, marginTop: '12px' }} onClick={load}>다시 시도</button>
+        )}
       </div>
     );
   }
