@@ -1,0 +1,19 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "mode": "rekey",
+  "policy": "유사도>=0.98 + 유일 후보 + 수치집합 동일 3중 조건. 원문 제어문자/오탈자를 제출측이 교정·누락한 경우를 되돌린다.",
+  "pendingBefore": 1,
+  "applied": 1,
+  "unresolved": 0,
+  "appliedDetail": [
+    {
+      "ko": "이 약은 기관지천식, 만성기관지염, 기관지확장증, 폐결핵, 폐기종, 상기도염(인후두염), 폐화농증, 폐렴, 낭성섬유증, 수술후 폐합병증 등의 객담배출곤란과 기관지조영, 기관지경 ",
+      "submittedKey": "이 약은 기관지천식, 만성기관지염, 기관지확장증, 폐결핵, 폐기종, 상기도염(인후두염), 폐화농증, 폐렴, 낭성섬유증, 수술후 폐합병증 등의 객담배출곤란과 기관지조영, 기관지경 검",
+      "rule": "control-char-normalized-exact",
+      "similarity": 1,
+      "diffAt": 44,
+      "shard": 2
+    }
+  ],
+  "unresolvedDetail": []
+}

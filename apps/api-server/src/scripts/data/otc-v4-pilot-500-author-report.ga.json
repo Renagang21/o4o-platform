@@ -1,0 +1,253 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "mode": "en",
+  "composed": 416,
+  "blocked": 0,
+  "tmMissingUnique": 0,
+  "missingSample": [],
+  "anomalies": [],
+  "routeGuardExemptions": 40,
+  "routeGuardExemptionPolicy": "해당 섹션 KO 공식 원문에 경구 동사가 실제 존재할 때만 면제(원문 충실 번역). 원문 근거 없는 경구 동사는 면제하지 않는다.",
+  "routeGuardExemptionDetail": [
+    {
+      "masterId": "092df237-586f-4a5d-a6d9-24387c05ebf7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "092df237-586f-4a5d-a6d9-24387c05ebf7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bby mouth\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0a2c7182-6ec3-4586-9ee4-a8905ef8cbed",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0a2c7182-6ec3-4586-9ee4-a8905ef8cbed",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bby mouth\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0adcd6d2-fbd2-4516-b5d4-15a4de9aab91",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "0c5d6f85-e8a7-4d72-a8b7-e9da4a5d8139",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0c5d6f85-e8a7-4d72-a8b7-e9da4a5d8139",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d6eba06-5373-47db-9639-73d6c3903eb6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d6eba06-5373-47db-9639-73d6c3903eb6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bby mouth\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d6f1fa3-0bc9-4466-917e-d8523984b7dd",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d6f1fa3-0bc9-4466-917e-d8523984b7dd",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d8652d7-8e64-4a26-b832-329fb4735583",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "105bda3d-ca30-49b5-a734-e0844adf9fbf",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1095c58a-103d-4072-a63c-8ef8034c9fc8",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "12e68473-14c3-4496-b647-b675b2f2000e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "12e68473-14c3-4496-b647-b675b2f2000e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "12fed7d1-1c3a-415c-9427-0a16fa81e78f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "12fed7d1-1c3a-415c-9427-0a16fa81e78f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "15659f7d-a331-4fa8-9c15-f112fa8c5626",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "168f70dd-b39a-4b48-b421-8f5f0a6311d9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "16ca65c9-e768-4d06-b766-d8f236f88019",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "16ca65c9-e768-4d06-b766-d8f236f88019",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN usage에 경구 동사: \\bswallow\\b",
+      "koSection": "용법·용량"
+    },
+    {
+      "masterId": "16ca65c9-e768-4d06-b766-d8f236f88019",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "21de2d06-2e8d-49b5-8e6a-26f2aa2e4e77",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "21de2d06-2e8d-49b5-8e6a-26f2aa2e4e77",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "220d46f6-38e0-4edb-b9cd-3bf832a5dd7e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "220d46f6-38e0-4edb-b9cd-3bf832a5dd7e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "23abad92-b5bb-4372-9c4d-2f4fa690e69c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN interaction에 경구 동사: \\borally\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "23b3bfb0-bb5f-4a51-bc15-0a7edfd6ca66",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2478dd9a-7363-4acf-a65e-b4faef02735d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2486df78-bb0c-41de-a14b-cbdb6beb4e3d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "260ddc4d-7177-4f62-9954-5948130464ec",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "27ca2eef-5343-4d2b-b196-2a6f98a21d5e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "27ca2eef-5343-4d2b-b196-2a6f98a21d5e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bby mouth\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2c0590c6-5403-4719-b9c0-26d1e8983127",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2e1674c0-c159-432a-a093-08aa86325d83",
+      "route": "vaginal",
+      "anomaly": "비경구(vaginal) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2e1674c0-c159-432a-a093-08aa86325d83",
+      "route": "vaginal",
+      "anomaly": "비경구(vaginal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2eb63f11-1f55-41a8-934a-f42a6df8a39d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2ebe4c0f-5dbe-456a-a900-c8ab9600d27a",
+      "route": "ophthalmic",
+      "anomaly": "비경구(ophthalmic) EN precaution에 경구 동사: \\bswallow\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "31e8cca5-582b-488f-9067-bf9d1e803618",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    }
+  ]
+}

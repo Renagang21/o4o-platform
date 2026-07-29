@@ -1,0 +1,44 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "mode": "merge",
+  "before": 1158,
+  "applied": 1,
+  "skippedExisting": 956,
+  "after": 1158,
+  "pendingAfter": 0,
+  "rejected": 2,
+  "rejectedDetail": [
+    {
+      "shard": 2,
+      "ko": "드물게 쇽 증상(가려움, 부종, 가슴 쓰림, 안색창백, 수족냉감, 식은 땀, 숨가쁨, 호흡곤란, 조홍, 두드러기 등), 요오드진, 때때로 동통, 가려움, 자극감, 발진, 발적, 피부염, 드물게 작열감, 피부궤양, 접촉피부염, 피부변색이 나타나는 경우 즉각 사용을 중지하고 의사 또는 약사와 상의하십시오.",
+      "reason": "TM 미등록 문장(대상 밖)"
+    },
+    {
+      "shard": 2,
+      "ko": "이 약은 기관지천식, 만성기관지염, 기관지확장증, 폐결핵, 폐기종, 상기도염(인후두염), 폐화농증, 폐렴, 낭성섬유증, 수술후 폐합병증 등의 객담배출곤란과 기관지조영, 기관지경 검사, 폐암 세포진, 기관절개술에서의 전·후 처치에 사용합니다.",
+      "reason": "TM 미등록 문장(대상 밖)"
+    }
+  ],
+  "overwriteFrom": 5,
+  "overwritten": 1,
+  "overwrittenDetail": [
+    {
+      "shard": 5,
+      "ko": "만 12세 이하의 소아는 1회 권장용량을 4~6시간마다 필요시 복용합니다.이 약은 가능한 최단기간동안 최소 유효용량으로 복용하며, 1일 5회(75 mg/kg)을 초과하여 복용하지 ",
+      "before": "Children aged 12 years or younger take the recommended single dose every 4 to 6 hours as needed. Take this medicine at the lowest effective dose for the shortes",
+      "after": "Children aged 12 years or younger take the recommended single dose every 4 to 6 hours as needed. Take this medicine at the lowest effective dose for the shortes"
+    }
+  ],
+  "numericExemptions": 1,
+  "numericExemptionPolicy": "1일/1회 관용 1 · 제N도/N차성 서수 N 만 면제. 해당 숫자가 문장 내 다른 용도로 쓰이면 면제 없음. 용량·연령 실수치는 면제 대상 아님.",
+  "numericExemptionDetail": [
+    {
+      "shard": 5,
+      "ko": "만 12세 이하의 소아는 1회 권장용량을 4~6시간마다 필요시 복용합니다.이 약은 가능한 최단기간동안 최소 유효용량으로 복용하며, 1일 5회(75 mg/kg)을 초과하여 복용하지 않습니다.몸무게를 아는 경우 몸무게에",
+      "en": "Children aged 12 years or younger take the recommended single dose every 4 to 6 hours as needed. Take this medicine at t",
+      "exempted": [
+        "1"
+      ]
+    }
+  ]
+}

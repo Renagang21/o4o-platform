@@ -1,0 +1,187 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "tm-repair-oralverb",
+  "total": 16,
+  "instruction": "EN 에서 원문에 없는 경구 투여 표현을 제거하고 원문 동사에 맞는 표현으로 교체한다. 의미·수치·강도는 그대로 둔다.",
+  "sentences": [
+    {
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약은 눈 또는 눈주위, 점막 등, 습진, 상처부위, 민감한 피부에 사용하지 마십시오.특히, 벗겨진 피부 표면 또는 물집이 있는 부위에 다량을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 반응(발진·발적(충혈되어 붉어짐), 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체질, 습윤(습기 참)이나 짓무름, 염증이 심한 사람, 소아는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 사용할 경우 보호자의 지도 감독 하에 사용하십시오.이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오.눈에 들어가지 않도록 주의하십시오.만일 눈에 들어간 경우에는 물로 씻고, 증상이 심한 경우에는 안과의사의 치료를 받으십시오.",
+      "currentEn": "Do not use this medicine in infants aged 30 months or younger. Do not use this medicine on the eyes or around the eyes, on mucous membranes, on eczema, on wounded areas, or on sensitive skin. In particular, do not use large amounts on peeled skin surfaces or on areas with blisters. Before using this medicine, consult a doctor or pharmacist if you have experienced allergic reactions to medicines or cosmetics (rash, redness (congested and reddened), itching, dermatitis caused by lacquer, etc.), if you have an allergic constitution, if you have severe moist skin (dampness), erosion or inflammation, or if the user is a child. Follow the prescribed dosage and administration carefully. When using it in children, use it under the guidance and supervision of a guardian. Use this medicine for external use only; do not take it internally or inhale it. Be careful not to let it get into the eyes. If it does get into the eyes, rinse with water, and if the symptoms are severe, receive treatment from an ophthalmologist.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈 주위, 점막 등, 상처부위, 민감한 피부에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상이 나타난 적이 있는 사람, 알레르기 체질인 환자, 습윤이나 짓무름, 염증이 심한 사람은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오.눈에 들어가지 않도록 주의하고 만일 눈에 들어간 경우 즉시 물로 씻어내십시오.약이 묻은 손이 눈 등 점막에 닿으면 자극이 있으므로 이 약을 만진 후 즉시 비누로 손을 잘 씻습니다.5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+      "currentEn": "Do not use this medicine on the eyes or the area around the eyes, on mucous membranes, on wounds, or on sensitive skin. Before using this medicine, people who have experienced allergic symptoms caused by medicines or cosmetics, patients with an allergic constitution, and people with severe moist skin, skin breakdown, or inflammation should consult a doctor or pharmacist. Follow the prescribed dosage and administration exactly. When giving it to a child, administer it under the guidance and supervision of a guardian. This medicine is for external use only; do not swallow or inhale it. Be careful not to let it get into the eyes; if it does get into the eyes, rinse immediately with water. Because hands with the medicine on them can cause irritation if they touch the eyes or other mucous membranes, wash your hands thoroughly with soap immediately after touching this medicine. If there is no improvement in symptoms after 5 to 6 days of use, stop using it immediately and consult a doctor or pharmacist.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈 주위, 점막 및 습진, 상처부위, 민감한 피부에는 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 발진 및 발적, 가려움, 옻 등에 의한 피부염 등의 알레르기 증상 경험자나 알레르기 체질, 습기가 차거나 짓무름 및 염증이 심한 사람은 의사 또는 약사와 상의하십시오.5~6일간 사용해도 증상이 개선되지 않는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.이 약은 외용, 즉 질환 부위에 바르는 약으로만 사용하고 내복 또는 흡입하지 마십시오.눈에 들어가지 않도록 주의하십시오.들어간 경우 물로 씻으십시오.증상이 심한 경우에는 안과의사의 치료를 받으십시오.어린이는 보호자의 지도 및 감독 하에 사용하십시오.정해진 용법과 용량을 잘 지키십시오.",
+      "currentEn": "Do not use it on or around the eyes, on mucous membranes, on eczema, on wounds, or on sensitive skin. Before using this medicine, those who have experienced allergic symptoms such as rash and redness or itching caused by medicines or cosmetics, or dermatitis caused by lacquer and the like, those with an allergic constitution, and people with severe dampness, rawness, or inflammation should consult a doctor or pharmacist. If symptoms do not improve after 5 to 6 days of use, stop using this medicine immediately and consult a doctor or pharmacist. Use this medicine only externally, that is, as a medicine applied to the diseased area; do not take it by mouth or inhale it. Be careful not to let it get into the eyes. If it does get in, rinse with water. If symptoms are severe, get treatment from an ophthalmologist. Children should use it under the guidance and supervision of a guardian. Follow the prescribed dosage and administration carefully.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "수두, 무좀, 백선 등 또는 화농되어 있는 부위에는 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품에 과민증 환자, 알레르기 체질인 환자, 습윤이나 미란(짓무름)이 심한 환자, 환부가 광범위한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우 즉시 물로 씻어 내십시오.밑화장, 면도 후 등 치료 이외의 목적으로 사용하지 마십시오.",
+      "currentEn": "Do not use it on chickenpox, athlete's foot, ringworm, or on areas that have become purulent. Before using this medicine, patients with hypersensitivity to medicines or cosmetics, patients with an allergic constitution, patients with severe moist skin or erosion (skin breakdown), and patients whose affected area is widespread should consult a doctor or pharmacist. Follow the prescribed dosage and administration exactly. When giving it to a child, administer it under the guidance and supervision of a guardian. This medicine is for external use only; do not swallow it. Be careful not to let it get into the eyes; if it does get into the eyes, rinse immediately with water. Do not use it for purposes other than treatment, such as as a makeup base or after shaving.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "수술자의 손 및 팔의 살균소독 시 이 약 5 mL를 취하여 손과 팔에 약 2분 30초간 잘 문질러 거품을 충분히 낸 후 흐르는 물로 철저히 씻어냅니다.손의 살균소독 시 이 약 5 mL를 취하여 손에 약 1분간 문지르고 흐르는 물에 철저히 씻어냅니다.수술부위의 살균소독 시 이 약을 직접 바르거나 또는 적당량을 사용하여 잘 문질러 거품을 충분히 낸 후 멸균거즈로 닦아냅니다.",
+      "currentEn": "For disinfecting the surgeon's hands and arms, take 5 mL of this medicine, rub it well into the hands and arms for about 2 minutes and 30 seconds to work up plenty of lather, and then rinse thoroughly under running water. For disinfecting the hands, take 5 mL of this medicine, rub it into the hands for about 1 minute, and rinse thoroughly under running water. For disinfecting the surgical site, apply this medicine directly or use an appropriate amount, rub it well to work up plenty of lather, and then wipe it off with sterile gauze.",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "액 적당량을 취해 젖은 두피 위에 바르고 거품이 나도록 마사지한 후 물로 충분히 헹굽니다.처음 2주간은 최소한 일주일에 2번 사용하고, 그 후에는 정기적으로 의사 또는 약사의 지시에 따라 사용하십시오.",
+      "currentEn": "Take an appropriate amount of the solution, apply it to the wet scalp, massage it until it lathers, and then rinse thoroughly with water. Use it at least 2 times a week for the first 2 weeks, and after that use it regularly as directed by a doctor or pharmacist.",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 30개월 이하의 유아, 피부감염증(피부결핵, 매독, 칸디다증, 백선, 대상포진, 단순포진, 수두, 종두증, 옴, 사면발이), 막 천공이 있는 습진성 외이도염, 궤양(베체트병 제외), 제2도 심재성 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사 환자는 이 약을 사용하지 마십시오.피부 감염을 수반하는 습진, 상처부위, 민감한 피부에 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 고령자, 알레르기 체질, 습윤(습기 참)이나 짓무름, 염증이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오.눈 또는 눈 주위, 점막 등에는 사용하지 않아야 하며 이 약이 눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우 즉시 물로 씻어내십시오.약액이 묻은 손이 눈 등 점막에 닿으면 자극이 있으므로 손에 묻은 약액은 잘 씻어내십시오.의사의 감독 없이 밀봉붕대법을 사용하지 마십시오.기저귀 등은 밀봉붕대법과 같은 작용을 나타낼 수 있으므로 주의하십시오.화장이나 면도 후 등 치료 이외의 목적으로 사용하지 마십시오.사용 전에 잘 흔들어 사용하십시오.염색한 머리에 사용하면 탈색될 수 있으므로 주의하십시오.",
+      "currentEn": "Patients with hypersensitivity to this medicine, infants aged 30 months or under, patients with skin infections (skin tuberculosis, syphilis, candidiasis, ringworm, shingles, herpes simplex, chickenpox, vaccinia, scabies, pubic lice), eczematous otitis externa with perforation of the eardrum, ulcers (excluding Behcet's disease), deep burns and frostbite of grade 2 or higher, perioral dermatitis, acne vulgaris, or rosacea must not use this medicine. Do not use it on eczema accompanied by skin infection, on wounds, or on sensitive skin. Before using this medicine, pregnant women or women who may be pregnant and breastfeeding women, children, elderly people, people with an allergic constitution, and patients with moist skin, skin maceration or severe inflammation should consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. When giving this medicine to children, administer it under the guidance and supervision of a guardian. Use this medicine for external use only; do not swallow or inhale it. It must not be used on or around the eyes or on mucous membranes; be careful not to let it get into the eyes, and if it does, rinse immediately with water. If hands with the solution on them touch mucous membranes such as the eyes, irritation will occur, so wash the solution off your hands thoroughly. Do not use occlusive dressings without a doctor's supervision. Be careful, because diapers and similar items can act like an occlusive dressing. Do not use it for purposes other than treatment, such as after applying makeup or shaving. Shake well before use. Be careful, because using it on dyed hair may cause the color to fade.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 프로필렌글리콜 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.구강용으로만 사용하십시오.발치(이를 뽑음) 후 등 구강 창상(상처)의 경우 혈액이 응고하여 출혈이 멎기 전에는 격렬한 양치는 피하십시오.증상이 개선되지 않거나 악화되는 경우 의사와 상의하십시오.섬광촬영술을 이용한 갑상선진단에 영향을 줄 수 있습니다.이 약의 투여와 섬광도 조사는 4주 이상의 간격을 두십시오.소독용으로 이 약을 과량 사용 시 요오드 독성이 일어날 수 있습니다.의복 등에 묻은 경우 바로 세척하면 물로 쉽게 씻겨집니다.실수로 과량 삼켰거나 눈에 들어간 경우 즉시 조치를 취하십시오.장신구(특히 은을 포함한 제품)에 닿지 않도록 하십시오.어린이에게 사용할 경우 보호자의 지도 감독하에 사용하게 하십시오.정해진 용법과 용량을 잘 지키십시오.",
+      "currentEn": "Patients who are hypersensitive to this medicine, patients with thyroid dysfunction, and children under 6 years of age must not use this medicine, and it must not be used during radioactive iodine therapy or before and after such therapy. Before using this medicine, patients with severe sores in the mouth, women who are pregnant, may be pregnant, or are breastfeeding, and patients who are hypersensitive to propylene glycol or have been in the past should consult a doctor or pharmacist. Use it for the mouth only. In the case of an oral wound such as after a tooth extraction, avoid vigorous rinsing until the blood has clotted and the bleeding has stopped. If the symptoms do not improve or become worse, consult a doctor. It may affect thyroid diagnosis using scintigraphy. Allow an interval of 4 weeks or more between the use of this medicine and a scintigraphy examination. Excessive use of this medicine as a disinfectant may cause iodine toxicity. If it gets on clothing, it washes out easily with water if rinsed immediately. If a large amount is swallowed by mistake or it gets into the eyes, take action immediately. Keep it from coming into contact with jewelry (especially items containing silver). When it is used by children, have them use it under the guidance and supervision of a guardian. Follow the prescribed dosage and administration carefully.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallowed",
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유ㆍ소아는 이 약을 사용하지 마십시오.눈과 눈 주위, 점막(입안, 코안, 질 등), 음부, 외음부, 습진, 습기참, 짓무름, 갈라짐 또는 상처가 심한 질환 부위, 손톱, 두피에 사용하지 마십시오.이 약을 사용하기 전에 약에 알레르기 증상 경험자, 알레르기 체질, 질환 부위가 곪거나 얼굴에 있거나 광범위한 사람, 습진과 무좀 • 완선, 체부백선의 구분이 불확실한 사람은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 물 또는 온수로 씻어내십시오.이 약이 묻은 손으로 눈이나 점막을 만지지 마십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.2주 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+      "currentEn": "Patients with hypersensitivity to this medicine, pregnant women or women who may be pregnant and breastfeeding women, and infants and young children must not use this medicine. Do not use it on the eyes or around the eyes, on mucous membranes (inside the mouth, inside the nose, the vagina, etc.), on the genitals, the external genitalia, eczema, moist areas, macerated skin, or diseased areas with severe cracking or wounds, on the nails, or on the scalp. Before using this medicine, those who have experienced allergic symptoms to medicines, people with an allergic constitution, people whose diseased area is festering or is on the face or is extensive, and people who are not sure whether their condition is eczema or athlete's foot, tinea cruris or tinea corporis should consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. Be careful not to let it get into the eyes, and if it does, rinse immediately with water or warm water. Do not touch your eyes or mucous membranes with hands that have this medicine on them. Use this medicine for external use only; do not swallow it. If there is no improvement in symptoms after using it for about 2 weeks, stop using it immediately and consult a doctor or pharmacist.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아, 소아, 눈이나 눈 주위, 점막(입안, 코안, 질), 음낭, 외음부, 습진, 습윤(습기 참), 짓무름, 갈라짐이나 상처가 심한 질환 부위, 손톱, 두피에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질, 알레르기 증상 경험자, 질환 부위가 얼굴 또는 광범위하거나 곪은 환자, 프로필렌글리콜에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.질환 부위와 그 주위를 깨끗이 한 후 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우에는 즉시 물 또는 온수로 씻어내십시오.본 약제가 묻은 손으로 눈이나 점막을 만지지 마십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.",
+      "currentEn": "Patients who are hypersensitive to this medicine, women who are pregnant, may be pregnant, or are breastfeeding, infants, and children must not use this medicine, and it must not be used on or around the eyes, on mucous membranes (inside the mouth, inside the nose, the vagina), on the scrotum or external genitalia, on eczema, on moist (damp) areas, on erosion, on diseased areas with severe cracking or wounds, on the nails, or on the scalp. Before using this medicine, consult a doctor or pharmacist if you have an allergic constitution or have experienced allergic symptoms, if the diseased area is on the face or is extensive or festering, or if you are hypersensitive to propylene glycol or have been in the past. Follow the prescribed dosage and administration carefully. Clean the diseased area and its surroundings before use. Be careful not to let it get into the eyes, and if it does get into the eyes, rinse them immediately with water or warm water. Do not touch your eyes or mucous membranes with hands that have this medicine on them. Use this medicine for external use only; do not take it internally.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 피부감염증(피부결핵, 매독, 칸디다증, 백선, 대상포진, 단순포진, 수두, 종두증, 옴, 사면발이), 고막 천공이 있는 습진성 외이도염, 궤양(베체트병 제외), 제2도 심재성 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사 환자는 이 약을 사용하지 마십시오.눈 또는 눈 주위, 점막, 피부 감염을 수반하는 습진, 상처부위, 민감한 피부, 화농이 있는 환부(질환 부위)에는 사용하지 마십시오.이 약을 사용하기 전에 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 고령자, 알레르기 체질, 습윤이나 짓무름, 심한 염증, 질환 부위가 광범위한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.이 약이 눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우에는 즉시 물로 씻어내십시오.의사의 감독 없이 밀봉붕대법을 사용하지 마십시오.화장이나 면도 후 등 치료 이외의 목적으로 사용하지 마십시오.이 약은 사용전에 잘 흔들어 사용하십시오.이 약을 염색한 머리에 사용하면 탈색될 수 있으니 주의하십시오.",
+      "currentEn": "Patients with hypersensitivity to this medicine, patients with skin infections (skin tuberculosis, syphilis, candidiasis, ringworm, shingles, herpes simplex, chickenpox, vaccinia, scabies, pubic lice), eczematous otitis externa with perforation of the eardrum, ulcers (excluding Behcet's disease), deep burns and frostbite of grade 2 or higher, perioral dermatitis, acne vulgaris, or rosacea must not use this medicine. Do not use it on or around the eyes, on mucous membranes, on eczema accompanied by skin infection, on wounds, on sensitive skin, or on suppurating affected areas (diseased sites). Before using this medicine, children, pregnant women or women who may be pregnant and breastfeeding women, elderly people, people with an allergic constitution, and patients with moist skin, skin maceration, severe inflammation or an extensive diseased area should consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. When giving this medicine to children, administer it under the guidance and supervision of a guardian. Use this medicine for external use only; do not swallow it. Be careful not to let this medicine get into the eyes, and if it does, rinse immediately with water. Do not use occlusive dressings without a doctor's supervision. Do not use it for purposes other than treatment, such as after applying makeup or shaving. Shake this medicine well before use. Be careful, because using this medicine on dyed hair may cause the color to fade.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.눈 또는 눈주위, 점막, 습진, 옻 등에 의한 피부염, 상처 부위, 민감함 피부에 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상(발진·발적(충혈되어 붉어짐), 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체질, 습윤(습기 참), 심한 미란(짓무름), 순환기 장애, 당뇨병 환자, 12세 이하의 소아, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부는 의사 또는 약사와 상의하십시오.5∼6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 사용할 경우 보호자의 지도감독하에 사용하십시오.이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오.눈에 들어가지 않도록 주의하고 만일 눈에 들어간 경우 물로 씻으십시오.손에 묻은 약액은 잘 씻으십시오.적용부위를 싸거나 감지 않고, 외부의 열이나 뜨거운 물에 노출하지 마십시오.이 약을 사용한 부위에 물이 닿은 경우 강한 자극을 느낄 수 있습니다.피부가 특히 약한 환자는 동일한 부위에 이 약을 연속적으로 사용하지 마십시오.장기간 사용하지 마십시오.",
+      "currentEn": "Patients who are hypersensitive to this medicine must not use this medicine. Do not use it on the eyes or around the eyes, on mucous membranes, on eczema, on dermatitis caused by lacquer, on wounded areas, or on sensitive skin. Before using this medicine, consult a doctor or pharmacist if you have experienced allergic symptoms from medicines or cosmetics (rash and redness (congested and reddened), itching, dermatitis caused by lacquer, etc.), if you have an allergic constitution, moist skin (dampness), severe erosion, circulatory disorders, or diabetes, if the user is a child aged 12 years or younger, or if you are pregnant, may be pregnant, or are breastfeeding. If there is no improvement in symptoms after 5 to 6 days of use, stop using it immediately and consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. When using it in children, use it under the guidance and supervision of a guardian. Use this medicine for external use only; do not take it internally or inhale it. Be careful not to let it get into the eyes, and if it does get into the eyes, rinse them with water. Wash any solution off your hands thoroughly. Do not cover or wrap the treated area, and do not expose it to external heat or hot water. If water touches the area where this medicine has been used, you may feel strong irritation. Patients with particularly delicate skin must not use this medicine repeatedly on the same area. Do not use it for a long period.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 약이나 화장품에 등에 의한 알레르기 증상이 나타난 적이 있는 환자, 환부가 광범위한 환자, 상처가 심하거나 화상이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.수일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.",
+      "currentEn": "Before using this medicine, patients who have had allergic symptoms caused by medicines or cosmetics, patients with an extensive affected area, and patients with severe wounds or severe burns should consult a doctor or pharmacist. Follow the prescribed dosage and administration carefully. When giving it to children, administer it under the guidance and supervision of a guardian. If there is no improvement in symptoms after several days of use, stop using it and consult a doctor or pharmacist. Use this medicine externally only; do not take it by mouth.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제를 사용하지 마십시오.이 약을 사용하는 동안 혈압강하제, 항우울약을 투여하지 마십시오.",
+      "currentEn": "While using this medicine, do not use suppositories, ointments, or creams containing dl-methylephedrine hydrochloride, scopolia extract, or glycyrrhizic acid. While using this medicine, do not take antihypertensive drugs or antidepressants.",
+      "section": "상호작용",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    },
+    {
+      "ko": "정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.눈에 들어가지 않도록 주의하십시오.5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.음이온에 의하여 난용성염을 생성하므로 희석하는 경우에는 깨끗한 증류수를 사용하십시오.사용하기 전 상처난 부위와 주위의 오염물질 등을 깨끗이 씻어낸 후 사용하십시오.",
+      "currentEn": "Follow the prescribed dosage and administration exactly. When giving it to a child, administer it under the guidance and supervision of a guardian. This medicine is for external use only; do not swallow it. Be careful not to let it get into the eyes. If there is no improvement in symptoms after 5 to 6 days of use, stop using it immediately and consult a doctor or pharmacist. Because it forms poorly soluble salts with anions, use clean distilled water when diluting it. Before use, wash off the contaminants on and around the wounded area thoroughly and then use it.",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "하루에 한번 환부(질환 부위)에 바릅니다.해당 부위를 따뜻한 물에 담근 뒤 완전히 말리고 부석이나 손톱 다듬는 줄로 사마귀, 티눈 또는 굳은살의 표면을 부드럽게 문질러 단단한 피부를 제거합니다.제공된 도포용 도구를 사용하여 환부에 이 약을 몇 방울을 조심스럽게 바르고 다음 방울을 바르기 전에 말립니다.도포용 도구로 환부에만 바르도록 주의하며 발바닥의 사마귀는 반창고로 덮고 24 시간 동안 그대로 둡니다.반창고를 먼저 제거한 후 매일 절차를 반복합니다.",
+      "currentEn": "Apply it to the affected area (the diseased site) once a day. Soak the area in warm water, dry it completely, and gently rub the surface of the wart, corn, or callus with a pumice stone or a nail file to remove the hard skin. Using the applicator provided, carefully apply a few drops of this medicine to the affected area, letting each drop dry before applying the next. Take care to apply it with the applicator only to the affected area, and for warts on the sole of the foot, cover with an adhesive plaster and leave it for 24 hours. Remove the plaster first and then repeat the procedure daily.",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "offendingTerms": [
+        "take"
+      ]
+    }
+  ]
+}

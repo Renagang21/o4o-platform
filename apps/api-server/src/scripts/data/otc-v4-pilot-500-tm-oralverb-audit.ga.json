@@ -1,0 +1,209 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "oral-verb-audit",
+  "liveDbWrite": 0,
+  "rule": "KO 경구동사 없음 + EN 경구동사 있음 → 원문에 없는 투여 방식 도입",
+  "tmTotal": 1158,
+  "hits": 16,
+  "hitsAffectingNonOralOnly": 16,
+  "byRoute": {
+    "topical": 16
+  },
+  "detail": [
+    {
+      "ko": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약은 눈 또는 눈주위, 점막 등, 습진, 상처부위, 민감한 피부에 사용하지 마십시오.특히, 벗겨진 피부 표면 또는 물집이 있는 부위에 다량을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 반응(발진·발적(",
+      "en": "Do not use this medicine in infants aged 30 months or younger. Do not use this medicine on the eyes or around the eyes, on mucous membranes, on eczema, on wound",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈 주위, 점막 등, 상처부위, 민감한 피부에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상이 나타난 적이 있는 사람, 알레르기 체질인 환자, 습윤이나 짓무름, 염증이 심한 사람은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 ",
+      "en": "Do not use this medicine on the eyes or the area around the eyes, on mucous membranes, on wounds, or on sensitive skin. Before using this medicine, people who h",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "눈 또는 눈 주위, 점막 및 습진, 상처부위, 민감한 피부에는 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 발진 및 발적, 가려움, 옻 등에 의한 피부염 등의 알레르기 증상 경험자나 알레르기 체질, 습기가 차거나 짓무름 및 염증이 심한 사람은 의사 또는 약사와 상의",
+      "en": "Do not use it on or around the eyes, on mucous membranes, on eczema, on wounds, or on sensitive skin. Before using this medicine, those who have experienced all",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "수두, 무좀, 백선 등 또는 화농되어 있는 부위에는 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품에 과민증 환자, 알레르기 체질인 환자, 습윤이나 미란(짓무름)이 심한 환자, 환부가 광범위한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투",
+      "en": "Do not use it on chickenpox, athlete's foot, ringworm, or on areas that have become purulent. Before using this medicine, patients with hypersensitivity to medi",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 3,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "수술자의 손 및 팔의 살균소독 시 이 약 5 mL를 취하여 손과 팔에 약 2분 30초간 잘 문질러 거품을 충분히 낸 후 흐르는 물로 철저히 씻어냅니다.손의 살균소독 시 이 약 5 mL를 취하여 손에 약 1분간 문지르고 흐르는 물에 철저히 씻어냅니다.수술부위의 살균소독 시 이 약을 직접 ",
+      "en": "For disinfecting the surgeon's hands and arms, take 5 mL of this medicine, rub it well into the hands and arms for about 2 minutes and 30 seconds to work up ple",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "액 적당량을 취해 젖은 두피 위에 바르고 거품이 나도록 마사지한 후 물로 충분히 헹굽니다.처음 2주간은 최소한 일주일에 2번 사용하고, 그 후에는 정기적으로 의사 또는 약사의 지시에 따라 사용하십시오.",
+      "en": "Take an appropriate amount of the solution, apply it to the wet scalp, massage it until it lathers, and then rinse thoroughly with water. Use it at least 2 time",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 30개월 이하의 유아, 피부감염증(피부결핵, 매독, 칸디다증, 백선, 대상포진, 단순포진, 수두, 종두증, 옴, 사면발이), 막 천공이 있는 습진성 외이도염, 궤양(베체트병 제외), 제2도 심재성 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사 환자는 이 ",
+      "en": "Patients with hypersensitivity to this medicine, infants aged 30 months or under, patients with skin infections (skin tuberculosis, syphilis, candidiasis, ringw",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 갑상선기능 이상 환자, 6세 미만의 소아, 방사성요오드 치료 중 및 치료 전후에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 입안이 심하게 헐은 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 프로필렌글리콜 과민증 환자 또는 경험자는 의사 ",
+      "en": "Patients who are hypersensitive to this medicine, patients with thyroid dysfunction, and children under 6 years of age must not use this medicine, and it must n",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "swallowed",
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유ㆍ소아는 이 약을 사용하지 마십시오.눈과 눈 주위, 점막(입안, 코안, 질 등), 음부, 외음부, 습진, 습기참, 짓무름, 갈라짐 또는 상처가 심한 질환 부위, 손톱, 두피에 사용하지 마십시오.이 약을 사",
+      "en": "Patients with hypersensitivity to this medicine, pregnant women or women who may be pregnant and breastfeeding women, and infants and young children must not us",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 유아, 소아, 눈이나 눈 주위, 점막(입안, 코안, 질), 음낭, 외음부, 습진, 습윤(습기 참), 짓무름, 갈라짐이나 상처가 심한 질환 부위, 손톱, 두피에는 이 약을 사용하지 마십시오.이 약을 사용하기 ",
+      "en": "Patients who are hypersensitive to this medicine, women who are pregnant, may be pregnant, or are breastfeeding, infants, and children must not use this medicin",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자, 피부감염증(피부결핵, 매독, 칸디다증, 백선, 대상포진, 단순포진, 수두, 종두증, 옴, 사면발이), 고막 천공이 있는 습진성 외이도염, 궤양(베체트병 제외), 제2도 심재성 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사 환자는 이 약을 사용하지 마십시오",
+      "en": "Patients with hypersensitivity to this medicine, patients with skin infections (skin tuberculosis, syphilis, candidiasis, ringworm, shingles, herpes simplex, ch",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.눈 또는 눈주위, 점막, 습진, 옻 등에 의한 피부염, 상처 부위, 민감함 피부에 사용하지 마십시오.이 약을 사용하기 전에 약이나 화장품 등에 의한 알레르기 증상(발진·발적(충혈되어 붉어짐), 가려움, 옻 등에 의한 피부염 등) 경험자,",
+      "en": "Patients who are hypersensitive to this medicine must not use this medicine. Do not use it on the eyes or around the eyes, on mucous membranes, on eczema, on de",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하기 전에 약이나 화장품에 등에 의한 알레르기 증상이 나타난 적이 있는 환자, 환부가 광범위한 환자, 상처가 심하거나 화상이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.수일간 투여",
+      "en": "Before using this medicine, patients who have had allergic symptoms caused by medicines or cosmetics, patients with an extensive affected area, and patients wit",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take",
+        "by mouth"
+      ]
+    },
+    {
+      "ko": "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제를 사용하지 마십시오.이 약을 사용하는 동안 혈압강하제, 항우울약을 투여하지 마십시오.",
+      "en": "While using this medicine, do not use suppositories, ointments, or creams containing dl-methylephedrine hydrochloride, scopolia extract, or glycyrrhizic acid. W",
+      "section": "상호작용",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "take"
+      ]
+    },
+    {
+      "ko": "정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 내복하지 마십시오.눈에 들어가지 않도록 주의하십시오.5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.음이온에 의하",
+      "en": "Follow the prescribed dosage and administration exactly. When giving it to a child, administer it under the guidance and supervision of a guardian. This medicin",
+      "section": "사용상 주의사항",
+      "routes": [
+        "topical"
+      ],
+      "masters": 1,
+      "matched": [
+        "swallow"
+      ]
+    },
+    {
+      "ko": "하루에 한번 환부(질환 부위)에 바릅니다.해당 부위를 따뜻한 물에 담근 뒤 완전히 말리고 부석이나 손톱 다듬는 줄로 사마귀, 티눈 또는 굳은살의 표면을 부드럽게 문질러 단단한 피부를 제거합니다.제공된 도포용 도구를 사용하여 환부에 이 약을 몇 방울을 조심스럽게 바르고 다음 방울을 바르기",
+      "en": "Apply it to the affected area (the diseased site) once a day. Soak the area in warm water, dry it completely, and gently rub the surface of the wart, corn, or c",
+      "section": "용법·용량",
+      "routes": [
+        "topical"
+      ],
+      "masters": 2,
+      "matched": [
+        "take"
+      ]
+    }
+  ]
+}

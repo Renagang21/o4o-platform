@@ -1,0 +1,222 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "independent-verification",
+  "batchId": "otc-v4-pilot-500",
+  "verifiedAt": "2026-07-29T14:18:22.725Z",
+  "independence": "실행기 로직 미import · 별개 섹션 파서 · 별개 수치 정규식 · 별개 검증 SQL",
+  "liveDbWrite": 0,
+  "counts": {
+    "target": 500,
+    "green": 416,
+    "exception": 84,
+    "skip": 0,
+    "writeActual": 2496
+  },
+  "gatesTotal": 24,
+  "gatesPassed": 24,
+  "verdict": "PASS",
+  "gates": [
+    {
+      "id": "IV-01",
+      "gate": "모집단 ↔ 결과 원장 일치",
+      "expected": "500건 동일 집합",
+      "actual": "결과 500건",
+      "pass": true
+    },
+    {
+      "id": "IV-02",
+      "gate": "대상 master 중복 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-03",
+      "gate": "GREEN+EXCEPTION+SKIP = 입력 수",
+      "expected": "500",
+      "actual": "416+84+0=500",
+      "pass": true
+    },
+    {
+      "id": "IV-04",
+      "gate": "실패 master DB residue 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-05",
+      "gate": "실패 master audit residue 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-06",
+      "gate": "예외 원장 dbWriteActual 0",
+      "expected": "전건 0",
+      "actual": "0건 위반",
+      "pass": true
+    },
+    {
+      "id": "IV-07",
+      "gate": "GREEN master KO authored canonical 정확히 1",
+      "expected": "0건 위반",
+      "actual": "0건",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-08",
+      "gate": "GREEN master EN canonical 정확히 1",
+      "expected": "0건 위반",
+      "actual": "0건",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-09",
+      "gate": "GREEN master easy ko canonical 잔존 0",
+      "expected": "0건 위반",
+      "actual": "0건",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-10",
+      "gate": "canonicalDup 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-11",
+      "gate": "sourceRef 타 master 누수 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-12",
+      "gate": "공식 6섹션 내용 보존(섹션 토큰 커버리지 ≥ 0.95)",
+      "expected": "미달 섹션 0",
+      "actual": "0개 master 미달",
+      "pass": true,
+      "detail": {
+        "coverage": {
+          "min": 0.9792,
+          "p01": 1,
+          "median": 1,
+          "sections": 1991
+        },
+        "worst": []
+      }
+    },
+    {
+      "id": "IV-13",
+      "gate": "수치 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-14",
+      "gate": "연령 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-15",
+      "gate": "기간 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-16",
+      "gate": "route 표현 오류 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-17",
+      "gate": "EN canonical 한글 잔존 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-18",
+      "gate": "대상 밖 audit 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-19",
+      "gate": "GREEN master audit 정확히 1",
+      "expected": "0건 위반",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-20",
+      "gate": "pilot 100 GREEN 80 불변",
+      "expected": "변경 0",
+      "actual": "변경 0 / 소실 0",
+      "pass": true,
+      "detail": {
+        "changed": [],
+        "removed": []
+      }
+    },
+    {
+      "id": "IV-21",
+      "gate": "대상 밖 내 source_type canonical 불변(귀속 기반)",
+      "expected": "25024",
+      "actual": "25024",
+      "pass": true,
+      "detail": {
+        "outsideAllNow": 96978,
+        "outsideAllAtBaseline": 93310,
+        "note": "전역 총량 차이는 병렬 세션의 정상 작업이며 본 배치 귀속이 아니다(IV-11 sourceRef 누수 0 · IV-18 대상 밖 audit 0 로 교차 확인).",
+        "externalSessionWritesSinceBaseline": [
+          {
+            "source_type": "o4o_hff_generated",
+            "n": 3668
+          }
+        ]
+      }
+    },
+    {
+      "id": "IV-22",
+      "gate": "pilot 100 예외 20 write 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-23",
+      "gate": "pilot 100 교집합 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-24",
+      "gate": "write 총량 = GREEN × 6",
+      "expected": "2496",
+      "actual": "2496",
+      "pass": true
+    }
+  ]
+}

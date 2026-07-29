@@ -1,0 +1,207 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 25,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 25,
+      "lastMasterId": "066c1cb2-35c7-4877-9f04-4438a9c0bf1c",
+      "green": 15,
+      "exception": 10,
+      "skip": 0,
+      "writeActual": 90,
+      "at": "2026-07-29T14:08:48.623Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 50,
+      "lastMasterId": "08804d7d-91f7-4f0f-bb1f-2088c780566b",
+      "green": 34,
+      "exception": 16,
+      "skip": 0,
+      "writeActual": 204,
+      "at": "2026-07-29T14:08:57.764Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 75,
+      "lastMasterId": "0a0da1de-f2e3-4746-830b-35b86e50991a",
+      "green": 56,
+      "exception": 19,
+      "skip": 0,
+      "writeActual": 336,
+      "at": "2026-07-29T14:09:08.166Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 100,
+      "lastMasterId": "0c189f59-c285-45e3-9838-be39d6174a90",
+      "green": 79,
+      "exception": 21,
+      "skip": 0,
+      "writeActual": 474,
+      "at": "2026-07-29T14:09:18.859Z"
+    },
+    {
+      "checkpoint": 5,
+      "processed": 125,
+      "lastMasterId": "0e08e9d1-0d3d-47b7-be7b-fe49bfabc8ea",
+      "green": 98,
+      "exception": 27,
+      "skip": 0,
+      "writeActual": 588,
+      "at": "2026-07-29T14:09:28.127Z"
+    },
+    {
+      "checkpoint": 6,
+      "processed": 150,
+      "lastMasterId": "0fdbac94-c447-4a07-8900-57b3e62cb5c0",
+      "green": 114,
+      "exception": 36,
+      "skip": 0,
+      "writeActual": 684,
+      "at": "2026-07-29T14:09:36.167Z"
+    },
+    {
+      "checkpoint": 7,
+      "processed": 175,
+      "lastMasterId": "11420178-cb5e-4940-b531-064d48eef3f0",
+      "green": 137,
+      "exception": 38,
+      "skip": 0,
+      "writeActual": 822,
+      "at": "2026-07-29T14:09:46.888Z"
+    },
+    {
+      "checkpoint": 8,
+      "processed": 200,
+      "lastMasterId": "1438feb6-86c2-43a2-89ab-6706f0406e8f",
+      "green": 158,
+      "exception": 42,
+      "skip": 0,
+      "writeActual": 948,
+      "at": "2026-07-29T14:09:56.741Z"
+    },
+    {
+      "checkpoint": 9,
+      "processed": 225,
+      "lastMasterId": "159d3ab6-8b54-4831-93f3-f2175222122a",
+      "green": 180,
+      "exception": 45,
+      "skip": 0,
+      "writeActual": 1080,
+      "at": "2026-07-29T14:10:06.848Z"
+    },
+    {
+      "checkpoint": 10,
+      "processed": 250,
+      "lastMasterId": "178a5f9c-52df-468c-acfd-295aedc35588",
+      "green": 197,
+      "exception": 53,
+      "skip": 0,
+      "writeActual": 1182,
+      "at": "2026-07-29T14:10:15.527Z"
+    },
+    {
+      "checkpoint": 11,
+      "processed": 275,
+      "lastMasterId": "190f4667-e6f2-4425-b48d-82314191adca",
+      "green": 220,
+      "exception": 55,
+      "skip": 0,
+      "writeActual": 1320,
+      "at": "2026-07-29T14:10:25.979Z"
+    },
+    {
+      "checkpoint": 12,
+      "processed": 300,
+      "lastMasterId": "1a9d0c16-1c5a-4192-9ac2-039374ee119c",
+      "green": 241,
+      "exception": 59,
+      "skip": 0,
+      "writeActual": 1446,
+      "at": "2026-07-29T14:10:35.658Z"
+    },
+    {
+      "checkpoint": 13,
+      "processed": 325,
+      "lastMasterId": "1c3cf783-668c-426e-a3b9-e52efaa8a5ef",
+      "green": 261,
+      "exception": 64,
+      "skip": 0,
+      "writeActual": 1566,
+      "at": "2026-07-29T14:10:45.442Z"
+    },
+    {
+      "checkpoint": 14,
+      "processed": 350,
+      "lastMasterId": "1d257657-76e6-4b47-964f-f92216dad834",
+      "green": 285,
+      "exception": 65,
+      "skip": 0,
+      "writeActual": 1710,
+      "at": "2026-07-29T14:10:56.123Z"
+    },
+    {
+      "checkpoint": 15,
+      "processed": 375,
+      "lastMasterId": "205b6f3f-bfb6-47bb-9185-983bfe27f2f8",
+      "green": 305,
+      "exception": 70,
+      "skip": 0,
+      "writeActual": 1830,
+      "at": "2026-07-29T14:11:05.493Z"
+    },
+    {
+      "checkpoint": 16,
+      "processed": 400,
+      "lastMasterId": "23361f60-1bef-4663-a670-61a96e1708e6",
+      "green": 330,
+      "exception": 70,
+      "skip": 0,
+      "writeActual": 1980,
+      "at": "2026-07-29T14:11:16.917Z"
+    },
+    {
+      "checkpoint": 17,
+      "processed": 425,
+      "lastMasterId": "2606e789-9262-4ad8-aec6-56b49481a42b",
+      "green": 355,
+      "exception": 70,
+      "skip": 0,
+      "writeActual": 2130,
+      "at": "2026-07-29T14:11:28.068Z"
+    },
+    {
+      "checkpoint": 18,
+      "processed": 450,
+      "lastMasterId": "2c3be8fb-e671-44ce-904b-9c0f04d96f43",
+      "green": 380,
+      "exception": 70,
+      "skip": 0,
+      "writeActual": 2280,
+      "at": "2026-07-29T14:11:39.055Z"
+    },
+    {
+      "checkpoint": 19,
+      "processed": 475,
+      "lastMasterId": "31548265-072d-4d6b-b7c1-2287aece4577",
+      "green": 405,
+      "exception": 70,
+      "skip": 0,
+      "writeActual": 2430,
+      "at": "2026-07-29T14:11:50.365Z"
+    },
+    {
+      "checkpoint": 20,
+      "processed": 500,
+      "lastMasterId": "fae6a66b-41ab-41db-9414-6f21fa315793",
+      "green": 416,
+      "exception": 84,
+      "skip": 0,
+      "writeActual": 2496,
+      "at": "2026-07-29T14:11:56.955Z"
+    }
+  ]
+}

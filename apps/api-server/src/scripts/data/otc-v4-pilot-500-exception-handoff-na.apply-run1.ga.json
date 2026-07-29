@@ -1,0 +1,4136 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "producer": "agent-ga",
+  "consumer": "agent-na",
+  "liveDbWrite": 0,
+  "batchId": "otc-v4-pilot-500",
+  "schema": "otc-v4-master-by-master-exception-handoff v1",
+  "total": 84,
+  "byExceptionCode": {
+    "ROUTE_UNRESOLVED": 50,
+    "ROUTE_CONFLICT": 20,
+    "SOURCE_EFFICACY_MISSING": 14
+  },
+  "invariantCheck": {
+    "allFailedWriteZero": true,
+    "residueDirty": 0
+  },
+  "rows": [
+    {
+      "masterId": "0342f09b-0f46-453d-b91d-668a2126e092",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "1b17bf29-a6e9-31b3-34bb-2562c1d0c319",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0342f09b-0f46-453d-b91d-668a2126e092 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0342f09b-0f46-453d-b91d-668a2126e092",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "03ba12c8-e4fc-4617-9288-66e859fb9f20",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "fcc52b76-bd9b-9bba-0b87-babe5bf1b6c5",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 03ba12c8-e4fc-4617-9288-66e859fb9f20 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:03ba12c8-e4fc-4617-9288-66e859fb9f20",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0565c8df-8f6b-46bd-b836-a8d95f2b9bd8",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면볼액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "e818f1d3-5702-c87e-2f97-650d4fec9db3",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0565c8df-8f6b-46bd-b836-a8d95f2b9bd8 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0565c8df-8f6b-46bd-b836-a8d95f2b9bd8",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "05987474-59df-408f-9984-fd6822904880",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "de56f9ce-5637-33ff-bc6e-7c69907366cc",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 05987474-59df-408f-9984-fd6822904880 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:05987474-59df-408f-9984-fd6822904880",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "05a44fc0-3581-432b-9498-d08e38b1b779",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "969139cb-46e2-b046-59c2-648d24653f95",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 05a44fc0-3581-432b-9498-d08e38b1b779 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:05a44fc0-3581-432b-9498-d08e38b1b779",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "05e1ff59-8246-436b-8418-eac9c23c4b15",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "7416d2b0-449d-0d51-c96f-a9600b7b9344",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 05e1ff59-8246-436b-8418-eac9c23c4b15 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:05e1ff59-8246-436b-8418-eac9c23c4b15",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "05f7b15d-1d2f-40d4-887a-d406a7888693",
+      "productCode": "201606591",
+      "productName": "큐앤큐헥시코올거즈액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "36243ae76cbef4a563f03fad825165c8",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 2,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "ff2f77db-b6da-1c00-a81f-993d11b63927",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 05f7b15d-1d2f-40d4-887a-d406a7888693 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:05f7b15d-1d2f-40d4-887a-d406a7888693",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "062ceeac-2517-412c-abcc-e39528449f7d",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b10d8910-c124-77ac-42b6-1841a3df53d9",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 062ceeac-2517-412c-abcc-e39528449f7d --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:062ceeac-2517-412c-abcc-e39528449f7d",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0640e641-5b5d-488a-a87a-b7a9879d37ca",
+      "productCode": "200201841",
+      "productName": "헥시덱스-4액(클로르헥시딘글루콘산염액)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "5c69ffa58383523a7db4d4fd134e7ece",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131305CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0fdec9c7-780d-da02-75bf-6411ee8a68aa",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0640e641-5b5d-488a-a87a-b7a9879d37ca --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0640e641-5b5d-488a-a87a-b7a9879d37ca",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "0641e186-1477-4803-84ca-f27eafc0308f",
+      "productCode": "199806484",
+      "productName": "드리클로액(염화알루미늄수화물)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "c58829924d0cee16c2442dec95adf802",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A03302CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "d058d0e7-5ff6-7e2c-e77c-95feeb8968b9",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0641e186-1477-4803-84ca-f27eafc0308f --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0641e186-1477-4803-84ca-f27eafc0308f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "06bc047c-831a-41dc-ba79-9f320e18762c",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a0b04185-4c17-1eef-5225-cde5b94ce9ef",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 06bc047c-831a-41dc-ba79-9f320e18762c --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:06bc047c-831a-41dc-ba79-9f320e18762c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "075d08e3-1f2a-452a-a644-9e41e80a809c",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "8d020b76-02b1-a56f-5fb6-4656a8029969",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 075d08e3-1f2a-452a-a644-9e41e80a809c --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:075d08e3-1f2a-452a-a644-9e41e80a809c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "077dfd6f-65f9-4891-8a32-2d4c3b495b19",
+      "productCode": "200200304",
+      "productName": "대한관류용멸균증류수",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "3201e28ac91f849a2d9bf947cb132edc",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "249202CIS",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "8ec31831-9bd0-2991-dfb2-40eb98bfd20a",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 077dfd6f-65f9-4891-8a32-2d4c3b495b19 --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:077dfd6f-65f9-4891-8a32-2d4c3b495b19",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "07c8d335-ad25-4342-89ee-7bec9de1ce43",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A42000CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "df8a82de-8b64-5fc2-67be-34e804b30ca1",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 07c8d335-ad25-4342-89ee-7bec9de1ce43 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:07c8d335-ad25-4342-89ee-7bec9de1ce43",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "productCode": "202002671",
+      "productName": "푸레파인마일드좌제",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "519f6341452aad07c8941b0242914283",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "E27800CSP",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b58fbba3-3a42-0448-b418-6abcbba59843",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 083f3a40-3ef8-4a96-84b6-7d2a8126aa3f --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0877e40e-323d-48fb-a838-dfd3017ba8f3",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "07358ce5-c5d6-10ba-e165-7a4024217d17",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0877e40e-323d-48fb-a838-dfd3017ba8f3 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0877e40e-323d-48fb-a838-dfd3017ba8f3",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "08b003c0-ff7a-4cdd-a3e4-9e53d240625c",
+      "productCode": "200904822",
+      "productName": "노스엣센스액(염화알루미늄)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "f22af8a1c2bbe67d403372f36ac246b8",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A03301CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "cd34115a-2b87-820b-795b-d4871b7076b4",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 08b003c0-ff7a-4cdd-a3e4-9e53d240625c --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:08b003c0-ff7a-4cdd-a3e4-9e53d240625c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "f63140ac-a303-fd56-11f4-28390b7d457e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 08ffaab2-3f82-4e7a-8bf0-0bc936a33932 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "09abcf6b-4276-4b31-b712-e2971124f9d0",
+      "productCode": "201607103",
+      "productName": "엔도파액(과아세트산액0.2%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 1
+      },
+      "officialSourceHash": "12ff198da5042f9429ffd78e36c6f3ff",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "3ef4398b-a124-9c72-d8d5-b53ca46e497a",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 09abcf6b-4276-4b31-b712-e2971124f9d0 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:09abcf6b-4276-4b31-b712-e2971124f9d0",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0aaba214-a218-4fc6-972a-325307d84f64",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "771a2d03-4806-b9cc-5f6b-9e01c6a285c1",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0aaba214-a218-4fc6-972a-325307d84f64 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0aaba214-a218-4fc6-972a-325307d84f64",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0b7e6fad-1120-42e3-986c-d9760e87f68d",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "117802CSP",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "dce90a11-07a1-12ba-60d7-28c5749d2f5c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0b7e6fad-1120-42e3-986c-d9760e87f68d --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0b7e6fad-1120-42e3-986c-d9760e87f68d",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0c7f4538-7b91-4b92-88fe-34273f0518a7",
+      "productCode": "200004835",
+      "productName": "그린태고액1%(알킬디아미노에틸글리신염산염액)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "3a2ce22c8153af64060601097e98bd34",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "5f46f164-074b-0877-b7e6-0c4bf0b1bbb1",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0c7f4538-7b91-4b92-88fe-34273f0518a7 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0c7f4538-7b91-4b92-88fe-34273f0518a7",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0cd5a7fb-e355-40b9-874c-d402fc9402aa",
+      "productCode": "201902450",
+      "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "6b9f8a37fea6c916851126c848810973",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "85ba6116-1b61-9de8-b4c1-0e7782ef6b9f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0cd5a7fb-e355-40b9-874c-d402fc9402aa --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0cd5a7fb-e355-40b9-874c-d402fc9402aa",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0d51e49f-4bb2-40c0-8385-1f8b1de5a19b",
+      "productCode": "201403893",
+      "productName": "베타딘드라이파우더스프레이",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "3700e39d3d013a25d937f91ff1126721",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "216234CSI",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "dfbdf2e7-a99c-bb16-1ac5-734800ce2c8e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0d51e49f-4bb2-40c0-8385-1f8b1de5a19b --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0d51e49f-4bb2-40c0-8385-1f8b1de5a19b",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "0d8ad428-1f1f-4a2f-b98c-b9d5781a60d7",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0a82bf2f-f4c4-82ba-25b7-367324cf5fc6",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0d8ad428-1f1f-4a2f-b98c-b9d5781a60d7 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0d8ad428-1f1f-4a2f-b98c-b9d5781a60d7",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "544700CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a308dd87-6659-6999-3676-2b1fe9e6e14f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "0deb76c9-59d5-4d82-9aa7-41771f4cb16d",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "871ae1f3-7fa7-523b-590c-6264bb342112",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0deb76c9-59d5-4d82-9aa7-41771f4cb16d --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0deb76c9-59d5-4d82-9aa7-41771f4cb16d",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0e2086c3-b129-4dcf-8faf-c67d235cb579",
+      "productCode": "200300245",
+      "productName": "대한관류용멸균생리식염수",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "6808d0a270c5f7693a98521cd320d96c",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 2,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "2edf14b1-2d26-6644-5f67-4b08360a6ec8",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0e2086c3-b129-4dcf-8faf-c67d235cb579 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0e2086c3-b129-4dcf-8faf-c67d235cb579",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0e2d2ed7-849b-4dc1-976a-8b760a1bb149",
+      "productCode": "202102233",
+      "productName": "릴라이온페라세이프산(과탄산나트륨)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "00b61f5707a9b6e9506d30949030b28f",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "7c35d6de-2370-a734-8f0c-d6dc8e1c1d14",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0e2d2ed7-849b-4dc1-976a-8b760a1bb149 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0e2d2ed7-849b-4dc1-976a-8b760a1bb149",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0e8c8a1c-6bc7-4529-9ac4-42c6802d5b45",
+      "productCode": "200300245",
+      "productName": "대한관류용멸균생리식염수",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "6808d0a270c5f7693a98521cd320d96c",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 2,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "7358003a-7d3a-0222-7521-e2bc58809a1f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0e8c8a1c-6bc7-4529-9ac4-42c6802d5b45 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0e8c8a1c-6bc7-4529-9ac4-42c6802d5b45",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0eacb4bd-636b-4480-9aca-6436fd185641",
+      "productCode": "201606591",
+      "productName": "큐앤큐헥시코올거즈액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "36243ae76cbef4a563f03fad825165c8",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 2,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "56fa238c-e015-18d7-f9f4-83dbc9855ad6",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0eacb4bd-636b-4480-9aca-6436fd185641 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0eacb4bd-636b-4480-9aca-6436fd185641",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0ef8bc59-5206-468b-86cb-a3a810bf11a9",
+      "productCode": "201500029",
+      "productName": "스웨클로액(염화알루미늄)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "1a276e50216f557a5fcf5b5767ae95ff",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "50ca62b7-975e-a58f-399f-e74a075ea37a",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0ef8bc59-5206-468b-86cb-a3a810bf11a9 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0ef8bc59-5206-468b-86cb-a3a810bf11a9",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0f13048a-58c7-4fa8-9c14-b880c17abab8",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "330800CSP",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "376e4c6b-3ecc-d645-edfb-dac1e571af6c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0f13048a-58c7-4fa8-9c14-b880c17abab8 --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0f13048a-58c7-4fa8-9c14-b880c17abab8",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0f332f33-126e-4d92-89f4-4e47b2ee5efc",
+      "productCode": "201601386",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "6053f3cc5132d0c3980d8fc637a7f75d",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b49eecee-87c2-bc3a-9a19-9241061c7902",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0f332f33-126e-4d92-89f4-4e47b2ee5efc --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0f332f33-126e-4d92-89f4-4e47b2ee5efc",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "productCode": "200108738",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A31402CSI",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0f707974-cfa7-4295-843e-da6b92b263d3",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0f97cc81-b2bc-4db3-af8f-79f9b62f4902 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "36a519ea-76cd-0f66-33e9-02997575a0d6",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 0fbb078e-45a1-4c8f-b689-1fb2a02552a5 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "productCode": "202107875",
+      "productName": "헤모렉스에스좌제",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "7aca14afbe652790bb29bb408ba907de",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "E56500CSP",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a2eb1a8b-3ad9-df3a-75c5-fbe4fc7468c7",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1026e687-70da-426c-a4c7-020024fe1436 --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1026e687-70da-426c-a4c7-020024fe1436",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "105e75b1-dc87-40fc-856f-ce191f05883f",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0056478b-b8af-11a5-8b14-78c8e1b6c087",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 105e75b1-dc87-40fc-856f-ce191f05883f --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:105e75b1-dc87-40fc-856f-ce191f05883f",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1186c652-716a-49a6-93a3-7cf8929229cb",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "55cdf5a4-52c5-b06e-2519-a3ed57746a64",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1186c652-716a-49a6-93a3-7cf8929229cb --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1186c652-716a-49a6-93a3-7cf8929229cb",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "120423aa-e658-443e-aafd-3124b53eb62c",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "3327fe4c-c086-2aa0-5df4-65f0982392c2",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 120423aa-e658-443e-aafd-3124b53eb62c --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:120423aa-e658-443e-aafd-3124b53eb62c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "124ed0d2-15c3-4732-a6cb-03cf92f4f347",
+      "productCode": "199801998",
+      "productName": "헥시덱스5%액(클로르헥시딘글루콘산염액)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "436632b84bcaaf083e4952e63190530e",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "385785c9-a3a5-cdfd-48a6-a852b7271dc2",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 124ed0d2-15c3-4732-a6cb-03cf92f4f347 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:124ed0d2-15c3-4732-a6cb-03cf92f4f347",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "12f3507e-fedd-4f00-b210-0467deebb691",
+      "productCode": "202400416",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0864c842-27f6-9311-ab2c-df161b53c78b",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 12f3507e-fedd-4f00-b210-0467deebb691 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:12f3507e-fedd-4f00-b210-0467deebb691",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "14574232-ee4d-4b70-85d2-12ec7f6f80f1",
+      "productCode": "199806429",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "450ad7d93a1fc3393515fc2eefb418db",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131305CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "f9021d8d-b308-2b10-a00e-6f32d6d4bd14",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 14574232-ee4d-4b70-85d2-12ec7f6f80f1 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:14574232-ee4d-4b70-85d2-12ec7f6f80f1",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "15365c55-51b6-444e-9081-dc79dc8f8757",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "8ed8375f-f6ca-13fb-1a59-05e7b962c396",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 15365c55-51b6-444e-9081-dc79dc8f8757 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:15365c55-51b6-444e-9081-dc79dc8f8757",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "153a34f6-7c14-4882-b238-28fd377fc8f3",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "59d7bca1-9873-3089-f428-c09613ad929e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 153a34f6-7c14-4882-b238-28fd377fc8f3 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:153a34f6-7c14-4882-b238-28fd377fc8f3",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "15d44af7-8b78-4fae-a94c-b652123fb38a",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b128a8a2-572d-dade-9852-a2fdeb59a36e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 15d44af7-8b78-4fae-a94c-b652123fb38a --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:15d44af7-8b78-4fae-a94c-b652123fb38a",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "15e043a6-b27b-451a-a054-6d71faeb8eba",
+      "productCode": "201606382",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "6bfd6507-9416-e1ca-23ea-fd7718626360",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 15e043a6-b27b-451a-a054-6d71faeb8eba --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:15e043a6-b27b-451a-a054-6d71faeb8eba",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "160b7362-9347-4175-b622-b52411db87b0",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "8ed719c2-a440-0fdf-c3b3-b44ae7666463",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 160b7362-9347-4175-b622-b52411db87b0 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:160b7362-9347-4175-b622-b52411db87b0",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1618daa1-f04f-4653-8c8b-5b60a8cbbe14",
+      "productCode": "201607103",
+      "productName": "엔도파액(과아세트산액0.2%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 1
+      },
+      "officialSourceHash": "12ff198da5042f9429ffd78e36c6f3ff",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "47b45ebb-2e63-f933-c893-390a6f62b1df",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1618daa1-f04f-4653-8c8b-5b60a8cbbe14 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1618daa1-f04f-4653-8c8b-5b60a8cbbe14",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "162735c3-9c97-4604-a3f7-849a6d82deca",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "95adefa9-9de2-9134-0162-2913d122caa5",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 162735c3-9c97-4604-a3f7-849a6d82deca --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:162735c3-9c97-4604-a3f7-849a6d82deca",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "167cd94a-c034-4e42-9d52-d7a3f92e2624",
+      "productCode": "200300340",
+      "productName": "성광헥시클렌액(클로르헥시딘글루콘산염액)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "a39eff62397074c15ddef315318f96f6",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131305CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "43ea4ebe-626b-ee79-6af2-9ab46120f0c8",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 167cd94a-c034-4e42-9d52-d7a3f92e2624 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:167cd94a-c034-4e42-9d52-d7a3f92e2624",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "171812b7-cef2-489b-a6f8-74000c5ca0e3",
+      "productCode": "199906999",
+      "productName": "쓰리엠스테리-가스EO카트리지",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "df4d37fa4cf7e04ce4d07d3da84b9b5c",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "36880fe7-e19d-b40d-2cc2-0cf6a91f2e03",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 171812b7-cef2-489b-a6f8-74000c5ca0e3 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:171812b7-cef2-489b-a6f8-74000c5ca0e3",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "175dcda0-73c8-477e-ac46-d45cc45b0d50",
+      "productCode": "200201841",
+      "productName": "헥시덱스-4액(클로르헥시딘글루콘산염액)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "5c69ffa58383523a7db4d4fd134e7ece",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131305CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "581f1940-4404-ff6e-b391-2ec7e94410a1",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 175dcda0-73c8-477e-ac46-d45cc45b0d50 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:175dcda0-73c8-477e-ac46-d45cc45b0d50",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1796beb4-079f-4878-aa1b-f74ab7450619",
+      "productCode": "200200304",
+      "productName": "대한관류용멸균증류수",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "3201e28ac91f849a2d9bf947cb132edc",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "249202CIS",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "2737ecbf-70a8-13fd-7dc7-82444af40ad2",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1796beb4-079f-4878-aa1b-f74ab7450619 --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1796beb4-079f-4878-aa1b-f74ab7450619",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1819ae41-5bba-4f39-9a1d-c40d241e00fe",
+      "productCode": "201607103",
+      "productName": "엔도파액(과아세트산액0.2%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 1
+      },
+      "officialSourceHash": "12ff198da5042f9429ffd78e36c6f3ff",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "efaac385-fe57-c5f6-d868-1880f5c3bf21",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1819ae41-5bba-4f39-9a1d-c40d241e00fe --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1819ae41-5bba-4f39-9a1d-c40d241e00fe",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1961a91a-911f-471b-94e4-476abde9e507",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "58a119c3-649c-9b3b-1c22-3b059d42aed9",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1961a91a-911f-471b-94e4-476abde9e507 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1961a91a-911f-471b-94e4-476abde9e507",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "197b876f-afad-4092-8439-150c5255063d",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 3,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "613854ae-dc12-a5a0-4b44-1ad836b93836",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 197b876f-afad-4092-8439-150c5255063d --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:197b876f-afad-4092-8439-150c5255063d",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "19825e3d-d2cb-409f-984b-c35dbbac3962",
+      "productCode": "199600446",
+      "productName": "성광알파헥시딘5%액(글루콘산클로르헥시딘액)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "5e3c46200f6fb85e51561c252ab28653",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "e97941f4-2019-1fb0-eded-4b4b0c1c98c9",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 19825e3d-d2cb-409f-984b-c35dbbac3962 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:19825e3d-d2cb-409f-984b-c35dbbac3962",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "19ecf1dc-090c-4728-bb03-de49be136515",
+      "productCode": "200404292",
+      "productName": "큐앤큐헥시딘스크랍",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "440007b88784e85c8ff8041009875962",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131311CDS",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "238219c8-0e11-533c-e714-37d4c54d8ec2",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 19ecf1dc-090c-4728-bb03-de49be136515 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:19ecf1dc-090c-4728-bb03-de49be136515",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1b8b4364-8b0a-4a04-a3c6-4800641e0f81",
+      "productCode": "200801347",
+      "productName": "구미히비크린에이액(글루콘산클로르헥시딘액)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "0ac504694900fa17903189f6c720bfe5",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "131305CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "c67b0455-ec02-7e3b-3587-93efc28651b9",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1b8b4364-8b0a-4a04-a3c6-4800641e0f81 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1b8b4364-8b0a-4a04-a3c6-4800641e0f81",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1b9cb7de-c776-4177-8b29-6d13b4f8c87c",
+      "productCode": "201606591",
+      "productName": "큐앤큐헥시코올거즈액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "36243ae76cbef4a563f03fad825165c8",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 2,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "32b2a330-2f5f-cf7b-676a-70f7b95d6a96",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1b9cb7de-c776-4177-8b29-6d13b4f8c87c --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1b9cb7de-c776-4177-8b29-6d13b4f8c87c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1bc4db31-2bcd-4dca-a6f4-aff67bfe2a55",
+      "productCode": "201701117",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "29b7acff0504db03546c1a915e9d61c6",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "6ac565c4-a942-dbd0-9748-43dcc10e019c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1bc4db31-2bcd-4dca-a6f4-aff67bfe2a55 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1bc4db31-2bcd-4dca-a6f4-aff67bfe2a55",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "productCode": "199806423",
+      "productName": "포스테리산좌제",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "518facd053ea09ff4c9fb4438838b379",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A77201CSP",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "b97956bd-7531-ce7d-15d7-f1660db39052",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1bcc85a0-817b-49d3-b597-08d088998ce5 --rollback-test --port 5503",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1bd2d4d4-92a3-4a8f-8e1b-dce1c55cf1b5",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 27,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "890a4d9a-8296-3f09-8d27-48114dce9802",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1bd2d4d4-92a3-4a8f-8e1b-dce1c55cf1b5 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1bd2d4d4-92a3-4a8f-8e1b-dce1c55cf1b5",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1c4ce545-7ae0-43d6-a508-2d94750804b8",
+      "productCode": "201708381",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_UNRESOLVED",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "bd9a369fc156c80a1f34b32824018661",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a1145f59-9a26-6954-1064-5b254a7b9427",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "공식 용법 원문·제형 근거로 투여경로 확정(제품명 추론 금지) 후 가 에이전트 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1c4ce545-7ae0-43d6-a508-2d94750804b8 --rollback-test --port 5503",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1c4ce545-7ae0-43d6-a508-2d94750804b8",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_UNRESOLVED"
+    },
+    {
+      "masterId": "1da4deb4-8dd4-4232-b075-155878f3be3e",
+      "productCode": "201307475",
+      "productName": "헥시타놀이티2%액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "ffb64004321762aea0a9df2e1e60ea51",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "D24400CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "78260d4a-a321-6ef6-a3a5-90d7f1826838",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1da4deb4-8dd4-4232-b075-155878f3be3e --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1da4deb4-8dd4-4232-b075-155878f3be3e",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1e075484-1750-467b-8d1d-21796045a1bc",
+      "productCode": "200901684",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "689e0b56c93afe83ec123961ee0c9bf9",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "216232CDS",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "5127d4bd-41a9-5563-a4eb-9fd195bd633f",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1e075484-1750-467b-8d1d-21796045a1bc --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1e075484-1750-467b-8d1d-21796045a1bc",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1eda7c31-6a7e-4da8-a1c2-3d4639b1c13c",
+      "productCode": "201501926",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "b1cf99a8317302736cfc6efb6592f91e",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "D52600CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "91cc0ea6-f9df-b641-0273-a8707137079c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1eda7c31-6a7e-4da8-a1c2-3d4639b1c13c --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1eda7c31-6a7e-4da8-a1c2-3d4639b1c13c",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1f1eda71-7e64-4b3d-8b8f-60a57f1faea8",
+      "productCode": "199806484",
+      "productName": "드리클로액(염화알루미늄수화물)",
+      "sourceHoldClass": "HOLD_ROUTE",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 0
+      },
+      "officialSourceHash": "c58829924d0cee16c2442dec95adf802",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": "A03302CLQ",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a63f55e2-e6f6-d7bc-bbdd-cce4e8071398",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1f1eda71-7e64-4b3d-8b8f-60a57f1faea8 --rollback-test --port 5503",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1f1eda71-7e64-4b3d-8b8f-60a57f1faea8",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
+      "productCode": "201803043",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "sourceHoldClass": "HOLD_IDENTITY",
+      "exceptionCode": "ROUTE_CONFLICT",
+      "failedStage": "route",
+      "officialSectionPresence": {
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "candidateRoute": null,
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "3648c604-838f-a20a-ef86-a733becd226e",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": true,
+      "recommendedAction": "비경구 경로 동사 2종 동시 출현 — 원문 기준 대표경로 확정 또는 subgroup 분리 후 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 1f6ee33a-ece9-45b8-81a6-a388dbb9a840 --rollback-test --port 5503",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
+      "stratum": "B_BOUNDARY",
+      "expectedExceptionCode": "ROUTE_CONFLICT"
+    },
+    {
+      "masterId": "67bb8315-f788-46c3-ac07-3d70a799978e",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "c2ceab3f-9f5f-acb7-9ad4-e63802b4ccc4",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 67bb8315-f788-46c3-ac07-3d70a799978e --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:67bb8315-f788-46c3-ac07-3d70a799978e",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "737f1b21-ad6a-40af-8df6-e974b642c3fd",
+      "productCode": "202105353",
+      "productName": "트로앤텍스프레이",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "ff85df68ba1de435bef77c6c87184ec6",
+      "candidateRoute": "topical",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "42295e38-aba9-61e5-95f6-abff91773b69",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 737f1b21-ad6a-40af-8df6-e974b642c3fd --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:737f1b21-ad6a-40af-8df6-e974b642c3fd",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "9c5da1ce-1fa7-49b6-9cf5-5ac800906088",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "2d6071d8-0070-cd99-837d-1a559e02438c",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only 9c5da1ce-1fa7-49b6-9cf5-5ac800906088 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:9c5da1ce-1fa7-49b6-9cf5-5ac800906088",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "a0b5d982-c4a1-4c88-9a8f-b6b42ff84ed8",
+      "productCode": "202106350",
+      "productName": "바이오탑하이듀얼캡슐",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 0,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "307a26d7a70b424aa18f4e9d9e780f4a",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E56100ACH",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0807349e-f589-6fd5-b6e3-81a4b36e5153",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only a0b5d982-c4a1-4c88-9a8f-b6b42ff84ed8 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:a0b5d982-c4a1-4c88-9a8f-b6b42ff84ed8",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "a5ac8ba6-0afc-471c-8028-5bfb3269649a",
+      "productCode": "200810766",
+      "productName": "엘카탄정(엘카르니틴)",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 0,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "9711f96c2602405706696466edb597bb",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "124503ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "23e28f6a-c147-2573-c817-4cd76c2e4890",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only a5ac8ba6-0afc-471c-8028-5bfb3269649a --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:a5ac8ba6-0afc-471c-8028-5bfb3269649a",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "a890f53e-b3ad-4124-ab79-955220f121c3",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "a9cf5f90-4e67-375e-5357-964aa2820b60",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only a890f53e-b3ad-4124-ab79-955220f121c3 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:a890f53e-b3ad-4124-ab79-955220f121c3",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "b5a8597e-d2a9-45ad-857a-f4e3641ad66d",
+      "productCode": "201204813",
+      "productName": "인코라민스페셜정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "efe61e384eb867e496bc723e3f6a5692",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "C97900ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "7a6dcaca-1e9d-eca8-857b-5c37fd8a9994",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only b5a8597e-d2a9-45ad-857a-f4e3641ad66d --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:b5a8597e-d2a9-45ad-857a-f4e3641ad66d",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "cac752ca-95ce-4148-9b08-f797968341c7",
+      "productCode": "202105353",
+      "productName": "트로앤텍스프레이",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "ff85df68ba1de435bef77c6c87184ec6",
+      "candidateRoute": "topical",
+      "identitySnapshot": {
+        "gencode": null,
+        "gencodeCount": 0,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "9c88a6dd-1aaf-76d1-2324-7220b468b7c8",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only cac752ca-95ce-4148-9b08-f797968341c7 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:cac752ca-95ce-4148-9b08-f797968341c7",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "ce6d942b-307e-4fad-8d79-dc9300d8d88e",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "404eb95d-d903-24f7-2f9b-0e486bf07e15",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only ce6d942b-307e-4fad-8d79-dc9300d8d88e --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:ce6d942b-307e-4fad-8d79-dc9300d8d88e",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "d2120914-81c9-498a-b7f1-57ca4be23a35",
+      "productCode": "201208419",
+      "productName": "도담도담츄어블정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "d97f0cc92ec6e59d00647df89265a11a",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "D18400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "74678323-fa3a-fedb-66ee-d72528c8c0c3",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only d2120914-81c9-498a-b7f1-57ca4be23a35 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:d2120914-81c9-498a-b7f1-57ca4be23a35",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "d9f4363f-b1d1-4783-bc62-4d1d9516effa",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "d75566ba-2fb2-dc25-75fc-0ef096052f51",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only d9f4363f-b1d1-4783-bc62-4d1d9516effa --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:d9f4363f-b1d1-4783-bc62-4d1d9516effa",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "e9ea5ed8-76c3-4dcf-a477-58618bf76ae8",
+      "productCode": "202106350",
+      "productName": "바이오탑하이듀얼캡슐",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 0,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 0,
+        "상호작용": 0
+      },
+      "officialSourceHash": "307a26d7a70b424aa18f4e9d9e780f4a",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E56100ACH",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "deabf6d5-6ab6-882a-5934-e8bfd5c637ed",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only e9ea5ed8-76c3-4dcf-a477-58618bf76ae8 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:e9ea5ed8-76c3-4dcf-a477-58618bf76ae8",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "f449d220-7f58-445e-9f66-eb1773b2956e",
+      "productCode": "202203772",
+      "productName": "이노콜에프정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "445d96a3f360a69dfccb5e022461b9b1",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E68400ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "0a153751-b7b7-14fe-4235-47cb5d2da333",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only f449d220-7f58-445e-9f66-eb1773b2956e --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:f449d220-7f58-445e-9f66-eb1773b2956e",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    },
+    {
+      "masterId": "fae6a66b-41ab-41db-9414-6f21fa315793",
+      "productCode": "202106059",
+      "productName": "센스비정",
+      "sourceHoldClass": "HOLD_SOURCE",
+      "exceptionCode": "SOURCE_EFFICACY_MISSING",
+      "failedStage": "source",
+      "officialSectionPresence": {
+        "효능·효과": 0,
+        "용법·용량": 0,
+        "경고": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
+      },
+      "officialSourceHash": "7977614d3a1ecc9f8b17adc294328098",
+      "candidateRoute": "oral",
+      "identitySnapshot": {
+        "gencode": "E53500ATB",
+        "gencodeCount": 1,
+        "classKinds": [
+          "일반의약품"
+        ],
+        "atcCode": null
+      },
+      "numericTokens": {
+        "digitTokens": null,
+        "hasUnicodeFraction": null,
+        "hasAgeToken": null,
+        "hasDurationToken": null
+      },
+      "existingCanonicalState": {
+        "authoredKo": 0,
+        "en": 0
+      },
+      "sourceRefState": {
+        "planned": "de82ed0f-f501-9f11-9bc5-554b1da7a4cc",
+        "liveConflict": 0
+      },
+      "dbWriteActual": 0,
+      "retryable": false,
+      "recommendedAction": "ETL 원천 재수집 전 terminal — 창작 금지, 원문 확보 시에만 재투입",
+      "reproductionCommand": "../../node_modules/.bin/tsx src/scripts/otc-v4-pilot-500-executor.ga.ts --only fae6a66b-41ab-41db-9414-6f21fa315793 --rollback-test --port 5503",
+      "detail": "공식 원문 효능·효과 섹션 부재",
+      "batchId": "otc-v4-pilot-500",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:fae6a66b-41ab-41db-9414-6f21fa315793",
+      "stratum": "C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "SOURCE_EFFICACY_MISSING"
+    }
+  ]
+}

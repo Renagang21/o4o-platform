@@ -1,0 +1,179 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "batchId": "otc-v4-pilot-500",
+  "kind": "expansion-verdict",
+  "counts": {
+    "target": 500,
+    "processed": 500,
+    "green": 416,
+    "exception": 84,
+    "skip": 0,
+    "writeActual": 2496,
+    "expectedWrite": 2496
+  },
+  "rerun": {
+    "skip": 416,
+    "green": 0,
+    "writeActual": 0
+  },
+  "byExceptionCode": {
+    "ROUTE_UNRESOLVED": 50,
+    "ROUTE_CONFLICT": 20,
+    "SOURCE_EFFICACY_MISSING": 14
+  },
+  "byRouteProduced": {
+    "topical": 149,
+    "oral": 208,
+    "ophthalmic": 54,
+    "vaginal": 3,
+    "oromucosal": 2
+  },
+  "byStratum": {
+    "A_NORMAL": {
+      "total": 416,
+      "green": 416,
+      "exception": 0,
+      "skip": 0
+    },
+    "B_BOUNDARY": {
+      "total": 70,
+      "green": 0,
+      "exception": 70,
+      "skip": 0
+    },
+    "C_SOURCE_COMPOSER": {
+      "total": 14,
+      "green": 0,
+      "exception": 14,
+      "skip": 0
+    }
+  },
+  "greenLedgerTotal": 416,
+  "independentVerification": {
+    "verdict": "PASS",
+    "passed": "24/24"
+  },
+  "gates": [
+    {
+      "id": "EXPALL-01",
+      "gate": "500 전량 처리(processed = 500, 중단 0)",
+      "pass": true,
+      "evidence": "processed=500 / target=500"
+    },
+    {
+      "id": "EXPALL-02",
+      "gate": "개별 실패 후 다음 master 계속 처리",
+      "pass": true,
+      "evidence": "GREEN 416 + EXCEPTION 84 + SKIP 0 = 500 (예외 발생 후에도 생산 계속됨)"
+    },
+    {
+      "id": "EXPALL-03",
+      "gate": "실패 master DB residue 0",
+      "pass": true,
+      "evidence": "residueDirty=0 · IV-04 실패 residue=0 · IV-05 audit residue=0"
+    },
+    {
+      "id": "EXPALL-04",
+      "gate": "정상 생산 master 공식 6섹션 mismatch 0",
+      "pass": true,
+      "evidence": "IV-12 0개 master 미달 · 섹션 커버리지 {\"min\":0.9792,\"p01\":1,\"median\":1,\"sections\":1991}"
+    },
+    {
+      "id": "EXPALL-05",
+      "gate": "수치·연령·기간 누락 0",
+      "pass": true,
+      "evidence": "수치 0 · 연령 0 · 기간 0"
+    },
+    {
+      "id": "EXPALL-06",
+      "gate": "canonicalDup 0",
+      "pass": true,
+      "evidence": "dup=0 · KO canonical 위반 0건 · EN canonical 위반 0건"
+    },
+    {
+      "id": "EXPALL-07",
+      "gate": "sourceRef 충돌·누출 0",
+      "pass": true,
+      "evidence": "타 master 누수=0 · SOURCE_REF_CONFLICT 예외 0건"
+    },
+    {
+      "id": "EXPALL-08",
+      "gate": "기존 LIVE 변경 0",
+      "pass": true,
+      "evidence": "대상 밖 mfds_drug_otc canonical 불변(25024) · 대상 밖 audit=0"
+    },
+    {
+      "id": "EXPALL-09",
+      "gate": "pilot 100 GREEN 80 불변",
+      "pass": true,
+      "evidence": "GREEN 80 변경 0 / 소실 0 · 예외 20 write=0 · 교집합=0"
+    },
+    {
+      "id": "EXPALL-10",
+      "gate": "재실행 시 완료 master 자동 skip",
+      "pass": true,
+      "evidence": "재실행 SKIP=416(=1차 GREEN 416) · 신규 write=0 · 신규 GREEN=0"
+    },
+    {
+      "id": "EXPALL-11",
+      "gate": "예외 원장 누락·중복 0",
+      "pass": true,
+      "evidence": "예외 원장 84건 = 결과 예외 84건 · 중복 0 · 전건 dbWriteActual 0=true"
+    },
+    {
+      "id": "EXPALL-12",
+      "gate": "checkpoint 재개 PASS",
+      "pass": true,
+      "evidence": "checkpoint 20회 · 최종 processed=500 · 재실행 중복 write=0"
+    },
+    {
+      "id": "EXPALL-13",
+      "gate": "독립검증(별개 코드경로) PASS",
+      "pass": true,
+      "evidence": "24/24 · 실행기 로직 미import · 별개 섹션 파서 · 별개 수치 정규식 · 별개 검증 SQL"
+    },
+    {
+      "id": "EXPALL-14",
+      "gate": "시스템 수준 오류 0(SYS-01~SYS-17 미발동)",
+      "pass": false,
+      "evidence": "SYS-12 가 문자 그대로 발동(병렬 HFF 세션). 귀속 증거상 본 배치 오염 0 — 사용자 판단 필요"
+    },
+    {
+      "id": "EXPALL-NOT",
+      "gate": "성공률은 전량 확대 차단 기준이 아니다",
+      "pass": true,
+      "evidence": "성공률 83.2% 는 판정에 사용하지 않음"
+    }
+  ],
+  "sys12": {
+    "id": "SYS-12",
+    "literalTrigger": true,
+    "attributedTo": "o4o_hff_generated (병렬 HFF 생산 세션)",
+    "evidence": {
+      "hffRowsOnMy500Targets": 0,
+      "writesOnPilot100Green80SinceBaseline": 0,
+      "myTargetsOtherSourceTypeWrites": "mfds_easy_drug 416건 — 본 배치 자신의 demote",
+      "outsideMySourceTypeCanonicalUnchanged": "25024",
+      "sourceRefLeak": "0",
+      "outsideAudit": "0"
+    },
+    "assessment": "SYS-12 가 방지하려는 실제 위험(타 세션이 본 배치 대상을 변경)은 발생하지 않았다. 대상 교집합 0, 귀속 누수 0.",
+    "decision": "USER_DECISION_REQUIRED — 지시서 §7 즉시 중지 목록에 명시된 조건이므로 자동 통과 처리하지 않는다."
+  },
+  "sysOthers": {
+    "SYS-01": "officialSourceHash 불일치 0 (prep systemStop 없음)",
+    "SYS-02~SYS-11": "실행기·독립검증 전 게이트 PASS",
+    "SYS-13": "pilot 100 GREEN 80 변경 0 / 소실 0",
+    "SYS-14": "pilot 100 예외 20 write 0",
+    "SYS-15": "재실행 SKIP 416 / 신규 write 0",
+    "SYS-16": "checkpoint 재개 중복 write 0",
+    "SYS-17": "sourceRef 타 master 재사용 0"
+  },
+  "finalVerdictEnum": [
+    "APPROVED_FOR_REMAINING_ALL",
+    "NEEDS_PIPELINE_FIX",
+    "SYSTEM_STOP"
+  ],
+  "verdict": "PENDING_USER_DECISION_SYS12",
+  "note": "EXPALL-01~13 및 EXPALL-NOT 전부 PASS. 유일한 미충족은 SYS-12 문자적 발동이며 귀속 증거상 본 배치 오염은 0. 전량 확대 착수는 사용자 판단 필요."
+}

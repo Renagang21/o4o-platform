@@ -1,0 +1,815 @@
+{
+  "kind": "pre-apply-baseline",
+  "takenAt": "2026-07-29T13:19:26.311Z",
+  "targets": 500,
+  "totals": {
+    "allcanon": 93810,
+    "v4canon": 25024,
+    "easycanon": 3749,
+    "auditall": 15439,
+    "outsidecanon": 93310
+  },
+  "pilot100GreenIds": 80,
+  "pilot100Hashes": [
+    {
+      "mid": "0015084b-d47e-4107-bc0b-52a8f612aa47",
+      "lang": "en",
+      "h": "709b423fb3547cde492b8fe8e80b3239"
+    },
+    {
+      "mid": "0015084b-d47e-4107-bc0b-52a8f612aa47",
+      "lang": "ko",
+      "h": "0b070b3f3b730a22b37e85bb1a94ab7f"
+    },
+    {
+      "mid": "002063d6-2bea-4975-9fab-7d13bba0a19f",
+      "lang": "en",
+      "h": "15c8ff5a7b65e0305c8f5dddd0213e61"
+    },
+    {
+      "mid": "002063d6-2bea-4975-9fab-7d13bba0a19f",
+      "lang": "ko",
+      "h": "6979f20c98ca16871bbdcb16c694c69f"
+    },
+    {
+      "mid": "00218d5c-d6d4-4206-bb80-bd131525d960",
+      "lang": "en",
+      "h": "dbac8783b338eddcce30e1c2dcd53f13"
+    },
+    {
+      "mid": "00218d5c-d6d4-4206-bb80-bd131525d960",
+      "lang": "ko",
+      "h": "0728835383d6373712db52c3398d2b03"
+    },
+    {
+      "mid": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "lang": "en",
+      "h": "b3496f4f76e4395f85e28c1829c8e3b5"
+    },
+    {
+      "mid": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "lang": "ko",
+      "h": "d209175e8a329530f338fa9d99a6da5d"
+    },
+    {
+      "mid": "003431b9-ebb0-4e19-86b1-fd30dfcaa1f7",
+      "lang": "en",
+      "h": "5e60b5ca6a30d5e0966300476261c6b7"
+    },
+    {
+      "mid": "003431b9-ebb0-4e19-86b1-fd30dfcaa1f7",
+      "lang": "ko",
+      "h": "39a7d16a8ccfc5ffd31b5aa9fbc1468d"
+    },
+    {
+      "mid": "00421b9b-e8a2-49a2-b45a-00a7e45b3643",
+      "lang": "en",
+      "h": "86609111d8efbc41d360d1724ed4052e"
+    },
+    {
+      "mid": "00421b9b-e8a2-49a2-b45a-00a7e45b3643",
+      "lang": "ko",
+      "h": "81ecd6bfad426ec777272f7181c85d0a"
+    },
+    {
+      "mid": "004aab4d-6f13-4d2e-87ae-1cc19368ce90",
+      "lang": "en",
+      "h": "74e9dfcc3f0bd03f605acc6e5aa90231"
+    },
+    {
+      "mid": "004aab4d-6f13-4d2e-87ae-1cc19368ce90",
+      "lang": "ko",
+      "h": "cbd30b26c3493058ff13a9a35ab5d47c"
+    },
+    {
+      "mid": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "lang": "en",
+      "h": "e3f081f0fbd98c693a59f2d2e87e850c"
+    },
+    {
+      "mid": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "lang": "ko",
+      "h": "c7e2f28af37caa18b858bf5b1b75d342"
+    },
+    {
+      "mid": "006431c2-1586-4799-9582-52971293424a",
+      "lang": "en",
+      "h": "9bbfa4b24132ee1814e4b9cb18349774"
+    },
+    {
+      "mid": "006431c2-1586-4799-9582-52971293424a",
+      "lang": "ko",
+      "h": "c510abeae6d7ae7dbfe57d9c012b2601"
+    },
+    {
+      "mid": "00715e89-8b9e-418c-97de-199ee077a9fe",
+      "lang": "en",
+      "h": "dfdaf89f89c173e30ad5fd822fce4535"
+    },
+    {
+      "mid": "00715e89-8b9e-418c-97de-199ee077a9fe",
+      "lang": "ko",
+      "h": "ac0844f5f63dbb0f18b5e12600002407"
+    },
+    {
+      "mid": "007b4844-d219-48c8-ab84-ec3c7b682fca",
+      "lang": "en",
+      "h": "78e32f7f5baa32986731efe1f7171005"
+    },
+    {
+      "mid": "007b4844-d219-48c8-ab84-ec3c7b682fca",
+      "lang": "ko",
+      "h": "469a7cb2aa32193cb35897bf3765144a"
+    },
+    {
+      "mid": "008ca661-455a-482b-a89f-5b68a23857dc",
+      "lang": "en",
+      "h": "7707ff0bda0a1879eb582f302851fb84"
+    },
+    {
+      "mid": "008ca661-455a-482b-a89f-5b68a23857dc",
+      "lang": "ko",
+      "h": "f77ec49c29875caf11a914d5f169b634"
+    },
+    {
+      "mid": "00a49157-6ded-488f-a647-db37bfc773a8",
+      "lang": "en",
+      "h": "d4e77fb2f35cdd896bb565bd6f9538d6"
+    },
+    {
+      "mid": "00a49157-6ded-488f-a647-db37bfc773a8",
+      "lang": "ko",
+      "h": "abe59031bfbbb5918b8aa657dea7184f"
+    },
+    {
+      "mid": "00b01fa6-bc5c-4cbb-851b-40f48786333b",
+      "lang": "en",
+      "h": "651d515c8483ab62ed95536fd5e51522"
+    },
+    {
+      "mid": "00b01fa6-bc5c-4cbb-851b-40f48786333b",
+      "lang": "ko",
+      "h": "7c857f818e6e348e59a4a25eb52dd307"
+    },
+    {
+      "mid": "00fdc1b1-336b-42b3-b26c-c7b75635b7f0",
+      "lang": "en",
+      "h": "40560e5bfd59836f35f621da973b9775"
+    },
+    {
+      "mid": "00fdc1b1-336b-42b3-b26c-c7b75635b7f0",
+      "lang": "ko",
+      "h": "252fb541972f99c23da283a93ad89025"
+    },
+    {
+      "mid": "01129495-6dbb-4cf6-bc44-0425d1a7fad6",
+      "lang": "en",
+      "h": "0b072dd525561f29e929389d94415b55"
+    },
+    {
+      "mid": "01129495-6dbb-4cf6-bc44-0425d1a7fad6",
+      "lang": "ko",
+      "h": "3176355b92d4fa1ba5dc7cb5e7350c3d"
+    },
+    {
+      "mid": "011ee863-0947-4669-a4d1-32263a9914ad",
+      "lang": "en",
+      "h": "6dc3a52df8c4bf32bfedeb5a0d289c41"
+    },
+    {
+      "mid": "011ee863-0947-4669-a4d1-32263a9914ad",
+      "lang": "ko",
+      "h": "b0060e5f912c0d7be67c89119182fe42"
+    },
+    {
+      "mid": "012903c2-bdfb-474b-861e-042c01c45f4c",
+      "lang": "en",
+      "h": "38c706e33a1fecd907821959fb0f6471"
+    },
+    {
+      "mid": "012903c2-bdfb-474b-861e-042c01c45f4c",
+      "lang": "ko",
+      "h": "b30ba888d05cecaffd79fd41a3e301d3"
+    },
+    {
+      "mid": "012979ab-ca63-4fda-b210-3e8e1e64577e",
+      "lang": "en",
+      "h": "422e9c1ab944db7a5f249ebe29ffd420"
+    },
+    {
+      "mid": "012979ab-ca63-4fda-b210-3e8e1e64577e",
+      "lang": "ko",
+      "h": "536dad4dcd88a27f21abb6c1b8f24542"
+    },
+    {
+      "mid": "01398122-2790-4db7-84af-ddb1354d3f47",
+      "lang": "en",
+      "h": "bd90b41d2cf800f792061525df35dc26"
+    },
+    {
+      "mid": "01398122-2790-4db7-84af-ddb1354d3f47",
+      "lang": "ko",
+      "h": "320a0623d8f3592418935e4db0913a29"
+    },
+    {
+      "mid": "015425b9-10e6-4344-99b7-f76eec68544c",
+      "lang": "en",
+      "h": "f4adceeff50fff2f6b4d9016301806d1"
+    },
+    {
+      "mid": "015425b9-10e6-4344-99b7-f76eec68544c",
+      "lang": "ko",
+      "h": "5e73632d2480d1f546ff0a6c9b87b15b"
+    },
+    {
+      "mid": "0157af47-6f06-4ceb-80c4-d82bb953ea5f",
+      "lang": "en",
+      "h": "f4adceeff50fff2f6b4d9016301806d1"
+    },
+    {
+      "mid": "0157af47-6f06-4ceb-80c4-d82bb953ea5f",
+      "lang": "ko",
+      "h": "5e73632d2480d1f546ff0a6c9b87b15b"
+    },
+    {
+      "mid": "01628248-a3df-43b2-b959-fd76cff8301d",
+      "lang": "en",
+      "h": "1aa30424c4d4e53233356437ad871161"
+    },
+    {
+      "mid": "01628248-a3df-43b2-b959-fd76cff8301d",
+      "lang": "ko",
+      "h": "2bf1f32c1bca81aea47c12c3c694ec1d"
+    },
+    {
+      "mid": "017425ec-6996-453b-a054-d23168684cbd",
+      "lang": "en",
+      "h": "0df32af93796c4e2bd7622c8b192db27"
+    },
+    {
+      "mid": "017425ec-6996-453b-a054-d23168684cbd",
+      "lang": "ko",
+      "h": "c24a1c90d293ecb56549522d565eef5b"
+    },
+    {
+      "mid": "0181e3ea-a445-407f-a647-b92d5eb4c479",
+      "lang": "en",
+      "h": "aecac096e9fe233986517cd63fac5da4"
+    },
+    {
+      "mid": "0181e3ea-a445-407f-a647-b92d5eb4c479",
+      "lang": "ko",
+      "h": "bc84ea5db897675c2a01835b149f2943"
+    },
+    {
+      "mid": "01a30c7b-69dd-49c8-a737-b927182ade72",
+      "lang": "en",
+      "h": "ca3c3f77ccc94e1cdc0444f2b98edaf9"
+    },
+    {
+      "mid": "01a30c7b-69dd-49c8-a737-b927182ade72",
+      "lang": "ko",
+      "h": "a185d94b1870da503234372ec24da999"
+    },
+    {
+      "mid": "01a6bba3-a1c7-472e-9f23-48922e87df31",
+      "lang": "en",
+      "h": "34a731ca1df905a9dd0b538547a6dc18"
+    },
+    {
+      "mid": "01a6bba3-a1c7-472e-9f23-48922e87df31",
+      "lang": "ko",
+      "h": "45d964f3671d596a6919c4d9ccac031b"
+    },
+    {
+      "mid": "01c4c33f-3e2a-40a8-b411-2bfcc22340ab",
+      "lang": "en",
+      "h": "fa467bfd4b242505a82f3fc79c6313c7"
+    },
+    {
+      "mid": "01c4c33f-3e2a-40a8-b411-2bfcc22340ab",
+      "lang": "ko",
+      "h": "a98c42b8e9485288a3062f2f6ecef791"
+    },
+    {
+      "mid": "01e30acc-fc34-413b-ac71-9507e55dde13",
+      "lang": "en",
+      "h": "f1241ce1e546220966dac81ac51a48c5"
+    },
+    {
+      "mid": "01e30acc-fc34-413b-ac71-9507e55dde13",
+      "lang": "ko",
+      "h": "a30a5fdfa1140e9ef7bdc851385f1cc9"
+    },
+    {
+      "mid": "01e59591-8415-4be1-8cc2-3ed5ae35def3",
+      "lang": "en",
+      "h": "742b6be1f1bf941cf4d94a4b09941601"
+    },
+    {
+      "mid": "01e59591-8415-4be1-8cc2-3ed5ae35def3",
+      "lang": "ko",
+      "h": "8941592173a7da5fe400d4313f9a5fdb"
+    },
+    {
+      "mid": "0203be99-2d01-4e15-9143-011de3060ea9",
+      "lang": "en",
+      "h": "f4adceeff50fff2f6b4d9016301806d1"
+    },
+    {
+      "mid": "0203be99-2d01-4e15-9143-011de3060ea9",
+      "lang": "ko",
+      "h": "5e73632d2480d1f546ff0a6c9b87b15b"
+    },
+    {
+      "mid": "02241d64-4d7c-43e8-bb7b-04413a4be730",
+      "lang": "en",
+      "h": "66f94b33b7bb2a330ccca0c4fc920bc3"
+    },
+    {
+      "mid": "02241d64-4d7c-43e8-bb7b-04413a4be730",
+      "lang": "ko",
+      "h": "f2a743e4f450f3a6f9030dedc30ead02"
+    },
+    {
+      "mid": "0232a1ca-4306-4957-bb2f-32e27f1bdc7a",
+      "lang": "en",
+      "h": "7801e621aad13300d20e4c993af2e6a5"
+    },
+    {
+      "mid": "0232a1ca-4306-4957-bb2f-32e27f1bdc7a",
+      "lang": "ko",
+      "h": "41592fb481dd3aec3cf3f4651428d7e0"
+    },
+    {
+      "mid": "023baa9e-75c6-409d-8bf4-f4d3c03336f6",
+      "lang": "en",
+      "h": "3f4a9e7640810b58454e61dccee57731"
+    },
+    {
+      "mid": "023baa9e-75c6-409d-8bf4-f4d3c03336f6",
+      "lang": "ko",
+      "h": "006a7b46ab7f2cb7708dd12f72285bdc"
+    },
+    {
+      "mid": "0276936b-97e9-4996-8a85-b6b2b73d0216",
+      "lang": "en",
+      "h": "05ff76145b9b1e17822fb27987503271"
+    },
+    {
+      "mid": "0276936b-97e9-4996-8a85-b6b2b73d0216",
+      "lang": "ko",
+      "h": "9445bcc050a553aa365f651d44f2c573"
+    },
+    {
+      "mid": "0281fa88-04b2-434a-a165-df0a620d6605",
+      "lang": "en",
+      "h": "f36ddb4d91ccc4d63eb096e37b923f0b"
+    },
+    {
+      "mid": "0281fa88-04b2-434a-a165-df0a620d6605",
+      "lang": "ko",
+      "h": "d85b9a7232584eae352303536a800023"
+    },
+    {
+      "mid": "028647fb-2dc8-47f8-8705-62888a711859",
+      "lang": "en",
+      "h": "ce66f298ee15403d218c5de4431d39c6"
+    },
+    {
+      "mid": "028647fb-2dc8-47f8-8705-62888a711859",
+      "lang": "ko",
+      "h": "2ed1dab31efc32e8144b0c208e009f94"
+    },
+    {
+      "mid": "02d2542b-ae0b-4ecf-a811-fa3772df2505",
+      "lang": "en",
+      "h": "5490ce68d265c7498a32ddd4867919cc"
+    },
+    {
+      "mid": "02d2542b-ae0b-4ecf-a811-fa3772df2505",
+      "lang": "ko",
+      "h": "7edf6befb159848020bdc572962a1acc"
+    },
+    {
+      "mid": "03455a80-d779-4a79-8739-e680c107d686",
+      "lang": "en",
+      "h": "95bbe1c647b576d9be72facea26572c1"
+    },
+    {
+      "mid": "03455a80-d779-4a79-8739-e680c107d686",
+      "lang": "ko",
+      "h": "3e8570a95bb0c33de2255775e97e910c"
+    },
+    {
+      "mid": "03605844-c52a-47e4-ab8b-d5316b80844a",
+      "lang": "en",
+      "h": "43afaff1bccae554ec173113a5b4ad47"
+    },
+    {
+      "mid": "03605844-c52a-47e4-ab8b-d5316b80844a",
+      "lang": "ko",
+      "h": "ed6211e515a76622b1bfb419ba9befea"
+    },
+    {
+      "mid": "0362e7db-96be-4679-a653-cb5b25bfff68",
+      "lang": "en",
+      "h": "ec30025d21b611ca50e2ec14259e6d9b"
+    },
+    {
+      "mid": "0362e7db-96be-4679-a653-cb5b25bfff68",
+      "lang": "ko",
+      "h": "f762c28d0da4d63ef8b13c7ad504e5c1"
+    },
+    {
+      "mid": "0374e2e2-aa44-41ea-8cec-eadaad4afcf5",
+      "lang": "en",
+      "h": "709b423fb3547cde492b8fe8e80b3239"
+    },
+    {
+      "mid": "0374e2e2-aa44-41ea-8cec-eadaad4afcf5",
+      "lang": "ko",
+      "h": "0b070b3f3b730a22b37e85bb1a94ab7f"
+    },
+    {
+      "mid": "0387acb0-0124-4d94-aac9-eec014044567",
+      "lang": "en",
+      "h": "c2b12be76031010179e9db8676571b01"
+    },
+    {
+      "mid": "0387acb0-0124-4d94-aac9-eec014044567",
+      "lang": "ko",
+      "h": "a50a82a5903308068f91e386fd6690fc"
+    },
+    {
+      "mid": "03a1e771-3d79-4e25-b558-4217d158a751",
+      "lang": "en",
+      "h": "709b423fb3547cde492b8fe8e80b3239"
+    },
+    {
+      "mid": "03a1e771-3d79-4e25-b558-4217d158a751",
+      "lang": "ko",
+      "h": "0b070b3f3b730a22b37e85bb1a94ab7f"
+    },
+    {
+      "mid": "03ba696d-3887-427c-a061-0e086a392363",
+      "lang": "en",
+      "h": "3e2070a022c288912ae6f53278520b54"
+    },
+    {
+      "mid": "03ba696d-3887-427c-a061-0e086a392363",
+      "lang": "ko",
+      "h": "427955975444a301227a12f1cf5dfd74"
+    },
+    {
+      "mid": "03dabf65-bb27-43ab-aa1f-640cfa06e729",
+      "lang": "en",
+      "h": "5c89eadff0ad7170a7c66610931ba7a7"
+    },
+    {
+      "mid": "03dabf65-bb27-43ab-aa1f-640cfa06e729",
+      "lang": "ko",
+      "h": "a896527a564c77f084f5246af7fb9575"
+    },
+    {
+      "mid": "03effc07-9a60-4378-9980-49a883259232",
+      "lang": "en",
+      "h": "94f39289122929f33a419dcd9cdb3bd2"
+    },
+    {
+      "mid": "03effc07-9a60-4378-9980-49a883259232",
+      "lang": "ko",
+      "h": "c3cbc4106edb8a9e1f1205ddbc86f303"
+    },
+    {
+      "mid": "03f0d2af-264e-4132-9a64-01ac8d86cb2e",
+      "lang": "en",
+      "h": "b674183a3c017b87a4d563b07964cc76"
+    },
+    {
+      "mid": "03f0d2af-264e-4132-9a64-01ac8d86cb2e",
+      "lang": "ko",
+      "h": "289be54e11c303388445e4be13f9e1a3"
+    },
+    {
+      "mid": "040a2801-e3ba-4c2a-b5c4-af3f470bd5fb",
+      "lang": "en",
+      "h": "1df5dfbd72f8c81f0a25b3718cba8906"
+    },
+    {
+      "mid": "040a2801-e3ba-4c2a-b5c4-af3f470bd5fb",
+      "lang": "ko",
+      "h": "66b3ca9f3815c7dfef901d4444472bf6"
+    },
+    {
+      "mid": "041ff4d1-fb33-4935-ae05-f34c47861682",
+      "lang": "en",
+      "h": "fd5f6f200da1b3af894a0790c5e45bce"
+    },
+    {
+      "mid": "041ff4d1-fb33-4935-ae05-f34c47861682",
+      "lang": "ko",
+      "h": "83486e4a6f216d6963d479faef8b09b7"
+    },
+    {
+      "mid": "044d0837-9723-4ce8-a260-54e12ea239db",
+      "lang": "en",
+      "h": "66b0320731b5cc82f4e9604da328b737"
+    },
+    {
+      "mid": "044d0837-9723-4ce8-a260-54e12ea239db",
+      "lang": "ko",
+      "h": "297d83e6bd142a1f90577b92dda6bee5"
+    },
+    {
+      "mid": "0469b0a2-c12c-40b9-8d56-8458e0b23322",
+      "lang": "en",
+      "h": "db0ae6c8263539ce03392cc0449eae7c"
+    },
+    {
+      "mid": "0469b0a2-c12c-40b9-8d56-8458e0b23322",
+      "lang": "ko",
+      "h": "64e5ed78d91bbea56bd01143ef1da5f3"
+    },
+    {
+      "mid": "0473405d-9ea7-4044-9d6e-bc3c175fcdac",
+      "lang": "en",
+      "h": "e5ff08be96f6cd669649fec60be7a006"
+    },
+    {
+      "mid": "0473405d-9ea7-4044-9d6e-bc3c175fcdac",
+      "lang": "ko",
+      "h": "3fb6b39651c3c33b684fee26a5465175"
+    },
+    {
+      "mid": "04864184-7b40-4e94-aeaf-22a31c2367ec",
+      "lang": "en",
+      "h": "ab63fa0812563fceb6a1dc13b48ab584"
+    },
+    {
+      "mid": "04864184-7b40-4e94-aeaf-22a31c2367ec",
+      "lang": "ko",
+      "h": "099622f9c4b38298384e48920d6e45bf"
+    },
+    {
+      "mid": "04978193-8926-417f-8d82-1780ae9b077b",
+      "lang": "en",
+      "h": "1ab2291495220ef340a8ef0e524afd8e"
+    },
+    {
+      "mid": "04978193-8926-417f-8d82-1780ae9b077b",
+      "lang": "ko",
+      "h": "d95a7cac20805da35173a9324c7b32d5"
+    },
+    {
+      "mid": "049e9890-870d-4d8e-9103-b2581f92f327",
+      "lang": "en",
+      "h": "4aa97bfbf1148d04db67c27ba996518f"
+    },
+    {
+      "mid": "049e9890-870d-4d8e-9103-b2581f92f327",
+      "lang": "ko",
+      "h": "70c0e40af620e7193782a6b7c2189afe"
+    },
+    {
+      "mid": "04a41278-3175-4c35-b944-d81c53b17444",
+      "lang": "en",
+      "h": "7a0536a9976a01e60c0fe5830f8ac40a"
+    },
+    {
+      "mid": "04a41278-3175-4c35-b944-d81c53b17444",
+      "lang": "ko",
+      "h": "4065e67a54f375a4180d3d7206bc12c2"
+    },
+    {
+      "mid": "04af1af7-4e1c-411b-99e9-220f78ad9085",
+      "lang": "en",
+      "h": "b11d133d8cb8aacfabad1075a03ecebd"
+    },
+    {
+      "mid": "04af1af7-4e1c-411b-99e9-220f78ad9085",
+      "lang": "ko",
+      "h": "bc9923bad0c53fb81e6b9f3bd31c9b1a"
+    },
+    {
+      "mid": "050466a4-e581-493b-bc95-f075739fad7c",
+      "lang": "en",
+      "h": "3020dd919748fef6ad544e835f26de34"
+    },
+    {
+      "mid": "050466a4-e581-493b-bc95-f075739fad7c",
+      "lang": "ko",
+      "h": "0435b44f7f8684081219437ab1a1bb54"
+    },
+    {
+      "mid": "050d6101-93ac-4fbf-a1d0-244a616ec9af",
+      "lang": "en",
+      "h": "395eb28875b49b216ba8448b16844009"
+    },
+    {
+      "mid": "050d6101-93ac-4fbf-a1d0-244a616ec9af",
+      "lang": "ko",
+      "h": "8f34d946d142ce39a9d4871426629acc"
+    },
+    {
+      "mid": "0510ba3d-5bf8-442a-ba46-ee28159f7b25",
+      "lang": "en",
+      "h": "fc7146e3890fda71b9bf779ed1e14b2f"
+    },
+    {
+      "mid": "0510ba3d-5bf8-442a-ba46-ee28159f7b25",
+      "lang": "ko",
+      "h": "9ac7c4c14dfa423923ff8666b1b60a48"
+    },
+    {
+      "mid": "051e3b29-4694-4c56-bd53-5623712312b4",
+      "lang": "en",
+      "h": "7fccef31fe9e35fd58d45a58ccb6dd11"
+    },
+    {
+      "mid": "051e3b29-4694-4c56-bd53-5623712312b4",
+      "lang": "ko",
+      "h": "e590996b56a68e9d2ca44e002a46c487"
+    },
+    {
+      "mid": "055e2b0f-da6f-4c37-8659-1ff7d5cb287c",
+      "lang": "en",
+      "h": "b8e3932a7fd2800e6310e7dc28651b40"
+    },
+    {
+      "mid": "055e2b0f-da6f-4c37-8659-1ff7d5cb287c",
+      "lang": "ko",
+      "h": "0ac742f1e72a1534ada62f57bd568df1"
+    },
+    {
+      "mid": "056d9fcf-e04e-4197-8ab4-cc199a6a7ad1",
+      "lang": "en",
+      "h": "9d5b84f352faa785a3b259482fe178d1"
+    },
+    {
+      "mid": "056d9fcf-e04e-4197-8ab4-cc199a6a7ad1",
+      "lang": "ko",
+      "h": "0f44b6edaeb66e3ba172f4103d51c724"
+    },
+    {
+      "mid": "0578b7b0-60c0-49a0-b7d4-11053b0f0477",
+      "lang": "en",
+      "h": "3020dd919748fef6ad544e835f26de34"
+    },
+    {
+      "mid": "0578b7b0-60c0-49a0-b7d4-11053b0f0477",
+      "lang": "ko",
+      "h": "0435b44f7f8684081219437ab1a1bb54"
+    },
+    {
+      "mid": "05c3daa1-b851-40c5-af11-925797d30e8b",
+      "lang": "en",
+      "h": "041da99de18a29b13a26f848e93be9a6"
+    },
+    {
+      "mid": "05c3daa1-b851-40c5-af11-925797d30e8b",
+      "lang": "ko",
+      "h": "41137777baf2f617f93f8da8b9a10a65"
+    },
+    {
+      "mid": "05f4a6e6-baaa-427e-97ca-ace6cbd5314b",
+      "lang": "en",
+      "h": "0db07236112d4693bd15f91edbbcb56f"
+    },
+    {
+      "mid": "05f4a6e6-baaa-427e-97ca-ace6cbd5314b",
+      "lang": "ko",
+      "h": "210f7195fef41ae3cb1aee76b50c968a"
+    },
+    {
+      "mid": "06000bbc-c2af-4468-9b84-6aef1a4a26b4",
+      "lang": "en",
+      "h": "a19fafd8e7105629a890d5217851a855"
+    },
+    {
+      "mid": "06000bbc-c2af-4468-9b84-6aef1a4a26b4",
+      "lang": "ko",
+      "h": "53032f5bf003e41aa23eb5b6da7c0441"
+    },
+    {
+      "mid": "06525b1b-0071-4f2e-b762-5c288d9760b2",
+      "lang": "en",
+      "h": "bfb753a5911ea094a3ae46ac08d827de"
+    },
+    {
+      "mid": "06525b1b-0071-4f2e-b762-5c288d9760b2",
+      "lang": "ko",
+      "h": "c09054185fbb45094d8da80b630188bf"
+    },
+    {
+      "mid": "06d10c1c-c401-4723-af6c-744b86a51057",
+      "lang": "en",
+      "h": "f264fc55a54a2a1f3d52a2eeafe8f435"
+    },
+    {
+      "mid": "06d10c1c-c401-4723-af6c-744b86a51057",
+      "lang": "ko",
+      "h": "8dca4b76468a9f6dfecfc7d740989fc7"
+    },
+    {
+      "mid": "06eb72a2-904a-4767-a144-edef3617ba21",
+      "lang": "en",
+      "h": "c1a8c2de089cc36f72948298f7d45c44"
+    },
+    {
+      "mid": "06eb72a2-904a-4767-a144-edef3617ba21",
+      "lang": "ko",
+      "h": "06f636229d479de424168472d61173d2"
+    },
+    {
+      "mid": "06ec5495-87d4-48c7-8f6d-d0e3bab05a83",
+      "lang": "en",
+      "h": "028b77667e1b7ff88ceb27b90d9cbd3d"
+    },
+    {
+      "mid": "06ec5495-87d4-48c7-8f6d-d0e3bab05a83",
+      "lang": "ko",
+      "h": "0738418f2701391f328adf366b756ca2"
+    },
+    {
+      "mid": "070a619a-e33a-4a1d-9a0d-ea7f0d953043",
+      "lang": "en",
+      "h": "ac20c19d04dc9650fc0f08b32baed696"
+    },
+    {
+      "mid": "070a619a-e33a-4a1d-9a0d-ea7f0d953043",
+      "lang": "ko",
+      "h": "dfedad429d222a9501f8dd5c1be309e1"
+    },
+    {
+      "mid": "095a26a9-c107-424f-9d7c-f6cc64f9e5db",
+      "lang": "en",
+      "h": "9c63ae6fb4956e753b99f15ac6d5df45"
+    },
+    {
+      "mid": "095a26a9-c107-424f-9d7c-f6cc64f9e5db",
+      "lang": "ko",
+      "h": "754ccaf023e91b4280c9f853720f0015"
+    },
+    {
+      "mid": "09cb8666-4ae2-4c15-956c-db2d05d0aaf1",
+      "lang": "en",
+      "h": "3f9a9f5d5bb35459454af54151e47c45"
+    },
+    {
+      "mid": "09cb8666-4ae2-4c15-956c-db2d05d0aaf1",
+      "lang": "ko",
+      "h": "f9711bcb0becaac0076fa1da6ee3f373"
+    },
+    {
+      "mid": "0b464d01-650c-47b5-b0cd-91a3efbc4a08",
+      "lang": "en",
+      "h": "e5f45463e9001d087f82a8d003c1ab15"
+    },
+    {
+      "mid": "0b464d01-650c-47b5-b0cd-91a3efbc4a08",
+      "lang": "ko",
+      "h": "7877214b73dd37e92732f60ec8e5f893"
+    },
+    {
+      "mid": "0b486f63-8cf0-46fb-8626-250593c9cd5a",
+      "lang": "en",
+      "h": "be8d3306df805ce09a507cd54b0fdf25"
+    },
+    {
+      "mid": "0b486f63-8cf0-46fb-8626-250593c9cd5a",
+      "lang": "ko",
+      "h": "dd171750a8d5651c0ab5b03ea7be161a"
+    },
+    {
+      "mid": "0b4d72b4-d0de-48ee-b2b5-5495ed404c9d",
+      "lang": "en",
+      "h": "358aff50b5c8bfed8a26c84c9915d42c"
+    },
+    {
+      "mid": "0b4d72b4-d0de-48ee-b2b5-5495ed404c9d",
+      "lang": "ko",
+      "h": "a7ffbeed5e0865a52708e4ec810a7f6d"
+    },
+    {
+      "mid": "0d13bf48-d2e7-4d78-9801-7c3e7ee945bd",
+      "lang": "en",
+      "h": "1cd84ed4755dc3e56aec95484a44ed72"
+    },
+    {
+      "mid": "0d13bf48-d2e7-4d78-9801-7c3e7ee945bd",
+      "lang": "ko",
+      "h": "7778b45b16cf25c905768b0e05d389a0"
+    },
+    {
+      "mid": "3be2690e-81a1-45ab-b1c4-e55adc82094c",
+      "lang": "en",
+      "h": "5bdf2dcb4adc993cb5e52a3c7e043b68"
+    },
+    {
+      "mid": "3be2690e-81a1-45ab-b1c4-e55adc82094c",
+      "lang": "ko",
+      "h": "4c84e5b1949d65a3d854c63f6f095730"
+    }
+  ]
+}

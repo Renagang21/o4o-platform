@@ -1,0 +1,10 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1",
+  "kind": "tm-shard-filled",
+  "shard": 5,
+  "total": 1,
+  "note": "용법 수량 보존 교정 — 1일(1) 이 영어에서 소실되어 composer 수량 게이트에 걸린 1건. 의미 변경 없음.",
+  "entries": {
+    "만 12세 이하의 소아는 1회 권장용량을 4~6시간마다 필요시 복용합니다.이 약은 가능한 최단기간동안 최소 유효용량으로 복용하며, 1일 5회(75 mg/kg)을 초과하여 복용하지 않습니다.몸무게를 아는 경우 몸무게에 따른 용량(10~15 mg/kg)으로 복용하는 것이 더 적절합니다.연령대별 용량은 허가사항을 참고하십시오.": "Children aged 12 years or younger take the recommended single dose every 4 to 6 hours as needed. Take this medicine at the lowest effective dose for the shortest possible period, and do not take more than 5 doses in 1 day (75 mg/kg). If the body weight is known, it is more appropriate to dose according to body weight (10 to 15 mg/kg). Refer to the approved labeling for doses by age group."
+  }
+}
