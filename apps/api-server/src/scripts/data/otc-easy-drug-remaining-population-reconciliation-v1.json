@@ -1,0 +1,737 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-POPULATION-RECONCILIATION-20-V1",
+  "agent": "la",
+  "mode": "READ-ONLY reconciliation",
+  "liveDbWrite": 0,
+  "censusFormulas": {
+    "A": {
+      "name": "공식 생산 모집단 census (baseline verbatim)",
+      "source": "otc-easy-drug-marketed-scope-baseline-census.ts / otc-easy-drug-remaining-3809-master-by-master-census.la.ts",
+      "definition": "OTC master(product_drug_extensions.drug_category='otc', deleted_at IS NULL) 전수 → pop 분류 → productionTargets = EASY_DRUG_REGISTERED_INCOMPLETE ∪ NON_EASY_WITH_O4O_EVIDENCE → hold != READY = remaining",
+      "filters": [
+        "OTC 조인 필수",
+        "완료(authored KO+EN canonical & needs_review 0) 제외",
+        "EXCLUDE 키워드/비소매 대용량/전건취소 제외",
+        "easy 미등록은 O4O 시장성 근거 있을 때만 편입"
+      ],
+      "measured": 3809
+    },
+    "B": {
+      "name": "보조 census (easy canonical 잔존)",
+      "source": "otc-v3-ready-1134-completion-basis-census.na.ts:27",
+      "definition": "SELECT count(DISTINCT master_id) FROM shared_product_descriptions WHERE description_type='STORE' AND status='canonical' AND COALESCE(language,'ko')='ko' AND source_type='mfds_easy_drug' AND deleted_at IS NULL",
+      "filters": [
+        "OTC 조인 없음",
+        "완료 여부 무관",
+        "제외 필터 없음",
+        "시장성 근거 무관"
+      ],
+      "measured": 3829
+    },
+    "divergencePoints": [
+      "B 는 OTC 조인이 없어 비-OTC master 를 포함한다",
+      "B 는 authored canonical 로 교체 완료된 master 도 easy 행이 canonical 로 남아있으면 계속 센다",
+      "B 는 수출/군납/비매품/비소매 대용량/전건취소 제외 필터를 적용하지 않는다",
+      "A 는 easy 원문이 없어도 O4O 시장성 근거가 있으면 편입한다 (B 에는 없음)",
+      "A 는 easy 행이 canonical/ko/live 가 아니어도 easy 등록으로 간주한다 (B 는 canonical/ko/live 만)"
+    ]
+  },
+  "setDifference": {
+    "aSize": 3809,
+    "bSize": 3829,
+    "countDelta": 20,
+    "intersection": 3809,
+    "aOnlyCount": 0,
+    "bOnlyCount": 20,
+    "symmetricDifference": 20,
+    "note": "보고된 \"20건 차이\" 는 두 집합 크기의 차(countDelta)이며, 실제 갈린 master 는 양방향 대칭차 전건이다",
+    "aOnly": [],
+    "bOnly": [
+      "1ad8e59a-7a18-4baa-96bf-d2db7458a1e9",
+      "1ca12a30-0e31-47ab-a6fd-fa2d2b6219ff",
+      "1ee79007-f3c5-4e57-899a-b83eb09f6d57",
+      "3683e251-cfbc-478b-bf0f-bf80222147ce",
+      "4a1ddf89-01d3-4098-8a4b-427a889cf153",
+      "4e3ac48a-dee8-41be-863f-1cfd79dfcc21",
+      "5c8d3179-b3d0-4ade-bbd1-6d9dd7b43d06",
+      "7307d983-7f26-412b-92b6-17700b128d53",
+      "786d9487-dad9-4a78-aa13-e9be58562bc8",
+      "8034eb5d-f083-4fe1-87a0-cc5bf4623180",
+      "a1f2981e-c4c2-4d0c-96b1-a0896ad59599",
+      "a3732ecb-f285-4488-807b-8496a6d994b8",
+      "a56e5a8f-f008-49bc-ad99-6d846ea05d5f",
+      "bd53ce41-9750-46d7-80db-06a071a9aaf2",
+      "cc86ce3d-25e2-498d-b062-849fe74e0ecf",
+      "dc8e4243-fa0d-4af8-b6c6-64e12a16ff9a",
+      "ddaf4f23-e488-40d9-9d43-002f3e6f7495",
+      "ea11771c-769b-45b1-aa52-2a33263b9ba2",
+      "f69fad53-2247-4c18-89ab-b98a49ea21e7",
+      "fe7a6aa3-ea17-4ff4-90d0-0598ef2d8812"
+    ]
+  },
+  "verdictSummary": {
+    "bySide": {
+      "B_ONLY": 20
+    },
+    "byVerdict": {
+      "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR": 20
+    },
+    "unclassified": 0
+  },
+  "verdicts": [
+    {
+      "masterId": "1ad8e59a-7a18-4baa-96bf-d2db7458a1e9",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "1ca12a30-0e31-47ab-a6fd-fa2d2b6219ff",
+      "productName": "알파간피점안액0.15%(주석산브리모니딘)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "1ee79007-f3c5-4e57-899a-b83eb09f6d57",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "3683e251-cfbc-478b-bf0f-bf80222147ce",
+      "productName": "메코마그민500정",
+      "permitCode": "202502076",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=drug_unspecified)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "drug_unspecified",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "4a1ddf89-01d3-4098-8a4b-427a889cf153",
+      "productName": "크라비트점안액(레보플록사신수화물)",
+      "permitCode": "200109567",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "4e3ac48a-dee8-41be-863f-1cfd79dfcc21",
+      "productName": "코솝점안액",
+      "permitCode": "199907094",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "5c8d3179-b3d0-4ade-bbd1-6d9dd7b43d06",
+      "productName": "알파간피점안액0.15%(주석산브리모니딘)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "7307d983-7f26-412b-92b6-17700b128d53",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "786d9487-dad9-4a78-aa13-e9be58562bc8",
+      "productName": "코솝점안액",
+      "permitCode": "199907094",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "8034eb5d-f083-4fe1-87a0-cc5bf4623180",
+      "productName": "메코마그민500정",
+      "permitCode": "202502076",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=drug_unspecified)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "drug_unspecified",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "a1f2981e-c4c2-4d0c-96b1-a0896ad59599",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "a3732ecb-f285-4488-807b-8496a6d994b8",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "a56e5a8f-f008-49bc-ad99-6d846ea05d5f",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "bd53ce41-9750-46d7-80db-06a071a9aaf2",
+      "productName": "메코마그민500정",
+      "permitCode": "202502076",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=drug_unspecified)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "drug_unspecified",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "cc86ce3d-25e2-498d-b062-849fe74e0ecf",
+      "productName": "메코마그민500정",
+      "permitCode": "202502076",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=drug_unspecified)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "drug_unspecified",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "dc8e4243-fa0d-4af8-b6c6-64e12a16ff9a",
+      "productName": "코솝점안액",
+      "permitCode": "199907094",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "ddaf4f23-e488-40d9-9d43-002f3e6f7495",
+      "productName": "크라비트점안액(레보플록사신수화물)",
+      "permitCode": "200109567",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "ea11771c-769b-45b1-aa52-2a33263b9ba2",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "f69fad53-2247-4c18-89ab-b98a49ea21e7",
+      "productName": "코솝점안액",
+      "permitCode": "199907094",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    },
+    {
+      "masterId": "fe7a6aa3-ea17-4ff4-90d0-0598ef2d8812",
+      "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+      "permitCode": "200307641",
+      "side": "B_ONLY",
+      "verdict": "EXCLUDE_OUT_OF_OFFICIAL_DENOMINATOR",
+      "reasonCode": "NOT_OTC_EXTENSION",
+      "reason": "보조 census 는 OTC 조인이 없어 포함되나, 공식 모집단은 product_drug_extensions.drug_category='otc' 인 master 만 세므로 제외(실측 drug_category=rx)",
+      "action": "제외 원장 기록 — 생산 대상 아님",
+      "facts": {
+        "otcExtension": 0,
+        "drugCategories": "rx",
+        "easyRowsAny": 1,
+        "easyCanonicalKo": 1,
+        "authoredKoCanonical": 0,
+        "authoredEnCanonical": 0,
+        "needsReview": 0,
+        "easyRowStates": [
+          "canonical/ko/live"
+        ],
+        "popClass": "NOT_IN_OTC_POPULATION",
+        "hold": null,
+        "holdReason": null,
+        "inReady1134": false
+      }
+    }
+  ],
+  "ssot": {
+    "decidedPopulation": 3809,
+    "basis": "census A (공식 생산 모집단 census)",
+    "why": [
+      "공식 분모 19,385 와 완료 15,576 을 산출한 것과 동일한 축(OTC 한정 · 완료 제외 · 비소매/취소 제외)이다",
+      "census B 는 완료 master 의 잔존 easy 행과 비-OTC master 를 포함하므로 생산 대상 집합이 아니라 데이터 위생 지표다",
+      "판정 결과 B 전용 건 중 잔여로 편입해야 할 master 수 = 0"
+    ],
+    "promotedFromB": [],
+    "arithmetic": {
+      "otcPopulation": 57572,
+      "popCounts": {
+        "NON_EASY_NO_MARKET_EVIDENCE": 32385,
+        "EASY_DRUG_REGISTERED_COMPLETED": 15576,
+        "EASY_DRUG_REGISTERED_INCOMPLETE": 3809,
+        "NON_EASY_ALREADY_PRODUCED": 2933,
+        "EXCLUDE_CONFIRMED": 2869
+      },
+      "productionTargets": 3809,
+      "ready": 0,
+      "remaining": 3809,
+      "holdCounts": {
+        "HOLD_IDENTITY": 3246,
+        "HOLD_ROUTE": 536,
+        "HOLD_SOURCE": 27
+      },
+      "identity": "productionTargets = ready + remaining",
+      "identityHolds": true
+    }
+  },
+  "hygieneNote": {
+    "staleEasyCanonicalOnCompleted": 0,
+    "meaning": "authored 로 교체 완료되었으나 easy canonical 행이 함께 canonical 로 남아있는 master. 생산 대상은 아니며, canonical 중복 위생 점검 대상(본 WO 범위 밖 · DB write 금지).",
+    "rxWithEasyCanonical": {
+      "count": 20,
+      "meaning": "전문의약품(rx)/미분류 master 에 e약은요 STORE canonical 이 부착되어 있음. 매장용 OTC 설명서 생산 대상이 아니며, 원문 부착 자체는 별도 위생/정책 검토 대상(본 WO 범위 밖 · DB write 금지).",
+      "distinctPermitCodes": [
+        "199907094",
+        "200109567",
+        "200307641",
+        "202502076"
+      ],
+      "duplicateMasterGroups": [
+        {
+          "permitCode": "199907094",
+          "masterCount": 4,
+          "masterIds": [
+            "4e3ac48a-dee8-41be-863f-1cfd79dfcc21",
+            "786d9487-dad9-4a78-aa13-e9be58562bc8",
+            "dc8e4243-fa0d-4af8-b6c6-64e12a16ff9a",
+            "f69fad53-2247-4c18-89ab-b98a49ea21e7"
+          ],
+          "productName": "코솝점안액",
+          "drugCategory": "rx"
+        },
+        {
+          "permitCode": "200109567",
+          "masterCount": 2,
+          "masterIds": [
+            "4a1ddf89-01d3-4098-8a4b-427a889cf153",
+            "ddaf4f23-e488-40d9-9d43-002f3e6f7495"
+          ],
+          "productName": "크라비트점안액(레보플록사신수화물)",
+          "drugCategory": "rx"
+        },
+        {
+          "permitCode": "200307641",
+          "masterCount": 10,
+          "masterIds": [
+            "1ad8e59a-7a18-4baa-96bf-d2db7458a1e9",
+            "1ca12a30-0e31-47ab-a6fd-fa2d2b6219ff",
+            "1ee79007-f3c5-4e57-899a-b83eb09f6d57",
+            "5c8d3179-b3d0-4ade-bbd1-6d9dd7b43d06",
+            "7307d983-7f26-412b-92b6-17700b128d53",
+            "a1f2981e-c4c2-4d0c-96b1-a0896ad59599",
+            "a3732ecb-f285-4488-807b-8496a6d994b8",
+            "a56e5a8f-f008-49bc-ad99-6d846ea05d5f",
+            "ea11771c-769b-45b1-aa52-2a33263b9ba2",
+            "fe7a6aa3-ea17-4ff4-90d0-0598ef2d8812"
+          ],
+          "productName": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+          "drugCategory": "rx"
+        },
+        {
+          "permitCode": "202502076",
+          "masterCount": 4,
+          "masterIds": [
+            "3683e251-cfbc-478b-bf0f-bf80222147ce",
+            "8034eb5d-f083-4fe1-87a0-cc5bf4623180",
+            "bd53ce41-9750-46d7-80db-06a071a9aaf2",
+            "cc86ce3d-25e2-498d-b062-849fe74e0ecf"
+          ],
+          "productName": "메코마그민500정",
+          "drugCategory": "drug_unspecified"
+        }
+      ]
+    }
+  },
+  "officialDenominatorIdentity": {
+    "completed": 15576,
+    "remaining": 3809,
+    "sum": 19385,
+    "officialDenominator": 19385,
+    "holds": true,
+    "meaning": "easy-drug 등록 OTC master = 완료 + 잔여. 이 항등식이 성립하므로 census A 가 공식 분모와 같은 축임이 실측으로 확인된다."
+  },
+  "pilotCrossCheck": {
+    "present": true,
+    "pilotSize": 100,
+    "allInSsot": true,
+    "outsideSsot": [],
+    "ready1134Intersection": 0,
+    "populationChanged": false,
+    "pilotDecision": "모집단 확정 후 무변경 — 확정 SSOT 가 기존 census A(3,809)와 동일 집합이므로 pilot 100 재생성 불필요",
+    "diff": {
+      "added": [],
+      "removed": []
+    }
+  },
+  "gates": {
+    "1_all_20_classified": true,
+    "2_unclassified_0": true,
+    "3_symmetric_difference_equals_count_delta": true,
+    "4_a_subset_of_b": true,
+    "5_denominator_identity_19385": true,
+    "6_production_targets_equals_ready_plus_remaining": true,
+    "7_ssot_equals_census_a": true,
+    "8_no_promoted_master_lacks_evidence": true,
+    "9_ready1134_intersection_0": true,
+    "10_excluded_all_out_of_denominator": true,
+    "11_every_verdict_has_reason": true,
+    "12_db_write_0": true
+  },
+  "gatePass": true
+}
