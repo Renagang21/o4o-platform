@@ -374,8 +374,18 @@ export function HubScreenSetLibraryPage() {
         </select>
       </div>
 
+      {/* 목록 조회 실패 — 오류를 성공/0건으로 위장하지 않고 명시 + 재시도 제공(§11, load-error 계약 4상태). */}
       {error && (
-        <div className="mb-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</div>
+        <div className="mb-3 flex items-center justify-between gap-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-3 py-2">
+          <span className="min-w-0">{error}</span>
+          <button
+            onClick={() => void loadData()}
+            disabled={isLoading}
+            className="shrink-0 px-2.5 py-1 rounded-md border border-red-300 text-red-700 text-xs font-semibold hover:bg-red-100 disabled:opacity-50"
+          >
+            다시 시도
+          </button>
+        </div>
       )}
 
       {source === 'operator' ? (
