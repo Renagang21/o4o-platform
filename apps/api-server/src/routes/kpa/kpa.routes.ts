@@ -1160,7 +1160,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   async function writeAuditLog(
     user: any,
     actionType: string,
-    targetType: 'member' | 'application' | 'content' | 'kpa_content',
+    targetType: string,
     targetId: string,
     metadata: Record<string, unknown> = {},
   ) {
@@ -1168,8 +1168,8 @@ export function createKpaRoutes(dataSource: DataSource): Router {
       const log = auditRepo.create({
         operator_id: user?.id,
         operator_role: (user?.roles || []).find((r: string) => r.startsWith('kpa:')) || 'unknown',
-        action_type: actionType as any,
-        target_type: targetType as any,
+        action_type: actionType,
+        target_type: targetType,
         target_id: targetId,
         metadata,
       });

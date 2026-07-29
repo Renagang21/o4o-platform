@@ -39,10 +39,11 @@ interface AuditLog {
 
 // ─── Labels ──────────────────────────────────────────────────
 
-// WO-O4O-KPA-OPERATOR-P2-P3-USABILITY-AND-ERROR-CLEANUP-CONSOLIDATED-V1:
-//   ACTION_LABELS 커버리지를 api-server 가 실제 emit 하는 action_type 전수(16키)로 확장.
-//   추정 등록 금지 — 각 키는 코드 emitter 확인분(member.controller / kpa.routes writeAuditLog /
-//   pharmacy-store-config / pharmacy-products / pharmacy-info). 미매핑 키는 render 에서 raw key fallback.
+// WO-O4O-KPA-OPERATOR-AUDIT-LOG-ENTITY-ACTION-TYPE-CONTRACT-ALIGNMENT-V1:
+//   ACTION_LABELS = api-server emitter 전수(16키) — 코드 emitter(member.controller / kpa.routes
+//   writeAuditLog / pharmacy-store-config / pharmacy-products / pharmacy-info) + 프로덕션 census 로 확정.
+//   CONTENT_BATCH_PUBLISHED · RESOURCE_STATUS_CHANGED 는 live emitter(실행 이력 0), APPLICATION_REVIEWED 는
+//   legacy(잔존 3건). 매핑에 없는 값은 render 에서 raw key fallback — union 을 좁혀 화면을 깨뜨리지 않는다.
 const ACTION_LABELS: Record<string, string> = {
   // member
   MEMBER_STATUS_CHANGED: '회원 상태 변경',
@@ -67,15 +68,14 @@ const ACTION_LABELS: Record<string, string> = {
   APPLICATION_REVIEWED: '신청서 검토',
 };
 
+// target_type 는 프로덕션 실측 4종만 존재: member · content · kpa_content · application(legacy).
+//   COURSE/RESOURCE/PHARMACY/STOREFRONT 개념은 action_type 에 인코딩되고 target_type 은 content/kpa_content 로
+//   기록되므로 course/resource/pharmacy/storefront 대상 라벨은 실 데이터 0건 → 제거(필터 정합). 미매핑 값은 raw fallback.
 const TARGET_LABELS: Record<string, string> = {
   member: '회원',
-  application: '신청서',
   content: '콘텐츠',
   kpa_content: '콘텐츠',
-  course: '강의',
-  resource: '자료',
-  pharmacy: '약국',
-  storefront: '매장',
+  application: '신청서', // legacy
 };
 
 const ACTION_COLORS: Record<string, string> = {
