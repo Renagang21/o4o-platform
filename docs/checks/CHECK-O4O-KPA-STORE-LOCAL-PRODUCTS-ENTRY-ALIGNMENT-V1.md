@@ -182,7 +182,54 @@ rg "정책 폐기" services/web-kpa-society/src
 
 ## 7. 브라우저 smoke (§8)
 
-배포 후 실브라우저 검증 — 아래 §8 참조.
+Playwright(headless Chromium) 실브라우저 · 프로덕션 · 약국 경영자 계정.
+
+| 배포 | 커밋 | 리비전 |
+|---|---|---|
+| 1차 | `5458c5c92` | `kpa-society-web-01732` 이전 (`01731`, 00:06 UTC) |
+| 2차 (smoke 후속) | `8439f01ba` | `kpa-society-web-01732` (00:36 UTC) — 최종 smoke 대상 |
+
+### 7.1 KPA (`https://kpa-society.co.kr`) — 최종 리비전 `01732`
+
+| 검증 | 결과 |
+|---|---|
+| 사이드바에 `매장 자체 상품` 노출 | **PASS** — `매장 자체 상품 :: /store/commerce/local-products` |
+| 배치 위치 | **PASS** — `매장 경영활용 제품` 바로 아래, `발주 내역` 위 |
+| 메뉴 클릭 → 진입 | **PASS** — `/store/commerce/local-products` (403/리다이렉트 없음, `PharmacyOwnerOnlyGuard` 통과) |
+| 화면 제목 | **PASS** — `매장 자체 상품(8)` |
+| 상품 설명 화면 라벨 | **PASS** — `매장 자체 상품 (8)` |
+| handled-products 버튼 | **PASS** — `O4O 표준 상품에서 추가 / 신규 상품 등록 요청 / 내 등록 요청 / 새로고침` → local 탭·등록 버튼 재추가 0 |
+| 태블릿 화면 제작 뒤로가기 | **PASS** — `/store/commerce/tablet-displays` → `/store` |
+| 데드링크 | **0** |
+
+### 7.2 1차 smoke 에서 발견 → 추가 수정 (`8439f01ba`)
+
+1차 smoke 에서 복원된 메뉴로 진입한 화면의 `h1` 이 **`매장 경영활용 제품`** 으로 표시됨.
+이는 다른 메뉴(`/store/handled-products`)의 라벨과 동일 → **두 메뉴가 같은 제목 화면으로 읽히는 충돌**.
+
+메뉴를 다시 노출시킨 본 WO 가 직접 유발한 결함이므로 §5.6(라벨 정합) 연장선에서 정정:
+
+`StoreLocalProductsPage.tsx` — `h1` · 빈 상태 문구 · 등록/수정 모달 제목 → `매장 자체 상품`
+(라벨 전용. route/API/DB/필드 무변경. `WO-O4O-KPA-STORE-HANDLED-PRODUCTS-TERM-CLARIFICATION-V1` 주석은 이력 보존)
+
+### 7.3 GlycoPharm 회귀 (`https://glycopharm.co.kr`) — 무변경 확인
+
+| 검증 | 결과 |
+|---|---|
+| `자체 상품 :: /store/commerce/local-products` | **PASS** — 라벨·경로 그대로 |
+| `제작 자료 :: /store/library/production-materials` | **PASS** — 그대로 |
+| 그룹 구조 / 항목 수 | **PASS** — 변화 없음 |
+
+### 7.4 K-Cosmetics
+
+매장주 테스트 계정이 `TEST-ACCOUNTS.local.md` 에 없어 브라우저 smoke 미수행.
+`git diff` 상 KCos 블록 변경 0 + `npx tsc --noEmit` PASS 로 정적 검증 대체.
+
+### 7.5 관측 (범위 외)
+
+상품 설명 화면에서 `403 GET /api/v1/products/{id}/ai-contents` 1건.
+본 WO 는 해당 화면의 **라벨만** 변경했으므로 기존 동작이며, WO §11(API 변경 금지) 상 이번 범위에서 미수정.
+후속 판단 필요 시 별도 WO 대상.
 
 ---
 
