@@ -31,6 +31,8 @@ import type { LocalProduct, LocalProductInput, BadgeType } from '../../api/local
 import { RichTextEditor } from '@o4o/content-editor';
 // WO-O4O-MY-STORE-LOCAL-PRODUCTS-COMMON-COMPONENT-EXTRACTION-V1: 공통 배지/옵션
 import { LOCAL_PRODUCT_BADGE_OPTIONS as BADGE_OPTIONS, LocalProductBadge } from '@o4o/store-ui-core';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
+import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '@o4o/store-ui-core';
 // WO-O4O-KPA-STORE-PRODUCT-MULTILINGUAL-BADGES-PILOT-V1: 다국어 콘텐츠 연결 상태 배지
 import { getMlcSummaryMap, type StoreMlcSummaryItem } from '../../api/multilingualProductContentStore';
 import { MultilingualContentBadge, localeLabel } from '../../components/MultilingualContentBadge';
@@ -278,8 +280,13 @@ export default function StoreLocalProductsPage() {
           >
             <BarChart3 className="w-4 h-4" />
           </button>
+          {/* WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+              legacy `/store/commerce/products/:id/pop`(local UUID 를 ProductMaster 처럼 사용) 경유 제거.
+              canonical POP 화면으로 직접 진입하고, 상품 정보는 수신측이 org-scoped API 로 재조회한다. */}
           <button
-            onClick={() => navigate(`/store/commerce/products/${product.id}/pop`)}
+            onClick={() =>
+              navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
+            }
             className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
             title="POP 만들기"
           >

@@ -16,6 +16,11 @@
  *   - AI 문구 생성 패널 추가 (AiContentModal, template-aware)
  *   - popAiContent (title/bullets/shortText/longText) 상태 관리
  *   - handleGenerate에 templateId + aiContent 전달
+ * WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+ *   - origin='local' (store_local_products) 수신 — 매장 자체 상품 POP 의 canonical 제작 화면.
+ *   - 상품명/문구/대표 이미지는 organization-scoped 단건 API 로 재조회(새로고침에도 유지).
+ *   - 전역 product_ai_contents 조회·저장 및 ProductMaster POP endpoint 호출 없음.
+ *   - 저장·렌더는 기존 `POST /pharmacy/pop/generate` (save=true → store_execution_assets) 재사용.
  *
  * 본 페이지 역할:
  *   - 선택된 자료 표시
@@ -26,7 +31,7 @@
  *   - PDF 출력
  */
 
-import { useState, useEffect, useCallback, type CSSProperties } from 'react';
+import { useState, useEffect, useCallback, useRef, type CSSProperties } from 'react';
 import {
   Megaphone, Trash2, ExternalLink, FileDown, QrCode, FolderOpen,
   ChevronDown, ChevronUp, CheckCircle2, LayoutTemplate, Save,
@@ -43,12 +48,15 @@ import { getStoreSlug } from '../../api/pharmacyInfo';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { findTemplate } from './productionTemplates';
 import type { ProductionTemplate } from './productionTemplates';
-import type { ProductionRouterState } from './productionTargets';
+import type { ProductionRouterState, ProductionSourceItem } from './productionTargets';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 매장 자체 상품 prefill (org 격리 단건 조회)
+import { getLocalProduct } from '../../api/localProducts';
 import { GuideBackLink } from '@o4o/store-ui-core';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-type PopItemOrigin = 'library' | 'snapshot' | 'direct';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 'local' = store_local_products
+type PopItemOrigin = 'library' | 'snapshot' | 'direct' | 'local';
 
 interface PopItem {
   id: string;
@@ -79,7 +87,13 @@ const ORIGIN_BADGE: Record<PopItemOrigin, { label: string; bg: string; color: st
   library:  { label: '자료',          bg: '#EFF6FF', color: '#2563EB' },
   snapshot: { label: '커뮤니티 콘텐츠', bg: '#F1F5F9', color: '#475569' },
   direct:   { label: '직접 작성 콘텐츠', bg: '#F0FDF4', color: '#16A34A' },
+  local:    { label: '매장 자체 상품',    bg: '#FEF3C7', color: '#B45309' },
 };
+
+/** HTML 본문 → POP 문구용 plain text (신규 요약 알고리즘 없음 — 태그 제거 + 공백 정리) */
+function htmlToPlainText(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
@@ -191,6 +205,99 @@ export function StorePopPage() {
 
   // 자료 수신 — "내 자료함 → 제작 시작 → POP" 진입의 production state.
   // WO-O4O-POP-TEMPLATE-WORKFLOW-V1: selectedTemplateId도 함께 수신.
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   origin='local' 추가 수신 + 조회 실패를 빈 폼으로 위장하지 않는 상태 분리(로딩/실패/차단).
+  //   진입 state 는 재시도를 위해 보관한다(window.history.replaceState 로 지워지므로 ref 사용).
+  const incomingItemsRef = useRef<ProductionSourceItem[] | null>(null);
+  const [sourceLoading, setSourceLoading] = useState(false);
+  const [sourceError, setSourceError] = useState<string | null>(null);
+
+  const loadSourceItems = useCallback(async (incoming: ProductionSourceItem[]) => {
+    setSourceLoading(true);
+    setSourceError(null);
+    const fetched: PopItem[] = [];
+    const unsupported: string[] = [];
+    let failed = 0;
+    let blocked = 0;
+
+    for (const it of incoming) {
+      const origin = (it.origin as PopItemOrigin | undefined) ?? null;
+      if (origin === 'library') {
+        try {
+          const res = await getStoreExecutionAsset(it.id);
+          const lib = res.data;
+          fetched.push({
+            id: lib.id,
+            title: lib.title,
+            description: lib.description ?? null,
+            category: lib.category,
+            fileUrl: lib.fileUrl,
+            assetType: lib.assetType,
+            url: lib.url,
+            origin: 'library',
+          });
+        } catch {
+          failed += 1;
+        }
+      } else if (origin === 'local') {
+        // 매장 자체 상품 — organization 격리 단건 조회.
+        //   404 = 미존재 또는 다른 조직 상품(차단) / 그 외 = 조회 실패.
+        try {
+          const p = await getLocalProduct(it.id);
+          const detail = p.detail_html ?? p.detailHtml ?? null;
+          fetched.push({
+            id: p.id,
+            title: p.name,
+            description:
+              (p.summary?.trim() || null)
+              ?? (detail ? htmlToPlainText(detail) || null : null)
+              ?? (p.description?.trim() || null),
+            category: p.category,
+            fileUrl: p.thumbnail_url ?? p.images?.[0] ?? null,
+            assetType: 'content',
+            url: null,
+            origin: 'local',
+          });
+        } catch (e: any) {
+          if (e?.status === 404) blocked += 1;
+          else failed += 1;
+        }
+      } else if (origin === 'snapshot' || origin === 'direct') {
+        fetched.push({
+          id: it.id,
+          title: it.title,
+          description: it.description ?? null,
+          category: null,
+          fileUrl: null,
+          assetType: 'content',
+          url: null,
+          origin,
+        });
+      } else {
+        unsupported.push(it.id);
+      }
+    }
+
+    if (fetched.length) {
+      setPopItems((prev) => {
+        const ids = new Set(prev.map((p) => p.id));
+        return [...prev, ...fetched.filter((f) => !ids.has(f.id))];
+      });
+    }
+
+    if (blocked > 0) {
+      setSourceError('해당 상품을 찾을 수 없습니다. 내 매장의 자체 상품인지 확인해 주세요.');
+    } else if (failed > 0) {
+      setSourceError('매장 자체 상품 정보를 불러오지 못했습니다.');
+    }
+
+    if (unsupported.length) {
+      console.warn('[StorePopPage] 지원하지 않는 origin', unsupported);
+      toast.error(`${unsupported.length}개 항목은 POP에 사용할 수 없습니다`);
+    }
+    setSourceLoading(false);
+  }, []);
+
   useEffect(() => {
     const state = location.state as ProductionRouterState | null;
     const incoming = state?.production?.source?.items;
@@ -203,67 +310,17 @@ export function StorePopPage() {
     if (tpl) setSelectedTemplate(tpl);
 
     if (!incoming?.length) return;
-
-    let cancelled = false;
-    (async () => {
-      const fetched: PopItem[] = [];
-      const unsupported: string[] = [];
-
-      for (const it of incoming) {
-        const origin = (it.origin as PopItemOrigin | undefined) ?? null;
-        if (origin === 'library') {
-          try {
-            const res = await getStoreExecutionAsset(it.id);
-            const lib = res.data;
-            fetched.push({
-              id: lib.id,
-              title: lib.title,
-              description: lib.description ?? null,
-              category: lib.category,
-              fileUrl: lib.fileUrl,
-              assetType: lib.assetType,
-              url: lib.url,
-              origin: 'library',
-            });
-          } catch {
-            // 단건 fetch 실패 — 항목 제외
-          }
-        } else if (origin === 'snapshot' || origin === 'direct') {
-          fetched.push({
-            id: it.id,
-            title: it.title,
-            description: it.description ?? null,
-            category: null,
-            fileUrl: null,
-            assetType: 'content',
-            url: null,
-            origin,
-          });
-        } else {
-          unsupported.push(it.id);
-        }
-      }
-
-      if (cancelled) return;
-
-      if (fetched.length) {
-        setPopItems((prev) => {
-          const ids = new Set(prev.map((p) => p.id));
-          return [...prev, ...fetched.filter((f) => !ids.has(f.id))];
-        });
-      }
-
-      if (unsupported.length) {
-        console.warn('[StorePopPage] 지원하지 않는 origin', unsupported);
-        toast.error(`${unsupported.length}개 항목은 POP에 사용할 수 없습니다`);
-      }
-    })();
+    incomingItemsRef.current = incoming;
+    loadSourceItems(incoming);
 
     window.history.replaceState({}, document.title);
-    return () => {
-      cancelled = true;
-    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleRetrySource = useCallback(() => {
+    const incoming = incomingItemsRef.current;
+    if (!incoming?.length) return;
+    loadSourceItems(incoming);
+  }, [loadSourceItems]);
 
   const handleRemove = (id: string) => {
     setPopItems((prev) => prev.filter((p) => p.id !== id));
@@ -289,6 +346,10 @@ export function StorePopPage() {
     const libraryItemIds = popItems.filter((p) => p.origin === 'library').map((p) => p.id);
     const directContentItemIds = popItems.filter((p) => p.origin === 'direct').map((p) => p.id);
     const snapshotItemIds = popItems.filter((p) => p.origin === 'snapshot').map((p) => p.id);
+    // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+    //   매장 자체 상품은 store_local_products id 로 전달 — 백엔드가 organization 격리 조회한다.
+    //   전역 ProductMaster POP endpoint(/api/v1/products/:id/pop/:layout) 는 사용하지 않는다.
+    const localProductItemIds = popItems.filter((p) => p.origin === 'local').map((p) => p.id);
 
     const token = getAccessToken();
     const authHeaders: Record<string, string> = token ? { Authorization: `Bearer ${token}` } : {};
@@ -303,6 +364,7 @@ export function StorePopPage() {
           ...(libraryItemIds.length ? { libraryItemIds } : {}),
           ...(directContentItemIds.length ? { directContentItemIds } : {}),
           ...(snapshotItemIds.length ? { snapshotItemIds } : {}),
+          ...(localProductItemIds.length ? { localProductItemIds } : {}),
           qrId: selectedQrId || undefined,
           layout,
           // WO-O4O-POP-TEMPLATE-WORKFLOW-V1: template + AI 문구 전달
@@ -428,6 +490,21 @@ export function StorePopPage() {
 
       {/* POP Item List */}
       <div style={styles.body}>
+        {/* WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+            진입 자료(특히 매장 자체 상품) 조회 상태를 빈 폼으로 위장하지 않는다. */}
+        {sourceLoading && (
+          <p style={{ color: colors.neutral500, fontSize: 13, padding: '8px 0' }}>
+            선택한 자료 정보를 불러오는 중…
+          </p>
+        )}
+        {sourceError && !sourceLoading && (
+          <div style={styles.sourceErrorBox}>
+            <span style={{ fontSize: 13, color: '#B91C1C' }}>{sourceError}</span>
+            <button type="button" onClick={handleRetrySource} style={styles.sourceRetryBtn}>
+              다시 시도
+            </button>
+          </div>
+        )}
         {popItems.length === 0 ? (
           <div style={styles.emptyState}>
             <Megaphone size={48} style={{ color: colors.neutral300, marginBottom: '12px' }} />
@@ -677,6 +754,29 @@ const styles: Record<string, CSSProperties> = {
   genPopActions: { display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 },
   genPopOpenBtn: { display: 'inline-flex', alignItems: 'center', gap: 4, padding: '6px 10px', fontSize: 13, fontWeight: 600, color: '#1D4ED8', background: '#EFF6FF', border: '1px solid #BFDBFE', borderRadius: 8, textDecoration: 'none' },
   genPopDelBtn: { display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 30, height: 30, border: `1px solid ${colors.neutral200}`, background: '#fff', borderRadius: 8, color: '#DC2626', cursor: 'pointer' },
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 진입 자료 조회 실패 안내
+  sourceErrorBox: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+    padding: '10px 14px',
+    marginBottom: 12,
+    border: '1px solid #FECACA',
+    background: '#FEF2F2',
+    borderRadius: 10,
+    flexWrap: 'wrap',
+  },
+  sourceRetryBtn: {
+    padding: '6px 12px',
+    fontSize: 12,
+    fontWeight: 600,
+    color: '#B91C1C',
+    background: '#fff',
+    border: '1px solid #FECACA',
+    borderRadius: 8,
+    cursor: 'pointer',
+  },
   emptyState: {
     display: 'flex',
     flexDirection: 'column',

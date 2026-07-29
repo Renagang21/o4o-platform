@@ -36,12 +36,17 @@ export type ProductionTarget = 'pop' | 'qr' | 'blog' | 'product-description';
  *   - origin 'snapshot' : asset_snapshots (커뮤니티/공급자에서 가져온 자료의 매장 사본)
  *   - origin 'direct'   : kpa_store_contents (매장이 직접 작성한 콘텐츠)
  *   - origin 'library'  : store_execution_assets (매장 자료함의 실행 자료)
+ *   - origin 'local'    : store_local_products (매장 자체 상품 — WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1)
+ *
+ * origin 은 본 코드베이스의 canonical source-type 어휘다. 'local' 은
+ * sourceType='local' / sourceId=store_local_products.id / masterId 없음 을 뜻하며,
+ * ProductMaster(전역 상품) 식별자는 이 경로로 전달되지 않는다.
  */
 export interface ProductionSourceItem {
   id: string;
   title: string;
   description?: string | null;
-  origin: 'snapshot' | 'direct' | 'library';
+  origin: 'snapshot' | 'direct' | 'library' | 'local';
 }
 
 /**

@@ -21,6 +21,8 @@ import {
   FileDown,
 } from 'lucide-react';
 import { colors } from '../../styles/theme';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
+import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '@o4o/store-ui-core';
 import {
   getProductMarketing,
   unlinkProductMarketingAsset,
@@ -45,11 +47,15 @@ export function ProductMarketingPage() {
   // WO-O4O-AI-AUTO-POP-BUILDER-V1: POP 편집 페이지로 이동
   // WO-O4O-KPA-STORE-QR-PRODUCT-CONTEXT-CANONICAL-MERGE-V1:
   //   production canonical(source.items[]) + productContext 분리 시그니처로 통일.
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   legacy builder route(`/store/commerce/products/:id/pop`) 경유 제거 → canonical POP 화면 직접 진입.
+  //   이 화면의 :productId 는 store_local_products.id 이므로 origin='local' source identity 로 전달한다
+  //   (연결된 자료실 항목이 있으면 그것을 우선 사용 — 기존 library prefill 동작 보존).
   const handleCreatePop = () => {
     if (!productId) return;
     const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
     if (targetAsset) {
-      navigate(`/store/commerce/products/${productId}/pop`, {
+      navigate(CANONICAL_STORE_POP_ROUTE, {
         state: {
           production: {
             source: {
@@ -65,12 +71,11 @@ export function ProductMarketingPage() {
             },
             target: 'pop' as const,
           },
-          productContext: { productId, productName: targetAsset.title },
         },
       });
     } else {
-      navigate(`/store/commerce/products/${productId}/pop`, {
-        state: { productContext: { productId } },
+      navigate(CANONICAL_STORE_POP_ROUTE, {
+        state: buildLocalProductPopState({ id: productId }),
       });
     }
   };

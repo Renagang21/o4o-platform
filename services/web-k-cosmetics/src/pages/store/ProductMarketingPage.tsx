@@ -21,6 +21,8 @@ import {
   BarChart3,
   FileDown,
 } from 'lucide-react';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
+import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '@o4o/store-ui-core';
 import {
   getProductMarketing,
   unlinkProductMarketingAsset,
@@ -52,11 +54,14 @@ export function ProductMarketingPage() {
   const [data, setData] = useState<ProductMarketingData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   legacy builder route(`/store/commerce/products/:id/pop`) 경유 제거 → canonical POP 화면 직접 진입.
+  //   이 화면의 :productId 는 store_local_products.id 이므로 origin='local' source identity 로 전달한다.
   const handleCreatePop = () => {
     if (!productId) return;
     const targetAsset = data?.libraryAssets.find((a: ProductLibraryAsset) => a.isActive);
     if (targetAsset) {
-      navigate(`/store/commerce/products/${productId}/pop`, {
+      navigate(CANONICAL_STORE_POP_ROUTE, {
         state: {
           production: {
             source: {
@@ -72,12 +77,11 @@ export function ProductMarketingPage() {
             },
             target: 'pop' as const,
           },
-          productContext: { productId, productName: targetAsset.title },
         },
       });
     } else {
-      navigate(`/store/commerce/products/${productId}/pop`, {
-        state: { productContext: { productId } },
+      navigate(CANONICAL_STORE_POP_ROUTE, {
+        state: buildLocalProductPopState({ id: productId }),
       });
     }
   };

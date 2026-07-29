@@ -6,8 +6,15 @@
  *   initialMode='pop') 제거. POP 문구는 선택 자료 원문 사용. 가져온 POP(prefill) 문구만 패널 표시.
  *   공통 AiContentModal 컴포넌트·백엔드 API 무변경. 편집기 Toolbar "AI 정리"는 본 화면 비대상.
  *
+ * WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+ *   매장 자체 상품 POP 의 canonical 제작 화면. router state 의 production.source.items 중
+ *   origin='local' (store_local_products) 항목을 organization-scoped 단건 API 로 재조회해 prefill 하고,
+ *   기존 `POST /glycopharm/pharmacy/pop/generate` 계약에 localProductItemIds 로 전달한다.
+ *   전역 product_ai_contents / ProductMaster POP endpoint 는 호출하지 않는다.
+ *
  * 흐름:
  *   1. 공급자 자료 선택 (GET /glycopharm/pharmacy/pop/source/supplier-items)
+ *      또는 매장 자체 상품 진입 (origin='local' router state)
  *   2. (가져온 POP 문구가 있을 때만) 문구 패널 — POP 콘텐츠로 저장 / 제거
  *   3. 레이아웃/템플릿 선택
  *   4. POP PDF 생성 (POST /glycopharm/pharmacy/pop/generate, aiContent 포함)
@@ -16,7 +23,7 @@
  * 권한: PHARMACIST (StoreLayoutWrapper ProtectedRoute)
  */
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { GuideBackLink } from '@o4o/store-ui-core';
 import {
@@ -38,8 +45,24 @@ import { createStaffPopPost } from '@/api/popStaff';
 import { getStoreSlug } from '@/api/storeHub';
 // WO-O4O-POP-QR-SELECTOR-GP-KCOS-PARITY-V1: POP 에 QR 연결
 import { getStoreQrCodes } from '@/api/storeProductionSources';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 매장 자체 상품 prefill (org 격리 단건 조회)
+import { getLocalProduct } from '@/api/localProducts';
+import { parseProductionRouterState } from '@o4o/store-ui-core';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
+
+/** WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: 매장 자체 상품 POP 입력 */
+interface LocalProductPopItem {
+  id: string;
+  title: string;
+  description: string | null;
+  imageUrl: string | null;
+}
+
+/** HTML 본문 → POP 문구용 plain text (신규 요약 알고리즘 없음) */
+function htmlToPlainText(html: string): string {
+  return html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+}
 
 interface SupplierItem {
   id: string;
@@ -88,6 +111,61 @@ export default function StorePopPage() {
     setPopAiContent({ title: pf.title || '', bullets: [], shortText: (pf.excerpt || '').trim(), longText: bodyText });
     window.history.replaceState({}, document.title);
   }, [location.state]);
+
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   매장 자체 상품(origin='local') 진입 — source identity 만 router state 로 받고 본문은 재조회한다.
+  const [localItems, setLocalItems] = useState<LocalProductPopItem[]>([]);
+  const [localLoading, setLocalLoading] = useState(false);
+  const [localError, setLocalError] = useState<string | null>(null);
+  const localIdsRef = useRef<string[]>([]);
+
+  const loadLocalProducts = useCallback(async (ids: string[]) => {
+    if (!ids.length) return;
+    setLocalLoading(true);
+    setLocalError(null);
+    const fetched: LocalProductPopItem[] = [];
+    let failed = 0;
+    let blocked = 0;
+    for (const id of ids) {
+      try {
+        const p = await getLocalProduct(id);
+        const detail = p.detail_html ?? p.detailHtml ?? null;
+        fetched.push({
+          id: p.id,
+          title: p.name,
+          description:
+            (p.summary?.trim() || null)
+            ?? (detail ? htmlToPlainText(detail) || null : null)
+            ?? (p.description?.trim() || null),
+          imageUrl: p.thumbnail_url ?? p.images?.[0] ?? null,
+        });
+      } catch (e: any) {
+        // 404 = 미존재 또는 다른 조직 상품(차단). 그 외 = 조회 실패.
+        if (e?.response?.status === 404 || e?.status === 404) blocked += 1;
+        else failed += 1;
+      }
+    }
+    if (fetched.length) {
+      setLocalItems((prev) => {
+        const seen = new Set(prev.map((p) => p.id));
+        return [...prev, ...fetched.filter((f) => !seen.has(f.id))];
+      });
+    }
+    if (blocked > 0) setLocalError('해당 상품을 찾을 수 없습니다. 내 매장의 자체 상품인지 확인해 주세요.');
+    else if (failed > 0) setLocalError('매장 자체 상품 정보를 불러오지 못했습니다.');
+    setLocalLoading(false);
+  }, []);
+
+  useEffect(() => {
+    const production = parseProductionRouterState(location.state);
+    const ids = (production?.source?.items ?? [])
+      .filter((it) => it.origin === 'local')
+      .map((it) => it.id);
+    if (!ids.length) return;
+    localIdsRef.current = ids;
+    loadLocalProducts(ids);
+    window.history.replaceState({}, document.title);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 콘텐츠로 저장
   const [savingContent, setSavingContent] = useState(false);
@@ -172,10 +250,16 @@ export default function StorePopPage() {
   // ─── POP PDF generation ───────────────────────────────────────────────────
 
   const handleGenerate = async () => {
-    if (selectedIds.length === 0) {
+    // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+    //   공급자 자료 / 매장 자체 상품 중 하나 이상이 필요하다.
+    if (selectedIds.length === 0 && localItems.length === 0) {
       toast.error('자료를 최소 1개 선택해주세요');
       return;
     }
+
+    // 매장 자체 상품 POP 은 결과를 매장 소유 제작 자료(store_execution_assets)로 저장한다
+    // → 내 자료함(/store/library/production-materials)에서 다시 열고 출력할 수 있다.
+    const hasLocal = localItems.length > 0;
 
     setGenerating(true);
     try {
@@ -188,11 +272,15 @@ export default function StorePopPage() {
         },
         credentials: 'include',
         body: JSON.stringify({
-          supplierItemIds: selectedIds,
+          ...(selectedIds.length ? { supplierItemIds: selectedIds } : {}),
+          ...(hasLocal ? { localProductItemIds: localItems.map((p) => p.id) } : {}),
           layout,
           templateId,
           ...(popAiContent ? { aiContent: popAiContent } : {}),
           ...(selectedQrId ? { qrId: selectedQrId } : {}),
+          ...(hasLocal
+            ? { save: true, title: `${popAiContent?.title || localItems[0].title} POP` }
+            : {}),
         }),
       });
 
@@ -201,12 +289,23 @@ export default function StorePopPage() {
         throw new Error((errData as any)?.error?.message || 'POP 생성 실패');
       }
 
+      if (hasLocal) {
+        // save=true 응답은 JSON({ assetId, fileUrl, title })
+        const result = await resp.json();
+        const fileUrl: string | undefined = result?.data?.fileUrl;
+        if (!fileUrl) throw new Error('POP 생성 결과를 확인할 수 없습니다');
+        window.open(fileUrl, '_blank');
+        toast.success('POP PDF가 생성되었습니다. 내 자료함에서 다시 열고 출력할 수 있습니다.');
+        return;
+      }
+
       const blob = await resp.blob();
       const url = URL.createObjectURL(blob);
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 60000);
       toast.success('POP PDF가 생성되었습니다');
     } catch (err: any) {
+      // 실패 시 선택 항목·문구는 유지한다(재시도 가능).
       toast.error(err?.message || 'POP 생성에 실패했습니다');
     } finally {
       setGenerating(false);
@@ -234,6 +333,71 @@ export default function StorePopPage() {
           <div style={{ marginTop: 8 }}><GuideBackLink to="/guide/features/pop" label="POP 제작 방법" /></div>
         </div>
       </div>
+
+      {/* WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+          매장 자체 상품 진입(origin='local'). 로딩/실패/차단을 빈 폼으로 위장하지 않는다. */}
+      {(localLoading || localError || localItems.length > 0) && (
+        <section style={sectionStyle}>
+          <div style={sectionHeaderStyle}>
+            <span style={{ fontWeight: 600, color: '#1e293b' }}>매장 자체 상품</span>
+          </div>
+
+          {localLoading && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: '#64748b', fontSize: 13 }}>
+              <Loader2 size={16} className="animate-spin" />
+              상품 정보를 불러오는 중...
+            </div>
+          )}
+
+          {localError && !localLoading && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <AlertCircle size={16} color="#dc2626" />
+              <span style={{ fontSize: 13, color: '#dc2626' }}>{localError}</span>
+              <button onClick={() => loadLocalProducts(localIdsRef.current)} style={retryBtnStyle}>
+                다시 시도
+              </button>
+            </div>
+          )}
+
+          {localItems.length > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+              {localItems.map((p) => (
+                <div
+                  key={p.id}
+                  style={{
+                    display: 'flex', gap: 12, alignItems: 'flex-start',
+                    border: '2px solid #ea580c', backgroundColor: '#fff7ed',
+                    borderRadius: 10, padding: '12px 14px',
+                  }}
+                >
+                  {p.imageUrl && (
+                    <img
+                      src={p.imageUrl}
+                      alt={p.title}
+                      style={{ width: 48, height: 48, borderRadius: 8, objectFit: 'cover', flexShrink: 0 }}
+                    />
+                  )}
+                  <div style={{ minWidth: 0, flex: 1 }}>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: '#1e293b', margin: 0 }}>{p.title}</p>
+                    {p.description && (
+                      <p style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{p.description}</p>
+                    )}
+                  </div>
+                  <button
+                    onClick={() => setLocalItems((prev) => prev.filter((x) => x.id !== p.id))}
+                    style={{ fontSize: 12, color: '#94a3b8', background: 'none', border: 'none', cursor: 'pointer', flexShrink: 0 }}
+                  >
+                    제외
+                  </button>
+                </div>
+              ))}
+              <p style={{ fontSize: 12, color: '#94a3b8', margin: 0 }}>
+                생성된 POP 은 내 자료함(제작 자료)에 저장되어 다시 열고 출력할 수 있습니다.
+              </p>
+            </div>
+          )}
+        </section>
+      )}
 
       {/* Step 1: 자료 선택 */}
       <section style={sectionStyle}>
@@ -453,11 +617,11 @@ export default function StorePopPage() {
       <div style={{ marginTop: 24, display: 'flex', justifyContent: 'flex-end' }}>
         <button
           onClick={handleGenerate}
-          disabled={generating || selectedIds.length === 0}
+          disabled={generating || (selectedIds.length === 0 && localItems.length === 0)}
           style={{
             ...generateBtnStyle,
-            opacity: generating || selectedIds.length === 0 ? 0.6 : 1,
-            cursor: generating || selectedIds.length === 0 ? 'not-allowed' : 'pointer',
+            opacity: generating || (selectedIds.length === 0 && localItems.length === 0) ? 0.6 : 1,
+            cursor: generating || (selectedIds.length === 0 && localItems.length === 0) ? 'not-allowed' : 'pointer',
           }}
         >
           {generating
@@ -467,7 +631,7 @@ export default function StorePopPage() {
         </button>
       </div>
 
-      {selectedIds.length === 0 && (
+      {selectedIds.length === 0 && localItems.length === 0 && (
         <p style={{ textAlign: 'right', fontSize: 12, color: '#94a3b8', marginTop: 8 }}>
           자료를 1개 이상 선택하면 POP를 생성할 수 있습니다
         </p>

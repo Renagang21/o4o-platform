@@ -25,6 +25,10 @@ import { NetureSupplierLibraryItem } from '../../../modules/neture/entities/Netu
 //   origin 어휘(@o4o/types/production)와 1:1 매핑되는 테이블에서 organization 격리 조회.
 import { KpaStoreContent } from '../../kpa/entities/kpa-store-content.entity.js';
 import { AssetSnapshot } from '../../../modules/asset-snapshot/entities/asset-snapshot.entity.js';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+//   매장 자체 상품(store_local_products)을 POP 입력 소스로 확장. origin='local' 과 1:1 매핑.
+//   전역 ProductMaster / product_ai_contents 와 무관 — organization 격리 조회만 수행한다.
+import { StoreLocalProduct } from '../../platform/entities/store-local-product.entity.js';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
 // HOTFIX-O4O-STORE-POP-PUBLIC-DOMAIN-CANONICAL-FIX-V1:
@@ -140,6 +144,8 @@ export function createStorePopController(
   // WO-KPA-POP-CONTENT-TO-PDF-GENERATION-V1: 콘텐츠/제작자료 source resolver 용 repo
   const directContentRepo = dataSource.getRepository(KpaStoreContent);
   const snapshotRepo = dataSource.getRepository(AssetSnapshot);
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: origin='local' source resolver
+  const localProductRepo = dataSource.getRepository(StoreLocalProduct);
   const requirePharmacyOwner = createRequireStoreOwner(dataSource, serviceKey);
 
   // ─── GET /pharmacy/pop/source/supplier-items — 공급자 공개 자료 목록 ──
@@ -189,6 +195,9 @@ export function createStorePopController(
         //   (execution-asset 형 제작자료는 기존 libraryItemIds 로 자연 분기.)
         directContentItemIds,
         snapshotItemIds,
+        // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+        //   매장 자체 상품 입력(origin='local' → store_local_products). organization 격리 조회.
+        localProductItemIds,
       } = req.body as {
         libraryItemIds?: string[];
         supplierItemIds?: string[];
@@ -200,20 +209,22 @@ export function createStorePopController(
         title?: string;
         directContentItemIds?: string[];
         snapshotItemIds?: string[];
+        localProductItemIds?: string[];
       };
 
       const hasLibraryItems = Array.isArray(libraryItemIds) && libraryItemIds.length > 0;
       const hasSupplierItems = Array.isArray(supplierItemIds) && supplierItemIds.length > 0;
       const hasDirectContent = Array.isArray(directContentItemIds) && directContentItemIds.length > 0;
       const hasSnapshotItems = Array.isArray(snapshotItemIds) && snapshotItemIds.length > 0;
+      const hasLocalProducts = Array.isArray(localProductItemIds) && localProductItemIds.length > 0;
 
       // 최소 1개 소스 필요
-      if (!hasLibraryItems && !hasSupplierItems && !hasDirectContent && !hasSnapshotItems) {
+      if (!hasLibraryItems && !hasSupplierItems && !hasDirectContent && !hasSnapshotItems && !hasLocalProducts) {
         res.status(400).json({
           success: false,
           error: {
             code: 'VALIDATION_ERROR',
-            message: 'libraryItemIds / supplierItemIds / directContentItemIds / snapshotItemIds 중 하나 이상 필요합니다.',
+            message: 'libraryItemIds / supplierItemIds / directContentItemIds / snapshotItemIds / localProductItemIds 중 하나 이상 필요합니다.',
           },
         });
         return;
@@ -224,7 +235,8 @@ export function createStorePopController(
         (libraryItemIds?.length ?? 0) +
         (supplierItemIds?.length ?? 0) +
         (directContentItemIds?.length ?? 0) +
-        (snapshotItemIds?.length ?? 0);
+        (snapshotItemIds?.length ?? 0) +
+        (localProductItemIds?.length ?? 0);
       if (totalCount > 8) {
         res.status(400).json({
           success: false,
@@ -298,6 +310,36 @@ export function createStorePopController(
             title: item.title,
             description: extractContentText(item.contentJson),
             imageUrl: null,
+            qrUrl: null,
+            qrLabel: null,
+            layout: validLayout as 'A4' | 'A5',
+            templateId: templateId || undefined,
+            aiContent: aiContent || undefined,
+          });
+        }
+      }
+
+      // ── 매장 자체 상품 (origin=local → store_local_products) ──
+      //   WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1
+      //   organization_id 격리 조회 — 다른 조직 상품은 결과에서 제외된다(조회 자체가 되지 않음).
+      //   전역 ProductMaster / product_ai_contents 를 전혀 참조하지 않는다.
+      if (hasLocalProducts) {
+        const localProducts = await localProductRepo.find({
+          where: { id: In(localProductItemIds!), organizationId },
+        });
+        for (const item of localProducts) {
+          sourceTitleById.set(item.id, item.name);
+          // 문구 우선순위: summary → detail_html(plain text) → description
+          const description =
+            (item.summary?.trim() || null)
+            ?? extractContentText(item.detailHtml)
+            ?? (item.description?.trim() || null);
+          // 대표 이미지: thumbnail_url → images[0]
+          const imageUrl = item.thumbnailUrl || item.images?.[0] || null;
+          popItems.push({
+            title: item.name,
+            description,
+            imageUrl,
             qrUrl: null,
             qrLabel: null,
             layout: validLayout as 'A4' | 'A5',
@@ -404,6 +446,10 @@ export function createStorePopController(
             ...(directContentItemIds ?? []).map((id) => ({ kind: 'content_direct', id, title: sourceTitleById.get(id) ?? null })),
             ...(snapshotItemIds ?? []).map((id) => ({ kind: 'content_snapshot', id, title: sourceTitleById.get(id) ?? null })),
             ...(libraryItemIds ?? []).map((id) => ({ kind: 'store_execution_asset', id, title: sourceTitleById.get(id) ?? null })),
+            // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+            //   local source identity(store_local_products.id) 를 기존 provenance 테이블에 보존.
+            //   신규 컬럼·임의 JSON 없음 — 기존 (source_kind, source_id) 계약 재사용.
+            ...(localProductItemIds ?? []).map((id) => ({ kind: 'store_local_product', id, title: sourceTitleById.get(id) ?? null })),
           ];
           if (derivationSources.length > 0) {
             await recordDerivations(dataSource, {

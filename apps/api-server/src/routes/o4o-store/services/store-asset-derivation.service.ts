@@ -26,6 +26,9 @@ export const STORE_ASSET_SOURCE_KINDS = [
   // WO-O4O-SUPPLIER-SCREEN-SET-BACKEND-HUB-COPY-V2B:
   //   공급자 Screen Set 원본(origin='supplier') → 매장 독립 사본 추적(FK 없음).
   'supplier_screen_set',
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   매장 자체 상품(store_local_products) → POP PDF 파생 추적. provenance 전용(FK 없음).
+  'store_local_product',
 ] as const;
 
 export const STORE_ASSET_DERIVED_KINDS = [

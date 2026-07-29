@@ -90,6 +90,18 @@ export async function fetchLocalProducts(params?: {
   return res.data.data;
 }
 
+/**
+ * WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1
+ * 매장 자체 상품 단건 조회 (organization 격리). canonical POP 화면의 local prefill 전용.
+ * 다른 조직 상품·미존재 → 404.
+ */
+export async function getLocalProduct(id: string): Promise<LocalProduct> {
+  const res = await api.get<{ success: boolean; data: LocalProduct }>(
+    `${BASE}/local-products/${id}`,
+  );
+  return res.data.data;
+}
+
 export async function createLocalProduct(
   data: LocalProductInput,
 ): Promise<LocalProduct> {

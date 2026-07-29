@@ -12,6 +12,7 @@
  * ┌──────────────────────────────────────────────────────┐
  * │ AUTHENTICATED (requireAuth + pharmacy owner)         │
  * │  GET    /local-products       — 목록 조회            │
+ * │  GET    /local-products/:id   — 단건 조회            │
  * │  POST   /local-products       — 생성                │
  * │  PUT    /local-products/:id   — 수정                │
  * │  DELETE /local-products/:id   — 비활성화             │
@@ -31,6 +32,9 @@ import { resolveStoreAccess } from '../../utils/store-owner.utils.js';
 // ─────────────────────────────────────────────────────
 
 const VALID_BADGE_TYPES = ['none', 'new', 'recommend', 'event'] as const;
+
+/** uuid 형식 가드 (uuid 컬럼 조회 시 캐스팅 오류로 인한 500 방지) */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Strip <script> tags and inline event handlers from HTML */
 function sanitizeHtml(input: string): string {
@@ -184,6 +188,69 @@ export function createStoreLocalProductRoutes(
       res.status(500).json({
         success: false,
         error: 'Failed to fetch local products',
+        code: 'INTERNAL_ERROR',
+      });
+    }
+  });
+
+  /**
+   * GET /local-products/:id
+   * 매장 자체 상품 단건 조회 (organization 격리)
+   *
+   * WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+   *   canonical POP 화면(/store/marketing/pop)이 origin='local' 진입 시 상품명·요약·대표 이미지를
+   *   prefill 하기 위한 read-only 단건 조회. 목록 API 는 limit 100 상한이 있어 상품 수가 많은 매장에서
+   *   특정 상품을 신뢰성 있게 되읽을 수 없다. 신규 저장 구조·컬럼 없음 — 기존 행의 읽기 경로만 추가.
+   */
+  router.get('/local-products/:id', async (req: Request, res: Response): Promise<void> => {
+    try {
+      const auth = await getAuth();
+      await new Promise<void>((resolve, reject) => {
+        (auth as any)(req, res, (err: any) => (err ? reject(err) : resolve()));
+      });
+
+      const authReq = req as AuthRequest;
+      const userId = authReq.user?.id;
+      if (!userId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
+        return;
+      }
+      const userRoles: string[] = authReq.user?.roles || [];
+      const organizationId = await resolveStoreAccess(dataSource, userId, userRoles);
+      if (!organizationId) {
+        res.status(403).json({ success: false, error: 'Store owner or operator role required', code: 'FORBIDDEN' });
+        return;
+      }
+
+      const productId = req.params.id;
+      // uuid 컬럼에 비-uuid 를 넘기면 Postgres 캐스팅 오류(500)가 나므로 형식 검증 후 404 로 응답.
+      if (!UUID_RE.test(productId)) {
+        res.status(404).json({ success: false, error: 'Product not found', code: 'NOT_FOUND' });
+        return;
+      }
+
+      // 다른 조직 상품은 organization_id 조건으로 차단 → 404 (존재 여부 노출 금지).
+      const rows = await dataSource.query(
+        `SELECT id, name, description, summary, detail_html, images, thumbnail_url, gallery_images,
+                category, barcode, price_display, badge_type, highlight_flag,
+                is_active, sort_order, created_at, updated_at
+         FROM store_local_products
+         WHERE id = $1 AND organization_id = $2
+         LIMIT 1`,
+        [productId, organizationId],
+      );
+
+      if (!rows[0]) {
+        res.status(404).json({ success: false, error: 'Product not found', code: 'NOT_FOUND' });
+        return;
+      }
+
+      res.json({ success: true, data: rows[0] });
+    } catch (error: any) {
+      console.error('[StoreLocalProduct] GET /local-products/:id error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Failed to fetch local product',
         code: 'INTERNAL_ERROR',
       });
     }

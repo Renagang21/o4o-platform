@@ -17,6 +17,8 @@ import {
   Edit2, Trash2, ChevronLeft, ChevronRight, Tablet, BarChart3, FileText,
 } from 'lucide-react';
 import { LocalProductBadge, LOCAL_PRODUCT_BADGE_OPTIONS, type LocalProductBadgeType } from './LocalProductBadge';
+// WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1: POP 진입 canonical 정렬
+import { CANONICAL_STORE_POP_ROUTE, buildLocalProductPopState } from '../../utils/productionUtils';
 
 // ==================== Types (service 공통) ====================
 
@@ -378,8 +380,13 @@ export function StoreLocalProductsManager({ api, labels }: StoreLocalProductsMan
                       >
                         <BarChart3 className="w-4 h-4" />
                       </button>
+                      {/* WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+                          legacy `/store/commerce/products/:id/pop` (local UUID 를 ProductMaster 처럼 사용)
+                          경유를 제거하고 canonical POP 화면으로 직접 진입한다. */}
                       <button
-                        onClick={() => navigate(`/store/commerce/products/${product.id}/pop`)}
+                        onClick={() =>
+                          navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
+                        }
                         className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
                         title="POP 만들기"
                       >

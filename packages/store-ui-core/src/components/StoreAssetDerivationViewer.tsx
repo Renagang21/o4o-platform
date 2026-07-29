@@ -45,6 +45,8 @@ const DEFAULT_SOURCE_KIND_LABELS: Record<string, string> = {
   library_resource: '자료',
   production_material: '매장 제작 자료',
   store_execution_asset: '자료',
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1
+  store_local_product: '매장 자체 상품',
 };
 
 export interface StoreAssetDerivationViewerProps {

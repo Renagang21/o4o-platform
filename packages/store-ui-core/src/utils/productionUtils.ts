@@ -31,7 +31,8 @@ export interface ProductionSourceItem {
   id: string;
   title: string;
   description?: string | null;
-  origin: 'snapshot' | 'direct' | 'library';
+  /** 'local' = store_local_products (매장 자체 상품) — WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1 */
+  origin: 'snapshot' | 'direct' | 'library' | 'local';
 }
 
 export interface ProductionSource {
@@ -84,11 +85,53 @@ export function composeSourceTextFromItems(items: ProductionSourceItem[]): strin
     const originLabel =
       it.origin === 'direct' ? '매장 직접 작성'
       : it.origin === 'snapshot' ? '커뮤니티 콘텐츠'
+      : it.origin === 'local' ? '매장 자체 상품'
       : '자료함';
     lines.push(`   출처: ${originLabel}`);
     lines.push('');
   });
   return lines.join('\n').trim();
+}
+
+// ─── 매장 자체 상품 POP 진입 (canonical) ─────────────────────────────────────
+
+/**
+ * WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1
+ *
+ * 매장 자체 상품 POP 제작의 canonical 진입 route.
+ * 과거 `/store/commerce/products/:id/pop` (ProductPopBuilderPage) 는 local product UUID 를
+ * ProductMaster ID 처럼 사용하던 잘못된 흐름이었고, 현재는 legacy compatibility route 로만 남아
+ * 이 route 로 1홉 수렴한다.
+ */
+export const CANONICAL_STORE_POP_ROUTE = '/store/marketing/pop';
+
+/**
+ * 매장 자체 상품 → canonical POP 화면 진입 router state 빌더.
+ *
+ * URL/state 에는 source identity(id + origin)만 싣는다. 상품명·이미지·문구는 수신측이
+ * organization-scoped API 로 다시 조회한다(새로고침에도 prefill 유지, 본문 URL 노출 없음).
+ * title/description 은 수신측 조회 전 표시용 hint 이며 신뢰 대상이 아니다.
+ */
+export function buildLocalProductPopState(product: {
+  id: string;
+  name?: string | null;
+  summary?: string | null;
+  description?: string | null;
+}): ProductionRouterState {
+  return buildProductionState({
+    target: 'pop',
+    source: {
+      fromLibrary: 'contents',
+      items: [
+        {
+          id: product.id,
+          title: product.name ?? '',
+          description: product.summary ?? product.description ?? null,
+          origin: 'local',
+        },
+      ],
+    },
+  });
 }
 
 /**
