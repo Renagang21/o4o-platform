@@ -162,7 +162,7 @@ KPA 운영자 영역 `WorkingContent`(내 콘텐츠)의 실제 업무 의미·�
 
 ## 14. IR commit SHA
 
-- 커밋: `<이 문서 커밋 후 채움>`
+- 커밋: `d7caa51ce`
 
 ---
 
