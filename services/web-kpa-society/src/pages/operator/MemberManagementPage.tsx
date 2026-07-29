@@ -298,9 +298,13 @@ export default function MemberManagementPage() {
     <div className="max-w-7xl mx-auto px-6 py-8">
       {/* WO-O4O-KPA-APPLICATION-DEAD-FLOW-RETIREMENT-V1: 가입 신청서(ApplicationsTab) outer tab 제거 —
           회원 승인 canonical 화면(OperatorMembersConsolePage)만 렌더. */}
+      {/* WO-O4O-KPA-OPERATOR-MEMBER-DEEPLINK-STATUS-TAB-SYNC-V1:
+          Action Queue 상태 딥링크(?members_tab=status-suspended 등)를 읽어 해당 탭 자동 선택.
+          공용 콘솔의 syncUrl opt-in(URL key=members_tab, 기본 false) 활성화만 — 공용 컴포넌트 무수정. */}
       <OperatorMembersConsolePage
           serviceKey="kpa-society"
           client={client}
+          syncUrl
           title="회원 관리"
           description="회원 현황 조회 및 승인/반려/정지/복원/탈퇴 처리"
           roleTabs={[

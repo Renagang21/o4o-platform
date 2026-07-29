@@ -91,7 +91,10 @@ export const kpaActionConfig: ServiceActionConfig = {
       //   canonical 회원 관리 화면 = /operator/members. 기존 /operator/users 는
       //   static Navigate 로 /operator/members 로 redirect 되며 query(status=suspended)를
       //   보존하지 못했음 → redirect 의존 제거하고 canonical route 로 직접 연결.
-      actionUrl: '/operator/members?status=suspended',
+      // WO-O4O-KPA-OPERATOR-MEMBER-DEEPLINK-STATUS-TAB-SYNC-V1:
+      //   공용 콘솔 canonical query 계약(members_tab=<statusTab key>)으로 정렬 → syncUrl 로 '정지' 탭 자동 선택.
+      //   ?status= 레거시 query 는 콘솔이 읽지 않으므로 호환 추가 없이 canonical 로 전환.
+      actionUrl: '/operator/members?members_tab=status-suspended',
       actionLabel: '회원 관리',
       actionType: 'NAVIGATE',
     },
