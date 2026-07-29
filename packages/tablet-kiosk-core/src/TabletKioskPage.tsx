@@ -291,7 +291,14 @@ function mapLocalProduct(p: any): DisplayProduct {
     type: 'local',
     name: p.name,
     priceDisplay: p.price_display,
-    description: p.description,
+    // WO-O4O-MY-STORE-FINAL-CLEANUP-AND-CLOSEOUT-V1 (범위 E — 정책 C: 직접 참조, fallback 슬롯 한정):
+    //   매장 자체 상품의 canonical 설명은 store_local_products.detail_html 이다
+    //   ("내 매장 > 상품 상세 설명" 화면이 쓰는 단일 저장소).
+    //   연결된 설명 콘텐츠(kpa_store_contents)가 있으면 그것이 우선하고(기존 동작 불변),
+    //   없을 때 태블릿이 보여주는 "기본 상품 설명" = detail_html → description 순으로 읽는다.
+    //   (진열 패널이 "선택 안 함 = 기본 상품 설명" 이라고 안내하는 계약과 정렬.)
+    //   복사·동기화·이중 canonical 없음 — 렌더 시점 단방향 읽기만 수행한다.
+    description: p.detail_html || p.description,
     summary: p.summary,
     category: p.category,
     imageUrl: p.thumbnail_url || p.images?.[0],
