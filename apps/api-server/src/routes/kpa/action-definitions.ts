@@ -53,7 +53,11 @@ export const kpaActionConfig: ServiceActionConfig = {
                 SELECT COUNT(*) FROM kpa_approval_requests
                 WHERE status = 'pending' AND entity_type = 'forum_category'
               ) AS cnt`,
-      actionUrl: '/operator/forum',
+      // WO-O4O-KPA-OPERATOR-ACTION-QUEUE-CANONICAL-LINK-FIX-V1:
+      //   집계 대상 = 포럼 카테고리 신청 대기. canonical 신청 처리 화면 =
+      //   /operator/forum-requests (ForumRequestsManagementPage). 기존 /operator/forum
+      //   (OperatorForumPage) 은 포럼 운영 화면이라 집계 의미와 도착 화면이 불일치했음.
+      actionUrl: '/operator/forum-requests',
       actionLabel: '포럼 관리',
       actionType: 'NAVIGATE',
     },
@@ -83,7 +87,11 @@ export const kpaActionConfig: ServiceActionConfig = {
       query: `SELECT COUNT(*)::int AS cnt, MIN(sm.updated_at) AS oldest
               FROM service_memberships sm
               WHERE sm.status = 'suspended' AND sm.service_key = 'kpa-society'`,
-      actionUrl: '/operator/users?status=suspended',
+      // WO-O4O-KPA-OPERATOR-ACTION-QUEUE-CANONICAL-LINK-FIX-V1:
+      //   canonical 회원 관리 화면 = /operator/members. 기존 /operator/users 는
+      //   static Navigate 로 /operator/members 로 redirect 되며 query(status=suspended)를
+      //   보존하지 못했음 → redirect 의존 제거하고 canonical route 로 직접 연결.
+      actionUrl: '/operator/members?status=suspended',
       actionLabel: '회원 관리',
       actionType: 'NAVIGATE',
     },
