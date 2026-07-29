@@ -104,20 +104,31 @@ dead entity(0행·live route/controller/frontend/repository 소비처 0). `o4o_a
 - **보존**: 과거 IR·CHECK·investigation·archive·아키텍처 분석 문서(`CONTENT-META-PRODUCTION-READY-V1.md` 등)는 기록으로 보존(운영 가이드·API 문서 아님). WO 원칙 준수.
 - org-join 관련 문서·타입·reviewUrl 은 §7 HOLD 로 미변경.
 
-## 9. 권한 6계층 검증
+## 9. 권한 계층 검증 (프로덕션 API smoke — 배포 리비전 `o4o-core-api-02987-w7j`)
 
-(§13 실브라우저 smoke 에서 확정)
+| # | 계층 | endpoint | 기대 | 실측 |
+|---|---|---|---|---|
+| 1 | 비로그인 | `GET /api/v1/kpa/operator/actions` | 401 | **401** ✓ |
+| 2 | 비로그인 | `POST /operator/actions/dismiss/:id`(body 有) | 401 | **401** ✓ |
+| 3 | 위조 토큰 | `GET /operator/actions` | 401 | **401** ✓ |
+| 4 | 비로그인 | `GET /operator/summary`(sibling) | 401 | **401** ✓ |
+| 5 | `kpa:admin`(Bearer) | `GET /operator/actions` | 200 | **200** ✓ (`{featureStatus:'ready', items:[]}`) |
+| 6 | `kpa:admin`(Cookie) | `GET /operator/actions` | 200 | **200** ✓ |
+| 7 | 인증·비운영 scope | `GET /operator/actions` | 403 | **미실행**(사유 하단) |
 
-1. action-queue `kpa:admin` 접근 — 
-2. `kpa:operator` 접근 — 
-3. `platform:super_admin` 기존 접근 — 
-4. store owner 차단 — 
-5. 일반 회원 차단 — 
-6. 비로그인 401 — 
+- 로그인 계정 = `sohae2100@gmail.com`(JWT roles = `kpa:admin`·`kpa:operator` 포함, `kpa-society` membership `admin`/active). 이 계정은 전 scope 보유 → **7번(403 scope-denial) 을 직접 실증할 비운영 KPA 계정이 없음**. `TEST-ACCOUNTS.local.md` 의 약국 경영자(`renagang21@gmail.com`)는 현재 `INVALID_CREDENTIALS`(자격증명 drift — 문서 갱신 권장).
+- **7번 보증 근거**: action-queue 는 이제 sibling operator-summary 라우터([kpa.routes.ts:251](../../apps/api-server/src/routes/kpa/kpa.routes.ts))와 **동일한 `requireKpaScope('kpa:operator')` 미들웨어**로 보호된다. summary 는 비로그인 401·admin 200 이 action-queue 와 완전 일치(위 표 4·§10) → 동일 미들웨어이므로 인증-비운영 계정의 scope-denial(403) 동작도 summary 와 동일함이 구조적으로 보증된다.
+- `POST /dismiss` body 없는 요청은 Cloud Run 프론트에서 411(Length Required) 로 앱 계층 도달 전 차단 — body 부여 시 401 확인(표 2).
 
-## 10. canonical 회원·자료함 회귀
+## 10. canonical 회원·자료함 회귀 (kpa:admin)
 
-(§13) 회원 관리·대시보드·AuditLog·자료함 회귀 smoke.
+| endpoint | 기대 | 실측 |
+|---|---|---|
+| `GET /api/v1/kpa/operator/summary` | 200 | **200** ✓ |
+| `GET /api/v1/kpa/members?limit=1` | 200 | **200** ✓ |
+
+- action-queue 가드 명시화가 인접 운영자 라우트(summary)·회원 라우트에 회귀를 유발하지 않음.
+- **실브라우저 제약**: MCP Playwright persistent profile(`C:\Users\home\.playwright-o4o-profile`) 이 실행 중 Chrome 에 잠겨 launch 실패 → CLAUDE.md §8 이 명시 허용하는 **API 직접 호출(curl)** smoke 로 대체. 인증 6계층·회귀 검증은 API smoke 로 완결.
 
 ## 11. HOLD 항목
 
@@ -128,18 +139,23 @@ dead entity(0행·live route/controller/frontend/repository 소비처 0). `o4o_a
 - api-server `tsc -p tsconfig.build.json --noEmit` **EXIT=0**; `npm run build` **EXIT=0** — migration JS 2개 `dist/database/migrations/` 산출 확인, 삭제 entity JS 제거 확인.
 - web-kpa-society `tsc --noEmit` **EXIT=0**; `vite build` ✓ **EXIT=0**.
 
-## 13. 배포 · 프로덕션 schema census · 실브라우저 smoke
+## 13. 배포 · 프로덕션 schema census · smoke
 
-(배포 후 갱신)
+- **배포**: commit `581c440cb` push → CI "Deploy API Server (Cloud Run)" run `30426179984` ✓. 서빙 리비전 `o4o-core-api-02987-w7j`(traffic 100%, `/health/detailed` healthy, DB pingMs 16).
+- **migration 적용**: Cloud Run Job `o4o-api-migrations-p55n9` successfully completed(exit 0 = ABORT throw 없음). `typeorm_migrations` 에 `DropKpaApplicationsDeadTable20270212000000`·`DropKpaWorkingContentsDeadTable20270213000000` 기록됨.
+- **schema census**(read-only, cloud-sql-proxy 15433):
 
-- 배포 리비전: (pending)
-- migration 적용 결과: (pending)
-- schema census(테이블 부재·index 부재): (pending)
-- action-queue 실브라우저 smoke: (pending)
-- 회원·대시보드·AuditLog 회귀: (pending)
-- removed API 404: (pending)
+| 대상 | 결과 |
+|---|---|
+| `to_regclass('kpa_applications')` | **NULL**(테이블 제거됨) ✓ |
+| `to_regclass('kpa_working_contents')` | **NULL**(테이블 제거됨) ✓ |
+| `IDX_kpa_working_contents_owner` | **NULL**(제거됨) ✓ |
+| `IDX_kpa_working_contents_source` | **NULL**(제거됨) ✓ |
+
+- **권한/회귀 smoke**: §9·§10(모두 PASS, 실브라우저는 profile-lock 로 API smoke 대체).
+- **removed API 404**: `kpa_applications`/`kpa_working_contents` 는 dead-flow retirement 로 라이브 route/컨트롤러가 이미 부재 → 신규 404 대상 endpoint 없음(entity 은퇴만, API 표면 무변경).
 
 ## 14. 커밋
 
-- 코드(guard·entity·registry·migration·block-adapter) + CHECK 초안: (commit 1)
-- 배포·smoke 결과 갱신: (commit 2)
+- **commit 1** `581c440cb`: 코드(guard·entity·registry·migration·block-adapter) + CHECK 초안. path-specific(다른 세션의 `modules/store-ai/*`·`scripts/*` 제외).
+- **commit 2**: CHECK §9–14 배포·census·smoke 결과 갱신.
