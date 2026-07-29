@@ -1,0 +1,3040 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+  "kind": "per-master-result-ledger",
+  "summary": {
+    "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+    "agent": "ga",
+    "writeOwner": "agent-ga",
+    "batchId": "otc-v4-finalall",
+    "mode": "rollback-test",
+    "port": 5505,
+    "startedAt": "2026-07-29T20:15:21.381Z",
+    "target": 50,
+    "processed": 50,
+    "green": 0,
+    "exception": 0,
+    "skip": 0,
+    "dryOrRollback": 50,
+    "koWriteActual": 0,
+    "enWriteActual": 0,
+    "writeActual": 0,
+    "expectedWrite": 0,
+    "byExceptionCode": {},
+    "byRouteProduced": {
+      "oral": 50
+    },
+    "byStratum": {
+      "A_NORMAL": {
+        "total": 50,
+        "green": 0,
+        "exception": 0,
+        "skip": 0
+      }
+    },
+    "failedMasterResidueDirty": 0,
+    "checkpoints": 1,
+    "pass": true
+  },
+  "results": [
+    {
+      "masterId": "c0288d41-02d9-45ef-9513-4014bc386af3",
+      "productCode": "201802575",
+      "productName": "코감노즈정",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "9cc8b0d8-f79b-a5af-0759-5e5ab8f5f5a8",
+      "officialSourceHash": "69dfad48095c4578df3564e76a83ecb1",
+      "koContentHash": "175c0bb75f8ccb653408b666107bbc94",
+      "enContentHash": "c7e14fd2a3a1626543c9ca7654dcd8ad",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "175c0bb75f8ccb653408b666107bbc94",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c7e14fd2a3a1626543c9ca7654dcd8ad",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c074c440-2f12-4287-be66-17773444a465",
+      "productCode": "200101057",
+      "productName": "용각산쿨과립",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "8975d719-a7ba-59ed-a759-4f14480719a9",
+      "officialSourceHash": "b2d0b923fc0a7b42f53b07e35ec887c0",
+      "koContentHash": "a0ff37e541521775ee17b1a0465a2509",
+      "enContentHash": "29373d5cdabce0ae2ae205b2f78d5bd4",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "a0ff37e541521775ee17b1a0465a2509",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "29373d5cdabce0ae2ae205b2f78d5bd4",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c0830a4e-cbf1-48bc-a7eb-c245f59e5c39",
+      "productCode": "202401275",
+      "productName": "챔프콜드펜하이시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "83f22443-d25f-1cba-547a-71f60deadff2",
+      "officialSourceHash": "a8a27cbe3226ebb64ccd938837f8f44b",
+      "koContentHash": "d8b7b941046ddd345c931b0a658914ff",
+      "enContentHash": "66b0320731b5cc82f4e9604da328b737",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d8b7b941046ddd345c931b0a658914ff",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "66b0320731b5cc82f4e9604da328b737",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c0881e16-9f2e-472c-9d73-c7a1552cab9f",
+      "productCode": "202204511",
+      "productName": "바이오탑하이스트산",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "9d37710e-f4a7-3c83-c161-55109b04a2bf",
+      "officialSourceHash": "5c58c9f28bec28175b12cbc0e962316b",
+      "koContentHash": "6687d18a4f7c0b3dd797a36ee73d5394",
+      "enContentHash": "af1c3a3fd985777584d05bed4d0db9c5",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "6687d18a4f7c0b3dd797a36ee73d5394",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "af1c3a3fd985777584d05bed4d0db9c5",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c0d0c6db-f2c1-4d7c-96ff-424f9f314fb0",
+      "productCode": "200401475",
+      "productName": "뮤코존정(메칠-NS-디아세틸시스테인)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "8a3074c9-95c5-6dd4-969b-52f98f4c77b5",
+      "officialSourceHash": "f0b1c3cedc26d7bcd79f589527bb7161",
+      "koContentHash": "1758993e2f3b07b2d0140bd427692664",
+      "enContentHash": "3b91836189c15888686235f552cca604",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "1758993e2f3b07b2d0140bd427692664",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "3b91836189c15888686235f552cca604",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c0d5d195-0f51-4f0c-998b-6ce918a0b1ec",
+      "productCode": "200201403",
+      "productName": "포타겔현탁액(디옥타헤드랄스멕타이트)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "7e3d4e7a-a161-bca4-ef45-0c2cecdca39f",
+      "officialSourceHash": "f2c7faf96085863fb1210e9660608725",
+      "koContentHash": "e4194512929e492151a4e070b10dfc97",
+      "enContentHash": "663b7937612423fb6f08eac41bf8496e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e4194512929e492151a4e070b10dfc97",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "663b7937612423fb6f08eac41bf8496e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c0eb9322-2730-4fdd-b260-81aa22f751e8",
+      "productCode": "202300978",
+      "productName": "속콜시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "00ad9767-9cc2-fbda-67a0-5500ec80792b",
+      "officialSourceHash": "048e5ddff67394b547619617f90b739c",
+      "koContentHash": "f5601b3792b2c78d581219d4b63c2ff5",
+      "enContentHash": "2154befd5e976d6ecf359dc187dd3dae",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f5601b3792b2c78d581219d4b63c2ff5",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2154befd5e976d6ecf359dc187dd3dae",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c1abfea1-3578-4c83-aa64-6ee3221efa78",
+      "productCode": "202204434",
+      "productName": "엠지멕스스피드액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "1663d60b-2dd0-eb86-29d2-c56a43c2a524",
+      "officialSourceHash": "b7139ea35e98f92f56bf6df275bdaba3",
+      "koContentHash": "e43feebe198a2216637d1793b1182c83",
+      "enContentHash": "eb957ead23c68833ef0d186097b0a5e5",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e43feebe198a2216637d1793b1182c83",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "eb957ead23c68833ef0d186097b0a5e5",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c1ce5519-e4b8-4129-a11a-eefd7b3e6fe9",
+      "productCode": "202501821",
+      "productName": "써스펜키즈시럽(아세트아미노펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "3e6e9850-4a35-0a60-03c3-b83ea50d02ea",
+      "officialSourceHash": "b946ce26905f349d1d109ddcf5b089b9",
+      "koContentHash": "3e071c0379d57261d61087e2e061d1a1",
+      "enContentHash": "115b602f4c709fad14b0c0438a038e73",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "3e071c0379d57261d61087e2e061d1a1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "115b602f4c709fad14b0c0438a038e73",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c1d47e26-98ca-4b5d-a4d3-7d8d3d884d4b",
+      "productCode": "202501145",
+      "productName": "라라포스액(L-아스파르트산-L-아르기닌수화물)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "9bab889c-2026-57c6-91c3-57b0f11ffc0c",
+      "officialSourceHash": "a06700de983dd3121c7dc9cc3b161439",
+      "koContentHash": "f695ede9c05dc66d20497d171deada95",
+      "enContentHash": "fcccea4df0cb1e1c964a5a5ded9366cf",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f695ede9c05dc66d20497d171deada95",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "fcccea4df0cb1e1c964a5a5ded9366cf",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c24126e9-068e-4c4e-a29f-b4a4ec9f0213",
+      "productCode": "201602340",
+      "productName": "미리놀과립(아세틸시스테인)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "3071d984-451c-b8fd-11c4-92e572dbe255",
+      "officialSourceHash": "8c1932505c810a569fcb7f21efd4ac6d",
+      "koContentHash": "0728835383d6373712db52c3398d2b03",
+      "enContentHash": "dbac8783b338eddcce30e1c2dcd53f13",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "0728835383d6373712db52c3398d2b03",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "dbac8783b338eddcce30e1c2dcd53f13",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c26f27ed-1af3-4089-badc-7946ae217193",
+      "productCode": "202401275",
+      "productName": "챔프콜드펜하이시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "8f4b21cc-839b-517d-ee61-381a5ff0bd9d",
+      "officialSourceHash": "a8a27cbe3226ebb64ccd938837f8f44b",
+      "koContentHash": "d8b7b941046ddd345c931b0a658914ff",
+      "enContentHash": "66b0320731b5cc82f4e9604da328b737",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d8b7b941046ddd345c931b0a658914ff",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "66b0320731b5cc82f4e9604da328b737",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c29ea002-d05e-49ef-8a3e-8fff12f3900e",
+      "productCode": "201401143",
+      "productName": "위제로무당액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "50ed577c-ad88-0b13-1ca4-f95fbd199dbc",
+      "officialSourceHash": "c782b020927db1b2c9438ebd285d0b4c",
+      "koContentHash": "9445bcc050a553aa365f651d44f2c573",
+      "enContentHash": "05ff76145b9b1e17822fb27987503271",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "9445bcc050a553aa365f651d44f2c573",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "05ff76145b9b1e17822fb27987503271",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c2ad2400-1aba-46ee-a8df-11b3a2602cc3",
+      "productCode": "201802172",
+      "productName": "맨포스5000액(L-아스파르트산-L-아르기닌)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "487700f1-1313-1abb-02a4-46635ba21544",
+      "officialSourceHash": "8da26536e19c62ef72ec5fe66441cc26",
+      "koContentHash": "4329df712f98b4b8cf8236bc59f18997",
+      "enContentHash": "cc40a85865fe7b80e3c0bc8436f7c4ad",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "4329df712f98b4b8cf8236bc59f18997",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "cc40a85865fe7b80e3c0bc8436f7c4ad",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c2cb4805-b5c8-4bfb-b7b2-8b2bc089b3e3",
+      "productCode": "201702324",
+      "productName": "코스빌연질캡슐(덱시부프로펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "4b3c0558-049d-0ed8-7c36-a6bded59eabd",
+      "officialSourceHash": "cd1843a3517c81b5071b4bde77620594",
+      "koContentHash": "61706d7877ac0ea61f5dc92664cac673",
+      "enContentHash": "8151248685047f38c713e43b0b16a4e6",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "61706d7877ac0ea61f5dc92664cac673",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8151248685047f38c713e43b0b16a4e6",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c2cd8c37-8dd0-4097-8667-c158d547f118",
+      "productCode": "202303174",
+      "productName": "맥스콘드로이틴1200경구용겔(콘드로이틴설페이트나트륨)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "2d4a67b6-bbe3-18be-b1aa-e56e74155a66",
+      "officialSourceHash": "255e291e5538566223010b10e231479e",
+      "koContentHash": "6bdcb4b4ac77678660334701d8f93ca6",
+      "enContentHash": "3a6ad007ee57fe07ea801189689d452f",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "6bdcb4b4ac77678660334701d8f93ca6",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "3a6ad007ee57fe07ea801189689d452f",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c2e2c6b9-68ef-4d0d-8c82-7ce8f77f1cce",
+      "productCode": "202401708",
+      "productName": "마그원스피드액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "99cb115d-a272-2959-a722-f8f2cb04b6e3",
+      "officialSourceHash": "a7e8b4c89138b5ce511f457c5ad69d5d",
+      "koContentHash": "37c77ab0103eb0e3f44e48e8d4a3b3a2",
+      "enContentHash": "1022d15f0e5c324387d4e94d96e3eb76",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "37c77ab0103eb0e3f44e48e8d4a3b3a2",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "1022d15f0e5c324387d4e94d96e3eb76",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c31748a9-b523-4852-94d6-99c54be64668",
+      "productCode": "202204225",
+      "productName": "투엑스비듀얼스피드액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "a5ed70b4-a110-fbf7-0007-fc0f100d0d0b",
+      "officialSourceHash": "4d9aa0b0a0f21af92e3f13c270374c24",
+      "koContentHash": "e0bd6bbe24dbe486bdde8968ad019a29",
+      "enContentHash": "b73696fb34a2d8e35cf71021f1a1c64e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e0bd6bbe24dbe486bdde8968ad019a29",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "b73696fb34a2d8e35cf71021f1a1c64e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c317e8af-3f30-441c-9d98-1f2e2653f510",
+      "productCode": "201705788",
+      "productName": "포스톤지엑스액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "5eeec5b5-6950-aa32-9c08-ae1df4a5c17c",
+      "officialSourceHash": "f4593481984bf01f52b9d513bacbcd72",
+      "koContentHash": "5457de1eb96ae364c0f0978dd6e72ed5",
+      "enContentHash": "729a9f56c4e290d1ff548c10266f048d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "5457de1eb96ae364c0f0978dd6e72ed5",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "729a9f56c4e290d1ff548c10266f048d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c31abbe3-f17f-456e-8283-09dc29febf87",
+      "productCode": "201903799",
+      "productName": "팜플루노즈연질캡슐",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "76e090ce-d33f-f6cf-f509-6a321b5abfba",
+      "officialSourceHash": "8a658193b377ca6f6faf9500984234c8",
+      "koContentHash": "35a51d925d9f7048e0c8d993c02d9b7f",
+      "enContentHash": "54334c712769adadfd3eb44fc36f5398",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "35a51d925d9f7048e0c8d993c02d9b7f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "54334c712769adadfd3eb44fc36f5398",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c33c6852-b87b-4e0f-a96b-e7ee67906475",
+      "productCode": "202302822",
+      "productName": "뉴흑과립(약용탄)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "048f0482-c79d-8541-e432-57a0caef9e7b",
+      "officialSourceHash": "85039967f768c382c814c6c8d49a84a0",
+      "koContentHash": "b8f2f8e883343364e4c6bd5e92d96e6b",
+      "enContentHash": "91db790cfbca3bbd4e0b56b7f49c3000",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "b8f2f8e883343364e4c6bd5e92d96e6b",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "91db790cfbca3bbd4e0b56b7f49c3000",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c34537df-817a-4399-a60d-9dd3d0837565",
+      "productCode": "202501583",
+      "productName": "히어로쿨산",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "4e286a03-f6f0-086f-5bb4-ec0db6824152",
+      "officialSourceHash": "3925adc2c238a1913babd956b56c822a",
+      "koContentHash": "3e7b29e1156cded3d70baa3056e38c71",
+      "enContentHash": "964eb5e6f82bbf39be7d907d48ff0f19",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "3e7b29e1156cded3d70baa3056e38c71",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "964eb5e6f82bbf39be7d907d48ff0f19",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c3632b49-b8a1-4705-929b-c5e18a915f31",
+      "productCode": "202003087",
+      "productName": "캐롤키즈에이시럽(아세트아미노펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "a920227a-4544-057c-061a-ca5cdec9e830",
+      "officialSourceHash": "9cb3c1de969dbcb3c549fc74c75be891",
+      "koContentHash": "2db72f371a4fcecaafcf33f7c49de8f8",
+      "enContentHash": "0f97b0f798b1a912f6d8dd4ceca36864",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "2db72f371a4fcecaafcf33f7c49de8f8",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0f97b0f798b1a912f6d8dd4ceca36864",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c40edd75-a6fd-4ffc-b747-45f5ddb26a59",
+      "productCode": "198601920",
+      "productName": "어린이부루펜시럽(이부프로펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "4abd2abe-9a93-3cef-b73e-49fa1129cf26",
+      "officialSourceHash": "23bf7559c1283474f4e43de05583b83d",
+      "koContentHash": "820188b3d5843a979e6e1dcbb921c58d",
+      "enContentHash": "8fd55d3dec56182387d77dab422d35f2",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "820188b3d5843a979e6e1dcbb921c58d",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8fd55d3dec56182387d77dab422d35f2",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c425f384-fbd2-433f-bf92-bdd10542cf32",
+      "productCode": "201606702",
+      "productName": "라라올라액(L-아스파르트산-L-아르기닌수화물)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "0a80845d-06cf-41b2-38b7-f5c70266cdfe",
+      "officialSourceHash": "8da26536e19c62ef72ec5fe66441cc26",
+      "koContentHash": "c920e88264afc52655dd2b0a560d9bd8",
+      "enContentHash": "832d6a7f2d76dfe092412259fe0b7c9b",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "c920e88264afc52655dd2b0a560d9bd8",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "832d6a7f2d76dfe092412259fe0b7c9b",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c428afed-b8f0-4ed1-9086-59fc914706e3",
+      "productCode": "196400089",
+      "productName": "보화소합원(소환)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "893a3c31-7c57-cd62-07ea-280efa118fee",
+      "officialSourceHash": "13c4bc93c0793117dd7fec1f4617c163",
+      "koContentHash": "b521415ca44d6d6a187b74f29335d90b",
+      "enContentHash": "a1b2171fa0d12b95eaa92eb23d8a07b8",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "b521415ca44d6d6a187b74f29335d90b",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a1b2171fa0d12b95eaa92eb23d8a07b8",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c45cc566-e32c-4380-8f9b-f2eb6b62cfee",
+      "productCode": "201908484",
+      "productName": "스피롱액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "b3cba058-bd66-108a-c541-f1cb53d6982e",
+      "officialSourceHash": "9629b583f54daa3105ad75ca595c57b2",
+      "koContentHash": "da1473a3f75d2108d1194441e8274cbf",
+      "enContentHash": "506a34f1482ed57767be1cff2b1feabd",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "da1473a3f75d2108d1194441e8274cbf",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "506a34f1482ed57767be1cff2b1feabd",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c473ff42-b567-4ac5-904b-435ccfbff216",
+      "productCode": "202202422",
+      "productName": "유한이브펜연질캡슐",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "4a38c13d-8f75-5a99-3561-df57538c066c",
+      "officialSourceHash": "5b459c3043fddd4dfdfcdab4b3c05d79",
+      "koContentHash": "d4d4e55e05563001ae417ad50145fc23",
+      "enContentHash": "0afbfc91906adbf1994f02da7e7a86d8",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d4d4e55e05563001ae417ad50145fc23",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0afbfc91906adbf1994f02da7e7a86d8",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c5060355-c2da-42d0-8602-792ef36b8894",
+      "productCode": "201309771",
+      "productName": "락투즈시럽(락툴로오스액)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "26a41482-9cc5-7925-e677-39ccc8cc1da1",
+      "officialSourceHash": "7b2fcfab1b5a39c80d47dc74e76921cc",
+      "koContentHash": "a4a7df33ffa676bd4000a518799c72b6",
+      "enContentHash": "511a31ba979381ebbc4cb5e90409b966",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "a4a7df33ffa676bd4000a518799c72b6",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "511a31ba979381ebbc4cb5e90409b966",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c528f979-bd63-4d9f-a059-e5bf2f861810",
+      "productCode": "201706955",
+      "productName": "속크린에스정",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "824aedd1-8de6-9f24-13d8-0b36a60ef3e7",
+      "officialSourceHash": "7e9af3308da777ab11f2aeb52d4c6286",
+      "koContentHash": "16882c2db3baed6b2e7f86a88b762a2e",
+      "enContentHash": "81efeb417b4627cd8260198cafa92a1d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "16882c2db3baed6b2e7f86a88b762a2e",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "81efeb417b4627cd8260198cafa92a1d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c53c915e-4469-4242-926b-59eb42a8adc9",
+      "productCode": "200511943",
+      "productName": "셀레나제티퍼오랄액(아셀렌산나트륨오수화물)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "055c7544-45b1-6882-c33c-c005c492d887",
+      "officialSourceHash": "1b3105db4177b832ad131a5d07d013e2",
+      "koContentHash": "4b109c9cb6f69c69c2b14f6bd22f221f",
+      "enContentHash": "e4c67ecff2c40988efcdee37970ca2c1",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "4b109c9cb6f69c69c2b14f6bd22f221f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "e4c67ecff2c40988efcdee37970ca2c1",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c54f91f6-bf84-4cb0-99e4-531a4961bc40",
+      "productCode": "202100082",
+      "productName": "트로앤텍트로키(오렌지)트로앤텍트로키(페퍼민트)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "879d0b30-d17a-c27a-dafc-3b2a0b891262",
+      "officialSourceHash": "b99d4e58fdb64fcea6750c3084c713dd",
+      "koContentHash": "0da1484765a4b8599d44a44ec1c4649b",
+      "enContentHash": "5d9af377d10128643be286a98bf9732e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "0da1484765a4b8599d44a44ec1c4649b",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "5d9af377d10128643be286a98bf9732e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c5898586-b01f-4d99-9061-987d90a160bb",
+      "productCode": "201702275",
+      "productName": "콜대원키즈코프시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "da6774f9-78fa-9260-0c0b-da78b1b0e771",
+      "officialSourceHash": "563abd44131476feb171b2ffc2f0d4a3",
+      "koContentHash": "128e03f159a26f2f9a3965cb37ce392a",
+      "enContentHash": "ecf548a96279a9580a47f0081a88d05c",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "128e03f159a26f2f9a3965cb37ce392a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "ecf548a96279a9580a47f0081a88d05c",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c59cf7ee-5f10-4f19-84bb-fc84553c3f6a",
+      "productCode": "202103611",
+      "productName": "파인큐아세트펜시럽(아세트아미노펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "6f4f6439-a758-90d8-e676-151eef91a35b",
+      "officialSourceHash": "266be8209ab80d5c1bc278520e4296cd",
+      "koContentHash": "1241d4b0a963f781ac50e63bc068a62f",
+      "enContentHash": "666a6a29cd250303af0ac86eafd0605e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "1241d4b0a963f781ac50e63bc068a62f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "666a6a29cd250303af0ac86eafd0605e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c5d0207e-965f-4cac-b5ae-55cb184087b8",
+      "productCode": "202107978",
+      "productName": "바이오탑디포르테세립",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "17ff621d-f29c-21a2-7059-f8d16b3fb62d",
+      "officialSourceHash": "1a4ec60098758bbfbc1d44c97328d472",
+      "koContentHash": "c29e658c6cfa4d652c8e890565afc368",
+      "enContentHash": "77750a65f2c400c9dcfd99d870fff458",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "c29e658c6cfa4d652c8e890565afc368",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "77750a65f2c400c9dcfd99d870fff458",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c5e55f82-1653-4215-a8ed-6b1d81aa06d8",
+      "productCode": "202401379",
+      "productName": "케이파이리보아세트산",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "49d8b8af-a0a8-4bab-2bf9-716f3f2f6643",
+      "officialSourceHash": "609a1b512d87cd8cfe3f6253db9c7def",
+      "koContentHash": "938fc5dabdb12683ddc52aca94e891ad",
+      "enContentHash": "343eb0125babfcd3094a8af656ab5575",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "938fc5dabdb12683ddc52aca94e891ad",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "343eb0125babfcd3094a8af656ab5575",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c5e72141-122e-47cb-b569-e16b426baa3b",
+      "productCode": "202501326",
+      "productName": "래피콜케어건조시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "c8d54ede-915e-195b-b066-1a604f91aac5",
+      "officialSourceHash": "cd8afa68d82a02c503a8680f0f20dd1a",
+      "koContentHash": "6a3e1c2f5373662af489d7b10f0fe0a5",
+      "enContentHash": "ab6ae0c2979da2b1effddea2d76e6998",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "6a3e1c2f5373662af489d7b10f0fe0a5",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "ab6ae0c2979da2b1effddea2d76e6998",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c61046c3-7b3e-45b1-ae45-8a22009e435c",
+      "productCode": "201700839",
+      "productName": "가네타인액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "68b07e53-2032-46ab-bc12-9c38ef7e7cf7",
+      "officialSourceHash": "38056293fb48ea078143a8d43d7771a1",
+      "koContentHash": "25a11eb72345c7898a4e2cf1dcbac5a0",
+      "enContentHash": "e28cb85849ff66360be15b8d91cc877c",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "25a11eb72345c7898a4e2cf1dcbac5a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "e28cb85849ff66360be15b8d91cc877c",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c688632b-34e6-4443-b59f-6008ca20a96e",
+      "productCode": "201500041",
+      "productName": "제이에스파모티딘정10밀리그램",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "027e4d59-46af-a069-5ffb-9c7b4bb8649d",
+      "officialSourceHash": "f48910da4bc210bc20454385c04d6ed8",
+      "koContentHash": "a60590a0e2c0b77d17e65eb5d0e8ab14",
+      "enContentHash": "88cf595c6a06988cd44bdd2281283f19",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "a60590a0e2c0b77d17e65eb5d0e8ab14",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "88cf595c6a06988cd44bdd2281283f19",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c68a32d3-d0ad-4495-a26f-8840335dde65",
+      "productCode": "202201984",
+      "productName": "내린다시럽(아세트아미노펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "db5e3ea4-cc06-30d0-7f42-45cf1df7effd",
+      "officialSourceHash": "1871174ca8bdec7643076b8ad8187cb3",
+      "koContentHash": "6d3d500c727de386025e2b2d4882b503",
+      "enContentHash": "696608e8874de89018e5187fbcfb0a4d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "6d3d500c727de386025e2b2d4882b503",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "696608e8874de89018e5187fbcfb0a4d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c68cab60-2fb2-41ed-a8d2-dc04d74f0d07",
+      "productCode": "201211097",
+      "productName": "듀파락-이지시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "c201a14c-e2c9-7369-60a1-ed7d92027453",
+      "officialSourceHash": "6d668d299eb7c02e6b651006d6c92089",
+      "koContentHash": "69058dacc699f9177fddeb0f203cf27e",
+      "enContentHash": "f33dbfba63ee70e01609a8f1ae617d77",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "69058dacc699f9177fddeb0f203cf27e",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f33dbfba63ee70e01609a8f1ae617d77",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c699344e-4181-47f7-9bec-c52401126133",
+      "productCode": "201603416",
+      "productName": "아사톱장용정100밀리그램(아스피린)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "8267aa92-ed09-a50d-0838-d5b0a036f6c5",
+      "officialSourceHash": "e67826bd30e56fd770843903183cbe63",
+      "koContentHash": "f499ebbd2e2560bd4bfa03c1d8448768",
+      "enContentHash": "1609d02445b7ceb9bc0e0cc14e12e3ec",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f499ebbd2e2560bd4bfa03c1d8448768",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "1609d02445b7ceb9bc0e0cc14e12e3ec",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c6e073a9-1d96-4615-ab34-f0b591333334",
+      "productCode": "201211097",
+      "productName": "듀락칸이지시럽(락툴로오즈농축액)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "a4dfaedc-d4d1-6248-8756-1609847bfe2b",
+      "officialSourceHash": "6d668d299eb7c02e6b651006d6c92089",
+      "koContentHash": "bdb2dc04729523b8745d33698dc9315a",
+      "enContentHash": "f33dbfba63ee70e01609a8f1ae617d77",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "bdb2dc04729523b8745d33698dc9315a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f33dbfba63ee70e01609a8f1ae617d77",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c6e68bab-f4c7-4e46-8748-ba96c23bcf14",
+      "productCode": "201707611",
+      "productName": "에너라민파워액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "a1e2dca5-8ab4-4405-7386-c24d7709a622",
+      "officialSourceHash": "f11bea1d410adc006072bf5a7a6c3020",
+      "koContentHash": "fe9c0a25f8fa17c38c697e45e260c074",
+      "enContentHash": "b4678705c511eae048eb7bd3c886a93e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "fe9c0a25f8fa17c38c697e45e260c074",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "b4678705c511eae048eb7bd3c886a93e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c7537110-9eb1-4e2a-b23b-61ef46e61059",
+      "productCode": "202203501",
+      "productName": "엠로딘액(L-카르니틴)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "1d8719c6-1d46-abef-0775-5fa1083f119e",
+      "officialSourceHash": "9e1a01b531b44f178d9864e8e3932089",
+      "koContentHash": "4c6474d078df4118cd4b5307d34dab5a",
+      "enContentHash": "b958d8dca86efb7c99b159047774f8c3",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "4c6474d078df4118cd4b5307d34dab5a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "b958d8dca86efb7c99b159047774f8c3",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c78ab447-baa7-4dc3-83fa-d1d98ca4e646",
+      "productCode": "195900045",
+      "productName": "자모",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "26fb76f6-cd58-fa05-122b-4ba6477067cf",
+      "officialSourceHash": "51093ca260664a5644dfc0e629c47817",
+      "koContentHash": "0b070b3f3b730a22b37e85bb1a94ab7f",
+      "enContentHash": "709b423fb3547cde492b8fe8e80b3239",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "0b070b3f3b730a22b37e85bb1a94ab7f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "709b423fb3547cde492b8fe8e80b3239",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c79b8620-5730-4bb1-95f0-ce540d4665c8",
+      "productCode": "202002302",
+      "productName": "센티몰액",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "ffe9dcf1-d5d0-229e-ee74-c91777530983",
+      "officialSourceHash": "d5279d070c293225517790e5f0a6138b",
+      "koContentHash": "e8d9a38c31b211ef3ecf505875e4e55f",
+      "enContentHash": "2f57c3571abb436a47e23ceca8d4987d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e8d9a38c31b211ef3ecf505875e4e55f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2f57c3571abb436a47e23ceca8d4987d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c7cb6b7b-0583-4022-b5ac-9a86334ea94d",
+      "productCode": "202401290",
+      "productName": "화이투벤코프시럽",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "49b01950-8fdd-c456-58d8-9108b9daa9d6",
+      "officialSourceHash": "06d6bd79cdc5fd736d8c473ded4b739d",
+      "koContentHash": "e7f70ad5cae1262fc15588d6ee8b652b",
+      "enContentHash": "85e8231f8e0850f6d2df6a1122242402",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e7f70ad5cae1262fc15588d6ee8b652b",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "85e8231f8e0850f6d2df6a1122242402",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c80811e7-ed60-4331-96ff-af53367ab488",
+      "productCode": "202502520",
+      "productName": "아콕스펜정500밀리그램(아세트아미노펜)",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "da8c7a92-4a3b-5628-54db-e6c4144c9d8d",
+      "officialSourceHash": "1fb03b8c0d48906dd98af198be20c374",
+      "koContentHash": "905d1ce86bc88477cbcb6587b8c733d5",
+      "enContentHash": "e9a3695319dfe7b0895588319b13b88a",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "905d1ce86bc88477cbcb6587b8c733d5",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "e9a3695319dfe7b0895588319b13b88a",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c82cf472-3663-483e-b410-383a15a39963",
+      "productCode": "201800637",
+      "productName": "생큐환",
+      "stratum": "A_NORMAL",
+      "route": "oral",
+      "sourceRef": "c777d84a-a0bc-e1eb-230d-5138c526fdc4",
+      "officialSourceHash": "0ebc2da6b75ccae9fb29ad62268c14ab",
+      "koContentHash": "f7cb3e601167a4c07398ccd466e29df9",
+      "enContentHash": "7707ff0bda0a1879eb582f302851fb84",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f7cb3e601167a4c07398ccd466e29df9",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "7707ff0bda0a1879eb582f302851fb84",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    }
+  ]
+}

@@ -1,0 +1,12 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+  "mode": "en",
+  "composed": 388,
+  "blocked": 0,
+  "tmMissingUnique": 0,
+  "missingSample": [],
+  "anomalies": [],
+  "routeGuardExemptions": 0,
+  "routeGuardExemptionPolicy": "해당 섹션 KO 공식 원문에 경구 동사가 실제 존재할 때만 면제(원문 충실 번역). 원문 근거 없는 경구 동사는 면제하지 않는다.",
+  "routeGuardExemptionDetail": []
+}

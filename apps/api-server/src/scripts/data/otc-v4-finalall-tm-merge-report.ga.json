@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+  "mode": "merge",
+  "before": 1025,
+  "applied": 34,
+  "skippedExisting": 0,
+  "after": 1059,
+  "pendingAfter": 0,
+  "rejected": 0,
+  "rejectedDetail": [],
+  "overwriteFrom": -1,
+  "overwritten": 0,
+  "overwrittenDetail": [],
+  "numericExemptions": 1,
+  "numericExemptionPolicy": "1일/1회 관용 1 · 제N도/N차성 서수 N 만 면제. 해당 숫자가 문장 내 다른 용도로 쓰이면 면제 없음. 용량·연령 실수치는 면제 대상 아님.",
+  "numericExemptionDetail": [
+    {
+      "shard": 0,
+      "ko": "만 8세 이상 및 성인은 1회 10mL, 만 24개월 이상~만 8세 미만은 1회 7mL, 만 3개월 이상~만 24개월 미만은 1회 5mL를 1일 1회 복용합니다.",
+      "en": "Adults and those aged 8 years and older take 10 mL as 1 dose, those aged 24 months and older and under 8 years take 7 mL",
+      "exempted": [
+        "1"
+      ]
+    }
+  ]
+}

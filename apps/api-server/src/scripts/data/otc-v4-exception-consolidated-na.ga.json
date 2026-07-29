@@ -17,6 +17,10 @@
     "otc-v4-next2000": {
       "file": "otc-v4-next2000-exception-handoff-na.run-20260729T154307.ga.json",
       "total": 38
+    },
+    "otc-v4-finalall": {
+      "file": "otc-v4-finalall-exception-handoff-na.run-20260729T201521.ga.json",
+      "total": 0
     }
   },
   "total": 142,
@@ -38,6 +42,13 @@
     "yes": 118,
     "no": 24
   },
+  "selectionExcludedTotal": 555,
+  "selectionExcludedByReason": {
+    "ROUTE_CONFLICT": 135,
+    "ROUTE_UNRESOLVED": 420
+  },
+  "combinedNaScope": 697,
+  "combinedNote": "생산 예외(rows) + 선정 제외(selectionExcluded) = agent-na 가 원인별로 정리할 전체 대상.",
   "invariantCheck": {
     "allFailedWriteZero": true,
     "duplicateMasterIds": 0,
@@ -7150,6 +7161,5003 @@
       "stratum": "C_SOURCE_COMPOSER",
       "expectedExceptionCode": "SOURCE_EFFICACY_MISSING",
       "group": "source"
+    }
+  ],
+  "selectionExcluded": [
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "55585dd9-c3f2-4649-a37e-177334ee2b7a",
+      "productName": "드리클로액(염화알루미늄수화물)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "55d78e28-0303-43e4-a6b9-ac8f38560a63",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "57f3cd72-a425-4bbe-993f-89a8979961b7",
+      "productName": "그린헥시딘스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5979759d-898f-44ed-9383-fdfd39e38510",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5b60f154-f632-4476-8984-aa6adcc1fa1c",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5bf7d6fc-2bb3-493b-874a-0592f863b43a",
+      "productName": "마이크로실드2액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5cca5105-fe8e-4052-9e2f-f56089c2dd56",
+      "productName": "그린솔트에프액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5da90ac1-c15c-4ee3-968c-58f469b96194",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5ed47233-eaff-4514-8892-099e0df15c49",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "637bf823-834c-41bf-9d08-14b9863d390d",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "63a727e7-8d3b-4087-980d-8b7b27bd6760",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "63d07486-b128-4976-8850-d83b36ef5685",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "641cfe84-e498-4a41-8faa-f774f5ecd704",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "64e276e4-81ec-4584-811d-b067e06abe34",
+      "productName": "물린디액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6892bb1e-3ac8-4df7-aed4-876ef581b9ad",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6c0ea945-3a1b-4cc0-a1cc-b7cd50ac085e",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6c49746f-0bea-4629-a023-e4491812b63e",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6dea0670-6e70-453f-9676-b34d3d515172",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6e84a64a-d953-4f11-a239-d2ca637791c3",
+      "productName": "마이크로실드2액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6f90e639-059a-493c-8f4e-9959519c8e65",
+      "productName": "노스엣센스액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "707ab127-fb4c-4ea0-8a00-6863fbd13863",
+      "productName": "그린헥시딘스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "71f9ec5e-31b2-4d1f-99ec-65cdc6fe3a54",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "73eef333-e019-4ae7-a369-8799400ca9b5",
+      "productName": "드리클로액(염화알루미늄수화물)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "74740bf9-a75d-4838-a46c-5b0234c2a326",
+      "productName": "성광헥시클렌액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "77db44f1-ce86-4a16-80b0-1507b53e5752",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7ad7e9b0-c12c-4fa0-acaf-4b173a04710c",
+      "productName": "물린디액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7f6541fe-bbab-4e74-93d7-33ef4d2179d8",
+      "productName": "헥시타놀이티2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "81c3f802-3803-4d75-a0f3-8a8344ab9064",
+      "productName": "헥시타놀이티2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "823d0370-dc22-42ff-a792-8174ac9c97ab",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "82aad70c-f415-4770-a91d-7b60a12ef7e4",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "83cee91c-48e8-41d4-b448-badc93295dc9",
+      "productName": "듀라프렙외용액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8478df6a-96cd-4953-824b-65ef370b1835",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "87bbc7ac-3b82-4b10-8342-c564a26cc203",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "88086357-5965-40c4-8257-942d1cb7669d",
+      "productName": "구미히비크린에이액(글루콘산클로르헥시딘액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "885fd581-8428-49c6-9bd6-20956cf9dd05",
+      "productName": "데오클렌액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "89f5307a-a37e-4e59-9266-7f627aedc2c5",
+      "productName": "헥시덱스-4액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8c3702cf-425a-4c57-9903-2bd717c56246",
+      "productName": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8e936824-6699-4e1e-bf47-a11d5d95fded",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8f42a8b5-ebb7-47e8-b8a7-5d4a70ce9b69",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8fdf4bfb-c608-467f-bff0-da8f25ee5b91",
+      "productName": "듀라프렙외용액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "90b7c4c9-28ae-4473-b9d4-ea97e6966854",
+      "productName": "물린디액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "921cdf00-27b9-4b7a-b469-39a305d2ae2b",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9226fe2b-b0ac-4bad-a8f3-89d62a0fffb4",
+      "productName": "헥시타놀이티2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "94773b05-cde1-40e9-8f5f-ac0c810780e6",
+      "productName": "헥시타놀2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "94a6c7ca-b291-4588-bc77-8171cb86d62c",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "952f3c0a-7fac-40b0-a6f6-fa91d36b9b3f",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "96bfb069-25aa-42fa-905e-95da7a34dbac",
+      "productName": "헥시덱스-4액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9781bc5a-3d7f-498d-9dbd-fcb8ba4cb603",
+      "productName": "헥시-알액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9b4f07ea-4e60-4859-9188-b60f292217a0",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9bd7f8bf-0080-43ce-8793-ab9983b0b3a4",
+      "productName": "노스엣액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9d4c391d-e342-481f-8a15-fdf216b8c0fe",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9e58ba8f-b9cd-4328-a2f9-e30fdc0217d6",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9e6b220f-7dbb-4084-b761-655cbbd145a9",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a0fbc562-772c-4333-8329-7f427ba22f59",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a36c79aa-e717-4331-999a-2241850c42e0",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a58d4194-0c78-4246-9726-60e13eb47d34",
+      "productName": "그린헥시디놀액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a5e32560-79e7-47f0-a67d-8588d7b5dcbe",
+      "productName": "드리클로액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a782659a-11ea-4032-973d-b519eb5c606d",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a79d53d0-1bab-4de9-bbe4-a8f443c9a846",
+      "productName": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a9d58063-09fc-42a4-a042-4b9d59911dbc",
+      "productName": "그린헥시디놀액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aac237b4-822b-410f-94f7-48db2850c5c4",
+      "productName": "듀라프렙외용액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "abb6a4ab-d483-48c1-8143-7d83bf16c0f1",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "addd5be6-e0fc-4602-a15b-b82e77ddc1d8",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aea1dc12-55a7-4407-b669-d7d1bd1c92a5",
+      "productName": "마이크로실드2액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aeb63b67-2177-4bab-b90f-58ad62b90ae0",
+      "productName": "그린헥시딘스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aef45529-b5c3-4ba0-a673-37dbb8402d5c",
+      "productName": "데오란트액(염화알루미늄수화물)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b0fa29f2-7b75-4619-a1f5-ad29d0636a96",
+      "productName": "헥시-알액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b4316233-aa10-4bc2-938f-4dd2d73d7016",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b602a298-aec5-4fc7-98b6-36fda4b1a870",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b62faad8-2947-4e25-af05-a43e5f2763d6",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b73adc0d-64d3-47b7-8217-bcbc33180bde",
+      "productName": "헥시타놀2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b7869fc5-2c96-400b-8030-e3049413e8f6",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b7a3a8ab-b96e-43ac-9d8b-67014c4b7e4a",
+      "productName": "티비엑스자임액(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b7f98573-66b8-4563-9048-8254aada4d68",
+      "productName": "드리클로액(염화알루미늄수화물)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b8e4ce56-b0e8-428f-bccb-9807c321a83d",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b9559edf-261b-4bc9-8fd4-b8f334a9c223",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c0d8662f-8aed-413b-ab8c-df714339a67a",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c23854cd-fe7f-417e-8b62-4ce812215253",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c2d8690a-717f-4602-aade-0b667524f3ca",
+      "productName": "헥시타놀2%액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c3479215-09ab-44f4-91ee-5f7b7f20adf5",
+      "productName": "그린헥시디놀액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c43d1958-0065-4fb8-ad53-3b1ddf32e2c0",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c44cb5c3-d368-491d-9e8b-e47fea72b260",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c4ac15ed-027e-4af4-b440-4f750fd08a7b",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c54e263e-8462-420b-8991-55877de140e7",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c594b09f-f8f4-4181-9c72-4e26331f017b",
+      "productName": "제올라에스액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c666a555-cfac-4f5f-a13f-703c1b84dc42",
+      "productName": "그린솔트에프액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ccf1fb57-a259-43f0-b75b-57608d7992d3",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ce58947e-a3bb-46f5-896f-bdabcd9fd987",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d364cefa-925f-4aac-a6dc-5ba65cf9e2ae",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d4cd182d-b4a3-4285-aec6-5b604bd085bb",
+      "productName": "마이크로실드4액(글루콘산클로르헥시딘)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d64b331f-239b-43ad-ba4d-aaac93001c84",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d93bc68f-49fa-4d2c-89db-a9983f1c4eff",
+      "productName": "드리클로액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "daa356fb-9ae2-405a-bb41-f63d906ed73a",
+      "productName": "베타딘드라이파우더스프레이",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dc354f2b-0102-4a5b-b257-3535c25eeffb",
+      "productName": "드리클로액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "de4fc3b4-e8f7-497c-b973-43673e237d83",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "de573b75-edc3-47a7-a400-95bc9fba07a0",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e0b2b7ce-1551-4ef0-98a7-3e26fde0a33e",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e118f024-834b-4afb-a4e2-acd856620e9d",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode gencode 부재)",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e5010810-056e-4932-a8c8-485c8336269f",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e5a52eef-a986-4bb3-abdc-3673451a89db",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e627aac9-8f01-4010-aa7b-80ee1d34312c",
+      "productName": "마이크로실드2액(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e6c75dd3-f054-47ff-bb97-bfbdf9b929a2",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e768360a-49e1-4404-bece-ce7f8a27b6bf",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e8e05049-c71f-4462-88f0-1b2daa9a2eb9",
+      "productName": "제올라에스액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e98247de-065f-4ddf-b44e-b61ac45f3274",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ea5f4941-7993-47f9-b533-6369ee4021b8",
+      "productName": "노스엣액(염화알루미늄)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "eb3d566f-7b06-46a0-8f19-725e346cf73c",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ebc6e9cc-a827-4ea5-8697-387a192c00fb",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ebcee778-8f0e-40a7-9db8-54ca4ec73b59",
+      "productName": "성광헥시클렌액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "edb4ecfc-cade-48df-837c-37559e273847",
+      "productName": "물린디액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ee4f7f4f-8579-4b93-95b3-97394e444c89",
+      "productName": "헥시-알액2%",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f04dadc3-4197-48e7-994b-f7b1b007c35f",
+      "productName": "성광헥시클렌액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f06d24db-f614-4279-a927-ef717ef62f69",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f2d70957-3c30-4b46-a407-bb216a079778",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "공식 용법 원문 다중 경로 동사: vaginal/topical (gencode external_site_ambiguous(CLQ))",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f44ffe86-90e9-4b4d-bcff-54fa48321c86",
+      "productName": "큐앤큐포비돈요오드스크랍(대)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f5b96b61-dacc-4893-b605-7267e6fcee2b",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f64fc2ea-910e-4e07-8d3a-ac58c6171b77",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f864061d-bbdc-40e4-bb2a-6f8fa1c77d79",
+      "productName": "성광헥시클렌액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f8d9dff8-ae86-4ff0-a9bd-f41f9bca6485",
+      "productName": "소프타-맨액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fa8a15c0-698a-4a94-8e00-ccb457cde846",
+      "productName": "큐앤큐헥시딘스크랍",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CDS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fbce95f7-8c09-43bb-b0b0-ce60aae1326e",
+      "productName": "큐앤큐헥시코올스틱스왑액",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CLQ), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "productName": "오트리잘비강분무액(염화나트륨)(소아용)15mL",
+      "reason": "ROUTE_CONFLICT",
+      "detail": "gencode external_site_ambiguous(CSI), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "1c51b786-e432-41bf-971b-33fb9da11817",
+      "productName": "바디드란트액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "1c6367cc-f4be-48ad-ae5f-213a8d6d3898",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "1c69a8f0-8492-40f5-8ca5-7d8da1ef5924",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "1e72af31-9a6d-470e-9d24-c2607a7a89f6",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "1ff3155d-0968-438a-a2d0-ac9b259a8b0f",
+      "productName": "그린헥시딘세정액4%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "20bc2398-465f-4dc4-b9e8-dcf8e2544eb7",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "20c50ea2-36b7-40d2-9b39-0c442e58ff55",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "20dd6a17-fd34-4f0f-8967-5931aa298386",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "21c15ccc-ddaa-4d56-bf1b-e2ffb53b5ab9",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "21ddd61d-79e5-471e-8edf-c6cf161220d7",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "226c39c1-45b7-4d2e-b6c1-e29fe38158eb",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "22ab7f2d-f486-4a2f-8a9c-faa08e6d64d9",
+      "productName": "그린헥시딘세정액4%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "productName": "포스테리산좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "23ac1227-dd47-4cee-b464-2036ad9ed89a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "23c46fa4-715a-443b-8f37-a8547fb72f78",
+      "productName": "스테리그린액(과산화수소수35%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2478b2ee-3807-4879-804b-79999ef7d5ac",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2492ef7a-b078-429d-a6c0-4bb642b16597",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "24e37de3-d414-452f-b530-2ff9b15013aa",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "25a17ce7-a88c-474a-8853-a161df0f953c",
+      "productName": "스테리그린액(과산화수소수35%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "275a64d2-9952-4c75-8a90-5691fd6bba32",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2851faf0-bd0b-4026-a101-cbd25b64e350",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "292b391e-bf05-4caf-9db0-90af35c4e2fd",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "297f80ae-abe1-4bf6-bc9f-eb5548a021bc",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2987ba0a-0ec8-4a71-84e7-1f8807d07a5b",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2ae4bb5e-d7f2-4496-a411-69d525c9fa98",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2b688d46-a5e6-462a-91d9-afd4e4308dc0",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "productName": "렉센엔좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2bfd2e88-313d-48e9-851a-d1a4e64ff78c",
+      "productName": "인사큐어액(히알루론산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2c25099a-28c1-4599-b847-4c7fa6ddd010",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2c2ee843-1539-4f6c-8b44-f8fb350d9c49",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2c759d88-c384-4364-8892-760caa8ff17a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2d75c1cc-a628-4e76-ad6a-a9eeb5a3f9c4",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2d916330-630b-4911-8f7d-dda2d72baab7",
+      "productName": "쿼드케어연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2db7a523-587d-451e-a3f7-b408303bc70a",
+      "productName": "성광알파헥시딘5%액(글루콘산클로르헥시딘액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2eff3518-af3a-41c5-856b-a155eb502bc2",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2f411a74-f699-4751-b37e-794e30266c9e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2f5ba35a-2da0-41b1-9615-d32ece79012f",
+      "productName": "이바프텐액(벤지다민염산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "2feeeb88-1f52-4219-bc5e-1eb305f8d266",
+      "productName": "그린헥시딘브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "308cd6ea-e76c-4141-b808-e60860d7da3b",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "309cf581-b5b6-4e1d-b673-80faaa9f65d3",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "33547b6e-8008-47f4-932b-f9856b02d7e3",
+      "productName": "성광알파헥시딘5%액(글루콘산클로르헥시딘액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "34643019-052e-45cc-b527-af28c1ca0afa",
+      "productName": "인사큐어액(히알루론산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "34c38b91-6b31-4527-8c77-ad39828c3827",
+      "productName": "액토시드피에이산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "353557e9-5c26-4322-9c54-fa60eb1985d7",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "35d03206-1d66-4be7-aab9-7407ddf86407",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "365136fa-fd7e-4d01-bf63-97e257e5cac6",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "37b1bacc-dc04-4adc-a3d9-118d26f5e6aa",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "productName": "푸레파인마일드좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "37c63960-1521-4c4b-b16a-c53fe651ea92",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3877c15c-ee9b-4276-b314-cce91ac5470c",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3b6be296-e8f5-473f-841d-9acdc37599fc",
+      "productName": "헥시덱스5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3be33326-1522-41f7-96ae-f3709eaf396f",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3cb295f2-c8c9-4f3e-86b1-ddd6a92950c2",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3d08147d-5701-4d5b-8196-27627716c1e6",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3d4aef26-af3d-4e11-9010-68a8ab8cc545",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3d8bc473-a871-42d1-9302-67b2a99d021e",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3d8f6440-9fde-4e79-b1d2-a92fd2fc15af",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3d981c6f-bf01-489e-9c08-de4de5ed6dc2",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3dd8f01c-1d11-44ec-8560-ffd658944fe6",
+      "productName": "디클리어액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3e88f1af-ad91-4d98-bb93-c7a3f08a7bcd",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "3ff55a8b-5e90-4097-8190-90e943c77e30",
+      "productName": "반테린코와이엑스크림",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "412e391b-3e9f-4115-a227-2d8fb06f5b2c",
+      "productName": "뮤코베리어액(히알루론산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "41d2d914-34d5-4853-b3e5-70d5266beb33",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "42257e29-8e58-4657-adc0-3b799dd3504e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "42309736-9ccf-4f0d-9c90-49f81e15d91a",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "42f2028c-db33-4408-b28c-50438b36b3fe",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4367f387-328a-4266-becb-a110e0e1649b",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "43a32557-2b02-4f02-b582-d14791c0e083",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "43bd218e-ae84-4d83-9b0f-6253939012fb",
+      "productName": "디클리어액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "444e477a-2b0b-44ed-828e-217efa1879a9",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4522c946-9dea-4b33-860f-18f719a905a0",
+      "productName": "애니큐어연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "456b56c6-e88b-47ab-8950-511eb4473da2",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "457b3af3-417f-45d9-9532-bf9a65575b2c",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4602f9d7-9470-4e67-964a-25d9ab5354ff",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "48d2886e-731b-4c67-8b77-ae459bf421dc",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4990d987-0e72-40c4-a776-85dd7690bbbf",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4a001867-2ae3-4ddd-881d-cd1c7cdf9efa",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4b082da8-f6fb-481d-94f6-39fd303c5f90",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4b1aeb75-3fca-450c-b071-2edc498682c6",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4baf8d25-5dfd-4f5f-9da1-d26c70f32ab4",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4d6c0953-9d9d-4419-af44-15c780ac43a5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4dd8cd93-f4ab-4c30-b929-5bde241f6302",
+      "productName": "안티포스연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4de3e021-d894-4556-8b76-6f02ef28f63f",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4ebc9613-caff-44d9-ab2f-110ab77a0023",
+      "productName": "헥시덱스5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4ef1e2a2-f526-4a01-9953-f0cd9ef88d1f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4f23a2a3-2ed0-40e7-b7f3-02b062bd2edd",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4f6c49e5-fb2d-44f8-8914-d95e911b6ca0",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "4ff66b7d-5501-4f43-b839-908b492e8cf7",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "514655f8-44de-4e14-99dc-fffcc87922b2",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "51d94cc8-0080-4900-a3d4-78321711cf57",
+      "productName": "헥시덱스5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "51dbb736-733c-416b-848a-39b0cac76fbf",
+      "productName": "스테리그린액(과산화수소수35%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "51f5e941-0ba0-4e9e-85c1-54f669a94ad3",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "productName": "포스테리산좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "524b23f7-8dce-49d9-a2e5-483b384c50b2",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "53925f96-624a-42eb-a4f1-f8c91918a5b7",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "553fc97c-1bec-41d7-8491-2c13b17570b9",
+      "productName": "릴라이온페라세이프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "554cfb9c-d7ec-464e-a609-0b21fbd6e430",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "55b21619-66c7-4ae9-9b11-77f9c2361643",
+      "productName": "스웨티브센스액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "56a9b74f-351a-4e6e-86e8-52b96ce67955",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "56c3f425-62ca-4717-a7b4-d5150e3d57bb",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5867e688-378f-4e18-b0f7-d0ab4fd932d8",
+      "productName": "치클리덴탈페이스트",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "59c6037b-c217-4f90-aab0-e8a1d817b15e",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5ad9f331-41de-4857-bec1-e39321b129f1",
+      "productName": "치클리덴탈페이스트",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5d6f6208-5366-4815-9228-f51d7bc73ea5",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5dbfe65d-1f2f-402d-bfb8-4c6e2ad33310",
+      "productName": "큐앤큐헥시코올탈지면볼액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5dcb1988-6227-4f23-966f-3f8620c3e330",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5df0ee08-dadb-4f83-ac7b-e68b126fbd15",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5e0de480-7512-4418-ad15-29a26dfdc674",
+      "productName": "헥시와입스4%(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "productName": "프라맥스에스좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5f3e3b35-6ac9-4bd6-9b3f-bae3673ff5b6",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "5fcf01cc-4433-4418-8d1a-fdfce9a2a362",
+      "productName": "바디드란트액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "601f4c71-b3b6-4bd6-b6d0-014e062a30a6",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "608c0fe4-fca0-4c21-8e27-cc99b255674c",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6136a910-5399-4eff-9f2b-359e07ab578a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "62d0687f-a43e-4bb3-b217-e9c3e1aec6bc",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "62ee507e-5275-4117-950f-10f5eda04873",
+      "productName": "성광관장약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "62fd9c76-1ebe-4ddd-b232-cba6c5680bc1",
+      "productName": "이바프텐액(벤지다민염산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "634dbb13-8a4c-410f-8a07-9f7aa396f746",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "644d80c9-d457-4e00-a4d4-077d98c51896",
+      "productName": "그린태고액1%(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6493a1e5-a312-4645-acb9-b894f15588f5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "65926329-1b3f-479e-9e81-ff8bbbfd795b",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "productName": "푸레파인마일드좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "67133531-11d2-47ab-9356-35e91749a530",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6744a19e-a9ad-4fca-9e0e-1ffd30877a99",
+      "productName": "엔도파액(과아세트산액0.2%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "678a7f11-e64e-4f08-b183-88dd57b6bbed",
+      "productName": "프리스엣마일드액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "68178680-12a1-4f77-8fb4-8324d337cc57",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "683e7cd6-24b8-45b0-be10-7e2469c8ae9d",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "684af612-b553-4d08-af78-63edb3db4cfc",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "68ef703b-2cff-4228-90e8-785172d889cd",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "695cf26b-b1f1-4037-8da4-a4278bb44326",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6b784026-7f1f-40e4-b2e7-b47c2ad4180d",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6bd05838-21f7-4f53-8c32-8d30557a9d8b",
+      "productName": "반테린코와이엑스크림",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6c2416da-e005-42e7-9b0a-2c5f68af3ed3",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6c6522eb-0165-401a-ab4b-0feea8d94f73",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6c9245dd-b8e7-4f1c-8f69-698410d20905",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6edeb395-f2b3-4f87-8f2b-4185ebce2dfc",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6f1741ee-3732-427f-9b62-f74d8f823cd0",
+      "productName": "큐앤큐헥시코올탈지면볼액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6f78cb51-c49c-43df-bb4d-569f6a04e911",
+      "productName": "드라이언액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "6fc86936-a773-412a-af67-04d547b99080",
+      "productName": "페리톡겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "700f6912-1893-4890-99c8-cc7e43ded75e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "706d91e0-76fe-4208-98bf-3845895627d0",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7149ae65-32e3-4893-968a-6ae120fbb356",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "71c77407-1b9d-4290-bf8b-880fa0a8dd38",
+      "productName": "대한관류용멸균생리식염수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "721ac702-7f65-46bb-89e9-3b1a10172592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "72b45d8d-82e9-4a18-8fdb-395d3bf1cdd9",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "735d8486-d75a-4d9e-a222-bbb917339616",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "74a3503d-bcd0-4cc8-8a07-5798c6e6fd9d",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "74b5d9b4-e91e-4f17-ba2b-de8f28b05ece",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "74e89a48-fa71-478d-ac13-aedf6d5fd909",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "75ccc059-7f24-495f-9600-f8fdf59afd99",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7684bdbb-3da5-4d13-bb76-856daad33ee4",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "76e8b15d-08bc-4618-9f54-0d1d73b9ffef",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "776f49b1-bf76-43eb-8b1f-95b725fc663e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "77a55f97-cb94-4cbd-b1ff-c60f14af1806",
+      "productName": "페리톡겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "788774ef-bb47-4133-9e28-8c1b2805c9ad",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "78c46327-48b8-4f64-ab0b-36b68784dd6f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "791c02a2-6211-4029-a429-e84a5fe3c0d3",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "795d74e0-7926-4f99-ae84-8e3f6f87cd07",
+      "productName": "유니클린액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7a92c82f-a379-478a-b782-57e7fb6136db",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7a97898a-43a1-4962-b2f3-1a021d90d947",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7b25d6e1-d3c2-4eb5-b5fb-22a358e798ab",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7bb597b1-31d1-428f-8ed2-5659171780d2",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7c0aa6fc-393e-4668-9581-19566f9a9e04",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7cdff1e1-c037-4339-9f96-5dd91e98e575",
+      "productName": "그린태고액1%(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7d07633a-7a4b-475e-b3a1-4415eb73a57a",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7d0afc09-0dd9-44c8-a52d-039672e9abd4",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7dc9caa7-9850-4799-baf8-eef19cb60652",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7dd6dbc1-4641-48c9-8666-c714b9da18d4",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7eb884b2-1a53-4686-af95-dd642bf84cbe",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7fc4999b-882e-4d7e-9d40-ad768c039521",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7fd9f83b-1f53-4c01-bc79-3a288f079b21",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7fdd7881-6766-42e7-839e-a8af40b259ac",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "7fe2ef66-723d-459f-bc2a-1ed43830b71f",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8246bf93-27e1-453f-a333-2f85257d8939",
+      "productName": "성광관장약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8281f7f7-55b0-4633-8c8a-4ae859f601ae",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8288a174-6cbf-485e-a4cc-eca97d0ab4cb",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "82ef4462-93bd-4994-87eb-5e406c4bb3f6",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8390ec4f-4d1d-4f7f-9f86-cf1e63f0bb60",
+      "productName": "드라이메디겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "83a195bc-b121-498b-baa2-e61b77524850",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "84167875-4668-4c04-ad8e-75f747811dc9",
+      "productName": "큐앤큐헥시코올탈지면볼액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8447ff23-b556-4101-b4aa-e64d86cac39f",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "855cfb76-f494-43e4-8386-305435d7c452",
+      "productName": "대한관류용멸균증류수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "86e3c078-318a-4a15-ac5e-e73749de46de",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "87b8b6bb-c602-4242-9b4c-3ef9bd9845fc",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "87e84cba-3e78-432c-82f5-206454ef4b9e",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "87fa6464-429d-4770-a206-57995acd6332",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "88a87e4b-6ef1-4b83-9cdf-cce8a5aea432",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "88e31467-fbd0-461d-9cd7-103e17f25116",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8a188dc7-0b54-4842-9090-f3ceb235039d",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8a39c29c-508c-4e26-8a7d-e52518e800b3",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8b4cb3bb-926d-4330-8ea3-af467f551aff",
+      "productName": "유니클린액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8b5801aa-2138-45eb-917d-3e7e2d8177ef",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8bbaad0e-a4f4-4ccc-8cd5-04f221da18df",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8c97a2cb-3df0-41b1-adf7-ed468dacf9a0",
+      "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8dcf5cc4-0c24-4942-8725-30b19fd383eb",
+      "productName": "그린태고액1%(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8ed60dbc-772c-4cbb-aa09-cde12b26d79a",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8efcc01e-3601-4620-a6dd-6b9f0ab5900e",
+      "productName": "솔트스틱액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8f0f7461-67bc-4d73-bfab-537cc8a08102",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8f5990bd-21ac-4432-9751-ec829404f32a",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "8fb8e44a-6ea2-4935-9ddc-d3e7e13df2e7",
+      "productName": "쓰리엠스테리-가스EO카트리지",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9180ea4c-61e1-49ff-b521-30a92837fcc8",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "927a56a1-1fde-4bbe-b368-9ea1e4f216a4",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "929bdcf8-d8ad-458d-ac23-10e4b38ac8bf",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "92ad8414-0f5e-4a1b-8b19-4160d8c86d0b",
+      "productName": "액토시드피에이산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "92c5cb19-0f68-426e-b921-52dc25d3af98",
+      "productName": "뮤코베리어액(히알루론산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "939cd78f-ac9f-40b3-a194-a8be19790764",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "93e3d637-87e8-4794-9ac3-a444f846a949",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "94059ca8-d062-4042-9454-ba7cb534924b",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "946932f6-cbb5-478c-934c-ae22f0771202",
+      "productName": "정우형개연교탕연조엑스(단미엑스혼합제)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "94847d27-7333-43e5-b4fe-bb67d64be205",
+      "productName": "드라이언액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9521142a-4a2c-4b8c-aca6-a0d194f4c764",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "95463829-a4d6-4974-a832-7684c8cb8afb",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "955d1a6f-ef18-4e59-b5e3-4aaab6669787",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "95fae3bb-7c4b-4daa-b521-82b71c395267",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "96ab8f76-12a3-4527-97d0-3c34a7ae2bc5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "96c58214-3e7d-4b7f-a7a9-616b5fa9af53",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "97d7184a-ed8a-4e2f-812c-8a1a6d04877e",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "98633a18-9e44-46d0-9e7d-3561ca85b882",
+      "productName": "스테리그린액(과산화수소수35%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "98ae2804-fcd2-4922-ae2e-5643ba86eed7",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9aa0a3f5-7a04-4393-8411-d7acfc0838a2",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9b1553df-795b-4162-b11d-5db0f6f0cd45",
+      "productName": "페라플루디액(과아세트산액0.2%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9cef5c9a-43dd-48e1-a7e5-386afcf6c33f",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9dd579e0-571c-47d3-81f3-3f5febeef844",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9df237af-e613-4b5c-9baa-2c05de03032b",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9e8dd2ba-6e7e-434f-8921-ba0ecb9396c6",
+      "productName": "그린헥시딘세정액4%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9f75ff5a-5d4f-497b-af02-393198fbc45b",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
+      "productName": "복합써스펜좌약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a0f42b16-330f-440b-b39d-da879ad2ccab",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a10e9890-cd9b-4705-a18e-655bc686ccb2",
+      "productName": "인사큐어액(히알루론산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a168a838-742d-4281-b9ae-1e0df32792ab",
+      "productName": "성광관장약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a22e39de-81db-47f0-ab4d-26e1b50c7bc7",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a2a406a9-b748-4a3e-bdeb-ced4a3892b8c",
+      "productName": "릴라이온페라세이프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a2ed92a2-fa52-40a7-a3b0-e65fc8d47adf",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a2fd894d-3d94-4c5c-aece-97e814b729f7",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a38e8c21-ecae-4cdd-8c7b-48f89c30430d",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a39b5bfb-c189-422f-a572-147f8791a717",
+      "productName": "복합써스펜좌약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a3b2dc6e-2d3d-40ea-b919-2ead2603ae2a",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a3de66fa-2cff-4e4e-8cca-ceb058f8b8c6",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a5c28beb-6028-4a7c-bb73-1c52e8047265",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a6675c37-9332-4e08-a4ce-c599eda85d7a",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a7011686-da82-489d-839e-e13eac608cb5",
+      "productName": "페리톡겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a75ced12-5042-4a47-a5b4-4ece0f314123",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a83c0a9c-54d3-40ab-96aa-a0bb9751ff20",
+      "productName": "데오란트센스액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a8f8b178-0dde-4f5f-bd2b-b83cc69acb49",
+      "productName": "헥시타놀2%스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "a9a15527-bed5-488e-a7c0-f690299922bb",
+      "productName": "액토시드피에이산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aa31d319-bc2e-4eaa-993c-8e46313fd12a",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ab263dd5-0d63-4e69-8417-8d851ea74753",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ab370537-e880-429c-8385-95c1a1d0946f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ac2507cf-e20f-43c0-929f-bf0f5f1e6cf2",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ac38a363-e135-4586-8438-25c26908c7ab",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ac466027-fb45-4416-96df-08487d589b0e",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "productName": "렉센엔좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "adeb2d1d-dbe6-4581-a424-920f4b8f56d9",
+      "productName": "그린헥시딘브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ae0cb0fe-b6da-443e-afe6-16d0cc16b7f0",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ae8cd755-a5d5-44a4-9511-260ee4f4af79",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "afeee643-3f07-46bf-9766-76b962acb323",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "aff26afa-a0df-46cf-9f87-ebce1c99c41c",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b0039a49-bf26-4508-838f-1b33b74f5afd",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b028588a-209e-4ca9-9190-3a7f3003d65b",
+      "productName": "솔트스틱액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b041d4ed-0598-4d6a-b0c7-17b5a200f98f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b0f43507-87a5-47f9-aff5-06e68d94e487",
+      "productName": "헥시와입스4%(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b0fca3d4-05ca-4e11-86b3-e2946703ae4e",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b11b2178-20e6-4bdb-bf64-943939f43a4c",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b1ab2aa6-1931-4159-b80c-aea8c12c562e",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b2e56eb7-fcc7-4509-9ffc-0aae349632eb",
+      "productName": "스웨티브센스액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b3fb6731-8622-435e-b28b-d1353d251117",
+      "productName": "페라플루디액(과아세트산액0.2%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b416ad70-f0ff-4b3f-a6c9-c83fadaa766c",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b4da5ea6-7805-4837-af4c-937b80f10ce0",
+      "productName": "헥시클렌브러쉬액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b4f5f937-fff6-4ce6-b715-c8f0d828e821",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b51454b9-53b8-4c99-ace8-6fa74fb60c93",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b540063c-f06b-40d2-9ae3-439f98c34a43",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b581a51a-01dc-414f-9e41-084578c8ce88",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b5dd2585-3679-4f01-b83f-6d50cd25a6df",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b64f90aa-bfab-418f-8c52-181fd2c247c0",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b6fdccf7-f12a-47df-93aa-c6d289ed3873",
+      "productName": "케어믹신플러스연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b76afa12-a19d-4fc0-8922-f574080b4320",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "b9985e48-cf04-4024-b966-65cbcc99eb44",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ba479971-a20c-43d0-b7dc-ee700010010c",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ba781a45-5268-4737-87ac-50b7fab86a9b",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bb59b91b-68bf-4e22-b5ab-d6f5aaabb742",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bc23f6c1-33ba-496c-93c7-f27e2fb58b85",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bc5cab7a-7e92-41cf-8d70-2ba2f5e43a7e",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bd4cd564-cb7d-4d4b-9308-6e4d16823f3b",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bd942a0c-fa97-40f7-b0b3-f4f7580e36bb",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bdbc83cb-2bb5-4ae9-b496-97dd2ba6ab86",
+      "productName": "데오란트센스액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bdcb3056-62a1-4264-9829-05f39e7fe0eb",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "be4c0a13-0e91-40e7-8115-8584f2e5dad4",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "be60f40a-1fa4-4b4a-9ace-1a86f8e7900d",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "be6e0e10-35ef-4585-a624-91b71b137e5f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "bed93936-8247-455e-91d5-40a460201469",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c260cb10-8e40-4d66-ba0b-2e560e695a3b",
+      "productName": "복합써스펜좌약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c26a9b5a-52da-4264-97ac-506d5201630e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c36287a5-5840-434b-9462-9a9891c6db72",
+      "productName": "안티포스연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c4491fbb-44a6-4eff-8610-166e0129f3bb",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c4ad6269-84c3-4e6a-b2c3-6421e4e4b87b",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c5057c9f-b87d-4e54-be85-1b8b323a276f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c53036bd-7f2c-473c-8f9c-e74fc80a54fc",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c5406795-ba3c-4dcf-a350-81b9aed4bb89",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c6125ecc-1a72-4add-8eeb-03871bf6d389",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c63e59b6-ab71-4c61-aede-d5fa4ff44d8f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c79074b7-957e-44e7-9a75-ee634a2d7103",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c7f7de24-7259-400d-bb7a-e454473a1015",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c82ac72c-048d-4c0b-b96f-bce13b65f494",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c883ecd6-668e-4097-bfca-95acd5e1026a",
+      "productName": "대한관류용멸균증류수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c889f3c7-ab54-4403-b12c-bb0cdba4896f",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c908cbcb-56c3-4f54-a321-155e07bfad7b",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "c90df8dd-bdf6-4936-ab85-a0a84e93817c",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ca1a8276-f0cc-4c20-b1c9-9bfebfc82beb",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ca5dad19-24cd-4bae-ad4b-e03e0fe25d26",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cb653ac7-60a9-4a97-badf-9afcb16f6e33",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cb92680a-d7fd-468e-b2f7-37b927554686",
+      "productName": "헥시와입스4%(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cb934a58-2505-4dec-9af5-8532c862a898",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cc1d1fc7-d0f8-4c85-8c9b-b43adf64083a",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "productName": "헤모렉스에스좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cc5873d3-1b27-4dfa-8474-f22b56558bf6",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "cc7f5bed-f30f-486f-85eb-296d73a27c6d",
+      "productName": "치클리덴탈페이스트",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ce35795f-fc57-40bf-a297-3ee0724ed84a",
+      "productName": "헥시타놀2%스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ce9586c0-e082-43fe-8999-5b41e10a3b77",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d0c275fd-2389-4bc1-92a5-c508c172186d",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d0c3dfb5-57ca-4572-a0d2-962024fe5ae4",
+      "productName": "헥시타놀2%스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d0fe1b61-9578-48e4-9971-5e91877e8064",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d1842f85-271c-4be8-a943-9500aa044ba6",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d1faae5d-0181-4ebd-a764-4c527575013a",
+      "productName": "뷰티스홈15%겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d1faccc4-771d-471a-8212-15a7af8001ff",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d231a503-a15f-4fe1-9a89-3705deb087fc",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d41904a2-bf95-43da-bfe7-57e4784d4a06",
+      "productName": "쿼드케어연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d41c98c9-8989-4121-964f-cb04acd4d776",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d56d1bcb-25db-4deb-9ca0-52aea81dadb0",
+      "productName": "이바프텐액(벤지다민염산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d5787808-955e-4c1c-b18b-f511683e5477",
+      "productName": "애니큐어연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d58824d9-9eba-4630-b24d-e940ebcc7948",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d64e6e1e-fb7c-4d39-9a7f-190b008e03d4",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d6c500f6-f391-48dd-8f76-2652d9ac785f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d7ffea9a-1127-43a7-a32e-43c5e3e24345",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "d8e16f95-061a-4a85-bbbb-3f04c0bd37ab",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "da0a03df-478e-4e6a-b552-9bc47a2528cd",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "da576904-ff98-417d-8149-265ad43203f7",
+      "productName": "디터점스울트라액(차아염소산나트륨0.14%)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "daf0b47a-a8ab-4704-a30e-a10d1b556b79",
+      "productName": "프리스엣마일드액(염화알루미늄수화물)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dbdcd850-396a-43c3-9629-7a592623861c",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dc2cfe31-89dc-49e3-beab-460a986539a0",
+      "productName": "네오프라신연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dc6ab6a3-f15c-429f-947d-5e5b20a9a29f",
+      "productName": "큐앤큐헥시코올탈지면볼액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dcab7b7e-d4df-41b2-8811-246d9bc08b69",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dcb45d1a-e84a-4d79-8c44-c67b0bc317bf",
+      "productName": "케어믹신플러스연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "dce4c57d-8472-4ef3-b26c-8bdda0c36a2f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "de406921-06e3-486d-aa3d-c99616c73dae",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "de79851e-cd48-49f2-9313-25d64cfe962a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "defce5d7-3859-4a86-8c8c-e2cae80f8a2a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e0e1c75e-aa0f-4070-a186-45560d0c2819",
+      "productName": "성광관장약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e19f9a09-9a9b-43ff-8b4e-2ebd4e166108",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e23b3fb9-4969-482d-a2ad-6ac60cf7f712",
+      "productName": "중외관류용멸균증류수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e356acc0-6108-4147-a2c4-1d8a64138225",
+      "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e356ec3f-3c1d-4847-94eb-1824182e83fc",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
+      "productName": "둘코락스좌약(비사코딜)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e3d08078-da28-4ddd-9f38-7feb7be6f9d2",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e3ed2cb4-ee73-49b8-b70a-4542f195330c",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e3f4e07e-be9d-4a51-a5e5-e544ee41a45a",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e5066538-9ca7-4cfc-a178-ec1cc484b57b",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e6381cdd-ec78-4420-8974-d5c965b16232",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e652a435-c742-4a3f-9fb9-31e89b0105d9",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e667c776-48fc-43a2-af12-809ff5f078f4",
+      "productName": "성광알파헥시딘5%액(글루콘산클로르헥시딘액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e6865e9b-ccc0-4292-8a03-a250657d64cf",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e6dac320-8438-4e16-bf6b-51fa41e12f61",
+      "productName": "이바프텐액(벤지다민염산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e86ec842-bcd4-4f0d-afb2-2045da490ab5",
+      "productName": "릴라이온페라세이프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e9e3a016-e303-4334-b6c1-e1e20d58ce5f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "e9ecbd43-3e46-4530-b170-a9acbc7bb5aa",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ec3e245d-6fc4-4ab4-ae05-8edba8197ad5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ec4196e6-e8cf-4267-a9eb-90276c9ba8f8",
+      "productName": "스웨클로액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ecbaf854-3648-406a-8119-b4d6f173556f",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ed246bb7-6ba5-4ce7-8e67-ca0ffc40ebab",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ed9f97c0-4644-4547-9ac0-a3ee960428ba",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ee117a3e-2f20-4dd6-be63-463ae74b8772",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ee5d0f28-4efb-4ec3-8535-a7020b71bb2a",
+      "productName": "네오프라신연고",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ef2c9750-1018-417b-9a41-caa3eb535d0e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ef3fdc4b-238e-4b6e-9d54-6c54b87e7df3",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ef4872d3-674c-40fc-843c-f77fd0c24299",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ef62f389-a288-4ceb-8abb-b5a6d6e9afe2",
+      "productName": "그린태고액1%(알킬디아미노에틸글리신염산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f02d5f13-746c-42d0-92ea-408694f334a5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f0591041-ce76-44c3-aeca-75e5d0e5cc38",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f0c2cac6-000f-4fe9-b035-4c6ee546d5e5",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f1095926-1d3b-40ff-8ea0-b117c3ffcba5",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f124170d-0907-4bc6-9a24-a867b827b34d",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f1e7fc1d-4314-448d-b460-8b0506fbb7ec",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f3dc2c30-464f-4a0d-86f9-7f6d4c7c47ba",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f41f13a6-8873-49c1-9e78-ef6d57ecfa74",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "productName": "프라맥스에스좌제",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f471a4dc-0bec-4695-aa0c-501751f96ab6",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f477c547-ff94-414d-bebb-54eaea060787",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f47c5422-ed78-4d06-a593-dbf9fbc9ab08",
+      "productName": "드라이메디겔",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f59691f8-7ea4-49b8-bb72-1b3fb61b7aa2",
+      "productName": "헥시타놀2%스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f5db1f87-e9ab-4bc9-895d-42242d906cd6",
+      "productName": "이바프텐액(벤지다민염산염)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f5faf23c-63ee-4ae8-9cc3-785498dcf092",
+      "productName": "에이치엠씨엔에프산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f65eef63-aff0-4d7f-87a0-a37ac7ce97d5",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f671bd4b-ef86-4e39-9c08-9d7992c1f4fd",
+      "productName": "헥시타놀2%스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f69b69cc-d75d-4496-ab13-2bd5568a3e0e",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f8415969-6b4a-4e8c-9ff8-ff821a5a418d",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f8f86b4e-d524-471b-8908-284dfdb8a15d",
+      "productName": "대한염화나트륨액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f930f339-194d-4544-8e55-83d5216bc423",
+      "productName": "스웨티브센스액(염화알루미늄)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f95ba89c-b146-4e5e-901b-1ff3ff0ac885",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f97b9239-d9fe-44cd-b169-0165bb1487e9",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "f9b8cbf1-0706-4554-b570-3bd2f0955424",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fb452d5d-7155-4710-8a6c-258c1ca3b101",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fb4ce9f4-7327-4d29-9223-504f19695436",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fb756de5-8dbc-45eb-933f-1de70a216cec",
+      "productName": "큐앤큐헥시알콜스틱스왑액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fbb27fae-ebc8-4851-a8be-a929bfd3b63c",
+      "productName": "액토시드피에이산(과탄산나트륨)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fc2eeb6f-d700-45f3-a5b8-a770aff3f7cb",
+      "productName": "헥시덱스5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fc730871-7076-492b-94cf-7821a162cb0a",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fc736472-7f10-4bbc-9e89-af389287a43c",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fcd4e922-110b-4bab-a164-004fec9a736d",
+      "productName": "그린헥시딘0.5%액(클로르헥시딘글루콘산염액)",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fda17850-af47-4193-9420-10275bf29ea6",
+      "productName": "솔트스틱액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "fe27bf7e-7788-425b-8f42-de182f286f0f",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ff0a33e3-8aea-462c-8873-9cc3813f53df",
+      "productName": "중외관류용멸균증류수",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CIS), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ff0db792-9045-4623-b48c-108ba0d00988",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
+      "productName": "복합써스펜좌약",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode suffix_not_allowlisted(CSP), 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
+    },
+    {
+      "masterId": "ffc7a2fd-779f-4939-a21e-56d485b222a5",
+      "productName": "큐앤큐헥시코올거즈액",
+      "reason": "ROUTE_UNRESOLVED",
+      "detail": "gencode gencode 부재, 공식 용법 원문에서 경로 동사 미검출",
+      "group": "route",
+      "stage": "selection",
+      "dbWriteActual": 0
     }
   ]
 }

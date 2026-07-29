@@ -1,0 +1,47 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 100,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 100,
+      "lastMasterId": "d1370f44-c797-4fb4-90b7-c223f10fc1f8",
+      "green": 100,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 600,
+      "at": "2026-07-29T20:16:51.217Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 200,
+      "lastMasterId": "e18006f8-0ab7-4a5b-bc31-7be5207af6eb",
+      "green": 200,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 1200,
+      "at": "2026-07-29T20:17:39.599Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 300,
+      "lastMasterId": "f20fbcb8-48c2-4ca4-9a2d-831b99e58702",
+      "green": 300,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 1800,
+      "at": "2026-07-29T20:18:31.359Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 388,
+      "lastMasterId": "ffe5f4e0-d599-4e2a-8658-1dac7c506dea",
+      "green": 388,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 2328,
+      "at": "2026-07-29T20:19:14.051Z"
+    }
+  ]
+}

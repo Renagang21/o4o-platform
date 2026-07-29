@@ -2,7 +2,7 @@
  * WO-O4O-OTC-EASY-DRUG-MASTER-BY-MASTER-PILOT500-THEN-NEXT2000-CONTINUOUS-PRODUCTION-V1
  *   — 누적 예외 원장 병합 → agent-na 단일 인계 원장 (에이전트 가, READ-ONLY · DB 접근 0)
  *
- * 병합 대상: pilot 100 예외 20 + pilot 500 예외 84 + next2000 예외 38
+ * 병합 대상: pilot 100 20 + pilot 500 84 + next2000 38 + finalall(정상 잔여 전량) 신규분
  *
  * ⚠️ 각 배치의 예외 원장은 **run 별 불변 파일**을 우선 사용한다.
  *    무접미 파일은 멱등 재실행이 덮어쓸 수 있어 정본이 아니다(pilot 500 에서 실측된 사고).
@@ -53,6 +53,7 @@ function main(): void {
     { batch: 'otc-v4-pilot-100', ...pickLedger('otc-v4-pilot-100-exception-handoff-na', ['otc-v4-pilot-100-exception-handoff-na.apply-run1.ga.json', 'otc-v4-pilot-100-exception-handoff-na.ga.json']) },
     { batch: 'otc-v4-pilot-500', ...pickLedger('otc-v4-pilot-500-exception-handoff-na', ['otc-v4-pilot-500-exception-handoff-na.apply-run1.ga.json', 'otc-v4-pilot-500-exception-handoff-na.ga.json']) },
     { batch: 'otc-v4-next2000', ...pickLedger('otc-v4-next2000-exception-handoff-na', ['otc-v4-next2000-exception-handoff-na.ga.json']) },
+    { batch: 'otc-v4-finalall', ...pickLedger('otc-v4-finalall-exception-handoff-na', ['otc-v4-finalall-exception-handoff-na.ga.json']) },
   ];
 
   const rows: any[] = [];
@@ -86,6 +87,23 @@ function main(): void {
   const allWriteZero = rows.every((r) => r.dbWriteActual === 0);
   const missingFields = rows.filter((r) => !r.masterId || !r.exceptionCode || r.dbWriteActual === undefined).length;
 
+  /**
+   * 선정 단계 제외분 — **생산에 투입되지 않았으므로 생산 예외 원장에는 없다.**
+   * 그러나 agent-na 가 원인별로 정리해야 하는 대상이므로 인계 원장에 함께 싣는다.
+   * (17필드 스키마는 생산 예외에만 있으므로 별도 섹션으로 둔다. DB write 는 애초에 0.)
+   */
+  const selLedger = P('otc-v4-finalall-selection-ledger.ga.json');
+  const selectionExcluded: any[] = [];
+  const selByReason: Record<string, number> = {};
+  if (fs.existsSync(selLedger)) {
+    const sj = JSON.parse(fs.readFileSync(selLedger, 'utf8'));
+    for (const e of (sj.excludedDetail || []) as Array<{ masterId: string; productName: string; reason: string; detail: string | null }>) {
+      if (seen.has(e.masterId)) continue;            // 이미 생산 예외로 잡힌 master 는 중복 제외
+      selByReason[e.reason] = (selByReason[e.reason] || 0) + 1;
+      selectionExcluded.push({ ...e, group: groupOf(e.reason), stage: 'selection', dbWriteActual: 0 });
+    }
+  }
+
   const out = {
     wo: WO_500, producer: 'agent-ga', consumer: 'agent-na',
     kind: 'consolidated-exception-handoff', liveDbWrite: 0,
@@ -93,6 +111,10 @@ function main(): void {
     sourceLedgers: perBatch,
     total: rows.length,
     byBatch, byGroup, byCode, retryable,
+    selectionExcludedTotal: selectionExcluded.length,
+    selectionExcludedByReason: selByReason,
+    combinedNaScope: rows.length + selectionExcluded.length,
+    combinedNote: '생산 예외(rows) + 선정 제외(selectionExcluded) = agent-na 가 원인별로 정리할 전체 대상.',
     invariantCheck: {
       allFailedWriteZero: allWriteZero,
       duplicateMasterIds: dupes.length,
@@ -106,8 +128,9 @@ function main(): void {
       reentry: '복구된 master 는 agent-ga 정본 실행기에 재투입한다. sourceRef 는 masterRefV4 로 동일하게 결정된다.',
     },
     rows,
+    selectionExcluded,
   };
   fs.writeFileSync(OUT, JSON.stringify(out, null, 2) + '\n', 'utf8');
-  console.log(JSON.stringify({ total: out.total, byBatch, byGroup, byCode, retryable, invariantCheck: out.invariantCheck, sourceLedgers: perBatch }, null, 2));
+  console.log(JSON.stringify({ total: out.total, byBatch, byGroup, byCode, retryable, selectionExcludedTotal: out.selectionExcludedTotal, selectionExcludedByReason: out.selectionExcludedByReason, combinedNaScope: out.combinedNaScope, invariantCheck: out.invariantCheck }, null, 2));
 }
 main();

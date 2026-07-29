@@ -1,0 +1,17 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-REMAINING-NORMAL-ALL-FINAL-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 100,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 50,
+      "lastMasterId": "c82cf472-3663-483e-b410-383a15a39963",
+      "green": 0,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 0,
+      "at": "2026-07-29T20:15:46.827Z"
+    }
+  ]
+}
