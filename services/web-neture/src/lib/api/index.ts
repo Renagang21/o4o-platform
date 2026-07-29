@@ -171,7 +171,7 @@ export {
 export { catalogImportApi } from './catalog.js';
 
 // Supplier CSV Import API (WO-NETURE-CSV-IMPORT-UI-V1)
-export { csvImportApi, type CsvBatch, type CsvBatchDetail, type CsvBatchRow, type CsvApplyResult } from './csvImport.js';
+// WO-O4O-NETURE-SUPPLIER-LEGACY-CSV-IMPORT-RETIREMENT-V1: csvImport 헬퍼 은퇴(소비처 0 — 배럴 재노출 제거).
 
 // Dashboard API
 export {

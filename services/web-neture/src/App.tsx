@@ -175,10 +175,10 @@ const SupplierLibraryFormPage = lazy(() =>
 const SupplierPartnerCommissionsPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.SupplierPartnerCommissionsPage }))
 );
-// WO-NETURE-CSV-IMPORT-UI-V1
-const SupplierCsvImportPage = lazy(() =>
-  import('./pages/supplier').then((m) => ({ default: m.SupplierCsvImportPage }))
-);
+// WO-O4O-NETURE-SUPPLIER-LEGACY-CSV-IMPORT-RETIREMENT-V1:
+// 레거시 CSV Import(SupplierCsvImportPage) 은퇴 — 프로덕션 배치 이력 0건·최근 사용 0·
+// canonical 대량 등록(/supplier/products/bulk)이 CSV 업로드→등록 경로를 완전 대체.
+// lazy import 제거, /supplier/csv-import 라우트는 Navigate redirect 로 전환(아래 라우트 참조).
 // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
 const SupplierB2BContentPage = lazy(() =>
   import('./pages/supplier/SupplierB2BContentPage').then((m) => ({ default: m.default }))
@@ -835,8 +835,10 @@ function App() {
               <Route path="/supplier/library/new" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/library/:id/edit" element={<SupplierLibraryFormPage />} />
               <Route path="/supplier/partner-commissions" element={<SupplierPartnerCommissionsPage />} />
-              {/* WO-NETURE-CSV-IMPORT-UI-V1 */}
-              <Route path="/supplier/csv-import" element={<SupplierCsvImportPage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-LEGACY-CSV-IMPORT-RETIREMENT-V1:
+                  레거시 CSV Import 은퇴 → canonical 대량 등록으로 영구 redirect.
+                  북마크·직접 URL·구 링크가 빈 화면/404 로 떨어지지 않도록 replace 로 흡수. */}
+              <Route path="/supplier/csv-import" element={<Navigate to="/supplier/products/bulk" replace />} />
               {/* WO-NETURE-B2B-CONTENT-MANAGEMENT-V1 */}
               <Route path="/supplier/b2b-content" element={<SupplierB2BContentPage />} />
               {/* WO-O4O-NETURE-SUPPLIER-STORE-DESCRIPTION-ENTRY-AND-ONBOARDING-V1 */}

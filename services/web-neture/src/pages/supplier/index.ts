@@ -15,7 +15,7 @@ export { default as SupplierTrialCreatePage } from './SupplierTrialCreatePage';
 export { default as SupplierTrialListPage } from './SupplierTrialListPage';
 export { default as SupplierTrialDetailPage } from './SupplierTrialDetailPage';
 export { default as SupplierTrialEditPage } from './SupplierTrialEditPage';
-export { default as SupplierCsvImportPage } from './SupplierCsvImportPage';
+// WO-O4O-NETURE-SUPPLIER-LEGACY-CSV-IMPORT-RETIREMENT-V1: SupplierCsvImportPage 은퇴(파일 제거).
 export { default as MyForumDashboardPage } from './MyForumDashboardPage';
 export { default as RequestCategoryPage } from './RequestCategoryPage';
 // WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C
