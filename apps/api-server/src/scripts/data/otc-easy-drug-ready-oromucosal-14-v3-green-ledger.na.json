@@ -1,0 +1,122 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OROMUCOSAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "na",
+  "role": "single DB write-owner",
+  "unit": "oromucosal-unit-1",
+  "route": "oromucosal",
+  "status": "GREEN",
+  "readinessWo": "WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-READINESS-V1",
+  "basis": {
+    "approvalSsotCommit": "00851d237",
+    "approvalStatus": "APPROVED_FOR_PRODUCTION",
+    "readinessCommit": "bb2e79a22",
+    "oralRouteCompleteCommit": "3f200900a",
+    "topicalGreenCommit": "196c5de65",
+    "ophthalmicGreenCommit": "d5b583861"
+  },
+  "target": { "masterCount": 14, "contentFp": 2, "koWrite": 56, "enWrite": 28, "totalWrite": 84 },
+  "fingerprints": [
+    { "fp": "6ac6d622f0258b39", "gencode": "A87803AMS", "form": "껌", "T": 8, "sourceRef": "1c2949d8-bbd8-c6be-3a7f-7cd78b9cb964" },
+    { "fp": "b22ecff7ba810d79", "gencode": "227736ATD", "form": "구강용해필름", "T": 6, "sourceRef": "87c69452-c185-4bbe-6600-a42ca6649d4e" }
+  ],
+  "hashInvariance": {
+    "dryRunPlanDigestMd5": "14867f16e6fd0d3a1935d2c0b2b9c9b6",
+    "unchangedAfterWhitelistEdit": true,
+    "readinessArtifactsUnchanged": true,
+    "approvalSsotAndUnitLedgerUnchanged": true
+  },
+  "prereqGate": {
+    "runner": "otc-v3-oromucosal-preflight-gate.na.ts",
+    "gates": 12,
+    "pass": true,
+    "failCount": 0,
+    "detail": {
+      "G1_oralComplete": { "ko": 540, "en": 540, "easyDeprecated": 540, "easyCanonical": 0, "audit": 540 },
+      "G2_preApplyReady": { "status": "PRE_APPLY_READY", "master": 14, "fp": 2, "writePlan": { "ko": 56, "en": 28, "total": 84 } },
+      "G3_readinessArtifactsUnchanged": "6개 산출물 md5 == bb2e79a22 blob md5",
+      "G4_approvalSsotUnchanged": "3개 SSOT md5 == 00851d237 blob md5 · APPROVED_FOR_PRODUCTION · 214fp/1134master · 대상집합 일치",
+      "G5_easyAnchor": 14,
+      "G6_existingAuthoredCanonical": { "ko": 0, "en": 0, "easyDeprecated": 0 },
+      "G7_v3SourceRefConflict": 0,
+      "G8_canonicalDup": 0,
+      "G9_targetTrackAudit": 0,
+      "G10_priorRoutesGreen": { "topical": { "ko": 327, "en": 327, "audit": 327 }, "ophthalmic": { "ko": 253, "en": 253, "audit": 253 } },
+      "G11_professionalUse": { "otcCovered": 14, "nonOtc": 0, "professionalUseFps": 0 },
+      "G12_dryRunDigest": "14867f16e6fd0d3a1935d2c0b2b9c9b6"
+    }
+  },
+  "rollbackTest": {
+    "note": "화이트리스트 해제 코드 변경 후 재실행 — LIVE apply 와 동일한 execKoFp/execEnFp 공유 상태에서 재입증",
+    "txWrittenThenRolledBack": 84,
+    "fpPassed": 2,
+    "residue": { "authoredRows": 0, "v3RefRows": 0, "easyDeprecated": 0, "auditRows": 0 },
+    "residueClean": true
+  },
+  "apply": {
+    "gates": "--apply --confirm --lang + per-unit·per-lang confirm env(OTC_V3_APPLY_{KO,EN}_OROMUCOSAL_UNIT_1=CONFIRM) + PRODUCTION_WO_BY_UNIT 화이트리스트",
+    "ko": { "fp": 2, "master": 14, "written": 56, "expected": 56, "fpCommitted": 2, "fpFailed": 0, "postVerifyFails": 0 },
+    "en": { "fp": 2, "master": 14, "written": 28, "expected": 28, "fpCommitted": 2, "fpFailed": 0, "postVerifyFails": 0, "koCanonicalPrecondition": 14 },
+    "totalWritten": 84,
+    "expectedTotal": 84,
+    "match": true,
+    "transaction": "fp별 단일 트랜잭션 · TX 내 사후검증 통과 시에만 COMMIT"
+  },
+  "postVerify": {
+    "runner": "otc-v3-topical-postverify.na.ts --unit oromucosal-unit-1",
+    "ko": { "canon1": 14, "authored": 14, "easyDeprecated": 14, "easyCanonLeft": 0, "audit": 14, "sourceRefScope": 14, "sourceRefOutside": 0, "canonicalDup": 0, "contentMismatchFps": 0 },
+    "en": { "canon1": 14, "authored": 14, "canonicalDup": 0, "sourceRefScope": 14, "sourceRefOutside": 0, "hangulFps": 0, "hangulFpsDb": 0, "contentMismatchFps": 0 },
+    "sourcePreservation": { "fpChecked": 2, "officialSectionsMissingFps": 0, "variantFps": 0, "safetySectionsExpected": 5, "safetySectionsFound": 5, "numericMissingFps": 0 },
+    "isolation": "oral-unit-1/2 · topical-unit-1 · ophthalmic-unit-1 전부 peerState=applied 유지 · thisWoAudit 0 · thisUnitRefRows 0"
+  },
+  "independentVerify": {
+    "runner": "otc-v3-oromucosal-track-verify.na.ts",
+    "pass": true,
+    "failCount": 0,
+    "targetMasters": 14,
+    "contentFp": 2,
+    "koAuthoredCanonical": 14,
+    "enCanonical": 14,
+    "easyDeprecated": 14,
+    "easyStillCanonical": 0,
+    "auditKo": 14,
+    "canonicalDup": 0,
+    "sourceRefLeak": 0,
+    "storedContentHashMismatch": 0,
+    "officialSixSectionsMismatch": 0,
+    "enHangul": 0,
+    "routeExpressionMismatch": 0,
+    "measuredWrite": 84
+  },
+  "oromucosalAxis": {
+    "fp_6ac6d622f0258b39_gum": { "requiredAxes": ["씹기"], "missing": [], "swallowAxis": "not-stated" },
+    "fp_b22ecff7ba810d79_film": { "requiredAxes": ["구강 부위", "삼킴"], "missing": [], "swallowAxis": "swallow" },
+    "swallowDirectionCheck": "구강용해필름 원문은 '녹은 후 바로 삼키도록' 이므로 EN 은 swallow 지시를 보존해야 하고 금지로 역전되면 FAIL — 실측 역전 0",
+    "judgmentAxisNote": "가글·도포·분사 축은 두 fp 공식 원문에 존재하지 않으므로 요구하지 않음(공허 통과). 원문에 없는 투여 표현을 EN 에 창작 삽입하는 것은 콘텐츠 정책 위반 — ophthalmic 정정과 동일 계열"
+  },
+  "scopePostCheck": {
+    "oral_540_unchanged": { "ko": 540, "en": 540, "audit": 540 },
+    "topical_327_unchanged": { "ko": 327, "en": 327, "audit": 327 },
+    "ophthalmic_253_unchanged": { "ko": 253, "en": 253, "audit": 253 },
+    "v1v2LiveUnchanged": { "thisWoAuditOutsideTarget": 0, "v3SourceRefLeak": 0 },
+    "oromucosalMeasuredWrite": 84,
+    "trackWide": { "fp": 214, "masters": 1134, "koAuthoredCanonical": 1134, "enCanonical": 1134, "easyStillCanonical": 0, "v3Rows": 2268, "koWrite": 4536, "enWrite": 2268, "totalWrite": 6804 }
+  },
+  "codeChange": {
+    "applyRunner": "otc-v3-topical-oromucosal-apply.na.ts — PRODUCTION_WO_BY_UNIT 에 oromucosal-unit-1 승인 WO 등재(화이트리스트 해제). write SQL 무변경",
+    "postverify": "otc-v3-topical-postverify.na.ts — PRODUCTION_WO_BY_UNIT 에 oromucosal WO 추가 · PEER_UNITS 에 topical-unit-1 추가(자기 제외 필터로 양방향 동작)",
+    "newFiles": ["otc-v3-oromucosal-preflight-gate.na.ts", "otc-v3-oromucosal-track-verify.na.ts", "otc-v3-ready-1134-completion-basis-census.na.ts"],
+    "auditMetadata": "wo 는 readiness 검증본 VERBATIM 유지, 실행 WO 는 productionWo 로 병기"
+  },
+  "trackStatus": {
+    "readyV3": "COMPLETE",
+    "units": { "oral-unit-1": "GREEN", "oral-unit-2": "GREEN", "topical-unit-1": "GREEN", "ophthalmic-unit-1": "GREEN", "oromucosal-unit-1": "GREEN" },
+    "totals": { "fp": 214, "masters": 1134, "koWrite": 4536, "enWrite": 2268, "totalWrite": 6804 }
+  },
+  "officialCompletionUpdate": {
+    "runner": "otc-v3-ready-1134-completion-basis-census.na.ts",
+    "before": 14442, "delta": 1134, "after": 15576, "denominator": 19385, "rate": "80.35%",
+    "measuredDelta": "트랙 authored KO canonical master 1,134 실측(=대상 전량) · easy 잔존 0",
+    "auxCensus": { "authoredKoCanonicalMastersGlobal": 12432, "authoredEnCanonicalMastersGlobal": 12432, "easyKoCanonicalMastersRemaining": 3829 }
+  },
+  "invariants": "승인 SSOT · V3 unit ledger · readiness 산출물 미수정(실행 상태만 별도 파일로 기록) · 타 unit GREEN 파일 미접촉 · pnpm-lock.yaml/.env 미접촉"
+}

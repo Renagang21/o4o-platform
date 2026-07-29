@@ -25,8 +25,9 @@ const READINESS_WO = 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V
 // unit별 승인(실행) WO — audit metadata.productionWo 대조축. apply 러너의 PRODUCTION_WO_BY_UNIT 과 동일해야 한다.
 const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
   'topical-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+  'oromucosal-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-OROMUCOSAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
 };
-const PEER_UNITS = ['oral-unit-1', 'oral-unit-2', 'ophthalmic-unit-1', 'oromucosal-unit-1'];
+const PEER_UNITS = ['oral-unit-1', 'oral-unit-2', 'topical-unit-1', 'ophthalmic-unit-1', 'oromucosal-unit-1'];
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
 const port = (): number => { const a = arg('--port'); return a ? parseInt(a, 10) : 5472; };
 const md5 = (s: string): string => crypto.createHash('md5').update(s).digest('hex');

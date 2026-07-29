@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-READY-OROMUCOSAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1",
+  "agent": "na",
+  "recordType": "track-completion",
+  "track": "READY 1,134 V3 (content fingerprint)",
+  "status": "COMPLETE",
+  "completedAt": "2026-07-29",
+  "approvalSsotCommit": "00851d237",
+  "executionOrder": [
+    { "unit": "oral-unit-1", "route": "oral", "masters": 270, "write": 1620, "status": "GREEN" },
+    { "unit": "oral-unit-2", "route": "oral", "masters": 270, "write": 1620, "status": "GREEN" },
+    { "unit": "topical-unit-1", "route": "topical", "masters": 327, "write": 1962, "status": "GREEN", "commit": "196c5de65" },
+    { "unit": "ophthalmic-unit-1", "route": "ophthalmic", "masters": 253, "write": 1518, "status": "GREEN", "commit": "d5b583861" },
+    { "unit": "oromucosal-unit-1", "route": "oromucosal", "masters": 14, "write": 84, "status": "GREEN", "commit": "this WO" }
+  ],
+  "totals": { "fp": 214, "masters": 1134, "koWrite": 4536, "enWrite": 2268, "totalWrite": 6804 },
+  "measuredFinalState": {
+    "koAuthoredCanonical": 1134,
+    "enAuthoredCanonical": 1134,
+    "easyStillCanonical": 0,
+    "v3SourceRefRows": 2268,
+    "v3SourceRefRowsOutsideTrack": 0,
+    "v3SourceRefsUsed": 214,
+    "canonicalDup": 0
+  },
+  "contract": "V3 = content fingerprint(공식 6섹션 전량을 지문에 포함) → 원문 동질성 보장. KO 4T(easy demote · authored insert · canonical flip · audit) + EN 2T(insert · flip) = master 당 6T",
+  "officialCompletion": { "before": 14442, "delta": 1134, "after": 15576, "denominator": 19385, "rate": "80.35%" },
+  "invariants": "승인 SSOT · unit ledger · readiness 산출물 미수정. 본 파일은 실행 상태 기록 전용"
+}

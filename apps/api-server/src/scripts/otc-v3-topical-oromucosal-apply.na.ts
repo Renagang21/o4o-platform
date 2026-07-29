@@ -36,8 +36,9 @@ const WO = 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-OROMUCOSAL-CONTENT-FP-V3-FINAL-RE
 // readiness 원장 대조축 불변. 실행 WO 는 productionWo 로 병기한다(da 형제 러너와 동일 규약).
 const PRODUCTION_WO_BY_UNIT: Record<string, string> = {
   'topical-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-TOPICAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
+  'oromucosal-unit-1': 'WO-O4O-OTC-EASY-DRUG-READY-OROMUCOSAL-UNIT1-CONTENT-FP-V3-FINAL-PRODUCTION-V1',
 };
-// 승인 WO 가 있는 unit 만 LIVE 허용 — 그 외(oromucosal-unit-1 등)는 강제중지(exit 3)
+// 승인 WO 가 있는 unit 만 LIVE 허용 — 그 외는 강제중지(exit 3)
 const APPLY_ALLOWED_UNITS = Object.keys(PRODUCTION_WO_BY_UNIT);
 let PRODUCTION_WO = PRODUCTION_WO_BY_UNIT['topical-unit-1'];
 
