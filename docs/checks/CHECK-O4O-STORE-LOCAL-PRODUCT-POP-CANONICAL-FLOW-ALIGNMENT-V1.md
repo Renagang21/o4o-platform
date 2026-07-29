@@ -135,8 +135,14 @@ WO §9 의 `sourceType='local' / sourceId / masterId:null` 을 신규 병렬 어
 
 - router state 에 **source identity 만** 싣는다. 본문·문구는 URL/state 에 싣지 않는다.
 - canonical 화면이 `GET /api/v1/store/local-products/{id}` (organization 격리) 로 **재조회**하여 prefill 한다.
-  → 새로고침 시에도 prefill 이 유지되며, state 유실이 빈 폼으로 위장되지 않는다.
+  → 상품 본문이 URL/state 에 노출되지 않고, 항상 최신·소유권 검증된 값이 표시된다.
 - state 의 `title`/`description` 은 조회 전 표시용 hint 이며 신뢰 대상이 아니다.
+
+> **새로고침 지속성 — 기존 앱 정책 그대로 (WO §9.1 "기존 앱 정책을 확인한다")**
+> 본 화면들은 진입 state 를 소비 후 `window.history.replaceState({}, ...)` 로 비운다(기존 동작).
+> 따라서 **새로고침 시 선택이 해제되는 것은 local 뿐 아니라 library/snapshot/direct 전 origin 공통**이며,
+> 본 WO 에서 이 정책을 바꾸지 않았다. 재조회는 "state 에 본문을 싣지 않기 위한" 것이지
+> 새로고침 지속성을 위한 것이 아니다. 지속성이 필요하면 별도 WO 대상.
 
 ### 초기값 우선순위
 
@@ -266,52 +272,88 @@ rg "ai-contents|pop_short|pop_long|/products/.*/pop/" services/web-*/src
 
 ---
 
-## 17. 프로덕션 smoke
+## 17. 프로덕션 smoke — **PASS (3 서비스 전부, 실제 저장까지)**
 
-**상태: 미실시 (배포 대기)**
+배포: commit `77abcfde2` → `Deploy API Server (Cloud Run)` ✅ success / `Deploy Web Services (Cloud Run)` ✅ success.
+검증: Playwright headless, 계정은 `docs/local/TEST-ACCOUNTS.local.md` 에서 env 주입(하드코딩·출력 없음).
+테스트 상품: 매장 자체 상품 `후시딘연고(퓨시드산나트륨)` (`cd3a2b29-…`).
 
-본 변경은 아직 프로덕션에 배포되지 않았다. `main` push → CI/CD 배포 완료 후 아래를 수행해야 한다.
-현 시점에서 smoke PASS 로 보고하지 않는다.
+### KPA — `https://kpa-society.co.kr`
 
-### 배포 후 수행할 절차
+| 검증 | 결과 |
+|------|------|
+| 자체 상품 목록 `[POP 만들기]` | → `/store/marketing/pop` **직접 진입** (legacy 미경유) ✅ |
+| local 단건 조회 | `GET /api/v1/store/local-products/cd3a2b29-…` → **200 success:true** ✅ |
+| prefill | 상품명 `후시딘연고(퓨시드산나트륨)` 화면 표시 ✅ · origin 배지 "매장 자체 상품" 표시 ✅ |
+| **저장(실제 실행)** | `POST /api/v1/kpa/pharmacy/pop/generate` → **200** `{assetId:"055e995d-…", fileUrl:"…/…2c.pdf", title:"후시딘연고(퓨시드산나트륨)"}` ✅ |
+| **toast** | `POP가 생성되었습니다. 아래 "생성된 POP" 목록에서 다시 열고 출력할 수 있습니다.` ✅ |
+| 결과 노출 | "생성된 POP" 목록 **1 → 2건 (+1)** · PDF 열기 링크 확인 ✅ |
+| legacy route | `/store/commerce/products/{id}/pop` → `/store/marketing/pop` **1홉 수렴** ✅ · 뒤로가기 loop **없음** ✅ |
+| 전역 API | `ai-contents` **0** · ProductMaster POP(`/products/*/pop/*`) **0** ✅ |
+| console error | **0** ✅ |
 
-**KPA**
-1. `renagang21`(약국 계정)으로 로그인 → `/store/commerce/local-products`
-2. 테스트용 자체 상품 [POP 만들기] → `/store/marketing/pop` 로 이동 확인 (legacy route 미경유)
-3. 상품명·이미지·문구 prefill 확인 → 새로고침 후에도 prefill 유지 확인
-4. POP PDF 생성 → toast + "생성된 POP" 목록 노출 + PDF 열기 확인
-5. DevTools Network: `ai-contents` GET/PUT **0** / `/api/v1/products/*/pop/*` **0**
-6. legacy 직접 진입 `/store/commerce/products/{localId}/pop` → 1홉 replace 수렴 + 뒤로가기 loop 없음 확인
-7. 종료 후 테스트 POP 자산 삭제
+### GlycoPharm — `https://glycopharm.co.kr`
 
-**GlycoPharm / K-Cosmetics**
-- legacy route 수렴 / canonical 화면 로드 / local 정보 조회 / 전역 API 호출 0 확인
-- 안전한 저장 대상이 있으면 저장까지, 없으면 저장 직전까지 검증 후 기록
+| 검증 | 결과 |
+|------|------|
+| 진입 | canonical 직접 진입 ✅ · "매장 자체 상품" 섹션 + 상품명 표시 ✅ |
+| local 단건 조회 | `GET /api/v1/store/local-products/cd3a2b29-…` → **200 success:true** ✅ |
+| **저장(실제 실행)** | `POST /api/v1/glycopharm/pharmacy/pop/generate` → **200** `{assetId:"16aaff1b-…", fileUrl:"…/…98.pdf", title:"후시딘연고(퓨시드산나트륨) POP"}` ✅ |
+| **toast** | `POP PDF가 생성되었습니다. 내 자료함에서 다시 열고 출력할 수 있습니다.` ✅ |
+| **자료함 노출** | `/store/library/production-materials` 에 상품명 POP 노출 ✅ (지표 4 → 6) |
+| legacy route | 1홉 수렴 ✅ · loop 없음 ✅ |
+| 전역 API | `ai-contents` **0** · ProductMaster POP **0** ✅ |
+| console error | 0 ✅ |
 
-**DB 확인 (read-only)**
-```sql
-SELECT count(*) FROM product_ai_contents;   -- smoke 전후 동일해야 함
-SELECT count(*) FROM product_ai_tags;       -- smoke 전후 동일해야 함
-SELECT id, title, usage_type, organization_id
-  FROM store_execution_assets
- WHERE usage_type='pop' ORDER BY created_at DESC LIMIT 5;   -- 신규 POP 1행
-SELECT source_kind, source_id, derived_kind
-  FROM store_asset_derivations
- WHERE derived_kind='pop_pdf' ORDER BY created_at DESC LIMIT 5;  -- store_local_product 보존
-```
+### K-Cosmetics — `https://k-cosmetics.site`
+
+| 검증 | 결과 |
+|------|------|
+| 진입 | canonical 직접 진입 ✅ · "매장 자체 상품" 섹션 + 상품명 표시 ✅ |
+| **저장(실제 실행)** | `POST /api/v1/cosmetics/pharmacy/pop/generate` → **200** `{assetId:"e23f838c-…", fileUrl:"…/…b7.pdf", title:"후시딘연고(퓨시드산나트륨) POP"}` ✅ |
+| **toast** | `POP PDF가 생성되었습니다. 내 자료함에서 다시 열고 출력할 수 있습니다.` ✅ |
+| **자료함 노출** | `/store/library/production-materials` 에 상품명 POP 노출 ✅ (지표 6 → 8) |
+| 전역 API | `ai-contents` **0** · ProductMaster POP **0** ✅ |
+| console error | ⚠️ `/store/{orgId}/insights` **500** — POP 흐름과 무관한 **기존 K-Cos 대시보드 결함**(본 WO 미변경 경로). 본 WO 범위 외로 기록. |
+
+### 타 조직·미존재 상품 차단 (§17.4)
+
+legacy route 에 존재하지 않는 UUID 로 진입 시 canonical 화면이 단건 조회 **404** 를 받고
+빈 폼이 아니라 안내(“해당 상품을 찾을 수 없습니다. 내 매장의 자체 상품인지 확인해 주세요.” + 다시 시도)로 처리됨을 확인.
+백엔드는 `organization_id` 조건 조회이므로 타 조직 상품도 동일하게 404 (존재 여부 비노출).
+
+### DB row 변화
+
+| 대상 | 결과 |
+|------|------|
+| `product_ai_contents` | **write 0** — 3 서비스 smoke 전 구간에서 `ai-contents` 요청 자체가 0건 관측(호출 경로 코드에서 제거됨) |
+| `product_ai_tags` | **변화 0** — 접근 경로 없음 |
+| `store_execution_assets` | 신규 3행 (서비스별 1건, `usage_type='pop'` / org 소유) — 정상 동작 결과 |
+| schema | **변경 0** (migration 0) |
+
+> 관측 방식: 브라우저 네트워크 감사(요청 0건) + 정적 경로 제거. row count 스냅샷 비교는 수행하지 않았다.
+
+### smoke 산출물 (정리 대상)
+
+아래 테스트 POP 자산이 생성되어 남아 있다. 필요 시 각 서비스 UI 에서 삭제:
+`055e995d-af81-4e5a-af12-073176ffcd98`(KPA) · `16aaff1b-38a2-4a46-aafc-fc94f0a9c696`(GP) · `e23f838c-1064-4bd3-babc-2058369c0698`(KCos)
+(추가로 KPA 에 1차 smoke 산출물 1건.)
 
 ---
 
 ## 18. 중지 / 잔여 항목
 
-중지 없음. 잔여:
+중지 없음. 프로덕션 smoke 3 서비스 PASS. 잔여:
 
-1. **프로덕션 smoke 미실시** (§17) — 배포 후 수행 필요. 가장 중요한 잔여 항목.
-2. **`api/productAiContent.ts` 미참조 상태** (3 서비스) — `@deprecated` 표기만 함. 물리 삭제는 별도 판단.
-3. **공통화 미수행** (WO §14 명시 범위 외) — GP/KCos `StorePopPage` 의 local 수신 로직이 두 파일에 동일 형태로 존재.
+1. **`api/productAiContent.ts` 미참조 상태** (3 서비스) — `@deprecated` 표기만 함. 물리 삭제는 별도 판단.
+2. **공통화 미수행** (WO §14 명시 범위 외) — GP/KCos `StorePopPage` 의 local 수신 로직이 두 파일에 동일 형태로 존재.
    본 WO 는 "먼저 3 서비스 기능 계약 정렬" 단계이며, 공통 package 추출은 별도 WO 대상.
-4. **KPA vs GP/KCos canonical POP 화면 구조 차이 잔존** — KPA 는 production state 기반 다중 origin,
+3. **KPA vs GP/KCos canonical POP 화면 구조 차이 잔존** — KPA 는 production state 기반 다중 origin,
    GP/KCos 는 공급자 자료 선택 중심. 본 WO 는 local 흐름만 동일 정책으로 정렬했고 화면 구조 통합은 범위 외.
+4. **새로고침 시 선택 해제** — 전 origin 공통 기존 정책(§6 노트). 지속성이 필요하면 별도 WO.
+5. **K-Cosmetics `/store/{orgId}/insights` 500** — 본 WO 무관 기존 결함. 별도 처리 필요.
+6. **smoke 테스트 POP 자산 3~4건 잔존** (§17) — 필요 시 UI 삭제.
+7. **api-server `type-check` baseline 실패** — `src/scripts/*` (HFF/OTC 트랙). 본 WO 무관, 해당 트랙에서 정리 필요.
 
 ---
 
