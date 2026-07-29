@@ -3,7 +3,8 @@
  */
 
 export * from './kpa-member.entity.js';
-export * from './kpa-application.entity.js';
+// WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1:
+//   KpaApplication(kpa_applications) 은 dead flow(0행·소비처0) → entity·table 은퇴.
 export * from './kpa-join-inquiry.entity.js';
 export * from './kpa-member-service.entity.js';
 export * from './kpa-audit-log.entity.js';
@@ -42,7 +43,8 @@ export { KpaApprovalRequest } from './kpa-approval-request.entity.js';
 export { ServiceProduct } from './service-product.entity.js';
 // WO-O4O-KPA-CONTENT-HUB-FOUNDATION-V1
 export { KpaContent } from './kpa-content.entity.js';
-export { KpaWorkingContent } from './kpa-working-content.entity.js';
+// WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1:
+//   KpaWorkingContent(kpa_working_contents) 은 dead entity(0행·소비처0·/assets/copy 무관) → 은퇴.
 // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
 export { StorePlaylist } from './store-playlist.entity.js';
 export { StorePlaylistItem } from './store-playlist-item.entity.js';

@@ -11,7 +11,7 @@
 
 import type { Block } from '@o4o/block-renderer';
 
-/** KPA 원본 블록 타입 (kpa_contents.blocks, kpa_working_contents.edited_blocks) */
+/** KPA 원본 블록 타입 (kpa_contents.blocks) */
 export interface KpaBlock {
   type: 'text' | 'image' | 'list' | string;
   content?: string;

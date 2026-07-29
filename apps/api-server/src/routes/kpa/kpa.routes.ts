@@ -255,7 +255,14 @@ export function createKpaRoutes(dataSource: DataSource): Router {
   }));
   // WO-O4O-OPERATOR-ACTION-LAYER-V1: Action Queue endpoints
   // WO-O4O-ACTION-SCOPE-GUARD-V1: execute endpoint admin-only scope guard
-  router.use('/operator', coreRequireAuth as any, createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
+  // WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1:
+  //   action-queue 는 KPA/GlycoPharm/Cosmetics 공유 컨트롤러이므로 KPA scope 는
+  //   반드시 이 마운트 지점에서 명시한다(공유 컨트롤러 내부 수정 금지).
+  //   기존에는 GET /actions·POST /actions/dismiss 가 상위 operator-summary 라우터의
+  //   마운트 순서(먼저 mount)에 의존해 requireKpaScope('kpa:operator') 로 보호되었다.
+  //   마운트 순서와 무관하게 보호되도록 kpa:operator scope 를 명시(허용 역할 불변,
+  //   execute 는 그대로 kpa:admin executeGuard 로 더 엄격).
+  router.use('/operator', coreRequireAuth as any, requireKpaScope('kpa:operator'), createActionQueueRouter(dataSource, kpaActionConfig, requireKpaScope('kpa:admin')));
 
   // Content Approval — hub_content_submission / signage_campaign_request
   // (WO-O4O-OPERATOR-CONTENT-APPROVAL-PHASE1-V1

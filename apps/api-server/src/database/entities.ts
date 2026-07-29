@@ -306,7 +306,7 @@ import {
 // ============================================================================
 import {
   KpaMember,
-  KpaApplication,
+  // KpaApplication: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 은퇴 (dead flow)
   KpaJoinInquiry,
   KpaMemberService,
   KpaAuditLog,
@@ -322,7 +322,7 @@ import {
   StorePlaylistItem, // WO-O4O-SIGNAGE-STORE-PLAYLIST-ENGINE-V1
   KpaApprovalRequest, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
   KpaContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
-  KpaWorkingContent, // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
+  // KpaWorkingContent: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 은퇴 (dead entity)
 } from '../routes/kpa/entities/index.js';
 import { KpaLegalDocument } from '../routes/kpa/entities/kpa-legal-document.entity.js'; // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1
 // WO-O4O-KPA-REGISTER-CANONICAL-CLEANUP-V1: external_expert / supplier_staff entity 제거
@@ -783,7 +783,7 @@ export const entities = [
   // KPA ENTITIES (Pharmacist Association SaaS)
   // ============================================================================
   KpaMember,
-  KpaApplication,
+  // KpaApplication: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 은퇴
   KpaJoinInquiry,
   KpaMemberService,
   KpaAuditLog,
@@ -813,7 +813,7 @@ export const entities = [
   // WO-TYPEORM-ENTITY-REGISTRATION-P1-FIX-V1 (예방 등록)
   KpaApprovalRequest,
   KpaContent,
-  KpaWorkingContent,
+  // KpaWorkingContent: WO-O4O-KPA-OPERATOR-RESIDUAL-DEBT-CLEANUP-AND-GUARD-HARDENING-V1 은퇴
   KpaLegalDocument,
   // ============================================================================
   // PARTNER DASHBOARD ENTITIES (WO-PARTNER-DASHBOARD-API-BE-IMPLEMENTATION-V1)
