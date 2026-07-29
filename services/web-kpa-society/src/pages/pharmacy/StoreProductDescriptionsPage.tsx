@@ -14,7 +14,15 @@
  *   - 페이지형 AI 진입(AI 보조 배너 "AI로 작성" + AiContentModal + "AI 재생성") 제거.
  *   - 직접 작성/저장/prefill 및 RichTextEditor Toolbar "AI 정리"(편집 보조)는 보존.
  *
- * Backend: ProductAiContent (contentType='product_description') — 조회/저장 API 재사용.
+ * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 (2026-07-29):
+ *   전역 자원 `product_ai_contents` (ProductMaster 기준 AI 초안) 를 매장 저장소로
+ *   사용하던 구조를 제거한다. 매장이 소유·편집하는 상품 설명의 canonical 저장 위치는
+ *   `store_local_products.detail_html` 이다.
+ *     - 조회: 목록 응답 row 의 detailHtml / detail_html (추가 조회 API 없음)
+ *     - 저장: PUT /api/v1/store/local-products/:id  { detailHtml }  (부분 업데이트)
+ *   description / summary / usage_info / caution_info 는 본 화면에서 건드리지 않는다.
+ *
+ * Backend: store_local_products (Display Domain, organization_id 격리).
  *
  * 진입 시 location.state.production.source.items 가 있으면 첫 항목을 기반으로
  * 상품 선택 + 자료 description prefill 처리.
@@ -27,12 +35,9 @@ import { toast } from '@o4o/error-handling';
 import { RichTextEditor } from '@o4o/content-editor';
 import {
   fetchLocalProducts,
+  updateLocalProduct,
   type LocalProduct,
 } from '../../api/localProducts';
-import {
-  getProductAiContents,
-  saveProductAiContent,
-} from '../../api/productAiContent';
 import { mediaApi } from '../../api/media';
 import { getAccessToken } from '../../contexts/AuthContext';
 import { colors } from '../../styles/theme';
@@ -46,11 +51,14 @@ export default function StoreProductDescriptionsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [content, setContent] = useState('');
-  const [contentLoading, setContentLoading] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [model, setModel] = useState<string | null>(null);
-  const [updatedAt, setUpdatedAt] = useState<string | null>(null);
   const [prefillNote, setPrefillNote] = useState<string | null>(null);
+
+  // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 §6.5:
+  //   "목록 실패" 와 "0건" 을 구분한다. 실패를 빈 목록으로 위장하지 않는다.
+  const [listError, setListError] = useState<string | null>(null);
+  //   저장 실패는 작성 내용을 유지한 채 명시적으로 노출하고 재시도 가능해야 한다.
+  const [saveError, setSaveError] = useState<string | null>(null);
 
   // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: template 상태
   const [selectedTemplate, setSelectedTemplate] = useState<ProductionTemplate | null>(null);
@@ -64,14 +72,17 @@ export default function StoreProductDescriptionsPage() {
 
   const fetchProducts = useCallback(async () => {
     setLoading(true);
+    setListError(null);
     try {
       const res = await fetchLocalProducts({ page: 1, limit: 100, activeOnly: 'true' });
-      setProducts(res.items || []);
-      if (res.items?.length && !selectedId) {
-        setSelectedId(res.items[0].id);
+      const items = res.items || [];
+      setProducts(items);
+      if (items.length && !selectedId) {
+        setSelectedId(items[0].id);
       }
     } catch (e: any) {
-      toast.error(e?.message || '상품 목록을 불러오지 못했습니다');
+      // 실패를 "0건" 으로 위장하지 않는다 — 목록 상태를 건드리지 않고 오류를 노출한다.
+      setListError(e?.message || '매장 자체 상품을 불러오지 못했습니다.');
     } finally {
       setLoading(false);
     }
@@ -82,33 +93,28 @@ export default function StoreProductDescriptionsPage() {
     fetchProducts();
   }, [fetchProducts]);
 
-  const fetchContent = useCallback(async (productId: string) => {
-    setContentLoading(true);
-    try {
-      const res = await getProductAiContents(productId);
-      const desc = (res.data || []).find((c) => c.contentType === 'product_description');
-      const rawContent = desc?.content || '';
-      // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
-      // 저장된 내용이 없을 때 template starterHtml을 초기 구조로 적용 (1회 소비)
-      const starterHtml = starterHtmlRef.current;
-      starterHtmlRef.current = null; // consume
-      setContent(rawContent || starterHtml || '');
-      setModel(desc?.model || null);
-      setUpdatedAt(desc?.updatedAt || null);
-    } catch {
-      const starterHtml = starterHtmlRef.current;
-      starterHtmlRef.current = null;
-      setContent(starterHtml || '');
-      setModel(null);
-      setUpdatedAt(null);
-    } finally {
-      setContentLoading(false);
-    }
-  }, []);
+  /**
+   * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+   *   설명은 목록 응답 row 안에 이미 들어 있다 (신규 단건 조회 API 없음).
+   *   목록 raw SQL 은 snake_case, POST/PUT 응답 entity 는 camelCase → 둘 다 수용.
+   */
+  const readDetailHtml = (p: LocalProduct | null | undefined): string =>
+    (p?.detailHtml ?? p?.detail_html ?? '') || '';
 
   useEffect(() => {
-    if (selectedId) fetchContent(selectedId);
-  }, [selectedId, fetchContent]);
+    if (!selectedId) return;
+    const row = products.find((p) => p.id === selectedId);
+    if (!row) return;
+    const saved = readDetailHtml(row);
+    // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
+    // 저장된 내용이 없을 때 template starterHtml을 초기 구조로 적용 (1회 소비)
+    const starterHtml = starterHtmlRef.current;
+    starterHtmlRef.current = null; // consume
+    setContent(saved || starterHtml || '');
+    setSaveError(null);
+    // products 갱신(저장 직후 row refresh)으로 편집 중 내용이 덮이지 않도록 선택 변경에만 반응한다.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedId]);
 
   // WO-O4O-KPA-STORE-PRODUCTION-ENTRY-CANONICAL-CORRECTION-V1 +
   // WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1:
@@ -153,13 +159,30 @@ export default function StoreProductDescriptionsPage() {
       return;
     }
     setSaving(true);
+    setSaveError(null);
     try {
-      const res = await saveProductAiContent(selectedId, 'product_description', trimmed);
-      setModel(res.data.model || null);
-      setUpdatedAt(res.data.updatedAt || null);
-      toast.success('저장되었습니다');
+      // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+      //   detail_html 만 부분 업데이트한다. description / summary / usage_info /
+      //   caution_info 는 전송하지 않으므로 백엔드 부분 업데이트에서 보존된다.
+      const saved = await updateLocalProduct(selectedId, { detailHtml: trimmed });
+      // PUT 응답은 entity(camelCase) 이므로 updatedAt / updated_at 양쪽을 수용한다.
+      const savedAt =
+        (saved as unknown as { updatedAt?: string })?.updatedAt ??
+        saved?.updated_at ??
+        new Date().toISOString();
+      // 선택과 작성 내용을 유지한 채 해당 row 만 갱신한다.
+      setProducts((prev) =>
+        prev.map((p) =>
+          p.id === selectedId
+            ? { ...p, detailHtml: trimmed, detail_html: trimmed, updated_at: savedAt }
+            : p,
+        ),
+      );
+      toast.success('상품 설명이 저장되었습니다');
     } catch (e: any) {
-      toast.error(e?.message || '저장에 실패했습니다');
+      // 작성 내용을 초기화하지 않는다.
+      setSaveError(e?.message || '상품 설명을 저장하지 못했습니다. 작성한 내용은 유지됩니다.');
+      toast.error('상품 설명을 저장하지 못했습니다');
     } finally {
       setSaving(false);
     }
@@ -173,7 +196,8 @@ export default function StoreProductDescriptionsPage() {
   };
 
   const selectedProduct = products.find((p) => p.id === selectedId) || null;
-  const hasExisting = !!updatedAt;
+  const savedHtml = readDetailHtml(selectedProduct);
+  const hasExisting = !!savedHtml.trim();
 
   return (
     <div style={styles.container}>
@@ -222,7 +246,10 @@ export default function StoreProductDescriptionsPage() {
           lineHeight: 1.6,
         }}
       >
-        상품설명은 <strong>O4O 공용 상품 DB 기준</strong>으로 관리됩니다. 공급자 설명·AI 초안·의약품 정보 등을 바탕으로 O4O 관리자가 대표 설명을 정비합니다.
+        {/* WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+            소유 계약 정정 — 이 화면에서 저장하는 설명은 매장 자체 상품에 귀속된다. */}
+        이 화면의 상세설명은 <strong>매장 자체 상품에 저장</strong>되며, 해당 매장에서만 조회·수정됩니다.
+        O4O 공용 상품 DB(표준 상품)의 대표 설명은 O4O 관리자가 관리하며 이 화면에서 수정되지 않습니다.
         약국 특화 홍보문·이벤트 문구·POP/블로그용 문구가 필요하면 <strong>콘텐츠 만들기</strong>에서 별도 콘텐츠로 제작하세요.
       </div>
 
@@ -234,6 +261,18 @@ export default function StoreProductDescriptionsPage() {
           <h2 style={styles.sidebarTitle}>매장 자체 상품 ({products.length})</h2>
           {loading ? (
             <p style={styles.sidebarEmpty}>불러오는 중...</p>
+          ) : listError ? (
+            /* WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 §6.5:
+               조회 실패는 "0건" 과 구분해 표시하고 재시도를 제공한다. */
+            <div style={{ padding: '12px 4px' }}>
+              <p style={{ ...styles.sidebarEmpty, color: '#B91C1C' }}>
+                매장 자체 상품을 불러오지 못했습니다.
+              </p>
+              <button type="button" onClick={fetchProducts} style={styles.retryBtn}>
+                <RefreshCw size={13} />
+                다시 시도
+              </button>
+            </div>
           ) : products.length === 0 ? (
             <div style={{ padding: '12px 4px' }}>
               <p style={styles.sidebarEmpty}>등록된 매장 자체 상품이 없습니다.</p>
@@ -297,13 +336,13 @@ export default function StoreProductDescriptionsPage() {
                   )}
                 </div>
                 <div style={styles.editorMeta}>
-                  {model && <span style={styles.metaBadge}>모델: {model}</span>}
-                  {updatedAt ? (
+                  {hasExisting ? (
                     <span style={styles.metaText}>
-                      저장: {new Date(updatedAt).toLocaleString('ko-KR')}
+                      저장: {new Date(selectedProduct.updated_at).toLocaleString('ko-KR')}
                     </span>
                   ) : (
-                    <span style={styles.metaTextMuted}>저장된 결과물 없음</span>
+                    /* §6.5: "저장된 설명 없음" 은 오류가 아니다 — 편집기는 그대로 사용 가능 */
+                    <span style={styles.metaTextMuted}>저장된 상세 설명이 없습니다.</span>
                   )}
                 </div>
               </div>
@@ -323,30 +362,33 @@ export default function StoreProductDescriptionsPage() {
                 </div>
               )}
 
-              {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: RichTextEditor */}
-              {contentLoading ? (
-                <div style={styles.editorLoading}>불러오는 중...</div>
-              ) : (
-                <RichTextEditor
-                  key={selectedId ?? 'empty'}
-                  value={content}
-                  onChange={(c) => setContent(c.html)}
-                  onImageUpload={handleImageUpload}
-                  placeholder={
-                    hasExisting
-                      ? '저장된 상품 상세설명을 수정하세요.'
-                      : selectedTemplate
-                        ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
-                        : '신규 생성은 "내 자료함 → 제작 시작 → 상품 상세설명"에서 시작하세요.'
-                  }
-                  minHeight="360px"
-                  preset="full"
-                  aiRequestHeaders={(() => {
-                    const token = getAccessToken();
-                    return token ? { Authorization: `Bearer ${token}` } : undefined;
-                  })()}
-                />
+              {/* §6.5: 저장 실패 — 작성 내용은 유지된 채 명시적으로 노출하고 재시도 가능 */}
+              {saveError && (
+                <div style={styles.saveErrorBanner}>
+                  <span>{saveError}</span>
+                </div>
               )}
+
+              {/* WO-O4O-PRODUCT-DESCRIPTION-TEMPLATE-WORKFLOW-V1: RichTextEditor */}
+              <RichTextEditor
+                key={selectedId ?? 'empty'}
+                value={content}
+                onChange={(c) => setContent(c.html)}
+                onImageUpload={handleImageUpload}
+                placeholder={
+                  hasExisting
+                    ? '저장된 상품 상세설명을 수정하세요.'
+                    : selectedTemplate
+                      ? `${selectedTemplate.name} 템플릿 구조로 작성하세요.`
+                      : '상품 상세설명을 작성하세요.'
+                }
+                minHeight="360px"
+                preset="full"
+                aiRequestHeaders={(() => {
+                  const token = getAccessToken();
+                  return token ? { Authorization: `Bearer ${token}` } : undefined;
+                })()}
+              />
 
               <div style={styles.actions}>
                 <button
@@ -506,14 +548,6 @@ const styles: Record<string, CSSProperties> = {
     fontSize: '14px',
     minHeight: '300px',
   },
-  editorLoading: {
-    minHeight: '360px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: colors.neutral400,
-    fontSize: '14px',
-  },
   editorHeader: {
     display: 'flex',
     justifyContent: 'space-between',
@@ -548,16 +582,6 @@ const styles: Record<string, CSSProperties> = {
     alignItems: 'flex-end',
     gap: '4px',
     flexShrink: 0,
-  },
-  metaBadge: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    padding: '2px 6px',
-    background: '#EFF6FF',
-    color: colors.primary,
-    borderRadius: '4px',
-    fontSize: '11px',
-    fontWeight: 500,
   },
   metaText: {
     fontSize: '11px',
@@ -619,6 +643,31 @@ const styles: Record<string, CSSProperties> = {
     fontWeight: 500,
     textDecoration: 'none',
     marginTop: '4px',
+  },
+  // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1 §6.5
+  retryBtn: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '5px',
+    padding: '6px 10px',
+    background: '#FEF2F2',
+    border: '1px solid #FECACA',
+    borderRadius: '6px',
+    fontSize: '12px',
+    color: '#B91C1C',
+    fontWeight: 500,
+    cursor: 'pointer',
+    marginTop: '4px',
+  },
+  saveErrorBanner: {
+    margin: '0 0 12px',
+    padding: '10px 14px',
+    background: '#FEF2F2',
+    border: '1px solid #FECACA',
+    borderRadius: '8px',
+    fontSize: '13px',
+    color: '#B91C1C',
+    lineHeight: 1.5,
   },
   libraryLink: {
     display: 'inline-flex',

@@ -151,7 +151,11 @@ export function createStoreLocalProductRoutes(
 
       const [items, countResult] = await Promise.all([
         dataSource.query(
-          `SELECT id, name, description, summary, images, thumbnail_url, gallery_images,
+          // WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+          //   detail_html 는 이미 스키마·PUT 입력·태블릿 소비 경로에 존재하지만
+          //   목록 응답에서만 누락되어 있었다. 매장 상품 설명 화면이 저장된 값을
+          //   되읽으려면 필요하므로 기존 컬럼을 응답에 포함한다 (신규 컬럼·신규 API 0).
+          `SELECT id, name, description, summary, detail_html, images, thumbnail_url, gallery_images,
                   category, barcode, price_display, badge_type, highlight_flag,
                   is_active, sort_order, created_at, updated_at
            FROM store_local_products

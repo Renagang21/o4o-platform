@@ -22,6 +22,13 @@ export interface LocalProduct {
   name: string;
   description: string | null;
   summary: string | null;
+  /**
+   * WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1:
+   *   매장 상품 상세 설명의 canonical 저장 위치. 목록 응답은 raw SQL snake_case,
+   *   POST/PUT 응답은 entity camelCase 이므로 소비처에서 둘 다 수용한다.
+   */
+  detail_html?: string | null;
+  detailHtml?: string | null;
   category: string | null;
   // WO-O4O-KPA-STORE-LOCAL-PRODUCT-REGISTRATION-ENHANCEMENT-V1: 선택 입력 바코드(빈 값=null)
   barcode: string | null;
@@ -41,6 +48,8 @@ export interface LocalProductInput {
   name: string;
   description?: string;
   summary?: string;
+  /** WO-O4O-STORE-PRODUCT-DESCRIPTION-OWNERSHIP-ALIGNMENT-V1: 매장 소유 상세 설명 (부분 업데이트) */
+  detailHtml?: string;
   category?: string;
   barcode?: string;
   priceDisplay?: string;
