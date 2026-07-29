@@ -96,16 +96,21 @@ A docs/checks/CHECK-O4O-NETURE-SUPPLIER-GUARD-IA-NOTIFICATION-AND-RESIDUAL-DEFEC
 
 ---
 
-## 8. 브라우저 smoke (배포 후 기재)
+## 8. 브라우저 smoke (2026-07-29 배포 후 수행)
 
-_배포 후 실브라우저 관측으로 갱신._
+배포: `18d1bcef0` → GitHub Actions **Deploy Web Services** success + **Deploy API Server** success. Neture admin(sohae2100) 로그인 후 실브라우저 관측.
 
 | 관측 | 결과 |
 |------|:----:|
-| `/workspace/supplier/requests` → `/supplier` (blank/404/loop 0) | _대기_ |
-| admin 대시보드 "공급사 승인" 카드 → `/admin/supplier-governance` | _대기_ |
-| 공급자 canonical 공간(`/supplier/dashboard` 등) 정상 · console error 0 | _대기_ |
-| 운영 mutation 0 | _대기_ |
+| `/workspace/supplier/requests` → `/supplier` redirect, SupplierLandingPage 전체 렌더(blank/404/loop **0**) | ✅ |
+| admin 대시보드 Policy "공급사 승인 대기" 링크 = `/admin/supplier-governance` | ✅ |
+| admin 대시보드 Structure Action "공급사 승인" 링크 = `/admin/supplier-governance` (기존 `/admin/admin-suppliers` 잔존 0) | ✅ |
+| `/admin/supplier-governance` 도착 페이지 렌더("공급자 상태 관리" · governance 테이블 · 활성 2) | ✅ |
+| governance 페이지 정책 안내 "승인·거절은 운영자 승인 콘솔에서 처리" 노출 → operator/admin 분리 불변 | ✅ |
+| console error: anon `/supplier` 의 401 auth/me·auth/refresh(비로그인 정상 동작)만, redirect/링크 유발 error 0 | ✅ |
+| 운영 supplier 상태 mutation **0** (read-only 관측만) | ✅ |
+
+> D2(offer-approval serviceKey)·D3(승인/반려 알림)은 런타임 상태전이 시점 생성 경로 — 프로덕션 supplier 상태를 변경하지 않는 제약상 live mutation smoke 미수행. 코드 경로(수신자 scope·guard-safe deep link·fire-and-forget)로 검증.
 
 ---
 
