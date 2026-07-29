@@ -115,7 +115,12 @@ KPA 운영자 감사 로그(`kpa_operator_audit_logs`)의 실제 emitter·DB 값
 
 - typecheck: api-server 변경 파일 0 error (`src/scripts/*` 기존 노이즈는 build tsconfig 제외), `tsc -p tsconfig.build.json` EXIT=0; web-kpa-society `tsc --noEmit` EXIT=0.
 - build: api-server EXIT=0, web-kpa-society `vite build` ✓ EXIT=0.
-- 배포: push → CI(detect-changes)로 `o4o-core-api` + `kpa-society-web` 자동 배포. (리비전·smoke 결과는 아래 완료 보고에서 갱신)
+- 배포: push(`c3e91c7e2`) → CI 자동 배포 성공 — `o4o-core-api-02983-qvd` · `kpa-society-web-01736-gnc`.
+- 실브라우저 smoke (Playwright, kpa:admin `sohae2100`, `/operator/audit-logs`, 프로덕션 API `api.neture.co.kr`):
+  - 헤더 **총 261건** = census 총계 일치.
+  - 액션 필터 = 16 라벨 전량 노출. 대상 필터 = `전체 대상/회원/콘텐츠/콘텐츠/신청서` 4종만(강의/자료/약국/매장 dead 라벨 제거 확인).
+  - 목록 렌더: `콘텐츠 수정`(CONTENT_UPDATED, channel/listing metadata)·`콘텐츠 삭제`·`콘텐츠 생성`·`회원 상태 변경`(pending→active) 정상 라벨+색상 뱃지, metadata 요약, 크래시/ErrorBoundary 없음. pagination 1/14.
+  - 필터 round-trip: 액션 `신청서 검토`(APPLICATION_REVIEWED, legacy) 선택 → **총 3건**, 대상 `신청서`(application legacy)·상세 `승인` 정상 표시 → legacy 값 라벨+필터+census(3) 일치 검증.
 
 ## 12. 잔여 미매핑 census
 
@@ -125,4 +130,5 @@ KPA 운영자 감사 로그(`kpa_operator_audit_logs`)의 실제 emitter·DB 값
 
 ## 13. 커밋
 
-- 코드 + CHECK: 아래 완료 보고 SHA 참조.
+- 코드(entity·kpa.routes·AuditLogPage) + CHECK 초안: `c3e91c7e2`
+- CHECK smoke/배포 결과 갱신: 본 문서 커밋 (완료 보고 참조)
