@@ -46,7 +46,8 @@ import { createOperatorProductApprovalController } from './controllers/operator-
 // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: createOperatorCurationController 제거
 import { createOperatorActionQueueController } from './controllers/operator-action-queue.controller.js';
 import { createAdminDashboardController } from './controllers/admin-dashboard.controller.js';
-import { createOperatorSupplierQualityController } from './controllers/operator-supplier-quality.controller.js';
+// WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
+// createOperatorSupplierQualityController 은퇴 — CSV import 품질 리포트 endpoint(소비처 0, redirect-only frontend).
 import { createOperatorCategoryMappingController } from './controllers/operator-category-mapping.controller.js';
 import { createOperatorRecruitingController } from './controllers/operator-recruiting.controller.js';
 import { createOperatorRecruitmentExposureController } from './controllers/operator-recruitment-exposure.controller.js';
@@ -174,8 +175,10 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: operator-curation 라우터 제거
   // WO-O4O-OPERATOR-ACTION-QUEUE-V1
   router.use('/operator', createOperatorActionQueueController(dataSource));
-  // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1
-  router.use('/operator', createOperatorSupplierQualityController(dataSource));
+  // WO-O4O-NETURE-SUPPLIER-QUALITY-REPORT-V1 → 은퇴
+  // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
+  // GET /operator/supplier-quality mount 제거 (소비처 0). CSV import 백엔드/테이블은 admin-dashboard
+  // BulkImportPage 가 upload endpoint 를 여전히 소비하므로 HOLD_EXTERNAL_CONSUMER 로 보존.
   // WO-NETURE-CATEGORY-MAPPING-RULE-SYSTEM-V1
   router.use('/operator', createOperatorCategoryMappingController());
   // WO-NETURE-RECRUITING-PRODUCTS-OPERATOR-MUTATION-API-V1

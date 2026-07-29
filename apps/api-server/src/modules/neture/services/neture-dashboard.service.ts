@@ -521,27 +521,32 @@ export class NetureDashboardService {
       const recentOrders7d = 0;
       const trend = 'none';
 
+      // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
+      // seller(=매장 경영자, store_owner) actionUrl 정본화. 기존 `/neture/seller/*` 는 API 경로 형태로
+      // 프론트 route 가 아니어서(현재 어떤 네비게이션도 소비하지 않아 런타임 데드링크는 없음) latent 정합만 교정.
+      // seller≠supplier 이므로 `/supplier/*` 로 옮기지 않고 seller scope 의 canonical `/store/*`(MainLayout, backend-gated)로 정렬한다.
+      // 전용 상세 페이지가 없는 requests 는 가장 가까운 canonical 목록(/store/manage/products)로 연결.
       return {
         products: {
           accessible,
           newThisWeek,
           notRequested,
-          actionUrl: '/neture/seller/available-supply-products',
+          actionUrl: '/store/manage/products/library',
         },
         requests: {
           pending,
           approved,
           rejected,
-          actionUrl: '/neture/seller/supply-requests',
+          actionUrl: '/store/manage/products',
         },
         exposure: {
           approvedButNotExposed,
-          actionUrl: '/neture/seller/my-products',
+          actionUrl: '/store/my-products',
         },
         operations: {
           recentOrders7d,
           trend,
-          actionUrl: '/neture/seller/orders',
+          actionUrl: '/store/orders',
         },
       };
     } catch (error) {

@@ -401,6 +401,16 @@ export class NetureSupplierService {
           logger.info(
             `[NetureSupplierService] Supplier deactivated: ${supplierId} by ${adminUserId} (revoked ${result.data?.revokedApprovalCount} approvals)`,
           );
+          // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
+          // 비활성화 알림 — 커밋 성공 + role 회수 후 fire-and-forget. supplier role 이 제거되어 /supplier/* 는
+          // guard 차단되므로 guard-safe 한 /mypage/business-profile 로 안내. 사유 원문은 본문에 넣지 않는다.
+          await this.notifySupplierAccount(
+            result.data.userId as string | null,
+            '공급자 계정이 비활성화되었습니다',
+            '계정이 비활성화되어 공급자 기능 이용이 중단되었습니다. 자세한 내용은 사업자 프로필에서 확인해 주세요.',
+            '/mypage/business-profile',
+            { supplierId, status: SupplierStatus.INACTIVE },
+          );
         }
         return result;
       });
@@ -477,6 +487,15 @@ export class NetureSupplierService {
         }
         if (result.success) {
           logger.info(`[NetureSupplierService] Supplier reactivated: ${supplierId} by ${adminUserId}`);
+          // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
+          // 재활성화 알림 — 커밋 성공 + role 복구 후 fire-and-forget. role 이 복구되어 /supplier/dashboard guard 통과.
+          await this.notifySupplierAccount(
+            result.data.userId as string | null,
+            '공급자 계정이 재활성화되었습니다',
+            '계정이 재활성화되어 공급자 기능을 다시 이용할 수 있습니다. 상품 승인·매장 진열은 다시 신청해 주세요.',
+            '/supplier/dashboard',
+            { supplierId, status: SupplierStatus.ACTIVE },
+          );
         }
         return result;
       });
