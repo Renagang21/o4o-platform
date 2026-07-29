@@ -1,0 +1,421 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-REMAINING-MASTER-BY-MASTER-PILOT-500-QUEUE-V1",
+  "consumer": "agent-na",
+  "producer": "agent-ga",
+  "liveDbWrite": 0,
+  "batchId": "otc-v4-pilot-500",
+  "exceptionHandoffSchema": {
+    "$schemaName": "otc-v4-master-by-master-exception-handoff",
+    "version": 1,
+    "recordPerFailedMaster": true,
+    "invariant": [
+      "실패 master 의 dbWriteActual 은 반드시 0",
+      "agent-na 는 DB write 0",
+      "재진입 후 write owner 는 항상 agent-ga"
+    ],
+    "required": {
+      "masterId": "uuid",
+      "productCode": "string(품목기준코드) | null",
+      "productName": "string",
+      "sourceHoldClass": "HOLD_IDENTITY|HOLD_ROUTE|HOLD_SOURCE",
+      "exceptionCode": "string(§exceptionCodes 중 하나 — 미분류는 OTHER_REVIEW_REQUIRED)",
+      "failedStage": "preflight|screen|identity|route|source|compose|translate|persist|verify",
+      "officialSectionPresence": "{\"효능·효과\":0|1,\"용법·용량\":0|1,\"경고\":0|1,\"사용상 주의사항\":0|1,\"이상반응\":0|1,\"상호작용\":0|1}",
+      "officialSourceHash": "md5(hex) | null",
+      "candidateRoute": "oral|topical|ophthalmic|oromucosal|vaginal|null",
+      "identitySnapshot": "{gencode: string|null, gencodeCount: number, permitCodeCount: number, officialSourceHashCount: number, classKinds: string[], atcCode: string|null}",
+      "numericTokens": "{digitTokens: number, hasUnicodeFraction: boolean, hasAgeToken: boolean, hasDurationToken: boolean}",
+      "existingCanonicalState": "{authoredKo: number, en: number}",
+      "sourceRefState": "{planned: uuid, liveConflict: number}",
+      "dbWriteActual": "number — 실패 레코드는 반드시 0",
+      "retryable": "boolean",
+      "recommendedAction": "string(나 에이전트 조치 제안)",
+      "reproductionCommand": "string(단일 master 재현 커맨드)"
+    },
+    "optional": {
+      "detail": "string",
+      "batchId": "string",
+      "occurredAtSourceRef": "otc-v4-master-leaflet:<masterId>",
+      "stratum": "A_NORMAL|B_BOUNDARY|C_SOURCE_COMPOSER",
+      "expectedExceptionCode": "string|null"
+    },
+    "naGroupingAxes": [
+      "route 미확정(ROUTE_UNRESOLVED)",
+      "identity 충돌(IDENTITY_CONFLICT — 정정 기준)",
+      "수치 파싱 실패(NUMERIC_PARSE_FAILED)",
+      "연령·기간 파싱 실패(AGE_PARSE_FAILED, DURATION_PARSE_FAILED)",
+      "공식 원문 결손(SOURCE_*_MISSING)",
+      "composer 미지원 구조(COMPOSER_SECTION_UNSUPPORTED, ROUTE_CONFLICT)",
+      "전문용 의심(PROFESSIONAL_USE)",
+      "canonical·sourceRef 충돌(EXISTING_CANONICAL_CONFLICT, SOURCE_REF_CONFLICT)"
+    ],
+    "naGroupReportFields": [
+      "expectedCount",
+      "commonCause",
+      "commonFixPossible",
+      "parserOrProfileFixPossible",
+      "gaReentryCondition",
+      "holdCondition"
+    ]
+  },
+  "exceptionCodes": [
+    {
+      "code": "IDENTITY_MISSING",
+      "category": "EXCEPTION_IDENTITY",
+      "stage": "identity",
+      "meaning": "표준코드 행 또는 품목 identity 축 자체가 부재",
+      "retryable": true,
+      "perMasterOnly": true,
+      "note": "per-master 모델에서는 자기 원문 grounding 으로 생산 가능 — 단독으로는 예외 아님(정보 기록용)"
+    },
+    {
+      "code": "IDENTITY_CONFLICT",
+      "category": "EXCEPTION_IDENTITY",
+      "stage": "identity",
+      "meaning": "(정정) permitCodeCount>=2 · 서로 다른 공식 원문 hash 다중 · 성분/함량/제형 상충 · master↔공식원문 단일 확정 불가",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "⚠️ gencodeCount>=2 단독은 더 이상 충돌 사유가 아니다(pilot 100 실측: 12건 중 10건 정상 생산). 정정 근거 = otc-easy-drug-remaining-pilot-500-identity-criteria-correction-v1.md"
+    },
+    {
+      "code": "ROUTE_UNRESOLVED",
+      "category": "EXCEPTION_ROUTE",
+      "stage": "route",
+      "meaning": "gencode·공식 용법 원문 어느 축에서도 투여경로 미검출",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "제품명 추론 금지 — na 가 원문/제형 근거로 확정"
+    },
+    {
+      "code": "ROUTE_CONFLICT",
+      "category": "EXCEPTION_ROUTE",
+      "stage": "route",
+      "meaning": "공식 용법 원문에 비경구 경로 동사 2종 이상 동시 출현",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "subgroup 분리 또는 대표경로 확정 필요"
+    },
+    {
+      "code": "SOURCE_EFFICACY_MISSING",
+      "category": "EXCEPTION_SOURCE",
+      "stage": "source",
+      "meaning": "공식 원문 효능·효과 섹션 부재/공란",
+      "retryable": false,
+      "perMasterOnly": false,
+      "note": "ETL 재수집 전 terminal — 창작 금지"
+    },
+    {
+      "code": "SOURCE_DOSAGE_MISSING",
+      "category": "EXCEPTION_SOURCE",
+      "stage": "source",
+      "meaning": "공식 원문 용법·용량 섹션 부재/공란",
+      "retryable": false,
+      "perMasterOnly": false,
+      "note": "ETL 재수집 전 terminal — 창작 금지"
+    },
+    {
+      "code": "NUMERIC_PARSE_FAILED",
+      "category": "EXCEPTION_COMPOSER",
+      "stage": "compose",
+      "meaning": "용법 수치(횟수/용량) 토큰 파싱 실패",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "unicode ½ 등 비-digit 분수 포함 — parser 보완 대상"
+    },
+    {
+      "code": "AGE_PARSE_FAILED",
+      "category": "EXCEPTION_COMPOSER",
+      "stage": "compose",
+      "meaning": "연령 구분(소아/성인/월령) 파싱 실패",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "profile 보완 대상"
+    },
+    {
+      "code": "DURATION_PARSE_FAILED",
+      "category": "EXCEPTION_COMPOSER",
+      "stage": "compose",
+      "meaning": "투여 기간·연용 한도 파싱 실패",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "profile 보완 대상"
+    },
+    {
+      "code": "COMPOSER_SECTION_UNSUPPORTED",
+      "category": "EXCEPTION_COMPOSER",
+      "stage": "compose",
+      "meaning": "공식 섹션 구조가 composer 프로파일 미지원",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "route profile 신설 후 재편입"
+    },
+    {
+      "code": "TRANSLATION_VALIDATION_FAILED",
+      "category": "EXCEPTION_TRANSLATION",
+      "stage": "translate",
+      "meaning": "EN 산출물이 KO canonical 의 수치·연령·금기 축을 보존하지 못함",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "KO canonical 선행 필수 — KO 미확정 시 HELD_KO_NOT_CANONICAL(예외 아님)"
+    },
+    {
+      "code": "PROFESSIONAL_USE",
+      "category": "EXCEPTION_PROFESSIONAL",
+      "stage": "screen",
+      "meaning": "전문의약품/수술·시술용 표지",
+      "retryable": false,
+      "perMasterOnly": false,
+      "note": "운영자 판단 전 terminal — 정상 대기열 편입 금지"
+    },
+    {
+      "code": "EXISTING_CANONICAL_CONFLICT",
+      "category": "EXCEPTION_IDENTITY",
+      "stage": "preflight",
+      "meaning": "해당 master 슬롯에 기존 authored/en canonical 존재",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "기존 LIVE 변경 금지 — 운영자 승인 없이는 terminal. pilot 100 GREEN 80 도 이 코드로 자동 격리된다"
+    },
+    {
+      "code": "SOURCE_REF_CONFLICT",
+      "category": "EXCEPTION_IDENTITY",
+      "stage": "preflight",
+      "meaning": "V4 sourceRef 가 이미 LIVE 행에 점유됨",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "namespace 산식 재검토 — 반복 시 시스템 중지 조건"
+    },
+    {
+      "code": "OTHER_REVIEW_REQUIRED",
+      "category": "EXCEPTION_OTHER",
+      "stage": "any",
+      "meaning": "상기 어느 코드에도 해당하지 않는 검토 필요",
+      "retryable": true,
+      "perMasterOnly": false,
+      "note": "분류 불가 건은 반드시 이 코드로 원장에 남긴다(누락 금지)"
+    }
+  ],
+  "systemStopConditions": [
+    {
+      "id": "SYS-01",
+      "condition": "master 와 공식 원문이 잘못 연결됨(officialSourceHash 가 원장과 불일치)",
+      "detect": "생산 직전 master 별 officialSourceHash 재계산 후 pilot 원장 대조"
+    },
+    {
+      "id": "SYS-02",
+      "condition": "서로 다른 master 의 원문이 혼합됨",
+      "detect": "산출 본문에 타 master 의 품목기준코드/제품명 토큰 출현 검사"
+    },
+    {
+      "id": "SYS-03",
+      "condition": "정상(A) 제품에서 공식 6섹션이 누락됨",
+      "detect": "A 산출물의 섹션 수가 원장 officialSectionCount 미만"
+    },
+    {
+      "id": "SYS-04",
+      "condition": "sourceRef 산식이 2건 이상에서 충돌",
+      "detect": "SOURCE_REF_CONFLICT 누적 ≥ 2"
+    },
+    {
+      "id": "SYS-05",
+      "condition": "canonicalDup 반복 발생",
+      "detect": "(master, description_type, language) canonical 중복 ≥ 1 (즉시 중지)"
+    },
+    {
+      "id": "SYS-06",
+      "condition": "성공 master 와 실패 master 를 분리할 수 없음",
+      "detect": "배치 종료 시 perMaster outcome 합 ≠ 입력 500"
+    },
+    {
+      "id": "SYS-07",
+      "condition": "실패 master 에 DB write 발생",
+      "detect": "실패 master 의 dbWriteActual > 0"
+    },
+    {
+      "id": "SYS-08",
+      "condition": "기존 LIVE 제품이 변경됨",
+      "detect": "target 밖 master 의 shared_product_descriptions 변경 감지"
+    },
+    {
+      "id": "SYS-09",
+      "condition": "재실행 시 완료 master 가 중복 반영됨",
+      "detect": "재실행 결과 CREATED > 0 (정상은 전량 SKIPPED)"
+    },
+    {
+      "id": "SYS-10",
+      "condition": "transaction/savepoint 격리 미작동",
+      "detect": "ROLLBACK 후 잔여 row(residue) > 0"
+    },
+    {
+      "id": "SYS-11",
+      "condition": "DB commit 결과를 신뢰할 수 없음",
+      "detect": "TX 내 사후검증과 별개 코드경로 track-verify 결과 불일치"
+    },
+    {
+      "id": "SYS-12",
+      "condition": "다른 세션의 LIVE write 감지",
+      "detect": "배치 전후 target 밖 STORE canonical count/max(updated_at) 변동"
+    },
+    {
+      "id": "SYS-13",
+      "condition": "pilot 100 GREEN 80 이 변경됨",
+      "detect": "GREEN 80 master 의 (content_hash, source_ref_id, status, updated_at) 배치 전후 스냅샷 비교 — 변경 ≥ 1 즉시 중지"
+    },
+    {
+      "id": "SYS-14",
+      "condition": "pilot 100 예외 20 에 DB write 발생",
+      "detect": "예외 20 master 의 STORE canonical row count 배치 전후 증가 ≥ 1"
+    },
+    {
+      "id": "SYS-15",
+      "condition": "완료 master 자동 skip 실패",
+      "detect": "이미 authored ko+en canonical 을 가진 master 에 CREATED > 0"
+    },
+    {
+      "id": "SYS-16",
+      "condition": "checkpoint 이후 재개 시 중복 write",
+      "detect": "checkpoint 재개 구간의 master 별 write 합 > 계약 기대치(GREEN×6T)"
+    },
+    {
+      "id": "SYS-17",
+      "condition": "master 별 sourceRef 가 다른 master 에 재사용됨",
+      "detect": "source_ref_id → master_id 매핑이 1:1 아님(동일 ref 가 2개 이상 master 에 존재)"
+    }
+  ],
+  "perMasterContinue": {
+    "rule": "제품 단위 실패는 전체 배치를 중지하지 않는다",
+    "onFailure": [
+      "해당 master DB write 0(savepoint 또는 독립 transaction ROLLBACK)",
+      "예외 원장 1행 기록(필수 필드 누락 0)",
+      "다음 master 로 계속",
+      "배치 전체 중지 금지"
+    ],
+    "notStopConditions": [
+      "개별 제품의 route 미확정",
+      "개별 제품의 identity 충돌",
+      "개별 제품의 수치/연령/기간 파싱 실패",
+      "개별 제품의 공식 원문 결손",
+      "개별 제품의 composer 미지원",
+      "성공률 자체"
+    ]
+  },
+  "expansionGateRemainingAll": [
+    {
+      "id": "EXPALL-01",
+      "gate": "500 전량 처리(processed = 500, 중단 0)"
+    },
+    {
+      "id": "EXPALL-02",
+      "gate": "개별 실패 후 다음 master 계속 처리"
+    },
+    {
+      "id": "EXPALL-03",
+      "gate": "실패 master DB residue 0"
+    },
+    {
+      "id": "EXPALL-04",
+      "gate": "정상 생산 master 공식 6섹션 mismatch 0"
+    },
+    {
+      "id": "EXPALL-05",
+      "gate": "수치·연령·기간 누락 0"
+    },
+    {
+      "id": "EXPALL-06",
+      "gate": "canonicalDup 0"
+    },
+    {
+      "id": "EXPALL-07",
+      "gate": "sourceRef 충돌·누출 0"
+    },
+    {
+      "id": "EXPALL-08",
+      "gate": "기존 LIVE 변경 0"
+    },
+    {
+      "id": "EXPALL-09",
+      "gate": "pilot 100 GREEN 80 불변"
+    },
+    {
+      "id": "EXPALL-10",
+      "gate": "재실행 시 완료 master 자동 skip"
+    },
+    {
+      "id": "EXPALL-11",
+      "gate": "예외 원장 누락·중복 0"
+    },
+    {
+      "id": "EXPALL-12",
+      "gate": "checkpoint 재개 PASS"
+    },
+    {
+      "id": "EXPALL-13",
+      "gate": "독립검증(별개 코드경로) PASS"
+    },
+    {
+      "id": "EXPALL-14",
+      "gate": "시스템 수준 오류 0(SYS-01~SYS-17 미발동)"
+    },
+    {
+      "id": "EXPALL-NOT",
+      "gate": "성공률은 절대 전량 확대 차단 기준이 아니다"
+    }
+  ],
+  "finalVerdictEnum": [
+    "APPROVED_FOR_REMAINING_ALL",
+    "NEEDS_PIPELINE_FIX",
+    "SYSTEM_STOP"
+  ],
+  "identityCriteriaCorrection": {
+    "wo": "WO §3",
+    "removed": "gencodeCount >= 2 단독 → IDENTITY_CONFLICT",
+    "kept": [
+      "permitCodeCount >= 2",
+      "서로 다른 공식 원문 hash 다중(officialSourceHashCount >= 2)",
+      "성분·함량·제형 또는 품목 identity 상충",
+      "master↔공식원문 단일 확정 불가"
+    ],
+    "evidence": "pilot 100 사전 IDENTITY_CONFLICT 12건 중 10건 GREEN 생산 · 2건 실패(사유는 ROUTE_UNRESOLVED, identity 아님)",
+    "effect": {
+      "reclassifiedTotal": 600,
+      "byTransition": {
+        "IDENTITY_CONFLICT → READY": 340,
+        "IDENTITY_CONFLICT → ROUTE_UNRESOLVED": 260
+      }
+    },
+    "document": "otc-easy-drug-remaining-pilot-500-identity-criteria-correction-v1.md",
+    "immutability": "pilot 100 원장·결과 파일은 수정하지 않는다(읽기 전용)"
+  },
+  "carriedOverExceptions": {
+    "rule": "pilot 100 예외 20 은 pilot 500 정상 생산 대기열에 재편입하지 않는다. agent-na 전용 예외 원장에 그대로 유지한다.",
+    "source": "otc-v4-pilot-100-exception-handoff-na.ga.json",
+    "total": 20,
+    "byCode": {
+      "ROUTE_UNRESOLVED": 6,
+      "ROUTE_CONFLICT": 4,
+      "SOURCE_EFFICACY_MISSING": 10
+    }
+  },
+  "naBatchClosureMethod": {
+    "rule": "시험/전량 생산 종료 후 예외를 제품 순서가 아니라 원인별로 묶어 일괄 마무리한다",
+    "groups": [
+      "route 미확정(ROUTE_UNRESOLVED)",
+      "identity 충돌(IDENTITY_CONFLICT — 정정 기준)",
+      "수치 파싱 실패(NUMERIC_PARSE_FAILED)",
+      "연령·기간 파싱 실패(AGE_PARSE_FAILED, DURATION_PARSE_FAILED)",
+      "공식 원문 결손(SOURCE_*_MISSING)",
+      "composer 미지원 구조(COMPOSER_SECTION_UNSUPPORTED, ROUTE_CONFLICT)",
+      "전문용 의심(PROFESSIONAL_USE)",
+      "canonical·sourceRef 충돌(EXISTING_CANONICAL_CONFLICT, SOURCE_REF_CONFLICT)"
+    ],
+    "perGroupReport": [
+      "expectedCount",
+      "commonCause",
+      "commonFixPossible",
+      "parserOrProfileFixPossible",
+      "gaReentryCondition",
+      "holdCondition"
+    ],
+    "invariant": "agent-na 는 DB write 0 · 재편입 승인 후 write 는 항상 agent-ga"
+  }
+}
