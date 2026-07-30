@@ -1,0 +1,63 @@
+{
+ "builtAt": "2026-07-30T11:18:08.013Z",
+ "wo": "WO-O4O-HFF-KO-PROBIOTICS-WOMAN-OFFICIAL-FUNCTION-SECTION-APPLY-V1",
+ "decision": {
+  "heading": "공식 인정 기능성",
+  "variant": "A_FAMILY_NATIVE_HEADING",
+  "scope": "#35 단건",
+  "sdIntroModified": false
+ },
+ "drift": {
+  "canonicalPresent": true,
+  "hashMatchesProposalBase": true,
+  "masterMatches": true,
+  "attrsOk": true,
+  "candidateLinkOk": true,
+  "sourceUnchanged": true
+ },
+ "checks": {
+  "insertPointFound": true,
+  "rebuiltMatchesProposal": true,
+  "introUnchanged": true,
+  "footUnchanged": true,
+  "allOldHeadingsKept": true,
+  "outsideIdentical": true,
+  "allClausesVerbatim": true,
+  "clausesInNew": 3,
+  "clausesExpected": 3,
+  "classesOk": true,
+  "balanced": true,
+  "noEmpty": true,
+  "familyPreserved": true,
+  "singleFunctionSection": true,
+  "lenDelta": 133
+ },
+ "gateOk": true,
+ "expectedUpdate": 1,
+ "targets": [
+  {
+   "targetIndex": 1,
+   "pilotIndex": 35,
+   "candidateId": "4b5975c9-0c61-4b06-9acd-aa2ed4081281",
+   "statementNo": "20040015070125",
+   "productName": "프로바이오틱스우먼",
+   "productMasterId": "e870ead8-b553-4e14-ac4d-b467ba4fff47",
+   "canonicalId": "f47c0032-72ad-46a7-8d4b-d1cd9c5e3806",
+   "rendererFamily": "WAE_I_JEPUM",
+   "patchOperation": "INSERT_OFFICIAL_FUNCTION_SECTION",
+   "insertedHeading": "공식 인정 기능성",
+   "insertedClauses": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+    "배변활동 원활에 도움을 줄 수 있음",
+    "장건강에 도움을 줄 수 있음"
+   ],
+   "insertedBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프로바이오틱스우먼<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)비피도 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 분말 · (주)비피도 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1억/2g) 이상</div><div class=\"sd-item\"><b>성상</b> 미황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 습기가 없는 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "oldContentHash": "ebfee8aed7ac8e25eb1e6fea50f764aa458ec029c343dc7aaaad4870f774ee13",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프로바이오틱스우먼<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)비피도 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 분말 · (주)비피도 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1억/2g) 이상</div><div class=\"sd-item\"><b>성상</b> 미황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 습기가 없는 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "newContentHash": "5b091172c2ce309d2f21dc5d280983ea253f3398f4d35b41149c9955e303d750",
+   "oldUpdatedAt": "2026-07-17T01:57:27.182Z",
+   "applyStatus": "APPLIED"
+  }
+ ]
+}

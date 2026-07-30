@@ -1,0 +1,99 @@
+{
+ "verifiedAt": "2026-07-30T11:19:26.126Z",
+ "readOnlySession": true,
+ "storage": {
+  "newHashMatch": true,
+  "oldHashRemains": false,
+  "attrsOk": true,
+  "candidateLinkOk": true,
+  "candidateSourceUnchanged": true
+ },
+ "content": {
+  "functionSectionPresent": true,
+  "headingIsFamilyVocab": true,
+  "driverVocabNotIntroduced": true,
+  "clauseItems": [
+   "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+   "배변활동 원활에 도움을 줄 수 있음",
+   "장건강에 도움을 줄 수 있음"
+  ],
+  "clauseCount": 3,
+  "clauseExpected": 3,
+  "allClausesVerbatimInSource": true,
+  "sdIntroUnchanged": true,
+  "footUnchanged": true,
+  "headingOrder": [
+   "왜 이 제품인가",
+   "공식 인정 기능성",
+   "섭취방법 (공식 표기 그대로)",
+   "표시 기준",
+   "이런 분께"
+  ],
+  "oldHeadingsAllKept": true,
+  "outsideBlockIdentical": true
+ },
+ "render": {
+  "widths": [
+   {
+    "width": 430,
+    "pageOverflow": false,
+    "elemOverflow": 0,
+    "clipped": 0,
+    "headings": [
+     "왜 이 제품인가",
+     "공식 인정 기능성",
+     "섭취방법 (공식 표기 그대로)",
+     "표시 기준",
+     "이런 분께"
+    ],
+    "clausesAsItems": 3,
+    "rawBracketVisible": false,
+    "emptyItem": false
+   },
+   {
+    "width": 820,
+    "pageOverflow": false,
+    "elemOverflow": 0,
+    "clipped": 0,
+    "headings": [
+     "왜 이 제품인가",
+     "공식 인정 기능성",
+     "섭취방법 (공식 표기 그대로)",
+     "표시 기준",
+     "이런 분께"
+    ],
+    "clausesAsItems": 3,
+    "rawBracketVisible": false,
+    "emptyItem": false
+   },
+   {
+    "width": 1280,
+    "pageOverflow": false,
+    "elemOverflow": 0,
+    "clipped": 0,
+    "headings": [
+     "왜 이 제품인가",
+     "공식 인정 기능성",
+     "섭취방법 (공식 표기 그대로)",
+     "표시 기준",
+     "이런 분께"
+    ],
+    "clausesAsItems": 3,
+    "rawBracketVisible": false,
+    "emptyItem": false
+   }
+  ],
+  "allOk": true
+ },
+ "corpus": {
+  "spd_all": 119974,
+  "spd_store_ko": 63321,
+  "without_fn_section": 825,
+  "hff_canonical": 40913,
+  "otherRowsUpdatedSinceManifest": 0,
+  "expectedWithoutFnSection": 825,
+  "expectedHffCanonical": 40913
+ },
+ "verdict": "PASS",
+ "failedChecks": []
+}

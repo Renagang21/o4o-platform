@@ -1,0 +1,36 @@
+{
+ "ranAt": "2026-07-30T11:18:11.998Z",
+ "wo": "WO-O4O-HFF-KO-PROBIOTICS-WOMAN-OFFICIAL-FUNCTION-SECTION-APPLY-V1",
+ "status": "APPLIED",
+ "expectedUpdate": 1,
+ "actualUpdate": 1,
+ "rolledBack": false,
+ "failReason": null,
+ "countsBefore": {
+  "spd_all": 119974,
+  "spd_store_ko": 63321,
+  "with_fn_section": 40087,
+  "without_fn_section": 826
+ },
+ "countsAfter": {
+  "spd_all": 119974,
+  "spd_store_ko": 63321,
+  "with_fn_section": 40088,
+  "without_fn_section": 825
+ },
+ "rowCountUnchanged": true,
+ "fnSectionDelta": {
+  "with": 1,
+  "without": -1
+ },
+ "target": {
+  "canonicalId": "f47c0032-72ad-46a7-8d4b-d1cd9c5e3806",
+  "productName": "프로바이오틱스우먼",
+  "newContentHash": "5b091172c2ce309d2f21dc5d280983ea253f3398f4d35b41149c9955e303d750",
+  "insertedClauses": [
+   "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+   "배변활동 원활에 도움을 줄 수 있음",
+   "장건강에 도움을 줄 수 있음"
+  ]
+ }
+}
