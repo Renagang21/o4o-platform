@@ -12,7 +12,11 @@ import cmsAPI, { CmsContent, ContentType } from '@/lib/cms';
 import { mediaApi } from '@/services/api/postApi';
 import toast from 'react-hot-toast';
 import { RichTextEditor } from '@o4o/content-editor';
-import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core';
+// WO-O4O-ADMIN-CMS-BROWSER-IMPORT-CRASH-FIX-V1:
+//   루트 배럴(@o4o/forum-core)은 backend export 와 `import { Router } from 'express'` 를 포함해
+//   브라우저 번들에서 런타임 크래시를 일으킨다. 필요한 두 함수만 클라이언트 안전 경로에서 직접 가져온다.
+//   (htmlToBlocks.ts 의 유일한 import 는 `import type { Block }` 로 런타임 의존이 0)
+import { htmlToBlocks, blocksToHtml } from '@o4o/forum-core/src/utils/htmlToBlocks';
 import { uploadImageForEditor } from '@/api/media-library.api';
 
 interface ContentFormModalProps {
