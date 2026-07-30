@@ -55,20 +55,28 @@ export class PharmacyHubSupplierProductController {
     const q = String(req.query.q ?? '').trim();
     const deliveredRaw = String(req.query.delivered ?? '').trim();
 
-    const params: unknown[] = [supplierId, SERVICE_KEY];
+    // ⚠️ 파라미터는 **쿼리에 실제로 등장하는 것만** 넘긴다. count 쿼리에 쓰이지 않는
+    //    placeholder 를 함께 넘기면 "bind message supplies N parameters, but prepared
+    //    statement requires M" 로 실패한다. 그래서 where 용 배열과 select 용 배열을 분리한다.
+    const whereParams: unknown[] = [supplierId];
     const conditions = ['spo.supplier_id = $1', 'spo.deleted_at IS NULL'];
 
     if (q) {
-      params.push(`%${q}%`);
-      conditions.push(`(pm.name ILIKE $${params.length} OR pm.barcode ILIKE $${params.length})`);
+      whereParams.push(`%${q}%`);
+      conditions.push(`(pm.name ILIKE $${whereParams.length} OR pm.barcode ILIKE $${whereParams.length})`);
     }
-    if (deliveredRaw === 'true') {
-      conditions.push(`$2 = ANY(spo.service_keys)`);
-    } else if (deliveredRaw === 'false') {
-      conditions.push(`NOT ($2 = ANY(spo.service_keys))`);
+    if (deliveredRaw === 'true' || deliveredRaw === 'false') {
+      whereParams.push(SERVICE_KEY);
+      const idx = whereParams.length;
+      conditions.push(deliveredRaw === 'true'
+        ? `$${idx} = ANY(spo.service_keys)`
+        : `NOT ($${idx} = ANY(spo.service_keys))`);
     }
 
     const where = `WHERE ${conditions.join(' AND ')}`;
+    // 목록 쿼리는 SELECT/JOIN 에서도 serviceKey 가 필요하므로 마지막 파라미터로 덧붙인다.
+    const listParams: unknown[] = [...whereParams, SERVICE_KEY];
+    const svc = `$${listParams.length}`;
 
     try {
       const [countRow] = await AppDataSource.query(
@@ -76,7 +84,7 @@ export class PharmacyHubSupplierProductController {
            FROM supplier_product_offers spo
            JOIN product_masters pm ON pm.id = spo.master_id
           ${where}`,
-        params,
+        whereParams,
       );
       const total = countRow?.total ?? 0;
 
@@ -94,7 +102,7 @@ export class PharmacyHubSupplierProductController {
             spo.approval_status                           AS "approvalStatus",
             spo.distribution_type                         AS "distributionType",
             spo.service_keys                              AS "serviceKeys",
-            ($2 = ANY(spo.service_keys))                  AS "deliveredToPharmacyHub",
+            (${svc} = ANY(spo.service_keys))              AS "deliveredToPharmacyHub",
             osp.unit_price                                AS "pharmacyHubUnitPrice",
             (SELECT pi.image_url FROM product_images pi
               WHERE pi.master_id = pm.id AND pi.deleted_at IS NULL
@@ -104,11 +112,11 @@ export class PharmacyHubSupplierProductController {
            FROM supplier_product_offers spo
            JOIN product_masters pm ON pm.id = spo.master_id
            LEFT JOIN product_categories pc ON pc.id = pm.category_id
-           LEFT JOIN offer_service_prices osp ON osp.offer_id = spo.id AND osp.service_key = $2
+           LEFT JOIN offer_service_prices osp ON osp.offer_id = spo.id AND osp.service_key = ${svc}
           ${where}
-          ORDER BY ($2 = ANY(spo.service_keys)) DESC, spo.updated_at DESC
+          ORDER BY (${svc} = ANY(spo.service_keys)) DESC, spo.updated_at DESC
           LIMIT ${limit} OFFSET ${(page - 1) * limit}`,
-        params,
+        listParams,
       );
 
       return res.json({
