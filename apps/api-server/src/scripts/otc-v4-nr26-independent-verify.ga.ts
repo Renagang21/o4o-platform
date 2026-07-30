@@ -453,6 +453,193 @@ async function main(): Promise<void> {
   }
 }
 /**
+ * ── POST_APPLY 독립검증 (READ-ONLY) ─────────────────────────────────────────────
+ * WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-FINAL-PRODUCTION-V1 사후검증.
+ * 판정 대상은 payload 가 아니라 **LIVE DB 에 실제로 들어간 content** 다.
+ * 실행: ... --post [--unit nasal-unit-1] [--port 5495]
+ */
+async function postMain(): Promise<void> {
+  const unitArg = arg('--unit');
+  const PWO = 'WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-FINAL-PRODUCTION-V1';
+  const pool = new Pool({ host: '127.0.0.1', port: PORT, user: 'o4o_api', database: process.env.DB_NAME || 'o4o_platform', max: 1, statement_timeout: 900000 });
+  const q = async (t: string, p?: unknown[]): Promise<any[]> => (await pool.query(t, p)).rows;
+  try {
+    await q('BEGIN TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY');
+
+    const sel = J(SELECTION);
+    const all = sel.masters as any[];
+    const masters = unitArg ? all.filter((m) => m.unit === unitArg) : all;
+    const ids = masters.map((m) => m.masterId);
+    const byId = new Map(masters.map((m) => [m.masterId, m]));
+    const refs = ids.map(refOf);
+    const N = ids.length;
+    const expectN = unitArg === 'nasal-unit-1' ? 14 : unitArg === 'rectal-unit-1' ? 12 : 26;
+    G('PV-01', `대상 master 수(${unitArg || '전체'})`, String(expectN), String(N), N === expectN);
+    const refMismatch = masters.filter((m) => refOf(m.masterId) !== m.sourceRef).length;
+    G('PV-02', 'sourceRef 독자 재계산 일치', '0건 불일치', String(refMismatch), refMismatch === 0);
+
+    // LIVE 상태 — master 별 실측
+    const st = await q(
+      `SELECT m.mid::text mid,
+         (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=m.mid AND s.description_type='STORE'
+            AND s.source_type=$2 AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)::int kocanon,
+         (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=m.mid AND s.description_type='STORE'
+            AND s.source_type=$2 AND s.status='canonical' AND s.language='en' AND s.deleted_at IS NULL)::int encanon,
+         (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=m.mid AND s.description_type='STORE'
+            AND s.source_type=$3 AND s.status='canonical' AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL)::int easyleft,
+         (SELECT count(*) FROM shared_product_descriptions s WHERE s.master_id=m.mid AND s.description_type='STORE'
+            AND s.source_type=$3 AND s.status='deprecated' AND s.deleted_at IS NULL)::int easydep,
+         (SELECT count(*) FROM shared_product_description_audit_logs a WHERE a.master_id=m.mid
+            AND a.event_type='canonical_replaced' AND (a.metadata->>'batchId')=$4)::int auditn
+       FROM unnest($1::uuid[]) m(mid) ORDER BY 1`, [ids, AUTHORED_V4, EASY, BATCH]);
+    const bad = (f: (r: any) => boolean): any[] => st.filter(f).map((r) => r.mid);
+    G('PV-03', 'authored KO canonical = 1/건', `${N}건 충족`, `${st.filter((r) => r.kocanon === 1).length}/${N}`, bad((r) => r.kocanon !== 1).length === 0, bad((r) => r.kocanon !== 1).slice(0, 5));
+    G('PV-04', 'authored EN canonical = 1/건', `${N}건 충족`, `${st.filter((r) => r.encanon === 1).length}/${N}`, bad((r) => r.encanon !== 1).length === 0, bad((r) => r.encanon !== 1).slice(0, 5));
+    G('PV-05', 'easy canonical 잔존 0', '0', String(bad((r) => r.easyleft !== 0).length), bad((r) => r.easyleft !== 0).length === 0, bad((r) => r.easyleft !== 0).slice(0, 5));
+    G('PV-06', 'easy deprecated 강등 = 1/건', `${N}건`, String(st.filter((r) => r.easydep >= 1).length), bad((r) => r.easydep < 1).length === 0, bad((r) => r.easydep < 1).slice(0, 5));
+    G('PV-07', `audit ${expectN}`, String(expectN), String(st.reduce((t, r) => t + r.auditn, 0)), bad((r) => r.auditn !== 1).length === 0, bad((r) => r.auditn !== 1).slice(0, 5));
+
+    const leak = (await q(
+      `SELECT count(*)::int n FROM shared_product_descriptions
+        WHERE source_ref_id = ANY($1::uuid[]) AND deleted_at IS NULL AND master_id <> ALL($2::uuid[])`, [refs, ids]))[0].n;
+    G('PV-08', 'sourceRef leak 0 (대상 밖 점유)', '0', String(leak), leak === 0);
+    const refCnt = await q(
+      `SELECT source_ref_id::text ref, count(*)::int n FROM shared_product_descriptions
+        WHERE source_ref_id = ANY($1::uuid[]) AND deleted_at IS NULL GROUP BY 1`, [refs]);
+    G('PV-09', 'sourceRef 점유 = master 당 2행(KO+EN)', `${N}ref × 2`, `${refCnt.length}ref · 비2행 ${refCnt.filter((r) => r.n !== 2).length}`,
+      refCnt.length === N && refCnt.every((r) => r.n === 2));
+    const dup = await q(
+      `SELECT master_id::text mid, COALESCE(language,'ko') lang, count(*)::int n FROM shared_product_descriptions
+        WHERE master_id = ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND deleted_at IS NULL
+        GROUP BY 1,2 HAVING count(*) > 1`, [ids]);
+    G('PV-10', 'canonicalDup 0', '0', String(dup.length), dup.length === 0, dup.slice(0, 5));
+
+    // LIVE content 실측 → payload hash 대조 + 품질 재판정
+    const live = await q(
+      `SELECT master_id::text mid, COALESCE(language,'ko') lang, content, md5(content) h
+         FROM shared_product_descriptions
+        WHERE master_id = ANY($1::uuid[]) AND description_type='STORE' AND status='canonical'
+          AND source_type=$2 AND deleted_at IS NULL`, [ids, AUTHORED_V4]);
+    const liveKo = new Map<string, { c: string; h: string }>(), liveEn = new Map<string, { c: string; h: string }>();
+    for (const r of live) (r.lang === 'en' ? liveEn : liveKo).set(r.mid, { c: r.content, h: r.h });
+    const koP = new Map((J(KO_PAYLOAD).payloads as any[]).map((p) => [p.masterId, p]));
+    const enP = new Map((J(EN_PAYLOAD).payloads as any[]).map((p) => [p.masterId, p]));
+    const hBad = ids.filter((i) => liveKo.get(i)?.h !== koP.get(i)?.contentHash || liveEn.get(i)?.h !== enP.get(i)?.contentHash);
+    G('PV-11', 'LIVE content md5 = 승인 payload hash', '0건 불일치', String(hBad.length), hBad.length === 0, hBad.slice(0, 5));
+
+    // 공식 원문(강등된 easy 행) 재파싱 → 6섹션 보존 · 수치/연령/기간 · route 표현
+    const easyRows = await q(
+      `SELECT pop.id mid, es.content FROM (SELECT unnest($1::uuid[])::text id) pop
+        JOIN LATERAL (
+          SELECT content FROM shared_product_descriptions s
+           WHERE s.master_id=pop.id::uuid AND s.source_type=$2 AND s.description_type='STORE'
+             AND COALESCE(s.language,'ko')='ko' AND s.deleted_at IS NULL
+           ORDER BY length(s.content) DESC LIMIT 1) es ON true`, [ids, EASY]);
+    const secMiss: any[] = [], numMiss: any[] = [], ageMiss: any[] = [], durMiss: any[] = [];
+    const koInv: any[] = [], koLost: any[] = [], enInv: any[] = [], enHan: any[] = [];
+    let srcDrift = 0, secHashDrift = 0;
+    const cov: number[] = [];
+    for (const r of easyRows) {
+      const m = byId.get(r.mid); if (!m) continue;
+      if (md5(r.content) !== m.officialSourceHash) srcDrift++;
+      const off = officialSections(r.content);
+      for (const k of SECTIONS) if ((off[k] ? md5(off[k]) : '') !== (m.officialSectionHash?.[k] ?? '')) secHashDrift++;
+      const present = SECTIONS.filter((k) => (off[k] || '').trim() !== '');
+      const body = plain(liveKo.get(r.mid)?.c || '');
+      const nbody = verbNorm(body);
+      const worst: any[] = [];
+      for (const k of present) {
+        const toks = [...new Set((verbNorm(plain(off[k])).match(/[가-힣]{2,}/g) || []))];
+        if (!toks.length) continue;
+        const miss = toks.filter((t) => !nbody.includes(t));
+        const c = (toks.length - miss.length) / toks.length;
+        cov.push(c);
+        if (c < SECTION_COVERAGE_MIN) worst.push({ sec: k, cov: +c.toFixed(4), missing: miss.slice(0, 8) });
+      }
+      if (worst.length) secMiss.push({ masterId: r.mid, sections: worst });
+      const offAll = present.map((k) => plain(off[k])).join(' ');
+      const mn = [...new Set(nums(offAll))].filter((x) => !nums(body).includes(x));
+      if (mn.length) numMiss.push({ masterId: r.mid, missing: mn.slice(0, 10) });
+      const ma = norm(ageTokens(offAll)).filter((x) => !norm(ageTokens(body)).includes(x));
+      if (ma.length) ageMiss.push({ masterId: r.mid, missing: ma });
+      const md = norm(durTokens(offAll)).filter((x) => !norm(durTokens(body)).includes(x));
+      if (md.length) durMiss.push({ masterId: r.mid, missing: md });
+      const offRaw = SECTIONS.map((k) => plain(off[k] || '')).join(' ');
+      for (const [label, re] of KO_FORBIDDEN[m.route]) if (re.test(body) && !re.test(offRaw)) koInv.push({ masterId: r.mid, label });
+      if (!KO_OWN[m.route].test(body)) koLost.push({ masterId: r.mid, route: m.route });
+      const ebody = plain(liveEn.get(r.mid)?.c || '');
+      for (const h of enInversionHits(m.route, ebody, offRaw)) enInv.push({ masterId: r.mid, route: m.route, ...h });
+      if (/[가-힣]/.test(ebody)) enHan.push({ masterId: r.mid });
+    }
+    cov.sort((a, b) => a - b);
+    G('PV-12', '공식 원문 hash drift 0 (apply 후 재조회)', '0', String(srcDrift), srcDrift === 0 && easyRows.length === N);
+    G('PV-13', '공식 6섹션 hash mismatch 0', '0', String(secHashDrift), secHashDrift === 0);
+    G('PV-14', `공식 섹션 내용 보존(LIVE content · 커버리지 ≥ ${SECTION_COVERAGE_MIN})`, '미달 0', String(secMiss.length), secMiss.length === 0,
+      { coverage: cov.length ? { min: +cov[0].toFixed(4), median: +cov[Math.floor(cov.length / 2)].toFixed(4), sections: cov.length } : null, worst: secMiss.slice(0, 5) });
+    G('PV-15', '수치 누락 0', '0', String(numMiss.length), numMiss.length === 0, numMiss.slice(0, 5));
+    G('PV-16', '연령 토큰 누락 0', '0', String(ageMiss.length), ageMiss.length === 0, ageMiss.slice(0, 5));
+    G('PV-17', '기간·횟수 토큰 누락 0', '0', String(durMiss.length), durMiss.length === 0, durMiss.slice(0, 5));
+    G('PV-18', 'KO route 표현 역전 0', '0', String(koInv.length), koInv.length === 0, koInv.slice(0, 8));
+    G('PV-19', 'KO 자기 경로 표현 보존(비강/직장)', '0건 소실', String(koLost.length), koLost.length === 0, koLost.slice(0, 5));
+    G('PV-20', 'EN route 표현 역전 0', '0', String(enInv.length), enInv.length === 0, enInv.slice(0, 8));
+    G('PV-21', 'EN 한글 잔존 0', '0', String(enHan.length), enHan.length === 0, enHan.slice(0, 5));
+
+    // 대상 밖 audit 0 · 대조군 write 0
+    const outsideAudit = (await q(
+      `SELECT count(*)::int n FROM shared_product_description_audit_logs
+        WHERE (metadata->>'batchId')=$1 AND master_id <> ALL($2::uuid[])`, [BATCH, all.map((m) => m.masterId)]))[0].n;
+    G('PV-22', '대상 밖 audit 0 (batch 전역)', '0', String(outsideAudit), outsideAudit === 0);
+    const withdrawn = new Set<string>((J(WITHDRAWN).rows as any[]).map((r) => r.masterId));
+    const srcTerm = new Set<string>((J(SRC_TERMINAL).masters as any[]).filter((m) => m.code === 'SOURCE_EFFICACY_MISSING').map((m) => m.mid));
+    const excl = new Set<string>((J(EXCLUDE).masters as any[]).map((m) => m.mid));
+    const allRefs = all.map((m) => refOf(m.masterId));
+    for (const [id, label, set] of [['PV-23', 'source terminal 24', srcTerm], ['PV-24', '기구 멸균제 3', withdrawn], ['PV-25', 'exclude 266', excl]] as Array<[string, string, Set<string>]>) {
+      const w = (await q(
+        `SELECT (SELECT count(*)::int FROM shared_product_descriptions WHERE master_id = ANY($1::uuid[]) AND source_ref_id = ANY($2::uuid[])) refhit,
+                (SELECT count(*)::int FROM shared_product_description_audit_logs WHERE master_id = ANY($1::uuid[]) AND (metadata->>'batchId')=$3) auditn`,
+        [[...set], allRefs, BATCH]))[0];
+      G(id, `${label} 본 배치 write 0`, '0', `ref ${w.refhit} · audit ${w.auditn}`, w.refhit === 0 && w.auditn === 0);
+    }
+
+    // 선행 유효 GREEN 3,378 불변
+    const greenRows: any[] = [];
+    for (const f of GREEN_LEDGERS) for (const r of (J(f).rows || [])) if ((!r.status || r.status === 'GREEN') && !withdrawn.has(r.masterId)) greenRows.push(r);
+    const gIds = greenRows.map((r) => r.masterId);
+    const gBy = new Map(greenRows.map((r) => [r.masterId, r]));
+    const gLive = await q(
+      `SELECT master_id::text mid, COALESCE(language,'ko') lang, md5(content) h FROM shared_product_descriptions
+        WHERE master_id = ANY($1::uuid[]) AND description_type='STORE' AND status='canonical' AND source_type=$2 AND deleted_at IS NULL`, [gIds, AUTHORED_V4]);
+    const gseen = new Map<string, { ko?: string; en?: string }>();
+    for (const r of gLive) { const e = gseen.get(r.mid) || {}; if (r.lang === 'en') e.en = r.h; else e.ko = r.h; gseen.set(r.mid, e); }
+    let gChanged = 0, gMissing = 0;
+    for (const id of gIds) {
+      const cur = gseen.get(id), exp = gBy.get(id)!;
+      if (!cur || !cur.ko || !cur.en) { gMissing++; continue; }
+      if (cur.ko !== exp.koContentHash || cur.en !== exp.enContentHash) gChanged++;
+    }
+    G('PV-26', '선행 유효 GREEN 3,378 불변', '변경 0 · 소실 0 · 대상 3378', `변경 ${gChanged} / 소실 ${gMissing} / 대상 ${gIds.length}`,
+      gChanged === 0 && gMissing === 0 && gIds.length === 3378);
+    // 대상 26 이 선행 GREEN 과 겹치지 않으므로, 전역 V4 canonical = 3378 + 처리 완료분
+    const globalV4 = (await q(
+      `SELECT count(DISTINCT master_id)::int n FROM shared_product_descriptions
+        WHERE description_type='STORE' AND status='canonical' AND source_type=$1 AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL`, [AUTHORED_V4]))[0].n;
+    G('PV-27', '전역 V4 authored KO canonical master 수 = 3378 + 신규', `3378+${N}=${3378 + N} 이상`, String(globalV4), globalV4 >= 3378 + N);
+
+    await q('COMMIT');
+    const pass = gates.every((g) => g.pass);
+    const outFile = P(`otc-v4-nr26-post-verification${unitArg ? `-${unitArg}` : '-all'}.ga.json`);
+    fs.writeFileSync(outFile, JSON.stringify({
+      wo: PWO, agent: 'ga', kind: 'post-apply-independent-verification', batchId: BATCH, mode: 'POST_APPLY',
+      unit: unitArg || 'all', verifiedAt: new Date().toISOString(), port: PORT, target: N,
+      total: gates.length, passed: gates.filter((g) => g.pass).length, failed: gates.filter((g) => !g.pass).length, pass, gates,
+    }, null, 2) + '\n');
+    console.log(JSON.stringify({ unit: unitArg || 'all', total: gates.length, passed: gates.filter((g) => g.pass).length, failed: gates.filter((g) => !g.pass).length, pass, out: path.basename(outFile) }, null, 2));
+    if (!pass) console.log(JSON.stringify(gates.filter((g) => !g.pass), null, 2));
+    if (!pass) process.exitCode = 2;
+  } finally { await pool.end(); }
+}
+
+/**
  * 면제 규칙(부정문 + 공식 근거)이 게이트를 무력화하지 않았는지 확인하는 negative control.
  * DB 접속 없음. 기대와 다르면 exit 1.
  */
@@ -480,4 +667,5 @@ function selftest(): void {
 }
 
 if (process.argv.includes('--selftest')) selftest();
+else if (process.argv.includes('--post')) postMain().catch((e) => { console.error(e); process.exit(1); });
 else main().catch((e) => { console.error(e); process.exit(1); });

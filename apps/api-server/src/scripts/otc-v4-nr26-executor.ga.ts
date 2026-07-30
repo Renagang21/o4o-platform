@@ -328,7 +328,43 @@ async function main(): Promise<void> {
   const outName = MODE === 'dry-run' ? `otc-v4-nr26-dryrun-${spec.unit}.ga.json`
     : MODE === 'rollback-test' ? `otc-v4-nr26-rollback-test-${spec.unit}.ga.json`
       : `otc-v4-nr26-apply-${spec.unit}.ga.json`;
-  fs.writeFileSync(path.join(DATA_DIR, outName), JSON.stringify({ wo: WO, kind: outName.replace('.ga.json', ''), summary, results }, null, 2) + '\n', 'utf8');
+  const body = JSON.stringify({ wo: WO, kind: outName.replace('.ga.json', ''), summary, results }, null, 2) + '\n';
+
+  if (MODE === 'APPLY') {
+    // 생산 WO Git 안전 규칙: **run 별 결과 원장 덮어쓰기 금지**.
+    // run-tag 별 파일은 불변(존재하면 SYSTEM STOP), 대표 파일은 최초 1회만 기록한다.
+    const runTag = (arg('--run-tag') || '').trim();
+    if (!runTag || !/^[a-z0-9][a-z0-9-]{0,32}$/.test(runTag)) {
+      throw new Error('SYSTEM STOP: APPLY 모드는 --run-tag <소문자-숫자-하이픈> 필수 (run 별 원장 불변 보장)');
+    }
+    const runOut = path.join(DATA_DIR, `otc-v4-nr26-apply-${spec.unit}.run-${runTag}.ga.json`);
+    if (fs.existsSync(runOut)) throw new Error(`SYSTEM STOP: run 원장 이미 존재 — 덮어쓰기 금지 (${path.basename(runOut)})`);
+    fs.writeFileSync(runOut, body, 'utf8');
+    const canonical = path.join(DATA_DIR, outName);
+    if (!fs.existsSync(canonical)) fs.writeFileSync(canonical, body, 'utf8');
+
+    // ── 단위 GREEN 원장 (최초 1회만 · 불변) ──────────────────────────────────
+    const greenOut = path.join(DATA_DIR, `otc-v4-nr26-green-${spec.unit}.ga.json`);
+    if (summary.pass && summary.green === units.length && !fs.existsSync(greenOut)) {
+      fs.writeFileSync(greenOut, JSON.stringify({
+        wo: WO, agent: 'ga', writeOwner: 'agent-ga', kind: 'green-ledger', batchId: BATCH_ID,
+        unit: spec.unit, route: spec.route, runTag,
+        masterCount: units.length, green: summary.green, exception: summary.exception,
+        committedWrite: summary.committedWriteActual,
+        writeContract: { perMasterKo: 4, perMasterEn: 2, perMaster: 6, unitTotal: units.length * 6 },
+        planDigest: summary.planDigest,
+        rows: results.map((r) => ({
+          masterId: r.masterId, productName: r.productName, permitCode: r.productCode,
+          route: r.route, sourceRef: r.sourceRef, officialSourceHash: r.officialSourceHash,
+          koContentHash: r.koContentHash, enContentHash: r.enContentHash,
+          writeActual: r.writeActual, postVerifyPass: r.postVerify?.pass ?? null, status: r.status,
+        })),
+        status: 'GREEN',
+      }, null, 2) + '\n', 'utf8');
+    }
+  } else {
+    fs.writeFileSync(path.join(DATA_DIR, outName), body, 'utf8');
+  }
 
   console.log(JSON.stringify(summary, null, 2));
   if (!summary.pass) process.exitCode = 2;

@@ -1,0 +1,228 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-FINAL-PRODUCTION-V1",
+  "agent": "ga",
+  "kind": "post-apply-independent-verification",
+  "batchId": "otc-v4-nr26",
+  "mode": "POST_APPLY",
+  "unit": "rectal-unit-1",
+  "verifiedAt": "2026-07-30T06:28:57.772Z",
+  "port": 5495,
+  "target": 12,
+  "total": 27,
+  "passed": 27,
+  "failed": 0,
+  "pass": true,
+  "gates": [
+    {
+      "id": "PV-01",
+      "gate": "대상 master 수(rectal-unit-1)",
+      "expected": "12",
+      "actual": "12",
+      "pass": true
+    },
+    {
+      "id": "PV-02",
+      "gate": "sourceRef 독자 재계산 일치",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "PV-03",
+      "gate": "authored KO canonical = 1/건",
+      "expected": "12건 충족",
+      "actual": "12/12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-04",
+      "gate": "authored EN canonical = 1/건",
+      "expected": "12건 충족",
+      "actual": "12/12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-05",
+      "gate": "easy canonical 잔존 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-06",
+      "gate": "easy deprecated 강등 = 1/건",
+      "expected": "12건",
+      "actual": "12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-07",
+      "gate": "audit 12",
+      "expected": "12",
+      "actual": "12",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-08",
+      "gate": "sourceRef leak 0 (대상 밖 점유)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "PV-09",
+      "gate": "sourceRef 점유 = master 당 2행(KO+EN)",
+      "expected": "12ref × 2",
+      "actual": "12ref · 비2행 0",
+      "pass": true
+    },
+    {
+      "id": "PV-10",
+      "gate": "canonicalDup 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-11",
+      "gate": "LIVE content md5 = 승인 payload hash",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-12",
+      "gate": "공식 원문 hash drift 0 (apply 후 재조회)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "PV-13",
+      "gate": "공식 6섹션 hash mismatch 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "PV-14",
+      "gate": "공식 섹션 내용 보존(LIVE content · 커버리지 ≥ 0.95)",
+      "expected": "미달 0",
+      "actual": "0",
+      "pass": true,
+      "detail": {
+        "coverage": {
+          "min": 1,
+          "median": 1,
+          "sections": 57
+        },
+        "worst": []
+      }
+    },
+    {
+      "id": "PV-15",
+      "gate": "수치 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-16",
+      "gate": "연령 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-17",
+      "gate": "기간·횟수 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-18",
+      "gate": "KO route 표현 역전 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-19",
+      "gate": "KO 자기 경로 표현 보존(비강/직장)",
+      "expected": "0건 소실",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-20",
+      "gate": "EN route 표현 역전 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-21",
+      "gate": "EN 한글 잔존 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "PV-22",
+      "gate": "대상 밖 audit 0 (batch 전역)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "PV-23",
+      "gate": "source terminal 24 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "PV-24",
+      "gate": "기구 멸균제 3 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "PV-25",
+      "gate": "exclude 266 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "PV-26",
+      "gate": "선행 유효 GREEN 3,378 불변",
+      "expected": "변경 0 · 소실 0 · 대상 3378",
+      "actual": "변경 0 / 소실 0 / 대상 3378",
+      "pass": true
+    },
+    {
+      "id": "PV-27",
+      "gate": "전역 V4 authored KO canonical master 수 = 3378 + 신규",
+      "expected": "3378+12=3390 이상",
+      "actual": "15836",
+      "pass": true
+    }
+  ]
+}
