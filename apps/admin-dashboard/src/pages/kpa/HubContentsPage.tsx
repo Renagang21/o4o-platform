@@ -76,6 +76,13 @@ const PRODUCER_BADGE_CLASS: Record<string, string> = {
   store:     'bg-teal-50 text-teal-700',
 };
 
+// 날짜 표시 — 값이 없거나 파싱 불가면 Invalid Date 대신 '-' 로 표기한다.
+function formatDate(value: string | null | undefined): string {
+  if (!value) return '-';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '-' : d.toLocaleDateString('ko-KR');
+}
+
 // ── API ──────────────────────────────────────────────────────────────────────
 
 interface ListResponse {
@@ -137,11 +144,13 @@ export default function HubContentsPage() {
     setPage(1);
   };
 
+  // O4OColumn.render 시그니처는 (value, row, index) 이다 (packages/ui BaseTable).
+  // 첫 인자는 row[key] 로 추출된 값이므로 행 전체는 두 번째 인자에서 받는다.
   const columns: O4OColumn<HubContentItemResponse>[] = [
     {
       key: 'title',
       header: '제목',
-      render: (row) => (
+      render: (_value, row) => (
         <div>
           <p className="text-sm font-medium text-gray-900">{row.title}</p>
           {row.description && (
@@ -154,7 +163,7 @@ export default function HubContentsPage() {
       key: 'producer',
       header: '출처',
       width: 110,
-      render: (row) => (
+      render: (_value, row) => (
         <span
           className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
             PRODUCER_BADGE_CLASS[row.producer] ?? 'bg-gray-100 text-gray-600'
@@ -168,10 +177,8 @@ export default function HubContentsPage() {
       key: 'createdAt',
       header: '등록일',
       width: 110,
-      render: (row) => (
-        <span className="text-sm text-gray-500">
-          {new Date(row.createdAt).toLocaleDateString('ko-KR')}
-        </span>
+      render: (_value, row) => (
+        <span className="text-sm text-gray-500">{formatDate(row.createdAt)}</span>
       ),
     },
   ];
