@@ -4,9 +4,16 @@
  * WO-O4O-STORE-CONTENT-HUB-SHARE-UI-PHASE2-V1
  * WO-O4O-HUB-PRODUCER-FILTERING-PHASE3-V1
  * WO-O4O-HUB-NOTICE-SYSTEM-V1
+ * WO-O4O-ADMIN-KPA-HUB-STORE-TAB-STALE-UI-REMOVAL-V1 (2026-07-30):
+ *   매장 콘텐츠(producer=store) 탭 제거. Store → HUB 게시·공유 흐름은
+ *   WO-O4O-REMOVE-STORE-TO-COMMUNITY-SHARE-FLOW-V1 (f9164dc4a, 2026-05-09) 에서 정책적으로 폐기되어
+ *   생성·승인·조회 경로가 모두 제거되었고, 백엔드 VALID_PRODUCERS 에도 'store' 가 없다.
+ *   그 결과 이 탭은 producer=store 요청으로 400 Invalid producer 만 발생시키는 잔재였다.
+ *   백엔드 producer 계약과 공용 HubProducer 타입('store' 포함)은 변경하지 않는다 —
+ *   3축 생산자 분류 값과 HUB 목록이 실제 제공하는 필터 값은 별개 계약이다.
  *
  * 경로: /operator/hub-contents
- * 기능: 상단 공지 영역 + [전체][공급자 자료][매장 활용 사례] 탭 + 출처 라벨 통일
+ * 기능: 상단 공지 영역 + [전체][공급자 자료] 탭 + 출처 라벨 통일
  */
 
 import { useState } from 'react';
@@ -25,7 +32,7 @@ const SERVICE_KEY = 'kpa-society';
 // 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
 const API_BASE = '/hub/contents';
 
-type TabKey = 'all' | 'supplier' | 'store';
+type TabKey = 'all' | 'supplier';
 
 interface TabDef {
   key: TabKey;
@@ -38,7 +45,8 @@ const TABS: TabDef[] = [
   {
     key: 'all',
     label: '전체',
-    description: '공급자, 운영자, 매장 활용 사례를 통합 조회합니다.',
+    // 매장 콘텐츠는 HUB 게시 대상이 아니다(Store → HUB 흐름 폐기) → 실제 통합 대상만 표기.
+    description: '공급자, 운영자, 커뮤니티 자료를 통합 조회합니다.',
   },
   {
     key: 'supplier',
@@ -46,18 +54,11 @@ const TABS: TabDef[] = [
     producer: 'supplier',
     description: '공급자가 제공한 공식 마케팅 자료입니다.',
   },
-  {
-    key: 'store',
-    label: '매장 활용 사례',
-    producer: 'store',
-    description: '다른 매장에서 실제로 활용한 콘텐츠입니다.',
-  },
 ];
 
 const EMPTY_MESSAGES: Record<TabKey, string> = {
   all:      'HUB에 등록된 콘텐츠가 없습니다.',
   supplier: '등록된 공급자 자료가 없습니다.',
-  store:    '승인된 매장 활용 사례가 없습니다.',
 };
 
 // WO 기준 출처 라벨 — 'store'는 "매장 활용"으로 표기 (HUB_PRODUCER_LABELS override)
