@@ -1,0 +1,1519 @@
+{
+ "generatedFrom": "apps/api-server/src/scripts/data/hff-ko-function-human-review-queue-v1.jsonl",
+ "expected": {
+  "total": 47,
+  "fragmentedCount": 2,
+  "malformedBracketCount": 45
+ },
+ "checks": {
+  "queueRows": 3858,
+  "total": 47,
+  "fragmentedCount": 2,
+  "malformedBracketCount": 45,
+  "fragOnly": 2,
+  "bracketOnly": 45,
+  "bothReasons": 0,
+  "candidateIdDup": 0,
+  "canonicalIdDup": 0,
+  "statementNoDup": 0,
+  "agent9HoldIntersection": 0,
+  "allInQueue": 47,
+  "reviewStatusNonPending": 0,
+  "bucketBreakdown": {
+   "CREATED": 34,
+   "SKIPPED_EXISTING": 13
+  },
+  "rendererBreakdown": {
+   "DRIVER": 35,
+   "COMPOSITE": 12
+  },
+  "matchesExpected": true
+ },
+ "manifest": [
+  {
+   "pilotIndex": 1,
+   "queueIndex": 8,
+   "priority": 1,
+   "candidateId": "19c89e9f-b781-4055-84d5-eee29f6be318",
+   "statementNo": "20040015083653",
+   "productName": "솔빛C",
+   "productMasterId": "4b8e25aa-fcea-4895-a050-9b8ccbc25038",
+   "canonicalId": "7ba37116-e1e0-49f1-86c2-a356ca76562f",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "354393021fb84be8bd33545c3433aa23f824424d70ce16f69f5ea1a0f0ea440d",
+   "canonicalContentLength": 1185,
+   "canonicalUpdatedAt": "2026-07-27T04:11:55.047Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 2,
+   "queueIndex": 17,
+   "priority": 1,
+   "candidateId": "635f1acf-fef7-4308-adb0-0ff4e0fe5977",
+   "statementNo": "200400151071289",
+   "productName": "야호킹파워",
+   "productMasterId": "78eee82a-1519-43cb-860b-abfaabb2598e",
+   "canonicalId": "7c242d02-f4c6-42cd-b858-9d6c8be1b2c8",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "63e21a014f6fbe8ac8b5b5ec6159dff2d9dc94b65679f34b822c1448e2fcb67d",
+   "canonicalContentLength": 2343,
+   "canonicalUpdatedAt": "2026-07-27T04:12:01.459Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 3,
+   "queueIndex": 72,
+   "priority": 1,
+   "candidateId": "6f4a0a79-eef3-498b-8587-9fd0df58c316",
+   "statementNo": "20040016037147",
+   "productName": "디믹스",
+   "productMasterId": "c2cea0c9-8808-47cb-a551-63338c675ba7",
+   "canonicalId": "0ab86bb8-e4b8-4101-b926-17da750ff838",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "159632236355a32f8d876d5149f5fcef959a04fef0a78b30e3e8fd562c8c9405",
+   "canonicalContentLength": 1463,
+   "canonicalUpdatedAt": "2026-07-27T04:12:12.996Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 4,
+   "queueIndex": 75,
+   "priority": 1,
+   "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+   "statementNo": "200400170061205",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "productMasterId": "2e066612-fe9b-4e7b-9e8c-ddb9fb5c2b5c",
+   "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "562366accb61f5ad60397dd4ca805f8a28c939a558153980338a59368bc3bb65",
+   "canonicalContentLength": 2199,
+   "canonicalUpdatedAt": "2026-07-27T04:12:14.253Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 5,
+   "queueIndex": 76,
+   "priority": 1,
+   "candidateId": "f2e425b6-660a-426e-ac40-c6e6654fcd5f",
+   "statementNo": "200400170061236",
+   "productName": "코큐텐 포뮬러",
+   "productMasterId": "d92786d1-ca68-4703-9b9c-eb230d87f852",
+   "canonicalId": "3672bd24-c8df-48fb-bf72-f8bd7a5efa44",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "bb6b278dfb05700ec605fad86754e75717de0abbde859d32d47ee7a14063921a",
+   "canonicalContentLength": 1929,
+   "canonicalUpdatedAt": "2026-07-27T04:12:14.400Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 6,
+   "queueIndex": 79,
+   "priority": 1,
+   "candidateId": "1bd47cf1-8d29-4fba-a155-349fa6bd698b",
+   "statementNo": "20040017006492",
+   "productName": "식물성 알티지오메가3 80",
+   "productMasterId": "7c93a250-5bd0-4ff7-82de-0e421408f314",
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "ff679c92f2f22247bc0c8937b8a701f9d9bb3efc7a171390250fce4a55109bd3",
+   "canonicalContentLength": 1617,
+   "canonicalUpdatedAt": "2026-07-27T04:12:17.867Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 7,
+   "queueIndex": 86,
+   "priority": 1,
+   "candidateId": "92a1d1c7-c4b4-494f-a391-3a799ccd3c37",
+   "statementNo": "20040017021828",
+   "productName": "한국가간보(佳肝寶)",
+   "productMasterId": "37105d6f-659b-4f21-b5be-4b70640e9437",
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "b87dda6d72bbd59a7ca619fd6316ed72a53b947b32311601158e2d3aeab69d3a",
+   "canonicalContentLength": 1365,
+   "canonicalUpdatedAt": "2026-07-27T04:12:29.706Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 8,
+   "queueIndex": 89,
+   "priority": 1,
+   "candidateId": "c38f5319-760b-4bad-bf9f-39df99e49e66",
+   "statementNo": "20040017031279",
+   "productName": "메타그린부스터샷7일",
+   "productMasterId": "f65b8872-255a-4a89-9fa0-596ed5c89c24",
+   "canonicalId": "05e36e76-9948-4092-82f0-83b94fdb38b6",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e4799ba9fa32d2cbd63a728bc069765614c761a7312050b2561a04438965c867",
+   "canonicalContentLength": 2000,
+   "canonicalUpdatedAt": "2026-07-27T04:12:31.240Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 9,
+   "queueIndex": 117,
+   "priority": 1,
+   "candidateId": "5ae0a6d3-d3c0-4a5b-8958-3d960f8f829a",
+   "statementNo": "20040020004469",
+   "productName": "바이오메라 면역젤리 튼튼대장 사과맛",
+   "productMasterId": "4ec9e9ea-2bc2-4d3d-9617-948c05dcff1f",
+   "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "6e2a89f8ec44516956a95e0b9a59c6287ab2fb501c8c06fa97926215888c4fcf",
+   "canonicalContentLength": 1384,
+   "canonicalUpdatedAt": "2026-07-28T20:50:02.030Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 10,
+   "queueIndex": 441,
+   "priority": 1,
+   "candidateId": "d9ecc227-103f-451f-a811-6ed4160d95db",
+   "statementNo": "200400200071620",
+   "productName": "뷰티업필",
+   "productMasterId": "f43ceaba-1f36-4eb1-babc-3aa655e2e7de",
+   "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "c28a3f8f6f4deed583dc7615055395beaed82f493f60ea192f066704f0323fb9",
+   "canonicalContentLength": 2280,
+   "canonicalUpdatedAt": "2026-07-28T20:52:17.064Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 11,
+   "queueIndex": 442,
+   "priority": 1,
+   "candidateId": "90c706ff-375c-416b-b064-2d1eeff74b8e",
+   "statementNo": "20040020013376",
+   "productName": "프리미엄 멀티비타민미네랄",
+   "productMasterId": "7201a0ed-1489-4e9d-b4eb-376ea8b36fda",
+   "canonicalId": "e70adc7e-74ab-4658-855b-e42a5763ca13",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "1d227a27782bf73ce4c7959d9cad18fc61ce99ac29780957d6f583ac7f4d759e",
+   "canonicalContentLength": 3198,
+   "canonicalUpdatedAt": "2026-07-28T21:55:51.740Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 12,
+   "queueIndex": 443,
+   "priority": 1,
+   "candidateId": "49b835aa-36f2-41bd-b5ce-0cd765dbe6f5",
+   "statementNo": "200400200142058",
+   "productName": "광동rTG오메가3",
+   "productMasterId": "f4688258-c7ac-42fc-9e15-e292632c25ed",
+   "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "00ac7312449e64ced407ecb7a280ac8236ccdbede038da0a52a2fa795e1412ff",
+   "canonicalContentLength": 1735,
+   "canonicalUpdatedAt": "2026-07-28T21:56:43.586Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 13,
+   "queueIndex": 898,
+   "priority": 1,
+   "candidateId": "e751e9d9-b7b3-4547-a940-37662588d3eb",
+   "statementNo": "20040020020636",
+   "productName": "돌외잎그린다이어트",
+   "productMasterId": "6f47fd23-9515-43ae-83b7-4d2775c216ac",
+   "canonicalId": "3e204146-7a4f-4328-b8f4-78018e98e77a",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "5b8d632667ae9ba15f5143ca5c68c2d6f60f5edf4ae8941bf8cc3de27fd83579",
+   "canonicalContentLength": 2044,
+   "canonicalUpdatedAt": "2026-07-28T21:58:52.648Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ENGLISH_CLAIM_IN_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 14,
+   "queueIndex": 1097,
+   "priority": 1,
+   "candidateId": "0ab2b69e-21da-4bf4-bb4c-88f88bc876c6",
+   "statementNo": "20040020020899",
+   "productName": "원컷 다이어트",
+   "productMasterId": "1eda8701-2e84-4b95-b3fc-88aa0a176405",
+   "canonicalId": "07bf837a-7692-4c6a-8ba4-cad86a984036",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "644b2ed673ee72f3540152e8dfbc8b71dc4284d762c2cbe69828a676045c6478",
+   "canonicalContentLength": 2139,
+   "canonicalUpdatedAt": "2026-07-28T21:59:19.847Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ENGLISH_CLAIM_IN_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 15,
+   "queueIndex": 1180,
+   "priority": 1,
+   "candidateId": "f88fa3c9-fe2b-407e-a104-64695f5216a9",
+   "statementNo": "20040020046598",
+   "productName": "더쎄라 빼라",
+   "productMasterId": "af98cb65-ec26-4e13-accb-a2d26ce59aff",
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "5daf0819f3163d0328394cf7266256c95426606a46dc682583c955d4eae84d8c",
+   "canonicalContentLength": 2380,
+   "canonicalUpdatedAt": "2026-07-28T22:23:48.084Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 16,
+   "queueIndex": 1258,
+   "priority": 1,
+   "candidateId": "b7b1af8c-91f4-4b94-be52-e878e0018772",
+   "statementNo": "201000190041382",
+   "productName": "면역피로탁",
+   "productMasterId": "42ca920d-aa35-43c3-a66b-e5082b094a7b",
+   "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "c9b2ea3cb3c3e6ec3de22ff6e7f2745981a82b439b3197f1bbbbf80da008a452",
+   "canonicalContentLength": 3105,
+   "canonicalUpdatedAt": "2026-07-29T03:22:35.240Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 17,
+   "queueIndex": 1267,
+   "priority": 1,
+   "candidateId": "93e5bd9a-203f-44b7-8036-dfddb5b57435",
+   "statementNo": "20120019007193",
+   "productName": "이너모아 다운부스트",
+   "productMasterId": "1cd410e2-5180-49ec-b6bf-b70515fc745b",
+   "canonicalId": "6e5726ec-cb74-4fa6-bc1e-0d90a3597e4b",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "d0c03aa8d81329d89313f7a4754ca7f5d3657b12964fea988b83d3989708913f",
+   "canonicalContentLength": 2066,
+   "canonicalUpdatedAt": "2026-07-29T03:28:34.158Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 18,
+   "queueIndex": 1270,
+   "priority": 1,
+   "candidateId": "d03bb768-143d-4b6b-9c90-2ac47c7af720",
+   "statementNo": "20130017122115",
+   "productName": "관절혁명",
+   "productMasterId": "c1b54173-b7d8-4e82-a87b-9de5ca5eba5c",
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "3ececc1d2c2abfc9bd3873af7b524c57733e5c116c59a4dbb21713cbdd67d947",
+   "canonicalContentLength": 1740,
+   "canonicalUpdatedAt": "2026-07-29T03:30:46.113Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 19,
+   "queueIndex": 1271,
+   "priority": 1,
+   "candidateId": "23ac7504-3a7b-44a8-8af4-3a3b8879d5e5",
+   "statementNo": "2013001712287",
+   "productName": "더신나게_다시관절",
+   "productMasterId": "9311fcb5-38ec-4cf0-a881-73699f86dce8",
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "03d09707910ccf52ff18d62cf525c42365e85024809f94819ad49196a711e40c",
+   "canonicalContentLength": 1670,
+   "canonicalUpdatedAt": "2026-07-29T03:30:54.381Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 20,
+   "queueIndex": 1272,
+   "priority": 1,
+   "candidateId": "3c290fe7-e09c-4815-94e8-f0399f2d3bf0",
+   "statementNo": "2013001712291",
+   "productName": "관절건강엔 정통관절",
+   "productMasterId": "0ffab1cb-2e7c-4f95-908a-c10d104ef059",
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "28e26c44e74f78b1ea2baca227bc8cc891c5900f0648c8c97bd1fcc596d48e3c",
+   "canonicalContentLength": 1672,
+   "canonicalUpdatedAt": "2026-07-29T03:30:55.063Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 21,
+   "queueIndex": 1490,
+   "priority": 1,
+   "candidateId": "79c4bbf9-715b-4239-917f-1cffa362424d",
+   "statementNo": "20140017002171",
+   "productName": "10종 복합코팅유산균 비(B)",
+   "productMasterId": "c973746f-4b7a-4ffa-8796-edc2e435af38",
+   "canonicalId": "3935cd64-c062-47b8-a8ea-974195408bfb",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e3815dc43e1fdd691b7c15a2c44e8adc5cdcda3a90a033821c8223fc055ee9c7",
+   "canonicalContentLength": 1345,
+   "canonicalUpdatedAt": "2026-07-29T03:58:44.428Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 22,
+   "queueIndex": 1532,
+   "priority": 1,
+   "candidateId": "ccb662ab-df8f-42a8-8374-71fd8618c1ba",
+   "statementNo": "20172880193315",
+   "productName": "관절연골엔 구절초 프리미엄",
+   "productMasterId": "be395495-89c9-4e87-8058-049ea7ff0f69",
+   "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "4b1ebc1860ac17fafaf55b82113f77d46fd1fa3fe41f3c4afc0194fb359f76a5",
+   "canonicalContentLength": 1756,
+   "canonicalUpdatedAt": "2026-07-29T04:02:04.159Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 23,
+   "queueIndex": 1641,
+   "priority": 1,
+   "candidateId": "fe600833-670a-4c7a-9131-29c980adf732",
+   "statementNo": "2019000939491",
+   "productName": "리얼퀸 센시다이어트",
+   "productMasterId": "ddbcb306-f4f4-4824-bc4e-2a03e916c26c",
+   "canonicalId": "29e87505-a1ba-4ad4-8cfe-4010ea41e96f",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "1dfbafe919ad479b098cdc205d1ebb72939f35709ecab9f5989e879cbaa23ced",
+   "canonicalContentLength": 1896,
+   "canonicalUpdatedAt": "2026-07-29T04:35:40.127Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 24,
+   "queueIndex": 1642,
+   "priority": 1,
+   "candidateId": "d71a96e6-fd25-48c5-a6e0-77b0f89e544a",
+   "statementNo": "2019000939492",
+   "productName": "리얼퀸",
+   "productMasterId": "c78d3e97-38e5-41a4-bd30-8ab7139658e0",
+   "canonicalId": "ed2ce160-42d1-41ef-bdaf-ff5f0dedf847",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "85f7cf634da32b7d4b70c5b2f17cb38801418688a5d75bc0733e6a6fa8060896",
+   "canonicalContentLength": 3137,
+   "canonicalUpdatedAt": "2026-07-29T04:35:40.240Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 25,
+   "queueIndex": 1645,
+   "priority": 1,
+   "candidateId": "c5311c15-5b60-434f-b16e-b1210640b4e3",
+   "statementNo": "20190009483131",
+   "productName": "바나바 혈당 케어",
+   "productMasterId": "ba75ddf9-2fbc-4899-aa8b-c8023f1ea4d9",
+   "canonicalId": "95abce8d-dfc0-450d-b09c-7389c48a513e",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "6d543d5d714769e464a3b17be777004ebfc957d659eb4f9b7a72a243579f96a9",
+   "canonicalContentLength": 1541,
+   "canonicalUpdatedAt": "2026-07-29T04:35:42.227Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 26,
+   "queueIndex": 1646,
+   "priority": 1,
+   "candidateId": "e59630f3-5859-46bd-9fbc-67618303da85",
+   "statementNo": "20190009483143",
+   "productName": "덴티케어 플렉스",
+   "productMasterId": "679606d1-df2e-4834-996e-bf4c75b37682",
+   "canonicalId": "9315b81e-b5a9-4a1f-a698-8eda706af907",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "71a75b221bcf68acc9c7c7f27a84913dfce8650d89b7a3cd36eb9dbdc1405a12",
+   "canonicalContentLength": 1575,
+   "canonicalUpdatedAt": "2026-07-29T04:35:42.790Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 27,
+   "queueIndex": 1647,
+   "priority": 1,
+   "candidateId": "b7120036-5080-4930-9300-c65a3405fef8",
+   "statementNo": "20190009483190",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "productMasterId": "b564269f-fb27-41a5-be9a-e2672762dc9e",
+   "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e30d812c3aa3a309ba95b88e864e4d48f2c4793eccd9409097b663c4e981bac1",
+   "canonicalContentLength": 1872,
+   "canonicalUpdatedAt": "2026-07-29T04:35:45.129Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 28,
+   "queueIndex": 1648,
+   "priority": 1,
+   "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+   "statementNo": "20190009483373",
+   "productName": "차전자피 카테킨 다이어트",
+   "productMasterId": "27f7ca99-c1e8-41ec-845c-6d38cfffefb1",
+   "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e0c62fc22279abe4d26d69b9048d34e0712e49558e93b516446fa152d3f790c0",
+   "canonicalContentLength": 1533,
+   "canonicalUpdatedAt": "2026-07-29T04:35:54.031Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 29,
+   "queueIndex": 1649,
+   "priority": 1,
+   "candidateId": "08f83edc-a9a7-4a80-acc6-4e90545456b0",
+   "statementNo": "20190009483400",
+   "productName": "텅장환",
+   "productMasterId": "175e06b6-c4b6-4737-b7d7-c387376b3048",
+   "canonicalId": "2e20164f-d102-41c0-9a84-ade39bb98e19",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e292550c8281189cc0a375e218d06b713053a9fca129093b383ffb7118e6f53f",
+   "canonicalContentLength": 1203,
+   "canonicalUpdatedAt": "2026-07-29T04:35:55.320Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 30,
+   "queueIndex": 1651,
+   "priority": 1,
+   "candidateId": "0abf229e-d191-4aee-be81-9e856f06cc6e",
+   "statementNo": "20190009483675",
+   "productName": "눈건강엔 루테인",
+   "productMasterId": "8868a49a-3e00-4987-9f94-d7a7f09fe518",
+   "canonicalId": "4c46958f-5e30-4aec-91c7-468cecde0dfc",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e7562541d641ae25dc62df15cc6b77807d3ed4a510ea47faab346ba73a7654c5",
+   "canonicalContentLength": 2323,
+   "canonicalUpdatedAt": "2026-07-29T04:36:09.142Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 31,
+   "queueIndex": 1652,
+   "priority": 1,
+   "candidateId": "fbcd093b-017d-46a5-89e6-e178da56aa90",
+   "statementNo": "2019001029743",
+   "productName": "에너씨슬 퍼펙트샷",
+   "productMasterId": "0ea69c12-810b-4fbf-93a0-8eab0d0cf3ef",
+   "canonicalId": "6f3b2178-951f-472c-8f9f-1598c28e6065",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "84068d33e23bef3f2cd4ed9668fad4d4016f273d9e830411625319abd1e46393",
+   "canonicalContentLength": 1736,
+   "canonicalUpdatedAt": "2026-07-29T04:36:22.666Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 32,
+   "queueIndex": 1734,
+   "priority": 1,
+   "candidateId": "953ba4da-1294-4f49-9d84-0a580a3111e3",
+   "statementNo": "20200016052132",
+   "productName": "리즈온 멀티비타민&미네랄",
+   "productMasterId": "f0ec50da-dc5c-4387-8fe2-a35a371bb6b6",
+   "canonicalId": "00c107d8-5520-48b9-80f5-128f633b6cc0",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "e6f40772448b2f89f2c03c79ddb8c715773454ebf4cec516e657deb9bf9c1399",
+   "canonicalContentLength": 4199,
+   "canonicalUpdatedAt": "2026-07-29T04:37:36.321Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 33,
+   "queueIndex": 1763,
+   "priority": 1,
+   "candidateId": "31c4b8c1-cc4e-40c6-b394-3e2774fd8357",
+   "statementNo": "2023000229646",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "productMasterId": "0768cf49-17b9-45c4-994d-404c78e3457c",
+   "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "b2aa1a63c5b42afe1e1291d5ff577f37dd716607c1777ce7f91fc398b063bb0d",
+   "canonicalContentLength": 1895,
+   "canonicalUpdatedAt": "2026-07-29T04:40:10.470Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 34,
+   "queueIndex": 1766,
+   "priority": 1,
+   "candidateId": "4ede1c8a-1a6f-479a-8fb2-af38ee141c42",
+   "statementNo": "2023000462433",
+   "productName": "팻키니 다이어트 워터",
+   "productMasterId": "6d400948-8a92-47b9-8c07-825ee67d8b6a",
+   "canonicalId": "06ecd786-8e9e-457d-b44e-80b91a05fe23",
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "82e2cb0799ce658c47a8cde4331fc714de61379fd5f8dc8f1bc795cc6d596e60",
+   "canonicalContentLength": 1670,
+   "canonicalUpdatedAt": "2026-07-29T04:40:17.020Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 35,
+   "queueIndex": 1831,
+   "priority": 1,
+   "candidateId": "4b5975c9-0c61-4b06-9acd-aa2ed4081281",
+   "statementNo": "20040015070125",
+   "productName": "프로바이오틱스우먼",
+   "productMasterId": "e870ead8-b553-4e14-ac4d-b467ba4fff47",
+   "canonicalId": "f47c0032-72ad-46a7-8d4b-d1cd9c5e3806",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "ebfee8aed7ac8e25eb1e6fea50f764aa458ec029c343dc7aaaad4870f774ee13",
+   "canonicalContentLength": 1440,
+   "canonicalUpdatedAt": "2026-07-17T01:57:27.182Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 36,
+   "queueIndex": 1835,
+   "priority": 1,
+   "candidateId": "95d7e6a5-ffba-438f-87e7-4da29b11c0c0",
+   "statementNo": "200400150831163",
+   "productName": "영웅제약 눈건강프로젝트2.0",
+   "productMasterId": "6de0eb27-cfe9-4ac7-b8a8-5d7a9ac05b0c",
+   "canonicalId": "392b89a9-7127-48fd-9de9-af91a8143eb7",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "DRIVER",
+   "canonicalContentHash": "a40373dc4e3926498aae91e61337d68d54de6e559e53585541918cfea999253c",
+   "canonicalContentLength": 2980,
+   "canonicalUpdatedAt": "2026-07-27T04:11:48.351Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 37,
+   "queueIndex": 1836,
+   "priority": 1,
+   "candidateId": "6b00b46c-4beb-4dc9-8daf-de4162db99a9",
+   "statementNo": "200400150831232",
+   "productName": "와이즈 루테인아스타잔틴",
+   "productMasterId": "7fb65740-7f53-4de0-ac9b-8b7e3d748914",
+   "canonicalId": "8cfea319-1438-47eb-bd1c-2992643c3ff8",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "70e000c98605e26580e8b9cd455c760efb490c19b566c5bb9e656a211983b0ba",
+   "canonicalContentLength": 2334,
+   "canonicalUpdatedAt": "2026-07-23T21:14:32.020Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 38,
+   "queueIndex": 1863,
+   "priority": 1,
+   "candidateId": "3ee7f7a8-3e83-4040-90db-9a989e38de1d",
+   "statementNo": "200400170211592",
+   "productName": "비타잉",
+   "productMasterId": "434fbec2-93ca-47f7-b45b-4ae9e30a9f6c",
+   "canonicalId": "052f21bf-4ddf-4eff-af09-f9486c332087",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "6bba681019a2b0803de7147b8f6ac874bfd42f43e0bb329f2ae6eac171674ba4",
+   "canonicalContentLength": 1385,
+   "canonicalUpdatedAt": "2026-07-23T15:27:51.827Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 39,
+   "queueIndex": 1864,
+   "priority": 1,
+   "candidateId": "18a1eab4-183b-4fb9-b889-b859638f296d",
+   "statementNo": "20040017021732",
+   "productName": "위앤업 밀크씨슬 ",
+   "productMasterId": "8ee3b56e-6529-46c8-a49a-597f4fad9942",
+   "canonicalId": "2ee0c8a2-8da7-4cff-a74f-67d49e5fbb35",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "3fb37b678d46d85129e5288b79fcf25d71cb3862c383bb55dd3dacb54b960dac",
+   "canonicalContentLength": 1500,
+   "canonicalUpdatedAt": "2026-07-17T05:45:59.049Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 40,
+   "queueIndex": 1934,
+   "priority": 1,
+   "candidateId": "fdff01ff-b9f6-4cbd-ac30-b4aa760ad316",
+   "statementNo": "200400200073393",
+   "productName": "아이틱스 루테인 지아잔틴 아스타잔틴",
+   "productMasterId": "ae6f59de-8103-41c2-9498-cf6d1ac5e424",
+   "canonicalId": "7f6cb771-d399-4092-a1b6-a342dd55eed1",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "cd02b4c741d03a427bff271c0cf257e60d0637dc90388bbb043cda001b600324",
+   "canonicalContentLength": 1519,
+   "canonicalUpdatedAt": "2026-07-22T03:52:22.520Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 41,
+   "queueIndex": 1935,
+   "priority": 1,
+   "candidateId": "7b511a86-9994-4576-8a6a-888f98faf413",
+   "statementNo": "200400200142115",
+   "productName": "눈건강 루테인지아잔틴 프리미엄",
+   "productMasterId": "a0278f3c-98d1-4eab-8c8b-1e1a1e21d821",
+   "canonicalId": "0adcabe9-deab-4b5a-bd80-e4e62c623a34",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "c35380c88191a4f5b1a96d2df5c137c6f4c285267850a4ce16fb6e449763726b",
+   "canonicalContentLength": 3481,
+   "canonicalUpdatedAt": "2026-07-22T01:08:57.085Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 42,
+   "queueIndex": 2079,
+   "priority": 1,
+   "candidateId": "b11656ed-c18d-4489-9b59-31fe9b74d97b",
+   "statementNo": "200600200081043",
+   "productName": "아이클리어 루테인지아잔틴 아스타잔틴 미니",
+   "productMasterId": "57632fea-ad3e-4fab-ba84-82541078e006",
+   "canonicalId": "944bf249-e896-4b26-81ea-d9e811abc9aa",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "f334bba5e2b7b724db7e04eb63a38de6de7e67ba6f86d826f10b477504ddc191",
+   "canonicalContentLength": 3145,
+   "canonicalUpdatedAt": "2026-07-23T16:59:44.646Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 43,
+   "queueIndex": 2080,
+   "priority": 1,
+   "candidateId": "38f5ae53-33cc-419d-8ad4-d32bb04dca36",
+   "statementNo": "200700170351393",
+   "productName": "에이드핏 이지클렌즈",
+   "productMasterId": "96f36fd2-c3e5-471c-a536-4498b8f2ef8c",
+   "canonicalId": "98717826-2536-44d6-82bf-89c0e80c4d2a",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "fb8b9d41440f3de2c3d2b52127d1c280cf34fd43ef603a9cfe4f4d79e8a2d659",
+   "canonicalContentLength": 1901,
+   "canonicalUpdatedAt": "2026-07-23T04:02:52.421Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 44,
+   "queueIndex": 2083,
+   "priority": 1,
+   "candidateId": "1ac13d80-633e-4fcb-abc1-acdf85b30cfd",
+   "statementNo": "201000190041434",
+   "productName": "뼈앤칼마디",
+   "productMasterId": "c1973fa1-393b-4d8d-9839-e1961f4358d1",
+   "canonicalId": "fca569cc-af62-4edf-b14c-81a158b9f059",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "699da89948578823f3653ecd7d870f63e8de6cd34196e04d6b7a4037ed037a42",
+   "canonicalContentLength": 2865,
+   "canonicalUpdatedAt": "2026-07-21T19:56:40.391Z",
+   "pilotReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "recommendedAction": "REVIEW_ORIGINAL_LINE_BREAK",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 45,
+   "queueIndex": 2084,
+   "priority": 1,
+   "candidateId": "1408fd08-6dc4-4ee1-87c2-a3e5dc4ba1c5",
+   "statementNo": "201000190041442",
+   "productName": "The K2칼마디채움",
+   "productMasterId": "0a8f4073-eaaa-4bc8-a95c-848c89fcda76",
+   "canonicalId": "fda7266e-4918-4741-91c3-bd313a907b16",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "ba6ab27de61651267cf548686d85a125257a6ee775c03fb5b0e55ef02d15517a",
+   "canonicalContentLength": 2406,
+   "canonicalUpdatedAt": "2026-07-18T21:09:58.301Z",
+   "pilotReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "recommendedAction": "REVIEW_ORIGINAL_LINE_BREAK",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 46,
+   "queueIndex": 2131,
+   "priority": 1,
+   "candidateId": "f9e007d8-43de-4454-b110-e89281bfa622",
+   "statementNo": "20172880193439",
+   "productName": "건기남의 올레유러핀",
+   "productMasterId": "d7378ab2-aeb5-4afe-986e-3e4082a6c4a9",
+   "canonicalId": "c981688c-aebf-4aa8-a1f2-c7d53be7e499",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "086e17a9b5166cda8882b04b67328d2ac59ce42b10a4a5ff9fe7acc27869b9d4",
+   "canonicalContentLength": 1415,
+   "canonicalUpdatedAt": "2026-07-22T03:52:22.520Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  },
+  {
+   "pilotIndex": 47,
+   "queueIndex": 2175,
+   "priority": 1,
+   "candidateId": "66ff3300-b2c1-4d73-a8e2-88303030487f",
+   "statementNo": "20190009105415",
+   "productName": "쌩쌩 리포좀 비타민C",
+   "productMasterId": "51bed288-3e63-4f92-aa96-c0c13a3df5ed",
+   "canonicalId": "fd947be4-81d9-4946-8f53-2a77dbc1d6f6",
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "canonicalContentHash": "e3e5af6588a9e02a963db199aaa0ef2c761a30043807550dbdbba85066d89ac6",
+   "canonicalContentLength": 1984,
+   "canonicalUpdatedAt": "2026-07-21T18:57:42.448Z",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "agent9HoldPresent": false,
+   "currentState": "READY_FOR_REVIEW",
+   "canonicalHashChangedSinceManifest": false,
+   "reviewStatus": "PENDING"
+  }
+ ]
+}

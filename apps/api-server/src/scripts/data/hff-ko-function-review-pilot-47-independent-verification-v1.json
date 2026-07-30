@@ -1,0 +1,90 @@
+{
+ "verifiedAt": "2026-07-30T09:50:29.422Z",
+ "readOnlySession": true,
+ "expectedUpdate": 6,
+ "targetCount": 6,
+ "newHashMatch": 6,
+ "oldHashRemains": 0,
+ "attrDrift": 0,
+ "candidateDrift": 0,
+ "insertedClaims": {
+  "expected": 11,
+  "visible": 11,
+  "notVerbatim": 0
+ },
+ "outsideBlockDrift": 0,
+ "nonAppliedTargets": 41,
+ "nonAppliedDrift": 0,
+ "nonAppliedDriftList": [],
+ "canonicalDupInPilotMasters": 0,
+ "perTarget": [
+  {
+   "pilotIndex": 6,
+   "productName": "식물성 알티지오메가3 80",
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 3,
+   "outsideBlockIdentical": true
+  },
+  {
+   "pilotIndex": 7,
+   "productName": "한국가간보(佳肝寶)",
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 1,
+   "outsideBlockIdentical": true
+  },
+  {
+   "pilotIndex": 15,
+   "productName": "더쎄라 빼라",
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 1,
+   "outsideBlockIdentical": true
+  },
+  {
+   "pilotIndex": 18,
+   "productName": "관절혁명",
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 2,
+   "outsideBlockIdentical": true
+  },
+  {
+   "pilotIndex": 19,
+   "productName": "더신나게_다시관절",
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 2,
+   "outsideBlockIdentical": true
+  },
+  {
+   "pilotIndex": 20,
+   "productName": "관절건강엔 정통관절",
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "newHashMatch": true,
+   "oldHashRemains": false,
+   "attrOk": true,
+   "candOk": true,
+   "insertedClaims": 2,
+   "outsideBlockIdentical": true
+  }
+ ],
+ "verdict": "PASS",
+ "failedChecks": []
+}

@@ -1,0 +1,348 @@
+{
+ "ranAt": "2026-07-30T09:48:38.162Z",
+ "wrapperProof": {
+  "wrapperApplied": true,
+  "withoutWrapper": {
+   "card_maxWidth": "none",
+   "card_borderRadius": "0px",
+   "hero_padding": "0px",
+   "badge_borderRadius": "0px"
+  },
+  "withWrapper": {
+   "card_maxWidth": "860px",
+   "card_borderRadius": "20px",
+   "hero_padding": "40px 34px 32px",
+   "badge_borderRadius": "999px"
+  },
+  "cssActuallyApplied": true
+ },
+ "total": 6,
+ "pass": 6,
+ "targets": [
+  {
+   "pilotIndex": 6,
+   "productName": "식물성 알티지오메가3 80",
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 3,
+     "insertedClaimsExpected": 3
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 3,
+     "insertedClaimsExpected": 3
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 3,
+     "insertedClaimsExpected": 3
+    }
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "pilotIndex": 7,
+   "productName": "한국가간보(佳肝寶)",
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    }
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "pilotIndex": 15,
+   "productName": "더쎄라 빼라",
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 1,
+     "insertedClaimsExpected": 1
+    }
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "pilotIndex": 18,
+   "productName": "관절혁명",
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    }
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "pilotIndex": 19,
+   "productName": "더신나게_다시관절",
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    }
+   ],
+   "verdict": "PASS"
+  },
+  {
+   "pilotIndex": 20,
+   "productName": "관절건강엔 정통관절",
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "undefinedClasses": [],
+   "widths": [
+    {
+     "width": 430,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 820,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    },
+    {
+     "width": 1280,
+     "pageOverflow": false,
+     "elemOverflow": 0,
+     "clipped": 0,
+     "ellipsis": 0,
+     "rawBracketVisible": false,
+     "emptyHeading": false,
+     "emptyItem": false,
+     "sdWarn": 0,
+     "footerPresent": true,
+     "sectionsPresent": true,
+     "insertedClaimsVisible": 2,
+     "insertedClaimsExpected": 2
+    }
+   ],
+   "verdict": "PASS"
+  }
+ ],
+ "verdict": "PASS"
+}

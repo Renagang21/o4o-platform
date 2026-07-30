@@ -1,0 +1,14 @@
+{
+ "ranAt": "2026-07-30T09:42:53.962Z",
+ "mode": "dry-run",
+ "dbWrites": 0,
+ "statusTally": {
+  "SAFE_APPLY": 6,
+  "NO_CHANGE": 3,
+  "BLOCKED_SOURCE": 5,
+  "BLOCKED_AMBIGUOUS": 22,
+  "BLOCKED_STRUCTURE": 11,
+  "FAILED_SYSTEM": 0
+ },
+ "sum": 47
+}

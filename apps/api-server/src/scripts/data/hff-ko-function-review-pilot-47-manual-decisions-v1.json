@@ -1,0 +1,2466 @@
+{
+ "decidedAt": "2026-07-30T09:42:53.955Z",
+ "total": 47,
+ "tally": {
+  "BLOCKED_RENDERER_STRUCTURE": 11,
+  "BLOCKED_SOURCE_DATA": 5,
+  "BLOCKED_AMBIGUOUS_BOUNDARY": 22,
+  "RESOLVED_NO_CHANGE": 3,
+  "SAFE_CANONICAL_PATCH": 6
+ },
+ "repairTally": {
+  "BLOCKED": 33,
+  "SOURCE_REPAIR": 5,
+  "NO_REPAIR_REQUIRED": 3,
+  "RENDER_ONLY_REPAIR": 6
+ },
+ "blockedTally": {
+  "NO_SIBLING_GROUP_TEMPLATE": 10,
+  "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR": 5,
+  "UNMATCHED_CLOSING_BRACKET": 7,
+  "BROKEN_LABEL_UNPARSEABLE:NO_MARKER": 9,
+  "NO_IDENTIFIABLE_BROKEN_LABEL_LINE": 4,
+  "BROKEN_LABEL_UNPARSEABLE:LABEL_HAS_BRACKET": 2,
+  "FUNCTION_BLOCK_ABSENT_NO_TEMPLATE": 1
+ },
+ "decisions": [
+  {
+   "pilotIndex": 1,
+   "queueIndex": 8,
+   "candidateId": "19c89e9f-b781-4055-84d5-eee29f6be318",
+   "statementNo": "20040015083653",
+   "productName": "솔빛C",
+   "canonicalId": "7ba37116-e1e0-49f1-86c2-a356ca76562f",
+   "productMasterId": "4b8e25aa-fcea-4895-a050-9b8ccbc25038",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 1,
+    "closeCount": 0,
+    "unmatchedOpenContexts": [
+     "[비타민C (가) 결합조직 형성과 기능유지에 필요(나) 철의 흡수에 필요"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "비타민C",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 1,
+    "bracketFragmentsRendered": [
+     "[비타민C (가) 결합조직 형성과 기능유지에 필요(나) 철의 흡수에 필요(다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 2,
+   "queueIndex": 17,
+   "candidateId": "635f1acf-fef7-4308-adb0-0ff4e0fe5977",
+   "statementNo": "200400151071289",
+   "productName": "야호킹파워",
+   "canonicalId": "7c242d02-f4c6-42cd-b858-9d6c8be1b2c8",
+   "productMasterId": "78eee82a-1519-43cb-860b-abfaabb2598e",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 9,
+    "closeCount": 8,
+    "unmatchedOpenContexts": [
+     " 필요\\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\\n[비타민D) (가) 칼슘과 인이 흡수되고 이용되는데 필요, (나) 뼈의 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 4,
+      "ok": true,
+      "why": null,
+      "label": "비타민D)",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 10,
+    "bracketFragmentsRendered": [
+     "[비타민D) (가) 칼슘과 인이 흡수되고 이용되는데 필요, (나) 뼈의 형성과 유지에 필요, (다) 골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "SOURCE_REPAIR",
+   "decision": "BLOCKED_SOURCE_DATA",
+   "decisionReasons": [
+    "공식 기능성 손실은 없으나 원문 대괄호 파편이 라벨/기능성 경계와 함께 노출 — 원천 정비 대상"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR"
+  },
+  {
+   "pilotIndex": 3,
+   "queueIndex": 72,
+   "candidateId": "6f4a0a79-eef3-498b-8587-9fd0df58c316",
+   "statementNo": "20040016037147",
+   "productName": "디믹스",
+   "canonicalId": "0ab86bb8-e4b8-4101-b926-17da750ff838",
+   "productMasterId": "c2cea0c9-8808-47cb-a551-63338c675ba7",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 1,
+    "closeCount": 0,
+    "unmatchedOpenContexts": [
+     "[녹차추출물 제품1. 항산화에 도움을 줄 수 있음 2. 체지방 감소에 도"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "녹차추출물 제품1. 항산화에 도움을 줄 수 있음",
+      "claimCount": 2
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [
+     "[녹차추출물 제품1."
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 4,
+   "queueIndex": 75,
+   "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+   "statementNo": "200400170061205",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+   "productMasterId": "2e066612-fe9b-4e7b-9e8c-ddb9fb5c2b5c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 6,
+    "closeCount": 7,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "자몽추출물등 복합물(Sinetrol)(제2019-24호)](국문) 체지방 감소에 도움을 줄 수 있음\\n(영문) May help t"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 11,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "자몽추출물등 복합물(Sinetrol)(제2019-24호)](국문) 체지방 감소에 도움을 줄 수 있음",
+     "(영문) May help to reduce body fat"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 5,
+   "queueIndex": 76,
+   "candidateId": "f2e425b6-660a-426e-ac40-c6e6654fcd5f",
+   "statementNo": "200400170061236",
+   "productName": "코큐텐 포뮬러",
+   "canonicalId": "3672bd24-c8df-48fb-bf72-f8bd7a5efa44",
+   "productMasterId": "d92786d1-ca68-4703-9b9c-eb230d87f852",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 7,
+    "closeCount": 6,
+    "unmatchedOpenContexts": [
+     "\\n\\n[판토텐산] ①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\\n\\n[나이아신 ①체내 에너지 생성에 필요\\n\\n[비타민C] ①결합조직 형성과 기"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 8,
+      "ok": true,
+      "why": null,
+      "label": "나이아신",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 8,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "NO_REPAIR_REQUIRED",
+   "decision": "RESOLVED_NO_CHANGE",
+   "decisionReasons": [
+    "공식 기능성 전량 렌더됨 · 표시 결함 없음(감사 false positive)"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": null
+  },
+  {
+   "pilotIndex": 6,
+   "queueIndex": 79,
+   "candidateId": "1bd47cf1-8d29-4fba-a155-349fa6bd698b",
+   "statementNo": "20040017006492",
+   "productName": "식물성 알티지오메가3 80",
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "productMasterId": "7c93a250-5bd0-4ff7-82de-0e421408f314",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "[EPA 및 DHA 함유유지 ① 혈중 중성지질 개선에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "EPA 및 DHA 함유유지",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[EPA 및 DHA 함유유지",
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을줄 수 있음",
+     "건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 3,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "EPA 및 DHA 함유유지",
+     "marker": "①",
+     "claims": [
+      "혈중 중성지질 개선에 도움을 줄 수 있음",
+      "혈행개선에 도움을줄 수 있음",
+      "건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 3,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">EPA 및 DHA 함유유지</span><ul><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 7,
+   "queueIndex": 86,
+   "candidateId": "92a1d1c7-c4b4-494f-a391-3a799ccd3c37",
+   "statementNo": "20040017021828",
+   "productName": "한국가간보(佳肝寶)",
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "productMasterId": "37105d6f-659b-4f21-b5be-4b70640e9437",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 2,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[밀크씨슬(카르두스 마리아누스)추출물) ① 간 건강에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "밀크씨슬(카르두스 마리아누스)추출물)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 3,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[밀크씨슬(카르두스 마리아누스)추출물)",
+     "간 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 1,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "밀크씨슬(카르두스 마리아누스)추출물)",
+     "marker": "①",
+     "claims": [
+      "간 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">밀크씨슬(카르두스 마리아누스)추출물)</span><ul><li>간 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 8,
+   "queueIndex": 89,
+   "candidateId": "c38f5319-760b-4bad-bf9f-39df99e49e66",
+   "statementNo": "20040017031279",
+   "productName": "메타그린부스터샷7일",
+   "canonicalId": "05e36e76-9948-4092-82f0-83b94fdb38b6",
+   "productMasterId": "f65b8872-255a-4a89-9fa0-596ed5c89c24",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 4,
+    "closeCount": 3,
+    "unmatchedOpenContexts": [
+     " 필요\\n[판토텐산]\\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\\n[APIC 대두배아열수추출물 등 복합물(제2008-6호)\\n(국문) 체지방"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 6,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 5,
+    "bracketFragmentsRendered": [
+     "[APIC 대두배아열수추출물 등 복합물(제2008-6호)"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 9,
+   "queueIndex": 117,
+   "candidateId": "5ae0a6d3-d3c0-4a5b-8958-3d960f8f829a",
+   "statementNo": "20040020004469",
+   "productName": "바이오메라 면역젤리 튼튼대장 사과맛",
+   "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+   "productMasterId": "4ec9e9ea-2bc2-4d3d-9617-948c05dcff1f",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 4,
+    "closeCount": 3,
+    "unmatchedOpenContexts": [
+     "[비오틴][(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\\n\\n[아연]①"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 3,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "불균형 원인 라인을 유일하게 특정 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_IDENTIFIABLE_BROKEN_LABEL_LINE"
+  },
+  {
+   "pilotIndex": 10,
+   "queueIndex": 441,
+   "candidateId": "d9ecc227-103f-451f-a811-6ed4160d95db",
+   "statementNo": "200400200071620",
+   "productName": "뷰티업필",
+   "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+   "productMasterId": "f43ceaba-1f36-4eb1-babc-3aa655e2e7de",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 10,
+    "closeCount": 8,
+    "unmatchedOpenContexts": [
+     "[비타민B1[①탄수화물과 에너지 대사에 필요\\n[비타민B2]①체내 에너지 ",
+     "[비타민B1[①탄수화물과 에너지 대사에 필요\\n[비타민B2]①체내 에너지 생성에 필요"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": false,
+      "why": "LABEL_HAS_BRACKET",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 14,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[비타민B1[",
+     "탄수화물과 에너지 대사에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:LABEL_HAS_BRACKET"
+  },
+  {
+   "pilotIndex": 11,
+   "queueIndex": 442,
+   "candidateId": "90c706ff-375c-416b-b064-2d1eeff74b8e",
+   "statementNo": "20040020013376",
+   "productName": "프리미엄 멀티비타민미네랄",
+   "canonicalId": "e70adc7e-74ab-4658-855b-e42a5763ca13",
+   "productMasterId": "7201a0ed-1489-4e9d-b4eb-376ea8b36fda",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 14,
+    "closeCount": 13,
+    "unmatchedOpenContexts": [
+     "에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 \\n\\n[비타민 D) ①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 16,
+      "ok": true,
+      "why": null,
+      "label": "비타민 D)",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 24,
+    "bracketFragmentsRendered": [
+     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 [비타민 D)"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "SOURCE_REPAIR",
+   "decision": "BLOCKED_SOURCE_DATA",
+   "decisionReasons": [
+    "공식 기능성 손실은 없으나 원문 대괄호 파편이 라벨/기능성 경계와 함께 노출 — 원천 정비 대상"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR"
+  },
+  {
+   "pilotIndex": 12,
+   "queueIndex": 443,
+   "candidateId": "49b835aa-36f2-41bd-b5ce-0cd765dbe6f5",
+   "statementNo": "200400200142058",
+   "productName": "광동rTG오메가3",
+   "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+   "productMasterId": "f4688258-c7ac-42fc-9e15-e292632c25ed",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "[EPA 및 DHA 함유유지\\n(1) 혈중 중성지질 개선･혈행 개선･건조한"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[EPA 및 DHA 함유유지",
+     "(1) 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 13,
+   "queueIndex": 898,
+   "candidateId": "e751e9d9-b7b3-4547-a940-37662588d3eb",
+   "statementNo": "20040020020636",
+   "productName": "돌외잎그린다이어트",
+   "canonicalId": "3e204146-7a4f-4328-b8f4-78018e98e77a",
+   "productMasterId": "6f47fd23-9515-43ae-83b7-4d2775c216ac",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "AUDIT_FALSE_POSITIVE_BALANCED",
+    "openCount": 1,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 18,
+    "bracketFragmentsRendered": [
+     "체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급) [May help reduce body fat mass.(Other function claime 2 grade.)] * 마그네슘"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 14,
+   "queueIndex": 1097,
+   "candidateId": "0ab2b69e-21da-4bf4-bb4c-88f88bc876c6",
+   "statementNo": "20040020020899",
+   "productName": "원컷 다이어트",
+   "canonicalId": "07bf837a-7692-4c6a-8ba4-cad86a984036",
+   "productMasterId": "1eda8701-2e84-4b95-b3fc-88aa0a176405",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "AUDIT_FALSE_POSITIVE_BALANCED",
+    "openCount": 1,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 15,
+    "bracketFragmentsRendered": [
+     "체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급) [May help reduce body fat mass.(Other function claime 2 grade.)] * 비타민B1"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 15,
+   "queueIndex": 1180,
+   "candidateId": "f88fa3c9-fe2b-407e-a104-64695f5216a9",
+   "statementNo": "20040020046598",
+   "productName": "더쎄라 빼라",
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "productMasterId": "af98cb65-ec26-4e13-accb-a2d26ce59aff",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 8,
+    "closeCount": 7,
+    "unmatchedOpenContexts": [
+     " 도움을 줄 수 있음\\n\\n[비타민B1] ①탄수화물과 에너지 대사에 필요\\n\\n[비타민B2 ①체내 에너지 생성에 필요\\n\\n[비타민C] ①결합조직 형성과 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 6,
+      "ok": true,
+      "why": null,
+      "label": "비타민B2",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 12,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[비타민B2",
+     "체내 에너지 생성에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 1,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 6,
+     "label": "비타민B2",
+     "marker": "①",
+     "claims": [
+      "체내 에너지 생성에 필요"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 16,
+   "queueIndex": 1258,
+   "candidateId": "b7b1af8c-91f4-4b94-be52-e878e0018772",
+   "statementNo": "201000190041382",
+   "productName": "면역피로탁",
+   "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+   "productMasterId": "42ca920d-aa35-43c3-a66b-e5082b094a7b",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 11,
+    "closeCount": 12,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "홍삼]①면역력 증진･피로개선에 도움을 줄 수 있음②혈소판 응집억제를 통한 혈"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 21,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "면역력 증진･피로개선에 도움을 줄 수 있음",
+     "혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 17,
+   "queueIndex": 1267,
+   "candidateId": "93e5bd9a-203f-44b7-8036-dfddb5b57435",
+   "statementNo": "20120019007193",
+   "productName": "이너모아 다운부스트",
+   "canonicalId": "6e5726ec-cb74-4fa6-bc1e-0d90a3597e4b",
+   "productMasterId": "1cd410e2-5180-49ec-b6bf-b70515fc745b",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 7,
+    "closeCount": 6,
+    "unmatchedOpenContexts": [
+     "차추출물] 항산화․체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음[\\n[비타민B1] ①탄수화물과 에너지 대사에 필요\\n[비타민B2] ①체내 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 7,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "불균형 원인 라인을 유일하게 특정 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_IDENTIFIABLE_BROKEN_LABEL_LINE"
+  },
+  {
+   "pilotIndex": 18,
+   "queueIndex": 1270,
+   "candidateId": "d03bb768-143d-4b6b-9c90-2ac47c7af720",
+   "statementNo": "20130017122115",
+   "productName": "관절혁명",
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "productMasterId": "c1b54173-b7d8-4e82-a87b-9de5ca5eba5c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 19,
+   "queueIndex": 1271,
+   "candidateId": "23ac7504-3a7b-44a8-8af4-3a3b8879d5e5",
+   "statementNo": "2013001712287",
+   "productName": "더신나게_다시관절",
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "productMasterId": "9311fcb5-38ec-4cf0-a881-73699f86dce8",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 20,
+   "queueIndex": 1272,
+   "candidateId": "3c290fe7-e09c-4815-94e8-f0399f2d3bf0",
+   "statementNo": "2013001712291",
+   "productName": "관절건강엔 정통관절",
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "productMasterId": "0ffab1cb-2e7c-4f95-908a-c10d104ef059",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 21,
+   "queueIndex": 1490,
+   "candidateId": "79c4bbf9-715b-4239-917f-1cffa362424d",
+   "statementNo": "20140017002171",
+   "productName": "10종 복합코팅유산균 비(B)",
+   "canonicalId": "3935cd64-c062-47b8-a8ea-974195408bfb",
+   "productMasterId": "c973746f-4b7a-4ffa-8796-edc2e435af38",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 0,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "프로바이오틱스 제품]①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 "
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [
+     "프로바이오틱스 제품]"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 22,
+   "queueIndex": 1532,
+   "candidateId": "ccb662ab-df8f-42a8-8374-71fd8618c1ba",
+   "statementNo": "20172880193315",
+   "productName": "관절연골엔 구절초 프리미엄",
+   "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+   "productMasterId": "be395495-89c9-4e87-8058-049ea7ff0f69",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "[구절초추출물(조인시스트®)\\n(국문) 관절 및 연골 건강에 도움을 줄 수"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[구절초추출물(조인시스트®)",
+     "(국문) 관절 및 연골 건강에 도움을 줄 수 있음",
+     "(영문) May help to maintain healthy joint and cartilage"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 23,
+   "queueIndex": 1641,
+   "candidateId": "fe600833-670a-4c7a-9131-29c980adf732",
+   "statementNo": "2019000939491",
+   "productName": "리얼퀸 센시다이어트",
+   "canonicalId": "29e87505-a1ba-4ad4-8cfe-4010ea41e96f",
+   "productMasterId": "ddbcb306-f4f4-4824-bc4e-2a03e916c26c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 5,
+    "closeCount": 4,
+    "unmatchedOpenContexts": [
+     "물]\\n-항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\\n\\n[은행잎추출물}\\n-기억력 개선･혈행 개선에 도움을 줄 수 있음\\n\\n[비타민"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 3,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[은행잎추출물}",
+     "-기억력 개선･혈행 개선에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 24,
+   "queueIndex": 1642,
+   "candidateId": "d71a96e6-fd25-48c5-a6e0-77b0f89e544a",
+   "statementNo": "2019000939492",
+   "productName": "리얼퀸",
+   "canonicalId": "ed2ce160-42d1-41ef-bdaf-ff5f0dedf847",
+   "productMasterId": "c78d3e97-38e5-41a4-bd30-8ab7139658e0",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 13,
+    "closeCount": 12,
+    "unmatchedOpenContexts": [
+     "물]\\n-항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\\n\\n[회화나무열매추출물}\\n-갱년기 여성의 건강에 도움을 줄 수 있음\\n\\n[비타"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 3,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 21,
+    "bracketFragmentsRendered": [
+     "[회화나무열매추출물}"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 25,
+   "queueIndex": 1645,
+   "candidateId": "c5311c15-5b60-434f-b16e-b1210640b4e3",
+   "statementNo": "20190009483131",
+   "productName": "바나바 혈당 케어",
+   "canonicalId": "95abce8d-dfc0-450d-b09c-7389c48a513e",
+   "productMasterId": "ba75ddf9-2fbc-4899-aa8b-c8023f1ea4d9",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 3,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "음\\n\\n[코엔자임Q10] ①항산화·높은 혈압 감소에 도움을 줄 수 있음\\n\\n[바나바잎 추출물 ①식후 혈당상승 억제에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 4,
+      "ok": true,
+      "why": null,
+      "label": "바나바잎 추출물",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 3,
+    "bracketFragmentsRendered": [
+     "항산화·높은 혈압 감소에 도움을 줄 수 있음 [바나바잎 추출물"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "SOURCE_REPAIR",
+   "decision": "BLOCKED_SOURCE_DATA",
+   "decisionReasons": [
+    "공식 기능성 손실은 없으나 원문 대괄호 파편이 라벨/기능성 경계와 함께 노출 — 원천 정비 대상"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR"
+  },
+  {
+   "pilotIndex": 26,
+   "queueIndex": 1646,
+   "candidateId": "e59630f3-5859-46bd-9fbc-67618303da85",
+   "statementNo": "20190009483143",
+   "productName": "덴티케어 플렉스",
+   "canonicalId": "9315b81e-b5a9-4a1f-a698-8eda706af907",
+   "productMasterId": "679606d1-df2e-4834-996e-bf4c75b37682",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 2,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\\n\\n[칼슘 ①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 4,
+      "ok": true,
+      "why": null,
+      "label": "칼슘",
+      "claimCount": 4
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 8,
+    "bracketFragmentsRendered": [
+     "골다공증발생 위험 감소에 도움을 줌 [칼슘"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "SOURCE_REPAIR",
+   "decision": "BLOCKED_SOURCE_DATA",
+   "decisionReasons": [
+    "공식 기능성 손실은 없으나 원문 대괄호 파편이 라벨/기능성 경계와 함께 노출 — 원천 정비 대상"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR"
+  },
+  {
+   "pilotIndex": 27,
+   "queueIndex": 1647,
+   "candidateId": "b7120036-5080-4930-9300-c65a3405fef8",
+   "statementNo": "20190009483190",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+   "productMasterId": "b564269f-fb27-41a5-be9a-e2672762dc9e",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 4,
+    "closeCount": 5,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "쏘팔메토 열매 추출물] ①전립선 건강의 유지에 도움을 줄 수 있음\\n[옥타코사놀 함유 유지] "
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 7,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "쏘팔메토 열매 추출물]",
+     "전립선 건강의 유지에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 28,
+   "queueIndex": 1648,
+   "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+   "statementNo": "20190009483373",
+   "productName": "차전자피 카테킨 다이어트",
+   "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+   "productMasterId": "27f7ca99-c1e8-41ec-845c-6d38cfffefb1",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 1,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "차전자피식이섬유]\\n혈중 콜레스테롤 개선에 도움을 줄 수 있음\\n배변활동 원활에 도움을 줄"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 1,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "차전자피식이섬유]",
+     "배변활동 원활에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 29,
+   "queueIndex": 1649,
+   "candidateId": "08f83edc-a9a7-4a80-acc6-4e90545456b0",
+   "statementNo": "20190009483400",
+   "productName": "텅장환",
+   "canonicalId": "2e20164f-d102-41c0-9a84-ade39bb98e19",
+   "productMasterId": "175e06b6-c4b6-4737-b7d7-c387376b3048",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 0,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "차전자피식이섬유]\\n혈중 콜레스테롤 개선에 도움을 줄 수 있음\\n배변활동 원활에 도움을 줄"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 3,
+    "bracketFragmentsRendered": [
+     "차전자피식이섬유]"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 30,
+   "queueIndex": 1651,
+   "candidateId": "0abf229e-d191-4aee-be81-9e856f06cc6e",
+   "statementNo": "20190009483675",
+   "productName": "눈건강엔 루테인",
+   "canonicalId": "4c46958f-5e30-4aec-91c7-468cecde0dfc",
+   "productMasterId": "8868a49a-3e00-4987-9f94-d7a7f09fe518",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 9,
+    "closeCount": 8,
+    "unmatchedOpenContexts": [
+     "산소로부터 세포를 보호하는데 필요\\n[나이아신]\\n체내 에너지 생성에 필요\\n[베타카로틴\\n(1) 어두운 곳에서 시각 적응을 위해 필요\\n(2) 피부와 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 10,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 15,
+    "bracketFragmentsRendered": [
+     "[베타카로틴"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 31,
+   "queueIndex": 1652,
+   "candidateId": "fbcd093b-017d-46a5-89e6-e178da56aa90",
+   "statementNo": "2019001029743",
+   "productName": "에너씨슬 퍼펙트샷",
+   "canonicalId": "6f3b2178-951f-472c-8f9f-1598c28e6065",
+   "productMasterId": "0ea69c12-810b-4fbf-93a0-8eab0d0cf3ef",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 2,
+    "closeCount": 3,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "액상[나이아신, 비타민B6, 비타민B1]]: 탄수화물과 에너지 대사에 필요, 체내 에너지 생성에 필요, 단백질 "
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 2,
+    "bracketFragmentsRendered": [
+     "]: 탄수화물과 에너지 대사에 필요, 체내 에너지 생성에 필요, 단백질 및 아미노산 이용에 필요",
+     "정제[밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산]: 간건강에 도움을 줄수 있음, 정상적인 엽산 대사에 필요, 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요, 체내 에너지 생성에 필요, 세포와 혈액생성에 필요, 태아신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 32,
+   "queueIndex": 1734,
+   "candidateId": "953ba4da-1294-4f49-9d84-0a580a3111e3",
+   "statementNo": "20200016052132",
+   "productName": "리즈온 멀티비타민&미네랄",
+   "canonicalId": "00c107d8-5520-48b9-80f5-128f633b6cc0",
+   "productMasterId": "f0ec50da-dc5c-4387-8fe2-a35a371bb6b6",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 19,
+    "closeCount": 18,
+    "unmatchedOpenContexts": [
+     " 필요 ②뼈의 형성과 유지에 필요 ③골다공증발생 위험 감소에 도움을 줌\\n[비타민 E) ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 2,
+      "ok": true,
+      "why": null,
+      "label": "비타민 E)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 33,
+    "bracketFragmentsRendered": [
+     "골다공증발생 위험 감소에 도움을 줌 [비타민 E)"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "SOURCE_REPAIR",
+   "decision": "BLOCKED_SOURCE_DATA",
+   "decisionReasons": [
+    "공식 기능성 손실은 없으나 원문 대괄호 파편이 라벨/기능성 경계와 함께 노출 — 원천 정비 대상"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "RAW_BRACKET_FRAGMENT_RENDERED_LABEL_BOUNDARY_NEEDS_SOURCE_REPAIR"
+  },
+  {
+   "pilotIndex": 33,
+   "queueIndex": 1763,
+   "candidateId": "31c4b8c1-cc4e-40c6-b394-3e2774fd8357",
+   "statementNo": "2023000229646",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+   "productMasterId": "0768cf49-17b9-45c4-994d-404c78e3457c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 4,
+    "closeCount": 5,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "비타민C] \\n(1) 결합조직 형성과 기능유지에 필요\\n(2) 철의 흡수에 필요\\n("
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 7,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "(1) 결합조직 형성과 기능유지에 필요",
+     "(2) 철의 흡수에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 34,
+   "queueIndex": 1766,
+   "candidateId": "4ede1c8a-1a6f-479a-8fb2-af38ee141c42",
+   "statementNo": "2023000462433",
+   "productName": "팻키니 다이어트 워터",
+   "canonicalId": "06ecd786-8e9e-457d-b44e-80b91a05fe23",
+   "productMasterId": "6d400948-8a92-47b9-8c07-825ee67d8b6a",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 2,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     " 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음\\n\\n[아프리카망고 종자추출물(IGOB131)(제2015-14호)\\n1) (국문"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 3,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [
+     "[아프리카망고 종자추출물(IGOB131)(제2015-14호)"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 35,
+   "queueIndex": 1831,
+   "candidateId": "4b5975c9-0c61-4b06-9acd-aa2ed4081281",
+   "statementNo": "20040015070125",
+   "productName": "프로바이오틱스우먼",
+   "canonicalId": "f47c0032-72ad-46a7-8d4b-d1cd9c5e3806",
+   "productMasterId": "e870ead8-b553-4e14-ac4d-b467ba4fff47",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 1,
+    "closeCount": 0,
+    "unmatchedOpenContexts": [
+     "[프로바이오틱스 제품①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "프로바이오틱스 제품",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": false,
+    "renderedItemCount": 0,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[프로바이오틱스 제품",
+     "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+     "배변활동 원활에 도움을 줄 수 있음",
+     "장건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "기능성 섹션 자체가 canonical 에 없어 동일 문서 내 복제 가능한 마크업 템플릿이 없음"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "FUNCTION_BLOCK_ABSENT_NO_TEMPLATE"
+  },
+  {
+   "pilotIndex": 36,
+   "queueIndex": 1835,
+   "candidateId": "95d7e6a5-ffba-438f-87e7-4da29b11c0c0",
+   "statementNo": "200400150831163",
+   "productName": "영웅제약 눈건강프로젝트2.0",
+   "canonicalId": "392b89a9-7127-48fd-9de9-af91a8143eb7",
+   "productMasterId": "6de0eb27-cfe9-4ac7-b8a8-5d7a9ac05b0c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 9,
+    "closeCount": 8,
+    "unmatchedOpenContexts": [
+     " 줄 수 있음.(나) 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음[\\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 12,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "불균형 원인 라인을 유일하게 특정 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_IDENTIFIABLE_BROKEN_LABEL_LINE"
+  },
+  {
+   "pilotIndex": 37,
+   "queueIndex": 1836,
+   "candidateId": "6b00b46c-4beb-4dc9-8daf-de4162db99a9",
+   "statementNo": "200400150831232",
+   "productName": "와이즈 루테인아스타잔틴",
+   "canonicalId": "8cfea319-1438-47eb-bd1c-2992643c3ff8",
+   "productMasterId": "7fb65740-7f53-4de0-ac9b-8b7e3d748914",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 6,
+    "closeCount": 5,
+    "unmatchedOpenContexts": [
+     "필요. 뼈의 형성과 유지에 필요. 골다공증발생 위험 감소에 도움을 줌.\\n[비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 4,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 15,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 38,
+   "queueIndex": 1863,
+   "candidateId": "3ee7f7a8-3e83-4040-90db-9a989e38de1d",
+   "statementNo": "200400170211592",
+   "productName": "비타잉",
+   "canonicalId": "052f21bf-4ddf-4eff-af09-f9486c332087",
+   "productMasterId": "434fbec2-93ca-47f7-b45b-4ae9e30a9f6c",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 1,
+    "closeCount": 0,
+    "unmatchedOpenContexts": [
+     "[비타민 C} ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "비타민 C}",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 2,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[비타민 C}",
+     "철의 흡수에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 39,
+   "queueIndex": 1864,
+   "candidateId": "18a1eab4-183b-4fb9-b889-b859638f296d",
+   "statementNo": "20040017021732",
+   "productName": "위앤업 밀크씨슬 ",
+   "canonicalId": "2ee0c8a2-8da7-4cff-a74f-67d49e5fbb35",
+   "productMasterId": "8ee3b56e-6529-46c8-a49a-597f4fad9942",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET",
+    "openCount": 1,
+    "closeCount": 0,
+    "unmatchedOpenContexts": [
+     "[밀크씨슬(카르두스 마리아누스)추출물 ① 간 건강에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "밀크씨슬(카르두스 마리아누스)추출물",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 1,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[밀크씨슬(카르두스 마리아누스)추출물"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 40,
+   "queueIndex": 1934,
+   "candidateId": "fdff01ff-b9f6-4cbd-ac30-b4aa760ad316",
+   "statementNo": "200400200073393",
+   "productName": "아이틱스 루테인 지아잔틴 아스타잔틴",
+   "canonicalId": "7f6cb771-d399-4092-a1b6-a342dd55eed1",
+   "productMasterId": "ae6f59de-8103-41c2-9498-cf6d1ac5e424",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 1,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "마리골드꽃추출물(지아잔틴함유)(제2025-07호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 1,
+    "bracketFragmentsRendered": [
+     "마리골드꽃추출물(지아잔틴함유)(제2025-07호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 눈의 피로도 개선에 도움을 줄 수 있음"
+    ],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": [
+     "마리골드꽃추출물(지아잔틴함유)(제2025-07호)] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 눈의 피로도 개선에 도움을 줄 수 있음"
+    ]
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 41,
+   "queueIndex": 1935,
+   "candidateId": "7b511a86-9994-4576-8a6a-888f98faf413",
+   "statementNo": "200400200142115",
+   "productName": "눈건강 루테인지아잔틴 프리미엄",
+   "canonicalId": "0adcabe9-deab-4b5a-bd80-e4e62c623a34",
+   "productMasterId": "a0278f3c-98d1-4eab-8c8b-1e1a1e21d821",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 9,
+    "closeCount": 8,
+    "unmatchedOpenContexts": [
+     "에 필요\\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요[\\n[셀렌]\\n(1) 유해산소로부터 세포를 보호하는데 필요\\n[비타민 E]\\n"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 21,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "(1) 유해산소로부터 세포를 보호하는데 필요",
+     "(2) 유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "notGroundedItems": [
+     "루테인",
+     "셀레늄"
+    ]
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "불균형 원인 라인을 유일하게 특정 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_IDENTIFIABLE_BROKEN_LABEL_LINE"
+  },
+  {
+   "pilotIndex": 42,
+   "queueIndex": 2079,
+   "candidateId": "b11656ed-c18d-4489-9b59-31fe9b74d97b",
+   "statementNo": "200600200081043",
+   "productName": "아이클리어 루테인지아잔틴 아스타잔틴 미니",
+   "canonicalId": "944bf249-e896-4b26-81ea-d9e811abc9aa",
+   "productMasterId": "57632fea-ad3e-4fab-ba84-82541078e006",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 10,
+    "closeCount": 9,
+    "unmatchedOpenContexts": [
+     "[루테인지아잔틴복합추출물(기능성원료인정 제2018-4호) (국문) 노화로"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 24,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:NO_MARKER"
+  },
+  {
+   "pilotIndex": 43,
+   "queueIndex": 2080,
+   "candidateId": "38f5ae53-33cc-419d-8ad4-d32bb04dca36",
+   "statementNo": "200700170351393",
+   "productName": "에이드핏 이지클렌즈",
+   "canonicalId": "98717826-2536-44d6-82bf-89c0e80c4d2a",
+   "productMasterId": "96f36fd2-c3e5-471c-a536-4498b8f2ef8c",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_OPENING_BRACKET",
+    "openCount": 2,
+    "closeCount": 3,
+    "unmatchedOpenContexts": [],
+    "unmatchedCloseContexts": [
+     "가르시니아캄보지아 추출물]① 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄"
+    ],
+    "brokenLabelLines": []
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 7,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "UNMATCHED_CLOSING_BRACKET"
+  },
+  {
+   "pilotIndex": 44,
+   "queueIndex": 2083,
+   "candidateId": "1ac13d80-633e-4fcb-abc1-acdf85b30cfd",
+   "statementNo": "201000190041434",
+   "productName": "뼈앤칼마디",
+   "canonicalId": "fca569cc-af62-4edf-b14c-81a158b9f059",
+   "productMasterId": "c1973fa1-393b-4d8d-9839-e1961f4358d1",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "sourceProblemSpan": {
+    "type": "MID_WORD_LINE_BREAK",
+    "fragments": [
+     {
+      "head": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도",
+      "next": "움을 줌"
+     },
+     {
+      "head": "움을 줌",
+      "next": "[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요"
+     }
+    ]
+   },
+   "currentCanonicalProblem": "NONE — 렌더러가 줄바꿈을 이미 올바르게 결합하여 공식 기능성 전량 보유",
+   "repairClass": "NO_REPAIR_REQUIRED",
+   "decision": "RESOLVED_NO_CHANGE",
+   "decisionReasons": [
+    "CURRENT_CANONICAL_ALREADY_COMPLETE",
+    "LINE_BREAK_IS_SOURCE_DISPLAY_ARTIFACT_ONLY"
+   ],
+   "reviewerChecks": {
+    "sourceClauses": 14,
+    "missingFromRender": 0,
+    "joinedPresentInSource": true
+   },
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": null
+  },
+  {
+   "pilotIndex": 45,
+   "queueIndex": 2084,
+   "candidateId": "1408fd08-6dc4-4ee1-87c2-a3e5dc4ba1c5",
+   "statementNo": "201000190041442",
+   "productName": "The K2칼마디채움",
+   "canonicalId": "fda7266e-4918-4741-91c3-bd313a907b16",
+   "productMasterId": "0a8f4073-eaaa-4bc8-a95c-848c89fcda76",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "SOURCE_LINE_BREAK_FRAGMENTED"
+   ],
+   "sourceProblemSpan": {
+    "type": "MID_WORD_LINE_BREAK",
+    "fragments": [
+     {
+      "head": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도",
+      "next": "움을 줌"
+     },
+     {
+      "head": "움을 줌",
+      "next": "[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요"
+     }
+    ]
+   },
+   "currentCanonicalProblem": "NONE — 렌더러가 줄바꿈을 이미 올바르게 결합하여 공식 기능성 전량 보유",
+   "repairClass": "NO_REPAIR_REQUIRED",
+   "decision": "RESOLVED_NO_CHANGE",
+   "decisionReasons": [
+    "CURRENT_CANONICAL_ALREADY_COMPLETE",
+    "LINE_BREAK_IS_SOURCE_DISPLAY_ARTIFACT_ONLY"
+   ],
+   "reviewerChecks": {
+    "sourceClauses": 11,
+    "missingFromRender": 0,
+    "joinedPresentInSource": true
+   },
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": null
+  },
+  {
+   "pilotIndex": 46,
+   "queueIndex": 2131,
+   "candidateId": "f9e007d8-43de-4454-b110-e89281bfa622",
+   "statementNo": "20172880193439",
+   "productName": "건기남의 올레유러핀",
+   "canonicalId": "c981688c-aebf-4aa8-a1f2-c7d53be7e499",
+   "productMasterId": "d7378ab2-aeb5-4afe-986e-3e4082a6c4a9",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 2,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[올리브잎주정추출물(제2014-9호)\\n(국문) 혈압 조절에 도움을 줄 수"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": false,
+      "why": "NO_MARKER",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 1,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[올리브잎주정추출물(제2014-9호)",
+     "(국문) 혈압 조절에 도움을 줄 수 있음",
+     "(영문) May help to maintain healthy blood pressure"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_RENDERER_STRUCTURE",
+   "decisionReasons": [
+    "닫는 대괄호 정상 그룹의 라벨+목록 마크업이 없어 verbatim 복제 불가"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "NO_SIBLING_GROUP_TEMPLATE"
+  },
+  {
+   "pilotIndex": 47,
+   "queueIndex": 2175,
+   "candidateId": "66ff3300-b2c1-4d73-a8e2-88303030487f",
+   "statementNo": "20190009105415",
+   "productName": "쌩쌩 리포좀 비타민C",
+   "canonicalId": "fd947be4-81d9-4946-8f53-2a77dbc1d6f6",
+   "productMasterId": "51bed288-3e63-4f92-aa96-c0c13a3df5ed",
+   "rendererFamily": "COMPOSITE",
+   "productionBucket": "SKIPPED_EXISTING",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 4,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\\n\\n[비타민D[①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필",
+     "요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\\n\\n[비타민D[①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 2,
+      "ok": false,
+      "why": "LABEL_HAS_BRACKET",
+      "label": null,
+      "claimCount": 0
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 7,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[비타민D[",
+     "칼슘과 인이 흡수되고 이용되는데 필요",
+     "뼈의 형성과 유지에 필요",
+     "골다공증발생 위험 감소에 도움을 줌"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "BLOCKED",
+   "decision": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "decisionReasons": [
+    "경계를 단일하게 확정할 수 없는 구조 변형이 존재"
+   ],
+   "reviewerChecks": {},
+   "proposedGroups": null,
+   "patchOperation": null,
+   "blockedReason": "BROKEN_LABEL_UNPARSEABLE:LABEL_HAS_BRACKET"
+  }
+ ]
+}

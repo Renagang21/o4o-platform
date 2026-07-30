@@ -1,0 +1,26 @@
+{
+ "auditedAt": "2026-07-30T09:50:29.424Z",
+ "globals": {
+  "spd_all": 119974,
+  "spd_store_ko": 63321,
+  "spd_hff": 56473
+ },
+ "hffCandidatesWithStoreKoCanonical": 40913,
+ "expectedHffCanonicalBaseline": 40913,
+ "hffCanonicalUnchanged": true,
+ "canonicalDupInPilotMasters": 0,
+ "agent9HoldQueue": {
+  "queued": 348,
+  "stillWithoutCanonical": 348,
+  "unchanged": true
+ },
+ "pilotAppliedCanonicalIds": [
+  "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+  "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+  "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+  "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+  "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+  "14affe71-6652-4b9e-87f0-4f9a4bb550f4"
+ ],
+ "verdict": "PASS"
+}

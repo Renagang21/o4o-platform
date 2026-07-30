@@ -1,0 +1,525 @@
+{
+ "total": 6,
+ "targets": [
+  {
+   "pilotIndex": 6,
+   "queueIndex": 79,
+   "candidateId": "1bd47cf1-8d29-4fba-a155-349fa6bd698b",
+   "statementNo": "20040017006492",
+   "productName": "식물성 알티지오메가3 80",
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "productMasterId": "7c93a250-5bd0-4ff7-82de-0e421408f314",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 2,
+    "unmatchedOpenContexts": [
+     "[EPA 및 DHA 함유유지 ① 혈중 중성지질 개선에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "EPA 및 DHA 함유유지",
+      "claimCount": 3
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[EPA 및 DHA 함유유지",
+     "혈중 중성지질 개선에 도움을 줄 수 있음",
+     "혈행개선에 도움을줄 수 있음",
+     "건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 3,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "EPA 및 DHA 함유유지",
+     "marker": "①",
+     "claims": [
+      "혈중 중성지질 개선에 도움을 줄 수 있음",
+      "혈행개선에 도움을줄 수 있음",
+      "건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 3,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">EPA 및 DHA 함유유지</span><ul><li>혈중 중성지질 개선에 도움을 줄 수 있음</li><li>혈행개선에 도움을줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 7,
+   "queueIndex": 86,
+   "candidateId": "92a1d1c7-c4b4-494f-a391-3a799ccd3c37",
+   "statementNo": "20040017021828",
+   "productName": "한국가간보(佳肝寶)",
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "productMasterId": "37105d6f-659b-4f21-b5be-4b70640e9437",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 2,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[밀크씨슬(카르두스 마리아누스)추출물) ① 간 건강에 도움을 줄 수 있음"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "밀크씨슬(카르두스 마리아누스)추출물)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 3,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[밀크씨슬(카르두스 마리아누스)추출물)",
+     "간 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 1,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "밀크씨슬(카르두스 마리아누스)추출물)",
+     "marker": "①",
+     "claims": [
+      "간 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">밀크씨슬(카르두스 마리아누스)추출물)</span><ul><li>간 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 15,
+   "queueIndex": 1180,
+   "candidateId": "f88fa3c9-fe2b-407e-a104-64695f5216a9",
+   "statementNo": "20040020046598",
+   "productName": "더쎄라 빼라",
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "productMasterId": "af98cb65-ec26-4e13-accb-a2d26ce59aff",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 8,
+    "closeCount": 7,
+    "unmatchedOpenContexts": [
+     " 도움을 줄 수 있음\\n\\n[비타민B1] ①탄수화물과 에너지 대사에 필요\\n\\n[비타민B2 ①체내 에너지 생성에 필요\\n\\n[비타민C] ①결합조직 형성과 "
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 6,
+      "ok": true,
+      "why": null,
+      "label": "비타민B2",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 12,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[비타민B2",
+     "체내 에너지 생성에 필요"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 1,
+    "insertGroups": 1,
+    "insertClauses": 1,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 6,
+     "label": "비타민B2",
+     "marker": "①",
+     "claims": [
+      "체내 에너지 생성에 필요"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 18,
+   "queueIndex": 1270,
+   "candidateId": "d03bb768-143d-4b6b-9c90-2ac47c7af720",
+   "statementNo": "20130017122115",
+   "productName": "관절혁명",
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "productMasterId": "c1b54173-b7d8-4e82-a87b-9de5ca5eba5c",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 19,
+   "queueIndex": 1271,
+   "candidateId": "23ac7504-3a7b-44a8-8af4-3a3b8879d5e5",
+   "statementNo": "2013001712287",
+   "productName": "더신나게_다시관절",
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "productMasterId": "9311fcb5-38ec-4cf0-a881-73699f86dce8",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  },
+  {
+   "pilotIndex": 20,
+   "queueIndex": 1272,
+   "candidateId": "3c290fe7-e09c-4815-94e8-f0399f2d3bf0",
+   "statementNo": "2013001712291",
+   "productName": "관절건강엔 정통관절",
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "productMasterId": "0ffab1cb-2e7c-4f95-908a-c10d104ef059",
+   "rendererFamily": "DRIVER",
+   "productionBucket": "CREATED",
+   "pilotReasons": [
+    "MALFORMED_BRACKET"
+   ],
+   "sourceProblemSpan": {
+    "type": "MISSING_CLOSING_BRACKET|NESTED_OR_EXTRA_BRACKET|BRACKET_SPLIT_BY_LINE_BREAK",
+    "openCount": 3,
+    "closeCount": 1,
+    "unmatchedOpenContexts": [
+     "[엠에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있",
+     "에스엠(MSM, 디메틸설폰) ① 관절 및 연골건강에 도움을 줄 수 있음\\n[NAG(엔에이지, N-Acetylglucosamine) ①관절 및 연골"
+    ],
+    "unmatchedCloseContexts": [],
+    "brokenLabelLines": [
+     {
+      "lineIndex": 0,
+      "ok": true,
+      "why": null,
+      "label": "엠에스엠(MSM, 디메틸설폰)",
+      "claimCount": 1
+     },
+     {
+      "lineIndex": 1,
+      "ok": true,
+      "why": null,
+      "label": "NAG(엔에이지, N-Acetylglucosamine)",
+      "claimCount": 1
+     }
+    ]
+   },
+   "currentCanonicalProblem": {
+    "functionBlockFound": true,
+    "renderedItemCount": 4,
+    "bracketFragmentsRendered": [],
+    "sourceClausesMissingFromRender": [
+     "[엠에스엠(MSM, 디메틸설폰)",
+     "관절 및 연골건강에 도움을 줄 수 있음",
+     "[NAG(엔에이지, N-Acetylglucosamine)",
+     "관절 및 연골 건강에 도움을 줄 수 있음"
+    ],
+    "notGroundedItems": []
+   },
+   "repairClass": "RENDER_ONLY_REPAIR",
+   "decision": "SAFE_CANONICAL_PATCH",
+   "decisionReasons": [
+    "원문은 보존되어 있고 닫는 대괄호 누락으로 parser 가 해당 라인을 전량 탈락시킴",
+    "라벨/기능성 경계가 첫 열거 마커 1개로 유일하게 확정됨",
+    "제안 문장 전량이 원문 dense 부분문자열(원문 밖 문자 추가 0)",
+    "동일 문서 형제 그룹 마크업을 verbatim 복제하여 renderer family·class 집합 보존"
+   ],
+   "reviewerChecks": {
+    "brokenLines": 2,
+    "insertGroups": 2,
+    "insertClauses": 2,
+    "templateFamily": "SD_ITEM_TAG",
+    "allClaimsVerbatim": true,
+    "allClaimsAbsentBefore": true
+   },
+   "proposedGroups": [
+    {
+     "lineIndex": 0,
+     "label": "엠에스엠(MSM, 디메틸설폰)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM, 디메틸설폰)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div>"
+    },
+    {
+     "lineIndex": 1,
+     "label": "NAG(엔에이지, N-Acetylglucosamine)",
+     "marker": "①",
+     "claims": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ],
+     "presentCount": 0,
+     "absentCount": 1,
+     "allVerbatim": true,
+     "html": "<div class=\"sd-item\"><span class=\"sd-tag\">NAG(엔에이지, N-Acetylglucosamine)</span><ul><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></div>"
+    }
+   ],
+   "patchOperation": "INSERT_MISSING_GROUP",
+   "blockedReason": null,
+   "templateFamily": "SD_ITEM_TAG"
+  }
+ ]
+}
