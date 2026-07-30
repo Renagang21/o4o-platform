@@ -2,6 +2,8 @@
 
 > WO: [WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1](../work-orders/WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1.md)
 > 실행일: 2026-07-30
+> **작업 전 HEAD: `9c26c0051d93dc5f26510905ac1962abccaa3e4b`**
+> Foundation 커밋: `489f497de`
 > 기준: 현재 `main` 실제 코드 (문서보다 코드 우선)
 > 판정: **PASS** — Foundation 범위 완료, 배포 미연결(WO §6 준수)
 
@@ -153,6 +155,37 @@
 | 프로덕션 DB 확인 | 로컬에 프로덕션 자격증명 없음 (`apps/api-server/.env` 의 `DB_PASSWORD` 공백). DB read 미수행 |
 
 ---
+
+## 7-A. 신규 테이블 · migration 생성 여부
+
+| 항목 | 결과 |
+|---|---|
+| 신규 테이블 생성 | **0건** |
+| migration 파일 추가 | **0건** |
+| 기존 테이블 스키마 변경 | **0건** |
+| 별도 데이터베이스 | **없음** |
+
+Foundation 은 스키마를 전혀 건드리지 않는다. 가입·승인은 기존 `service_memberships` row(`service_key='pharmacy-hub'`), 권한은 기존 `role_assignments` row(prefix `pharmacy-hub:`) 로 표현된다.
+
+## 7-B. 병행 작업 파일 미포함 확인
+
+본 작업 시점의 작업 트리에는 병행 HFF/OTC 세션 및 KPA admin 변경이 함께 존재했다. 아래 파일들은 **열람조차 하지 않았거나 열람만 했고, 수정·stage·commit 대상에서 전부 제외**했다.
+
+| 병행 변경 | 처리 |
+|---|---|
+| `apps/admin-dashboard/src/pages/kpa/HubContentsPage.tsx` | 미접촉 · 미커밋 |
+| `apps/api-server/src/scripts/hff-ko-*.mjs` | 미접촉 · 미커밋 |
+| `apps/api-server/src/scripts/data/hff-ko-skipped-existing-2451-*` | 미접촉 · 미커밋 |
+| `apps/api-server/src/scripts/otc-v4-nr26-*` | 미접촉 · 미커밋 |
+
+검증:
+
+```bash
+git show --name-only --pretty=format: 489f497de | grep -E 'HubContentsPage|src/scripts/'
+# → 매칭 0건 (병행 파일 미포함 확인)
+```
+
+Foundation 커밋에 포함된 경로는 30개이며 전부 Pharmacy-Hub 관련 파일(+ 본 CHECK 문서 + `pnpm-lock.yaml`)이다. `git add .` 은 사용하지 않고 path-specific stage 만 사용했다.
 
 ## 8. 잔여 부채 / 주의점
 
