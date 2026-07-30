@@ -1,0 +1,88 @@
+{
+ "builtAt": "2026-07-30T11:03:13.039Z",
+ "applied": false,
+ "dbWrites": 0,
+ "note": "제안 전용 산출물 — 어느 안을 적용할지는 family 정책 결정(15,402건) 이후 후속 WO 에서 확정한다.",
+ "target": {
+  "pilotIndex": 35,
+  "candidateId": "4b5975c9-0c61-4b06-9acd-aa2ed4081281",
+  "canonicalId": "f47c0032-72ad-46a7-8d4b-d1cd9c5e3806",
+  "productMasterId": "e870ead8-b553-4e14-ac4d-b467ba4fff47",
+  "statementNo": "20040015070125",
+  "productName": "프로바이오틱스우먼",
+  "productionBucket": "SKIPPED_EXISTING",
+  "rendererFamilyLabel": "COMPOSITE",
+  "authoringFamily": "WAE_I_JEPUM (왜 이 제품인가)",
+  "canonicalCreatedAt": "2026-07-17T00:28:12.090Z",
+  "currentHash": "ebfee8aed7ac8e25eb1e6fea50f764aa458ec029c343dc7aaaad4870f774ee13",
+  "currentLength": 1440,
+  "currentHeadings": [
+   "왜 이 제품인가",
+   "섭취방법 (공식 표기 그대로)",
+   "표시 기준",
+   "이런 분께"
+  ]
+ },
+ "officialSource": {
+  "mainFnctnRaw": "[프로바이오틱스 제품①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음",
+  "parsedLabel": "프로바이오틱스 제품",
+  "parsedClauses": [
+   "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+   "배변활동 원활에 도움을 줄 수 있음",
+   "장건강에 도움을 줄 수 있음"
+  ],
+  "allClausesVerbatimInSource": true
+ },
+ "findings": {
+  "dedicatedFunctionSectionPresent": false,
+  "functionsAppearInIntroProse": true,
+  "introProseExcerpt": "이 제품의 표시 기준은 2g당 1억 CFU 이상입니다. 공식 섭취방법은 1일 1회, 1회 1포입니다. 1포의 중량은 공식 표기에 없어 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.",
+  "introProseIsParaphrased": true,
+  "paraphraseEvidence": "공식 `장건강` → 본문 `장 건강` · 3절이 쉼표로 병합되어 절 단위 식별 불가",
+  "correctionToPilotWording": "파일럿의 \"기능성 3절 전량 미노출\" 은 **전용 컨테이너 기준**이며, 산문 내 언급은 존재한다."
+ },
+ "proposals": {
+  "A_FAMILY_NATIVE_HEADING__RECOMMENDED": {
+   "description": "이 문서가 속한 왜-family 자체 어휘 `공식 인정 기능성` 로 섹션 신설. 단일 원료이므로 `원료별 …` 아님. 위치는 family 시그니처 순서대로 `왜 이 제품인가` 직후·`섭취방법` 앞. 마크업은 문서 내 기존 sd-why 재사용.",
+   "insertedBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>",
+   "content": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프로바이오틱스우먼<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)비피도 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 분말 · (주)비피도 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1억/2g) 이상</div><div class=\"sd-item\"><b>성상</b> 미황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 습기가 없는 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "checks": {
+    "classesOk": true,
+    "balanced": true,
+    "clausesVisible": 3,
+    "clausesExpected": 3,
+    "allClausesVerbatim": true,
+    "keptHeadings": true,
+    "footKept": true,
+    "introKept": true,
+    "noEmpty": true,
+    "lenDelta": 133,
+    "newHash": "5b091172c2ce309d2f21dc5d280983ea253f3398f4d35b41149c9955e303d750",
+    "allPass": true
+   },
+   "tradeoff": "family 계약과 완전 정렬. 동일 시그니처 문서로 배치 확장이 가능하다.",
+   "recommended": true
+  },
+  "B_DRIVER_STANDARD_HEADING": {
+   "description": "driver 표준 어휘 `주요 기능성` 을 sd-intro 직후에 신설.",
+   "insertedBlock": "<h2>주요 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>",
+   "content": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">2g당 1억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프로바이오틱스우먼<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)비피도 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>2g당 1억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. <b>1포의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>주요 기능성</h2><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>2g당 1억 CFU 이상</b></li><li><b>1포의 중량은 공식 표기에 없어</b> 포당 균수는 따로 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>미황색의 분말 · (주)비피도 제조</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량(1억/2g) 이상</div><div class=\"sd-item\"><b>성상</b> 미황색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 습기가 없는 서늘한 곳에 보관</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>하루 한 번으로 관리하고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>",
+   "checks": {
+    "classesOk": true,
+    "balanced": true,
+    "clausesVisible": 3,
+    "clausesExpected": 3,
+    "allClausesVerbatim": true,
+    "keptHeadings": true,
+    "footKept": true,
+    "introKept": true,
+    "noEmpty": true,
+    "lenDelta": 130,
+    "newHash": "ca24be454d63aef67f780faf1cd476e67e1af9b5a4616b65f3e5de0e05a12608",
+    "allPass": true
+   },
+   "tradeoff": "플랫폼 표준 어휘와는 정렬되나 이 문서 family 의 기능성 헤딩 어휘와 불일치한다.",
+   "recommended": false
+  }
+ }
+}

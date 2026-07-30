@@ -1,0 +1,1431 @@
+{
+ "auditedAt": "2026-07-30T11:03:21.578Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "sampleSize": 400,
+ "sampling": "ORDER BY canonical id LIMIT 400 — 결정적 표본(무작위 아님). 전수 아님을 명시.",
+ "tally": {
+  "recoverableFromOfficialSource": 218,
+  "allClausesAlreadyInProse": 195,
+  "clausesPartiallyMissing": 23,
+  "boundaryUnresolved": 182,
+  "noOfficialSource": 0
+ },
+ "note": "`RECOVERABLE_*` 는 공식 MAIN_FNCTN 에서 절 경계를 마커로 확정할 수 있다는 의미이며, 어느 어휘/구조로 렌더할지는 family 정책 결정 사항이다.",
+ "rows": [
+  {
+   "canonicalId": "00009d2d-9e33-4bc9-babd-bbc463be9177",
+   "stmt": "200600200031296",
+   "name": "셀로맥스 아연",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "000b7786-dd8d-4dc8-b12a-d4d98b1299bf",
+   "stmt": "200400200022688",
+   "name": "린앤핏-가르시니아",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "000f0d01-f7c8-4298-878e-4cfe04e59e89",
+   "stmt": "200400170211894",
+   "name": "프리미엄 비아메닉스 골드",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00104dc7-4df1-44fe-9dab-1a19ca967513",
+   "stmt": "20180012174266",
+   "name": "이너플라워 프로바이오틱스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0017e863-7b36-4466-96ea-5af805f51615",
+   "stmt": "20040015107288",
+   "name": "맛있게씹어먹는철분",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "0018ce45-d655-4aa7-b18b-cbe9616811af",
+   "stmt": "2019000437318",
+   "name": "머시스 소이프로틴",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "002002d2-5abf-4535-a078-0537fcee9c51",
+   "stmt": "20040017006927",
+   "name": "헬로 하루히알 젤리",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00214926-6e50-4f89-8604-3106aa48e985",
+   "stmt": "200400200072757",
+   "name": "초임계 알티지오메가3 ADE",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "00259864-6094-421f-8033-5c73fda1d0e9",
+   "stmt": "2004002007440",
+   "name": "홍삼분말",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "0028fee0-f6e2-496f-b1a9-d5018c4f12b3",
+   "stmt": "2022002132835",
+   "name": "퓨어온 마그네슘 400 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 7
+  },
+  {
+   "canonicalId": "0029adcd-3dff-4732-8b08-7d67524f7e19",
+   "stmt": "202100128553",
+   "name": "뉴블린 루테인 rTG오메가3 4종 복합 기능성",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "002bcb3e-069a-4a4a-87ad-f278956c9e60",
+   "stmt": "200400170061401",
+   "name": "면역젤리 키즈",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 4,
+   "clausesFoundInDoc": 4
+  },
+  {
+   "canonicalId": "002e10b1-13ca-4325-aecb-82cf7ddd05f9",
+   "stmt": "2019001634012",
+   "name": "뉴트리마인 요오드",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "002fa1aa-f3bc-4bad-a115-51aba5e2c511",
+   "stmt": "200400200024058",
+   "name": "마그셀라 D",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0035dd24-36a3-4e04-8617-92eadc5732a0",
+   "stmt": "200400150831459",
+   "name": "겟잇뉴트리 리얼 비오틴 10000",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "003713e7-ddd3-4a49-86b2-5e992be53348",
+   "stmt": "200400200023745",
+   "name": "뉴칸 슬림 클렌즈 젤리",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0038ccb1-8a6b-4eb0-8011-d691e623990d",
+   "stmt": "20040017015456",
+   "name": "퍼플부스트 맥스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0048e959-67c3-44f5-9695-fa414ad925dc",
+   "stmt": "20040020028493",
+   "name": "우리루테인에프(F)",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "004e9f1d-566e-4a1c-b155-22686501c5b6",
+   "stmt": "200400200141867",
+   "name": "치아엔탑 덴티 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 12,
+   "clausesFoundInDoc": 12
+  },
+  {
+   "canonicalId": "004f2add-fa42-4b03-8d76-e54c2cfe650a",
+   "stmt": "2016000600567",
+   "name": "뼈건강 칼마디 칼슘·마그네슘·비타민D",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "0051d3c8-f179-4d7d-a80d-fe0e64919c06",
+   "stmt": "202300287851",
+   "name": "SJTP홍삼캡슐",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00520142-8471-4f1e-ac91-3fab38b0411c",
+   "stmt": "20040017106454",
+   "name": "관절건강 MSM 엠에스엠",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "0054d9fa-d89b-4a1c-8a43-d03f942232aa",
+   "stmt": "200400200022168",
+   "name": "구강항균엔 프로폴리스",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "00565ccb-ab10-4557-a65b-e0f306b98e9c",
+   "stmt": "20040020039118",
+   "name": "발효홍삼캡슐F",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "005c0437-9b76-477e-a816-99a70fdd9740",
+   "stmt": "20120019007755",
+   "name": "코어리셋 비움차전자피",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "005c1e57-e4bf-4609-9a5d-75b4e3b5f70c",
+   "stmt": "2015001000271",
+   "name": "댄디루파낙 I",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "005c827c-9177-48e2-a55d-b2eb9d5e4cbc",
+   "stmt": "20040015110792",
+   "name": "정상적인 면역기능에 필요한 면역밸런스V2",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "005f0758-d6f5-440a-9adb-d502fd094f3c",
+   "stmt": "2004001702931",
+   "name": "관절엔 웰베라식물성MSM",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "0061c9c6-2208-4b4a-9fce-60086fd3b444",
+   "stmt": "2019000437370",
+   "name": "제트맥스프로틴 오트밀맛",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00634be4-dec0-48f0-9ecc-3d517aef9bdf",
+   "stmt": "20040020004455",
+   "name": "셀로맥스 코랄칼슘 키즈츄어블",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "0073de87-6061-407c-aefb-19ac74dd5dc5",
+   "stmt": "20040017059296",
+   "name": "구강항균을 더하다",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 13,
+   "clausesFoundInDoc": 12
+  },
+  {
+   "canonicalId": "007418cb-1092-4ce9-8689-ae31dab376c4",
+   "stmt": "200400200141199",
+   "name": "닥터소이지 비타민D 2000IU",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "007625d8-77f1-4636-9ccc-7e25691d3d58",
+   "stmt": "20230029284179",
+   "name": "에너쎌 비오틴",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0077e162-808e-4557-9c27-b7104283d166",
+   "stmt": "200400170061026",
+   "name": "마이니 비타민D3 2000IU",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "00798105-f2f0-4a4f-85ac-c2d6c976f177",
+   "stmt": "2016000600532",
+   "name": "고려은단비타민C분말",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "007c1f25-89ac-41f8-b296-3d57b0396299",
+   "stmt": "200700170351556",
+   "name": "필리 비타민 C",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "007e7015-e815-4f9c-92d1-75b073928c6e",
+   "stmt": "20040017006732",
+   "name": "스몰윈도우 스쿠알렌",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "00816c5b-0374-4c1a-aa02-0716a7598c07",
+   "stmt": "201600060054",
+   "name": "고려은단멀티비타민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 10,
+   "clausesFoundInDoc": 10
+  },
+  {
+   "canonicalId": "0083dbeb-7556-41b0-b1dd-7af617acb305",
+   "stmt": "2009001702345",
+   "name": "메가비타민B컴플렉스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 12,
+   "clausesFoundInDoc": 12
+  },
+  {
+   "canonicalId": "00846b07-82db-4024-ae67-0dac7b4547d1",
+   "stmt": "200400200141393",
+   "name": "눈건강 루테인&아스타잔틴 20/4",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0088cf6b-1717-4c86-ac6e-3d141f68940d",
+   "stmt": "20200016052115",
+   "name": "엔썸잇 프리미엄 하루한알 녹차 카테킨 EGCG",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "00892c67-bf09-4d35-b34e-a1ca3d79a402",
+   "stmt": "2014002002881",
+   "name": "키즈짱 STEP2",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0098c414-c3cf-4128-b060-945df5160348",
+   "stmt": "200700170352048",
+   "name": "코코칼슘젤리",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "00a359f2-213a-49fb-9410-03e9ff1386b5",
+   "stmt": "200700170352133",
+   "name": "클린봉봉",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "00a91b74-4781-4d83-a4a9-d45c6331e43a",
+   "stmt": "20190004553262",
+   "name": "번개맨 방패용사 아연스틱젤리",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "00ac4cd1-8c9c-4f39-9af8-f3541cc5fcdc",
+   "stmt": "20120017002257",
+   "name": "유산균팡팡",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00aefb1a-1421-4f56-aaf3-6f9226b3926c",
+   "stmt": "20060020008980",
+   "name": "눈건강 루테인지아잔틴 아스타잔틴",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00b03989-9f71-4e46-a8b8-c79baf761404",
+   "stmt": "20120019007412",
+   "name": "활성 엽산 콰트레 비타민D 액티브",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00b0e2ed-8f95-4e2d-9bf4-65d683463e25",
+   "stmt": "20040017006788",
+   "name": "퍼펙트 비전 포뮬러",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "00c0413a-41b1-46d5-b0b0-540c888fd523",
+   "stmt": "20040015162119",
+   "name": "악마다이어트 레드라벨 파워 가르시니아",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "00c45424-c5c7-4765-83bf-aac1bac2e89c",
+   "stmt": "20040015110894",
+   "name": "엠시톨디",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "00c78325-2005-4fc4-91ed-eaa39de30be5",
+   "stmt": "20040017021986",
+   "name": "리뉴 에너지 레드",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 14,
+   "clausesFoundInDoc": 14
+  },
+  {
+   "canonicalId": "00c94696-72fc-4cc3-b848-e3315cec056a",
+   "stmt": "20040017014577",
+   "name": "커커비타민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "00cbfa87-3727-4fc2-9872-1f1d73ddcb4d",
+   "stmt": "200700170352558",
+   "name": "튼튼베리어",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00d53eef-e8ec-46c0-86d7-46b308a650e3",
+   "stmt": "20060020008440",
+   "name": "더폴릭포대디",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 13,
+   "clausesFoundInDoc": 13
+  },
+  {
+   "canonicalId": "00dd1ebb-5850-41cb-89f9-b4ec18259cf5",
+   "stmt": "200700170351666",
+   "name": "코엔자임Q10 캡슐",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "00de3ccc-9004-49a8-a28e-e90328708332",
+   "stmt": "20040015107899",
+   "name": "유판씨80",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "00e1a2bb-6c37-48c9-88f4-226834d43e78",
+   "stmt": "20040017021875",
+   "name": "시크릿 클리어 ",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00e1ee47-66fc-43a9-8d92-07070eafcec1",
+   "stmt": "200700170352967",
+   "name": "비타민K2&D3 밸런스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00e876ce-5897-4c53-8ae1-8941c6033626",
+   "stmt": "20040017106445",
+   "name": "우리아이쑥쑥 칼슘 비타민D 아연",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "00ea36a6-dec7-4016-ab73-0717e86b5641",
+   "stmt": "200400200141444",
+   "name": "제일메가 알티지 오메가3 듀얼",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00ecbe4e-b884-48d6-8ee0-cf678a33818d",
+   "stmt": "20040020028672",
+   "name": "광동 비타민D 2000IU",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "00f0f68e-7682-4dc0-a3a4-b823b2df7ec0",
+   "stmt": "200600200081335",
+   "name": "심플바이오 루테인지아잔틴",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "00f8a3da-b78f-4221-a4d7-7aac845b12fe",
+   "stmt": "2022001309336",
+   "name": "카보스탑",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0100d5f2-eaaf-4b02-8302-2ad4b502b319",
+   "stmt": "2004001519193",
+   "name": "쿨러",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "0105f7a1-7c9d-4c6a-a73b-71ee197c4c2f",
+   "stmt": "2009001702341",
+   "name": "메가비오틴5000",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 7
+  },
+  {
+   "canonicalId": "010626c7-597a-44a9-b68f-b05d4013d429",
+   "stmt": "2022001022259",
+   "name": "혈당·혈행·간 토탈케어",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01068a42-7e5c-4b98-a00b-e8e9d64732a1",
+   "stmt": "200400200141275",
+   "name": "브이디에스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0108ce05-e44d-4c8f-b7b9-80458e6634a5",
+   "stmt": "20040015083835",
+   "name": "일양오메가3루테인 ",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0108fb28-0c1a-4613-b00b-8692921d5d13",
+   "stmt": "200400200081636",
+   "name": "츄어블멀티비타민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 25,
+   "clausesFoundInDoc": 25
+  },
+  {
+   "canonicalId": "010b518a-d803-4a66-a81a-ad1984283779",
+   "stmt": "20190009483218",
+   "name": "칼마디아 프리미엄",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 11,
+   "clausesFoundInDoc": 11
+  },
+  {
+   "canonicalId": "010e99b4-384c-446f-8947-fa2c85217d03",
+   "stmt": "20240028080177",
+   "name": "글루코사민플러스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "011318a7-50f1-417b-a00f-47ab6a4a90b5",
+   "stmt": "200400200061895",
+   "name": "와이즈헬스 비타민D3 4000 IU",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0114fa0f-2969-43bb-8556-8867d5223169",
+   "stmt": "200400200022748",
+   "name": "락티브 우리아이 면역엔 잘 먹는 홍삼젤리",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01178ee9-5e58-435f-a0d4-6f959303133e",
+   "stmt": "20220020002104",
+   "name": "엘리나 C 플러스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0117e72b-17ad-4d23-ba24-68debe190758",
+   "stmt": "200400200022491",
+   "name": "세노메가 알티지오메가3 큐텐+",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "011f97a3-b7d4-4805-96f1-429b8038ac29",
+   "stmt": "20040015083852",
+   "name": "건강한 간 리버-에스(Liver-S)",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 7
+  },
+  {
+   "canonicalId": "0124cbf6-8e11-4373-a4a3-bea6936b1ea4",
+   "stmt": "20200016052245",
+   "name": "비너틱스",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 0
+  },
+  {
+   "canonicalId": "01293d96-9796-436a-bc68-86af4500fcd8",
+   "stmt": "200400200082381",
+   "name": "TENNAX (텐엑스)",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "01312fd6-ec7b-42ac-b7fc-798ba7ed0641",
+   "stmt": "20120019007515",
+   "name": "비타민D 4000IU",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01315655-879e-4021-99c6-593ea52e27b5",
+   "stmt": "2004001704926",
+   "name": "호본마디글루코사민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "013641ca-1287-4866-bd7e-1769ab7fa7cd",
+   "stmt": "200400200141853",
+   "name": "두뇌엔 포스파티딜세린 징코 PS",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "013db6e0-2619-4dc1-a101-4f5ea2236278",
+   "stmt": "20040020041482",
+   "name": "황금쾌변 차전자피 식이섬유",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01439558-2d1b-4f61-996c-07119ee1ab42",
+   "stmt": "201000190041570",
+   "name": "블루 멀티미네랄",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "01485f39-4ba9-46de-9137-558ed4926c3b",
+   "stmt": "20040020028824",
+   "name": "코리긴 엑스트라(KOLIGIN EXTRA)",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "014da840-2d04-41ba-89bc-6d4ce02cd951",
+   "stmt": "2004001706140",
+   "name": "그린프로폴리스 포르테",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "014ee473-110f-467a-b2a0-25ae368d610a",
+   "stmt": "202100111823",
+   "name": "마이크로바이옴 5",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01562279-211c-4323-8247-c1eab1617cdc",
+   "stmt": "20040020020538",
+   "name": "하루홍삼농축정",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 0
+  },
+  {
+   "canonicalId": "015f690e-51ff-4546-8e99-48ccee7ba146",
+   "stmt": "20040020028140",
+   "name": "오메가-3골드",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "016190fc-a94b-4d64-8c68-0f66b7c24dc5",
+   "stmt": "2023000462482",
+   "name": "어나더 토탈 조인 파워",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01647f79-1e6e-4c65-ab04-fcf17d29ebd5",
+   "stmt": "20190009483432",
+   "name": "콜레스테롤 케어 헬스&다이어트",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "0165120c-7318-4717-9bbe-e44637c41897",
+   "stmt": "200400200022952",
+   "name": "아크 어써라이즈 식물성 알티지 오메가3 1200mg",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01677329-65b4-4d4b-9755-6b74748c7564",
+   "stmt": "20040017059241",
+   "name": "더락토 장+",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "016a9fea-189a-43e4-b343-b7a540d94c8f",
+   "stmt": "2022002132834",
+   "name": "하루시작 인지력 기억력엔 포스파티딜세린 징코",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "016ad0c1-9a2e-4670-8521-ff05ba2f4670",
+   "stmt": "2004001902926",
+   "name": "Gold power propolis",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "016b903b-c420-4f1a-a8f0-aacc62c8250a",
+   "stmt": "200400150832459",
+   "name": "청화파인(FINE) 프라임",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "016f15c4-3976-411a-9fe8-2fc92c97846e",
+   "stmt": "20172880236339",
+   "name": "PS, Gkgo 18mg, VE",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01762505-d753-494e-802c-040c4a3eaaa5",
+   "stmt": "20040020028618",
+   "name": "알파플러스 루테인",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "017669ee-dcdc-422b-8fb6-f8d0ef582368",
+   "stmt": "2004001701397",
+   "name": "다이어트 가르시니아",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01807911-be30-4626-a9b9-4ba24e304dfc",
+   "stmt": "20130017122112",
+   "name": "사라처럼블렌드",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01827242-92e9-45f6-8954-3259d635e27b",
+   "stmt": "200400170211710",
+   "name": "혈행건강 알티지 오메가-3 플러스 A.D.E",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "0182a175-f0a1-4e2e-974b-e93f25de8d16",
+   "stmt": "201000190041496",
+   "name": "덴탈프린스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 10,
+   "clausesFoundInDoc": 10
+  },
+  {
+   "canonicalId": "01882e9f-5164-4ae3-b611-73861c71003d",
+   "stmt": "200400200061491",
+   "name": "안국 눈에 좋은 루테인 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 12,
+   "clausesFoundInDoc": 12
+  },
+  {
+   "canonicalId": "018890bc-1c17-44cd-aa96-2c233b898b6f",
+   "stmt": "200400200082432",
+   "name": "에버콜라겐 타임비오틴 업F",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "0190103c-c034-4b89-8cd4-66441fc3c9ca",
+   "stmt": "20040015110803",
+   "name": "애니멀킹덤 츄어블 아연 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "0193c6bb-18eb-4f07-aea0-abcadac806f1",
+   "stmt": "20040020046353",
+   "name": "헬시모빌리티글루코사민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "019a4a58-3803-4bae-a07c-7e486e013309",
+   "stmt": "20040015110720",
+   "name": "액티브마그네슘플러스비타민D",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 8,
+   "clausesFoundInDoc": 8
+  },
+  {
+   "canonicalId": "01a40cad-0372-40f3-b633-6e9b5e000474",
+   "stmt": "20040017015308",
+   "name": "광동엽산 600",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "01a47d39-d76c-4ae9-ba4f-37bfaa101d5f",
+   "stmt": "200400200023893",
+   "name": "오메가 플러스 13",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01a689b5-c2fc-408b-9b02-6b3f16531d62",
+   "stmt": "200400170061931",
+   "name": "츄어블 알래스카 오메가3",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01aa0a09-3430-4d09-9e4d-8a87166a6368",
+   "stmt": "200400200082824",
+   "name": "관절건강",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01ab4784-0d50-4cac-9be1-34a1df1a8d17",
+   "stmt": "200400170061908",
+   "name": "알티지 오메가 3 츄어블 1000",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01b3abbf-504e-410f-98e9-0a4757e1285b",
+   "stmt": "200400170211245",
+   "name": "핑크그린 나이트컷 ",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "01b42dd2-6f57-4861-acf1-17eee513729a",
+   "stmt": "20172880236184",
+   "name": "프리미엄 쾌변엔 차전자피 식이섬유",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01bb5699-9927-41ae-8aaf-893481edcd8c",
+   "stmt": "200400200141863",
+   "name": "닥터언 식물성 오메가3",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01c080f6-ea0c-4ccc-a628-b51019ea17ab",
+   "stmt": "200700170351428",
+   "name": "뉴라이프 뉴트리션 종합비타민16",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 29,
+   "clausesFoundInDoc": 29
+  },
+  {
+   "canonicalId": "01c21711-2498-4ee1-b7fe-71d07faf877a",
+   "stmt": "20040020046586",
+   "name": "맥스부스터",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "01c46158-8ea9-4409-902d-2a0bcf52b454",
+   "stmt": "200400200082919",
+   "name": "하루한팩 for 다이어트",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01c700ad-852d-486e-80d2-bee9e5ed2e74",
+   "stmt": "20180012174496",
+   "name": "라비센 슈프림 프레쉬",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01c88469-0bd1-4e67-8b8c-988a8edd594f",
+   "stmt": "20040015162294",
+   "name": "비오틴올로지",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  },
+  {
+   "canonicalId": "01d1e47c-5abd-4e14-86e5-33e0f51aa6ce",
+   "stmt": "20040017014655",
+   "name": "미플러스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01d329c3-f00a-45a0-ae3a-a37ef9993ea8",
+   "stmt": "20040017006752",
+   "name": "데이츄 히알루론산",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 4,
+   "clausesFoundInDoc": 4
+  },
+  {
+   "canonicalId": "01e86f39-aea3-42a4-b480-a51ae90d695a",
+   "stmt": "20040017068228",
+   "name": "메노센스퀸",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "01e9e3dc-3a82-467a-9409-d698c61a110b",
+   "stmt": "20040017006797",
+   "name": "셀티바 식물성 알티지 오메가3",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "01f87f39-35fe-432e-b8d3-10aca343a2be",
+   "stmt": "200400150831932",
+   "name": "관절·연골엔 뮤코다당·단백 콘드로이친",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 0
+  },
+  {
+   "canonicalId": "01f8a408-41b0-4fbb-ab81-c4b0622ae9bb",
+   "stmt": "200700170353158",
+   "name": "바이탈 비타컴플렉스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "01fcf0d4-01ee-4740-85e0-79d2bbdc3f25",
+   "stmt": "20160012278167",
+   "name": "혜당천지송",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "01fe5bc4-3a79-445a-ae5e-083940479324",
+   "stmt": "20040017006584",
+   "name": "안타메가",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "01ffe113-9e8d-4c56-8b61-f300bdd4e235",
+   "stmt": "20040017021902",
+   "name": "김오곤원장의 미라클 관절의신",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "0201d26d-8bc8-4574-a9fe-188374d837fc",
+   "stmt": "20040015107596",
+   "name": "라이토플렉스 리뉴얼",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "020579c7-0c9d-455e-a11e-dd012a6b94c1",
+   "stmt": "20200016052239",
+   "name": "베이랩 프리미엄 테아닌α",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 11,
+   "clausesFoundInDoc": 11
+  },
+  {
+   "canonicalId": "020698ea-116e-4753-86b4-cd478019e802",
+   "stmt": "20172880236308",
+   "name": "피토틱스 브라운",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02080e97-7d30-4162-a6ce-f0af0d08d574",
+   "stmt": "200400150831752",
+   "name": "비바우먼 밸런스업(Viva Woman Balance UP)",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "020a8db4-0e7c-4984-b569-7281c707d462",
+   "stmt": "20040017021991",
+   "name": "비오팜 면역+비타",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 7
+  },
+  {
+   "canonicalId": "021d2efb-6e4b-4821-8afd-889a8960a02e",
+   "stmt": "20172880236168",
+   "name": "8000 메가비움 차전자피 환",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0221dba7-1130-40b7-8750-c080a63b98b5",
+   "stmt": "200400200022566",
+   "name": "제이톡",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02234319-8640-414b-b8ca-ecbc3e9b9339",
+   "stmt": "20140020012143",
+   "name": "한인 혈당엔",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0223702e-5cbf-4184-97f0-f0664c2d645b",
+   "stmt": "200400150831439",
+   "name": "에스디엣 컷 (SDIET CUT)",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "022bdc28-b0ee-4a6a-9959-822c69880d2d",
+   "stmt": "2023002721153",
+   "name": "프로바이오틱스 100억 유산균 클래식 PRO",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "022dc8e1-c8e3-41e5-9ae9-c35fb7b61d6f",
+   "stmt": "200400200073127",
+   "name": "다이어트포스 프로",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "022dca3c-d7cd-45cb-ae01-ada9e11eaa3e",
+   "stmt": "20060020008208",
+   "name": "셀로맥스 골드 세븐",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "022f659c-3965-4098-a5e9-c84305a9bc08",
+   "stmt": "200400200082215",
+   "name": "닥터언 비오틴",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "0232fe48-fb1d-479f-9b4b-19fbdb2c7545",
+   "stmt": "200400170211584",
+   "name": "하와이안 스피루리나",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "023839a9-0b05-4f7c-b210-bbfa57dbf4a3",
+   "stmt": "200400150832112",
+   "name": "닥터겟잇 케이슬림 CLA HMYH",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0242909b-4288-45f7-acd2-382fa233f93f",
+   "stmt": "200400200072238",
+   "name": "알티지 오메가3++",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "024ddf65-c75e-4345-bbc1-bc8fc48b4864",
+   "stmt": "20140020012223",
+   "name": "관절 엠에스엠 플러스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0257df7d-ab13-4c05-8216-867dced558fa",
+   "stmt": "20190009483551",
+   "name": "일양코큐텐 100mg",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0258203b-58ec-4bc7-813e-0c51e527b728",
+   "stmt": "20040017006640",
+   "name": "퓨어온 비타민D 1000IU 츄어블",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "0259c992-db77-40cf-8192-6ff561693a86",
+   "stmt": "2022002132838",
+   "name": "기억력·인지력 두뇌엔 포스파티딜세린 PS 징코 플러스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0259e8c7-9cee-41be-a30b-8d554b0586d1",
+   "stmt": "20040017017979",
+   "name": "듀오락 김치유산균 LP3",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "025a4170-c8df-48b3-a2db-166171630d03",
+   "stmt": "200400200201227",
+   "name": "컷팅블록커 가르시니아 2800 젤리",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "025f853f-6009-43f7-993d-752f4cb2a2f6",
+   "stmt": "20190009483298",
+   "name": "비타민 D3 5000 IU",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "026392f1-7562-4594-85ee-b1b3274169b7",
+   "stmt": "2020001612234",
+   "name": "팻디터다이어트",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "026424b0-3fb5-49eb-a09b-625bea636f12",
+   "stmt": "2023000462463",
+   "name": "GLYNEAR",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0265bbfd-279e-4f70-8d22-e935b9d75f6b",
+   "stmt": "200700170352186",
+   "name": "더 미네랄 철분",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "0271d984-eb58-4cc5-b580-cc5d1975b2af",
+   "stmt": "2006002000863",
+   "name": "튼튼닷컴 코엔자임Q10",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 15,
+   "clausesFoundInDoc": 15
+  },
+  {
+   "canonicalId": "0280eafb-509e-4c92-8401-333350535238",
+   "stmt": "200600200032386",
+   "name": "로그네이처 초임계 알티지(rTG)오메가3 +1000",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0282a3cc-bd24-4a67-aa5e-6b59d0bf620a",
+   "stmt": "200400200081689",
+   "name": "마이니 활력 멀티맨",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 31,
+   "clausesFoundInDoc": 31
+  },
+  {
+   "canonicalId": "02899040-c3dc-41c3-9793-ea0da9ab139f",
+   "stmt": "20120019007850",
+   "name": "마이메이트 장용성 rTG 오메가3",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "028aec72-6bf8-4e88-9bec-7b46405b4cfd",
+   "stmt": "20220011370128",
+   "name": "로보카폴리 키즈 쑥쑥 멀티비타민",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 17,
+   "clausesFoundInDoc": 17
+  },
+  {
+   "canonicalId": "0294e951-3dfc-4551-ac2a-e0db4ea63a2f",
+   "stmt": "202200102224",
+   "name": "루테인 비타민A 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "0295a17d-5f5a-4d8f-a10e-59a5e7dc0802",
+   "stmt": "20040015110626",
+   "name": "마이니 지니키즈 튼튼아연&C ",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "02964ebe-ba8d-49f3-beba-9a94f3fd4ee6",
+   "stmt": "20040017006809",
+   "name": "다이아톱정",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 21,
+   "clausesFoundInDoc": 21
+  },
+  {
+   "canonicalId": "029a8e05-3545-4ec8-9dde-41cfbe78a66f",
+   "stmt": "20040015094189",
+   "name": "리벨라 씬톡스(rebella thin-talks)",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "029bb9ba-3735-4626-a2ef-c3beeba0c3cd",
+   "stmt": "200400200073332",
+   "name": "탄수화물 컷팅 가르시니아 다이어트 1000",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "029ecbbf-a021-44ec-b884-dfe23a98e73c",
+   "stmt": "200400150831777",
+   "name": "초임계 rTG 알티지 오메가3",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 3,
+   "clausesFoundInDoc": 3
+  },
+  {
+   "canonicalId": "02a50727-67c7-4de8-9f6d-bcd60ab7607b",
+   "stmt": "200400170061245",
+   "name": "비오비타 우리아이 쾌변젤리 골드",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02a69757-7176-4892-a66e-31675f6c849c",
+   "stmt": "20040017106268",
+   "name": "치로칼슘앤비타민D",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 7,
+   "clausesFoundInDoc": 7
+  },
+  {
+   "canonicalId": "02aa959c-029c-460a-92ce-709a990e4b65",
+   "stmt": "200400200023339",
+   "name": "차차나아지겠지2",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02ab139c-741d-4492-947c-20210554a877",
+   "stmt": "200400150832456",
+   "name": "혈당엔 코로솔산 바나바",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02ac47a0-c3f3-4b13-bc47-89493ed327d8",
+   "stmt": "200400151071187",
+   "name": "뉴트원 비오틴 부스터",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02aed0bb-f748-43dc-a533-1ca20410049e",
+   "stmt": "20172880193386",
+   "name": "메가바이탈 나이아신 500",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02aef681-3b64-4649-9ea5-9152f9b9172d",
+   "stmt": "200600200031890",
+   "name": "인생 프로바이오틱스",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02b2864e-6a2f-4d7c-afeb-5c996b2451e6",
+   "stmt": "2015001201285",
+   "name": "비비클린 모로오렌지맛",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "02ba136a-5aa7-4169-81de-16fe466bf4a8",
+   "stmt": "201000190041527",
+   "name": "관절돌리도 옵티MSM",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 4,
+   "clausesFoundInDoc": 4
+  },
+  {
+   "canonicalId": "02c99a0e-4e14-40af-9e11-3f7b53fb3a79",
+   "stmt": "200400170061223",
+   "name": "필리 프로폴리스 젤리",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "02d1d397-1384-4121-b9da-7d8e18d64fcc",
+   "stmt": "2022002000289",
+   "name": "하루 루틴 비타민C",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02d20e52-7104-4500-8454-d469a68358b2",
+   "stmt": "2022002000283",
+   "name": "칼슘",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02df2d30-db3e-4169-bc67-b9a1d6f8cbe1",
+   "stmt": "201200190071034",
+   "name": "Kordel’s Aquamin organic calcium",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02e1f591-416e-4daa-83fa-b0e5765c8af2",
+   "stmt": "20040015110814",
+   "name": "변한 슬림핏 차전자피 가르시니아",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "02ec0271-7193-412f-84f1-a12d73a1b04a",
+   "stmt": "2017286000757",
+   "name": "관절에 기가막혀",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02ed1600-0a3e-458d-a254-9312ab983295",
+   "stmt": "200400150831392",
+   "name": "하람스칼슘비타민미네랄",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 11,
+   "clausesFoundInDoc": 11
+  },
+  {
+   "canonicalId": "02ed2dd1-e82c-48a2-be5d-324c7fa0b6a7",
+   "stmt": "20172880193166",
+   "name": "푸응 2주 스파르컷",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "02f6eb3f-2ccc-4b9b-bb5e-0023f7d01eaf",
+   "stmt": "20130020008325",
+   "name": "이너라이트",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02f7a665-932e-4bdf-8a61-42076c46eefe",
+   "stmt": "201100200997",
+   "name": "관절건강에 도움을 주는 옵티엠에스엠 조인트케어 ",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "02f7c506-2c12-4a39-8e53-c94d2b4c945b",
+   "stmt": "200700170352158",
+   "name": "더파르마 마그네슘락테이트 플러스디정",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 5,
+   "clausesFoundInDoc": 5
+  },
+  {
+   "canonicalId": "02fabffe-8dcb-4ed5-bccf-4ae5b08b2b42",
+   "stmt": "20040017021609",
+   "name": "면역밸런스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 6,
+   "clausesFoundInDoc": 6
+  },
+  {
+   "canonicalId": "02fcc09d-72a5-4302-bd2c-3f8473e8d333",
+   "stmt": "200400170061754",
+   "name": "블루데이엔 보라지유 츄어블",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "0302dc43-fba5-4c34-b27c-a4188ec67b0a",
+   "stmt": "200400200082165",
+   "name": "케이세라 키즈밸런스(Kthera kids balance)",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 8,
+   "clausesFoundInDoc": 8
+  },
+  {
+   "canonicalId": "03085bec-9a93-4c35-a965-e7892b1c3a17",
+   "stmt": "2004001508152",
+   "name": "아스오메가 플러스",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 2,
+   "clausesFoundInDoc": 2
+  },
+  {
+   "canonicalId": "030ae962-ff13-4257-989d-67ab3741e661",
+   "stmt": "20040020016658",
+   "name": "프로메가 오메가3 트리플",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "030e8c56-7379-49a4-a8e6-4ff16db4eeb9",
+   "stmt": "20220020002140",
+   "name": "간건강 밀크씨슬 실리마린",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "031bb4b4-96b4-4f86-a538-a9e36a939ec9",
+   "stmt": "2015001201130",
+   "name": "관절편환",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "03208ed0-5896-493e-bd82-c761738a0f7d",
+   "stmt": "200400150832139",
+   "name": "간편한 피로개선 밀크씨슬홍경천",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "03319d88-6509-4394-ae47-b508ab5ae6eb",
+   "stmt": "2009001702372",
+   "name": "퍼펙트 솔루션 프로바이오틱스 포 맘",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "03326a5b-83cb-4328-be6a-ff88b921f77b",
+   "stmt": "20040020046668",
+   "name": "나이아신V",
+   "klass": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "03394cf7-cf6c-419a-93c6-b53a86799b25",
+   "stmt": "2016001227881",
+   "name": "아이 빛나라 눈 ",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 8,
+   "clausesFoundInDoc": 8
+  },
+  {
+   "canonicalId": "033ad8a2-86af-45e3-8ab1-ac0ceddc73e1",
+   "stmt": "20040020028527",
+   "name": "MSM 2000",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 1,
+   "clausesFoundInDoc": 1
+  },
+  {
+   "canonicalId": "03428c3a-d217-4ead-b242-36b72f1be5e2",
+   "stmt": "2018001246618",
+   "name": "데일리비타 발포멀티비타민 오렌지맛",
+   "klass": "RECOVERABLE_CLAUSES_PARTIALLY_MISSING",
+   "clauseCount": 19,
+   "clausesFoundInDoc": 18
+  },
+  {
+   "canonicalId": "034456fa-3c25-485a-99bb-bd37fce9cb97",
+   "stmt": "20160012278129",
+   "name": "The 키움",
+   "klass": "RECOVERABLE_ALL_CLAUSES_ALREADY_IN_PROSE",
+   "clauseCount": 9,
+   "clausesFoundInDoc": 9
+  }
+ ]
+}

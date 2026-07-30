@@ -1,0 +1,117 @@
+{
+ "auditedAt": "2026-07-30T11:03:20.532Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "scope": "HFF STORE/ko canonical (source_type=o4o_hff_generated)",
+ "aggregate": {
+  "total": 40913,
+  "has_function_section_any_vocab": 40087,
+  "missing_function_section": 826,
+  "vocab_driver_주요기능성": 25415,
+  "vocab_wae_공식인정기능성": 38097,
+  "family_wae": 15371,
+  "wae_family_missing_function_section": 826,
+  "has_iron_bunkke": 15435,
+  "has_expert_footer": 26958,
+  "missing_expert_footer": 13955
+ },
+ "headingSignaturesOfTrulyMissingGroup": [
+  {
+   "headings": "왜 이 제품인가 | 섭취방법 (공식 표기 그대로) | 표시 기준 | 이런 분께",
+   "count": 761
+  },
+  {
+   "headings": "왜 이 제품인가 | 섭취방법 (공식 표기 그대로) | 표시 기준 | 보호자 안내",
+   "count": 59
+  },
+  {
+   "headings": "왜 이 제품인가 | 섭취방법 (공식 표기 그대로) | 표시 기준 (액상) | 보호자 안내",
+   "count": 4
+  },
+  {
+   "headings": "왜 이 제품인가 | 섭취방법 (공식 표기 그대로) | 표시 기준 (액상) | 이런 분께",
+   "count": 2
+  }
+ ],
+ "waeFamilyFunctionHeadingVocabulary": [
+  {
+   "heading": "원료별 공식 인정 기능성",
+   "count": 8277
+  },
+  {
+   "heading": "공식 인정 기능성",
+   "count": 2226
+  },
+  {
+   "heading": "비타민 D 영양기능 (공식 인정 기능성)",
+   "count": 448
+  },
+  {
+   "heading": "MSM 기능성 (공식 인정)",
+   "count": 384
+  },
+  {
+   "heading": "비타민 C 영양기능 (공식 인정 기능성)",
+   "count": 332
+  },
+  {
+   "heading": "아연 영양기능 (공식 인정 기능성)",
+   "count": 289
+  },
+  {
+   "heading": "이 홍삼의 공식 기능성",
+   "count": 271
+  },
+  {
+   "heading": "식이섬유 기능성 (공식 인정)",
+   "count": 204
+  },
+  {
+   "heading": "루테인 기능성 (공식 인정)",
+   "count": 174
+  },
+  {
+   "heading": "밀크씨슬 기능성 (공식 인정)",
+   "count": 170
+  }
+ ],
+ "correctionNote": {
+  "initialWrongConclusion": "\"왜-family 는 전용 기능성 섹션이 없다 / #35 는 15,402건 family 의 대표 사례\" — **오류**",
+  "cause": "기능성 섹션 보유 판정을 driver 어휘 `주요 기능성` 단독 LIKE 로 수행했다. 왜-family 는 `공식 인정 기능성` / `원료별 공식 인정 기능성` 등 자체 어휘를 쓴다.",
+  "corrected": "왜-family 도 전용 기능성 섹션을 보유한다. 기능성 섹션이 실제로 없는 문서는 훨씬 적으며, `#35` 는 그 소수 집합에 속한다."
+ },
+ "interpretation": {
+  "twoAuthoringFamilies": true,
+  "driverFamily": {
+   "functionHeading": "주요 기능성",
+   "count": 25415
+  },
+  "waeFamily": {
+   "count": 15371,
+   "functionHeadingVocab": "공식 인정 기능성 / 원료별 공식 인정 기능성 / <원료> 영양기능 (공식 인정 기능성)",
+   "missingFunctionSection": 826
+  },
+  "note": "`#35` 복구 시 올바른 헤딩은 **그 family 자체 어휘**(단일 원료이므로 `공식 인정 기능성`)이다. driver 의 `주요 기능성` 을 쓰거나 `왜 이 제품인가` 에 병합하는 것은 family 계약과 불일치한다."
+ },
+ "policyMismatches": [
+  {
+   "id": "PM1-IRON-BUNKKE",
+   "description": "`이런 분께` 섹션 — 최근 WO 들이 driver 산출물에 대해 금지 항목으로 명시(구매지원 내러티브 축)",
+   "count": 15435,
+   "inScopeOfThisWo": false
+  },
+  {
+   "id": "PM2-NO-EXPERT-FOOTER",
+   "description": "`매장 내 약사 등 전문가` 문의 footer 부재 — CLAUDE.md 콘텐츠 불변 원칙 대비",
+   "count": 13955,
+   "inScopeOfThisWo": false
+  },
+  {
+   "id": "PM3-NO-FUNCTION-CONTAINER",
+   "description": "어떤 어휘로도 기능성 섹션이 없음 — 공식 기능성이 절 단위로 식별되지 않음",
+   "count": 826,
+   "inScopeOfThisWo": true
+  }
+ ],
+ "recommendation": "기능성 섹션이 실제로 없는 826건이 대상이다. 복구 어휘는 문서가 속한 family 의 자체 기능성 헤딩을 따른다(왜-family=공식 인정 기능성, driver=주요 기능성). 단건 선행 후 동일 시그니처 배치로 확장할 것."
+}
