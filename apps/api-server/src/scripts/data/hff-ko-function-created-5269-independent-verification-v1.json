@@ -1,0 +1,83 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§22 독립검증(별개 read-only 세션) + §23 전체 corpus 사후 감사. DB write 0.",
+ "generatedAt": "2026-07-30T05:28:57.855Z",
+ "transactionReadOnly": "on",
+ "structuralChecks": [
+  {
+   "no": 1,
+   "name": "대상 canonical 5,269 전량 조회",
+   "ok": true,
+   "detail": 5269
+  },
+  {
+   "no": 2,
+   "name": "저장 content = manifest newContentHash",
+   "ok": true,
+   "detail": 5269
+  },
+  {
+   "no": 3,
+   "name": "이전 content 잔존 0",
+   "ok": true,
+   "detail": 0
+  },
+  {
+   "no": 4,
+   "name": "updated_at 전량 갱신",
+   "ok": true,
+   "detail": 5269
+  },
+  {
+   "no": 5,
+   "name": "status/type/language/source/master/deleted_at 불변",
+   "ok": true,
+   "detail": 5269
+  },
+  {
+   "no": 6,
+   "name": "SKIPPED_EXISTING 안전 2,451 지문 불변",
+   "ok": true,
+   "detail": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94"
+  },
+  {
+   "no": 7,
+   "name": "사람 검토 3,652 지문 불변",
+   "ok": true,
+   "detail": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3"
+  },
+  {
+   "no": 8,
+   "name": "CREATED 비대상 19,805 지문 불변",
+   "ok": true,
+   "detail": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  },
+  {
+   "no": 9,
+   "name": "canonical 총수 불변 (63,321 / HFF 40,913)",
+   "ok": true,
+   "detail": "63321 / 40913"
+  },
+  {
+   "no": 10,
+   "name": "Agent 9 HOLD 348 pending 유지 · canonical 0",
+   "ok": true,
+   "detail": "pending 348 / canonical 0"
+  }
+ ],
+ "contentChecks": {
+  "koClauseLost": 0,
+  "fabricated": 0,
+  "englishOnly": 0,
+  "nonFuncChanged": 0,
+  "emptyItemOrTag": 0,
+  "rawTagLeak": 0,
+  "scriptOrStyle": 0,
+  "footerMissing": 0,
+  "expertNoticeMissing": 0,
+  "classVocabViolation": 0
+ },
+ "contentSamples": {},
+ "note": "공식 반복 문장과 ○ ● ◦ ※ 잔존은 §23 계약에 따라 실패로 계산하지 않는다. corpus 는 DRIVER / COMPOSITE renderer family 2종이 공존하며, 섹션·문구 계약은 family 별로 다르다. 이번 WO write 대상은 DRIVER family 내 CREATED 안전 5,269 뿐이다.",
+ "verdict": "PASS"
+}

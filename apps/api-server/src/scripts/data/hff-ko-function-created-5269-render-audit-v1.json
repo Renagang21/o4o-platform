@@ -1,0 +1,3348 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§16 — 반영 후 생산 코드 출력 42건 × 430/820/1280 실브라우저 렌더 검증. DB 접근 0.",
+ "generatedAt": "2026-07-30T05:14:45.446Z",
+ "cssSource": "packages/content-editor/src/components/ContentRenderer.tsx :: storeDescriptionCss (원문 추출, 수정 없음)",
+ "wrapper": "<div class=\"store-desc-content\">",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "sampleCount": 42,
+ "categoryCounts": {
+  "LONG_LABEL": 7,
+  "SPECIES_ABBREV": 7,
+  "MIXED": 7,
+  "MARKER": 7,
+  "ENGLISH_PARALLEL": 7,
+  "FORM_INGREDIENT_BOUNDARY": 7
+ },
+ "computedStyleExpectation": {
+  "430": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "28px 22px 24px",
+   "sd-badge.border-radius": "999px"
+  },
+  "820": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "40px 34px 32px",
+   "sd-badge.border-radius": "999px"
+  },
+  "1280": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "40px 34px 32px",
+   "sd-badge.border-radius": "999px"
+  }
+ },
+ "computedStyleNote": "sd-hero padding 은 @container (min-width:640px) 규칙에 따라 카드 인라인 폭 기준으로 전환된다. 430px 뷰포트=기본값, 820/1280px=확대값.",
+ "zeroChecks": {
+  "WRAPPER_MISSING": 0,
+  "SD_CARD_MISSING": 0,
+  "COMPUTED_STYLE_MISMATCH": 0,
+  "HORIZONTAL_OVERFLOW": 0,
+  "EMPTY_LIST_ITEM": 0,
+  "EMPTY_TAG": 0,
+  "RAW_TAG_LEAK": 0,
+  "FUNC_SECTION_MISSING": 0,
+  "RENDER_ERROR": 0
+ },
+ "violations": [],
+ "verdict": "PASS",
+ "perWidth": [
+  {
+   "width": 430,
+   "samples": [
+    {
+     "idx": 0,
+     "candidateId": "0035d1f4-21e4-4d95-9223-4193f6438e8a",
+     "statementNo": "200600200081215",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "candidateId": "006ed5e1-edf7-4d8c-a8c1-41b0d1f1ee8a",
+     "statementNo": "200700170353042",
+     "category": "LONG_LABEL",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 12,
+     "emptyItems": 0,
+     "tagCount": 5,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "candidateId": "00b154be-24d3-4e85-aa21-e391cf3cf767",
+     "statementNo": "200700170351566",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+     "statementNo": "2019000939498",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "candidateId": "011ec19b-58e5-4019-9bfd-0bdb365ea600",
+     "statementNo": "200400200141868",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "candidateId": "01bd38a9-8ca9-49a4-abe0-d2bd67532eea",
+     "statementNo": "200400170061493",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 7,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "candidateId": "01dc55b6-ee08-4bbe-aa6f-de145f980ca0",
+     "statementNo": "200700170352166",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 6,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+     "statementNo": "200400170061669",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "candidateId": "160f37cb-6def-44ee-8aa0-d4350c8615b5",
+     "statementNo": "20180012056100",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "candidateId": "1e36bff1-aa32-4080-968b-9697d1c7725b",
+     "statementNo": "20130020024301",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+     "statementNo": "200400200082764",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 4,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "candidateId": "20a952f0-78bb-432b-9e82-3f050dd536a0",
+     "statementNo": "20180012056111",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "candidateId": "317e5481-71b5-4257-a969-5732746cf0c2",
+     "statementNo": "200400200061821",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "candidateId": "34abc0af-0870-4e90-8d65-15eed8c08110",
+     "statementNo": "200400200062179",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "candidateId": "043dd1d0-478f-427e-886b-73f0c7b08ec4",
+     "statementNo": "20160006007131",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "candidateId": "084e0db9-8cf9-4dd3-9395-13747d1952b1",
+     "statementNo": "20110017019151",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "candidateId": "0a68a1f9-5b0c-40fe-aac3-7c29efd4559f",
+     "statementNo": "202000124464",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "candidateId": "0b0ccc7f-94a3-46da-97e4-0fcae2b3896e",
+     "statementNo": "20110017019152",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "candidateId": "11ae0a53-7ca2-4bcd-8de6-1b41483379fe",
+     "statementNo": "20040015094224",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "candidateId": "13e6bd0d-67dd-4f6f-a9bc-f23d39474bd3",
+     "statementNo": "20110017019117",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 43,
+     "emptyItems": 0,
+     "tagCount": 10,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "candidateId": "189dea50-fd25-4602-a59f-8fa7017d7f3e",
+     "statementNo": "20040020041557",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 1,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "candidateId": "00355600-59d2-4ec1-93d3-6dbd198e3b08",
+     "statementNo": "20190004553230",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "candidateId": "00453d7e-7831-4862-a178-d8252dad4641",
+     "statementNo": "2004002005258",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "candidateId": "009947ce-a9cd-491e-add4-99fb6f714674",
+     "statementNo": "20190009483869",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 28,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "candidateId": "0104835c-1a5f-4422-84e6-057bb00d807a",
+     "statementNo": "200400200022155",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 22,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "candidateId": "013faadf-4046-442f-bb04-60056ed2bd98",
+     "statementNo": "20190009483154",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 42,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "candidateId": "015011b4-0cb7-4d60-9145-04c9e231aa10",
+     "statementNo": "20040015100147",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "candidateId": "0171fdd2-c446-46be-99ed-0813a33c1d09",
+     "statementNo": "200400150831710",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 44,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "candidateId": "00a1a06b-e3ac-429e-aec5-b60cac511296",
+     "statementNo": "2004002005257",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "candidateId": "01fecfa6-3150-4fa1-bff5-a668d2666524",
+     "statementNo": "200400200062167",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "candidateId": "0315c229-5226-4de9-a905-859058986b7d",
+     "statementNo": "20040017030140",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "candidateId": "034f48d1-11e1-4f4c-8417-82e0a8c7e71c",
+     "statementNo": "20040020013421",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "candidateId": "03504127-0536-4940-8544-57000f8a4bcc",
+     "statementNo": "2016001213216",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "candidateId": "035b88c7-17cd-4cd5-8d24-12828dcbcc53",
+     "statementNo": "200400200083004",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 16,
+     "emptyItems": 0,
+     "tagCount": 11,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 34,
+     "candidateId": "03805d06-7c83-4b8e-b383-6720fbce2e4f",
+     "statementNo": "200400200061368",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 35,
+     "candidateId": "00001c7a-0eb9-4135-9c91-7b62d5db236a",
+     "statementNo": "20040015162402",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 15,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 36,
+     "candidateId": "000ea9fb-e27d-4eea-9655-f4932adfbc51",
+     "statementNo": "200400200023726",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 26,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 37,
+     "candidateId": "0038c442-5ca7-4716-818c-971011ee9936",
+     "statementNo": "200600200031155",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 38,
+     "candidateId": "00b596f9-e40f-4712-8b1b-d99b9645e643",
+     "statementNo": "20240028080361",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 39,
+     "candidateId": "00b6e5fe-4b43-4da7-82ce-695f9fa442e6",
+     "statementNo": "20120019007391",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 40,
+     "candidateId": "00c4ccf6-1f21-474f-a1fc-ba9891b3407c",
+     "statementNo": "200400200061936",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 41,
+     "candidateId": "00e9cb5f-f351-420e-91c7-e6a61d96b8af",
+     "statementNo": "20240028080438",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    }
+   ]
+  },
+  {
+   "width": 820,
+   "samples": [
+    {
+     "idx": 0,
+     "candidateId": "0035d1f4-21e4-4d95-9223-4193f6438e8a",
+     "statementNo": "200600200081215",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "candidateId": "006ed5e1-edf7-4d8c-a8c1-41b0d1f1ee8a",
+     "statementNo": "200700170353042",
+     "category": "LONG_LABEL",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 12,
+     "emptyItems": 0,
+     "tagCount": 5,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "candidateId": "00b154be-24d3-4e85-aa21-e391cf3cf767",
+     "statementNo": "200700170351566",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+     "statementNo": "2019000939498",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "candidateId": "011ec19b-58e5-4019-9bfd-0bdb365ea600",
+     "statementNo": "200400200141868",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "candidateId": "01bd38a9-8ca9-49a4-abe0-d2bd67532eea",
+     "statementNo": "200400170061493",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 7,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "candidateId": "01dc55b6-ee08-4bbe-aa6f-de145f980ca0",
+     "statementNo": "200700170352166",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 6,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+     "statementNo": "200400170061669",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "candidateId": "160f37cb-6def-44ee-8aa0-d4350c8615b5",
+     "statementNo": "20180012056100",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "candidateId": "1e36bff1-aa32-4080-968b-9697d1c7725b",
+     "statementNo": "20130020024301",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+     "statementNo": "200400200082764",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 4,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "candidateId": "20a952f0-78bb-432b-9e82-3f050dd536a0",
+     "statementNo": "20180012056111",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "candidateId": "317e5481-71b5-4257-a969-5732746cf0c2",
+     "statementNo": "200400200061821",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "candidateId": "34abc0af-0870-4e90-8d65-15eed8c08110",
+     "statementNo": "200400200062179",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "candidateId": "043dd1d0-478f-427e-886b-73f0c7b08ec4",
+     "statementNo": "20160006007131",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "candidateId": "084e0db9-8cf9-4dd3-9395-13747d1952b1",
+     "statementNo": "20110017019151",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "candidateId": "0a68a1f9-5b0c-40fe-aac3-7c29efd4559f",
+     "statementNo": "202000124464",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "candidateId": "0b0ccc7f-94a3-46da-97e4-0fcae2b3896e",
+     "statementNo": "20110017019152",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "candidateId": "11ae0a53-7ca2-4bcd-8de6-1b41483379fe",
+     "statementNo": "20040015094224",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "candidateId": "13e6bd0d-67dd-4f6f-a9bc-f23d39474bd3",
+     "statementNo": "20110017019117",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 43,
+     "emptyItems": 0,
+     "tagCount": 10,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "candidateId": "189dea50-fd25-4602-a59f-8fa7017d7f3e",
+     "statementNo": "20040020041557",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 1,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "candidateId": "00355600-59d2-4ec1-93d3-6dbd198e3b08",
+     "statementNo": "20190004553230",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "candidateId": "00453d7e-7831-4862-a178-d8252dad4641",
+     "statementNo": "2004002005258",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "candidateId": "009947ce-a9cd-491e-add4-99fb6f714674",
+     "statementNo": "20190009483869",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 28,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "candidateId": "0104835c-1a5f-4422-84e6-057bb00d807a",
+     "statementNo": "200400200022155",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 22,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "candidateId": "013faadf-4046-442f-bb04-60056ed2bd98",
+     "statementNo": "20190009483154",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 42,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "candidateId": "015011b4-0cb7-4d60-9145-04c9e231aa10",
+     "statementNo": "20040015100147",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "candidateId": "0171fdd2-c446-46be-99ed-0813a33c1d09",
+     "statementNo": "200400150831710",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 44,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "candidateId": "00a1a06b-e3ac-429e-aec5-b60cac511296",
+     "statementNo": "2004002005257",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "candidateId": "01fecfa6-3150-4fa1-bff5-a668d2666524",
+     "statementNo": "200400200062167",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "candidateId": "0315c229-5226-4de9-a905-859058986b7d",
+     "statementNo": "20040017030140",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "candidateId": "034f48d1-11e1-4f4c-8417-82e0a8c7e71c",
+     "statementNo": "20040020013421",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "candidateId": "03504127-0536-4940-8544-57000f8a4bcc",
+     "statementNo": "2016001213216",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "candidateId": "035b88c7-17cd-4cd5-8d24-12828dcbcc53",
+     "statementNo": "200400200083004",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 16,
+     "emptyItems": 0,
+     "tagCount": 11,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 34,
+     "candidateId": "03805d06-7c83-4b8e-b383-6720fbce2e4f",
+     "statementNo": "200400200061368",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 35,
+     "candidateId": "00001c7a-0eb9-4135-9c91-7b62d5db236a",
+     "statementNo": "20040015162402",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 15,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 36,
+     "candidateId": "000ea9fb-e27d-4eea-9655-f4932adfbc51",
+     "statementNo": "200400200023726",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 26,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 37,
+     "candidateId": "0038c442-5ca7-4716-818c-971011ee9936",
+     "statementNo": "200600200031155",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 38,
+     "candidateId": "00b596f9-e40f-4712-8b1b-d99b9645e643",
+     "statementNo": "20240028080361",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 39,
+     "candidateId": "00b6e5fe-4b43-4da7-82ce-695f9fa442e6",
+     "statementNo": "20120019007391",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 40,
+     "candidateId": "00c4ccf6-1f21-474f-a1fc-ba9891b3407c",
+     "statementNo": "200400200061936",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 41,
+     "candidateId": "00e9cb5f-f351-420e-91c7-e6a61d96b8af",
+     "statementNo": "20240028080438",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    }
+   ]
+  },
+  {
+   "width": 1280,
+   "samples": [
+    {
+     "idx": 0,
+     "candidateId": "0035d1f4-21e4-4d95-9223-4193f6438e8a",
+     "statementNo": "200600200081215",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "candidateId": "006ed5e1-edf7-4d8c-a8c1-41b0d1f1ee8a",
+     "statementNo": "200700170353042",
+     "category": "LONG_LABEL",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 12,
+     "emptyItems": 0,
+     "tagCount": 5,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "candidateId": "00b154be-24d3-4e85-aa21-e391cf3cf767",
+     "statementNo": "200700170351566",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+     "statementNo": "2019000939498",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "candidateId": "011ec19b-58e5-4019-9bfd-0bdb365ea600",
+     "statementNo": "200400200141868",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "candidateId": "01bd38a9-8ca9-49a4-abe0-d2bd67532eea",
+     "statementNo": "200400170061493",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 7,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "candidateId": "01dc55b6-ee08-4bbe-aa6f-de145f980ca0",
+     "statementNo": "200700170352166",
+     "category": "LONG_LABEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 6,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+     "statementNo": "200400170061669",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 8,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "candidateId": "160f37cb-6def-44ee-8aa0-d4350c8615b5",
+     "statementNo": "20180012056100",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "candidateId": "1e36bff1-aa32-4080-968b-9697d1c7725b",
+     "statementNo": "20130020024301",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+     "statementNo": "200400200082764",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 4,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "candidateId": "20a952f0-78bb-432b-9e82-3f050dd536a0",
+     "statementNo": "20180012056111",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 6,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "candidateId": "317e5481-71b5-4257-a969-5732746cf0c2",
+     "statementNo": "200400200061821",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "candidateId": "34abc0af-0870-4e90-8d65-15eed8c08110",
+     "statementNo": "200400200062179",
+     "category": "SPECIES_ABBREV",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "candidateId": "043dd1d0-478f-427e-886b-73f0c7b08ec4",
+     "statementNo": "20160006007131",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 9,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "candidateId": "084e0db9-8cf9-4dd3-9395-13747d1952b1",
+     "statementNo": "20110017019151",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "candidateId": "0a68a1f9-5b0c-40fe-aac3-7c29efd4559f",
+     "statementNo": "202000124464",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "candidateId": "0b0ccc7f-94a3-46da-97e4-0fcae2b3896e",
+     "statementNo": "20110017019152",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 2,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "candidateId": "11ae0a53-7ca2-4bcd-8de6-1b41483379fe",
+     "statementNo": "20040015094224",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "candidateId": "13e6bd0d-67dd-4f6f-a9bc-f23d39474bd3",
+     "statementNo": "20110017019117",
+     "category": "MIXED",
+     "changeReason": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 43,
+     "emptyItems": 0,
+     "tagCount": 10,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "candidateId": "189dea50-fd25-4602-a59f-8fa7017d7f3e",
+     "statementNo": "20040020041557",
+     "category": "MIXED",
+     "changeReason": "SAFE_FUNCTION_RESTORE",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 1,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "candidateId": "00355600-59d2-4ec1-93d3-6dbd198e3b08",
+     "statementNo": "20190004553230",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 14,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "candidateId": "00453d7e-7831-4862-a178-d8252dad4641",
+     "statementNo": "2004002005258",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 17,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "candidateId": "009947ce-a9cd-491e-add4-99fb6f714674",
+     "statementNo": "20190009483869",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 28,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "candidateId": "0104835c-1a5f-4422-84e6-057bb00d807a",
+     "statementNo": "200400200022155",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 22,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "candidateId": "013faadf-4046-442f-bb04-60056ed2bd98",
+     "statementNo": "20190009483154",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 42,
+     "emptyItems": 0,
+     "tagCount": 3,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "candidateId": "015011b4-0cb7-4d60-9145-04c9e231aa10",
+     "statementNo": "20040015100147",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "candidateId": "0171fdd2-c446-46be-99ed-0813a33c1d09",
+     "statementNo": "200400150831710",
+     "category": "MARKER",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 44,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "candidateId": "00a1a06b-e3ac-429e-aec5-b60cac511296",
+     "statementNo": "2004002005257",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "candidateId": "01fecfa6-3150-4fa1-bff5-a668d2666524",
+     "statementNo": "200400200062167",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "candidateId": "0315c229-5226-4de9-a905-859058986b7d",
+     "statementNo": "20040017030140",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "candidateId": "034f48d1-11e1-4f4c-8417-82e0a8c7e71c",
+     "statementNo": "20040020013421",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "candidateId": "03504127-0536-4940-8544-57000f8a4bcc",
+     "statementNo": "2016001213216",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 3,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "candidateId": "035b88c7-17cd-4cd5-8d24-12828dcbcc53",
+     "statementNo": "200400200083004",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 16,
+     "emptyItems": 0,
+     "tagCount": 11,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 34,
+     "candidateId": "03805d06-7c83-4b8e-b383-6720fbce2e4f",
+     "statementNo": "200400200061368",
+     "category": "ENGLISH_PARALLEL",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 10,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 35,
+     "candidateId": "00001c7a-0eb9-4135-9c91-7b62d5db236a",
+     "statementNo": "20040015162402",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 15,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 36,
+     "candidateId": "000ea9fb-e27d-4eea-9655-f4932adfbc51",
+     "statementNo": "200400200023726",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 26,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 37,
+     "candidateId": "0038c442-5ca7-4716-818c-971011ee9936",
+     "statementNo": "200600200031155",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 4,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 38,
+     "candidateId": "00b596f9-e40f-4712-8b1b-d99b9645e643",
+     "statementNo": "20240028080361",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 7,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 39,
+     "candidateId": "00b6e5fe-4b43-4da7-82ce-695f9fa442e6",
+     "statementNo": "20120019007391",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 13,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 40,
+     "candidateId": "00c4ccf6-1f21-474f-a1fc-ba9891b3407c",
+     "statementNo": "200400200061936",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 5,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 41,
+     "candidateId": "00e9cb5f-f351-420e-91c7-e6a61d96b8af",
+     "statementNo": "20240028080438",
+     "category": "FORM_INGREDIENT_BOUNDARY",
+     "changeReason": "SAFE_SEGMENTATION_REPAIR",
+     "wrapper": true,
+     "card": true,
+     "funcSection": true,
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "itemCount": 8,
+     "emptyItems": 0,
+     "tagCount": 0,
+     "emptyTags": 0,
+     "rawTagLeak": false
+    }
+   ]
+  }
+ ]
+}

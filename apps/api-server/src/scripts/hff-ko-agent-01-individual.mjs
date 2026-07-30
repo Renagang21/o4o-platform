@@ -30,6 +30,7 @@
 import pg from 'pg';
 import fs from 'node:fs';
 import { randomUUID } from 'node:crypto';
+import { createSegmenter } from './hff-ko-function-clause-segmenter-v2.mjs';
 
 const APPLY = process.argv.includes('--apply');
 const CONFIRM = process.env.HFF_AGENT1_APPLY_CONFIRM === 'YES';
@@ -52,6 +53,8 @@ const REGULATORY_TYPE = '건강기능식품';
 const esc = (s) => (s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const norm = (s) => (s ?? '').replace(/\r/g, '').replace(/ /g, ' ').replace(/[\t ]+/g, ' ').replace(/\n{2,}/g, '\n').trim();
 const flat = (s) => norm(s).replace(/\n/g, ' ').replace(/\s+/g, ' ').trim();
+// V2 분절 규칙. 정규화 계약(norm/flat)은 기존 정의를 주입해 이중 정의하지 않는다.
+const { extractFunctionsV2 } = createSegmenter({ norm, flat });
 // NOTE(정제계약): 과장/최상급 표현 기반 PROMO HOLD 제거.
 //   사유 — 정제된 Agent 9 보류 목록에 없음. 공식 MAIN_FNCTN/SRV_USE 원문을 verbatim 사용하므로
 //   원문에 포함된 표현이 false HOLD 를 유발해서는 안 됨(원문 밖 문구 추가는 별도로 금지되어 이미 방지됨).
@@ -193,7 +196,7 @@ function composeKo(row) {
   if (!flat(fnRaw)) return { status: 'HOLD', reason: 'NO_FUNCTIONAL_DATA', detail: 'MAIN_FNCTN 공식 기능성 없음' };
   if (!flat(srvRaw)) return { status: 'HOLD', reason: 'NO_INTAKE_DATA', detail: 'SRV_USE 공식 섭취방법 없음' };
 
-  const { groups, flat: flatFns, flatText } = extractFunctions(fnRaw);
+  const { groups, flat: flatFns, flatText } = extractFunctionsV2(fnRaw);
   let allFns = groups.length ? groups.flatMap((g) => g.items) : flatFns;
   // 분할 실패 시 보류하지 않고 공식 MAIN_FNCTN 원문 전체를 단일 문장으로 fallback.
   //   (flatText 는 자기 자신의 부분문자열이므로 반날조 불변식 유지 · verbatim ⊆ MAIN_FNCTN 성립)
@@ -214,7 +217,9 @@ function composeKo(row) {
     (intake.chips.filter((c) => /1일/.test(c)).map((c) => `<span class="sd-badge">${esc(c)}</span>`).join(''));
 
   // 다기능성 상위 목록은 계약 어휘 밖(sd-func)이라 무스타일이었다 → sd-core > sd-item 으로 정비.
-  const funcSection = groups.length
+  // 라벨(헤더)이 하나도 없는 제품은 기존 평면 sd-why 경로를 유지한다 — 무라벨 원문에 빈 태그를 만들지 않는다.
+  const hasFuncHeader = groups.some((g) => g.header !== null && g.header !== undefined);
+  const funcSection = groups.length && hasFuncHeader
     ? blocksToCards(groups.map((g) => ({ header: g.header, items: g.items })), li, esc)
     : `<ul class="sd-why">${li(allFns)}</ul>`;
 

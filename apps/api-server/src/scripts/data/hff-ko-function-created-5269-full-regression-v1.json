@@ -1,0 +1,72 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§12·§13·§14 — 전체 41,261 BEFORE(패치 전)/AFTER(패치 후) 회귀 + 등가성 + 내용 검증. read-only.",
+ "generatedAt": "2026-07-30T05:17:12.916Z",
+ "population": {
+  "total": 41261,
+  "buckets": {
+   "CREATED": 25074,
+   "SKIPPED_EXISTING": 15839,
+   "HOLD_FOR_AGENT_9": 348
+  }
+ },
+ "classification": {
+  "TARGET_CHANGED": 5269,
+  "NON_TARGET_UNCHANGED": 29889,
+  "NON_TARGET_CHANGED": 0,
+  "HUMAN_REVIEW_UNCHANGED": 3652,
+  "RENDER_FAILURE": 0,
+  "SKIPPED_EXISTING_SAFE_DB_UNCHANGED": 2451
+ },
+ "detail": {
+  "targetChanged": 5269,
+  "targetUnchanged": 0,
+  "targetProposedHashMismatch": 0,
+  "skippedSafeChanged": 2451,
+  "skippedSafeProposedHashMismatch": 0,
+  "skippedSafeUnchanged": 0,
+  "humanReviewChanged": 3652,
+  "humanReviewUnchanged": 0,
+  "noChangeUnchanged": 29889,
+  "noChangeChanged": 0,
+  "holdBefore": 352,
+  "holdAfter": 352,
+  "statusFlip": 0,
+  "v2ChangedSetSize": 11372,
+  "actualChangedTotal": 11372,
+  "changedNotInV2": 0,
+  "v2ChangedButUnchanged": 0,
+  "statusFlipSample": []
+ },
+ "zeroChecks": {
+  "OFFICIAL_KO_CLAUSE_DELETED": 0,
+  "FABRICATED_CLAUSE": 0,
+  "OFFICIAL_REPETITION_DEDUPED": 0,
+  "ENGLISH_ONLY_CLAUSE_ADDED": 0,
+  "NON_FUNCTIONAL_LINE_ADDED": 0,
+  "CLAUSE_ORDER_CONTAMINATION": 0,
+  "CROSS_PRODUCT_CONTAMINATION": 0,
+  "PRODUCT_NAME_DRIFT": 0,
+  "SRV_USE_DRIFT": 0,
+  "INTAKE_HINT_DRIFT": 0,
+  "FOOTER_DRIFT": 0,
+  "CLASS_STRUCTURE_DRIFT": 0,
+  "RENDER_FAILURE": 0
+ },
+ "zeroCheckScope": "§14 내용 검증은 DB 반영 대상 5,269 에 적용. 비대상은 정보 집계.",
+ "nonTargetInfo": {
+  "OFFICIAL_KO_CLAUSE_DELETED": 1881,
+  "OFFICIAL_REPETITION_DEDUPED": 0,
+  "CLAUSE_ORDER_CONTAMINATION": 0,
+  "CLASS_STRUCTURE_DRIFT": 0
+ },
+ "targetExcludedKinds": {
+  "LANG_TAG_OR_ENGLISH": 798,
+  "FORM_OR_INGREDIENT": 21,
+  "NOTICE_OR_METADATA": 12
+ },
+ "targetUnresolvedCount": 0,
+ "zeroSamples": {},
+ "fatal": [],
+ "verdict": "PASS"
+}

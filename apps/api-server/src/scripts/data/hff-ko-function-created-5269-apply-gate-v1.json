@@ -1,0 +1,138 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§17·§19 — 최종 Apply 대상 교집합 + Apply 게이트 21항목.",
+ "generatedAt": "2026-07-30T05:17:15.506Z",
+ "finalTargetCount": 5269,
+ "excludedCount": 0,
+ "excluded": [],
+ "gate": [
+  {
+   "no": 1,
+   "name": "기준 commit 292f238d1 산출물 사용",
+   "ok": true,
+   "detail": "V2 manifest 6종 입력"
+  },
+  {
+   "no": 2,
+   "name": "patch clean 적용",
+   "ok": true,
+   "detail": "git apply 성공 + segmenter-v2 모듈 생성"
+  },
+  {
+   "no": 3,
+   "name": "fixture 23 전부 PASS",
+   "ok": true,
+   "detail": "23/23"
+  },
+  {
+   "no": 4,
+   "name": "분석 segmenter ≡ 반영 코드",
+   "ok": true,
+   "detail": "artifactMismatch 0"
+  },
+  {
+   "no": 5,
+   "name": "fixture 10 zero-check 0",
+   "ok": true,
+   "detail": "{\"OFFICIAL_KO_CLAUSE_DELETED\":0,\"FABRICATED_CLAUSE\":0,\"LABEL_RENDERED_AS_CLAUSE\":0,\"SPECIES_ABBREV_MISSPLIT\":0,\"ENGLISH_IN_KO_STORE_ITEMS\":0,\"NON_FUNCTION_AREA_CHANGED\":0,\"CROSS_PRODUCT_CONTAMINATION\":0,\"OFFICIAL_REPETITION_DEDUPED\":0,\"RENDER_FAILURE\":0,\"UNRESOLVED_AUTO_SAVED\":0}"
+  },
+  {
+   "no": 6,
+   "name": "전체 41,261 dry-run 완료",
+   "ok": true,
+   "detail": "{\"TARGET_CHANGED\":5269,\"NON_TARGET_UNCHANGED\":29889,\"NON_TARGET_CHANGED\":0,\"HUMAN_REVIEW_UNCHANGED\":3652,\"RENDER_FAILURE\":0,\"SKIPPED_EXISTING_SAFE_DB_UNCHANGED\":2451}"
+  },
+  {
+   "no": 7,
+   "name": "TARGET_CHANGED = 5,269",
+   "ok": true,
+   "detail": 5269
+  },
+  {
+   "no": 8,
+   "name": "NON_TARGET_CHANGED = 0",
+   "ok": true,
+   "detail": 0
+  },
+  {
+   "no": 9,
+   "name": "RENDER_FAILURE = 0",
+   "ok": true,
+   "detail": 0
+  },
+  {
+   "no": 10,
+   "name": "§14 내용 검증 zero-check 전부 0",
+   "ok": true,
+   "detail": "{\"OFFICIAL_KO_CLAUSE_DELETED\":0,\"FABRICATED_CLAUSE\":0,\"OFFICIAL_REPETITION_DEDUPED\":0,\"ENGLISH_ONLY_CLAUSE_ADDED\":0,\"NON_FUNCTIONAL_LINE_ADDED\":0,\"CLAUSE_ORDER_CONTAMINATION\":0,\"CROSS_PRODUCT_CONTAMINATION\":0,\"PRODUCT_NAME_DRIFT\":0,\"SRV_USE_DRIFT\":0,\"INTAKE_HINT_DRIFT\":0,\"FOOTER_DRIFT\":0,\"CLASS_STRUCTURE_DRIFT\":0,\"RENDER_FAILURE\":0}"
+  },
+  {
+   "no": 11,
+   "name": "등가성 mismatch 0 (제안 해시 일치)",
+   "ok": true,
+   "detail": "target 0 / skipped 0"
+  },
+  {
+   "no": 12,
+   "name": "변경 집합 = V2 예측 집합",
+   "ok": true,
+   "detail": "11372 == 11372"
+  },
+  {
+   "no": 13,
+   "name": "표본 60 전부 PASS",
+   "ok": true,
+   "detail": "60/60"
+  },
+  {
+   "no": 14,
+   "name": "렌더 40건 이상 × 3폭 PASS",
+   "ok": true,
+   "detail": "42건"
+  },
+  {
+   "no": 15,
+   "name": "computed-style 4항목 증명",
+   "ok": true,
+   "detail": "sd-card max-width/border-radius · sd-hero padding · sd-badge border-radius"
+  },
+  {
+   "no": 16,
+   "name": "manifest 중복 0 (4키)",
+   "ok": true,
+   "detail": "candidateId/statementNo/productMasterId/canonicalId"
+  },
+  {
+   "no": 17,
+   "name": "candidate·ProductMaster·canonical 존재 5,269",
+   "ok": true,
+   "detail": "전량 실측 일치"
+  },
+  {
+   "no": 18,
+   "name": "canonical hash drift 0",
+   "ok": true,
+   "detail": "beforeContentHash 전량 일치"
+  },
+  {
+   "no": 19,
+   "name": "보호 집합 해시 고정 완료",
+   "ok": true,
+   "detail": "SKIPPED 2,451 / 검토 3,652 / HOLD 348 / CREATED 비대상 19,805 / 전체 40,913"
+  },
+  {
+   "no": 20,
+   "name": "rollback manifest 5,269 · oldContent 전량",
+   "ok": true,
+   "detail": "count 5269"
+  },
+  {
+   "no": 21,
+   "name": "최종 교집합 = 5,269 · 제외 0",
+   "ok": true,
+   "detail": "excluded 0"
+  }
+ ],
+ "passed": 21,
+ "verdict": "APPLY_ALLOWED"
+}

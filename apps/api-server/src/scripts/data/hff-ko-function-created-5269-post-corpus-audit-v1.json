@@ -1,0 +1,29 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§23 — HFF canonical 40,913 전수 사후 감사. read-only.",
+ "generatedAt": "2026-07-30T05:28:57.855Z",
+ "corpusAudit": {
+  "total": 40913,
+  "familyDriver": 25415,
+  "familyComposite": 15498,
+  "funcClaimWithoutSectionLabel": 826,
+  "missingWrapper": 0,
+  "missingFuncClaim": 0,
+  "unlabeledTouchedByThisApply": 0,
+  "driverMissingIntakeSection": 0,
+  "driverMissingSpecSection": 0,
+  "driverMissingExpertNotice": 0,
+  "missingFooter": 0,
+  "emptyListItem": 0,
+  "emptyTag": 0,
+  "rawTagLeak": 0,
+  "scriptOrStyle": 0,
+  "emptyH1": 0,
+  "duplicateCanonicalPerMaster": 0,
+  "wrongTypeOrLang": 0,
+  "shortBody": 0
+ },
+ "corpusSamples": {},
+ "note": "공식 반복 문장과 ○ ● ◦ ※ 잔존은 §23 계약에 따라 실패로 계산하지 않는다. corpus 는 DRIVER / COMPOSITE renderer family 2종이 공존하며, 섹션·문구 계약은 family 별로 다르다. 이번 WO write 대상은 DRIVER family 내 CREATED 안전 5,269 뿐이다.",
+ "verdict": "PASS"
+}

@@ -1,0 +1,93 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§20·§21 — CREATED 안전 5,269 제한 UPDATE. 허용 write = content + updated_at.",
+ "generatedAt": "2026-07-30T05:19:58.522Z",
+ "mode": "COMMITTED",
+ "expectedUpdate": 5269,
+ "actualUpdate": 5269,
+ "appliedCount": 5269,
+ "insertCount": 0,
+ "deleteCount": 0,
+ "beforeMeasures": {
+  "m1_storeKoCanonicalTotal": 63321,
+  "m2_hffCanonicalCount": 40913,
+  "m3_candidateByStatus": [
+   {
+    "s": "approved_new_master",
+    "c": 40913
+   },
+   {
+    "s": "pending",
+    "c": 348
+   }
+  ],
+  "m4_agent9Queue": 348,
+  "m5_maxUpdatedAt": "2026-07-29T04:59:37.830Z",
+  "m6_skippedExistingSafe": {
+   "count": 2451,
+   "setHash": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94"
+  },
+  "m7_humanReview": {
+   "count": 3652,
+   "setHash": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3"
+  },
+  "m8_createdNonTarget": {
+   "count": 19805,
+   "setHash": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  },
+  "m9_targetSetHash": {
+   "count": 5269,
+   "setHash": "7e9e10363385da1bbb7a2c09a8ed68e4f47723fe0b9f4ec50ad1d7cf74501f31"
+  }
+ },
+ "afterMeasures": {
+  "m1_storeKoCanonicalTotal": 63321,
+  "m2_hffCanonicalCount": 40913,
+  "m3_candidateByStatus": [
+   {
+    "s": "approved_new_master",
+    "c": 40913
+   },
+   {
+    "s": "pending",
+    "c": 348
+   }
+  ],
+  "m4_agent9Queue": 348,
+  "m5_maxUpdatedAt": "2026-07-29T20:19:09.302Z",
+  "m6_skippedExistingSafe": {
+   "count": 2451,
+   "setHash": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94"
+  },
+  "m7_humanReview": {
+   "count": 3652,
+   "setHash": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3"
+  },
+  "m8_createdNonTarget": {
+   "count": 19805,
+   "setHash": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  },
+  "m9_targetSetHash": {
+   "count": 5269,
+   "setHash": "974c16751d00bbce6c2ec4f401d815715082ca9af8af89897e0e6ff68d5092a2"
+  }
+ },
+ "baselineV2Comparison": {
+  "m2_hffCanonicalCount_v2": 40913,
+  "m2_hffCanonicalCount_now": 40913,
+  "m1_storeKoCanonicalTotal_v2": 63321,
+  "m1_storeKoCanonicalTotal_now": 63321,
+  "protectionHashes_preapply": {
+   "skippedExistingSafe": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94",
+   "humanReview": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3",
+   "createdNonTarget": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  },
+  "protectionHashes_after": {
+   "skippedExistingSafe": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94",
+   "humanReview": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3",
+   "createdNonTarget": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  }
+ },
+ "errors": [],
+ "verdict": "APPLIED"
+}

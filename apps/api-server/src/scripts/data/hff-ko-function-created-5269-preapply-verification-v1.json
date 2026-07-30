@@ -1,0 +1,78 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-APPLY-AND-CREATED-5269-CANONICAL-BACKFILL-V1",
+ "contract": "§7·§8 — 대상 manifest 정합 + 실측 대조 + 보호 집합 해시 고정. read-only.",
+ "generatedAt": "2026-07-30T05:17:12.915Z",
+ "transactionReadOnly": "on",
+ "population": {
+  "total": 41261,
+  "buckets": {
+   "CREATED": 25074,
+   "SKIPPED_EXISTING": 15839,
+   "HOLD_FOR_AGENT_9": 348
+  }
+ },
+ "manifestChecks": {
+  "total": 5269,
+  "dupCandidateId": 0,
+  "dupStatementNo": 0,
+  "dupProductMasterId": 0,
+  "dupCanonicalId": 0,
+  "bucketAllCreated": true,
+  "confidenceAllHigh": true,
+  "applyStatusAllNotApplied": true,
+  "requiredFieldsPresent": true
+ },
+ "targetVerify": {
+  "candidateMissing": {
+   "count": 0,
+   "sample": []
+  },
+  "masterLinkMismatch": {
+   "count": 0,
+   "sample": []
+  },
+  "canonicalMissing": {
+   "count": 0,
+   "sample": []
+  },
+  "canonicalIdMismatch": {
+   "count": 0,
+   "sample": []
+  },
+  "beforeHashMismatch": {
+   "count": 0,
+   "sample": []
+  },
+  "sourceRefMismatch": {
+   "count": 0,
+   "sample": []
+  }
+ },
+ "protection": {
+  "skippedExistingSafe": {
+   "count": 2451,
+   "canonicalPresent": 2451,
+   "setHash": "9d4b329439450c7af98e73f66a10b6e1cf218d8dc704d731b4e6f6793c396e94"
+  },
+  "humanReview": {
+   "count": 3652,
+   "canonicalPresent": 3652,
+   "setHash": "adf16f1528a18da9574ddc079e11917b90dd53c503418a686608d07bdd0b36c3"
+  },
+  "hold": {
+   "count": 348,
+   "canonicalPresent": 0
+  },
+  "createdNonTarget": {
+   "count": 19805,
+   "canonicalPresent": 19805,
+   "setHash": "6b58a2665ce1b0d7de44bc13e1e3a2bb0bc0d242cbb27a2e636ff1d802485a4d"
+  },
+  "allHffCanonical": {
+   "count": 40913,
+   "setHash": "f7d489736784c31a624a4297dea8f66c4ee0cf2855d45229b88ded8363925203"
+  },
+  "totalStoreKoCanonical": 63321
+ },
+ "fatal": []
+}
