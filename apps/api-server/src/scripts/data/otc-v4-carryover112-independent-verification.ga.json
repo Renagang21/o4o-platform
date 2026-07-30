@@ -1,0 +1,129 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-CARRYOVER-112-BULK-FINAL-RESOLUTION-V1",
+  "agent": "ga",
+  "kind": "independent-verification",
+  "readOnly": true,
+  "dbWrite": 0,
+  "independence": "판정기 미import · 경로 추출을 부위↔동사 근접 윈도우 방식으로 재구현 · 섹션 파서/sourceRef 산식/검증 SQL 독자 재계산",
+  "total": 15,
+  "passed": 15,
+  "verdict": "PASS",
+  "gates": [
+    {
+      "id": "V-01",
+      "gate": "입력 master 수",
+      "expected": "112",
+      "actual": "112",
+      "pass": true
+    },
+    {
+      "id": "V-02",
+      "gate": "결과 합계 = 입력",
+      "expected": "112",
+      "actual": "112 (원장합 112)",
+      "pass": true
+    },
+    {
+      "id": "V-03",
+      "gate": "master 중복 0 · 입력 밖 0",
+      "expected": "0 / 0",
+      "actual": "0 / 0",
+      "pass": true
+    },
+    {
+      "id": "V-04",
+      "gate": "기존 유효 GREEN 혼입",
+      "expected": "set=3404 · 혼입 0",
+      "actual": "set=3404 · 0",
+      "pass": true
+    },
+    {
+      "id": "V-05",
+      "gate": "source terminal 혼입",
+      "expected": "set=24 · 혼입 0",
+      "actual": "set=24 · 0",
+      "pass": true
+    },
+    {
+      "id": "V-06",
+      "gate": "기구 멸균제 혼입",
+      "expected": "set=3 · 혼입 0",
+      "actual": "set=3 · 0",
+      "pass": true
+    },
+    {
+      "id": "V-07",
+      "gate": "exclude 혼입",
+      "expected": "set=266 · 혼입 0",
+      "actual": "set=266 · 0",
+      "pass": true
+    },
+    {
+      "id": "V-08",
+      "gate": "공식 원문 hash 재계산 일치 · 근거 없는 route 확정 0",
+      "expected": "0 / 0",
+      "actual": "0 / 0",
+      "pass": true
+    },
+    {
+      "id": "V-09",
+      "gate": "제품명 단독 판정 0 (근거 문구가 공식 용법/보조축 인용)",
+      "expected": "0 / 0",
+      "actual": "0 / 0",
+      "pass": true
+    },
+    {
+      "id": "V-10",
+      "gate": "복수 경로 강제 단일화 0 (독립 윈도우 추출 대조)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "V-11",
+      "gate": "source 충돌 임의 선택 0",
+      "expected": "0 / 0",
+      "actual": "0 / 0",
+      "pass": true
+    },
+    {
+      "id": "V-12",
+      "gate": "sourceRef 재계산 불일치 · 중복 · LIVE 점유",
+      "expected": "0 / 0 / 0",
+      "actual": "0 / 0 / 0",
+      "pass": true
+    },
+    {
+      "id": "V-13",
+      "gate": "DB write 0 (authored 신규 0 · 원장 선언 0)",
+      "expected": "authored 0 · 선언 true",
+      "actual": "authored 0 · 선언 true · session ro=on",
+      "pass": true
+    },
+    {
+      "id": "V-14",
+      "gate": "판정기 재실행 산출물 byte-identical",
+      "expected": "동일",
+      "actual": "동일 (7ccb12f18a78 / 62cc898535b7 / 52a5c897fd23)",
+      "pass": true
+    },
+    {
+      "id": "V-15",
+      "gate": "분류 7종 폐쇄 · 창작 0 · terminal 재투입 0",
+      "expected": "0 / 0 / 0",
+      "actual": "0 / 0 / 0",
+      "pass": true
+    }
+  ],
+  "detail": {
+    "badHash": [],
+    "noEvidence": [],
+    "forced": [],
+    "conflictArbitrary": []
+  },
+  "ledgerHashes": {
+    "otc-v4-carryover112-resolution-ledger.ga.json": "7ccb12f18a78d1adae57ed5a143996ccfa17e1b684a9441ab674da24ec40857b",
+    "otc-v4-carryover112-agent-ga-reentry.ga.json": "62cc898535b75aa95d65d92b96cfd2254b665f6a01c2c86e110d3de5cf2e7bf8",
+    "otc-v4-carryover112-terminal-ledger.ga.json": "52a5c897fd236b0fb00df094fd2dc596a6729f517f8a22c5201873cb19f2f3eb"
+  }
+}
