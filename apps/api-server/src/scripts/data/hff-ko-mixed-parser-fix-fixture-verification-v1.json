@@ -1,0 +1,240 @@
+{
+ "wo": "WO-O4O-HFF-KO-MIXED-FUNCTION-BLOCK-PARSER-FIX-AND-118-CANONICAL-BACKFILL-V1",
+ "phase": "B-fixture",
+ "baseCommit": "8e154e3f3",
+ "generatedAt": "2026-07-30T02:43:19.301Z",
+ "gate": {
+  "fixtures": 8,
+  "pass": 8,
+  "fail": 0,
+  "sourceClauseMissingTotal": 0,
+  "fabricatedClauseTotal": 0,
+  "emptyItemTotal": 0,
+  "orderPreservedAll": true,
+  "officialRepeatKeptAll": true,
+  "structureRegressionTotal": 0,
+  "fabricatedHeaderTotal": 0
+ },
+ "results": [
+  {
+   "id": "FX-1-MIXED",
+   "label": "혼합형(무라벨 선행 + [원료] 라벨)",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "아연: 정상적인 면역기능에 필요",
+    "아연: 정상적인 세포분열에 필요",
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+    "장 건강에 도움을 줄 수 있음"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": false,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 2,
+    "beforeGroupCount": 1,
+    "nullHeaderGroups": 1,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<div class=\"sd-core\"><div class=\"sd-item\"><ul><li>아연: 정상적인 면역기능에 필요</li><li>아연: 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>장 건강에 도움을 줄 수 있음</li></ul></div></div>"
+  },
+  {
+   "id": "FX-2-LABELED_ONLY",
+   "label": "라벨형만",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "면역력 증진에 도움을 줄 수 있음",
+    "피로개선에 도움을 줄 수 있음"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 1,
+    "beforeGroupCount": 1,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<div class=\"sd-item\"><span class=\"sd-tag\">홍삼</span><ul><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li></ul></div>"
+  },
+  {
+   "id": "FX-3-UNLABELED_ONLY",
+   "label": "무라벨형만",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+    "혈행 개선에 도움을 줄 수 있음"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 0,
+    "beforeGroupCount": 0,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<ul class=\"sd-why\"><li>혈중 콜레스테롤 개선에 도움을 줄 수 있음</li><li>혈행 개선에 도움을 줄 수 있음</li></ul>"
+  },
+  {
+   "id": "FX-4-MULTI_LABEL",
+   "label": "다중 원료 라벨형",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "정상적인 면역기능에 필요"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 3,
+    "beforeGroupCount": 3,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li></ul></div></div>"
+  },
+  {
+   "id": "FX-5-OFFICIAL_REPEAT",
+   "label": "동일 공식 기능성 반복(무라벨 + 라벨 양쪽)",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "정상적인 면역기능에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatCount": 2,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": false,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 3,
+    "beforeGroupCount": 2,
+    "nullHeaderGroups": 1,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<div class=\"sd-core\"><div class=\"sd-item\"><ul><li>정상적인 면역기능에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>"
+  },
+  {
+   "id": "FX-6-FLAT_SD_WHY",
+   "label": "sd-why 평면형(마커 없는 단일 문장군)",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "장 건강에 도움을 줄 수 있음.",
+    "배변활동 원활에 도움을 줄 수 있음."
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 0,
+    "beforeGroupCount": 0,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<ul class=\"sd-why\"><li>장 건강에 도움을 줄 수 있음.</li><li>배변활동 원활에 도움을 줄 수 있음.</li></ul>"
+  },
+  {
+   "id": "FX-7-EMPTY_FN",
+   "label": "빈 MAIN_FNCTN",
+   "pass": true,
+   "beforeStatus": "HOLD",
+   "afterStatus": "HOLD",
+   "renderedItems": [],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 0,
+    "beforeGroupCount": 0,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": null
+  },
+  {
+   "id": "FX-8-SHORT_SINGLE",
+   "label": "짧은 단일 문장",
+   "pass": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "renderedItems": [
+    "영양성분 보충"
+   ],
+   "checks": {
+    "sourceClauseMissing": [],
+    "fabricatedClauses": [],
+    "emptyItems": 0,
+    "orderPreserved": true,
+    "officialRepeatKept": true,
+    "byteIdenticalToBefore": true,
+    "structureRegression": false,
+    "holdOk": true,
+    "classOk": true,
+    "afterGroupCount": 0,
+    "beforeGroupCount": 0,
+    "nullHeaderGroups": 0,
+    "fabricatedHeaders": 0
+   },
+   "afterFunctionHtml": "<ul class=\"sd-why\"><li>영양성분 보충</li></ul>"
+  }
+ ]
+}

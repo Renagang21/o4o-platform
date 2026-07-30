@@ -1,0 +1,1909 @@
+[
+ {
+  "index": 1,
+  "candidateId": "75fa9fc4-b86f-44a0-985c-d9279af15147",
+  "statementNo": "200400150832478",
+  "productName": "바이오파파 다이어트 유산균 바이오 슬림",
+  "productMasterId": "9c12c1b4-594b-468f-a578-27aea469e654",
+  "canonicalId": "6e69f575-e916-42f5-8c99-3bcbea2ead26",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)]\n(가) 체지방 감소에 도움을 줄 수 있음\n(나) 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n[바나바잎 추출물]\n식후 혈당상승 억제에 도움을 줄 수 있음\n[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌.\n[비타민B1]\n탄수화물과 에너지 대사에 필요\n[비오틴]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">바나바잎 추출물</span><ul><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>(가) 칼슘과 인이 흡수되고 이용되는데 필요</li><li>(나) 뼈의 형성과 유지에 필요</li><li>(다) 골다공증발생 위험 감소에 도움을 줌.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음",
+   "유산균증식및유해균억제",
+   "장건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 2,
+  "candidateId": "7a3956a7-8364-4d35-b751-fb89af413839",
+  "statementNo": "200400150832024",
+  "productName": "녹차카테킨+",
+  "productMasterId": "0c5a8bcf-05d3-4c31-8a49-6139b8522fda",
+  "canonicalId": "0dd64812-683c-4301-9d3f-9140d22f90d7",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)]\n(국문) 배변활동 원활에 도움을 줄 수 있음\n(영문) May help to improve bowel movements\n\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[비타민B1]\n탄수화물과 에너지 대사에 필요\n\n[비타민B2]\n체내 에너지 생성에 필요\n\n[비타민B6]\n단백질 및 아미노산 이용에 필요\n혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비오틴]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[아연]\n정상적인 면역기능에 필요\n정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동원활에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 3,
+  "candidateId": "ed9b0d3d-9c5f-46cd-9503-2fe5d675f790",
+  "statementNo": "200400150832025",
+  "productName": "그린몬스터 다이어트 쾌변 쑥",
+  "productMasterId": "bd97549a-e9e9-4337-aca1-a4414f6fc5e8",
+  "canonicalId": "ef34ca2a-f58e-49e2-ae8e-b195bcb7fa72",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)]\n(국문) 배변활동 원활에 도움을 줄 수 있음\n(영문) May help to improve bowel movements\n\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[비타민B1]\n탄수화물과 에너지 대사에 필요\n\n[비타민B2]\n체내 에너지 생성에 필요\n\n[비타민B6]\n단백질 및 아미노산 이용에 필요\n혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비오틴]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[아연]\n정상적인 면역기능에 필요\n정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동원활에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 4,
+  "candidateId": "d351c181-a5b2-4b6e-ba64-570bab2e4cd7",
+  "statementNo": "20040015083888",
+  "productName": "닥터혈당컨트롤",
+  "productMasterId": "01a6e993-e6c3-4adb-899d-13098081f553",
+  "canonicalId": "0c8d2289-dcca-4a82-8e1d-ea0e676cb5cc",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①식후 혈당상승 억제에 도움을 줄 수 있음\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①체내 에너지 생성에 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[비타민E]  항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[크롬] 체내 탄수화물, 지방, 단백질 대사에 관여",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">크롬</span><ul><li>체내 탄수화물, 지방, 단백질 대사에 관여</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음",
+   "탄수화물과에너지대사에필요",
+   "체내에너지생성에필요",
+   "체내에너지생성에필요",
+   "단백질대사와에너지생성에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "세포와혈액생성에필요",
+   "태아신경관의정상발달에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "단백질대사와에너지생성에필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 5,
+  "candidateId": "4a51f6b8-110c-4a75-af0d-6361bcdfcbd8",
+  "statementNo": "200400150831397",
+  "productName": "멀티비타민 앤 미네랄",
+  "productMasterId": "c41c6064-f2bb-4b09-a620-4a6827aa87ee",
+  "canonicalId": "beab42b6-8100-4a2c-aed6-3eeb069af1e8",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌\n[나이아신] 체내 에너지 생성에 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[망간] 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요\n[비타민A] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[셀렌] 에너지 이용에 필요, 신경과 근육 기능 유지에 필요\n[비오틴] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민B12] 정상적인 엽산 대사에 필요\n[비타민B6] 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요\n[엽산] 세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>에너지 이용에 필요, 신경과 근육 기능 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "비타민C]결합조직형성과기능유지에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 6,
+  "candidateId": "94834a4a-2f67-4e06-8e2e-370506de5497",
+  "statementNo": "20040015083972",
+  "productName": "코큐텐11",
+  "productMasterId": "d7a9cad4-f07f-480b-9dc6-e4d89a9d1d0e",
+  "canonicalId": "7b9f1c12-bc00-4642-a91b-21d69f4a4083",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①항산화·높은 혈압 감소에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①체내 에너지 생성에 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n[크롬 ] 체내 탄수화물, 지방, 단백질 대사에 관여\n\n",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">크롬</span><ul><li>체내 탄수화물, 지방, 단백질 대사에 관여</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "높은혈압감소에도움을줄수있음",
+   "탄수화물과에너지대사에필요",
+   "체내에너지생성에필요",
+   "체내에너지생성에필요",
+   "단백질대사와에너지생성에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "세포와혈액생성에필요",
+   "태아신경관의정상발달에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "단백질대사와에너지생성에필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요",
+   "유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 7,
+  "candidateId": "2c8852bb-feb7-4221-91fc-d9ee78590a4a",
+  "statementNo": "200400170061087",
+  "productName": "광동 궁리본 유산균",
+  "productMasterId": "a3a264b9-a286-4e2e-937d-c6e003552bdf",
+  "canonicalId": "4faa6d16-bfcc-442b-a6b7-d68aa7e15489",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus acidophilus YT1 (제2019-22호)]  (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to improve menopausal women's health\n[프로바이오틱스] 유산균 증식 및 유해균 억제․배변활동 원활·장건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제․배변활동 원활·장건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "갱년기여성건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 8,
+  "candidateId": "5306d70e-0656-402c-b3e5-574b9b01267f",
+  "statementNo": "20040015191225",
+  "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+  "productMasterId": "ef23e1de-3cd6-48b5-8eac-0591a6f5c4fe",
+  "canonicalId": "cbad2a14-6f42-4b4e-a851-54b880a9095b",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 유해산소로부터 세포를 보호하는데 필요\n\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 체내 탄수화물, 지방, 단백질 대사에 관여\n\n(1) 체내 산소운반과 혈액생성에 필요\n(2) 에너지 생성에 필요\n\n(1) 갑상선 호르몬의 합성에 필요\n(2) 에너지 생성에 필요\n(3) 신경발달에 필요\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n\n(1) 철의 운반과 이용에 필요\n(2) 유해산소로부터 세포를 보호하는데 필요\n\n(1) 정상적인 엽산 대사에 필요\n\n(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요\n\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n(1) 뼈 형성에 필요\n(2) 에너지 이용에 필요\n(3) 유해산소로부터 세포를 보호하는데 필요,[비타민B1] 탄수화물과 에너지 대사에 필요.\n[비타민B2] 체내 에너지 생성에 필요.\n[비타민B6] 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.\n[비오틴] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요.\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요.\n[나이아신] 체내 에너지 생성에 필요.\n[비타민B12] 정상적인 엽산대사에 필요.\n[비타민A] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요.\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증 발생 위험 감소에 도움을 줌.\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.\n[비타민K] 정상적인 혈액응고에 필요, 뼈의 구성에 필요.\n[비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.\n[셀렌] 유해산소로부터 세포를 보호하는데 필요.\n[크롬] 체내 탄수화물, 지방, 단백질 대사에 관여.\n[철] 체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요.\n[엽산] 세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.\n[망간] 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요 \n[요오드] 갑상선 호르몬의 합성에 필요, 에너지 생성에 필요 신경발달에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B12</span><ul><li>정상적인 엽산대사에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증 발생 위험 감소에 도움을 줌.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민K</span><ul><li>정상적인 혈액응고에 필요, 뼈의 구성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">크롬</span><ul><li>체내 탄수화물, 지방, 단백질 대사에 관여.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">철</span><ul><li>체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">요오드</span><ul><li>갑상선 호르몬의 합성에 필요, 에너지 생성에 필요 신경발달에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "철의운반과이용에필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 9,
+  "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+  "statementNo": "200400170061205",
+  "productName": "내추럴 어드밴스드 다이어트 ",
+  "productMasterId": "2e066612-fe9b-4e7b-9e8c-ddb9fb5c2b5c",
+  "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "자몽추출물등 복합물(Sinetrol)(제2019-24호)](국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[비타민 C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n[비타민 A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n[비타민 B12]①정상적인 엽산 대사에 필요\n\n[비타민 B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민 B1]①탄수화물과 에너지 대사에 필요\n\n[비타민 B2]①체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 10,
+  "candidateId": "7af35a06-31ec-4d71-a5bc-26411f515eb9",
+  "statementNo": "20040015162300",
+  "productName": "수면앤다이어트",
+  "productMasterId": "514ac9d1-4529-4d42-9b85-88219e769334",
+  "canonicalId": "8f39e7ee-eec7-4180-bb57-a97b25b0f948",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요,·감태추출물(개별인정형원료 제2015-6호) : 수면의 질 개선에 도움을 줄 수 있음\n·콜레우스포스콜리추출물[개별인정형원료 제2012-5호] : 체지방 감소에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">개별인정형원료 제2012-5호</span><ul><li>: 체지방 감소에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "탄수화물과에너지대사에필요",
+   "체내에너지생성에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "단백질대사와에너지생성에필요",
+   "유해산소로부터세포를보호하는데필요",
+   "수면의질개선에도움을줄수있음",
+   "콜레우스포스콜리추출물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 11,
+  "candidateId": "84589a8a-1172-4be9-94d9-720169ec15fd",
+  "statementNo": "20040015107764",
+  "productName": "제너럴밸런스 W솔루션",
+  "productMasterId": "63708c6d-80cd-4140-bfb0-8d32a2fd83d0",
+  "canonicalId": "d70a9ac4-3ca1-4adb-a166-643c2de22332",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①탄수화물과 에너지 대사에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요,[석류추출물(제2015-28호)] 갱년기 여성의 건강에 도움을 줄 수 있음. ",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">석류추출물(제2015-28호)</span><ul><li>갱년기 여성의 건강에 도움을 줄 수 있음.</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "탄수화물과에너지대사에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "결합조직형성과기능유지에필요",
+   "유해산소로부터세포를보호하는데필요",
+   "단백질대사와에너지생성에필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요",
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 12,
+  "candidateId": "14a9b351-4398-489d-8dbb-e8d1cb41cec6",
+  "statementNo": "200400170061507",
+  "productName": "메노락토 프리미엄",
+  "productMasterId": "0f727a64-56ec-4675-a3d8-91f92c5d7a71",
+  "canonicalId": "94f5ef15-350f-410d-b197-c7e6fd5e8647",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus acidophilus YT1 (제2019-22호)] (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to menopausal womens health\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n\n[셀렌] ①유해산소로부터 세포를 보호하는데 필요\n\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n[비오틴] (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n\n[엽산] ①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "갱년기여성건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 13,
+  "candidateId": "26432d24-b0fa-40f4-8938-523d1bae831c",
+  "statementNo": "200400170061686",
+  "productName": "엘레씬",
+  "productMasterId": "44ae2e7e-9d01-4b55-8ec8-a06094223eac",
+  "canonicalId": "b9e19d4b-d7ff-4391-af50-4bacac2f8249",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(국문) 체지방 감소에 도움을 줄 수 있음 \n(영문) May help to reduce body fat\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음\n",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 14,
+  "candidateId": "3685815e-3a42-4312-a12f-0ab44ab191ca",
+  "statementNo": "20040017006271",
+  "productName": "쏘팔메토플러스",
+  "productMasterId": "07a82cba-73af-4007-9ba1-a195916591b9",
+  "canonicalId": "4730ea7f-826d-406e-bd01-49220e52bd05",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "전립선 건강의 유지에 도움을 줄 수 있음\n[아연]①정상적인 면역기능에 필요② 정상적인 세포분열에 필요  ",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "전립선건강의유지에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 15,
+  "candidateId": "52cd3f79-0cd1-4b1e-a310-af60d6165480",
+  "statementNo": "200400170171009",
+  "productName": "리프로락",
+  "productMasterId": "1b44fdf9-0659-4692-a737-9834cbe57863",
+  "canonicalId": "9fb2161e-b9a7-4c1d-bce2-954bcc2df1cc",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①체내 에너지 생성에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n[비타민 E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "체내에너지생성에필요",
+   "탄수화물과에너지대사에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 16,
+  "candidateId": "b844ce36-764c-4b58-98f9-ab01c821902c",
+  "statementNo": "200400170211893",
+  "productName": "B:OK 실크텐션 머릿결 유산균",
+  "productMasterId": "0a9aa81e-5ba1-469b-864f-cf25014f0ac7",
+  "canonicalId": "ed866fe4-c7e0-432a-a6a8-cac23cb029d3",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactilactobacillus curvatus LB-P9 프로바이오틱스]\n  (국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음\n  (영문) May help to improve hair condition(luster·elasticity)\n[셀레늄] (1) 유해산소로부터 세포를 보호하는데 필요\n[비오틴] (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n[비타민B6] (1) 단백질 및 아미노산 이용에 필요, (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요, (</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 17,
+  "candidateId": "bdc202ea-cf40-4a41-a423-844c9065f449",
+  "statementNo": "200400170061709",
+  "productName": "다이어트유산균 듀얼 락토슬림",
+  "productMasterId": "2503019f-16b6-4028-9756-7018ba8aec1e",
+  "canonicalId": "0a0317bd-2324-4bfc-9662-2bcbd8e30f38",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)]\n(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음\n\n[나이아신] ①체내 에너지 생성에 필요\n\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[판토텐산] (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 18,
+  "candidateId": "f20d3890-4c05-4c70-88a9-a680ab7feaaf",
+  "statementNo": "20040017006598",
+  "productName": "눈에좋은 맑은 루테인",
+  "productMasterId": "5fdbfb11-0e76-4f17-bf71-e65825189591",
+  "canonicalId": "ad95fcff-33a7-4333-897c-98ed26c9d334",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">마리골드꽃추출물</span><ul><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요",
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요",
+   "유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 19,
+  "candidateId": "8f79ff1d-28c7-47ad-b3fc-c2d02ddef308",
+  "statementNo": "200400170211365",
+  "productName": "니아르 포스콜린 에스케어",
+  "productMasterId": "3eb73951-0b93-40b2-b950-de91f45f81bd",
+  "canonicalId": "5e1a6d8c-f8ec-4201-a213-48a7be815e21",
+  "patternType": "LABELED_ONLY",
+  "mainFunctionSource": "[녹차추출물] ①항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[비타민B1] (1) 탄수화물과 에너지 대사에 필요\n\n[비타민B2] (1) 체내 에너지 생성에 필요\n\n[비타민B6] ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[판토텐산] (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[콜레우스 포스콜리 추출물(제2012-5호)] 체지방 감소에 도움을 줄 수 있음 (생리활성기능 2등급)\n\n[바나바잎 추출물] ①식후 혈당상승 억제에 도움을 줄 수 있음\n\n[셀레늄(또는 셀렌)] ①유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">콜레우스 포스콜리 추출물(제2012-5호)</span><ul><li>체지방 감소에 도움을 줄 수 있음 (생리활성기능 2등급)</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">바나바잎 추출물</span><ul><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "]체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 20,
+  "candidateId": "4d3fe144-3c36-4b76-86d0-114121c68459",
+  "statementNo": "200400170061890",
+  "productName": "덴프스 유산균이야기 다이어트",
+  "productMasterId": "b72ae266-116c-466f-8b5e-905e26a77916",
+  "canonicalId": "ae79ca21-ea6b-4855-b9aa-6a56e62f8e3d",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)]\n(국문) 체지방 감소에 도움을 줄 수 있음 \n(영문) May help to reduce body fat\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요\n[비타민B2]\n(1) 체내 에너지 생성에 필요\n[판토텐산]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 21,
+  "candidateId": "bc103018-929b-4d44-89db-a19951432b19",
+  "statementNo": "200400170211547",
+  "productName": "덴프스 유산균이야기 다이어트",
+  "productMasterId": "8e188373-3237-4dcf-896c-a818e0eeddee",
+  "canonicalId": "a6bda6ee-6ac5-40e8-8b21-fa1575f173d7",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L.curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(기능성원료인정 제2019-4호)] \n\n(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[프로바이오틱스] ①유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 22,
+  "candidateId": "444b4436-612b-450d-ae05-1ce91ecca55b",
+  "statementNo": "20040017006845",
+  "productName": "맘스포뮬러 비타민D 2000IU",
+  "productMasterId": "c29e2610-0eec-43cf-b423-2644d6a125db",
+  "canonicalId": "4a80514e-f55c-42ba-9e9d-5e22ea127724",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요\n[비타민 E]항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민 E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "칼슘과인이흡수되고이용되는데필요",
+   "뼈의형성과유지에필요",
+   "골다공증발생위험감소에도움을줌"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 23,
+  "candidateId": "e139ec88-e7a7-4f9e-90a8-4014c48902d6",
+  "statementNo": "200400170061811",
+  "productName": "슬로우글로우 다이어트 유산균",
+  "productMasterId": "d0edcf4c-b83e-42f9-b721-1d8f4a85622b",
+  "canonicalId": "18c59353-79db-42b6-9183-16bcc7238ae9",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정 제2019-4호)]\n(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[바나바잎추출물]\n① 식후 혈당상승 억제에 도움을 줄 수 있음\n\n[판토텐산]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민D]\n(1) 칼슘과 인이 흡수되고 이용되는데 필요\n(2) 뼈의 형성과 유지에 필요\n(3) 골다공증발생 위험 감소에 도움을 줌\n\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요\n\n[비오틴]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">바나바잎추출물</span><ul><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 24,
+  "candidateId": "76195fc4-f826-4302-8ed2-54ffa357464e",
+  "statementNo": "20040017006600",
+  "productName": "아이에버루테인",
+  "productMasterId": "332d25c8-971c-42b1-a00b-2c16666f95aa",
+  "canonicalId": "f7307fdb-56b7-4baa-a578-0a47025ea8bb",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음,[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n[비타민B2]①체내 에너지 생성에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">마리골드꽃추출물</span><ul><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음,</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "결합조직형성과기능유지에필요",
+   "유해산소로부터세포를보호하는데필요",
+   "유해산소로부터세포를보호하는데필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 25,
+  "candidateId": "bad02774-32c9-4356-b1bb-9b7020b8a1bd",
+  "statementNo": "200400170061599",
+  "productName": "야쿠르트 핏바이오틱스",
+  "productMasterId": "6dc66995-fbc1-4309-98f5-ca35e47e24a1",
+  "canonicalId": "ac6afb6b-1e1b-499c-b96f-9345b1120f66",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus 복합물 HY7601 + KY1032 (제2019-4호)]\n(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[프로바이오틱스]유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n[나이아신] 체내 에너지 생성에 필요\n[비타민D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 26,
+  "candidateId": "52fe3b41-2411-4357-b984-329760d02bd7",
+  "statementNo": "200400170061694",
+  "productName": "엘레씬 다이어트 유산균",
+  "productMasterId": "e990696d-53ef-4686-8c6b-3399c94d2ced",
+  "canonicalId": "1f6b091d-3773-4097-9a6a-b5bb8d778524",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(국문) 체지방 감소에 도움을 줄 수 있음 \n(영문) May help to reduce body fat\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 27,
+  "candidateId": "74c7e00a-b856-4d6d-a893-5ee09b2a747e",
+  "statementNo": "200400170061769",
+  "productName": "익스트림 트리플 HMB 3000",
+  "productMasterId": "ea09538c-deaa-4294-aa9f-6a9580bcd78a",
+  "canonicalId": "52685061-8470-42ea-aa47-844b4c2b50ae",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[CaHMB(Calcium β-Hydroxy-β-methylbutyrate)(제2023-26호)]\n(국문) 운동수행능력 향상에 도움을 줄 수 있음\n(영문) May help to improve endurance of exercise performance capability\n[비타민D]\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n[아연]\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "운동수행능력향상에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 28,
+  "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+  "statementNo": "200400170061669",
+  "productName": "트루락 날씬 다이어트 유산균",
+  "productMasterId": "4991b046-947e-49ea-8682-ed1a9ad31f91",
+  "canonicalId": "589badf9-cd5c-49b7-bfeb-21a9f701195d",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)]\n(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat\n\n[프로바이오틱스]\n유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n[아연]\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[판토텐산]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민D]\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 29,
+  "candidateId": "d04268d4-098a-4be9-8100-ce952ebe89d0",
+  "statementNo": "20040020001277",
+  "productName": "라인 케어",
+  "productMasterId": "e20df92d-79e7-4934-bc14-52516f446b8f",
+  "canonicalId": "327b58f9-7884-434d-9f72-88112715c4c1",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌\n\n자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음(생리활성기능 2등급)\n체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)\n피부보습에 도움을 줄 수 있음(생리활성기능 2등급)\n,[핑거루트추출분말(판두라틴)] \n① 체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)\n② 자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음(생리활성기능 2등급)\n③ 피부보습에 도움을 줄 수 있음(생리활성기능 2등급)",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">핑거루트추출분말(판두라틴)</span><ul><li>체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음(생리활성기능 2등급)</li><li>피부보습에 도움을 줄 수 있음(생리활성기능 2등급)</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "탄수화물이지방으로합성되는것을억제하여체지방감소에도움을줌"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 30,
+  "candidateId": "68af5c2f-7704-4a8e-b5c3-4b2d561e8cb0",
+  "statementNo": "2004001706144",
+  "productName": "스킨마스터 피에스트로 프로",
+  "productMasterId": "5730d5de-b09d-49d1-a3f6-aa2a4e586e4f",
+  "canonicalId": "3b74633a-faa6-4364-81af-834fde89245c",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(국문)\n1. 피부 보습에 도움을 줄 수 있음 \n2. 자외선에 의한 피부 손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 \n(영문)\n1. Help to maintain skin moisturizing\n2. Help to maintain skin health from skin damage by UV radiation,[비타민C]\n①결합조직 형성과 기능유지에 필요\n②철의 흡수에 필요\n③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "피부보습에도움을줄수있음",
+   "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 31,
+  "candidateId": "8b73f8d8-c3fc-44f8-b2d5-1c9cc5489c51",
+  "statementNo": "20040020003105",
+  "productName": "호리호리 하이킥",
+  "productMasterId": "20629219-d965-4216-bb40-a09f20b173c7",
+  "canonicalId": "d79ba28d-e9b2-4e44-b36e-5a4d03d34dc3",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌\n[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④청년기 이전에 적절한 운동과 건강한 식습관을 유지하면서 충분한 칼슘을 섭취하면 향후 골다공증발생의 위험을 감소시킬 수 있음  ",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">칼슘</span><ul><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>청년기 이전에 적절한 운동과 건강한 식습관을 유지하면서 충분한 칼슘을 섭취하면 향후 골다공증발생의 위험을 감소시킬 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "탄수화물이지방으로합성되는것을억제하여체지방감소에도움을줌"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 32,
+  "candidateId": "c2a77922-ab87-489a-a3da-c18ff85e7995",
+  "statementNo": "200400200061477",
+  "productName": "비스테디 다이어트 유산균",
+  "productMasterId": "c4ac1287-d9c4-4d87-9a44-bab5de3b39e9",
+  "canonicalId": "a48e0777-d660-4475-ad22-d1d7025f2756",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제에 도움을 줄 수 있음, 배변활동 원활에 도움을 줄 수 있음, 장 건강에 도움을 줄 수 있음,  \n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요, \n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요, \n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌, \n비타민B1 : 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제에 도움을 줄 수 있음, 배변활동 원활에 도움을 줄 수 있음, 장 건강에 도움을 줄 수 있음,</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,</li><li>아연 : (</li><li>정상적인 면역기능에 필요 (</li><li>정상적인 세포분열에 필요,</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌,</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 33,
+  "candidateId": "6e79d5bb-bb72-4ba6-a238-581b7283077b",
+  "statementNo": "20040020002937",
+  "productName": "앨트헬스오메가-3",
+  "productMasterId": "5dec8ed6-7c0d-464b-8f4c-f39b0f509a6b",
+  "canonicalId": "281a9031-2212-41c7-9866-1f18b30dfd95",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①유해산소로부터 세포를 보호하는데 필요\n\n[EPA 및 DHA 함유유지]①혈중 중성지질 개선②혈행개선 ③ 건조한 눈을 개선하여 눈건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">EPA 및 DHA 함유유지</span><ul><li>혈중 중성지질 개선</li><li>혈행개선</li><li>건조한 눈을 개선하여 눈건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 34,
+  "candidateId": "8874e716-6bb8-4e31-b960-eea18325782c",
+  "statementNo": "200400200061907",
+  "productName": "다이어트 유산균",
+  "productMasterId": "5916cb14-d2e4-488d-8e8e-89989a8018f5",
+  "canonicalId": "b92cfae5-2658-4305-8da5-a4e16b8599d5",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 35,
+  "candidateId": "5b74bb91-dacf-47bd-a1fc-ce2fb33d9440",
+  "statementNo": "20040020006879",
+  "productName": "트리플러스50+액티브",
+  "productMasterId": "da4af040-6060-444e-9e73-2d8fb25faa70",
+  "canonicalId": "966fd0a7-b89a-4d07-9b9c-97e9a5c60dc2",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n[토마토추출물]항산화에 도움을 줄 수 있음\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①체내 에너지 생성에 필요\n\n①체내 산소운반과 혈액생성에 필요②에너지 생성에 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①체내 에너지 생성에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(EPA 및 DHA 함유 유지)①혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">토마토추출물</span><ul><li>항산화에 도움을 줄 수 있음</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>체내 에너지 생성에 필요</li><li>체내 산소운반과 혈액생성에 필요</li><li>에너지 생성에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>체내 에너지 생성에 필요</li><li>탄수화물과 에너지 대사에 필요</li><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (EPA 및 DHA 함유 유지)</li><li>혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "신경과근육기능유지에필요",
+   "정상적인혈액응고에필요",
+   "신경과근육기능유지에필요",
+   "결합조직형성과기능유지에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 36,
+  "candidateId": "aebe02f5-26e1-4291-b6ab-49c722f5d7fd",
+  "statementNo": "200400200071680",
+  "productName": "광동 눈 건강엔 루테인",
+  "productMasterId": "7154f08f-c0c7-4938-ac45-52782afe9b6d",
+  "canonicalId": "ffab71f6-9a6d-4226-a91d-12cab671d58b",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[마리골도꽃추출물]노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">마리골도꽃추출물</span><ul><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줌</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요",
+   "결합조직형성과기능유지에필요",
+   "유해산소로부터세포를보호하는데필요",
+   "칼슘과인이흡수되고이용되는데필요",
+   "뼈의형성과유지에필요",
+   "골다공증발생위험감소에도움을줌",
+   "유해산소로부터세포를보호하는데필요",
+   "유해산소로부터세포를보호하는데필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 37,
+  "candidateId": "c81a8932-daa3-48e1-b0b7-9dff8c9699c8",
+  "statementNo": "200400200062095",
+  "productName": "다이어트 유산균 & 혈당케어",
+  "productMasterId": "2ee39c10-cba2-4884-a5a5-47fc3d521900",
+  "canonicalId": "81162d5b-a612-4065-94df-e267e19d9336",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B1 : 탄수화물과 에너지 대사에 필요\n바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li><li>바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 38,
+  "candidateId": "e3673abf-2c9f-4491-9524-8cfba0ba8bf9",
+  "statementNo": "20040020006683",
+  "productName": "메타볼",
+  "productMasterId": "ec32e526-16c8-43b2-9f64-8e916a4c3488",
+  "canonicalId": "fb6fa5aa-82a1-4ee4-a3ae-c88411210b0a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "① 코엔자임 Q10은 항산화에 도움을 줄 수 있습니다.② 코엔자임 Q10은 혈압이 높은 사람에게 도움을 줄 수 있습니다.\n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요\n[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n[비타민B12]①정상적인 엽산 대사에 필요\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요\n[비타민B1]①탄수화물과 에너지 대사에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B2]①체내 에너지 생성에 필요\n[아연]①정상적인 면역기능에 필요② 정상적인 세포분열에 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요 ②뼈의 형성과 유지에 필요\n[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[엽산]①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n  ",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">마그네슘</span><ul><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "코엔자임Q10은항산화에도움을줄수있습니다.",
+   "코엔자임Q10은혈압이높은사람에게도움을줄수있습니다."
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 39,
+  "candidateId": "b5627267-9eb3-4ccd-ae70-3cc4230881a3",
+  "statementNo": "200400200061905",
+  "productName": "셀티바 프로바이오틱 다이어트",
+  "productMasterId": "fce1c3f0-e638-40fe-93db-5686826c3cd3",
+  "canonicalId": "52ce799e-668b-4d7c-9bb3-2e63da00ced2",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 40,
+  "candidateId": "2c94dd57-3920-4f90-a9a4-62efc30d8fb7",
+  "statementNo": "200400200062173",
+  "productName": "암드 슬림 다이어트 유산균",
+  "productMasterId": "daa9b33a-7300-4261-b0fb-39277002b86f",
+  "canonicalId": "eb8df195-edeb-44b1-8f7a-77c3cd60b6fc",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B1 : 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 41,
+  "candidateId": "7c3de1a8-010c-49d0-a04e-4602abb327de",
+  "statementNo": "200400200062161",
+  "productName": "여에스더 뇌 유산균",
+  "productMasterId": "4f7680f6-250c-44d3-99ef-fdd86a1d21f8",
+  "canonicalId": "2410e47a-fc14-497c-bad6-f267f2af49a8",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. mucosae NK41과 B. longum NK46의 프로바이오틱스 복합물(NVP-2106)(제2025-15호) : (국문) 노화로 인해 저하된 인지기능 개선에 도움을 줄 수 있음 (영문) May help to improve cognitive function affected by aging\n유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>mucosae NK41과 B.</li><li>longum NK46의 프로바이오틱스 복합물(NVP-2106)(제2025-15호) : (국문) 노화로 인해 저하된 인지기능 개선에 도움을 줄 수 있음 (영문) May help to improve cognitive function affected by aging</li><li>유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.mucosaeNK41과B.longumNK46의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 42,
+  "candidateId": "a0eb0082-016f-42dc-85f7-1ed3d0eaee62",
+  "statementNo": "20040020006671",
+  "productName": "코큐비타",
+  "productMasterId": "7155b780-6eba-4238-beea-b0c69ed969ee",
+  "canonicalId": "3f3b3d3b-493d-4403-888b-f5d1dc4ecb46",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "① 코엔자임 Q10은 항산화에 도움을 줄 수 있습니다.② 코엔자임 Q10은 혈압이 높은 사람에게 도움을 줄 수 있습니다. \n[비타민E]①유해산소로부터 세포를 보호하는데 필요\n[비타민B1]①탄수화물과 에너지 대사에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n[비타민B2]①체내 에너지 생성에 필요  ",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "코엔자임Q10은항산화에도움을줄수있습니다.",
+   "코엔자임Q10은혈압이높은사람에게도움을줄수있습니다."
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 43,
+  "candidateId": "c7916419-b89b-455e-bacd-4c0b7ab5f34c",
+  "statementNo": "200400200062104",
+  "productName": "혈당 컷 · 다이어트 유산균",
+  "productMasterId": "0f1e5bcc-d678-41d7-a24c-ab9d50008976",
+  "canonicalId": "d759847f-16b0-4e27-8d39-b7cec421aeb8",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음\n판토텐산 :지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음</li><li>판토텐산 :지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 44,
+  "candidateId": "8e425277-81bf-426a-b0fd-d4e4127d080c",
+  "statementNo": "200400200082857",
+  "productName": "보스정",
+  "productMasterId": "80a03337-8d91-44b5-b745-b126bcc513f4",
+  "canonicalId": "8af9dfe7-6e95-4ef3-a73c-9b0ed4b47759",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[보스웰리아추출물(Boswellia serrata R. extract)(기능성원료인정 제2014-23호)] (국문) 관절 및 연골건강에 도움을 줄 수 있음, (영문) May help to maintain healthy joint and cartilage\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[셀레늄] 유해산소로부터 세포를 보호하는데 필요\n[망간] 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "관절및연골건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 45,
+  "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+  "statementNo": "200400200082764",
+  "productName": "건강한 생 유산균 키즈 300억",
+  "productMasterId": "12a9b918-52bb-4b9d-a642-1ff07808434a",
+  "canonicalId": "81eff384-e1f5-4cc8-bac4-ea107603d25a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[과채유래유산균(L.plantarum CJLP133)(기능성원료인정제2013-11호)] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[비타민 D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "면역과민반응에의한피부상태개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 46,
+  "candidateId": "1670cc3b-cc79-4d94-8666-9a1b2db90a1b",
+  "statementNo": "200400200083035",
+  "productName": "데이즈 핏핏",
+  "productMasterId": "7063c6cc-0112-4f1b-b493-1c48ea34e133",
+  "canonicalId": "2f4f5de6-a982-4c57-8653-ec9e9a4a11c8",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide)분말(기능성원료인정 제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음, (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements\n[마그네슘] 에너지 이용에 필요, 신경과 근육 기능 유지에 필요\n[콜레우스포스콜리추출물] 체지방 감소에 도움을 줄 수 있음\n[녹차추출물] 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민B6] 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">마그네슘</span><ul><li>에너지 이용에 필요, 신경과 근육 기능 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">콜레우스포스콜리추출물</span><ul><li>체지방 감소에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 47,
+  "candidateId": "b1003670-3aad-41e1-88ce-96b0a802fb07",
+  "statementNo": "200400200083114",
+  "productName": "액티브솔루션 장건강",
+  "productMasterId": "002cfa45-5f65-45a3-bccd-7f20b650d39f",
+  "canonicalId": "f8ee5042-8afb-4cf1-898c-3157adf97eb1",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements\n[프로바이오틱스] 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n[셀레늄] 유해산소로부터 세포를 보호하는데 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌\n[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">바나바잎추출물</span><ul><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 48,
+  "candidateId": "239bc33a-0100-414f-8702-1b8085e39997",
+  "statementNo": "200400200083244",
+  "productName": "우먼올핏",
+  "productMasterId": "05a18117-c22e-4443-a1e3-03ed905ecabf",
+  "canonicalId": "a1c654d2-5ab9-43d2-9837-7af99257f81d",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements  \n[핑거루트추출물(판두라틴)(제2013-5호)] (국문) 자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, 체지방 감소에 도움을 줄 수 있음, 피부보습에 도움을 줄 수 있음 (영문) May help to maintain skin health from skin damage by UV radiation, May help to reduce body fat, May help to maintain skin moisturizing \n[마그네슘] 에너지 이용에 필요, 신경과 근육 기능 유지에 필요\n[테아닌] 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n[은행잎 추출물] 기억력 개선·혈행 개선에 도움을 줄 수 있음\n[셀렌] 유해산소로부터 세포를 보호하는데 필요\n[나이아신] 체내 에너지 생성에 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[비타민 A] 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민 D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌\n[비오틴] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민 B6] 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민 B12] 정상적인 엽산 대사에 필요\n[비타민 B1] 탄수화물과 에너지 대사에 필요\n[비타민 B2] 체내 에너지 생성에 필요\n[엽산] 세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">핑거루트추출물(판두라틴)(제2013-5호)</span><ul><li>(국문) 자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, 체지방 감소에 도움을 줄 수 있음, 피부보습에 도움을 줄 수 있음 (영문) May help to maintain skin health from skin damage by UV radiation, May help to reduce body fat, May help to maintain skin moisturizing</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">마그네슘</span><ul><li>에너지 이용에 필요, 신경과 근육 기능 유지에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">테아닌</span><ul><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">은행잎 추출물</span><ul><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 49,
+  "candidateId": "c7920089-ae97-458b-89fc-b56e9f2261ec",
+  "statementNo": "200400200082591",
+  "productName": "지큐랩 콜레스테롤 솔루션",
+  "productMasterId": "4d9e4a94-3a52-405f-a89c-fef277d01b14",
+  "canonicalId": "3d9bd1da-59f4-4644-aa52-48f6ee9a530b",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "B. breve IDCC 4401 열처리배양건조물(BBRⓇ)(제2021-5호)\n(국문) 혈중 콜레스테롤 개선에 도움을 줄 수 있음\n(영문) May help to reduce blood cholesterol levels \n",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>breve IDCC 4401 열처리배양건조물(BBRⓇ)(제2021-5호)</li><li>(국문) 혈중 콜레스테롤 개선에 도움을 줄 수 있음</li><li>(영문) May help to reduce blood cholesterol levels</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "B.breveIDCC4401열처리배양건조물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 50,
+  "candidateId": "9fa29f8d-6729-4f3b-b438-919b0d5ca5cf",
+  "statementNo": "200400200082716",
+  "productName": "지큐랩 콜레스테롤 솔루션 데일리",
+  "productMasterId": "1b9ff881-5fdd-414d-b799-0ec6dd2df8fd",
+  "canonicalId": "40ff51bc-c157-42ab-93a9-1d96c47d5070",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[B. breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]\n(국문) 혈중 콜레스테롤 개선에 도움을 줄 수 있음\n(영문) May help to reduce blood cholesterol levels \n[비타민 B12] (1) 정상적인 엽산 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민 B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "혈중콜레스테롤개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 51,
+  "candidateId": "651ec646-7097-46fd-8860-7500a9e32f77",
+  "statementNo": "200400200083187",
+  "productName": "트리플 프리바이오틱스",
+  "productMasterId": "534ade52-3320-46e2-8837-f2b23932da61",
+  "canonicalId": "ca390007-77ea-472e-845d-eb666da1f1fd",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide)분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements  \n[프락토올리고당] 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프락토올리고당</span><ul><li>장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 52,
+  "candidateId": "9da75de2-624c-43f5-aa6d-91986a9c3ed6",
+  "statementNo": "20040020041556",
+  "productName": "고려양간보DX",
+  "productMasterId": "8180d901-564a-4ab3-b9e3-43b1dc3c78d6",
+  "canonicalId": "85a1e9c6-ad0c-48f6-820a-36fe72a39290",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(국문) 알콜성 손상으로부터 간을 보호하는데 도움을 줄 수 있음\n(영문) May help to liver health on alcoholic liver damage\n\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,[헛개나무과병추출분말(제2016-10호)] 알콜성 손상으로부터 간을 보호하는데 도움을 줄 수 있음.\n[비타민 C] 결합조직 형성과 기능 유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">헛개나무과병추출분말(제2016-10호)</span><ul><li>알콜성 손상으로부터 간을 보호하는데 도움을 줄 수 있음.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>결합조직 형성과 기능 유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "]알콜성손상으로부터간을보호하는데도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 53,
+  "candidateId": "74ce3334-100c-442b-b6ec-673bdb950e1b",
+  "statementNo": "20040020041541",
+  "productName": "근력 강화 & 프로틴",
+  "productMasterId": "310c49e1-ce4a-4a8b-8152-053c800690ac",
+  "canonicalId": "cd04b225-07d0-4d86-a67d-e379adeff46a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(국문) 근력개선에 도움을 줄 수 있음\n(영문) May help to improve muscle strength\n\n\n(1) 근육, 결합조직 등 신체조직의 구성성분\n(2) 효소, 호르몬, 항체의 구성에 필요\n(3) 체내 필수 영양성분이나 활성물질의 운반과 저장에 필요\n(4) 체액, 산-염기의 균형 유지에 필요\n(5) 에너지, 포도당, 지질의 합성에 필요\n\n(1) 에너지 이용에 필요\n(2) 신경과 근육 기능 유지에 필요,[강황추출물(제2023-5호)] 근력개선에 도움을 줄 수 있음.\n[단백질] 근육, 결합조직 등 신체조직의 구성성분. 효소, 호르몬, 항체의 구성에 필요. 체내 필수 영양성분이나 활성물질의 운반과 저장에 필요. 체액, 산-염기의 균형 유지에 필요. 에너지, 포도당, 지질의 합성에 필요.\n[마그네슘] 에너지 이용에 필요. 신경과 근육 기능 유지에 필요.",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">강황추출물(제2023-5호)</span><ul><li>근력개선에 도움을 줄 수 있음.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">단백질</span><ul><li>근육, 결합조직 등 신체조직의 구성성분.</li><li>효소, 호르몬, 항체의 구성에 필요.</li><li>체내 필수 영양성분이나 활성물질의 운반과 저장에 필요.</li><li>체액, 산-염기의 균형 유지에 필요.</li><li>에너지, 포도당, 지질의 합성에 필요.</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">마그네슘</span><ul><li>에너지 이용에 필요.</li><li>신경과 근육 기능 유지에 필요.</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "]근력개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 54,
+  "candidateId": "504cbb3c-fb9b-42ae-81a9-90f8dea41659",
+  "statementNo": "2006001532626",
+  "productName": "셀로맥스 알로푸룬쾌변주스",
+  "productMasterId": "2dc76ef2-5fdd-4fa8-8102-cac1dd8a8914",
+  "canonicalId": "7b8880db-503b-495a-b085-476cb7c9d26a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(1)기능성 내용 : 식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음\n(2) 일일섭취량\n (가)식후 혈당상승 억제에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 4.0~30 g (액상원료는 4.0~44 g)\n (나)혈중 중성지질 개선에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 5.0~30 g (액상원료는 5.0~44 g)\n (다)배변활동 원활에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 4.2~30 g (액상원료는 4.2~44 g),[난소화성말토덱스트린] 식후 혈당상승 억제･배변활동 원활에 도움을 줄 수 있음\n",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">난소화성말토덱스트린</span><ul><li>식후 혈당상승 억제･배변활동 원활에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음",
+   "난소화성말토덱스트린식이섬유로서",
+   "혈중중성지질개선에도움을줄수있음",
+   "난소화성말토덱스트린식이섬유로서",
+   "난소화성말토덱스트린식이섬유로서"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 55,
+  "candidateId": "8ccab18b-7d54-431d-8198-d1d59a9f887c",
+  "statementNo": "200600200081148",
+  "productName": "셀로맥스 명품 골드세븐",
+  "productMasterId": "f5febdb8-f1d1-4525-bd36-af6525c076e4",
+  "canonicalId": "cc1e1065-d06c-4950-8a9f-c6dee32b7e3c",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제2024-18호)] (국문) 피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, (영문) May help to moisturize (dry) skin, May help to maintain good skin health by protecting against damage from UV exposure\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "피부보습에도움을줄수있음",
+   "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 56,
+  "candidateId": "6da98da1-b56e-47e7-9ffa-8c5c0b33f8aa",
+  "statementNo": "200600200081153",
+  "productName": "셀로맥스 오메가3&7",
+  "productMasterId": "bd73319a-02e7-4ee6-b27a-7b87a204391d",
+  "canonicalId": "b97370cd-ff1c-4bc0-b4f6-37a842f6828a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제 2024-18호)] (국문) 피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, (영문) May help to moisturize (dry) skin, May help to maintain good skin health by protecting against damage from UV exposure\n[EPA및DHA함유유지]혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n[비타민D] 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">EPA및DHA함유유지</span><ul><li>혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "피부보습에도움을줄수있음",
+   "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 57,
+  "candidateId": "9377f2af-bcc5-44b5-951a-7e67b44fdc30",
+  "statementNo": "200600200033255",
+  "productName": "콜레올로지 혈당 컷 • 다이어트 유산균",
+  "productMasterId": "b738bc35-79e8-4111-ac07-3209ff12997c",
+  "canonicalId": "8aaa7127-7b9f-4dad-b44d-a2d5e5b2932a",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "- L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)  : 체지방 감소에 도움을 줄 수 있음, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n- 바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음\n- 판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n- 비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : 체지방 감소에 도움을 줄 수 있음, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>바나바잎 추출물 : 식후 혈당상승 억제에 도움을 줄 수 있음</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 58,
+  "candidateId": "57bf2a6d-92ae-4212-b3b8-90dffc1220ba",
+  "statementNo": "200600200033217",
+  "productName": "콜레올로지 컷 다이어트 유산균",
+  "productMasterId": "50eacf92-ca66-49f1-8b98-5be6d1d2fe85",
+  "canonicalId": "21368329-86d2-4c50-80f5-04c01db9b6e2",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "1) L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : 체지방 감소에 도움을 줄 수 있음.\n2) 프로바이오틱스 : 유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음.",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : 체지방 감소에 도움을 줄 수 있음.</li><li>프로바이오틱스 : 유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음.</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 59,
+  "candidateId": "3a74914f-3d19-4bc4-a8ed-4a4d6b16c14c",
+  "statementNo": "200700170352303",
+  "productName": "마이크로바이옴 프로바이오틱스 당큐락",
+  "productMasterId": "8c7a3f95-da0f-4e7d-8b51-445999458712",
+  "canonicalId": "0e229fb7-b9ef-425d-8ba3-f8e1771a91a0",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)](국문) 식후 혈당 상승 억제에 도움을 줄 수 있음(영문) May help to suppress the increase of blood glucose level after meals\n[프로바이오틱스]유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음\n",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 60,
+  "candidateId": "87a3cf4e-ec84-4416-9513-ee6bae69fd5c",
+  "statementNo": "200700170352383",
+  "productName": "TWK10 100억 캡슐",
+  "productMasterId": "67df4aca-4352-47a1-b1ed-2bbc955c3248",
+  "canonicalId": "8196c64e-67da-4ba3-8c34-f42245cf3cad",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)] \n(국문) 운동수행능력 향상에 도움을 줄 수 있음\n(영문) May help to improve endurance of exercise performance capability\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음\n[아연] \n①정상적인 면역기능에 필요\n②정상적인 세포분열에 필요\n[비타민 D]\n①칼슘과 인이 흡수되고 이용되는데 필요\n②뼈의 형성과 유지에 필요\n③골다공증발생 위험 감소에 도움을 줌\n[셀레늄(또는 셀렌)]\n유해산소로부터 세포를 보호하는데 필요\n[비타민 B1]\n탄수화물과 에너지 대사에 필요\n[비타민 B2]\n체내 에너지 생성에 필요\n[비타민 B6]\n①단백질 및 아미노산 이용에 필요\n②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[나이아신]\n체내 에너지 생성에 필요\n[판토텐산]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "운동수행능력향상에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 61,
+  "candidateId": "4da642ed-afbf-49f0-a33e-77a4b70114ca",
+  "statementNo": "200700170353041",
+  "productName": "뉴오리진 당당",
+  "productMasterId": "206736d5-3303-433a-8081-732d61c5bdc1",
+  "canonicalId": "1b6b07ac-e62c-4648-b55f-56c86d229e92",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)] 식후 혈당 상승 억제에 도움을 줄 수 있음\n[프로바이오틱스]유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 62,
+  "candidateId": "287649af-5ef6-4ab1-8d97-7d1d7af0b768",
+  "statementNo": "200700170353161",
+  "productName": "원더씬",
+  "productMasterId": "d8f966ec-1e26-4c11-ad58-077216324b6b",
+  "canonicalId": "23841fda-6372-4314-aab3-93f7646861ca",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum ATG-K2 프로바이오틱스(제2025-58호)]\n체지방 감소에 도움을 줄 수 있음\n\n[프로바이오틱스]\n유산균 증식 및 유해균 억제‧배변활동 원활‧장건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제‧배변활동 원활‧장건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 63,
+  "candidateId": "bd5803cf-d3e1-4d60-8086-098cf1bae174",
+  "statementNo": "200700170352404",
+  "productName": "관절엔 조인트 큐",
+  "productMasterId": "4f6aaf64-439c-413f-807f-0be6b59c7080",
+  "canonicalId": "52123cdb-0b7c-49a8-9ae9-a5434bb9000f",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[CMO 함유 FAC(Fatty Acid Complex)(제2014-26호)] \n(국문) 관절 건강에 도움을 줄 수 있음\n(영문) May help to maintain healthy joint and cartilage\n[망간] \n① 뼈 형성에 필요\n② 에너지 이용에 필요\n③ 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "관절건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 64,
+  "candidateId": "edcdedc9-4564-4ee8-a450-ad886eac7c6e",
+  "statementNo": "200700170352511",
+  "productName": "더 콜라겐",
+  "productMasterId": "48c001a4-de4d-4375-9706-143ed16016cd",
+  "canonicalId": "89216247-0e5e-4155-bf72-7ed8a7c6ab4b",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)](국문)① 피부 보습에 도움을 줄 수 있음 ② 자외선에 의한 피부 손상으로부터 피부 건강을  유지하는데 도움을 줄 수 있음(영문)① May help to moisturize (dry) skin ② May help to maintain good skin health by protecting against damage from UV exposure\n[비타민D]칼슘과 인이 흡수되고 이용되는데 필요뼈의 형성과 유지에 필요골다공증발생 위험 감소에 도움을 줌\n[판토텐산]지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비오틴]지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민C]결합조직 형성과 기능유지에 필요철의 흡수에 필요항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[아연]정상적인 면역기능에 필요정상적인 세포분열에 필요\n[셀렌]유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요뼈의 형성과 유지에 필요골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요철의 흡수에 필요항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "피부보습에도움을줄수있음",
+   "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 65,
+  "candidateId": "e4c3307f-2f83-43fc-988b-7ab5b68663bc",
+  "statementNo": "200700170352385",
+  "productName": "TWK10 100억 분말",
+  "productMasterId": "5160b4c3-6c21-4ddd-8a0a-ef08a5a1354a",
+  "canonicalId": "220927cc-a086-4d52-bad3-222a41f87b5d",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)] \n(국문) 운동수행능력 향상에 도움을 줄 수 있음\n(영문) May help to improve endurance of exercise performance capability\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음\n[아연] \n①정상적인 면역기능에 필요\n②정상적인 세포분열에 필요\n[비타민 D]\n①칼슘과 인이 흡수되고 이용되는데 필요\n②뼈의 형성과 유지에 필요\n③골다공증발생 위험 감소에 도움을 줌\n[셀레늄(또는 셀렌)]\n유해산소로부터 세포를 보호하는데 필요\n[비타민 B1]\n탄수화물과 에너지 대사에 필요\n[비타민 B2]\n체내 에너지 생성에 필요\n[비타민 B6]\n①단백질 및 아미노산 이용에 필요\n②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[나이아신]\n체내 에너지 생성에 필요\n[판토텐산]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "운동수행능력향상에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 66,
+  "candidateId": "a2b78b7e-7873-4ce4-b4b9-899bf5b52dd9",
+  "statementNo": "200700170353174",
+  "productName": "당큐락 이지",
+  "productMasterId": "cd993511-6895-4140-bdf1-faf1e005d27c",
+  "canonicalId": "c4cda85e-2172-4bb8-ba92-992f27c2707c",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactobacillus plantarum HAC01 프로바이오틱스(제2022-21호)]\n(국문) 식후 혈당 상승 억제에 도움을 줄 수 있음\n(영문) May help to suppress the increase of blood glucose level after meals\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 67,
+  "candidateId": "b7b1af8c-91f4-4b94-be52-e878e0018772",
+  "statementNo": "201000190041382",
+  "productName": "면역피로탁",
+  "productMasterId": "42ca920d-aa35-43c3-a66b-e5082b094a7b",
+  "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "홍삼]①면역력 증진･피로개선에 도움을 줄 수 있음②혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음 \n[비타민C]①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민B1]①탄수화물과 에너지 대사에 필요\n[나이아신]①체내 에너지 생성에 필요\n[비타민B6]①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민B2]①체내 에너지 생성에 필요\n[판토텐산]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[엽산]①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n[비타민A]①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험감소에 도움을 줌\n[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[셀레늄(또는 셀렌)]①유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "피로개선에도움을줄수있음",
+   "혈소판응집억제를통한혈액흐름",
+   "항산화에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 68,
+  "candidateId": "487d89a8-56ad-4024-b0e8-02aa9fdc6654",
+  "statementNo": "200700170352508",
+  "productName": "파워업 유산균",
+  "productMasterId": "3226cde9-3c18-47cb-8109-a4a03a108b9c",
+  "canonicalId": "f34af9e7-b5e3-43ae-a127-5a5a4d9c2b3a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)]\n(국문)운동수행능력 향상에 도움을 줄 수 있음 \n(영문) May help to improve endurance of exercise performance capability\n\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음\n\n[판토텐산]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[셀레늄(또는 셀렌)]\n유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "운동수행능력향상에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 69,
+  "candidateId": "d0af0b7e-9c38-4511-b616-383aa1afc225",
+  "statementNo": "200700170352294",
+  "productName": "혈당엔 유산균 HAC01",
+  "productMasterId": "0bf890c9-a0f1-46bd-81ef-f3e6fbc1fa1b",
+  "canonicalId": "4c4f1a8c-3710-47b7-b799-79d9e63fcedd",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)]\n(국문) 식후 혈당 상승 억제에 도움을 줄 수 있음\n(영문) May help to suppress the increase of blood glucose level after meals\n\n[프로바이오틱스]유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "식후혈당상승억제에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 70,
+  "candidateId": "03256d73-156e-4714-9cf1-8fa65c31cc67",
+  "statementNo": "200700170352547",
+  "productName": "힌트 TWK10 프로바이오틱스",
+  "productMasterId": "70287145-df9d-486b-84ef-1e2c030c370b",
+  "canonicalId": "db127904-edbe-49c9-aca1-e18292f30340",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)] \n(국문)운동수행능력 향상에 도움을 줄 수 있음 \n(영문) May help to improve endurance of exercise performance capability\n\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음\n\n[비타민B1]\n탄수화물과 에너지 대사에 필요\n\n[비타민B2]\n체내 에너지 생성에 필요\n\n[비타민B6]\n단백질 및 아미노산 이용에 필요\n혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[셀레늄]\n유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "운동수행능력향상에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 71,
+  "candidateId": "bbebdb01-ade7-47b8-ad8f-3e7bc009b47b",
+  "statementNo": "20110017019122",
+  "productName": "수피아 헬씨 생유산균(포도맛)",
+  "productMasterId": "f42639bf-3fa7-4dbc-9d85-e9acaec588a9",
+  "canonicalId": "a9fe7403-497c-43ee-a616-ff4413c9da7c",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요,[프로바이오틱스] ① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음 \n[비타민D] ① 칼슘과 인이 흡수되고 이용되는데 필요 ② 뼈의 형성과 유지에 필요 ③ 골다공증발생 위험 감소에 도움을 줌\n[아연] ① 정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "장건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 72,
+  "candidateId": "827cdef4-bfc8-46d6-9fe0-516913f1df3f",
+  "statementNo": "20110017019123",
+  "productName": "수피아 헬씨 생유산균",
+  "productMasterId": "2b49ff40-9c5a-48fd-bc1b-baf4b3cae504",
+  "canonicalId": "b540a956-1c11-4e9f-bc89-84fc2035dcf9",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요,[프로바이오틱스] ① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음 \n[비타민D] ① 칼슘과 인이 흡수되고 이용되는데 필요 ② 뼈의 형성과 유지에 필요 ③ 골다공증발생 위험 감소에 도움을 줌\n[아연] ① 정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "장건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 73,
+  "candidateId": "a0fcc12a-feb1-46c8-8e33-d6f18cf7d89d",
+  "statementNo": "20110020099111",
+  "productName": "리얼모닝",
+  "productMasterId": "3ea34939-b8d7-450a-bf3b-34565fed9a4c",
+  "canonicalId": "1610ba18-34f8-42d4-ae78-eb72ab9b997c",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①혈중 콜레스테롤 개선·배변활동 원활에 도움을 줄 수 있음\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동원활에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 74,
+  "candidateId": "826faee1-7a68-46a9-890f-a673287b8754",
+  "statementNo": "2011002009984",
+  "productName": "대한민국호간보인 ND-1(엔디)",
+  "productMasterId": "9cc55343-8a05-4f74-ade0-48cfcaf99b4f",
+  "canonicalId": "d1e1f771-2c38-4848-898d-ed343d3144fa",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③유해산소로부터 세포를 보호하는데 필요,[헛개나무과병추출분말]알콜성손상으로부터간을보호하는데도움을줄수있음(생리활성기능2등급)",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">헛개나무과병추출분말</span><ul><li>알콜성손상으로부터간을보호하는데도움을줄수있음(생리활성기능2등급)</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "결합조직형성과기능유지에필요",
+   "유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 75,
+  "candidateId": "e8951a66-09f8-4eae-a002-5fd6487df953",
+  "statementNo": "20110017019109",
+  "productName": "올데이 비타민C",
+  "productMasterId": "21ba8896-e3f1-4a9f-8c04-9473c08dbb9b",
+  "canonicalId": "732af1df-a534-489b-ba55-d4fcfcd8e4f2",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,[비타민C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "항산화작용을하여유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 76,
+  "candidateId": "679c9513-7d43-4079-9a48-b938b335714a",
+  "statementNo": "20130020024337",
+  "productName": "듀얼플랜 다이어트 유산균",
+  "productMasterId": "a6062e3f-e106-45be-907e-c3d52069637d",
+  "canonicalId": "407f9aa4-3c99-44d0-ac09-c0216846ed78",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B1 : 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 77,
+  "candidateId": "86f2fee2-66d0-42e1-97da-7d6345a6b750",
+  "statementNo": "20150010018134",
+  "productName": "리멤버핏 인지력",
+  "productMasterId": "3d70e602-82c9-4ba2-a671-15d8e8e500e3",
+  "canonicalId": "ce2f01c1-eae0-4903-a6ef-5c4b6c53ba2a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(국문) 노화로 저하된 인지기능 개선에 도움을 줄 수 있음\n(영문) May help to improve cognitive function affected by aging,[프로바이오틱스]\n유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "노화로저하된인지기능개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 78,
+  "candidateId": "7f42c742-b4d6-4b4a-bb45-b07b5434eed7",
+  "statementNo": "20140017002645",
+  "productName": "보성 옴니아 포스트바이오틱스 (Omnia Postbiotics)",
+  "productMasterId": "f156f805-2e95-4f7a-9b57-f3cea9605ba0",
+  "canonicalId": "a8e38ee3-c566-4e8d-a0bc-7749b8e90b8b",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[프락토올리고당]① 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프락토올리고당</span><ul><li>장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "면역과민반응에의한피부상태개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 79,
+  "candidateId": "1e36bff1-aa32-4080-968b-9697d1c7725b",
+  "statementNo": "20130020024301",
+  "productName": "셀티바 프로바이오틱 다이어트 토탈 케어",
+  "productMasterId": "869356e0-e865-4eae-bd57-383f624312f8",
+  "canonicalId": "a673af6f-92db-4e89-9f86-13f0d0c20ebd",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat \n프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat</li><li>프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 80,
+  "candidateId": "050c1e6b-7e88-4121-bac0-63379d76b4d4",
+  "statementNo": "20140017002690",
+  "productName": "스킨케어 SKIN CARE",
+  "productMasterId": "420bfc86-b9c8-4fe5-88fb-5cc5562ea60d",
+  "canonicalId": "dacd4c77-8f92-4797-a28b-7864f9f05370",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\n[프로바이오틱스] ①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "면역과민반응에의한피부상태개선에도움을줄수있음",
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 81,
+  "candidateId": "f0a855d9-8826-401d-b986-15dc860456ae",
+  "statementNo": "20130020024399",
+  "productName": "오브맘 다이어트 유산균",
+  "productMasterId": "ef3432d4-54ab-4035-af3b-b7914c840122",
+  "canonicalId": "9d7d261c-6087-4322-b4d4-dd23a411412a",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n크롬 : 체내 탄수화물, 지방, 단백질 대사에 관여\n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n나이아신 : 체내 에너지 생성에 필요\n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B6 : (1) 단백질 및 아미노산 이용에 필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n비타민B1 : 탄수화물과 에너지 대사에 필요\n비타민B2 : 체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>크롬 : 체내 탄수화물, 지방, 단백질 대사에 관여</li><li>아연 : (</li><li>정상적인 면역기능에 필요 (</li><li>정상적인 세포분열에 필요</li><li>나이아신 : 체내 에너지 생성에 필요</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민B6 : (</li><li>단백질 및 아미노산 이용에 필요 (</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li><li>비타민B2 : 체내 에너지 생성에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 82,
+  "candidateId": "ed5eb56d-549e-4e0a-9ea8-f69374e97787",
+  "statementNo": "20130020024342",
+  "productName": "자사 오브맘 다이어트 유산균",
+  "productMasterId": "422aee68-3063-400a-b459-b7232d4940e5",
+  "canonicalId": "7b21128c-206e-4ee1-bbab-be60064af656",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음 \n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요  \n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌  \n비타민B1 : 탄수화물과 에너지 대사에 필요  ",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>아연 : (</li><li>정상적인 면역기능에 필요 (</li><li>정상적인 세포분열에 필요</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 83,
+  "candidateId": "e40a411c-2b9d-47e6-9688-f2cc1b302d01",
+  "statementNo": "20130020024371",
+  "productName": "장건강 다이어트",
+  "productMasterId": "902ef99b-be38-42ae-b3cc-cd711e5f011f",
+  "canonicalId": "0f0f4383-8def-4118-8b42-3373380333d6",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat\n프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat</li><li>프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 84,
+  "candidateId": "070bfebd-5fa3-44ef-ad44-667dd3ad8991",
+  "statementNo": "20140017002592",
+  "productName": "지큐랩 포스트바이오틱스 츄어블",
+  "productMasterId": "79d1b840-f7ea-459c-87eb-2a66d4a1a395",
+  "canonicalId": "0e2aa845-e466-44c9-818d-81a4286cfc0f",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[비타민 C] ①결합조직 형성과 기능유지에 필요 ②철의 흡수에 필요 ③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "면역과민반응에의한피부상태개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 85,
+  "candidateId": "2e138f5f-8129-4dbc-816c-8a73d224cdd5",
+  "statementNo": "20140017002638",
+  "productName": "지큐랩 프로 프리 포스트바이오틱스",
+  "productMasterId": "3bfadf28-c550-4bd8-b6c2-85f8b635796e",
+  "canonicalId": "1a052801-ce86-4d84-8d99-09888b2ade43",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음\n[자일로올리고당 분말] 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\n[프로바이오틱스] ①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">자일로올리고당 분말</span><ul><li>장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "면역과민반응에의한피부상태개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 86,
+  "candidateId": "bf766c60-eb3d-45b0-a40f-f8a8faea8294",
+  "statementNo": "20150010018154",
+  "productName": "초록이 액티브 클린",
+  "productMasterId": "09863102-1d4b-48c7-90b9-a4d1f4d990d7",
+  "canonicalId": "758db0af-a3c7-4e7f-a44e-ccf7887ed396",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]\n장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\n\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 87,
+  "candidateId": "f37b9876-4b48-4711-ba20-4f444745c110",
+  "statementNo": "20150010018159",
+  "productName": "초록이 슬림밸런스&쾌변",
+  "productMasterId": "a3379809-9842-41b7-b0e0-dc1ee1afc543",
+  "canonicalId": "05b935c4-7294-4ad6-9e91-7ec0a42c605e",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]\n장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\n\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 88,
+  "candidateId": "351616ce-f171-4320-9df6-451d5174b824",
+  "statementNo": "20150010018158",
+  "productName": "초록이 카테킨&프리바이오틱스 쾌변 다이어트",
+  "productMasterId": "b4222547-3820-4013-9198-468e47fa3847",
+  "canonicalId": "a7bfb129-090e-465c-9fcc-cdedecf75573",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]\n장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\n\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 89,
+  "candidateId": "73515b49-0ab6-4557-9181-f0f290c2457d",
+  "statementNo": "20130020024302",
+  "productName": "케어프리 유산균 다이어트",
+  "productMasterId": "5ddf0e6d-ada0-4802-83ae-e8c68f88831f",
+  "canonicalId": "2675cfe2-4688-4b51-95a5-b62381a88879",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat  (2) 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음 \n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요  \n비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌  \n비타민B1 : 탄수화물과 에너지 대사에 필요  ",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음</li><li>아연 : (</li><li>정상적인 면역기능에 필요 (</li><li>정상적인 세포분열에 필요</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민D : (</li><li>칼슘과 인이 흡수되고 이용되는데 필요 (</li><li>뼈의 형성과 유지에 필요 (</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 90,
+  "candidateId": "10a11c0e-da33-41ec-92da-87dd240fe6ed",
+  "statementNo": "20140017002596",
+  "productName": "콜레스테롤 BBR 700억 포스트바이오틱스(Cholesterol BBR 70 Billion Postbiotics)",
+  "productMasterId": "a7704a43-7cbb-42e1-91f7-f49e288e9741",
+  "canonicalId": "7018e6ff-8de0-4d9f-9f22-0a23eb4d9736",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[B. breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]\n혈중 콜레스테롤 개선에 도움을 줄 수 있음 (May help to reduce blood cholesterol levels)\n\n[나이아신] 체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "혈중콜레스테롤개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 91,
+  "candidateId": "bbf40cc1-707d-4ae1-98ac-0fa7d2d01fa1",
+  "statementNo": "20140017002640",
+  "productName": "콜레스테롤·혈당·혈압·항산화 올인원 케어 포스트바이오틱스",
+  "productMasterId": "a9626182-be88-42aa-a491-d8bcc5ba84c8",
+  "canonicalId": "5813bab0-dc12-4856-8ac9-98b8e9fd0c64",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[B. breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]\n혈중 콜레스테롤 개선에 도움을 줄 수 있음 (May help to reduce blood cholesterol levels)\n\n[바나바잎 추출물] 식후 혈당상승 억제에 도움을 줄 수 있음\n[코엔자임Q10] 항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">바나바잎 추출물</span><ul><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">코엔자임Q10</span><ul><li>항산화 ･ 높은 혈압 감소에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "혈중콜레스테롤개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 92,
+  "candidateId": "aa386473-62b7-4b7e-ad41-a3545e251af3",
+  "statementNo": "201727820684",
+  "productName": "리버치온 골드",
+  "productMasterId": "f2125678-8df1-45ac-9537-253a4d384bee",
+  "canonicalId": "667787d4-871d-49d0-8000-11c0cee42ba5",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "밀크씨슬추출물]간 건강에 도움을 줄 수 있음\n[나이아신]체내 에너지 생성에 필요\n[판토텐산]지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민 B1]탄수화물과 에너지 대사에 필요\n[비타민 B2]체내 에너지 생성에 필요\n[비타민 B6]단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "밀크씨슬추출물]간건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 93,
+  "candidateId": "f0a658b9-b6c8-4f31-acac-77580d119c5e",
+  "statementNo": "20172880193371",
+  "productName": "모발유산균 엘비나인 플러스",
+  "productMasterId": "cc8feaf1-79f0-450f-9005-75d64a5793a0",
+  "canonicalId": "5b344fdd-3288-473c-bda5-fab48f616fa2",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]\n(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음\n(영문) May help to improve hair condition(luster·elasticity)\n\n[셀렌]\n(1) 유해산소로부터 세포를 보호하는데 필요\n\n[비오틴]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B6]\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 94,
+  "candidateId": "ec150c85-1d4d-4dd4-b3de-e49a53588002",
+  "statementNo": "20172880193372",
+  "productName": "모발유산균 엘비나인 ",
+  "productMasterId": "03955de1-c3d3-476f-9615-5438d9ff8560",
+  "canonicalId": "d0658a90-d75d-44eb-adc4-152b49801756",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]\n(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음\n(영문) May help to improve hair condition(luster·elasticity)\n\n[비오틴]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 95,
+  "candidateId": "2a0c60bf-d94a-4776-95c4-bc866b2c8aed",
+  "statementNo": "20172880193365",
+  "productName": "모큐락+",
+  "productMasterId": "209f79cb-2d9d-42d5-ad15-418604397a99",
+  "canonicalId": "30496059-94a6-4e5e-9fc4-b037b8af7bc5",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]\n(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음\n(영문) May help to improve hair condition(luster·elasticity)\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n[셀레늄]\n(1) 유해산소로부터 세포를 보호하는데 필요\n[비오틴]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 96,
+  "candidateId": "5f27a412-53db-4dc3-b13d-74d780b0b944",
+  "statementNo": "20160012278172",
+  "productName": "백세시크릿-Dr(Hundred years Secret-Dr)",
+  "productMasterId": "60646822-bb24-43a7-bc03-2fbe958f1b64",
+  "canonicalId": "b7d5c100-4537-424c-880b-9a625def5408",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌,[비타민D]\n① 칼슘과 인이 흡수되고 이용되는데 필요\n② 뼈의 형성과 유지에 필요\n③ 골다공증 발생 위험 감소에 도움",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증 발생 위험 감소에 도움</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "항산화작용을하여유해산소로부터세포를보호하는데필요",
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요",
+   "골다공증발생위험감소에도움을줌"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 97,
+  "candidateId": "c88e2fd8-01cc-4dd0-91bb-9177a045a81a",
+  "statementNo": "20180012056101",
+  "productName": "밸런스 위드인 슬림핏",
+  "productMasterId": "5f62fd03-2472-44ef-b207-b43f32baab5f",
+  "canonicalId": "28a96d48-2bf3-45a5-8b94-06e7ce3e86d3",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (1) (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (2) 유산균 증식 및 유해균 억제∙배변활동 원활∙장 건강에 도움을 줄 수 있음\n나이아신 : 체내 에너지 생성에 필요\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B1 : 탄수화물과 에너지 대사에 필요\n비타민B2 : 체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>curvatus HY7601와 L.</li><li>plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (</li><li>(국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat (</li><li>유산균 증식 및 유해균 억제∙배변활동 원활∙장 건강에 도움을 줄 수 있음</li><li>나이아신 : 체내 에너지 생성에 필요</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li><li>비타민B2 : 체내 에너지 생성에 필요</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 98,
+  "candidateId": "287c77f7-a446-48af-9d03-55d30e4848ab",
+  "statementNo": "20172880193399",
+  "productName": "엔브릿지모발유산균",
+  "productMasterId": "a8edc6ce-1319-413b-990b-6612343c5f84",
+  "canonicalId": "4e58faef-4caf-4762-be48-19b455e1f504",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Latilactobacillus curvatus LB-P9(제2025-5호)]\n(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음\n(영문) May help to improve hair condition(luster·elasticity)\n\n[아연]\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[셀레늄(또는 셀렌)]\n(1) 유해산소로부터 세포를 보호하는데 필요\n\n[비오틴]\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민B6]\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n[비타민B1]\n(1) 탄수화물과 에너지 대사에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀레늄(또는 셀렌)</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "개선에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 99,
+  "candidateId": "b55182d6-0d07-44f7-bc38-f56f6f8405dc",
+  "statementNo": "201728208671",
+  "productName": "오큐아레즈투엠",
+  "productMasterId": "0e1ebb79-ed62-4be7-9492-8c83e5669fd5",
+  "canonicalId": "f0af0bb5-ed0c-4ab3-82ef-77eac4e42e74",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①체내 에너지 생성에 필요\n\n[마리골드꽃추출물] 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">마리골드꽃추출물</span><ul><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "항산화작용을하여유해산소로부터세포를보호하는데필요",
+   "결합조직형성과기능유지에필요",
+   "항산화작용을하여유해산소로부터세포를보호하는데필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요",
+   "철의운반과이용에필요",
+   "유해산소로부터세포를보호하는데필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "체내에너지생성에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 100,
+  "candidateId": "da8d3be3-8070-42d2-9936-c2737c89f6fe",
+  "statementNo": "2018000391521",
+  "productName": "웰러스 알티지 오메가3 1000",
+  "productMasterId": "edd1cdc1-dacc-455a-862b-d79baec73d1e",
+  "canonicalId": "25d38f40-c30c-4625-abbc-1d82e29d2382",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①혈중 중성지질 개선․혈행 개선․기억력 개선․건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음,[EPA 및 DHA 함유 유지] 혈중 중성지질 개선ㆍ혈행 개선ㆍ기억력 개선ㆍ건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">EPA 및 DHA 함유 유지</span><ul><li>혈중 중성지질 개선ㆍ혈행 개선ㆍ기억력 개선ㆍ건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "혈중중성지질개선․혈행개선․기억력개선․건조한눈을개선하여눈건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 101,
+  "candidateId": "89303d97-baf6-43cb-9d74-c6f4786de33c",
+  "statementNo": "20190004553112",
+  "productName": "코오롱 알티지오메가3 1100",
+  "productMasterId": "1ad8d529-05b9-4768-8afa-470d5d83b3bd",
+  "canonicalId": "0b3b9baf-6439-47ba-bb65-f06958c82bd2",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "EPA 및 DHA 함유 유지\n1) 혈중 중성지질 개선․혈행 개선에 도움을 줄 수 있음\n2) 기억력 개선에 도움을 줄 수 있음\n3) 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n\n[비타민E]\n1)항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">비타민E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "EPA및DHA함유유지",
+   "혈중중성지질개선․혈행개선에도움을줄수있음",
+   "기억력개선에도움을줄수있음",
+   "건조한눈을개선하여눈건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 102,
+  "candidateId": "755d2333-61fb-438c-ac6f-df7c7bbb2a4d",
+  "statementNo": "2019001634047",
+  "productName": "블랙진생 콜레스테롤케어",
+  "productMasterId": "88654917-c9ce-4c99-8581-9f08c73769cf",
+  "canonicalId": "879210b3-910e-401a-a401-e45d6514d7f3",
+  "patternType": "UNLABELED_ONLY",
+  "mainFunctionSource": "-. 정상적인 면역기능과 세포분열에 필요\n-. 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음\n-. 혈중 콜레스테롤 개선·혈압조절에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<ul class=\"sd-why\"><li>정상적인 면역기능과 세포분열에 필요</li><li>면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음</li><li>혈중 콜레스테롤 개선·혈압조절에 도움을 줄 수 있음</li></ul>\n  ",
+  "suspectedMissingClauses": [
+   ".정상적인면역기능과세포분열에필요",
+   ".혈중콜레스테롤개선"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 103,
+  "candidateId": "c4fe012e-28bd-4dc9-8a04-fcadd744de98",
+  "statementNo": "2020000604517",
+  "productName": "익수 관절 황진환진액 MSM 2000",
+  "productMasterId": "f1911dfd-d3e9-4f31-bd16-694b47a62761",
+  "canonicalId": "6e8d21d1-162f-4f64-b6ec-0aac585fd656",
+  "patternType": "LABELED_ONLY",
+  "mainFunctionSource": "([엠에스엠(MSM)]관절 및 연골건강에 도움을 줄 수 있음\n[N-아세틸글루코사민(NAG)]관절 및 연골 건강 ･ 피부보습에 도움을 줄 수 있음\n[칼슘]①뼈와 치아 형성에 필요 ②신경과 근육 기능 유지에 필요 ③정상적인 혈액응고에 필요\n④골다공증 발생 위험 감소에 도움을 줌",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">엠에스엠(MSM)</span><ul><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">N-아세틸글루코사민(NAG)</span><ul><li>관절 및 연골 건강 ･ 피부보습에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">칼슘</span><ul><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증 발생 위험 감소에 도움을 줌</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "]관절및연골건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 104,
+  "candidateId": "fd6995c1-2f98-4a4c-aead-91cba2f34ddd",
+  "statementNo": "20190004553194",
+  "productName": "듀얼 바이탈 이뮨",
+  "productMasterId": "90749c02-6579-4ec4-8c76-3e37e0d9fafe",
+  "canonicalId": "321efc97-04a2-40e4-a8d7-7d9bcd56929a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①체내 에너지 생성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①정상적인 엽산 대사에 필요\n\n①탄수화물과 에너지 대사에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①체내 에너지 생성에 필요\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n\n①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①갑상선 호르몬의 합성에 필요②에너지 생성에 필요③신경발달에 필요\n\n①항산화에 도움을 줄 수 있음\n\n[비타민 E ]① 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n①유해산소로부터 세포를 보호하는데 필요\n\n①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요\n\n\n\n①산화,환원 효소의 활성에 필요\n\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[비타민 C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민 E</span><ul><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>산화,환원 효소의 활성에 필요</li><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체내에너지생성에필요",
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요",
+   "정상적인엽산대사에필요",
+   "탄수화물과에너지대사에필요",
+   "단백질및아미노산이용에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "체내에너지생성에필요",
+   "세포와혈액생성에필요",
+   "태아신경관의정상발달에필요",
+   "혈액의호모시스테인수준을정상으로유지하는데필요",
+   "갑상선호르몬의합성에필요",
+   "항산화에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 105,
+  "candidateId": "f1c53de4-a3bd-4739-88ee-443703f48191",
+  "statementNo": "2018001231060",
+  "productName": "메디타민 퓨어 레이디 프로바이오틱스",
+  "productMasterId": "42f42311-d516-4a24-9715-94895c83e8c5",
+  "canonicalId": "ba12cc77-4db8-4362-958c-e1f8ea69eaa8",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n\n(1) 어두운 곳에서 시각 적응을 위해 필요\n(2) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(3) 상피세포의 성장과 발달에 필요,[프로바이오틱스] 유산균 증식 및 유해균 억제ㆍ배변 활동 원활ㆍ장 건강에 도움을 줄 수 있음 ",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제ㆍ배변 활동 원활ㆍ장 건강에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "어두운곳에서시각적응을위해필요",
+   "피부와점막을형성하고기능을유지하는데필요",
+   "상피세포의성장과발달에필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 106,
+  "candidateId": "b7120036-5080-4930-9300-c65a3405fef8",
+  "statementNo": "20190009483190",
+  "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+  "productMasterId": "b564269f-fb27-41a5-be9a-e2672762dc9e",
+  "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "쏘팔메토 열매 추출물] ①전립선 건강의 유지에 도움을 줄 수 있음\n[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음\n[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n[망간] ①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n[비타민 B2] ①체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "쏘팔메토열매추출물]",
+   "전립선건강의유지에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 107,
+  "candidateId": "6107accb-a467-4f19-83e0-6e78dc20a65d",
+  "statementNo": "2019000910596",
+  "productName": "쏘팔메토골드",
+  "productMasterId": "07e73f0d-1430-4d4a-98a2-d2050809a5fa",
+  "canonicalId": "906255ce-edf9-4ad3-b7f5-780e4ee63d5a",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n①전립선 건강의 유지에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지] ①지구력 증진에 도움을 줄 수 있음\n\n①탄수화물과 에너지 대사에 필요\n\n①체내 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li><li>탄수화물과 에너지 대사에 필요</li><li>체내 에너지 생성에 필요</li><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>체내 에너지 생성에 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "정상적인면역기능에필요",
+   "정상적인세포분열에필요",
+   "전립선건강의유지에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 108,
+  "candidateId": "9e1bab27-f1e8-46c7-8cba-a7601608e32c",
+  "statementNo": "20190004553414",
+  "productName": "엠프로 M.PRO 다이어트 ",
+  "productMasterId": "20e741de-cebc-45fa-824b-191a6b2f05a2",
+  "canonicalId": "b61c486f-851f-4cc4-8cea-42e711e67afe",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[L. curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)] \n(국문) 체지방 감소에 도움을 줄 수 있음 /  (영문) May help to reduce body fat\n유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음\n[난소화성말토덱스트린] 식후 혈당상승 억제 • 혈중 중성지질 개선 • 배변활동 원활에 도움을 줄 수 있음\t\t\t\t\t\t\t\t\t\t\t\n[비타민C] 1) 결합조직 형성과 기능유지에 필요 2) 철의 흡수에 필요 3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\t\t\t\t\t\t\t\t\t\t\t",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">난소화성말토덱스트린</span><ul><li>식후 혈당상승 억제 • 혈중 중성지질 개선 • 배변활동 원활에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음",
+   "유산균증식및유해균억제",
+   "장건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 109,
+  "candidateId": "70b398c3-a463-410a-9003-41f71883f591",
+  "statementNo": "2019000939499",
+  "productName": "올 뉴 초록이 시즌4",
+  "productMasterId": "47b8543a-a901-4f65-a8b2-1fd019f24ca6",
+  "canonicalId": "f02a577f-4474-4183-85ea-a4b3f65f2202",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]\n 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)\n\n[녹차추출물]\n 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n 지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 110,
+  "candidateId": "ba9aa2cf-190e-4f78-805c-a7334d9c1ce1",
+  "statementNo": "20190009483845",
+  "productName": "올 뉴 초록이 시즌4",
+  "productMasterId": "ddcaaec7-b77f-4193-86d6-186ed67c3f76",
+  "canonicalId": "d5391740-368a-4534-ba7b-8f02d2fa4fe2",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]\n장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)\n\n[녹차추출물]\n항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 111,
+  "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+  "statementNo": "20190009483373",
+  "productName": "차전자피 카테킨 다이어트",
+  "productMasterId": "27f7ca99-c1e8-41ec-845c-6d38cfffefb1",
+  "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "차전자피식이섬유]\n혈중 콜레스테롤 개선에 도움을 줄 수 있음\n배변활동 원활에 도움을 줄 수 있음\n[녹차추출물]\n항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동원활에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 112,
+  "candidateId": "b2a607d7-078c-4f60-888e-cf0e225a20d7",
+  "statementNo": "20180012174522",
+  "productName": "체지방감소 프로젝트365 비피더스 다이어트 핏",
+  "productMasterId": "bb44d5e9-1636-4ff2-ab73-37c3d1693d38",
+  "canonicalId": "e60f4ee1-b64a-4f95-b6a8-c895db9b40e8",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)] : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음\n[아연] (가) 정상적인 면역기능에 필요, (나) 정상적인 세포분열에 필요\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[비타민 B1] 탄수화물과 에너지 대사에 필요\n[비타민 D] (가) 칼슘과 인이 흡수되고 이용되는데 필요, (나) 뼈의 형성과 유지에 필요, (다) 골다공증발생 위험 감소에 도움을 줌\n[비타민 B2] 체내 에너지 생성에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>(가) 정상적인 면역기능에 필요, (나) 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>(가) 칼슘과 인이 흡수되고 이용되는데 필요, (나) 뼈의 형성과 유지에 필요, (다) 골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "체지방감소에도움을줄수있음",
+   "유산균증식및유해균억제",
+   "장건강에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 113,
+  "candidateId": "fbe6078e-1b05-4d6d-bc01-dcf18b74e978",
+  "statementNo": "2019000939496",
+  "productName": "초록이 슬림밸런스&쾌변",
+  "productMasterId": "55607155-1640-42b3-b880-deb14de93521",
+  "canonicalId": "88ce2dad-b113-4bf5-a635-eeecaea62399",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]\n 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)\n\n[녹차추출물]\n 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n 지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 114,
+  "candidateId": "f8bc4892-e7b3-44dc-be51-729e96ceef0b",
+  "statementNo": "20190009483840",
+  "productName": "초록이 슬림&쾌변",
+  "productMasterId": "37ca2a06-1362-4b78-b268-c90f88fdc687",
+  "canonicalId": "06737977-539b-4f2f-abdb-21ab38d380bf",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide) 분말(제2009-80호)] \n (가) 장내 유익균 증식, 유해균 억제 도움을 줄 수 있음\n (나) 배변활동에 도움을 줄 수 있음\n[녹차추출물]\n (가) 항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>(가) 항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "유해균억제도움을줄수있음",
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 115,
+  "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+  "statementNo": "2019000939498",
+  "productName": "초록이 액티브 클린",
+  "productMasterId": "e3672c30-ce49-42f5-8737-3f350d4b382c",
+  "canonicalId": "ff54d647-9f6c-476f-acb3-7a6e849c3de6",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]\n 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)\n\n[녹차추출물]\n 항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음\n\n[옥타코사놀 함유 유지]\n 지구력 증진에 도움을 줄 수 있음",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">옥타코사놀 함유 유지</span><ul><li>지구력 증진에 도움을 줄 수 있음</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "배변활동에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 116,
+  "candidateId": "473da538-5396-44c1-ab8b-23263f8a26ad",
+  "statementNo": "202000124461",
+  "productName": "17종포스트바이오틱스김치생유산균 키즈",
+  "productMasterId": "e6392e74-5cd9-43dc-8504-55117145c22d",
+  "canonicalId": "1f048d5c-70b1-46a4-8f1e-f176ca004ea9",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "유산균 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요,[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div>\n  ",
+  "suspectedMissingClauses": [
+   "유산균증식및유해균억제",
+   "배변활동원활에도움을줄수있음"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 117,
+  "candidateId": "2c0b5cc6-0792-4b8b-90d4-b7f9aed91475",
+  "statementNo": "2021000662219",
+  "productName": "홍삼정이뮨부스터",
+  "productMasterId": "f21eaa52-e870-4606-8dc8-bba19e499b73",
+  "canonicalId": "697e6bac-de35-43ac-924e-fbbd91b5984f",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "(1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음\n(2) 일일섭취량\n (가)면역력 증진･피로개선에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 3~80 mg\n (나)혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 2.4~80 mg\n\n(1) 유해산소로부터 세포를 보호하는데 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 뼈 형성에 필요\n(2) 에너지 이용에 필요\n(3) 유해산소로부터 세포를 보호하는데 필요\n\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(1) 탄수화물과 에너지 대사에 필요\n\n(1) 체내 에너지 생성에 필요\n\n(1) 철의 운반과 이용에 필요\n(2) 유해산소로부터 세포를 보호하는데 필요\n\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요\n\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n(3) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요,[비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[나이아신] 체내 에너지 생성에 필요\n[셀렌] 유해산소로부터 세포를 보호하는데 필요\n[비타민B6] 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 \n유지하는데 필요\n[비타민B1] 탄수화물과 에너지 대사에 필요\n[비타민B2] 체내 에너지 생성에 필요\n[판토텐산] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[망간] 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요\n[아연] 정상적인 면역기능에 필요, 정상적인 세포분열에 필요\n[구리] 철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요\n[비타민K] 정상적인 혈액응고에 필요, 뼈의 구성에 필요\n[엽산] 세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 \n수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로</li><li>유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">망간</span><ul><li>뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">구리</span><ul><li>철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민K</span><ul><li>정상적인 혈액응고에 필요, 뼈의 구성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">엽산</span><ul><li>세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인</li><li>수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "피로개선에도움을줄수있음",
+   "Rb1및Rg3의합계로서3",
+   "혈소판응집억제를통한혈액흐름",
+   "항산화에도움을줄수있음",
+   "Rb1및Rg3의합계로서"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ },
+ {
+  "index": 118,
+  "candidateId": "31c4b8c1-cc4e-40c6-b394-3e2774fd8357",
+  "statementNo": "2023000229646",
+  "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+  "productMasterId": "0768cf49-17b9-45c4-994d-404c78e3457c",
+  "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+  "patternType": "MIXED_LABELED_AND_UNLABELED",
+  "mainFunctionSource": "비타민C] \n(1) 결합조직 형성과 기능유지에 필요\n(2) 철의 흡수에 필요\n(3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 \n\n[홍삼] \n(1) 면역력 증진 ･ 피로개선에 도움을 줄 수 있음\n(2) 혈소판 응집억제를 통한 혈액흐름 ･ 기억력 개선 ･ 항산화에 도움을 줄 수 있음 \n\n[아연] \n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n[셀렌] \n유해산소로부터 세포를 보호하는데 필요\n\n[비타민B6]\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+  "oldRenderedFunctionText": "<div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">홍삼</span><ul><li>면역력 증진 ･ 피로개선에 도움을 줄 수 있음</li><li>혈소판 응집억제를 통한 혈액흐름 ･ 기억력 개선 ･ 항산화에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div></div>\n  ",
+  "suspectedMissingClauses": [
+   "결합조직형성과기능유지에필요",
+   "항산화작용을하여유해산소로부터세포를보호하는데필요"
+  ],
+  "sourceAuditFile": "apps/api-server/src/scripts/data/hff-ko-full-corpus-functionality-omission-audit-v1.json"
+ }
+]

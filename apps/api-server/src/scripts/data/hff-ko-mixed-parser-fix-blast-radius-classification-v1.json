@@ -1,0 +1,5155 @@
+{
+ "wo": "WO-O4O-HFF-KO-MIXED-FUNCTION-BLOCK-PARSER-FIX-AND-118-CANONICAL-BACKFILL-V1",
+ "phase": "C-blast-radius-classification",
+ "generatedAt": "2026-07-30T02:47:58.499Z",
+ "changedTotal": 227,
+ "inTarget118": 98,
+ "outsideTarget118": 129,
+ "orderChangedRecomputed": 0,
+ "tally": {
+  "D1_ONLY": 2,
+  "D2_PRESENT": 124,
+  "D3_PRESENT": 162,
+  "MIXED_CAUSE": 74
+ },
+ "inTarget": {
+  "D1_ONLY": 0,
+  "D2_PRESENT": 48,
+  "D3_PRESENT": 98
+ },
+ "outTarget": {
+  "D1_ONLY": 2,
+  "D2_PRESENT": 76,
+  "D3_PRESENT": 64
+ },
+ "needsHumanReviewTotal": 124,
+ "needsHumanReviewOutsideTarget": 76,
+ "needsHumanReviewInTarget": 48,
+ "items": [
+  {
+   "candidateId": "4a51f6b8-110c-4a75-af0d-6361bcdfcbd8",
+   "statementNo": "200400150831397",
+   "productName": "멀티비타민 앤 미네랄",
+   "inTarget118": true,
+   "canonicalId": "beab42b6-8100-4a2c-aed6-3eeb069af1e8",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 15,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "7a3956a7-8364-4d35-b751-fb89af413839",
+   "statementNo": "200400150832024",
+   "productName": "녹차카테킨+",
+   "inTarget118": true,
+   "canonicalId": "0dd64812-683c-4301-9d3f-9140d22f90d7",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 11,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)]",
+    "(영문) May help to improve bowel movements"
+   ],
+   "newOfficialClauses": [
+    "(국문) 배변활동 원활에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ed9b0d3d-9c5f-46cd-9503-2fe5d675f790",
+   "statementNo": "200400150832025",
+   "productName": "그린몬스터 다이어트 쾌변 쑥",
+   "inTarget118": true,
+   "canonicalId": "ef34ca2a-f58e-49e2-ae8e-b195bcb7fa72",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 11,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)]",
+    "(영문) May help to improve bowel movements"
+   ],
+   "newOfficialClauses": [
+    "(국문) 배변활동 원활에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "75fa9fc4-b86f-44a0-985c-d9279af15147",
+   "statementNo": "200400150832478",
+   "productName": "바이오파파 다이어트 유산균 바이오 슬림",
+   "inTarget118": true,
+   "canonicalId": "6e69f575-e916-42f5-8c99-3bcbea2ead26",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 10,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "curvatus HY7601와 L.",
+    "plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)]"
+   ],
+   "newOfficialClauses": [
+    "(가) 체지방 감소에 도움을 줄 수 있음",
+    "(나) 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d351c181-a5b2-4b6e-ba64-570bab2e4cd7",
+   "statementNo": "20040015083888",
+   "productName": "닥터혈당컨트롤",
+   "inTarget118": true,
+   "canonicalId": "0c8d2289-dcca-4a82-8e1d-ea0e676cb5cc",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 16,
+   "addedCount": 14,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "식후 혈당상승 억제에 도움을 줄 수 있음",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요"
+   ],
+   "duplicateKeys": 3,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "94834a4a-2f67-4e06-8e2e-370506de5497",
+   "statementNo": "20040015083972",
+   "productName": "코큐텐11",
+   "inTarget118": true,
+   "canonicalId": "7b9f1c12-bc00-4642-a91b-21d69f4a4083",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 15,
+   "addedCount": 14,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화·높은 혈압 감소에 도움을 줄 수 있음",
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 3,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "11ae0a53-7ca2-4bcd-8de6-1b41483379fe",
+   "statementNo": "20040015094224",
+   "productName": "관절엔 글루코사민 MSM 비타민D",
+   "inTarget118": false,
+   "canonicalId": "2d450bd6-2149-4a1c-aedb-90a89efe95f7",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "7fe1d7fa-e680-4a37-acc9-5db3c0e6930c",
+   "statementNo": "20040015094228",
+   "productName": "관절엔 소연골 뮤코다당 콘드로이친 1200",
+   "inTarget118": false,
+   "canonicalId": "81ffde8a-55e8-4253-84bf-4ad5399ed8ff",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 14,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "관절 및 연골건강에 도움을 줄 수 있음",
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "5e1c7a0a-c444-4df3-92aa-048123e6df2c",
+   "statementNo": "200400151071119",
+   "productName": "뉴바이탈 올인원",
+   "inTarget118": false,
+   "canonicalId": "a98c4af5-5deb-4c3a-8368-b05456ec3d61",
+   "beforeClauseCount": 21,
+   "afterClauseCount": 22,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "*밀크씨슬 정제"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "84589a8a-1172-4be9-94d9-720169ec15fd",
+   "statementNo": "20040015107764",
+   "productName": "제너럴밸런스 W솔루션",
+   "inTarget118": true,
+   "canonicalId": "d70a9ac4-3ca1-4adb-a166-643c2de22332",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 13,
+   "addedCount": 12,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물과 에너지 대사에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "7af35a06-31ec-4d71-a5bc-26411f515eb9",
+   "statementNo": "20040015162300",
+   "productName": "수면앤다이어트",
+   "inTarget118": true,
+   "canonicalId": "8f39e7ee-eec7-4180-bb57-a97b25b0f948",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 7,
+   "addedCount": 6,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "유해산소로부터 세포를 보호하는데 필요,·감태추출물(개별인정형원료 제2015-6호) : 수면의 질 개선에 도움을 줄 수 있음 ·콜레우스포스콜리추출물"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "5306d70e-0656-402c-b3e5-574b9b01267f",
+   "statementNo": "20040015191225",
+   "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+   "inTarget118": true,
+   "canonicalId": "cbad2a14-6f42-4b4e-a851-54b880a9095b",
+   "beforeClauseCount": 18,
+   "afterClauseCount": 55,
+   "addedCount": 37,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 탄수화물, 지방, 단백질 대사에 관여",
+    "체내 산소운반과 혈액생성에 필요",
+    "에너지 생성에 필요",
+    "갑상선 호르몬의 합성에 필요",
+    "에너지 생성에 필요",
+    "신경발달에 필요",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "철의 운반과 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 엽산 대사에 필요",
+    "정상적인 혈액응고에 필요",
+    "뼈의 구성에 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "뼈 형성에 필요",
+    "에너지 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 6,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f7d158f2-b3ed-4770-bb23-0e0f065c7190",
+   "statementNo": "2004001536231",
+   "productName": "늘비움",
+   "inTarget118": false,
+   "canonicalId": "44441096-c3f0-4278-b3f1-a9c1f485a914",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선·배변활동 원활에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "2c8852bb-feb7-4221-91fc-d9ee78590a4a",
+   "statementNo": "200400170061087",
+   "productName": "광동 궁리본 유산균",
+   "inTarget118": true,
+   "canonicalId": "4faa6d16-bfcc-442b-a6b7-d68aa7e15489",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lactobacillus acidophilus YT1 (제2019-22호)] (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to improve menopausal women's health"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+   "statementNo": "200400170061205",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "inTarget118": true,
+   "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+   "beforeClauseCount": 11,
+   "afterClauseCount": 13,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "자몽추출물등 복합물(Sinetrol)(제2019-24호)](국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "f2e425b6-660a-426e-ac40-c6e6654fcd5f",
+   "statementNo": "200400170061236",
+   "productName": "코큐텐 포뮬러",
+   "inTarget118": false,
+   "canonicalId": "3672bd24-c8df-48fb-bf72-f8bd7a5efa44",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[나이아신"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "14a9b351-4398-489d-8dbb-e8d1cb41cec6",
+   "statementNo": "200400170061507",
+   "productName": "메노락토 프리미엄",
+   "inTarget118": true,
+   "canonicalId": "94f5ef15-350f-410d-b197-c7e6fd5e8647",
+   "beforeClauseCount": 10,
+   "afterClauseCount": 11,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lactobacillus acidophilus YT1 (제2019-22호)] (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to menopausal womens health"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "bad02774-32c9-4356-b1bb-9b7020b8a1bd",
+   "statementNo": "200400170061599",
+   "productName": "야쿠르트 핏바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "ac6afb6b-1e1b-499c-b96f-9345b1120f66",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 8,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactobacillus 복합물 HY7601 + KY1032 (제2019-4호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+   "statementNo": "200400170061669",
+   "productName": "트루락 날씬 다이어트 유산균",
+   "inTarget118": true,
+   "canonicalId": "589badf9-cd5c-49b7-bfeb-21a9f701195d",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 12,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "curvatus HY7601와 L.",
+    "plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "26432d24-b0fa-40f4-8938-523d1bae831c",
+   "statementNo": "200400170061686",
+   "productName": "엘레씬",
+   "inTarget118": true,
+   "canonicalId": "b9e19d4b-d7ff-4391-af50-4bacac2f8249",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "52fe3b41-2411-4357-b984-329760d02bd7",
+   "statementNo": "200400170061694",
+   "productName": "엘레씬 다이어트 유산균",
+   "inTarget118": true,
+   "canonicalId": "1f6b091d-3773-4097-9a6a-b5bb8d778524",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bdc202ea-cf40-4a41-a423-844c9065f449",
+   "statementNo": "200400170061709",
+   "productName": "다이어트유산균 듀얼 락토슬림",
+   "inTarget118": true,
+   "canonicalId": "0a0317bd-2324-4bfc-9662-2bcbd8e30f38",
+   "beforeClauseCount": 11,
+   "afterClauseCount": 15,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "curvatus HY7601와 L.",
+    "plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "74c7e00a-b856-4d6d-a893-5ee09b2a747e",
+   "statementNo": "200400170061769",
+   "productName": "익스트림 트리플 HMB 3000",
+   "inTarget118": true,
+   "canonicalId": "52685061-8470-42ea-aa47-844b4c2b50ae",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 8,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[CaHMB(Calcium β-Hydroxy-β-methylbutyrate)(제2023-26호)]",
+    "(영문) May help to improve endurance of exercise performance capability"
+   ],
+   "newOfficialClauses": [
+    "(국문) 운동수행능력 향상에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "e139ec88-e7a7-4f9e-90a8-4014c48902d6",
+   "statementNo": "200400170061811",
+   "productName": "슬로우글로우 다이어트 유산균",
+   "inTarget118": true,
+   "canonicalId": "18c59353-79db-42b6-9183-16bcc7238ae9",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 11,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "curvatus HY7601와 L.",
+    "plantarum KY1032의 프로바이오틱스 복합물(개별인정 제2019-4호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "4d3fe144-3c36-4b76-86d0-114121c68459",
+   "statementNo": "200400170061890",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "inTarget118": true,
+   "canonicalId": "ae79ca21-ea6b-4855-b9aa-6a56e62f8e3d",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 11,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "3685815e-3a42-4312-a12f-0ab44ab191ca",
+   "statementNo": "20040017006271",
+   "productName": "쏘팔메토플러스",
+   "inTarget118": true,
+   "canonicalId": "4730ea7f-826d-406e-bd01-49220e52bd05",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "전립선 건강의 유지에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "1bd47cf1-8d29-4fba-a155-349fa6bd698b",
+   "statementNo": "20040017006492",
+   "productName": "식물성 알티지오메가3 80",
+   "inTarget118": false,
+   "canonicalId": "667cd678-4f3d-4d62-b7bf-23e2c6a54b2f",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 8,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[EPA 및 DHA 함유유지",
+    "혈중 중성지질 개선에 도움을 줄 수 있음",
+    "혈행개선에 도움을줄 수 있음",
+    "건조한 눈을 개선하여 눈 건강에도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f20d3890-4c05-4c70-88a9-a680ab7feaaf",
+   "statementNo": "20040017006598",
+   "productName": "눈에좋은 맑은 루테인",
+   "inTarget118": true,
+   "canonicalId": "ad95fcff-33a7-4333-897c-98ed26c9d334",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 8,
+   "addedCount": 7,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 3,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "76195fc4-f826-4302-8ed2-54ffa357464e",
+   "statementNo": "20040017006600",
+   "productName": "아이에버루테인",
+   "inTarget118": true,
+   "canonicalId": "f7307fdb-56b7-4baa-a578-0a47025ea8bb",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 19,
+   "addedCount": 6,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "444b4436-612b-450d-ae05-1ce91ecca55b",
+   "statementNo": "20040017006845",
+   "productName": "맘스포뮬러 비타민D 2000IU",
+   "inTarget118": true,
+   "canonicalId": "4a80514e-f55c-42ba-9e9d-5e22ea127724",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 5,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "52cd3f79-0cd1-4b1e-a310-af60d6165480",
+   "statementNo": "200400170171009",
+   "productName": "리프로락",
+   "inTarget118": true,
+   "canonicalId": "9fb2161e-b9a7-4c1d-bce2-954bcc2df1cc",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 9,
+   "addedCount": 7,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "체내 에너지 생성에 필요",
+    "탄수화물과 에너지 대사에 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9cf17eff-f702-41e4-b771-a77dbbd169c9",
+   "statementNo": "200400170211147",
+   "productName": "더좋은 면역 베타글루칸",
+   "inTarget118": false,
+   "canonicalId": "76e1acb3-5449-4aca-b2a4-f391bdb2b4da",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "베타글루칸분말"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bc103018-929b-4d44-89db-a19951432b19",
+   "statementNo": "200400170211547",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "inTarget118": true,
+   "canonicalId": "a6bda6ee-6ac5-40e8-8b21-fa1575f173d7",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[L.curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(기능성원료인정 제2019-4호)]",
+    "(영문) May help to reduce body fat"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b844ce36-764c-4b58-98f9-ab01c821902c",
+   "statementNo": "200400170211893",
+   "productName": "B:OK 실크텐션 머릿결 유산균",
+   "inTarget118": true,
+   "canonicalId": "ed866fe4-c7e0-432a-a6a8-cac23cb029d3",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 8,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactilactobacillus curvatus LB-P9 프로바이오틱스]",
+    "(영문) May help to improve hair condition(luster·elasticity)"
+   ],
+   "newOfficialClauses": [
+    "(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "92a1d1c7-c4b4-494f-a391-3a799ccd3c37",
+   "statementNo": "20040017021828",
+   "productName": "한국가간보(佳肝寶)",
+   "inTarget118": false,
+   "canonicalId": "47185450-a34b-4ebb-b33c-a06ce59dda2e",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 5,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[밀크씨슬(카르두스 마리아누스)추출물)"
+   ],
+   "newOfficialClauses": [
+    "간 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "68af5c2f-7704-4a8e-b5c3-4b2d561e8cb0",
+   "statementNo": "2004001706144",
+   "productName": "스킨마스터 피에스트로 프로",
+   "inTarget118": true,
+   "canonicalId": "3b74633a-faa6-4364-81af-834fde89245c",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 (국문) 1. 피부 보습에 도움을 줄 수 있음 2. 자외선에 의한 피부 손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 (영문) 1. Help to maintain skin moisturizing 2. Help to maintain skin health from skin damage by UV radiation,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "2b044eb1-974f-4f11-9009-9468acba2cbd",
+   "statementNo": "20040017106211",
+   "productName": "나토엔자임",
+   "inTarget118": false,
+   "canonicalId": "8094f1c2-4877-472c-857a-0e8f61bf82e7",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 0,
+   "removedCount": 0,
+   "cause": [],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "861fd737-cddf-4136-b1c4-f4bf4279b234",
+   "statementNo": "20040020001137",
+   "productName": "귀인 홍삼정",
+   "inTarget118": false,
+   "canonicalId": "b295530f-4a3e-4192-a7ea-2ff8acda74da",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 12,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "피로회복"
+   ],
+   "newOfficialClauses": [
+    "면역력 증진",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "442b1bd3-c898-4823-ba0b-19231cacc8b6",
+   "statementNo": "20040020001147",
+   "productName": "홍삼농축액Ⅰ(원료성)",
+   "inTarget118": false,
+   "canonicalId": "bb8c391b-a3f1-441b-89d2-0e925a7170a3",
+   "beforeClauseCount": 28,
+   "afterClauseCount": 32,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "피로회복"
+   ],
+   "newOfficialClauses": [
+    "면역력 증진",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "3835aab9-570a-4b37-ade3-aa18a8075fd2",
+   "statementNo": "20040020001177",
+   "productName": "홍삼농축액(원료성)",
+   "inTarget118": false,
+   "canonicalId": "0830796e-00d6-4603-8dab-8c81f566a579",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 12,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "피로회복"
+   ],
+   "newOfficialClauses": [
+    "면역력 증진",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7c714629-6626-47e3-8ae3-ffbf0f489e37",
+   "statementNo": "20040020001216",
+   "productName": "홍삼농축액 골드(원료성)",
+   "inTarget118": false,
+   "canonicalId": "afcb1996-7ba1-45e4-aa2e-9c44684aaa8f",
+   "beforeClauseCount": 15,
+   "afterClauseCount": 20,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "피로회복"
+   ],
+   "newOfficialClauses": [
+    "면역력 증진",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d04268d4-098a-4be9-8100-ce952ebe89d0",
+   "statementNo": "20040020001277",
+   "productName": "라인 케어",
+   "inTarget118": true,
+   "canonicalId": "327b58f9-7884-434d-9f72-88112715c4c1",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "6e79d5bb-bb72-4ba6-a238-581b7283077b",
+   "statementNo": "20040020002937",
+   "productName": "앨트헬스오메가-3",
+   "inTarget118": true,
+   "canonicalId": "281a9031-2212-41c7-9866-1f18b30dfd95",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "8b73f8d8-c3fc-44f8-b2d5-1c9cc5489c51",
+   "statementNo": "20040020003105",
+   "productName": "호리호리 하이킥",
+   "inTarget118": true,
+   "canonicalId": "d79ba28d-e9b2-4e44-b36e-5a4d03d34dc3",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "4ae088e7-4db1-485e-8019-015f3833581e",
+   "statementNo": "20040020003152",
+   "productName": "울트라 오메가3 EPA/DHA800",
+   "inTarget118": false,
+   "canonicalId": "41ae0a70-5879-49b2-8eac-583e1582bfea",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 9,
+   "addedCount": 0,
+   "removedCount": 0,
+   "cause": [],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "5ae0a6d3-d3c0-4a5b-8958-3d960f8f829a",
+   "statementNo": "20040020004469",
+   "productName": "바이오메라 면역젤리 튼튼대장 사과맛",
+   "inTarget118": false,
+   "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "4f63e3d8-40de-4888-8a54-141cf43b60a2",
+   "statementNo": "20040020004482",
+   "productName": "글로시 히알루론산 & 비오틴",
+   "inTarget118": false,
+   "canonicalId": "da8297de-8c5c-455c-bdcd-d29ba9a00bb8",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "a0eb0082-016f-42dc-85f7-1ed3d0eaee62",
+   "statementNo": "20040020006671",
+   "productName": "코큐비타",
+   "inTarget118": true,
+   "canonicalId": "3f3b3d3b-493d-4403-888b-f5d1dc4ecb46",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 10,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "코엔자임 Q10은 항산화에 도움을 줄 수 있습니다.",
+    "코엔자임 Q10은 혈압이 높은 사람에게 도움을 줄 수 있습니다."
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "e3673abf-2c9f-4491-9524-8cfba0ba8bf9",
+   "statementNo": "20040020006683",
+   "productName": "메타볼",
+   "inTarget118": true,
+   "canonicalId": "fb6fa5aa-82a1-4ee4-a3ae-c88411210b0a",
+   "beforeClauseCount": 19,
+   "afterClauseCount": 21,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "코엔자임 Q10은 항산화에 도움을 줄 수 있습니다.",
+    "코엔자임 Q10은 혈압이 높은 사람에게 도움을 줄 수 있습니다."
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "5b74bb91-dacf-47bd-a1fc-ce2fb33d9440",
+   "statementNo": "20040020006879",
+   "productName": "트리플러스50+액티브",
+   "inTarget118": true,
+   "canonicalId": "966fd0a7-b89a-4d07-9b9c-97e9a5c60dc2",
+   "beforeClauseCount": 26,
+   "afterClauseCount": 35,
+   "addedCount": 6,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "뼈와 치아 형성에 필요",
+    "신경과 근육 기능 유지에 필요",
+    "정상적인 혈액응고에 필요",
+    "신경과 근육 기능 유지에 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "d9ecc227-103f-451f-a811-6ed4160d95db",
+   "statementNo": "200400200071620",
+   "productName": "뷰티업필",
+   "inTarget118": false,
+   "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 16,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[비타민B1"
+   ],
+   "newOfficialClauses": [
+    "탄수화물과 에너지 대사에 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "aebe02f5-26e1-4291-b6ab-49c722f5d7fd",
+   "statementNo": "200400200071680",
+   "productName": "광동 눈 건강엔 루테인",
+   "inTarget118": true,
+   "canonicalId": "ffab71f6-9a6d-4226-a91d-12cab671d58b",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 14,
+   "addedCount": 13,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9fa29f8d-6729-4f3b-b438-919b0d5ca5cf",
+   "statementNo": "200400200082716",
+   "productName": "지큐랩 콜레스테롤 솔루션 데일리",
+   "inTarget118": true,
+   "canonicalId": "40ff51bc-c157-42ab-93a9-1d96c47d5070",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]",
+    "(영문) May help to reduce blood cholesterol levels"
+   ],
+   "newOfficialClauses": [
+    "(국문) 혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+   "statementNo": "200400200082764",
+   "productName": "건강한 생 유산균 키즈 300억",
+   "inTarget118": true,
+   "canonicalId": "81eff384-e1f5-4cc8-bac4-ea107603d25a",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[과채유래유산균(L.plantarum CJLP133)(기능성원료인정제2013-11호)] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "8e425277-81bf-426a-b0fd-d4e4127d080c",
+   "statementNo": "200400200082857",
+   "productName": "보스정",
+   "inTarget118": true,
+   "canonicalId": "8af9dfe7-6e95-4ef3-a73c-9b0ed4b47759",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[보스웰리아추출물(Boswellia serrata R."
+   ],
+   "newOfficialClauses": [
+    "extract)(기능성원료인정 제2014-23호)] (국문) 관절 및 연골건강에 도움을 줄 수 있음, (영문) May help to maintain healthy joint and cartilage"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "1670cc3b-cc79-4d94-8666-9a1b2db90a1b",
+   "statementNo": "200400200083035",
+   "productName": "데이즈 핏핏",
+   "inTarget118": true,
+   "canonicalId": "2f4f5de6-a982-4c57-8653-ec9e9a4a11c8",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[자일로올리고당(xylooligosaccharide)분말(기능성원료인정 제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음, (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "b1003670-3aad-41e1-88ce-96b0a802fb07",
+   "statementNo": "200400200083114",
+   "productName": "액티브솔루션 장건강",
+   "inTarget118": true,
+   "canonicalId": "f8ee5042-8afb-4cf1-898c-3157adf97eb1",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "651ec646-7097-46fd-8860-7500a9e32f77",
+   "statementNo": "200400200083187",
+   "productName": "트리플 프리바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "ca390007-77ea-472e-845d-eb666da1f1fd",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[자일로올리고당(Xylooligosaccharide)분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "239bc33a-0100-414f-8702-1b8085e39997",
+   "statementNo": "200400200083244",
+   "productName": "우먼올핏",
+   "inTarget118": true,
+   "canonicalId": "a1c654d2-5ab9-43d2-9837-7af99257f81d",
+   "beforeClauseCount": 16,
+   "afterClauseCount": 17,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] (국문) 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음 (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria, May help to improve bowel movements"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "49b835aa-36f2-41bd-b5ce-0cd765dbe6f5",
+   "statementNo": "200400200142058",
+   "productName": "광동rTG오메가3",
+   "inTarget118": false,
+   "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[EPA 및 DHA 함유유지",
+    "혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "cf0b9470-d09f-437c-a6c8-fd853e74b862",
+   "statementNo": "20040020039130",
+   "productName": "인삼농축액 7",
+   "inTarget118": false,
+   "canonicalId": "61256e5f-fd5a-47ff-9ca3-c4e2971a8768",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "면역력 증진･피로개선･뼈 건강에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "3ea0d6d4-2ec1-4a3d-b9f9-d5c15940b412",
+   "statementNo": "20040020041520",
+   "productName": "위드컷 레드",
+   "inTarget118": false,
+   "canonicalId": "8b8162cb-281e-4da6-a03b-3b628eb71570",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 체내 에너지 생성에 필요 (1) 탄수화물과 에너지 대사에 필요 체지방 감소에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "e067b909-0d01-4291-bb24-919231403831",
+   "statementNo": "20040020041539",
+   "productName": "올인원 멀티비타민 미네랄 21",
+   "inTarget118": false,
+   "canonicalId": "99ae078d-681c-48c7-a9f5-b7e105935dd2",
+   "beforeClauseCount": 36,
+   "afterClauseCount": 74,
+   "addedCount": 38,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "체내 탄수화물, 지방, 단백질 대사에 관여",
+    "산화·환원 효소의 활성에 필요",
+    "뼈 형성에 필요",
+    "에너지 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "갑상선 호르몬의 합성에 필요",
+    "에너지 생성에 필요",
+    "신경발달에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "철의 운반과 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "체내 산소운반과 혈액생성에 필요",
+    "에너지 생성에 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 엽산 대사에 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "탄수화물과 에너지 대사에 필요",
+    "정상적인 혈액응고에 필요",
+    "뼈의 구성에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 6,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "c8d82d37-490c-4b37-a4f8-49566c9a76dd",
+   "statementNo": "20040020041540",
+   "productName": "이뮨&프로틴 밸런스",
+   "inTarget118": false,
+   "canonicalId": "c4cf13bf-15b9-482d-9e95-1c972e12c12b",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 28,
+   "addedCount": 18,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [
+    "근육, 결합조직 등 신체조직의 구성성분"
+   ],
+   "newOfficialClauses": [
+    "효소, 호르몬, 항체의 구성에 필요",
+    "체내 필수 영양성분이나 활성물질의 운반과 저장에 필요",
+    "체액, 산-염기의 균형 유지에 필요",
+    "에너지, 포도당, 지질의 합성에 필요",
+    "뼈와 치아 형성에 필요",
+    "신경과 근육 기능 유지에 필요",
+    "정상적인 혈액응고에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "에너지 이용에 필요",
+    "신경과 근육 기능 유지에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 2,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "74ce3334-100c-442b-b6ec-673bdb950e1b",
+   "statementNo": "20040020041541",
+   "productName": "근력 강화 & 프로틴",
+   "inTarget118": true,
+   "canonicalId": "cd04b225-07d0-4d86-a67d-e379adeff46a",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 17,
+   "addedCount": 9,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to improve muscle strength",
+    "근육, 결합조직 등 신체조직의 구성성분"
+   ],
+   "newOfficialClauses": [
+    "(국문) 근력개선에 도움을 줄 수 있음",
+    "효소, 호르몬, 항체의 구성에 필요",
+    "체내 필수 영양성분이나 활성물질의 운반과 저장에 필요",
+    "체액, 산-염기의 균형 유지에 필요",
+    "에너지, 포도당, 지질의 합성에 필요",
+    "에너지 이용에 필요",
+    "신경과 근육 기능 유지에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "5899a84e-ade4-4459-a0c9-8b3b7f2f8c27",
+   "statementNo": "20040020041544",
+   "productName": "밀크씨슬 11종 복합기능성",
+   "inTarget118": false,
+   "canonicalId": "2de8dbf6-70b7-412b-afd5-8586dc7dbd2a",
+   "beforeClauseCount": 11,
+   "afterClauseCount": 26,
+   "addedCount": 8,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "4f9b22dc-38b9-421f-9d1a-75a02f40b097",
+   "statementNo": "20040020041549",
+   "productName": "멀티비타민울트라",
+   "inTarget118": false,
+   "canonicalId": "0bdb7627-72fb-4feb-9fbd-351b119812ec",
+   "beforeClauseCount": 36,
+   "afterClauseCount": 77,
+   "addedCount": 41,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 혈액응고에 필요",
+    "뼈의 구성에 필요",
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "정상적인 엽산 대사에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "체내 산소운반과 혈액생성에 필요",
+    "에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "철의 운반과 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "갑상선 호르몬의 합성에 필요",
+    "에너지 생성에 필요",
+    "신경발달에 필요",
+    "뼈 형성에 필요",
+    "에너지 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "산화·환원 효소의 활성에 필요",
+    "체내 탄수화물, 지방, 단백질 대사에 관여,"
+   ],
+   "duplicateKeys": 9,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "307a8846-746c-426e-a39a-9ab4707c803b",
+   "statementNo": "20040020041555",
+   "productName": "삼대오백 크레아퓨어 크레아틴",
+   "inTarget118": false,
+   "canonicalId": "56f56efb-9131-478f-a701-e8758b8f52d2",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "근력 운동 시에 운동수행능력 향상에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9da75de2-624c-43f5-aa6d-91986a9c3ed6",
+   "statementNo": "20040020041556",
+   "productName": "고려양간보DX",
+   "inTarget118": true,
+   "canonicalId": "85a1e9c6-ad0c-48f6-820a-36fe72a39290",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 7,
+   "addedCount": 5,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to liver health on alcoholic liver damage"
+   ],
+   "newOfficialClauses": [
+    "(국문) 알콜성 손상으로부터 간을 보호하는데 도움을 줄 수 있음",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "189dea50-fd25-4602-a59f-8fa7017d7f3e",
+   "statementNo": "20040020041557",
+   "productName": "6년근 고려 홍삼 골드 EX",
+   "inTarget118": false,
+   "canonicalId": "75d16e71-1058-4701-8456-49f7b5aaabc8",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f772f1b9-c513-4cdd-bd19-0de444b9ce22",
+   "statementNo": "20040020041559",
+   "productName": "미네랄 생 유산균",
+   "inTarget118": false,
+   "canonicalId": "ec5b8dac-bf39-4f89-9a15-6659d850b5fe",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f88fa3c9-fe2b-407e-a104-64695f5216a9",
+   "statementNo": "20040020046598",
+   "productName": "더쎄라 빼라",
+   "inTarget118": false,
+   "canonicalId": "4b2c0bd5-ae26-4dc4-868d-ca0e564c509c",
+   "beforeClauseCount": 12,
+   "afterClauseCount": 14,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[비타민B2"
+   ],
+   "newOfficialClauses": [
+    "체내 에너지 생성에 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "504cbb3c-fb9b-42ae-81a9-90f8dea41659",
+   "statementNo": "2006001532626",
+   "productName": "셀로맥스 알로푸룬쾌변주스",
+   "inTarget118": true,
+   "canonicalId": "7b8880db-503b-495a-b085-476cb7c9d26a",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 6,
+   "addedCount": 5,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "일일섭취량"
+   ],
+   "newOfficialClauses": [
+    "(1)기능성 내용 : 식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음",
+    "(가)식후 혈당상승 억제에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 4.0~30 g (액상원료는 4.0~44 g)",
+    "(나)혈중 중성지질 개선에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 5.0~30 g (액상원료는 5.0~44 g)",
+    "(다)배변활동 원활에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 4.2~30 g (액상원료는 4.2~44 g),"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "8ccab18b-7d54-431d-8198-d1d59a9f887c",
+   "statementNo": "200600200081148",
+   "productName": "셀로맥스 명품 골드세븐",
+   "inTarget118": true,
+   "canonicalId": "cc1e1065-d06c-4950-8a9f-c6dee32b7e3c",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제2024-18호)] (국문) 피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, (영문) May help to moisturize (dry) skin, May help to maintain good skin health by protecting against damage from UV exposure"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "6da98da1-b56e-47e7-9ffa-8c5c0b33f8aa",
+   "statementNo": "200600200081153",
+   "productName": "셀로맥스 오메가3&7",
+   "inTarget118": true,
+   "canonicalId": "b97370cd-ff1c-4bc0-b4f6-37a842f6828a",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제 2024-18호)] (국문) 피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음, (영문) May help to moisturize (dry) skin, May help to maintain good skin health by protecting against damage from UV exposure"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "b1a5b5ba-ac3c-4c75-9b49-8b1b16eda5cc",
+   "statementNo": "200700170351498",
+   "productName": "리스펙타 질 좋은 유산균",
+   "inTarget118": false,
+   "canonicalId": "d61c75f8-2651-412d-9e75-7c558afd79be",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "주된 기능성",
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ba789437-a40c-4be6-92ab-34b1b5871cb6",
+   "statementNo": "200700170351513",
+   "productName": "핑크 프로바이오틱스",
+   "inTarget118": false,
+   "canonicalId": "c9c1a5b5-f8b3-4716-a0cb-bc7a658e6f7b",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "30e46501-0630-4fe4-a676-ef403539c00c",
+   "statementNo": "200700170351558",
+   "productName": "프로바이오틱스&우먼",
+   "inTarget118": false,
+   "canonicalId": "3dab7b6f-f019-4182-8d28-f55a29ac75c7",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "c582ebcd-1942-453f-ba0f-cdc10b6f7ade",
+   "statementNo": "200700170351564",
+   "productName": "리스펙타 질 유산균 플러스",
+   "inTarget118": false,
+   "canonicalId": "d1395dee-3d47-4b37-811a-a21ff08c64c8",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 9,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "00b154be-24d3-4e85-aa21-e391cf3cf767",
+   "statementNo": "200700170351566",
+   "productName": "바이오메라 리스펙타 질유산균",
+   "inTarget118": false,
+   "canonicalId": "7246f38c-7dff-4862-8314-33c0dd320c8e",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ab958891-31c8-470d-84d4-e5592e1469a4",
+   "statementNo": "200700170351573",
+   "productName": "우먼케어 건강한질엔",
+   "inTarget118": false,
+   "canonicalId": "0a45c7e5-245a-46f9-88eb-b71cc492a552",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "411066f1-a70a-49cb-adbd-8fb39092b5d4",
+   "statementNo": "200700170351661",
+   "productName": "지노 마스터",
+   "inTarget118": false,
+   "canonicalId": "d7ab7546-7287-4d40-a0cd-38aa79c41998",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "2887cea9-c1db-434b-9363-9214c7891035",
+   "statementNo": "200700170351697",
+   "productName": "리스펙타 와이밸런스",
+   "inTarget118": false,
+   "canonicalId": "634d96d3-1394-47a3-a792-e3dc55229ae2",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "1d8c9fd5-acac-4fbf-a0a3-cd025c8d510a",
+   "statementNo": "200700170351726",
+   "productName": "인 케어",
+   "inTarget118": false,
+   "canonicalId": "b940e5d2-1b33-48e3-b6b2-673419571d32",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "45616693-566a-41cf-a723-519a7dbfbc0b",
+   "statementNo": "200700170351745",
+   "productName": "베리베리(very very) 질건강 유산균 리스펙타",
+   "inTarget118": false,
+   "canonicalId": "b38a85ed-e560-43c4-af2e-a3f9150b57a9",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bd447ad3-9df7-4c2d-ab06-ff73de848949",
+   "statementNo": "200700170351777",
+   "productName": "이너시아+ 리스펙타",
+   "inTarget118": false,
+   "canonicalId": "58e31216-4bc2-454d-8093-9f1865e74161",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "83f462de-fee5-44d4-9cc7-1c609cfaee2a",
+   "statementNo": "200700170351843",
+   "productName": "와이Y바이오틱스 더블케어",
+   "inTarget118": false,
+   "canonicalId": "3170c9ec-02aa-41ef-9674-88c50b1a2ccb",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "6625fd73-0c59-4565-b466-3cd676852672",
+   "statementNo": "200700170351849",
+   "productName": "리스펙타 질유산균",
+   "inTarget118": false,
+   "canonicalId": "5427c762-a729-46cd-9146-e9b98559dc86",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "efd4d247-4a33-4f19-8300-90a6e983f657",
+   "statementNo": "200700170351854",
+   "productName": "여성유산균",
+   "inTarget118": false,
+   "canonicalId": "668b5dbb-3e1d-416a-9dd1-b4a4c1b911d7",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 9,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bd3412a2-a4be-4173-9b69-e476a207119c",
+   "statementNo": "200700170351857",
+   "productName": "지노마스터 퀵",
+   "inTarget118": false,
+   "canonicalId": "934d741b-b81d-473e-9f3c-c3f48c2eae52",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "9dfd2940-523f-4181-813f-e89a5b543d62",
+   "statementNo": "200700170351874",
+   "productName": "트루알엑스 지노 프로바이오틱스",
+   "inTarget118": false,
+   "canonicalId": "a4b515e5-5790-47f0-ba5f-3c407c764e18",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d5b17902-e2e3-4a9d-8e18-8d83f957910a",
+   "statementNo": "200700170351878",
+   "productName": "질 건강 리스펙타 프로바이오틱스 액티브",
+   "inTarget118": false,
+   "canonicalId": "b813f458-6159-4c17-8abd-17da54dbd67b",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "1d50d8c8-806e-412d-954b-5a03b4fcdf81",
+   "statementNo": "200700170351903",
+   "productName": "루피움 Y 밸런스 리스펙타",
+   "inTarget118": false,
+   "canonicalId": "97fc8eb7-742b-4858-9c52-246f62512251",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "83d9b490-2648-47b6-98e2-8a22f80cfaab",
+   "statementNo": "200700170351911",
+   "productName": "Daily Wise 리스펙타 유산균",
+   "inTarget118": false,
+   "canonicalId": "9dfaacb6-8e2e-4226-bc5c-4951d8f5985a",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7c88fdcb-fcc9-42f6-87b2-434b0e9bfe32",
+   "statementNo": "200700170351914",
+   "productName": "좋은버릇 레디케어 리스펙타 질유산균",
+   "inTarget118": false,
+   "canonicalId": "469ebbba-1349-4ca5-90cc-c40336177e4b",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 7,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d2223870-9101-48c8-a5c7-9ea8f75f5880",
+   "statementNo": "200700170351923",
+   "productName": "트루알엑스 지노 퀸 포뮬러",
+   "inTarget118": false,
+   "canonicalId": "de416946-c521-4aa4-858c-91986ebf0ad3",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 9,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7aefa88a-090d-4414-8239-7b71efb25ce6",
+   "statementNo": "200700170351939",
+   "productName": "리스펙타 와이(Y) 질건강 유산균",
+   "inTarget118": false,
+   "canonicalId": "a45a16d3-9034-4111-9342-5e8ca86579cd",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "740dd7a8-636e-4339-ac2c-4fcd98e84fcf",
+   "statementNo": "200700170351946",
+   "productName": "여성을 위한 유산균 이너 프로바이오틱스",
+   "inTarget118": false,
+   "canonicalId": "4ed3e555-b713-40bb-bd40-dcc583651bfe",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7204e49b-4e47-40ed-9c2c-d2728fda5dc5",
+   "statementNo": "200700170351956",
+   "productName": "질 요로 건강 이너펙타",
+   "inTarget118": false,
+   "canonicalId": "9fa4eb3a-53c8-4304-9a9e-148b8fd765e1",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b1e5c0f4-e11d-4600-a081-d9c13954e9e0",
+   "statementNo": "200700170352075",
+   "productName": "질 건강 리스펙타 프로바이오틱스",
+   "inTarget118": false,
+   "canonicalId": "7c6d11c3-112d-404e-8192-123a58f802e5",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "01dc55b6-ee08-4bbe-aa6f-de145f980ca0",
+   "statementNo": "200700170352166",
+   "productName": "여에스더 질 유산균 리스펙타 pro",
+   "inTarget118": false,
+   "canonicalId": "12eaa977-b32c-4ff0-801a-19294d5234d2",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d0af0b7e-9c38-4511-b616-383aa1afc225",
+   "statementNo": "200700170352294",
+   "productName": "혈당엔 유산균 HAC01",
+   "inTarget118": true,
+   "canonicalId": "4c4f1a8c-3710-47b7-b799-79d9e63fcedd",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)]",
+    "(영문) May help to suppress the increase of blood glucose level after meals"
+   ],
+   "newOfficialClauses": [
+    "(국문) 식후 혈당 상승 억제에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "3a74914f-3d19-4bc4-a8ed-4a4d6b16c14c",
+   "statementNo": "200700170352303",
+   "productName": "마이크로바이옴 프로바이오틱스 당큐락",
+   "inTarget118": true,
+   "canonicalId": "0e229fb7-b9ef-425d-8ba3-f8e1771a91a0",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)](국문) 식후 혈당 상승 억제에 도움을 줄 수 있음(영문) May help to suppress the increase of blood glucose level after meals"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "ef7568ad-b4d0-45d7-ab5c-c0b6da2b566f",
+   "statementNo": "200700170352338",
+   "productName": "질건강프로젝트365 리스펙타 여성 유산균",
+   "inTarget118": false,
+   "canonicalId": "17abdf73-4a29-43fe-be3a-7928bc5941e4",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "e9cf0d17-270a-4f8c-a33c-9ca1499a563e",
+   "statementNo": "200700170352363",
+   "productName": "랩트리션 리스펙타 모이스처 플러스",
+   "inTarget118": false,
+   "canonicalId": "a1991f20-c1b3-4d30-9e5e-8d869040f04a",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "{리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "87a3cf4e-ec84-4416-9513-ee6bae69fd5c",
+   "statementNo": "200700170352383",
+   "productName": "TWK10 100억 캡슐",
+   "inTarget118": true,
+   "canonicalId": "8196c64e-67da-4ba3-8c34-f42245cf3cad",
+   "beforeClauseCount": 13,
+   "afterClauseCount": 16,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)]",
+    "(영문) May help to improve endurance of exercise performance capability"
+   ],
+   "newOfficialClauses": [
+    "(국문) 운동수행능력 향상에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "e4c3307f-2f83-43fc-988b-7ab5b68663bc",
+   "statementNo": "200700170352385",
+   "productName": "TWK10 100억 분말",
+   "inTarget118": true,
+   "canonicalId": "220927cc-a086-4d52-bad3-222a41f87b5d",
+   "beforeClauseCount": 13,
+   "afterClauseCount": 16,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)]",
+    "(영문) May help to improve endurance of exercise performance capability"
+   ],
+   "newOfficialClauses": [
+    "(국문) 운동수행능력 향상에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bd5803cf-d3e1-4d60-8086-098cf1bae174",
+   "statementNo": "200700170352404",
+   "productName": "관절엔 조인트 큐",
+   "inTarget118": true,
+   "canonicalId": "52123cdb-0b7c-49a8-9ae9-a5434bb9000f",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[CMO 함유 FAC(Fatty Acid Complex)(제2014-26호)]",
+    "(영문) May help to maintain healthy joint and cartilage"
+   ],
+   "newOfficialClauses": [
+    "(국문) 관절 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "c0e83a05-c1c5-4186-908e-e736a0209ddf",
+   "statementNo": "200700170352413",
+   "productName": "락토바이브 지노솔루션",
+   "inTarget118": false,
+   "canonicalId": "89622b93-54a7-40af-b68e-4ff362f314db",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "54f2c116-2314-4f14-ab80-ac317da7b8ea",
+   "statementNo": "200700170352456",
+   "productName": "이뮨쎄나",
+   "inTarget118": false,
+   "canonicalId": "d75701fd-080f-4bcc-9b7a-0e63caf31b8d",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "487d89a8-56ad-4024-b0e8-02aa9fdc6654",
+   "statementNo": "200700170352508",
+   "productName": "파워업 유산균",
+   "inTarget118": true,
+   "canonicalId": "f34af9e7-b5e3-43ae-a127-5a5a4d9c2b3a",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)]",
+    "(영문) May help to improve endurance of exercise performance capability"
+   ],
+   "newOfficialClauses": [
+    "(국문)운동수행능력 향상에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "edcdedc9-4564-4ee8-a450-ad886eac7c6e",
+   "statementNo": "200700170352511",
+   "productName": "더 콜라겐",
+   "inTarget118": true,
+   "canonicalId": "89216247-0e5e-4155-bf72-7ed8a7c6ab4b",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 11,
+   "addedCount": 5,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)](국문)",
+    "May help to moisturize (dry) skin",
+    "May help to maintain good skin health by protecting against damage from UV exposure"
+   ],
+   "newOfficialClauses": [
+    "피부 보습에 도움을 줄 수 있음",
+    "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음(영문)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "2d2dba33-6850-432a-b293-1661a3a2bf35",
+   "statementNo": "200700170352523",
+   "productName": "이너케어 유산균",
+   "inTarget118": false,
+   "canonicalId": "212e82c9-f01f-43d0-ba20-a977d74d6ce9",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "16237320-1b79-4b27-b8a3-67de621e064d",
+   "statementNo": "200700170352539",
+   "productName": "리스펙타 우먼플랜",
+   "inTarget118": false,
+   "canonicalId": "cd6a632f-caa3-4975-abea-7a00a4d30570",
+   "beforeClauseCount": 10,
+   "afterClauseCount": 11,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "03256d73-156e-4714-9cf1-8fa65c31cc67",
+   "statementNo": "200700170352547",
+   "productName": "힌트 TWK10 프로바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "db127904-edbe-49c9-aca1-e18292f30340",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 9,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)]",
+    "(영문) May help to improve endurance of exercise performance capability"
+   ],
+   "newOfficialClauses": [
+    "(국문)운동수행능력 향상에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "547e22b6-639a-4fcd-815d-33224d7666a1",
+   "statementNo": "200700170352609",
+   "productName": "것시스 질건강 리스펙타 유산균",
+   "inTarget118": false,
+   "canonicalId": "eda39016-0557-46cb-8297-20e7fb79879c",
+   "beforeClauseCount": 10,
+   "afterClauseCount": 11,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ca05128b-f628-4fce-9535-a292a3e54cb3",
+   "statementNo": "200700170352700",
+   "productName": "락토바이브 지노솔루션 스틱",
+   "inTarget118": false,
+   "canonicalId": "6f89c90a-1bdc-40f9-8cfc-ffd482d0e315",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "4fe640dd-f52f-4b53-8662-d6fde305a6ce",
+   "statementNo": "200700170352743",
+   "productName": "지노프레쉬 질유산균&비피더스 100억",
+   "inTarget118": false,
+   "canonicalId": "3ee18183-1664-4480-aea9-55c50a1118b2",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "fa747cf4-0b23-47a5-9d3c-c0073ea816fa",
+   "statementNo": "200700170352752",
+   "productName": "질건강엔 리스펙타&지노밸런스",
+   "inTarget118": false,
+   "canonicalId": "793354a5-d767-4444-9106-e3bcc151f405",
+   "beforeClauseCount": 10,
+   "afterClauseCount": 11,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "9e5928d5-2038-456a-a041-006f852c4a8a",
+   "statementNo": "200700170352839",
+   "productName": "리스펙타 질건강 유산균",
+   "inTarget118": false,
+   "canonicalId": "b62a887d-0943-477b-b2e9-d12fff651ac8",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "4da642ed-afbf-49f0-a33e-77a4b70114ca",
+   "statementNo": "200700170353041",
+   "productName": "뉴오리진 당당",
+   "inTarget118": true,
+   "canonicalId": "1b6b07ac-e62c-4648-b55f-56c86d229e92",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)] 식후 혈당 상승 억제에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "820dbc51-af39-4e4e-80e4-23ad972efd96",
+   "statementNo": "200700170353153",
+   "productName": "콜레올로지 리스펙타 질 건강 유산균",
+   "inTarget118": false,
+   "canonicalId": "fc1ba0ff-5efd-4872-a96f-92a07a861432",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "287649af-5ef6-4ab1-8d97-7d1d7af0b768",
+   "statementNo": "200700170353161",
+   "productName": "원더씬",
+   "inTarget118": true,
+   "canonicalId": "23841fda-6372-4314-aab3-93f7646861ca",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactiplantibacillus plantarum ATG-K2 프로바이오틱스(제2025-58호)]"
+   ],
+   "newOfficialClauses": [
+    "체지방 감소에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "a2b78b7e-7873-4ce4-b4b9-899bf5b52dd9",
+   "statementNo": "200700170353174",
+   "productName": "당큐락 이지",
+   "inTarget118": true,
+   "canonicalId": "c4cda85e-2172-4bb8-ba92-992f27c2707c",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Lactobacillus plantarum HAC01 프로바이오틱스(제2022-21호)]",
+    "(영문) May help to suppress the increase of blood glucose level after meals"
+   ],
+   "newOfficialClauses": [
+    "(국문) 식후 혈당 상승 억제에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "c70279b2-bac6-4741-ba2f-036731fc4afd",
+   "statementNo": "200700170353208",
+   "productName": "헬시부트 올데이 블룸",
+   "inTarget118": false,
+   "canonicalId": "85419baf-42c5-454f-ad28-9455576b3502",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[리스펙타(Respecta®)"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b7b1af8c-91f4-4b94-be52-e878e0018772",
+   "statementNo": "201000190041382",
+   "productName": "면역피로탁",
+   "inTarget118": true,
+   "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+   "beforeClauseCount": 21,
+   "afterClauseCount": 23,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "면역력 증진･피로개선에 도움을 줄 수 있음",
+    "혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "4b66de71-6fca-4d7e-a65c-926ed55d7636",
+   "statementNo": "20110017019108",
+   "productName": "젬무브 생생 이너핏 신바이오틱스(GEMMOVE SAENG SAENG INNER FIT SYNBIOTICS)",
+   "inTarget118": false,
+   "canonicalId": "c9005ba6-5eda-4bdf-bdd4-1e2d58511971",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "e8951a66-09f8-4eae-a002-5fd6487df953",
+   "statementNo": "20110017019109",
+   "productName": "올데이 비타민C",
+   "inTarget118": true,
+   "canonicalId": "732af1df-a534-489b-ba55-d4fcfcd8e4f2",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "e07aba9b-eb99-48fa-8ee1-c056868645c8",
+   "statementNo": "20110017019110",
+   "productName": "케어플러스 프로바이오틱스 이뮨",
+   "inTarget118": false,
+   "canonicalId": "90acd705-7844-47f2-9923-ebdad4cf33b5",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "13e6bd0d-67dd-4f6f-a9bc-f23d39474bd3",
+   "statementNo": "20110017019117",
+   "productName": "바이탈리셋 비타원샷",
+   "inTarget118": false,
+   "canonicalId": "f4689d69-a6f7-459a-9e6c-f5b83c25d4da",
+   "beforeClauseCount": 19,
+   "afterClauseCount": 32,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "상피세포의 성장과 발달에 필요 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 정상적인 엽산 대사에 필요",
+    "골다공증발생 위험 감소에 도움을 줌 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 (1) 정상적인 혈액응고에 필요 (2) 뼈의 구성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "e320ce76-ee2b-45d0-8f09-8ca524294ff0",
+   "statementNo": "20110017019120",
+   "productName": "치카오 치아 앤 멀티비타민",
+   "inTarget118": false,
+   "canonicalId": "ce6dfed5-a340-42f4-ba9e-b476974a4470",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 27,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "bbebdb01-ade7-47b8-ad8f-3e7bc009b47b",
+   "statementNo": "20110017019122",
+   "productName": "수피아 헬씨 생유산균(포도맛)",
+   "inTarget118": true,
+   "canonicalId": "a9fe7403-497c-43ee-a616-ff4413c9da7c",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 13,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "827cdef4-bfc8-46d6-9fe0-516913f1df3f",
+   "statementNo": "20110017019123",
+   "productName": "수피아 헬씨 생유산균",
+   "inTarget118": true,
+   "canonicalId": "b540a956-1c11-4e9f-bc89-84fc2035dcf9",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 13,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "c2f03d4e-8157-4c2b-a03d-e0a7f7136315",
+   "statementNo": "20110017019125",
+   "productName": "수피아 헬씨 차전자피",
+   "inTarget118": false,
+   "canonicalId": "c2750efd-905d-4c67-817e-9f017ffd607f",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 3,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선·배변활동 원활에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "46e7beb8-e931-4bd3-8f06-c81761846d1b",
+   "statementNo": "20110017019126",
+   "productName": "수피아 헬씨 엠에스엠",
+   "inTarget118": false,
+   "canonicalId": "8e1eb408-cfb9-46f4-adfe-ff775076137e",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "97e41b9c-3455-4480-a9e0-62f1e34475c2",
+   "statementNo": "20110017019127",
+   "productName": "수피아 헬씨 비타민미네랄",
+   "inTarget118": false,
+   "canonicalId": "5a62792a-320b-49cb-bf9c-c08341819276",
+   "beforeClauseCount": 13,
+   "afterClauseCount": 24,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "골다공증발생 위험 감소에 도움을 줌 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "606f6bbf-6475-4016-8a0c-375e38a5db93",
+   "statementNo": "20110017019128",
+   "productName": "쑤욱빼 다이어트 커피맛",
+   "inTarget118": false,
+   "canonicalId": "0f4b2759-e80d-45c3-9e3a-d6075e4bff23",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "bfe6af7d-e439-4f91-89c1-82a22d5bfa5b",
+   "statementNo": "20110017019130",
+   "productName": "락토랑L",
+   "inTarget118": false,
+   "canonicalId": "041f6875-a2b5-44d6-b5d1-ebefef833df3",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 14,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "88ffac87-5bef-4e96-9997-757932e282b6",
+   "statementNo": "20110017019132",
+   "productName": "야미타 C",
+   "inTarget118": false,
+   "canonicalId": "f7affc41-4df8-47a3-9642-e8218a524bcb",
+   "beforeClauseCount": 11,
+   "afterClauseCount": 20,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "골다공증발생 위험 감소에 도움을 줌 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "31925fc2-4c87-4804-9644-7764cd48c5c7",
+   "statementNo": "20110017019135",
+   "productName": "시에트랩 데이케어",
+   "inTarget118": false,
+   "canonicalId": "9ca48195-d38e-48b0-81f2-802a08a5be3b",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 15,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "8993347b-312d-4dd5-aa1e-1644c4ecde4b",
+   "statementNo": "20110017019136",
+   "productName": "프리바이오틱스 트리플",
+   "inTarget118": false,
+   "canonicalId": "0b793da3-1eae-43f9-a9fb-6129a4d040e6",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "a46f0d5c-0891-464d-8f94-197b8d6d9126",
+   "statementNo": "20110017019138",
+   "productName": "락토 프리미엄 생유산균19",
+   "inTarget118": false,
+   "canonicalId": "7af0b769-4a68-4542-943e-b96a6c9dbc73",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "d4c5afcb-f14c-4577-a6f5-9dda0bb28667",
+   "statementNo": "20110017019139",
+   "productName": "멀티비타민 츄어블정 블루베리맛",
+   "inTarget118": false,
+   "canonicalId": "7b36de84-05da-45e6-af0b-8f28dce09bd9",
+   "beforeClauseCount": 23,
+   "afterClauseCount": 39,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "상피세포의 성장과 발달에 필요 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 엽산 대사에 필요",
+    "골다공증발생 위험 감소에 도움을 줌 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 (1) 정상적인 혈액응고에 필요 (2) 뼈의 구성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "b53d3b95-1532-4847-ac7f-21d5e4da4ee4",
+   "statementNo": "20110017019140",
+   "productName": "게스프로 키즈(Gespro Minlac)",
+   "inTarget118": false,
+   "canonicalId": "ab75788e-f355-4d1f-bb6a-159c5fef3ee6",
+   "beforeClauseCount": 6,
+   "afterClauseCount": 12,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "22929652-338f-4a37-8ece-61c665217a0b",
+   "statementNo": "20110017019141",
+   "productName": "게스프로 패밀리(Gespro Filory)",
+   "inTarget118": false,
+   "canonicalId": "b8be9b62-78f3-4a73-954b-8c7747eadd70",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 13,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 정상적인 엽산 대사에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "abdfae3a-6b1b-4fd2-ab6d-2c0406bf6560",
+   "statementNo": "20110017019142",
+   "productName": "데이리 B",
+   "inTarget118": false,
+   "canonicalId": "ab0734e5-f798-46eb-a3d1-c6af6eb3ef84",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "지구력 증진에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "ce760999-9f45-4009-9ee7-eeddf53ba7ea",
+   "statementNo": "20110017019145",
+   "productName": "아침엔 유산균 키즈",
+   "inTarget118": false,
+   "canonicalId": "7ab1bb40-d09b-4c43-8145-f533039da8d8",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 18,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "fe1e5a8d-bcd3-4dda-be50-c04dcdad6c1d",
+   "statementNo": "20110017019147",
+   "productName": "시에트랩 데이케어(포도맛)",
+   "inTarget118": false,
+   "canonicalId": "64f56523-ff8b-4e3e-b53b-d23820181ea9",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 15,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "22023b61-e0d4-4191-8312-b36b807c75d7",
+   "statementNo": "20110017019148",
+   "productName": "모어라이트 에스",
+   "inTarget118": false,
+   "canonicalId": "45b2aa7f-5445-4123-9811-1fa15787f4bb",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 15,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "c7e366ca-e40d-4c0f-aebb-19f7e40695a8",
+   "statementNo": "20110017019149",
+   "productName": "매일매일 키즈랑(Kidsrang)",
+   "inTarget118": false,
+   "canonicalId": "226b3bbe-957f-4a1d-af71-a68f9f1ebfee",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 28,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "c63e0a37-7001-4f3c-a7cb-dc7b1f8002c1",
+   "statementNo": "20110017019150",
+   "productName": "데이리 Y",
+   "inTarget118": false,
+   "canonicalId": "77ef3814-7b20-438c-8d24-96bbb8cd90fe",
+   "beforeClauseCount": 16,
+   "afterClauseCount": 27,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 엽산 대사에 필요",
+    "골다공증발생 위험 감소에 도움을 줌 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "084e0db9-8cf9-4dd3-9395-13747d1952b1",
+   "statementNo": "20110017019151",
+   "productName": "키즈비타씨",
+   "inTarget118": false,
+   "canonicalId": "41d8010a-1507-470b-9368-83cd026ec7e6",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "0b0ccc7f-94a3-46da-97e4-0fcae2b3896e",
+   "statementNo": "20110017019152",
+   "productName": "장건강 생유산균 코어",
+   "inTarget118": false,
+   "canonicalId": "4989f489-fd3f-4aed-89d1-bbf2684241e9",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "2dd23ba7-62c5-4e7e-9bca-6e11d13fccf5",
+   "statementNo": "20110017019153",
+   "productName": "시에트랩 데이케어(블루베리맛)",
+   "inTarget118": false,
+   "canonicalId": "f1493347-8501-467c-8ad5-cd94938e1bcb",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 15,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지 생성에 필요",
+    "체내 에너지 생성에 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "c06e9c64-52fa-4e26-b308-6454f974a86d",
+   "statementNo": "20110017019155",
+   "productName": "바나바 혈당케어 & 유산균",
+   "inTarget118": false,
+   "canonicalId": "c3595780-bc44-4ff4-b9ea-d07377565079",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "식후 혈당상승 억제에 도움을 줄 수 있음 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9c2fb768-36a1-45fe-9bf1-324650c62177",
+   "statementNo": "2011001701943",
+   "productName": "케어플러스 메가 비타민C 3000",
+   "inTarget118": false,
+   "canonicalId": "98833056-74a4-4cd7-9143-5af5261df468",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f35d8dc5-bfb9-4229-b946-09833b0d3190",
+   "statementNo": "2011001701956",
+   "productName": "뽀로로 데일리 비타민C",
+   "inTarget118": false,
+   "canonicalId": "84f2a413-9673-4f2d-97c9-4cfd1af92456",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "a0fcc12a-feb1-46c8-8e33-d6f18cf7d89d",
+   "statementNo": "20110020099111",
+   "productName": "리얼모닝",
+   "inTarget118": true,
+   "canonicalId": "1610ba18-34f8-42d4-ae78-eb72ab9b997c",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선·배변활동 원활에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "826faee1-7a68-46a9-890f-a673287b8754",
+   "statementNo": "2011002009984",
+   "productName": "대한민국호간보인 ND-1(엔디)",
+   "inTarget118": true,
+   "canonicalId": "d1e1f771-2c38-4848-898d-ed343d3144fa",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "유해산소로부터 세포를 보호하는데 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "d03bb768-143d-4b6b-9c90-2ac47c7af720",
+   "statementNo": "20130017122115",
+   "productName": "관절혁명",
+   "inTarget118": false,
+   "canonicalId": "dc5b7bac-2534-4693-9be8-7f3bff424e58",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[엠에스엠(MSM, 디메틸설폰)"
+   ],
+   "newOfficialClauses": [
+    "관절 및 연골건강에 도움을 줄 수 있음 [NAG(엔에이지, N-Acetylglucosamine)",
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "23ac7504-3a7b-44a8-8af4-3a3b8879d5e5",
+   "statementNo": "2013001712287",
+   "productName": "더신나게_다시관절",
+   "inTarget118": false,
+   "canonicalId": "d6dbb416-cf27-4e31-a146-71c3c198a67c",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[엠에스엠(MSM, 디메틸설폰)"
+   ],
+   "newOfficialClauses": [
+    "관절 및 연골건강에 도움을 줄 수 있음 [NAG(엔에이지, N-Acetylglucosamine)",
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "3c290fe7-e09c-4815-94e8-f0399f2d3bf0",
+   "statementNo": "2013001712291",
+   "productName": "관절건강엔 정통관절",
+   "inTarget118": false,
+   "canonicalId": "14affe71-6652-4b9e-87f0-4f9a4bb550f4",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[엠에스엠(MSM, 디메틸설폰)"
+   ],
+   "newOfficialClauses": [
+    "관절 및 연골건강에 도움을 줄 수 있음 [NAG(엔에이지, N-Acetylglucosamine)",
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "070bfebd-5fa3-44ef-ad44-667dd3ad8991",
+   "statementNo": "20140017002592",
+   "productName": "지큐랩 포스트바이오틱스 츄어블",
+   "inTarget118": true,
+   "canonicalId": "0e2aa845-e466-44c9-818d-81a4286cfc0f",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 4,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "10a11c0e-da33-41ec-92da-87dd240fe6ed",
+   "statementNo": "20140017002596",
+   "productName": "콜레스테롤 BBR 700억 포스트바이오틱스(Cholesterol BBR 70 Billion Postbiotics)",
+   "inTarget118": true,
+   "canonicalId": "7018e6ff-8de0-4d9f-9f22-0a23eb4d9736",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]"
+   ],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선에 도움을 줄 수 있음 (May help to reduce blood cholesterol levels)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "2e138f5f-8129-4dbc-816c-8a73d224cdd5",
+   "statementNo": "20140017002638",
+   "productName": "지큐랩 프로 프리 포스트바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "1a052801-ce86-4d84-8d99-09888b2ade43",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 5,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "bbf40cc1-707d-4ae1-98ac-0fa7d2d01fa1",
+   "statementNo": "20140017002640",
+   "productName": "콜레스테롤·혈당·혈압·항산화 올인원 케어 포스트바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "5813bab0-dc12-4856-8ac9-98b8e9fd0c64",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)]"
+   ],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선에 도움을 줄 수 있음 (May help to reduce blood cholesterol levels)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7f42c742-b4d6-4b4a-bb45-b07b5434eed7",
+   "statementNo": "20140017002645",
+   "productName": "보성 옴니아 포스트바이오틱스 (Omnia Postbiotics)",
+   "inTarget118": true,
+   "canonicalId": "a8e38ee3-c566-4e8d-a0bc-7749b8e90b8b",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "050c1e6b-7e88-4121-bac0-63379d76b4d4",
+   "statementNo": "20140017002690",
+   "productName": "스킨케어 SKIN CARE",
+   "inTarget118": true,
+   "canonicalId": "dacd4c77-8f92-4797-a28b-7864f9f05370",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 5,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물] 면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "86f2fee2-66d0-42e1-97da-7d6345a6b750",
+   "statementNo": "20150010018134",
+   "productName": "리멤버핏 인지력",
+   "inTarget118": true,
+   "canonicalId": "ce2f01c1-eae0-4903-a6ef-5c4b6c53ba2a",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "(영문) May help to improve cognitive function affected by aging,"
+   ],
+   "newOfficialClauses": [
+    "(국문) 노화로 저하된 인지기능 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "bf766c60-eb3d-45b0-a40f-f8a8faea8294",
+   "statementNo": "20150010018154",
+   "productName": "초록이 액티브 클린",
+   "inTarget118": true,
+   "canonicalId": "758db0af-a3c7-4e7f-a44e-ccf7887ed396",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "351616ce-f171-4320-9df6-451d5174b824",
+   "statementNo": "20150010018158",
+   "productName": "초록이 카테킨&프리바이오틱스 쾌변 다이어트",
+   "inTarget118": true,
+   "canonicalId": "a7bfb129-090e-465c-9fcc-cdedecf75573",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 3,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "f37b9876-4b48-4711-ba20-4f444745c110",
+   "statementNo": "20150010018159",
+   "productName": "초록이 슬림밸런스&쾌변",
+   "inTarget118": true,
+   "canonicalId": "05b935c4-7294-4ad6-9e91-7ec0a42c605e",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "043dd1d0-478f-427e-886b-73f0c7b08ec4",
+   "statementNo": "20160006007131",
+   "productName": "락포엘 맥스 프로바이오틱스 플러스",
+   "inTarget118": false,
+   "canonicalId": "d69e11f9-da59-4081-b288-cbb5ae681884",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 5,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "5f27a412-53db-4dc3-b13d-74d780b0b944",
+   "statementNo": "20160012278172",
+   "productName": "백세시크릿-Dr(Hundred years Secret-Dr)",
+   "inTarget118": true,
+   "canonicalId": "b7d5c100-4537-424c-880b-9a625def5408",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 7,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 (1) 어두운 곳에서 시각 적응을 위해 필요 (2) 피부와 점막을 형성하고 기능을 유지하는데 필요 (3) 상피세포의 성장과 발달에 필요",
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "aa386473-62b7-4b7e-ad41-a3545e251af3",
+   "statementNo": "201727820684",
+   "productName": "리버치온 골드",
+   "inTarget118": true,
+   "canonicalId": "667787d4-871d-49d0-8000-11c0cee42ba5",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "밀크씨슬추출물]간 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "b55182d6-0d07-44f7-bc38-f56f6f8405dc",
+   "statementNo": "201728208671",
+   "productName": "오큐아레즈투엠",
+   "inTarget118": true,
+   "canonicalId": "f0af0bb5-ed0c-4ab3-82ef-77eac4e42e74",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 12,
+   "addedCount": 11,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "철의 운반과 이용에 필요",
+    "유해산소로부터 세포를 보호하는데 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "체내 에너지 생성에 필요"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "ccb662ab-df8f-42a8-8374-71fd8618c1ba",
+   "statementNo": "20172880193315",
+   "productName": "관절연골엔 구절초 프리미엄",
+   "inTarget118": false,
+   "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[구절초추출물(조인시스트®)",
+    "(영문) May help to maintain healthy joint and cartilage"
+   ],
+   "newOfficialClauses": [
+    "(국문) 관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "2a0c60bf-d94a-4776-95c4-bc866b2c8aed",
+   "statementNo": "20172880193365",
+   "productName": "모큐락+",
+   "inTarget118": true,
+   "canonicalId": "30496059-94a6-4e5e-9fc4-b037b8af7bc5",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 8,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]",
+    "(영문) May help to improve hair condition(luster·elasticity)"
+   ],
+   "newOfficialClauses": [
+    "(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "f0a658b9-b6c8-4f31-acac-77580d119c5e",
+   "statementNo": "20172880193371",
+   "productName": "모발유산균 엘비나인 플러스",
+   "inTarget118": true,
+   "canonicalId": "5b344fdd-3288-473c-bda5-fab48f616fa2",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 8,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]",
+    "(영문) May help to improve hair condition(luster·elasticity)"
+   ],
+   "newOfficialClauses": [
+    "(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ec150c85-1d4d-4dd4-b3de-e49a53588002",
+   "statementNo": "20172880193372",
+   "productName": "모발유산균 엘비나인 ",
+   "inTarget118": true,
+   "canonicalId": "d0658a90-d75d-44eb-adc4-152b49801756",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 5,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)]",
+    "(영문) May help to improve hair condition(luster·elasticity)"
+   ],
+   "newOfficialClauses": [
+    "(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "287c77f7-a446-48af-9d03-55d30e4848ab",
+   "statementNo": "20172880193399",
+   "productName": "엔브릿지모발유산균",
+   "inTarget118": true,
+   "canonicalId": "4e58faef-4caf-4762-be48-19b455e1f504",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 10,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[Latilactobacillus curvatus LB-P9(제2025-5호)]",
+    "(영문) May help to improve hair condition(luster·elasticity)"
+   ],
+   "newOfficialClauses": [
+    "(국문) 모발상태(윤기·탄력) 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b5b96b52-d490-4436-b28d-c27b9d2fee35",
+   "statementNo": "2018000391520",
+   "productName": "도둑다이어트 포스콜린",
+   "inTarget118": false,
+   "canonicalId": "176253b3-4e32-4b7d-8f5b-fcedd5640d0f",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 13,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "da8d3be3-8070-42d2-9936-c2737c89f6fe",
+   "statementNo": "2018000391521",
+   "productName": "웰러스 알티지 오메가3 1000",
+   "inTarget118": true,
+   "canonicalId": "25d38f40-c30c-4625-abbc-1d82e29d2382",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "혈중 중성지질 개선․혈행 개선․기억력 개선․건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "b2a607d7-078c-4f60-888e-cf0e225a20d7",
+   "statementNo": "20180012174522",
+   "productName": "체지방감소 프로젝트365 비피더스 다이어트 핏",
+   "inTarget118": true,
+   "canonicalId": "e60f4ee1-b64a-4f95-b6a8-c895db9b40e8",
+   "beforeClauseCount": 5,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "[Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)] : (국문) 체지방 감소에 도움을 줄 수 있음 (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "a44ba3fe-a5e1-4645-939c-67f432cf24e0",
+   "statementNo": "201800122965",
+   "productName": "휴비스트 Hi K2+D3",
+   "inTarget118": false,
+   "canonicalId": "5536313d-aec5-4439-bb06-0ef9594d7654",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 7,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 정상적인 혈액응고에 필요 (2) 뼈의 구성에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9133d640-4f21-43c0-bf9a-428298b2f2aa",
+   "statementNo": "201800122967",
+   "productName": "휴비스트 Hi K2nD3 ",
+   "inTarget118": false,
+   "canonicalId": "9b1d7a4c-a392-4332-8bb0-50e42fe3509d",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 6,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "(1) 정상적인 혈액응고에 필요 (2) 뼈의 구성에 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "7fc3c540-bab0-4538-8cd2-acf194511eab",
+   "statementNo": "2018001231038",
+   "productName": "슬림플래닛 녹차카테킨 1000mg",
+   "inTarget118": false,
+   "canonicalId": "ce9e88ee-d8b7-4398-886a-97e3c952071a",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 2,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f1c53de4-a3bd-4739-88ee-443703f48191",
+   "statementNo": "2018001231060",
+   "productName": "메디타민 퓨어 레이디 프로바이오틱스",
+   "inTarget118": true,
+   "canonicalId": "ba12cc77-4db8-4362-958c-e1f8ea69eaa8",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 5,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+    "어두운 곳에서 시각 적응을 위해 필요",
+    "피부와 점막을 형성하고 기능을 유지하는데 필요",
+    "상피세포의 성장과 발달에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "89303d97-baf6-43cb-9d74-c6f4786de33c",
+   "statementNo": "20190004553112",
+   "productName": "코오롱 알티지오메가3 1100",
+   "inTarget118": true,
+   "canonicalId": "0b3b9baf-6439-47ba-bb65-f06958c82bd2",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 5,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "EPA 및 DHA 함유 유지",
+    "혈중 중성지질 개선․혈행 개선에 도움을 줄 수 있음",
+    "기억력 개선에 도움을 줄 수 있음",
+    "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "fd6995c1-2f98-4a4c-aead-91cba2f34ddd",
+   "statementNo": "20190004553194",
+   "productName": "듀얼 바이탈 이뮨",
+   "inTarget118": true,
+   "canonicalId": "321efc97-04a2-40e4-a8d7-7d9bcd56929a",
+   "beforeClauseCount": 17,
+   "afterClauseCount": 36,
+   "addedCount": 16,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "체내 에너지 생성에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "정상적인 엽산 대사에 필요",
+    "탄수화물과 에너지 대사에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "체내 에너지 생성에 필요",
+    "뼈 형성에 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "갑상선 호르몬의 합성에 필요",
+    "에너지 생성에 필요",
+    "신경발달에 필요",
+    "항산화에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 2,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "9e1bab27-f1e8-46c7-8cba-a7601608e32c",
+   "statementNo": "20190004553414",
+   "productName": "엠프로 M.PRO 다이어트 ",
+   "inTarget118": true,
+   "canonicalId": "b61c486f-851f-4cc4-8cea-42e711e67afe",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 7,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)]"
+   ],
+   "newOfficialClauses": [
+    "(국문) 체지방 감소에 도움을 줄 수 있음 / (영문) May help to reduce body fat",
+    "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "6107accb-a467-4f19-83e0-6e78dc20a65d",
+   "statementNo": "2019000910596",
+   "productName": "쏘팔메토골드",
+   "inTarget118": true,
+   "canonicalId": "906255ce-edf9-4ad3-b7f5-780e4ee63d5a",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 10,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "전립선 건강의 유지에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "fe600833-670a-4c7a-9131-29c980adf732",
+   "statementNo": "2019000939491",
+   "productName": "리얼퀸 센시다이어트",
+   "inTarget118": false,
+   "canonicalId": "29e87505-a1ba-4ad4-8cfe-4010ea41e96f",
+   "beforeClauseCount": 4,
+   "afterClauseCount": 6,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[은행잎추출물}"
+   ],
+   "newOfficialClauses": [
+    "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "fbe6078e-1b05-4d6d-bc01-dcf18b74e978",
+   "statementNo": "2019000939496",
+   "productName": "초록이 슬림밸런스&쾌변",
+   "inTarget118": true,
+   "canonicalId": "88ce2dad-b113-4bf5-a635-eeecaea62399",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+   "statementNo": "2019000939498",
+   "productName": "초록이 액티브 클린",
+   "inTarget118": true,
+   "canonicalId": "ff54d647-9f6c-476f-acb3-7a6e849c3de6",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "70b398c3-a463-410a-9003-41f71883f591",
+   "statementNo": "2019000939499",
+   "productName": "올 뉴 초록이 시즌4",
+   "inTarget118": true,
+   "canonicalId": "f02a577f-4474-4183-85ea-a4b3f65f2202",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b7120036-5080-4930-9300-c65a3405fef8",
+   "statementNo": "20190009483190",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "inTarget118": true,
+   "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 9,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "쏘팔메토 열매 추출물]"
+   ],
+   "newOfficialClauses": [
+    "전립선 건강의 유지에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+   "statementNo": "20190009483373",
+   "productName": "차전자피 카테킨 다이어트",
+   "inTarget118": true,
+   "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "차전자피식이섬유]"
+   ],
+   "newOfficialClauses": [
+    "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+    "배변활동 원활에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "62e79e5b-ee4e-470a-a3c5-0630b4c49218",
+   "statementNo": "20190009483671",
+   "productName": "리포좀 멀티비타민 골드",
+   "inTarget118": false,
+   "canonicalId": "1020dc0d-410d-4a37-a14b-477e7c5ffb94",
+   "beforeClauseCount": 16,
+   "afterClauseCount": 33,
+   "addedCount": 17,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "칼슘과 인이 흡수되고 이용되는데 필요",
+    "뼈의 형성과 유지에 필요",
+    "골다공증발생 위험 감소에 도움을 줌",
+    "탄수화물과 에너지 대사에 필요",
+    "체내 에너지 생성에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "체내 에너지 생성에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "정상적인 엽산 대사에 필요",
+    "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요,"
+   ],
+   "duplicateKeys": 3,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "f8bc4892-e7b3-44dc-be51-729e96ceef0b",
+   "statementNo": "20190009483840",
+   "productName": "초록이 슬림&쾌변",
+   "inTarget118": true,
+   "canonicalId": "06737977-539b-4f2f-abdb-21ab38d380bf",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(Xylooligosaccharide) 분말(제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "(가) 장내 유익균 증식, 유해균 억제 도움을 줄 수 있음",
+    "(나) 배변활동에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ba9aa2cf-190e-4f78-805c-a7334d9c1ce1",
+   "statementNo": "20190009483845",
+   "productName": "올 뉴 초록이 시즌4",
+   "inTarget118": true,
+   "canonicalId": "d5391740-368a-4534-ba7b-8f02d2fa4fe2",
+   "beforeClauseCount": 2,
+   "afterClauseCount": 4,
+   "addedCount": 2,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "[자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)]"
+   ],
+   "newOfficialClauses": [
+    "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "7fca4e43-e074-4f2a-80d6-7a62520eb64a",
+   "statementNo": "2019001029755",
+   "productName": "세리번 나이트V3",
+   "inTarget118": false,
+   "canonicalId": "9f4ec917-4e1a-4f18-91ff-b1e5110ecd4b",
+   "beforeClauseCount": 8,
+   "afterClauseCount": 9,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "액상 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "301c16a7-f780-41ae-a48a-36d178e59e8c",
+   "statementNo": "2019001029761",
+   "productName": "밀크씨슬 에너지샷",
+   "inTarget118": false,
+   "canonicalId": "b8d30f0f-7c5e-46ad-9c62-9453f3f07878",
+   "beforeClauseCount": 10,
+   "afterClauseCount": 11,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "액상 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d98372ec-4bfe-4d78-a1f6-915a4fc20e19",
+   "statementNo": "2019001029765",
+   "productName": "바이탈올인원 씨슬 플러스",
+   "inTarget118": false,
+   "canonicalId": "346c8b4a-c022-4f52-9a50-f4cdaa06f50b",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 15,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "액상 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "a747f76a-0629-4819-b839-0e72daefbdf4",
+   "statementNo": "2019001029769",
+   "productName": "에르고 런",
+   "inTarget118": false,
+   "canonicalId": "a2008585-14c8-422e-ae74-13ca2d1fae93",
+   "beforeClauseCount": 9,
+   "afterClauseCount": 10,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "액상 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "473da538-5396-44c1-ab8b-23263f8a26ad",
+   "statementNo": "202000124461",
+   "productName": "17종포스트바이오틱스김치생유산균 키즈",
+   "inTarget118": true,
+   "canonicalId": "1f048d5c-70b1-46a4-8f1e-f176ca004ea9",
+   "beforeClauseCount": 1,
+   "afterClauseCount": 4,
+   "addedCount": 3,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "0a68a1f9-5b0c-40fe-aac3-7c29efd4559f",
+   "statementNo": "202000124464",
+   "productName": "다이어트 & 유산균 19종 3종복합기능성",
+   "inTarget118": false,
+   "canonicalId": "a59ef61a-9cb0-4adc-a9d0-345cf1a98b88",
+   "beforeClauseCount": 3,
+   "afterClauseCount": 6,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음,"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "2d2ec236-21b9-48e9-86ea-fa300d799ed3",
+   "statementNo": "20200016052163",
+   "productName": "VECELL 오리지날 포 맨",
+   "inTarget118": false,
+   "canonicalId": "d45fd9bf-0940-40ae-99a2-5d69b101b3cb",
+   "beforeClauseCount": 35,
+   "afterClauseCount": 36,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "872789f4-ff7a-4a6f-bfb8-6a876cb47e0f",
+   "statementNo": "20200016052164",
+   "productName": "VECELL 오리지날 포 우먼",
+   "inTarget118": false,
+   "canonicalId": "717f40dc-0093-415e-b467-79c3cd46b622",
+   "beforeClauseCount": 35,
+   "afterClauseCount": 36,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b1a7bffb-f7c9-435f-a113-c3b03603621f",
+   "statementNo": "20200016052165",
+   "productName": "지셀라 멀티케어 W",
+   "inTarget118": false,
+   "canonicalId": "824bc0a4-51d5-43b7-8291-e0454ffde16b",
+   "beforeClauseCount": 40,
+   "afterClauseCount": 41,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ae944d75-37b5-4dde-95e9-b7134d2cfb52",
+   "statementNo": "20200016052166",
+   "productName": "지셀라 멀티케어 Y",
+   "inTarget118": false,
+   "canonicalId": "e87b2c04-0c76-487c-8193-3be01cabf0c9",
+   "beforeClauseCount": 39,
+   "afterClauseCount": 40,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "4ca73698-3fe7-4897-8dd5-6cae6925ac29",
+   "statementNo": "20200016052184",
+   "productName": "원데이올인원",
+   "inTarget118": false,
+   "canonicalId": "b925ca4e-9238-4aa4-89d5-718407a59a14",
+   "beforeClauseCount": 40,
+   "afterClauseCount": 41,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "eee75c3a-385f-4ca0-9967-55803f5c1b35",
+   "statementNo": "20200016052195",
+   "productName": "비타밀크씨슬 이뮨 플러스 에너지샷",
+   "inTarget118": false,
+   "canonicalId": "05315cda-5d91-433d-9adb-6ea8f8a5a831",
+   "beforeClauseCount": 48,
+   "afterClauseCount": 49,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "<정제1>"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "0c8cbfea-c99a-4985-9dbd-39f058f128e0",
+   "statementNo": "20200016052196",
+   "productName": "에고랩스 밸런스업 올인원팩",
+   "inTarget118": false,
+   "canonicalId": "a9ec91af-177b-4455-9881-f512f557bd07",
+   "beforeClauseCount": 55,
+   "afterClauseCount": 56,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d4906789-a921-4634-9c61-e307ff015532",
+   "statementNo": "20200016052197",
+   "productName": "에고랩스 메모리업 올인원팩",
+   "inTarget118": false,
+   "canonicalId": "f27f5bf2-e87e-4a7a-9303-be108fb434a3",
+   "beforeClauseCount": 46,
+   "afterClauseCount": 47,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d510e0e1-7a06-4d92-a512-edc99e78ca3b",
+   "statementNo": "20200016052200",
+   "productName": "디엘오 코어팩 2.2",
+   "inTarget118": false,
+   "canonicalId": "f337acd5-f88c-4f65-8b1b-f51130fdbf03",
+   "beforeClauseCount": 36,
+   "afterClauseCount": 37,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "15fadace-9ec8-4c2c-be54-ab19828c92cc",
+   "statementNo": "20200016052202",
+   "productName": "릴렉스팩",
+   "inTarget118": false,
+   "canonicalId": "d7c7b6f6-83a2-4a0c-a861-2c9c03b75859",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "8dc60256-7ca2-408e-8b66-08639e705b7a",
+   "statementNo": "20200016052214",
+   "productName": "프리미엄 올인원 멀티팩 Premium All in one Multipack",
+   "inTarget118": false,
+   "canonicalId": "dfedc000-18e6-48d1-b2ac-cc4f5d7a2dfe",
+   "beforeClauseCount": 25,
+   "afterClauseCount": 26,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "204f8c62-2644-4264-ac1a-c92cbb90f82d",
+   "statementNo": "20200016052222",
+   "productName": "고앤당 바비진 이뮨샷 ",
+   "inTarget118": false,
+   "canonicalId": "30f73050-b2c4-4d95-b53b-1bdc47e7165d",
+   "beforeClauseCount": 26,
+   "afterClauseCount": 27,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "45f59fd6-2e55-4a5e-bb6c-2ca3cb63181c",
+   "statementNo": "20200016052234",
+   "productName": "벨라핏 이너뷰티 올인원 부스터",
+   "inTarget118": false,
+   "canonicalId": "6660bb23-ec1f-48d2-bdfb-9e38bde35b41",
+   "beforeClauseCount": 19,
+   "afterClauseCount": 20,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "03aeedf4-1f48-45f9-ada1-91cdca02a189",
+   "statementNo": "20200016052277",
+   "productName": "류랩 포커스 데일리",
+   "inTarget118": false,
+   "canonicalId": "09641c01-fdf0-4863-b45f-04d6ea2061e8",
+   "beforeClauseCount": 24,
+   "afterClauseCount": 25,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "d453e008-12c6-41fa-a041-d6bb0f9db419",
+   "statementNo": "20200016052278",
+   "productName": "하우데이원팩",
+   "inTarget118": false,
+   "canonicalId": "369e8811-5348-413c-a600-7e587cb87356",
+   "beforeClauseCount": 22,
+   "afterClauseCount": 23,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "b86ee795-2790-4c6d-8b9e-f5a8f7c0b815",
+   "statementNo": "20200016052343",
+   "productName": "뷔셀 데이케어",
+   "inTarget118": false,
+   "canonicalId": "aff5606d-c59e-463e-bc9e-7f9b24f08ce0",
+   "beforeClauseCount": 38,
+   "afterClauseCount": 39,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "6fa5e90f-8a07-40c3-9dc5-388af2fd0d63",
+   "statementNo": "20200016052415",
+   "productName": "코오롱 쏘팔 시그니처 올인원 25",
+   "inTarget118": false,
+   "canonicalId": "5693d88b-67bf-4295-bde3-c152043a1295",
+   "beforeClauseCount": 52,
+   "afterClauseCount": 53,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "정제1 :"
+   ],
+   "newOfficialClauses": [],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "2c0b5cc6-0792-4b8b-90d4-b7f9aed91475",
+   "statementNo": "2021000662219",
+   "productName": "홍삼정이뮨부스터",
+   "inTarget118": true,
+   "canonicalId": "697e6bac-de35-43ac-924e-fbbd91b5984f",
+   "beforeClauseCount": 14,
+   "afterClauseCount": 40,
+   "addedCount": 19,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE",
+    "D1_OFFICIAL_DUPLICATE"
+   ],
+   "nonFunctionalLines": [
+    "일일섭취량"
+   ],
+   "newOfficialClauses": [
+    "(1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음",
+    "(가)면역력 증진･피로개선에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 3~80 mg",
+    "(나)혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 2.4~80 mg",
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+    "뼈 형성에 필요",
+    "에너지 이용에 필요",
+    "단백질 및 아미노산 이용에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+    "철의 운반과 이용에 필요",
+    "정상적인 면역기능에 필요",
+    "정상적인 세포분열에 필요",
+    "정상적인 혈액응고에 필요",
+    "뼈의 구성에 필요",
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요,"
+   ],
+   "duplicateKeys": 1,
+   "needsHumanReview": true
+  },
+  {
+   "candidateId": "ecff0166-35f2-42a5-abbb-b9752c35a5c2",
+   "statementNo": "2022001022239",
+   "productName": "프리미엄 알로에 젤리스틱",
+   "inTarget118": false,
+   "canonicalId": "0b9958a3-0432-49a9-915b-8ba1bf30c54e",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 8,
+   "addedCount": 1,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE"
+   ],
+   "nonFunctionalLines": [],
+   "newOfficialClauses": [
+    "피부건강·장 건강·면역력 증진에 도움을 줄 수 있음"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": false
+  },
+  {
+   "candidateId": "31c4b8c1-cc4e-40c6-b394-3e2774fd8357",
+   "statementNo": "2023000229646",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "inTarget118": true,
+   "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+   "beforeClauseCount": 7,
+   "afterClauseCount": 11,
+   "addedCount": 4,
+   "removedCount": 0,
+   "cause": [
+    "D3_NEW_OFFICIAL_CLAUSE",
+    "D2_NON_FUNCTIONAL_LINE"
+   ],
+   "nonFunctionalLines": [
+    "비타민C]"
+   ],
+   "newOfficialClauses": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "duplicateKeys": 0,
+   "needsHumanReview": true
+  }
+ ]
+}

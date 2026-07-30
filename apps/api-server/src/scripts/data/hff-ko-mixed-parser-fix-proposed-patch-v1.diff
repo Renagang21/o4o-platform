@@ -1,0 +1,58 @@
+diff --git a/apps/api-server/src/scripts/hff-ko-agent-01-individual.mjs b/apps/api-server/src/scripts/hff-ko-agent-01-individual.mjs
+index 54c6db002..a17e0f7fd 100644
+--- a/apps/api-server/src/scripts/hff-ko-agent-01-individual.mjs
++++ b/apps/api-server/src/scripts/hff-ko-agent-01-individual.mjs
+@@ -30,6 +30,7 @@
+ import pg from 'pg';
+ import fs from 'node:fs';
+ import { randomUUID } from 'node:crypto';
++import { pathToFileURL } from 'node:url';
+ 
+ const APPLY = process.argv.includes('--apply');
+ const CONFIRM = process.env.HFF_AGENT1_APPLY_CONFIRM === 'YES';
+@@ -74,18 +75,30 @@ function extractFunctions(rawFn) {
+       .map((p) => p.replace(/^[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮\-·•\s]*/, '').replace(/^\d+\)\s*/, '').replace(/\s+/g, ' ').trim())
+       .filter((p) => p.length >= 4);
+   };
++  // WO-O4O-HFF-KO-MIXED-FUNCTION-BLOCK-PARSER-FIX-AND-118-CANONICAL-BACKFILL-V1 (결함 보정)
++  //   혼합형 MAIN_FNCTN(무라벨 선행 블록 + [원료] 라벨 블록)에서 라벨 없는 세그먼트를 폐기하면
++  //   그 구간에만 있는 공식 기능성(예: 아연 면역·세포분열, 구리 철의 운반)이 그대로 탈락한다.
++  //   "라벨 블록이 존재한다"는 "무라벨 블록을 폐기한다"의 근거가 아니므로 원문 순서대로 함께 보존한다.
++  //   header=null → 원료명을 임의로 부여하지 않는다(문구 추가·재작성·병합·dedupe 없음).
++  //   라벨 그룹이 하나도 없으면 기존 평면(sd-why) 경로를 그대로 유지한다(정상 구조 회귀 0).
++  let labeledCount = 0;
+   if (hasBracket) {
+     const segs = text.split(/(?=\[[^\]]{1,40}\])/);
+     for (const seg of segs) {
+       const m = seg.match(/^\[([^\]]{1,40})\]/);
+-      if (!m) continue;
++      if (!m) {
++        const items = splitItems(seg);
++        if (items.length) groups.push({ header: null, items });
++        continue;
++      }
+       const header = m[1].trim();
+       const body = seg.slice(m[0].length);
+       const items = splitItems(body);
+-      if (items.length) groups.push({ header, items });
++      if (items.length) { groups.push({ header, items }); labeledCount++; }
+     }
+   }
+   const flatItems = splitItems(text.replace(/\[[^\]]{1,40}\]/g, ' '));
++  if (!labeledCount) return { groups: [], flat: flatItems, flatText };
+   return { groups, flat: flatItems, flatText };
+ }
+ 
+@@ -377,4 +390,11 @@ async function main() {
+   console.log('JSON_REPORT_END');
+   await client.end();
+ }
+-main().catch((e) => { console.error('[hff-ko-agent-01] FAILED:', e?.message || e); process.exit(1); });
++// 렌더 계약 검증(fixture·회귀 비교)에서 DB 접속 없이 순수 함수만 재사용할 수 있도록 노출.
++export { extractFunctions, composeKo };
++
++// 직접 실행일 때만 생산 파이프라인을 구동한다(import 시 부작용 없음).
++const invokedDirectly = process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href;
++if (invokedDirectly) {
++  main().catch((e) => { console.error('[hff-ko-agent-01] FAILED:', e?.message || e); process.exit(1); });
++}
