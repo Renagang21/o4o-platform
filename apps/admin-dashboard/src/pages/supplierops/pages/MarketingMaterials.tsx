@@ -40,7 +40,9 @@ interface ListResponse {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE = '/api/v1/kpa/supplier/content-submissions';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_BASE = '/kpa/supplier/content-submissions';
 
 const STATUS_CONFIG: Record<string, { label: string; icon: typeof Clock; className: string }> = {
   pending: { label: '승인 대기', icon: Clock, className: 'text-amber-600 bg-amber-50' },

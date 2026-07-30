@@ -68,7 +68,9 @@ interface AssetsResponse {
 
 // ── Constants ──────────────────────────────────────────────────────────────
 
-const API_BASE = '/api/v1/kpa/store/assets';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_BASE = '/kpa/store/assets';
 
 const ASSET_TYPE_CONFIG: Record<StoreAsset['assetType'], { label: string; icon: typeof File; className: string }> = {
   file: { label: '파일', icon: File, className: 'text-blue-600 bg-blue-50' },

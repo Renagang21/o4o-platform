@@ -23,9 +23,11 @@ import PageHeader from '../../components/common/PageHeader';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const API_LIST = '/api/v1/kpa/news/admin/list';
-const API_CREATE = '/api/v1/kpa/news/';
-const API_UPDATE = (id: string) => `/api/v1/kpa/news/${id}`;
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_LIST = '/kpa/news/admin/list';
+const API_CREATE = '/kpa/news/';
+const API_UPDATE = (id: string) => `/kpa/news/${id}`;
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

@@ -15,7 +15,7 @@
  *   - 강제 해제 (DELETE → is_forced=false)
  *
  * API: /api/v1/kpa/admin/force-assets  (GET/POST/PATCH/DELETE)
- *      /api/v1/kpa/admin/snapshots      (GET — snapshot 선택)
+ *      /api/v1/kpa/admin/force-assets/snapshots  (GET — snapshot 선택)
  *      /api/v1/kpa/organizations        (GET — 대상 org 선택)
  */
 

@@ -39,7 +39,9 @@ interface SubmitResponse {
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
-const API_BASE = '/api/v1/kpa/supplier/content-submissions';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_BASE = '/kpa/supplier/content-submissions';
 
 const CONTENT_TYPE_OPTIONS = [
   { value: 'article', label: '아티클 (글)', description: '제품 설명, 사용법, 임상 정보 등 글 형태의 자료' },

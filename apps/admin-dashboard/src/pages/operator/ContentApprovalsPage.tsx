@@ -83,7 +83,9 @@ const STATUS_BADGE: Record<ApprovalStatus, { label: string; className: string }>
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
-const API_BASE = '/api/v1/kpa/operator/approvals';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_BASE = '/kpa/operator/approvals';
 
 async function fetchApprovals(entityType: string, status: string, page: number): Promise<ListResponse> {
   const params: Record<string, string> = { status, page: String(page), limit: '20' };

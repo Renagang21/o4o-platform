@@ -21,7 +21,9 @@ import PageHeader from '../../components/common/PageHeader';
 // ── Constants ────────────────────────────────────────────────────────────────
 
 const SERVICE_KEY = 'kpa-society';
-const API_BASE = '/api/v1/hub/contents';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const API_BASE = '/hub/contents';
 
 type TabKey = 'all' | 'supplier' | 'store';
 
@@ -107,7 +109,7 @@ async function fetchHubContents(
 }
 
 async function fetchNotices(): Promise<NoticeItem[]> {
-  const res = await authClient.api.get<NoticeResponse>('/api/v1/kpa/notices');
+  const res = await authClient.api.get<NoticeResponse>('/kpa/notices');
   return res.data?.data ?? [];
 }
 
