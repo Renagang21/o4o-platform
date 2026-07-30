@@ -10,7 +10,12 @@ export type ServiceKey =
   | 'neture'
   | 'glycopharm'
   | 'cosmetics'
-  | 'platform';
+  | 'platform'
+  // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1: Pharmacy-Hub (파머시 허브).
+  //   type-only 확장(union 확대). 기존 5 키의 동작·설정은 변경하지 않는다.
+  //   role prefix === service_memberships.service_key (self-map) 이므로
+  //   ROLE_PREFIX_TO_CANONICAL_SERVICE_KEY 항목 추가는 불필요하다.
+  | 'pharmacy-hub';
 
 /** Service-prefixed role format: "service:role" */
 export type PrefixedRole = `${ServiceKey}:${string}`;

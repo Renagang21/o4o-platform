@@ -1,0 +1,35 @@
+/**
+ * Pharmacy-Hub — WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+ *
+ * Design Core v1.0 토큰 중 Foundation 화면이 실제로 쓰는 최소 집합만 인라인한다.
+ * (Docker 빌드 컨텍스트에서 monorepo token 패키지를 참조할 수 없어 기존 서비스도 인라인 방식)
+ * 실제 화면 구축 WO 에서 공통 토큰 세트로 정렬한다.
+ */
+
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+
+  --color-primary: #2563eb;
+  --color-primary-dark: #1d4ed8;
+
+  --color-text-primary: #111827;
+  --color-text-secondary: #4b5563;
+  --color-bg-primary: #ffffff;
+  --color-bg-secondary: #f9fafb;
+  --color-border-default: #e5e7eb;
+}
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}

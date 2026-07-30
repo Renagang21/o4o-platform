@@ -19,7 +19,8 @@ export type ServiceKey =
   | 'neture'       // Neture service
   | 'glycopharm'   // GlycoPharm service
   | 'cosmetics'    // K-Cosmetics service
-  | 'lms';         // LMS service
+  | 'lms'          // LMS service
+  | 'pharmacy-hub'; // Pharmacy-Hub (파머시 허브) — WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 
 /**
  * Platform-level roles (cross-service access)
@@ -90,6 +91,23 @@ export type LmsRole =
   | 'lms:instructor';     // LMS 강사
 
 /**
+ * Pharmacy-Hub service roles
+ *
+ * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+ *
+ * Foundation 단계 3 역할 진입점만 정의한다.
+ * - operator    : 서비스 운영자 (가입 승인 · 회원 관리 · 커뮤니티 · 공지/운영자 콘텐츠)
+ * - store_owner : 약국 경영자 (기존 store_owner 계열과 동일 의미, 서비스 경계만 분리)
+ * - supplier    : 공급자 (기존 공통 공급자 원장을 재사용, Pharmacy-Hub 노출 경계만 분리)
+ *
+ * admin 은 정의하지 않는다 — 구조·정책·거버넌스는 platform:super_admin / platform 축이 담당.
+ */
+export type PharmacyHubRole =
+  | 'pharmacy-hub:operator'
+  | 'pharmacy-hub:store_owner'
+  | 'pharmacy-hub:supplier';
+
+/**
  * Union of all service-prefixed roles
  */
 export type PrefixedRole =
@@ -98,7 +116,8 @@ export type PrefixedRole =
   | NetureRole
   | GlycoPharmRole
   | CosmeticsRole
-  | LmsRole;
+  | LmsRole
+  | PharmacyHubRole;
 
 /**
  * WO-OPERATOR-ROLE-CLEANUP-V1: All roles are now prefixed.
@@ -489,6 +508,32 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     description: 'LMS 강사',
     service: 'lms',
     category: 'service',
+    deprecated: false
+  },
+
+  // Pharmacy-Hub roles (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
+  'pharmacy-hub:operator': {
+    role: 'pharmacy-hub:operator',
+    label: 'Pharmacy-Hub Operator',
+    description: '파머시 허브 서비스 운영자 (가입 승인 · 회원 관리 · 커뮤니티 · 공지)',
+    service: 'pharmacy-hub',
+    category: 'service',
+    deprecated: false
+  },
+  'pharmacy-hub:store_owner': {
+    role: 'pharmacy-hub:store_owner',
+    label: 'Pharmacy-Hub Store Owner',
+    description: '파머시 허브 약국 경영자',
+    service: 'pharmacy-hub',
+    category: 'commerce',
+    deprecated: false
+  },
+  'pharmacy-hub:supplier': {
+    role: 'pharmacy-hub:supplier',
+    label: 'Pharmacy-Hub Supplier',
+    description: '파머시 허브 공급자 (공통 공급자 원장 재사용, 노출 경계만 분리)',
+    service: 'pharmacy-hub',
+    category: 'commerce',
     deprecated: false
   }
 };

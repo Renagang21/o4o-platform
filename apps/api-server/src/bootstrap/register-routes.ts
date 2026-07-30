@@ -98,6 +98,8 @@ import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.rout
 import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
 import { createYaksaRoutes } from '../routes/yaksa/yaksa.routes.js';
 import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
+// WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
 import { createKpaRoutes, createKpaJoinPublicRoutes } from '../routes/kpa/kpa.routes.js';
 import { createNetureRoutes } from '../routes/neture/neture.routes.js';
 import createNetureModuleRoutes from '../modules/neture/neture.routes.js';
@@ -643,6 +645,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.info('✅ GlycopharmPaymentEventHandler initialized');
     } catch (glycopharmError) {
       logger.error('Failed to register Glycopharm routes:', glycopharmError);
+    }
+
+    // 27b. Register Pharmacy-Hub routes (WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1)
+    //      Foundation 범위: service-info / me-access / 역할별 scope ping 만.
+    try {
+      app.use('/api/v1/pharmacy-hub', createPharmacyHubRoutes());
+      logger.info('✅ Pharmacy-Hub routes registered at /api/v1/pharmacy-hub');
+    } catch (pharmacyHubError) {
+      logger.error('Failed to register Pharmacy-Hub routes:', pharmacyHubError);
     }
 
     // 28g. Register Store AI routes (WO-O4O-STORE-HUB-AI-SUMMARY-V1)

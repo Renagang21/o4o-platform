@@ -17,6 +17,11 @@ export interface O4OService {
   key: string;
   /** 서비스 표시 이름 */
   name: string;
+  /**
+   * 한글 표시 이름 (optional — 미지정 시 name 사용).
+   * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1 에서 추가. 기존 서비스는 미지정으로 동작 불변.
+   */
+  nameKo?: string;
   /** 서비스 도메인 */
   domain: string;
   /** 서비스 설명 */
@@ -53,6 +58,26 @@ export const O4O_SERVICES: O4OService[] = [
     domain: 'k-cosmetics.site',
     description: '화장품 유통 플랫폼',
     joinEnabled: true,
+  },
+  /**
+   * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+   *
+   * Pharmacy-Hub (파머시 허브) — 공급자와 약국 경영자를 직접 연결하는 O4O 약국 전문 서비스.
+   *
+   * joinEnabled: false 인 이유:
+   *   가입 신청 write-path(service_memberships pending 생성) + 운영자 승인 콘솔이
+   *   아직 없다. 후속 "Pharmacy-Hub 회원가입·승인" WO 에서 true 로 전환한다.
+   *   (getJoinableServices() 소비처에 미완성 가입 카드가 노출되지 않도록 방어)
+   *
+   * 미포함(후속): platform_services row seed — 본 Foundation 은 migration 을 추가하지 않는다.
+   */
+  {
+    key: 'pharmacy-hub',
+    name: 'Pharmacy-Hub',
+    nameKo: '파머시 허브',
+    domain: 'pharmacyhub.co.kr',
+    description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
+    joinEnabled: false,
   },
 ];
 
