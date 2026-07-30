@@ -1,0 +1,2359 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "mode": "en",
+  "composed": 535,
+  "blocked": 0,
+  "tmMissingUnique": 0,
+  "missingSample": [],
+  "anomalies": [],
+  "routeGuardExemptions": 391,
+  "routeGuardExemptionPolicy": "해당 섹션 KO 공식 원문에 경구 동사가 실제 존재할 때만 면제(원문 충실 번역). 원문 근거 없는 경구 동사는 면제하지 않는다.",
+  "routeGuardExemptionDetail": [
+    {
+      "masterId": "02342db7-70a4-481a-96d3-c862017edb5d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "03ba12c8-e4fc-4617-9288-66e859fb9f20",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0423e7ed-a455-4444-8317-8d480caa03be",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0423e7ed-a455-4444-8317-8d480caa03be",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "053d7657-f18e-4c05-ac2f-630d703dd736",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "053d7657-f18e-4c05-ac2f-630d703dd736",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0565c8df-8f6b-46bd-b836-a8d95f2b9bd8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "05a44fc0-3581-432b-9498-d08e38b1b779",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "05f7b15d-1d2f-40d4-887a-d406a7888693",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0640e641-5b5d-488a-a87a-b7a9879d37ca",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0640e641-5b5d-488a-a87a-b7a9879d37ca",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "09abcf6b-4276-4b31-b712-e2971124f9d0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0cd5a7fb-e355-40b9-874c-d402fc9402aa",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d51e49f-4bb2-40c0-8385-1f8b1de5a19b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0d8ad428-1f1f-4a2f-b98c-b9d5781a60d7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0deb76c9-59d5-4d82-9aa7-41771f4cb16d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0e2d2ed7-849b-4dc1-976a-8b760a1bb149",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0eacb4bd-636b-4480-9aca-6436fd185641",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "0f332f33-126e-4d92-89f4-4e47b2ee5efc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1186c652-716a-49a6-93a3-7cf8929229cb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "120423aa-e658-443e-aafd-3124b53eb62c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "124ed0d2-15c3-4732-a6cb-03cf92f4f347",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "124ed0d2-15c3-4732-a6cb-03cf92f4f347",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "14574232-ee4d-4b70-85d2-12ec7f6f80f1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "14574232-ee4d-4b70-85d2-12ec7f6f80f1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "15365c55-51b6-444e-9081-dc79dc8f8757",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "160b7362-9347-4175-b622-b52411db87b0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1618daa1-f04f-4653-8c8b-5b60a8cbbe14",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "167cd94a-c034-4e42-9d52-d7a3f92e2624",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "167cd94a-c034-4e42-9d52-d7a3f92e2624",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "175dcda0-73c8-477e-ac46-d45cc45b0d50",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "175dcda0-73c8-477e-ac46-d45cc45b0d50",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1819ae41-5bba-4f39-9a1d-c40d241e00fe",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1961a91a-911f-471b-94e4-476abde9e507",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "197b876f-afad-4092-8439-150c5255063d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "19825e3d-d2cb-409f-984b-c35dbbac3962",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "19825e3d-d2cb-409f-984b-c35dbbac3962",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "19ecf1dc-090c-4728-bb03-de49be136515",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "19ecf1dc-090c-4728-bb03-de49be136515",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1b8b4364-8b0a-4a04-a3c6-4800641e0f81",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1b8b4364-8b0a-4a04-a3c6-4800641e0f81",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1b9cb7de-c776-4177-8b29-6d13b4f8c87c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1bc4db31-2bcd-4dca-a6f4-aff67bfe2a55",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1c4ce545-7ae0-43d6-a508-2d94750804b8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1c4ce545-7ae0-43d6-a508-2d94750804b8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1c4ce545-7ae0-43d6-a508-2d94750804b8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1c69a8f0-8492-40f5-8ca5-7d8da1ef5924",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1da4deb4-8dd4-4232-b075-155878f3be3e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1da4deb4-8dd4-4232-b075-155878f3be3e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1e075484-1750-467b-8d1d-21796045a1bc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1eda7c31-6a7e-4da8-a1c2-3d4639b1c13c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1eda7c31-6a7e-4da8-a1c2-3d4639b1c13c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "20bc2398-465f-4dc4-b9e8-dcf8e2544eb7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "20c50ea2-36b7-40d2-9b39-0c442e58ff55",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "20dd6a17-fd34-4f0f-8967-5931aa298386",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "21c15ccc-ddaa-4d56-bf1b-e2ffb53b5ab9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "21ddd61d-79e5-471e-8edf-c6cf161220d7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "23c46fa4-715a-443b-8f37-a8547fb72f78",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "248b57da-3ae1-435f-8dbc-ba6a392030b0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2492ef7a-b078-429d-a6c0-4bb642b16597",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "25a17ce7-a88c-474a-8853-a161df0f953c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2851faf0-bd0b-4026-a101-cbd25b64e350",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2987ba0a-0ec8-4a71-84e7-1f8807d07a5b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2c25099a-28c1-4599-b847-4c7fa6ddd010",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2c25099a-28c1-4599-b847-4c7fa6ddd010",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2cfabfd5-1910-4059-b620-4ed9440ef416",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2cfabfd5-1910-4059-b620-4ed9440ef416",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2d3f2117-adb4-4451-a5d5-171d1cfca6fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2d3f2117-adb4-4451-a5d5-171d1cfca6fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2d75c1cc-a628-4e76-ad6a-a9eeb5a3f9c4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2db7a523-587d-451e-a3f7-b408303bc70a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2db7a523-587d-451e-a3f7-b408303bc70a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2eff3518-af3a-41c5-856b-a155eb502bc2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2feeeb88-1f52-4219-bc5e-1eb305f8d266",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2feeeb88-1f52-4219-bc5e-1eb305f8d266",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "306f5a76-6273-4604-b327-734917d710a3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "308cd6ea-e76c-4141-b808-e60860d7da3b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "309cf581-b5b6-4e1d-b673-80faaa9f65d3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3217d189-da63-4a84-bf9f-b547bf1e31a5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3217d189-da63-4a84-bf9f-b547bf1e31a5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "33547b6e-8008-47f4-932b-f9856b02d7e3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "33547b6e-8008-47f4-932b-f9856b02d7e3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "349ceebc-6801-49c7-a2a4-918628542a7a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "349ceebc-6801-49c7-a2a4-918628542a7a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "35d03206-1d66-4be7-aab9-7407ddf86407",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "37c63960-1521-4c4b-b16a-c53fe651ea92",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3a0e6389-aa60-4944-84cd-83816a62d6a9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3a0e6389-aa60-4944-84cd-83816a62d6a9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3b6be296-e8f5-473f-841d-9acdc37599fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3b6be296-e8f5-473f-841d-9acdc37599fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3be33326-1522-41f7-96ae-f3709eaf396f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3be33326-1522-41f7-96ae-f3709eaf396f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3be33326-1522-41f7-96ae-f3709eaf396f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3d4aef26-af3d-4e11-9010-68a8ab8cc545",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3d8bc473-a871-42d1-9302-67b2a99d021e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3f3930d2-7d44-4028-86a4-9ac2e3de7873",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "3ff55a8b-5e90-4097-8190-90e943c77e30",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "41d2d914-34d5-4853-b3e5-70d5266beb33",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "42309736-9ccf-4f0d-9c90-49f81e15d91a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "456b56c6-e88b-47ab-8950-511eb4473da2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "456b56c6-e88b-47ab-8950-511eb4473da2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "456b56c6-e88b-47ab-8950-511eb4473da2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "457b3af3-417f-45d9-9532-bf9a65575b2c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "46a97cf2-405e-4f40-8304-faae83da13c9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "46a97cf2-405e-4f40-8304-faae83da13c9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "47441a0a-3f22-4fa8-88c7-0aeed188c64c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "47441a0a-3f22-4fa8-88c7-0aeed188c64c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "48d2886e-731b-4c67-8b77-ae459bf421dc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "48d2886e-731b-4c67-8b77-ae459bf421dc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "48d2886e-731b-4c67-8b77-ae459bf421dc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "48ef36b5-35fc-46f4-b23e-e241d3df3abc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "48ef36b5-35fc-46f4-b23e-e241d3df3abc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4b082da8-f6fb-481d-94f6-39fd303c5f90",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4baf8d25-5dfd-4f5f-9da1-d26c70f32ab4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4de3e021-d894-4556-8b76-6f02ef28f63f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4de3e021-d894-4556-8b76-6f02ef28f63f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4de3e021-d894-4556-8b76-6f02ef28f63f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4ebc9613-caff-44d9-ab2f-110ab77a0023",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "4ebc9613-caff-44d9-ab2f-110ab77a0023",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "50c025e8-28ff-4945-a413-8c37fc60b6b4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "50f5d705-a622-43d4-958d-2003b6543fd1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "50f5d705-a622-43d4-958d-2003b6543fd1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "51d94cc8-0080-4900-a3d4-78321711cf57",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "51d94cc8-0080-4900-a3d4-78321711cf57",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "51dbb736-733c-416b-848a-39b0cac76fbf",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "53925f96-624a-42eb-a4f1-f8c91918a5b7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "53e84987-7b69-4fdc-882f-18d30f33ef5b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "54957e7b-a301-481a-87c1-368a23578260",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "54957e7b-a301-481a-87c1-368a23578260",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "553fc97c-1bec-41d7-8491-2c13b17570b9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "554cfb9c-d7ec-464e-a609-0b21fbd6e430",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "55d78e28-0303-43e4-a6b9-ac8f38560a63",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "56c3f425-62ca-4717-a7b4-d5150e3d57bb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "57f3cd72-a425-4bbe-993f-89a8979961b7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5b60f154-f632-4476-8984-aa6adcc1fa1c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5b60f154-f632-4476-8984-aa6adcc1fa1c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5bf7d6fc-2bb3-493b-874a-0592f863b43a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5bf7d6fc-2bb3-493b-874a-0592f863b43a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5d6f6208-5366-4815-9228-f51d7bc73ea5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5dbfe65d-1f2f-402d-bfb8-4c6e2ad33310",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "63a727e7-8d3b-4087-980d-8b7b27bd6760",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "63d07486-b128-4976-8850-d83b36ef5685",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "63d07486-b128-4976-8850-d83b36ef5685",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "641cfe84-e498-4a41-8faa-f774f5ecd704",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "641cfe84-e498-4a41-8faa-f774f5ecd704",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "65926329-1b3f-479e-9e81-ff8bbbfd795b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "65926329-1b3f-479e-9e81-ff8bbbfd795b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6744a19e-a9ad-4fca-9e0e-1ffd30877a99",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "683e7cd6-24b8-45b0-be10-7e2469c8ae9d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "68ef703b-2cff-4228-90e8-785172d889cd",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "695cf26b-b1f1-4037-8da4-a4278bb44326",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6b784026-7f1f-40e4-b2e7-b47c2ad4180d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6bd05838-21f7-4f53-8c32-8d30557a9d8b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6c2416da-e005-42e7-9b0a-2c5f68af3ed3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6c49746f-0bea-4629-a023-e4491812b63e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6c49746f-0bea-4629-a023-e4491812b63e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6c6522eb-0165-401a-ab4b-0feea8d94f73",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6c9245dd-b8e7-4f1c-8f69-698410d20905",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6e84a64a-d953-4f11-a239-d2ca637791c3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6e84a64a-d953-4f11-a239-d2ca637791c3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "6f1741ee-3732-427f-9b62-f74d8f823cd0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "706d91e0-76fe-4208-98bf-3845895627d0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "707ab127-fb4c-4ea0-8a00-6863fbd13863",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "71f9ec5e-31b2-4d1f-99ec-65cdc6fe3a54",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "71f9ec5e-31b2-4d1f-99ec-65cdc6fe3a54",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "721ac702-7f65-46bb-89e9-3b1a10172592",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "72b45d8d-82e9-4a18-8fdb-395d3bf1cdd9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "74740bf9-a75d-4838-a46c-5b0234c2a326",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "74740bf9-a75d-4838-a46c-5b0234c2a326",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "74e89a48-fa71-478d-ac13-aedf6d5fd909",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "74e89a48-fa71-478d-ac13-aedf6d5fd909",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "75ccc059-7f24-495f-9600-f8fdf59afd99",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7684bdbb-3da5-4d13-bb76-856daad33ee4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "77db44f1-ce86-4a16-80b0-1507b53e5752",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "77db44f1-ce86-4a16-80b0-1507b53e5752",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "788774ef-bb47-4133-9e28-8c1b2805c9ad",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "791c02a2-6211-4029-a429-e84a5fe3c0d3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "791c02a2-6211-4029-a429-e84a5fe3c0d3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7a92c82f-a379-478a-b782-57e7fb6136db",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7a97898a-43a1-4962-b2f3-1a021d90d947",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7d0afc09-0dd9-44c8-a52d-039672e9abd4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7dc9caa7-9850-4799-baf8-eef19cb60652",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7dc9caa7-9850-4799-baf8-eef19cb60652",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7dd6dbc1-4641-48c9-8666-c714b9da18d4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7dd6dbc1-4641-48c9-8666-c714b9da18d4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7dd6dbc1-4641-48c9-8666-c714b9da18d4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7f6541fe-bbab-4e74-93d7-33ef4d2179d8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7f6541fe-bbab-4e74-93d7-33ef4d2179d8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7fdd7881-6766-42e7-839e-a8af40b259ac",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "7fe2ef66-723d-459f-bc2a-1ed43830b71f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "81c3f802-3803-4d75-a0f3-8a8344ab9064",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "81c3f802-3803-4d75-a0f3-8a8344ab9064",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "84167875-4668-4c04-ad8e-75f747811dc9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8478df6a-96cd-4953-824b-65ef370b1835",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8478df6a-96cd-4953-824b-65ef370b1835",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "87b8b6bb-c602-4242-9b4c-3ef9bd9845fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "88086357-5965-40c4-8257-942d1cb7669d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "88086357-5965-40c4-8257-942d1cb7669d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "88a87e4b-6ef1-4b83-9cdf-cce8a5aea432",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "89f5307a-a37e-4e59-9266-7f627aedc2c5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "89f5307a-a37e-4e59-9266-7f627aedc2c5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8a188dc7-0b54-4842-9090-f3ceb235039d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8a39c29c-508c-4e26-8a7d-e52518e800b3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8b5801aa-2138-45eb-917d-3e7e2d8177ef",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8c97a2cb-3df0-41b1-adf7-ed468dacf9a0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8ed60dbc-772c-4cbb-aa09-cde12b26d79a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8f0f7461-67bc-4d73-bfab-537cc8a08102",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8f42a8b5-ebb7-47e8-b8a7-5d4a70ce9b69",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8f42a8b5-ebb7-47e8-b8a7-5d4a70ce9b69",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "8f5990bd-21ac-4432-9751-ec829404f32a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9180ea4c-61e1-49ff-b521-30a92837fcc8",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "921cdf00-27b9-4b7a-b469-39a305d2ae2b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "921cdf00-27b9-4b7a-b469-39a305d2ae2b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9226fe2b-b0ac-4bad-a8f3-89d62a0fffb4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9226fe2b-b0ac-4bad-a8f3-89d62a0fffb4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "927a56a1-1fde-4bbe-b368-9ea1e4f216a4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "94773b05-cde1-40e9-8f5f-ac0c810780e6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "94a6c7ca-b291-4588-bc77-8171cb86d62c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "94a6c7ca-b291-4588-bc77-8171cb86d62c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "952f3c0a-7fac-40b0-a6f6-fa91d36b9b3f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "952f3c0a-7fac-40b0-a6f6-fa91d36b9b3f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "95463829-a4d6-4974-a832-7684c8cb8afb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "955d1a6f-ef18-4e59-b5e3-4aaab6669787",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "95fae3bb-7c4b-4daa-b521-82b71c395267",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "96bfb069-25aa-42fa-905e-95da7a34dbac",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "96bfb069-25aa-42fa-905e-95da7a34dbac",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9781bc5a-3d7f-498d-9dbd-fcb8ba4cb603",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9781bc5a-3d7f-498d-9dbd-fcb8ba4cb603",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "97d7184a-ed8a-4e2f-812c-8a1a6d04877e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "98633a18-9e44-46d0-9e7d-3561ca85b882",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9aa0a3f5-7a04-4393-8411-d7acfc0838a2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9b4f07ea-4e60-4859-9188-b60f292217a0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9b4f07ea-4e60-4859-9188-b60f292217a0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9cef5c9a-43dd-48e1-a7e5-386afcf6c33f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9cef5c9a-43dd-48e1-a7e5-386afcf6c33f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9d4c391d-e342-481f-8a15-fdf216b8c0fe",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9d4c391d-e342-481f-8a15-fdf216b8c0fe",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9df237af-e613-4b5c-9baa-2c05de03032b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9e58ba8f-b9cd-4328-a2f9-e30fdc0217d6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9e6b220f-7dbb-4084-b761-655cbbd145a9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "9f75ff5a-5d4f-497b-af02-393198fbc45b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a0f42b16-330f-440b-b39d-da879ad2ccab",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a0f42b16-330f-440b-b39d-da879ad2ccab",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a0f42b16-330f-440b-b39d-da879ad2ccab",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a0fbc562-772c-4333-8329-7f427ba22f59",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a0fbc562-772c-4333-8329-7f427ba22f59",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a2a406a9-b748-4a3e-bdeb-ced4a3892b8c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a2ed92a2-fa52-40a7-a3b0-e65fc8d47adf",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a3de66fa-2cff-4e4e-8cca-ceb058f8b8c6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a58d4194-0c78-4246-9726-60e13eb47d34",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a58d4194-0c78-4246-9726-60e13eb47d34",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a5c28beb-6028-4a7c-bb73-1c52e8047265",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a75ced12-5042-4a47-a5b4-4ece0f314123",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a782659a-11ea-4032-973d-b519eb5c606d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a782659a-11ea-4032-973d-b519eb5c606d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a8f8b178-0dde-4f5f-bd2b-b83cc69acb49",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a9d58063-09fc-42a4-a042-4b9d59911dbc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "a9d58063-09fc-42a4-a042-4b9d59911dbc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aa31d319-bc2e-4eaa-993c-8e46313fd12a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ab263dd5-0d63-4e69-8417-8d851ea74753",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ab370537-e880-429c-8385-95c1a1d0946f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "abb6a4ab-d483-48c1-8143-7d83bf16c0f1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "abb6a4ab-d483-48c1-8143-7d83bf16c0f1",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ac466027-fb45-4416-96df-08487d589b0e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ac466027-fb45-4416-96df-08487d589b0e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "adeb2d1d-dbe6-4581-a424-920f4b8f56d9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "adeb2d1d-dbe6-4581-a424-920f4b8f56d9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aea1dc12-55a7-4407-b669-d7d1bd1c92a5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aea1dc12-55a7-4407-b669-d7d1bd1c92a5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aeb63b67-2177-4bab-b90f-58ad62b90ae0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "afeee643-3f07-46bf-9766-76b962acb323",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aff26afa-a0df-46cf-9f87-ebce1c99c41c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "aff26afa-a0df-46cf-9f87-ebce1c99c41c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b041d4ed-0598-4d6a-b0c7-17b5a200f98f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b0fa29f2-7b75-4619-a1f5-ad29d0636a96",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b0fa29f2-7b75-4619-a1f5-ad29d0636a96",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b0fca3d4-05ca-4e11-86b3-e2946703ae4e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b416ad70-f0ff-4b3f-a6c9-c83fadaa766c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b4316233-aa10-4bc2-938f-4dd2d73d7016",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b4316233-aa10-4bc2-938f-4dd2d73d7016",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b4da5ea6-7805-4837-af4c-937b80f10ce0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b4da5ea6-7805-4837-af4c-937b80f10ce0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b51454b9-53b8-4c99-ace8-6fa74fb60c93",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b62faad8-2947-4e25-af05-a43e5f2763d6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b62faad8-2947-4e25-af05-a43e5f2763d6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b73adc0d-64d3-47b7-8217-bcbc33180bde",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b8e4ce56-b0e8-428f-bccb-9807c321a83d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b8e4ce56-b0e8-428f-bccb-9807c321a83d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "b9985e48-cf04-4024-b966-65cbcc99eb44",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ba479971-a20c-43d0-b7dc-ee700010010c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "bb59b91b-68bf-4e22-b5ab-d6f5aaabb742",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "be60f40a-1fa4-4b4a-9ace-1a86f8e7900d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "bed93936-8247-455e-91d5-40a460201469",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c0d8662f-8aed-413b-ab8c-df714339a67a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c0d8662f-8aed-413b-ab8c-df714339a67a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c2d8690a-717f-4602-aade-0b667524f3ca",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c3479215-09ab-44f4-91ee-5f7b7f20adf5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c3479215-09ab-44f4-91ee-5f7b7f20adf5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c43d1958-0065-4fb8-ad53-3b1ddf32e2c0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c43d1958-0065-4fb8-ad53-3b1ddf32e2c0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c4491fbb-44a6-4eff-8610-166e0129f3bb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c44cb5c3-d368-491d-9e8b-e47fea72b260",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c44cb5c3-d368-491d-9e8b-e47fea72b260",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c4ad6269-84c3-4e6a-b2c3-6421e4e4b87b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c5057c9f-b87d-4e54-be85-1b8b323a276f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c53036bd-7f2c-473c-8f9c-e74fc80a54fc",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "c90df8dd-bdf6-4936-ab85-a0a84e93817c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ca1a8276-f0cc-4c20-b1c9-9bfebfc82beb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ce35795f-fc57-40bf-a297-3ee0724ed84a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d0c3dfb5-57ca-4572-a0d2-962024fe5ae4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d364cefa-925f-4aac-a6dc-5ba65cf9e2ae",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d364cefa-925f-4aac-a6dc-5ba65cf9e2ae",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d41c98c9-8989-4121-964f-cb04acd4d776",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d4cd182d-b4a3-4285-aec6-5b604bd085bb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d4cd182d-b4a3-4285-aec6-5b604bd085bb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d58824d9-9eba-4630-b24d-e940ebcc7948",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "d8e16f95-061a-4a85-bbbb-3f04c0bd37ab",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "da576904-ff98-417d-8149-265ad43203f7",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "daa356fb-9ae2-405a-bb41-f63d906ed73a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "dbdcd850-396a-43c3-9629-7a592623861c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "dc6ab6a3-f15c-429f-947d-5e5b20a9a29f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "dce4c57d-8472-4ef3-b26c-8bdda0c36a2f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "de406921-06e3-486d-aa3d-c99616c73dae",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "de4fc3b4-e8f7-497c-b973-43673e237d83",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "de4fc3b4-e8f7-497c-b973-43673e237d83",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "de573b75-edc3-47a7-a400-95bc9fba07a0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "de573b75-edc3-47a7-a400-95bc9fba07a0",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e0b2b7ce-1551-4ef0-98a7-3e26fde0a33e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e0b2b7ce-1551-4ef0-98a7-3e26fde0a33e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e356acc0-6108-4147-a2c4-1d8a64138225",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e3ed2cb4-ee73-49b8-b70a-4542f195330c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e3f4e07e-be9d-4a51-a5e5-e544ee41a45a",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e5010810-056e-4932-a8c8-485c8336269f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e5066538-9ca7-4cfc-a178-ec1cc484b57b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e5066538-9ca7-4cfc-a178-ec1cc484b57b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e5a52eef-a986-4bb3-abdc-3673451a89db",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e5a52eef-a986-4bb3-abdc-3673451a89db",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e627aac9-8f01-4010-aa7b-80ee1d34312c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e627aac9-8f01-4010-aa7b-80ee1d34312c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e6381cdd-ec78-4420-8974-d5c965b16232",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e667c776-48fc-43a2-af12-809ff5f078f4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e667c776-48fc-43a2-af12-809ff5f078f4",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e86ec842-bcd4-4f0d-afb2-2045da490ab5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e9e3a016-e303-4334-b6c1-e1e20d58ce5f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "e9ecbd43-3e46-4530-b170-a9acbc7bb5aa",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ebc6e9cc-a827-4ea5-8697-387a192c00fb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ebc6e9cc-a827-4ea5-8697-387a192c00fb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ebcee778-8f0e-40a7-9db8-54ca4ec73b59",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ebcee778-8f0e-40a7-9db8-54ca4ec73b59",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ecbaf854-3648-406a-8119-b4d6f173556f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ed246bb7-6ba5-4ce7-8e67-ca0ffc40ebab",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ee117a3e-2f20-4dd6-be63-463ae74b8772",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ee4f7f4f-8579-4b93-95b3-97394e444c89",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ee4f7f4f-8579-4b93-95b3-97394e444c89",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ef3fdc4b-238e-4b6e-9d54-6c54b87e7df3",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f04dadc3-4197-48e7-994b-f7b1b007c35f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f04dadc3-4197-48e7-994b-f7b1b007c35f",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f0591041-ce76-44c3-aeca-75e5d0e5cc38",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f06d24db-f614-4279-a927-ef717ef62f69",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f06d24db-f614-4279-a927-ef717ef62f69",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f0c2cac6-000f-4fe9-b035-4c6ee546d5e5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f44ffe86-90e9-4b4d-bcff-54fa48321c86",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f471a4dc-0bec-4695-aa0c-501751f96ab6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f471a4dc-0bec-4695-aa0c-501751f96ab6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f471a4dc-0bec-4695-aa0c-501751f96ab6",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f59691f8-7ea4-49b8-bb72-1b3fb61b7aa2",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f5b96b61-dacc-4893-b605-7267e6fcee2b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f5b96b61-dacc-4893-b605-7267e6fcee2b",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f5faf23c-63ee-4ae8-9cc3-785498dcf092",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f65eef63-aff0-4d7f-87a0-a37ac7ce97d5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f671bd4b-ef86-4e39-9c08-9d7992c1f4fd",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f864061d-bbdc-40e4-bb2a-6f8fa1c77d79",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f864061d-bbdc-40e4-bb2a-6f8fa1c77d79",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f97b9239-d9fe-44cd-b169-0165bb1487e9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f97b9239-d9fe-44cd-b169-0165bb1487e9",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f9b8cbf1-0706-4554-b570-3bd2f0955424",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fa8a15c0-698a-4a94-8e00-ccb457cde846",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fa8a15c0-698a-4a94-8e00-ccb457cde846",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fb756de5-8dbc-45eb-933f-1de70a216cec",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fb756de5-8dbc-45eb-933f-1de70a216cec",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btaken\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fb756de5-8dbc-45eb-933f-1de70a216cec",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fbce95f7-8c09-43bb-b0b0-ce60aae1326e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fbce95f7-8c09-43bb-b0b0-ce60aae1326e",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fc2eeb6f-d700-45f3-a5b8-a770aff3f7cb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fc2eeb6f-d700-45f3-a5b8-a770aff3f7cb",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fc736472-7f10-4bbc-9e89-af389287a43c",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fcd4e922-110b-4bab-a164-004fec9a736d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "fcd4e922-110b-4bab-a164-004fec9a736d",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ff0db792-9045-4623-b48c-108ba0d00988",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ffc7a2fd-779f-4939-a21e-56d485b222a5",
+      "route": "topical",
+      "anomaly": "비경구(topical) EN precaution에 경구 동사: \\btake\\b",
+      "koSection": "사용상 주의사항"
+    }
+  ]
+}

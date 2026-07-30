@@ -1,0 +1,17 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 100,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 5,
+      "lastMasterId": "03ba12c8-e4fc-4617-9288-66e859fb9f20",
+      "green": 0,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 0,
+      "at": "2026-07-30T03:26:38.329Z"
+    }
+  ]
+}

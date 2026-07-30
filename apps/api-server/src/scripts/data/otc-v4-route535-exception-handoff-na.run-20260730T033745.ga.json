@@ -1,0 +1,15 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "producer": "agent-ga",
+  "consumer": "agent-na",
+  "liveDbWrite": 0,
+  "batchId": "otc-v4-route535",
+  "schema": "otc-v4-master-by-master-exception-handoff v1",
+  "total": 0,
+  "byExceptionCode": {},
+  "invariantCheck": {
+    "allFailedWriteZero": true,
+    "residueDirty": 0
+  },
+  "rows": []
+}

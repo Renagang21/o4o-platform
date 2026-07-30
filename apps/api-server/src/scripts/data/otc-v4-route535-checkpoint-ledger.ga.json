@@ -1,0 +1,67 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 100,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 100,
+      "lastMasterId": "2feeeb88-1f52-4219-bc5e-1eb305f8d266",
+      "green": 0,
+      "exception": 0,
+      "skip": 100,
+      "writeActual": 0,
+      "at": "2026-07-30T03:37:57.854Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 200,
+      "lastMasterId": "684af612-b553-4d08-af78-63edb3db4cfc",
+      "green": 0,
+      "exception": 0,
+      "skip": 200,
+      "writeActual": 0,
+      "at": "2026-07-30T03:38:10.342Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 300,
+      "lastMasterId": "96ab8f76-12a3-4527-97d0-3c34a7ae2bc5",
+      "green": 0,
+      "exception": 0,
+      "skip": 300,
+      "writeActual": 0,
+      "at": "2026-07-30T03:38:23.566Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 400,
+      "lastMasterId": "c4491fbb-44a6-4eff-8610-166e0129f3bb",
+      "green": 0,
+      "exception": 0,
+      "skip": 400,
+      "writeActual": 0,
+      "at": "2026-07-30T03:38:36.087Z"
+    },
+    {
+      "checkpoint": 5,
+      "processed": 500,
+      "lastMasterId": "f0c2cac6-000f-4fe9-b035-4c6ee546d5e5",
+      "green": 0,
+      "exception": 0,
+      "skip": 500,
+      "writeActual": 0,
+      "at": "2026-07-30T03:38:48.810Z"
+    },
+    {
+      "checkpoint": 6,
+      "processed": 535,
+      "lastMasterId": "ffc7a2fd-779f-4939-a21e-56d485b222a5",
+      "green": 0,
+      "exception": 0,
+      "skip": 535,
+      "writeActual": 0,
+      "at": "2026-07-30T03:38:53.219Z"
+    }
+  ]
+}

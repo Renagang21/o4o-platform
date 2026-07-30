@@ -1,0 +1,340 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "kind": "per-master-result-ledger",
+  "summary": {
+    "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+    "agent": "ga",
+    "writeOwner": "agent-ga",
+    "batchId": "otc-v4-route535",
+    "mode": "rollback-test",
+    "port": 5495,
+    "startedAt": "2026-07-30T03:26:35.741Z",
+    "target": 5,
+    "processed": 5,
+    "green": 0,
+    "exception": 0,
+    "skip": 0,
+    "dryOrRollback": 5,
+    "koWriteActual": 0,
+    "enWriteActual": 0,
+    "writeActual": 0,
+    "expectedWrite": 0,
+    "byExceptionCode": {},
+    "byRouteProduced": {
+      "topical": 5
+    },
+    "byStratum": {
+      "D_ROUTE_RECOVERED": {
+        "total": 5,
+        "green": 0,
+        "exception": 0,
+        "skip": 0
+      }
+    },
+    "failedMasterResidueDirty": 0,
+    "checkpoints": 1,
+    "pass": true
+  },
+  "results": [
+    {
+      "masterId": "01833688-4b53-4da3-bcbb-cf7b679e8e79",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "stratum": "D_ROUTE_RECOVERED",
+      "route": "topical",
+      "sourceRef": "bc0b4d1f-10c6-3797-13d6-7ed03133d23d",
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "koContentHash": "cb210d4d91f9259d135800ec47fda934",
+      "enContentHash": "0fa101423d8e8c1c85e54882090f3a87",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb210d4d91f9259d135800ec47fda934",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0fa101423d8e8c1c85e54882090f3a87",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "02342db7-70a4-481a-96d3-c862017edb5d",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "stratum": "D_ROUTE_RECOVERED",
+      "route": "topical",
+      "sourceRef": "2492a184-89c8-c77f-7493-b50654266600",
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "koContentHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+      "enContentHash": "c12caa9534703776571dda9ad2db320a",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "41a0a7cd564dc329e19cc548cac2ec2c",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c12caa9534703776571dda9ad2db320a",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "02e2a85b-afea-415b-bff8-e5cd91ff2ab0",
+      "productCode": "200707111",
+      "productName": "소프타-맨액",
+      "stratum": "D_ROUTE_RECOVERED",
+      "route": "topical",
+      "sourceRef": "46acbc80-d6eb-cf58-6c11-78b496b8293a",
+      "officialSourceHash": "b97db0460a9de9a52f9277dfe42242cf",
+      "koContentHash": "cb210d4d91f9259d135800ec47fda934",
+      "enContentHash": "0fa101423d8e8c1c85e54882090f3a87",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb210d4d91f9259d135800ec47fda934",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0fa101423d8e8c1c85e54882090f3a87",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "0342f09b-0f46-453d-b91d-668a2126e092",
+      "productCode": "200800378",
+      "productName": "큐앤큐바셀린윤나거즈",
+      "stratum": "D_ROUTE_RECOVERED",
+      "route": "topical",
+      "sourceRef": "1b17bf29-a6e9-31b3-34bb-2562c1d0c319",
+      "officialSourceHash": "0d9534e82660b799c9f778fea2926752",
+      "koContentHash": "79f1a866dfc266e58bcf16f7f0ce0060",
+      "enContentHash": "a82a267244096cc10a4562417d90a4a2",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "79f1a866dfc266e58bcf16f7f0ce0060",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a82a267244096cc10a4562417d90a4a2",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "03ba12c8-e4fc-4617-9288-66e859fb9f20",
+      "productCode": "201606592",
+      "productName": "큐앤큐헥시코올탈지면액",
+      "stratum": "D_ROUTE_RECOVERED",
+      "route": "topical",
+      "sourceRef": "fcc52b76-bd9b-9bba-0b87-babe5bf1b6c5",
+      "officialSourceHash": "103be688205b6ad145fe473fdeb03b03",
+      "koContentHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+      "enContentHash": "c12caa9534703776571dda9ad2db320a",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "41a0a7cd564dc329e19cc548cac2ec2c",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c12caa9534703776571dda9ad2db320a",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    }
+  ]
+}

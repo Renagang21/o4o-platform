@@ -1,0 +1,61 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "kind": "withdraw-non-human-device-sterilant",
+  "mode": "APPLY",
+  "reason": "NON_HUMAN_DEVICE_STERILANT",
+  "targets": 3,
+  "rows": [
+    {
+      "masterId": "06712efc-26fd-43fa-b97e-3e5a3eafaaa1",
+      "reason": "NON_HUMAN_DEVICE_STERILANT",
+      "demoted": 2,
+      "restored": 1,
+      "audit": 1,
+      "committed": true,
+      "demotedLangs": [
+        "ko",
+        "en"
+      ],
+      "check": {
+        "authoredcanon": 0,
+        "easykocanon": 1
+      },
+      "pass": true
+    },
+    {
+      "masterId": "171812b7-cef2-489b-a6f8-74000c5ca0e3",
+      "reason": "NON_HUMAN_DEVICE_STERILANT",
+      "demoted": 2,
+      "restored": 1,
+      "audit": 1,
+      "committed": true,
+      "demotedLangs": [
+        "ko",
+        "en"
+      ],
+      "check": {
+        "authoredcanon": 0,
+        "easykocanon": 1
+      },
+      "pass": true
+    },
+    {
+      "masterId": "8fb8e44a-6ea2-4935-9ddc-d3e7e13df2e7",
+      "reason": "NON_HUMAN_DEVICE_STERILANT",
+      "demoted": 2,
+      "restored": 1,
+      "audit": 1,
+      "committed": true,
+      "demotedLangs": [
+        "ko",
+        "en"
+      ],
+      "check": {
+        "authoredcanon": 0,
+        "easykocanon": 1
+      },
+      "pass": true
+    }
+  ],
+  "pass": true
+}

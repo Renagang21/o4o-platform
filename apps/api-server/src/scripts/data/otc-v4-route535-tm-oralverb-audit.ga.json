@@ -1,0 +1,11 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-RECOVERABLE-535-FINAL-PRODUCTION-V1",
+  "kind": "oral-verb-audit",
+  "liveDbWrite": 0,
+  "rule": "KO 경구동사 없음 + EN 경구동사 있음 → 원문에 없는 투여 방식 도입",
+  "tmTotal": 207,
+  "hits": 0,
+  "hitsAffectingNonOralOnly": 0,
+  "byRoute": {},
+  "detail": []
+}
