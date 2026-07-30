@@ -1,0 +1,85 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "pre-apply-content-verification",
+  "unit": "rectal",
+  "liveDbWrite": 0,
+  "independence": "composer/author/executor 미import · 독자 파서·어휘·수치 추출",
+  "gatesTotal": 10,
+  "gatesPassed": 10,
+  "verdict": "PASS",
+  "gates": [
+    {
+      "id": "CV-01",
+      "gate": "입력 = KO payload = EN payload",
+      "actual": "26/26/26",
+      "pass": true
+    },
+    {
+      "id": "CV-02",
+      "gate": "route 전건 주입 일치",
+      "actual": "26/26",
+      "pass": true
+    },
+    {
+      "id": "CV-03",
+      "gate": "공식 섹션 내용 보존(커버리지 ≥0.95)",
+      "actual": "미달 0",
+      "pass": true,
+      "detail": {
+        "min": 0.9851,
+        "median": 1,
+        "sections": 131,
+        "worst": []
+      }
+    },
+    {
+      "id": "CV-04",
+      "gate": "수치 누락 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-05",
+      "gate": "연령 토큰 누락 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-06",
+      "gate": "기간·횟수 토큰 누락 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-07",
+      "gate": "rectal 경로 표현 존재",
+      "actual": "미검출 0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-08",
+      "gate": "타 경로 표현 혼입 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-09",
+      "gate": "EN 한글 잔존 0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "CV-10",
+      "gate": "EN 경구동사 오도입 0(원문 근거 없는 것)",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    }
+  ]
+}

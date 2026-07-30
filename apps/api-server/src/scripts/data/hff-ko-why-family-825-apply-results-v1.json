@@ -1,0 +1,328 @@
+{
+ "ranAt": "2026-07-30T11:37:17.281Z",
+ "wo": "WO-O4O-HFF-KO-WHY-FAMILY-825-OFFICIAL-FUNCTION-SECTION-FULL-PRODUCTION-V1",
+ "status": "APPLIED",
+ "expectedUpdate": 300,
+ "actualUpdate": 300,
+ "rolledBack": false,
+ "failReason": null,
+ "countsBefore": {
+  "spd_all": 120058,
+  "spd_store_ko": 63321,
+  "without_fn": 825,
+  "hff_canonical": 40913
+ },
+ "countsAfter": {
+  "spd_all": 120058,
+  "spd_store_ko": 63321,
+  "without_fn": 525,
+  "hff_canonical": 40913
+ },
+ "rowCountUnchanged": true,
+ "withoutFnSectionDelta": -300,
+ "hffCanonicalUnchanged": true,
+ "clausesRestored": 451,
+ "results": [
+  {
+   "targetIndex": 1,
+   "canonicalId": "00ac4cd1-8c9c-4f39-9af8-f3541cc5fcdc",
+   "productName": "유산균팡팡",
+   "updated": 1
+  },
+  {
+   "targetIndex": 2,
+   "canonicalId": "0124cbf6-8e11-4373-a4a3-bea6936b1ea4",
+   "productName": "비너틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 3,
+   "canonicalId": "01677329-65b4-4d4b-9755-6b74748c7564",
+   "productName": "더락토 장+",
+   "updated": 1
+  },
+  {
+   "targetIndex": 4,
+   "canonicalId": "03a8dadd-4784-4023-8176-b00b45e6db2f",
+   "productName": "유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 5,
+   "canonicalId": "042f283f-9de9-400d-81ee-e25ca53cac53",
+   "productName": "야쿠르트 프리미엄 라이트",
+   "updated": 1
+  },
+  {
+   "targetIndex": 6,
+   "canonicalId": "056153b9-4bcf-43fd-b71d-2d4a7fe7a88d",
+   "productName": "코오롱 아이사랑 매일 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 7,
+   "canonicalId": "07033516-ae29-4d7a-98b3-bfe5034275b8",
+   "productName": "프로바이오틱스 FIT",
+   "updated": 1
+  },
+  {
+   "targetIndex": 8,
+   "canonicalId": "091a0904-fc2a-4e43-af40-d36426c70c69",
+   "productName": "장을위한생유산균19",
+   "updated": 1
+  },
+  {
+   "targetIndex": 9,
+   "canonicalId": "0a3bbc35-4651-4260-bf5e-5eefc62bc181",
+   "productName": "비피더스 더블커버",
+   "updated": 1
+  },
+  {
+   "targetIndex": 10,
+   "canonicalId": "0a72fc79-3dfb-402c-8133-3712b767d05f",
+   "productName": "프로바이오닉 플러스 (Probionic Plus)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 11,
+   "canonicalId": "0c595c5e-5b59-454c-ad63-70eeb1108126",
+   "productName": "랩바이옴 액티브 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 12,
+   "canonicalId": "0d8a1ad2-e640-4d54-9bdf-e767fe303d4a",
+   "productName": "비타할로 프로바이오틱스 100억",
+   "updated": 1
+  },
+  {
+   "targetIndex": 13,
+   "canonicalId": "0dd814c0-2a53-4dd2-af8a-523d43c5469b",
+   "productName": "생유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 14,
+   "canonicalId": "1051aecb-04bc-4a09-a1e3-3f63b4678794",
+   "productName": "유키플러스캡슐",
+   "updated": 1
+  },
+  {
+   "targetIndex": 15,
+   "canonicalId": "108da099-2ecd-4a75-8d75-c8f6f6b3f45c",
+   "productName": "락토셀",
+   "updated": 1
+  },
+  {
+   "targetIndex": 16,
+   "canonicalId": "10cc6c22-e7ad-4285-ab92-abbceb57f26c",
+   "productName": "프로바이오틱스 김치유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 17,
+   "canonicalId": "11d12a9e-f347-42cb-a770-e0f4b5aa1a13",
+   "productName": "우리가족 장건강엔 프로바이오틱스 생유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 18,
+   "canonicalId": "11f806aa-4f75-486e-9bb2-2d30296db0d7",
+   "productName": "장에존혼합유산균19",
+   "updated": 1
+  },
+  {
+   "targetIndex": 19,
+   "canonicalId": "14d3b5f2-d8b4-4bf3-9b58-d4774680c576",
+   "productName": "위앤업(WE&UP) 프로바이오틱스 ",
+   "updated": 1
+  },
+  {
+   "targetIndex": 20,
+   "canonicalId": "15a727e2-5f64-462f-8721-6828b3f83908",
+   "productName": "코알라팔스 생생 유산균 포도맛",
+   "updated": 1
+  },
+  {
+   "targetIndex": 21,
+   "canonicalId": "162e85e5-22a8-4ebe-968d-ecdad0598bd0",
+   "productName": "장건강 혼합유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 22,
+   "canonicalId": "17b6df9d-af41-49ce-a3b0-2b82fdc13026",
+   "productName": "3-스텝 활성 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 23,
+   "canonicalId": "1aa979b2-e98f-49b5-9e04-63cf351f284f",
+   "productName": "장케어A",
+   "updated": 1
+  },
+  {
+   "targetIndex": 24,
+   "canonicalId": "1b913784-ef63-4b4a-8776-f92dea7334dd",
+   "productName": "닥터프로바 패밀리",
+   "updated": 1
+  },
+  {
+   "targetIndex": 25,
+   "canonicalId": "1bd3b81e-5095-4db0-8307-0c2824df8bbd",
+   "productName": "엠티원",
+   "updated": 1
+  },
+  {
+   "targetIndex": 26,
+   "canonicalId": "1c0876f9-bd21-4d4e-b050-3b3f87a67df8",
+   "productName": "슈퍼 프로바이오 펜타5",
+   "updated": 1
+  },
+  {
+   "targetIndex": 27,
+   "canonicalId": "1c093cc1-f9bd-459b-bb57-b21cd9f92bbc",
+   "productName": "포스트바이오틱스 키즈핏",
+   "updated": 1
+  },
+  {
+   "targetIndex": 28,
+   "canonicalId": "1ccbd797-e100-4212-afed-0d636efe9b04",
+   "productName": "어뉴엠 장앤청 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 29,
+   "canonicalId": "1d17a188-6b1e-4df8-a9bc-b7a85bea3426",
+   "productName": "뉴피니티 프로바이오틱스 (Nufinity Probiotics)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 30,
+   "canonicalId": "1d7f6296-a05f-4de8-a193-5d3edceb3b79",
+   "productName": "올데이 W프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 31,
+   "canonicalId": "1db2ddc5-0569-4c5c-b7e6-a50d41616182",
+   "productName": "엘스픽",
+   "updated": 1
+  },
+  {
+   "targetIndex": 32,
+   "canonicalId": "1eb6550a-4b32-42e9-8ba9-7b53db0f4621",
+   "productName": "자랑가능",
+   "updated": 1
+  },
+  {
+   "targetIndex": 33,
+   "canonicalId": "1f1c6b63-aa7c-4c5c-bbe7-9e145d18506f",
+   "productName": "락토핏 생유산균 코어",
+   "updated": 1
+  },
+  {
+   "targetIndex": 34,
+   "canonicalId": "1f8d232b-933d-4ff7-a987-488ddf56e174",
+   "productName": "유기농 장대원 키즈",
+   "updated": 1
+  },
+  {
+   "targetIndex": 35,
+   "canonicalId": "2215040c-c1b6-43a7-acd7-a1180e57fa1f",
+   "productName": "프로바이오틱스BGA",
+   "updated": 1
+  },
+  {
+   "targetIndex": 36,
+   "canonicalId": "22d1dc37-69a8-4f5c-aebc-29dc676452e8",
+   "productName": "마이니 장건강 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 37,
+   "canonicalId": "238e854b-859d-4cdc-8b64-92ed1013f297",
+   "productName": "닥터팡 키즈베이비 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 38,
+   "canonicalId": "23948198-2257-40ec-90e0-7e91427d4f61",
+   "productName": "액티브 프로바이오틱스 ",
+   "updated": 1
+  },
+  {
+   "targetIndex": 39,
+   "canonicalId": "24b85c6a-07c6-417c-8dcd-e5f90acdf2ba",
+   "productName": "세븐(Seven)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 40,
+   "canonicalId": "269d024d-d498-4e8f-a45d-4356b6a0308d",
+   "productName": "메디타민 대장건강 비피더스 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 41,
+   "canonicalId": "279cfa37-cd3c-40ff-b2dd-4a751df0330a",
+   "productName": "금단미인 우리유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 42,
+   "canonicalId": "281954eb-0a66-4316-a56e-39552d4d04bf",
+   "productName": "이너메이크-Ⅱ 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 43,
+   "canonicalId": "292c652f-d269-416c-b813-3fe5f02c7f79",
+   "productName": "락토랩 장건강 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 44,
+   "canonicalId": "2942241f-0698-49b3-beaa-c5002128f83b",
+   "productName": "락토 생 유산균 골드",
+   "updated": 1
+  },
+  {
+   "targetIndex": 45,
+   "canonicalId": "29786516-62d9-4fbc-a729-367d15684e6f",
+   "productName": "하이프로락토 hi pro lacto",
+   "updated": 1
+  },
+  {
+   "targetIndex": 46,
+   "canonicalId": "29c6aa00-6250-4ad5-b9cd-cacef6a1f73d",
+   "productName": "모거티움",
+   "updated": 1
+  },
+  {
+   "targetIndex": 47,
+   "canonicalId": "2a128633-3dc4-49bb-b977-6411471e9fd2",
+   "productName": "츄어블혼합유산균플러스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 48,
+   "canonicalId": "2a57f8f4-f020-4296-ad8d-f1abba84bf55",
+   "productName": "코알라팔스 생생 유산균 딸기맛",
+   "updated": 1
+  },
+  {
+   "targetIndex": 49,
+   "canonicalId": "2b8ecc49-7c0f-448a-bb75-89dc498e72f7",
+   "productName": "프리미엄 프로바이오틱스 유산균19",
+   "updated": 1
+  },
+  {
+   "targetIndex": 50,
+   "canonicalId": "2c3560c1-d7fd-4fa0-88e2-780258eec0f2",
+   "productName": "장건강엔 데일리 프로바이오틱스 생유산균",
+   "updated": 1
+  }
+ ],
+ "resultsTruncated": true
+}

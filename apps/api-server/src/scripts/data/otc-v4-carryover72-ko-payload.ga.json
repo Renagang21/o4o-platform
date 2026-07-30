@@ -1,0 +1,607 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "ko-payload",
+  "total": 30,
+  "payloads": [
+    {
+      "masterId": "12f3507e-fedd-4f00-b210-0467deebb691",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "permitCode": "202400416",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
+      "sourceRef": "0864c842-27f6-9311-ab2c-df161b53c78b",
+      "title": "이벤칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.",
+      "contentHash": "c84d124f5d772cc614c38721b281677f",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</span></div>\n    <h1>이벤칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202400416 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202400416 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염 환자는 용액을 적신 거즈를 질 안에 넣고, 가벼운 압력으로 해당부위를 1~3분 간 누르십시오. 3~4일 간격으로 두 번 사용하십시오.<br>구내염 및 치육염 환자는 적신 면봉 등을 이용해 여러 번 반복하여 바르십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 사용하지 마십시오.</li>\n      <li>월경 중에는 사용하지 마십시오.</li>\n      <li>성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 마십시오. 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.</li>\n      <li>증상이 사라지지 않으면 의사와 상의하십시오.</li>\n      <li>국소적으로만 사용하며, 눈에 들어가지 않도록 주의하십시오. 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n      <li>구강점막이나 잇몸에 사용한 후에는 철저하게 입 안을 헹구십시오.</li>\n      <li>콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기 반응, 치아의 법랑질 손상 등이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약을 사용하는 동안 다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "15e043a6-b27b-451a-a054-6d71faeb8eba",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "permitCode": "201606382",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "6bfd6507-9416-e1ca-23ea-fd7718626360",
+      "title": "페리터치액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "08bba17c7cbc05445b1abd1c517850f2",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>페리터치액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201606382 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201606382 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "permitCode": "201803043",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "3648c604-838f-a20a-ef86-a733becd226e",
+      "title": "이반크린액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "b56a66e1b41f472906904fcc2d7e2e67",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>이반크린액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201803043 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201803043 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "productName": "오라칠액(폴리크레줄렌액50%)",
+      "permitCode": "200902501",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "sourceRef": "4b4b11da-09fd-37fe-ca2e-4f03621ea1eb",
+      "title": "오라칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.",
+      "contentHash": "03547ba14266e6aa020538935dd3d8ee",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</span></div>\n    <h1>오라칠액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당 부위를 1~3분간 눌러서 사용하십시오. 3~4일 간격으로 2회 사용하고, 증상이 사라지지 않으면 의사와 상의하십시오.<br>구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러 번 반복하여 발라서 사용하십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 국소적으로만 사용하십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약을 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약을 월경 중에 사용하지 마십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 말고 그대로 다음 용량을 적용하여 사용하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기 반응이 나타날 수 있습니다.\n강한 산성으로 인해 치아의 법랑질에 손상을 줄 수 있습니다.</li>\n      <li>이러한 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약을 사용하는 동안 다른 외용제와 병행하여 사용하지 마십시오.</li>\n      <li>콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 사용에 주의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "permitCode": "201702575",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "71b0d3ca-42fa-c5b8-d8f7-c7bdd479989c",
+      "title": "오라메칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>오라메칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201702575 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201702575 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "28158f9d-6aba-4912-a784-10feaa77fe4d",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "permitCode": "201605110",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "839a4da8-a4bf-8076-b519-9045f2d2e3eb",
+      "title": "립톡케어액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "e5941bff3076f16b02d422d2d937cf25",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>립톡케어액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "28f68a84-db96-43ac-bc9c-6ccb4264d64f",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "permitCode": "202401206",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "sourceRef": "72721182-6576-9607-86fa-0a1d9a1dbb97",
+      "title": "동화알보칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.",
+      "contentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</span></div>\n    <h1>동화알보칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다. 3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.<br>구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "2a6baf5d-53e2-4437-8c87-37f0811a1717",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "permitCode": "202401206",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "sourceRef": "2b7407d7-6c54-ed9c-37bd-e7811e882d1a",
+      "title": "동화알보칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.",
+      "contentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</span></div>\n    <h1>동화알보칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다. 3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.<br>구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "2cf7c9db-4316-46f8-a735-83759c1b23eb",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "e42fcfe5-27eb-6cec-8b88-3e572c0fd3ad",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "3653eb12-eb2d-4344-8d37-1bfce061d5cd",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "permitCode": "201605110",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "43ff37a0-739b-20e3-2dce-0131cf41b38c",
+      "title": "립톡케어액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "e5941bff3076f16b02d422d2d937cf25",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>립톡케어액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "38c4e1df-bdad-43d6-9124-1e8626d2d429",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "permitCode": "200902501",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "sourceRef": "670e77d1-4eab-c0b5-c800-beb2b4d88c4b",
+      "title": "알보큐액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.",
+      "contentHash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</span></div>\n    <h1>알보큐액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당 부위를 1~3분간 눌러서 사용하십시오. 3~4일 간격으로 2회 사용하고, 증상이 사라지지 않으면 의사와 상의하십시오.<br>구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러 번 반복하여 발라서 사용하십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 국소적으로만 사용하십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약을 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약을 월경 중에 사용하지 마십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 말고 그대로 다음 용량을 적용하여 사용하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기 반응이 나타날 수 있습니다.\n강한 산성으로 인해 치아의 법랑질에 손상을 줄 수 있습니다.</li>\n      <li>이러한 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약을 사용하는 동안 다른 외용제와 병행하여 사용하지 마십시오.</li>\n      <li>콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 사용에 주의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "permitCode": "202401206",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "sourceRef": "3c837f9a-47fb-ed97-7cf4-ff3015edc9f0",
+      "title": "동화알보칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.",
+      "contentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</span></div>\n    <h1>동화알보칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다. 3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.<br>구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "2d9a44da-e4ab-f274-bf97-4cd095ca2711",
+      "title": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>다케다알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "45867269-1354-485a-8a72-fa9ffb84ecc9",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "permitCode": "201803043",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "046a4088-43ba-2d9f-d75e-1742cdb9cdef",
+      "title": "이반크린액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "b56a66e1b41f472906904fcc2d7e2e67",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>이반크린액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201803043 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201803043 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "5979759d-898f-44ed-9383-fdfd39e38510",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "permitCode": "201604703",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "c4ae7b93-4598-da9f-fe67-614ab53de393",
+      "title": "알보제로액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "aac37f9028a2f9b2a017bf9fe4b77794",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보제로액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "permitCode": "201604703",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "4041704e-34c0-c64a-c971-266ec36218f2",
+      "title": "알보제로액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "aac37f9028a2f9b2a017bf9fe4b77794",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보제로액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "637bf823-834c-41bf-9d08-14b9863d390d",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "permitCode": "200902501",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "sourceRef": "885705d0-aca1-c931-43dc-545a2b084fab",
+      "title": "알보큐액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.",
+      "contentHash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</span></div>\n    <h1>알보큐액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당 부위를 1~3분간 눌러서 사용하십시오. 3~4일 간격으로 2회 사용하고, 증상이 사라지지 않으면 의사와 상의하십시오.<br>구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러 번 반복하여 발라서 사용하십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 국소적으로만 사용하십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약을 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약을 월경 중에 사용하지 마십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 말고 그대로 다음 용량을 적용하여 사용하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기 반응이 나타날 수 있습니다.\n강한 산성으로 인해 치아의 법랑질에 손상을 줄 수 있습니다.</li>\n      <li>이러한 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약을 사용하는 동안 다른 외용제와 병행하여 사용하지 마십시오.</li>\n      <li>콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 사용에 주의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "823d0370-dc22-42ff-a792-8174ac9c97ab",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "4aff7ceb-fbe7-d55b-e8a1-821bf3896b35",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "87bbc7ac-3b82-4b10-8342-c564a26cc203",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "permitCode": "202401206",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "sourceRef": "70f53e24-f995-2b07-f6be-93f78c931374",
+      "title": "동화알보칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.",
+      "contentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</span></div>\n    <h1>동화알보칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202401206 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다. 3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.<br>구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.</li>\n      <li>치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n      <li>이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "8e936824-6699-4e1e-bf47-a11d5d95fded",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "097d48f6-ed52-e384-f71f-2207fcbc63c9",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "b9559edf-261b-4bc9-8fd4-b8f334a9c223",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "permitCode": "202400416",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
+      "sourceRef": "e64d360e-ead3-441d-7f0f-dcac2ccac88f",
+      "title": "이벤칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.",
+      "contentHash": "c84d124f5d772cc614c38721b281677f",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</span></div>\n    <h1>이벤칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 202400416 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 202400416 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염 환자는 용액을 적신 거즈를 질 안에 넣고, 가벼운 압력으로 해당부위를 1~3분 간 누르십시오. 3~4일 간격으로 두 번 사용하십시오.<br>구내염 및 치육염 환자는 적신 면봉 등을 이용해 여러 번 반복하여 바르십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 사용하지 마십시오.</li>\n      <li>월경 중에는 사용하지 마십시오.</li>\n      <li>성교를 하거나 자극적인 비누로 세척하지 마십시오.</li>\n      <li>이 약의 사용을 잊은 경우에는 용량을 보충하지 마십시오. 그대로 다음 용량을 적용하십시오.</li>\n      <li>이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.</li>\n      <li>증상이 사라지지 않으면 의사와 상의하십시오.</li>\n      <li>국소적으로만 사용하며, 눈에 들어가지 않도록 주의하십시오. 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.</li>\n      <li>구강점막이나 잇몸에 사용한 후에는 철저하게 입 안을 헹구십시오.</li>\n      <li>콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기 반응, 치아의 법랑질 손상 등이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약을 사용하는 동안 다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "c54e263e-8462-420b-8991-55877de140e7",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "permitCode": "201604643",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "db25dad0-68de-77d9-31cb-20dd5e7d33bc",
+      "title": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "715b06b16f71791afde9ac4c2545dcb6",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>애니메디콘센트레이트액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "ce58947e-a3bb-46f5-896f-bdabcd9fd987",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "5ef76142-e91a-c572-0f08-ee7079d84dc8",
+      "title": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>다케다알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "7f8b0b90-87dc-7815-de6b-c2cc1133e013",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "d64b331f-239b-43ad-ba4d-aaac93001c84",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "0615ba93-b38e-fa4b-6e4b-cbfe5e626b01",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "permitCode": "201702575",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "5f69461d-40f7-0973-25a7-73baf8634178",
+      "title": "오라메칠액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>오라메칠액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201702575 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201702575 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "7b19261f-2f18-d607-e9ba-b2c5fc205136",
+      "title": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "95fc5156e791821029e0673f55166de1",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "e118f024-834b-4afb-a4e2-acd856620e9d",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "permitCode": "201606382",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "6f2cd914-5667-9304-cfd9-88b7018db758",
+      "title": "페리터치액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "08bba17c7cbc05445b1abd1c517850f2",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>페리터치액(폴리크레줄렌액50%)<small>이 설명서는 품목기준코드 201606382 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>이 설명서는 품목기준코드 201606382 제품의 공식 허가사항을 기준으로 작성했습니다. 제품 선택 시 성분과 함량을 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "e768360a-49e1-4404-bece-ce7f8a27b6bf",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "permitCode": "201604643",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "sourceRef": "5fa5dded-a220-a79b-e293-4f6e69cd98d0",
+      "title": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "715b06b16f71791afde9ac4c2545dcb6",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>애니메디콘센트레이트액(폴리크레줄렌액50%)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제와 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "f2d70957-3c30-4b46-a407-bb216a079778",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "permitCode": "201506617",
+      "route": "oromucosal+vaginal",
+      "stratum": "A_NORMAL",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "sourceRef": "99a7a52c-d24c-928d-8a65-8d0dea21d775",
+      "title": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "summary": "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.",
+      "contentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 일반의약품</span><span class=\"sd-badge\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</span></div>\n    <h1>다케다알보칠콘센트레이트액(폴리크레줄렌)<small>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 일반의약품</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(214703CLQ) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다. 3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>다른 외용제를 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    }
+  ]
+}

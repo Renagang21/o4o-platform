@@ -1,0 +1,54 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "mode": "merge",
+  "before": 23,
+  "applied": 23,
+  "skippedExisting": 0,
+  "after": 23,
+  "pendingAfter": 0,
+  "rejected": 0,
+  "rejectedDetail": [],
+  "overwriteFrom": 0,
+  "overwritten": 6,
+  "overwrittenDetail": [
+    {
+      "shard": 0,
+      "ko": "이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.치료기간 중 성교를 하거나 자극적인 비누로",
+      "before": "Patients with hypersensitivity to this medicine and women during menstruation must not use this medicine. Before using this medicine, pregnant or breastfeeding ",
+      "after": "Patients with hypersensitivity to this medicine and women during menstruation must not use this medicine. Before using this medicine, pregnant or breastfeeding "
+    },
+    {
+      "shard": 0,
+      "ko": "이 약에 과민증 환자는 사용하지 마십시오.월경 중에는 사용하지 마십시오.성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 마십시오.그대",
+      "before": "Patients with hypersensitivity to this medicine must not use it. Do not use it during menstruation. Do not have intercourse or wash with irritating soap. If you",
+      "after": "Patients with hypersensitivity to this medicine must not use it. Do not use it during menstruation. Do not have intercourse or wash with irritating soap. If you"
+    },
+    {
+      "shard": 0,
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질",
+      "before": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeed",
+      "after": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeed"
+    },
+    {
+      "shard": 0,
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질",
+      "before": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeed",
+      "after": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeed"
+    },
+    {
+      "shard": 0,
+      "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.이 약은 국소적으로만 사용하십시오.이 약은 강한 산성을 띠고",
+      "before": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, pregnant and breastfeeding women should consult a doctor",
+      "after": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, pregnant and breastfeeding women should consult a doctor"
+    },
+    {
+      "shard": 0,
+      "ko": "이 약을 사용하는 동안 다른 외용제와 병행하여 사용하지 마십시오.콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 사용에 주의하십시오.",
+      "before": "While using this medicine, do not use it in combination with other preparations for external use. Take care in use, as it may weaken latex or rubber products su",
+      "after": "While using this medicine, do not use it in combination with other preparations for external use. Be careful in use, as it may weaken latex or rubber products s"
+    }
+  ],
+  "numericExemptions": 0,
+  "numericExemptionPolicy": "1일/1회 관용 1 · 제N도/N차성 서수 N 만 면제. 해당 숫자가 문장 내 다른 용도로 쓰이면 면제 없음. 용량·연령 실수치는 면제 대상 아님.",
+  "numericExemptionDetail": []
+}

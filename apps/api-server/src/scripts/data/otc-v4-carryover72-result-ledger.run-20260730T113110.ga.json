@@ -1,0 +1,1496 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "per-master-result-ledger",
+  "summary": {
+    "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+    "agent": "ga",
+    "writeOwner": "agent-ga",
+    "batchId": "otc-v4-carryover72",
+    "mode": "APPLY",
+    "port": 5510,
+    "startedAt": "2026-07-30T11:31:10.503Z",
+    "target": 26,
+    "processed": 26,
+    "green": 26,
+    "exception": 0,
+    "skip": 0,
+    "dryOrRollback": 0,
+    "koWriteActual": 104,
+    "enWriteActual": 52,
+    "writeActual": 156,
+    "expectedWrite": 156,
+    "byExceptionCode": {},
+    "byRouteProduced": {
+      "rectal": 26
+    },
+    "byStratum": {
+      "A_NORMAL": {
+        "total": 26,
+        "green": 26,
+        "exception": 0,
+        "skip": 0
+      }
+    },
+    "failedMasterResidueDirty": 0,
+    "checkpoints": 1,
+    "pass": true
+  },
+  "results": [
+    {
+      "masterId": "03a20337-efc0-4604-887e-7ce2c9cdeb02",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "247fcba9-6946-113b-1f3a-15a72da4f11e",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "0b7e6fad-1120-42e3-986c-d9760e87f68d",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "dce90a11-07a1-12ba-60d7-28c5749d2f5c",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "a308dd87-6659-6999-3676-2b1fe9e6e14f",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "0f13048a-58c7-4fa8-9c14-b880c17abab8",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "376e4c6b-3ecc-d645-edfb-dac1e571af6c",
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "koContentHash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+      "enContentHash": "4c5f31b67fe6a5a5a45cc3697f202319",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "4c5f31b67fe6a5a5a45cc3697f202319",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+        "enhash": "4c5f31b67fe6a5a5a45cc3697f202319"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "2478b2ee-3807-4879-804b-79999ef7d5ac",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "bea43907-2db2-e548-21be-e23aa6dd7eaa",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "a0c58713-8786-3820-60ae-2832c75f7743",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "444e477a-2b0b-44ed-828e-217efa1879a9",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "d17d086a-4027-d1e4-cee9-288450e8c38e",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "62ee507e-5275-4117-950f-10f5eda04873",
+      "productCode": "197300075",
+      "productName": "성광관장약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "df050967-20e4-d00f-b60f-d94865bb6ddd",
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
+      "koContentHash": "cb0af03a3a2755a7219f251845aa0ce3",
+      "enContentHash": "8afc6d5ffb2e6404af0e2592135b152d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb0af03a3a2755a7219f251845aa0ce3",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8afc6d5ffb2e6404af0e2592135b152d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "cb0af03a3a2755a7219f251845aa0ce3",
+        "enhash": "8afc6d5ffb2e6404af0e2592135b152d"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "6dea0670-6e70-453f-9676-b34d3d515172",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "d44beab5-5898-0c5e-9a2f-4c3cc051b3fb",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "7d07633a-7a4b-475e-b3a1-4415eb73a57a",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "d8138d8b-00e8-3dd9-525f-4caeb71d0a98",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "8246bf93-27e1-453f-a333-2f85257d8939",
+      "productCode": "197300075",
+      "productName": "성광관장약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "5383baa6-5f69-e5f3-6a7e-88512c3cdeeb",
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
+      "koContentHash": "cb0af03a3a2755a7219f251845aa0ce3",
+      "enContentHash": "8afc6d5ffb2e6404af0e2592135b152d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb0af03a3a2755a7219f251845aa0ce3",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8afc6d5ffb2e6404af0e2592135b152d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "cb0af03a3a2755a7219f251845aa0ce3",
+        "enhash": "8afc6d5ffb2e6404af0e2592135b152d"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "82aad70c-f415-4770-a91d-7b60a12ef7e4",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "6e49158d-2201-4b3d-2e00-476bea6a5f5d",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "87e84cba-3e78-432c-82f5-206454ef4b9e",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "dd3438c1-c07b-70e4-3f93-567e01296e79",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "fbe12b20-0f15-71cc-58de-0ad706c15348",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "9ee26830-3b41-d98e-8c9e-9bbf8149da19",
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "koContentHash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+      "enContentHash": "4c5f31b67fe6a5a5a45cc3697f202319",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "4c5f31b67fe6a5a5a45cc3697f202319",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+        "enhash": "4c5f31b67fe6a5a5a45cc3697f202319"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "a168a838-742d-4281-b9ae-1e0df32792ab",
+      "productCode": "197300075",
+      "productName": "성광관장약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "3d8c0e2b-404e-9787-94d1-6fef43b9d7ef",
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
+      "koContentHash": "cb0af03a3a2755a7219f251845aa0ce3",
+      "enContentHash": "8afc6d5ffb2e6404af0e2592135b152d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb0af03a3a2755a7219f251845aa0ce3",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8afc6d5ffb2e6404af0e2592135b152d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "cb0af03a3a2755a7219f251845aa0ce3",
+        "enhash": "8afc6d5ffb2e6404af0e2592135b152d"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "4b597faa-299d-5d70-297e-9cddcadd6435",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "a39b5bfb-c189-422f-a572-147f8791a717",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "57c4a397-c7d9-3bfb-05d8-2199d89d39c5",
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "koContentHash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+      "enContentHash": "4c5f31b67fe6a5a5a45cc3697f202319",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "4c5f31b67fe6a5a5a45cc3697f202319",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+        "enhash": "4c5f31b67fe6a5a5a45cc3697f202319"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "ac38a363-e135-4586-8438-25c26908c7ab",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "a74831b7-b625-7da0-fbc5-564ee9becfc6",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "c260cb10-8e40-4d66-ba0b-2e560e695a3b",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "5bb679c1-2fe3-5689-74c0-14c883f2a194",
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "koContentHash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+      "enContentHash": "4c5f31b67fe6a5a5a45cc3697f202319",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "4c5f31b67fe6a5a5a45cc3697f202319",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+        "enhash": "4c5f31b67fe6a5a5a45cc3697f202319"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "c889f3c7-ab54-4403-b12c-bb0cdba4896f",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "854d72a9-7cb4-f0c9-3a11-03a70a19bff1",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "cae55865-b208-229d-afab-9d915cfc9212",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "e0e1c75e-aa0f-4070-a186-45560d0c2819",
+      "productCode": "197300075",
+      "productName": "성광관장약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "b0dd48c9-d9a3-6225-85f8-c3e8851a3f35",
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
+      "koContentHash": "cb0af03a3a2755a7219f251845aa0ce3",
+      "enContentHash": "8afc6d5ffb2e6404af0e2592135b152d",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "cb0af03a3a2755a7219f251845aa0ce3",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "8afc6d5ffb2e6404af0e2592135b152d",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "cb0af03a3a2755a7219f251845aa0ce3",
+        "enhash": "8afc6d5ffb2e6404af0e2592135b152d"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
+      "productCode": "200512347",
+      "productName": "둘코락스좌약(비사코딜)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "be890654-f60b-58d5-e418-6bfdcda79bfd",
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
+      "koContentHash": "f048f8329aa4fe084cfc5788c70691eb",
+      "enContentHash": "2dd292997ca2f90bedb687b8d68bef46",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f048f8329aa4fe084cfc5788c70691eb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "2dd292997ca2f90bedb687b8d68bef46",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "f048f8329aa4fe084cfc5788c70691eb",
+        "enhash": "2dd292997ca2f90bedb687b8d68bef46"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "eb3d566f-7b06-46a0-8f19-725e346cf73c",
+      "productCode": "199702005",
+      "productName": "렉크린액(인산나트륨에네마)",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "e3a51ef9-171f-6151-7b72-6f80bd16d9f6",
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
+      "koContentHash": "77273c4a9f49380f2305c132fe1630a0",
+      "enContentHash": "c3732738c0a88bcdd914652306104940",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "77273c4a9f49380f2305c132fe1630a0",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "c3732738c0a88bcdd914652306104940",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "77273c4a9f49380f2305c132fe1630a0",
+        "enhash": "c3732738c0a88bcdd914652306104940"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    },
+    {
+      "masterId": "ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
+      "productCode": "199102142",
+      "productName": "복합써스펜좌약",
+      "stratum": "A_NORMAL",
+      "route": "rectal",
+      "sourceRef": "9acec731-6f35-fe61-6ba1-371821105689",
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
+      "koContentHash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+      "enContentHash": "4c5f31b67fe6a5a5a45cc3697f202319",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "4c5f31b67fe6a5a5a45cc3697f202319",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "status": "GREEN",
+      "committed": true,
+      "after": {
+        "easykocanon": 0,
+        "authoredkocanon": 1,
+        "authoredkoany": 1,
+        "encanon": 1,
+        "enany": 1,
+        "refrows": 2,
+        "refoutside": 0,
+        "auditn": 1,
+        "kohash": "02fa5287a8a86f6db87e35c0c7d61c9a",
+        "enhash": "4c5f31b67fe6a5a5a45cc3697f202319"
+      },
+      "postVerify": {
+        "fail": [],
+        "pass": true
+      }
+    }
+  ]
+}

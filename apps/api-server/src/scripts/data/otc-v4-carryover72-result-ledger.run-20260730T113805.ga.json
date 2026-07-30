@@ -1,0 +1,1840 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "per-master-result-ledger",
+  "summary": {
+    "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+    "agent": "ga",
+    "writeOwner": "agent-ga",
+    "batchId": "otc-v4-carryover72",
+    "mode": "rollback-test",
+    "port": 5510,
+    "startedAt": "2026-07-30T11:38:05.235Z",
+    "target": 30,
+    "processed": 30,
+    "green": 0,
+    "exception": 0,
+    "skip": 0,
+    "dryOrRollback": 30,
+    "koWriteActual": 0,
+    "enWriteActual": 0,
+    "writeActual": 0,
+    "expectedWrite": 0,
+    "byExceptionCode": {},
+    "byRouteProduced": {
+      "oromucosal+vaginal": 30
+    },
+    "byStratum": {
+      "A_NORMAL": {
+        "total": 30,
+        "green": 0,
+        "exception": 0,
+        "skip": 0
+      }
+    },
+    "failedMasterResidueDirty": 0,
+    "checkpoints": 2,
+    "pass": true
+  },
+  "results": [
+    {
+      "masterId": "12f3507e-fedd-4f00-b210-0467deebb691",
+      "productCode": "202400416",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "0864c842-27f6-9311-ab2c-df161b53c78b",
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
+      "koContentHash": "c84d124f5d772cc614c38721b281677f",
+      "enContentHash": "93ce41a48fd5bc2997b5a4629a84eb1f",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "c84d124f5d772cc614c38721b281677f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "93ce41a48fd5bc2997b5a4629a84eb1f",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "15e043a6-b27b-451a-a054-6d71faeb8eba",
+      "productCode": "201606382",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "6bfd6507-9416-e1ca-23ea-fd7718626360",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "08bba17c7cbc05445b1abd1c517850f2",
+      "enContentHash": "b89095926abab2c7ca14bed739f65903",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "08bba17c7cbc05445b1abd1c517850f2",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "b89095926abab2c7ca14bed739f65903",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
+      "productCode": "201803043",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "3648c604-838f-a20a-ef86-a733becd226e",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "b56a66e1b41f472906904fcc2d7e2e67",
+      "enContentHash": "96998a090f4dd222bfbbda3193b2bd1c",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "b56a66e1b41f472906904fcc2d7e2e67",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "96998a090f4dd222bfbbda3193b2bd1c",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
+      "productCode": "200902501",
+      "productName": "오라칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "4b4b11da-09fd-37fe-ca2e-4f03621ea1eb",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "koContentHash": "03547ba14266e6aa020538935dd3d8ee",
+      "enContentHash": "d8463959d85728b45f73ec02df812b71",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "03547ba14266e6aa020538935dd3d8ee",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "d8463959d85728b45f73ec02df812b71",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
+      "productCode": "201702575",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "71b0d3ca-42fa-c5b8-d8f7-c7bdd479989c",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+      "enContentHash": "0640f02639593070a85558c7794422b7",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0640f02639593070a85558c7794422b7",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "28158f9d-6aba-4912-a784-10feaa77fe4d",
+      "productCode": "201605110",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "839a4da8-a4bf-8076-b519-9045f2d2e3eb",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "e5941bff3076f16b02d422d2d937cf25",
+      "enContentHash": "74121e471156784259588a538251ce6f",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e5941bff3076f16b02d422d2d937cf25",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "74121e471156784259588a538251ce6f",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "28f68a84-db96-43ac-bc9c-6ccb4264d64f",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "72721182-6576-9607-86fa-0a1d9a1dbb97",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "koContentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "enContentHash": "a960db8f713d6a99306a59c16a0cc92e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d5666af4dba3f03e009299b1f5ef816a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a960db8f713d6a99306a59c16a0cc92e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "2a6baf5d-53e2-4437-8c87-37f0811a1717",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "2b7407d7-6c54-ed9c-37bd-e7811e882d1a",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "koContentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "enContentHash": "a960db8f713d6a99306a59c16a0cc92e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d5666af4dba3f03e009299b1f5ef816a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a960db8f713d6a99306a59c16a0cc92e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "2cf7c9db-4316-46f8-a735-83759c1b23eb",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "e42fcfe5-27eb-6cec-8b88-3e572c0fd3ad",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "3653eb12-eb2d-4344-8d37-1bfce061d5cd",
+      "productCode": "201605110",
+      "productName": "립톡케어액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "43ff37a0-739b-20e3-2dce-0131cf41b38c",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "e5941bff3076f16b02d422d2d937cf25",
+      "enContentHash": "74121e471156784259588a538251ce6f",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "e5941bff3076f16b02d422d2d937cf25",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "74121e471156784259588a538251ce6f",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "38c4e1df-bdad-43d6-9124-1e8626d2d429",
+      "productCode": "200902501",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "670e77d1-4eab-c0b5-c800-beb2b4d88c4b",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "koContentHash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+      "enContentHash": "d8463959d85728b45f73ec02df812b71",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "d8463959d85728b45f73ec02df812b71",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "3c837f9a-47fb-ed97-7cf4-ff3015edc9f0",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "koContentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "enContentHash": "a960db8f713d6a99306a59c16a0cc92e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d5666af4dba3f03e009299b1f5ef816a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a960db8f713d6a99306a59c16a0cc92e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
+      "productCode": "201506617",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "2d9a44da-e4ab-f274-bf97-4cd095ca2711",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "45867269-1354-485a-8a72-fa9ffb84ecc9",
+      "productCode": "201803043",
+      "productName": "이반크린액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "046a4088-43ba-2d9f-d75e-1742cdb9cdef",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "b56a66e1b41f472906904fcc2d7e2e67",
+      "enContentHash": "96998a090f4dd222bfbbda3193b2bd1c",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "b56a66e1b41f472906904fcc2d7e2e67",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "96998a090f4dd222bfbbda3193b2bd1c",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "5979759d-898f-44ed-9383-fdfd39e38510",
+      "productCode": "201604703",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "c4ae7b93-4598-da9f-fe67-614ab53de393",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "aac37f9028a2f9b2a017bf9fe4b77794",
+      "enContentHash": "bc79e4fb4006f7673daa8b37f4347f22",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "aac37f9028a2f9b2a017bf9fe4b77794",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "bc79e4fb4006f7673daa8b37f4347f22",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
+      "productCode": "201604703",
+      "productName": "알보제로액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "4041704e-34c0-c64a-c971-266ec36218f2",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "aac37f9028a2f9b2a017bf9fe4b77794",
+      "enContentHash": "bc79e4fb4006f7673daa8b37f4347f22",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "aac37f9028a2f9b2a017bf9fe4b77794",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "bc79e4fb4006f7673daa8b37f4347f22",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "637bf823-834c-41bf-9d08-14b9863d390d",
+      "productCode": "200902501",
+      "productName": "알보큐액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "885705d0-aca1-c931-43dc-545a2b084fab",
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
+      "koContentHash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+      "enContentHash": "d8463959d85728b45f73ec02df812b71",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "f83d279ac00abeb2d9d32c6d13fb83cb",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "d8463959d85728b45f73ec02df812b71",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "823d0370-dc22-42ff-a792-8174ac9c97ab",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "4aff7ceb-fbe7-d55b-e8a1-821bf3896b35",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "87bbc7ac-3b82-4b10-8342-c564a26cc203",
+      "productCode": "202401206",
+      "productName": "동화알보칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "70f53e24-f995-2b07-f6be-93f78c931374",
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
+      "koContentHash": "d5666af4dba3f03e009299b1f5ef816a",
+      "enContentHash": "a960db8f713d6a99306a59c16a0cc92e",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "d5666af4dba3f03e009299b1f5ef816a",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "a960db8f713d6a99306a59c16a0cc92e",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "8e936824-6699-4e1e-bf47-a11d5d95fded",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "097d48f6-ed52-e384-f71f-2207fcbc63c9",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "b9559edf-261b-4bc9-8fd4-b8f334a9c223",
+      "productCode": "202400416",
+      "productName": "이벤칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "e64d360e-ead3-441d-7f0f-dcac2ccac88f",
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
+      "koContentHash": "c84d124f5d772cc614c38721b281677f",
+      "enContentHash": "93ce41a48fd5bc2997b5a4629a84eb1f",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "c84d124f5d772cc614c38721b281677f",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "93ce41a48fd5bc2997b5a4629a84eb1f",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "c54e263e-8462-420b-8991-55877de140e7",
+      "productCode": "201604643",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "db25dad0-68de-77d9-31cb-20dd5e7d33bc",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "715b06b16f71791afde9ac4c2545dcb6",
+      "enContentHash": "aa7fa34b80d8bcf4e89f1f7349014337",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "715b06b16f71791afde9ac4c2545dcb6",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "aa7fa34b80d8bcf4e89f1f7349014337",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "ce58947e-a3bb-46f5-896f-bdabcd9fd987",
+      "productCode": "201506617",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "5ef76142-e91a-c572-0f08-ee7079d84dc8",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "7f8b0b90-87dc-7815-de6b-c2cc1133e013",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "d64b331f-239b-43ad-ba4d-aaac93001c84",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "0615ba93-b38e-fa4b-6e4b-cbfe5e626b01",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
+      "productCode": "201702575",
+      "productName": "오라메칠액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "5f69461d-40f7-0973-25a7-73baf8634178",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+      "enContentHash": "0640f02639593070a85558c7794422b7",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "ab014ddb5ff8899e51e5a3c5677b77ba",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "0640f02639593070a85558c7794422b7",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
+      "productCode": "201506617",
+      "productName": "알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "7b19261f-2f18-d607-e9ba-b2c5fc205136",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "95fc5156e791821029e0673f55166de1",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "95fc5156e791821029e0673f55166de1",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "e118f024-834b-4afb-a4e2-acd856620e9d",
+      "productCode": "201606382",
+      "productName": "페리터치액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "6f2cd914-5667-9304-cfd9-88b7018db758",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "08bba17c7cbc05445b1abd1c517850f2",
+      "enContentHash": "b89095926abab2c7ca14bed739f65903",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "08bba17c7cbc05445b1abd1c517850f2",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "b89095926abab2c7ca14bed739f65903",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "e768360a-49e1-4404-bece-ce7f8a27b6bf",
+      "productCode": "201604643",
+      "productName": "애니메디콘센트레이트액(폴리크레줄렌액50%)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "5fa5dded-a220-a79b-e293-4f6e69cd98d0",
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
+      "koContentHash": "715b06b16f71791afde9ac4c2545dcb6",
+      "enContentHash": "aa7fa34b80d8bcf4e89f1f7349014337",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "715b06b16f71791afde9ac4c2545dcb6",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "aa7fa34b80d8bcf4e89f1f7349014337",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    },
+    {
+      "masterId": "f2d70957-3c30-4b46-a407-bb216a079778",
+      "productCode": "201506617",
+      "productName": "다케다알보칠콘센트레이트액(폴리크레줄렌)",
+      "stratum": "A_NORMAL",
+      "route": "oromucosal+vaginal",
+      "sourceRef": "99a7a52c-d24c-928d-8a65-8d0dea21d775",
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
+      "koContentHash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+      "enContentHash": "f20e18e19a2b9485e781ea817de4fc03",
+      "ko": {
+        "writeActual": 4,
+        "writePlan": 4,
+        "post": {
+          "canoncnt": 1,
+          "authored": 1,
+          "dep": 1,
+          "easyleft": 0,
+          "storedhash": "db5b113b8d3bc1c2edbf0032cf6efb85",
+          "outside": 0,
+          "auditn": 1
+        },
+        "fail": []
+      },
+      "en": {
+        "writeActual": 2,
+        "writePlan": 2,
+        "post": {
+          "encanon": 1,
+          "storedhash": "f20e18e19a2b9485e781ea817de4fc03",
+          "outside": 0
+        },
+        "fail": []
+      },
+      "koWriteActual": 0,
+      "enWriteActual": 0,
+      "writeActual": 0,
+      "status": "ROLLBACK_TEST_PASS",
+      "committed": false,
+      "txWritten": 6,
+      "after": {
+        "easykocanon": 1,
+        "authoredkocanon": 0,
+        "authoredkoany": 0,
+        "encanon": 0,
+        "enany": 0,
+        "refrows": 0,
+        "refoutside": 0,
+        "auditn": 0,
+        "kohash": null,
+        "enhash": null
+      },
+      "residue": {
+        "authoredKoAny": 0,
+        "enAny": 0,
+        "refRows": 0,
+        "auditRows": 0
+      },
+      "residueClean": true
+    }
+  ]
+}

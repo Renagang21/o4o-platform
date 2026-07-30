@@ -1,0 +1,40 @@
+{
+ "ranAt": "2026-07-30T11:36:28.393Z",
+ "applied": false,
+ "dbWrites": 0,
+ "targetsRendered": 300,
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "wrapperProof": {
+  "withoutWrapper": {
+   "card_maxWidth": "none",
+   "card_borderRadius": "0px",
+   "hero_padding": "0px"
+  },
+  "withWrapper": {
+   "card_maxWidth": "860px",
+   "card_borderRadius": "20px",
+   "hero_padding": "40px 34px 32px"
+  },
+  "cssActuallyApplied": true
+ },
+ "aggregate": {
+  "checked": 900,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "rawBracketIntroducedByPatch": 0,
+  "rawBracketPreExisting": 36,
+  "clauseMissing": 0,
+  "footerMissing": 0,
+  "undefinedClass": 0,
+  "headingOrderBad": 0,
+  "sectionMissing": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}

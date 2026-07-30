@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "checkpoint-ledger",
+  "every": 26,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 26,
+      "lastMasterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
+      "green": 0,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 0,
+      "at": "2026-07-30T11:38:19.239Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 30,
+      "lastMasterId": "f2d70957-3c30-4b46-a407-bb216a079778",
+      "green": 0,
+      "exception": 0,
+      "skip": 0,
+      "writeActual": 0,
+      "at": "2026-07-30T11:38:21.054Z"
+    }
+  ]
+}

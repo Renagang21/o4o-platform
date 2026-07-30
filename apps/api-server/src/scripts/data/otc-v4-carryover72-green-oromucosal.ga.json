@@ -1,0 +1,343 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "green-ledger",
+  "total": 16,
+  "rows": [
+    {
+      "status": "GREEN",
+      "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "f63140ac-a303-fd56-11f4-28390b7d457e",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "36a519ea-76cd-0f66-33e9-02997575a0d6",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "365136fa-fd7e-4d01-bf63-97e257e5cac6",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "e9ef16a4-76dc-946e-a2a9-52ec1a0e9aa8",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "3877c15c-ee9b-4276-b314-cce91ac5470c",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "ba9dcb0e-7668-d9d8-0f8d-4f97013aa265",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "f259b971-a9b2-5e0f-8507-ef56bd02ecea",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "8995abbe-16d3-72fb-ecfd-172bc84c6b46",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "514655f8-44de-4e14-99dc-fffcc87922b2",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "3a4f3a82-a68c-e303-f813-0a44b65fac19",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "c598b69f-b1c8-bd8e-a6c5-3d4086a115b5",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "7149ae65-32e3-4893-968a-6ae120fbb356",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "82bb64b0-afb8-82b6-4bc3-872f864e1ba7",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "8281f7f7-55b0-4633-8c8a-4ae859f601ae",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "2a8da621-4b79-f706-aa78-1dc5545ddc70",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "8447ff23-b556-4101-b4aa-e64d86cac39f",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "3818093b-065e-5e02-ef28-797ec2407e9a",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "a6675c37-9332-4e08-a4ce-c599eda85d7a",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "8caf04f3-dc1e-fbc2-1a22-4bd54cc8c20d",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드",
+      "route": "oromucosal",
+      "sourceRef": "1d97679b-6d42-f8e9-0593-325391bfce30",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "5499dc968810a84db1554cf62e27244b",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "84843c8d-3312-df55-6ba2-e32ac6c8dd8a",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "c5406795-ba3c-4dcf-a350-81b9aed4bb89",
+      "productCode": "201804150",
+      "productName": "뷰티스홈10%겔(카바마이드퍼옥사이드)",
+      "route": "oromucosal",
+      "sourceRef": "9e5575b5-e126-415f-a633-8771865877eb",
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
+      "koContentHash": "cab6f34a79fe2f65f1a372111f61710c",
+      "enContentHash": "a446775b936ebc12c58b9f09a6bab2ab",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    },
+    {
+      "status": "GREEN",
+      "masterId": "d1faae5d-0181-4ebd-a764-4c527575013a",
+      "productCode": "201804151",
+      "productName": "뷰티스홈15%겔",
+      "route": "oromucosal",
+      "sourceRef": "e379ad3f-b141-1cf9-60c8-13bffd19981e",
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
+      "koContentHash": "be92303be835f1851eada21663b24dc6",
+      "enContentHash": "91c75450c7c5978895504ef292f79dc2",
+      "koWriteActual": 4,
+      "enWriteActual": 2,
+      "writeActual": 6,
+      "auditRows": 1,
+      "canonicalState": {
+        "authoredKoCanonical": 1,
+        "enCanonical": 1,
+        "easyKoCanonicalLeft": 0
+      },
+      "independentVerify": "PASS"
+    }
+  ]
+}
