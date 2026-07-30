@@ -1,0 +1,374 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-HUMAN-REVIEW-QUEUE-BUILD-V1",
+ "contract": "§7~§10 — 사람 검토 원본 4집합 read-only 검증. 원본 파일 수정 0 · DB 접근 0.",
+ "generatedAt": "2026-07-30T06:51:29.493Z",
+ "dbWrite": 0,
+ "baseCommit": "55c99593f",
+ "sources": {
+  "A": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-function-backfill-human-review-targets-v2.json",
+   "sha256": "64981b67e783f24b3b3d2e54a1650c04484c32d03dafe001f6bc656d6e76a620"
+  },
+  "A_ANALYSIS": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-function-clause-human-review-analysis-v2.json",
+   "sha256": "e27e98ce82922a643488d3b2f21dee453b067e5c046f79be83767f5e3765fb92"
+  },
+  "A_REGRESSION": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-function-clause-full-regression-v2.json",
+   "sha256": "b4ed7fc086937f941c9a20419883f96c5e9afd0bbafa0acb38fc58bc774bff18"
+  },
+  "B": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-skipped-existing-2451-review-targets-v1.json",
+   "sha256": "075d00fa94ace075918612098af6d4e5fadb1f2a74b02a93faad2672851d2622"
+  },
+  "B_DIFF": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-skipped-existing-2451-function-diff-v1.json",
+   "sha256": "56ad8533fac7da805c0fb484175fc6d977a4d92c0996aa386e8f158167dcff1f"
+  },
+  "B_FAMILY": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-skipped-existing-2451-renderer-family-audit-v1.json",
+   "sha256": "e43f5f79d92fdef9d8c4caf8d8201ed3744764abd47577abd14a5ee4bd67c60a"
+  },
+  "B_VERIFY": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-skipped-existing-2451-independent-verification-v1.json",
+   "sha256": "13e70da686ba5bdb7ec23dcfb5098dbe7ac253f2fb3d375ab360ffab465b8c80"
+  },
+  "D": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-agent-09-hold-queue-v1.jsonl",
+   "sha256": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11"
+  },
+  "D_SUMMARY": {
+   "file": "apps/api-server/src/scripts/data/hff-ko-agent-09-hold-queue-summary-v1.json",
+   "sha256": "ba6dad26189511fe53ab2dafa1233c448f6ea1854d4879920462696c7b905ed8"
+  }
+ },
+ "setA": {
+  "count": 3652,
+  "buckets": {
+   "SKIPPED_EXISTING": 844,
+   "CREATED": 2808
+  },
+  "reasonTally": {
+   "HUMAN_REVIEW_REQUIRED": 3652,
+   "UNRESOLVED_SEGMENT_PRESENT": 2729,
+   "LABEL_ISSUE:UNCLOSED_BRACKET": 33,
+   "ENGLISH_ONLY_CLAUSE": 252,
+   "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET": 10,
+   "LABEL_ISSUE:ENGLISH_CLAIM_IN_BRACKET": 2,
+   "SOURCE_LINE_BREAK_FRAGMENTED": 2
+  },
+  "recommendedActionTally": {
+   "MANUAL_CLASSIFICATION_CONFIRMATION": 923,
+   "MANUAL_SEGMENT_CONFIRMATION": 2729
+  },
+  "statusTally": {
+   "PENDING_REVIEW": 3652
+  }
+ },
+ "setB": {
+  "count": 206,
+  "classification": {
+   "HUMAN_REVIEW_REQUIRED": 138,
+   "STRUCTURE_ADAPTER_REQUIRED": 68
+  },
+  "applyStatus": {
+   "HUMAN_REVIEW": 138,
+   "UNSUPPORTED_STRUCTURE": 68
+  },
+  "family": {
+   "COMPOSITE": 206
+  },
+  "reasonTally": {
+   "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS": 4,
+   "INGREDIENT_CARD_NOT_FOUND": 33,
+   "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS": 9,
+   "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL": 26,
+   "INSERT_CLAUSE_CARRIES_INLINE_LABEL": 3,
+   "MULTIPLE_FUNCTIONAL_SECTIONS": 5,
+   "NO_FUNCTIONAL_SECTION": 68,
+   "INSERT_CLAUSE_NO_FUNCTION_PREDICATE": 6,
+   "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT": 38,
+   "INSERT_CLAUSE_LEADING_PUNCTUATION": 10,
+   "PARTIAL_DUPLICATION_RISK": 4
+  }
+ },
+ "setC": {
+  "count": 2,
+  "items": [
+   {
+    "candidateId": "1ac13d80-633e-4fcb-abc1-acdf85b30cfd",
+    "statementNo": "201000190041434",
+    "productName": "뼈앤칼마디",
+    "productionBucket": "SKIPPED_EXISTING",
+    "canonicalId": "fca569cc-af62-4edf-b14c-81a158b9f059",
+    "reviewReasons": [
+     "HUMAN_REVIEW_REQUIRED",
+     "UNRESOLVED_SEGMENT_PRESENT",
+     "SOURCE_LINE_BREAK_FRAGMENTED"
+    ],
+    "unresolvedFragments": [
+     "움을 줌"
+    ],
+    "sourceLineBreakContext": [
+     "[비오틴]①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+     "[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+     "[아연]①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+     "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도",
+     "움을 줌",
+     "[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+     "[구리]①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요"
+    ],
+    "inB": false
+   },
+   {
+    "candidateId": "1408fd08-6dc4-4ee1-87c2-a3e5dc4ba1c5",
+    "statementNo": "201000190041442",
+    "productName": "The K2칼마디채움",
+    "productionBucket": "SKIPPED_EXISTING",
+    "canonicalId": "fda7266e-4918-4741-91c3-bd313a907b16",
+    "reviewReasons": [
+     "HUMAN_REVIEW_REQUIRED",
+     "UNRESOLVED_SEGMENT_PRESENT",
+     "SOURCE_LINE_BREAK_FRAGMENTED"
+    ],
+    "unresolvedFragments": [
+     "움을 줌"
+    ],
+    "sourceLineBreakContext": [
+     "[비타민D]①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+     "[비타민K]①정상적인 혈액응고에 필요②뼈의 구성에 필요",
+     "[칼슘]①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도",
+     "움을 줌",
+     "[마그네슘]①에너지 이용에 필요②신경과 근육 기능 유지에 필요"
+    ],
+    "inB": false
+   }
+  ]
+ },
+ "setD": {
+  "count": 348,
+  "queueSha256": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11",
+  "byPriority": {
+   "1": 5,
+   "2": 29,
+   "3": 314
+  },
+  "byReason": {
+   "HINT_UNDER_EXTRACTION": 5,
+   "NO_FUNCTIONAL_DATA": 29,
+   "NO_INTAKE_DATA": 314
+  },
+  "statusTally": {
+   "PENDING": 348
+  }
+ },
+ "checks": [
+  {
+   "name": "A_ROW_COUNT_3652",
+   "ok": true,
+   "evidence": {
+    "rows": 3652,
+    "declared": 3652
+   }
+  },
+  {
+   "name": "A_CANDIDATE_ID_UNIQUE",
+   "ok": true,
+   "evidence": {
+    "dup": 0
+   }
+  },
+  {
+   "name": "A_CANONICAL_ID_UNIQUE",
+   "ok": true,
+   "evidence": {
+    "dup": 0
+   }
+  },
+  {
+   "name": "A_BUCKETS_2808_844",
+   "ok": true,
+   "evidence": {
+    "SKIPPED_EXISTING": 844,
+    "CREATED": 2808
+   }
+  },
+  {
+   "name": "A_REQUIRED_FIELDS_PRESENT",
+   "ok": true,
+   "evidence": {
+    "violations": [],
+    "count": 0
+   }
+  },
+  {
+   "name": "A_ALL_PENDING_REVIEW",
+   "ok": true,
+   "evidence": {
+    "PENDING_REVIEW": 3652
+   }
+  },
+  {
+   "name": "A_MATCHES_ANALYSIS_SSOT",
+   "ok": true,
+   "evidence": {
+    "analysisTotal": 3652,
+    "analysisBuckets": {
+     "SKIPPED_EXISTING": 844,
+     "CREATED": 2808
+    }
+   }
+  },
+  {
+   "name": "B_ROW_COUNT_206",
+   "ok": true,
+   "evidence": {
+    "rows": 206,
+    "declared": 206
+   }
+  },
+  {
+   "name": "B_138_PLUS_68",
+   "ok": true,
+   "evidence": {
+    "HUMAN_REVIEW": 138,
+    "UNSUPPORTED_STRUCTURE": 68
+   }
+  },
+  {
+   "name": "B_CANDIDATE_ID_UNIQUE",
+   "ok": true,
+   "evidence": {
+    "dup": 0
+   }
+  },
+  {
+   "name": "B_CANONICAL_ID_UNIQUE",
+   "ok": true,
+   "evidence": {
+    "dup": 0
+   }
+  },
+  {
+   "name": "B_CANONICAL_ID_PRESENT",
+   "ok": true,
+   "evidence": {
+    "missing": 0
+   }
+  },
+  {
+   "name": "B_FAMILY_KNOWN",
+   "ok": true,
+   "evidence": {
+    "COMPOSITE": 206
+   }
+  },
+  {
+   "name": "B_REASON_PRESENT",
+   "ok": true,
+   "evidence": {
+    "missing": 0
+   }
+  },
+  {
+   "name": "B_REPRODUCIBLE_FROM_DIFF",
+   "ok": true,
+   "evidence": {
+    "diffReviewRows": 206,
+    "diffApplyStatusCount": {
+     "NO_CHANGE": 2232,
+     "HUMAN_REVIEW": 138,
+     "SAFE_APPLY": 13,
+     "UNSUPPORTED_STRUCTURE": 68
+    }
+   }
+  },
+  {
+   "name": "B_FAMILY_MATCHES_FAMILY_AUDIT",
+   "ok": true,
+   "evidence": {
+    "mismatch": 0
+   }
+  },
+  {
+   "name": "B_DISJOINT_FROM_APPLIED_13",
+   "ok": true,
+   "evidence": {
+    "appliedRows": 13,
+    "appliedVerdict": "PASS"
+   }
+  },
+  {
+   "name": "C_ROW_COUNT_2",
+   "ok": true,
+   "evidence": {
+    "rows": 2
+   }
+  },
+  {
+   "name": "C_MATCHES_REGRESSION_DIAGNOSTIC",
+   "ok": true,
+   "evidence": {
+    "declared": 2,
+    "found": 2
+   }
+  },
+  {
+   "name": "C_SUBSET_OF_A",
+   "ok": true,
+   "evidence": {
+    "count": 2
+   }
+  },
+  {
+   "name": "C_FRAGMENT_EVIDENCE_PRESENT",
+   "ok": true,
+   "evidence": {
+    "evidence": [
+     {
+      "candidateId": "1ac13d80-633e-4fcb-abc1-acdf85b30cfd",
+      "fragments": 1
+     },
+     {
+      "candidateId": "1408fd08-6dc4-4ee1-87c2-a3e5dc4ba1c5",
+      "fragments": 1
+     }
+    ]
+   }
+  },
+  {
+   "name": "D_ROW_COUNT_348",
+   "ok": true,
+   "evidence": {
+    "rows": 348,
+    "declared": 348
+   }
+  },
+  {
+   "name": "D_ALL_PENDING_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "PENDING": 348
+   }
+  },
+  {
+   "name": "UNION_SIZE_CONSISTENT",
+   "ok": true,
+   "evidence": {
+    "union": 3858,
+    "A": 3652,
+    "B\\A": 206,
+    "C\\(A∪B)": 0
+   }
+  },
+  {
+   "name": "C_ALREADY_IN_UNION_NO_EXTRA_ROW",
+   "ok": true,
+   "evidence": {
+    "cInA": 2,
+    "C": 2
+   }
+  }
+ ],
+ "verdict": "PASS"
+}

@@ -1,0 +1,111 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-HUMAN-REVIEW-QUEUE-BUILD-V1",
+ "contract": "§23 — DB write 0 증명. BEFORE == AFTER, INSERT/UPDATE/DELETE = 0.",
+ "generatedAt": "2026-07-30T07:02:40.193Z",
+ "before": {
+  "hff_canonical": 40913,
+  "masters": 40913,
+  "candidates": 40913,
+  "corpus_md5": "ebc73eaf078d0bf35eeb33973d4b6b34",
+  "max_updated_at": "2026-07-29T21:33:09.753Z",
+  "store_ko_canonical": 63321,
+  "candidates_total": 394495,
+  "candidates_deleted": 0,
+  "maxUpdatedAt": "2026-07-29T21:33:09.753Z"
+ },
+ "after": {
+  "hff_canonical": 40913,
+  "masters": 40913,
+  "candidates": 40913,
+  "corpus_md5": "ebc73eaf078d0bf35eeb33973d4b6b34",
+  "max_updated_at": "2026-07-29T21:33:09.753Z",
+  "store_ko_canonical": 63321,
+  "candidates_total": 394495,
+  "candidates_deleted": 0,
+  "maxUpdatedAt": "2026-07-29T21:33:09.753Z"
+ },
+ "diff": [],
+ "writes": {
+  "insert": 0,
+  "update": 0,
+  "delete": 0
+ },
+ "checks": [
+  {
+   "name": "TRANSACTION_READ_ONLY",
+   "ok": true,
+   "evidence": {
+    "transactionReadOnly": "on"
+   }
+  },
+  {
+   "name": "HFF_CANONICAL_TOTAL_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": 40913,
+    "after": 40913
+   }
+  },
+  {
+   "name": "STORE_KO_CANONICAL_TOTAL_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": 63321,
+    "after": 63321
+   }
+  },
+  {
+   "name": "CORPUS_HASH_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": "ebc73eaf078d0bf35eeb33973d4b6b34",
+    "after": "ebc73eaf078d0bf35eeb33973d4b6b34"
+   }
+  },
+  {
+   "name": "MASTER_LINK_COUNT_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": {
+     "masters": 40913,
+     "candidates": 40913
+    },
+    "after": {
+     "masters": 40913,
+     "candidates": 40913
+    }
+   }
+  },
+  {
+   "name": "CANDIDATE_TABLE_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": {
+     "total": 394495,
+     "deleted": 0
+    },
+    "after": {
+     "total": 394495,
+     "deleted": 0
+    }
+   }
+  },
+  {
+   "name": "MAX_UPDATED_AT_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": "2026-07-29T21:33:09.753Z",
+    "after": "2026-07-29T21:33:09.753Z"
+   }
+  },
+  {
+   "name": "AGENT9_QUEUE_FILE_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "before": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11",
+    "after": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11"
+   }
+  }
+ ],
+ "verdict": "PASS"
+}

@@ -1,0 +1,44 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-HUMAN-REVIEW-QUEUE-BUILD-V1",
+ "contract": "§11·§12 — candidateId 기준 집합 대조. FINAL_FUNCTION_REVIEW_QUEUE = A ∪ B ∪ C. D 는 교집합 메타데이터로만 연결하며 큐 수에 합산하지 않는다.",
+ "generatedAt": "2026-07-30T06:51:29.721Z",
+ "sizes": {
+  "A": 3652,
+  "B": 206,
+  "C": 2,
+  "D": 348
+ },
+ "intersections": {
+  "A∩B": 0,
+  "A∩C": 2,
+  "B∩C": 0,
+  "A∩D": 0,
+  "B∩D": 0,
+  "C∩D": 0
+ },
+ "intersectionMembers": {
+  "A∩B": [],
+  "A∩C": [
+   "1ac13d80-633e-4fcb-abc1-acdf85b30cfd",
+   "1408fd08-6dc4-4ee1-87c2-a3e5dc4ba1c5"
+  ],
+  "B∩C": [],
+  "A∩D": [],
+  "B∩D": [],
+  "C∩D": []
+ },
+ "differences": {
+  "A\\B": 3652,
+  "B\\A": 206,
+  "C\\A": 0,
+  "C\\(A∪B)": 0
+ },
+ "finalUniqueQueueSize": 3858,
+ "interpretation": [
+  "|A ∪ B ∪ C| = 3858 — 이 값이 FINAL_FUNCTION_REVIEW_QUEUE 의 고유 대상 수다.",
+  "A ∩ B = 0 — 2,451 트랙 모집단은 V2 사람 검토 3,652 과 구성상 서로소이므로 교집합 0 이 정상이다.",
+  "C ⊂ A (2/2) — SOURCE_LINE_BREAK_FRAGMENTED 2건은 이미 A 에 포함되어 별도 행을 추가하지 않고 사유 태그만 병합한다.",
+  "A ∩ D = 0, B ∩ D = 0 — Agent 9 HOLD 348 은 canonical 미보유(HOLD) 집합이라 기능성 절 검토 후보와 교집합이 0 이다. 교집합 0 도 감사 결과로 명시한다(§10)."
+ ],
+ "verdict": "PASS"
+}

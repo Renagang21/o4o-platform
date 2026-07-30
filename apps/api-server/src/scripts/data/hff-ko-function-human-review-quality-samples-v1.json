@@ -1,0 +1,8410 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-HUMAN-REVIEW-QUEUE-BUILD-V1",
+ "contract": "§21·§22 — 표본 최소 80건 + 큐 전체 감사. 사람 검토 판정은 수행하지 않는다. DB write 0.",
+ "generatedAt": "2026-07-30T07:04:03.367Z",
+ "queueTotal": 3858,
+ "splitTotal": 0,
+ "sampleSize": 80,
+ "sampleByStratum": {
+  "P1": 30,
+  "P2": 30,
+  "P3": 20
+ },
+ "samplingRule": "우선순위 구간별 균등 간격(결정적) 추출. P2·Agent9 부족분은 P1 로 보충(§21).",
+ "fullQueueChecks": [
+  {
+   "name": "QUEUE_SIZE_EQUALS_UNION",
+   "ok": true,
+   "evidence": {
+    "queue": 3858,
+    "split": 0,
+    "union": 3858
+   }
+  },
+  {
+   "name": "CANDIDATE_ID_UNIQUE",
+   "ok": true,
+   "evidence": {
+    "rows": 3858,
+    "unique": 3858
+   }
+  },
+  {
+   "name": "QUEUE_INDEX_CONTIGUOUS_FROM_1",
+   "ok": true,
+   "evidence": {
+    "first": 1,
+    "last": 3858
+   }
+  },
+  {
+   "name": "REQUIRED_FIELDS_PRESENT",
+   "ok": true,
+   "evidence": {
+    "missing": []
+   }
+  },
+  {
+   "name": "ALL_REVIEW_STATUS_PENDING",
+   "ok": true,
+   "evidence": {
+    "PENDING": 3858
+   }
+  },
+  {
+   "name": "PRIORITY_IN_RANGE",
+   "ok": true,
+   "evidence": {
+    "1": 2252,
+    "2": 149,
+    "3": 1457
+   }
+  },
+  {
+   "name": "STANDARDIZED_REASONS_IN_VOCABULARY",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "RECOMMENDED_ACTION_IN_VOCABULARY",
+   "ok": true,
+   "evidence": {
+    "REVIEW_SOURCE_BOUNDARY": 2250,
+    "REVIEW_ORIGINAL_LINE_BREAK": 2,
+    "REVIEW_COMPOSITE_GROUPING": 39,
+    "REVIEW_RENDERER_STRUCTURE": 101,
+    "REVIEW_CANONICAL_PATCH_LOCATION": 9,
+    "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS": 1251,
+    "REVIEW_ENGLISH_POLICY": 206
+   }
+  },
+  {
+   "name": "CURRENT_STATE_IN_VOCABULARY",
+   "ok": true,
+   "evidence": {
+    "READY_FOR_REVIEW": 3858
+   }
+  },
+  {
+   "name": "SOURCE_SETS_IN_VOCABULARY",
+   "ok": true,
+   "evidence": {
+    "V2_HUMAN_REVIEW": 3652,
+    "SKIPPED_HUMAN_REVIEW": 138,
+    "SOURCE_LINE_BREAK_FRAGMENTED": 2,
+    "SKIPPED_UNSUPPORTED_STRUCTURE": 68
+   }
+  },
+  {
+   "name": "ORIGINAL_REASONS_PRESERVED",
+   "ok": true,
+   "evidence": {
+    "note": "원본 파일의 reviewReasons·reason 전부가 originalReviewReasons 에 남아있는지 확인"
+   }
+  },
+  {
+   "name": "SORT_ORDER_VALID",
+   "ok": true,
+   "evidence": {
+    "violations": 0
+   }
+  },
+  {
+   "name": "P1_REASON_CONSISTENT",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "P2_REASON_CONSISTENT",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "P3_REASON_CONSISTENT",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "AGENT9_NO_DUPLICATE_QUEUE_ROW",
+   "ok": true,
+   "evidence": {
+    "intersection": 0,
+    "note": "Agent 9 HOLD 348 은 큐 수에 합산하지 않는다(§11)."
+   }
+  },
+  {
+   "name": "AGENT9_METADATA_PRESENT",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "DB_AUDIT_COVERS_ALL",
+   "ok": true,
+   "evidence": {
+    "audited": 3858,
+    "rows": 3858
+   }
+  },
+  {
+   "name": "NO_AUTO_RESOLUTION_APPLIED",
+   "ok": true,
+   "evidence": {}
+  }
+ ],
+ "failedChecks": [],
+ "failedSamples": [],
+ "queueFileSha256": "dc6042a2011cf081b437addd38a5eb925be1ce5d09e36b77cfd5ba9050bb7016",
+ "samples": [
+  {
+   "stratum": "P1",
+   "queueIndex": 1,
+   "candidateId": "00e4a2e7-6920-4940-886c-a863acb1e3bd",
+   "statementNo": "200400150831813",
+   "productName": "데이즈멀티팩",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "EPA및DHA함유유지 : 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\n마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n프로바이오틱스 : 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음\n비타민A : (가) 어두운 곳에서 시각 적응을 위해 필요\n(나) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(다) 상피세포의 성장과 발달에 필요\n비타민D : (가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요",
+   "renderedFunctionCount": 38,
+   "proposedSegmentCount": 41,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 785
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "306425fb-94c2-4787-b962-e3c4222ad190"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 38
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 76,
+   "candidateId": "f2e425b6-660a-426e-ac40-c6e6654fcd5f",
+   "statementNo": "200400170061236",
+   "productName": "코큐텐 포뮬러",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:UNCLOSED_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[코엔자임Q10] 항산화·높은 혈압 감소에 도움을 줄 수 있음\n\n[비타민B1] ①탄수화물과 에너지 대사에 필요\n\n[비타민B2] ①체내 에너지 생성에 필요\n\n[판토텐산] ①지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[나이아신 ①체내 에너지 생성에 필요\n\n[비타민C] ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n[비타민E] ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 16,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "LABEL_ISSUE:UNCLOSED_BRACKET"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MALFORMED_BRACKET",
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 255
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "3672bd24-c8df-48fb-bf72-f8bd7a5efa44"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 151,
+   "candidateId": "2e1fe8b6-487c-401c-b827-2350be08d16b",
+   "statementNo": "200400200061378",
+   "productName": "셀로맥스 리프리놀 포르테",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "리프리놀-초록입홍합추출오일 : 관절건강에 도움을 줄 수 있음\n\n비타민D : ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 6,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 97
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "4837adff-18ce-440a-90f5-11ad738f724f"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 226,
+   "candidateId": "ab0d3eaa-4971-4d36-af4c-e1f04c220738",
+   "statementNo": "200400200061620",
+   "productName": "다이어트 에스카페",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "난소화설말토덱스트린 : (1)식후 혈당상승 억제에 도움을 줄 수 있음  (2)배변활동 원활에 도움을 줄 수 있음\n가르시니아캄보지아 추출물 : 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 121
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "585bd605-8997-4c35-b5a2-5e8f124ca144"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 301,
+   "candidateId": "90f86415-b27c-42a4-888d-eaca3843575e",
+   "statementNo": "200400200061829",
+   "productName": "아이시안 루테인+빌베리",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "빌베리 추출물 : 눈의 피로 개선에 도움을 줄 수 있음\n마리골드꽃추출물 : 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n비타민A : (1) 어두운 곳에서 시각 적응을 위해 필요 (2) 피부와 점막을 형성하고 기능을 유지하는데 필요 (3) 상피세포의 성장과 발달에 필요",
+   "renderedFunctionCount": 10,
+   "proposedSegmentCount": 8,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 170
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "eaacc4cd-02de-48c4-934c-b8b0ee39d924"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 10
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 376,
+   "candidateId": "00925935-947d-41c2-a567-3cdb55df0b34",
+   "statementNo": "200400200062032",
+   "productName": "트리플러스 오메가-3 이뮨 맨",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음\n칼슘 : (1) 뼈와 치아 형성에 필요 (2) 신경과 근육 기능 유지에 필요 (3) 정상적인 혈액응고에 필요 (4) 골다공증발생 위험 감소에 도움을 줌\n마그네슘 : (1) 에너지 이용에 필요 (2) 신경과 근육 기능 유지에 필요\n비타민C : (1) 결합조직 형성과 기능유지에 필요 (2) 철의 흡수에 필요 (3) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n셀레늄 : 유해산소로부터 세포를 보호하는데 필요\n판토텐산 : 지방, 탄수화물, 단백",
+   "renderedFunctionCount": 67,
+   "proposedSegmentCount": 67,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 1110
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "0ecdf162-8bcc-4344-b29e-d630240728c2"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 67
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 451,
+   "candidateId": "32c2d93b-a5bb-467c-ac54-1bfc89d0d805",
+   "statementNo": "20040020016654",
+   "productName": "슬로우 락토엑스",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스\n\n① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음 ③ 장 건강에 도움을 줄 수 있음\n\n아연\n\n①정상적인 면역기능에 필요 ②정상적인 세포분열에 필요\n\n셀레늄(또는 셀렌)\n\n①유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 11,
+   "proposedSegmentCount": 9,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 149
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "a28feb1c-19b6-418a-9f9d-2c5c0df96776"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 11
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 526,
+   "candidateId": "5070e696-797e-459f-b291-837e291677b2",
+   "statementNo": "200400200201089",
+   "productName": "멀티비타민&미네랄+",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "구리\n1. 철의 운반과 이용에 필요\n2. 유해산소로부터 세포를 보호하는데 필요\n\n나이아신\n체내 에너지 생성에 필요\n\n망간\n1. 뼈 형성에 필요\n2. 에너지 이용에 필요\n3. 유해산소로부터 세포를 보호하는데 필요\n\n몰리브덴\n산화·환원 효소의 활성에 필요\n\n비오틴\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n비타민A\n1. 어두운 곳에서 시각 적응을 위해 필요\n2. 피부와 점막을 형성하고 기능을 유지하는데 필요\n3. 상피세포의 성장과 발달에 필요\n비타민B1\n탄수화물과 에너지 대사에 필요\n\n비타민B2\n체내 에너지 생성에 필요\n\n비",
+   "renderedFunctionCount": 64,
+   "proposedSegmentCount": 59,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 886
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "460d6edb-3d03-4b50-8827-5ea3e1397e78"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 64
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 601,
+   "candidateId": "07bc8d28-c134-42a0-b226-643eece4b3e8",
+   "statementNo": "200400200201211",
+   "productName": "블루밍가든",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "나이아신\n체내 에너지 생성에 필요\n\n밀크씨슬(카르두스 마리아누스) 추출물\n간 건강에 도움을 줄 수 있음\n\n비타민 B1\n탄수화물과 에너지 대사에 필요\n\n비타민 B2\n체내 에너지 생성에 필요\n\n비타민 B6\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n비타민 B12\n정상적인 엽산 대사에 필요\n\n셀렌\n유해산소로부터 세포를 보호하는데 필요\n\n아연\n(1) 정상적인 면역기능에 필요\n(2) 정상적인 세포분열에 필요\n\n엽산\n(1) 세포와 혈액생성에 필요\n(2) 태아 신경관의 정상 발달에 필요\n",
+   "renderedFunctionCount": 29,
+   "proposedSegmentCount": 22,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 332
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "9fed8144-5156-4918-b1a2-9de48fdf8732"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 29
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 676,
+   "candidateId": "1d6ed8e6-3391-4c57-a948-6b506eaefba9",
+   "statementNo": "200400200201317",
+   "productName": "스위트드림",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 비타민B6\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n* 테아닌\n① 스트레스로 인한 긴장완화에 도움을 줄 수 있음",
+   "renderedFunctionCount": 11,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 93
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "b188ee67-c6de-4ad3-8d2c-7a465e8db77a"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 11
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 751,
+   "candidateId": "40833339-bec9-4f48-ad19-de84e6b4d9df",
+   "statementNo": "200400200201431",
+   "productName": "닥터 셀프로 self-professional",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 나이아신\n① 체내 에너지 생성에 필요\n\n* 망간\n① 뼈 형성에 필요\n② 에너지 이용에 필요\n③ 유해산소로부터 세포를 보호하는데 필요\n\n* 비타민 B1\n① 탄수화물과 에너지 대사에 필요\n\n* 비타민 B2\n① 체내 에너지 생성에 필요\n\n* 비타민 B6\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n* 비타민 D\n① 칼슘과 인이 흡수되고 이용되는데 필요\n② 뼈의 형성과 유지에 필요\n③ 골다공증발생 위험 감소에 도움을 줌\n\n* 비타민 E\n① 항산화 작용을 하여 유해산소로부터 세포를 보호하는",
+   "renderedFunctionCount": 26,
+   "proposedSegmentCount": 24,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 380
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "9ef0b650-a191-488f-ac0a-993cd494f45e"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 26
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 826,
+   "candidateId": "28abfa30-6f2c-4013-8455-d5a6747f169f",
+   "statementNo": "200400200201537",
+   "productName": "쿨멜팅 리포퍼 철분",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 비타민 B12\r\n①정상적인 엽산 대사에 필요\r\n\r\n* 비타민 C\r\n①결합조직 형성과 기능유지에 필요\r\n②철의 흡수에 필요\r\n③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\r\n\r\n* 엽산\r\n①세포와 혈액생성에 필요\r\n②태아 신경관의 정상 발달에 필요\r\n③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\r\n\r\n* 철\r\n① 체내 산소운반과 혈액생성에 필요\r\n② 에너지 생성에 필요",
+   "renderedFunctionCount": 17,
+   "proposedSegmentCount": 13,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 219
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "3570e561-3e34-45f3-83b1-608393d9edc8"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 17
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 901,
+   "candidateId": "a220e32a-4d80-4d65-b4ac-51b92a7062c1",
+   "statementNo": "20040020020641",
+   "productName": "네오랩 릴렉스케어",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 비타민B6\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n* L-테아닌\n① 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n* 판토텐산\n① 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "renderedFunctionCount": 10,
+   "proposedSegmentCount": 7,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 134
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "f37b5727-0128-4909-8bd0-23fa78e6de76"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 10
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 976,
+   "candidateId": "73eef8e7-ff8f-4485-afd6-decb5c1ba1af",
+   "statementNo": "20040020020738",
+   "productName": "굿앤키즈 유산균",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 아연\n① 정상적인 면역기능에 필요\n② 정상적인 세포분열에 필요\n\n* 프로바이오틱스\n① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음\n② 배변활동 원활에 도움을 줄 수 있음\n③ 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 11,
+   "proposedSegmentCount": 7,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 117
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "40da2799-2216-446e-a584-5861e4b81af1"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 11
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1051,
+   "candidateId": "23dbfc71-51db-4a98-9a58-5c978204f184",
+   "statementNo": "20040020020838",
+   "productName": "키즈츄어블멀티비타민",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 나이아신\n① 체내 에너지 생성에 필요\n\n* 비타민A\n① 어두운 곳에서 시각 적응을 위해 필요\n② 피부와 점막을 형성하고 기능을 유지하는데 필요\n③ 상피세포의 성장과 발달에 필요\n\n* 비타민B1\n① 탄수화물과 에너지 대사에 필요\n\n* 비타민B2\n① 체내 에너지 생성에 필요\n\n* 비타민B6\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n* 비타민B12\n① 정상적인 엽산 대사에 필요\n\n* 비타민C\n① 결합조직 형성과 기능유지에 필요\n② 철의 흡수에 필요\n③ 항산화 작용을 하여 유해산소로부",
+   "renderedFunctionCount": 28,
+   "proposedSegmentCount": 34,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 574
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "32203f9c-a097-4edc-beff-39cd96d72763"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 28
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1127,
+   "candidateId": "e3a825f9-e4b7-46fb-ac8a-404d85e8bf40",
+   "statementNo": "20040020020936",
+   "productName": "엠에스 액티브 멀티비타민 리퀴드",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 나이아신\n① 체내 에너지 생성에 필요\n\n* 비오틴\n① 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n* 비타민A\n① 어두운 곳에서 시각 적응을 위해 필요\n② 피부와 점막을 형성하고 기능을 유지하는데 필요\n③ 상피세포의 성장과 발달에 필요\n\n* 비타민B1\n① 탄수화물과 에너지 대사에 필요\n\n* 비타민B2\n① 체내 에너지 생성에 필요\n\n* 비타민B6\n① 단백질 및 아미노산 이용에 필요\n② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n* 비타민C\n① 결합조직 형성과 기능유지에 필요\n② 철의 흡수에 필요\n③ 항산화 작용",
+   "renderedFunctionCount": 32,
+   "proposedSegmentCount": 34,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 583
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "b1309fe9-b85f-4717-a055-ebdc1876c07e"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 32
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1202,
+   "candidateId": "3dc3f3f0-5418-44f1-bf86-d28fdf4e1f54",
+   "statementNo": "200600200031507",
+   "productName": "루테인아스타잔틴A+",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "1) 마리골드꽃추출물\n    - 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음\n2) 헤마토코쿠스 추출물\n    - 눈의 피로도 개선에 도움을 줄 수 있음\n3) 비타민A\n    - 어두운 곳에서 시각 적응을 위해 필요\n    - 피부와 점막을 형성하고 기능을 유지하는데 필요\n    - 상피세포의 성장과 발달에 필요     ",
+   "renderedFunctionCount": 14,
+   "proposedSegmentCount": 8,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 200
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "d6001ff4-2d93-4c87-855c-795e7546bf94"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 14
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1277,
+   "candidateId": "b4eb71ce-a85c-470e-a549-88d18349cc52",
+   "statementNo": "20130020008602",
+   "productName": "다이어트 토키",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "가르시니아캄보지아추출물 : (1) 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음\n\n테아닌 : (1) 스트레스로 인한 긴장완화에 도움을 줄 수 있음\n\n비타민 B1 : (1) 탄수화물과 에너지 대사에 필요\n\n비타민 B2 : (1) 체내 에너지 생성에 필요\n\n비타민 B6\n(1) 단백질 및 아미노산 이용에 필요\n(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n나이아신 : (1) 체내 에너지 생성에 필요\n\n판토텐산 : (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "renderedFunctionCount": 24,
+   "proposedSegmentCount": 15,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 287
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "28acd062-06f9-4719-8296-22febd12ba24"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 24
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1352,
+   "candidateId": "f58d5ce0-ed15-422c-a0f9-82259e993bfd",
+   "statementNo": "20130020024349",
+   "productName": "간당당",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "마그네슘 : (1) 에너지 이용에 필요 (2) 신경과 근육 기능 유지에 필요\n밀크씨슬(카르두스 마리아누스) 추출물 : 간 건강에 도움을 줄 수 있음\n홍경천 추출물 : 스트레스로 인한 피로 개선에 도움을 줄 수 있음\n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n나이아신 : 체내 에너지 생성에 필요\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n비타민B6 : (1) 단백질 및 아미노산 이용에 필요 (2) 혈액의 호모시스테인 수준",
+   "renderedFunctionCount": 24,
+   "proposedSegmentCount": 27,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 439
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "fb943378-6c1a-4c14-9c5e-e9e3b8662d06"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 24
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1427,
+   "candidateId": "07202d45-c6fb-41aa-8eb7-fd63a00f3650",
+   "statementNo": "20130020024466",
+   "productName": "롱키아이",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "유산균발효굴추출물(FGO)(제2024-27호) : (국문) 어린이 키성장에 도움을 줄 수 있음 (영문) May help to children grow taller\n아연 : (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요\n셀레늄: 유해산소로부터 세포를 보호하는데 필요\n나이아신 : 체내 에너지 생성에 필요\n비타민 B6 : (1) 단백질 및 아미노산 이용에 필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n비타민 B1 : 탄수화물과 에너지 대사에 필요",
+   "renderedFunctionCount": 15,
+   "proposedSegmentCount": 15,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_PARALLEL_AMBIGUOUS",
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 268
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "6fdac341-658d-4411-995d-d95092ad5b23"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 15
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1502,
+   "candidateId": "06382533-133a-4521-b42a-274303eaeb82",
+   "statementNo": "20172880193194",
+   "productName": "장이나라",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "아연\n①정상적인 면역기능에 필요  ②정상적인 세포분열에 필요\n\n프로바이오틱스\n①유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 7,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 86
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "4cb6dd9e-5cdc-47b6-8595-51b7fcd436cf"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 7
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1577,
+   "candidateId": "61b80194-e82e-4828-aa33-813f065455ab",
+   "statementNo": "20180012056107",
+   "productName": "이알하나 ERr731",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌\n루바브뿌리추출물(ERr731®)(제2024-17호) : (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to maintain female health in menopause\n비타민K : (1) 정상적인 혈액응고에 필요 (2) 뼈의 구성에 필요",
+   "renderedFunctionCount": 15,
+   "proposedSegmentCount": 10,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_PARALLEL_AMBIGUOUS",
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 223
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "f47836f7-2b5f-44a6-bf11-48cc77e744ce"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 15
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1652,
+   "candidateId": "fbcd093b-017d-46a5-89e6-e178da56aa90",
+   "statementNo": "2019001029743",
+   "productName": "에너씨슬 퍼펙트샷",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+   ],
+   "standardizedReviewReasons": [
+    "MALFORMED_BRACKET",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "액상[나이아신, 비타민B6, 비타민B1]]: 탄수화물과 에너지 대사에 필요, 체내 에너지 생성에 필요, 단백질 및 아미노산 이용에 필요\n정제[밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산]: 간건강에 도움을 줄수 있음, 정상적인 엽산 대사에 필요, 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요, 체내 에너지 생성에 필요, 세포와 혈액생성에 필요, 태아신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "renderedFunctionCount": 7,
+   "proposedSegmentCount": 6,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MALFORMED_BRACKET",
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 269
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "6f3b2178-951f-472c-8f9f-1598c28e6065"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 7
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1727,
+   "candidateId": "0302e502-3ff3-4ac3-b615-d0a632149c94",
+   "statementNo": "202000047849",
+   "productName": "키텐셜 그로우업 딸기우유맛",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "유산균발효굴추출물 : (국문) 어린이 키성장에 도움을 줄 수 있음 / (영문) May help to children grow taller\n아연 : (1) 정상적인 면역기능에 필요 / (2) 정상적인 세포분열에 필요",
+   "renderedFunctionCount": 8,
+   "proposedSegmentCount": 6,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_PARALLEL_AMBIGUOUS",
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 119
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "64b21cb6-8077-4c93-8cda-dd813aa224b1"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 8
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1802,
+   "candidateId": "311c6576-c4d8-4227-b966-9c839e5dcf3e",
+   "statementNo": "2023002928442",
+   "productName": "두뇌엔 PS300 알파플러스",
+   "priority": 1,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "은행잎 추출물 ① 기억력 개선･혈행 개선에 도움을 줄 수 있음\n포스파티딜세린 ① 노화로 인해 저하된 인지력 개선･자외선에 의한 피부 손상으로부터 피부 건강 유지･피부보습에 도움을 줄 수 있음\n비타민 B1 ① 탄수화물과 에너지 대사에 필요.\n비타민 B2 ① 체내 에너지 생성에 필요.\n비타민 B6 ① 단백질 및 아미노산 이용에 필요. ② 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요.\n아연 ①정상적인 면역기능에 필요 ② 정상적인 세포분열에 필요",
+   "renderedFunctionCount": 15,
+   "proposedSegmentCount": 14,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 251
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "7e816d86-1c1a-4f62-97db-b53819017342"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 15
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1877,
+   "candidateId": "0909f6e3-9b75-467c-99ea-9d19578b8124",
+   "statementNo": "200400200061334",
+   "productName": "덴디돌",
+   "priority": 1,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "칼슘 : ① 뼈와 치아 형성에 필요\n           ② 신경과 근육 기능 유지에 필요\n           ③ 정상적인 혈액응고에 필요\n           ④ 골다공증발생 위험 감소에 도움을 줌\n프로폴리스 : 항산화에 도움을 줄 수 있음.\n비타민D : ① 칼슘과 인이 흡수되고 이용되는데 필요\n              ② 뼈의 형성과 유지에 필요\n              ③ 골다공증발생 위험 감소에 도움을 줌",
+   "renderedFunctionCount": 14,
+   "proposedSegmentCount": 11,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 230
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "efaa3dd0-a45b-498e-8ea1-5ffea2c1fe5c"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 14
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 1952,
+   "candidateId": "89cb9f57-8cfd-4fc0-8a83-dcc48579174a",
+   "statementNo": "200400200201100",
+   "productName": "웅진 오직 리포좀 비타민C 코어",
+   "priority": 1,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "비타민C\n1. 결합조직 형성과 기능유지에 필요\n2. 철의 흡수에 필요\n3. 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 8,
+   "proposedSegmentCount": 4,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 73
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "443233f8-52c2-4974-9a5f-09b45b69a1a4"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 8
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 2027,
+   "candidateId": "08027e30-0b78-4182-b45a-b8acc56c2e39",
+   "statementNo": "20040020020659",
+   "productName": "테디촌테디베어 프로바이오틱스 키즈",
+   "priority": 1,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED"
+   ],
+   "standardizedReviewReasons": [
+    "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "* 프로바이오틱스\n① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음\n② 배변활동 원활에 도움을 줄 수 있음\n③ 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 4,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FORM_FUNCTION_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 79
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "ff9b13c9-f2d2-49a7-91ac-2ed1d1deb4ba"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 2102,
+   "candidateId": "4db34606-6c53-4ee7-9053-e4b558435088",
+   "statementNo": "20130020024425",
+   "productName": "화이버 다이어트 젤리 애플사이다비니거맛",
+   "priority": 1,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "난소화성말토덱스트린 : (1) 식후 혈당상승 억제에 도움을 줄 수 있음 (2) 배변활동 원활에 도움을 줄 수 있음\n가르시니아캄보지아 추출물 : 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 122
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "443a0345-3ec1-4fad-8343-35910550b023"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P1",
+   "queueIndex": 2177,
+   "candidateId": "51e7edf7-952b-4bca-914d-d9c39d3661fb",
+   "statementNo": "20190009483460",
+   "productName": "프롬바이오 프로폴리스",
+   "priority": 1,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_SOURCE_BOUNDARY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로폴리스 : 항산화에 도움을 줄 수 있음\n\n비타민A : (가) 어두운 곳에서 시각 적응을 위해 필요 (나) 피부와 점막을 형성하고 기능을 유지하는데 필요 (다) 상피세포의 성장과 발달에 필요\n\n비타민B2 : 체내 에너지 생성에 필요\n\n비타민D : (가) 칼슘과 인이 흡수되고 이용되는데 필요 (나) 뼈의 형성과 유지에 필요 (다) 골다공증발생 위험 감소에 도움을 줌\n\n비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n아연 : (가) 정상적인 면역",
+   "renderedFunctionCount": 15,
+   "proposedSegmentCount": 19,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 1
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_SOURCE_BOUNDARY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 324
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "dc8bbccd-9474-4ab6-a508-6a78038a9d4a"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 15
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2253,
+   "candidateId": "1be30296-2968-4384-9c84-97d6046cf0f4",
+   "statementNo": "200400150831475",
+   "productName": "한미 혈당콜레스테롤 케어",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS"
+   ],
+   "standardizedReviewReasons": [
+    "OFFICIAL_GROUP_RESTART_AMBIGUOUS"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[마늘] 혈중 콜레스테롤 개선‧혈압조절에 도움을 줄 수 있음\n\n-기억력 개선·혈행 개선에 도움을 줄 수 있음\n\n①식후 혈당상승 억제에 도움을 줄 수 있음\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "renderedFunctionCount": 2,
+   "proposedSegmentCount": 2,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "OFFICIAL_GROUP_RESTART_AMBIGUOUS"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 115
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "b436560d-307f-482c-949e-2e6ef5f29d73"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 2
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2257,
+   "candidateId": "b3898e9d-395b-40fd-96c3-c06f3e480151",
+   "statementNo": "200400150832099",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INGREDIENT_CARD_NOT_FOUND"
+   ],
+   "standardizedReviewReasons": [
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[뮤코다당단백]\n관절 및 연골건강에 도움을 줄 수 있음\n[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌\n[망간]\n(가) 뼈 형성에 필요\n(나) 에너지 이용에 필요\n(다) 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 6,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INGREDIENT_CARD_NOT_FOUND"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 162
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "e4c848f8-cce3-42c3-b6e9-624d82ce5467"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2262,
+   "candidateId": "1e9f703a-a581-46be-940e-3f750bfe71a8",
+   "statementNo": "200400150832147",
+   "productName": "관절의 품격",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INGREDIENT_CARD_NOT_FOUND"
+   ],
+   "standardizedReviewReasons": [
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[N-아세틸글루코사민]\n관절 및 연골건강에 도움을 줄 수 있음 \n[MSM]\n관절 및 연골건강에 도움을 줄 수 있음\n[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌",
+   "renderedFunctionCount": 2,
+   "proposedSegmentCount": 3,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INGREDIENT_CARD_NOT_FOUND"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 137
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "f7387278-16c2-4a8a-a410-2e1ed2f51863"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 2
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2267,
+   "candidateId": "511efa3c-c3ba-445e-bb3c-b97d4452455f",
+   "statementNo": "200400150832298",
+   "productName": "인테라 엠지투에이 관절연골케어 콘드로이친 뮤코다당단백 1400",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INGREDIENT_CARD_NOT_FOUND"
+   ],
+   "standardizedReviewReasons": [
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[뮤코다당·단백]\n관절 및 연골건강에 도움을 줄 수 있음\n[비타민D]\n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌\n[망간]\n(가) 뼈 형성에 필요\n(나) 에너지 이용에 필요\n(다) 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 6,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INGREDIENT_CARD_NOT_FOUND"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 163
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "f22b949f-0110-4c3b-9179-f427595b2980"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2272,
+   "candidateId": "62497d96-af8e-4891-aa07-04322ab2349a",
+   "statementNo": "20040015104267",
+   "productName": "애터미 홍삼 & 비수리킹",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+   ],
+   "standardizedReviewReasons": [
+    "MULTI_INGREDIENT_FLAT_STRUCTURE"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[비수리추출분말]\n(국문) 갱년기 남성건강에 도움을 줄 수 있음\n(영문) May help to maintain male health in menopause\n[홍삼]\n면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MULTI_INGREDIENT_FLAT_STRUCTURE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 144
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "46848dea-bc82-4303-b254-e43c75ee6dba"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2277,
+   "candidateId": "932832b0-ad3f-4581-b5bd-c0c27e3528ce",
+   "statementNo": "20040015162434",
+   "productName": "DH프라임생유산균",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 50
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "4894cf31-3e14-4597-b8ac-9f12a2c8a674"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2282,
+   "candidateId": "5270c34a-19f2-4d21-8bb2-57565b49051a",
+   "statementNo": "2004001706177",
+   "productName": "관절연골엔 콘드로이친 뮤코다당단백 1200",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+   ],
+   "standardizedReviewReasons": [
+    "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "관절 및 연골건강에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요\n\n①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 8,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 154
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "cf11f905-1b07-4980-8f17-422854309c74"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2287,
+   "candidateId": "8f01874b-1828-40fa-bf11-46b931baf776",
+   "statementNo": "200400200023577",
+   "productName": "피부엔 로즈마리 히알루론산",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "MULTIPLE_FUNCTIONAL_SECTIONS"
+   ],
+   "standardizedReviewReasons": [
+    "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+   ],
+   "recommendedAction": "REVIEW_CANONICAL_PATCH_LOCATION",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "1) 로즈마리추출물등복합물 : 자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음.\n2) 히알루론산 : 피부보습에 도움을 줄 수 있음.\n3) 비타민A : 어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요.\n4) 비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요.",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "MULTIPLE_FUNCTIONAL_SECTIONS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_CANONICAL_PATCH_LOCATION"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 200
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "84760022-f1bf-4e29-8617-10c8904f1788"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2292,
+   "candidateId": "416cd09a-9244-4637-8d81-3d60c0342727",
+   "statementNo": "200400200061628",
+   "productName": "식물성 유산균 패밀리",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 51
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "c9f80d6c-498b-4b91-b95b-2728a58289dd"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2297,
+   "candidateId": "972f662a-3c55-496f-aa9b-4a0b834c6dce",
+   "statementNo": "200400200061674",
+   "productName": "코어리셋 옴니바이오틱스",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 51
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "8e481227-80bf-4b15-8fa8-66e13df89310"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2302,
+   "candidateId": "e4828983-e6ab-4c80-9d43-df3f115d5526",
+   "statementNo": "200400200061732",
+   "productName": "프로바이오틱스 트리플",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 52
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "25eb43c4-ec34-45d7-bd93-c698380c4605"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2307,
+   "candidateId": "e5c61b67-b41e-4f84-944b-f05036510463",
+   "statementNo": "200400200062142",
+   "productName": "유산균",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 50
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "1c59a1dc-7079-48d9-aafe-1e2ca83349be"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2312,
+   "candidateId": "500edb8a-a052-4e29-a8b0-e57b1743a03e",
+   "statementNo": "200400200082793",
+   "productName": "에버콜라겐 타임 비오틴",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+   ],
+   "standardizedReviewReasons": [
+    "MULTI_INGREDIENT_FLAT_STRUCTURE"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[저분자콜라겐펩타이드(기능성원료인정 제2023-14호)]\n(국문) 피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n(영문) May help to moisturize (dry) skin, May help to maintain good skin health by protecting against damage from UV exposure\n[비오틴] 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "renderedFunctionCount": 2,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MULTI_INGREDIENT_FLAT_STRUCTURE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 254
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "d6714db7-cc01-4766-90c6-f6ba8ba96e6e"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 2
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2317,
+   "candidateId": "1b11212b-e9c2-4ab2-8fff-a0151ca63254",
+   "statementNo": "200400200141972",
+   "productName": "이지루틴 다이어트 & 혈당 컷",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+   ],
+   "standardizedReviewReasons": [
+    "MULTI_INGREDIENT_FLAT_STRUCTURE"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[모로오렌지추출분말(Morosil®)(제2021-7호)]\n(국문) 체지방 감소에 도움을 줄 수 있음 \n(영문) May help to reduce body fat\n[바나바잎추출물] 식후 혈당상승 억제에 도움을 줄 수 있음",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MULTI_INGREDIENT_FLAT_STRUCTURE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 122
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "4cd6f9a2-cb72-452d-b237-fde5c6b25d33"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2322,
+   "candidateId": "742a0232-256e-4c5c-9f85-652c7b824aa8",
+   "statementNo": "200600200031462",
+   "productName": "애터미 터마신 MSM",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "MULTIPLE_FUNCTIONAL_SECTIONS"
+   ],
+   "standardizedReviewReasons": [
+    "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+   ],
+   "recommendedAction": "REVIEW_CANONICAL_PATCH_LOCATION",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "1)강황 추출물(터마신)(기능성원료인정제2014-2호) : 관절건강에 도움을 줄 수 있음 \n2)엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰) : 관절 및 연골건강에 도움을 줄 수 있음\n3)셀렌 : 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 2,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "MULTIPLE_FUNCTIONAL_SECTIONS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_CANONICAL_PATCH_LOCATION"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 145
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "240c8401-87ff-4e7a-9141-d2f597457b08"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 2
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2327,
+   "candidateId": "a35a5c6c-f43b-4302-9f8e-c035d97fb02b",
+   "statementNo": "200600200031988",
+   "productName": "유산균",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "- 프로바이오틱스 : 유산균 증식 및 유해균 억제․배변활동 원활 · 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 53
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "5485018f-2698-4f85-a381-17a8e3db6f85"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2332,
+   "candidateId": "4f49cba1-80c2-4bb3-afa2-43962b8db73c",
+   "statementNo": "200600200032473",
+   "productName": "리베브 프로바이오틱스 100억",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "- 프로바이오틱스 : 유산균 증식 및 유해균 억제 · 배변활동 원활 · 장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 55
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "067f8787-a8f9-44c8-995c-be460fc2a083"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2337,
+   "candidateId": "5cf433cd-4991-4606-ab61-93a79f0b3f84",
+   "statementNo": "200600200032747",
+   "productName": "마이케어 [장]솔루션",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "- 프로바이오틱스 : 유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 56
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "6320226a-e607-4cd9-97d3-eda09f2a32c6"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2342,
+   "candidateId": "74cb41f8-51e4-4737-99b0-450d44148e3a",
+   "statementNo": "200600200033132",
+   "productName": "Poppro Probiotics",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "- 프로바이오틱스 : 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 52
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "591516c2-27e7-462b-8498-3ecd6c7a95d2"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2347,
+   "candidateId": "07245038-3f0c-41ff-ae41-436d617c44e0",
+   "statementNo": "200600200033257",
+   "productName": "하랑원 에센셜 프로바이오틱스",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "- 프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 52
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "87804e69-b647-457d-a6a7-553bc24ab756"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2352,
+   "candidateId": "f0a818b4-0a2a-4500-a5d1-433a7b3c46c2",
+   "statementNo": "20060020008521",
+   "productName": "밸런스 오메가3 프로",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "PARTIAL_DUPLICATION_RISK"
+   ],
+   "standardizedReviewReasons": [
+    "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+   ],
+   "recommendedAction": "REVIEW_CANONICAL_PATCH_LOCATION",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "1.혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음 2.건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음\t\t\t\t\t\n①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "PARTIAL_DUPLICATION_RISK"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_CANONICAL_PATCH_LOCATION"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 164
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "fe1e7b97-b098-4ef9-acc0-86472bfd2fce"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2357,
+   "candidateId": "7abb0864-6e07-4393-a63c-09759ff12b3c",
+   "statementNo": "20060020008912",
+   "productName": "BODY DOCTORS 코엔자임큐(Q)텐",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+   ],
+   "standardizedReviewReasons": [
+    "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①항산화·높은 혈압 감소에 도움을 줄 수 있음\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n①유해산소로부터 세포를 보호하는데 필요\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 5,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 108
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "424d666b-fc60-4af0-890d-6628ceb8c766"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 5
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2362,
+   "candidateId": "8c3a600b-801d-49b8-839b-a0b9a5b41b9d",
+   "statementNo": "200700170352412",
+   "productName": "익스트림 프로바이오틱스",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)]\n(국문) 운동수행능력 향상에 도움을 줄 수 있음\n(영문) May help to improve endurance of exercise performance capability\n\n[프로바이오틱스]\n유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 2,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 207
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "e28b5f63-dfcd-443a-97d9-e3ce5235b216"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2367,
+   "candidateId": "d72d665e-393f-4c62-a758-4623143298b3",
+   "statementNo": "200700170352689",
+   "productName": "스킨케어 기능성 나티콜 콜라겐",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "PARTIAL_DUPLICATION_RISK"
+   ],
+   "standardizedReviewReasons": [
+    "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+   ],
+   "recommendedAction": "REVIEW_CANONICAL_PATCH_LOCATION",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[비오틴]\n지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n[저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)]\n피부 보습에 도움을 줄 수 있음\n자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "PARTIAL_DUPLICATION_RISK"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_CANONICAL_PATCH_LOCATION"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 140
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "99b069bf-5531-4097-9941-385453f3383d"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2372,
+   "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+   "statementNo": "2009001702357",
+   "productName": "유렉스 프로바이오틱스 (Urex Plus Vcap-5)",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "유산균 증식을 통한 여성 질 건강에 도움을 줄 수 있음\n (생리활성기능 2등급)\n,[프로바이오틱스] 유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 3,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 95
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "42570f16-75ac-4f90-8e06-86433a618e37"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2377,
+   "candidateId": "363b825b-b6e3-4e31-9d72-b3c33a73aed5",
+   "statementNo": "20120019007442",
+   "productName": "슈퍼 프로바이오틱스19 플러스",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_UNSUPPORTED_STRUCTURE"
+   ],
+   "originalReviewReasons": [
+    "NO_FUNCTIONAL_SECTION"
+   ],
+   "standardizedReviewReasons": [
+    "UNSUPPORTED_RENDERER_STRUCTURE",
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음 ",
+   "renderedFunctionCount": 0,
+   "proposedSegmentCount": 1,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "NO_FUNCTIONAL_SECTION"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "UNSUPPORTED_RENDERER_STRUCTURE",
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 50
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "12316ace-f414-4135-b94a-1ea7d7f68cab"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 0
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2382,
+   "candidateId": "13064c7d-eeba-40e4-a35e-f51bbb77eb29",
+   "statementNo": "201600100024",
+   "productName": "조인트365 리프리놀",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+   ],
+   "standardizedReviewReasons": [
+    "MULTI_INGREDIENT_FLAT_STRUCTURE"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "(국문) 관절 건강에 도움을 줄 수 있음\n(영문) May help to maintain healthy joint\n\n항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,[리프리놀-초록입홍합추출오일(2009-49호)] 관절 건강에 도움을 줄 수 있음\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 2,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "MULTI_INGREDIENT_FLAT_STRUCTURE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 179
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "7324a80b-9393-44f8-af57-67470c05bb3e"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2387,
+   "candidateId": "cab68033-46f0-4156-9b44-2898f66000b6",
+   "statementNo": "20190009105359",
+   "productName": "쎈 소연골 뮤코다당·단백 (콘드로이친) 1200",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+   ],
+   "standardizedReviewReasons": [
+    "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+   ],
+   "recommendedAction": "REVIEW_COMPOSITE_GROUPING",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "관절 및 연골건강에 도움을 줄 수 있음\n\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n(1) 정상적인 혈액응고에 필요\n(2) 뼈의 구성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 7,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "COMPOSITE_GROUP_BOUNDARY_UNCLEAR"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_COMPOSITE_GROUPING"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 141
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "944d311d-fb8f-4797-b7fa-8d8835b86dc4"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2392,
+   "candidateId": "31cb6714-b8f0-4241-a19f-7a71f5d62f82",
+   "statementNo": "20190009483481",
+   "productName": "뼈 · 연골 · 관절엔 상어연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INGREDIENT_CARD_NOT_FOUND"
+   ],
+   "standardizedReviewReasons": [
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[뮤코다당·단백] \n(가) 관절 및 연골건강에 도움을 줄 수 있음\n[비타민 D] \n(가) 칼슘과 인이 흡수되고 이용되는데 필요\n(나) 뼈의 형성과 유지에 필요\n(다) 골다공증발생 위험 감소에 도움을 줌\n[망간]\n(가) 뼈 형성에 필요\n(나) 에너지 이용에 필요\n(다) 유해산소로부터 세포를 보호하는데 필요\n[비타민 K]\n(가) 정상적인 혈액응고에 필요\n(나) 뼈의 구성에 필요\n[셀레늄]\n(가) 유해산소로부터 세포를 보호하는데 필요\n[아연]\n(가) 정상적인 면역기능에 필요\n(나) 정상적인 세포분열에 필요",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 11,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INGREDIENT_CARD_NOT_FOUND"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 282
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "f8dc3af8-815c-4285-9754-e6d2d76ede55"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P2",
+   "queueIndex": 2397,
+   "candidateId": "117bafde-5b55-4df7-bf1b-1ee9dbbfd838",
+   "statementNo": "20190009483685",
+   "productName": "팜스 슈퍼 바이오 히알루론산",
+   "priority": 2,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INGREDIENT_CARD_NOT_FOUND"
+   ],
+   "standardizedReviewReasons": [
+    "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+   ],
+   "recommendedAction": "REVIEW_RENDERER_STRUCTURE",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[NAG]\n(가) 관절 및 연골건강에 도움을 줄 수 있음\n[히알루론산]\n(가) 피부보습에 도움을 줄 수 있음\n[비타민C]\n(가) 결합조직 형성과 기능유지에 필요\n(나) 철의 흡수에 필요\n(다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n[비타민A]\n(가) 어두운 곳에서 시각 적응을 위해 필요\n(나) 피부와 점막을 형성하고 기능을 유지하는데 필요\n(다) 상피세포의 성장과 발달에 필요\n[판토텐산]\n(가) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n[나이아신]\n(가) 체내 에너지 생성에 필요\n[비오틴]\n(가) 지방",
+   "renderedFunctionCount": 2,
+   "proposedSegmentCount": 9,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INGREDIENT_CARD_NOT_FOUND"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "FUNCTION_CONTAINER_NOT_IDENTIFIABLE"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 2
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_RENDERER_STRUCTURE"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 326
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "0f39f8df-debb-4402-9de9-092c9a3d1559"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 2
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2402,
+   "candidateId": "90136ad6-3708-49cb-8cdd-008d8404aa04",
+   "statementNo": "200400150831702",
+   "productName": "한미양행 프로틴 밸런스업",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요\n\n장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음\n\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요",
+   "renderedFunctionCount": 15,
+   "proposedSegmentCount": 12,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 242
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "fcf34ffd-7f6a-46a6-9b62-d644967226dd"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 15
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2474,
+   "candidateId": "190b833b-2bdd-4728-b260-e265f312be14",
+   "statementNo": "20040015162277",
+   "productName": "프라임 건강한 간 밀크씨슬 스페셜",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "밀크씨슬 - ① 간 건강에 도움을 줄 수 있음\n\n엽산 - ①세포와 혈액생성에 필요\n         ②태아 신경관의 정상 발달에 필요\n         ③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n비타민B1 - ①탄수화물과 에너지 대사에 필요\n\n비타민B2 - ①체내 에너지 생성에 필요\n\n비타민B6 - ①단백질 및 아미노산 이용에 필요\n                ②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n나이아신 - ①체내 에너지 생성에 필요\n\n①정상적인 면역기능에 필요②정상적인 세포분열에 필요",
+   "renderedFunctionCount": 17,
+   "proposedSegmentCount": 17,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 290
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "e5cd352a-06bc-44be-8d4f-3d74a813c474"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 17
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2547,
+   "candidateId": "a34221e8-8494-4fde-a89f-e60a43d7ee89",
+   "statementNo": "20040017014495",
+   "productName": "소이 프로틴(바닐라맛)",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요",
+   "renderedFunctionCount": 10,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 113
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "1a75092b-b63b-4fef-bf18-51213263fa36"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 10
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2620,
+   "candidateId": "83cb7e16-5c86-4f59-8fb1-6ac15b4fb29f",
+   "statementNo": "20040020001425",
+   "productName": "밀크씨슬&비타민",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "(밀크씨슬추출물)① 간 건강에 도움을 줄 수 있음\n\n(비타민B1) (1) 탄수화물과 에너지 대사에 필요\n\n(비타민B2) (1) 체내 에너지 생성에 필요\n\n(비타민B6)①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(비타민B12)(1) 정상적인 엽산 대사에 필요\n\n(판토텐산)(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n(나이아신) ①체내 에너지 생성에 필요\n\n(엽산) ①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n",
+   "renderedFunctionCount": 12,
+   "proposedSegmentCount": 19,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 338
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "7a80d2df-635c-430f-9970-aff0101365ee"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 12
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2693,
+   "candidateId": "7428e1c5-a139-4e13-bebd-f76124602cea",
+   "statementNo": "200400200061474",
+   "productName": "피부 솔루션",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "히알루론산 : 피부보습. 자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음\n\n비타민C : ①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n비타민E : ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n비타민A : ①어두운 곳에서 시각 적응을 위해 필요②피부와 점막을 형성하고 기능을 유지하는데 필요③상피세포의 성장과 발달에 필요",
+   "renderedFunctionCount": 10,
+   "proposedSegmentCount": 12,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 234
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "9c5c10b7-42e4-40b4-a2f2-78af8ea019fa"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 10
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2766,
+   "candidateId": "49757d9a-9b8a-41c2-9e4e-a462fec15c12",
+   "statementNo": "200400200082161",
+   "productName": "마이밀 뉴Nu프로틴 플레인",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요\n①뼈와 치아 형성에 필요②신경과 근육 기능 유지에 필요③정상적인 혈액응고에 필요④골다공증발생 위험 감소에 도움을 줌\n①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n①체내 에너지 생성에 필요\n①단백질 및 아미노산 이용에 필요②혈액",
+   "renderedFunctionCount": 24,
+   "proposedSegmentCount": 17,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 326
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "e7d70676-b775-48ea-8c08-dc6a253243b0"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 24
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2839,
+   "candidateId": "24fd433e-9f10-410b-bd33-cf406ef713fd",
+   "statementNo": "2004002002556",
+   "productName": "트루락 생 프리바이오틱스 프락토올리고당, 아연, 셀렌",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "(프락토올리고당)장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음\n\n(셀렌)유해산소로부터 세포를 보호하는데 필요\n\n(아연) (1) 정상적인 면역기능에 필요\n         (2) 정상적인 세포분열에 필요",
+   "renderedFunctionCount": 7,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 117
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "41f6d143-d1cd-4a47-b47d-a6987157d239"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 7
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2911,
+   "candidateId": "0056bb5d-b43e-45ac-a0fc-d1945565f7fd",
+   "statementNo": "200700170351833",
+   "productName": "지노프리 질 유산균",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_ENGLISH_POLICY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[아연] ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n[비타민 D] ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n\n리스펙타(Respecta®)[프로바이오틱스 등 복합물],  (제2019-26호)\n(국문) 질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음\n(영문) May help to proliferate vaginal beneficial flora and to suppress pathogenic bacteria\n\n[프로바이오틱스] 유산균 증식 및 유해균 억제 · ",
+   "renderedFunctionCount": 18,
+   "proposedSegmentCount": 14,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_PARALLEL_AMBIGUOUS",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_ENGLISH_POLICY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 325
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "ee97d8ab-8546-4be9-a3c3-47e511ff112a"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 18
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 2984,
+   "candidateId": "1483f5bf-3cd5-4cef-a884-3dd430873b00",
+   "statementNo": "20110018024126",
+   "productName": "지엠지 로얄 프로틴 웨이 더블유피에이치 프리미엄",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 113
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "a20a7234-e62e-42c7-a64c-50bcb70a15ac"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3057,
+   "candidateId": "4bb6db90-d2fc-451c-adf2-8f569976d2e7",
+   "statementNo": "20130020008492",
+   "productName": "백년누리 브레인 인지력 기억력 활동 개선 포스파티딜세린 징코 피에스",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "포스파티딜세린 - ① 노화로 인해 저하된 인지력 개선 · 자외선에 의한 피부 손상으로부터 피부 건강 유지 · 피부보습에 도움을 줄 수 있음\n\n은행잎추출물-기억력 개선 · 혈행 개선에 도움을 줄 수 있음\n\n비타민E- 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "renderedFunctionCount": 4,
+   "proposedSegmentCount": 4,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 151
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "d0cac6bb-b7ba-4cd1-ad34-4479b898605c"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 4
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3130,
+   "candidateId": "82cc97c1-7919-4dfc-89a4-3649d5a08f95",
+   "statementNo": "20160006007128",
+   "productName": "바이크롬 간 유산균",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "ENGLISH_ONLY_CLAUSE"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_ONLY_FUNCTION",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_ENGLISH_POLICY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "(국문) 1. 비알콜성 간손상으로부터 간 건강에 도움을 줄 수 있음\n(영문) 1. May help to liver health by non-alcoholic liver injury\n\n(국문) 2. 알콜성 간손상으로부터 간 건강에 도움을 줄 수 있음\n(영문) 2. May help to liver health by alcoholic liver injury\n,유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음.",
+   "renderedFunctionCount": 14,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT",
+       "ENGLISH_ONLY_CLAUSE"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_ONLY_FUNCTION",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_ENGLISH_POLICY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 241
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "212a30fe-a401-4849-8e88-1d05808139cc"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 14
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3203,
+   "candidateId": "845f9db1-18d0-4d8a-9221-5f2a2ae63b74",
+   "statementNo": "2018000312534",
+   "productName": "프로게이너 소이프로틴 곡물맛",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 113
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "b0c57205-fd81-4b4b-b6aa-162fb63526b0"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3276,
+   "candidateId": "7633f92f-74c3-4b0c-9347-da62335be7b5",
+   "statementNo": "20190009483318",
+   "productName": "메가 칼슘 마그네슘 아연 플러스 비타민D·K",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "비타민D - ①칼슘과 인이 흡수되고 이용되는데 필요②뼈의 형성과 유지에 필요③골다공증발생 위험 감소에 도움을 줌\n구리 - ①철의 운반과 이용에 필요②유해산소로부터 세포를 보호하는데 필요\n망간 - ①뼈 형성에 필요②에너지 이용에 필요③유해산소로부터 세포를 보호하는데 필요\n셀렌 - ①유해산소로부터 세포를 보호하는데 필요\n아연 - ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n마그네슘 - ①에너지 이용에 필요②신경과 근육 기능 유지에 필요\n몰리브덴 - ①산화·환원 효소의 활성에 필요\n칼슘 - ①뼈와 치아 형성에 필요②신경과 근육 기",
+   "renderedFunctionCount": 24,
+   "proposedSegmentCount": 29,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 374
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "27117b94-09be-49e3-abc1-fbfd45e68ca6"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 24
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3349,
+   "candidateId": "1f58b491-3fca-4bb5-bd38-6f0cac4f62c5",
+   "statementNo": "20220011370209",
+   "productName": "오늘부터 버닝워터",
+   "priority": 3,
+   "productionBucket": "CREATED",
+   "rendererFamily": "DRIVER",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT",
+    "ENGLISH_ONLY_CLAUSE"
+   ],
+   "standardizedReviewReasons": [
+    "ENGLISH_ONLY_FUNCTION",
+    "ENGLISH_PARALLEL_AMBIGUOUS",
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_ENGLISH_POLICY",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음\n\n①결합조직 형성과 기능유지에 필요②철의 흡수에 필요③항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n①체내 에너지 생성에 필요\n\n(1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요\n\n①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n(국문) 체지방 감소에 도움을 줄 수 있음\n         운동으로 인한 피로 개선에 도움을 줄 수 있음 \n(영문) May help to reduce body fat\n         May ",
+   "renderedFunctionCount": 13,
+   "proposedSegmentCount": 12,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT",
+       "ENGLISH_ONLY_CLAUSE"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "ENGLISH_ONLY_FUNCTION",
+       "ENGLISH_PARALLEL_AMBIGUOUS",
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_ENGLISH_POLICY"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 349
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "baebb63f-94b6-4a54-984a-a36ecfb2fcb9"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 13
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3421,
+   "candidateId": "956d9fa3-8396-4381-b0de-a5a6f5c6dbe1",
+   "statementNo": "2004001516277",
+   "productName": "식이섬유화이버플러스",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "SKIPPED_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "INSERT_CLAUSE_NO_FUNCTION_PREDICATE"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "[차전자피 제품]①콜레스테롤 개선②배변활동 원활\r\n1) 배변활동원활\r\n2) 콜레스테롤 개선\r\n1) 배변활동원활\r\n2) 콜레스테롤 개선\r\n",
+   "renderedFunctionCount": 1,
+   "proposedSegmentCount": 3,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": false,
+      "inB": true
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "INSERT_CLAUSE_NO_FUNCTION_PREDICATE"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 76
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "a05f472c-77b9-4901-a87f-d7cb85f25368"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 1
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3494,
+   "candidateId": "f6636148-050b-448b-906f-60d91f94402b",
+   "statementNo": "200400200061284",
+   "productName": "HAPPY MASTER7",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "엠에스엠(MSM) : ① 관절 및 연골건강에 도움을 줄 수 있음\n\n비타민B6 : ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n엽산 : ①세포와 혈액생성에 필요②태아 신경관의 정상 발달에 필요③혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "renderedFunctionCount": 11,
+   "proposedSegmentCount": 9,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 159
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "2658eb6d-60d0-433f-b3c7-01a152216846"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 11
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3567,
+   "candidateId": "4222e1c0-1eb4-47bb-afee-9047d46e6862",
+   "statementNo": "200400200082257",
+   "productName": "컴플릿 프로틴",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "①근육, 결합조직 등 신체조직의 구성성분②효소, 호르몬, 항체의 구성에 필요③체내 필수 영양성분이나 활성물질의 운반과 저장에 필요④체액, 산-염기의 균형 유지에 필요⑤에너지, 포도당, 지질의 합성에 필요",
+   "renderedFunctionCount": 9,
+   "proposedSegmentCount": 5,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 113
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "1c80bcff-03ac-449f-b62c-1552cd328f3a"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 9
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3640,
+   "candidateId": "3d90e024-573c-4564-a604-768368b74435",
+   "statementNo": "200600200032238",
+   "productName": "알고케어 마그네슘 보틀",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "마그네슘 : 1. 에너지 이용에 필요 2. 신경과 근육 기능 유지에 필요",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 3,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 40
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "7223312a-f49b-4ddd-9c5d-75a30848e546"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3713,
+   "candidateId": "03893504-9543-46c5-9004-1bd908cae37a",
+   "statementNo": "2013002002463",
+   "productName": "마이니 지니키즈 면역비타젤리",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "비타민E : ①항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요\n\n나이아신 : ①체내 에너지 생성에 필요\n\n아연 : ①정상적인 면역기능에 필요②정상적인 세포분열에 필요\n\n비타민B6 : ①단백질 및 아미노산 이용에 필요②혈액의 호모시스테인 수준을 정상으로 유지하는데 필요\n\n비타민B1 : ①탄수화물과 에너지 대사에 필요",
+   "renderedFunctionCount": 14,
+   "proposedSegmentCount": 12,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 181
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "5fc1b785-9812-488b-9fcb-4083605b3eae"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 14
+     }
+    }
+   ],
+   "ok": true
+  },
+  {
+   "stratum": "P3",
+   "queueIndex": 3786,
+   "candidateId": "68ac0d3f-6993-4c45-b269-12806124c01f",
+   "statementNo": "2018001205684",
+   "productName": "알고케어 뉴트리션 비타민D3",
+   "priority": 3,
+   "productionBucket": "SKIPPED_EXISTING",
+   "rendererFamily": "COMPOSITE",
+   "sourceSets": [
+    "V2_HUMAN_REVIEW"
+   ],
+   "originalReviewReasons": [
+    "HUMAN_REVIEW_REQUIRED",
+    "UNRESOLVED_SEGMENT_PRESENT"
+   ],
+   "standardizedReviewReasons": [
+    "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+   ],
+   "recommendedAction": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS",
+   "currentState": "READY_FOR_REVIEW",
+   "officialFunctionExcerpt": "비타민D : (1) 칼슘과 인이 흡수되고 이용되는데 필요 (2) 뼈의 형성과 유지에 필요 (3) 골다공증발생 위험 감소에 도움을 줌",
+   "renderedFunctionCount": 6,
+   "proposedSegmentCount": 4,
+   "checks": [
+    {
+     "name": "SOURCE_ROW_TRACEABLE",
+     "ok": true,
+     "evidence": {
+      "inA": true,
+      "inB": false
+     }
+    },
+    {
+     "name": "ORIGINAL_REASONS_KEPT",
+     "ok": true,
+     "evidence": {
+      "original": [
+       "HUMAN_REVIEW_REQUIRED",
+       "UNRESOLVED_SEGMENT_PRESENT"
+      ]
+     }
+    },
+    {
+     "name": "STANDARDIZED_MAPPING_JUSTIFIED",
+     "ok": true,
+     "evidence": {
+      "standardized": [
+       "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN"
+      ]
+     }
+    },
+    {
+     "name": "PRIORITY_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "priority": 3
+     }
+    },
+    {
+     "name": "ACTION_MATCHES_REASON",
+     "ok": true,
+     "evidence": {
+      "action": "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS"
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_PRESENT",
+     "ok": true,
+     "evidence": {
+      "length": 73
+     }
+    },
+    {
+     "name": "OFFICIAL_FUNCTION_NOT_MODIFIED",
+     "ok": true,
+     "evidence": {
+      "note": "공식 기능성 원문은 큐에 그대로 복사되며 번역·요약·삭제하지 않는다."
+     }
+    },
+    {
+     "name": "DB_STATE_CONSISTENT",
+     "ok": true,
+     "evidence": {
+      "dbState": "READY_FOR_REVIEW",
+      "dbCanonicalId": "8d5d30a9-24b0-4fb3-b337-bd1d9324a30f"
+     }
+    },
+    {
+     "name": "REVIEW_STATUS_PENDING",
+     "ok": true,
+     "evidence": {}
+    },
+    {
+     "name": "NO_CONTENT_REWRITE",
+     "ok": true,
+     "evidence": {
+      "rendered": 6
+     }
+    }
+   ],
+   "ok": true
+  }
+ ],
+ "verdict": "PASS"
+}

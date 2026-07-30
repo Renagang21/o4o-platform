@@ -1,0 +1,99 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-HUMAN-REVIEW-QUEUE-BUILD-V1",
+ "contract": "§18~§20 — FINAL_FUNCTION_REVIEW_QUEUE = A ∪ B ∪ C. 판정 실행 0 · DB write 0.",
+ "generatedAt": "2026-07-30T07:02:40.171Z",
+ "baseCommit": "55c99593f",
+ "sets": {
+  "A": 3652,
+  "B": 206,
+  "C": 2,
+  "D_agent9": 348
+ },
+ "intersections": {
+  "A∩B": 0,
+  "A∩C": 2,
+  "B∩C": 0,
+  "A∩D": 0,
+  "B∩D": 0,
+  "C∩D": 0
+ },
+ "finalUnique": 3858,
+ "queueTotal": 3858,
+ "splitTotal": 0,
+ "byPriority": {
+  "1": 2252,
+  "2": 149,
+  "3": 1457
+ },
+ "byBucket": {
+  "CREATED": 2808,
+  "SKIPPED_EXISTING": 1050
+ },
+ "bySourceSet": {
+  "V2_HUMAN_REVIEW": 3652,
+  "SKIPPED_HUMAN_REVIEW": 138,
+  "SOURCE_LINE_BREAK_FRAGMENTED": 2,
+  "SKIPPED_UNSUPPORTED_STRUCTURE": 68
+ },
+ "byRepresentativeClassification": {
+  "V2_HUMAN_REVIEW": 3650,
+  "HUMAN_REVIEW_REQUIRED": 138,
+  "SOURCE_LINE_BREAK_FRAGMENTED": 2,
+  "UNSUPPORTED_STRUCTURE": 68
+ },
+ "byStandardizedReason": {
+  "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR": 973,
+  "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN": 3043,
+  "ENGLISH_PARALLEL_AMBIGUOUS": 242,
+  "FORM_FUNCTION_BOUNDARY_UNCLEAR": 1260,
+  "MALFORMED_BRACKET": 45,
+  "ENGLISH_ONLY_FUNCTION": 252,
+  "SOURCE_LINE_BREAK_FRAGMENTED": 2,
+  "OFFICIAL_GROUP_RESTART_AMBIGUOUS": 4,
+  "FUNCTION_CONTAINER_NOT_IDENTIFIABLE": 101,
+  "MULTI_INGREDIENT_FLAT_STRUCTURE": 9,
+  "COMPOSITE_GROUP_BOUNDARY_UNCLEAR": 26,
+  "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH": 9,
+  "UNSUPPORTED_RENDERER_STRUCTURE": 68,
+  "OTHER_REVIEW_REQUIRED": 14
+ },
+ "byRecommendedAction": {
+  "REVIEW_SOURCE_BOUNDARY": 2250,
+  "REVIEW_ORIGINAL_LINE_BREAK": 2,
+  "REVIEW_COMPOSITE_GROUPING": 39,
+  "REVIEW_RENDERER_STRUCTURE": 101,
+  "REVIEW_CANONICAL_PATCH_LOCATION": 9,
+  "REVIEW_OFFICIAL_FUNCTION_COMPLETENESS": 1251,
+  "REVIEW_ENGLISH_POLICY": 206
+ },
+ "byRendererFamily": {
+  "DRIVER": 2814,
+  "COMPOSITE": 1044
+ },
+ "byCurrentState": {
+  "READY_FOR_REVIEW": 3858
+ },
+ "splitByState": {},
+ "reviewStatusTally": {
+  "PENDING": 3858
+ },
+ "agent9Intersection": 0,
+ "duplicateCandidateId": 0,
+ "duplicateStatementNo": 0,
+ "sortContract": "priority ASC → productionBucket(CREATED→SKIPPED_EXISTING→HOLD_FOR_AGENT_9→OTHER) → statementNo ASC → candidateId ASC",
+ "reviewStatusVocabulary": [
+  "PENDING",
+  "IN_REVIEW",
+  "RESOLVED_NO_CHANGE",
+  "RESOLVED_UPDATED",
+  "BLOCKED_SOURCE_DATA",
+  "BLOCKED_STRUCTURE",
+  "FAILED_SYSTEM"
+ ],
+ "anomalyCount": 0,
+ "files": {
+  "queue": "apps/api-server/src/scripts/data/hff-ko-function-human-review-queue-v1.jsonl",
+  "staleResolved": "apps/api-server/src/scripts/data/hff-ko-function-human-review-stale-resolved-v1.jsonl",
+  "anomalies": "apps/api-server/src/scripts/data/hff-ko-function-human-review-anomalies-v1.json"
+ }
+}
