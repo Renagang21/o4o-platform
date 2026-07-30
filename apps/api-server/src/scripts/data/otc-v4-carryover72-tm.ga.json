@@ -3,9 +3,36 @@
   "agent": "ga",
   "kind": "sentence-translation-memory",
   "note": "문장 1:1 KO→EN 번역만. 공식 원문에 없는 의료사실 생성 금지. 수치·연령·기간 보존. 한글 잔존 금지.",
-  "total": 23,
+  "total": 52,
   "filled": 23,
   "annotations": {
+    "3~6세는 1회 2개, 1~2세는 1회 1~2개, 3~12개월은 1회 1개씩, 1일 2~3회 좌약의 둥근부분부터 직장내 깊이 삽입합니다.직장 근육긴장으로 밀려나올 경우에는 양쪽대퇴부를 오므려 약 1분간 안아줍니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "구강상태가 건강한지를 확인 후 구강내를 깨끗이 양치질하여 깨끗한 상태를 유지합니다.트레이에 본 겔 15 %를 1/2정도 채운 후 치아에 장착하고 잇몸 밖으로 나온 일부 겔을 칫솔로 닦아내고 양치질을 합니다.매일 1회 약 4시간 정도 장착, 약 10일간 합니다.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "구역, 구토 또는 하부복통, 항문 불쾌감, 직장통, 직장의 출혈 또는 배변의 실패 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
     "국소적인 자극 및 알레르기 반응, 치아의 법랑질 손상 등이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
       "count": 2,
       "masters": 2,
@@ -13,7 +40,7 @@
         "oromucosal+vaginal"
       ],
       "section": "이상반응",
-      "from": ""
+      "from": "v4-500"
     },
     "국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
       "count": 12,
@@ -22,7 +49,7 @@
         "oromucosal+vaginal"
       ],
       "section": "이상반응",
-      "from": ""
+      "from": "v4-500"
     },
     "국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
       "count": 9,
@@ -31,6 +58,15 @@
         "oromucosal+vaginal"
       ],
       "section": "이상반응",
+      "from": "v4-500"
+    },
+    "다른 완하제와 함께 투여 시 의사 또는 약사와 상의하십시오.": {
+      "count": 11,
+      "masters": 11,
+      "routes": [
+        "rectal"
+      ],
+      "section": "상호작용",
       "from": ""
     },
     "다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.": {
@@ -40,7 +76,7 @@
         "oromucosal+vaginal"
       ],
       "section": "상호작용",
-      "from": ""
+      "from": "v4-500"
     },
     "다른 외용제를 함께 사용하지 마십시오.": {
       "count": 9,
@@ -49,7 +85,7 @@
         "oromucosal+vaginal"
       ],
       "section": "상호작용",
-      "from": ""
+      "from": "v4-500"
     },
     "다른 외용제와 함께 사용하지 마십시오.": {
       "count": 12,
@@ -58,6 +94,96 @@
         "oromucosal+vaginal"
       ],
       "section": "상호작용",
+      "from": "v4-500"
+    },
+    "다음의 사용 과정을 약 10일 동안 하십시오.1. 구강상태가 건강한지 확인한 뒤, 구강내를 깨끗이 양치질하여 깨끗한 상태를 유지하십시오.2. 트레이에 본 겔을 절반 정도 채우십시오.3. 환자 치아에 장착하고, 잇몸 밖으로 나온 일부 겔을 칫솔로 닦아내고 양치질을 하십시오.4. 매일 1회, 약 4시간 정도 장착하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용(사용)할 때는 의사 또는 약사와 상의하십시오.간손상을 일으킬 수 있습니다.아세트아미노펜으로 일일 최대 용량(4,000mg)을 초과하여 복용(사용)하거나, 아세트아미노펜을 포함하는 다른 제품과 함께 복용(사용)하지 마십시오.간손상을 일으킬 수 있습니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
+      ],
+      "section": "경고",
+      "from": ""
+    },
+    "발진, 복통, 복명, 복부팽만감, 직장불쾌감, 항문부의 열감, 이화감, 혈압변동, 기립성 조절장애 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 4,
+      "masters": 4,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "성인은 1일 1회 1 병(118 mL), 3세 이상의 소아는 1일 1회 1/2 병(59 mL)을 좌측으로 누운상태나 슬흉위(무릎가슴자세)에서 사용합니다.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "성인은 1회 15 g(30 mL), 6~11세는 1회 10 g(20 mL), 1~5세는 1회 5 g(10 mL), 1세 미만은 1회 2.5 g(5 mL)을 항문내 주입합니다.연령, 증상에 따라 적절히 증감합니다.": {
+      "count": 4,
+      "masters": 4,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "성인은 1회 1개(10 mg)씩, 만 6세~12세 소아는 1회 ½개(5 mg)씩, 1일 1회 필요 시 항문에 삽입합니다.연령, 증상에 따라 적절히 증감합니다.": {
+      "count": 11,
+      "masters": 11,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "쇽(호흡곤란, 두드러기 등), 천식발작, 드물게 혈소판감소, 과립구감소, 용혈성빈혈, 메트헤모글로빈혈증, 청색증, 드물게 발진, 안면부종, 호흡곤란, 발한, 저혈압, 구역, 구토, 식욕부진, 설사, 변의, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "아세트아미노펜을 포함하는 다른 제품, 다른 소염진통제, 다른 해열진통제와 함께 사용하지 마십시오.바르비탈계 약물, 삼환계 항우울제, 알코올, 리튬, 티아지드계 이뇨제, 레보도파와 함께 사용 시 의사 또는 약사와 상의하십시오.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
+      ],
+      "section": "상호작용",
+      "from": ""
+    },
+    "의사의 지시없이 신질환 또는 나트륨제한 식이요법을 하고 있는 경우 이 약을 사용하지 마십시오.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "경고",
+      "from": ""
+    },
+    "이 약에 과민증 환자, 3세 미만의 소아, 선천성 거대결장증, 울혈성 심부전, 심한 신장기능장애, 위장관 폐쇄, 장폐색, 천공, 항문폐쇄증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 신장기능장애 환자, 배변 습관의 갑작스런 변화가 2주이상 지속된 사람, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 3∼12세 어린이, 고령자, 거대결장증이 있는 어린이는 의사 또는 약사와 상의하십시오.이 약은 의사의 지시 없이 1주일 이상 사용하지 마십시오.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
       "from": ""
     },
     "이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.": {
@@ -65,6 +191,24 @@
       "masters": 4,
       "routes": [
         "oromucosal+vaginal"
+      ],
+      "section": "사용상 주의사항",
+      "from": "v4-500"
+    },
+    "이 약에 과민증 환자, 임부 및 수유부, 18세 미만의 소아, 구강 내 감염 또는 상처가 있는 환자는 이 약을 사용하지 마십시오.이 약은 먹지 말아야 하며 실수로 삼켰을 때는 즉시 토해내십시오.가능하면 잇몸에 직접 닿지 않게 하고, 만일 접촉되었을 경우에는 즉시 물로 씻어내십시오.눈에 들어가지 않도록 주의하고, 접촉했을 경우에는 즉시 물로 씻어내고 의사와 상의하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "이 약에 과민증 환자, 호모시스틴뇨증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 간장애, 신장애, 신생아, 미숙아, 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상담하십시오.의사의 지시 없이 통증에 10일 이상(성인) 또는 5일 이상(소아) 투여하지 말고 발열에 3일 이상 투여하지 않습니다.이 약은 직장내 투여에 한하고 경구로 투여하지 않습니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
       ],
       "section": "사용상 주의사항",
       "from": ""
@@ -76,7 +220,7 @@
         "oromucosal+vaginal"
       ],
       "section": "사용상 주의사항",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.": {
       "count": 9,
@@ -85,7 +229,7 @@
         "oromucosal+vaginal"
       ],
       "section": "사용상 주의사항",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.": {
       "count": 12,
@@ -94,7 +238,7 @@
         "oromucosal+vaginal"
       ],
       "section": "사용상 주의사항",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.이 약은 국소적으로만 사용하십시오.이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.이 약을 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.이 약을 월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 말고 그대로 다음 용량을 적용하여 사용하십시오.": {
       "count": 3,
@@ -103,6 +247,60 @@
         "oromucosal+vaginal"
       ],
       "section": "사용상 주의사항",
+      "from": "v4-500"
+    },
+    "이 약에 과민증, 급성 복부 질환(충수염, 장출혈, 궤양성 결장염 등), 장마비, 창자막힘, 구역, 구토를 동반하는 중증의 복부통증, 경련성 변비, 중증의 단단한 변, 급성 맹장염과 같은 급성 복부수술상태, 항문 열창(찢긴상처), 급성 장염, 심한 탈수상태 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 고령자는 의사 또는 약사와 상의하십시오.이 약을 장기간 사용하지 마십시오.": {
+      "count": 11,
+      "masters": 11,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "이 약으로 치료하는 동안에는 담배, 커피, 주스를 금지하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "상호작용",
+      "from": ""
+    },
+    "이 약은 감기로 인한 발열 및 통증에 사용합니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "이 약은 급·만성변비, 수술·분만전후 및 X-선 촬영 시 장내분변 제거에 사용합니다.": {
+      "count": 11,
+      "masters": 11,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "이 약은 변비, 외과수술시, X-ray조사 및 내시경 검사시의 장세척에 사용합니다.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "이 약은 변비, 장내용물의 배설에 사용합니다.": {
+      "count": 4,
+      "masters": 4,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
       "from": ""
     },
     "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.": {
@@ -112,7 +310,7 @@
         "oromucosal+vaginal"
       ],
       "section": "효능·효과",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.": {
       "count": 4,
@@ -121,13 +319,22 @@
         "oromucosal+vaginal"
       ],
       "section": "효능·효과",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.": {
       "count": 5,
       "masters": 5,
       "routes": [
         "oromucosal+vaginal"
+      ],
+      "section": "효능·효과",
+      "from": "v4-500"
+    },
+    "이 약은 치아의 미백에 사용합니다.": {
+      "count": 16,
+      "masters": 16,
+      "routes": [
+        "oromucosal"
       ],
       "section": "효능·효과",
       "from": ""
@@ -139,7 +346,7 @@
         "oromucosal+vaginal"
       ],
       "section": "상호작용",
-      "from": ""
+      "from": "v4-500"
     },
     "이 약을 사용하는 동안 다른 외용제와 함께 사용하지 마십시오.": {
       "count": 2,
@@ -148,6 +355,42 @@
         "oromucosal+vaginal"
       ],
       "section": "상호작용",
+      "from": "v4-500"
+    },
+    "잇몸, 치아 또는 위장관에 자극이 나타나는 경우 이 약의 사용을 즉각 중지하고, 구강 안을 물로 여러 차례 씻어낸 후 불소 겔로 처치하십시오.이후 치과의사와 계속 사용여부에 대해 상의하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "잇몸, 치아및 위장관 자극(심한 경우 염증을 유발)이 나타날 수 있습니다.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "장관의 천공, 장관내 출혈, 심한 전신쇠약, 심한 복통 또는 구역, 구토 환자는 이 약을 사용하지 마십시오.급성 복증, 국소(장관, 항문)에 염증·창상, 중증의 심질환, 당뇨병, 중증의 경결변, 신생아 및 유아, 임부 또는 임신하고 있을 가능성이 있는 여성, 장관마비, 치출혈의 증상이 있는 환자, 고령자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.약에 대한 의존성이 나타나므로 연용은 피하십시오.관장에만 사용하고 내복하지 않습니다.사용잔액은 재사용 하지 않고 버립니다.": {
+      "count": 4,
+      "masters": 4,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "직장출혈 또는 배변의 실패 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.혈변, 어지러움, 실신, 복부통증, 설사, 아나필락시스반응, 혈관신경성부종(부기), 다른 과민반응, 탈수증, 복부 경련, 구역, 복부 불쾌감, 대장염(허헐성 대장염 포함), 배뇨감, 두통, 요통, 항문주위피부염, 직장열감, 항문부동통, 항문출혈, 항문직장 불쾌감이 나타날 수 있습니다.": {
+      "count": 11,
+      "masters": 11,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
       "from": ""
     },
     "질 세균 감염 환자는 용액을 적신 거즈를 질 안에 넣고, 가벼운 압력으로 해당부위를 1~3분 간 누르십시오.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염 환자는 적신 면봉 등을 이용해 여러 번 반복하여 바르십시오.": {
@@ -157,7 +400,7 @@
         "oromucosal+vaginal"
       ],
       "section": "용법·용량",
-      "from": ""
+      "from": "v4-500"
     },
     "질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": {
       "count": 9,
@@ -166,7 +409,7 @@
         "oromucosal+vaginal"
       ],
       "section": "용법·용량",
-      "from": ""
+      "from": "v4-500"
     },
     "질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당 부위를 1~3분간 눌러서 사용하십시오.3~4일 간격으로 2회 사용하고, 증상이 사라지지 않으면 의사와 상의하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러 번 반복하여 발라서 사용하십시오.": {
       "count": 3,
@@ -175,7 +418,7 @@
         "oromucosal+vaginal"
       ],
       "section": "용법·용량",
-      "from": ""
+      "from": "v4-500"
     },
     "질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": {
       "count": 12,
@@ -184,7 +427,7 @@
         "oromucosal+vaginal"
       ],
       "section": "용법·용량",
-      "from": ""
+      "from": "v4-500"
     },
     "질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다.3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": {
       "count": 4,
@@ -193,6 +436,15 @@
         "oromucosal+vaginal"
       ],
       "section": "용법·용량",
+      "from": "v4-500"
+    },
+    "치료 중 담배, 커피 및 쥬스를 피하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "상호작용",
       "from": ""
     },
     "치료 초기에 국소적인 자극 및 알레르기 반응이 나타날 수 있습니다.강한 산성으로 인해 치아의 법랑질에 손상을 줄 수 있습니다.이러한 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
@@ -202,7 +454,7 @@
         "oromucosal+vaginal"
       ],
       "section": "이상반응",
-      "from": ""
+      "from": "v4-500"
     },
     "치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
       "count": 4,
@@ -211,32 +463,70 @@
         "oromucosal+vaginal"
       ],
       "section": "이상반응",
+      "from": "v4-500"
+    },
+    "퍼옥사이드 과민증 환자, 구강 내 감염 또는 상처가 있는 환자, 임부 및 수유부, 18세 미만의 소아는 이 약을 사용하지 마십시오.먹지 마십시오.실수로 삼켰을 떄는 즉시 토하십시오.잇몸에 직접 닿게 하지 마십시오.잇몸에 접촉한 경우에는 즉시 물로 씻어내십시오.눈에 들어가지 않도록 하십시오.눈에 접촉한 경우에는 즉시 물로 씻어내고 의사와 상의하십시오.의사 또는 약사의 지시에 따라 사용하십시오.": {
+      "count": 8,
+      "masters": 8,
+      "routes": [
+        "oromucosal"
+      ],
+      "section": "사용상 주의사항",
       "from": ""
     }
   },
   "entries": {
+    "3~6세는 1회 2개, 1~2세는 1회 1~2개, 3~12개월은 1회 1개씩, 1일 2~3회 좌약의 둥근부분부터 직장내 깊이 삽입합니다.직장 근육긴장으로 밀려나올 경우에는 양쪽대퇴부를 오므려 약 1분간 안아줍니다.": "",
+    "구강상태가 건강한지를 확인 후 구강내를 깨끗이 양치질하여 깨끗한 상태를 유지합니다.트레이에 본 겔 15 %를 1/2정도 채운 후 치아에 장착하고 잇몸 밖으로 나온 일부 겔을 칫솔로 닦아내고 양치질을 합니다.매일 1회 약 4시간 정도 장착, 약 10일간 합니다.": "",
+    "구역, 구토 또는 하부복통, 항문 불쾌감, 직장통, 직장의 출혈 또는 배변의 실패 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "",
     "국소적인 자극 및 알레르기 반응, 치아의 법랑질 손상 등이 나타나는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If local irritation, an allergic reaction, or damage to the enamel of the teeth occurs, stop using this medicine immediately and consult a doctor or pharmacist.",
     "국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If local irritation, an allergic reaction, or damage to the enamel of the teeth occurs, stop using it immediately and consult a doctor or pharmacist.",
     "국소적인 자극 및 알레르기반응, 치아의 법랑질에 손상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If local irritation, an allergic reaction, or damage to the enamel of the teeth appears, stop using it immediately and consult a doctor or pharmacist.",
+    "다른 완하제와 함께 투여 시 의사 또는 약사와 상의하십시오.": "",
     "다른 외용제, 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품과 함께 사용하지 마십시오.": "Do not use it together with other preparations for external use, or with latex or rubber products such as condoms and vaginal contraceptive diaphragms.",
     "다른 외용제를 함께 사용하지 마십시오.": "Do not use other preparations for external use together with it.",
     "다른 외용제와 함께 사용하지 마십시오.": "Do not use it together with other preparations for external use.",
+    "다음의 사용 과정을 약 10일 동안 하십시오.1. 구강상태가 건강한지 확인한 뒤, 구강내를 깨끗이 양치질하여 깨끗한 상태를 유지하십시오.2. 트레이에 본 겔을 절반 정도 채우십시오.3. 환자 치아에 장착하고, 잇몸 밖으로 나온 일부 겔을 칫솔로 닦아내고 양치질을 하십시오.4. 매일 1회, 약 4시간 정도 장착하십시오.": "",
+    "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용(사용)할 때는 의사 또는 약사와 상의하십시오.간손상을 일으킬 수 있습니다.아세트아미노펜으로 일일 최대 용량(4,000mg)을 초과하여 복용(사용)하거나, 아세트아미노펜을 포함하는 다른 제품과 함께 복용(사용)하지 마십시오.간손상을 일으킬 수 있습니다.": "",
+    "발진, 복통, 복명, 복부팽만감, 직장불쾌감, 항문부의 열감, 이화감, 혈압변동, 기립성 조절장애 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "",
+    "성인은 1일 1회 1 병(118 mL), 3세 이상의 소아는 1일 1회 1/2 병(59 mL)을 좌측으로 누운상태나 슬흉위(무릎가슴자세)에서 사용합니다.": "",
+    "성인은 1회 15 g(30 mL), 6~11세는 1회 10 g(20 mL), 1~5세는 1회 5 g(10 mL), 1세 미만은 1회 2.5 g(5 mL)을 항문내 주입합니다.연령, 증상에 따라 적절히 증감합니다.": "",
+    "성인은 1회 1개(10 mg)씩, 만 6세~12세 소아는 1회 ½개(5 mg)씩, 1일 1회 필요 시 항문에 삽입합니다.연령, 증상에 따라 적절히 증감합니다.": "",
+    "쇽(호흡곤란, 두드러기 등), 천식발작, 드물게 혈소판감소, 과립구감소, 용혈성빈혈, 메트헤모글로빈혈증, 청색증, 드물게 발진, 안면부종, 호흡곤란, 발한, 저혈압, 구역, 구토, 식욕부진, 설사, 변의, 피부점막안증후군(스티븐스-존슨증후군), 독성표피괴사용해(리엘증후군) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "",
+    "아세트아미노펜을 포함하는 다른 제품, 다른 소염진통제, 다른 해열진통제와 함께 사용하지 마십시오.바르비탈계 약물, 삼환계 항우울제, 알코올, 리튬, 티아지드계 이뇨제, 레보도파와 함께 사용 시 의사 또는 약사와 상의하십시오.": "",
+    "의사의 지시없이 신질환 또는 나트륨제한 식이요법을 하고 있는 경우 이 약을 사용하지 마십시오.": "",
+    "이 약에 과민증 환자, 3세 미만의 소아, 선천성 거대결장증, 울혈성 심부전, 심한 신장기능장애, 위장관 폐쇄, 장폐색, 천공, 항문폐쇄증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 신장기능장애 환자, 배변 습관의 갑작스런 변화가 2주이상 지속된 사람, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 3∼12세 어린이, 고령자, 거대결장증이 있는 어린이는 의사 또는 약사와 상의하십시오.이 약은 의사의 지시 없이 1주일 이상 사용하지 마십시오.": "",
     "이 약에 과민증 환자, 월경 중인 경우는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 수유부는 의사나 약사와 상의하십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.이 약은 국소적으로만 사용하고, 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.": "Patients with hypersensitivity to this medicine and women during menstruation must not use this medicine. Before using this medicine, pregnant or breastfeeding women should consult a doctor or pharmacist. Do not have intercourse or wash with irritating soap during the treatment period. If you forget to use this medicine, do not make up the dose; simply apply the next dose. Use this medicine locally only, and after applying it to the oral mucosa or the gums, rinse the mouth thoroughly. This medicine is strongly acidic, so be careful that it does not get into the eyes; if it does get into the eyes, rinse them immediately with clean water and then consult a doctor or pharmacist.",
+    "이 약에 과민증 환자, 임부 및 수유부, 18세 미만의 소아, 구강 내 감염 또는 상처가 있는 환자는 이 약을 사용하지 마십시오.이 약은 먹지 말아야 하며 실수로 삼켰을 때는 즉시 토해내십시오.가능하면 잇몸에 직접 닿지 않게 하고, 만일 접촉되었을 경우에는 즉시 물로 씻어내십시오.눈에 들어가지 않도록 주의하고, 접촉했을 경우에는 즉시 물로 씻어내고 의사와 상의하십시오.": "",
+    "이 약에 과민증 환자, 호모시스틴뇨증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 간장애, 신장애, 신생아, 미숙아, 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상담하십시오.의사의 지시 없이 통증에 10일 이상(성인) 또는 5일 이상(소아) 투여하지 말고 발열에 3일 이상 투여하지 않습니다.이 약은 직장내 투여에 한하고 경구로 투여하지 않습니다.": "",
     "이 약에 과민증 환자는 사용하지 마십시오.월경 중에는 사용하지 마십시오.성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 마십시오.그대로 다음 용량을 적용하십시오.이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.증상이 사라지지 않으면 의사와 상의하십시오.국소적으로만 사용하며, 눈에 들어가지 않도록 주의하십시오.눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.구강점막이나 잇몸에 사용한 후에는 철저하게 입 안을 헹구십시오.콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.": "Patients with hypersensitivity to this medicine must not use it. Do not use it during menstruation. Do not have intercourse or wash with irritating soap. If you forget to use this medicine, do not make up the dose. Simply apply the next dose. Before using this medicine, pregnant and breastfeeding women should consult a doctor or pharmacist. If the symptoms do not go away, consult a doctor. Use it locally only, and be careful that it does not get into the eyes. If it gets into the eyes, rinse them immediately with clean water and then consult a doctor or pharmacist. After using it on the oral mucosa or the gums, rinse the mouth thoroughly. Be careful, as it may weaken latex or rubber products such as condoms and vaginal contraceptive diaphragms.",
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어 내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeeding women should consult a doctor or pharmacist. This medicine may weaken latex or rubber products such as condoms and vaginal contraceptive diaphragms, so use it with care. Do not use it during menstruation. Do not have intercourse or wash with irritating soap during the treatment period. If you forget to use this medicine, do not make up the dose; simply apply the next dose. Use it locally only. Be careful that it does not get into the eyes, and if it does get into the eyes, rinse them immediately with clean water. After applying it to the oral mucosa or the gums, rinse the mouth thoroughly.",
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.이 약은 콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 주의하십시오.월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 않고 그대로 다음 용량을 적용하십시오.국소적으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, women who are pregnant or may be pregnant and breastfeeding women should consult a doctor or pharmacist. This medicine may weaken latex or rubber products such as condoms and vaginal contraceptive diaphragms, so use it with care. Do not use it during menstruation. Do not have intercourse or wash with irritating soap during the treatment period. If you forget to use this medicine, do not make up the dose; simply apply the next dose. Use it locally only. Be careful that it does not get into the eyes, and if it does get into the eyes, rinse them immediately with clean water. After applying it to the oral mucosa or the gums, rinse the mouth thoroughly.",
     "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부, 수유부는 의사 또는 약사와 상의하십시오.이 약은 국소적으로만 사용하십시오.이 약은 강한 산성을 띠고 있으므로 눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우에는 즉시 깨끗한 물로 씻어낸 후, 의사 또는 약사와 상의하십시오.이 약을 구강점막이나 잇몸에 적용한 후에는 철저하게 입안을 헹구십시오.이 약을 월경 중에 사용하지 마십시오.치료기간 중 성교를 하거나 자극적인 비누로 세척하지 마십시오.이 약의 사용을 잊은 경우에는 용량을 보충하지 말고 그대로 다음 용량을 적용하여 사용하십시오.": "Patients with hypersensitivity to this medicine must not use this medicine. Before using this medicine, pregnant and breastfeeding women should consult a doctor or pharmacist. Use this medicine locally only. This medicine is strongly acidic, so be careful that it does not get into the eyes; if it does get into the eyes, rinse them immediately with clean water and then consult a doctor or pharmacist. After applying this medicine to the oral mucosa or the gums, rinse the mouth thoroughly. Do not use this medicine during menstruation. Do not have intercourse or wash with irritating soap during the treatment period. If you forget to use this medicine, do not make up the dose but simply apply the next dose.",
+    "이 약에 과민증, 급성 복부 질환(충수염, 장출혈, 궤양성 결장염 등), 장마비, 창자막힘, 구역, 구토를 동반하는 중증의 복부통증, 경련성 변비, 중증의 단단한 변, 급성 맹장염과 같은 급성 복부수술상태, 항문 열창(찢긴상처), 급성 장염, 심한 탈수상태 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 소아, 고령자는 의사 또는 약사와 상의하십시오.이 약을 장기간 사용하지 마십시오.": "",
+    "이 약으로 치료하는 동안에는 담배, 커피, 주스를 금지하십시오.": "",
+    "이 약은 감기로 인한 발열 및 통증에 사용합니다.": "",
+    "이 약은 급·만성변비, 수술·분만전후 및 X-선 촬영 시 장내분변 제거에 사용합니다.": "",
+    "이 약은 변비, 외과수술시, X-ray조사 및 내시경 검사시의 장세척에 사용합니다.": "",
+    "이 약은 변비, 장내용물의 배설에 사용합니다.": "",
     "이 약은 질 세균 감염, 구내염 및 치육염(잇몸염)에 사용합니다.": "This medicine is used for bacterial vaginal infection, stomatitis, and gingivitis (inflammation of the gums).",
     "이 약은 질 세균 감염, 구내염 및 치육염에 사용하십시오.": "Use this medicine for bacterial vaginal infection, stomatitis, and gingivitis.",
     "이 약은 질 세균 감염, 구내염 및 치육염에 사용합니다.": "This medicine is used for bacterial vaginal infection, stomatitis, and gingivitis.",
+    "이 약은 치아의 미백에 사용합니다.": "",
     "이 약을 사용하는 동안 다른 외용제와 병행하여 사용하지 마십시오.콘돔, 질내 피임용 격막과 같은 라텍스 또는 고무제품을 약화시킬 수 있으므로 사용에 주의하십시오.": "While using this medicine, do not use it in combination with other preparations for external use. Be careful in use, as it may weaken latex or rubber products such as condoms and vaginal contraceptive diaphragms.",
     "이 약을 사용하는 동안 다른 외용제와 함께 사용하지 마십시오.": "While using this medicine, do not use it together with other preparations for external use.",
+    "잇몸, 치아 또는 위장관에 자극이 나타나는 경우 이 약의 사용을 즉각 중지하고, 구강 안을 물로 여러 차례 씻어낸 후 불소 겔로 처치하십시오.이후 치과의사와 계속 사용여부에 대해 상의하십시오.": "",
+    "잇몸, 치아및 위장관 자극(심한 경우 염증을 유발)이 나타날 수 있습니다.": "",
+    "장관의 천공, 장관내 출혈, 심한 전신쇠약, 심한 복통 또는 구역, 구토 환자는 이 약을 사용하지 마십시오.급성 복증, 국소(장관, 항문)에 염증·창상, 중증의 심질환, 당뇨병, 중증의 경결변, 신생아 및 유아, 임부 또는 임신하고 있을 가능성이 있는 여성, 장관마비, 치출혈의 증상이 있는 환자, 고령자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.약에 대한 의존성이 나타나므로 연용은 피하십시오.관장에만 사용하고 내복하지 않습니다.사용잔액은 재사용 하지 않고 버립니다.": "",
+    "직장출혈 또는 배변의 실패 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.혈변, 어지러움, 실신, 복부통증, 설사, 아나필락시스반응, 혈관신경성부종(부기), 다른 과민반응, 탈수증, 복부 경련, 구역, 복부 불쾌감, 대장염(허헐성 대장염 포함), 배뇨감, 두통, 요통, 항문주위피부염, 직장열감, 항문부동통, 항문출혈, 항문직장 불쾌감이 나타날 수 있습니다.": "",
     "질 세균 감염 환자는 용액을 적신 거즈를 질 안에 넣고, 가벼운 압력으로 해당부위를 1~3분 간 누르십시오.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염 환자는 적신 면봉 등을 이용해 여러 번 반복하여 바르십시오.": "For patients with a bacterial vaginal infection, place gauze soaked in the solution into the vagina and press the affected area with light pressure for 1 to 3 minutes. Use it twice at intervals of 3 to 4 days. For patients with stomatitis and gingivitis, apply it repeatedly several times using a soaked cotton swab or similar.",
     "질 세균 감염에 사용 시 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에 사용 시 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": "When used for a bacterial vaginal infection, place gauze soaked in the solution into the vagina and press the affected area with light pressure for 1 to 3 minutes. Use it twice at intervals of 3 to 4 days. When used for stomatitis and gingivitis, apply this medicine repeatedly several times using a cotton swab or similar soaked with it.",
     "질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당 부위를 1~3분간 눌러서 사용하십시오.3~4일 간격으로 2회 사용하고, 증상이 사라지지 않으면 의사와 상의하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러 번 반복하여 발라서 사용하십시오.": "For a bacterial vaginal infection, place gauze soaked in the solution into the vagina and press the affected area with light pressure for 1 to 3 minutes. Use it 2 times at intervals of 3 to 4 days, and if the symptoms do not go away, consult a doctor. For stomatitis and gingivitis, apply this medicine repeatedly several times using a cotton swab or similar soaked with it.",
     "질 세균 감염에는 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1~3분간 누릅니다.3~4일 간격으로 두 번 사용하십시오.구내염 및 치육염에는 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": "For a bacterial vaginal infection, place gauze soaked in the solution into the vagina and press the affected area with light pressure for 1 to 3 minutes. Use it twice at intervals of 3 to 4 days. For stomatitis and gingivitis, apply this medicine repeatedly several times using a cotton swab or similar soaked with it.",
     "질 세균 감염의 경우, 용액을 적신 거즈를 질 안에 넣고 가벼운 압력으로 해당부위를 1 〜 3분간 누릅니다.3 〜 4일 간격으로 두 번 사용하고, 증상이 사라지지 않으면 의사와 상담합니다.구내염 및 치육염의 경우, 이 약을 적신 면봉 등을 이용해 여러번 반복하여 발라줍니다.": "In the case of a bacterial vaginal infection, place gauze soaked in the solution into the vagina and press the affected area with light pressure for 1 to 3 minutes. Use it twice at intervals of 3 to 4 days, and if the symptoms do not go away, consult a doctor. In the case of stomatitis and gingivitis, apply this medicine repeatedly several times using a cotton swab or similar soaked with it.",
+    "치료 중 담배, 커피 및 쥬스를 피하십시오.": "",
     "치료 초기에 국소적인 자극 및 알레르기 반응이 나타날 수 있습니다.강한 산성으로 인해 치아의 법랑질에 손상을 줄 수 있습니다.이러한 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "Local irritation and an allergic reaction may appear at the beginning of treatment. Because it is strongly acidic, it may damage the enamel of the teeth. If these symptoms appear, stop using it immediately and consult a doctor or pharmacist.",
-    "치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If local irritation and an allergic reaction appear at the beginning of treatment, or if the strong acidity damages the enamel of the teeth, stop using it immediately and consult a doctor or pharmacist."
+    "치료 초기에 국소적인 자극 및 알레르기반응이 나타나는 경우, 강한 산성으로 인해 치아의 법랑질에 손상을 주는 경우에는 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If local irritation and an allergic reaction appear at the beginning of treatment, or if the strong acidity damages the enamel of the teeth, stop using it immediately and consult a doctor or pharmacist.",
+    "퍼옥사이드 과민증 환자, 구강 내 감염 또는 상처가 있는 환자, 임부 및 수유부, 18세 미만의 소아는 이 약을 사용하지 마십시오.먹지 마십시오.실수로 삼켰을 떄는 즉시 토하십시오.잇몸에 직접 닿게 하지 마십시오.잇몸에 접촉한 경우에는 즉시 물로 씻어내십시오.눈에 들어가지 않도록 하십시오.눈에 접촉한 경우에는 즉시 물로 씻어내고 의사와 상의하십시오.의사 또는 약사의 지시에 따라 사용하십시오.": ""
   }
 }

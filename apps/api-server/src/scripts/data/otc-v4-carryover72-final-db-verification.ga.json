@@ -1,0 +1,132 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-PRODUCTION-V1",
+  "kind": "final-db-state-verification",
+  "liveDbWrite": 0,
+  "note": "payload 기반 멱등 재실행 대신 DB 실측으로 exactly-once 상태를 검증. 유닛별 TM/shard 파일이 후속 유닛 실행으로 덮여 42건 EN payload 재구성이 불가했다.",
+  "gatesTotal": 13,
+  "gatesPassed": 12,
+  "verdict": "FAIL",
+  "auditByBatch": [
+    {
+      "b": "otc-v4-carryover72",
+      "n": 72
+    },
+    {
+      "b": "otc-v4-finalall",
+      "n": 388
+    },
+    {
+      "b": "otc-v4-next2000",
+      "n": 1962
+    },
+    {
+      "b": "otc-v4-nr26",
+      "n": 26
+    },
+    {
+      "b": "otc-v4-pilot-100",
+      "n": 80
+    },
+    {
+      "b": "otc-v4-pilot-500",
+      "n": 416
+    },
+    {
+      "b": "otc-v4-route535",
+      "n": 538
+    }
+  ],
+  "gates": [
+    {
+      "id": "FV-00",
+      "gate": "READ ONLY 트랜잭션",
+      "expected": "on",
+      "actual": "on",
+      "pass": true
+    },
+    {
+      "id": "FV-01",
+      "gate": "입력 72",
+      "expected": "72",
+      "actual": "72",
+      "pass": true
+    },
+    {
+      "id": "FV-02",
+      "gate": "KO authored canonical = 72",
+      "expected": "72",
+      "actual": "72",
+      "pass": true
+    },
+    {
+      "id": "FV-03",
+      "gate": "EN canonical = 72",
+      "expected": "72",
+      "actual": "72",
+      "pass": true
+    },
+    {
+      "id": "FV-04",
+      "gate": "canonicalDup 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-05",
+      "gate": "easy canonical 잔존 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-06",
+      "gate": "master별 audit 정확히 1",
+      "expected": "0 위반",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-07",
+      "gate": "대상 밖 audit 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-08",
+      "gate": "sourceRef 타 master 누수 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-09",
+      "gate": "선행 GREEN 3,404 불변(KO+EN 2행/master)",
+      "expected": "4916",
+      "actual": "4916",
+      "pass": true
+    },
+    {
+      "id": "FV-10",
+      "gate": "terminal 40 write 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-11",
+      "gate": "누적 V4 GREEN master",
+      "expected": "3476",
+      "actual": "15908",
+      "pass": false
+    },
+    {
+      "id": "FV-12",
+      "gate": "easy canonical 잔존 master(참고)",
+      "expected": "-",
+      "actual": "353",
+      "pass": true
+    }
+  ]
+}

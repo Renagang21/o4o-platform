@@ -1,0 +1,90 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-CARRYOVER72-FINAL-VERIFICATION-AND-TRACK-CLOSURE-V1",
+  "kind": "final-track-closure-verification",
+  "liveDbWrite": 0,
+  "gatesTotal": 10,
+  "gatesPassed": 8,
+  "verdict": "FAIL",
+  "gates": [
+    {
+      "id": "FV-00",
+      "gate": "READ ONLY TX",
+      "expected": "on",
+      "actual": "on",
+      "pass": true
+    },
+    {
+      "id": "FV-A",
+      "gate": "V4 batch audit 보유 고유 master",
+      "expected": "3479",
+      "actual": "3479",
+      "pass": true
+    },
+    {
+      "id": "FV-11",
+      "gate": "V4 유효 GREEN master",
+      "expected": "3476",
+      "actual": "3476",
+      "pass": true
+    },
+    {
+      "id": "FV-02",
+      "gate": "carryover72 KO canonical",
+      "expected": "72",
+      "actual": "72",
+      "pass": true
+    },
+    {
+      "id": "FV-03",
+      "gate": "carryover72 EN canonical",
+      "expected": "72",
+      "actual": "72",
+      "pass": true
+    },
+    {
+      "id": "FV-08",
+      "gate": "sourceRef master별 2행(KO+EN)",
+      "expected": "0 위반",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-06",
+      "gate": "carryover72 master별 audit 1",
+      "expected": "0 위반",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-14",
+      "gate": "run 원장 KO hash 와 DB 일치(multi 30)",
+      "expected": "0 불일치",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "FV-12",
+      "gate": "terminal/exclude 고유 master",
+      "expected": "333",
+      "actual": "330",
+      "pass": false,
+      "detail": {
+        "exclude266": 266,
+        "sourceTerminal24": 24,
+        "terminal112": 40,
+        "dupAcrossGroups": 0
+      }
+    },
+    {
+      "id": "FV-13",
+      "gate": "공식 분모 3,809 차이 0",
+      "expected": "3809",
+      "actual": "3806",
+      "pass": false,
+      "detail": {
+        "green": 3476,
+        "termExcl": 330
+      }
+    }
+  ]
+}

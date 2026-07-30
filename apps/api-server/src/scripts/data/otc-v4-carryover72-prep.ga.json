@@ -23,372 +23,13 @@
     "authoredEnCanonical": 72,
     "easyKoCanonical": 0,
     "sourceRefLiveOccupied": 72,
-    "sourceHashDrift": 72,
+    "sourceHashDrift": 0,
     "sourceRefUnique": true,
-    "expectedWriteT": 432
+    "expectedWriteT": 432,
+    "deprecatedFallbackUsed": 72,
+    "alreadyProducedCount": 72
   },
-  "systemStop": [
-    "SYS 공식 원문 부재 03a20337-efc0-4604-887e-7ce2c9cdeb02",
-    "SYS 기존 authored canonical 03a20337-efc0-4604-887e-7ce2c9cdeb02",
-    "SYS easy ko canonical 0 03a20337-efc0-4604-887e-7ce2c9cdeb02",
-    "SYS sourceRef LIVE 점유 2 03a20337-efc0-4604-887e-7ce2c9cdeb02",
-    "SYS 효능/용법 섹션 부재 03a20337-efc0-4604-887e-7ce2c9cdeb02",
-    "SYS 공식 원문 부재 08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
-    "SYS 기존 authored canonical 08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
-    "SYS easy ko canonical 0 08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
-    "SYS sourceRef LIVE 점유 2 08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
-    "SYS 효능/용법 섹션 부재 08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
-    "SYS 공식 원문 부재 0b7e6fad-1120-42e3-986c-d9760e87f68d",
-    "SYS 기존 authored canonical 0b7e6fad-1120-42e3-986c-d9760e87f68d",
-    "SYS easy ko canonical 0 0b7e6fad-1120-42e3-986c-d9760e87f68d",
-    "SYS sourceRef LIVE 점유 2 0b7e6fad-1120-42e3-986c-d9760e87f68d",
-    "SYS 효능/용법 섹션 부재 0b7e6fad-1120-42e3-986c-d9760e87f68d",
-    "SYS 공식 원문 부재 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
-    "SYS 기존 authored canonical 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
-    "SYS easy ko canonical 0 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
-    "SYS sourceRef LIVE 점유 2 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
-    "SYS 효능/용법 섹션 부재 0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
-    "SYS 공식 원문 부재 0f13048a-58c7-4fa8-9c14-b880c17abab8",
-    "SYS 기존 authored canonical 0f13048a-58c7-4fa8-9c14-b880c17abab8",
-    "SYS easy ko canonical 0 0f13048a-58c7-4fa8-9c14-b880c17abab8",
-    "SYS sourceRef LIVE 점유 2 0f13048a-58c7-4fa8-9c14-b880c17abab8",
-    "SYS 효능/용법 섹션 부재 0f13048a-58c7-4fa8-9c14-b880c17abab8",
-    "SYS 공식 원문 부재 0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
-    "SYS 기존 authored canonical 0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
-    "SYS easy ko canonical 0 0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
-    "SYS sourceRef LIVE 점유 2 0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
-    "SYS 효능/용법 섹션 부재 0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
-    "SYS 공식 원문 부재 12f3507e-fedd-4f00-b210-0467deebb691",
-    "SYS 기존 authored canonical 12f3507e-fedd-4f00-b210-0467deebb691",
-    "SYS easy ko canonical 0 12f3507e-fedd-4f00-b210-0467deebb691",
-    "SYS sourceRef LIVE 점유 2 12f3507e-fedd-4f00-b210-0467deebb691",
-    "SYS 효능/용법 섹션 부재 12f3507e-fedd-4f00-b210-0467deebb691",
-    "SYS 공식 원문 부재 15e043a6-b27b-451a-a054-6d71faeb8eba",
-    "SYS 기존 authored canonical 15e043a6-b27b-451a-a054-6d71faeb8eba",
-    "SYS easy ko canonical 0 15e043a6-b27b-451a-a054-6d71faeb8eba",
-    "SYS sourceRef LIVE 점유 2 15e043a6-b27b-451a-a054-6d71faeb8eba",
-    "SYS 효능/용법 섹션 부재 15e043a6-b27b-451a-a054-6d71faeb8eba",
-    "SYS 공식 원문 부재 1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
-    "SYS 기존 authored canonical 1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
-    "SYS easy ko canonical 0 1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
-    "SYS sourceRef LIVE 점유 2 1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
-    "SYS 효능/용법 섹션 부재 1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
-    "SYS 공식 원문 부재 2072f867-2b0b-464e-91f4-b241adb0ff57",
-    "SYS 기존 authored canonical 2072f867-2b0b-464e-91f4-b241adb0ff57",
-    "SYS easy ko canonical 0 2072f867-2b0b-464e-91f4-b241adb0ff57",
-    "SYS sourceRef LIVE 점유 2 2072f867-2b0b-464e-91f4-b241adb0ff57",
-    "SYS 효능/용법 섹션 부재 2072f867-2b0b-464e-91f4-b241adb0ff57",
-    "SYS 공식 원문 부재 2478b2ee-3807-4879-804b-79999ef7d5ac",
-    "SYS 기존 authored canonical 2478b2ee-3807-4879-804b-79999ef7d5ac",
-    "SYS easy ko canonical 0 2478b2ee-3807-4879-804b-79999ef7d5ac",
-    "SYS sourceRef LIVE 점유 2 2478b2ee-3807-4879-804b-79999ef7d5ac",
-    "SYS 효능/용법 섹션 부재 2478b2ee-3807-4879-804b-79999ef7d5ac",
-    "SYS 공식 원문 부재 25de2536-53f8-41b4-afee-63a8ed2e0cb7",
-    "SYS 기존 authored canonical 25de2536-53f8-41b4-afee-63a8ed2e0cb7",
-    "SYS easy ko canonical 0 25de2536-53f8-41b4-afee-63a8ed2e0cb7",
-    "SYS sourceRef LIVE 점유 2 25de2536-53f8-41b4-afee-63a8ed2e0cb7",
-    "SYS 효능/용법 섹션 부재 25de2536-53f8-41b4-afee-63a8ed2e0cb7",
-    "SYS 공식 원문 부재 28158f9d-6aba-4912-a784-10feaa77fe4d",
-    "SYS 기존 authored canonical 28158f9d-6aba-4912-a784-10feaa77fe4d",
-    "SYS easy ko canonical 0 28158f9d-6aba-4912-a784-10feaa77fe4d",
-    "SYS sourceRef LIVE 점유 2 28158f9d-6aba-4912-a784-10feaa77fe4d",
-    "SYS 효능/용법 섹션 부재 28158f9d-6aba-4912-a784-10feaa77fe4d",
-    "SYS 공식 원문 부재 28f68a84-db96-43ac-bc9c-6ccb4264d64f",
-    "SYS 기존 authored canonical 28f68a84-db96-43ac-bc9c-6ccb4264d64f",
-    "SYS easy ko canonical 0 28f68a84-db96-43ac-bc9c-6ccb4264d64f",
-    "SYS sourceRef LIVE 점유 2 28f68a84-db96-43ac-bc9c-6ccb4264d64f",
-    "SYS 효능/용법 섹션 부재 28f68a84-db96-43ac-bc9c-6ccb4264d64f",
-    "SYS 공식 원문 부재 2a6baf5d-53e2-4437-8c87-37f0811a1717",
-    "SYS 기존 authored canonical 2a6baf5d-53e2-4437-8c87-37f0811a1717",
-    "SYS easy ko canonical 0 2a6baf5d-53e2-4437-8c87-37f0811a1717",
-    "SYS sourceRef LIVE 점유 2 2a6baf5d-53e2-4437-8c87-37f0811a1717",
-    "SYS 효능/용법 섹션 부재 2a6baf5d-53e2-4437-8c87-37f0811a1717",
-    "SYS 공식 원문 부재 2cf7c9db-4316-46f8-a735-83759c1b23eb",
-    "SYS 기존 authored canonical 2cf7c9db-4316-46f8-a735-83759c1b23eb",
-    "SYS easy ko canonical 0 2cf7c9db-4316-46f8-a735-83759c1b23eb",
-    "SYS sourceRef LIVE 점유 2 2cf7c9db-4316-46f8-a735-83759c1b23eb",
-    "SYS 효능/용법 섹션 부재 2cf7c9db-4316-46f8-a735-83759c1b23eb",
-    "SYS 공식 원문 부재 365136fa-fd7e-4d01-bf63-97e257e5cac6",
-    "SYS 기존 authored canonical 365136fa-fd7e-4d01-bf63-97e257e5cac6",
-    "SYS easy ko canonical 0 365136fa-fd7e-4d01-bf63-97e257e5cac6",
-    "SYS sourceRef LIVE 점유 2 365136fa-fd7e-4d01-bf63-97e257e5cac6",
-    "SYS 효능/용법 섹션 부재 365136fa-fd7e-4d01-bf63-97e257e5cac6",
-    "SYS 공식 원문 부재 3653eb12-eb2d-4344-8d37-1bfce061d5cd",
-    "SYS 기존 authored canonical 3653eb12-eb2d-4344-8d37-1bfce061d5cd",
-    "SYS easy ko canonical 0 3653eb12-eb2d-4344-8d37-1bfce061d5cd",
-    "SYS sourceRef LIVE 점유 2 3653eb12-eb2d-4344-8d37-1bfce061d5cd",
-    "SYS 효능/용법 섹션 부재 3653eb12-eb2d-4344-8d37-1bfce061d5cd",
-    "SYS 공식 원문 부재 37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
-    "SYS 기존 authored canonical 37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
-    "SYS easy ko canonical 0 37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
-    "SYS sourceRef LIVE 점유 2 37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
-    "SYS 효능/용법 섹션 부재 37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
-    "SYS 공식 원문 부재 3877c15c-ee9b-4276-b314-cce91ac5470c",
-    "SYS 기존 authored canonical 3877c15c-ee9b-4276-b314-cce91ac5470c",
-    "SYS easy ko canonical 0 3877c15c-ee9b-4276-b314-cce91ac5470c",
-    "SYS sourceRef LIVE 점유 2 3877c15c-ee9b-4276-b314-cce91ac5470c",
-    "SYS 효능/용법 섹션 부재 3877c15c-ee9b-4276-b314-cce91ac5470c",
-    "SYS 공식 원문 부재 38c4e1df-bdad-43d6-9124-1e8626d2d429",
-    "SYS 기존 authored canonical 38c4e1df-bdad-43d6-9124-1e8626d2d429",
-    "SYS easy ko canonical 0 38c4e1df-bdad-43d6-9124-1e8626d2d429",
-    "SYS sourceRef LIVE 점유 2 38c4e1df-bdad-43d6-9124-1e8626d2d429",
-    "SYS 효능/용법 섹션 부재 38c4e1df-bdad-43d6-9124-1e8626d2d429",
-    "SYS 공식 원문 부재 397788d1-65cd-4138-b03b-3def57d4656b",
-    "SYS 기존 authored canonical 397788d1-65cd-4138-b03b-3def57d4656b",
-    "SYS easy ko canonical 0 397788d1-65cd-4138-b03b-3def57d4656b",
-    "SYS sourceRef LIVE 점유 2 397788d1-65cd-4138-b03b-3def57d4656b",
-    "SYS 효능/용법 섹션 부재 397788d1-65cd-4138-b03b-3def57d4656b",
-    "SYS 공식 원문 부재 3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
-    "SYS 기존 authored canonical 3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
-    "SYS easy ko canonical 0 3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
-    "SYS sourceRef LIVE 점유 2 3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
-    "SYS 효능/용법 섹션 부재 3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
-    "SYS 공식 원문 부재 3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
-    "SYS 기존 authored canonical 3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
-    "SYS easy ko canonical 0 3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
-    "SYS sourceRef LIVE 점유 2 3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
-    "SYS 효능/용법 섹션 부재 3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
-    "SYS 공식 원문 부재 444e477a-2b0b-44ed-828e-217efa1879a9",
-    "SYS 기존 authored canonical 444e477a-2b0b-44ed-828e-217efa1879a9",
-    "SYS easy ko canonical 0 444e477a-2b0b-44ed-828e-217efa1879a9",
-    "SYS sourceRef LIVE 점유 2 444e477a-2b0b-44ed-828e-217efa1879a9",
-    "SYS 효능/용법 섹션 부재 444e477a-2b0b-44ed-828e-217efa1879a9",
-    "SYS 공식 원문 부재 45867269-1354-485a-8a72-fa9ffb84ecc9",
-    "SYS 기존 authored canonical 45867269-1354-485a-8a72-fa9ffb84ecc9",
-    "SYS easy ko canonical 0 45867269-1354-485a-8a72-fa9ffb84ecc9",
-    "SYS sourceRef LIVE 점유 2 45867269-1354-485a-8a72-fa9ffb84ecc9",
-    "SYS 효능/용법 섹션 부재 45867269-1354-485a-8a72-fa9ffb84ecc9",
-    "SYS 공식 원문 부재 4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
-    "SYS 기존 authored canonical 4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
-    "SYS easy ko canonical 0 4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
-    "SYS sourceRef LIVE 점유 2 4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
-    "SYS 효능/용법 섹션 부재 4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
-    "SYS 공식 원문 부재 514655f8-44de-4e14-99dc-fffcc87922b2",
-    "SYS 기존 authored canonical 514655f8-44de-4e14-99dc-fffcc87922b2",
-    "SYS easy ko canonical 0 514655f8-44de-4e14-99dc-fffcc87922b2",
-    "SYS sourceRef LIVE 점유 2 514655f8-44de-4e14-99dc-fffcc87922b2",
-    "SYS 효능/용법 섹션 부재 514655f8-44de-4e14-99dc-fffcc87922b2",
-    "SYS 공식 원문 부재 51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
-    "SYS 기존 authored canonical 51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
-    "SYS easy ko canonical 0 51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
-    "SYS sourceRef LIVE 점유 2 51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
-    "SYS 효능/용법 섹션 부재 51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
-    "SYS 공식 원문 부재 5979759d-898f-44ed-9383-fdfd39e38510",
-    "SYS 기존 authored canonical 5979759d-898f-44ed-9383-fdfd39e38510",
-    "SYS easy ko canonical 0 5979759d-898f-44ed-9383-fdfd39e38510",
-    "SYS sourceRef LIVE 점유 2 5979759d-898f-44ed-9383-fdfd39e38510",
-    "SYS 효능/용법 섹션 부재 5979759d-898f-44ed-9383-fdfd39e38510",
-    "SYS 공식 원문 부재 5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
-    "SYS 기존 authored canonical 5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
-    "SYS easy ko canonical 0 5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
-    "SYS sourceRef LIVE 점유 2 5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
-    "SYS 효능/용법 섹션 부재 5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
-    "SYS 공식 원문 부재 62ee507e-5275-4117-950f-10f5eda04873",
-    "SYS 기존 authored canonical 62ee507e-5275-4117-950f-10f5eda04873",
-    "SYS easy ko canonical 0 62ee507e-5275-4117-950f-10f5eda04873",
-    "SYS sourceRef LIVE 점유 2 62ee507e-5275-4117-950f-10f5eda04873",
-    "SYS 효능/용법 섹션 부재 62ee507e-5275-4117-950f-10f5eda04873",
-    "SYS 공식 원문 부재 637bf823-834c-41bf-9d08-14b9863d390d",
-    "SYS 기존 authored canonical 637bf823-834c-41bf-9d08-14b9863d390d",
-    "SYS easy ko canonical 0 637bf823-834c-41bf-9d08-14b9863d390d",
-    "SYS sourceRef LIVE 점유 2 637bf823-834c-41bf-9d08-14b9863d390d",
-    "SYS 효능/용법 섹션 부재 637bf823-834c-41bf-9d08-14b9863d390d",
-    "SYS 공식 원문 부재 6dea0670-6e70-453f-9676-b34d3d515172",
-    "SYS 기존 authored canonical 6dea0670-6e70-453f-9676-b34d3d515172",
-    "SYS easy ko canonical 0 6dea0670-6e70-453f-9676-b34d3d515172",
-    "SYS sourceRef LIVE 점유 2 6dea0670-6e70-453f-9676-b34d3d515172",
-    "SYS 효능/용법 섹션 부재 6dea0670-6e70-453f-9676-b34d3d515172",
-    "SYS 공식 원문 부재 7149ae65-32e3-4893-968a-6ae120fbb356",
-    "SYS 기존 authored canonical 7149ae65-32e3-4893-968a-6ae120fbb356",
-    "SYS easy ko canonical 0 7149ae65-32e3-4893-968a-6ae120fbb356",
-    "SYS sourceRef LIVE 점유 2 7149ae65-32e3-4893-968a-6ae120fbb356",
-    "SYS 효능/용법 섹션 부재 7149ae65-32e3-4893-968a-6ae120fbb356",
-    "SYS 공식 원문 부재 7d07633a-7a4b-475e-b3a1-4415eb73a57a",
-    "SYS 기존 authored canonical 7d07633a-7a4b-475e-b3a1-4415eb73a57a",
-    "SYS easy ko canonical 0 7d07633a-7a4b-475e-b3a1-4415eb73a57a",
-    "SYS sourceRef LIVE 점유 2 7d07633a-7a4b-475e-b3a1-4415eb73a57a",
-    "SYS 효능/용법 섹션 부재 7d07633a-7a4b-475e-b3a1-4415eb73a57a",
-    "SYS 공식 원문 부재 823d0370-dc22-42ff-a792-8174ac9c97ab",
-    "SYS 기존 authored canonical 823d0370-dc22-42ff-a792-8174ac9c97ab",
-    "SYS easy ko canonical 0 823d0370-dc22-42ff-a792-8174ac9c97ab",
-    "SYS sourceRef LIVE 점유 2 823d0370-dc22-42ff-a792-8174ac9c97ab",
-    "SYS 효능/용법 섹션 부재 823d0370-dc22-42ff-a792-8174ac9c97ab",
-    "SYS 공식 원문 부재 8246bf93-27e1-453f-a333-2f85257d8939",
-    "SYS 기존 authored canonical 8246bf93-27e1-453f-a333-2f85257d8939",
-    "SYS easy ko canonical 0 8246bf93-27e1-453f-a333-2f85257d8939",
-    "SYS sourceRef LIVE 점유 2 8246bf93-27e1-453f-a333-2f85257d8939",
-    "SYS 효능/용법 섹션 부재 8246bf93-27e1-453f-a333-2f85257d8939",
-    "SYS 공식 원문 부재 8281f7f7-55b0-4633-8c8a-4ae859f601ae",
-    "SYS 기존 authored canonical 8281f7f7-55b0-4633-8c8a-4ae859f601ae",
-    "SYS easy ko canonical 0 8281f7f7-55b0-4633-8c8a-4ae859f601ae",
-    "SYS sourceRef LIVE 점유 2 8281f7f7-55b0-4633-8c8a-4ae859f601ae",
-    "SYS 효능/용법 섹션 부재 8281f7f7-55b0-4633-8c8a-4ae859f601ae",
-    "SYS 공식 원문 부재 82aad70c-f415-4770-a91d-7b60a12ef7e4",
-    "SYS 기존 authored canonical 82aad70c-f415-4770-a91d-7b60a12ef7e4",
-    "SYS easy ko canonical 0 82aad70c-f415-4770-a91d-7b60a12ef7e4",
-    "SYS sourceRef LIVE 점유 2 82aad70c-f415-4770-a91d-7b60a12ef7e4",
-    "SYS 효능/용법 섹션 부재 82aad70c-f415-4770-a91d-7b60a12ef7e4",
-    "SYS 공식 원문 부재 8447ff23-b556-4101-b4aa-e64d86cac39f",
-    "SYS 기존 authored canonical 8447ff23-b556-4101-b4aa-e64d86cac39f",
-    "SYS easy ko canonical 0 8447ff23-b556-4101-b4aa-e64d86cac39f",
-    "SYS sourceRef LIVE 점유 2 8447ff23-b556-4101-b4aa-e64d86cac39f",
-    "SYS 효능/용법 섹션 부재 8447ff23-b556-4101-b4aa-e64d86cac39f",
-    "SYS 공식 원문 부재 87bbc7ac-3b82-4b10-8342-c564a26cc203",
-    "SYS 기존 authored canonical 87bbc7ac-3b82-4b10-8342-c564a26cc203",
-    "SYS easy ko canonical 0 87bbc7ac-3b82-4b10-8342-c564a26cc203",
-    "SYS sourceRef LIVE 점유 2 87bbc7ac-3b82-4b10-8342-c564a26cc203",
-    "SYS 효능/용법 섹션 부재 87bbc7ac-3b82-4b10-8342-c564a26cc203",
-    "SYS 공식 원문 부재 87e84cba-3e78-432c-82f5-206454ef4b9e",
-    "SYS 기존 authored canonical 87e84cba-3e78-432c-82f5-206454ef4b9e",
-    "SYS easy ko canonical 0 87e84cba-3e78-432c-82f5-206454ef4b9e",
-    "SYS sourceRef LIVE 점유 2 87e84cba-3e78-432c-82f5-206454ef4b9e",
-    "SYS 효능/용법 섹션 부재 87e84cba-3e78-432c-82f5-206454ef4b9e",
-    "SYS 공식 원문 부재 8e936824-6699-4e1e-bf47-a11d5d95fded",
-    "SYS 기존 authored canonical 8e936824-6699-4e1e-bf47-a11d5d95fded",
-    "SYS easy ko canonical 0 8e936824-6699-4e1e-bf47-a11d5d95fded",
-    "SYS sourceRef LIVE 점유 2 8e936824-6699-4e1e-bf47-a11d5d95fded",
-    "SYS 효능/용법 섹션 부재 8e936824-6699-4e1e-bf47-a11d5d95fded",
-    "SYS 공식 원문 부재 91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
-    "SYS 기존 authored canonical 91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
-    "SYS easy ko canonical 0 91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
-    "SYS sourceRef LIVE 점유 2 91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
-    "SYS 효능/용법 섹션 부재 91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
-    "SYS 공식 원문 부재 9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
-    "SYS 기존 authored canonical 9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
-    "SYS easy ko canonical 0 9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
-    "SYS sourceRef LIVE 점유 2 9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
-    "SYS 효능/용법 섹션 부재 9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
-    "SYS 공식 원문 부재 a168a838-742d-4281-b9ae-1e0df32792ab",
-    "SYS 기존 authored canonical a168a838-742d-4281-b9ae-1e0df32792ab",
-    "SYS easy ko canonical 0 a168a838-742d-4281-b9ae-1e0df32792ab",
-    "SYS sourceRef LIVE 점유 2 a168a838-742d-4281-b9ae-1e0df32792ab",
-    "SYS 효능/용법 섹션 부재 a168a838-742d-4281-b9ae-1e0df32792ab",
-    "SYS 공식 원문 부재 a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
-    "SYS 기존 authored canonical a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
-    "SYS easy ko canonical 0 a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
-    "SYS sourceRef LIVE 점유 2 a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
-    "SYS 효능/용법 섹션 부재 a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
-    "SYS 공식 원문 부재 a39b5bfb-c189-422f-a572-147f8791a717",
-    "SYS 기존 authored canonical a39b5bfb-c189-422f-a572-147f8791a717",
-    "SYS easy ko canonical 0 a39b5bfb-c189-422f-a572-147f8791a717",
-    "SYS sourceRef LIVE 점유 2 a39b5bfb-c189-422f-a572-147f8791a717",
-    "SYS 효능/용법 섹션 부재 a39b5bfb-c189-422f-a572-147f8791a717",
-    "SYS 공식 원문 부재 a6675c37-9332-4e08-a4ce-c599eda85d7a",
-    "SYS 기존 authored canonical a6675c37-9332-4e08-a4ce-c599eda85d7a",
-    "SYS easy ko canonical 0 a6675c37-9332-4e08-a4ce-c599eda85d7a",
-    "SYS sourceRef LIVE 점유 2 a6675c37-9332-4e08-a4ce-c599eda85d7a",
-    "SYS 효능/용법 섹션 부재 a6675c37-9332-4e08-a4ce-c599eda85d7a",
-    "SYS 공식 원문 부재 ac38a363-e135-4586-8438-25c26908c7ab",
-    "SYS 기존 authored canonical ac38a363-e135-4586-8438-25c26908c7ab",
-    "SYS easy ko canonical 0 ac38a363-e135-4586-8438-25c26908c7ab",
-    "SYS sourceRef LIVE 점유 2 ac38a363-e135-4586-8438-25c26908c7ab",
-    "SYS 효능/용법 섹션 부재 ac38a363-e135-4586-8438-25c26908c7ab",
-    "SYS 공식 원문 부재 b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
-    "SYS 기존 authored canonical b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
-    "SYS easy ko canonical 0 b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
-    "SYS sourceRef LIVE 점유 2 b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
-    "SYS 효능/용법 섹션 부재 b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
-    "SYS 공식 원문 부재 b9559edf-261b-4bc9-8fd4-b8f334a9c223",
-    "SYS 기존 authored canonical b9559edf-261b-4bc9-8fd4-b8f334a9c223",
-    "SYS easy ko canonical 0 b9559edf-261b-4bc9-8fd4-b8f334a9c223",
-    "SYS sourceRef LIVE 점유 2 b9559edf-261b-4bc9-8fd4-b8f334a9c223",
-    "SYS 효능/용법 섹션 부재 b9559edf-261b-4bc9-8fd4-b8f334a9c223",
-    "SYS 공식 원문 부재 ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
-    "SYS 기존 authored canonical ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
-    "SYS easy ko canonical 0 ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
-    "SYS sourceRef LIVE 점유 2 ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
-    "SYS 효능/용법 섹션 부재 ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
-    "SYS 공식 원문 부재 c260cb10-8e40-4d66-ba0b-2e560e695a3b",
-    "SYS 기존 authored canonical c260cb10-8e40-4d66-ba0b-2e560e695a3b",
-    "SYS easy ko canonical 0 c260cb10-8e40-4d66-ba0b-2e560e695a3b",
-    "SYS sourceRef LIVE 점유 2 c260cb10-8e40-4d66-ba0b-2e560e695a3b",
-    "SYS 효능/용법 섹션 부재 c260cb10-8e40-4d66-ba0b-2e560e695a3b",
-    "SYS 공식 원문 부재 c5406795-ba3c-4dcf-a350-81b9aed4bb89",
-    "SYS 기존 authored canonical c5406795-ba3c-4dcf-a350-81b9aed4bb89",
-    "SYS easy ko canonical 0 c5406795-ba3c-4dcf-a350-81b9aed4bb89",
-    "SYS sourceRef LIVE 점유 2 c5406795-ba3c-4dcf-a350-81b9aed4bb89",
-    "SYS 효능/용법 섹션 부재 c5406795-ba3c-4dcf-a350-81b9aed4bb89",
-    "SYS 공식 원문 부재 c54e263e-8462-420b-8991-55877de140e7",
-    "SYS 기존 authored canonical c54e263e-8462-420b-8991-55877de140e7",
-    "SYS easy ko canonical 0 c54e263e-8462-420b-8991-55877de140e7",
-    "SYS sourceRef LIVE 점유 2 c54e263e-8462-420b-8991-55877de140e7",
-    "SYS 효능/용법 섹션 부재 c54e263e-8462-420b-8991-55877de140e7",
-    "SYS 공식 원문 부재 c889f3c7-ab54-4403-b12c-bb0cdba4896f",
-    "SYS 기존 authored canonical c889f3c7-ab54-4403-b12c-bb0cdba4896f",
-    "SYS easy ko canonical 0 c889f3c7-ab54-4403-b12c-bb0cdba4896f",
-    "SYS sourceRef LIVE 점유 2 c889f3c7-ab54-4403-b12c-bb0cdba4896f",
-    "SYS 효능/용법 섹션 부재 c889f3c7-ab54-4403-b12c-bb0cdba4896f",
-    "SYS 공식 원문 부재 ce58947e-a3bb-46f5-896f-bdabcd9fd987",
-    "SYS 기존 authored canonical ce58947e-a3bb-46f5-896f-bdabcd9fd987",
-    "SYS easy ko canonical 0 ce58947e-a3bb-46f5-896f-bdabcd9fd987",
-    "SYS sourceRef LIVE 점유 2 ce58947e-a3bb-46f5-896f-bdabcd9fd987",
-    "SYS 효능/용법 섹션 부재 ce58947e-a3bb-46f5-896f-bdabcd9fd987",
-    "SYS 공식 원문 부재 d1faae5d-0181-4ebd-a764-4c527575013a",
-    "SYS 기존 authored canonical d1faae5d-0181-4ebd-a764-4c527575013a",
-    "SYS easy ko canonical 0 d1faae5d-0181-4ebd-a764-4c527575013a",
-    "SYS sourceRef LIVE 점유 2 d1faae5d-0181-4ebd-a764-4c527575013a",
-    "SYS 효능/용법 섹션 부재 d1faae5d-0181-4ebd-a764-4c527575013a",
-    "SYS 공식 원문 부재 d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
-    "SYS 기존 authored canonical d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
-    "SYS easy ko canonical 0 d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
-    "SYS sourceRef LIVE 점유 2 d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
-    "SYS 효능/용법 섹션 부재 d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
-    "SYS 공식 원문 부재 d64b331f-239b-43ad-ba4d-aaac93001c84",
-    "SYS 기존 authored canonical d64b331f-239b-43ad-ba4d-aaac93001c84",
-    "SYS easy ko canonical 0 d64b331f-239b-43ad-ba4d-aaac93001c84",
-    "SYS sourceRef LIVE 점유 2 d64b331f-239b-43ad-ba4d-aaac93001c84",
-    "SYS 효능/용법 섹션 부재 d64b331f-239b-43ad-ba4d-aaac93001c84",
-    "SYS 공식 원문 부재 d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
-    "SYS 기존 authored canonical d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
-    "SYS easy ko canonical 0 d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
-    "SYS sourceRef LIVE 점유 2 d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
-    "SYS 효능/용법 섹션 부재 d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
-    "SYS 공식 원문 부재 e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
-    "SYS 기존 authored canonical e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
-    "SYS easy ko canonical 0 e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
-    "SYS sourceRef LIVE 점유 2 e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
-    "SYS 효능/용법 섹션 부재 e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
-    "SYS 공식 원문 부재 e0e1c75e-aa0f-4070-a186-45560d0c2819",
-    "SYS 기존 authored canonical e0e1c75e-aa0f-4070-a186-45560d0c2819",
-    "SYS easy ko canonical 0 e0e1c75e-aa0f-4070-a186-45560d0c2819",
-    "SYS sourceRef LIVE 점유 2 e0e1c75e-aa0f-4070-a186-45560d0c2819",
-    "SYS 효능/용법 섹션 부재 e0e1c75e-aa0f-4070-a186-45560d0c2819",
-    "SYS 공식 원문 부재 e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
-    "SYS 기존 authored canonical e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
-    "SYS easy ko canonical 0 e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
-    "SYS sourceRef LIVE 점유 2 e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
-    "SYS 효능/용법 섹션 부재 e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
-    "SYS 공식 원문 부재 e118f024-834b-4afb-a4e2-acd856620e9d",
-    "SYS 기존 authored canonical e118f024-834b-4afb-a4e2-acd856620e9d",
-    "SYS easy ko canonical 0 e118f024-834b-4afb-a4e2-acd856620e9d",
-    "SYS sourceRef LIVE 점유 2 e118f024-834b-4afb-a4e2-acd856620e9d",
-    "SYS 효능/용법 섹션 부재 e118f024-834b-4afb-a4e2-acd856620e9d",
-    "SYS 공식 원문 부재 e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
-    "SYS 기존 authored canonical e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
-    "SYS easy ko canonical 0 e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
-    "SYS sourceRef LIVE 점유 2 e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
-    "SYS 효능/용법 섹션 부재 e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
-    "SYS 공식 원문 부재 e768360a-49e1-4404-bece-ce7f8a27b6bf",
-    "SYS 기존 authored canonical e768360a-49e1-4404-bece-ce7f8a27b6bf",
-    "SYS easy ko canonical 0 e768360a-49e1-4404-bece-ce7f8a27b6bf",
-    "SYS sourceRef LIVE 점유 2 e768360a-49e1-4404-bece-ce7f8a27b6bf",
-    "SYS 효능/용법 섹션 부재 e768360a-49e1-4404-bece-ce7f8a27b6bf",
-    "SYS 공식 원문 부재 eb3d566f-7b06-46a0-8f19-725e346cf73c",
-    "SYS 기존 authored canonical eb3d566f-7b06-46a0-8f19-725e346cf73c",
-    "SYS easy ko canonical 0 eb3d566f-7b06-46a0-8f19-725e346cf73c",
-    "SYS sourceRef LIVE 점유 2 eb3d566f-7b06-46a0-8f19-725e346cf73c",
-    "SYS 효능/용법 섹션 부재 eb3d566f-7b06-46a0-8f19-725e346cf73c",
-    "SYS 공식 원문 부재 f2d70957-3c30-4b46-a407-bb216a079778",
-    "SYS 기존 authored canonical f2d70957-3c30-4b46-a407-bb216a079778",
-    "SYS easy ko canonical 0 f2d70957-3c30-4b46-a407-bb216a079778",
-    "SYS sourceRef LIVE 점유 2 f2d70957-3c30-4b46-a407-bb216a079778",
-    "SYS 효능/용법 섹션 부재 f2d70957-3c30-4b46-a407-bb216a079778",
-    "SYS 공식 원문 부재 ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
-    "SYS 기존 authored canonical ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
-    "SYS easy ko canonical 0 ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
-    "SYS sourceRef LIVE 점유 2 ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
-    "SYS 효능/용법 섹션 부재 ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052"
-  ],
+  "systemStop": [],
   "rows": [
     {
       "masterId": "03a20337-efc0-4604-887e-7ce2c9cdeb02",
@@ -400,16 +41,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -438,7 +79,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
@@ -450,16 +92,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -488,7 +130,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "0b7e6fad-1120-42e3-986c-d9760e87f68d",
@@ -500,16 +143,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -538,7 +181,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "0d9d7351-bbf1-42b7-9b5b-268a6270c5fc",
@@ -550,16 +194,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -588,7 +232,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "0f13048a-58c7-4fa8-9c14-b880c17abab8",
@@ -600,16 +245,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 6,
       "gencode": "330800CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -638,7 +283,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
@@ -650,16 +296,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -688,7 +334,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "12f3507e-fedd-4f00-b210-0467deebb691",
@@ -700,16 +347,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -740,7 +387,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "15e043a6-b27b-451a-a054-6d71faeb8eba",
@@ -752,16 +400,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -792,7 +440,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "1f6ee33a-ece9-45b8-81a6-a388dbb9a840",
@@ -804,16 +453,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -844,7 +493,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "2072f867-2b0b-464e-91f4-b241adb0ff57",
@@ -856,16 +506,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -896,7 +546,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "2478b2ee-3807-4879-804b-79999ef7d5ac",
@@ -908,16 +559,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -946,7 +597,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "25de2536-53f8-41b4-afee-63a8ed2e0cb7",
@@ -958,16 +610,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -998,7 +650,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "28158f9d-6aba-4912-a784-10feaa77fe4d",
@@ -1010,16 +663,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1050,7 +703,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "28f68a84-db96-43ac-bc9c-6ccb4264d64f",
@@ -1062,16 +716,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -1102,7 +756,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "2a6baf5d-53e2-4437-8c87-37f0811a1717",
@@ -1114,16 +769,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -1154,7 +809,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "2cf7c9db-4316-46f8-a735-83759c1b23eb",
@@ -1166,16 +822,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1206,7 +862,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "365136fa-fd7e-4d01-bf63-97e257e5cac6",
@@ -1218,16 +875,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1256,7 +913,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "3653eb12-eb2d-4344-8d37-1bfce061d5cd",
@@ -1268,16 +926,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1308,7 +966,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "37922366-ade2-49cb-8e0e-e51a0b2f7c0a",
@@ -1320,16 +979,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -1358,7 +1017,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "3877c15c-ee9b-4276-b314-cce91ac5470c",
@@ -1370,16 +1030,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1408,7 +1068,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "38c4e1df-bdad-43d6-9124-1e8626d2d429",
@@ -1420,16 +1081,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1460,7 +1121,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
@@ -1472,16 +1134,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1510,7 +1172,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "3dd10ef6-5afc-42f8-9e46-e2a286e7b781",
@@ -1522,16 +1185,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -1562,7 +1225,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "3de0fa6c-0580-4588-8e03-bd20cdbc8b36",
@@ -1574,16 +1238,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1614,7 +1278,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "444e477a-2b0b-44ed-828e-217efa1879a9",
@@ -1626,16 +1291,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -1664,7 +1329,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "45867269-1354-485a-8a72-fa9ffb84ecc9",
@@ -1676,16 +1342,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -1716,7 +1382,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
@@ -1728,16 +1395,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1766,7 +1433,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "514655f8-44de-4e14-99dc-fffcc87922b2",
@@ -1778,16 +1446,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1816,7 +1484,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "51bd3d2b-4679-4f90-a577-ea4181e2c8ec",
@@ -1828,16 +1497,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -1866,7 +1535,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "5979759d-898f-44ed-9383-fdfd39e38510",
@@ -1878,16 +1548,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1918,7 +1588,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "5d2b58a0-408f-4cb1-a378-fa5798d24dc8",
@@ -1930,16 +1601,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -1970,7 +1641,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "62ee507e-5275-4117-950f-10f5eda04873",
@@ -1982,16 +1654,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 4,
       "gencode": null,
       "gencodeCount": 0,
       "route": "rectal",
@@ -2020,7 +1692,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "637bf823-834c-41bf-9d08-14b9863d390d",
@@ -2032,16 +1705,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "073f868af86da495e29297d3e2ff22cb",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -2072,7 +1745,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "6dea0670-6e70-453f-9676-b34d3d515172",
@@ -2084,16 +1758,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2122,7 +1796,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "7149ae65-32e3-4893-968a-6ae120fbb356",
@@ -2134,16 +1809,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -2172,7 +1847,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "7d07633a-7a4b-475e-b3a1-4415eb73a57a",
@@ -2184,16 +1860,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2222,7 +1898,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "823d0370-dc22-42ff-a792-8174ac9c97ab",
@@ -2234,16 +1911,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -2274,7 +1951,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "8246bf93-27e1-453f-a333-2f85257d8939",
@@ -2286,16 +1964,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 4,
       "gencode": null,
       "gencodeCount": 0,
       "route": "rectal",
@@ -2324,7 +2002,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "8281f7f7-55b0-4633-8c8a-4ae859f601ae",
@@ -2336,16 +2015,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -2374,7 +2053,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "82aad70c-f415-4770-a91d-7b60a12ef7e4",
@@ -2386,16 +2066,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2424,7 +2104,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "8447ff23-b556-4101-b4aa-e64d86cac39f",
@@ -2436,16 +2117,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -2474,7 +2155,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "87bbc7ac-3b82-4b10-8342-c564a26cc203",
@@ -2486,16 +2168,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "ae617b092537d4875f801e54ae585e02",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -2526,7 +2208,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "87e84cba-3e78-432c-82f5-206454ef4b9e",
@@ -2538,16 +2221,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2576,7 +2259,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "8e936824-6699-4e1e-bf47-a11d5d95fded",
@@ -2588,16 +2272,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -2628,7 +2312,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "91bd7a5a-02fe-4ce4-b73f-9619c4050cdf",
@@ -2640,16 +2325,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2678,7 +2363,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
@@ -2690,16 +2376,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 6,
       "gencode": "330800CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2728,7 +2414,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "a168a838-742d-4281-b9ae-1e0df32792ab",
@@ -2740,16 +2427,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 4,
       "gencode": null,
       "gencodeCount": 0,
       "route": "rectal",
@@ -2778,7 +2465,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "a2c23339-b6aa-4f9d-bb6a-39786bc67e55",
@@ -2790,16 +2478,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2828,7 +2516,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "a39b5bfb-c189-422f-a572-147f8791a717",
@@ -2840,16 +2529,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 6,
       "gencode": "330800CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2878,7 +2567,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "a6675c37-9332-4e08-a4ce-c599eda85d7a",
@@ -2890,16 +2580,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -2928,7 +2618,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "ac38a363-e135-4586-8438-25c26908c7ab",
@@ -2940,16 +2631,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -2978,7 +2669,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "b5b0f7a9-8e3b-4f89-8fe1-39c523da9579",
@@ -2990,16 +2682,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -3028,7 +2720,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "b9559edf-261b-4bc9-8fd4-b8f334a9c223",
@@ -3040,16 +2733,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "66996df9bd846e2d58c055c75f9d5ccc",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -3080,7 +2773,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "ba1cc7d4-177a-4f48-bd11-5b9b271479c2",
@@ -3092,16 +2786,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -3130,7 +2824,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "c260cb10-8e40-4d66-ba0b-2e560e695a3b",
@@ -3142,16 +2837,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 6,
       "gencode": "330800CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -3180,7 +2875,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "c5406795-ba3c-4dcf-a350-81b9aed4bb89",
@@ -3192,16 +2888,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "be16bba0cb754bc93be8bf32567a8ee6",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -3230,7 +2926,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "c54e263e-8462-420b-8991-55877de140e7",
@@ -3242,16 +2939,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3282,7 +2979,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "c889f3c7-ab54-4403-b12c-bb0cdba4896f",
@@ -3294,16 +2992,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -3332,7 +3030,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "ce58947e-a3bb-46f5-896f-bdabcd9fd987",
@@ -3344,16 +3043,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3384,7 +3083,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "d1faae5d-0181-4ebd-a764-4c527575013a",
@@ -3396,16 +3096,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_SINGLE_ROUTE",
       "composerProfile": "oromucosal",
-      "officialSourceHash": null,
+      "officialSourceHash": "8037b4e65bab45e309927048a9866ec4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal",
@@ -3434,7 +3134,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "d440b985-14de-4b6d-ad67-b9f8fbb1e09b",
@@ -3446,16 +3147,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3486,7 +3187,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "d64b331f-239b-43ad-ba4d-aaac93001c84",
@@ -3498,16 +3200,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3538,7 +3240,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "d7f7f5cb-a939-46cc-83a4-91f4b1d2238a",
@@ -3550,16 +3253,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -3588,7 +3291,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e05b67b1-1dc2-4f0c-ba26-e1021c2af687",
@@ -3600,16 +3304,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -3640,7 +3344,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e0e1c75e-aa0f-4070-a186-45560d0c2819",
@@ -3652,16 +3357,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "e8d1c02864fc18404a734f5827c866e0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 4,
       "gencode": null,
       "gencodeCount": 0,
       "route": "rectal",
@@ -3690,7 +3395,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e0f5d278-e3d3-42a6-9bf6-1d9f79965e57",
@@ -3702,16 +3408,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3742,7 +3448,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e118f024-834b-4afb-a4e2-acd856620e9d",
@@ -3754,16 +3461,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": null,
       "gencodeCount": 0,
       "route": "oromucosal+vaginal",
@@ -3794,7 +3501,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e3b5bf69-7f01-4fb8-a1b9-5c6d5c596931",
@@ -3806,16 +3514,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "9a58d10c79eb226f93bdd5c607e8cea4",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "117802CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -3844,7 +3552,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "e768360a-49e1-4404-bece-ce7f8a27b6bf",
@@ -3856,16 +3565,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "8cd7494a0260b60066f108951b124d37",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3896,7 +3605,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "eb3d566f-7b06-46a0-8f19-725e346cf73c",
@@ -3908,16 +3618,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "ed9c93516ed6ad7f05f72e62ee3588d0",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
         "상호작용": 0
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "544700CLQ",
       "gencodeCount": 1,
       "route": "rectal",
@@ -3946,7 +3656,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "f2d70957-3c30-4b46-a407-bb216a079778",
@@ -3958,16 +3669,16 @@
       "sourceHoldClass": "TRUE_MULTI_ROUTE",
       "finalClassification": "RECOVERABLE_MULTI_ROUTE_CONTENT",
       "composerProfile": "multi-nonoral",
-      "officialSourceHash": null,
+      "officialSourceHash": "11f4a820edfda2d3fec712310b882c0d",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
+        "효능·효과": 1,
+        "용법·용량": 1,
         "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 5,
       "gencode": "214703CLQ",
       "gencodeCount": 1,
       "route": "oromucosal+vaginal",
@@ -3998,7 +3709,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     },
     {
       "masterId": "ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
@@ -4010,16 +3722,16 @@
       "sourceHoldClass": "ROUTE_SOURCE_CONFLICT",
       "finalClassification": "SOURCE_CONFLICT_RESOLVED",
       "composerProfile": "rectal",
-      "officialSourceHash": null,
+      "officialSourceHash": "c60003eed21f45077add106048ce580b",
       "officialSectionPresence": {
-        "효능·효과": 0,
-        "용법·용량": 0,
-        "경고": 0,
-        "사용상 주의사항": 0,
-        "이상반응": 0,
-        "상호작용": 0
+        "효능·효과": 1,
+        "용법·용량": 1,
+        "경고": 1,
+        "사용상 주의사항": 1,
+        "이상반응": 1,
+        "상호작용": 1
       },
-      "officialSectionCount": 0,
+      "officialSectionCount": 6,
       "gencode": "330800CSP",
       "gencodeCount": 1,
       "route": "rectal",
@@ -4048,7 +3760,8 @@
       "expectedStatus": "PRODUCE_EXPECTED",
       "expectedExceptionCode": null,
       "producible": true,
-      "dosageForm": null
+      "dosageForm": null,
+      "usedDeprecatedFallback": true
     }
   ]
 }

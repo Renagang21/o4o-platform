@@ -66,13 +66,42 @@ async function main(): Promise<void> {
         GROUP BY 1`, [ids]);
     const permitBy = new Map(permitRows.map((r: any) => [r.mid, (r.codes || []).filter(Boolean).slice().sort()]));
 
+    /**
+     * 제한적 deprecated fallback (멱등 재실행 전용).
+     * 이번 생산으로 easy KO canonical 이 deprecated 로 강등되면 fetchMasterLive 가 원문을 못 집는다.
+     * 아래 계약을 **전부** 만족할 때만 그 deprecated 행을 원문으로 인정한다:
+     *   동일 masterId · easy source 계열 · 원장 officialSourceHash 와 hash 일치 ·
+     *   authored V4 KO·EN canonical 이 이미 정상 존재 · 후보가 정확히 1개.
+     * 복수 후보 / hash 불일치 는 시스템 중지. 최초 생산 대상 선정에는 쓰지 않는다.
+     */
+    const depRows = await db.query(
+      `SELECT master_id::text mid, md5(content) h, content FROM shared_product_descriptions
+        WHERE master_id = ANY($1::uuid[]) AND source_type='mfds_easy_drug' AND description_type='STORE'
+          AND status='deprecated' AND COALESCE(language,'ko')='ko' AND deleted_at IS NULL`, [ids]);
+    const depBy = new Map<string, Array<{ h: string; content: string }>>();
+    for (const r of depRows as any[]) {
+      const a = depBy.get(r.mid) || []; a.push({ h: r.h, content: r.content }); depBy.set(r.mid, a);
+    }
+    const fallbackUsed: Array<{ masterId: string; hash: string }> = [];
+
     const rows: any[] = [];
     const srcDump: Record<string, Record<string, string>> = {};
     const gate: Record<string, unknown> = {};
 
     for (const m of targets) {
       const lv = live.get(m.masterId);
-      const content = lv?.easyContent ?? null;
+      let content = lv?.easyContent ?? null;
+      let usedFallback = false;
+      if (!content) {
+        const cands = (depBy.get(m.masterId) || []).filter((d) => d.h === m.officialSourceHash);
+        const slotNow = lv?.slot ?? { authoredKoCanon: 0, enCanon: 0 };
+        if (cands.length === 1 && slotNow.authoredKoCanon === 1 && slotNow.enCanon === 1) {
+          content = cands[0].content; usedFallback = true;
+          fallbackUsed.push({ masterId: m.masterId, hash: cands[0].h });
+        } else if (cands.length > 1) {
+          stop.push(`SYS deprecated easy 후보 ${cands.length}건 — 임의 선택 금지 ${m.masterId}`);
+        }
+      }
       const slot = lv?.slot ?? { easyKoCanon: 0, authoredKoCanon: 0, authoredKoAny: 0, enCanon: 0 };
       const ref = masterRefV4(m.masterId);
       const refOcc = (refBy.get(ref) as number) || 0;
@@ -82,16 +111,20 @@ async function main(): Promise<void> {
       const hash = content ? md5(content) : null;
 
       // ── 시스템 중지 조건 (§11) ────────────────────────────────────────────────
-      if (!content) stop.push(`SYS 공식 원문 부재 ${m.masterId}`);
+      if (!content) stop.push(`SYS 공식 원문 부재(fallback 불가) ${m.masterId}`);
       if (hash && m.officialSourceHash && hash !== m.officialSourceHash) stop.push(`SYS source hash drift ${m.masterId} (원장 ${m.officialSourceHash} / 실측 ${hash})`);
       if (ref !== m.sourceRef) stop.push(`SYS sourceRef 산식 불일치 ${m.masterId}`);
       if (priorGreen.has(m.masterId)) stop.push(`SYS 기존 GREEN 교집합 ${m.masterId}`);
       if (termIds.has(m.masterId)) stop.push(`SYS terminal 혼입 ${m.masterId}`);
       if (srcTerminal.has(m.masterId)) stop.push(`SYS source terminal 혼입 ${m.masterId}`);
       if (excl266.has(m.masterId)) stop.push(`SYS exclude266 혼입 ${m.masterId}`);
-      if (slot.authoredKoCanon > 0 || slot.authoredKoAny > 0 || slot.enCanon > 0) stop.push(`SYS 기존 authored canonical ${m.masterId}`);
-      if (slot.easyKoCanon !== 1) stop.push(`SYS easy ko canonical ${slot.easyKoCanon} ${m.masterId}`);
-      if (refOcc > 0) stop.push(`SYS sourceRef LIVE 점유 ${refOcc} ${m.masterId}`);
+      // 이미 생산 완료된 master(=멱등 재실행)는 authored 존재·easy 0·sourceRef 점유가 정상 상태다.
+      const alreadyProduced = slot.authoredKoCanon === 1 && slot.enCanon === 1;
+      if (!alreadyProduced) {
+        if (slot.authoredKoCanon > 0 || slot.authoredKoAny > 0 || slot.enCanon > 0) stop.push(`SYS 기존 authored canonical ${m.masterId}`);
+        if (slot.easyKoCanon !== 1) stop.push(`SYS easy ko canonical ${slot.easyKoCanon} ${m.masterId}`);
+        if (refOcc > 0) stop.push(`SYS sourceRef LIVE 점유 ${refOcc} ${m.masterId}`);
+      }
       if (classKinds.some((k) => normalize(k).includes('전문'))) stop.push(`SYS 전문의약품 ${m.masterId}`);
       if (!sec[MANDATORY_SECTIONS[0]] || !sec[MANDATORY_SECTIONS[1]]) stop.push(`SYS 효능/용법 섹션 부재 ${m.masterId}`);
       // 원장 drift — 최종 분류·routeSet 이 인계 시점과 같아야 한다
@@ -125,6 +158,7 @@ async function main(): Promise<void> {
         expectedStatus: 'PRODUCE_EXPECTED', expectedExceptionCode: null,
         producible: true,
         dosageForm: null,
+        usedDeprecatedFallback: usedFallback,
       });
       if (content) srcDump[m.masterId] = sec;
     }
@@ -147,6 +181,8 @@ async function main(): Promise<void> {
     gate.sourceHashDrift = rows.filter((r) => r.officialSourceHash !== (targets.find((t) => t.masterId === r.masterId)?.officialSourceHash)).length;
     gate.sourceRefUnique = new Set(rows.map((r) => r.plannedSourceRef)).size === rows.length;
     gate.expectedWriteT = rows.length * 6;
+    gate.deprecatedFallbackUsed = fallbackUsed.length;
+    gate.alreadyProducedCount = rows.filter((r) => r.slot.authoredKoCanon === 1 && r.slot.enCanon === 1).length;
     if (rows.length !== gate.expectedTotal) stop.push(`입력 수 불일치 ${rows.length} != ${gate.expectedTotal}`);
     if (gate.duplicateMasterIds !== 0) stop.push('master 중복');
     if (!gate.sourceRefUnique) stop.push('sourceRef 내부 중복');
