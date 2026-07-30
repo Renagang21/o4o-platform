@@ -1,0 +1,179 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-ROUTE-673-CURRENT-REMAINDER-RECONCILIATION-V1",
+  "kind": "independent-verification",
+  "agent": "ga",
+  "codePath": "reconciliation 실행기 미import · LIVE 행 단위 재수집 · git blob 대비 원장 무결성 · 규칙 독립 재계산",
+  "summary": {
+    "checks": 15,
+    "failed": 0,
+    "pass": true,
+    "liveDbWrite": 0
+  },
+  "checks": [
+    {
+      "id": "R-01",
+      "name": "기존 673 판정 원장 3종 무수정 (45b2f1add blob 동일)",
+      "pass": true,
+      "evidence": {
+        "modified": []
+      }
+    },
+    {
+      "id": "R-02",
+      "name": "재판정 0 — classification·resolvedRoute 전건 승계",
+      "pass": true,
+      "evidence": {
+        "driftCount": 0,
+        "sample": []
+      }
+    },
+    {
+      "id": "R-03",
+      "name": "reconciliation 대상 = 673 · 중복 0 · 누락 0",
+      "pass": true,
+      "evidence": {
+        "rows": 673,
+        "distinct": 673
+      }
+    },
+    {
+      "id": "R-04",
+      "name": "분류별 건수 = WO 기준치(535/46/35/31/26)",
+      "pass": true,
+      "evidence": {
+        "expect": {
+          "RECOVERABLE_ROUTE_CONFIRMED": 535,
+          "TRUE_MULTI_ROUTE": 46,
+          "HOLD_UNRESOLVED": 35,
+          "ROUTE_SOURCE_CONFLICT": 31,
+          "REQUIRES_ROUTE_PROFILE": 26
+        },
+        "got": {
+          "HOLD_UNRESOLVED": 35,
+          "RECOVERABLE_ROUTE_CONFIRMED": 535,
+          "ROUTE_SOURCE_CONFLICT": 31,
+          "REQUIRES_ROUTE_PROFILE": 26,
+          "TRUE_MULTI_ROUTE": 46
+        }
+      }
+    },
+    {
+      "id": "R-05",
+      "name": "LIVE 상태 독립 재수집 결과 = 원장 state/liveState",
+      "pass": true,
+      "evidence": {
+        "mismatch": 0,
+        "dbRows": 673
+      }
+    },
+    {
+      "id": "R-06",
+      "name": "SKIP_COMPLETE = authored ko/en canonical 1/1 인 건에 한정",
+      "pass": true,
+      "evidence": {
+        "skipComplete": 0,
+        "recoverableAlreadyProduced": 0
+      }
+    },
+    {
+      "id": "R-07",
+      "name": "재투입 큐 = 미생산 RECOVERABLE 전량 · 그 외 0",
+      "pass": true,
+      "evidence": {
+        "queue": 535,
+        "expected": 535
+      }
+    },
+    {
+      "id": "R-08",
+      "name": "재투입 큐 route 전건 composer 지원",
+      "pass": true,
+      "evidence": {
+        "byRoute": {
+          "topical": 496,
+          "oromucosal": 39
+        },
+        "bad": 0
+      }
+    },
+    {
+      "id": "R-09",
+      "name": "재투입 큐 오염 0 (exclude 266 · source 24 · 기존 GREEN)",
+      "pass": true,
+      "evidence": {
+        "exclude": 0,
+        "sourceTerminal": 0,
+        "existingGreen": 0,
+        "excludeSize": 266,
+        "sourceSize": 24,
+        "greenSize": 2846
+      }
+    },
+    {
+      "id": "R-10",
+      "name": "기존 GREEN 합집합 = 2,846 (pilot100 80 + pilot500 416 + next2000 1,962 + final 388)",
+      "pass": true,
+      "evidence": {
+        "greenUnion": 2846
+      }
+    },
+    {
+      "id": "R-11",
+      "name": "carry-over = 673 − 재투입 − SKIP_COMPLETE · 중복 0",
+      "pass": true,
+      "evidence": {
+        "carry": 138,
+        "queue": 535,
+        "skip": 0
+      }
+    },
+    {
+      "id": "R-12",
+      "name": "재투입 큐 ⊆ 나 에이전트 RECOVERABLE 535",
+      "pass": true,
+      "evidence": {
+        "naReentry": 535,
+        "notInNa": 0
+      }
+    },
+    {
+      "id": "R-13",
+      "name": "plannedSourceRef = uuid(md5(\"otc-v4-master-leaflet:\"+masterId)) 독립 재계산 일치 · 중복 0",
+      "pass": true,
+      "evidence": {
+        "bad": 0,
+        "distinct": 535,
+        "sample": "bc0b4d1f-10c6-3797-13d6-7ed03133d23d"
+      }
+    },
+    {
+      "id": "R-14",
+      "name": "DB write 0 — 673 master authored row 및 route-673 batch audit 최근 변동 0",
+      "pass": true,
+      "evidence": {
+        "authoredTouchedRecently": 0,
+        "routeBatchAudit": 0,
+        "since": null
+      }
+    },
+    {
+      "id": "R-15",
+      "name": "산출물 3종 지문 기록(2회 실행 대조용)",
+      "pass": true,
+      "evidence": [
+        {
+          "file": "otc-v4-route-673-reconciliation-ledger.ga.json",
+          "sha256": "cd82811e7588e67d0313a5cd090e27187a13d9d84da5dca94406e498cbab0ce8"
+        },
+        {
+          "file": "otc-v4-route-673-final-reentry-queue.ga.json",
+          "sha256": "4ff08f70ba2b9667e7015d14a90d69ca392873eb2d6b7eb541bc4563bc393980"
+        },
+        {
+          "file": "otc-v4-route-673-carryover-ledger.ga.json",
+          "sha256": "a28fe6e3c090d1beedc5df15f08465b44855b8c78f34fd891a6c1adcc4730fa2"
+        }
+      ]
+    }
+  ]
+}
