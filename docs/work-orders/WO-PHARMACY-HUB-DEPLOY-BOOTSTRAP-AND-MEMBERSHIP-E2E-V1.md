@@ -6,7 +6,7 @@
 | 항목 | 값 |
 |------|------|
 | 선행 WO | `WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1`, `WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1` |
-| 상태 | 구현 완료 · E2E 검증 대기 |
+| 상태 | 배포 완료 · E2E 검증 완료 (미검증 2건은 §4-3 차단 사유 참조) |
 | 착수일 | 2026-07-30 |
 
 ---
@@ -107,28 +107,52 @@ write-path 규약과 일치한다 — `MembershipApprovalService` 가 이 값을
 - `src/scripts/audit-roles.ts` — `ServiceKey` union 확장(Foundation WO)의 미반영 잔재.
   `tsconfig.build.json` 이 `src/scripts/**/*` 를 exclude 하므로 빌드 · 배포 무영향.
 
-### 4-2. E2E 검증 (배포 후 수행)
+### 4-2. E2E 검증 (프로덕션 실측 — 2026-07-30)
 
-약국 경영자 (`renagang21@gmail.com`)
+배포 결과
 
-```text
-가입 신청 → 운영자 pending 목록 노출 → 승인
-→ role_assignments 에 pharmacy-hub:store_owner → /store-owner 진입
-```
+| 항목 | 결과 |
+|------|------|
+| `pharmacy-hub-web` Cloud Run | ✅ `https://pharmacy-hub-web-3e3aws7zqa-du.a.run.app` — 발급 URL 이 §3-2 예측값과 일치 (정정 불필요) |
+| CORS preflight (신규 오리진) | ✅ 204 + `access-control-allow-origin` 정확 반영 |
+| migration `20270217000000` | ✅ 실행 · `granted pharmacy-hub:operator to ... (idempotent)` 로그 (SKIP 분기 미진입 = 대상 계정 존재) |
 
-공급자 (`sohae21@naver.com`)
+⚠️ **detect-changes 함정**: 워크플로 파일만 변경된 push 는 `decide` 가 전 서비스를 false 로
+판정해 배포가 skip 된다 (실측: 전 job skipped). 최초 연결 시에는
+`gh workflow run deploy-web-services.yml -f service=pharmacy-hub` 로 dispatch 해야 한다.
 
-```text
-가입 신청 → 운영자 승인 → pharmacy-hub:supplier → /supplier 진입
-```
+기능 검증
 
-추가 확인 항목
+| 검증 | 결과 |
+|------|------|
+| 최초 운영자 부여 | ✅ `sohae2100` roles 에 `pharmacy-hub:operator` |
+| **기존 역할 보존** | ✅ cosmetics/glycopharm/kpa/neture admin·operator 9개 전부 유지 (삭제·교체 0) |
+| 가입 신청 (store_owner / supplier) | ✅ 201 → `status=pending`, `role` 이 prefixed 로 저장 |
+| 중복 신청 차단 | ✅ 409 `ALREADY_PENDING` |
+| 승인 2건 | ✅ 200, `status=active`, `approvedBy`/`approvedAt` 기록 |
+| 공급자 진입 | ✅ `/supplier/ping` 200 · `me/access.entryPoints.supplier=true` |
+| 역할 격리 | ✅ 공급자 토큰으로 `/store-owner/ping` 403 |
+| 비운영자 승인 API | ✅ 403 |
+| 브라우저 (공급자 · 운영자) | ✅ 로그인 → 역할별 진입 성공, console error 0, API 전부 200, Tailwind 렌더 정상 |
+| migration 재실행 | ✅ `typeorm_migrations` 기록으로 재실행 자체가 없음 + `ON CONFLICT DO NOTHING` |
 
-- 반려 사유 표시
-- 중복 신청 차단 (409)
-- 다른 서비스 membership 상태 불변
-- 비운영자 승인 API 403
-- migration 재실행 시 중복 행 0
+⚠️ **승인 직후 stale JWT**: 승인 전에 발급된 access token 은 역할이 반영되지 않아 scope guard 가
+403 을 준다. 승인 후 재로그인이 필요하다 (구조상 정상 — 프론트 CTA 안내 확인 권장).
+
+### 4-3. 미검증 2건 (차단 사유 있음)
+
+| 항목 | 차단 사유 |
+|------|-----------|
+| 약국 경영자 **브라우저** 진입 | `renagang21@gmail.com` 프로덕션 비밀번호가 `TEST-ACCOUNTS.local.md` 값과 불일치 → `401 INVALID_CREDENTIALS`. 문서 45행이 "서비스 시작 전 비번 변경 대상"으로 표기한 계정이며, 문서가 갱신되지 않은 것으로 보인다. 셸 개입 없이 파일 payload 로 재시도해도 동일. 계정 잠금 로직은 없고 `SERVICE_NOT_MEMBER` 와 구분된 코드이므로 bcrypt 불일치 확정. **서버 측 역할 부여(`pharmacy-hub:store_owner` active)는 확인됨** — 사용자 측 진입만 미검증. |
+| 반려 사유 표시 | 두 신청을 모두 승인해 pending 이 없다. 반려 경로 검증에는 제3 신원이 필요하다. |
+
+### 4-4. 검증 중 발생한 데이터 blemish
+
+첫 `curl -d` payload 의 한글이 Windows 셸에서 깨져 `renagang21` 의
+`businessInfo.businessName` 이 `테스트약국` → U+FFFD 문자열로 저장되었다.
+나머지 프로필 필드(담당자명 · 사업자번호 · 주소)는 온전하다. 테스트 계정이므로 교정하지 않는다.
+이후 payload 는 **UTF-8 파일 + `--data-binary`** 로 전송해 재발하지 않았다
+(동일 방식으로 보낸 `쓰리라이프존` 은 정상 저장 확인).
 
 ## 5. 범위 밖 (후속)
 
