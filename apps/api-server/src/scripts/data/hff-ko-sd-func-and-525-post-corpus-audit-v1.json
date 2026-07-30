@@ -1,0 +1,24 @@
+{
+ "auditedAt": "2026-07-30T13:01:57.191Z",
+ "globals": {
+  "spd_all": 120118,
+  "spd_store_ko": 63321,
+  "without_fn": 14,
+  "hff_canonical": 40913
+ },
+ "expected": {
+  "without_fn": 14,
+  "hff_canonical": 40913
+ },
+ "agent9HoldQueue": {
+  "queued": 348,
+  "stillWithoutCanonical": 348,
+  "unchanged": true
+ },
+ "functionSectionAbsent": {
+  "before": 525,
+  "after": 14,
+  "restored": 511
+ },
+ "verdict": "FAIL"
+}

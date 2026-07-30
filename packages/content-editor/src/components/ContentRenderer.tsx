@@ -211,6 +211,19 @@ const storeDescriptionCss = `
 .store-desc-content .sd-why li,.store-desc-content .sd-who li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-line);line-height:1.5}
 .store-desc-content .sd-why li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-blue)}
 .store-desc-content .sd-who li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-gold)}
+/* sd-func — 원료별 공식 인정 기능성 목록의 **상위 컨테이너**(원료 그룹 단위).
+   저장 콘텐츠 17,432건(ko 8,716 + en 8,716)이 이미 사용 중인 class 로, 구조는 전량
+   ul.sd-func > li > b(원료명) + 중첩 ul.sd-why(절 목록) 형태로 균일하다.
+   (이 CSS 는 템플릿 리터럴 내부이므로 주석에 backtick 을 쓰면 리터럴이 종료된다 — 사용 금지)
+   지금까지 미정의였던 탓에 브라우저 기본 disc 불릿·기본 padding 이 그대로 노출됐다.
+   신규 디자인을 만들지 않고 기존 토큰만으로 여백·간격·줄간격만 보장한다. */
+.store-desc-content .sd-func{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px}
+.store-desc-content .sd-func>li{margin:0;padding:0}
+.store-desc-content .sd-func>li>b{display:block;font-size:15px;font-weight:800;color:var(--sd-navy);line-height:1.5;margin:0 0 2px}
+/* 중첩 목록은 상위 그룹 안에서 1열을 유지한다(원료별 절이 좌우로 섞이지 않게).
+   마지막 항목의 구분선은 그룹 경계와 중복되므로 제거한다. */
+.store-desc-content .sd-func .sd-why{display:block;margin:0;padding:0}
+.store-desc-content .sd-func .sd-why li:last-child{border-bottom:0}
 /* sd-warn — 금기·경고·주의사항 전용(CR-020). **의미 색**이라 sd-theme-* 가 바꾸지 않는다.
    색만으로 의미를 전달하지 않기 위해 삼각 마커 + 좌측 굵은 선 + 박스 배경을 함께 쓴다. */
 .store-desc-content .sd-warn{list-style:none;margin:0;padding:12px 14px;border:1px solid var(--sd-warn-line);border-left:3px solid var(--sd-warn);border-radius:12px;background:var(--sd-warn-bg)}

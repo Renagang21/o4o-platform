@@ -1,0 +1,1618 @@
+{
+ "ranAt": "2026-07-30T12:52:55.877Z",
+ "dbWrites": 0,
+ "cssChange": {
+  "addedBytes": 874,
+  "addedSelectors": 5,
+  "scope": ".store-desc-content .sd-func 하위 전용"
+ },
+ "sdFuncDocs": {
+  "count": 12,
+  "allOk": true,
+  "docs": [
+   {
+    "canonicalId": "ca59a780-ee66-4032-88e4-f35cc0701656",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3523,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "f6284df5-8c95-4045-9cd9-0097b065b701",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3119,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "a83b3e96-593a-47b2-bd0e-5c3e0e01a634",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3177,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "a38b338e-62d2-4cab-985f-918186f959c2",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3096,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "e82aa987-7bf2-4d0a-b8cc-81b548859a18",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3112,
+       "liCount": 63,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "6d39cab4-1924-41be-9008-4bfbd8934af2",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 3053,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "212bbf34-e463-4084-8ca9-602c87fb3177",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 2992,
+       "liCount": 61,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "8f834d4a-f7b0-428b-9318-fc26c623bb58",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 4475,
+       "liCount": 22,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "64482e02-8247-40bf-aac7-51d7dcca8ad0",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 6206,
+       "liCount": 70,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "778e6f28-1376-492b-bad3-1b311ae7e389",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5893,
+       "liCount": 77,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "b8fd8721-8d62-47ab-9163-587b89e5a51f",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5614,
+       "liCount": 69,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   },
+   {
+    "canonicalId": "c083e1b2-5900-4bc3-b1d6-0d43298dc7f0",
+    "widths": [
+     {
+      "width": 430,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 402
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 820,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 792
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 792
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     },
+     {
+      "width": 1280,
+      "before": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "disc",
+        "paddingLeft": "40px",
+        "display": "block",
+        "rowGap": "normal"
+       },
+       "nestedDisplay": "grid",
+       "cardWidth": 860
+      },
+      "after": {
+       "pageOverflow": false,
+       "elemOverflow": 0,
+       "clipped": 0,
+       "emptyLi": false,
+       "textLen": 5561,
+       "liCount": 68,
+       "sdFunc": {
+        "listStyleType": "none",
+        "paddingLeft": "0px",
+        "display": "flex",
+        "rowGap": "14px"
+       },
+       "nestedDisplay": "block",
+       "cardWidth": 860
+      },
+      "textPreserved": true,
+      "liPreserved": true,
+      "bulletRemoved": true,
+      "paddingNormalized": true,
+      "nestedSingleColumn": true,
+      "afterClean": true
+     }
+    ],
+    "ok": true
+   }
+  ]
+ },
+ "nonSdFuncRegression": {
+  "count": 12,
+  "allIdentical": true,
+  "docs": [
+   {
+    "canonicalId": "5693d88b-67bf-4295-bde3-c152043a1295",
+    "ok": true
+   },
+   {
+    "canonicalId": "a9ec91af-177b-4455-9881-f512f557bd07",
+    "ok": true
+   },
+   {
+    "canonicalId": "7d1edaaf-d43d-4806-921d-1181c5d9b67b",
+    "ok": true
+   },
+   {
+    "canonicalId": "2216a665-e19f-43c9-9fc2-8886200f4872",
+    "ok": true
+   },
+   {
+    "canonicalId": "b6c343f0-3ed3-4939-aae4-5268dcafab79",
+    "ok": true
+   },
+   {
+    "canonicalId": "f27f5bf2-e87e-4a7a-9303-be108fb434a3",
+    "ok": true
+   },
+   {
+    "canonicalId": "10220c91-4803-40c8-859b-ded3655fa09e",
+    "ok": true
+   },
+   {
+    "canonicalId": "5e966f13-faa1-4d9e-94c1-fed58097b653",
+    "ok": true
+   },
+   {
+    "canonicalId": "ed336c50-8862-4955-b99c-7d997461ff99",
+    "ok": true
+   },
+   {
+    "canonicalId": "05315cda-5d91-433d-9adb-6ea8f8a5a831",
+    "ok": true
+   },
+   {
+    "canonicalId": "2ee6023e-0733-4393-af22-1ad13c66095d",
+    "ok": true
+   },
+   {
+    "canonicalId": "1b5fa147-45e8-4383-94c4-f9c8be6bbab9",
+    "ok": true
+   }
+  ]
+ },
+ "verdict": "PASS"
+}

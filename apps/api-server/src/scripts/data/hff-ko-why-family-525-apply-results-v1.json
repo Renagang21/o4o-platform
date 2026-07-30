@@ -1,0 +1,328 @@
+{
+ "ranAt": "2026-07-30T13:01:03.024Z",
+ "wo": "WO-O4O-HFF-KO-WHY-FAMILY-SD-FUNC-STYLING-AND-REMAINING-525-FULL-PRODUCTION-V1",
+ "status": "APPLIED",
+ "expectedUpdate": 511,
+ "actualUpdate": 511,
+ "rolledBack": false,
+ "failReason": null,
+ "countsBefore": {
+  "spd_all": 120118,
+  "spd_store_ko": 63321,
+  "without_fn": 525,
+  "hff_canonical": 40913
+ },
+ "countsAfter": {
+  "spd_all": 120118,
+  "spd_store_ko": 63321,
+  "without_fn": 14,
+  "hff_canonical": 40913
+ },
+ "rowCountUnchanged": true,
+ "withoutFnSectionDelta": -511,
+ "hffCanonicalUnchanged": true,
+ "clausesRestored": 627,
+ "results": [
+  {
+   "targetIndex": 1,
+   "canonicalId": "00104dc7-4df1-44fe-9dab-1a19ca967513",
+   "productName": "이너플라워 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 2,
+   "canonicalId": "014ee473-110f-467a-b2a0-25ae368d610a",
+   "productName": "마이크로바이옴 5",
+   "updated": 1
+  },
+  {
+   "targetIndex": 3,
+   "canonicalId": "01c700ad-852d-486e-80d2-bee9e5ed2e74",
+   "productName": "라비센 슈프림 프레쉬",
+   "updated": 1
+  },
+  {
+   "targetIndex": 4,
+   "canonicalId": "020698ea-116e-4753-86b4-cd478019e802",
+   "productName": "피토틱스 브라운",
+   "updated": 1
+  },
+  {
+   "targetIndex": 5,
+   "canonicalId": "022bdc28-b0ee-4a6a-9959-822c69880d2d",
+   "productName": "프로바이오틱스 100억 유산균 클래식 PRO",
+   "updated": 1
+  },
+  {
+   "targetIndex": 6,
+   "canonicalId": "02aef681-3b64-4649-9ea5-9152f9b9172d",
+   "productName": "인생 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 7,
+   "canonicalId": "02f6eb3f-2ccc-4b9b-bb5e-0023f7d01eaf",
+   "productName": "이너라이트",
+   "updated": 1
+  },
+  {
+   "targetIndex": 8,
+   "canonicalId": "03319d88-6509-4394-ae47-b508ab5ae6eb",
+   "productName": "퍼펙트 솔루션 프로바이오틱스 포 맘",
+   "updated": 1
+  },
+  {
+   "targetIndex": 9,
+   "canonicalId": "03b3a89e-c76b-4dd3-80b9-f3ae6ba6bcae",
+   "productName": "STOM 프로비젠",
+   "updated": 1
+  },
+  {
+   "targetIndex": 10,
+   "canonicalId": "0431d445-6693-4cba-8292-fd5f01ddc1c1",
+   "productName": "장밸런스 536 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 11,
+   "canonicalId": "046fc742-2f9d-45f1-bbc4-c68966bd5c52",
+   "productName": "락토밸런스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 12,
+   "canonicalId": "047fcd62-ef8e-47b5-8648-2a70a26076dd",
+   "productName": "여에스더 유산균 락토지지(Lacto. GG)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 13,
+   "canonicalId": "048c0315-8bcb-439d-9647-edb2f3f78299",
+   "productName": "락토벨라",
+   "updated": 1
+  },
+  {
+   "targetIndex": 14,
+   "canonicalId": "056a5ed2-6002-4154-9498-90a2024495ca",
+   "productName": "活性益生菌粉(활성유산균분말)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 15,
+   "canonicalId": "059ba75c-5718-4fd5-b763-ca47a2936744",
+   "productName": "장건강 100억 쿨멜팅 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 16,
+   "canonicalId": "05fea192-e6bf-44ba-ad14-e0f8a63b9037",
+   "productName": "바이오코어 100억 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 17,
+   "canonicalId": "060e0c8c-d600-4ee4-ac4c-40e5d36ce629",
+   "productName": "셀티바 프로바이오틱스 키즈",
+   "updated": 1
+  },
+  {
+   "targetIndex": 18,
+   "canonicalId": "067f8787-a8f9-44c8-995c-be460fc2a083",
+   "productName": "리베브 프로바이오틱스 100억",
+   "updated": 1
+  },
+  {
+   "targetIndex": 19,
+   "canonicalId": "0691e461-5856-4417-a758-8c8c3b380ff6",
+   "productName": "하루틴 유산균 프리미엄 알파α",
+   "updated": 1
+  },
+  {
+   "targetIndex": 20,
+   "canonicalId": "0722fe69-9958-4207-86f0-d4886b6bb5ee",
+   "productName": "잔트롤 비피투 혼합유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 21,
+   "canonicalId": "07865b29-cf02-4bc4-bc6f-698ab64b308e",
+   "productName": "CreNeuroS CNS Mood Probiotic Capsules",
+   "updated": 1
+  },
+  {
+   "targetIndex": 22,
+   "canonicalId": "083ca4b7-0640-43ff-b54e-67c5f4b64013",
+   "productName": "프로바이오틱스 츄어블",
+   "updated": 1
+  },
+  {
+   "targetIndex": 23,
+   "canonicalId": "0846e0f6-d250-4ee8-820f-9cdf2e0fc27a",
+   "productName": "멀티 프로바이오틱스 생유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 24,
+   "canonicalId": "08e889f0-56a0-4c82-a1ec-6e8e4e52bac5",
+   "productName": "웰씨드프로바이오틱스100억",
+   "updated": 1
+  },
+  {
+   "targetIndex": 25,
+   "canonicalId": "0a159419-abb9-4be8-aad2-9a3616938def",
+   "productName": "이너블라썸",
+   "updated": 1
+  },
+  {
+   "targetIndex": 26,
+   "canonicalId": "0a37a2f3-e4ed-44c0-9ea0-8c6b4fd2a48f",
+   "productName": "굿데이 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 27,
+   "canonicalId": "0abe3aee-685d-40df-b35c-77d5ab7976df",
+   "productName": "하루틴 유산균 스틱 알파 α",
+   "updated": 1
+  },
+  {
+   "targetIndex": 28,
+   "canonicalId": "0bf8512d-6df9-47e3-beac-6acedcc32efc",
+   "productName": "락토베지카 (Besika)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 29,
+   "canonicalId": "0c1f8785-63e5-4d02-85e3-082c68cdbaf3",
+   "productName": "파네나 릴렉스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 30,
+   "canonicalId": "0c34bf5d-1686-401a-84fe-856570baa6b2",
+   "productName": "생유산균 락토핏 골드",
+   "updated": 1
+  },
+  {
+   "targetIndex": 31,
+   "canonicalId": "0cb55d13-6c75-4382-8a85-9f1838506b52",
+   "productName": "청인 골드에스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 32,
+   "canonicalId": "0cf3da97-b804-49a0-a58e-25e78e2d1e45",
+   "productName": "뉴오리진 프로바이오틱스 (New Origin Probiotics)",
+   "updated": 1
+  },
+  {
+   "targetIndex": 33,
+   "canonicalId": "0d795b9b-8e8c-49a4-9814-c2b238d994b6",
+   "productName": "365초",
+   "updated": 1
+  },
+  {
+   "targetIndex": 34,
+   "canonicalId": "0e9b2f91-3db3-49a5-8752-f96c40db39f5",
+   "productName": "이즈바디",
+   "updated": 1
+  },
+  {
+   "targetIndex": 35,
+   "canonicalId": "0ed3c3f5-2af8-4fb3-ab89-2b14ec8d0bb0",
+   "productName": "더 파르마 유산균 II",
+   "updated": 1
+  },
+  {
+   "targetIndex": 36,
+   "canonicalId": "10cf38c3-7325-4adb-9ddd-f8d533a453f2",
+   "productName": "심리스 프로캡슐 맥스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 37,
+   "canonicalId": "110b5ae5-68fd-42d2-af51-84b289ebf80c",
+   "productName": "프로비던스 올인원 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 38,
+   "canonicalId": "11296581-e90c-4521-8072-7ce7cf1d9c2a",
+   "productName": "프로바이오틱스 17",
+   "updated": 1
+  },
+  {
+   "targetIndex": 39,
+   "canonicalId": "114e1051-1a7d-405d-9e31-c25144d9e834",
+   "productName": "해피문데이 랩 장 건강 100억 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 40,
+   "canonicalId": "11533d30-e3ea-4759-a123-dd4be15be906",
+   "productName": "데이프로바",
+   "updated": 1
+  },
+  {
+   "targetIndex": 41,
+   "canonicalId": "1166a7f8-7f7c-4cb6-b38b-c8be84da733e",
+   "productName": "나우케어 생유산균 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 42,
+   "canonicalId": "1196557d-612d-425d-a5bf-9efdea92433f",
+   "productName": "에버원스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 43,
+   "canonicalId": "119ba09a-b45b-4047-8700-551f5660a331",
+   "productName": "유기농 장대원",
+   "updated": 1
+  },
+  {
+   "targetIndex": 44,
+   "canonicalId": "11fc802a-11c5-430f-97b7-efe202211f14",
+   "productName": "닥터오라클 프리미엄 프로바이오틱스 100억 CFU",
+   "updated": 1
+  },
+  {
+   "targetIndex": 45,
+   "canonicalId": "12316ace-f414-4135-b94a-1ea7d7f68cab",
+   "productName": "슈퍼 프로바이오틱스19 플러스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 46,
+   "canonicalId": "12fd90e1-3367-423b-b965-f49146f50706",
+   "productName": "10억 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 47,
+   "canonicalId": "13a7a053-14bd-4d34-92c5-bc1f630ad45a",
+   "productName": "알로에바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 48,
+   "canonicalId": "1462f46a-8b44-4450-9a62-2ae30e708270",
+   "productName": "프로바이오 패밀리 유산균",
+   "updated": 1
+  },
+  {
+   "targetIndex": 49,
+   "canonicalId": "148ac512-12ca-4013-8aac-886e60584825",
+   "productName": "스노우 글로우 프로바이오틱스",
+   "updated": 1
+  },
+  {
+   "targetIndex": 50,
+   "canonicalId": "14fbd27b-8abc-4c5f-83e4-98c92dc1de99",
+   "productName": "트루락우먼",
+   "updated": 1
+  }
+ ],
+ "resultsTruncated": true
+}

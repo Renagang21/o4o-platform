@@ -1,0 +1,24 @@
+{
+ "verifiedAt": "2026-07-30T13:01:57.188Z",
+ "readOnlySession": true,
+ "targetCount": 511,
+ "newHashMatch": 511,
+ "oldHashRemains": 0,
+ "attrDrift": 0,
+ "candidateDrift": 0,
+ "outsideBlockDrift": 0,
+ "clauses": {
+  "expected": 631,
+  "visible": 631,
+  "notVerbatim": 0
+ },
+ "duplicateFunctionSection": 0,
+ "sdIntroDrift": 0,
+ "footDrift": 0,
+ "rendererFamilyDrift": 0,
+ "nonTargetCount": 14,
+ "nonTargetDrift": 0,
+ "verdict": "PASS",
+ "failedChecks": [],
+ "sampleFailures": []
+}
