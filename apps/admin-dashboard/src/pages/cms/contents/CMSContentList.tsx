@@ -21,6 +21,7 @@ import {
   Archive,
   Filter,
   X,
+  Loader2,
 } from 'lucide-react';
 import cmsAPI, { CmsContent, ContentType, ContentStatus } from '@/lib/cms';
 import toast from 'react-hot-toast';
@@ -88,6 +89,8 @@ export default function CMSContentList() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingContent, setEditingContent] = useState<CmsContent | null>(null);
   const [total, setTotal] = useState(0);
+  // WO-O4O-ADMIN-CMS-BODY-CANONICAL-EDIT-HYDRATION-FIX-V2: 상세 hydrate 진행 중인 콘텐츠 id
+  const [hydratingId, setHydratingId] = useState<string | null>(null);
 
   const loadContents = useCallback(async () => {
     try {
@@ -118,9 +121,27 @@ export default function CMSContentList() {
     setIsModalOpen(true);
   };
 
-  const handleEdit = (content: CmsContent) => {
-    setEditingContent(content);
-    setIsModalOpen(true);
+  // WO-O4O-ADMIN-CMS-BODY-CANONICAL-EDIT-HYDRATION-FIX-V2
+  //   목록 API projection 은 body / bodyBlocks / attachments / metadata 를 반환하지 않는다.
+  //   목록 row 를 그대로 모달에 넘기면 기존 본문·첨부가 빈 상태로 열려 편집이 불가능하다.
+  //   따라서 수정 진입 시 상세 API 로 hydrate 한 뒤에만 모달을 연다.
+  //   상세 조회 실패 시에는 모달을 아예 열지 않아 "빈 본문으로 저장" 경로를 원천 차단한다.
+  const handleEdit = async (content: CmsContent) => {
+    if (hydratingId) return;
+    setHydratingId(content.id);
+    try {
+      const detail = await cmsAPI.getContent(content.id);
+      setEditingContent(detail);
+      setIsModalOpen(true);
+    } catch (error: any) {
+      console.error('Failed to load content detail for editing:', error);
+      toast.error(
+        error.response?.data?.error?.message ||
+          '본문을 불러오지 못했습니다. 기존 콘텐츠 보호를 위해 수정 창을 열지 않았습니다.'
+      );
+    } finally {
+      setHydratingId(null);
+    }
   };
 
   const handleModalClose = () => {
@@ -393,13 +414,18 @@ export default function CMSContentList() {
                         </div>
                       </div>
                       <div className="flex items-center gap-2 ml-4">
-                        {/* Edit Button */}
+                        {/* Edit Button — 상세 hydrate 중에는 비활성 (V2) */}
                         <button
                           onClick={() => handleEdit(content)}
-                          className="p-2 text-gray-400 hover:text-gray-600"
-                          title="Edit"
+                          disabled={hydratingId !== null}
+                          className="p-2 text-gray-400 hover:text-gray-600 disabled:opacity-40 disabled:cursor-wait"
+                          title={hydratingId === content.id ? '본문 불러오는 중...' : 'Edit'}
                         >
-                          <Edit className="w-5 h-5" />
+                          {hydratingId === content.id ? (
+                            <Loader2 className="w-5 h-5 animate-spin" />
+                          ) : (
+                            <Edit className="w-5 h-5" />
+                          )}
                         </button>
 
                         {/* Publish Button (for draft) */}

@@ -700,9 +700,14 @@ export interface CmsContent {
   type: ContentType;
   title: string;
   summary: string | null;
-  body: string | null;
-  bodyBlocks: Record<string, any>[] | null;
-  attachments: Array<{ name: string; url: string; type: string; size?: number }> | null;
+  // WO-O4O-ADMIN-CMS-BODY-CANONICAL-EDIT-HYDRATION-FIX-V2:
+  //   아래 4개 필드는 상세 API(GET /cms/contents/:id)만 반환한다.
+  //   목록 API(GET /cms/contents)는 손으로 쓴 projection 이라 이 필드들을 아예 내려주지 않으므로
+  //   optional 로 선언해 "미조회(undefined)" 와 "실제 빈 값(null)" 을 타입에서 구분할 수 있게 한다.
+  //   (기존에는 필수로 선언돼 목록 row 에 대해 타입이 거짓이었고, 빈 본문 버그가 컴파일에서 잡히지 않았다.)
+  body?: string | null;
+  bodyBlocks?: Record<string, any>[] | null;
+  attachments?: Array<{ name: string; url: string; type: string; size?: number }> | null;
   imageUrl: string | null;
   linkUrl: string | null;
   linkText: string | null;
@@ -712,7 +717,7 @@ export interface CmsContent {
   sortOrder: number;
   isPinned: boolean;
   isOperatorPicked: boolean;
-  metadata: Record<string, any>;
+  metadata?: Record<string, any>;
   createdBy: string | null;
   createdAt: string;
   updatedAt: string;

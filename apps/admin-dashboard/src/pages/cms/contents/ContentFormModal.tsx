@@ -66,16 +66,50 @@ interface FormData {
   attachments: AttachmentItem[];
 }
 
+/**
+ * WO-O4O-ADMIN-CMS-BODY-CANONICAL-EDIT-HYDRATION-FIX-V2
+ *
+ * CMS 본문 canonical 계약:
+ *   - `body`        : canonical HTML. 공개 상세 / 사이니지 / 매장 사본 등 모든 소비처의 읽기 기준.
+ *   - `bodyBlocks`  : 편집용 파생 구조화 데이터. canonical 이 아니다.
+ * 편집기 초기화는 `body` 우선이고, `body` 가 없고 `bodyBlocks` 만 있는 레거시 레코드는
+ * blocksToHtml() 로 복원해 편집 가능하게 한다.
+ */
+function deriveEditorHtml(content: CmsContent | null): string {
+  if (!content) return '';
+  if (typeof content.body === 'string' && content.body.trim()) {
+    return content.body;
+  }
+  const blocks = content.bodyBlocks;
+  if (Array.isArray(blocks) && blocks.length > 0) {
+    return blocksToHtml(blocks as any);
+  }
+  return '';
+}
+
+/**
+ * 상세 API 로 hydrate 된 객체인지 판별한다.
+ * 목록 projection 은 body / bodyBlocks 를 아예 내려주지 않으므로(둘 다 undefined),
+ * "미조회" 와 "실제 빈 본문(null 또는 '')" 을 이 조건으로 구분할 수 있다.
+ */
+function isHydratedDetail(content: CmsContent): boolean {
+  return content.body !== undefined || content.bodyBlocks !== undefined;
+}
+
 export default function ContentFormModal({ content, onClose, onSave }: ContentFormModalProps) {
   const isEditing = !!content;
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // 수정 모드에서 hydrate 되지 않은 객체가 들어온 경우 저장을 차단한다(2차 방어선).
+  // 정상 경로(CMSContentList.handleEdit)는 상세 조회 성공 후에만 모달을 연다.
+  const isHydrated = !content || isHydratedDetail(content);
 
   const [formData, setFormData] = useState<FormData>({
     serviceKey: content?.serviceKey || '',
     type: content?.type || 'hero',
     title: content?.title || '',
     summary: content?.summary || '',
-    editorHtml: content?.bodyBlocks ? blocksToHtml(content.bodyBlocks as any) : '',
+    editorHtml: deriveEditorHtml(content),
     imageUrl: content?.imageUrl || '',
     linkUrl: content?.linkUrl || '',
     linkText: content?.linkText || '',
@@ -153,11 +187,21 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
       return;
     }
 
+    // V2: 상세 조회 실패/미조회 상태에서는 저장을 허용하지 않는다.
+    if (!isHydrated) {
+      toast.error('본문을 불러오지 못한 상태에서는 저장할 수 없습니다. 창을 닫고 다시 시도해 주세요.');
+      return;
+    }
+
     setSaving(true);
     try {
-      const metadata: Record<string, any> = {};
+      // V2: metadata 는 전체 교체 대상이므로 기존 값을 보존한 뒤 편집 항목만 덮어쓴다.
+      //     (기존 구현은 backgroundColor 만 담은 새 객체로 교체해 creatorType 등을 잃었다.)
+      const metadata: Record<string, any> = { ...(content?.metadata || {}) };
       if (formData.backgroundColor) {
         metadata.backgroundColor = formData.backgroundColor;
+      } else {
+        delete metadata.backgroundColor;
       }
 
       const data: Record<string, any> = {
@@ -174,14 +218,29 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
         metadata: Object.keys(metadata).length > 0 ? metadata : undefined,
       };
 
-      // Guide/Knowledge type: convert editor HTML to bodyBlocks
-      if ((formData.type === 'guide' || formData.type === 'knowledge') && formData.editorHtml.trim()) {
-        data.bodyBlocks = htmlToBlocks(formData.editorHtml);
+      // V2: Guide/Knowledge 본문 저장 — canonical `body`(HTML) 와 파생 `bodyBlocks` 를 동일 편집
+      //     결과로 함께 동기화한다. 본문을 실제로 비운 경우에도 두 필드를 같이 비워 불일치를 막는다.
+      //     (rich editor 를 노출하지 않는 hero/notice 등은 두 필드를 전송하지 않아 기존 값이 보존된다 —
+      //      백엔드 PUT 은 `if (field !== undefined)` patch 방식이다.)
+      if (formData.type === 'guide' || formData.type === 'knowledge') {
+        const html = formData.editorHtml.trim();
+        data.body = html || null;
+        data.bodyBlocks = html ? htmlToBlocks(html) : null;
       }
 
-      // Knowledge type: include attachments
+      // V2: Knowledge 첨부파일 — 목록 projection 에 필드가 없다는 이유로 기존 첨부를 null 로
+      //     덮어쓰지 않는다. hydrate 된 상태에서만 도달하며,
+      //       · 현재 목록이 있으면 그대로 전송
+      //       · 원래 첨부가 있었는데 사용자가 전부 제거했을 때만 null 전송(명시적 삭제)
+      //       · 원래도 없고 지금도 없으면 아예 전송하지 않는다(no-op)
       if (formData.type === 'knowledge') {
-        data.attachments = formData.attachments.length > 0 ? formData.attachments : null;
+        const originalHadAttachments =
+          Array.isArray(content?.attachments) && content!.attachments!.length > 0;
+        if (formData.attachments.length > 0) {
+          data.attachments = formData.attachments;
+        } else if (originalHadAttachments) {
+          data.attachments = null;
+        }
       }
 
       if (isEditing) {
@@ -552,6 +611,16 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
                   </p>
                 </div>
               )}
+
+              {/* V2: hydrate 되지 않은 상태(정상 경로에서는 발생하지 않음) — 저장 차단을 명시한다 */}
+              {!isHydrated && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                  <p className="text-sm text-red-700">
+                    기존 본문을 불러오지 못했습니다. 콘텐츠 훼손을 막기 위해 저장이 차단되었습니다.
+                    창을 닫고 다시 시도해 주세요.
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Footer */}
@@ -567,7 +636,7 @@ export default function ContentFormModal({ content, onClose, onSave }: ContentFo
               <button
                 type="submit"
                 className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={saving || uploading}
+                disabled={saving || uploading || !isHydrated}
               >
                 {saving ? 'Saving...' : isEditing ? 'Update' : 'Create'}
               </button>
