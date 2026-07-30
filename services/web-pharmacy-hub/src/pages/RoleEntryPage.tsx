@@ -19,9 +19,14 @@ interface Props {
   role: string;
   /** 후속 WO 에서 채울 기능 목록 (설명용) */
   plannedFeatures: string[];
+  /**
+   * 이미 연결된 실기능 진입 링크.
+   * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 에서 운영자 가입 신청 관리가 추가되었다.
+   */
+  links?: { to: string; label: string }[];
 }
 
-export default function RoleEntryPage({ role, plannedFeatures }: Props) {
+export default function RoleEntryPage({ role, plannedFeatures, links = [] }: Props) {
   const { user } = useAuth();
   const roles: string[] = Array.isArray(user?.roles) ? (user!.roles as string[]) : [];
   const hasRole = roles.includes(role);
@@ -40,6 +45,21 @@ export default function RoleEntryPage({ role, plannedFeatures }: Props) {
           </p>
         )}
       </div>
+
+      {links.length > 0 && (
+        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4 text-sm">
+          <h2 className="mb-2 font-semibold text-gray-700">이용 가능한 기능</h2>
+          <ul className="space-y-1">
+            {links.map((l) => (
+              <li key={l.to}>
+                <Link to={l.to} className="text-primary-600 underline">
+                  {l.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
 
       <div className="rounded-lg border border-dashed border-gray-300 p-4 text-sm">
         <h2 className="mb-2 font-semibold text-gray-700">후속 WO 예정 기능</h2>

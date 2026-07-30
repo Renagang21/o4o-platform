@@ -64,12 +64,10 @@ export const O4O_SERVICES: O4OService[] = [
    *
    * Pharmacy-Hub (파머시 허브) — 공급자와 약국 경영자를 직접 연결하는 O4O 약국 전문 서비스.
    *
-   * joinEnabled: false 인 이유:
-   *   가입 신청 write-path(service_memberships pending 생성) + 운영자 승인 콘솔이
-   *   아직 없다. 후속 "Pharmacy-Hub 회원가입·승인" WO 에서 true 로 전환한다.
-   *   (getJoinableServices() 소비처에 미완성 가입 카드가 노출되지 않도록 방어)
-   *
-   * 미포함(후속): platform_services row seed — 본 Foundation 은 migration 을 추가하지 않는다.
+   * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1:
+   *   joinEnabled false → true. 가입 신청 write-path(POST /api/v1/pharmacy-hub/join)와
+   *   운영자 승인 콘솔(/api/v1/pharmacy-hub/operator/memberships)이 연결되었다.
+   *   platform_services row 는 20270216000000-SeedPharmacyHubServiceAndRoles 에서 seed 한다.
    */
   {
     key: 'pharmacy-hub',
@@ -77,7 +75,7 @@ export const O4O_SERVICES: O4OService[] = [
     nameKo: '파머시 허브',
     domain: 'pharmacyhub.co.kr',
     description: '약국 경영자·공급자 직접 연결 약국 전문 서비스',
-    joinEnabled: false,
+    joinEnabled: true,
   },
 ];
 

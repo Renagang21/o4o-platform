@@ -108,6 +108,22 @@ export class AuthRegisterController extends BaseController {
         }
       }
 
+      // WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §5.2:
+      //   Pharmacy-Hub 가입 신청 역할은 약국 경영자(store_owner) / 공급자(supplier) 만 허용한다.
+      //   operator 는 자가 신청 경로가 없다 — 기존 admin role grant flow 에서만 부여된다.
+      //   (Neture 의 NETURE_SIGNUP_ROLE_REQUIRED 와 동일 패턴 — serviceKey 로 한정하므로 타 서비스 무영향.)
+      const PHARMACY_HUB_ALLOWED_SIGNUP_ROLES = ['store_owner', 'supplier'];
+      if (serviceKey === 'pharmacy-hub') {
+        if (!data.role || !PHARMACY_HUB_ALLOWED_SIGNUP_ROLES.includes(data.role)) {
+          return BaseController.error(
+            res,
+            'Pharmacy-Hub 가입 신청 역할이 필요합니다. (약국 경영자 / 공급자)',
+            400,
+            'PHARMACY_HUB_SIGNUP_ROLE_REQUIRED',
+          );
+        }
+      }
+
       const rawRole = data.membershipType === 'student'
         ? 'user'
         : (data.role || 'customer');
@@ -120,9 +136,16 @@ export class AuthRegisterController extends BaseController {
       //   멤버십 승인 시 그대로 cosmetics:store_owner 가 부여되도록 한다.
       //   (다른 서비스의 seller/legacy role 은 영향 없음 — serviceKey 로 한정.)
       const SELLER_LEGACY_ROLES = ['seller', 'cosmetics:seller', 'k-cosmetics:seller'];
-      const membershipRole = serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
-        ? 'cosmetics:store_owner'
-        : effectiveRole;
+      // WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-E:
+      //   Pharmacy-Hub 는 처음부터 prefixed role 을 service_memberships.role 에 저장한다.
+      //   승인 시 MembershipApprovalService 가 이 값을 그대로 role_assignments 에 부여하므로
+      //   (k-cosmetics 선례와 동일 메커니즘) 별도 매핑 코드를 만들지 않는다.
+      //   여기 저장되는 값은 위 §5.2 게이트를 통과한 store_owner / supplier 뿐이다.
+      const membershipRole = serviceKey === 'pharmacy-hub'
+        ? `pharmacy-hub:${effectiveRole}`
+        : serviceKey === 'k-cosmetics' && SELLER_LEGACY_ROLES.includes(effectiveRole)
+          ? 'cosmetics:store_owner'
+          : effectiveRole;
 
       // WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1: Name normalization
       let resolvedName: string;

@@ -15,7 +15,7 @@ import { getServiceMembershipStatus } from '../lib/membershipGate';
 const ENTRIES = [
   { to: '/store-owner', role: ROLES.storeOwner, desc: '매장 운영·공급 상품 확인 (준비 중)' },
   { to: '/supplier', role: ROLES.supplier, desc: '공급 상품·자료 제공 (준비 중)' },
-  { to: '/operator', role: ROLES.operator, desc: '가입 승인·회원 관리·커뮤니티 (준비 중)' },
+  { to: '/operator', role: ROLES.operator, desc: '가입 신청 승인·회원 관리 (커뮤니티는 준비 중)' },
 ];
 
 export default function HomePage() {
@@ -36,13 +36,25 @@ export default function HomePage() {
         {isAuthenticated ? (
           <p>
             로그인 상태 · 서비스 가입 상태: <strong>{status}</strong>
+            {status !== 'active' && (
+              <>
+                {' · '}
+                <Link to="/join/status" className="text-primary-600 underline">
+                  신청 상태 확인
+                </Link>
+              </>
+            )}
           </p>
         ) : (
           <p>
             <Link to="/login" className="text-primary-600 underline">
               로그인
             </Link>
-            {' '}후 이용할 수 있습니다.
+            {' '}후 이용할 수 있습니다. 아직 회원이 아니라면{' '}
+            <Link to="/join" className="text-primary-600 underline">
+              가입 신청
+            </Link>
+            을 진행해 주세요.
           </p>
         )}
       </section>

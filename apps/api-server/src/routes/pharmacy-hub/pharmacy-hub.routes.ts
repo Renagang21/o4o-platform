@@ -1,19 +1,22 @@
 /**
- * Pharmacy-Hub Routes (Foundation)
+ * Pharmacy-Hub Routes
  *
- * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
+ * WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1 (Foundation)
+ * WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 (가입·승인)
  *
- * Foundation 범위 — 서비스 키 · 표시명 · 역할 경계가 동작하는지 확인하는 최소 라우트만 둔다.
- *
- *   GET /api/v1/pharmacy-hub/service-info            (public)  서비스 식별 정보
- *   GET /api/v1/pharmacy-hub/me/access               (auth)    내 멤버십/역할 진입점
- *   GET /api/v1/pharmacy-hub/operator/ping           (operator scope)
- *   GET /api/v1/pharmacy-hub/store-owner/ping        (store_owner scope)
- *   GET /api/v1/pharmacy-hub/supplier/ping           (supplier scope)
+ *   GET   /api/v1/pharmacy-hub/service-info                              (public)
+ *   GET   /api/v1/pharmacy-hub/me/access                                 (auth)
+ *   POST  /api/v1/pharmacy-hub/join                                      (public)  가입 신청
+ *   GET   /api/v1/pharmacy-hub/join/status                               (auth)    내 가입 상태
+ *   GET   /api/v1/pharmacy-hub/operator/memberships                      (operator scope)
+ *   GET   /api/v1/pharmacy-hub/operator/memberships/:id                  (operator scope)
+ *   PATCH /api/v1/pharmacy-hub/operator/memberships/:id/approve          (operator scope)
+ *   PATCH /api/v1/pharmacy-hub/operator/memberships/:id/reject           (operator scope)
+ *   GET   /api/v1/pharmacy-hub/{operator|store-owner|supplier}/ping      (각 scope)
  *
  * 포함하지 않는 것 (후속 WO):
- *   가입 신청·승인 write-path, 회원 관리, 상품 카탈로그/장바구니/주문,
- *   콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
+ *   상품 카탈로그/장바구니/주문, 콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
+ *   운영자 권한은 회원 가입 승인·반려까지이며 상품·주문·콘텐츠 승인은 정의하지 않는다.
  *
  * 공통 원장 재사용 원칙 (WO §3):
  *   users / organizations / service_memberships / ProductMaster /
@@ -26,6 +29,8 @@ import { getService } from '../../config/service-catalog.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requirePharmacyHubScope } from '../../middleware/pharmacy-hub-scope.middleware.js';
+import { PharmacyHubJoinController } from '../../controllers/pharmacy-hub/PharmacyHubJoinController.js';
+import { PharmacyHubMembershipConsoleController } from '../../controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
@@ -84,6 +89,39 @@ export function createPharmacyHubRoutes(): Router {
       },
     });
   });
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 가입 신청 (WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §6-A)
+  //   POST /join         (public) 신규/기존 사용자 가입 신청 — Core register 경로에 위임
+  //   GET  /join/status  (auth)   내 가입 상태
+  // ───────────────────────────────────────────────────────────────────────────
+  router.post('/join', PharmacyHubJoinController.apply);
+  router.get('/join/status', requireAuth as any, PharmacyHubJoinController.myStatus);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 운영자 회원 승인 콘솔 (§6-C)
+  //   모든 엔드포인트가 requireAuth + pharmacy-hub:operator scope 를 요구하고,
+  //   service_key='pharmacy-hub' 범위를 코드에서 고정한다.
+  //   회원 가입 승인·반려 외의 승인(상품/주문/콘텐츠)은 정의하지 않는다 (§5.5).
+  // ───────────────────────────────────────────────────────────────────────────
+  const operatorGuards = [requireAuth as any, requirePharmacyHubScope(`${SERVICE_KEY}:operator`)];
+
+  router.get('/operator/memberships', ...operatorGuards, PharmacyHubMembershipConsoleController.list);
+  router.get(
+    '/operator/memberships/:membershipId',
+    ...operatorGuards,
+    PharmacyHubMembershipConsoleController.detail,
+  );
+  router.patch(
+    '/operator/memberships/:membershipId/approve',
+    ...operatorGuards,
+    PharmacyHubMembershipConsoleController.approve,
+  );
+  router.patch(
+    '/operator/memberships/:membershipId/reject',
+    ...operatorGuards,
+    PharmacyHubMembershipConsoleController.reject,
+  );
 
   /** 역할별 진입점 guard 동작 확인 (Foundation ping) */
   router.get(

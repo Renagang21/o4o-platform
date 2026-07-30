@@ -32,7 +32,7 @@ export default function LoginPage() {
       const wrapped = err as Error & { code?: string };
       setError(
         wrapped.code === 'SERVICE_NOT_MEMBER'
-          ? `${BRAND.nameKo} 가입 회원이 아닙니다. 가입 신청 기능은 준비 중입니다.`
+          ? `${BRAND.nameKo} 가입 회원이 아닙니다. 가입 신청 후 운영자 승인을 받아 주세요.`
           : wrapped.message,
       );
     } finally {
@@ -79,6 +79,14 @@ export default function LoginPage() {
       </form>
 
       <p className="mt-4 text-center text-sm">
+        <Link to="/join" className="text-primary-600 underline">
+          가입 신청
+        </Link>
+        {' · '}
+        <Link to="/join/status" className="text-primary-600 underline">
+          신청 상태 확인
+        </Link>
+        {' · '}
         <Link to="/" className="text-gray-500 underline">
           처음으로
         </Link>
