@@ -18,12 +18,13 @@ on:
       - 'services/web-k-cosmetics/**'
       - 'services/web-kpa-society/**'
       - 'services/web-glycopharm/**'
+      - 'services/web-pharmacy-hub/**'
       - 'packages/**'
       - '.github/workflows/deploy-web-services.yml'
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm)'
+        description: 'Service to deploy (all, neture, k-cosmetics, kpa-society, glycopharm, pharmacy-hub)'
         required: false
         default: 'all'
 
@@ -43,6 +44,9 @@ env:
   VITE_SERVICE_URL_GLYCOPHARM: https://glycopharm.co.kr
   VITE_SERVICE_URL_KPA_SOCIETY: https://kpa-society.co.kr
   VITE_SERVICE_URL_K_COSMETICS: https://k-cosmetics.site
+  # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
+  VITE_API_URL_PHARMACY_HUB: https://api.neture.co.kr
+  VITE_SERVICE_URL_PHARMACY_HUB: https://pharmacyhub.co.kr
 
 jobs:
   detect-changes:
@@ -52,6 +56,7 @@ jobs:
       k-cosmetics: ${{ steps.changes.outputs.k-cosmetics }}
       kpa-society: ${{ steps.changes.outputs.kpa-society }}
       glycopharm: ${{ steps.changes.outputs.glycopharm }}
+      pharmacy-hub: ${{ steps.changes.outputs.pharmacy-hub }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
@@ -71,11 +76,13 @@ jobs:
               echo "k-cosmetics=true" >> $GITHUB_OUTPUT
               echo "kpa-society=true" >> $GITHUB_OUTPUT
               echo "glycopharm=true" >> $GITHUB_OUTPUT
+              echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
             else
               echo "neture=$( [ "$SERVICE" = 'neture' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "k-cosmetics=$( [ "$SERVICE" = 'k-cosmetics' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "kpa-society=$( [ "$SERVICE" = 'kpa-society' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
               echo "glycopharm=$( [ "$SERVICE" = 'glycopharm' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
+              echo "pharmacy-hub=$( [ "$SERVICE" = 'pharmacy-hub' ] && echo 'true' || echo 'false' )" >> $GITHUB_OUTPUT
             fi
             exit 0
           fi
@@ -116,6 +123,7 @@ jobs:
             echo "k-cosmetics=true" >> $GITHUB_OUTPUT
             echo "kpa-society=true" >> $GITHUB_OUTPUT
             echo "glycopharm=true" >> $GITHUB_OUTPUT
+            echo "pharmacy-hub=true" >> $GITHUB_OUTPUT
             exit 0
           fi
 
@@ -134,6 +142,7 @@ jobs:
           decide "k-cosmetics" "services/web-k-cosmetics/"
           decide "kpa-society" "services/web-kpa-society/"
           decide "glycopharm" "services/web-glycopharm/"
+          decide "pharmacy-hub" "services/web-pharmacy-hub/"
 
   deploy-neture:
     needs: detect-changes
@@ -417,8 +426,80 @@ jobs:
 
           echo "Service URL: ${SERVICE_URL}"
 
+  # WO-PHARMACY-HUB-DEPLOY-BOOTSTRAP-AND-MEMBERSHIP-E2E-V1
+  #   기존 4개 서비스 job 과 동일 구조. DNS(pharmacyhub.co.kr) 매핑은 이 WO 범위 밖 —
+  #   임시 Cloud Run URL 로 가입·승인 E2E 검증까지만 수행한다.
+  deploy-pharmacy-hub:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.pharmacy-hub == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: ${{ env.PROJECT_ID }}
+
+      - name: Configure Docker for GCR
+        run: gcloud auth configure-docker gcr.io --quiet
+
+      - name: Build and push Docker image
+        run: |
+          echo "Building pharmacy-hub-web Docker image..."
+          IMAGE_TAG="${{ github.sha }}"
+
+          # Build from repo root with Dockerfile path (for workspace packages)
+          docker build \
+            --platform linux/amd64 \
+            --build-arg VITE_API_BASE_URL=${{ env.VITE_API_URL_PHARMACY_HUB }} \
+            --build-arg VITE_SERVICE_URL=${{ env.VITE_SERVICE_URL_PHARMACY_HUB }} \
+            -f services/web-pharmacy-hub/Dockerfile \
+            -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:${IMAGE_TAG} \
+            -t gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:latest \
+            .
+
+          docker push gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:${IMAGE_TAG}
+          docker push gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:latest
+
+      - name: Deploy to Cloud Run
+        run: |
+          echo "Deploying pharmacy-hub-web to Cloud Run..."
+
+          gcloud run deploy pharmacy-hub-web \
+            --image=gcr.io/${{ env.PROJECT_ID }}/pharmacy-hub-web:${{ github.sha }} \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --platform=managed \
+            --allow-unauthenticated \
+            --port=8080 \
+            --memory=256Mi \
+            --cpu=1 \
+            --min-instances=0 \
+            --max-instances=5
+
+          echo "pharmacy-hub-web deployed successfully!"
+
+      - name: Verify deployment
+        run: |
+          SERVICE_URL=$(gcloud run services describe pharmacy-hub-web \
+            --region=${{ env.REGION }} \
+            --project=${{ env.PROJECT_ID }} \
+            --format="value(status.url)")
+
+          echo "Service URL: ${SERVICE_URL}"
+
   summary:
-    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm]
+    needs: [detect-changes, deploy-neture, deploy-k-cosmetics, deploy-kpa-society, deploy-glycopharm, deploy-pharmacy-hub]
     if: always()
     runs-on: ubuntu-latest
     steps:
@@ -433,6 +514,7 @@ jobs:
           echo "  - k-cosmetics-web: ${{ needs.detect-changes.outputs.k-cosmetics }}"
           echo "  - kpa-society-web: ${{ needs.detect-changes.outputs.kpa-society }}"
           echo "  - glycopharm-web: ${{ needs.detect-changes.outputs.glycopharm }}"
+          echo "  - pharmacy-hub-web: ${{ needs.detect-changes.outputs.pharmacy-hub }}"
           echo ""
           echo "Time: $(date)"
           echo "Commit: ${{ github.sha }}"
