@@ -1,0 +1,763 @@
+{
+ "generatedAt": "2026-07-30T03:07:17.704Z",
+ "totalLabelOccurrences": 71704,
+ "distinctLabels": 1036,
+ "min": 1,
+ "median": 4,
+ "p90": 9,
+ "p95": 13,
+ "p99": 26,
+ "max": 68,
+ "countGt40": 139,
+ "countGt60": 11,
+ "countGt80": 0,
+ "countGt100": 0,
+ "longLabelClassificationCounts": {
+  "NORMAL_INGREDIENT_LABEL": 51,
+  "ENGLISH_CLAIM_IN_BRACKET": 1
+ },
+ "longLabelsDistinctGt40": [
+  {
+   "len": 68,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 68,
+   "label": "L.curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(기능성원료인정 제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 67,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정 제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 67,
+   "label": "L. plantarum LC27과 B. longum LC67의 프로바이오틱스 복합물(NVP-1702)(제2023-19호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 62,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 62,
+   "label": "May help reduce body fat mass.(Other function claime 2 grade.)",
+   "classification": "ENGLISH_CLAIM_IN_BRACKET"
+  },
+  {
+   "len": 61,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 61,
+   "label": "L. curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 60,
+   "label": "L.Curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 60,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 58,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 57,
+   "label": "보스웰리아추출물(Boswellia serrata R. extract)(기능성원료인정 제2014-23호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 56,
+   "label": "Lactiplantibacillus plantarum LMT1-48 프로바이오틱스(제2025-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 55,
+   "label": "Lactiplantibacillus plantarum ATG-K2 프로바이오틱스(제2025-58호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "B. breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 53,
+   "label": "B. breve IDCC 4401(BBR4401) 열처리배양건조물(기능성원료인정제2021-5호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 52,
+   "label": "CaHMB(Calcium β-Hydroxy-β-methylbutyrate)(제2023-26호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 51,
+   "label": "B. breveIDCC 4401(BBR4401) 열처리배양건조물 (기능성인정제2021-5호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "보스웰리아 추출물(Boswellia serrata R. extract)(제2014-23호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 49,
+   "label": "자일로올리고당(xylooligosaccharide)분말(기능성원료인정 제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 49,
+   "label": "Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 48,
+   "label": "Lactobacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 48,
+   "label": "Lactobacillus plantarum HAC01 프로바이오틱스(제2022-21호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 47,
+   "label": "과채유래유산균(L.plantarum CJLP133)(기능성원료인정 제2013-11호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 47,
+   "label": "Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "과채유래유산균(L.plantarum CJLP133)(기능성원료인정제2013-11호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제 2024-18호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 45,
+   "label": "팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제2024-18호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 44,
+   "label": "Lactobacillus 복합물 HY7601 + KY1032 (제2019-4호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 44,
+   "label": "Lactobacillus sakei Probio65(개별인정형(2013-17호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "고시 제2021-95호(2021.11.23.), 시행일(2022.11.23.)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine) ",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "다이크로스타키스 글로메라타 추출물(Dyglomera ®)(제2023-36호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "자일로올리고당(xylooligosaccharide) 분말(제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "Latilactobacillus curvatus LB-P9(제2025-5호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "자일로올리고당(Xylooligosaccharide) 분말(제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "Lactobacillus acidophilus YT1 (제2019-22호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "Lactilactobacillus curvatus LB-P9 프로바이오틱스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "자일로올리고당(xylooligosaccharide)분말(제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "아프리카 망고 종자추출물(IGOB131)(기능성원료인정 제2015-14호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "자일로올리고당(Xylooligosaccharide)분말(제2009-80호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "CMO 함유 FAC(Fatty Acid Complex)(제2014-26호)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  }
+ ],
+ "longestSamples": [
+  {
+   "len": 68,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)",
+   "statementNo": "200400150832478",
+   "candidateId": "75fa9fc4-b86f-44a0-985c-d9279af15147",
+   "productName": "바이오파파 다이어트 유산균 바이오 슬림",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 68,
+   "label": "L.curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(기능성원료인정 제2019-4호)",
+   "statementNo": "200400170211547",
+   "candidateId": "bc103018-929b-4d44-89db-a19951432b19",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 67,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정 제2019-4호)",
+   "statementNo": "200400170061811",
+   "candidateId": "e139ec88-e7a7-4f9e-90a8-4014c48902d6",
+   "productName": "슬로우글로우 다이어트 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 67,
+   "label": "L. plantarum LC27과 B. longum LC67의 프로바이오틱스 복합물(NVP-1702)(제2023-19호)",
+   "statementNo": "200700170353196",
+   "candidateId": "f1bdb5f4-84c2-4634-8407-71287f2430f0",
+   "productName": "바이크롬 리버케어",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 62,
+   "label": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "statementNo": "200400170061669",
+   "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+   "productName": "트루락 날씬 다이어트 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 62,
+   "label": "May help reduce body fat mass.(Other function claime 2 grade.)",
+   "statementNo": "20040020020636",
+   "candidateId": "e751e9d9-b7b3-4547-a940-37662588d3eb",
+   "productName": "돌외잎그린다이어트",
+   "classification": "ENGLISH_CLAIM_IN_BRACKET"
+  },
+  {
+   "len": 61,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)",
+   "statementNo": "200700170352447",
+   "candidateId": "e3e98ace-5157-4cf8-bbcf-0bde72f1292b",
+   "productName": "빌드 100억 유산균 액티브",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 61,
+   "label": "L. curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "statementNo": "20190004553414",
+   "candidateId": "9e1bab27-f1e8-46c7-8cba-a7601608e32c",
+   "productName": "엠프로 M.PRO 다이어트 ",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 60,
+   "label": "L.Curvatus HY7601와 L.plantarum KY1032의 프로바이오틱스 복합물(제2019-4호)",
+   "statementNo": "200400200141948",
+   "candidateId": "87e8e691-59c6-4ddd-ba75-0e5b8e3f2531",
+   "productName": "다이어트 100억 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 60,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+   "statementNo": "200700170352530",
+   "candidateId": "c8fabc5c-75f6-4715-8bd4-ef73a97a77ed",
+   "productName": "AG바이옴 스포츠",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 58,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)",
+   "statementNo": "200700170352520",
+   "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+   "productName": "맨 TWK10 100억 캡슐",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 57,
+   "label": "보스웰리아추출물(Boswellia serrata R. extract)(기능성원료인정 제2014-23호)",
+   "statementNo": "200400200082857",
+   "candidateId": "8e425277-81bf-426a-b0fd-d4e4127d080c",
+   "productName": "보스정",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 56,
+   "label": "Lactiplantibacillus plantarum LMT1-48 프로바이오틱스(제2025-32호)",
+   "statementNo": "200700170353074",
+   "candidateId": "f00e7ab0-7b98-4614-a096-7d7ae6042257",
+   "productName": "락티플랜",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 55,
+   "label": "Lactiplantibacillus plantarum ATG-K2 프로바이오틱스(제2025-58호)",
+   "statementNo": "200700170353161",
+   "candidateId": "287649af-5ef6-4ab1-8d97-7d1d7af0b768",
+   "productName": "원더씬",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "B. breve IDCC 4401(BBR4401) 열처리배양건조물 (기능성원료인정제2021-5호)",
+   "statementNo": "200400200082716",
+   "candidateId": "9fa29f8d-6729-4f3b-b438-919b0d5ca5cf",
+   "productName": "지큐랩 콜레스테롤 솔루션 데일리",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactiplantibacillus plantarum HAC01 프로바이오틱스(제2022-21호)",
+   "statementNo": "200700170352294",
+   "candidateId": "d0af0b7e-9c38-4511-b616-383aa1afc225",
+   "productName": "혈당엔 유산균 HAC01",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactobacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+   "statementNo": "200700170352383",
+   "candidateId": "87a3cf4e-ec84-4416-9513-ee6bae69fd5c",
+   "productName": "TWK10 100억 캡슐",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 54,
+   "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+   "statementNo": "200700170352412",
+   "candidateId": "8c3a600b-801d-49b8-839b-a0b9a5b41b9d",
+   "productName": "익스트림 프로바이오틱스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 53,
+   "label": "B. breve IDCC 4401(BBR4401) 열처리배양건조물(기능성원료인정제2021-5호)",
+   "statementNo": "200400200082728",
+   "candidateId": "a83f0622-b845-427e-a5e6-a8d1d058760c",
+   "productName": "지큐랩 콜레스테롤 솔루션 팜",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 52,
+   "label": "CaHMB(Calcium β-Hydroxy-β-methylbutyrate)(제2023-26호)",
+   "statementNo": "200400170061769",
+   "candidateId": "74c7e00a-b856-4d6d-a893-5ee09b2a747e",
+   "productName": "익스트림 트리플 HMB 3000",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 51,
+   "label": "B. breveIDCC 4401(BBR4401) 열처리배양건조물 (기능성인정제2021-5호)",
+   "statementNo": "20140017002616",
+   "candidateId": "6168f657-5235-4636-8d35-6bec63e233f9",
+   "productName": "슬림 다이어트 & 유산균 ",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "보스웰리아 추출물(Boswellia serrata R. extract)(제2014-23호)",
+   "statementNo": "200600200081389",
+   "candidateId": "9dcca780-4708-4ae8-aefc-9db9ccbb1918",
+   "productName": "관절연골엔 보스웰리아 플렉스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호)",
+   "statementNo": "20172880193365",
+   "candidateId": "2a0c60bf-d94a-4776-95c4-bc866b2c8aed",
+   "productName": "모큐락+",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 50,
+   "label": "밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산",
+   "statementNo": "2019001029743",
+   "candidateId": "fbcd093b-017d-46a5-89e6-e178da56aa90",
+   "productName": "에너씨슬 퍼펙트샷",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 49,
+   "label": "자일로올리고당(xylooligosaccharide)분말(기능성원료인정 제2009-80호)",
+   "statementNo": "200400200083035",
+   "candidateId": "1670cc3b-cc79-4d94-8666-9a1b2db90a1b",
+   "productName": "데이즈 핏핏",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 49,
+   "label": "Latilactobacillus curvatus LB-P9 프로바이오틱스(제2025-5호",
+   "statementNo": "20172880193373",
+   "candidateId": "e46429ae-00f6-4ba4-8c16-3f27c9d9d6da",
+   "productName": "모발락",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 48,
+   "label": "Lactobacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+   "statementNo": "200700170352467",
+   "candidateId": "e2cfdaa7-5b14-4400-af3c-f48254aeb267",
+   "productName": "맨 TWK10 운동수행능력 레시피",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 48,
+   "label": "Lactobacillus plantarum HAC01 프로바이오틱스(제2022-21호)",
+   "statementNo": "200700170353174",
+   "candidateId": "a2b78b7e-7873-4ce4-b4b9-899bf5b52dd9",
+   "productName": "당큐락 이지",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 47,
+   "label": "과채유래유산균(L.plantarum CJLP133)(기능성원료인정 제2013-11호)",
+   "statementNo": "200400200082879",
+   "candidateId": "a5a1b878-38fc-4d00-864f-8047d83c9332",
+   "productName": "바이오코어 피부면역 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 47,
+   "label": "Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물",
+   "statementNo": "20140017002175",
+   "candidateId": "9619f01b-d9a2-4e06-b31a-9ce0dcae1302",
+   "productName": "지큐랩 포스트바이오틱스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "Bacillus coagulans SNZ 1969 프로바이오틱스(제2023-34호)",
+   "statementNo": "200400150832024",
+   "candidateId": "7a3956a7-8364-4d35-b751-fb89af413839",
+   "productName": "녹차카테킨+",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "과채유래유산균(L.plantarum CJLP133)(기능성원료인정제2013-11호)",
+   "statementNo": "200400200082764",
+   "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+   "productName": "건강한 생 유산균 키즈 300억",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 46,
+   "label": "팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제 2024-18호)",
+   "statementNo": "200600200081153",
+   "candidateId": "6da98da1-b56e-47e7-9ffa-8c5c0b33f8aa",
+   "productName": "셀로맥스 오메가3&7",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 45,
+   "label": "팔밋올레산 함유 명태(알래스카폴락)유래 정제어유(기능성원료인정 제2024-18호)",
+   "statementNo": "200600200081148",
+   "candidateId": "8ccab18b-7d54-431d-8198-d1d59a9f887c",
+   "productName": "셀로맥스 명품 골드세븐",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 44,
+   "label": "Lactobacillus 복합물 HY7601 + KY1032 (제2019-4호)",
+   "statementNo": "200400170061599",
+   "candidateId": "bad02774-32c9-4356-b1bb-9b7020b8a1bd",
+   "productName": "야쿠르트 핏바이오틱스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 44,
+   "label": "Lactobacillus sakei Probio65(개별인정형(2013-17호)",
+   "statementNo": "200700170351959",
+   "candidateId": "fa71dce3-9c7e-486b-bd83-f30ba5d3f2fb",
+   "productName": "토트랑 피부유산균키즈",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "Bifidobacterium breve B-3 프로바이오틱스(제2023-2호)",
+   "statementNo": "200400170061890",
+   "candidateId": "4d3fe144-3c36-4b76-86d0-114121c68459",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "고시 제2021-95호(2021.11.23.), 시행일(2022.11.23.)",
+   "statementNo": "20040017015350",
+   "candidateId": "431889e5-640b-4431-8748-7f69dd8afcc2",
+   "productName": "메타듀오 STEP 2",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine) ",
+   "statementNo": "2017286000751",
+   "candidateId": "adaa87ba-2e4a-45d6-9e04-53c4c8d8836a",
+   "productName": "관절생생진액",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 43,
+   "label": "자일로올리고당(Xylooligosaccharide) 분말 (제2009-80호)",
+   "statementNo": "2019000939496",
+   "candidateId": "fbe6078e-1b05-4d6d-bc01-dcf18b74e978",
+   "productName": "초록이 슬림밸런스&쾌변",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "다이크로스타키스 글로메라타 추출물(Dyglomera ®)(제2023-36호)",
+   "statementNo": "200400170211798",
+   "candidateId": "45f8bafb-9083-4810-b129-a136324c7b67",
+   "productName": "올빼 Bio 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)",
+   "statementNo": "20040017038131",
+   "candidateId": "579a4c9b-5b58-4f4d-a892-2a2e1ec0634e",
+   "productName": "온에이지(ONAGE)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "자일로올리고당(xylooligosaccharide) 분말(제2009-80호)",
+   "statementNo": "200400200083114",
+   "candidateId": "b1003670-3aad-41e1-88ce-96b0a802fb07",
+   "productName": "액티브솔루션 장건강",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)",
+   "statementNo": "200700170352511",
+   "candidateId": "edcdedc9-4564-4ee8-a450-ad886eac7c6e",
+   "productName": "더 콜라겐",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "Latilactobacillus curvatus LB-P9(제2025-5호)",
+   "statementNo": "20172880193399",
+   "candidateId": "287c77f7-a446-48af-9d03-55d30e4848ab",
+   "productName": "엔브릿지모발유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 42,
+   "label": "자일로올리고당(Xylooligosaccharide) 분말(제2009-80호)",
+   "statementNo": "20190009483840",
+   "candidateId": "f8bc4892-e7b3-44dc-be51-729e96ceef0b",
+   "productName": "초록이 슬림&쾌변",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "Lactobacillus acidophilus YT1 (제2019-22호)",
+   "statementNo": "200400170061087",
+   "candidateId": "2c8852bb-feb7-4221-91fc-d9ee78590a4a",
+   "productName": "광동 궁리본 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "Lactilactobacillus curvatus LB-P9 프로바이오틱스",
+   "statementNo": "200400170211893",
+   "candidateId": "b844ce36-764c-4b58-98f9-ab01c821902c",
+   "productName": "B:OK 실크텐션 머릿결 유산균",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "자일로올리고당(xylooligosaccharide)분말(제2009-80호)",
+   "statementNo": "200400200082481",
+   "candidateId": "bc5f095b-e843-41ab-8955-3a47151c69b9",
+   "productName": "판도라 슬리밍 컷",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "아프리카 망고 종자추출물(IGOB131)(기능성원료인정 제2015-14호)",
+   "statementNo": "200400200082919",
+   "candidateId": "e2cf9faa-6f8b-4c9d-ad6c-1057753a06e5",
+   "productName": "하루한팩 for 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "자일로올리고당(Xylooligosaccharide)분말(제2009-80호)",
+   "statementNo": "200400200083187",
+   "candidateId": "651ec646-7097-46fd-8860-7500a9e32f77",
+   "productName": "트리플 프리바이오틱스",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 41,
+   "label": "CMO 함유 FAC(Fatty Acid Complex)(제2014-26호)",
+   "statementNo": "200700170352404",
+   "candidateId": "bd5803cf-d3e1-4d60-8086-098cf1bae174",
+   "productName": "관절엔 조인트 큐",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)",
+   "statementNo": "200400170061597",
+   "candidateId": "82b590bc-8236-4f61-8ee7-8751a5cf0cf7",
+   "productName": "아리에블랙 엠에스엠",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "Lactobacillus acidophilus YT1(제2019-22호)",
+   "statementNo": "200400170061740",
+   "candidateId": "2b02ebcd-17fa-4602-8205-eea28323c088",
+   "productName": "메노락토 프리미엄 징코",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "가다랑어 엘라스틴 펩타이드(VGPG Elastin®)(제2022-38호)",
+   "statementNo": "200400170061918",
+   "candidateId": "b9ca1a6e-8f67-46ba-b258-b03533d04513",
+   "productName": "모발콜라겐 엘라스틴",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "레몬버베나추출물 등 복합물(티에뜨레Ⓡ)(기능성원료인정 제2022-13호)",
+   "statementNo": "200400200082962",
+   "candidateId": "277bca1a-c1e3-46e3-8863-f2d391aa73f3",
+   "productName": "레몬버베나 컷 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "레몬버베나추출물 등 복합물(티에뜨레®)(기능성원료인정 제2022-13호)",
+   "statementNo": "200400200083018",
+   "candidateId": "fbb0672c-3576-4bfe-a1cb-8827b4166160",
+   "productName": "지엘픽슬림 레몬버베나",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "Lactobacillus sakei Probio65(제 2013-17호)",
+   "statementNo": "200700170352104",
+   "candidateId": "aa20564a-8c18-4ce1-82f0-ccaf113fd908",
+   "productName": "엄선유 (엄마가 선택한 유산균)",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "Lactobacillus sakei Probio65 (제2013-17호)",
+   "statementNo": "200700170352194",
+   "candidateId": "74440b13-69cd-4600-a527-5e5f0e4bd2b4",
+   "productName": "피부유산균 100억",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  },
+  {
+   "len": 40,
+   "label": "다이크로스타키스 글로메라타 추출물(Dyglomera®)(제2023-9호)",
+   "statementNo": "200700170352778",
+   "candidateId": "956c0acd-4ead-4bd5-a4a0-8fe33e7a83ea",
+   "productName": "라인 컷 다이어트",
+   "classification": "NORMAL_INGREDIENT_LABEL"
+  }
+ ]
+}

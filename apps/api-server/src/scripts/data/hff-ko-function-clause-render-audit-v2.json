@@ -1,0 +1,3014 @@
+{
+ "generatedAt": "2026-07-30T04:05:25.144Z",
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-NORMALIZATION-AND-BACKFILL-TARGET-REBASE-V2",
+ "contract": "§25 — 제안 출력 렌더 검증 30건 이상 × 430/820/1280. DB 콘텐츠 변경 없음.",
+ "cssSource": "packages/content-editor/src/components/ContentRenderer.tsx :: storeDescriptionCss (원문 추출, 수정 없음)",
+ "wrapper": "<div class=\"store-desc-content\">",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "sampleCount": 34,
+ "sampleIndex": [
+  {
+   "candidateId": "4a51f6b8-110c-4a75-af0d-6361bcdfcbd8",
+   "statementNo": "200400150831397",
+   "productName": "멀티비타민 앤 미네랄",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "a8c06c2a-b732-4a51-b0b6-c056e9e9c1f3",
+   "statementNo": "200400170061930",
+   "productName": "동국 루테인지아잔틴",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "e3673abf-2c9f-4491-9524-8cfba0ba8bf9",
+   "statementNo": "20040020006683",
+   "productName": "메타볼",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "2d2ded30-ea32-4d4d-8fce-c8f4f9284511",
+   "statementNo": "2006001532625",
+   "productName": "쾌변 클렌즈 다이어트 올인원",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "a0fcc12a-feb1-46c8-8e33-d6f18cf7d89d",
+   "statementNo": "20110020099111",
+   "productName": "리얼모닝",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "f1c53de4-a3bd-4739-88ee-443703f48191",
+   "statementNo": "2018001231060",
+   "productName": "메디타민 퓨어 레이디 프로바이오틱스",
+   "changeClass": "SAFE_FUNCTION_RESTORE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "241c3130-c8e2-4e9c-ab89-629b3619f5ac",
+   "statementNo": "20040015039130",
+   "productName": "천하무적키즈왕홍삼",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "005ab1e1-2f78-4102-be28-90f4c7f8fd63",
+   "statementNo": "200400151101062",
+   "productName": "그린컷 카테킨 애프터",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "48e09d82-1dc6-4547-a822-cabb3a6970ac",
+   "statementNo": "200400200022487",
+   "productName": "에너씨슬콜레다운",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "3b65c3ba-b462-4def-90d9-724d8ab2298f",
+   "statementNo": "200400200023814",
+   "productName": "키즈텐칼슘업사과맛",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "df58fef6-3a8b-444f-a0ea-a3c80c0d12f6",
+   "statementNo": "20040020019413",
+   "productName": "휴먼알파",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "9ba3088e-cc88-4158-85e1-f35ff3723f25",
+   "statementNo": "200600200033084",
+   "productName": "햇살채움 비타민D",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "b8cc770c-3305-4f96-bbdb-7572431db424",
+   "statementNo": "2015000612728",
+   "productName": "바이오스 라이프 에스 베타카로틴",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "0eaf7564-f99e-4c26-bd0d-fac008ccdb1d",
+   "statementNo": "2020001626832",
+   "productName": "이너뷰 콜라겐 더마스틱",
+   "changeClass": "SAFE_SEGMENTATION_REPAIR",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "fa77f6ab-79d5-4471-971f-0b05963daea8",
+   "statementNo": "200400150831423",
+   "productName": "리얼컷 카페 라이트",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "f55963e4-b9fa-4b41-a979-8ba74a384974",
+   "statementNo": "20040017006824",
+   "productName": "마시는 시네트롤 자몽 다이어트",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "795e6740-0841-422b-8b26-6ba6602b6202",
+   "statementNo": "200400200082643",
+   "productName": "에버콜라겐 타임 시그니처",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "c5566a17-4eea-4e00-a41d-553152a6cd03",
+   "statementNo": "200400200142016",
+   "productName": "리셋핏 뉴시아 다이어트 티 모로오렌지",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "66b0ce2b-2c48-499f-8869-f503d972625a",
+   "statementNo": "200700170352532",
+   "productName": "보스웰리아 세라트린",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "dea0fc00-b7d6-47b6-8856-d297d4096c86",
+   "statementNo": "20180012174315",
+   "productName": "이너케어 우먼크랜베리유산균",
+   "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "11ae0a53-7ca2-4bcd-8de6-1b41483379fe",
+   "statementNo": "20040015094224",
+   "productName": "관절엔 글루코사민 MSM 비타민D",
+   "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "3c887a09-d74a-4ff7-8ac1-f03dcc78f839",
+   "statementNo": "200700170351898",
+   "productName": "비타포뮬러 프리프로바이오틱스",
+   "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "85ba07e4-6dbd-4f8b-a270-99a6ffed4350",
+   "statementNo": "200700170353000",
+   "productName": "탄탄 슬리밍 C3G 다이어트 플러스",
+   "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "ce760999-9f45-4009-9ee7-eeddf53ba7ea",
+   "statementNo": "20110017019145",
+   "productName": "아침엔 유산균 키즈",
+   "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "6f6402e8-7e90-4812-9601-ba373c3d4772",
+   "statementNo": "20040015039106",
+   "productName": "아이사랑비타민",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "df477265-6d3d-4da8-b832-b8a82fc352d8",
+   "statementNo": "200400200061418",
+   "productName": "촉촉한 나",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "8f648302-6386-48e8-aa61-13b8208e1c55",
+   "statementNo": "200400200201065",
+   "productName": "쿠프 데일리 와이케어 유산균",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "02a7a5b7-63f8-4a35-8941-befa6f85b051",
+   "statementNo": "20040020020739",
+   "productName": "프로바이오 생유산균 골드",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "eba3103d-b59b-485d-abeb-412b76865c28",
+   "statementNo": "20130020008443",
+   "productName": "리포좀 비타민C 블랙",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "b49ade60-6c0b-400b-9c7b-e17e7daf7327",
+   "statementNo": "2018000312526",
+   "productName": "프로게이너 닭가슴살 쉐이크",
+   "changeClass": "HUMAN_REVIEW_REQUIRED",
+   "pattern": "UNLABELED_ONLY",
+   "autoEligible": false,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "390dcebc-459f-438d-b229-f9266a52a70a",
+   "statementNo": "20040017021897",
+   "productName": "고려홍삼정타브렛 ",
+   "changeClass": "UNCHANGED",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "1e0c7369-722b-4ab4-a89d-430aae0f3eb8",
+   "statementNo": "200400200141808",
+   "productName": "SCZ 바나바잎추출물 츄어블",
+   "changeClass": "UNCHANGED",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "5ec6e31a-a768-4a1e-98ee-7549f24bfa2b",
+   "statementNo": "200700170352877",
+   "productName": "닥터피엔티 캄 슬립",
+   "changeClass": "UNCHANGED",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  },
+  {
+   "candidateId": "a847114e-fc82-4e1f-b2c3-d07d168f37cc",
+   "statementNo": "201600100025",
+   "productName": "메모리365 VIVI",
+   "changeClass": "UNCHANGED",
+   "pattern": "LABELED_ONLY",
+   "autoEligible": true,
+   "status": "CREATE"
+  }
+ ],
+ "computedStyleExpectation": {
+  "430": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "28px 22px 24px",
+   "sd-badge.border-radius": "999px"
+  },
+  "820": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "40px 34px 32px",
+   "sd-badge.border-radius": "999px"
+  },
+  "1280": {
+   "sd-card.max-width": "860px",
+   "sd-card.border-radius": "20px",
+   "sd-hero.padding": "40px 34px 32px",
+   "sd-badge.border-radius": "999px"
+  }
+ },
+ "computedStyleNote": "sd-hero padding 은 @container (min-width:640px) 규칙에 따라 카드 인라인 폭 기준으로 전환된다. 430px 뷰포트에서는 기본값, 820/1280px 에서는 확대값이 정상이다.",
+ "perWidth": [
+  {
+   "width": 430,
+   "samples": [
+    {
+     "idx": 0,
+     "statementNo": "200400150831397",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "statementNo": "200400170061930",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "statementNo": "20040020006683",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "statementNo": "2006001532625",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "statementNo": "20110020099111",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "statementNo": "2018001231060",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "statementNo": "20040015039130",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "statementNo": "200400151101062",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 14,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "statementNo": "200400200022487",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "statementNo": "200400200023814",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "statementNo": "20040020019413",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "statementNo": "200600200033084",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "statementNo": "2015000612728",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "statementNo": "2020001626832",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "statementNo": "200400150831423",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "statementNo": "20040017006824",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "statementNo": "200400200082643",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "statementNo": "200400200142016",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "statementNo": "200700170352532",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "statementNo": "20180012174315",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "statementNo": "20040015094224",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "statementNo": "200700170351898",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "statementNo": "200700170353000",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "statementNo": "20110017019145",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "statementNo": "20040015039106",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "statementNo": "200400200061418",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 6,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "statementNo": "200400200201065",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "statementNo": "20040020020739",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "statementNo": "20130020008443",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "statementNo": "2018000312526",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 4,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "statementNo": "20040017021897",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "statementNo": "200400200141808",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "statementNo": "200700170352877",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "statementNo": "201600100025",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "28px 22px 24px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 402
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    }
+   ]
+  },
+  {
+   "width": 820,
+   "samples": [
+    {
+     "idx": 0,
+     "statementNo": "200400150831397",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "statementNo": "200400170061930",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "statementNo": "20040020006683",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "statementNo": "2006001532625",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "statementNo": "20110020099111",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "statementNo": "2018001231060",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "statementNo": "20040015039130",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "statementNo": "200400151101062",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 14,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "statementNo": "200400200022487",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "statementNo": "200400200023814",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "statementNo": "20040020019413",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "statementNo": "200600200033084",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "statementNo": "2015000612728",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "statementNo": "2020001626832",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "statementNo": "200400150831423",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "statementNo": "20040017006824",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "statementNo": "200400200082643",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "statementNo": "200400200142016",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "statementNo": "200700170352532",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "statementNo": "20180012174315",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "statementNo": "20040015094224",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "statementNo": "200700170351898",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "statementNo": "200700170353000",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "statementNo": "20110017019145",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "statementNo": "20040015039106",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "statementNo": "200400200061418",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 6,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "statementNo": "200400200201065",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "statementNo": "20040020020739",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "statementNo": "20130020008443",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "statementNo": "2018000312526",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 4,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "statementNo": "20040017021897",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "statementNo": "200400200141808",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "statementNo": "200700170352877",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "statementNo": "201600100025",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 792
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    }
+   ]
+  },
+  {
+   "width": 1280,
+   "samples": [
+    {
+     "idx": 0,
+     "statementNo": "200400150831397",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 1,
+     "statementNo": "200400170061930",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 2,
+     "statementNo": "20040020006683",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 3,
+     "statementNo": "2006001532625",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 4,
+     "statementNo": "20110020099111",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 5,
+     "statementNo": "2018001231060",
+     "changeClass": "SAFE_FUNCTION_RESTORE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 6,
+     "statementNo": "20040015039130",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 7,
+     "statementNo": "200400151101062",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 14,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 8,
+     "statementNo": "200400200022487",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 9,
+     "statementNo": "200400200023814",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 10,
+     "statementNo": "20040020019413",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 11,
+     "statementNo": "200600200033084",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 12,
+     "statementNo": "2015000612728",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 13,
+     "statementNo": "2020001626832",
+     "changeClass": "SAFE_SEGMENTATION_REPAIR",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 14,
+     "statementNo": "200400150831423",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 15,
+     "statementNo": "20040017006824",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 1,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 16,
+     "statementNo": "200400200082643",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 17,
+     "statementNo": "200400200142016",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 18,
+     "statementNo": "200700170352532",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 19,
+     "statementNo": "20180012174315",
+     "changeClass": "SAFE_ENGLISH_PARALLEL_EXCLUSION",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 20,
+     "statementNo": "20040015094224",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 21,
+     "statementNo": "200700170351898",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 22,
+     "statementNo": "200700170353000",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 23,
+     "statementNo": "20110017019145",
+     "changeClass": "NON_FUNCTIONAL_ONLY_CHANGE",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 24,
+     "statementNo": "20040015039106",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 2,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 25,
+     "statementNo": "200400200061418",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 6,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 26,
+     "statementNo": "200400200201065",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 27,
+     "statementNo": "20040020020739",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 7,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 28,
+     "statementNo": "20130020008443",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 3,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 29,
+     "statementNo": "2018000312526",
+     "changeClass": "HUMAN_REVIEW_REQUIRED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 4,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 30,
+     "statementNo": "20040017021897",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 31,
+     "statementNo": "200400200141808",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 32,
+     "statementNo": "200700170352877",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    },
+    {
+     "idx": 33,
+     "statementNo": "201600100025",
+     "changeClass": "UNCHANGED",
+     "present": {
+      "sdCard": true,
+      "sdHero": true,
+      "sdBadge": true,
+      "sdFoot": true,
+      "h1": true
+     },
+     "computed": {
+      "sd-card.max-width": "860px",
+      "sd-card.border-radius": "20px",
+      "sd-hero.padding": "40px 34px 32px",
+      "sd-badge.border-radius": "999px"
+     },
+     "overflow": {
+      "cardScrollVsClient": 0,
+      "rootScrollVsClient": 0,
+      "cardWidthPx": 860
+     },
+     "whyItemCount": 0,
+     "whyItemsEmpty": 0,
+     "rawTagLeak": false
+    }
+   ]
+  }
+ ],
+ "violations": [],
+ "verdict": "PASS",
+ "renderFailureCount": 0
+}

@@ -1,0 +1,62 @@
+{
+ "generatedAt": "2026-07-30T03:07:17.707Z",
+ "distinctAbbrev": 4,
+ "items": [
+  {
+   "abbrev": "L.",
+   "count": 58,
+   "topFollowers": [
+    {
+     "word": "plantarum",
+     "count": 41
+    },
+    {
+     "word": "curvatus",
+     "count": 16
+    },
+    {
+     "word": "mucosae",
+     "count": 1
+    }
+   ],
+   "distinctFollowers": 3
+  },
+  {
+   "abbrev": "B.",
+   "count": 3,
+   "topFollowers": [
+    {
+     "word": "longum",
+     "count": 2
+    },
+    {
+     "word": "breve",
+     "count": 1
+    }
+   ],
+   "distinctFollowers": 2
+  },
+  {
+   "abbrev": "R.",
+   "count": 2,
+   "topFollowers": [
+    {
+     "word": "extract",
+     "count": 2
+    }
+   ],
+   "distinctFollowers": 1
+  },
+  {
+   "abbrev": "P.",
+   "count": 1,
+   "topFollowers": [
+    {
+     "word": "hepiali",
+     "count": 1
+    }
+   ],
+   "distinctFollowers": 1
+  }
+ ]
+}

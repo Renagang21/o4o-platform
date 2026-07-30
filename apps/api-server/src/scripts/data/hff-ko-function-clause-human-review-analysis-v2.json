@@ -1,0 +1,68 @@
+{
+ "generatedAt": "2026-07-30T04:14:59.036Z",
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-NORMALIZATION-AND-BACKFILL-TARGET-REBASE-V2",
+ "contract": "§16/§26-C 사람 검토 대상 분석 + §19·§20 V1 대조.",
+ "humanReviewTotal": 3652,
+ "byBucket": {
+  "SKIPPED_EXISTING": 844,
+  "CREATED": 2808
+ },
+ "byChangeClass": {
+  "HUMAN_REVIEW_REQUIRED": 3652
+ },
+ "reasonTally": {
+  "HUMAN_REVIEW_REQUIRED": 3652,
+  "UNRESOLVED_SEGMENT_PRESENT": 2729,
+  "LABEL_ISSUE:UNCLOSED_BRACKET": 33,
+  "ENGLISH_ONLY_CLAUSE": 252,
+  "LABEL_ISSUE:ORPHAN_CLOSE_BRACKET": 10,
+  "LABEL_ISSUE:ENGLISH_CLAIM_IN_BRACKET": 2,
+  "SOURCE_LINE_BREAK_FRAGMENTED": 2
+ },
+ "recommendedActionTally": {
+  "MANUAL_CLASSIFICATION_CONFIRMATION": 923,
+  "MANUAL_SEGMENT_CONFIRMATION": 2729
+ },
+ "v1Reconciliation": {
+  "note": "§20 — V2 결과를 V1 수치에 맞추지 않는다. 차이의 원인만 기록한다.",
+  "v1Baseline": {
+   "omissionProducts": 118,
+   "v1MixedRestored": 98,
+   "v1CreatedChanged": 227,
+   "v1SkippedExistingChanged": 54,
+   "v1Population": 281,
+   "v1NeedsHumanReview": 124
+  },
+  "v1Omission118Count": 118,
+  "v1ChangedCount": 227,
+  "v2ChangedTotal": 11372,
+  "v2ChangedAmongV1Omission118": 116,
+  "v2SafeAmongV1Omission118": 98,
+  "v1ChangedNotChangedInV2Count": 0,
+  "v1ChangedNotChangedInV2Sample": [],
+  "v1Omission118NotChangedInV2": [
+   {
+    "candidateId": "8f79ff1d-28c7-47ad-b3fc-c2d02ddef308",
+    "statementNo": "200400170211365",
+    "productName": "니아르 포스콜린 에스케어",
+    "v1PatternType": "LABELED_ONLY",
+    "v2Verdict": "UNCHANGED — BEFORE 렌더에 공식 기능성 절 전량 존재. 복원 대상 없음."
+   },
+   {
+    "candidateId": "755d2333-61fb-438c-ac6f-df7c7bbb2a4d",
+    "statementNo": "2019001634047",
+    "productName": "블랙진생 콜레스테롤케어",
+    "v1PatternType": "UNLABELED_ONLY",
+    "v2Verdict": "UNCHANGED — BEFORE 렌더에 공식 기능성 절 전량 존재. 복원 대상 없음."
+   }
+  ],
+  "explanation": [
+   "V1 은 혼합형(MIXED_LABELED_AND_UNLABELED) 무라벨 블록 누락 1개 원인만 대상으로 했고 모집단도 그 원인에 해당하는 281건이었다.",
+   "V2 는 §1 8개 작업 항목(긴 라벨·균종 약어·마커·영문 병기·비기능 라인·감사 인공물)을 전량 41,261건에 적용했으므로 변경 제품 수가 V1 보다 크게 늘어나는 것이 정상이다(V1 227 → V2 11,372).",
+   "V1 의 118건 누락 집계는 혼합형 패턴에 한정된 과소 집계였다(§30 — 중단 사유 아님).",
+   "V1 이 변경 대상으로 본 227건은 전량 V2 에서도 변경 대상이다(v1ChangedNotChangedInV2Count = 0). 즉 V2 정규화가 V1 의 개선을 축소하지 않았다.",
+   "V1 118 누락 목록 중 2건(200400170211365 니아르 포스콜린 에스케어, 2019001634047 블랙진생 콜레스테롤케어)은 V2 에서 무변경이다. 두 건 모두 현재 BEFORE 렌더에 원문 MAIN_FNCTN 의 공식 기능성 절이 전부 이미 포함되어 있어 복원할 절이 없다. V1 감사 비교기의 선행 `]`·`.` 인공물(§1-⑥)로 인한 과대 검출이며, 공식 한국어 기능성 절 삭제가 아니다(§21 LOST 게이트 전량 0)."
+  ]
+ },
+ "dbCanonicalRowsRead": 11372
+}

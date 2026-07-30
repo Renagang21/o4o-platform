@@ -1,0 +1,95 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FUNCTION-CLAUSE-SEGMENTER-NORMALIZATION-AND-BACKFILL-TARGET-REBASE-V2",
+ "contract": "§29 — DB write 0 증빙. BEFORE == AFTER / INSERT 0 / UPDATE 0 / DELETE 0. read-only 해제 없음.",
+ "population": 41261,
+ "BEFORE": {
+  "measuredAt": "2026-07-30T04:21:28.115Z",
+  "transactionReadOnly": "on",
+  "m1_storeKoCanonicalTotal": 63321,
+  "m2_hffCanonicalCount": 40913,
+  "m3_hffCanonicalContentSetHash": "fe156c6c164b26382c959794c963b55b",
+  "m4_candidateTotal": 41261,
+  "m4_candidateStatusCounts": {
+   "approved_new_master": 40913,
+   "pending": 348
+  },
+  "m5_productMasterLinked": 40913,
+  "m5_distinctMasters": 40913,
+  "m6_agent9Queue": {
+   "rows": 348,
+   "distinctCandidateIds": 348,
+   "priorities": [
+    1,
+    2,
+    3
+   ],
+   "standardizedReasons": [
+    "HINT_UNDER_EXTRACTION",
+    "NO_FUNCTIONAL_DATA",
+    "NO_INTAKE_DATA"
+   ],
+   "originalHoldReasons": 3,
+   "agent9Statuses": [
+    "PENDING"
+   ],
+   "queueFileSha256": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11",
+   "dbCandidateStatusCounts": {
+    "pending": 348
+   }
+  },
+  "m7_maxUpdatedAt": {
+   "hffCanonical": "2026-07-29T04:59:37.830Z",
+   "candidates": "2026-07-29T04:59:37.830Z"
+  }
+ },
+ "AFTER": {
+  "measuredAt": "2026-07-30T04:24:40.389Z",
+  "transactionReadOnly": "on",
+  "m1_storeKoCanonicalTotal": 63321,
+  "m2_hffCanonicalCount": 40913,
+  "m3_hffCanonicalContentSetHash": "fe156c6c164b26382c959794c963b55b",
+  "m4_candidateTotal": 41261,
+  "m4_candidateStatusCounts": {
+   "approved_new_master": 40913,
+   "pending": 348
+  },
+  "m5_productMasterLinked": 40913,
+  "m5_distinctMasters": 40913,
+  "m6_agent9Queue": {
+   "rows": 348,
+   "distinctCandidateIds": 348,
+   "priorities": [
+    1,
+    2,
+    3
+   ],
+   "standardizedReasons": [
+    "HINT_UNDER_EXTRACTION",
+    "NO_FUNCTIONAL_DATA",
+    "NO_INTAKE_DATA"
+   ],
+   "originalHoldReasons": 3,
+   "agent9Statuses": [
+    "PENDING"
+   ],
+   "queueFileSha256": "10e2c11ceb69422289c938dbaab8c5932a0682e0f8bb1fe2a15f008fc26dcc11",
+   "dbCandidateStatusCounts": {
+    "pending": 348
+   }
+  },
+  "m7_maxUpdatedAt": {
+   "hffCanonical": "2026-07-29T04:59:37.830Z",
+   "candidates": "2026-07-29T04:59:37.830Z"
+  }
+ },
+ "comparison": {
+  "diff": [],
+  "dbWrite": {
+   "INSERT": 0,
+   "UPDATE": 0,
+   "DELETE": 0
+  },
+  "verdict": "DB_UNCHANGED",
+  "note": "두 시점 모두 read-only 트랜잭션에서 측정했다. 이 WO 의 모든 세션은 SELECT 전용이며 canonical INSERT·UPDATE·DELETE 를 수행하지 않았다."
+ }
+}

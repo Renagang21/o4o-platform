@@ -1,0 +1,1254 @@
+{
+ "generatedAt": "2026-07-30T04:18:44.228Z",
+ "total": 23,
+ "passed": 23,
+ "failed": 0,
+ "zeroChecks": {
+  "OFFICIAL_KO_CLAUSE_DELETED": 0,
+  "FABRICATED_CLAUSE": 0,
+  "LABEL_RENDERED_AS_CLAUSE": 0,
+  "SPECIES_ABBREV_MISSPLIT": 0,
+  "ENGLISH_IN_KO_STORE_ITEMS": 0,
+  "NON_FUNCTION_AREA_CHANGED": 0,
+  "CROSS_PRODUCT_CONTAMINATION": 0,
+  "OFFICIAL_REPETITION_DEDUPED": 0,
+  "RENDER_FAILURE": 0,
+  "UNRESOLVED_AUTO_SAVED": 0
+ },
+ "fixtures": [
+  {
+   "id": "F01",
+   "why": "무라벨 ① 마커 기본",
+   "mainFunctionSource": "①면역력 증진에 도움을 줄 수 있음②피로개선에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 2,
+    "labels": 0,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "면역력 증진에 도움을 줄 수 있음",
+    "피로개선에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "면역력 증진에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "피로개선에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F02",
+   "why": "라벨 1개 + ①~⑤ (실측 홍삼제품)",
+   "mainFunctionSource": "[홍삼제품]①면역력 증진에 도움을 줄 수 있음②피로개선에 도움을 줄 수 있음③혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음④기억력 개선에 도움을 줄 수 있음⑤항산화에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "LABELED_ONLY",
+    "items": 5,
+    "labels": 1,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 1,
+   "storeItems": [
+    "면역력 증진에 도움을 줄 수 있음",
+    "피로개선에 도움을 줄 수 있음",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음",
+    "기억력 개선에 도움을 줄 수 있음",
+    "항산화에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "홍삼제품",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "면역력 증진에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "피로개선에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "기억력 개선에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "항산화에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F03",
+   "why": "조건 대괄호(라벨 아님) + (가)(나) 마커 — 실측 MIXED 218 대표",
+   "mainFunctionSource": "(가) 면역력 증진·피로개선·뼈 건강에 도움을 줄 수 있음\n(나) 간 건강에 도움을 줄 수 있음[1) (2) (다)의 제조방법에 한함]",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 2,
+    "labels": 0,
+    "auto": true,
+    "labelIssue": "NOT_AT_SEGMENT_START"
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "면역력 증진·피로개선·뼈 건강에 도움을 줄 수 있음",
+    "간 건강에 도움을 줄 수 있음[1) (2) (다)의 제조방법에 한함]"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [
+    {
+     "label": "1) (2) (다)의 제조방법에 한함",
+     "reason": "NOT_AT_SEGMENT_START"
+    }
+   ],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "면역력 증진·피로개선·뼈 건강에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "간 건강에 도움을 줄 수 있음[1) (2) (다)의 제조방법에 한함]",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F04",
+   "why": "68자 긴 라벨 인식(상한 미변경) — 실측 최장",
+   "mainFunctionSource": "[L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)]\n(가) 체지방 감소에 도움을 줄 수 있음\n(나) 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "LABELED_ONLY",
+    "items": 2,
+    "labels": 1,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 1,
+   "storeItems": [
+    "체지방 감소에 도움을 줄 수 있음",
+    "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "L. curvatus HY7601와 L. plantarum KY1032의 프로바이오틱스 복합물(개별인정형 제2019-4호)",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "체지방 감소에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F05",
+   "why": "본문 내 균종 약어 period 오분할 방지",
+   "mainFunctionSource": "[프로바이오틱스]\nL. plantarum 및 B. longum 의 유산균 증식에 도움을 줄 수 있음. 배변활동 원활에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "LABELED_ONLY",
+    "items": 2,
+    "labels": 1,
+    "auto": true,
+    "mustContain": [
+     "L. plantarum 및 B. longum 의 유산균 증식에 도움을 줄 수 있음."
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 1,
+   "storeItems": [
+    "L. plantarum 및 B. longum 의 유산균 증식에 도움을 줄 수 있음.",
+    "배변활동 원활에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "프로바이오틱스",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "L. plantarum 및 B. longum 의 유산균 증식에 도움을 줄 수 있음.",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "배변활동 원활에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F06",
+   "why": "(국문)/(영문) 인라인 병기 — ko 만 저장",
+   "mainFunctionSource": "(국문) 체지방 감소에 도움을 줄 수 있음\n(영문) May help to reduce body fat",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 1,
+    "labels": 0,
+    "auto": true,
+    "english": 1,
+    "mustEqual": [
+     "체지방 감소에 도움을 줄 수 있음"
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "체지방 감소에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [
+    "May help to reduce body fat"
+   ],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "체지방 감소에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to reduce body fat",
+     "note": "(영문) 섹션 병기"
+    }
+   ]
+  },
+  {
+   "id": "F07",
+   "why": "(국문)/(영문) 섹션형 다줄 병기",
+   "mainFunctionSource": "(국문)\n -자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n -피부보습에 도움을 줄 수 있음\n(영문)\n  -May help to maintain skin health from skin damage by UV radiation\n  -May help to maintain skin moisturizing",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 2,
+    "labels": 0,
+    "auto": true,
+    "english": 2
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음",
+    "피부보습에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [
+    "May help to maintain skin health from skin damage by UV radiation",
+    "May help to maintain skin moisturizing"
+   ],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "NOTICE_OR_METADATA",
+     "confidence": "HIGH",
+     "text": "(국문)",
+     "note": "(국문) 섹션 시작"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "피부보습에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "NOTICE_OR_METADATA",
+     "confidence": "HIGH",
+     "text": "(영문)",
+     "note": "(영문) 섹션 시작"
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to maintain skin health from skin damage by UV radiation",
+     "note": "(영문) 섹션 병기"
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to maintain skin moisturizing",
+     "note": "(영문) 섹션 병기"
+    }
+   ]
+  },
+  {
+   "id": "F08",
+   "why": "(1)(2)(3) 마커 + 섹션형 병기 — 실측 보에센판두라",
+   "mainFunctionSource": "(국문)\n(1) 자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음\n(2) 체지방 감소에 도움을 줄 수 있음\n(3) 피부보습에 도움을 줄 수 있음\n(영문)\n(1) May help to maintain skin health from skin damage by UV radiation\n(2) May help to reduce body fat\n(3) May help to maintain skin moisturizing",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 3,
+    "labels": 0,
+    "auto": true,
+    "english": 3
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음",
+    "체지방 감소에 도움을 줄 수 있음",
+    "피부보습에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [
+    "May help to maintain skin health from skin damage by UV radiation",
+    "May help to reduce body fat",
+    "May help to maintain skin moisturizing"
+   ],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "NOTICE_OR_METADATA",
+     "confidence": "HIGH",
+     "text": "(국문)",
+     "note": "(국문) 섹션 시작"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "체지방 감소에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "피부보습에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "NOTICE_OR_METADATA",
+     "confidence": "HIGH",
+     "text": "(영문)",
+     "note": "(영문) 섹션 시작"
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to maintain skin health from skin damage by UV radiation",
+     "note": "(영문) 섹션 병기"
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to reduce body fat",
+     "note": "(영문) 섹션 병기"
+    },
+    {
+     "kind": "ENGLISH_PARALLEL",
+     "confidence": "HIGH",
+     "text": "May help to maintain skin moisturizing",
+     "note": "(영문) 섹션 병기"
+    }
+   ]
+  },
+  {
+   "id": "F09",
+   "why": "불완전 대괄호 — 라벨 추정 금지 + 자동 부적격",
+   "mainFunctionSource": "[프로바이오틱스 제품①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "labels": 0,
+    "auto": false,
+    "labelIssue": "UNCLOSED_BRACKET"
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+    "배변활동 원활에 도움을 줄 수 있음",
+    "장건강에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)",
+     "text": "[프로바이오틱스 제품"
+    }
+   ],
+   "labelIssues": [
+    {
+     "label": null,
+     "reason": "UNCLOSED_BRACKET"
+    }
+   ],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "text": "[프로바이오틱스 제품",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "배변활동 원활에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "장건강에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F10",
+   "why": "불완전 대괄호 2 — 실측 솔빛C",
+   "mainFunctionSource": "[비타민C (가) 결합조직 형성과 기능유지에 필요(나) 철의 흡수에 필요(다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "labels": 0,
+    "auto": false,
+    "labelIssue": "UNCLOSED_BRACKET"
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "결합조직 형성과 기능유지에 필요",
+    "철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)",
+     "text": "[비타민C"
+    }
+   ],
+   "labelIssues": [
+    {
+     "label": null,
+     "reason": "UNCLOSED_BRACKET"
+    }
+   ],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "text": "[비타민C",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "결합조직 형성과 기능유지에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "철의 흡수에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F11",
+   "why": "같은 줄 라벨 + 마침표 뒤 (나) 분할 + 잔여 대괄호",
+   "mainFunctionSource": "[루테인지아잔틴복합추출물(제2018-4호)] (가)노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음.(나) 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음[\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "expect": {
+    "labels": 2,
+    "items": 3,
+    "auto": false,
+    "labelIssue": "UNCLOSED_BRACKET"
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 2,
+   "storeItems": [
+    "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+    "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음[",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "MEDIUM",
+     "note": "불완전 대괄호 잔존",
+     "text": "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음["
+    }
+   ],
+   "labelIssues": [
+    {
+     "label": null,
+     "reason": "UNCLOSED_BRACKET"
+    }
+   ],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "루테인지아잔틴복합추출물(제2018-4호)",
+     "note": null
+    },
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "비타민E",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "MEDIUM",
+     "text": "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음[",
+     "note": "불완전 대괄호 잔존"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F12",
+   "why": "라벨 없는 원료명 헤더 + 가) 마커 — 실측 비타V100",
+   "mainFunctionSource": "엽산\n(가) 세포와 혈액생성에 필요\n(나) 태아 신경관의 정상 발달에 필요\n\n철\n가) 체내 산소운반과 혈액생성에 필요\n(나) 에너지 생성에 필요",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "labels": 0,
+    "items": 4,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "세포와 혈액생성에 필요",
+    "태아 신경관의 정상 발달에 필요",
+    "체내 산소운반과 혈액생성에 필요",
+    "에너지 생성에 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "HIGH",
+     "text": "엽산",
+     "note": "4자 미만 단편(기존 동작과 동일하게 미저장)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "세포와 혈액생성에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "태아 신경관의 정상 발달에 필요",
+     "note": null
+    },
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "HIGH",
+     "text": "철",
+     "note": "4자 미만 단편(기존 동작과 동일하게 미저장)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "체내 산소운반과 혈액생성에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "에너지 생성에 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F13",
+   "why": "숫자 원료 열거 + (가) 마커 — 실측 데이빗",
+   "mainFunctionSource": "1. EPA 및 DHA 함유 유지\n(가)혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음\n(나)건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음 \n\n2.마리골드꽃추출물\n노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "labels": 0,
+    "items": 4,
+    "auto": false
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "EPA 및 DHA 함유 유지",
+    "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+    "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+    "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)",
+     "text": "마리골드꽃추출물"
+    }
+   ],
+   "labelIssues": [],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "EPA 및 DHA 함유 유지",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "MEDIUM",
+     "text": "마리골드꽃추출물",
+     "note": "원료명·제형명 단독(라벨 없는 헤더 추정)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F14",
+   "why": "중간점은 절 구분자로 쓰지 않는다",
+   "mainFunctionSource": "①면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 1,
+    "labels": 0,
+    "auto": true,
+    "mustEqual": [
+     "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음"
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F15",
+   "why": "공식 반복 자동 dedupe 금지",
+   "mainFunctionSource": "[아연]\n정상적인 면역기능에 필요\n[셀렌]\n정상적인 면역기능에 필요",
+   "expect": {
+    "labels": 2,
+    "items": 2,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 2,
+   "storeItems": [
+    "정상적인 면역기능에 필요",
+    "정상적인 면역기능에 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "아연",
+     "note": null
+    },
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "셀렌",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "정상적인 면역기능에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "정상적인 면역기능에 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F16",
+   "why": "별표 + 제형어는 기능성 절이 아니다",
+   "mainFunctionSource": "[밀크씨슬추출물]\n간 건강에 도움을 줄 수 있음\n*밀크씨슬 정제",
+   "expect": {
+    "labels": 1,
+    "items": 1,
+    "auto": true,
+    "form": 1
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 1,
+   "storeItems": [
+    "간 건강에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "밀크씨슬추출물",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "간 건강에 도움을 줄 수 있음",
+     "note": null
+    },
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "HIGH",
+     "text": "*밀크씨슬 정제",
+     "note": "별표 + 제형어"
+    }
+   ]
+  },
+  {
+   "id": "F17",
+   "why": "병기 근거 없는 영문 단독 → 자동 번역·삭제 금지, 사람 검토",
+   "mainFunctionSource": "[Vitamin D]\nMay help calcium absorption",
+   "expect": {
+    "labels": 1,
+    "items": 0,
+    "auto": false,
+    "review": 1
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "LABELED_ONLY",
+   "labels": 1,
+   "storeItems": [],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "ENGLISH_ONLY_REVIEW",
+     "confidence": "LOW",
+     "note": "영문 기능성 추정(병기 근거 없음)",
+     "text": "May help calcium absorption"
+    }
+   ],
+   "labelIssues": [],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "Vitamin D",
+     "note": null
+    },
+    {
+     "kind": "ENGLISH_ONLY_REVIEW",
+     "confidence": "LOW",
+     "text": "May help calcium absorption",
+     "note": "영문 기능성 추정(병기 근거 없음)"
+    }
+   ]
+  },
+  {
+   "id": "F18",
+   "why": "라벨 내부 영문 클레임은 라벨로 인식하지 않는다",
+   "mainFunctionSource": "[May help reduce body fat mass.(Other function claime 2 grade.)]\n체지방 감소에 도움을 줄 수 있음",
+   "expect": {
+    "labels": 0,
+    "auto": false,
+    "labelIssue": "ENGLISH_CLAIM_IN_BRACKET"
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "체지방 감소에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "ENGLISH_ONLY_REVIEW",
+     "confidence": "LOW",
+     "note": "영문 기능성 추정(병기 근거 없음)",
+     "text": "[May help reduce body fat mass.(Other function claime 2 grade.)]"
+    }
+   ],
+   "labelIssues": [
+    {
+     "label": "May help reduce body fat mass.(Other function claime 2 grade.)",
+     "reason": "ENGLISH_CLAIM_IN_BRACKET"
+    }
+   ],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "ENGLISH_ONLY_REVIEW",
+     "confidence": "LOW",
+     "text": "[May help reduce body fat mass.(Other function claime 2 grade.)]",
+     "note": "영문 기능성 추정(병기 근거 없음)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "체지방 감소에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F19",
+   "why": "⑯~⑳ 마커 인식(기존 ⑮ 상한 초과)",
+   "mainFunctionSource": "⑯철의 흡수에 필요⑰에너지 생성에 필요⑱신경발달에 필요⑲뼈 형성에 필요⑳유해산소로부터 세포를 보호하는데 필요",
+   "expect": {
+    "pattern": "UNLABELED_ONLY",
+    "items": 5,
+    "labels": 0,
+    "auto": true
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "철의 흡수에 필요",
+    "에너지 생성에 필요",
+    "신경발달에 필요",
+    "뼈 형성에 필요",
+    "유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "철의 흡수에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "에너지 생성에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "신경발달에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "뼈 형성에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "유해산소로부터 세포를 보호하는데 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F20",
+   "why": "기능성 근거 없는 원문 → 저장 대상 0 + fallback",
+   "mainFunctionSource": "해당사항",
+   "expect": {
+    "items": 0,
+    "auto": false
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "UNRESOLVED",
+     "confidence": "LOW",
+     "note": "기능성 서술 근거 부족",
+     "text": "해당사항"
+    }
+   ],
+   "labelIssues": [],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "UNRESOLVED",
+     "confidence": "LOW",
+     "text": "해당사항",
+     "note": "기능성 서술 근거 부족"
+    }
+   ]
+  },
+  {
+   "id": "F21",
+   "why": "대괄호 없는 `원료명 : 절` 표제 분리 — 실측 유산균 제품",
+   "mainFunctionSource": "과채유래유산균(L.plantarum CJLP133)(제2013-11호) : (국문) 장 건강에 도움을 줄 수 있음",
+   "expect": {
+    "items": 1,
+    "labels": 0,
+    "form": 1,
+    "auto": true,
+    "mustEqual": [
+     "장 건강에 도움을 줄 수 있음"
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "장 건강에 도움을 줄 수 있음"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FORM_OR_INGREDIENT",
+     "confidence": "HIGH",
+     "text": "과채유래유산균(L.plantarum CJLP133)(제2013-11호)",
+     "note": "원료 표제(콜론 구조)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "장 건강에 도움을 줄 수 있음",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F22",
+   "why": "여는 대괄호 유실 선행 라벨(`비타민C] …`) → 라벨 분리",
+   "mainFunctionSource": "비타민C] 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요\n[비타민E] 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "expect": {
+    "labels": 2,
+    "items": 2,
+    "auto": true,
+    "mustEqual": [
+     "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요"
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "labels": 2,
+   "storeItems": [
+    "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요",
+    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+   ],
+   "englishParallel": [],
+   "reviewItems": [],
+   "labelIssues": [
+    {
+     "label": null,
+     "reason": "ORPHAN_CLOSE_BRACKET"
+    }
+   ],
+   "autoEligible": true,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "비타민E",
+     "note": null
+    },
+    {
+     "kind": "LABEL",
+     "confidence": "HIGH",
+     "text": "비타민C",
+     "note": "라벨(여는 대괄호 유실)"
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "note": null
+    }
+   ]
+  },
+  {
+   "id": "F23",
+   "why": "원문 자체가 조사로 절단된 절 → 삭제하지 않고 저장 + 자동 부적격(§12)",
+   "mainFunctionSource": "①면역력 증진②피로회복③혈소판 응집 억제를 통한 혈액흐름에",
+   "expect": {
+    "items": 3,
+    "labels": 0,
+    "auto": false,
+    "mustEqual": [
+     "혈소판 응집 억제를 통한 혈액흐름에"
+    ]
+   },
+   "pass": true,
+   "errors": [],
+   "pattern": "UNLABELED_ONLY",
+   "labels": 0,
+   "storeItems": [
+    "면역력 증진",
+    "피로회복",
+    "혈소판 응집 억제를 통한 혈액흐름에"
+   ],
+   "englishParallel": [],
+   "reviewItems": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "LOW",
+     "note": "문장 절단 추정(조사 종결)",
+     "text": "혈소판 응집 억제를 통한 혈액흐름에"
+    }
+   ],
+   "labelIssues": [],
+   "autoEligible": false,
+   "beforeStatus": "CREATE",
+   "afterStatus": "CREATE",
+   "segments": [
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "면역력 증진",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "HIGH",
+     "text": "피로회복",
+     "note": null
+    },
+    {
+     "kind": "FUNCTION_KO",
+     "confidence": "LOW",
+     "text": "혈소판 응집 억제를 통한 혈액흐름에",
+     "note": "문장 절단 추정(조사 종결)"
+    }
+   ]
+  }
+ ]
+}

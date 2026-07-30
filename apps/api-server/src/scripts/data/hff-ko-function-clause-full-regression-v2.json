@@ -1,0 +1,60 @@
+{
+ "generatedAt": "2026-07-30T04:01:35.849Z",
+ "totalCandidates": 41261,
+ "productionStatusCounts": {
+  "HOLD_FOR_AGENT_9": 348,
+  "SKIPPED_EXISTING": 15839,
+  "CREATED": 25074
+ },
+ "changeClassCounts": {
+  "NON_RENDER_HOLD_NO_FUNCTIONAL_DATA": 29,
+  "UNCHANGED": 29537,
+  "HUMAN_REVIEW_REQUIRED": 3652,
+  "SAFE_SEGMENTATION_REPAIR": 6704,
+  "SAFE_FUNCTION_RESTORE": 69,
+  "SAFE_ENGLISH_PARALLEL_EXCLUSION": 830,
+  "NON_RENDER_HOLD_NO_INTAKE_DATA": 314,
+  "NON_FUNCTIONAL_ONLY_CHANGE": 117,
+  "NON_RENDER_HOLD_HINT_UNDER_EXTRACTION": 9
+ },
+ "changedTotal": 11372,
+ "statusMatrix": {
+  "HOLD->HOLD": 352,
+  "CREATE->CREATE": 40909
+ },
+ "gates": {
+  "RENDER_FAILURE": 0,
+  "UNEXPECTED_CHANGE": 0,
+  "NON_FUNC_AREA_BYTE_CHANGED": 0,
+  "SRV_USE_DRIFT": 0,
+  "INTAKE_HINT_DRIFT": 0,
+  "FOOTER_DRIFT": 0,
+  "PRODUCT_NAME_DRIFT": 0,
+  "CLASS_STRUCTURE_DRIFT": 0,
+  "CROSS_PRODUCT_CONTAMINATION": 0,
+  "FABRICATED_KO_CLAUSE": 0,
+  "OFFICIAL_KO_CLAUSE_DELETED": 0,
+  "OFFICIAL_REPETITION_DEDUPED": 0
+ },
+ "diagnostics": {
+  "SOURCE_LINE_BREAK_FRAGMENTED": 2
+ },
+ "diagnosticsNote": {
+  "SOURCE_LINE_BREAK_FRAGMENTED": "원문 단어 중간 개행(예: `…감소에 도` + 개행 + `움을 줌`)으로 동일 문구의 복본 1건이 FUNCTION_KO + UNRESOLVED 두 조각으로 남은 제품 수. 원문 텍스트는 segments 에 전량 보존되며 해당 제품은 HUMAN_REVIEW_REQUIRED 로 분류되어 자동 backfill 대상에서 제외된다. 기능성 절 자동 삭제(§21 OFFICIAL_REPETITION_DEDUPED)가 아니다. 단어 중간 결합 heuristic 은 오결합 위험이 커 도입하지 않았다."
+ },
+ "holdAnalyzed": 348,
+ "sets": {
+  "A_SAFE_BACKFILL_TARGET": 5269,
+  "B_HUMAN_REVIEW_REQUIRED": 2808,
+  "C_SKIPPED_EXISTING_BACKFILL_CANDIDATE": 3295,
+  "D_UNCHANGED": 29537
+ },
+ "v1Baseline": {
+  "omissionProducts": 118,
+  "v1MixedRestored": 98,
+  "v1CreatedChanged": 227,
+  "v1SkippedExistingChanged": 54,
+  "v1Population": 281,
+  "v1NeedsHumanReview": 124
+ }
+}
