@@ -436,6 +436,19 @@ export class NetureService {
     return this.offerService.updateDistribution(offerId, supplierId, userId, input);
   }
 
+  /**
+   * 승인 대상이 아닌 서비스 1개의 제공 시작/중지 (pharmacy-hub 등).
+   * WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
+   */
+  async setServiceDelivery(
+    offerId: string,
+    supplierId: string,
+    serviceKey: string,
+    input: { enabled: boolean; unitPrice?: number | null },
+  ) {
+    return this.offerService.setServiceDelivery(offerId, supplierId, serviceKey, input);
+  }
+
   // WO-NETURE-B2B-CONTENT-MANAGEMENT-V1
   async updateBusinessContent(
     offerId: string,

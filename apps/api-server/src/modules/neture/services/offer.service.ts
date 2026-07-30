@@ -14,7 +14,7 @@ import { ProductImportCommonService } from './product-import-common.service.js';
 import { OfferServiceApprovalService } from './offer-service-approval.service.js';
 import type { NetureCatalogService } from './catalog.service.js';
 import { OfferErrorCode } from '../constants/offer-error-code.js';
-import { filterApprovalEligibleServiceKeys } from '../constants/approval-service-keys.js';
+import { filterApprovalEligibleServiceKeys, isApprovalEligibleServiceKey } from '../constants/approval-service-keys.js';
 // WO-O4O-SUPPLIER-PRODUCT-REGISTER-BY-CATEGORY-STATUS-V1: 품목군 등록 가능 상태 gate
 import {
   SupplierRegulatedCategoryService,
@@ -1219,14 +1219,26 @@ export class NetureOfferService {
     if (offer.supplier_id !== supplierId) return { success: false, error: 'NOT_OWNED' };
 
     const currentKeys: string[] = offer.service_keys || [];
-    // 서비스 대상은 승인 대상 키(SSOT)만 허용
-    const nextKeys = input.serviceKeys !== undefined
+    // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1:
+    //   이 경로는 **승인 대상 키(SSOT) 3개만 책임진다**. 그 밖의 키
+    //   (pharmacy-hub / neture / glucoseview 등)는 다른 경로가 소유하므로 그대로 보존한다.
+    //
+    //   이전 구현은 nextKeys = filterApprovalEligibleServiceKeys(input.serviceKeys) 였다.
+    //   승인 대상이 아닌 키는 입력에 담겨 있든 없든 전부 탈락 → 공급자가 유통 화면을
+    //   한 번 저장하면 pharmacy-hub / neture / glucoseview 가 조용히 삭제되었다.
+    //
+    //   approval 생성·취소 diff 는 여전히 승인 대상 키에서만 계산하므로
+    //   기존 3개 서비스의 승인·listing 거동은 변하지 않는다.
+    const preservedKeys = currentKeys.filter((k) => !isApprovalEligibleServiceKey(k));
+    const currentEligible = filterApprovalEligibleServiceKeys(currentKeys);
+    const nextEligible = input.serviceKeys !== undefined
       ? filterApprovalEligibleServiceKeys(input.serviceKeys)
-      : currentKeys;
+      : currentEligible;
+    const nextKeys = Array.from(new Set([...nextEligible, ...preservedKeys]));
     const nextIsPublic = input.isPublic !== undefined ? !!input.isPublic : !!offer.is_public;
 
-    const added = nextKeys.filter((k) => !currentKeys.includes(k));
-    const removed = currentKeys.filter((k) => !nextKeys.includes(k));
+    const added = nextEligible.filter((k) => !currentEligible.includes(k));
+    const removed = currentEligible.filter((k) => !nextEligible.includes(k));
     const nextDist = deriveDistributionType(nextIsPublic, nextKeys);
 
     const approvalService = new OfferServiceApprovalService(AppDataSource);
@@ -1275,6 +1287,128 @@ export class NetureOfferService {
     } catch (error) {
       await queryRunner.rollbackTransaction();
       logger.error(`[NetureOfferService] updateDistribution failed for ${offerId}:`, error);
+      throw error;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  // ==================== 단일 서비스 제공 토글 (WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1) ====================
+
+  /**
+   * 특정 서비스 1개에 대한 제공 시작/중지 — `service_keys` 에서 그 키만 멱등 추가/제거한다.
+   *
+   * updateDistribution 과의 관계:
+   *   updateDistribution 은 **승인 대상 3키(glycopharm/kpa-society/k-cosmetics)** 를 책임진다.
+   *   승인 큐·listing 캐스케이드가 그 3키에만 존재하기 때문이다.
+   *   이 메서드는 **승인 대상이 아닌 키**(pharmacy-hub 등)를 담당한다 — 승인 레코드를
+   *   만들지 않고 즉시 제공을 시작/중지한다. 유통 관리 기능을 복제하지 않으려고
+   *   소유권 검증·distribution_type 파생·서비스별 가격을 모두 기존 규칙으로 재사용한다.
+   *
+   * 불변식:
+   *   - 다른 서비스 키는 절대 건드리지 않는다 (대상 키 1개만 add/remove).
+   *   - offer_service_approvals / organization_product_listings / product_approvals 미변경.
+   *   - ProductMaster · 공통 가격(price_general) 미변경.
+   *   - Offer 삭제 없음.
+   *
+   * 규제 상품 게이트: 대상 서비스가 `service_audience_policies.is_pharmacy_target_service`
+   *   가 아니면 규제 상품 연결을 거부한다 (createSupplierOffer / submitForApproval 와 동일 술어).
+   */
+  async setServiceDelivery(
+    offerId: string,
+    supplierId: string,
+    serviceKey: string,
+    input: { enabled: boolean; unitPrice?: number | null },
+  ): Promise<{ success: boolean; error?: string; message?: string; data?: Record<string, unknown> }> {
+    if (isApprovalEligibleServiceKey(serviceKey)) {
+      // 승인 대상 키는 승인 큐를 거쳐야 한다 — 이 경로로 우회시키지 않는다.
+      return { success: false, error: 'SERVICE_KEY_REQUIRES_APPROVAL_FLOW' };
+    }
+
+    const [row]: Array<{
+      id: string;
+      supplier_id: string;
+      is_public: boolean;
+      service_keys: string[] | null;
+      is_regulated: boolean | null;
+    }> = await AppDataSource.query(
+      `SELECT o.id, o.supplier_id, o.is_public, o.service_keys, pc.is_regulated
+         FROM supplier_product_offers o
+         JOIN product_masters pm ON pm.id = o.master_id
+         LEFT JOIN product_categories pc ON pc.id = pm.category_id
+        WHERE o.id = $1 AND o.deleted_at IS NULL`,
+      [offerId],
+    );
+    if (!row) return { success: false, error: 'OFFER_NOT_FOUND' };
+    if (row.supplier_id !== supplierId) return { success: false, error: 'NOT_OWNED' };
+
+    const currentKeys: string[] = row.service_keys || [];
+    const alreadyOn = currentKeys.includes(serviceKey);
+
+    if (input.enabled && !!row.is_regulated) {
+      const isPharmacyAudience = await new ServiceAudienceService(AppDataSource).getPharmacyAudienceResolver();
+      if (!isPharmacyAudience(serviceKey)) {
+        return {
+          success: false,
+          error: OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE,
+          message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
+        };
+      }
+    }
+
+    const nextKeys = input.enabled
+      ? (alreadyOn ? currentKeys : [...currentKeys, serviceKey])
+      : currentKeys.filter((k) => k !== serviceKey);
+    // distribution_type 은 (is_public, service_keys) 파생값이다. updateSupplierOffer 가
+    // 모든 공급자 편집에서 같은 규칙으로 재계산하므로, 여기서도 함께 맞춰 중간 불일치를 없앤다.
+    const nextDist = deriveDistributionType(!!row.is_public, nextKeys);
+
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    try {
+      await queryRunner.query(
+        `UPDATE supplier_product_offers
+            SET service_keys = $2::text[], distribution_type = $3, updated_at = NOW()
+          WHERE id = $1`,
+        [offerId, nextKeys, nextDist],
+      );
+
+      // 서비스별 공급가 — 값이 오면 upsert. 제공 중지 시 가격 행은 지우지 않는다
+      // (재개 시 이전 단가 보존. 노출은 service_keys 로만 결정되므로 잔존 행은 무해하다).
+      let priceApplied: number | null = null;
+      if (input.unitPrice !== undefined && input.unitPrice !== null) {
+        const price = Math.max(0, Math.trunc(Number(input.unitPrice)));
+        if (!Number.isFinite(price)) return { success: false, error: 'INVALID_UNIT_PRICE' };
+        await queryRunner.query(
+          `INSERT INTO offer_service_prices (offer_id, service_key, unit_price, created_at, updated_at)
+           VALUES ($1, $2, $3, NOW(), NOW())
+           ON CONFLICT (offer_id, service_key)
+           DO UPDATE SET unit_price = EXCLUDED.unit_price, updated_at = NOW()`,
+          [offerId, serviceKey, price],
+        );
+        priceApplied = price;
+      }
+
+      await queryRunner.commitTransaction();
+      logger.info(
+        `[NetureOfferService] setServiceDelivery offer ${offerId} ${serviceKey}=${input.enabled} dist=${nextDist} price=${priceApplied ?? 'unchanged'}`,
+      );
+      return {
+        success: true,
+        data: {
+          offerId,
+          serviceKey,
+          enabled: input.enabled,
+          changed: alreadyOn !== input.enabled,
+          serviceKeys: nextKeys,
+          distributionType: nextDist,
+          unitPrice: priceApplied,
+        },
+      };
+    } catch (error) {
+      await queryRunner.rollbackTransaction();
+      logger.error(`[NetureOfferService] setServiceDelivery failed for ${offerId}:`, error);
       throw error;
     } finally {
       await queryRunner.release();

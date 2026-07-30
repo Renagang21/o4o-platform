@@ -31,6 +31,11 @@ import { requireAuth } from '../../middleware/auth.middleware.js';
 import { requirePharmacyHubScope } from '../../middleware/pharmacy-hub-scope.middleware.js';
 import { PharmacyHubJoinController } from '../../controllers/pharmacy-hub/PharmacyHubJoinController.js';
 import { PharmacyHubMembershipConsoleController } from '../../controllers/pharmacy-hub/PharmacyHubMembershipConsoleController.js';
+// WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
+import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierProductController.js';
+import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
+import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
+import { AppDataSource } from '../../database/connection.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
@@ -144,6 +149,40 @@ export function createPharmacyHubRoutes(): Router {
     requirePharmacyHubScope(`${SERVICE_KEY}:supplier`),
     (_req, res) => res.json({ success: true, data: { scope: `${SERVICE_KEY}:supplier` } })
   );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 공급자 상품 제공 설정 (WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 §6-A)
+  //
+  //   자격 3중 (WO §4.2):
+  //     requireAuth
+  //     → requirePharmacyHubScope('pharmacy-hub:supplier')  membership active + 역할
+  //     → createRequireActiveSupplier                        Neture 공급자 원장 + ACTIVE
+  //   본인 소유 Offer 검증은 setServiceDelivery / 목록 WHERE supplier_id 에서 수행한다.
+  //
+  //   상품 등록·수정은 여기 없다 — 기존 Neture 공급자 원장이 담당한다 (§9).
+  // ───────────────────────────────────────────────────────────────────────────
+  const supplierProductGuards = [
+    requireAuth as any,
+    requirePharmacyHubScope(`${SERVICE_KEY}:supplier`),
+    createRequireActiveSupplier(AppDataSource) as any,
+  ];
+
+  router.get('/supplier/products', ...supplierProductGuards, PharmacyHubSupplierProductController.list);
+  router.patch(
+    '/supplier/products/:offerId/delivery',
+    ...supplierProductGuards,
+    PharmacyHubSupplierProductController.setDelivery,
+  );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 약국 경영자 상품 조회 (§6-D)
+  //   Pharmacy-Hub 제공 대상 + 공통 안전 게이트를 통과한 상품만 노출한다.
+  //   담기·주문·취급등록 액션은 이번 WO 범위 밖 (§9).
+  // ───────────────────────────────────────────────────────────────────────────
+  const storeOwnerGuards = [requireAuth as any, requirePharmacyHubScope(`${SERVICE_KEY}:store_owner`)];
+
+  router.get('/store-owner/products', ...storeOwnerGuards, PharmacyHubStoreProductController.list);
+  router.get('/store-owner/products/:offerId', ...storeOwnerGuards, PharmacyHubStoreProductController.detail);
 
   return router;
 }
