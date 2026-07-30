@@ -316,9 +316,79 @@ build PASS + 전수 링크 스크립트(데드링크 0 / legacy 경유 0)로 검
 
 > K-Cosmetics `/insights` 500 은 K-Cosmetics 정비 WO 에서 처리 (§범위 6 조사 결과 활용).
 
+## 8-A. 배포 후 브라우저 smoke (2026-07-30 · read-only)
+
+배포 대상 리비전 `kpa-society-web-01745-g6f` (`4d474418b` 반영, `2026-07-29T14:21Z`).
+계정 = 약국 경영자(`C 테스트 약국`). **DB write 0 · 저장 버튼 클릭 0.**
+
+### 8-A.1 breadcrumb 6곳 — **6/6 PASS**
+
+| 경로 | 최종 URL | redirect | 기대 그룹명 | 결과 |
+|---|---|:---:|---|:---:|
+| `/store/marketing/pop` | 동일 | 없음 | 약국 경영지원 | FOUND |
+| `/store/marketing/qr` | 동일 | 없음 | 약국 경영지원 | FOUND |
+| `/store/marketing/product-descriptions` | 동일 | 없음 | 약국 경영지원 | FOUND |
+| `/store/analytics/marketing` | 동일 | 없음 | 분석 | FOUND |
+| `/store/library/contents` | 동일 | 없음 | 약국 자료함 | FOUND |
+| `/store/library/resources` | 동일 | 없음 | 약국 자료함 | FOUND |
+
+사이드바 실측 계층(`매장 홈 · 약국 상품·거래 · 약국 경영지원 · 약국 자료함 · 디지털 사이니지 · 온라인 판매 · 분석 · 설정`)과 일치.
+
+### 8-A.2 canonical 링크 직접 진입 — **5/5 PASS (redirect 0)**
+
+| 경로 | 최종 URL | redirect | 렌더 |
+|---|---|:---:|---|
+| `/store/online-sales/settings` | 동일 | 없음 | OK |
+| `/store/commerce/products` | 동일 | 없음 | OK |
+| `/store/commerce/products/b2c` | 동일 | 없음 | OK |
+| `/store/marketing/signage/playlist` | 동일 | 없음 | OK |
+| `/store-hub/event-offers` | 동일 | 없음 | OK |
+
+`/store/commerce/products/b2c` 렌더 후 anchor 전수 검사에서 legacy 경로
+(`/store/channels`, `/store/products`, `/hub/event-offers`, `/event-offers`, `/store/marketing/signage`) **0건**.
+
+### 8-A.3 삭제한 4파일 관련 route — **PASS**
+
+방문한 11개 화면 전부 정상 렌더. `pageerror` 0건. JS 콘솔 error 는 아래 §8-A.5 의 API 403 3건뿐이며 모듈 로드 실패·`undefined` 참조는 없음.
+
+### 8-A.4 ServiceBanner '이벤트 보기' — **브라우저 검증 불가 (신규 발견)**
+
+`ServiceBanner.tsx` 의 `ExternalServiceSection` 은 **앱 전체에서 소비처 0** 이다
+(`ServiceBanner` 문자열이 `components/ServiceBanner.tsx` 와 `components/index.ts` 두 파일에만 존재).
+따라서 `/` 및 대시보드에 '이벤트 보기' 버튼이 렌더되지 않아 클릭 경로가 존재하지 않는다.
+
+- 코드 수정 자체는 정확하다 — `linkUrl="/store-hub/event-offers"`, 그리고 §8-A.2 에서 해당 canonical 경로가 redirect 없이 이벤트 목록으로 진입함을 확인했다.
+- 다만 이 배너는 **mount 되지 않는 dead component** 이므로 "화면에서 클릭해 확인"은 성립하지 않는다.
+- 판정: 링크 정합은 PASS(경로 검증으로 대체), 컴포넌트 자체의 은퇴/재연결은 이번 WO 범위 밖 → 후속 IA 항목으로 이관.
+
+### 8-A.5 부수 관찰 — 이번 WO 범위 밖
+
+`/store/marketing/signage/playlist` 에서 3건 403:
+
+```text
+403 GET /api/signage/kpa-society/schedules
+403 GET /api/signage/kpa-society/media?limit=200
+403 GET /api/signage/kpa-society/playlists?limit=100
+```
+
+- 원인은 해당 계정의 signage scope 부재(`requireSignageOperatorOrStore`)이며 **경로 변경과 무관**하다 (legacy 경로도 동일 화면·동일 endpoint).
+- 화면은 403 을 `플레이리스트가 없습니다` / `현재 적용된 스케줄이 없습니다` 로 표시 — **실패를 0건으로 위장**하는 load-error 계약 위반 패턴. Neture Load-Error 계약화 트랙과 동일 유형이므로 그 트랙 또는 signage 정비 WO 로 이관한다.
+
+### 8-A.6 판정
+
+```text
+breadcrumb 6곳            PASS
+canonical 링크 직접 진입   PASS (redirect 0 · legacy anchor 0)
+삭제 파일 route 런타임     PASS (pageerror 0)
+ServiceBanner 이벤트 보기  PASS(경로 검증) / 클릭 경로 부재 → 후속 IA
+=> KPA '내 매장' 정비 CLOSED
+```
+
+---
+
 ## 9. 잔여 항목
 
-1. 최종본(`7ddec3506`) 배포 후 KPA 브라우저 재확인 — 사이드바 이동·breadcrumb 표기·이벤트 배너 링크.
+1. ~~최종본(`7ddec3506`) 배포 후 KPA 브라우저 재확인~~ → **§8-A 완료 (2026-07-30)**.
 2. 후속 공용 WO 3건(§8).
 3. K-Cosmetics `/insights` 500 (범위 외).
 4. api-server `type-check` 의 `src/scripts/*` baseline 실패 — 해당 트랙에서 정리 필요.
@@ -329,4 +399,5 @@ build PASS + 전수 링크 스크립트(데드링크 0 / legacy 경유 0)로 검
 |-----|------|
 | `cba87a635` | 범위 축소 forward revert (범위 밖 전부 원복) |
 | `7ddec3506` | 범위 2 — KPA 메뉴·내비게이션 canonical 정합 |
-| (본 문서) | CHECK 작성 |
+| `4d474418b` | CHECK 작성 |
+| (본 커밋) | §8-A 배포 후 브라우저 smoke 기록 — KPA 정비 CLOSED |
