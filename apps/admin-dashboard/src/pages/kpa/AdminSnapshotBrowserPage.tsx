@@ -63,7 +63,9 @@ interface OrgItem {
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
-const SNAP_API = '/api/v1/kpa/admin/force-assets/snapshots';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const SNAP_API = '/kpa/admin/force-assets/snapshots';
 
 async function fetchSnapshots(params: {
   search: string;
@@ -80,7 +82,7 @@ async function fetchSnapshots(params: {
 }
 
 async function fetchOrgs(): Promise<OrgItem[]> {
-  const res = await authClient.api.get<{ success: boolean; data: OrgItem[] }>('/api/v1/kpa/organizations');
+  const res = await authClient.api.get<{ success: boolean; data: OrgItem[] }>('/kpa/organizations');
   return res.data.data ?? [];
 }
 

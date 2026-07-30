@@ -92,7 +92,9 @@ interface PreselectedSnapshot {
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
-const BASE = '/api/v1/kpa/admin/force-assets';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
+const BASE = '/kpa/admin/force-assets';
 
 async function fetchForceAssets(page: number, orgFilter?: string): Promise<{ items: ForceAssetItem[]; total: number; page: number; limit: number }> {
   const params: Record<string, any> = { page, limit: 20 };
@@ -112,7 +114,7 @@ async function fetchSnapshots(search: string, type: string): Promise<SnapshotIte
 }
 
 async function fetchOrgs(): Promise<OrgItem[]> {
-  const res = await authClient.api.get<{ success: boolean; data: OrgItem[] }>('/api/v1/kpa/organizations');
+  const res = await authClient.api.get<{ success: boolean; data: OrgItem[] }>('/kpa/organizations');
   return res.data.data ?? [];
 }
 
