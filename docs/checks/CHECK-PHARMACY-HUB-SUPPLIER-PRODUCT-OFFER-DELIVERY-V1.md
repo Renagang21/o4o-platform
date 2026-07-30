@@ -280,6 +280,17 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 | 17 | 약국 노출 게이트 결과 (SQL 실측) | ✅ 대상 1건만 반환 · 적용 단가 9,900 |
 | 18 | 타 서비스 오염 | ✅ `offer_service_approvals`=0 · OPL=20(불변) · `product_approvals`=0 |
 
+**브라우저 스모크** (배포된 Cloud Run, 공급자 계정, 실제 저장 수행):
+
+| 항목 | 결과 |
+|------|------|
+| `/supplier/products` 렌더 | ✅ 2행 표시 · 적용 단가 `9,900원`(서비스가) / `34,000원`(기본가 fallback) · 활성/비활성·제공 상태 구분 표시 |
+| 실제 저장 (제공 중지 → 재시작) | ✅ PATCH 200 ×2 · toast `"… 을(를) Pharmacy-Hub 에 제공 시작했습니다."` 표시 · 목록 즉시 반영 |
+| `/store-owner/products` (supplier 계정) | ✅ 403 → `"Pharmacy-Hub 약국 경영자 승인이 완료된 계정만 상품을 조회할 수 있습니다."` 안내 |
+| console error | 위 의도된 403 1건 외 **0건** |
+
+최종 상태: Offer A = 제공 중(`is_active=true`, 서비스 단가 9,900 유지), Offer B = 미제공·비활성.
+
 ### 8-3. 미검증 1건
 
 **약국 경영자 상품 조회의 HTTP 200 경로** — `pharmacy-hub:store_owner` 역할로 로그인 가능한 계정이 없다.
