@@ -57,7 +57,11 @@ interface NavigationApiResponse {
 export const useAdminMenu = () => {
   const { user } = useAuth();
   const { cptMenuItems, isLoading: cptLoading } = useDynamicCPTMenu();
-  const { isActive: isAppActive, isLoading: appStatusLoading } = useAppStatus();
+  const {
+    isActive: isAppActive,
+    isLoading: appStatusLoading,
+    isUnavailable: appStatusUnavailable,
+  } = useAppStatus();
 
   const [dynamicMenuItems, setDynamicMenuItems] = useState<MenuItem[] | null>(null);
   const [apiLoading, setApiLoading] = useState(true);
@@ -148,8 +152,17 @@ export const useAdminMenu = () => {
         return item;
       }
 
-      // Check app status - if menu has appId, only show if app is active
-      if ((item as any).appId && !isAppActive((item as any).appId)) {
+      // Check app status - if menu has appId, only hide when the app is genuinely inactive.
+      // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1:
+      //   로딩 중이거나 상태 확인 실패(appStatusUnavailable)일 때는 비활성으로 확정하지 않는다.
+      //   과거에는 /admin/apps 403 → apps=[] → 모든 appId 메뉴가 사라졌다.
+      //   메뉴 노출은 인가 경계가 아니며, 실제 권한 검사는 기존 인증·인가 계약이 담당한다.
+      if (
+        (item as any).appId &&
+        !appStatusLoading &&
+        !appStatusUnavailable &&
+        !isAppActive((item as any).appId)
+      ) {
         if (process.env.NODE_ENV === 'development') {
           console.debug(`[Menu Filter] App inactive: ${item.id} (appId: ${(item as any).appId})`);
         }
@@ -181,7 +194,8 @@ export const useAdminMenu = () => {
 
       return item;
     }).filter(Boolean);
-  }, [isAppActive, userRoles, userPermissions, dynamicMenuItems]);
+    // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1: 상태 확정 여부도 의존성에 포함
+  }, [isAppActive, appStatusLoading, appStatusUnavailable, userRoles, userPermissions, dynamicMenuItems]);
 
   const filteredMenuItems = filterMenuItems([...allMenuItems]);
 

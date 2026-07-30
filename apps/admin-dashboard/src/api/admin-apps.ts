@@ -220,9 +220,32 @@ export interface DisabledAppsSummary {
 /**
  * Admin Apps API Client
  */
+/**
+ * WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1
+ *
+ * 인증 사용자용 read-only 앱 활성 상태.
+ * 메뉴·라우트 게이팅 전용이며 관리 필드를 포함하지 않는다.
+ * 플랫폼 관리자 전용 `/admin/apps`(requireAdmin)와는 별개 계약이다 — 혼용 금지.
+ */
+export interface AppAvailabilityEntry {
+  appId: string;
+  active: boolean;
+}
+
+export const appAvailabilityApi = {
+  /** 활성 앱만 반환한다. 목록에 없으면 비활성으로 해석한다. */
+  getAvailability: async (): Promise<AppAvailabilityEntry[]> => {
+    const response = await api.get('/apps/availability');
+    return response.data.apps;
+  },
+};
+
 export const adminAppsApi = {
   /**
    * Get all installed apps
+   *
+   * ⚠️ platform 관리자 전용(`requireAdmin`). 앱 관리 화면(AppStorePage 등)에서만 사용한다.
+   *    메뉴·라우트 게이팅에는 `appAvailabilityApi.getAvailability()` 를 사용할 것.
    */
   getInstalledApps: async (): Promise<AppRegistryEntry[]> => {
     const response = await api.get('/admin/apps');

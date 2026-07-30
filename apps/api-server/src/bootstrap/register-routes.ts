@@ -39,6 +39,8 @@ import surveyRoutes from '../modules/survey/routes/survey.routes.js';
 import appreciationRoutes from '../modules/appreciation/routes/appreciation.routes.js';
 import settingsRoutes from '../routes/settingsRoutes.js';
 import adminAppsRoutes from '../routes/admin/apps.routes.js';
+// WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1: 인증 사용자용 앱 활성 상태(read-only)
+import appAvailabilityRoutes from '../routes/app-availability.routes.js';
 import adminUsersRoutes from '../routes/admin/users.routes.js';
 // WO-O4O-ADMIN-PLATFORM-SETTINGS-SUPER-ADMIN-ACCOUNT-MANAGEMENT-V1: 관리자 계정 안전 유지관리(additive)
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
@@ -160,6 +162,10 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   // WO-O4O-APPRECIATION-POINT-LIKE-SYSTEM-PHASE1-V1: 기여 감사 포인트
   app.use('/api/v1/appreciation', appreciationRoutes);
   app.use('/api/v1/settings', settingsRoutes);
+  // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1:
+  //   인증 사용자용 read-only 앱 활성 상태(메뉴·라우트 게이팅 전용, 관리 필드 미노출).
+  //   아래 /api/v1/admin/apps 의 requireAdmin 경계는 변경하지 않는다.
+  app.use('/api/v1/apps', appAvailabilityRoutes);
   app.use('/api/v1/admin/apps', adminAppsRoutes);
   app.use('/api/v1/admin/users', adminUsersRoutes);
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);

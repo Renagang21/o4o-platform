@@ -97,15 +97,16 @@ export const AppGuard: FC<AppGuardProps> = ({
   requireActive = false,
   children,
 }) => {
-  const { isLoading, error, isInstalled, isActive, getStatus } = useAppStatus();
+  const { isLoading, isUnavailable, isInstalled, isActive } = useAppStatus();
 
   // Show loading state while checking app status
   if (isLoading) {
     return <LoadingState message={`${appName} 상태 확인 중...`} />;
   }
 
-  // Show error if failed to check app status
-  if (error) {
+  // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1:
+  //   "상태 확인 실패" 는 "미설치/비활성" 과 구분해 안내한다(기존 동작 유지).
+  if (isUnavailable) {
     return (
       <div className="flex flex-col items-center justify-center py-16 px-4">
         <AlertCircle className="w-12 h-12 text-red-500 mb-4" />
@@ -143,21 +144,33 @@ export const AppGuard: FC<AppGuardProps> = ({
  *   }
  */
 export function useAppGuard(appId: string, requireActive = false) {
-  const { isLoading, error, isInstalled, isActive, getStatus } = useAppStatus();
+  const { isLoading, error, isUnavailable, isInstalled, isActive } = useAppStatus();
 
-  const shouldCall = isLoading
+  // WO-O4O-ADMIN-APP-AVAILABILITY-READ-CONTRACT-FIX-V1:
+  //   로딩 중이거나 상태 확인 실패면 호출하지 않는다(비활성으로 확정하지도 않는다).
+  const shouldCall = isLoading || isUnavailable
     ? false
     : requireActive
       ? isActive(appId)
       : isInstalled(appId);
 
+  const status: 'unknown' | 'active' | 'inactive' | 'not-installed' =
+    isLoading || isUnavailable
+      ? 'unknown'
+      : !isInstalled(appId)
+        ? 'not-installed'
+        : isActive(appId)
+          ? 'active'
+          : 'inactive';
+
   return {
     isLoading,
     error,
+    isUnavailable,
     shouldCall,
     isInstalled: isInstalled(appId),
     isActive: isActive(appId),
-    status: getStatus(appId),
+    status,
   };
 }
 
