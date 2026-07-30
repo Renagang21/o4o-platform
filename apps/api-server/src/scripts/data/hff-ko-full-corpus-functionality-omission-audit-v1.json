@@ -1,0 +1,1616 @@
+{
+ "scope": "HFF ko CREATED 전수 (본 드라이버 생산분)",
+ "scanned": 25074,
+ "fullyCovered": 24956,
+ "withOmission": 118,
+ "omittedClauseTotal": 255,
+ "englishOnlyClauseSkipped": 50,
+ "byPattern": {
+  "MIXED_LABELED_AND_UNLABELED": 163,
+  "LABELED_ONLY": 9190,
+  "UNLABELED_ONLY": 15721
+ },
+ "omissionByPattern": {
+  "MIXED_LABELED_AND_UNLABELED": 98,
+  "LABELED_ONLY": 2,
+  "UNLABELED_ONLY": 18
+ },
+ "samples": [
+  {
+   "statementNo": "200400150832478",
+   "productName": "바이오파파 다이어트 유산균 바이오 슬림",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 9,
+   "omitted": 3,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음",
+    "유산균증식및유해균억제",
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400150832024",
+   "productName": "녹차카테킨+",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 9,
+   "omitted": 1,
+   "omittedSample": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400150832025",
+   "productName": "그린몬스터 다이어트 쾌변 쑥",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 9,
+   "omitted": 1,
+   "omittedSample": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015083888",
+   "productName": "닥터혈당컨트롤",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 15,
+   "omitted": 13,
+   "omittedSample": [
+    "식후혈당상승억제에도움을줄수있음",
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "체내에너지생성에필요"
+   ]
+  },
+  {
+   "statementNo": "200400150831397",
+   "productName": "멀티비타민 앤 미네랄",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 24,
+   "omitted": 1,
+   "omittedSample": [
+    "비타민C]결합조직형성과기능유지에필요"
+   ]
+  },
+  {
+   "statementNo": "20040015083972",
+   "productName": "코큐텐11",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 14,
+   "omitted": 14,
+   "omittedSample": [
+    "높은혈압감소에도움을줄수있음",
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "체내에너지생성에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061087",
+   "productName": "광동 궁리본 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 3,
+   "omitted": 1,
+   "omittedSample": [
+    "갱년기여성건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015191225",
+   "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 54,
+   "omitted": 3,
+   "omittedSample": [
+    "철의운반과이용에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061205",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 11,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015162300",
+   "productName": "수면앤다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 9,
+   "omitted": 8,
+   "omittedSample": [
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요"
+   ]
+  },
+  {
+   "statementNo": "20040015107764",
+   "productName": "제너럴밸런스 W솔루션",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 12,
+   "omitted": 11,
+   "omittedSample": [
+    "탄수화물과에너지대사에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "결합조직형성과기능유지에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061507",
+   "productName": "메노락토 프리미엄",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 12,
+   "omitted": 1,
+   "omittedSample": [
+    "갱년기여성건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061686",
+   "productName": "엘레씬",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 3,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006271",
+   "productName": "쏘팔메토플러스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 3,
+   "omitted": 1,
+   "omittedSample": [
+    "전립선건강의유지에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170171009",
+   "productName": "리프로락",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 10,
+   "omitted": 7,
+   "omittedSample": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "단백질및아미노산이용에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170211893",
+   "productName": "B:OK 실크텐션 머릿결 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 6,
+   "omitted": 1,
+   "omittedSample": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061709",
+   "productName": "다이어트유산균 듀얼 락토슬림",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 13,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006598",
+   "productName": "눈에좋은 맑은 루테인",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 8,
+   "omitted": 7,
+   "omittedSample": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "어두운곳에서시각적응을위해필요"
+   ]
+  },
+  {
+   "statementNo": "200400170211365",
+   "productName": "니아르 포스콜린 에스케어",
+   "pattern": "LABELED_ONLY",
+   "clauseCount": 4,
+   "omitted": 1,
+   "omittedSample": [
+    "]체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061890",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 9,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170211547",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 3,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006845",
+   "productName": "맘스포뮬러 비타민D 2000IU",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 5,
+   "omitted": 3,
+   "omittedSample": [
+    "칼슘과인이흡수되고이용되는데필요",
+    "뼈의형성과유지에필요",
+    "골다공증발생위험감소에도움을줌"
+   ]
+  },
+  {
+   "statementNo": "200400170061811",
+   "productName": "슬로우글로우 다이어트 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 8,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006600",
+   "productName": "아이에버루테인",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 18,
+   "omitted": 5,
+   "omittedSample": [
+    "결합조직형성과기능유지에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "유해산소로부터세포를보호하는데필요",
+    "정상적인면역기능에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061599",
+   "productName": "야쿠르트 핏바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "clauseCount": 7,
+   "omitted": 1,
+   "omittedSample": [
+    "체지방감소에도움을줄수있음"
+   ]
+  }
+ ],
+ "omissionProducts": [
+  {
+   "statementNo": "200400150832478",
+   "candidateId": "75fa9fc4-b86f-44a0-985c-d9279af15147",
+   "productName": "바이오파파 다이어트 유산균 바이오 슬림",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음",
+    "유산균증식및유해균억제",
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400150832024",
+   "candidateId": "7a3956a7-8364-4d35-b751-fb89af413839",
+   "productName": "녹차카테킨+",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400150832025",
+   "candidateId": "ed9b0d3d-9c5f-46cd-9503-2fe5d675f790",
+   "productName": "그린몬스터 다이어트 쾌변 쑥",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015083888",
+   "candidateId": "d351c181-a5b2-4b6e-ba64-570bab2e4cd7",
+   "productName": "닥터혈당컨트롤",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 13,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음",
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "체내에너지생성에필요",
+    "단백질대사와에너지생성에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "세포와혈액생성에필요",
+    "태아신경관의정상발달에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "단백질대사와에너지생성에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요"
+   ]
+  },
+  {
+   "statementNo": "200400150831397",
+   "candidateId": "4a51f6b8-110c-4a75-af0d-6361bcdfcbd8",
+   "productName": "멀티비타민 앤 미네랄",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "비타민C]결합조직형성과기능유지에필요"
+   ]
+  },
+  {
+   "statementNo": "20040015083972",
+   "candidateId": "94834a4a-2f67-4e06-8e2e-370506de5497",
+   "productName": "코큐텐11",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 14,
+   "omittedClauses": [
+    "높은혈압감소에도움을줄수있음",
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "체내에너지생성에필요",
+    "단백질대사와에너지생성에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "세포와혈액생성에필요",
+    "태아신경관의정상발달에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "단백질대사와에너지생성에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요",
+    "유해산소로부터세포를보호하는데필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061087",
+   "candidateId": "2c8852bb-feb7-4221-91fc-d9ee78590a4a",
+   "productName": "광동 궁리본 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "갱년기여성건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015191225",
+   "candidateId": "5306d70e-0656-402c-b3e5-574b9b01267f",
+   "productName": "프리미엄 멀티비타민 이뮨 부스터샷",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "철의운반과이용에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061205",
+   "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040015162300",
+   "candidateId": "7af35a06-31ec-4d71-a5bc-26411f515eb9",
+   "productName": "수면앤다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 8,
+   "omittedClauses": [
+    "탄수화물과에너지대사에필요",
+    "체내에너지생성에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "단백질대사와에너지생성에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "수면의질개선에도움을줄수있음",
+    "콜레우스포스콜리추출물"
+   ]
+  },
+  {
+   "statementNo": "20040015107764",
+   "candidateId": "84589a8a-1172-4be9-94d9-720169ec15fd",
+   "productName": "제너럴밸런스 W솔루션",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 11,
+   "omittedClauses": [
+    "탄수화물과에너지대사에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "결합조직형성과기능유지에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "단백질대사와에너지생성에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요",
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061507",
+   "candidateId": "14a9b351-4398-489d-8dbb-e8d1cb41cec6",
+   "productName": "메노락토 프리미엄",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "갱년기여성건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061686",
+   "candidateId": "26432d24-b0fa-40f4-8938-523d1bae831c",
+   "productName": "엘레씬",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006271",
+   "candidateId": "3685815e-3a42-4312-a12f-0ab44ab191ca",
+   "productName": "쏘팔메토플러스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "전립선건강의유지에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170171009",
+   "candidateId": "52cd3f79-0cd1-4b1e-a310-af60d6165480",
+   "productName": "리프로락",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 7,
+   "omittedClauses": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "체내에너지생성에필요",
+    "탄수화물과에너지대사에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170211893",
+   "candidateId": "b844ce36-764c-4b58-98f9-ab01c821902c",
+   "productName": "B:OK 실크텐션 머릿결 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061709",
+   "candidateId": "bdc202ea-cf40-4a41-a423-844c9065f449",
+   "productName": "다이어트유산균 듀얼 락토슬림",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006598",
+   "candidateId": "f20d3890-4c05-4c70-88a9-a680ab7feaaf",
+   "productName": "눈에좋은 맑은 루테인",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 7,
+   "omittedClauses": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "유해산소로부터세포를보호하는데필요"
+   ]
+  },
+  {
+   "statementNo": "200400170211365",
+   "candidateId": "8f79ff1d-28c7-47ad-b3fc-c2d02ddef308",
+   "productName": "니아르 포스콜린 에스케어",
+   "pattern": "LABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "]체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061890",
+   "candidateId": "4d3fe144-3c36-4b76-86d0-114121c68459",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170211547",
+   "candidateId": "bc103018-929b-4d44-89db-a19951432b19",
+   "productName": "덴프스 유산균이야기 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006845",
+   "candidateId": "444b4436-612b-450d-ae05-1ce91ecca55b",
+   "productName": "맘스포뮬러 비타민D 2000IU",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "칼슘과인이흡수되고이용되는데필요",
+    "뼈의형성과유지에필요",
+    "골다공증발생위험감소에도움을줌"
+   ]
+  },
+  {
+   "statementNo": "200400170061811",
+   "candidateId": "e139ec88-e7a7-4f9e-90a8-4014c48902d6",
+   "productName": "슬로우글로우 다이어트 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040017006600",
+   "candidateId": "76195fc4-f826-4302-8ed2-54ffa357464e",
+   "productName": "아이에버루테인",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 5,
+   "omittedClauses": [
+    "결합조직형성과기능유지에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "유해산소로부터세포를보호하는데필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요"
+   ]
+  },
+  {
+   "statementNo": "200400170061599",
+   "candidateId": "bad02774-32c9-4356-b1bb-9b7020b8a1bd",
+   "productName": "야쿠르트 핏바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061694",
+   "candidateId": "52fe3b41-2411-4357-b984-329760d02bd7",
+   "productName": "엘레씬 다이어트 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061769",
+   "candidateId": "74c7e00a-b856-4d6d-a893-5ee09b2a747e",
+   "productName": "익스트림 트리플 HMB 3000",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "운동수행능력향상에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400170061669",
+   "candidateId": "044262ed-6899-4b40-a946-9fadff3acf2d",
+   "productName": "트루락 날씬 다이어트 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040020001277",
+   "candidateId": "d04268d4-098a-4be9-8100-ce952ebe89d0",
+   "productName": "라인 케어",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "탄수화물이지방으로합성되는것을억제하여체지방감소에도움을줌"
+   ]
+  },
+  {
+   "statementNo": "2004001706144",
+   "candidateId": "68af5c2f-7704-4a8e-b5c3-4b2d561e8cb0",
+   "productName": "스킨마스터 피에스트로 프로",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "피부보습에도움을줄수있음",
+    "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040020003105",
+   "candidateId": "8b73f8d8-c3fc-44f8-b2d5-1c9cc5489c51",
+   "productName": "호리호리 하이킥",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "탄수화물이지방으로합성되는것을억제하여체지방감소에도움을줌"
+   ]
+  },
+  {
+   "statementNo": "200400200061477",
+   "candidateId": "c2a77922-ab87-489a-a3da-c18ff85e7995",
+   "productName": "비스테디 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20040020002937",
+   "candidateId": "6e79d5bb-bb72-4ba6-a238-581b7283077b",
+   "productName": "앨트헬스오메가-3",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "유해산소로부터세포를보호하는데필요"
+   ]
+  },
+  {
+   "statementNo": "200400200061907",
+   "candidateId": "8874e716-6bb8-4e31-b960-eea18325782c",
+   "productName": "다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20040020006879",
+   "candidateId": "5b74bb91-dacf-47bd-a1fc-ce2fb33d9440",
+   "productName": "트리플러스50+액티브",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 4,
+   "omittedClauses": [
+    "신경과근육기능유지에필요",
+    "정상적인혈액응고에필요",
+    "신경과근육기능유지에필요",
+    "결합조직형성과기능유지에필요"
+   ]
+  },
+  {
+   "statementNo": "200400200071680",
+   "candidateId": "aebe02f5-26e1-4291-b6ab-49c722f5d7fd",
+   "productName": "광동 눈 건강엔 루테인",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 12,
+   "omittedClauses": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "결합조직형성과기능유지에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "칼슘과인이흡수되고이용되는데필요",
+    "뼈의형성과유지에필요",
+    "골다공증발생위험감소에도움을줌",
+    "유해산소로부터세포를보호하는데필요",
+    "유해산소로부터세포를보호하는데필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요"
+   ]
+  },
+  {
+   "statementNo": "200400200062095",
+   "candidateId": "c81a8932-daa3-48e1-b0b7-9dff8c9699c8",
+   "productName": "다이어트 유산균 & 혈당케어",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20040020006683",
+   "candidateId": "e3673abf-2c9f-4491-9524-8cfba0ba8bf9",
+   "productName": "메타볼",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "코엔자임Q10은항산화에도움을줄수있습니다.",
+    "코엔자임Q10은혈압이높은사람에게도움을줄수있습니다."
+   ]
+  },
+  {
+   "statementNo": "200400200061905",
+   "candidateId": "b5627267-9eb3-4ccd-ae70-3cc4230881a3",
+   "productName": "셀티바 프로바이오틱 다이어트",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "200400200062173",
+   "candidateId": "2c94dd57-3920-4f90-a9a4-62efc30d8fb7",
+   "productName": "암드 슬림 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "200400200062161",
+   "candidateId": "7c3de1a8-010c-49d0-a04e-4602abb327de",
+   "productName": "여에스더 뇌 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.mucosaeNK41과B.longumNK46의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20040020006671",
+   "candidateId": "a0eb0082-016f-42dc-85f7-1ed3d0eaee62",
+   "productName": "코큐비타",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "코엔자임Q10은항산화에도움을줄수있습니다.",
+    "코엔자임Q10은혈압이높은사람에게도움을줄수있습니다."
+   ]
+  },
+  {
+   "statementNo": "200400200062104",
+   "candidateId": "c7916419-b89b-455e-bacd-4c0b7ab5f34c",
+   "productName": "혈당 컷 · 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "200400200082857",
+   "candidateId": "8e425277-81bf-426a-b0fd-d4e4127d080c",
+   "productName": "보스정",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "관절및연골건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200082764",
+   "candidateId": "1f9fa705-cf14-4127-af0f-b62f9ef2acd6",
+   "productName": "건강한 생 유산균 키즈 300억",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "면역과민반응에의한피부상태개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200083035",
+   "candidateId": "1670cc3b-cc79-4d94-8666-9a1b2db90a1b",
+   "productName": "데이즈 핏핏",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200083114",
+   "candidateId": "b1003670-3aad-41e1-88ce-96b0a802fb07",
+   "productName": "액티브솔루션 장건강",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200083244",
+   "candidateId": "239bc33a-0100-414f-8702-1b8085e39997",
+   "productName": "우먼올핏",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200082591",
+   "candidateId": "c7920089-ae97-458b-89fc-b56e9f2261ec",
+   "productName": "지큐랩 콜레스테롤 솔루션",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "B.breveIDCC4401열처리배양건조물"
+   ]
+  },
+  {
+   "statementNo": "200400200082716",
+   "candidateId": "9fa29f8d-6729-4f3b-b438-919b0d5ca5cf",
+   "productName": "지큐랩 콜레스테롤 솔루션 데일리",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "혈중콜레스테롤개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200400200083187",
+   "candidateId": "651ec646-7097-46fd-8860-7500a9e32f77",
+   "productName": "트리플 프리바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040020041556",
+   "candidateId": "9da75de2-624c-43f5-aa6d-91986a9c3ed6",
+   "productName": "고려양간보DX",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "]알콜성손상으로부터간을보호하는데도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20040020041541",
+   "candidateId": "74ce3334-100c-442b-b6ec-673bdb950e1b",
+   "productName": "근력 강화 & 프로틴",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "]근력개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2006001532626",
+   "candidateId": "504cbb3c-fb9b-42ae-81a9-90f8dea41659",
+   "productName": "셀로맥스 알로푸룬쾌변주스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 5,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음",
+    "난소화성말토덱스트린식이섬유로서",
+    "혈중중성지질개선에도움을줄수있음",
+    "난소화성말토덱스트린식이섬유로서",
+    "난소화성말토덱스트린식이섬유로서"
+   ]
+  },
+  {
+   "statementNo": "200600200081148",
+   "candidateId": "8ccab18b-7d54-431d-8198-d1d59a9f887c",
+   "productName": "셀로맥스 명품 골드세븐",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "피부보습에도움을줄수있음",
+    "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200600200081153",
+   "candidateId": "6da98da1-b56e-47e7-9ffa-8c5c0b33f8aa",
+   "productName": "셀로맥스 오메가3&7",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "피부보습에도움을줄수있음",
+    "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200600200033255",
+   "candidateId": "9377f2af-bcc5-44b5-951a-7e67b44fdc30",
+   "productName": "콜레올로지 혈당 컷 • 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "200600200033217",
+   "candidateId": "57bf2a6d-92ae-4212-b3b8-90dffc1220ba",
+   "productName": "콜레올로지 컷 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "200700170352303",
+   "candidateId": "3a74914f-3d19-4bc4-a8ed-4a4d6b16c14c",
+   "productName": "마이크로바이옴 프로바이오틱스 당큐락",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352383",
+   "candidateId": "87a3cf4e-ec84-4416-9513-ee6bae69fd5c",
+   "productName": "TWK10 100억 캡슐",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "운동수행능력향상에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170353041",
+   "candidateId": "4da642ed-afbf-49f0-a33e-77a4b70114ca",
+   "productName": "뉴오리진 당당",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170353161",
+   "candidateId": "287649af-5ef6-4ab1-8d97-7d1d7af0b768",
+   "productName": "원더씬",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352404",
+   "candidateId": "bd5803cf-d3e1-4d60-8086-098cf1bae174",
+   "productName": "관절엔 조인트 큐",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "관절건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352511",
+   "candidateId": "edcdedc9-4564-4ee8-a450-ad886eac7c6e",
+   "productName": "더 콜라겐",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "피부보습에도움을줄수있음",
+    "자외선에의한피부손상으로부터피부건강을유지하는데도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352385",
+   "candidateId": "e4c3307f-2f83-43fc-988b-7ab5b68663bc",
+   "productName": "TWK10 100억 분말",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "운동수행능력향상에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170353174",
+   "candidateId": "a2b78b7e-7873-4ce4-b4b9-899bf5b52dd9",
+   "productName": "당큐락 이지",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "201000190041382",
+   "candidateId": "b7b1af8c-91f4-4b94-be52-e878e0018772",
+   "productName": "면역피로탁",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "피로개선에도움을줄수있음",
+    "혈소판응집억제를통한혈액흐름",
+    "항산화에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352508",
+   "candidateId": "487d89a8-56ad-4024-b0e8-02aa9fdc6654",
+   "productName": "파워업 유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "운동수행능력향상에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352294",
+   "candidateId": "d0af0b7e-9c38-4511-b616-383aa1afc225",
+   "productName": "혈당엔 유산균 HAC01",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "식후혈당상승억제에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "200700170352547",
+   "candidateId": "03256d73-156e-4714-9cf1-8fa65c31cc67",
+   "productName": "힌트 TWK10 프로바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "운동수행능력향상에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20110017019122",
+   "candidateId": "bbebdb01-ade7-47b8-ad8f-3e7bc009b47b",
+   "productName": "수피아 헬씨 생유산균(포도맛)",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20110017019123",
+   "candidateId": "827cdef4-bfc8-46d6-9fe0-516913f1df3f",
+   "productName": "수피아 헬씨 생유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20110020099111",
+   "candidateId": "a0fcc12a-feb1-46c8-8e33-d6f18cf7d89d",
+   "productName": "리얼모닝",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2011002009984",
+   "candidateId": "826faee1-7a68-46a9-890f-a673287b8754",
+   "productName": "대한민국호간보인 ND-1(엔디)",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "결합조직형성과기능유지에필요",
+    "유해산소로부터세포를보호하는데필요"
+   ]
+  },
+  {
+   "statementNo": "20110017019109",
+   "candidateId": "e8951a66-09f8-4eae-a002-5fd6487df953",
+   "productName": "올데이 비타민C",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "항산화작용을하여유해산소로부터세포를보호하는데필요"
+   ]
+  },
+  {
+   "statementNo": "20130020024337",
+   "candidateId": "679c9513-7d43-4079-9a48-b938b335714a",
+   "productName": "듀얼플랜 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20150010018134",
+   "candidateId": "86f2fee2-66d0-42e1-97da-7d6345a6b750",
+   "productName": "리멤버핏 인지력",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "노화로저하된인지기능개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20140017002645",
+   "candidateId": "7f42c742-b4d6-4b4a-bb45-b07b5434eed7",
+   "productName": "보성 옴니아 포스트바이오틱스 (Omnia Postbiotics)",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "면역과민반응에의한피부상태개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20130020024301",
+   "candidateId": "1e36bff1-aa32-4080-968b-9697d1c7725b",
+   "productName": "셀티바 프로바이오틱 다이어트 토탈 케어",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20140017002690",
+   "candidateId": "050c1e6b-7e88-4121-bac0-63379d76b4d4",
+   "productName": "스킨케어 SKIN CARE",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "면역과민반응에의한피부상태개선에도움을줄수있음",
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20130020024399",
+   "candidateId": "f0a855d9-8826-401d-b986-15dc860456ae",
+   "productName": "오브맘 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20130020024342",
+   "candidateId": "ed5eb56d-549e-4e0a-9ea8-f69374e97787",
+   "productName": "자사 오브맘 다이어트 유산균",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20130020024371",
+   "candidateId": "e40a411c-2b9d-47e6-9688-f2cc1b302d01",
+   "productName": "장건강 다이어트",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20140017002592",
+   "candidateId": "070bfebd-5fa3-44ef-ad44-667dd3ad8991",
+   "productName": "지큐랩 포스트바이오틱스 츄어블",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "면역과민반응에의한피부상태개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20140017002638",
+   "candidateId": "2e138f5f-8129-4dbc-816c-8a73d224cdd5",
+   "productName": "지큐랩 프로 프리 포스트바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "면역과민반응에의한피부상태개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20150010018154",
+   "candidateId": "bf766c60-eb3d-45b0-a40f-f8a8faea8294",
+   "productName": "초록이 액티브 클린",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20150010018159",
+   "candidateId": "f37b9876-4b48-4711-ba20-4f444745c110",
+   "productName": "초록이 슬림밸런스&쾌변",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20150010018158",
+   "candidateId": "351616ce-f171-4320-9df6-451d5174b824",
+   "productName": "초록이 카테킨&프리바이오틱스 쾌변 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20130020024302",
+   "candidateId": "73515b49-0ab6-4557-9181-f0f290c2457d",
+   "productName": "케어프리 유산균 다이어트",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20140017002596",
+   "candidateId": "10a11c0e-da33-41ec-92da-87dd240fe6ed",
+   "productName": "콜레스테롤 BBR 700억 포스트바이오틱스(Cholesterol BBR 70 Billion Postbiotics)",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "혈중콜레스테롤개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20140017002640",
+   "candidateId": "bbf40cc1-707d-4ae1-98ac-0fa7d2d01fa1",
+   "productName": "콜레스테롤·혈당·혈압·항산화 올인원 케어 포스트바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "혈중콜레스테롤개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "201727820684",
+   "candidateId": "aa386473-62b7-4b7e-ad41-a3545e251af3",
+   "productName": "리버치온 골드",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "밀크씨슬추출물]간건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20172880193371",
+   "candidateId": "f0a658b9-b6c8-4f31-acac-77580d119c5e",
+   "productName": "모발유산균 엘비나인 플러스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20172880193372",
+   "candidateId": "ec150c85-1d4d-4dd4-b3de-e49a53588002",
+   "productName": "모발유산균 엘비나인 ",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20172880193365",
+   "candidateId": "2a0c60bf-d94a-4776-95c4-bc866b2c8aed",
+   "productName": "모큐락+",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20160012278172",
+   "candidateId": "5f27a412-53db-4dc3-b13d-74d780b0b944",
+   "productName": "백세시크릿-Dr(Hundred years Secret-Dr)",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 5,
+   "omittedClauses": [
+    "항산화작용을하여유해산소로부터세포를보호하는데필요",
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요",
+    "골다공증발생위험감소에도움을줌"
+   ]
+  },
+  {
+   "statementNo": "20180012056101",
+   "candidateId": "c88e2fd8-01cc-4dd0-91bb-9177a045a81a",
+   "productName": "밸런스 위드인 슬림핏",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "L.curvatusHY7601와L.plantarumKY1032의프로바이오틱스복합물"
+   ]
+  },
+  {
+   "statementNo": "20172880193399",
+   "candidateId": "287c77f7-a446-48af-9d03-55d30e4848ab",
+   "productName": "엔브릿지모발유산균",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "개선에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "201728208671",
+   "candidateId": "b55182d6-0d07-44f7-bc38-f56f6f8405dc",
+   "productName": "오큐아레즈투엠",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 10,
+   "omittedClauses": [
+    "항산화작용을하여유해산소로부터세포를보호하는데필요",
+    "결합조직형성과기능유지에필요",
+    "항산화작용을하여유해산소로부터세포를보호하는데필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요",
+    "철의운반과이용에필요",
+    "유해산소로부터세포를보호하는데필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "체내에너지생성에필요"
+   ]
+  },
+  {
+   "statementNo": "2018000391521",
+   "candidateId": "da8d3be3-8070-42d2-9936-c2737c89f6fe",
+   "productName": "웰러스 알티지 오메가3 1000",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "혈중중성지질개선․혈행개선․기억력개선․건조한눈을개선하여눈건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190004553112",
+   "candidateId": "89303d97-baf6-43cb-9d74-c6f4786de33c",
+   "productName": "코오롱 알티지오메가3 1100",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 4,
+   "omittedClauses": [
+    "EPA및DHA함유유지",
+    "혈중중성지질개선․혈행개선에도움을줄수있음",
+    "기억력개선에도움을줄수있음",
+    "건조한눈을개선하여눈건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2019001634047",
+   "candidateId": "755d2333-61fb-438c-ac6f-df7c7bbb2a4d",
+   "productName": "블랙진생 콜레스테롤케어",
+   "pattern": "UNLABELED_ONLY",
+   "omitted": 2,
+   "omittedClauses": [
+    ".정상적인면역기능과세포분열에필요",
+    ".혈중콜레스테롤개선"
+   ]
+  },
+  {
+   "statementNo": "2020000604517",
+   "candidateId": "c4fe012e-28bd-4dc9-8a04-fcadd744de98",
+   "productName": "익수 관절 황진환진액 MSM 2000",
+   "pattern": "LABELED_ONLY",
+   "omitted": 1,
+   "omittedClauses": [
+    "]관절및연골건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190004553194",
+   "candidateId": "fd6995c1-2f98-4a4c-aead-91cba2f34ddd",
+   "productName": "듀얼 바이탈 이뮨",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 13,
+   "omittedClauses": [
+    "체내에너지생성에필요",
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요",
+    "정상적인엽산대사에필요",
+    "탄수화물과에너지대사에필요",
+    "단백질및아미노산이용에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "체내에너지생성에필요",
+    "세포와혈액생성에필요",
+    "태아신경관의정상발달에필요",
+    "혈액의호모시스테인수준을정상으로유지하는데필요",
+    "갑상선호르몬의합성에필요",
+    "항산화에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2018001231060",
+   "candidateId": "f1c53de4-a3bd-4739-88ee-443703f48191",
+   "productName": "메디타민 퓨어 레이디 프로바이오틱스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "어두운곳에서시각적응을위해필요",
+    "피부와점막을형성하고기능을유지하는데필요",
+    "상피세포의성장과발달에필요"
+   ]
+  },
+  {
+   "statementNo": "20190009483190",
+   "candidateId": "b7120036-5080-4930-9300-c65a3405fef8",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "쏘팔메토열매추출물]",
+    "전립선건강의유지에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2019000910596",
+   "candidateId": "6107accb-a467-4f19-83e0-6e78dc20a65d",
+   "productName": "쏘팔메토골드",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "정상적인면역기능에필요",
+    "정상적인세포분열에필요",
+    "전립선건강의유지에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190004553414",
+   "candidateId": "9e1bab27-f1e8-46c7-8cba-a7601608e32c",
+   "productName": "엠프로 M.PRO 다이어트 ",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음",
+    "유산균증식및유해균억제",
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2019000939499",
+   "candidateId": "70b398c3-a463-410a-9003-41f71883f591",
+   "productName": "올 뉴 초록이 시즌4",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190009483845",
+   "candidateId": "ba9aa2cf-190e-4f78-805c-a7334d9c1ce1",
+   "productName": "올 뉴 초록이 시즌4",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190009483373",
+   "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+   "productName": "차전자피 카테킨 다이어트",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20180012174522",
+   "candidateId": "b2a607d7-078c-4f60-888e-cf0e225a20d7",
+   "productName": "체지방감소 프로젝트365 비피더스 다이어트 핏",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 3,
+   "omittedClauses": [
+    "체지방감소에도움을줄수있음",
+    "유산균증식및유해균억제",
+    "장건강에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2019000939496",
+   "candidateId": "fbe6078e-1b05-4d6d-bc01-dcf18b74e978",
+   "productName": "초록이 슬림밸런스&쾌변",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "20190009483840",
+   "candidateId": "f8bc4892-e7b3-44dc-be51-729e96ceef0b",
+   "productName": "초록이 슬림&쾌변",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "유해균억제도움을줄수있음",
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2019000939498",
+   "candidateId": "00e3e72c-e55c-42dc-8f88-e3c8b238699e",
+   "productName": "초록이 액티브 클린",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 1,
+   "omittedClauses": [
+    "배변활동에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "202000124461",
+   "candidateId": "473da538-5396-44c1-ab8b-23263f8a26ad",
+   "productName": "17종포스트바이오틱스김치생유산균 키즈",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "유산균증식및유해균억제",
+    "배변활동원활에도움을줄수있음"
+   ]
+  },
+  {
+   "statementNo": "2021000662219",
+   "candidateId": "2c0b5cc6-0792-4b8b-90d4-b7f9aed91475",
+   "productName": "홍삼정이뮨부스터",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 5,
+   "omittedClauses": [
+    "피로개선에도움을줄수있음",
+    "Rb1및Rg3의합계로서3",
+    "혈소판응집억제를통한혈액흐름",
+    "항산화에도움을줄수있음",
+    "Rb1및Rg3의합계로서"
+   ]
+  },
+  {
+   "statementNo": "2023000229646",
+   "candidateId": "31c4b8c1-cc4e-40c6-b394-3e2774fd8357",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "pattern": "MIXED_LABELED_AND_UNLABELED",
+   "omitted": 2,
+   "omittedClauses": [
+    "결합조직형성과기능유지에필요",
+    "항산화작용을하여유해산소로부터세포를보호하는데필요"
+   ]
+  }
+ ]
+}

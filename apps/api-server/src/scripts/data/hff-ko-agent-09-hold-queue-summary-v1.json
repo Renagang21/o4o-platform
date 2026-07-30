@@ -1,0 +1,62 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-FULL-CORPUS-INTEGRATED-QUALITY-AUDIT-AND-AGENT-9-QUEUE-BUILD-V1",
+ "scope": "HFF ko 전량 41,261 중 HOLD_FOR_AGENT_9 348 통합 단일 큐",
+ "holdFileRows": 348,
+ "queueTotal": 348,
+ "staleHolds": 0,
+ "anomalies": [],
+ "allPending": true,
+ "duplicateCandidateId": 0,
+ "duplicateStatementNo": 0,
+ "byPriority": {
+  "1": 5,
+  "2": 29,
+  "3": 314
+ },
+ "byReason": {
+  "HINT_UNDER_EXTRACTION": 5,
+  "NO_FUNCTIONAL_DATA": 29,
+  "NO_INTAKE_DATA": 314
+ },
+ "byRange": {
+  "10,001~15,000": 21,
+  "15,001~20,000": 6,
+  "25,001~30,000": 53,
+  "1~5,000": 23,
+  "5,001~10,000": 43,
+  "35,001~40,000": 64,
+  "20,001~25,000": 69,
+  "30,001~35,000": 67,
+  "40,001~41,261": 2
+ },
+ "sortContract": "priority ASC → statementNo ASC → candidateId ASC",
+ "statusVocabulary": [
+  "PENDING",
+  "RESOLVED",
+  "SKIPPED_CANONICAL_EXISTS",
+  "BLOCKED_SOURCE_DATA",
+  "FAILED_SYSTEM"
+ ],
+ "dbWriteWatch": {
+  "before": {
+   "storeKoCanonicalTotal": 63321,
+   "hffCandidateApproved": 40913,
+   "hffCandidateLinked": 40913,
+   "hffMasters": 40943,
+   "maxSpdUpdatedAt": "2026-07-29T04:59:37.830Z"
+  },
+  "after": {
+   "storeKoCanonicalTotal": 63321,
+   "hffCandidateApproved": 40913,
+   "hffCandidateLinked": 40913,
+   "hffMasters": 40943,
+   "maxSpdUpdatedAt": "2026-07-29T04:59:37.830Z"
+  },
+  "identical": true,
+  "diff": []
+ },
+ "files": {
+  "queue": "apps/api-server/src/scripts/data/hff-ko-agent-09-hold-queue-v1.jsonl",
+  "staleHolds": "apps/api-server/src/scripts/data/hff-ko-agent-09-stale-holds-v1.jsonl"
+ }
+}

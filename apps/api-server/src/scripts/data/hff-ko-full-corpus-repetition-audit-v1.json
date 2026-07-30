@@ -1,0 +1,121 @@
+{
+ "productsScanned": 40913,
+ "driverSchemeProducts": 25415,
+ "sdItemGroupRepeat": {
+  "products": 36,
+  "cases": 87,
+  "samples": [
+   {
+    "statementNo": "2004001510079",
+    "productName": "홍삼앤바나바",
+    "cases": 1
+   },
+   {
+    "statementNo": "2004001516285",
+    "productName": "헤파골드",
+    "cases": 1
+   },
+   {
+    "statementNo": "2004001516291",
+    "productName": "오메가 큐(Omega Q)",
+    "cases": 2
+   },
+   {
+    "statementNo": "2004001516294",
+    "productName": "플라체 비엑스(PLACE BX)",
+    "cases": 8
+   },
+   {
+    "statementNo": "2004001516297",
+    "productName": "곡물보감S",
+    "cases": 2
+   },
+   {
+    "statementNo": "2004001536223",
+    "productName": "눈팔팔 루테인",
+    "cases": 1
+   },
+   {
+    "statementNo": "2004001516280",
+    "productName": "삼성니코비타",
+    "cases": 1
+   },
+   {
+    "statementNo": "2004001516281",
+    "productName": "와우 플러스(Wow Plus)",
+    "cases": 3
+   },
+   {
+    "statementNo": "2004001516290",
+    "productName": "체지방감소 가르시니아",
+    "cases": 1
+   },
+   {
+    "statementNo": "2004001520145",
+    "productName": "파워 엠토",
+    "cases": 4
+   }
+  ]
+ },
+ "sdWhyFlatRepeat": {
+  "products": 1402,
+  "cases": 3085,
+  "samples": [
+   {
+    "statementNo": "20040015070229",
+    "productName": "지근억비피더스프로G",
+    "cases": 1
+   },
+   {
+    "statementNo": "200400150831093",
+    "productName": "칼슘프리미엄비타민미네랄",
+    "cases": 3
+   },
+   {
+    "statementNo": "200400150831132",
+    "productName": "요미핏",
+    "cases": 2
+   },
+   {
+    "statementNo": "200400150831138",
+    "productName": "쏘팔메토 HMYH",
+    "cases": 1
+   },
+   {
+    "statementNo": "200400150831454",
+    "productName": "인테로 어골칼슘 & 피지에이 +",
+    "cases": 2
+   },
+   {
+    "statementNo": "200400150831479",
+    "productName": "어골칼듐",
+    "cases": 3
+   },
+   {
+    "statementNo": "200400150831486",
+    "productName": "이너부스터",
+    "cases": 1
+   },
+   {
+    "statementNo": "200400150831518",
+    "productName": "프리미엄 간에좋은 밀크씨슬 9 실리마린 마스터",
+    "cases": 2
+   },
+   {
+    "statementNo": "200400150831573",
+    "productName": "프리그케어티엠(Pregcare TM)",
+    "cases": 2
+   },
+   {
+    "statementNo": "200400150831675",
+    "productName": "바이탈 로얄 칼슘(Vital Royal Calcium)",
+    "cases": 2
+   }
+  ]
+ },
+ "unexplainedDup": {
+  "products": 0,
+  "cases": 0,
+  "samples": []
+ }
+}
