@@ -76,59 +76,63 @@ const PageLoader = () => (
  */
 export function AppRoutes() {
   return [
-    // 포럼 - App-based routes with AppRouteGuard
+    // 포럼 — 플랫폼 기본 커뮤니티 기능 (설치형 앱 아님)
+    //
+    // WO-O4O-ADMIN-FORUM-BASE-FEATURE-GUARD-ALIGNMENT-V1:
+    //   기존에는 <AppRouteGuard appId="forum"> 로 앱 availability 게이팅을 했으나,
+    //   평문 appId 'forum' 은 app_registry / seed / appsCatalog 어디에도 존재하지 않는다
+    //   (카탈로그의 forum 계열은 forum-core / organization-forum / forum-yaksa 등 별도 확장 앱).
+    //   그 결과 availability 조회가 정상이어도 항상 비활성으로 판정되어
+    //   모든 사용자가 /error/app-disabled 로 튕겼다.
+    //   Forum 은 전 서비스 공통 기본 기능이므로 설치형 앱 게이팅 대상이 아니다 → 게이팅만 제거.
+    //
+    //   접근 통제는 그대로 유지된다:
+    //     - 프론트: AdminProtectedRoute (forum:read / forum:write)
+    //     - 백엔드: /api/v1/forum 목록·조회 optionalAuth, 작성·수정·삭제 authenticate,
+    //               운영자 관리(admin-forum.routes) router.use(authenticate)
+    //   앱 availability 는 권한 검사를 대신하지 않는다.
+    //
+    //   forum-yaksa 등 서비스별 확장 앱의 가드는 그대로 둔다(아래 Yaksa Community 블록).
     <Route key="/forum" path="/forum" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumDashboard />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumDashboard />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/forum/boards" path="/forum/boards" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumBoardList />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumBoardList />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/forum/categories" path="/forum/categories" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumCategories />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumCategories />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/forum/posts/:id" path="/forum/posts/:id" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumPostDetail />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumPostDetail />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/forum/posts/new" path="/forum/posts/new" element={
       <AdminProtectedRoute requiredPermissions={['forum:write']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumPostForm />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumPostForm />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/forum/posts/:id/edit" path="/forum/posts/:id/edit" element={
       <AdminProtectedRoute requiredPermissions={['forum:write']}>
-        <AppRouteGuard appId="forum">
-          <Suspense fallback={<PageLoader />}>
-            <ForumPostForm />
-          </Suspense>
-        </AppRouteGuard>
+        <Suspense fallback={<PageLoader />}>
+          <ForumPostForm />
+        </Suspense>
       </AdminProtectedRoute>
     } />,
 
