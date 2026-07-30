@@ -1,0 +1,548 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-ROUTE-PROFILE-FINAL-READINESS-V1",
+  "mode": "en",
+  "composed": 26,
+  "blocked": 0,
+  "tmMissingUnique": 0,
+  "missingSample": [],
+  "anomalies": [],
+  "routeGuardExemptions": 18,
+  "routeGuardExemptionPolicy": "해당 섹션 KO 공식 원문에 경구 동사가 실제 존재할 때만 면제(원문 충실 번역). 원문 근거 없는 경구 동사는 면제하지 않는다.",
+  "routeGuardExemptionDetail": [
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN interaction에 경구 동사: \\btake\\b",
+      "koSection": "상호작용"
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "route": "rectal",
+      "anomaly": "비경구(rectal) EN precaution에 경구 동사: \\borally\\b",
+      "koSection": "사용상 주의사항"
+    }
+  ],
+  "routeGate": [
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "interval",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "interval",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "en",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    }
+  ]
+}

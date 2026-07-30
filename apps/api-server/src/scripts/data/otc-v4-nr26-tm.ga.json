@@ -1,0 +1,262 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-ROUTE-PROFILE-FINAL-READINESS-V1",
+  "agent": "ga",
+  "kind": "sentence-translation-memory",
+  "note": "문장 1:1 KO→EN 번역만. 공식 원문에 없는 의료사실 생성 금지. 수치·연령·기간 보존. 한글 잔존 금지. 경로 표현 역전 금지.",
+  "total": 25,
+  "filled": 25,
+  "annotations": {
+    "2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "nasal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약과 함께 사용하지 마십시오.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "상호작용",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "가벼운 정도의 소양감(가려움), 통증, 출혈이 나타날 수 있습니다.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.": {
+      "count": 9,
+      "masters": 9,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.": {
+      "count": 7,
+      "masters": 7,
+      "routes": [
+        "nasal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.": {
+      "count": 7,
+      "masters": 7,
+      "routes": [
+        "nasal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.7일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.어린이에게는 사용하지 마십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.정해진 용법과 용량을 잘 지키십시오.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게는 사용하지 마십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 4,
+      "masters": 4,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 2,
+      "masters": 2,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "아침 ∙ 저녁 1회 1개씩, 1일 2회 가능한 한 배변 후 항문내에 삽입합니다.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나 병변이 있는 사람은 의사 또는 약사와 상의하십시오.이 약은 점비용으로만 사용하십시오.위생상 한 제품은 한 사람이 사용하십시오.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여 사용하십시오.": {
+      "count": 2,
+      "masters": 2,
+      "routes": [
+        "nasal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.이 약은 점비용으로만 사용하십시오.위생상 한 제품은 한 사람만 사용하십시오.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "nasal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 경화된 경우에는 무르게 한 후 사용하십시오.이 약은 직장(곧창자)에만 사용하고 내복용으로는 사용하지 마십시오.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "사용상 주의사항",
+      "from": ""
+    },
+    "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "이 약은 치질에 사용합니다.": {
+      "count": 3,
+      "masters": 3,
+      "routes": [
+        "rectal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "이 약은 코점막 건조 증상의 완화에 사용합니다.": {
+      "count": 5,
+      "masters": 5,
+      "routes": [
+        "nasal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.": {
+      "count": 2,
+      "masters": 2,
+      "routes": [
+        "nasal"
+      ],
+      "section": "효능·효과",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.": {
+      "count": 7,
+      "masters": 7,
+      "routes": [
+        "nasal"
+      ],
+      "section": "효능·효과",
+      "from": ""
+    },
+    "젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.": {
+      "count": 7,
+      "masters": 7,
+      "routes": [
+        "nasal"
+      ],
+      "section": "경고",
+      "from": ""
+    },
+    "충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "이상반응",
+      "from": "otc-v4-next2000-tm.ga.json"
+    },
+    "코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.": {
+      "count": 7,
+      "masters": 7,
+      "routes": [
+        "nasal"
+      ],
+      "section": "이상반응",
+      "from": ""
+    },
+    "필요시 2~3시간마다 성인은 1~8회, 영아는 1회, 1개월~12개월은 1~2회, 1세~2세는 1~3회, 2세~5세는 1~4회, 5세~8세는 1~5회, 8세~12세는 1~6회 뿌립니다.자세한 용법·용량은 허가사항 상세정보를 참고하십시오.": {
+      "count": 2,
+      "masters": 2,
+      "routes": [
+        "nasal"
+      ],
+      "section": "용법·용량",
+      "from": ""
+    },
+    "혈압강하제, 항우울약과 함께 복용하지 마십시오.": {
+      "count": 6,
+      "masters": 6,
+      "routes": [
+        "rectal"
+      ],
+      "section": "상호작용",
+      "from": ""
+    }
+  },
+  "entries": {
+    "2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.": "For children under 2 years of age, spray once into each nostril. For children 2 years of age and older, spray 1 to 2 times into each nostril, 2 to 4 times a day or whenever needed.",
+    "dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약과 함께 사용하지 마십시오.": "Do not use this medicine together with suppositories, ointments or creams containing dl-methylephedrine hydrochloride, scopolia extract or glycyrrhizic acid, with antihypertensive medicines, or with antidepressants.",
+    "가벼운 정도의 소양감(가려움), 통증, 출혈이 나타날 수 있습니다.": "Mild itching, pain, or bleeding may occur.",
+    "만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.": "For adults and those 15 years of age and older, insert 1 piece into the rectum at a time, within the range of 3 times a day.",
+    "부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If edema (swelling), a feeling of irritation, allergic symptoms (rash, congestion causing reddening, itching, etc.), or bleeding occurs, stop using it immediately and consult a doctor or pharmacist.",
+    "스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.": "Use the spray nozzle for infants aged 1 to 24 months and the jet nozzle for children 6 years of age and older and for adults, spraying 2 times into each nasal cavity in the morning and in the evening. To keep the solution from running down into the larynx or pharynx, lie on your side at an angle or stand with your head tilted while using it.",
+    "스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.": "Do not use the spray nozzle in infants under 1 month of age. Do not use the jet nozzle in infants and young children under 6 years of age. If several people share it, an infection may be spread.",
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.7일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.어린이에게는 사용하지 마십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.정해진 용법과 용량을 잘 지키십시오.": "Do not use this medicine if you have heart disease, high blood pressure, thyroid disease, diabetes, or difficulty urinating due to an enlarged prostate. Before using this medicine, women who are pregnant or who may be pregnant should consult a doctor or pharmacist. If your symptoms do not improve after about 7 days of use, stop using it immediately and consult a doctor or pharmacist. Do not use it in children. Use this medicine only in the rectum and do not use it orally. If the medicine has become soft, cool it briefly before use, and if it has become too hard, soften it before use. Follow the prescribed directions and dosage carefully.",
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게는 사용하지 마십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "Do not use this medicine if you have heart disease, high blood pressure, thyroid disease, diabetes, or difficulty urinating due to an enlarged prostate. Before using this medicine, women who are pregnant or who may be pregnant should consult a doctor or pharmacist. Follow the prescribed directions and dosage carefully. Do not use it in children. Use this medicine only in the rectum and do not use it orally. If the medicine has become soft, cool it briefly before use, and if it has become too hard, soften it before use. If your symptoms do not improve after about 7 days of use, stop using it immediately and consult a doctor or pharmacist.",
+    "심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게는 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.이 약은 직장에만 사용하고 내복용으로는 사용하지 마십시오.7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "Do not use this medicine if you have heart disease, high blood pressure, thyroid disease, diabetes, or difficulty urinating due to an enlarged prostate. Before using this medicine, women who are pregnant or who may be pregnant should consult a doctor or pharmacist. Follow the prescribed directions and dosage carefully. Do not use it in children. If the medicine has become soft, cool it briefly before use, and if it has become too hard, soften it before use. Use this medicine only in the rectum and do not use it orally. If your symptoms do not improve after about 7 days of use, stop using it immediately and consult a doctor or pharmacist.",
+    "아침 ∙ 저녁 1회 1개씩, 1일 2회 가능한 한 배변 후 항문내에 삽입합니다.": "Insert 1 piece into the anus at a time in the morning and in the evening, 2 times a day, preferably after a bowel movement.",
+    "이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나 병변이 있는 사람은 의사 또는 약사와 상의하십시오.이 약은 점비용으로만 사용하십시오.위생상 한 제품은 한 사람이 사용하십시오.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여 사용하십시오.": "Do not use this medicine if you are hypersensitive to it or to benzalkonium chloride. Before using this medicine, consult a doctor or pharmacist if you have experienced allergic symptoms related to nasal drops (for example, rash, redness, swelling, or a stinging sensation), or if you have recently had nose surgery or have a lesion. Use this medicine only as a nasal drop. For hygiene, one product should be used by one person only. To keep the solution from running down into the larynx or pharynx, lie on your side at an angle or stand with your head tilted while using it.",
+    "이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.이 약은 점비용으로만 사용하십시오.위생상 한 제품은 한 사람만 사용하십시오.": "Do not use this medicine if you are hypersensitive to it or to benzalkonium chloride. Before using this medicine, consult a doctor or pharmacist if you have experienced allergic symptoms related to nasal drops (for example, rash, redness, swelling, or a stinging sensation), or if you have recently had nose surgery or have bodily changes caused by illness. Use this medicine only as a nasal drop. For hygiene, one product should be used by only one person.",
+    "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 경화된 경우에는 무르게 한 후 사용하십시오.이 약은 직장(곧창자)에만 사용하고 내복용으로는 사용하지 마십시오.": "Do not use this medicine if you are hypersensitive to it. If the medicine has become soft, cool it briefly before use, and if it has hardened too much, soften it before use. Use this medicine only in the rectum (the large bowel) and do not use it orally.",
+    "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.": "This medicine is used for the temporary relief of the pain, itching, swelling and bleeding of anal fissure and hemorrhoids.",
+    "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.": "This medicine is used for the temporary relief of the pain, itching, swelling (puffiness), and bleeding of anal fissures and hemorrhoids, and for disinfection.",
+    "이 약은 치질에 사용합니다.": "This medicine is used for hemorrhoids.",
+    "이 약은 코점막 건조 증상의 완화에 사용합니다.": "This medicine is used to relieve symptoms of dryness of the nasal mucosa.",
+    "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.": "This medicine is used for washing out the nasal cavity (inside the nose) in a blocked nose caused by nasal mucosal discharge or purulent (festering) discharge, and to relieve dryness of the nasal mucosa.",
+    "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.": "This medicine is used for nasal cavity irrigation for a stuffy nose caused by nasal mucous discharge or purulent (suppurative) conditions.",
+    "젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.": "The jet nozzle has a strong spray pressure, so when it is used in infants and young children there is a risk that the solution may enter the wrong place or that laryngeal spasm may occur.",
+    "충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.": "If congestion causing reddening, edema (swelling), a feeling of irritation, allergic symptoms (rash, congestion causing reddening, itching, etc.), or bleeding occurs, stop using it immediately and consult a doctor or pharmacist.",
+    "코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.": "If the nose is inflamed, a temporary stinging sensation and similar effects may occur. If the stinging persists, consult a doctor or pharmacist.",
+    "필요시 2~3시간마다 성인은 1~8회, 영아는 1회, 1개월~12개월은 1~2회, 1세~2세는 1~3회, 2세~5세는 1~4회, 5세~8세는 1~5회, 8세~12세는 1~6회 뿌립니다.자세한 용법·용량은 허가사항 상세정보를 참고하십시오.": "When needed, spray every 2 to 3 hours: adults 1 to 8 times, newborn infants 1 time, infants 1 to 12 months of age 1 to 2 times, children 1 to 2 years of age 1 to 3 times, children 2 to 5 years of age 1 to 4 times, children 5 to 8 years of age 1 to 5 times, and children 8 to 12 years of age 1 to 6 times. For detailed directions and dosage, refer to the detailed information in the approved labeling.",
+    "혈압강하제, 항우울약과 함께 복용하지 마십시오.": "Do not take this medicine together with antihypertensive medicines or antidepressants."
+  }
+}

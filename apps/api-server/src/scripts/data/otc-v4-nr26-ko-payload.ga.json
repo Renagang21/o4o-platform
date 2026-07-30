@@ -1,0 +1,1124 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-ROUTE-PROFILE-FINAL-READINESS-V1",
+  "kind": "ko-payload",
+  "total": 26,
+  "payloads": [
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "unit": "nasal-unit-1",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "permitCode": "200410068",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "sourceRef": "a7409325-a2b0-2d7f-23b9-3c1dbaaada07",
+      "title": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "summary": "이 약은 코점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "41112a6535dd3e0daf8fe560a3e96f4d",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>오트리빈베이비내추럴비강분무액(염화나트륨)<small>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.<br>2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람만 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "unit": "rectal-unit-1",
+      "productName": "푸레파인마일드좌제",
+      "permitCode": "202002671",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "519f6341452aad07c8941b0242914283",
+      "sourceRef": "b58fbba3-3a42-0448-b418-6abcbba59843",
+      "title": "푸레파인마일드좌제",
+      "summary": "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.",
+      "contentHash": "7ed8871192425ba090fb054e56776899",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</span></div>\n    <h1>푸레파인마일드좌제<small>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>7일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "0f707974-cfa7-4295-843e-da6b92b263d3",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "unit": "rectal-unit-1",
+      "productName": "헤모렉스에스좌제",
+      "permitCode": "202107875",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "7aca14afbe652790bb29bb408ba907de",
+      "sourceRef": "a2eb1a8b-3ad9-df3a-75c5-fbe4fc7468c7",
+      "title": "헤모렉스에스좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "08bc023db6414ded38e6b031c2727e74",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>헤모렉스에스좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "unit": "rectal-unit-1",
+      "productName": "포스테리산좌제",
+      "permitCode": "199806423",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "518facd053ea09ff4c9fb4438838b379",
+      "sourceRef": "b97956bd-7531-ce7d-15d7-f1660db39052",
+      "title": "포스테리산좌제",
+      "summary": "이 약은 치질에 사용합니다.",
+      "contentHash": "f968e98852fcb1a8deb076441db55b20",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치질에 사용합니다.</span></div>\n    <h1>포스테리산좌제<small>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치질에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치질에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">아침 ∙ 저녁 1회 1개씩, 1일 2회 가능한 한 배변 후 항문내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 경화된 경우에는 무르게 한 후 사용하십시오.이 약은 직장(곧창자)에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>가벼운 정도의 소양감(가려움), 통증, 출혈이 나타날 수 있습니다.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "unit": "nasal-unit-1",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "permitCode": "200410068",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "sourceRef": "4b3eab21-1ad4-f947-f5aa-97ba52881fba",
+      "title": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "summary": "이 약은 코점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "41112a6535dd3e0daf8fe560a3e96f4d",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>오트리빈베이비내추럴비강분무액(염화나트륨)<small>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.<br>2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람만 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "unit": "rectal-unit-1",
+      "productName": "포스테리산좌제",
+      "permitCode": "199806423",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "518facd053ea09ff4c9fb4438838b379",
+      "sourceRef": "489d8649-125a-241c-5925-44ea0024dedc",
+      "title": "포스테리산좌제",
+      "summary": "이 약은 치질에 사용합니다.",
+      "contentHash": "f968e98852fcb1a8deb076441db55b20",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치질에 사용합니다.</span></div>\n    <h1>포스테리산좌제<small>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치질에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치질에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">아침 ∙ 저녁 1회 1개씩, 1일 2회 가능한 한 배변 후 항문내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 경화된 경우에는 무르게 한 후 사용하십시오.이 약은 직장(곧창자)에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>가벼운 정도의 소양감(가려움), 통증, 출혈이 나타날 수 있습니다.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "unit": "rectal-unit-1",
+      "productName": "렉센엔좌제",
+      "permitCode": "202107891",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "7aca14afbe652790bb29bb408ba907de",
+      "sourceRef": "59015f2b-4738-1e8c-b67f-f6c2be25361b",
+      "title": "렉센엔좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "bc544f974cdec4b2c96e67bb1a915cbb",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>렉센엔좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "unit": "rectal-unit-1",
+      "productName": "푸레파인마일드좌제",
+      "permitCode": "202002671",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "519f6341452aad07c8941b0242914283",
+      "sourceRef": "23636981-fcd4-d603-1df5-8f34384a0f3b",
+      "title": "푸레파인마일드좌제",
+      "summary": "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.",
+      "contentHash": "7ed8871192425ba090fb054e56776899",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</span></div>\n    <h1>푸레파인마일드좌제<small>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>7일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "unit": "nasal-unit-1",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "permitCode": "200410068",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "sourceRef": "fa0f9bee-1b81-7804-0f40-71221a9273f7",
+      "title": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "summary": "이 약은 코점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "41112a6535dd3e0daf8fe560a3e96f4d",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>오트리빈베이비내추럴비강분무액(염화나트륨)<small>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.<br>2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람만 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "unit": "nasal-unit-1",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "permitCode": "200906231",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "939bb09a219c283fbf9c6fed1a61af9a",
+      "sourceRef": "479efcd9-a2df-802b-4195-2afa1ac4e941",
+      "title": "나자린플러스분무액(염화나트륨)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "e1886040cbe59808790901ac6791965b",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>나자린플러스분무액(염화나트륨)<small>동일 일반명코드(228730CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228730CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">필요시 2~3시간마다 성인은 1~8회, 영아는 1회, 1개월~12개월은 1~2회, 1세~2세는 1~3회, 2세~5세는 1~4회, 5세~8세는 1~5회, 8세~12세는 1~6회 뿌립니다.<br>자세한 용법·용량은 허가사항 상세정보를 참고하십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나 병변이 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람이 사용하십시오.</li>\n      <li>액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "unit": "rectal-unit-1",
+      "productName": "포스테리산좌제",
+      "permitCode": "199806423",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "518facd053ea09ff4c9fb4438838b379",
+      "sourceRef": "73277b70-77d2-5d3a-9c0e-d841c5a06fd1",
+      "title": "포스테리산좌제",
+      "summary": "이 약은 치질에 사용합니다.",
+      "contentHash": "f968e98852fcb1a8deb076441db55b20",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치질에 사용합니다.</span></div>\n    <h1>포스테리산좌제<small>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치질에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치질에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A77201CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">아침 ∙ 저녁 1회 1개씩, 1일 2회 가능한 한 배변 후 항문내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 경화된 경우에는 무르게 한 후 사용하십시오.이 약은 직장(곧창자)에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>가벼운 정도의 소양감(가려움), 통증, 출혈이 나타날 수 있습니다.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "c80e052a-5573-c783-ced7-cd80b7f3d48c",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "unit": "nasal-unit-1",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "permitCode": "200410068",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "sourceRef": "4d36a5f1-1bdb-0fde-93d8-69a8e4e0ca82",
+      "title": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "summary": "이 약은 코점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "41112a6535dd3e0daf8fe560a3e96f4d",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>오트리빈베이비내추럴비강분무액(염화나트륨)<small>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.<br>2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람만 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "unit": "rectal-unit-1",
+      "productName": "프라맥스에스좌제",
+      "permitCode": "202106673",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "04d1f99acb5c68103666adbbf559c00f",
+      "sourceRef": "61f86e7e-94e6-ac4c-ee31-daa7d7927cde",
+      "title": "프라맥스에스좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "c4f939e4c4479bffb6fe684285320b2e",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>프라맥스에스좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "unit": "rectal-unit-1",
+      "productName": "푸레파인마일드좌제",
+      "permitCode": "202002671",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "519f6341452aad07c8941b0242914283",
+      "sourceRef": "e87c08a6-d98e-37c9-ef59-bc9cb42a2037",
+      "title": "푸레파인마일드좌제",
+      "summary": "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.",
+      "contentHash": "7ed8871192425ba090fb054e56776899",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</span></div>\n    <h1>푸레파인마일드좌제<small>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E27800CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>7일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "74be1dd6-b982-c1f8-c48e-bf342dbc522a",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "3cbf5820-e26c-4837-443c-ca095dffa99f",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "d0528690-391d-764d-7aa3-ffb7f50480cf",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "8097df67-187c-2dda-3011-1b0ebbfa997b",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "unit": "rectal-unit-1",
+      "productName": "렉센엔좌제",
+      "permitCode": "202107891",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "7aca14afbe652790bb29bb408ba907de",
+      "sourceRef": "3629a32f-4867-59a1-fda6-a0bd54277154",
+      "title": "렉센엔좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "bc544f974cdec4b2c96e67bb1a915cbb",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>렉센엔좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "unit": "rectal-unit-1",
+      "productName": "헤모렉스에스좌제",
+      "permitCode": "202107875",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "7aca14afbe652790bb29bb408ba907de",
+      "sourceRef": "576ad25b-6590-9500-8820-189675832733",
+      "title": "헤모렉스에스좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "08bc023db6414ded38e6b031c2727e74",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>헤모렉스에스좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "unit": "nasal-unit-1",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "permitCode": "200906231",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "939bb09a219c283fbf9c6fed1a61af9a",
+      "sourceRef": "c98eeb43-b006-889d-93cf-bedb7fce2ab1",
+      "title": "나자린플러스분무액(염화나트륨)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "e1886040cbe59808790901ac6791965b",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>나자린플러스분무액(염화나트륨)<small>동일 일반명코드(228730CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228730CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">필요시 2~3시간마다 성인은 1~8회, 영아는 1회, 1개월~12개월은 1~2회, 1세~2세는 1~3회, 2세~5세는 1~4회, 5세~8세는 1~5회, 8세~12세는 1~6회 뿌립니다.<br>자세한 용법·용량은 허가사항 상세정보를 참고하십시오.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나 병변이 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람이 사용하십시오.</li>\n      <li>액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "unit": "nasal-unit-1",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "permitCode": "200108738",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "cfe3b0f5e320f5ed781d42d570d898d4",
+      "sourceRef": "3e5ba1d0-792e-9cbb-d7eb-a691f7bd5e0d",
+      "title": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "summary": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "contentHash": "a15999081618250d90ca7a1d60e2bcd4",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</span></div>\n    <h1>피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)<small>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(A31402CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">스프레이 노즐은 1~24개월 영아에게, 젯 노즐은 6세 이상 어린이 및 성인에게 아침과 저녁에 각 비강에 2회씩 분사합니다.액이 후두나 인두로 흘러 들어가지 않도록 옆으로 비스듬히 눕거나 일어선 상태로 머리를 기울여서 투여 합니다.</p>\n    <h2>경고</h2>\n    <ul class=\"sd-warn\">\n      <li>젯 노즐은 영유아가 사용 시 분사압력이 커서 잘못된 곳으로 들어가거나 후두 경련이 일어날 위험이 있습니다.</li>\n    </ul>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>스프레이 노즐은 1개월 미만 영아에게 사용하지 않습니다.젯 노즐은 6세 미만 영유아에게 사용하지 않습니다.여러 사람이 함께 사용하면 감염이 전파될 수 있습니다.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>코에 염증이 생긴 경우 일시적으로 따끔거림 등이 나타날 수 있습니다.따끔거림이 지속되는 경우 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "경고",
+        "사용상 주의사항",
+        "이상반응"
+      ]
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "unit": "rectal-unit-1",
+      "productName": "프라맥스에스좌제",
+      "permitCode": "202106673",
+      "route": "rectal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "04d1f99acb5c68103666adbbf559c00f",
+      "sourceRef": "75858572-e9c1-8ffe-0922-654d31400bd8",
+      "title": "프라맥스에스좌제",
+      "summary": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.",
+      "contentHash": "c4f939e4c4479bffb6fe684285320b2e",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 직장용제</span><span class=\"sd-badge\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</span></div>\n    <h1>프라맥스에스좌제<small>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 직장용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화 및 소독에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(E56500CSP) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">만 15세 이상 및 성인은 1회 1개, 1일 3회의 범위 내에서 직장내에 삽입합니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>심장질환, 고혈압, 갑상선질환, 당뇨병, 전립샘비대증으로 인한 배뇨곤란 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성은 의사 또는 약사와 상의하십시오.</li>\n      <li>정해진 용법과 용량을 잘 지키십시오.</li>\n      <li>어린이에게는 사용하지 마십시오.</li>\n      <li>이 약이 무르게 된 경우에는 잠시 냉각시킨 후에 사용하며 또한 지나치게 단단해진 경우에는 무르게 한 후 사용하십시오.</li>\n      <li>이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오.</li>\n      <li>7일정도 사용하여도 증상의 개선이 나타나지 않을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>이상반응</h2>\n    <ul class=\"sd-warn\">\n      <li>충혈되어 붉어짐, 부종(부기), 자극감, 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등), 출혈 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.</li>\n    </ul>\n    <h2>상호작용</h2>\n    <ul class=\"sd-warn\">\n      <li>혈압강하제, 항우울약과 함께 사용하지 마십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항",
+        "이상반응",
+        "상호작용"
+      ]
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "unit": "nasal-unit-1",
+      "productName": "오트리잘비강분무액(염화나트륨)(소아용)15mL",
+      "permitCode": "200410068",
+      "route": "nasal",
+      "stratum": "E_ROUTE_PROFILE_NEW",
+      "officialSourceHash": "892b5096b338ce427b16bc4e4a4a3ca5",
+      "sourceRef": "9bbf0437-c369-a68d-30a6-e46f5d24e0d4",
+      "title": "오트리잘비강분무액(염화나트륨)(소아용)15mL",
+      "summary": "이 약은 코점막 건조 증상의 완화에 사용합니다.",
+      "contentHash": "566942ec9cf0ed7b6eb1ae8b7fc2e90b",
+      "content": "<div class=\"sd-card\">\n  <div class=\"sd-hero\">\n    <div class=\"sd-badges\"><span class=\"sd-badge is-solid\">일반의약품 · 비강용제</span><span class=\"sd-badge\">이 약은 코점막 건조 증상의 완화에 사용합니다.</span></div>\n    <h1>오트리잘비강분무액(염화나트륨)(소아용)15mL<small>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</small></h1>\n  </div>\n  <div class=\"sd-body\">\n    <p class=\"sd-intro\">이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n    <h2>한눈에 보기</h2>\n    <div class=\"sd-core\">\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">분류</span>\n        <p>일반의약품 · 비강용제</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">작용</span>\n        <p>이 약은 코점막 건조 증상의 완화에 사용합니다.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">선택 포인트</span>\n        <p>동일 일반명코드(228731CSI) 제품은 성분·함량·제형이 같습니다. 제품명이 아니라 성분과 함량으로 확인하세요.</p>\n      </div>\n      <div class=\"sd-item\">\n        <span class=\"sd-tag\">주의 대상</span>\n        <p>아래 안전정보 대상에 해당하면 매장 약사에게 먼저 문의하세요.</p>\n      </div>\n    </div>\n    <h2>사용 안내</h2>\n    <p class=\"sd-intake\">2세 미만의 소아는 각각의 콧구멍에 1회씩 뿌립니다.<br>2세 이상의 소아는 하루에 2~4회씩 또는 필요할 때마다 각각의 콧구멍에 1~2회씩 뿌립니다.</p>\n    <h2>사용상 주의사항</h2>\n    <ul class=\"sd-warn\">\n      <li>이 약 또는 벤잘코늄염화물에 과민증 환자는 이 약을 사용하지 마십시오.</li>\n      <li>이 약을 사용하기 전에 점비약 관련 알레르기 증상(예: 발진, 발적, 부기, 자극감 등) 경험자, 최근에 코수술을 했거나, 병에 의한 몸의 변화가 있는 사람은 의사 또는 약사와 상의하십시오.</li>\n      <li>이 약은 점비용으로만 사용하십시오.</li>\n      <li>위생상 한 제품은 한 사람만 사용하십시오.</li>\n    </ul>\n    <p class=\"sd-foot\">이 설명서는 매장 상담을 돕기 위한 것입니다. 제품 선택과 사용 전 매장 약사 등 전문가에게 문의하세요.</p>\n  </div>\n</div>",
+      "sectionsPresent": [
+        "효능·효과",
+        "용법·용량",
+        "사용상 주의사항"
+      ]
+    }
+  ],
+  "routeGate": [
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "1bcc85a0-817b-49d3-b597-08d088998ce5",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "age",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "20abc6bc-7ed9-4aed-b2b9-dde701fe0052",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "2356af1d-c231-4054-b437-85ab09cb78b0",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "age",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "37b9dbbc-2fb3-401c-9b7e-105610d07b66",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "interval",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5215df64-4c1d-4801-8d93-e3c377f33f59",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "timing"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "age",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5a2ffb8b-13b1-462d-a5a1-4c2c94014994",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "66d11137-c915-41bb-b30c-4d48f5e4e78a",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "6cdeec41-ce1f-4f8d-9cff-4a102794273c",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "79c5c2a7-16cb-4694-9245-75347a7dcb59",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "95909623-2ba5-4437-812b-7c4428ff7ddd",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "e21be2a6-8627-47c0-b31a-de8449ad9a0c",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "interval",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ececd42e-557a-4f42-ac6c-9d444143a1e2",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age",
+        "tipHygiene"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "unit": "rectal-unit-1",
+      "route": "rectal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "perDose",
+        "perDay",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "interval",
+        "duration",
+        "timing",
+        "posture"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    },
+    {
+      "masterId": "ffb8e11e-c549-45bc-9cc8-b7f71baf0693",
+      "unit": "nasal-unit-1",
+      "route": "nasal",
+      "lang": "ko",
+      "elementsPreserved": [
+        "site",
+        "delivery",
+        "nostril",
+        "perDose",
+        "age"
+      ],
+      "elementsAbsentInOfficial": [
+        "perDay",
+        "interval",
+        "duration",
+        "preUse",
+        "tipHygiene"
+      ],
+      "elementViolations": [],
+      "inversions": [],
+      "ownMarkerInRendered": true
+    }
+  ]
+}

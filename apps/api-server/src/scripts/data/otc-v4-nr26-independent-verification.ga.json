@@ -1,0 +1,375 @@
+{
+  "wo": "WO-O4O-OTC-EASY-DRUG-V4-NASAL14-RECTAL12-ROUTE-PROFILE-FINAL-READINESS-V1",
+  "agent": "ga",
+  "kind": "independent-verification",
+  "batchId": "otc-v4-nr26",
+  "mode": "PRE_APPLY",
+  "verifiedAt": "2026-07-30T06:07:01.413Z",
+  "port": 5495,
+  "target": 26,
+  "byRoute": {
+    "nasal": 14,
+    "rectal": 12
+  },
+  "liveDbWriteCommitted": 0,
+  "total": 43,
+  "passed": 43,
+  "failed": 0,
+  "pass": true,
+  "gates": [
+    {
+      "id": "IV-01",
+      "gate": "입력 26 재현(carry-over REQUIRES_ROUTE_PROFILE ∩ nasal|rectal)",
+      "expected": "26 · 집합 일치",
+      "actual": "원장 재도출 26 / 선정 26 / 차집합 0",
+      "pass": true
+    },
+    {
+      "id": "IV-02",
+      "gate": "nasal 14 / rectal 12",
+      "expected": "nasal 14 · rectal 12",
+      "actual": "nasal 14 · rectal 12",
+      "pass": true
+    },
+    {
+      "id": "IV-03",
+      "gate": "입력 중복 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-04",
+      "gate": "resolvedRoute drift 0 (route 재판정 없음)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-05",
+      "gate": "unit 배정 정합(nasal-unit-1 / rectal-unit-1)",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-06",
+      "gate": "선행 유효 GREEN 누계 3,378",
+      "expected": "3378",
+      "actual": "3378",
+      "pass": true
+    },
+    {
+      "id": "IV-07",
+      "gate": "선행 GREEN 교집합 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-08",
+      "gate": "source terminal 24 교집합 0 (모집단 24)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-09",
+      "gate": "기구 멸균제 회수 3 교집합 0 (모집단 3)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-10",
+      "gate": "exclude 266 교집합 0 (모집단 266)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-11",
+      "gate": "대상 26 easy ko canonical 정확히 1",
+      "expected": "0건 위반",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-12",
+      "gate": "기존 authored KO·EN canonical 0 (점유 없음)",
+      "expected": "0건",
+      "actual": "authored 0 / en 0",
+      "pass": true,
+      "detail": {
+        "authored": [],
+        "en": []
+      }
+    },
+    {
+      "id": "IV-13",
+      "gate": "canonicalDup 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-14",
+      "gate": "sourceRef 독자 재계산 일치(결정론)",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-15",
+      "gate": "sourceRef 내부 중복 0",
+      "expected": "26 distinct",
+      "actual": "26 distinct",
+      "pass": true
+    },
+    {
+      "id": "IV-16",
+      "gate": "sourceRef LIVE 점유 0 (V2/V3/V4 충돌 없음)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-17",
+      "gate": "공식 원문 hash drift 0 (전체)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-18",
+      "gate": "공식 6섹션 hash drift 0 (독자 파서 재파싱)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-19",
+      "gate": "전문의약품 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-20",
+      "gate": "KO·EN payload 26/26 · 대상 집합 일치",
+      "expected": "KO 26 · EN 26 · 차집합 0",
+      "actual": "KO 26 · EN 26 · 차집합 0",
+      "pass": true
+    },
+    {
+      "id": "IV-21",
+      "gate": "payload contentHash 독자 재계산 일치",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-22",
+      "gate": "공식 섹션 내용 보존(토큰 커버리지 ≥ 0.95)",
+      "expected": "미달 0",
+      "actual": "0개 master 미달",
+      "pass": true,
+      "detail": {
+        "coverage": {
+          "min": 1,
+          "p01": 1,
+          "median": 1,
+          "sections": 113
+        },
+        "worst": []
+      }
+    },
+    {
+      "id": "IV-23",
+      "gate": "수치 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-24",
+      "gate": "연령 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-25",
+      "gate": "기간·횟수 토큰 누락 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-26",
+      "gate": "KO route 표현 역전 0 (§6·§7 금지 계열)",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-27",
+      "gate": "KO 자기 경로 표현 보존(비강/직장)",
+      "expected": "0건 소실",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-28",
+      "gate": "EN route 표현 역전 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-29",
+      "gate": "EN 한글 잔존 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-30",
+      "gate": "EN 신규 수치(원문·KO 밖) 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-31",
+      "gate": "타 master 원문·식별자 혼입 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "id": "IV-32",
+      "gate": "dry-run plan digest 독자 재계산 일치(재현성)",
+      "expected": "0건 불일치",
+      "actual": "0",
+      "pass": true,
+      "detail": {
+        "nasal-unit-1": "3358e7b59b7a8af1ef571576fab721ce39a77052dcd843dafd2582d85d284df3",
+        "rectal-unit-1": "57100f63e1f6a980324e67944aa31eb78516f7e7511362d9921fbcf485b44528"
+      }
+    },
+    {
+      "id": "IV-33",
+      "gate": "rollback-test 26/26 PASS · residue 0",
+      "expected": "0건 위반",
+      "actual": "0",
+      "pass": true,
+      "detail": [
+        {
+          "unit": "nasal-unit-1",
+          "target": 14,
+          "txWrittenThenRolledBack": 84,
+          "committed": 0
+        },
+        {
+          "unit": "rectal-unit-1",
+          "target": 12,
+          "txWrittenThenRolledBack": 72,
+          "committed": 0
+        }
+      ]
+    },
+    {
+      "id": "IV-34",
+      "gate": "rollback TX 내부 write = 26 × 6",
+      "expected": "156",
+      "actual": "156",
+      "pass": true
+    },
+    {
+      "id": "IV-35",
+      "gate": "rollback 잔여 0 (독립 커넥션 재확인)",
+      "expected": "authored 0 · en 0 · ref 0 · audit 0",
+      "actual": "authored 0 · en 0 · ref 0 · auditBatch 0 · auditWo 0",
+      "pass": true
+    },
+    {
+      "id": "IV-36",
+      "gate": "LIVE DB write(커밋) 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-37",
+      "gate": "대상 밖 audit 0",
+      "expected": "0",
+      "actual": "0",
+      "pass": true
+    },
+    {
+      "id": "IV-38",
+      "gate": "source terminal 24 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "IV-39",
+      "gate": "기구 멸균제 3 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "IV-40",
+      "gate": "exclude 266 본 배치 write 0",
+      "expected": "0",
+      "actual": "ref 0 · audit 0",
+      "pass": true
+    },
+    {
+      "id": "IV-41",
+      "gate": "선행 유효 GREEN 3,378 불변(KO·EN content md5 대조)",
+      "expected": "변경 0 · 소실 0",
+      "actual": "변경 0 / 소실 0 / 대상 3378",
+      "pass": true,
+      "detail": {
+        "changed": [],
+        "missing": []
+      }
+    },
+    {
+      "id": "IV-42",
+      "gate": "LIVE apply 이중 게이트 잠금 존재(env 2개 동시 충족 필요)",
+      "expected": "locked",
+      "actual": "locked",
+      "pass": true
+    },
+    {
+      "id": "IV-43",
+      "gate": "현재 세션 LIVE 잠금 해제 안 됨",
+      "expected": "closed",
+      "actual": "closed",
+      "pass": true
+    }
+  ]
+}
