@@ -1,0 +1,137 @@
+{
+ "total": 14,
+ "tally": {
+  "SAFE_FUNCTION_APPLY": 1,
+  "BLOCKED_AMBIGUOUS_BOUNDARY": 13
+ },
+ "decisions": [
+  {
+   "canonicalId": "13b10e8a-86d7-47b5-b8fc-15bb55414239",
+   "candidateId": "5b055df3-8614-417e-bcaf-957d038052bd",
+   "statementNo": "20040015070130",
+   "productName": "포거트(Fourgurt)",
+   "sourceMainFunction": "①유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음,① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음",
+   "status": "SAFE_FUNCTION_APPLY",
+   "reason": "R-A",
+   "clauseCount": 1,
+   "multi": false
+  },
+  {
+   "canonicalId": "140613f3-7282-400c-a8ea-64702763f447",
+   "candidateId": "71bd05a8-2da5-4dda-b2db-899e8b3848c8",
+   "statementNo": "20040020020586",
+   "productName": "디노보 프로제닉스",
+   "sourceMainFunction": "* 프로바이오틱스 ① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음 ③ 장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "424b5e8a-ad93-4473-8e64-86b33e64c993",
+   "candidateId": "c8fabc5c-75f6-4715-8bd4-ef73a97a77ed",
+   "statementNo": "200700170352530",
+   "productName": "AG바이옴 스포츠",
+   "sourceMainFunction": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)] (국문)운동수행능력 향상에 도움을 줄 수 있음 (영문) May help to improve endurance of exercise performance capability [프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "42570f16-75ac-4f90-8e06-86433a618e37",
+   "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+   "statementNo": "2009001702357",
+   "productName": "유렉스 프로바이오틱스 (Urex Plus Vcap-5)",
+   "sourceMainFunction": "유산균 증식을 통한 여성 질 건강에 도움을 줄 수 있음 (생리활성기능 2등급) ,[프로바이오틱스] 유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "59c12dc8-fc8f-4bf5-9aad-1ab7bfdaade3",
+   "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+   "statementNo": "200700170352520",
+   "productName": "맨 TWK10 100억 캡슐",
+   "sourceMainFunction": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)] (국문)운동수행능력 향상에 도움을 줄 수 있음 (영문) May help to improve endurance of exercise performance capability [프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "7c8261dd-3387-4ab1-9930-5e4993d83808",
+   "candidateId": "ba81ab55-f224-4c7a-a10e-9470a2def968",
+   "statementNo": "200700170351496",
+   "productName": "지노프레쉬 질유산균 50억",
+   "sourceMainFunction": "[리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)] (국문) 질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음 (영문) May help to proliferate vaginal beneficial flora and to suppress pathogenic bacteria",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "852ec525-8f37-4d3f-a8c4-8022b43ba681",
+   "candidateId": "3c887a09-d74a-4ff7-8ac1-f03dcc78f839",
+   "statementNo": "200700170351898",
+   "productName": "비타포뮬러 프리프로바이오틱스",
+   "sourceMainFunction": "[프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음 [자일로올리고당(xylooligosaccharide) 분말(제2009-80호)] 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "a666721b-4230-4bf6-aa1b-1b5283f73be6",
+   "candidateId": "51f3192d-afa9-4345-9f9f-f1a2baa34a9c",
+   "statementNo": "200700170351487",
+   "productName": "페미밸런스 플러스",
+   "sourceMainFunction": "[리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)] (국문) 질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음 (영문) May help to proliferate vaginal beneficial flora and to suppress pathogenic bacteria",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "b913aa9c-5165-41c8-91de-ae56f5c30a65",
+   "candidateId": "e3e98ace-5157-4cf8-bbcf-0bde72f1292b",
+   "statementNo": "200700170352447",
+   "productName": "빌드 100억 유산균 액티브",
+   "sourceMainFunction": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)] (국문) 운동수행능력 향상에 도움을 줄 수 있음 (영문) May help to improve endurance of exercise performance capability [프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "d10f757e-2140-4699-9b01-cc31139fe0be",
+   "candidateId": "e0acdaf0-47cb-4cc4-abd9-0c88708ea966",
+   "statementNo": "2019000939480",
+   "productName": "쾌변엔 천둥이 더블케어",
+   "sourceMainFunction": "[프로바이오틱스] 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음 [락추로스 파우더(Lactulose Powder)] , 제2009-40호 (국문) 유익균 증식, 유해균 억제에 도움을 줄 수 있습니다. (영문) May help to increase beneficial intestinal flora and suppress pathogenic bacteria",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "d4667307-5700-41a3-8c23-063724866fde",
+   "candidateId": "4a13ba2c-fa44-4c4a-8f11-4846c06b4ffb",
+   "statementNo": "200700170352690",
+   "productName": "포켓부스터",
+   "sourceMainFunction": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)] 운동수행능력 향상에 도움을 줄 수 있음 [프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "db8c2ae7-e69b-4ef6-8f62-4d882d5e5084",
+   "candidateId": "24516fc0-ea81-47c7-a733-fa5ecfa36f08",
+   "statementNo": "200700170352946",
+   "productName": "이퓨니드 리스펙타 질유산균",
+   "sourceMainFunction": "[리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)] 질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "e28b5f63-dfcd-443a-97d9-e3ce5235b216",
+   "candidateId": "8c3a600b-801d-49b8-839b-a0b9a5b41b9d",
+   "statementNo": "200700170352412",
+   "productName": "익스트림 프로바이오틱스",
+   "sourceMainFunction": "[Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)] (국문) 운동수행능력 향상에 도움을 줄 수 있음 (영문) May help to improve endurance of exercise performance capability [프로바이오틱스] 유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  },
+  {
+   "canonicalId": "f47692e1-74f9-4c17-86e6-725d24f00a48",
+   "candidateId": "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf",
+   "statementNo": "200700170352997",
+   "productName": "마이올랑스 유산균(Myolance Probiotics)",
+   "sourceMainFunction": "[프로바이오틱스] 유산균 증식 및 유해균 억제 ･배변활동 원활 ･장 건강에 도움을 줄 수 있음 [Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)] 운동수행능력 향상에 도움을 줄 수 있음",
+   "status": "BLOCKED_AMBIGUOUS_BOUNDARY",
+   "reason": "BOUNDARY_UNRESOLVED"
+  }
+ ]
+}

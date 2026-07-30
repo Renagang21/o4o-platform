@@ -1,0 +1,39 @@
+{
+ "auditedAt": "2026-07-30T13:25:49.884Z",
+ "finalContractAudit": {
+  "ko_total": 40913,
+  "wae_total": 15371,
+  "has_fn": 40900,
+  "no_fn": 13,
+  "audience_left": 127,
+  "audience_wae": 0,
+  "has_expert": 40786,
+  "no_expert": 127,
+  "has_footer": 40913,
+  "uses_sdfunc": 8718
+ },
+ "before": {
+  "no_fn": 14,
+  "audience": 15435,
+  "no_expert": 13955
+ },
+ "after": {
+  "no_fn": 13,
+  "audience": 127,
+  "no_expert": 127
+ },
+ "outOfScopeRemaining": {
+  "audience_nonWae": 127,
+  "noExpert_nonWae": 127,
+  "note": "왜-family 밖(비-왜-family) 127건 — 본 WO 범위 밖으로 미변경"
+ },
+ "hffCanonical": 40913,
+ "agent9HoldQueue": {
+  "queued": 348,
+  "stillWithoutCanonical": 348,
+  "unchanged": true
+ },
+ "canonicalDup": 0,
+ "enDocsModified": 0,
+ "verdict": "PASS"
+}

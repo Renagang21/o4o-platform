@@ -1,0 +1,29 @@
+{
+ "ranAt": "2026-07-30T13:20:00.957Z",
+ "applied": false,
+ "dbWrites": 0,
+ "totalTargets": 15371,
+ "renderedDocs": 181,
+ "comboCoverage": {
+  "AUD+FOOT": 13764,
+  "AUD": 1543,
+  "FOOT": 63,
+  "FN+AUD+FOOT": 1
+ },
+ "aggregate": {
+  "checked": 543,
+  "docs": 181,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "audienceVisible": 0,
+  "expertMissing": 0,
+  "footerMisplaced": 0,
+  "fnClauseMissing": 0,
+  "rawHtmlVisible": 0,
+  "emptySection": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}

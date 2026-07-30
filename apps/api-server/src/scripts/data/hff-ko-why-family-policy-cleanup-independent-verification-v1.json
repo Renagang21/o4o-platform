@@ -1,0 +1,26 @@
+{
+ "verifiedAt": "2026-07-30T13:25:49.870Z",
+ "readOnlySession": true,
+ "targetCount": 15371,
+ "newHashMatch": 15371,
+ "oldHashRemains": 0,
+ "attrDrift": 0,
+ "audienceLeftInTargets": 0,
+ "expertMissingInTargets": 0,
+ "clauseDuplicated": 0,
+ "fnClauseMissing": 0,
+ "rollbackReversalOk": 15371,
+ "rollbackReversalFail": 0,
+ "outsideTargetsUpdatedSinceBuild": 0,
+ "canonicalDup": 0,
+ "enDocsModified": 0,
+ "agent9HoldQueue": {
+  "queued": 348,
+  "stillWithoutCanonical": 348,
+  "unchanged": true
+ },
+ "hffCanonical": 40913,
+ "verdict": "PASS",
+ "failedChecks": [],
+ "sampleFailures": []
+}

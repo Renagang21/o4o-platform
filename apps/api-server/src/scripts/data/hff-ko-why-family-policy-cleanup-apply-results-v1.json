@@ -1,0 +1,38 @@
+{
+ "ranAt": "2026-07-30T13:23:08.321Z",
+ "wo": "WO-O4O-HFF-KO-WHY-FAMILY-REMAINING-14-AND-AUTHORING-POLICY-FULL-CLEANUP-V1",
+ "status": "APPLIED",
+ "expectedUpdate": 15371,
+ "actualUpdate": 15371,
+ "rolledBack": false,
+ "failReason": null,
+ "elapsedMs": 124744,
+ "countsBefore": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 14,
+  "audience": 15435,
+  "no_expert": 13955,
+  "hff_canonical": 40913
+ },
+ "countsAfter": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 13,
+  "audience": 127,
+  "no_expert": 127,
+  "hff_canonical": 40913
+ },
+ "rowCountUnchanged": true,
+ "deltas": {
+  "no_fn": -1,
+  "audience": -15308,
+  "no_expert": -13828
+ },
+ "effects": {
+  "functionSectionsInserted": 1,
+  "functionClausesRestored": 1,
+  "audienceSectionsRemoved": 15308,
+  "footerClausesAdded": 13828
+ }
+}
