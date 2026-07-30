@@ -1,0 +1,151 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-SKIPPED-EXISTING-2451-FUNCTION-CANONICAL-BACKFILL-V1",
+ "contract": "§21·§23 — 선행 게이트 전량 PASS + 5개 산출물 교집합 확정 후에만 APPLY_APPROVED.",
+ "generatedAt": "2026-07-30T06:31:41.529Z",
+ "scope": {
+  "woTargetSet": 2451,
+  "safeCandidates": 13,
+  "finalApplyTargets": 13,
+  "humanReview": 138,
+  "unsupportedStructure": 68,
+  "noChange": 2232,
+  "scopeExpansion": false
+ },
+ "allowedUpdateColumns": [
+  "content",
+  "updated_at"
+ ],
+ "checks": [
+  {
+   "name": "GATE_PREAPPLY_VERIFICATION",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_FIXTURE_CHECK",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_FUNCTION_DIFF",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_QUALITY_SAMPLES",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_FULL_REGRESSION",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_RENDER_AUDIT",
+   "ok": true,
+   "evidence": {
+    "verdict": "PASS"
+   }
+  },
+  {
+   "name": "GATE_RENDERER_FAMILY_AUDIT",
+   "ok": true,
+   "evidence": {
+    "DRIVER": 15,
+    "COMPOSITE": 2436,
+    "OTHER_OR_UNKNOWN": 0
+   }
+  },
+  {
+   "name": "GATE_SOURCE_METADATA_AUDIT",
+   "ok": true,
+   "evidence": {
+    "sourceType": {
+     "o4o_hff_generated": 2451
+    },
+    "sourceRefKind": {
+     "EQ_CANDIDATE_ID": 2451
+    }
+   }
+  },
+  {
+   "name": "INTERSECTION_COMPLETE",
+   "ok": true,
+   "evidence": {
+    "safeTargets": 13,
+    "diffSafe": 13,
+    "qualitySafe": 13,
+    "renderPassAllWidths": 13,
+    "final": 13
+   }
+  },
+  {
+   "name": "NO_SCOPE_EXPANSION",
+   "ok": true,
+   "evidence": {
+    "final": 13
+   }
+  },
+  {
+   "name": "QUALITY_ALL_PASS",
+   "ok": true,
+   "evidence": {
+    "violations": 0
+   }
+  },
+  {
+   "name": "REGRESSION_INTERSECTIONS_EMPTY",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "NO_BASELINE_DRIFT",
+   "ok": true,
+   "evidence": {
+    "drift": []
+   }
+  },
+  {
+   "name": "NO_PATCH_VERIFY_FAILURE",
+   "ok": true,
+   "evidence": {
+    "failures": []
+   }
+  },
+  {
+   "name": "MANIFEST_COVERS_FINAL_SET",
+   "ok": true,
+   "evidence": {
+    "manifest": 13,
+    "final": 13
+   }
+  },
+  {
+   "name": "MANIFEST_ROLLBACK_PAYLOAD_PRESENT",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "MANIFEST_CANONICAL_IDS_UNIQUE",
+   "ok": true,
+   "evidence": {}
+  },
+  {
+   "name": "MANIFEST_SOURCE_METADATA_UNCHANGED",
+   "ok": true,
+   "evidence": {}
+  }
+ ],
+ "verdict": "APPLY_APPROVED"
+}

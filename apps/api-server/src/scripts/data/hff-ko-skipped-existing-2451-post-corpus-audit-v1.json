@@ -1,0 +1,120 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-SKIPPED-EXISTING-2451-FUNCTION-CANONICAL-BACKFILL-V1",
+ "contract": "§27 — 전체 corpus 사후 감사. 공식 기능성 반복·h2 부재·마커 잔존·(국문) 선두 표기는 실패로 계산하지 않는다. 공식 기능성 문구 존재는 필수(§26 에서 판정).",
+ "generatedAt": "2026-07-30T06:34:55.215Z",
+ "corpusPost": {
+  "rows": 40913,
+  "corpusMd5": "ebc73eaf078d0bf35eeb33973d4b6b34",
+  "totalBytes": "74201818"
+ },
+ "corpusPre": {
+  "rows": 40913,
+  "corpusMd5": "a9455aea2c3ad048d81638ccd3d833a9",
+  "totalBytes": "74201230"
+ },
+ "expectedChanges": [
+  {
+   "canonicalId": "a3d2ed4f-b1be-48a0-8e89-c0a4788dee30",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "c10d481d-4fe3-4545-b812-816d6b72b3de",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "2f85d5c1-3e69-484d-9b53-c0ee41e71cef",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "a1581991-6869-422e-9ce5-0f59a96d8b2c",
+   "lengthDelta": 29
+  },
+  {
+   "canonicalId": "30fcd2e8-a79b-4718-911d-cf7b00efa01c",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "653f19dd-fe29-4cef-a857-feef2f6c8cce",
+   "lengthDelta": 33
+  },
+  {
+   "canonicalId": "20672358-9a6f-4246-aa9e-763cdb48511e",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "2c8ccb93-c593-4183-b891-be9f0cbe5721",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "1c22e0d3-9989-4088-b94b-ba8b56f3f08b",
+   "lengthDelta": 40
+  },
+  {
+   "canonicalId": "fb0bf767-e730-4b0e-8c6a-075e977e881a",
+   "lengthDelta": 80
+  },
+  {
+   "canonicalId": "5dc7205b-6f9e-43c6-84b7-01f5b13c2809",
+   "lengthDelta": 80
+  },
+  {
+   "canonicalId": "4697ae16-14b5-45d2-a51e-165b18e829bf",
+   "lengthDelta": 46
+  },
+  {
+   "canonicalId": "e23b9e51-7494-43c2-b94f-eb05be606ef2",
+   "lengthDelta": 40
+  }
+ ],
+ "unexpectedChanges": [],
+ "checks": [
+  {
+   "name": "SNAPSHOT_COVERS_2451",
+   "ok": true,
+   "evidence": {
+    "post": 2451
+   }
+  },
+  {
+   "name": "CHANGED_SET_EQUALS_MANIFEST",
+   "ok": true,
+   "evidence": {
+    "changed": 13,
+    "manifest": 13
+   }
+  },
+  {
+   "name": "NO_UNEXPECTED_CHANGE",
+   "ok": true,
+   "evidence": {
+    "unexpected": []
+   }
+  },
+  {
+   "name": "CORPUS_ROW_COUNT_UNCHANGED",
+   "ok": true,
+   "evidence": {
+    "pre": 40913,
+    "post": 40913
+   }
+  },
+  {
+   "name": "CORPUS_HASH_CHANGED_ONLY_BY_APPLY",
+   "ok": true,
+   "evidence": {
+    "preMd5": "a9455aea2c3ad048d81638ccd3d833a9",
+    "postMd5": "ebc73eaf078d0bf35eeb33973d4b6b34"
+   }
+  },
+  {
+   "name": "CORPUS_BYTES_GREW_BY_INSERTS_ONLY",
+   "ok": true,
+   "evidence": {
+    "preBytes": "74201230",
+    "postBytes": "74201818",
+    "sumDelta": 588
+   }
+  }
+ ],
+ "verdict": "PASS"
+}

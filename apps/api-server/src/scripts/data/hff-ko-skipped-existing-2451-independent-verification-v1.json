@@ -1,0 +1,222 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-SKIPPED-EXISTING-2451-FUNCTION-CANONICAL-BACKFILL-V1",
+ "contract": "§26 — apply 계산을 재사용하지 않고 DB 실측값만으로 재검증. rollback payload 대비 additive-only·구조·metadata 불변 판정.",
+ "generatedAt": "2026-07-30T06:34:55.211Z",
+ "targetCount": 13,
+ "checks": [
+  {
+   "name": "ALL_TARGETS_VERIFIED",
+   "ok": true,
+   "evidence": {
+    "verified": 13,
+    "expected": 13
+   }
+  },
+  {
+   "name": "NO_TARGET_FAILURE",
+   "ok": true,
+   "evidence": {
+    "failures": []
+   }
+  },
+  {
+   "name": "NO_CANONICAL_DUPLICATE",
+   "ok": true,
+   "evidence": {
+    "duplicates": []
+   }
+  },
+  {
+   "name": "UPDATED_ROW_COUNT_MATCHES",
+   "ok": true,
+   "evidence": {
+    "updated": 13
+   }
+  }
+ ],
+ "verdict": "PASS",
+ "perTarget": [
+  {
+   "candidateId": "dd0d1bbc-9a28-4bd0-9c0d-15ec5a5b0fab",
+   "canonicalId": "c10d481d-4fe3-4545-b812-816d6b72b3de",
+   "productName": "웨이크 뉴로(WAKE NEURO)",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "10e46023192e15da5294199ef0d3630175cdf82b73e57f75ff59eb06aa54decd",
+   "expectedHash": "10e46023192e15da5294199ef0d3630175cdf82b73e57f75ff59eb06aa54decd",
+   "dbLength": 2716,
+   "rollbackLength": 2676,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "7aeacc04-79a2-4273-9922-cfd8d25f91c2",
+   "canonicalId": "2f85d5c1-3e69-484d-9b53-c0ee41e71cef",
+   "productName": "jw중외제약 치아튼튼 인사프로",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "1228efd8054b534980a3c9ee889147d08ccdd309f170feeffb3e966b2eeff01b",
+   "expectedHash": "1228efd8054b534980a3c9ee889147d08ccdd309f170feeffb3e966b2eeff01b",
+   "dbLength": 2998,
+   "rollbackLength": 2958,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "b929525c-71e1-4bbc-b16e-984475b76dbe",
+   "canonicalId": "a3d2ed4f-b1be-48a0-8e89-c0a4788dee30",
+   "productName": "인사튼튼 덴탈케어",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "36c7d933c879046df7803972b10485bd60b1412deb4eebdb739965fd1df5c829",
+   "expectedHash": "36c7d933c879046df7803972b10485bd60b1412deb4eebdb739965fd1df5c829",
+   "dbLength": 2995,
+   "rollbackLength": 2955,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "bb90dc2a-8dc2-4b59-b27a-c426f0d5ea5f",
+   "canonicalId": "a1581991-6869-422e-9ce5-0f59a96d8b2c",
+   "productName": "키클래오042",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "6bf68727f738aa9ce3abd1717c6e6c0ace4a6c834609fdf96aae1a682d18d49d",
+   "expectedHash": "6bf68727f738aa9ce3abd1717c6e6c0ace4a6c834609fdf96aae1a682d18d49d",
+   "dbLength": 1695,
+   "rollbackLength": 1666,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "4ef749bf-c9db-4b7b-baed-41a5857dac9e",
+   "canonicalId": "653f19dd-fe29-4cef-a857-feef2f6c8cce",
+   "productName": "메타그린 젤리 더블컷",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "c1cfa16fd64c9dc85c2df3cba3c28331ca65d6cf9ffd345ffd93d19f2f7e73f7",
+   "expectedHash": "c1cfa16fd64c9dc85c2df3cba3c28331ca65d6cf9ffd345ffd93d19f2f7e73f7",
+   "dbLength": 1763,
+   "rollbackLength": 1730,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "a23cb01d-b5bb-4a3d-bdd5-3d605442be0a",
+   "canonicalId": "20672358-9a6f-4246-aa9e-763cdb48511e",
+   "productName": "스몰윈도우 마디프리놀 골드",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "ac839948104bc1b5cb31c03a1b22df9f1677accfc62fe8fd34e3c76bbe409997",
+   "expectedHash": "ac839948104bc1b5cb31c03a1b22df9f1677accfc62fe8fd34e3c76bbe409997",
+   "dbLength": 1531,
+   "rollbackLength": 1491,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "681e37dc-7bcf-49d1-a9a7-9c217494b556",
+   "canonicalId": "2c8ccb93-c593-4183-b891-be9f0cbe5721",
+   "productName": "프리미엄 초록입홍합오일",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "eb0232b2ae501a6c6dd291c528b74d469c43ed02eb4eba15ba204607a2bcba49",
+   "expectedHash": "eb0232b2ae501a6c6dd291c528b74d469c43ed02eb4eba15ba204607a2bcba49",
+   "dbLength": 1477,
+   "rollbackLength": 1437,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "08afd7ae-774f-4c34-ae55-f0dbf4f2578d",
+   "canonicalId": "1c22e0d3-9989-4088-b94b-ba8b56f3f08b",
+   "productName": "웰스루테인지아잔틴",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "1d307b32ea31042d0c23e3283a83df1366ed8ae788eadaf3cdcc8c0c09f868a8",
+   "expectedHash": "1d307b32ea31042d0c23e3283a83df1366ed8ae788eadaf3cdcc8c0c09f868a8",
+   "dbLength": 3474,
+   "rollbackLength": 3434,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "8624d111-d7a8-45e9-90b3-b99613ee2957",
+   "canonicalId": "30fcd2e8-a79b-4718-911d-cf7b00efa01c",
+   "productName": "오큐시안 멀티",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "9557cddc855f4e3fc9f55a61e71ffc7c5bf909f63bfffd17375f38ac8c09207a",
+   "expectedHash": "9557cddc855f4e3fc9f55a61e71ffc7c5bf909f63bfffd17375f38ac8c09207a",
+   "dbLength": 3598,
+   "rollbackLength": 3558,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "a5beea3b-d79e-4e91-9e63-5f03c78daea9",
+   "canonicalId": "fb0bf767-e730-4b0e-8c6a-075e977e881a",
+   "productName": "스템플렉스 캡슐",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 2,
+   "dbContentHash": "a9d097b5e63deef738485fe19c405d5b27c56a3ea38e7c2888a71e759d78da93",
+   "expectedHash": "a9d097b5e63deef738485fe19c405d5b27c56a3ea38e7c2888a71e759d78da93",
+   "dbLength": 2438,
+   "rollbackLength": 2358,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "cd1782f9-e443-4622-8da3-74dd4cfad8ff",
+   "canonicalId": "5dc7205b-6f9e-43c6-84b7-01f5b13c2809",
+   "productName": "레스플렉스 캡슐",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 2,
+   "dbContentHash": "2c570800d2d1c676c7682ede7ebc3b6ad3635e16e5d3ce1abe12e157feee3e32",
+   "expectedHash": "2c570800d2d1c676c7682ede7ebc3b6ad3635e16e5d3ce1abe12e157feee3e32",
+   "dbLength": 2137,
+   "rollbackLength": 2057,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "39894b49-b7c1-4c9c-9ac3-2e19070be34d",
+   "canonicalId": "4697ae16-14b5-45d2-a51e-165b18e829bf",
+   "productName": "웰러스 바른 핏 가르시니아",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "8aef9ec2c7fb937bc24bf3629c70e40b9ad36abe698dfeff95befcfd1efd180b",
+   "expectedHash": "8aef9ec2c7fb937bc24bf3629c70e40b9ad36abe698dfeff95befcfd1efd180b",
+   "dbLength": 2118,
+   "rollbackLength": 2072,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  },
+  {
+   "candidateId": "50478f47-6a5f-4575-86fd-d57bb1f136a1",
+   "canonicalId": "e23b9e51-7494-43c2-b94f-eb05be606ef2",
+   "productName": "초임계 루테인 아스타잔틴",
+   "rendererFamily": "COMPOSITE",
+   "insertCount": 1,
+   "dbContentHash": "2d2ddd4faa7d9f234ecefa7e1601e19bdc0d1ac47ba3a725d76aeb57ba304ca9",
+   "expectedHash": "2d2ddd4faa7d9f234ecefa7e1601e19bdc0d1ac47ba3a725d76aeb57ba304ca9",
+   "dbLength": 2961,
+   "rollbackLength": 2921,
+   "updatedAt": "2026-07-29T21:33:09.753Z",
+   "verdict": "PASS",
+   "fails": []
+  }
+ ]
+}

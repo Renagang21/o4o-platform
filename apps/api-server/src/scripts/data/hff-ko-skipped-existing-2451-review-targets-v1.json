@@ -1,0 +1,6893 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-SKIPPED-EXISTING-2451-FUNCTION-CANONICAL-BACKFILL-V1",
+ "contract": "§16 — 기존 구조를 보존한 자동 삽입이 불가하여 DB write 없이 사람 검토로 분리한 대상.",
+ "generatedAt": "2026-07-30T06:23:39.876Z",
+ "count": 206,
+ "reasonCount": {
+  "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS": 4,
+  "INGREDIENT_CARD_NOT_FOUND": 33,
+  "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS": 9,
+  "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL": 26,
+  "INSERT_CLAUSE_CARRIES_INLINE_LABEL": 3,
+  "MULTIPLE_FUNCTIONAL_SECTIONS": 5,
+  "NO_FUNCTIONAL_SECTION": 68,
+  "INSERT_CLAUSE_NO_FUNCTION_PREDICATE": 6,
+  "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT": 38,
+  "INSERT_CLAUSE_LEADING_PUNCTUATION": 10,
+  "PARTIAL_DUPLICATION_RISK": 4
+ },
+ "items": [
+  {
+   "candidateId": "1be30296-2968-4384-9c84-97d6046cf0f4",
+   "canonicalId": "b436560d-307f-482c-949e-2e6ef5f29d73",
+   "statementNo": "200400150831475",
+   "productName": "한미 혈당콜레스테롤 케어",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "마늘",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "마늘",
+     "clause": "정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "3c4e0a54-909d-4f0d-b9c2-db481a8ad672",
+   "canonicalId": "cf91a27d-3e83-4c09-a930-701728269fa0",
+   "statementNo": "200400150831566",
+   "productName": "어린콜라겐 펩타이드 비오틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "어두운 곳에서 시각 적응을 위해 필요"
+    },
+    {
+     "header": null,
+     "clause": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "c71ccb68-f0e8-40af-ae7a-a29f50b11248",
+   "canonicalId": "710c5309-1332-4317-b7bd-63b2fb8dcd1c",
+   "statementNo": "200400150832066",
+   "productName": "연골관절건강 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4c504a29-ea61-4ccd-8072-e443d010080b",
+   "canonicalId": "0e4290ba-dcc8-4006-a020-9603d962c191",
+   "statementNo": "200400150832078",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "b3898e9d-395b-40fd-96c3-c06f3e480151",
+   "canonicalId": "e4c848f8-cce3-42c3-b6e9-624d82ce5467",
+   "statementNo": "200400150832099",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "2e1d5408-8dbb-4b02-ad66-3711aa22be16",
+   "canonicalId": "bdf9eb7e-664a-4b9f-b916-952bf4e3c058",
+   "statementNo": "200400150832101",
+   "productName": "관절편한 뮤코다당콘드로이친 1200 플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "a01dab76-45cf-4a43-a94d-e97bade28d2a",
+   "canonicalId": "c8a1d105-9f14-410d-8b6e-02d1fcb06371",
+   "statementNo": "200400150832104",
+   "productName": "관절 튼튼 뮤코다당단백 콘드로이친+",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민B6",
+     "clause": "단백질 및 아미노산 이용에 필요"
+    },
+    {
+     "header": "비타민B6",
+     "clause": "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "c11167a8-04a0-4f30-858e-f1c19b55a635",
+   "canonicalId": "bba75652-7a63-4d12-b259-325b86cb27fc",
+   "statementNo": "200400150832138",
+   "productName": "관절연골엔 뮤코다당단백 콘드로이친 1500",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "6e759910-5047-4b0e-829a-9f6040c13192",
+   "canonicalId": "dd7d055b-48fb-4eab-9ced-88116350fc34",
+   "statementNo": "200400150832141",
+   "productName": "관절연골엔 보스웰리아 콘드로이친 뮤코다당단백",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "1e9f703a-a581-46be-940e-3f750bfe71a8",
+   "canonicalId": "f7387278-16c2-4a8a-a410-2e1ed2f51863",
+   "statementNo": "200400150832147",
+   "productName": "관절의 품격",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "bd42c707-6bde-48ff-8487-fb6540ed5020",
+   "canonicalId": "7207ecec-e567-4585-ad56-3704b216e171",
+   "statementNo": "200400150832177",
+   "productName": "Strong Bone MSM + NAG",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "97f64a4b-3e5a-4905-a533-2c4c143e5418",
+   "canonicalId": "10f59f16-1d63-4792-9200-89bde551b13e",
+   "statementNo": "200400150832186",
+   "productName": "뮤코다당단백 콘드로이친 1200+비타민D+망간 트리플액션",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f149c098-069c-4612-9051-21887708d84c",
+   "canonicalId": "72a9725d-3f83-465d-bfd7-756588e4a652",
+   "statementNo": "200400150832268",
+   "productName": "연골 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f9b3ef2a-35e4-4232-8cb6-9139cb50a73e",
+   "canonicalId": "7716d638-6b8a-45b0-8963-0701cd9ccdb3",
+   "statementNo": "200400150832295",
+   "productName": "관절연골건강 콘드로이친 뮤코다당단백 1500mg 함유",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "511efa3c-c3ba-445e-bb3c-b97d4452455f",
+   "canonicalId": "f22b949f-0110-4c3b-9179-f427595b2980",
+   "statementNo": "200400150832298",
+   "productName": "인테라 엠지투에이 관절연골케어 콘드로이친 뮤코다당단백 1400",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "11bf7cb3-ccf4-4c07-88db-055f5e96b7b9",
+   "canonicalId": "0ed404ec-bf0b-4b96-b601-06f858751456",
+   "statementNo": "200400150832313",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1500 철갑상어 소 연골",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "aee59666-1abc-4069-950b-a08bb6dc3c99",
+   "canonicalId": "d57333f9-a179-40ea-bfa0-b4dc43a01d54",
+   "statementNo": "200400150832393",
+   "productName": "백세 관절튼튼 뮤코다당단백(콘드로이친) 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d15f4eb5-967c-4466-aa04-b8f7ab48f3f3",
+   "canonicalId": "a46f7365-7aba-408b-9501-d101e2dfd2ef",
+   "statementNo": "200400150832490",
+   "productName": "뮤코다당단백 콘드로이친 프라임",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d43d0c62-8090-42f1-8ba9-b52b79c38832",
+   "canonicalId": "1ba35437-429e-41e0-9e67-4f9b86493f37",
+   "statementNo": "200400150832525",
+   "productName": "Crystal Skin Premium Bovine Cartilage Boswellia Chondroitin 1200 크리스탈 스킨 프리미엄 소 연골 보스웰리아 콘드로이친 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "62497d96-af8e-4891-aa07-04322ab2349a",
+   "canonicalId": "46848dea-bc82-4303-b254-e43c75ee6dba",
+   "statementNo": "20040015104267",
+   "productName": "애터미 홍삼 & 비수리킹",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비수리추출분말",
+     "clause": "갱년기 남성건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "이 홍삼의 공식 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-fn",
+     "itemCount": 6,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "7f0759dd-8f31-434f-ba45-f15bf7b25205",
+   "canonicalId": "fbf5c109-3a65-4015-94f5-ed30d5d0188c",
+   "statementNo": "20040015104313",
+   "productName": "유한m 프리미엄 소연골 콘드로이친 뮤코다당단백 1500",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "5e2040d8-f76e-4d72-985e-11fa4773deb0",
+   "canonicalId": "8b88f04f-14dc-4872-a3c5-e6516dec3d14",
+   "statementNo": "20040015104317",
+   "productName": "관절연골엔 콘드로이친 뮤코다당단백 1500",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "1a8bf67e-751d-4f29-9075-f5a17ba454d1",
+   "canonicalId": "6e503c2f-9dcf-491c-97c5-4dfd4d80d57e",
+   "statementNo": "200400151071108",
+   "productName": "프로모나 비오틴 10000",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 17,
+     "ingredients": [
+      "나이아신",
+      "비오틴",
+      "비타민 B1",
+      "비타민 B12",
+      "비타민 B2",
+      "비타민 B6",
+      "비타민 C",
+      "셀레늄",
+      "아연",
+      "엽산",
+      "판토텐산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "8bc820ca-e952-4381-bd90-4fdd140f8582",
+   "canonicalId": "1631dc7d-cd51-4521-ab1c-5adef67e93ca",
+   "statementNo": "200400151071329",
+   "productName": "평제원관절연골정",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_CARRIES_INLINE_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘 :뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증 발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "비타민D :칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "582f5161-f1db-49dd-b4a1-7f0402b91aa5",
+   "canonicalId": "e143926f-8d62-4daa-b9ae-588a055295ed",
+   "statementNo": "20040015162286",
+   "productName": "컷앤핏 트리플 다이어트",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MULTIPLE_FUNCTIONAL_SECTIONS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "피부보습에 도움을 줄 수 있음,-가르시니아캄보지아추출물 : 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "체지방 감소에 도움을 줄 수 있음(생리활성기능2등급)"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    },
+    {
+     "h2": "함께 표시된 공식 기능성 (원문 보존)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "932832b0-ad3f-4581-b5bd-c0c27e3528ce",
+   "canonicalId": "4894cf31-3e14-4597-b8ac-9f12a2c8a674",
+   "statementNo": "20040015162434",
+   "productName": "DH프라임생유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "a8807137-220e-437a-81ac-08200d9b1e02",
+   "canonicalId": "9f46dba4-849d-4f35-8d52-24fa38fb4304",
+   "statementNo": "20040015162494",
+   "productName": "소연골 뮤코다당·단백 콘드로이친 스트롱(BOVINE CARTILAGE Mucopolysaccharide protein)",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "bf841617-5bab-415e-9117-2b1ca71d2ee5",
+   "canonicalId": "7f372926-cd54-4860-915d-2539fe377c04",
+   "statementNo": "2004001516271",
+   "productName": "식이섬유화이버캡",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동 원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동 원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동 원활"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "956d9fa3-8396-4381-b0de-a5a6f5c6dbe1",
+   "canonicalId": "a05f472c-77b9-4901-a87f-d7cb85f25368",
+   "statementNo": "2004001516277",
+   "productName": "식이섬유화이버플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동 원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동원활"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "fbce5c73-5bf8-4573-bf59-1df5b9d4cb69",
+   "canonicalId": "319c9cc1-820d-4e2f-8725-f9f946fc445f",
+   "statementNo": "2004001516278",
+   "productName": "화이버오렌지향",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동 원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동원활"
+    },
+    {
+     "header": "차전자피 제품",
+     "clause": "배변활동원활"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "33725df6-4b00-4e5b-977a-85631e8caae4",
+   "canonicalId": "f09933df-8f5d-4d70-bbe1-029fb7b5f11f",
+   "statementNo": "2004001516284",
+   "productName": "경남비타민씨플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요 비타민B6 : 단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 9,
+     "ingredients": [
+      "나이아신",
+      "비오틴",
+      "비타민 B6",
+      "비타민 C",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "a8c06c2a-b732-4a51-b0b6-c056e9e9c1f3",
+   "canonicalId": "8ea913f4-c2c7-4472-8d3e-cf9b2d3164ae",
+   "statementNo": "200400170061930",
+   "productName": "동국 루테인지아잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "⌜건강기능식품의 기준 및 규격⌟ 제3.2.2-26 마리골드꽃추출물에 따름"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "루테인 기능성 (공식 인정)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 4,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f95133ba-0ede-43f6-a3fa-a38cb056a898",
+   "canonicalId": "63c56c03-f83a-48f1-9131-e204ef123a87",
+   "statementNo": "200400170211846",
+   "productName": "트루 뼈건강 칼마디",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "칼슘",
+     "clause": "정상적인 혈액응고에 필요 4)골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 9,
+     "ingredients": [
+      "마그네슘",
+      "비타민 D",
+      "칼슘"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "53f9d8c1-8151-47bb-93ee-62b72d8e3cda",
+   "canonicalId": "8e8f379b-9f5e-4c19-bdf6-63f877aaf84c",
+   "statementNo": "200400170211891",
+   "productName": "관절엔 대한보감 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요,"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요,"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요,"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요,"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요,"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "579a4c9b-5b58-4f4d-a892-2a2e1ec0634e",
+   "canonicalId": "d9ec8670-76ba-454d-b220-6fb7877ff840",
+   "statementNo": "20040017038131",
+   "productName": "온에이지(ONAGE)",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "PARTIAL_DUPLICATION_RISK",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)",
+     "clause": "관절 및 연골 건강·피부보습에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "1a220d40-46e0-4966-8065-c72a0a2c1854",
+   "canonicalId": "89f8df53-7e78-495d-8816-0c960196da7a",
+   "statementNo": "20040017038305",
+   "productName": "관절나라",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "칼슘",
+     "clause": "뼈와 치아 형성에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "골다공증 발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "마그네슘",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "마그네슘",
+     "clause": "신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "5270c34a-19f2-4d21-8bb2-57565b49051a",
+   "canonicalId": "cf11f905-1b07-4980-8f17-422854309c74",
+   "statementNo": "2004001706177",
+   "productName": "관절연골엔 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d8d04c97-a187-48c9-879c-72ab3a7fd0fd",
+   "canonicalId": "5cd57865-2e78-4823-936a-c537bc363a4f",
+   "statementNo": "2004001706179",
+   "productName": "관절연골엔 뮤코다당단백 콘드로이친 프리미엄 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "139afef9-81a7-4d4b-81a6-a37db8080bf6",
+   "canonicalId": "d637e6d8-4031-488e-9903-8c3bc6cf53e9",
+   "statementNo": "200400200021905",
+   "productName": "스마일렌 식물성오메가3  ",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "\"건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "(생리활성기능 2등급)\""
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "비타민 E",
+      "오메가3"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "07d4da79-a932-4431-875a-8360575165e3",
+   "canonicalId": "7ca1fb8d-c6a1-4bd0-8de5-8e44245fcb1e",
+   "statementNo": "200400200021918",
+   "productName": "비타민D2000IU",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.,비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "비타민 D 영양기능 (공식 인정 기능성)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 3,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "23414fb4-d5c6-41db-b780-23ac4bf5a7d2",
+   "canonicalId": "4cc20bab-d62b-4a6e-9029-8fdf5199eb82",
+   "statementNo": "200400200022048",
+   "productName": "무브케어",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "PARTIAL_DUPLICATION_RISK",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "관절 및 연골 건강·피부보습에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈와 치아 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    },
+    {
+     "header": null,
+     "clause": "뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "cb894d83-7135-4d45-ac86-73b94199c46d",
+   "canonicalId": "dcce76fc-edb4-4e7e-b8f1-1a155c8220ee",
+   "statementNo": "200400200022179",
+   "productName": "프렌·디 2000IU",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌.,비타민D : 칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "비타민 D 영양기능 (공식 인정 기능성)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 3,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "7bfce546-bc42-4c38-b3d5-e42452a99763",
+   "canonicalId": "d67e2caf-1208-46ff-8ce2-2dfb2dd492ef",
+   "statementNo": "200400200022706",
+   "productName": "인스킨밸런스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "N-아세틸글루코사민",
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "e1312b21-d7f1-427d-8bfd-86eddb5be87d",
+   "canonicalId": "1ca40c7f-460a-49ec-8593-baa03a734f5f",
+   "statementNo": "200400200023200",
+   "productName": "피부N365",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MULTIPLE_FUNCTIONAL_SECTIONS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    },
+    {
+     "h2": "함께 표시된 공식 기능성 (원문 보존)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 3,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d5e3e673-d41e-44d2-bcba-70c55ce566cb",
+   "canonicalId": "a85fedd1-aeca-42df-93bd-6c435c6e910e",
+   "statementNo": "200400200023202",
+   "productName": "뷰빗 팻바이부스터",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "체지방 감소에 도움을 줄 수 있음, 운동으로 인한 피로 개선에 도움을 줄 수 있음."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "473f17f9-6553-4b76-a966-7e4c8ed0f65a",
+   "canonicalId": "52ecbd57-63a3-4012-8974-96e6c036eec5",
+   "statementNo": "200400200023381",
+   "productName": "관절 연골 뮤코다당단백 콘드로이친 골드",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "42928d33-cb66-4e0a-b551-47135153cea2",
+   "canonicalId": "6827979d-98a2-41b2-9f62-27a1b4e6290a",
+   "statementNo": "200400200023392",
+   "productName": "관절엔 소연골 뮤코다당단백 콘드로이친 골드",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "00c89e23-6d75-4f65-9255-c900a8824263",
+   "canonicalId": "bab7eab8-7627-4001-ad82-ef567ca234c1",
+   "statementNo": "200400200023414",
+   "productName": "더마뷰티 스킨부스터",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MULTIPLE_FUNCTIONAL_SECTIONS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    },
+    {
+     "h2": "함께 표시된 공식 기능성 (원문 보존)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 5,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "8f01874b-1828-40fa-bf11-46b931baf776",
+   "canonicalId": "84760022-f1bf-4e29-8617-10c8904f1788",
+   "statementNo": "200400200023577",
+   "productName": "피부엔 로즈마리 히알루론산",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MULTIPLE_FUNCTIONAL_SECTIONS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    },
+    {
+     "h2": "함께 표시된 공식 기능성 (원문 보존)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 4,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "41b80f08-4bdf-4fff-a378-3723556ff6c8",
+   "canonicalId": "d2ed3100-f304-4c8f-8d61-6008f647900e",
+   "statementNo": "200400200023758",
+   "productName": "티에스 뮤코다당단백 콘드로이친",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4f6babca-9a7d-4680-9721-df88a7f19b07",
+   "canonicalId": "0551b32e-3fa9-4dc5-afae-9cd99720201a",
+   "statementNo": "200400200023855",
+   "productName": "마이포텐 올인원 스킨글로우",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "관절 및 연골 건강·피부보습에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "피부보습·자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요."
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요."
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 4,
+     "ingredients": [
+      "N-아세틸글루코사민",
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "bb178739-c177-435f-a8ac-53e237eff03e",
+   "canonicalId": "54d12e15-6d69-4c15-9746-3acb504835ac",
+   "statementNo": "200400200023944",
+   "productName": "의사가 성분배합한 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌."
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요."
+    },
+    {
+     "header": null,
+     "clause": "세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요."
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "70c33534-3428-42a8-955d-cd9dff6f7c93",
+   "canonicalId": "8ed5216e-66ad-43ff-8635-7fc63d317b87",
+   "statementNo": "200400200061350",
+   "productName": "프로바이오틱스100억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "9dfc9006-049a-4619-bbc0-9d150cb42ca4",
+   "canonicalId": "fa19d351-3c79-4bfd-8b19-260454322eb4",
+   "statementNo": "200400200061382",
+   "productName": "프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "733faae1-1279-4ccd-bbc0-fee8d7e43e5d",
+   "canonicalId": "90679722-255c-4c31-b402-7009ed38847a",
+   "statementNo": "200400200061398",
+   "productName": "프로바이오틱스 플러스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "715828d6-b727-4121-a846-fafab0584ad6",
+   "canonicalId": "eb26c937-aa22-43d5-aa4e-5b46885fef0d",
+   "statementNo": "200400200061626",
+   "productName": "올인원 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "416cd09a-9244-4637-8d81-3d60c0342727",
+   "canonicalId": "c9f80d6c-498b-4b91-b95b-2728a58289dd",
+   "statementNo": "200400200061628",
+   "productName": "식물성 유산균 패밀리",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "06f0df75-7a1d-4299-8ab8-d1c114dbdd38",
+   "canonicalId": "05fea192-e6bf-44ba-ad14-e0f8a63b9037",
+   "statementNo": "200400200061629",
+   "productName": "바이오코어 100억 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "873f90af-1240-4b9e-9086-1f267c6c61dd",
+   "canonicalId": "a72b349e-4465-40b3-a1a2-786f45992568",
+   "statementNo": "200400200061637",
+   "productName": "유산균 플러스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "b865627e-d9a6-45d9-a9c9-c712cc062a8e",
+   "canonicalId": "c3326944-967e-49b7-b6d9-6f15411dec4e",
+   "statementNo": "200400200061645",
+   "productName": "에이치 005 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "adbc8a87-2357-4e18-83e1-522ff0868193",
+   "canonicalId": "f89af6d9-1170-4bce-92b7-937abc1f1fbc",
+   "statementNo": "200400200061659",
+   "productName": "생유산균 패밀리 플러스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "972f662a-3c55-496f-aa9b-4a0b834c6dce",
+   "canonicalId": "8e481227-80bf-4b15-8fa8-66e13df89310",
+   "statementNo": "200400200061674",
+   "productName": "코어리셋 옴니바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "09030620-fa7d-4e36-87b9-ad7f6e79c6a3",
+   "canonicalId": "60bec6ce-bd45-4339-ad14-df5cc97031c5",
+   "statementNo": "200400200061703",
+   "productName": "락토바이옴 솔루션3",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "c5d5f068-c58f-4a46-9a5c-ce2abc92782d",
+   "canonicalId": "fce01c7c-c3f0-4dae-bc64-bfa9db99f78b",
+   "statementNo": "200400200061704",
+   "productName": "락토바이옴 이지",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "8e3dcc77-dfb5-4e8d-a815-8fb1ff819a08",
+   "canonicalId": "c0fc6bd3-c4cf-4c29-b63f-d8e26a129c24",
+   "statementNo": "200400200061725",
+   "productName": "락토바이옴 솔루션2",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "a2535125-bb92-4064-b439-68412f706654",
+   "canonicalId": "1ffa0453-0fac-4d7d-b287-7a94a229b90d",
+   "statementNo": "200400200061726",
+   "productName": "락토바이옴 솔루션1",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "e4828983-e6ab-4c80-9d43-df3f115d5526",
+   "canonicalId": "25eb43c4-ec34-45d7-bd93-c698380c4605",
+   "statementNo": "200400200061732",
+   "productName": "프로바이오틱스 트리플",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "03edf279-6ba5-47a8-80f3-b57bcce0ed35",
+   "canonicalId": "826dc16e-8427-4879-9bd2-25bffde9d36b",
+   "statementNo": "200400200061841",
+   "productName": "베베 C 것 케어",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "0908178a-3477-47a1-aa4c-804628bdc7ac",
+   "canonicalId": "5aa15b05-a516-456d-8d0e-1dd33640762f",
+   "statementNo": "200400200061925",
+   "productName": "마이키즈 비피더스 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "2290b84b-1d7f-4139-baf9-0eebca5140d5",
+   "canonicalId": "5daa5a9b-6ff9-4878-b7c4-dbb43654fcff",
+   "statementNo": "200400200062068",
+   "productName": "뉴케어 마이키즈 비피더스 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "c255e154-6419-42f7-810f-529aefdbef4b",
+   "canonicalId": "fe985f9c-286e-43c3-8314-47e98cc52f62",
+   "statementNo": "200400200062135",
+   "productName": "바이오리브 100억 유산균 프레시",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "e5c61b67-b41e-4f84-944b-f05036510463",
+   "canonicalId": "1c59a1dc-7079-48d9-aafe-1e2ca83349be",
+   "statementNo": "200400200062142",
+   "productName": "유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "1443ee1d-78c3-4539-9353-8c06b99f4b22",
+   "canonicalId": "4575275e-111d-4bdf-b9a1-6c951d741c71",
+   "statementNo": "200400200073171",
+   "productName": "피부보습 건강엔 어린콜라겐 & 비오틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요/철의 흡수에 필요/항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f3e3b7d2-d8ae-4087-b538-999bbaaeeb42",
+   "canonicalId": "532032cf-d82b-444f-8c70-69080197174a",
+   "statementNo": "200400200082459",
+   "productName": "글로우 콜렉티브 콜라겐",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "ca2be4f0-6819-4990-8f87-9b9c145606fb",
+   "canonicalId": "4c638b21-e11b-41c0-a53b-2769390286e6",
+   "statementNo": "200400200082543",
+   "productName": "더 콜렉티브 콜라겐",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_CLAUSE_GROUPS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "101ab17b-8219-4b6f-b556-03b41117567a",
+   "canonicalId": "b67afe19-d68b-4b94-8ea0-edbf65848038",
+   "statementNo": "200400200082718",
+   "productName": "관절연골엔 철갑상어 뮤코다당단백 콘드로이친 K",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "95081ca2-9256-4369-8835-45b7d91e802e",
+   "canonicalId": "98e2cad9-304f-4869-bb5d-3cf8fb01b32f",
+   "statementNo": "200400200082776",
+   "productName": "에버콜라겐 인앤업비오틴 업",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "셀렌",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "3aab47cd-ac7b-417d-bc10-1c8b642460f9",
+   "canonicalId": "6b57e87e-56f0-4066-854e-711246d33ae4",
+   "statementNo": "200400200082783",
+   "productName": "에버콜라겐 타임비오틴 핏",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "546f8a7a-9972-4c3b-8ef6-33718b0aee13",
+   "canonicalId": "b4915e93-1c41-484a-b9b1-eec5ec5b3308",
+   "statementNo": "200400200082785",
+   "productName": "에버콜라겐 블랙",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    },
+    {
+     "header": "판토텐산",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "a5d68ba7-89e6-45fd-a533-e7ef2135ee75",
+   "canonicalId": "2d97de40-ba5d-47e3-8642-df7efd8cba56",
+   "statementNo": "200400200082787",
+   "productName": "에버콜라겐 타임비오틴 업",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "500edb8a-a052-4e29-a8b0-e57b1743a03e",
+   "canonicalId": "d6714db7-cc01-4766-90c6-f6ba8ba96e6e",
+   "statementNo": "200400200082793",
+   "productName": "에버콜라겐 타임 비오틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "fb518417-d3f0-468e-850c-448cb4c3c34e",
+   "canonicalId": "d544678e-92cd-4923-9289-d76561b92c3b",
+   "statementNo": "200400200082796",
+   "productName": "에버콜라겐 유브이케어",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "0b256f79-e48e-4665-af0d-0e993de8918c",
+   "canonicalId": "9ee10890-55ac-43e6-b4e8-34d085914992",
+   "statementNo": "200400200082800",
+   "productName": "에버콜라겐 인앤업비오틴 팜",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "a337cd3c-4415-4445-81db-ae242854ff64",
+   "canonicalId": "3da07ee5-c606-473f-a7e3-16b3bb6ee4db",
+   "statementNo": "200400200082801",
+   "productName": "에버콜라겐 타임비오틴 팜",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "481780f5-e17c-435a-9088-7d20cb60e57f",
+   "canonicalId": "a2b7dbc9-3747-492e-a901-2e70b7ad5063",
+   "statementNo": "200400200083068",
+   "productName": "에버콜라겐 타임 레티놀A",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민A",
+     "clause": "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    },
+    {
+     "header": "셀렌",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "76a77125-cdf4-4c59-ac62-5df84a8fe87a",
+   "canonicalId": "6caf6b37-8554-4c74-a78a-09681bd38f56",
+   "statementNo": "200400200083080",
+   "productName": "조인트본 부스터",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "962fc5d4-2efd-4edb-b49e-648fe97648c5",
+   "canonicalId": "53c288a9-d39f-449e-b04c-42d009908671",
+   "statementNo": "200400200083270",
+   "productName": "에버콜라겐 고-백 플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "818fb0fc-d293-4d6c-83fe-8eb8f11e4cb7",
+   "canonicalId": "39e1e41d-0aba-40f4-9c59-4abb047d3548",
+   "statementNo": "200400200083398",
+   "productName": "에버콜라겐 인앤업 코어",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "6aa32c7a-9ea0-4ad1-b22d-ed1fa83414f1",
+   "canonicalId": "35905a7d-04ce-4d5d-b770-76399741ae34",
+   "statementNo": "200400200141945",
+   "productName": "관절 6",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "칼슘",
+     "clause": "ⓛ뼈와 치아 형성에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "칼슘",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "마그네슘",
+     "clause": "ⓛ에너지 이용에 필요"
+    },
+    {
+     "header": "마그네슘",
+     "clause": "신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "ⓛ정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "ⓛ칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "03705584-8162-45db-8fb6-8ed8a94465ee",
+   "canonicalId": "549c7e42-d029-4140-9b7a-53c3aeafeb5f",
+   "statementNo": "200400200141947",
+   "productName": "모로실 다이어트 & 혈당 관리를 모아담다",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "바나바잎추출물",
+     "clause": "식후 혈당상승 억제에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "1b11212b-e9c2-4ab2-8fff-a0151ca63254",
+   "canonicalId": "4cd6f9a2-cb72-452d-b237-fde5c6b25d33",
+   "statementNo": "200400200141972",
+   "productName": "이지루틴 다이어트 & 혈당 컷",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "바나바잎추출물",
+     "clause": "식후 혈당상승 억제에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "c86243ac-ec87-4aa1-a6b1-ee08bb70689d",
+   "canonicalId": "e98148bc-799f-4531-8820-f30d692ba834",
+   "statementNo": "200400200142174",
+   "productName": "관절케어 프로",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "b5f015fb-ac0d-4e8b-bffe-a65d602e130b",
+   "canonicalId": "8bdf509b-6e7d-42fa-a6bd-f5613f97ff57",
+   "statementNo": "20040020020527",
+   "productName": "쿨가이",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화에 도움을 줄 수 있음 2.체지방 감소에 도움을 줄 수 있음3."
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 5,
+     "ingredients": [
+      "녹차 카테킨",
+      "비타민 C"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4bfc34d2-ba13-4bfd-9161-15e84d2c63a8",
+   "canonicalId": "a69fd3ab-69a5-4478-a795-488dd71d7bb3",
+   "statementNo": "20040020028546",
+   "productName": "리얼 루테인",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 19,
+     "ingredients": [
+      "나이아신",
+      "루테인",
+      "망간",
+      "비타민 A",
+      "비타민 B12",
+      "비타민 B2",
+      "비타민 B6",
+      "비타민 E",
+      "셀레늄",
+      "아연",
+      "엽산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "5bff836e-9946-4a6f-8ecf-d72edbb5bca6",
+   "canonicalId": "62d6d52a-9bd8-4e95-bc84-857501d61d12",
+   "statementNo": "20040020028724",
+   "productName": "포맨 눈건강 쏘팔코사놀",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 10,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 E",
+      "셀레늄",
+      "쏘팔메토열매추출물 (로르산)",
+      "아연",
+      "옥타코사놀"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "b300b582-ddc7-4e2f-bc9b-2e53c601f4eb",
+   "canonicalId": "b07ecb59-90b7-4f03-aec5-857aa1c33193",
+   "statementNo": "20040020031563",
+   "productName": "관절 연골엔 콘드로이친 뮤코다당단백 1500",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "683f4757-3949-4ffd-a1df-b3d4c7f65cbe",
+   "canonicalId": "23648453-ca0a-468a-8013-467e39ef1188",
+   "statementNo": "20040020041551",
+   "productName": "관절엔 일맥 뮤코다당단백 (콘드로이친) 1200 에센셜",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "ac1d3400-994d-4a37-8fed-7638cf08f61f",
+   "canonicalId": "69acbb64-f15e-4421-904a-5b58d595f71b",
+   "statementNo": "20040020071471",
+   "productName": "셀티바 발포 다이어트 모로오렌지맛",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "그린커피빈주정추출물",
+     "clause": "체지방 감소에 도움을 줄 수 있음/"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 7,
+     "ingredients": [
+      "그린커피빈추출물",
+      "비타민 C",
+      "판토텐산",
+      "비타민 B1",
+      "비타민 B2"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "c4fffd9f-24c8-4546-b641-f057875a3acb",
+   "canonicalId": "ad032204-40b7-4f2e-96c2-67f7ec499f10",
+   "statementNo": "200600200031053",
+   "productName": "웰키즈칼슘",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_CARRIES_INLINE_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘:(가) 뼈와 치아 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "비타민D :(가) 칼슘과 인이 흡수되고 이용되는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 7,
+     "ingredients": [
+      "비타민 D",
+      "칼슘"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "742a0232-256e-4c5c-9f85-652c7b824aa8",
+   "canonicalId": "240c8401-87ff-4e7a-9141-d2f597457b08",
+   "statementNo": "200600200031462",
+   "productName": "애터미 터마신 MSM",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MULTIPLE_FUNCTIONAL_SECTIONS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "강황 추출물(터마신)(기능성원료인정제2014-2호) : 관절건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)"
+     ],
+     "extraTopUl": 0
+    },
+    {
+     "h2": "함께 표시된 공식 기능성 (원문 보존)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "be055383-f250-4a14-b894-9b66dd8e9b09",
+   "canonicalId": "78ba3dbd-366f-469d-a496-f0d9e68df65a",
+   "statementNo": "200600200031489",
+   "productName": "셀로맥스 요오드",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "갑상선 호르몬의 합성에 필요 2)에너지 생성에 필요 3)신경발달에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "요오드 영양기능 (공식 인정 기능성)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 3,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d27329c8-2ac5-4a50-a3df-fcac014f8e56",
+   "canonicalId": "7ba65485-390b-420d-bd03-2d140f5fe378",
+   "statementNo": "200600200031504",
+   "productName": "프로바이오티카",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "afe78034-822f-41ff-b1aa-3ba76fad331f",
+   "canonicalId": "edbffc3b-033e-4fd0-8bf6-e573978ee51a",
+   "statementNo": "200600200031835",
+   "productName": "락톱 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음, 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "95060a1d-0b92-4a86-9c5c-cd2a4f4ba510",
+   "canonicalId": "ccc7fe04-fd8d-4bc7-aaaa-2cb912d5ac29",
+   "statementNo": "200600200031881",
+   "productName": "프로바이오틱스 50억 장용캡슐",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활, 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "d1d1dba5-fd8f-46f2-8405-6f2ef38d163b",
+   "canonicalId": "02aef681-3b64-4649-9ea5-9152f9b9172d",
+   "statementNo": "200600200031890",
+   "productName": "인생 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활·장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "a35a5c6c-f43b-4302-9f8e-c035d97fb02b",
+   "canonicalId": "5485018f-2698-4f85-a381-17a8e3db6f85",
+   "statementNo": "200600200031988",
+   "productName": "유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제․배변활동 원활 · 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "1c149cf3-815f-4361-a397-5d0cbeab6d5c",
+   "canonicalId": "b68c6b77-4a18-4e76-85a4-5108da1f8fd9",
+   "statementNo": "200600200032252",
+   "productName": "이너플러스 여성유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "36c4400a-7871-403f-9525-cb68014eaaa6",
+   "canonicalId": "ffcc63ef-161b-4a57-b0ac-586c344e2b8b",
+   "statementNo": "200600200032289",
+   "productName": "100억 프리미엄 패밀리 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "00713b5e-68fd-4428-8566-9954bb102427",
+   "canonicalId": "dc822e8c-2e15-4463-82fc-14592544f725",
+   "statementNo": "200600200032316",
+   "productName": "프로바이오슈퍼K",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "2cc29228-254e-47c0-87c1-9557d61926de",
+   "canonicalId": "60af5e6b-68bc-4d66-8458-f97ead22d45d",
+   "statementNo": "200600200032444",
+   "productName": "하루엔진 포 우먼",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화∙체지방감소∙혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "기억력 개선∙혈행 개선에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제∙배변활동 원활∙장건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": null,
+     "clause": "탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "단백질 및 아미노산 이용에 필요 , 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 엽산 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "bea4d268-e302-4b7e-8626-31c9aed21da1",
+   "canonicalId": "8ce48193-585c-4acd-9edd-0ed5d46322d1",
+   "statementNo": "200600200032468",
+   "productName": "장용성 프로바이오틱스 플러스 100억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "4f49cba1-80c2-4bb3-afa2-43962b8db73c",
+   "canonicalId": "067f8787-a8f9-44c8-995c-be460fc2a083",
+   "statementNo": "200600200032473",
+   "productName": "리베브 프로바이오틱스 100억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "7e117e2d-f504-4426-baca-2b06c0fc2fe8",
+   "canonicalId": "d4a8dd7f-0567-4587-b4a7-33b7097ea4fc",
+   "statementNo": "200600200032527",
+   "productName": "100억 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "9de889b1-9f34-4470-8329-53400a5332a3",
+   "canonicalId": "f43acaac-59fd-4d4c-9e75-5547542b14c3",
+   "statementNo": "200600200032572",
+   "productName": "나를 위한 관절MSM&NAG",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "2592445f-4277-49ce-adab-8a4e603fa5e1",
+   "canonicalId": "470c96ed-1ce0-4fc0-91aa-cf93a8f2b989",
+   "statementNo": "200600200032587",
+   "productName": "데일리 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "284e5069-2a75-45af-89ea-9154d550ef1d",
+   "canonicalId": "6c4b1750-039a-471f-b9a7-b96f39157bfb",
+   "statementNo": "200600200032640",
+   "productName": "코어리셋 옴니바이오틱스 프라임",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "38ff9f08-d386-4c07-ad17-6b90aac1f17b",
+   "canonicalId": "cdf30dab-90ad-4bae-b399-079bdaf027f8",
+   "statementNo": "200600200032659",
+   "productName": "애터미 SCI 마이크로바이옴",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "5cf433cd-4991-4606-ab61-93a79f0b3f84",
+   "canonicalId": "6320226a-e607-4cd9-97d3-eda09f2a32c6",
+   "statementNo": "200600200032747",
+   "productName": "마이케어 [장]솔루션",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 · 배변활동 원활 · 장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "14ce1b81-9e17-40bd-8ca7-eedabd967e39",
+   "canonicalId": "ee503a1f-f356-48f3-a588-58db1baa4487",
+   "statementNo": "200600200032918",
+   "productName": "일양 살아있는 프로바이오틱스 장용캡슐",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "3b6e10a3-7ba7-4e8a-85b3-f5dd46fb0056",
+   "canonicalId": "25b9b971-c740-4188-8fd8-6f8f6b41125a",
+   "statementNo": "200600200032925",
+   "productName": "PROLACTO PLUS GOS DIETARY SUPPLEMENT PRODUCT (LA-MOON VITA BRAND)",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "1b3ff40d-f752-41fe-8fab-75f8ffbcbc28",
+   "canonicalId": "059ba75c-5718-4fd5-b763-ca47a2936744",
+   "statementNo": "200600200032943",
+   "productName": "장건강 100억 쿨멜팅 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "b42535e7-429f-4c95-9ab4-3e821c5d17d7",
+   "canonicalId": "4678efd8-6706-4297-8a59-5041938bc279",
+   "statementNo": "200600200032944",
+   "productName": "비타블로썸 콘드로이친 뮤코다당ㆍ단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4c8e641a-5fcd-4b67-b93a-b79b8e336e09",
+   "canonicalId": "f94c5ce4-7519-4e89-ad62-864487619046",
+   "statementNo": "200600200032960",
+   "productName": "센트룸 원데이팩 우먼 2030",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_CARRIES_INLINE_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": null,
+     "clause": "탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "체내 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 엽산 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "체내 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    },
+    {
+     "header": null,
+     "clause": "철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "갑상선 호르몬의 합성에 필요, 에너지 생성에 필요, 신경발달에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "산화･환원 효소의 활성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "체내 탄수화물, 지방, 단백질 대사에 관여"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f8eb9aa7-4791-4cd7-a9e8-ce145ac38eff",
+   "canonicalId": "cd049ae2-cab3-4193-8090-ccca8361f424",
+   "statementNo": "200600200032988",
+   "productName": "관절닥터 타마본 5Days",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "7cf6f42d-663f-4372-a91d-6e6923c63dfd",
+   "canonicalId": "21f8fed8-0ad2-4021-90ea-c3e24e7011a1",
+   "statementNo": "200600200033042",
+   "productName": "장용성유산균100억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "74cb41f8-51e4-4737-99b0-450d44148e3a",
+   "canonicalId": "591516c2-27e7-462b-8498-3ecd6c7a95d2",
+   "statementNo": "200600200033132",
+   "productName": "Poppro Probiotics",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "dbad8994-c789-4290-9299-028b12567a5b",
+   "canonicalId": "07865b29-cf02-4bc4-bc6f-698ab64b308e",
+   "statementNo": "200600200033210",
+   "productName": "CreNeuroS CNS Mood Probiotic Capsules",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "ba23ca54-48e3-4e35-a576-9db5f8a1c48f",
+   "canonicalId": "6c68913a-8b62-49ae-a3c6-0554888a122c",
+   "statementNo": "200600200033218",
+   "productName": "프로바이오틱스 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "d9ef3597-68e3-4358-b4e4-51ea0fbb1d27",
+   "canonicalId": "b835da7d-19da-4633-aed6-4fcdff11b596",
+   "statementNo": "200600200033231",
+   "productName": "DCN 퍼펙트 유산균 프로바이오틱스 100억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제 ･ 배변활동 원활･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "a9b5d017-fa1c-4983-b6cd-1d677b7cea3e",
+   "canonicalId": "82f801c0-9589-47b6-948b-6e2c75b99616",
+   "statementNo": "200600200033236",
+   "productName": "마더네스트 쿨멜팅 100억 생유산균 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "07245038-3f0c-41ff-ae41-436d617c44e0",
+   "canonicalId": "87804e69-b647-457d-a6a7-553bc24ab756",
+   "statementNo": "200600200033257",
+   "productName": "하랑원 에센셜 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "ced0a122-a2a7-4357-a4ef-eb61399897d0",
+   "canonicalId": "65136e1d-c451-4374-aba4-eb2db58a3ed4",
+   "statementNo": "200600200033260",
+   "productName": "헤라클레스 엑스퍼트 비피더스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "64be6eec-7424-46b9-a2ff-5eeb098e673c",
+   "canonicalId": "16ed479d-3c3b-46c5-a224-d91ce83efec1",
+   "statementNo": "20060020003527",
+   "productName": "애터미 프로바이오틱스 10플러스 친생 유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제∙배변활동 원활∙장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "6ebeda3b-90c6-49cc-b958-5d2169b4a842",
+   "canonicalId": "d22a2bb8-a222-411f-8e3b-0ae930f731a1",
+   "statementNo": "20060020008217",
+   "productName": "루테인-골드",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 14,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 E",
+      "셀레늄",
+      "아연",
+      "엽산",
+      "판토텐산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "7316fa1f-25af-4065-a0c4-cd52f8a1f410",
+   "canonicalId": "b792557d-8fd1-4401-813f-ce185a9823f7",
+   "statementNo": "20060020008287",
+   "productName": "루테인 플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 15,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 B6",
+      "비타민 D",
+      "비타민 E",
+      "셀레늄",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f0a818b4-0a2a-4500-a5d1-433a7b3c46c2",
+   "canonicalId": "fe1e7b97-b098-4ef9-acc0-86472bfd2fce",
+   "statementNo": "20060020008521",
+   "productName": "밸런스 오메가3 프로",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "PARTIAL_DUPLICATION_RISK",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음 2.건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 6,
+     "ingredients": [
+      "비타민 A",
+      "비타민 E",
+      "오메가3"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "fcd5c1ad-a703-497a-a76f-e16155e2d356",
+   "canonicalId": "92e3672d-c588-484d-898c-0cc8f297f5dc",
+   "statementNo": "20060020008646",
+   "productName": "루테인지아잔틴 MAX",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 6,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 E",
+      "셀레늄"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "25bc2449-bc69-409e-9d36-a29fe90a83c4",
+   "canonicalId": "1860853d-8407-414e-92a5-75a564f432db",
+   "statementNo": "20060020008810",
+   "productName": "모아락 루테인 지아잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 12,
+     "ingredients": [
+      "루테인",
+      "마그네슘",
+      "비타민 A",
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 E",
+      "셀레늄",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4034469b-d012-4fbf-8bb9-309d9db0cf10",
+   "canonicalId": "afc93d07-7e8f-4e5c-b992-e36281a325c1",
+   "statementNo": "20060020008817",
+   "productName": "지아잔틴 루테인 맥스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 10,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 E",
+      "셀레늄",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "0e922ca0-2c0f-49b2-847e-565016c9a5b8",
+   "canonicalId": "476570ea-ac49-4e72-9cdb-200b4612b57e",
+   "statementNo": "20060020008876",
+   "productName": "눈에 베타카로틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 10,
+     "ingredients": [
+      "비타민 A",
+      "비타민 E",
+      "셀레늄",
+      "헤마토코쿠스추출물(아스타잔틴)",
+      "아연",
+      "오메가3"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "7abb0864-6e07-4393-a63c-09759ff12b3c",
+   "canonicalId": "424d666b-fc60-4af0-890d-6628ceb8c766",
+   "statementNo": "20060020008912",
+   "productName": "BODY DOCTORS 코엔자임큐(Q)텐",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 5,
+     "ingredients": [
+      "비타민 E",
+      "셀레늄",
+      "아연",
+      "코엔자임Q10"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "51f3192d-afa9-4345-9f9f-f1a2baa34a9c",
+   "canonicalId": "a666721b-4230-4bf6-aa1b-1b5283f73be6",
+   "statementNo": "200700170351487",
+   "productName": "페미밸런스 플러스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clause": "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "ba81ab55-f224-4c7a-a10e-9470a2def968",
+   "canonicalId": "7c8261dd-3387-4ab1-9930-5e4993d83808",
+   "statementNo": "200700170351496",
+   "productName": "지노프레쉬 질유산균 50억",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clause": "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "ab0e1b15-e517-422b-b246-e70b2378a05f",
+   "canonicalId": "5ed3ad3b-74e4-4292-bf9b-11034e2fff98",
+   "statementNo": "200700170351741",
+   "productName": "가족사랑 관절건강",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "3c887a09-d74a-4ff7-8ac1-f03dcc78f839",
+   "canonicalId": "852ec525-8f37-4d3f-a8c4-8022b43ba681",
+   "statementNo": "200700170351898",
+   "productName": "비타포뮬러 프리프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": "자일로올리고당(xylooligosaccharide) 분말(제2009-80호)",
+     "clause": "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "8c3a600b-801d-49b8-839b-a0b9a5b41b9d",
+   "canonicalId": "e28b5f63-dfcd-443a-97d9-e3ce5235b216",
+   "statementNo": "200700170352412",
+   "productName": "익스트림 프로바이오틱스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "e3e98ace-5157-4cf8-bbcf-0bde72f1292b",
+   "canonicalId": "b913aa9c-5165-41c8-91de-ae56f5c30a65",
+   "statementNo": "200700170352447",
+   "productName": "빌드 100억 유산균 액티브",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+   "canonicalId": "59c12dc8-fc8f-4bf5-9aad-1ab7bfdaade3",
+   "statementNo": "200700170352520",
+   "productName": "맨 TWK10 100억 캡슐",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "c8fabc5c-75f6-4715-8bd4-ef73a97a77ed",
+   "canonicalId": "424b5e8a-ad93-4473-8e64-86b33e64c993",
+   "statementNo": "200700170352530",
+   "productName": "AG바이옴 스포츠",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "1693e642-559e-409c-b1f4-85e76df73005",
+   "canonicalId": "8c74f198-3128-42f5-bdf2-a0c954542337",
+   "statementNo": "200700170352665",
+   "productName": "더모이스처",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민A",
+     "clause": "어두운 곳에서 시각 적응을 위해 필요"
+    },
+    {
+     "header": "비타민A",
+     "clause": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+    },
+    {
+     "header": "비타민A",
+     "clause": "상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": "나이아신",
+     "clause": "체내 에너지 생성에 필요"
+    },
+    {
+     "header": "판토텐산",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "N-아세틸글루코사민",
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d72d665e-393f-4c62-a758-4623143298b3",
+   "canonicalId": "99b069bf-5531-4097-9941-385453f3383d",
+   "statementNo": "200700170352689",
+   "productName": "스킨케어 기능성 나티콜 콜라겐",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "PARTIAL_DUPLICATION_RISK",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4a13ba2c-fa44-4c4a-8f11-4846c06b4ffb",
+   "canonicalId": "d4667307-5700-41a3-8c23-063724866fde",
+   "statementNo": "200700170352690",
+   "productName": "포켓부스터",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "7a258827-bceb-4238-b391-e72ba2804e8f",
+   "canonicalId": "9d92fecd-8eed-4e64-b2db-fcb4cd0f1997",
+   "statementNo": "200700170352862",
+   "productName": "운동부스터 유한 생유산균 스틱",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 ･배변활동 원활 ･장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "24516fc0-ea81-47c7-a733-fa5ecfa36f08",
+   "canonicalId": "db8c2ae7-e69b-4ef6-8f62-4d882d5e5084",
+   "statementNo": "200700170352946",
+   "productName": "이퓨니드 리스펙타 질유산균",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clause": "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf",
+   "canonicalId": "f47692e1-74f9-4c17-86e6-725d24f00a48",
+   "statementNo": "200700170352997",
+   "productName": "마이올랑스 유산균(Myolance Probiotics)",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제 ･배변활동 원활 ･장 건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clause": "운동수행능력 향상에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+   "canonicalId": "42570f16-75ac-4f90-8e06-86433a618e37",
+   "statementNo": "2009001702357",
+   "productName": "유렉스 프로바이오틱스 (Urex Plus Vcap-5)",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식을 통한 여성 질 건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "(생리활성기능 2등급)"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "d2f691e5-3a05-4b10-b416-9925c8146ed6",
+   "canonicalId": "65d454d5-e345-4227-98e4-3d31760ce723",
+   "statementNo": "201000190041343",
+   "productName": "간별사",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_NO_FUNCTION_PREDICATE",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "기능성 내용"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 13,
+     "ingredients": [
+      "나이아신",
+      "밀크씨슬",
+      "비타민 B1",
+      "비타민 B12",
+      "비타민 B6",
+      "비타민 C",
+      "엽산",
+      "판토텐산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "ae923a71-1cad-4fa2-abed-f4f01d7dbcfa",
+   "canonicalId": "a167ecdf-23b8-4ad7-a882-d299418322d8",
+   "statementNo": "2011001701988",
+   "productName": "헤이, 장 (Hey, Jang)",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활에 도움을 줄 수 있음,"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음"
+    },
+    {
+     "header": "프로바이오틱스",
+     "clause": "배변활동 원활에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "7637a6c1-2899-4378-9dbc-e7c37356e91e",
+   "canonicalId": "92fab4ee-3f2e-4b99-954e-953aa6501fbe",
+   "statementNo": "20110020099300",
+   "productName": "대관절 만보 천보",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "14cbaebc-917c-4e54-8b9e-dabb4bb733b9",
+   "canonicalId": "4893a016-da48-4d32-84a4-28201ce9364e",
+   "statementNo": "20120017002113",
+   "productName": "슈퍼 프로바이오틱스 플래티넘",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "배변활동 원활에 도움을 줄 수 있음."
+    },
+    {
+     "header": null,
+     "clause": "장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "01868d5f-bccd-4b94-bff7-1f06e95949ef",
+   "canonicalId": "47d1047b-d12e-4a29-958c-aad6c217cc07",
+   "statementNo": "20120019007392",
+   "productName": "프로바이오틱스 19",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "363b825b-b6e3-4e31-9d72-b3c33a73aed5",
+   "canonicalId": "12316ace-f414-4135-b94a-1ea7d7f68cab",
+   "statementNo": "20120019007442",
+   "productName": "슈퍼 프로바이오틱스19 플러스",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "e9326978-eaea-4e0b-b8ec-d61ef1d5305b",
+   "canonicalId": "2824e48b-cad8-4e78-ab91-cd5f5c633c7d",
+   "statementNo": "20120019007627",
+   "productName": "면역공식 발효 베타글루칸",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "베타글루칸분말",
+     "clause": ": (국문) 면역기능 증진에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "806c70b9-c738-44aa-b172-041078c7f44a",
+   "canonicalId": "9fb15061-4925-4da9-a7a2-2e134872c4aa",
+   "statementNo": "20130015151103",
+   "productName": "트루엔 듀얼액상콜라겐",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "피쉬콜라겐펩타이드 – 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음, 피부보습에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "b8e3b585-dd59-4bb4-ae9c-d15dba628bd6",
+   "canonicalId": "c74539ad-c615-43e3-8111-d1ceadfb038d",
+   "statementNo": "20130015151111",
+   "productName": "우리아이 항균엔 프로폴리스 먹짱",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "아연 - 정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "아연 영양기능 (공식 인정 기능성)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 4,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d8d88237-10a5-4c29-a74a-b7d358f6192f",
+   "canonicalId": "eec27226-244e-4175-bf13-fe6406772fb5",
+   "statementNo": "2013001515171",
+   "productName": "장인정신 에브리데이 튼튼지니어스 홍삼젤리",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "체내 에너지 생성에 필요,홍삼 - 면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "나이아신 - 체내 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "이 홍삼의 공식 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-fn",
+     "itemCount": 5,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d8388269-8178-4a78-9d74-ff1e39bda364",
+   "canonicalId": "54902c44-ea51-471d-b1df-35c51eb03810",
+   "statementNo": "2013001515173",
+   "productName": "장인정신 에브리데이 뮨키즈 아연젤리 애플키위맛",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "아연 - 정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "아연 영양기능 (공식 인정 기능성)",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 2,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "92c1b7cb-3535-4cf8-8088-4c1ce3f046eb",
+   "canonicalId": "202b5c1a-1350-419d-af52-f41ba0882632",
+   "statementNo": "20130020008532",
+   "productName": "뼈관절연골엔 뮤코다당단백 (콘드로이친) 1200 비타민D 비타민K 망간",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "55bf8e8e-3591-4824-bff2-f8ee2dc55cec",
+   "canonicalId": "fb2c4f7c-b0c6-4d67-8fe6-c758b2255d1e",
+   "statementNo": "20130020024296",
+   "productName": "아미네 보떼 8",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음,"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "5a147306-517d-4b9e-9f85-cb91963f23a7",
+   "canonicalId": "facdb17c-03e0-4962-99b6-a35d248b84a2",
+   "statementNo": "20130020024542",
+   "productName": "100억 유산균 캡슐",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "3c10d202-5e58-4a4f-9b59-9e591ea276ef",
+   "canonicalId": "1c68dd0c-4b4b-4b41-9622-793d6fee12d0",
+   "statementNo": "2015000221753",
+   "productName": "관절콘드로이친뮤코다당단백1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "13064c7d-eeba-40e4-a35e-f51bbb77eb29",
+   "canonicalId": "7324a80b-9393-44f8-af57-67470c05bb3e",
+   "statementNo": "201600100024",
+   "productName": "조인트365 리프리놀",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "FLAT_LIST_WITH_MULTIPLE_OFFICIAL_INGREDIENTS",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요,"
+    },
+    {
+     "header": "비타민E",
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "FLAT",
+     "ulClass": "sd-why",
+     "itemCount": 1,
+     "ingredients": [],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "b76e68c3-c3cf-4b3e-b3f9-066e4b153e48",
+   "canonicalId": "43d81d1b-a18e-4a40-9a04-aaeda426ec80",
+   "statementNo": "2018000391573",
+   "productName": "관절엔 소연골 뮤코다당단백(콘드로이친) 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "cfcf7a04-6d4b-490e-bdc9-97631103d56e",
+   "canonicalId": "fc51fe65-152c-4ae4-ae7e-ff6d049684fd",
+   "statementNo": "20180012056109",
+   "productName": "더 프로바이오틱스 키움 243",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "5b38deef-cb1c-4cfb-848c-2b9025db8107",
+   "canonicalId": "eac3611d-145f-4b3d-8952-b8998f83a1a3",
+   "statementNo": "20180012056112",
+   "productName": "파파 파르마 키즈유산균 아이상쾌해",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "유산균 증식 및 유해균 억제∙배변활동 원활∙장 건강에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "17a93040-04f0-4d04-bdb9-9ba462173ee1",
+   "canonicalId": "757531bb-8450-4873-a993-b93146c283c8",
+   "statementNo": "2018001205627",
+   "productName": "유기농 비타민D 2000IU 플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요 2)뼈의 형성과 유지에 필요 3)골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 4,
+     "ingredients": [
+      "비타민 D",
+      "셀레늄"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "0def1aa3-6b23-45e6-99cf-97dc88e51324",
+   "canonicalId": "f66abbfb-2e62-4b25-b733-dd2b8c1ba63b",
+   "statementNo": "2018001205628",
+   "productName": "유기농 비타민D 1000IU 플러스",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요 2)뼈의 형성과 유지에 필요 3)골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 4,
+     "ingredients": [
+      "비타민 D",
+      "셀레늄"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "2e5b3c01-c337-443b-8584-f36b1e0890f9",
+   "canonicalId": "f0ee2f49-9cf0-4c2e-9d21-42b2b61262a3",
+   "statementNo": "20190004553185",
+   "productName": "코엔자임Q10",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "비타민 E",
+      "셀레늄",
+      "코엔자임Q10"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "cab68033-46f0-4156-9b44-2898f66000b6",
+   "canonicalId": "944d311d-fb8f-4797-b7fa-8d8835b86dc4",
+   "statementNo": "20190009105359",
+   "productName": "쎈 소연골 뮤코다당·단백 (콘드로이친) 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "e0acdaf0-47cb-4cc4-abd9-0c88708ea966",
+   "canonicalId": "d10f757e-2140-4699-9b01-cc31139fe0be",
+   "statementNo": "2019000939480",
+   "productName": "쾌변엔 천둥이 더블케어",
+   "family": "COMPOSITE",
+   "classification": "STRUCTURE_ADAPTER_REQUIRED",
+   "reason": "NO_FUNCTIONAL_SECTION",
+   "applyStatus": "UNSUPPORTED_STRUCTURE",
+   "missingClauses": [
+    {
+     "header": "프로바이오틱스",
+     "clause": "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+    },
+    {
+     "header": "락추로스 파우더(Lactulose Powder)",
+     "clause": "유익균 증식, 유해균 억제에 도움을 줄 수 있습니다."
+    }
+   ],
+   "sections": []
+  },
+  {
+   "candidateId": "e0a68627-5f9b-4ca9-aebf-67e983cff383",
+   "canonicalId": "4e12c99d-ca60-4424-acaa-1a75c1199a52",
+   "statementNo": "20190009483188",
+   "productName": "오메가글루코사민",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 엽산 대사에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요, 신경과 근육 기능 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "EPA 및 DHA 함유유지 : 혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "07da8959-f6b3-4ac2-bd1a-12c5d289b62f",
+   "canonicalId": "f4d66b51-66a8-4dcc-bd9f-8fe9409f6aaf",
+   "statementNo": "20190009483278",
+   "productName": "루테인아스타잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 10,
+     "ingredients": [
+      "루테인",
+      "비타민 A",
+      "비타민 B1",
+      "비타민 E",
+      "셀레늄",
+      "아연",
+      "헤마토코쿠스추출물 (아스타잔틴)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "476f3066-22ce-4f0d-b8a6-0074230852e8",
+   "canonicalId": "7c034e39-fa0b-4f74-9e5f-668ec0de053b",
+   "statementNo": "20190009483475",
+   "productName": "뼈 · 연골 · 관절엔 소연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4d165f00-b191-4f85-82b0-87e5a2720116",
+   "canonicalId": "a006d2e6-23ce-4068-ba76-e443672b66bc",
+   "statementNo": "20190009483480",
+   "productName": "관절건강 MSM NAG 비타민D",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "31cb6714-b8f0-4241-a19f-7a71f5d62f82",
+   "canonicalId": "f8dc3af8-815c-4285-9754-e6d2d76ede55",
+   "statementNo": "20190009483481",
+   "productName": "뼈 · 연골 · 관절엔 상어연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "셀레늄",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4554acf7-71a7-4f2f-badd-5831d3b6844f",
+   "canonicalId": "05ca07a5-55bc-41a0-ac43-0f67bcae9258",
+   "statementNo": "20190009483574",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "뼈의 구성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "e8769cd0-53b4-4459-8f04-d82080c5c976",
+   "canonicalId": "680e726e-7b90-4b58-bd67-be302dc05eb3",
+   "statementNo": "20190009483575",
+   "productName": "소연골 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민 K",
+     "clause": "뼈의 구성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "a9bf94f7-133e-48bb-83d0-280dbcaaaf81",
+   "canonicalId": "9795befb-743c-4072-9bb1-c66157350195",
+   "statementNo": "20190009483620",
+   "productName": "항산화건강 라이코펜15골드",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 8,
+     "ingredients": [
+      "라이코펜",
+      "비타민 A",
+      "비타민 E",
+      "셀레늄",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "19ad9377-764f-4b2a-97b9-6fe5497425aa",
+   "canonicalId": "98eee489-f83d-4b96-b75a-5d13c52aee7b",
+   "statementNo": "20190009483651",
+   "productName": "관절튼튼 뮤코다당단백[콘드로이친] 비타민D 망간",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민 D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민 D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "117bafde-5b55-4df7-bf1b-1ee9dbbfd838",
+   "canonicalId": "0f39f8df-debb-4402-9de9-092c9a3d1559",
+   "statementNo": "20190009483685",
+   "productName": "팜스 슈퍼 바이오 히알루론산",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민C",
+     "clause": "결합조직 형성과 기능유지에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "철의 흡수에 필요"
+    },
+    {
+     "header": "비타민C",
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민A",
+     "clause": "어두운 곳에서 시각 적응을 위해 필요"
+    },
+    {
+     "header": "비타민A",
+     "clause": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+    },
+    {
+     "header": "비타민A",
+     "clause": "상피세포의 성장과 발달에 필요"
+    },
+    {
+     "header": "판토텐산",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    },
+    {
+     "header": "나이아신",
+     "clause": "체내 에너지 생성에 필요"
+    },
+    {
+     "header": "비오틴",
+     "clause": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 2,
+     "ingredients": [
+      "N-아세틸글루코사민",
+      "히알루론산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "597ef05e-f482-4f3c-bced-c18b1eb33535",
+   "canonicalId": "8a71f804-2b4a-4367-b230-c2bd3067f7f0",
+   "statementNo": "20190009483689",
+   "productName": "루테인지아잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민E",
+     "clause": ": 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 12,
+     "ingredients": [
+      "구리",
+      "루테인",
+      "비타민 A",
+      "비타민 C",
+      "비타민 E",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "877b43d1-9fdc-4f90-892b-1ea57102e4c3",
+   "canonicalId": "d0b0d3b3-351e-47da-9422-9c1375053dfa",
+   "statementNo": "20190009483690",
+   "productName": "기운찬 이뮨-MK",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "셀레늄(또는 셀렌)",
+     "clause": ": 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민B1",
+     "clause": ": 탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": "비타민B2",
+     "clause": ": 체내 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 13,
+     "ingredients": [
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 B6",
+      "비타민 C",
+      "비타민 D",
+      "셀레늄",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "3764d3cf-182a-45f0-ab94-850cee2239eb",
+   "canonicalId": "0cde6f8c-784b-4021-a859-64cc079e7836",
+   "statementNo": "20190009483717",
+   "productName": "슈퍼 클리어 눈 건강 루테인지아잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민E",
+     "clause": ": 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 12,
+     "ingredients": [
+      "구리",
+      "루테인",
+      "비타민 A",
+      "비타민 C",
+      "비타민 E",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "086d3daa-2b28-43e8-8946-b6473dd36110",
+   "canonicalId": "794d8c15-5519-4a61-a566-4978462c8f14",
+   "statementNo": "20190009483839",
+   "productName": "분홍이 슬림&비오틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "총(-)-Hydroxycitric acid",
+     "clause": ": 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음"
+    },
+    {
+     "header": "비타민 B1",
+     "clause": ": 탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": "비타민 B2",
+     "clause": ": 체내 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 7,
+     "ingredients": [
+      "가르시니아캄보지아 추출물",
+      "비오틴",
+      "비타민 B1",
+      "비타민 B2",
+      "비타민 B6",
+      "판토텐산"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "f8ea29da-6447-4943-b19e-832b0d5f9868",
+   "canonicalId": "c7e4cc67-1691-40c0-a110-12a6e5f5fb3f",
+   "statementNo": "20190009483850",
+   "productName": "하루틴 눈건강 루테인지아잔틴",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민E",
+     "clause": ": 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 12,
+     "ingredients": [
+      "구리",
+      "루테인",
+      "비타민 A",
+      "비타민 C",
+      "비타민 E",
+      "아연"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "4d783afa-abd7-4a41-8b6f-6ea5f22dc757",
+   "canonicalId": "685c679b-f88e-465b-bb2d-6582da4e4a52",
+   "statementNo": "20200016052251",
+   "productName": "뉴콘액티브",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "비타민B1",
+     "clause": "탄수화물과 에너지 대사에 필요"
+    },
+    {
+     "header": "나이아신",
+     "clause": "체내 에너지 생성에 필요"
+    },
+    {
+     "header": "비타민B6",
+     "clause": "단백질 및 아미노산 이용에 필요"
+    },
+    {
+     "header": "비타민B6",
+     "clause": "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+    },
+    {
+     "header": "비타민B2",
+     "clause": "체내 에너지 생성에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "5cc4652f-052d-4220-a664-046c7f64f525",
+   "canonicalId": "675fab37-f3ea-4500-b9df-fd5224d7ff64",
+   "statementNo": "20220011370142",
+   "productName": "성균관 소연골 뮤코다당 단백[콘드로이친]1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "9abad7ca-f3ae-4543-bbd7-0221cf98d274",
+   "canonicalId": "cc086292-b8cf-402c-bae0-9d0f2a29b854",
+   "statementNo": "20220011370404",
+   "productName": "오큘라레이드 CORE",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_LEADING_PUNCTUATION",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "「건강기능식품의 기준 및 규격」제3.2.2-26 마리골드꽃추출물에 따름"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "루테인",
+      "헤마토코쿠스 추출물",
+      "비타민 E"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "6a9b63b7-45d6-4430-9abd-20efc9a4019a",
+   "canonicalId": "676c1e7a-b483-471b-a934-1b8e87fe3237",
+   "statementNo": "202200172208",
+   "productName": "닥터트루 프리미엄 뮤코다당단백 소연골 콘드로이친 1200 MAX",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INGREDIENT_CARD_NOT_FOUND",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": "아연",
+     "clause": "정상적인 면역기능에 필요"
+    },
+    {
+     "header": "아연",
+     "clause": "정상적인 세포분열에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": "망간",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "셀렌",
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "정상적인 혈액응고에 필요"
+    },
+    {
+     "header": "비타민K",
+     "clause": "뼈의 구성에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": "비타민D",
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "adf2df42-5fd4-4512-bb6b-24acc33b73b4",
+   "canonicalId": "687b309d-ca57-422b-b115-64f639453873",
+   "statementNo": "202300092644",
+   "productName": "뮤코다당단백 콘드로이친 Max업",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요"
+    },
+    {
+     "header": null,
+     "clause": "유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈의 형성과 유지에 필요"
+    },
+    {
+     "header": null,
+     "clause": "골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "809e6acb-a56a-4a79-b180-49cd6a9de003",
+   "canonicalId": "cb0cf74c-29ca-4fa3-af73-8080ee8a9785",
+   "statementNo": "20240028080208",
+   "productName": "비타블로썸 콘드로이친 뮤코다당·단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "ffd02707-bb87-4043-abca-400277d505b1",
+   "canonicalId": "71b8732a-4142-4495-a5c6-eb07473dd088",
+   "statementNo": "20240028080348",
+   "productName": "액티브 조인트",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "근력개선에 도움을 줄 수 있음"
+    },
+    {
+     "header": null,
+     "clause": "에너지 이용에 필요, 신경과 근육 기능 유지에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "36ee7f3f-0e97-400a-86d4-d182cd7547d3",
+   "canonicalId": "392f626e-bac1-433a-b207-f9a9acfa4095",
+   "statementNo": "20240028080352",
+   "productName": "나를 위한 관절MSM&NAG",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 3,
+     "ingredients": [
+      "MSM(엠에스엠·디메틸설폰)",
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "280596c8-899a-4812-b3e2-8a2dde30ffdb",
+   "canonicalId": "bab6fd53-c876-4606-924e-45ed546006ea",
+   "statementNo": "20240028080400",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d606733e-17d3-4f33-b3ca-5dcccbef383c",
+   "canonicalId": "986feea9-e6e7-496a-8af5-064b87565e09",
+   "statementNo": "20240028080435",
+   "productName": "리튠 관절 건강 콘드로이친 뮤코다당·단백 1200",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "뮤코다당·단백(콘드로이친)"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  },
+  {
+   "candidateId": "d8bcd312-77ed-4a08-8780-f2f3e9fc1ab3",
+   "canonicalId": "0b1662a7-e179-484d-96cf-beba0d10280b",
+   "statementNo": "20240028080439",
+   "productName": "관절닥터 타마본 5Days",
+   "family": "COMPOSITE",
+   "classification": "HUMAN_REVIEW_REQUIRED",
+   "reason": "INSERT_CLAUSE_MULTI_CLAUSE_SEGMENT",
+   "applyStatus": "HUMAN_REVIEW",
+   "missingClauses": [
+    {
+     "header": null,
+     "clause": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+    },
+    {
+     "header": null,
+     "clause": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+    },
+    {
+     "header": null,
+     "clause": "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+    },
+    {
+     "header": null,
+     "clause": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+    }
+   ],
+   "sections": [
+    {
+     "h2": "관절·피부 원료별 공식 인정 기능성",
+     "mode": "PER_INGREDIENT",
+     "ulClass": "sd-func",
+     "itemCount": 1,
+     "ingredients": [
+      "N-아세틸글루코사민"
+     ],
+     "extraTopUl": 0
+    }
+   ]
+  }
+ ]
+}

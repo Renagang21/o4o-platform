@@ -1,0 +1,319 @@
+{
+ "workOrder": "WO-O4O-HFF-KO-SKIPPED-EXISTING-2451-FUNCTION-CANONICAL-BACKFILL-V1",
+ "contract": "§16 — family 보존 삽입만으로 안전 적용 가능한 최종 대상. baselineContentHash 는 apply WHERE 조건의 기준.",
+ "generatedAt": "2026-07-30T06:23:39.876Z",
+ "count": 13,
+ "items": [
+  {
+   "candidateId": "dd0d1bbc-9a28-4bd0-9c0d-15ec5a5b0fab",
+   "canonicalId": "c10d481d-4fe3-4545-b812-816d6b72b3de",
+   "productMasterId": "d7c9420a-51bc-4583-87dc-af6f38fff835",
+   "statementNo": "20040015107883",
+   "productName": "웨이크 뉴로(WAKE NEURO)",
+   "family": "COMPOSITE",
+   "baselineContentHash": "cbb65f0433f97b92923e26edc9dc8b2eb479d34f8474142acfe986624dfc251f",
+   "proposedContentHash": "10e46023192e15da5294199ef0d3630175cdf82b73e57f75ff59eb06aa54decd",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1400,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "7aeacc04-79a2-4273-9922-cfd8d25f91c2",
+   "canonicalId": "2f85d5c1-3e69-484d-9b53-c0ee41e71cef",
+   "productMasterId": "5caac3e5-9d1c-4970-80c1-0f4e7233fba8",
+   "statementNo": "200400170211878",
+   "productName": "jw중외제약 치아튼튼 인사프로",
+   "family": "COMPOSITE",
+   "baselineContentHash": "be7e0c4937f4bc743195471bcf1aa098f9ded9429c080e3dde42526a27f642d3",
+   "proposedContentHash": "1228efd8054b534980a3c9ee889147d08ccdd309f170feeffb3e966b2eeff01b",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1211,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 C",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "b929525c-71e1-4bbc-b16e-984475b76dbe",
+   "canonicalId": "a3d2ed4f-b1be-48a0-8e89-c0a4788dee30",
+   "productMasterId": "50a11919-4e81-4696-ae2d-38bca8367be4",
+   "statementNo": "200400170211941",
+   "productName": "인사튼튼 덴탈케어",
+   "family": "COMPOSITE",
+   "baselineContentHash": "c7b5a5e537f0baef6847ce5d6c7ff59f0b4178b389a0a3978aaa5c9683010885",
+   "proposedContentHash": "36c7d933c879046df7803972b10485bd60b1412deb4eebdb739965fd1df5c829",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1207,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 C",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "bb90dc2a-8dc2-4b59-b27a-c426f0d5ea5f",
+   "canonicalId": "a1581991-6869-422e-9ce5-0f59a96d8b2c",
+   "productMasterId": "002be4b5-fe5d-4d1c-b516-e9b1d2aa9867",
+   "statementNo": "200400200022648",
+   "productName": "키클래오042",
+   "family": "COMPOSITE",
+   "baselineContentHash": "c100a852ac998647eefb2e5f384db42c579a26f7be233ddb7415a0045e4cdd7b",
+   "proposedContentHash": "6bf68727f738aa9ce3abd1717c6e6c0ace4a6c834609fdf96aae1a682d18d49d",
+   "insertCount": 1,
+   "lengthDelta": 29,
+   "sectionH2": "이 홍삼의 공식 기능성",
+   "mode": "FLAT",
+   "inserts": [
+    {
+     "atIndex": 652,
+     "text": "어린이 키성장에 도움을 줄 수 있음.",
+     "ingredient": null,
+     "html": "<li>어린이 키성장에 도움을 줄 수 있음.</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "4ef749bf-c9db-4b7b-baed-41a5857dac9e",
+   "canonicalId": "653f19dd-fe29-4cef-a857-feef2f6c8cce",
+   "productMasterId": "85516c0a-667d-4ab6-ae47-2c35a179c281",
+   "statementNo": "200400200024017",
+   "productName": "메타그린 젤리 더블컷",
+   "family": "COMPOSITE",
+   "baselineContentHash": "0e4e3663631fb0a5d777d01ba8815014b65ac54c900d1bf4fd8d967b7189cd0b",
+   "proposedContentHash": "c1cfa16fd64c9dc85c2df3cba3c28331ca65d6cf9ffd345ffd93d19f2f7e73f7",
+   "insertCount": 1,
+   "lengthDelta": 33,
+   "sectionH2": "가르시니아캄보지아 추출물 기능성 (공식 인정)",
+   "mode": "FLAT",
+   "inserts": [
+    {
+     "atIndex": 811,
+     "text": "체내 탄수화물, 지방, 단백질 대사에 관여.",
+     "ingredient": null,
+     "html": "<li>체내 탄수화물, 지방, 단백질 대사에 관여.</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "a23cb01d-b5bb-4a3d-bdd5-3d605442be0a",
+   "canonicalId": "20672358-9a6f-4246-aa9e-763cdb48511e",
+   "productMasterId": "b840fbf4-9e8c-4e72-a5f2-5c23c3ec3837",
+   "statementNo": "200400200061454",
+   "productName": "스몰윈도우 마디프리놀 골드",
+   "family": "COMPOSITE",
+   "baselineContentHash": "8ea97fce36f663e9ed706cfcfad5583f1ce515620be37528bcaebefdca691568",
+   "proposedContentHash": "ac839948104bc1b5cb31c03a1b22df9f1677accfc62fe8fd34e3c76bbe409997",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "공식 인정 기능성",
+   "mode": "FLAT",
+   "inserts": [
+    {
+     "atIndex": 709,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": null,
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "681e37dc-7bcf-49d1-a9a7-9c217494b556",
+   "canonicalId": "2c8ccb93-c593-4183-b891-be9f0cbe5721",
+   "productMasterId": "ff3f4a07-c1e7-41d6-aa40-e4336f187b49",
+   "statementNo": "200400200061750",
+   "productName": "프리미엄 초록입홍합오일",
+   "family": "COMPOSITE",
+   "baselineContentHash": "340693e79e05fe69c040899272259b6e0afcabbd5a1247e7ce7ce0a6aa15f0d3",
+   "proposedContentHash": "eb0232b2ae501a6c6dd291c528b74d469c43ed02eb4eba15ba204607a2bcba49",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "공식 인정 기능성",
+   "mode": "FLAT",
+   "inserts": [
+    {
+     "atIndex": 696,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": null,
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "08afd7ae-774f-4c34-ae55-f0dbf4f2578d",
+   "canonicalId": "1c22e0d3-9989-4088-b94b-ba8b56f3f08b",
+   "productMasterId": "5156fa4a-d702-49ee-9756-98d027d5935a",
+   "statementNo": "200600200081138",
+   "productName": "웰스루테인지아잔틴",
+   "family": "COMPOSITE",
+   "baselineContentHash": "c0908bb38e0391e39c3ee04e32e42089b3b7daba9a699e88b23cdad8e3e41fd4",
+   "proposedContentHash": "1d307b32ea31042d0c23e3283a83df1366ed8ae788eadaf3cdcc8c0c09f868a8",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1800,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "8624d111-d7a8-45e9-90b3-b99613ee2957",
+   "canonicalId": "30fcd2e8-a79b-4718-911d-cf7b00efa01c",
+   "productMasterId": "fb4bc05a-664d-4801-a633-ecc908114711",
+   "statementNo": "20060020008996",
+   "productName": "오큐시안 멀티",
+   "family": "COMPOSITE",
+   "baselineContentHash": "50b505f3c1ff9b3d0ba945698895b8b97c9fb50098888c17dd611552c1fd76bd",
+   "proposedContentHash": "9557cddc855f4e3fc9f55a61e71ffc7c5bf909f63bfffd17375f38ac8c09207a",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1829,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "a5beea3b-d79e-4e91-9e63-5f03c78daea9",
+   "canonicalId": "fb0bf767-e730-4b0e-8c6a-075e977e881a",
+   "productMasterId": "905f9be6-4568-451e-8c48-c2850aa91048",
+   "statementNo": "20160007515124",
+   "productName": "스템플렉스 캡슐",
+   "family": "COMPOSITE",
+   "baselineContentHash": "cfead31add9d04eb4a151d93e24272a915cefd05bb3d9ddb10fa071ae02fafeb",
+   "proposedContentHash": "a9d097b5e63deef738485fe19c405d5b27c56a3ea38e7c2888a71e759d78da93",
+   "insertCount": 2,
+   "lengthDelta": 80,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1042,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 C",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    },
+    {
+     "atIndex": 1116,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "cd1782f9-e443-4622-8da3-74dd4cfad8ff",
+   "canonicalId": "5dc7205b-6f9e-43c6-84b7-01f5b13c2809",
+   "productMasterId": "86daf6c0-0a51-436c-802d-d9dbab4d7718",
+   "statementNo": "2016000751590",
+   "productName": "레스플렉스 캡슐",
+   "family": "COMPOSITE",
+   "baselineContentHash": "703482e439db499d12aa555a8285b17a3b92e6e2150759e6f9b29eac26cde9b0",
+   "proposedContentHash": "2c570800d2d1c676c7682ede7ebc3b6ad3635e16e5d3ce1abe12e157feee3e32",
+   "insertCount": 2,
+   "lengthDelta": 80,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 955,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 C",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    },
+    {
+     "atIndex": 1029,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "39894b49-b7c1-4c9c-9ac3-2e19070be34d",
+   "canonicalId": "4697ae16-14b5-45d2-a51e-165b18e829bf",
+   "productMasterId": "8105d9e5-9158-4526-b693-7e513bc54e74",
+   "statementNo": "2018000391519",
+   "productName": "웰러스 바른 핏 가르시니아",
+   "family": "COMPOSITE",
+   "baselineContentHash": "5f8fde404a6450d9894ae356e69b1671bbf95122d804bd67a8e4715ec804db26",
+   "proposedContentHash": "8aef9ec2c7fb937bc24bf3629c70e40b9ad36abe698dfeff95befcfd1efd180b",
+   "insertCount": 1,
+   "lengthDelta": 46,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 881,
+     "text": "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌",
+     "ingredient": "가르시니아캄보지아 추출물",
+     "html": "<li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  },
+  {
+   "candidateId": "50478f47-6a5f-4575-86fd-d57bb1f136a1",
+   "canonicalId": "e23b9e51-7494-43c2-b94f-eb05be606ef2",
+   "productMasterId": "0cea3588-8e72-4772-ba35-c699f9776144",
+   "statementNo": "20190009483374",
+   "productName": "초임계 루테인 아스타잔틴",
+   "family": "COMPOSITE",
+   "baselineContentHash": "a7e65a2f8838e0dc6ccd1bb0df7ab34d3eead2d645f29f91d076af1d094a7172",
+   "proposedContentHash": "2d2ddd4faa7d9f234ecefa7e1601e19bdc0d1ac47ba3a725d76aeb57ba304ca9",
+   "insertCount": 1,
+   "lengthDelta": 40,
+   "sectionH2": "원료별 공식 인정 기능성",
+   "mode": "PER_INGREDIENT",
+   "inserts": [
+    {
+     "atIndex": 1474,
+     "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+     "ingredient": "비타민 E",
+     "html": "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+    }
+   ],
+   "changeReason": "SAFE_MISSING_CLAUSE"
+  }
+ ]
+}
