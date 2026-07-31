@@ -1,0 +1,56 @@
+{
+ "ranAt": "2026-07-31T05:39:11.648Z",
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "4 — EN canonical 정합",
+ "status": "APPLIED",
+ "expectedUpdate": 15498,
+ "actualUpdate": 15498,
+ "rolledBack": false,
+ "failReason": null,
+ "elapsedMs": 194633,
+ "countsBefore": {
+  "spd_all": 120118,
+  "en_total": 15498,
+  "en_who": 15498,
+  "en_no_expert": 13955,
+  "en_no_fn": 826,
+  "ko_total": 40913,
+  "ko_no_fn": 2,
+  "ko_audience": 0
+ },
+ "countsAfter": {
+  "spd_all": 120118,
+  "en_total": 15498,
+  "en_who": 0,
+  "en_no_expert": 0,
+  "en_no_fn": 824,
+  "ko_total": 40913,
+  "ko_no_fn": 2,
+  "ko_audience": 0
+ },
+ "rowCountUnchanged": true,
+ "deltas": {
+  "en_who": -15498,
+  "en_no_expert": -13955,
+  "en_no_fn": -2,
+  "ko_no_fn": 0
+ },
+ "effects": {
+  "whoSectionsRemoved": 15498,
+  "footerClausesAdded": 13955,
+  "functionSectionsInserted": 2,
+  "functionClausesRestored": 2
+ },
+ "reusedAssets": {
+  "expertClause": "· This health functional food is not a drug for preventing or treating disease; consult a pharmacist or professional in store",
+  "expertClauseSource": "기존 EN canonical 1,543 건 실측 (Phase 4-B probe) — 신규 번역 아님",
+  "functionHeading": "Officially recognised functions",
+  "functionHeadingSource": "기존 EN canonical 2,275 건에서 사용 중"
+ },
+ "holdRemaining": 824,
+ "enFunctionTally": {
+  "HOLD:NO_OFFICIAL_EN_GROUNDING": 819,
+  "HOLD:EN_GROUNDING_PARTIAL_1_OF_2_GROUPS": 5,
+  "SAFE_EN_FUNCTION_APPLY": 2
+ }
+}

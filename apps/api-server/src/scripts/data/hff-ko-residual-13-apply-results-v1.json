@@ -1,0 +1,36 @@
+{
+ "ranAt": "2026-07-31T05:25:31.324Z",
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "2 — ko 기능성 섹션 부재 13건 사람 판정",
+ "status": "APPLIED",
+ "expectedUpdate": 11,
+ "actualUpdate": 11,
+ "rolledBack": false,
+ "failReason": null,
+ "elapsedMs": 4628,
+ "countsBefore": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 13,
+  "audience": 0,
+  "no_expert": 0
+ },
+ "countsAfter": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 2,
+  "audience": 0,
+  "no_expert": 0
+ },
+ "rowCountUnchanged": true,
+ "deltas": {
+  "no_fn": -11,
+  "audience": 0,
+  "no_expert": 0
+ },
+ "effects": {
+  "functionSectionsInserted": 11,
+  "functionClausesRestored": 20
+ },
+ "holdRemaining": 2
+}

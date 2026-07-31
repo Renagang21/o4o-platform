@@ -1,0 +1,230 @@
+{
+ "ranAt": "2026-07-31T05:26:41.979Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "4-A — EN canonical 전수 정합 감사",
+ "enTotal": 15498,
+ "h2Tally": {
+  "Labelled standard": 15492,
+  "Who it suits": 15435,
+  "Why this product": 15371,
+  "Directions (exactly as officially stated)": 15227,
+  "Officially recognised functions by ingredient": 8355,
+  "Officially recognised functions": 2275,
+  "Vitamin D nutritional functions (officially recognised)": 448,
+  "MSM functional claims (officially recognised)": 384,
+  "Vitamin C nutritional functions (officially recognised)": 332,
+  "Zinc nutritional functions (officially recognised)": 289,
+  "Recognized functions": 271,
+  "Directions": 271,
+  "Dietary fibre functional claims (officially recognised)": 204,
+  "Lutein functional claims (officially recognised)": 174,
+  "Milk thistle functional claims (officially recognised)": 170,
+  "Magnesium nutritional functions (officially recognised)": 168,
+  "Vitamin E nutritional functions (officially recognised)": 151,
+  "Calcium nutritional functions (officially recognised)": 133,
+  "Propolis functional claims (officially recognised)": 122,
+  "Garcinia cambogia extract functional claims (officially recognised)": 110,
+  "Green tea catechin functional claims (officially recognised)": 102,
+  "Coenzyme Q10 functional claims (officially recognised)": 102,
+  "Biotin nutritional functions (officially recognised)": 91,
+  "Glucosamine functional claims (officially recognised)": 90,
+  "L-theanine functional claims (officially recognised)": 86
+ },
+ "shapeTally": {
+  "NO_FN|WHO|WHO_H2|WHO_RE_OK|EXPERT_MISSING|FOOT_RE_OK": 763,
+  "FN|WHO|WHO_H2|WHO_RE_OK|EXPERT_MISSING|FOOT_RE_OK": 13129,
+  "FN|WHO|WHO_H2|WHO_RE_OK|EXPERT_OK|FOOT_RE_OK": 1543,
+  "NO_FN|WHO|NO_WHO_H2|WHO_RE_OK|EXPERT_MISSING|FOOT_RE_OK": 63
+ },
+ "sdWho": {
+  "total": 15498,
+  "headingTally": {
+   "Who it suits": 15435,
+   "null": 63
+  },
+  "whoRegexMatched": 15498
+ },
+ "functionMissing": {
+  "total": 826,
+  "groundingTally": {
+   "NO_GROUND:KO_ONLY_SOURCE": 819,
+   "GROUNDED:BILINGUAL_MARKER": 7
+  }
+ },
+ "groundedSamples": [
+  {
+   "canonicalId": "3b0e3389-e580-4d11-a8d7-0eba99bb1df8",
+   "candidateId": "e0acdaf0-47cb-4cc4-abd9-0c88708ea966",
+   "statementNo": "2019000939480",
+   "productName": "쾌변엔 천둥이 더블케어",
+   "grounded": true,
+   "groundKind": "BILINGUAL_MARKER",
+   "groundWhy": null,
+   "groundParts": [
+    "May help to increase beneficial intestinal flora and suppress pathogenic bacteria"
+   ],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "3d013b15-695c-42f8-8f97-7b48815bc21a",
+   "candidateId": "51f3192d-afa9-4345-9f9f-f1a2baa34a9c",
+   "statementNo": "200700170351487",
+   "productName": "페미밸런스 플러스",
+   "grounded": true,
+   "groundKind": "BILINGUAL_MARKER",
+   "groundWhy": null,
+   "groundParts": [
+    "May help to proliferate vaginal beneficial flora and to suppress pathogenic bacteria"
+   ],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "629bc0ba-b4f6-4858-8d3b-b9acdb65dc1e",
+   "candidateId": "e3e98ace-5157-4cf8-bbcf-0bde72f1292b",
+   "statementNo": "200700170352447",
+   "productName": "빌드 100억 유산균 액티브",
+   "grounded": true,
+   "groundKind": "BILINGUAL_MARKER",
+   "groundWhy": null,
+   "groundParts": [
+    "May help to improve endurance of exercise performance capability"
+   ],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "81bfe840-978e-45ab-b06a-757a78309038",
+   "candidateId": "c8fabc5c-75f6-4715-8bd4-ef73a97a77ed",
+   "statementNo": "200700170352530",
+   "productName": "AG바이옴 스포츠",
+   "grounded": true,
+   "groundKind": "BILINGUAL_MARKER",
+   "groundWhy": null,
+   "groundParts": [
+    "May help to improve endurance of exercise performance capability"
+   ],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "8d05944d-9796-4ca7-84ce-3a78ef188da6",
+   "candidateId": "ba81ab55-f224-4c7a-a10e-9470a2def968",
+   "statementNo": "200700170351496",
+   "productName": "지노프레쉬 질유산균 50억",
+   "grounded": true,
+   "groundKind": "BILINGUAL_MARKER",
+   "groundWhy": null,
+   "groundParts": [
+    "May help to proliferate vaginal beneficial flora and to suppress pathogenic bacteria"
+   ],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  }
+ ],
+ "ungroundedSamples": [
+  {
+   "canonicalId": "00002fca-e0f8-4b11-bfd1-0b46c9c5e078",
+   "candidateId": "353dffea-7a24-4086-8d82-68aaf8c460d7",
+   "statementNo": "2022001022288",
+   "productName": "유피어라",
+   "grounded": false,
+   "groundKind": null,
+   "groundWhy": "KO_ONLY_SOURCE",
+   "groundParts": [],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "00724c59-2857-41be-9dd0-915e4a3d2233",
+   "candidateId": "8de97c92-3979-46dd-a2ca-bf706b5b2733",
+   "statementNo": "200700170352620",
+   "productName": "사이언스 코어 유산균 YG",
+   "grounded": false,
+   "groundKind": null,
+   "groundWhy": "KO_ONLY_SOURCE",
+   "groundParts": [],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "02482aad-86b5-4972-845e-457bd796ccd9",
+   "candidateId": "fb29fe3f-075f-4d3c-8eb5-66fa090eeb79",
+   "statementNo": "200400170211268",
+   "productName": "닥터오 엔:오 장",
+   "grounded": false,
+   "groundKind": null,
+   "groundWhy": "KO_ONLY_SOURCE",
+   "groundParts": [],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "029f2102-fea1-452b-8049-664c391bb2ca",
+   "candidateId": "fc7dec80-7bb9-453e-b2e1-7c7d4734e908",
+   "statementNo": "200400200061506",
+   "productName": "슈퍼프로바이오 펜타5골드",
+   "grounded": false,
+   "groundKind": null,
+   "groundWhy": "KO_ONLY_SOURCE",
+   "groundParts": [],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  },
+  {
+   "canonicalId": "031a9ba6-50fc-4ea3-a0df-d8fc68434d00",
+   "candidateId": "95060a1d-0b92-4a86-9c5c-cd2a4f4ba510",
+   "statementNo": "200600200031881",
+   "productName": "프로바이오틱스 50억 장용캡슐",
+   "grounded": false,
+   "groundKind": null,
+   "groundWhy": "KO_ONLY_SOURCE",
+   "groundParts": [],
+   "h2": [
+    "Why this product",
+    "Directions (exactly as officially stated)",
+    "Labelled standard",
+    "Who it suits"
+   ]
+  }
+ ]
+}

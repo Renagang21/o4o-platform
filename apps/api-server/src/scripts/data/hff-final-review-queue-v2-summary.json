@@ -1,0 +1,53 @@
+{
+ "builtAt": "2026-07-31T05:41:27.802Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "3 — 최종 큐 재구성 / 5 — EN 짝 없는 KO 모집단 확정",
+ "inputs": {
+  "originalQueue": 3858,
+  "deltaRows": 1397,
+  "agent9Hold": 348,
+  "thisWoKoHold": 2,
+  "thisWoEnHold": 824
+ },
+ "deltaResolvedUnique": 820,
+ "deltaStillPendingUnique": 563,
+ "excluded": {
+  "alreadyResolvedInOriginalQueue": 139,
+  "permanentlyExcluded": true
+ },
+ "v2": {
+  "rows": 4544,
+  "uniqueCanonicalIds": 4544,
+  "trackTally": {
+   "THIS_WO_HOLD": 826,
+   "DELTA_STILL_PENDING": 50,
+   "ORIGINAL_QUEUE": 3668
+  },
+  "langTally": {
+   "ko": 3720,
+   "en": 824
+  }
+ },
+ "scheduledOnce": true,
+ "alsoModifiedInThisWo": {
+  "count": 850,
+  "editScope": "AUDIENCE_REMOVAL/EXPERT_CLAUSE (기능성 문구 미변경)",
+  "samples": [
+   "00002fca-e0f8-4b11-bfd1-0b46c9c5e078",
+   "00724c59-2857-41be-9dd0-915e4a3d2233",
+   "02482aad-86b5-4972-845e-457bd796ccd9"
+  ]
+ },
+ "step5": {
+  "koWithoutEnPair": 25415,
+  "action": "POLICY_DECISION_ONLY — 자동 생성하지 않음"
+ },
+ "liveCounts": {
+  "ko_total": 40913,
+  "en_total": 15498,
+  "ko_no_fn": 2,
+  "en_no_fn": 824
+ }
+}

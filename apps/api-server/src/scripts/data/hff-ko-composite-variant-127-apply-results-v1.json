@@ -1,0 +1,40 @@
+{
+ "ranAt": "2026-07-31T05:20:28.526Z",
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "1 — ko COMPOSITE 변종 family 판정 교정 + 정책 patch",
+ "status": "APPLIED",
+ "expectedUpdate": 127,
+ "actualUpdate": 127,
+ "rolledBack": false,
+ "failReason": null,
+ "elapsedMs": 6697,
+ "countsBefore": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 13,
+  "audience": 127,
+  "no_expert": 127,
+  "non_wae": 25542
+ },
+ "countsAfter": {
+  "spd_all": 120118,
+  "ko_total": 40913,
+  "no_fn": 13,
+  "audience": 0,
+  "no_expert": 0,
+  "non_wae": 25542
+ },
+ "rowCountUnchanged": true,
+ "deltas": {
+  "no_fn": 0,
+  "audience": -127,
+  "no_expert": -127,
+  "non_wae": 0
+ },
+ "effects": {
+  "audienceSectionsRemoved": 127,
+  "footerClausesAdded": 127,
+  "functionSectionsInserted": 0,
+  "functionClausesRestored": 0
+ }
+}

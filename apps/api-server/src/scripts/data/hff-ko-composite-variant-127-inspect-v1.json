@@ -1,0 +1,52 @@
+{
+ "ranAt": "2026-07-31T05:17:24.801Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "population": 127,
+ "familyTally": {
+  "COMPOSITE": 127
+ },
+ "shapeTally": {
+  "AUD|AUD_RE_OK|EXPERT_MISSING|FOOT_RE_OK|FN_OK": 127
+ },
+ "h2Tally": {
+  "섭취방법 (공식 표기 그대로)": 127,
+  "표시 기준": 127,
+  "이런 분께": 127,
+  "원료별 공식 인정 기능성": 78,
+  "공식 인정 기능성": 49
+ },
+ "sampleH2": [
+  {
+   "canonicalId": "0223702e-5cbf-4184-97f0-f0664c2d645b",
+   "family": "COMPOSITE",
+   "h2": [
+    "원료별 공식 인정 기능성",
+    "섭취방법 (공식 표기 그대로)",
+    "표시 기준",
+    "이런 분께"
+   ]
+  },
+  {
+   "canonicalId": "02aa959c-029c-460a-92ce-709a990e4b65",
+   "family": "COMPOSITE",
+   "h2": [
+    "원료별 공식 인정 기능성",
+    "섭취방법 (공식 표기 그대로)",
+    "표시 기준",
+    "이런 분께"
+   ]
+  },
+  {
+   "canonicalId": "07e0ea1b-f6c8-4d83-89d6-e77c4cb450ee",
+   "family": "COMPOSITE",
+   "h2": [
+    "공식 인정 기능성",
+    "섭취방법 (공식 표기 그대로)",
+    "표시 기준",
+    "이런 분께"
+   ]
+  }
+ ],
+ "sampleTail": "> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  <h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul></div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 충분한 물과 함께 섭취 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담</div></div>"
+}

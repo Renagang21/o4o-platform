@@ -1,0 +1,359 @@
+{
+ "builtAt": "2026-07-31T05:24:28.727Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "2 — ko 기능성 섹션 부재 13건 사람 판정",
+ "population": 13,
+ "tally": {
+  "SAFE_FUNCTION_APPLY": 11,
+  "HOLD": 2
+ },
+ "targets": [
+  {
+   "canonicalId": "140613f3-7282-400c-a8ea-64702763f447",
+   "productMasterId": "6d4c3367-e5b0-436b-a1ff-d7badb8401c5",
+   "candidateId": "71bd05a8-2da5-4dda-b2db-899e8b3848c8",
+   "statementNo": "20040020020586",
+   "productName": "디노보 프로제닉스",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-2 열거헤더 = 라벨, ①②③ = 절 경계",
+   "oldContentHash": "471bdeb4665e019a166fefbfd9f292a286273a602b3e3f20bb16fd9eb7786063",
+   "newContentHash": "00f4549439f90c260d53b9894ed75be705a35b7266f0d2cbdbae4a3ec284352a",
+   "oldLength": 1587,
+   "newLength": 1772,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li><li>장건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 3,
+   "fnGroups": [
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제에 도움을 줄 수 있음",
+      "배변활동 원활에 도움을 줄 수 있음",
+      "장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "424b5e8a-ad93-4473-8e64-86b33e64c993",
+   "productMasterId": "4bbc7b25-76d8-4c25-a3d7-35056c9a5cd8",
+   "candidateId": "c8fabc5c-75f6-4715-8bd4-ef73a97a77ed",
+   "statementNo": "200700170352530",
+   "productName": "AG바이옴 스포츠",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "1203b124db2ddbeeb2841b9d77328ee75e27cb43864c763db2d96fe675308785",
+   "newContentHash": "886a09d97d3e650662d140e83134ffa68da2737240a806d2c7c600678ae59f45",
+   "oldLength": 1665,
+   "newLength": 1944,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정 제 2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "59c12dc8-fc8f-4bf5-9aad-1ab7bfdaade3",
+   "productMasterId": "ff6416df-1ff8-45ec-95f7-8679763cf0d9",
+   "candidateId": "a7bfe5d2-08d9-4f80-9488-8b75bca091d9",
+   "statementNo": "200700170352520",
+   "productName": "맨 TWK10 100억 캡슐",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "4203c2a6ce000f9762b4f53b6ad107fc41219fcac642f51e1fa97ac918c86682",
+   "newContentHash": "d15beee15db0562368a396b1e2ddb20c4a3979d8491b1349690068fae09363fb",
+   "oldLength": 1665,
+   "newLength": 1942,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(개별인정제2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "7c8261dd-3387-4ab1-9930-5e4993d83808",
+   "productMasterId": "eed670a6-1b13-4a02-9554-01acffee14be",
+   "candidateId": "ba81ab55-f224-4c7a-a10e-9470a2def968",
+   "statementNo": "200700170351496",
+   "productName": "지노프레쉬 질유산균 50억",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "0fc1530d3a3257b6b25d8029332d1bd4c67062c584e9fea6bd1ab079b5a71def",
+   "newContentHash": "81eb703c3f020ce69c9775181a8e9b53ff2d815bb52d0bd9c7a7c8d291e2a84c",
+   "oldLength": 1680,
+   "newLength": 1850,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)</b><ul class=\"sd-why\"><li>질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 1,
+   "fnGroups": [
+    {
+     "label": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clauses": [
+      "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "852ec525-8f37-4d3f-a8c4-8022b43ba681",
+   "productMasterId": "12873f95-acc9-46ad-90d8-a0916e3b6c04",
+   "candidateId": "3c887a09-d74a-4ff7-8ac1-f03dcc78f839",
+   "statementNo": "200700170351898",
+   "productName": "비타포뮬러 프리프로바이오틱스",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "3eefdae6797ae3c948d775c91fcb85b5b3ad1497d6b4976ad8380231ff6dd6c1",
+   "newContentHash": "b1f06b3837cafec06f582c62273d680c4731f8da1f0952853573d61aa8105940",
+   "oldLength": 1608,
+   "newLength": 1891,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></li><li><b>자일로올리고당(xylooligosaccharide) 분말(제2009-80호)</b><ul class=\"sd-why\"><li>장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "자일로올리고당(xylooligosaccharide) 분말(제2009-80호)",
+     "clauses": [
+      "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "a666721b-4230-4bf6-aa1b-1b5283f73be6",
+   "productMasterId": "ddbd3e9a-b9ee-4369-a170-e01b30a7457a",
+   "candidateId": "51f3192d-afa9-4345-9f9f-f1a2baa34a9c",
+   "statementNo": "200700170351487",
+   "productName": "페미밸런스 플러스",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "a6875f6f459a09d223b3aa0f22a14d4eb723dc956415c661272dd70e2de7685b",
+   "newContentHash": "10a5f0fba6e7425b2ae05336726a8b74730ede5e43f4d72cc998fc5566a0bb39",
+   "oldLength": 1673,
+   "newLength": 1843,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)</b><ul class=\"sd-why\"><li>질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 1,
+   "fnGroups": [
+    {
+     "label": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clauses": [
+      "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "b913aa9c-5165-41c8-91de-ae56f5c30a65",
+   "productMasterId": "dae59bfc-73a6-45e4-8cd2-9e2a73ef753a",
+   "candidateId": "e3e98ace-5157-4cf8-bbcf-0bde72f1292b",
+   "statementNo": "200700170352447",
+   "productName": "빌드 100억 유산균 액티브",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "ef6f660c35b79c3011653b839321bf6c04d796cd40da813e7c8af58b7812bc65",
+   "newContentHash": "2b2603e014578dc58de0384ebe7b331c0c79bb84fb688d0510f52e137e22ddc3",
+   "oldLength": 1661,
+   "newLength": 1941,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(기능성원료인정제2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "d4667307-5700-41a3-8c23-063724866fde",
+   "productMasterId": "af8a6e32-9eb4-4a53-b68f-0f918f212aec",
+   "candidateId": "4a13ba2c-fa44-4c4a-8f11-4846c06b4ffb",
+   "statementNo": "200700170352690",
+   "productName": "포켓부스터",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "2db72e30ebacdbfdf5cc38ca91653a1173279b23adba18c7f843700916fc2a67",
+   "newContentHash": "507e16aaec1a986aaaa8130094c1537edf70d5e0ad9d54be2593796052c0ae48",
+   "oldLength": 1661,
+   "newLength": 1934,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "db8c2ae7-e69b-4ef6-8f62-4d882d5e5084",
+   "productMasterId": "196b0844-5930-4f56-8a48-90b57b1dc9b4",
+   "candidateId": "24516fc0-ea81-47c7-a733-fa5ecfa36f08",
+   "statementNo": "200700170352946",
+   "productName": "이퓨니드 리스펙타 질유산균",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "88ba12bd5a55ccaf43c5328d18d60f91168f83bf12175fbfbfb8453353f1a354",
+   "newContentHash": "18bfa5729278c3c18a20f5f7a6d87849211beec51dc10e042723da138109b571",
+   "oldLength": 1661,
+   "newLength": 1831,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)</b><ul class=\"sd-why\"><li>질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 1,
+   "fnGroups": [
+    {
+     "label": "리스펙타(Respecta®)[프로바이오틱스 등 복합물](제2019-26호)",
+     "clauses": [
+      "질내 유익균 증식 및 유해균 억제에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "e28b5f63-dfcd-443a-97d9-e3ce5235b216",
+   "productMasterId": "f41757c9-d471-43a3-aab1-4402b57863e6",
+   "candidateId": "8c3a600b-801d-49b8-839b-a0b9a5b41b9d",
+   "statementNo": "200700170352412",
+   "productName": "익스트림 프로바이오틱스",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "0ceb714fc51fc7ba0f83daf2ff4c1c400ffb7fbf5d776a8a39dee32f9e63bfff",
+   "newContentHash": "f171bb2a39fccf70908969316c1d1359c86dd93ccb7cae7743d022a92207bf93",
+   "oldLength": 1692,
+   "newLength": 1964,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 • 배변활동 원활 • 장건강에 도움을 줄 수있음"
+     ]
+    }
+   ]
+  },
+  {
+   "canonicalId": "f47692e1-74f9-4c17-86e6-725d24f00a48",
+   "productMasterId": "24afcd36-de18-462b-a884-c5d20bcced9f",
+   "candidateId": "7b734cdd-6de9-4aed-be0c-cc0adefbe3bf",
+   "statementNo": "200700170352997",
+   "productName": "마이올랑스 유산균(Myolance Probiotics)",
+   "ops": [
+    "FN"
+   ],
+   "combo": "FN",
+   "rule": "H-1 라벨그룹 = 절 (그룹 내부 미분할, 영문 제외)",
+   "oldContentHash": "a6ef05264b19836d372f6b1da430a40f5040a98a22e248408fd1ae12ca793015",
+   "newContentHash": "0fed045ff6d00b35aae96da2c0f171982a15444f1edd37dab965808c697e9589",
+   "oldLength": 1676,
+   "newLength": 1948,
+   "fnInsertedBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제 ･배변활동 원활 ･장 건강에 도움을 줄 수 있음</li></ul></li><li><b>Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)</b><ul class=\"sd-why\"><li>운동수행능력 향상에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "fnClauseCount": 2,
+   "fnGroups": [
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제 ･배변활동 원활 ･장 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "Lactiplantibacillus plantarum TWK10 프로바이오틱스(제2022-32호)",
+     "clauses": [
+      "운동수행능력 향상에 도움을 줄 수 있음"
+     ]
+    }
+   ]
+  }
+ ],
+ "holdRows": 2,
+ "boundaryRules": [
+  "H-1 깊이인식 top-level [라벨] = 그룹, 그룹 내부 미분할, (영문) 구간 제외",
+  "H-2 라벨 부재 시 *헤더 = 라벨, ①②③ = 절 경계",
+  "라벨 밖 잔여 텍스트 / 비-verbatim / 영문 혼입 = HOLD"
+ ],
+ "effects": {
+  "functionSectionsInserted": 11,
+  "functionClausesRestored": 20
+ },
+ "expectedUpdate": 11,
+ "reversalContract": {
+  "FN": "fnInsertedBlock 문자열을 content 에서 1회 제거",
+  "verify": "역연산 후 sha256 == oldContentHash (insertOnly 체크로 전건 증명)"
+ }
+}

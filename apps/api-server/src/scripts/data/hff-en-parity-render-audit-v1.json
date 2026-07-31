@@ -1,0 +1,30 @@
+{
+ "ranAt": "2026-07-31T05:35:06.859Z",
+ "applied": false,
+ "dbWrites": 0,
+ "coverage": "SIGNATURE_FULL",
+ "perSignatureCap": 3,
+ "totalTargets": 15498,
+ "missingContent": 0,
+ "signatures": 47,
+ "signaturesCovered": 47,
+ "fnDocsRendered": 2,
+ "fnDocsTotal": 2,
+ "renderedDocs": 140,
+ "aggregate": {
+  "checked": 420,
+  "docs": 140,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "emptySection": 0,
+  "audienceVisible": 0,
+  "expertMissing": 0,
+  "footerMisplaced": 0,
+  "functionMismatch": 0,
+  "rawHtmlVisible": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}

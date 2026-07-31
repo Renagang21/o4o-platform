@@ -1,0 +1,25 @@
+{
+ "ranAt": "2026-07-31T05:24:30.553Z",
+ "applied": false,
+ "dbWrites": 0,
+ "coverage": "FULL",
+ "totalTargets": 11,
+ "renderedDocs": 11,
+ "aggregate": {
+  "checked": 33,
+  "docs": 11,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "emptySection": 0,
+  "functionMissing": 0,
+  "clauseMissing": 0,
+  "labelMissing": 0,
+  "englishLeaked": 0,
+  "footerMisplaced": 0,
+  "rawHtmlVisible": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}

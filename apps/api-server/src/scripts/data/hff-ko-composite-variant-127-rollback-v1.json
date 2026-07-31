@@ -1,0 +1,2576 @@
+{
+ "builtAt": "2026-07-31T05:18:42.140Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "phase": "1 — ko COMPOSITE 변종 family 판정 교정 + 정책 patch",
+ "scopeMeasured": {
+  "ko_total": 40913,
+  "non_wae": 25542,
+  "audience_all": 127,
+  "no_expert_all": 127
+ },
+ "candidateRows": 127,
+ "familyTally": {
+  "COMPOSITE": 127
+ },
+ "targets": [
+  {
+   "canonicalId": "0223702e-5cbf-4184-97f0-f0664c2d645b",
+   "productMasterId": "9fbb7b4c-8504-47e8-be7e-08b86e3af630",
+   "candidateId": "19c2058e-83ad-42b6-8ac8-ac6eee2d7510",
+   "statementNo": "200400150831439",
+   "productName": "에스디엣 컷 (SDIET CUT)",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "091a3b71734d7c0fea80af3f27227a8fae9c6582532f9556c6279ed678f7a9eb",
+   "newContentHash": "5f3bb3b4a238875e069268b92c3deaa93ce67bb2c5a3206339e691271b05e5d1",
+   "oldLength": 1595,
+   "newLength": 1554,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "02aa959c-029c-460a-92ce-709a990e4b65",
+   "productMasterId": "7441625d-0b2d-437a-8933-1ae5a4f286db",
+   "candidateId": "cb20e6c2-9750-456d-927d-be2a800e804d",
+   "statementNo": "200400200023339",
+   "productName": "차차나아지겠지2",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "dba442176b2f15506433b3970859f216f1a16fd0868145df5d3f03d3dad48e10",
+   "newContentHash": "a8b7b15c4378206cc3bee0c0b54fbf82bfe2fae91bbb9fe4c47ca84072561ada",
+   "oldLength": 1508,
+   "newLength": 1478,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 아연 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "07e0ea1b-f6c8-4d83-89d6-e77c4cb450ee",
+   "productMasterId": "8cbe2e8b-d08f-475f-ab2e-aad75d8d7693",
+   "candidateId": "46a77f6f-d837-4c65-8671-023d21bd5e70",
+   "statementNo": "20040020010419",
+   "productName": "닥터화이버에스큐",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "3b92a92a5d417c49816140999a5dba386da1a1882f8dea35c0cc0c64533443a2",
+   "newContentHash": "babe31c30cbb2f57740f429c1926896a3ac7b33d908609824197ab1f6ad7a4ff",
+   "oldLength": 1266,
+   "newLength": 1244,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "0959b359-cfc2-453b-8a72-d86f8ece427a",
+   "productMasterId": "2e613031-dd92-4ff9-ad34-55b57d5891fa",
+   "candidateId": "f4fd88f2-0e34-4060-976d-8d79e8f53e3d",
+   "statementNo": "20220010222117",
+   "productName": "푸응 7 Days 데일리버닝",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "7ed2abe59fbc107f3187d780715f2c52a6fdf6eba1d557c7ceb38d79702700df",
+   "newContentHash": "206a24a549e0bc642aeab146a3b074727d32852d45bfbe8bc050ecaed39611da",
+   "oldLength": 1416,
+   "newLength": 1385,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "0981adc6-880b-4db0-9921-4530f5a7bee3",
+   "productMasterId": "ff701951-2bea-4bc0-beb9-b41ae222cb22",
+   "candidateId": "1f4111f3-c2b1-4d7c-a142-6746868f508b",
+   "statementNo": "20040017021874",
+   "productName": "웰빙 프로틴",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "cc84309b367191f8adb414cca867628f88d21d0a892d059695b899a9cd751784",
+   "newContentHash": "d0bd8ded5a147e2616601ad2d9a69866e70ef09e699fe5cf830baea9aab01dc9",
+   "oldLength": 1250,
+   "newLength": 1228,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "0aadc98d-97c5-40ff-a108-69a7f8d1f776",
+   "productMasterId": "5cc2ef9e-3880-49e8-a260-980e0b89fe24",
+   "candidateId": "fc272ab7-a6bc-4a09-a58f-ae6df8e8fd75",
+   "statementNo": "20040020020720",
+   "productName": "7일만 클린다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1e7c3fcb852c78e83dd460481bc7a6844be0c8b3fab14042204d0340323c48fc",
+   "newContentHash": "3848322c8df90b4b37909fbc0508b3a50a05b074312ac0adf492ee6697216ddf",
+   "oldLength": 1460,
+   "newLength": 1435,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "0bb000c0-bc34-4fc0-83a4-e6bb698b3521",
+   "productMasterId": "d69be10c-a564-466b-8d65-9c824c6cb86b",
+   "candidateId": "69d5b3fa-1234-40e1-8a11-151bdd647573",
+   "statementNo": "2018001246650",
+   "productName": "빼고빼고 카페 스위트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e79a04e30c5f4aabdcf1dd38e981be4be94bac854051e835ce6cea5f69d46b06",
+   "newContentHash": "1da75c9a7763e3a01d77ecfd5e3fa8812cfbbc6fc5151496ee416f6ebba2a8a8",
+   "oldLength": 1644,
+   "newLength": 1597,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "0ff84b08-babd-46d0-bfbb-73ed11f321cb",
+   "productMasterId": "f24b719e-1177-4610-ace8-13741539e3ee",
+   "candidateId": "e5edd5a4-38d9-4f0a-aa1d-e54c1d168b78",
+   "statementNo": "201000190041299",
+   "productName": "혈당컷 단백업",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "3c9e29ef3f92e42f1014875b6682da36908f0e97d7ed6e572788e54f56570fba",
+   "newContentHash": "8c1bdd9c4023424705eddb57cb04086cef58a1a290de7626b1efc13c21759be2",
+   "oldLength": 1275,
+   "newLength": 1253,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "114efea9-4a81-4ba3-854b-90e034fdc0f7",
+   "productMasterId": "3407566f-9e31-4fc1-9424-cc5f519e2479",
+   "candidateId": "c66d4345-17a5-4f01-95ba-32dd051af75e",
+   "statementNo": "200400170211440",
+   "productName": "퓨어리셋",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1ea3174d75e52dcb07ef05c1d4139ef3cfe6a5742e79639606279375bd7aad2b",
+   "newContentHash": "ba472321928d5bea8c30cff134f409b91727d4bd8f8c6254fc8f3560d7221326",
+   "oldLength": 1671,
+   "newLength": 1630,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "117c492c-0dab-4995-ad8c-a8294ba2b575",
+   "productMasterId": "0921c9e1-d6f4-4391-9d42-d6e614ba1280",
+   "candidateId": "0a870dc1-fd9a-480e-a393-77b830f6f96e",
+   "statementNo": "2004001507232",
+   "productName": "해피플러스핏",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "dad6509496be10fd812549e4e79f587d82cadbcfa1f98c5c6e66fcf5bd4e6b05",
+   "newContentHash": "4f5b46160e1a70c13c7c4271f3c011912b2df579062b83120ae572c45b0abb45",
+   "oldLength": 1570,
+   "newLength": 1529,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "12446c55-56b4-4181-9ceb-1609282e2869",
+   "productMasterId": "646a9b0f-8231-4ddf-a7f6-2088255c6a98",
+   "candidateId": "8e571374-4242-4135-9b8d-5b93ae18bdc0",
+   "statementNo": "20040015162505",
+   "productName": "아락핏",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "12ad5a44c38233394e3250823aba440abee622ee90606e37e989ca9272a2cad3",
+   "newContentHash": "0be0345946e01f292f553e7baf435f36bc3aa89eb16068a4cdf06865b05752a7",
+   "oldLength": 1565,
+   "newLength": 1524,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "124be0a4-cf44-46bd-95df-6062600bfc90",
+   "productMasterId": "269aeb96-e66d-428c-9dfa-8c34d3386b43",
+   "candidateId": "90a60cee-6b7b-4b2d-8074-ca7579382feb",
+   "statementNo": "20190009483674",
+   "productName": "딥트3일 스트롱플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9e102856db8fd08e939a725554cf5520948479f404dac53468ca808195bb390a",
+   "newContentHash": "123c89a75c12aa7051fd5e9998886dc4cc594f6f7406a29248f550215fd4e869",
+   "oldLength": 1559,
+   "newLength": 1518,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "177c5a76-7db3-476d-bd91-a8b9df11d877",
+   "productMasterId": "e8352f20-8013-4b78-8f63-fe59f9c3fdb5",
+   "candidateId": "eaa0bb43-1591-4645-ac23-f3f418a04cbd",
+   "statementNo": "201100170169",
+   "productName": "해피클린(Happy clean)",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "5ae450e61b0fa0390b4b54ebf59e67cba60cb3d51b8183674daccac0eea7a119",
+   "newContentHash": "f16bcab76680c516f2807809cd04b811c36e944ac9dd70c8bf20e9af56d79bfc",
+   "oldLength": 1651,
+   "newLength": 1610,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "1bc3edc2-81c9-4e93-98e9-a98399366287",
+   "productMasterId": "180b85c6-c6a5-4bf0-a629-e8e1b7ae137c",
+   "candidateId": "986a7952-50c6-4160-87d0-4bbc33956b7c",
+   "statementNo": "20040020010421",
+   "productName": "케이푸드 화이버슬림+",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9547012860a79488505b80dd0bdc9c35724c35b443f739d5ee53b9c269e02ea3",
+   "newContentHash": "324eb25d99d0c6a5fe22f9c321cfbbbdb1e6461cb64a5a14fa922d69314e008f",
+   "oldLength": 1269,
+   "newLength": 1247,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "1cfcb834-1759-470d-bc01-4ddb80151490",
+   "productMasterId": "ec9e5d4a-c74c-4023-b8f9-650052136a7d",
+   "candidateId": "528b9823-a8a2-45ec-b6b1-6d0d547cf973",
+   "statementNo": "20140020012109",
+   "productName": "바이래빗Lv2",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "2b1adb12872aa547d3c6f8d04d75a95c9dedb528153489e4098144dd6af55f8e",
+   "newContentHash": "03dedebe7000cc2bf4729fdd0571f44784b03602bcc4f62d6f0eaebff5cbad51",
+   "oldLength": 1614,
+   "newLength": 1573,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "1e0e509b-0c72-471d-9991-87da81742382",
+   "productMasterId": "6299fc89-8905-4acd-8264-b16049b85b89",
+   "candidateId": "d3065036-2d1d-4e4c-ade1-236b238cfbed",
+   "statementNo": "200400170211729",
+   "productName": "혈당박사 울트라",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "2d094fe491db41d33916f08e83e5d94c941689b375e8dcdd9dd45254a09f56d4",
+   "newContentHash": "0a7574d57b76f73fb4cd6abc636374c545809f3e9c0d3ce10e11f87375a3655f",
+   "oldLength": 1348,
+   "newLength": 1325,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>귀리 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "217d6780-c2ab-4844-869e-3a661c9265b2",
+   "productMasterId": "60ca85a6-498b-406c-8330-c48259caad82",
+   "candidateId": "447edda8-9021-45fe-a32e-4e1b0b97221a",
+   "statementNo": "2023002889413",
+   "productName": "신정애 싹빼 다이어트 환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1020317e8cdfc14365060e9c04883559f803f283f11a99451417e3293bd1b91b",
+   "newContentHash": "1dbb9343fe9cb44df9a27dc6a056ad66c27ea482cd80fec4c9bde03a8e79e2e5",
+   "oldLength": 1602,
+   "newLength": 1561,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "23764626-0ca7-425b-930a-fd23e15854bf",
+   "productMasterId": "fcde2c1d-b433-46ac-a4ae-7bf50a81dae5",
+   "candidateId": "b5f3e9fa-9946-4813-9eb7-291e5deee832",
+   "statementNo": "201100170167",
+   "productName": "클라라",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "570af79b0eea2052c4538a4d8d70ef2219d915264914af9db9270d481319bc18",
+   "newContentHash": "8301b1fe01ddc7114db29e279a8348376bfa1dea029663fbf089a83e3c563de7",
+   "oldLength": 1631,
+   "newLength": 1590,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "23fa97b6-8d31-4898-bb3c-ef0c63a41126",
+   "productMasterId": "ef885efc-6801-412a-9be3-08a2bd408442",
+   "candidateId": "460b1220-19d8-4a71-9fc6-db1db59f0b72",
+   "statementNo": "20190009483677",
+   "productName": "딥트 3일 사이언스 업",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a11ec9dc0856d5cd8af9bcf8009d8134387d17ebde8301ef5b9ece55d435d2b1",
+   "newContentHash": "30da867fcebe8e9544072c8febafc67aa475d6a9486805ee3061a54f05807934",
+   "oldLength": 1563,
+   "newLength": 1522,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "24bf5580-d547-471d-98ac-7f9d3c560d45",
+   "productMasterId": "dd96bdaa-495e-4ea3-8740-c1018ef0d267",
+   "candidateId": "bf8e7fb8-1935-4c1d-95d2-acfc8ca130a0",
+   "statementNo": "2021001609016",
+   "productName": "가르시니아×차전자피 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "f86c890eef6949c437d3889fc3ce28d5047c08fddfa2fecc70f87d0852748e17",
+   "newContentHash": "2318e6a954df9a6de89e61147853895f3aa2d4661010ccb863e675c0891d56ce",
+   "oldLength": 1325,
+   "newLength": 1303,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "24df4399-f2c7-4890-b2be-e61ce2afc21c",
+   "productMasterId": "60588b52-c0cd-46d9-b965-01a92e79f521",
+   "candidateId": "fdf827d0-e7e3-4642-85ba-9fafe2f36d2a",
+   "statementNo": "2004001507233",
+   "productName": "해피플러스센스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8bad3b7591a6bb3ecf75963b87bd0982891f048741bd6135686c4dffa7784252",
+   "newContentHash": "4a92e2e5d623ec9bddde2ee83eab081d6022c9d41a389d3141ffa944682dd651",
+   "oldLength": 1586,
+   "newLength": 1545,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2609a614-faee-42ff-be34-c61dab1c016d",
+   "productMasterId": "7ebb5551-382b-4b1c-8998-6b7beed4c4c5",
+   "candidateId": "9a495b43-9e5c-400e-a804-bc153195862c",
+   "statementNo": "2020000997228",
+   "productName": "커피맛 다이어트에 빠지소서",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "399046a771ad8e3b1c4a706786a1cc5de20dc1c49995871fcbf62e9d6f3ef714",
+   "newContentHash": "4093a46b0343d5ae0b401129a0902bfe1b64bf0f0ee0a92c22ed2017e7e24471",
+   "oldLength": 1670,
+   "newLength": 1623,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "27048570-4e57-41ab-9624-c257fdd61802",
+   "productMasterId": "7282e14a-0b86-4970-9535-67074f312870",
+   "candidateId": "9cbc4f9d-b560-4e1f-bc1b-ca8ee803de52",
+   "statementNo": "201100170166",
+   "productName": "바라크플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "bb8e8b25a0ae6db0bdfd0d47b126d54bc82576d8bea01b75b6509be8b30db3d3",
+   "newContentHash": "38bdf99da7f38870875a480c5f2cfb2a7b27a31f9b050e9d3c0f3e3836478490",
+   "oldLength": 1569,
+   "newLength": 1528,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2a42b32d-4bcb-478f-b193-662665bccd2b",
+   "productMasterId": "bdae0bb9-5658-44c4-a624-ea6db1ca2fcb",
+   "candidateId": "af99da2e-5935-48d7-95f5-28dc7e83dec0",
+   "statementNo": "20130020008639",
+   "productName": "주르르륵",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "50218c5b578eee23aad9851aa9b924d7ac0c8b47be01b12a5be3bac56ee3bc3f",
+   "newContentHash": "7aa377fcc21ebe5967c7672b1a541ddda93d6ff03b338e458ec6766ca642f56d",
+   "oldLength": 1218,
+   "newLength": 1196,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2a5be66c-594b-47dc-b3cd-65f61a55eeda",
+   "productMasterId": "1a9b6f9a-0ed0-42ce-8846-3f7991d0ee46",
+   "candidateId": "4e528e3c-ffbc-4eff-a316-4b5879147e84",
+   "statementNo": "20040020028475",
+   "productName": "쾌변엔 차전자피",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "03f2d45242eea57af0089e7a28b3b0c6e64fb1b5d0240ffd058192964bc3b6e1",
+   "newContentHash": "0415e4e16a633dac6e639ca9c27906327efd58870b9f5169b5550db63a290b3b",
+   "oldLength": 1293,
+   "newLength": 1271,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2ab99c64-0ccf-464f-a6f9-e3184787513b",
+   "productMasterId": "5487ac81-7c4b-4e92-9d58-b12988ec8d4e",
+   "candidateId": "842b1af5-66a2-49c9-8fa8-82e8bde9bfa3",
+   "statementNo": "200400170211902",
+   "productName": "드림 퓨어(Dream Pure) 쾌변 헬퍼(HELPER) Ⅱ",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "90182e494bda50d2a3384c4ccafac59692cc42377c9fada366431433f8852b7d",
+   "newContentHash": "e41c1d45d3491ab03c7d7462e1dc52c42ff3a865c5671bf162632228a3b213cd",
+   "oldLength": 1676,
+   "newLength": 1635,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2c1d1871-7b06-492e-af46-f310c0aefa67",
+   "productMasterId": "b6c5f3e5-67d9-4d8e-941f-504076eb39ff",
+   "candidateId": "5755abd3-ac29-41ac-9e23-c37982e9484a",
+   "statementNo": "200400200082644",
+   "productName": "카페빼빼 에디션",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "d4b16454c2d719f404d91a217cd77d3e01af8df98974a2805c0cab65301017ce",
+   "newContentHash": "e264cf058c2015aecf67787e41f016f0f20321a611fb4388666d27204e265072",
+   "oldLength": 1549,
+   "newLength": 1527,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2f832359-b29a-4a59-ba60-488b8f6c5622",
+   "productMasterId": "131108ad-56d9-495b-aabf-650f129f7794",
+   "candidateId": "a0e517df-84e5-4bf8-8c7f-b2c618601a78",
+   "statementNo": "20040017021932",
+   "productName": "지아오굴란 엑스티(T) 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1f5fed501d587c3b12cc02b469aad161eeb9da759fabb118dc0cbed91a54d017",
+   "newContentHash": "2bfdebdaab5f883a2b0174df57e3690b1c94bbb166e181e58c29af0ce45a135b",
+   "oldLength": 1386,
+   "newLength": 1364,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "2fd2c427-044d-4602-8e2c-b8cbd23e6e1c",
+   "productMasterId": "8ee88aa4-7631-4d10-af08-fc1351b8525f",
+   "candidateId": "3cc48039-00da-4e86-a061-028565fdaab6",
+   "statementNo": "200400170211297",
+   "productName": "비움다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "d253555e933adcbf716d10fdb3e3385e7614591cf16931bd21a6d9499bb7661e",
+   "newContentHash": "4d6377b9201380f6fe713c402ebda739a90398f38bdff40a9386210565f51ebb",
+   "oldLength": 1663,
+   "newLength": 1622,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "31210793-c391-46eb-a05f-2712ad72dfb0",
+   "productMasterId": "4d6bbd4b-4f0a-47d6-a8de-545f86c5d58a",
+   "candidateId": "0e8099f5-bbc8-4c64-a49f-35a360ea6b17",
+   "statementNo": "2023000400022",
+   "productName": "숲 속비움",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8198b3bf2792dc501890f72ebe5daaaec66aafaa3f3728205df7e2f9b5ed4dbb",
+   "newContentHash": "336ce1aa883bb1b9e451aea704509c53fec3338a315770f2be25e7186a095c7e",
+   "oldLength": 1135,
+   "newLength": 1113,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "32f5b80f-314c-4bc3-836c-d32e90678208",
+   "productMasterId": "1e3028eb-c1a8-4932-8c6b-1103c67e0025",
+   "candidateId": "106cba6d-9717-4bf8-938c-69b26b7a9707",
+   "statementNo": "2011001701633",
+   "productName": "케이에세르 장박사",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "893a7fe14d171d10f35134a2662e46c6504444f9afa69205d2e3d33ce97b21e6",
+   "newContentHash": "040b2b4953d4fbae0b18e0ba5e3ec12c424f675b5999b84a8c9da0b611fa235a",
+   "oldLength": 1614,
+   "newLength": 1573,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "334e6a15-66a0-403f-8d8b-fb6ceab5fae4",
+   "productMasterId": "68a433bd-4332-4df2-8949-719cc7d68602",
+   "candidateId": "440687ed-153f-42e7-8078-d79f1ac5c0fe",
+   "statementNo": "2022002106774",
+   "productName": "Diet 비울땐 확실하게 차전자피식이섬유",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "c0596f525fdfdc9dfec4dc8ba422c03c82dd691dbe8483911bfc6111a7f5984c",
+   "newContentHash": "aae99a60f9c9f3be1ecd912ae9a2c2cfbe0ac328b90b99428475697812a98ff1",
+   "oldLength": 1597,
+   "newLength": 1556,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "33f96087-6790-4cc9-9fbe-0f39f35c48ea",
+   "productMasterId": "00d76b64-d98f-435d-9584-11ddace893cd",
+   "candidateId": "10bb1392-756a-4d0b-bd4b-7557c0b2e14f",
+   "statementNo": "2023002876652",
+   "productName": "테이스티 쾌변 다이어트엔 차전자피 가르시니아",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "4299dee72f72a9c554261abc0e7537bdb7fbeb3aa14fc57fc14eaf786d55e48c",
+   "newContentHash": "ed53bac9cd9cf729a4c288cfb2b6ee63806c26e91c325912b0290f82b46d66b2",
+   "oldLength": 1644,
+   "newLength": 1603,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "36792bce-bf93-4a1b-91a9-36d915211401",
+   "productMasterId": "e2e3e947-cb0d-40ac-96a1-c377486fa443",
+   "candidateId": "e3c00bc6-2969-434c-9f2c-9d24690d184a",
+   "statementNo": "20040017021832",
+   "productName": "프리미엄 비움 플러스컷",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "0335ef89fc64398124911b84083d984a5ad073c2162a41835b0099d9bfd0f3af",
+   "newContentHash": "61f027c899f0f629e49891a466e76bfbc47908f24de1fab63e8c154cec35df59",
+   "oldLength": 1562,
+   "newLength": 1521,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "3b9f7acb-8b00-492b-9afd-1d5c5067aa15",
+   "productMasterId": "3a874199-157e-49a1-87b3-a797b60fb5a8",
+   "candidateId": "248ae9a6-d7b5-46c4-aaaf-9a4732185603",
+   "statementNo": "20220021067104",
+   "productName": "쾌변포유 차전자피 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "f47083b3af638166ad336845f1831010df966649f0ef313cbac5febdb628424f",
+   "newContentHash": "d97033d50be33dd2c844564fd1be0d99379664ad77ca7f4affa64589674c26ac",
+   "oldLength": 1647,
+   "newLength": 1606,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "3f24fb3a-29ec-4102-b9a5-62ae95cd828f",
+   "productMasterId": "91bcf672-62a6-44eb-9c9b-8c86e3a34960",
+   "candidateId": "b74aa15e-9b64-4a2b-be21-5cba36f3b214",
+   "statementNo": "202300040008",
+   "productName": "아미크릭리바",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "fccc989ef148a3bc8ebc382cbd0abe187b2874c192e1b45a8e0b2a0e93bf046f",
+   "newContentHash": "7853e9f69ac551b6852e706d48a2fd7285e28731207f5f070a14ac664f23f23a",
+   "oldLength": 1136,
+   "newLength": 1114,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4187eeec-60d5-41d3-af93-45c2aeb77866",
+   "productMasterId": "f20034c2-2ec6-4302-848e-7dc1752167b2",
+   "candidateId": "9aa10e9b-a02f-48a6-9f29-fa84b1156e56",
+   "statementNo": "20220011370168",
+   "productName": "딥트3일 스트롱 플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6e18f09c6640cb5a3da7e96792bcc61503bff58a3ace2892de98451cc9122004",
+   "newContentHash": "73f2c6989d14bc7c966cfbad21fa26b907d288b473b3cc74deeab27c96fc6d77",
+   "oldLength": 1633,
+   "newLength": 1592,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "43739b5a-84a5-499c-8b55-0709f4a71d3a",
+   "productMasterId": "485b8cdd-e6fb-462c-bbc2-17f43362eef2",
+   "candidateId": "b22cdde4-dd18-4d40-a9c6-c6b36cfc1934",
+   "statementNo": "20190009483313",
+   "productName": "다이어트 환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "db718833ed09d74bee7385a3eda986b0e170af5968ec6156d335c48cfea190f2",
+   "newContentHash": "a31a5550ac2025b997e3752e135b9b1e62b65537db662df7a290417adec255df",
+   "oldLength": 1556,
+   "newLength": 1515,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "442f9742-e463-4fc4-b502-b4771e1a1ac0",
+   "productMasterId": "6fb5a8e9-2bd3-441d-8541-9a94e4160584",
+   "candidateId": "1f06fc0c-a895-4167-a923-99ce070b61f6",
+   "statementNo": "20190009483292",
+   "productName": "신비감 비움애(愛)",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "5c08b64a98c8aae36a667dc58f03f0776f40f8fc431ef1b1544ae96079077622",
+   "newContentHash": "b545b5fe56c1f4ffab1b473c1029b928177351e86d1fe0ea6f19ad8062be114f",
+   "oldLength": 1165,
+   "newLength": 1143,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4a1812f2-e5f0-4a65-9bd5-978d6555fc74",
+   "productMasterId": "971ffc51-1a2e-4cc7-9b27-75ea84ad2b4c",
+   "candidateId": "a7402bce-8d83-4314-95a0-277398e5e8a4",
+   "statementNo": "200400151071323",
+   "productName": "수월환 차전자피 가르시니아 다이어트 ",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "49f72f7fe13762e62cc9761e85b5ed6b9c9252d25ebf565957bde04a2b26dcc0",
+   "newContentHash": "4aaa1c6fdadc337c745474767d7ead03e928f1208d665b78ced0171aa63cb664",
+   "oldLength": 1621,
+   "newLength": 1580,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4b42ce23-3596-4240-b4f3-16c8ca693daf",
+   "productMasterId": "ddd9cb3c-bcd0-4a4a-b2f5-824d143ef4b7",
+   "candidateId": "eb8c6a31-cdaa-49f5-8691-cf83b65e9649",
+   "statementNo": "20040017021833",
+   "productName": "엠아이비(MIB) 비움",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "54380a04a5733b56e5984dd1c5fa12b35bf56c64655909f249d5d96789b2d245",
+   "newContentHash": "ffad07c2afe26969af5abb63d716eb96ef2e27dfe6a559b38dbe6dda6c99c764",
+   "oldLength": 1524,
+   "newLength": 1483,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4cea03db-3dcb-406a-ac84-a3cfecef13d6",
+   "productMasterId": "88a40820-ef18-474d-af03-42d216e212e5",
+   "candidateId": "7a0dcaf0-fb96-4fe7-9f3c-d62eede8e960",
+   "statementNo": "20040020028361",
+   "productName": "변해라",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "51e5199d07793bbc713fa43aadbb07089b336c2245a2ff815aed19d6d3740648",
+   "newContentHash": "a9b4c24efdd54249493268105d522a73c57b729a3850050ac9dd8df9f3725d1f",
+   "oldLength": 1538,
+   "newLength": 1497,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4d12a0b9-c4b4-467f-9f9b-3063086f31d2",
+   "productMasterId": "14a78a71-6512-4b9a-bfc8-44f146dde508",
+   "candidateId": "952d7526-18b9-4506-a6ce-f2f35a31c613",
+   "statementNo": "202300040009",
+   "productName": "시원케어",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "cc8d8e7044ff01be5543d5bb765906c7e981ba80d76034b3ae82b8f06ebd69d9",
+   "newContentHash": "f72c93f6a0c86b1ecc2980a7e338a448040ec690d23d9885c7e54368fc7b4642",
+   "oldLength": 1134,
+   "newLength": 1112,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "4fd02d40-1b5b-40dc-a53e-988d94f38fec",
+   "productMasterId": "87af208d-b4a7-4aef-99f3-5e10aad27b86",
+   "candidateId": "8f9073d9-cd9a-4c8e-baec-273c48d3fff5",
+   "statementNo": "20040017015354",
+   "productName": "차전자피에 빠지다",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "bceaac69946931f0ae5724bfcc7dc7c549180b9747b77d7983b3f11fff4b696e",
+   "newContentHash": "050935591275b3c92dfaff9ba00e66cdd5cc10917dd63a29ac8614e384b348fd",
+   "oldLength": 1194,
+   "newLength": 1172,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "50bc8e3d-4855-46ea-b069-ed928bc6397e",
+   "productMasterId": "81728ab5-a811-4f58-873b-eac01ab61d97",
+   "candidateId": "8c7d7e6c-b8aa-4922-8387-b8b218f28c9d",
+   "statementNo": "2021001609015",
+   "productName": "차전자피 배변",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9c473426639c36997b8a007d265699869feebbd7969acf51add42e56da2abf42",
+   "newContentHash": "7a754f79d6bcd423763a3f7b738a62b4bf2595131856253f30226db97c3802db",
+   "oldLength": 1290,
+   "newLength": 1268,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "515b98a4-a2f6-4563-a300-6d37ea9a1a7e",
+   "productMasterId": "0279cd4f-3d55-4d94-a8c3-a28a907bdf17",
+   "candidateId": "01aef356-02e5-4359-9c6b-cb83fe361406",
+   "statementNo": "20040020046656",
+   "productName": "푸응 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "ed2c9d4d8c9a865736e86ced41294c4341a0c119a2e438f5ae572d8906dcce72",
+   "newContentHash": "0bc3d5152d5dc98eb52931c56bd39e2eb7e919d4ed7d768f06510aaef236f630",
+   "oldLength": 1589,
+   "newLength": 1548,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "52a5e44a-8d1a-4dec-81ff-2c76f3379437",
+   "productMasterId": "c7d1fecf-5405-44d9-83b9-63a1e25c3941",
+   "candidateId": "8b1941b3-a89b-4a8f-8be5-1a4485fad96a",
+   "statementNo": "2017286000732",
+   "productName": "나다비(nadabi) 가르시니아+차전자피",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "c14e0a7bab0fd50e0b774ec103b819436368b5d8a177624cdea832b43cc1aafc",
+   "newContentHash": "21aae84c6d81eb79dfa834fe90a8ac95c5250ba8fbfc270cdeee6cad1eee3429",
+   "oldLength": 1683,
+   "newLength": 1642,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "52a75251-932a-4898-97e4-77f1b294e114",
+   "productMasterId": "c961d4aa-8e1f-4372-8b6b-334a5239f9a1",
+   "candidateId": "45ac87ac-f3d1-4964-9b40-4ff01913d731",
+   "statementNo": "2020001605292",
+   "productName": "식후혈당킬러",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "5690d5d916099c4b8df7a7bf413fd4d5a3fbed20145f95c5205d9c637b9cb246",
+   "newContentHash": "8b93be6d57d9766d4ad3d6d7bbbf4da852b0294b999de9fa276f28bc34515a91",
+   "oldLength": 1331,
+   "newLength": 1309,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "57b9f472-dd09-4d5e-b926-3c5c168c3665",
+   "productMasterId": "a9b9d62a-6cd7-4d72-8485-1dc45daa75d1",
+   "candidateId": "3d6d4657-8caf-4057-9dd5-eb0ed4bbae04",
+   "statementNo": "20190009483533",
+   "productName": "장건강 프로젝트 365 차전자피식이섬유환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "76643c2d6840d08371673cffd9a2ef34157bd122906b0e4d45d1c0d567cdc7fe",
+   "newContentHash": "15f91c291f9cc5fdc1886a8643ead41c2694a01a547aa62570d958cf195638de",
+   "oldLength": 1200,
+   "newLength": 1178,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "57ba9c8b-8be4-4fcd-8551-d2387d7cc80f",
+   "productMasterId": "469285cb-ea16-40aa-8c71-94f0147ad33b",
+   "candidateId": "26cd2621-9cc4-44f8-93b2-b5f278a7c184",
+   "statementNo": "201000190041394",
+   "productName": "변하게 하는 가차환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e799a35fd5c6f50079a6878dca20a70257e1227c8e49b4782112b2dc30279ac8",
+   "newContentHash": "65f057e1884899165f5c5397e718d7057ffa1735ec5ee886025db84824a2f50e",
+   "oldLength": 1626,
+   "newLength": 1585,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "591c960a-9cb2-44ee-9e96-aeff300eacd7",
+   "productMasterId": "f5783e40-1690-4d9d-80f4-29455cb3258a",
+   "candidateId": "76fe66ce-cc53-4c5d-8af1-9a4f204794fa",
+   "statementNo": "20120019007555",
+   "productName": "차전자피 식이섬유 에스라인 쾌변 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1d094fcf61db4aa9f1720fda45fb71803174b8f9ca0425a5949ab52d71b75db6",
+   "newContentHash": "a79d1c903b76c9fc644d1dbc1a404d44bee08e2c48050ad809c8f8ac70bf7d08",
+   "oldLength": 1665,
+   "newLength": 1624,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "6512c230-06a4-4989-80da-9fade4304abc",
+   "productMasterId": "c62aac68-d95d-44c9-b5b3-dc87428b0f2a",
+   "candidateId": "dbf2c939-5516-453d-867a-3e918f5b3ad7",
+   "statementNo": "20160012278148",
+   "productName": "날위한시간",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "4003b6cf78267b12ef22b9e19593fa856933274d37b4580b5ceee364632ccc7c",
+   "newContentHash": "85138c6a9d3b6e6ffe985e86c176550698050fd08400318778faae9d033eab86",
+   "oldLength": 1503,
+   "newLength": 1462,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "65f7e764-0076-497d-a1aa-04a0a29c126b",
+   "productMasterId": "9bf7caef-68d3-4ca6-94d4-b03cadac3423",
+   "candidateId": "8974df47-c541-4540-a9af-83d2c2c22bd4",
+   "statementNo": "2021001609029",
+   "productName": "쾌변박사 플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "b2be3926032d37cdc57ddbc2fb1204ba9eec4b7ff52dc9a6f653b2dc894b2482",
+   "newContentHash": "4c71344765741bf0b1ae91a686004c083da41e33e4a897a85f2926a93363fc35",
+   "oldLength": 1275,
+   "newLength": 1253,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "6917ee81-2c86-42e6-a0a0-2af20d46f55f",
+   "productMasterId": "9c5ce20d-1cce-410e-9b11-3acb67fbb61f",
+   "candidateId": "85bef4f6-d2e0-40aa-b8dd-e19dafd2ea07",
+   "statementNo": "200400200061944",
+   "productName": "셀티바 글루트랙 블랙키 AM",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "fcc6011cacb9309bfab09a1696933129e564be5664d25ad7dd99d19a29c4547e",
+   "newContentHash": "90ab6aa64ebdb7521c017afdad9c5e9fd20f8e33668a74fd41ae9ab05ede3aba",
+   "oldLength": 1298,
+   "newLength": 1276,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "6cb47001-b46c-4bd9-ba5b-6732e9c63b5a",
+   "productMasterId": "83d3123f-c16b-4aee-ad1a-31d98cd4bc77",
+   "candidateId": "859029ff-c33d-47fc-a657-e0e710a84b1c",
+   "statementNo": "20040015162447",
+   "productName": "다이어트 보조제 빼르메스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8926d60f47730a84e835df652ac5cd15ff2a73997b1a0b29b5ad3e20e677d2a1",
+   "newContentHash": "25715a3fc7960e27070603172c750371680fd4c9b850b0744cc3817300eb4bf6",
+   "oldLength": 1482,
+   "newLength": 1457,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "6d67b692-c31e-435e-ad25-0717292450a2",
+   "productMasterId": "7c65777d-3837-4b5c-8c25-5db797fb0b73",
+   "candidateId": "9e4e0453-f613-4f9e-b768-cf6c4c47a7b5",
+   "statementNo": "20110017019154",
+   "productName": "쾌변엔 차전자피화이버",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8b0f603354117e5ee3d1985b93f20c6464f8f885ec9f3b0f45785030e0d74082",
+   "newContentHash": "99d0bc5605c5bb0590ab3e7e49c70d7d5b0bbe873c6b02186a66688411b2a224",
+   "oldLength": 1264,
+   "newLength": 1242,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "6ff1aaf8-d7d3-428c-a29c-8ec84e7178bd",
+   "productMasterId": "b73a241a-33bd-4c15-9b23-f09bd60a3485",
+   "candidateId": "9d233b49-1e62-4bce-bf33-16c3a802fdf1",
+   "statementNo": "200600200032630",
+   "productName": "에스(S)라인다이어트식이섬유-커피맛",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "0b13e3e68acb5a211b40bcb49852d255bea7a3a028db9c9f88e5a7fb32e92f7b",
+   "newContentHash": "45be0449728bb2a030cab3107b5865d29a89f1eeeb301732600a2129775acb70",
+   "oldLength": 1564,
+   "newLength": 1533,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "765f932d-6263-4786-bc5c-082bac7c3e59",
+   "productMasterId": "dcb7e830-220c-450b-9ac1-4ad1e01d1fab",
+   "candidateId": "0fbf6735-65b3-4bb1-b729-be9f20855d3b",
+   "statementNo": "20220021067105",
+   "productName": "엔지엔 뭉글뭉글 퐁 식이섬유 60포",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8c65cd5d00f39eda446192042990422b537e3a0b741d7b45b9ebc230f3036f50",
+   "newContentHash": "ac725f99a97b0b9d47f1d22475f073fa7f64493316a8ac89323716dd2fa5f3aa",
+   "oldLength": 1592,
+   "newLength": 1551,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7912c20d-919a-4b37-9eb8-9b7e811e27ba",
+   "productMasterId": "8bd9c5a7-9013-41e1-9191-6b4700587a4b",
+   "candidateId": "9391f625-6af0-45d5-af1b-0b6309419931",
+   "statementNo": "2021001609024",
+   "productName": "쾌변박사",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "f3b677ebbb236e89c29d643f77ec3d2b1724de12d674e01d0a31027dd993cdd2",
+   "newContentHash": "571d03071630fe54401c316f38bb07515b0846c3cb7cfc5bc9f82b4058b9fdec",
+   "oldLength": 1265,
+   "newLength": 1243,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7a1f31d2-3575-4c52-bf6a-bbbb1e77a627",
+   "productMasterId": "5c364cb4-a172-4076-baed-662555f6fc09",
+   "candidateId": "140315b5-5ca9-4b85-9cdd-08c6d6822cdd",
+   "statementNo": "20040020001203",
+   "productName": "호프 프로테인 타입1",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "b78053767b1bd88d2429e26997e45b84349af8902ef9cb8302664a3050cda14f",
+   "newContentHash": "638ac68ef25db93a7d19e1d380d34eb82790b6e7838b198c7c38a3dfcba754dd",
+   "oldLength": 1164,
+   "newLength": 1142,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7e609916-3271-4759-9340-f609372a6303",
+   "productMasterId": "936b1a6a-047c-4bf8-abff-05f9b5b0334d",
+   "candidateId": "faddfaf8-c1c5-46a0-8d6a-6b0b28871d8b",
+   "statementNo": "201600121374",
+   "productName": "가르시니아 프리미엄",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "3d05a5408020f7f947dad03a594448e7253db57a1ed0f0f4bdbacf7893693d2c",
+   "newContentHash": "e24c4092fdc310a1bd5cc4c651ac1b7bcf79f75e0b2d993a000b32d445553934",
+   "oldLength": 1200,
+   "newLength": 1178,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7ebc4d4d-7c20-4ba2-a512-f6d883623c01",
+   "productMasterId": "fa471d2c-f814-482c-88a2-591be2c28c19",
+   "candidateId": "e86e2e5c-d297-4e7c-ac7e-344bc47ba04b",
+   "statementNo": "2020001201696",
+   "productName": "달심 쾌변",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "d17e3fe33f0a3c585483f200afba5e2c1ac912daf00dda2d66be7d6f13ae020c",
+   "newContentHash": "dc17c61e7224568ad30c894d3ac372ea6e88376de12a62136808d612d5f595e5",
+   "oldLength": 1175,
+   "newLength": 1153,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7f90dbd1-388c-45c0-9c18-c8c2aa034bcb",
+   "productMasterId": "405c0d82-cc73-434e-b65a-c59b694fa7b6",
+   "candidateId": "f7d5750c-fe87-4ea2-b497-3cf7c85faf0a",
+   "statementNo": "20040017021763",
+   "productName": "굿모닝쾌변다이어트 ",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a45a2044fa5145136d9d17ad626f813b2e0ed1ee04a0470ac4c5a50278426382",
+   "newContentHash": "1497da118d622f7050a7be5261c8916289366b6c86e4aff1547a5abf1b5b26b8",
+   "oldLength": 1552,
+   "newLength": 1511,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "7fe1f86c-6a2b-4897-b86a-5526e2b59ae6",
+   "productMasterId": "b83ad459-b846-427b-bc46-0d765f00d3e4",
+   "candidateId": "72dddb38-abf0-4208-9001-0fb882bcf5f5",
+   "statementNo": "20240028080432",
+   "productName": "이눌린치커리 데일리 워터믹스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "c4950b6e066fc847b3509e07ff6932ad5c4f75115d1450944b1477e16ce522d9",
+   "newContentHash": "c89422f8689657b1e6e594e0595df3b5cc65534704576748f41c182e54471cb2",
+   "oldLength": 1352,
+   "newLength": 1330,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "81a786ab-c7a5-459e-91e8-01124ff4a7a7",
+   "productMasterId": "c171af7b-4024-44cb-a250-b5842ca0456d",
+   "candidateId": "c3e93598-265d-4edc-a45c-2915552bb388",
+   "statementNo": "2020001244624",
+   "productName": "누다 이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "2b4439c75cf3ea90db8e829b1d510b4b84bbb125f12ed09b4f6ecec488eaafe4",
+   "newContentHash": "fbd46c51d23a6acb75cf7a93467b793ff6f7d6c35a3f257b9c76d003bff7826a",
+   "oldLength": 1575,
+   "newLength": 1534,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "82f11017-874b-43f4-b5d5-5f2b6fbc6fcb",
+   "productMasterId": "78f8a9f1-5088-4b68-a887-07538275d1cb",
+   "candidateId": "69a4cf9b-66c7-42b5-af72-b26e2cec0528",
+   "statementNo": "2022002106710",
+   "productName": "쿨비어다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a279b6e8c5f86c5e08a8a87f222d465a0d7a9e9e8916bae9579a861f01329c6f",
+   "newContentHash": "66ae565d6a7ea816ac6160d0a88dcf209d09d3d1e8a46ba4bfe5b3c5b4432caf",
+   "oldLength": 1582,
+   "newLength": 1541,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "849975e0-22e0-4811-84cd-54c1e0e50542",
+   "productMasterId": "9aadf16b-8b48-4711-bc09-70937a678ff1",
+   "candidateId": "817b5b3a-8d7f-4e3c-a7f1-8dc81f9c799c",
+   "statementNo": "200400200141252",
+   "productName": "빠져도좋아",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "35bdd3330809be41e79a4f6f378632ce948d95cf279c8c111e3c38b1417b1c8a",
+   "newContentHash": "203a87e77c59e7f01f4c0cb982628d5d5fd079c53842535ac71551a33b2b64ac",
+   "oldLength": 1581,
+   "newLength": 1540,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "85a8970d-4529-4dd0-8041-25e2ed42c733",
+   "productMasterId": "78aff900-a03b-4152-8818-6d9080230691",
+   "candidateId": "c1905d10-e7d0-42d3-813e-fa935ec3f70c",
+   "statementNo": "20040020020979",
+   "productName": "상쾌쾌변 차전자피 식이섬유",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "2140b4c4b8664f24e408b28f46fd1dfcb2b6c708feb74673d4c4a190836e6867",
+   "newContentHash": "f7641ca98634f2c027a2a42b1fe8db71953723caa820da19a24404d8720cad9a",
+   "oldLength": 1213,
+   "newLength": 1191,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8723bfd8-3c12-456c-9c35-a155f060d14a",
+   "productMasterId": "8b7afc15-a505-4947-a86c-521d482b14d2",
+   "candidateId": "6d2c9b4e-25c5-4d31-a9b0-c026a68ca79c",
+   "statementNo": "200400200023673",
+   "productName": "넌 나의 혈당",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6ffd10aa1d9232012801f3a865682a2da80524e2f12d41800eea49279450c259",
+   "newContentHash": "0f6bdadd43840671e24262eaf32e73a4b6ccca692cae2fe24baf1b60c0602df4",
+   "oldLength": 1290,
+   "newLength": 1267,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>귀리 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8b421d43-7d62-41bc-8f32-8910a28a5d25",
+   "productMasterId": "43f9515a-898a-4fd6-abee-99fa0bef5732",
+   "candidateId": "b13f3d0f-24ce-4bd1-982c-ea5b86329e6d",
+   "statementNo": "2022002106741",
+   "productName": "다이어트&차전자피",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "23f64ed287c80a762e0effbd9ecc1453955f23b5710689954204814d16c10631",
+   "newContentHash": "0a0b29c88696251c33d4018c03c380fbef3080572f0af77c6560980779020aad",
+   "oldLength": 1586,
+   "newLength": 1545,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8bef74d4-455a-4f8d-a2b6-8aaec5bd599a",
+   "productMasterId": "703e8dcb-8370-4ff9-a7e7-4d473ca368eb",
+   "candidateId": "80fed77d-d635-487f-b666-86ab8c426c6f",
+   "statementNo": "20040020001206",
+   "productName": "호프 프로테인 타입2",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9b30fdfc66d7f8f23d651af39af100b99db197c6252b4927e48148ff9636144d",
+   "newContentHash": "e8ea6dae9c094d31d1908b263a06066aff36156eeca1e6747db2a61d230627f8",
+   "oldLength": 1164,
+   "newLength": 1142,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8c5251bb-fe81-497b-8c09-51f943226cb6",
+   "productMasterId": "569aa0fc-5aa2-4e57-9bff-94386f7c14fd",
+   "candidateId": "c0777113-d689-480b-86bf-ace38e4afdc7",
+   "statementNo": "20040020038159",
+   "productName": "장미",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "bd3468528f94ea5babeb2f94b6a62a5ff22899e438dba5bb20462fe7d8e4effe",
+   "newContentHash": "888647b482a5298ae973c16caa4908079318921fcb789ca2730e0a64cfa708d2",
+   "oldLength": 1646,
+   "newLength": 1605,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8c605836-5663-4e31-a3b0-f7559e815043",
+   "productMasterId": "8865a049-0778-4066-8467-42fdd0da1d5f",
+   "candidateId": "e5fb58cd-f768-4626-92fa-33da6ad7ec1d",
+   "statementNo": "20190009483447",
+   "productName": "푸전자피X다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "52584d7756a2fc431264e919681dbc830c712bda3059597b851bb18558c85f02",
+   "newContentHash": "61c9858bd52071ce1230a3c0d3d51456fbdd364e8e55fa9ee36e8a39578204a3",
+   "oldLength": 1287,
+   "newLength": 1265,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "8c7f991c-ae0b-4042-9a3a-458ae2213bf2",
+   "productMasterId": "9d4da855-6937-45d2-b423-56b618dd6d8a",
+   "candidateId": "f9c550bd-6655-4f36-9a5d-fc5414dd4683",
+   "statementNo": "200700170352623",
+   "productName": "눈꽃 차전자피 쾌변 & 다이어트 S",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "350c5e2c219c185c205d7cbdba766291289c3d62f948f2dd4a6c97c4a9d36be2",
+   "newContentHash": "684968976eb5d316b0c59b8fe4191be7d161c1e99b4f729bf5b3b569f2b44b0f",
+   "oldLength": 1659,
+   "newLength": 1618,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "909845cb-6698-4890-9631-23b3acee993f",
+   "productMasterId": "ec392325-79e7-46b9-9d26-d4192b883326",
+   "candidateId": "ebb07ec4-bca3-4553-a23f-f5360cd718d5",
+   "statementNo": "20160012278145",
+   "productName": "쉬움-비움Q",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "0e6ca72720380237020bca085f904297fb116c461afa440cf2c5c84e28a5d917",
+   "newContentHash": "8facd7adeb27c52ad70d49fb3a2dcce1180a0dc9fc656d20450868de630e9407",
+   "oldLength": 1582,
+   "newLength": 1541,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "90f020dc-4595-4c9a-9c23-119345b17152",
+   "productMasterId": "da943635-2275-46e8-bfe9-e3dee976c3f0",
+   "candidateId": "7706cceb-d9c4-4140-b980-f1efea563483",
+   "statementNo": "2023002889415",
+   "productName": "활력쾌변",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e0f21a3f5e5955e639ba9e2c63eb75bbdfef9344741c9c27843cd9305f8b810a",
+   "newContentHash": "861d72c08322d1f7817391aabe83251fc33f79d39603052cc02a838e0eab6135",
+   "oldLength": 1527,
+   "newLength": 1486,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "922a54cf-acc8-40fa-9682-c53768dcc247",
+   "productMasterId": "9e26c11f-c0af-4e65-b483-fc8f579188ea",
+   "candidateId": "283bdc9b-1a32-4557-a6cf-f01887e71e68",
+   "statementNo": "20140020012215",
+   "productName": "장큐프리(free)",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "b77dc92fdc09547ebe1807dfa4ce2d72ef257d501026b4717d370a4f190145bd",
+   "newContentHash": "49db42969f7a3dc543be890b462721797407dc8d770f93f003fad4fd62468763",
+   "oldLength": 1608,
+   "newLength": 1567,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "92d87e5c-513b-4c54-a6f1-4f7d48a0cb1e",
+   "productMasterId": "228bd279-7733-412e-9064-ea5cc59d3c46",
+   "candidateId": "d0377094-bb86-4c7c-8585-dba757665053",
+   "statementNo": "20040020001223",
+   "productName": "슬림업뷰티 에브리데이",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "771a088620ee81998c1f941b8de6da2ebbd330a82648c8082996f6d73f2bed7a",
+   "newContentHash": "77ea0357f65e32f982813aff540cc1942e0ef4ff086ba0e6a02d92e43c53b894",
+   "oldLength": 1148,
+   "newLength": 1126,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9326097e-e321-4b35-a147-cbf8a8ad962b",
+   "productMasterId": "e4792ef2-0269-4f84-baec-a2a48bf9e029",
+   "candidateId": "7d9e2c3f-ff58-4641-a162-e512d5638ef0",
+   "statementNo": "2004001507377",
+   "productName": "장박사플러스식이섬유",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a51f4c20de93baedead6823374b7de249fbb76c72ae21977c5cb7d3813d2e2e2",
+   "newContentHash": "25e7e95f577881aded8aefc1d0d41820b9103637927f16e51e66fb6f204c40e1",
+   "oldLength": 1141,
+   "newLength": 1119,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "98717826-2536-44d6-82bf-89c0e80c4d2a",
+   "productMasterId": "96f36fd2-c3e5-471c-a536-4498b8f2ef8c",
+   "candidateId": "38f5ae53-33cc-419d-8ad4-d32bb04dca36",
+   "statementNo": "200700170351393",
+   "productName": "에이드핏 이지클렌즈",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "fb8b9d41440f3de2c3d2b52127d1c280cf34fd43ef603a9cfe4f4d79e8a2d659",
+   "newContentHash": "78f95cfb1068517cd193fdc9e3340abfefa652c45d53fd9c813f3376d2b2367d",
+   "oldLength": 1901,
+   "newLength": 1848,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 · 비오틴 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "98b40e0f-1a15-4a98-bbfe-30981f38fd1f",
+   "productMasterId": "1135d875-db6c-4d32-8174-e869cc2eddd9",
+   "candidateId": "2cf843a3-8af2-41d6-a20d-837f01e12a79",
+   "statementNo": "20040020031547",
+   "productName": "피버 다이어트 Fiber Diet",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "78a791adb7bfc5b3c6cedc75f0be575f0ed49cf47573db7f62131c65f5c5358c",
+   "newContentHash": "589716d9960740afe18c8e403d12f2985ece73f2bea56ab37243eb6d9c801926",
+   "oldLength": 1364,
+   "newLength": 1342,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "98e983dc-a4e6-4e49-9ba4-cc9f2579e80e",
+   "productMasterId": "fdfad3a7-b581-422a-a645-4be53d589a10",
+   "candidateId": "052dab93-83dd-48bb-9ae6-3ea9bf1641c5",
+   "statementNo": "202400280808",
+   "productName": "에스(S)라인다이어트식이섬유-커피맛",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9c815b3ddf93aeea5d00567fb83cee2777da3342539f070bb2dd894a48a6c769",
+   "newContentHash": "686913216a3071893dd613ac225e8e682bfdd1582ff0f4b88833e43e53597bce",
+   "oldLength": 1563,
+   "newLength": 1532,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "99700182-2798-40e6-9f17-25a4ee0a8a0a",
+   "productMasterId": "ce72ba09-8417-4fb2-a862-c02f59b19315",
+   "candidateId": "603af93d-e3eb-483e-a316-f65eb8bdeeb9",
+   "statementNo": "200400170211562",
+   "productName": "바나당 블링핏 다이어트 프리미엄",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "dafd9cf7300591624c5148c31e524e88924a2da2b600e46d9db69b8dfaf158c2",
+   "newContentHash": "3044e98140fad115fae8a920149167b710f87f1523a75af958e06d651d687f14",
+   "oldLength": 1710,
+   "newLength": 1669,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9acefba8-5318-4189-a133-777dc9e21af2",
+   "productMasterId": "fd247727-cfe9-4a60-a54c-08dd365ba5cf",
+   "candidateId": "0563571c-bc01-497e-9d2a-a4e9c41a5bde",
+   "statementNo": "20190009483272",
+   "productName": "똥쟁이 잠백이",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "82ed70b1020c2c9227e851e3815dd6069b724545b74b67a2534f388085624b44",
+   "newContentHash": "19bffd202aa07e328556c87fc290e10d4dd2d596cdfb2821cf8994933d6acfe6",
+   "oldLength": 1190,
+   "newLength": 1168,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9bec8b1a-22fd-4525-b626-816aa3a3b559",
+   "productMasterId": "5328f904-f4fb-4c7d-ac5d-a44e9d384300",
+   "candidateId": "82a1b7e8-6a88-4172-8c14-c29a72224557",
+   "statementNo": "2022002106770",
+   "productName": "킬리셔스 차전자피 & 가르시니아 다이어트 애플맛",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "00aa028ddeee44bed47dd20e5b8981829f40000080f8fded4a923bb41f380633",
+   "newContentHash": "00067d6308294a49b46ff3431fa0080fa678e66d3ab2d660c77e666ceae855ff",
+   "oldLength": 1603,
+   "newLength": 1562,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9ccfa27d-8311-405d-8cd5-e33ca4aaf16a",
+   "productMasterId": "c18437a3-8c5b-4985-b3ce-bd9abc934a00",
+   "candidateId": "ac7c383a-465e-47db-b6bb-da9f750ecdcb",
+   "statementNo": "2019000939485",
+   "productName": "초록이 화이버 아웃",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "765b9126f7256f6c0b33f5833492eb30d7b38ead466d386465f47bc885aa308b",
+   "newContentHash": "4b9d6babe8bc6522b0f221d8e454f1c0d9cf1c888c2c6f6cab1efb51f7150338",
+   "oldLength": 1372,
+   "newLength": 1347,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9cdb35ca-ed1b-4c74-8426-8ac3b863484d",
+   "productMasterId": "7354de94-6044-451a-b454-fac7660054e5",
+   "candidateId": "bf643f12-811d-45df-8ea0-87bdc5ddf94f",
+   "statementNo": "200400170211307",
+   "productName": "삼성 프리미엄 쾌변 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "b030e81c43c8f80d48b82e281130bcff407752b9c9b967b03dedb8ed793411a9",
+   "newContentHash": "40c3dc98a1b4e60513a4d0eec8d12d38309349b33fee8cc74a31d377bdadd5f9",
+   "oldLength": 1670,
+   "newLength": 1629,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "9ecd86bd-6798-4412-871f-57aea5e72021",
+   "productMasterId": "fc0506b1-ded5-4eed-a3b2-5c99cc6bb5b0",
+   "candidateId": "e7ee5c6f-2286-4329-bbad-8acc88b3f443",
+   "statementNo": "20040020028299",
+   "productName": "대자인 세로자임",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a101583d1e5cd94e586738d32cfe061cc526e2368e1e8a8d405cc125dd56dfa0",
+   "newContentHash": "4718a259eee2138d7297b3dd72dabdc139f4a1f9760e0cda3851438f14dee3c9",
+   "oldLength": 1465,
+   "newLength": 1424,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "a340c2f5-2510-4fe2-9347-f83f481ab95a",
+   "productMasterId": "cb1dbd31-2487-41c3-aaa2-de13b0265856",
+   "candidateId": "cc015930-d4be-4dcb-a80d-b9e7d1257506",
+   "statementNo": "2004001507383",
+   "productName": "Dr. Milagro's good gut",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e25be8c805eb3cca51c0598198f30da254072789d9fa52b7e99262734d59d142",
+   "newContentHash": "804f158b1068fdf433d92228085bc2c88ea0cc6bd9ff210ee2655fbebdbeec36",
+   "oldLength": 1173,
+   "newLength": 1151,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "a3874bbd-23be-47ed-9a5a-0228a5d2bb6a",
+   "productMasterId": "5eb083a5-239e-4fc3-8045-082863506707",
+   "candidateId": "67118c5c-a0ce-4619-be0b-fb09daaeb6f9",
+   "statementNo": "20200016052124",
+   "productName": "뿡빼 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e18d65505fa18ccbba09e870a3dd8382b1e9e9bb73b2119c0eb76955afc46285",
+   "newContentHash": "e12b5fae6572fb2575f8f9955a4de90d5000c01adba01822cc13b2dc8a456807",
+   "oldLength": 1687,
+   "newLength": 1646,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "a3dfed9d-0c88-40a2-b334-e7f6acc200df",
+   "productMasterId": "3c36a7bc-5cc0-4544-aa11-76f253d5854b",
+   "candidateId": "1dc5591f-91c5-4bd1-9e74-c04eff796f1b",
+   "statementNo": "200700170352686",
+   "productName": "헬시허그 쾌변차전자피&다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6b82d520424ace3f17b346dff1032b68aaa9b6aa792e0bbc807ac45cfcdfc1a1",
+   "newContentHash": "550cab473d3859b62702924a1385caf8e84afedd7d4ec1ee506043b4059559ab",
+   "oldLength": 1656,
+   "newLength": 1615,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "a515d3f2-57af-403b-9fe3-147ade20910e",
+   "productMasterId": "fcdf9cc4-973c-4f02-b4a3-9f7614e722f7",
+   "candidateId": "3cd898c2-155d-4383-8678-ce3001035745",
+   "statementNo": "2022002132856",
+   "productName": "배변건강 쾌변엔 차전자피 환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "235d4b56751d8958785742462e9cdc0183faee22125f884f29bc40b7bd957c71",
+   "newContentHash": "04af44c34271e2c575e19cb0b0e51eadb8898a13e0c3a5d5f8c11367af492c04",
+   "oldLength": 1208,
+   "newLength": 1186,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "a85fedd1-aeca-42df-93bd-6c435c6e910e",
+   "productMasterId": "8685ccfe-d140-4828-8276-470ac77ab28c",
+   "candidateId": "d5e3e673-d41e-44d2-bcba-70c55ce566cb",
+   "statementNo": "200400200023202",
+   "productName": "뷰빗 팻바이부스터",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "698242c06bc16c147634991fad44bd9f7b7daff07637aefe55842c3393cafe8b",
+   "newContentHash": "d59389fe316b6bcda0d17ebaa6b0bf8f8a5221b0752326718790829bad739075",
+   "oldLength": 1390,
+   "newLength": 1368,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "abb3a78d-3767-4c49-846c-4f4db6cb32e2",
+   "productMasterId": "541afd23-de42-4aeb-904e-1d4467e37e1d",
+   "candidateId": "0e6e0210-9397-47e5-b783-c4972f041b11",
+   "statementNo": "20040015107611",
+   "productName": "청정미인",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "0de92a4bdd5dc356172ba428a74852e4c45979e2d2bfb41f0571a3ccd51269f4",
+   "newContentHash": "da7186a8d47421c2a409fbfd845cadba21f79a52b612997863459fbf4980448b",
+   "oldLength": 1499,
+   "newLength": 1458,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b19fd63a-4b01-47f6-bf96-35c0c3665d43",
+   "productMasterId": "937547c8-7084-4805-8933-65e822112016",
+   "candidateId": "b8fd3137-80d9-41b7-91a9-354f92e3bbb4",
+   "statementNo": "2022002106771",
+   "productName": "비움 차전자피 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "3e6f88d96b1e9e4cd035c9f3845476393cb2ccca38dd01c84790ac80113ac5a6",
+   "newContentHash": "fa7d7210526d6f1f3fd6d34746830aa588b2a7717a3cbd1e689fe67bed327996",
+   "oldLength": 1585,
+   "newLength": 1544,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b2d88c37-5c1d-42d0-94ee-a6aa925b33a7",
+   "productMasterId": "6b980500-9986-4763-bb11-536648b644fe",
+   "candidateId": "319ab456-9242-472b-9685-b035521f0d47",
+   "statementNo": "2011001701622",
+   "productName": "에세르 클린 닥터",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "4bfa8e81c5616570a6e11487fb0e723b477436b1608233ba414e2bc4ada266ce",
+   "newContentHash": "4045a4abf8f7ac01f9e8a5af1c28e2e846c6c5db2623cf3b2743064a594e815b",
+   "oldLength": 1629,
+   "newLength": 1588,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b377a1ea-9f28-4640-a33d-074eab34302f",
+   "productMasterId": "aacaf445-6769-4120-b71a-ffec43d68845",
+   "candidateId": "efa35723-35a6-4484-8873-7e24f4b3e5e9",
+   "statementNo": "20200016052237",
+   "productName": "탄수컷 다이어트 나나환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "44baae0edc9dac255560630bbce6b59ce761c17a9332366d77d92c1adcbd1bb3",
+   "newContentHash": "ac683e1fceefd65ac7752cd3c2adc288fe1607ae5d0d8f3ceb7b49d6bf138c3d",
+   "oldLength": 1665,
+   "newLength": 1624,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b3ac8272-9178-442c-aca9-c4a994760485",
+   "productMasterId": "86334b9d-e8e9-4089-9478-b025fc4fda37",
+   "candidateId": "0fb1bc4a-83c8-4165-a730-964cdc3b9060",
+   "statementNo": "20040020010409",
+   "productName": "장루트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "53dbb8844342b423ee845ef9e469a3541ac926ff696cef46e31d030de1f7d8c2",
+   "newContentHash": "5872b8d09f54a67db1c0386afc5150f760c74e7ebdda7b9b01f9f37d8ae9ac78",
+   "oldLength": 1605,
+   "newLength": 1564,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b3afbd46-41f1-4df6-a51e-71fd3855031b",
+   "productMasterId": "ac2b5c7a-b896-4c67-beac-a97338b99b79",
+   "candidateId": "a6da3f2f-4ed4-448f-b21e-590adbc82921",
+   "statementNo": "200400200083272",
+   "productName": "테이스티 통쾌변 차전자피+마그네슘",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "91d0a5ec53f4f31f36835f62e0709e7869f38d64b27ab928c7fb8813f96087be",
+   "newContentHash": "f6fec8e0aea785a59897116c349fd1df142094b2aeffd7d04a35550b6850de1f",
+   "oldLength": 1623,
+   "newLength": 1591,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 마그네슘 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "b99de163-abe8-47c5-934c-ebd9274cc79d",
+   "productMasterId": "65b20dc0-15f0-4360-ab55-9b3bc874028a",
+   "candidateId": "3329635e-4eed-48e5-ab11-c5da1f3329b6",
+   "statementNo": "20140020012139",
+   "productName": "한인 차전자피가르시니아",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "c3d917684a14a8c9c9e2e93428a4fa12bec15d61c715c91db4a95b276076f610",
+   "newContentHash": "7c7063a2e2e29ec082ac226d7d2ad39b6f562b155396f395e25da89a8c456cb0",
+   "oldLength": 1612,
+   "newLength": 1571,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "bb5ab1ed-17d9-4c10-bb8e-ff45a3871e92",
+   "productMasterId": "fe862918-b8c9-4637-9192-10d5fac07df2",
+   "candidateId": "ad0ecbce-880c-4c9f-a451-5a7794c30f9e",
+   "statementNo": "20040017046110",
+   "productName": "변해봐",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "b4933056db495d7b110825691b77a09e05181e1436e3b3d56baafad54681f43b",
+   "newContentHash": "f91fd5db6e1253fbb50addbe888ce521649be09825d868eccae90e1ce952b345",
+   "oldLength": 1516,
+   "newLength": 1475,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "bc920de8-5e70-44e3-869a-61a9447cc920",
+   "productMasterId": "b329e7b6-c758-401e-a232-2a9619664220",
+   "candidateId": "38005701-e77b-4704-bfc1-a452819f94fa",
+   "statementNo": "20120019007485",
+   "productName": "차전자피 가르시니아 슬리밍 환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "174ce17516efcc127c00d2197d92b2c94ed974fda67f52234dc6209af6cac26c",
+   "newContentHash": "7caed98a226dd08a8360b6a9863cd7b62d915402ddb3d4c3b1880295dbb1751d",
+   "oldLength": 1659,
+   "newLength": 1618,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "bdff86e8-2621-4556-83b8-a6f35e9a4e21",
+   "productMasterId": "54c4aff0-0ccf-4909-97c4-133edc7c45d4",
+   "candidateId": "f5a05884-a630-40f3-a91a-d8a7d7ce7bf1",
+   "statementNo": "20040017015440",
+   "productName": "살뺄라카노",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "625d08613a138ad436a9166382f1b51bee46eebe3e08c96d6597d26557aee5b5",
+   "newContentHash": "5dd308f5a8b501c0ab9c8c505a1ddb43d36de0909b6c128bc58e76e39e36e4ac",
+   "oldLength": 1715,
+   "newLength": 1668,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "be8e93f8-3038-4fc3-90e2-92a58d4c6dc6",
+   "productMasterId": "b9f9e626-2d03-42d7-b70a-f05ad82063ff",
+   "candidateId": "49719f11-3fb4-4cf1-96c5-0bd20338d9f0",
+   "statementNo": "20040015073100",
+   "productName": "장박사플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "d837541193a948c8f101cc64e196825f38221be80e2c7f4c069293e794fad609",
+   "newContentHash": "83bf45a7d9683884944be100f480dae5f38e0b93d9ac033ed283d44355396e7d",
+   "oldLength": 1187,
+   "newLength": 1165,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "c7134c2b-4674-4063-b0d8-935e910af4d5",
+   "productMasterId": "4ff6580c-59b9-4de5-8ecb-1e84a4bf6e01",
+   "candidateId": "95d0011b-889c-4ff3-a51f-7efdab9b841e",
+   "statementNo": "201400200254",
+   "productName": "하이생 혈당밸런스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "3c87a139335407f88c132f8120a9204f361a8ee0ddba94eb29b82e5ff49a42c2",
+   "newContentHash": "3034b21fc8720a4fdbdc669178c5066c330d7344ad244c54974ba1b24343d6cb",
+   "oldLength": 1177,
+   "newLength": 1155,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "c784bdd6-04cd-4b9a-be22-2352fbe094c9",
+   "productMasterId": "0bec0142-97fd-4ad9-ba5a-c92c90899518",
+   "candidateId": "0b121b30-5a8a-44e4-a657-5ca4428fd952",
+   "statementNo": "200400200061787",
+   "productName": "마이엣지",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "de9f7b4ad29ce4118cc369efaef22fb73124f935ef69100439a37a49a5661dbd",
+   "newContentHash": "c7c9979b30a0e214554001d6e124aa1942a3e3587529517e87e469e56789e7a7",
+   "oldLength": 1222,
+   "newLength": 1200,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "c979dcfc-c188-4d68-992e-deb2ea57d51e",
+   "productMasterId": "6eb585d3-d79e-4405-9e83-7d2b782c6709",
+   "candidateId": "7481928d-94cc-4f0a-bd72-6da5bd970f6d",
+   "statementNo": "20130020008455",
+   "productName": "YUUAKI GARCINIA PLUS APPLE CIDER VINEGAR POWDER",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "918906b1b256812165d80e623c876195dfc10401ace80816e2d03ff1b9f2a00f",
+   "newContentHash": "fd7cf38dc15b622d8e88b11179c730803e26889e8f6597b6d0fc9b0819ddc962",
+   "oldLength": 1378,
+   "newLength": 1356,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "cad065d8-8bc1-4cdd-b456-6b6420958b69",
+   "productMasterId": "21219b49-a6b6-4087-bcab-d78728522d07",
+   "candidateId": "15c10cfd-eaaa-4475-84bf-3c7ec1cc93ad",
+   "statementNo": "2004001507230",
+   "productName": "구구팔팔다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1a781b55a9f65a7054331296bde30d81af68980b292f458365365e05135834b3",
+   "newContentHash": "8bdaf88c1f6f8aaec0742df6b1aeb3ad105f2f068e7ddfe9e829ed303b16f250",
+   "oldLength": 1596,
+   "newLength": 1555,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "cb02704a-e875-44ed-8859-ab7571b66841",
+   "productMasterId": "3a75ec55-8a56-43f5-b9b9-b4d3f3341ab0",
+   "candidateId": "6a099832-1b85-40d8-b5a3-bad7e4726b42",
+   "statementNo": "202300288946",
+   "productName": "김소형원방 온감 환 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "9a666936c6a3f9c54252670324e2553ddfc2e651be181298a524fe7f5f3d896f",
+   "newContentHash": "78a3bbbd3d5e613a81f4afdf8cd35ce644e63747b0035e2024210b03704e8da2",
+   "oldLength": 1633,
+   "newLength": 1592,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "cf4a52b5-ec4b-471f-8264-9eeb86e9d290",
+   "productMasterId": "cc99c3a9-da0a-43f4-af16-f768a1c104c7",
+   "candidateId": "4e1841ba-5f60-402f-81c8-5b103d8c8b74",
+   "statementNo": "20190009483630",
+   "productName": "배변건강 쾌변엔 차전자피 환 ",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "5d75e24ebc1f535ae89bd65d8e4da04ea0a55c1b2cdc703740b3e057e69c7fdd",
+   "newContentHash": "bd4f72c34eb497893c68e3e31537d29efcc354c8eb7af28d0f0b3f9208fe2842",
+   "oldLength": 1207,
+   "newLength": 1185,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "d679ae11-4db1-4aab-a509-f5dd84cd6c87",
+   "productMasterId": "ec42796d-1737-4403-9ea0-0ab11e9407ee",
+   "candidateId": "7766077f-46c7-499c-b77f-99b62ff6f0f9",
+   "statementNo": "20110020099180",
+   "productName": "다비움",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "8499ed96f1c544c252c28b4eb325b16e1b1fde92d682014ced3fdb0123ec7436",
+   "newContentHash": "4df48c39c70f67c8c6f121a19103db4a5b254d38f40d5fea86ae359c0b760929",
+   "oldLength": 1194,
+   "newLength": 1172,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "d688686d-a7ab-4861-a909-2ad2929e88f5",
+   "productMasterId": "972f3881-2c28-4252-8bd3-80fecb2ec006",
+   "candidateId": "3013f381-ad8b-4a45-bbbb-93d03cd98315",
+   "statementNo": "20190009483561",
+   "productName": "속시원한 장쾌골드",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "a464c5fe2888a5e3998af58a4bc5ddad47fd272e10f4aa535c2339dca12461d1",
+   "newContentHash": "5678d4b035bf4fa225bc0b2809c46f00395799aa62723c4cfaba5fca6e3bb3fb",
+   "oldLength": 1188,
+   "newLength": 1166,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "d7916781-a839-4214-a6e1-de7812bf32f0",
+   "productMasterId": "fb39a159-2bee-4985-99ab-3857fc4f8830",
+   "candidateId": "cf19f34c-1266-4ba9-bd96-9d29a3137b25",
+   "statementNo": "200400170211969",
+   "productName": "드림(Dream) 쾌변 헬퍼(HELPER)",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "62f6e1abc052cce565096a70fcec746da6b7a4e338eec6f7f1776dec9ee96ca8",
+   "newContentHash": "1cace980574a0e54709dc829b31f3699ad3929dfcb97a041fd08e45f4fca46e4",
+   "oldLength": 1666,
+   "newLength": 1625,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "dadd04d4-8b4a-48e0-99b7-bff15405a917",
+   "productMasterId": "c95b9c48-a99b-42b5-ad1f-e94583d15a51",
+   "candidateId": "7743b5c7-051a-4964-b953-fc0d5d4e0ff2",
+   "statementNo": "200600200032806",
+   "productName": "다이트 모닝팩",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "589e43cf8c149523c57781f98ca83b5081a172de6b66b66e6803d5c49ced728a",
+   "newContentHash": "49b94a2af4892d45d30a965dcb9d812e1a03a69619b0da3703aca05698a5a780",
+   "oldLength": 1579,
+   "newLength": 1554,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "dbe4e803-ee3f-4a50-9f66-b8e7860c81ed",
+   "productMasterId": "1481f843-f69d-45c8-b593-62568bb833cf",
+   "candidateId": "d1593420-2904-4ef4-9b03-e0eea1d1efed",
+   "statementNo": "200400170211546",
+   "productName": "디자인포 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "51667134aee048ba4aa54bd19f9cc59483f948a7d7244dda5e439f383f937e81",
+   "newContentHash": "dbd4d8092da99f400191d57c0e5c1bcc98192ddd85980c6ed215163248eaa6ea",
+   "oldLength": 1698,
+   "newLength": 1657,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "dd119d8f-e98d-4ec4-86e6-13aa2734af41",
+   "productMasterId": "58cddf64-a4a1-4d2d-bdcc-8145fbb21330",
+   "candidateId": "6d98fbd4-6881-4d46-9599-e51e10613982",
+   "statementNo": "20040017015394",
+   "productName": "시에트랩 트리플케어",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "ff10fa666afb43b8437769dcabae2573dba912a32aa1f25ae98c8b041cdf39d1",
+   "newContentHash": "80880dec91503e6a6228a16cfcd3e3b8c84cab9ca595fdd06c033f5ee03ec163",
+   "oldLength": 1318,
+   "newLength": 1296,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "e2460f3e-2eef-48e6-b79f-14b7efdb3105",
+   "productMasterId": "811e68bf-465b-4413-89d9-ab2bf05f7dc4",
+   "candidateId": "c8021017-4997-4a67-9c64-38f0fd1375c4",
+   "statementNo": "20090016001120",
+   "productName": "배변의종말",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "62d1d13ed504d08211ff42fce65cb6337617474a145cfdd022fda3ef14e286c3",
+   "newContentHash": "c1fa1b3934fd094026722c41920c59d81640444d0aab143a33386359840a1e0d",
+   "oldLength": 1316,
+   "newLength": 1294,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "e4c0cf7b-baf2-4310-90bd-88b0beb2693b",
+   "productMasterId": "7e121472-f4e9-4230-a033-5c145ea1795e",
+   "candidateId": "85c17d9a-544c-402d-a733-70d835dcb163",
+   "statementNo": "2023002889410",
+   "productName": "다이어트 환",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "052f9e2e2dc6e60b048b6c870622e1dba6d44ee478cdb1f6587c582d508b6b03",
+   "newContentHash": "db8e01482c4e978877ac38f9293f1baa0de1e9037f01d3a4e43f038909a43576",
+   "oldLength": 1624,
+   "newLength": 1583,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "ea6398d3-4348-4e6b-943f-0eb685599c9f",
+   "productMasterId": "17223ee5-ff5f-4dc9-9c27-bb01b0ce3934",
+   "candidateId": "1d573337-6f69-408c-9ae1-d147571fc280",
+   "statementNo": "200400170211234",
+   "productName": "7일:컷 다이어트",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "ef54eb59a4910e401de5b1b9d71add9b33d3b27782751134a2755c05523ec903",
+   "newContentHash": "b0463d9b9214c6a9e4d952c624b88ce5687ec2d4a808a43b3bf8c067a1cdc997",
+   "oldLength": 1660,
+   "newLength": 1619,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "ecc6a29b-962f-41e0-89c3-cf01347cf02c",
+   "productMasterId": "54124731-bc19-4fd9-b7da-9a9da55800ae",
+   "candidateId": "7137a5e3-e6a4-47c5-97ea-cb73bdd0384b",
+   "statementNo": "2022002106760",
+   "productName": "올라이티플러스",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6526dafd1ea5f5e8640e7b9de793efc126fdfc72436e94b06f3fb3d68ecda812",
+   "newContentHash": "115c2233cc5f027460c58c332d9cf80614b7090122e89a76ac51c2c14661dc00",
+   "oldLength": 1623,
+   "newLength": 1576,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f09525e3-b4df-47c1-a4c5-4e592cc5a3a5",
+   "productMasterId": "81442035-a040-44d0-bb53-8d2ea4ec425d",
+   "candidateId": "ec5ac80b-18c5-438e-963e-9fffef938825",
+   "statementNo": "2004001507378",
+   "productName": "경성제약 장박사",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6d03d7122dac45f164d1a074d3dcd9ebdbd2ab291e724d9171296fd0ee62772e",
+   "newContentHash": "16f3ad34a88d58c04b5e95b76526ebf6d4a548fb8abff1084f9761e6969db440",
+   "oldLength": 1159,
+   "newLength": 1137,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f2311786-6d35-40e0-8f59-2232d169ec54",
+   "productMasterId": "d2c53935-2531-4915-af29-1b8138759512",
+   "candidateId": "d3dfe87b-6c31-4b44-a5e3-b31a6856a6d7",
+   "statementNo": "200400170211315",
+   "productName": "날씬하게 변:한순간",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "2639cd7f52958630f8435212351098fe1ce3e6bb3e1f3cffd57228c37b527508",
+   "newContentHash": "d3f49f6acf5be5ad3453c78d611cd2da86823a33bb5289710726687396e0b22b",
+   "oldLength": 1667,
+   "newLength": 1626,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>차전자피 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f6121ed1-7daf-4bda-9662-595bff820692",
+   "productMasterId": "a468e229-7eb6-44b8-a4f0-a3699ae0a98a",
+   "candidateId": "1d4d16a0-3427-4b19-8bab-6ff7090b17d0",
+   "statementNo": "2023000400010",
+   "productName": "다비우니",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "6fbee30e964e5c70a3bed30807f498032f100073f363da5427cbfc8a95be8110",
+   "newContentHash": "11c77e266e7c5bd380bc192f0ecf3e69e8684dfe183aef33aa3a94d89ed29d73",
+   "oldLength": 1134,
+   "newLength": 1112,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f78a8706-c501-4afe-8953-7ac3376d3cbf",
+   "productMasterId": "8c62251b-3ffd-46e0-b442-4b2478de095e",
+   "candidateId": "2748f76a-8617-442e-9038-7f6b78ecb0b4",
+   "statementNo": "2023000400020",
+   "productName": "에버힐링-R",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "118dfe473390144cb10b64928ac36537b9701329d08d564537ee278eaeac6f70",
+   "newContentHash": "30873359945d100bd91daaef79f5372e11b3245c097be4ab960ae28aa2fe83be",
+   "oldLength": 1136,
+   "newLength": 1114,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f7ca3b31-f134-47bc-baa4-589c11566a1c",
+   "productMasterId": "72bfbed5-3786-4f7a-996b-a391bc09d72d",
+   "candidateId": "c3e6d9a8-9039-4840-8b82-5733cd60c63b",
+   "statementNo": "20040017015467",
+   "productName": "살뺄라카노티 자스민향",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "1f1f38d00e5904a76812dcccd4107add6417153b9f0c8144fbaebade24c188a7",
+   "newContentHash": "af789b6d9eb6ee0dd201cffb126aaca42ecbb2b5dfd779904f9ba10af5402361",
+   "oldLength": 1722,
+   "newLength": 1675,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>난소화성말토덱스트린 · 가르시니아캄보지아 추출물 섭취를 함께 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "f95aa912-f645-423b-9f82-5dc1b61c5318",
+   "productMasterId": "a72358a2-a102-47e3-9315-71ecd3124aca",
+   "candidateId": "01dc482d-75e4-41af-9c50-099925aa147f",
+   "statementNo": "2017288019388",
+   "productName": "솔루션 쾌변 화이바",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "e92035471dd03d60f59d7651c6c8a265e25074c66dc91be490d0d7fa2af610c4",
+   "newContentHash": "6ec23b3269357e365c1a94bb43398d5247c653aead9940d9c45bf328a64531af",
+   "oldLength": 1313,
+   "newLength": 1291,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  },
+  {
+   "canonicalId": "fdcd7c84-35c0-4649-bb2c-b4da1c80483f",
+   "productMasterId": "d974ba22-2549-43b1-bf80-ed7d66a8c7e3",
+   "candidateId": "f66eefdb-7eca-498d-aefd-31cbfd36f08e",
+   "statementNo": "20090016001116",
+   "productName": "곡정통 ",
+   "rendererFamily": "COMPOSITE",
+   "rendererFamilySource": "MEASURED_H2_SIGNALS",
+   "ops": [
+    "AUD",
+    "FOOT"
+   ],
+   "combo": "AUD+FOOT",
+   "oldContentHash": "46bfa53611444bdec5a0289621ce75861ce1a8da656123cd2eacdbe90187c0b2",
+   "newContentHash": "27cc9eaa42922bbc07e87b395a572d37325da7ab8a9d14f0e7977dbccc48d089",
+   "oldLength": 1314,
+   "newLength": 1292,
+   "audienceRemovedHtml": "<h2>이런 분께</h2><ul class=\"sd-who\"><li>식이섬유 섭취를 챙기고 싶은 분</li><li>포 형태를 선호하는 분</li></ul>",
+   "footerClauseAdded": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오"
+  }
+ ],
+ "canonicalIdDup": 0,
+ "comboTally": {
+  "AUD+FOOT": 127
+ },
+ "effects": {
+  "audienceSectionsRemoved": 127,
+  "footerClausesAdded": 127,
+  "functionSectionsInserted": 0,
+  "functionClausesRestored": 0
+ },
+ "standardExpertClause": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오",
+ "expectedUpdate": 127,
+ "reversalContract": {
+  "AUD": "audienceRemovedHtml 을 sd-body 종료 </div> 앞(sd-foot 직전)에 재삽입",
+  "FOOT": "footerClauseAdded 를 ' '+clause 형태로 content 말미에서 제거",
+  "verify": "역연산 후 sha256 == oldContentHash (build 단계 reversible 체크로 전건 증명 완료)"
+ }
+}

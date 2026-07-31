@@ -1,0 +1,106 @@
+{
+ "ranAt": "2026-07-31T05:42:26.926Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-MULTILINGUAL-AUTHORING-CONTRACT-PARITY-AND-RESIDUAL-CLEANUP-V1",
+ "countChecks": {
+  "spd_all": {
+   "expected": 120118,
+   "actual": 120118,
+   "ok": true
+  },
+  "ko_total": {
+   "expected": 40913,
+   "actual": 40913,
+   "ok": true
+  },
+  "ko_audience": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "ko_no_expert": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "ko_no_fn": {
+   "expected": 2,
+   "actual": 2,
+   "ok": true
+  },
+  "en_total": {
+   "expected": 15498,
+   "actual": 15498,
+   "ok": true
+  },
+  "en_who": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "en_expert_exact": {
+   "expected": 15498,
+   "actual": 15498,
+   "ok": true
+  },
+  "en_no_fn": {
+   "expected": 824,
+   "actual": 824,
+   "ok": true
+  }
+ },
+ "manifests": [
+  {
+   "file": "hff-ko-composite-variant-127-rollback-v1.json",
+   "targets": 127,
+   "matchesNewHash": 127,
+   "stillOldHash": 0,
+   "mismatch": 0,
+   "missing": 0,
+   "verdict": "PASS"
+  },
+  {
+   "file": "hff-ko-residual-13-rollback-v1.json",
+   "targets": 11,
+   "matchesNewHash": 11,
+   "stillOldHash": 0,
+   "mismatch": 0,
+   "missing": 0,
+   "verdict": "PASS"
+  },
+  {
+   "file": "hff-en-parity-rollback-v1.json",
+   "targets": 15498,
+   "matchesNewHash": 15498,
+   "stillOldHash": 0,
+   "mismatch": 0,
+   "missing": 0,
+   "verdict": "PASS"
+  }
+ ],
+ "enFunctionInsertCheck": {
+  "docs": 2,
+  "allPresent": true,
+  "koreanLeak": 0,
+  "detail": [
+   {
+    "id": "3d013b15-695c-42f8-8f97-7b48815bc21a",
+    "sectionPresent": true,
+    "koreanInSection": false
+   },
+   {
+    "id": "8d05944d-9796-4ca7-84ce-3a78ef188da6",
+    "sectionPresent": true,
+    "koreanInSection": false
+   }
+  ]
+ },
+ "finalQueue": {
+  "rows": 4544,
+  "uniqueIds": 4544,
+  "allRowsExistInDb": true,
+  "missingInDb": 0
+ },
+ "verdict": "PASS"
+}

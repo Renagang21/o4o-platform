@@ -1,0 +1,16 @@
+{
+ "ranAt": "2026-07-31T05:27:27.574Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "enTotal": 15498,
+ "footRegexMiss": 0,
+ "footLabelTally": {
+  "Precautions": 15498
+ },
+ "expertClauseTally": {
+  "· This health functional food is not a drug for preventing or treating disease; consult a pharmacist or professional in store": 1543
+ },
+ "sdWhoNonStandardHeading": {
+  "For guardians": 63
+ }
+}
