@@ -1,0 +1,52 @@
+{
+  "wo": "WO-O4O-OTC-STORE-EN-CANONICAL-BULK-AUDIT-TRANSLATE-APPLY-BATCH-5000-V1",
+  "batchId": "otc-en-audit-batch-01",
+  "mode": "READ-ONLY",
+  "liveDbWrite": 0,
+  "startedAt": "2026-07-31T14:59:29.564Z",
+  "populationTotal": 22011,
+  "populationMasters": 22011,
+  "duplicateCanonicalMasters": 0,
+  "batchProductMasters": 5000,
+  "batchKoDescriptions": 5000,
+  "existingEn": 5000,
+  "enMissing": 0,
+  "classification": {
+    "PASS_EXISTING": 4751,
+    "REVIEW_REQUIRED": 248,
+    "RETRANSLATED_INVALID": 1
+  },
+  "defectCodes": {
+    "ABNORMAL_REPETITION": 1
+  },
+  "softSignals": {
+    "NUMERIC_VALUE_MISSING_IN_EN": 211,
+    "DOSE_LIMIT_SENTENCE_MISSING": 55,
+    "POSSIBLE_ROUTE_VERB_ISSUE": 31
+  },
+  "translationApiCalls": 0,
+  "translationSucceeded": 0,
+  "translationValidationFailed": 0,
+  "plannedNewEn": 0,
+  "plannedUpdateEn": 1,
+  "plannedDbWrites": 1,
+  "totalsReconcile": {
+    "sum": 5000,
+    "manifest": 5000,
+    "ok": true
+  },
+  "bySourceType": {
+    "mfds_drug_otc": {
+      "PASS_EXISTING": 3446,
+      "REVIEW_REQUIRED": 199
+    },
+    "mfds_drug_otc_nutrition_combo": {
+      "PASS_EXISTING": 765,
+      "RETRANSLATED_INVALID": 1
+    },
+    "o4o_drug_otc_topical": {
+      "PASS_EXISTING": 540,
+      "REVIEW_REQUIRED": 49
+    }
+  }
+}

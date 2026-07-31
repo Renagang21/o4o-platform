@@ -1,0 +1,43 @@
+{
+ "wo": "WO-O4O-OTC-STORE-EN-CANONICAL-BULK-AUDIT-TRANSLATE-APPLY-BATCH-5000-V1",
+ "batchId": "otc-en-audit-batch-01",
+ "classification": "RETRANSLATED_INVALID",
+ "total": 1,
+ "rows": [
+  {
+   "batchId": "otc-en-audit-batch-01",
+   "seq": 430,
+   "masterId": "05607729-c6b6-48c4-bf87-fe55f653efee",
+   "productName": "일양아이콤연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "koDescriptionId": "61c6eac2-5e18-4929-8054-a3a364082803",
+   "enDescriptionId": "f609c338-d7c5-4779-bfff-d721657c38ac",
+   "koSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "enSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "koHash": "08ea81fe0b44448b28e61ccdb3af0ef3",
+   "enHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "classification": "RETRANSLATED_INVALID",
+   "reason": "확정 결함: ABNORMAL_REPETITION",
+   "defectCodes": [
+    "ABNORMAL_REPETITION"
+   ],
+   "softSignals": [],
+   "detail": {
+    "repeated": [],
+    "koUnitNumCount": 12,
+    "lostNums": [],
+    "lostDoseNums": [],
+    "enKoTextRatio": 2.69,
+    "koLiCount": 7,
+    "enLiCount": 10,
+    "enSummaryEmpty": false
+   },
+   "translationExecuted": false,
+   "translationModel": null,
+   "translationHash": null,
+   "applyTarget": false,
+   "humanReview": false,
+   "blockedReason": null
+  }
+ ]
+}
