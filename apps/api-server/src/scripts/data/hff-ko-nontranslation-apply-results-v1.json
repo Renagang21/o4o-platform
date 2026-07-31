@@ -1,0 +1,240 @@
+{
+ "ranAt": "2026-07-31T07:42:31.667Z",
+ "wo": "WO-O4O-HFF-KO-NONTRANSLATION-RESIDUAL-AND-AGENT9-HOLD-FULL-CLEANUP-V1",
+ "gates": {
+  "renderVerdictPass": true,
+  "renderCoversAllTargets": true,
+  "renderClauseLossZero": true,
+  "renderOutOfSourceZero": true,
+  "canonicalIdUnique": true,
+  "statementNoUnique": true,
+  "afterHashMatchesContent": true,
+  "contentActuallyChanged": true,
+  "additiveOnly": true,
+  "agent9NoInsert": true,
+  "doubleGate": true
+ },
+ "applied": true,
+ "rolledBack": false,
+ "systemicError": null,
+ "trackA": {
+  "expectedUpdates": 26,
+  "actualUpdates": 26,
+  "finalHold": 0
+ },
+ "trackB": {
+  "expectedInserts": 0,
+  "actualInserts": 0,
+  "note": "§11 전제(ProductMaster 단일 확정) 미충족 348건 전량 HOLD"
+ },
+ "rows": [
+  {
+   "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+   "statementNo": "20040020004469",
+   "productName": "바이오메라 면역젤리 튼튼대장 사과맛",
+   "result": "UPDATED",
+   "beforeHash": "6e2a89f8ec44516956a95e0b9a59c6287ab2fb501c8c06fa97926215888c4fcf",
+   "afterHash": "1002ae7ff80987c0d4e60f758163a9a538d963a785aceb89922fc50c98913c52"
+  },
+  {
+   "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+   "statementNo": "200400200071620",
+   "productName": "뷰티업필",
+   "result": "UPDATED",
+   "beforeHash": "c28a3f8f6f4deed583dc7615055395beaed82f493f60ea192f066704f0323fb9",
+   "afterHash": "f650d97be0a2c802580221ba5f565748db0007c9112c9f6415845deb116cf1d8"
+  },
+  {
+   "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+   "statementNo": "200400200142058",
+   "productName": "광동rTG오메가3",
+   "result": "UPDATED",
+   "beforeHash": "00ac7312449e64ced407ecb7a280ac8236ccdbede038da0a52a2fa795e1412ff",
+   "afterHash": "e3d801af9747196fffbb8edc4a37d142ad10a2b6ae4eb81f009f89bda070b8bb"
+  },
+  {
+   "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+   "statementNo": "201000190041382",
+   "productName": "면역피로탁",
+   "result": "UPDATED",
+   "beforeHash": "c9b2ea3cb3c3e6ec3de22ff6e7f2745981a82b439b3197f1bbbbf80da008a452",
+   "afterHash": "a869013c012a6b826c99cc31c69d712b590bf0f3e4e0577f2d2477f01eb7caa5"
+  },
+  {
+   "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+   "statementNo": "20172880193315",
+   "productName": "관절연골엔 구절초 프리미엄",
+   "result": "UPDATED",
+   "beforeHash": "4b1ebc1860ac17fafaf55b82113f77d46fd1fa3fe41f3c4afc0194fb359f76a5",
+   "afterHash": "9ced5cad78475b3c2b8bc26e46c63728cdf345d56a244c6c6f50b69b04bc648e"
+  },
+  {
+   "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+   "statementNo": "20190009483190",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "result": "UPDATED",
+   "beforeHash": "e30d812c3aa3a309ba95b88e864e4d48f2c4793eccd9409097b663c4e981bac1",
+   "afterHash": "c2159ec454fded5a3503635aadf07c1deb4916aa90d5f990380b4c6b99651d66"
+  },
+  {
+   "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+   "statementNo": "2023000229646",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "result": "UPDATED",
+   "beforeHash": "b2aa1a63c5b42afe1e1291d5ff577f37dd716607c1777ce7f91fc398b063bb0d",
+   "afterHash": "f4c7bb92389e3328d91d0bb91af02c046f8517d035f7cca9f1107bbf61b92288"
+  },
+  {
+   "canonicalId": "1631dc7d-cd51-4521-ab1c-5adef67e93ca",
+   "statementNo": "200400151071329",
+   "productName": "평제원관절연골정",
+   "result": "UPDATED",
+   "beforeHash": "43c864fa1c33564adc74d139dbfa1f79f784ef7108733f21ad5701180f6d6f09",
+   "afterHash": "4724f80358c1e2d495c21c5f4a99b2a9c505f5a334f78cbd95b9b11f5d50554c"
+  },
+  {
+   "canonicalId": "fb2c4f7c-b0c6-4d67-8fe6-c758b2255d1e",
+   "statementNo": "20130020024296",
+   "productName": "아미네 보떼 8",
+   "result": "UPDATED",
+   "beforeHash": "c0f74081fac6cdc41387fb0748eb0272bc0cf2c5c04c1b0adeff40a1aca8b262",
+   "afterHash": "4496ed3da3aa734ba193b397e4163537ec552f8d8ed7362c51054691b3e6a117"
+  },
+  {
+   "canonicalId": "d67e2caf-1208-46ff-8ce2-2dfb2dd492ef",
+   "statementNo": "200400200022706",
+   "productName": "인스킨밸런스",
+   "result": "UPDATED",
+   "beforeHash": "42d06203a70540e183fe229cccd76a23beaf773cfae8fa9fe366d7012da37217",
+   "afterHash": "f5c611e21e26a2cd03ce83b5747f60903f5f57d2b9664d5790bbb3effaff5428"
+  },
+  {
+   "canonicalId": "52ecbd57-63a3-4012-8974-96e6c036eec5",
+   "statementNo": "200400200023381",
+   "productName": "관절 연골 뮤코다당단백 콘드로이친 골드",
+   "result": "UPDATED",
+   "beforeHash": "e8ea5ecb4a00dffc0daaa13d48a03f3b3c11dca00dc0c5f366aabc5b88879764",
+   "afterHash": "9e91690b6ef672d498266bc4c4489b478b39f1fe4cb0aac3daa62ec6df0a2cdc"
+  },
+  {
+   "canonicalId": "6827979d-98a2-41b2-9f62-27a1b4e6290a",
+   "statementNo": "200400200023392",
+   "productName": "관절엔 소연골 뮤코다당단백 콘드로이친 골드",
+   "result": "UPDATED",
+   "beforeHash": "055653386fe1862f6214c7687880ea0e62aba4b6c28dc2fdecd1cc9ed6bf8b56",
+   "afterHash": "20caf51137a7ba25c54e2d4d38d0bb6498af7fc293e0b837b963a288a680adc7"
+  },
+  {
+   "canonicalId": "d2ed3100-f304-4c8f-8d61-6008f647900e",
+   "statementNo": "200400200023758",
+   "productName": "티에스 뮤코다당단백 콘드로이친",
+   "result": "UPDATED",
+   "beforeHash": "a52b6e2ad8f9642b68c35342cc9c9dfcf048afabc8e508b37e6331167f7bce18",
+   "afterHash": "2554d35b26d671a3b498462192f4dc75cf3ed63426b6435d5c2ba646c72c117d"
+  },
+  {
+   "canonicalId": "0551b32e-3fa9-4dc5-afae-9cd99720201a",
+   "statementNo": "200400200023855",
+   "productName": "마이포텐 올인원 스킨글로우",
+   "result": "UPDATED",
+   "beforeHash": "831a922c354bddca7228b2fb0bbbc55038f1c879d60fcffda42f4111e41c4443",
+   "afterHash": "b2ec7be61e369e78bcfe6a9becaad6ab5e09ff8ea7515e24a11155d8966e0b05"
+  },
+  {
+   "canonicalId": "54d12e15-6d69-4c15-9746-3acb504835ac",
+   "statementNo": "200400200023944",
+   "productName": "의사가 성분배합한 콘드로이친 뮤코다당단백 1200",
+   "result": "UPDATED",
+   "beforeHash": "e9a1dbdaf86c205923198864cf82e8dac7b75fa5aec4941abd7e80e5dc565efc",
+   "afterHash": "3c036c762cdeeefc746ea42eb287ae6832a117a9a553b59d46a1ee6a31637137"
+  },
+  {
+   "canonicalId": "6caf6b37-8554-4c74-a78a-09681bd38f56",
+   "statementNo": "200400200083080",
+   "productName": "조인트본 부스터",
+   "result": "UPDATED",
+   "beforeHash": "11384702a32ab599fcea2283a8d8d2d0ac7bb17cd9e03086b62811c88c3d4b87",
+   "afterHash": "cda01a50652efcd953ae5c6fb55bf72430fb9ae504677c3ef39a11d77a17555f"
+  },
+  {
+   "canonicalId": "23648453-ca0a-468a-8013-467e39ef1188",
+   "statementNo": "20040020041551",
+   "productName": "관절엔 일맥 뮤코다당단백 (콘드로이친) 1200 에센셜",
+   "result": "UPDATED",
+   "beforeHash": "0775592913b9d2ca8e8df3c8c1545c508d54c1ed25279d8741a9253db09b48d7",
+   "afterHash": "391dbf1418151fd9747810e6c77ef52ba6d8f5cd9881c5672597b217653d4a4f"
+  },
+  {
+   "canonicalId": "f43acaac-59fd-4d4c-9e75-5547542b14c3",
+   "statementNo": "200600200032572",
+   "productName": "나를 위한 관절MSM&NAG",
+   "result": "UPDATED",
+   "beforeHash": "ce54e10b7a983f9ee2a5d730c77354bdcc1d6fb24914911aea5f004ea885022b",
+   "afterHash": "3f3140d48dae061efbe3ac3e8348e8937be78b5b506982a860a74690ee1ee03a"
+  },
+  {
+   "canonicalId": "4678efd8-6706-4297-8a59-5041938bc279",
+   "statementNo": "200600200032944",
+   "productName": "비타블로썸 콘드로이친 뮤코다당ㆍ단백 1200",
+   "result": "UPDATED",
+   "beforeHash": "c3ab391a6a4db3b4046721a762ad696a0c9b4b1d4aac6ac03fdf986d7bf02155",
+   "afterHash": "d24d882a60bff44d0115c55149ba35715535862431e0af1406d827da46d23973"
+  },
+  {
+   "canonicalId": "cd049ae2-cab3-4193-8090-ccca8361f424",
+   "statementNo": "200600200032988",
+   "productName": "관절닥터 타마본 5Days",
+   "result": "UPDATED",
+   "beforeHash": "3196f799398fc81bee9adda0c23f85d90bccd25f3bb61610f6f4e092bb65bdb1",
+   "afterHash": "e9f2bb71a31c83be3e7099ec8d4658b391e38d23c055618ea37eb7b8d7c5fa1e"
+  },
+  {
+   "canonicalId": "cb0cf74c-29ca-4fa3-af73-8080ee8a9785",
+   "statementNo": "20240028080208",
+   "productName": "비타블로썸 콘드로이친 뮤코다당·단백 1200",
+   "result": "UPDATED",
+   "beforeHash": "255a6b5112d99ad8d08ba0f698d3ff6a32052b9e803c5a8cf18212177bca0bf6",
+   "afterHash": "7e3a7011bbe3bffa3c78cf2940efd3a811b1b1b370b2693feb3d7e24b424e4a8"
+  },
+  {
+   "canonicalId": "71b8732a-4142-4495-a5c6-eb07473dd088",
+   "statementNo": "20240028080348",
+   "productName": "액티브 조인트",
+   "result": "UPDATED",
+   "beforeHash": "91cf45f4d4a9e3d8d848e653f687d933eced0943ca4475862937650a6fa1d8e5",
+   "afterHash": "8dabbdb8936095696244aa3eb3b3dd9fd1a1833294af3aac13f9134e73fcccfb"
+  },
+  {
+   "canonicalId": "392f626e-bac1-433a-b207-f9a9acfa4095",
+   "statementNo": "20240028080352",
+   "productName": "나를 위한 관절MSM&NAG",
+   "result": "UPDATED",
+   "beforeHash": "2cb47423259eb6d24faa451afe651ccf075d29f32d84ea3f84677cf657de0958",
+   "afterHash": "843915daa185361e48266289da5f549ad04cbed314df45431a8ea8a307d32cd4"
+  },
+  {
+   "canonicalId": "bab6fd53-c876-4606-924e-45ed546006ea",
+   "statementNo": "20240028080400",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1200",
+   "result": "UPDATED",
+   "beforeHash": "2dbb3947187fd8dd303c8a96f7f949cb6b9fe7fb933ec0388c30090d209cd4f8",
+   "afterHash": "4252bedcbddb6dd9d0648ab8babb91a4883e113634feb2adb15f898739e1fb8e"
+  },
+  {
+   "canonicalId": "986feea9-e6e7-496a-8af5-064b87565e09",
+   "statementNo": "20240028080435",
+   "productName": "리튠 관절 건강 콘드로이친 뮤코다당·단백 1200",
+   "result": "UPDATED",
+   "beforeHash": "e2e1c01e0212c21cdc8187ea566f777061612df2cebb1e694ff4b5aa532330aa",
+   "afterHash": "821824dd81a0dd442e954a1227f96abee1ac5848a73986654342b056e8cd985b"
+  },
+  {
+   "canonicalId": "0b1662a7-e179-484d-96cf-beba0d10280b",
+   "statementNo": "20240028080439",
+   "productName": "관절닥터 타마본 5Days",
+   "result": "UPDATED",
+   "beforeHash": "f51db6d7181b12c59347e0fbe29979c70fbdd8d15dbb2e52966ec39a3eb1c9d8",
+   "afterHash": "455e48aeb42bf35e67f2535d9ff21ef6dbe3b6a3d92d45e879734f5bc7c6143a"
+  }
+ ]
+}

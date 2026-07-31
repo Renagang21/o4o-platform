@@ -1,0 +1,654 @@
+{
+ "ranAt": "2026-07-31T07:49:57.033Z",
+ "wo": "WO-O4O-HFF-KO-NONTRANSLATION-RESIDUAL-AND-AGENT9-HOLD-FULL-CLEANUP-V1",
+ "readOnly": true,
+ "dbWrites": 0,
+ "independentOfApplyScript": true,
+ "baselineFrom": "hff-wo-independent-verification-v1.json",
+ "checks": {
+  "hffCanonicalRowsUnchanged": {
+   "expected": 56411,
+   "actual": 56411,
+   "ok": true
+  },
+  "spdAllDeltaFromOtherSources": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true,
+   "spdAllNow": 120140,
+   "spdAllBaseline": 120118,
+   "newRowsBySource": []
+  },
+  "hffKoCanonicalUnchanged": {
+   "expected": 40913,
+   "actual": 40913,
+   "ok": true
+  },
+  "hffEnCanonicalUnchanged": {
+   "expected": 15498,
+   "actual": 15498,
+   "ok": true
+  },
+  "koWithoutEnPairUnchanged": {
+   "expected": 25415,
+   "actual": 25415,
+   "ok": true
+  },
+  "existingCanonicalUpdateCount": {
+   "expected": 26,
+   "actual": 26,
+   "ok": true
+  },
+  "newKoCanonicalCount": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "trackBCanonicalCreated": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "agent9ReasonMatch": {
+   "expected": 348,
+   "actual": 348,
+   "ok": true
+  },
+  "writesOutsideManifestZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true,
+   "rows": []
+  },
+  "enCanonicalChangeZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "canonicalDuplicatesZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "nonFunctionalDriftZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "functionalClauseDeletionZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "finalQueueDuplicateZero": {
+   "expected": 0,
+   "actual": 0,
+   "ok": true
+  },
+  "finalQueueKoRowsExistInDb": {
+   "expected": 175,
+   "actual": 175,
+   "ok": true
+  },
+  "finalQueueAgent9RowsHaveNoCanonical": {
+   "expected": 348,
+   "actual": 348,
+   "ok": true
+  }
+ },
+ "verdict": "PASS",
+ "detail": {
+  "targetCheck": [
+   {
+    "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "1631dc7d-cd51-4521-ab1c-5adef67e93ca",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "fb2c4f7c-b0c6-4d67-8fe6-c758b2255d1e",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "d67e2caf-1208-46ff-8ce2-2dfb2dd492ef",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "52ecbd57-63a3-4012-8974-96e6c036eec5",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "6827979d-98a2-41b2-9f62-27a1b4e6290a",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "d2ed3100-f304-4c8f-8d61-6008f647900e",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "0551b32e-3fa9-4dc5-afae-9cd99720201a",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "54d12e15-6d69-4c15-9746-3acb504835ac",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "6caf6b37-8554-4c74-a78a-09681bd38f56",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "23648453-ca0a-468a-8013-467e39ef1188",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "f43acaac-59fd-4d4c-9e75-5547542b14c3",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "4678efd8-6706-4297-8a59-5041938bc279",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "cd049ae2-cab3-4193-8090-ccca8361f424",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "cb0cf74c-29ca-4fa3-af73-8080ee8a9785",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "71b8732a-4142-4495-a5c6-eb07473dd088",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "392f626e-bac1-433a-b207-f9a9acfa4095",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "bab6fd53-c876-4606-924e-45ed546006ea",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "986feea9-e6e7-496a-8af5-064b87565e09",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   },
+   {
+    "canonicalId": "0b1662a7-e179-484d-96cf-beba0d10280b",
+    "exists": true,
+    "matchesAfter": true,
+    "stillBefore": false,
+    "updatedAt": "2026-07-30T22:42:31.202Z"
+   }
+  ],
+  "structure": [
+   {
+    "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 104
+   },
+   {
+    "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 94
+   },
+   {
+    "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 132
+   },
+   {
+    "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 147
+   },
+   {
+    "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 109
+   },
+   {
+    "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 106
+   },
+   {
+    "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 152
+   },
+   {
+    "canonicalId": "1631dc7d-cd51-4521-ab1c-5adef67e93ca",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 262
+   },
+   {
+    "canonicalId": "fb2c4f7c-b0c6-4d67-8fe6-c758b2255d1e",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 107
+   },
+   {
+    "canonicalId": "d67e2caf-1208-46ff-8ce2-2dfb2dd492ef",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 128
+   },
+   {
+    "canonicalId": "52ecbd57-63a3-4012-8974-96e6c036eec5",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 123
+   },
+   {
+    "canonicalId": "6827979d-98a2-41b2-9f62-27a1b4e6290a",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 230
+   },
+   {
+    "canonicalId": "d2ed3100-f304-4c8f-8d61-6008f647900e",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 230
+   },
+   {
+    "canonicalId": "0551b32e-3fa9-4dc5-afae-9cd99720201a",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": false,
+    "growth": 446
+   },
+   {
+    "canonicalId": "54d12e15-6d69-4c15-9746-3acb504835ac",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 440
+   },
+   {
+    "canonicalId": "6caf6b37-8554-4c74-a78a-09681bd38f56",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 207
+   },
+   {
+    "canonicalId": "23648453-ca0a-468a-8013-467e39ef1188",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 123
+   },
+   {
+    "canonicalId": "f43acaac-59fd-4d4c-9e75-5547542b14c3",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 209
+   },
+   {
+    "canonicalId": "4678efd8-6706-4297-8a59-5041938bc279",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 123
+   },
+   {
+    "canonicalId": "cd049ae2-cab3-4193-8090-ccca8361f424",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 401
+   },
+   {
+    "canonicalId": "cb0cf74c-29ca-4fa3-af73-8080ee8a9785",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 123
+   },
+   {
+    "canonicalId": "71b8732a-4142-4495-a5c6-eb07473dd088",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 168
+   },
+   {
+    "canonicalId": "392f626e-bac1-433a-b207-f9a9acfa4095",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 209
+   },
+   {
+    "canonicalId": "bab6fd53-c876-4606-924e-45ed546006ea",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 316
+   },
+   {
+    "canonicalId": "986feea9-e6e7-496a-8af5-064b87565e09",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 316
+   },
+   {
+    "canonicalId": "0b1662a7-e179-484d-96cf-beba0d10280b",
+    "currentEqualsAfter": true,
+    "rollbackRestoresBefore": true,
+    "prefixIntact": true,
+    "suffixIntact": true,
+    "fullyExplainedByInsertion": true,
+    "growth": 401
+   }
+  ],
+  "clauseKeep": [
+   {
+    "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+    "beforeClauses": 16,
+    "missing": 0
+   },
+   {
+    "canonicalId": "cd2af182-5332-44f4-b463-f8d9285c6287",
+    "beforeClauses": 9,
+    "missing": 0
+   },
+   {
+    "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+    "beforeClauses": 30,
+    "missing": 0
+   },
+   {
+    "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+    "beforeClauses": 10,
+    "missing": 0
+   },
+   {
+    "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+    "beforeClauses": 12,
+    "missing": 0
+   },
+   {
+    "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+    "beforeClauses": 10,
+    "missing": 0
+   },
+   {
+    "canonicalId": "1631dc7d-cd51-4521-ab1c-5adef67e93ca",
+    "beforeClauses": 5,
+    "missing": 0
+   },
+   {
+    "canonicalId": "fb2c4f7c-b0c6-4d67-8fe6-c758b2255d1e",
+    "beforeClauses": 5,
+    "missing": 0
+   },
+   {
+    "canonicalId": "d67e2caf-1208-46ff-8ce2-2dfb2dd492ef",
+    "beforeClauses": 6,
+    "missing": 0
+   },
+   {
+    "canonicalId": "52ecbd57-63a3-4012-8974-96e6c036eec5",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "6827979d-98a2-41b2-9f62-27a1b4e6290a",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "d2ed3100-f304-4c8f-8d61-6008f647900e",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "0551b32e-3fa9-4dc5-afae-9cd99720201a",
+    "beforeClauses": 7,
+    "missing": 0
+   },
+   {
+    "canonicalId": "54d12e15-6d69-4c15-9746-3acb504835ac",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "6caf6b37-8554-4c74-a78a-09681bd38f56",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "23648453-ca0a-468a-8013-467e39ef1188",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "f43acaac-59fd-4d4c-9e75-5547542b14c3",
+    "beforeClauses": 6,
+    "missing": 0
+   },
+   {
+    "canonicalId": "4678efd8-6706-4297-8a59-5041938bc279",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "cd049ae2-cab3-4193-8090-ccca8361f424",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "cb0cf74c-29ca-4fa3-af73-8080ee8a9785",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "71b8732a-4142-4495-a5c6-eb07473dd088",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "392f626e-bac1-433a-b207-f9a9acfa4095",
+    "beforeClauses": 6,
+    "missing": 0
+   },
+   {
+    "canonicalId": "bab6fd53-c876-4606-924e-45ed546006ea",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "986feea9-e6e7-496a-8af5-064b87565e09",
+    "beforeClauses": 4,
+    "missing": 0
+   },
+   {
+    "canonicalId": "0b1662a7-e179-484d-96cf-beba0d10280b",
+    "beforeClauses": 4,
+    "missing": 0
+   }
+  ]
+ }
+}
