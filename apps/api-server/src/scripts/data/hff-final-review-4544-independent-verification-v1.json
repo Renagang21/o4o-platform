@@ -1,0 +1,138 @@
+{
+ "ranAt": "2026-07-31T06:33:00.047Z",
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "independent": true,
+ "dbWrites": 0,
+ "observedCounts": {
+  "spd_all": "120140",
+  "ko_total": "40913",
+  "en_total": "15498",
+  "ko_pairless": "25415"
+ },
+ "note": "spd_all 은 타 도메인 write 로 변동하므로 불변식에서 제외하고 관측값으로만 기록한다",
+ "checks": [
+  {
+   "name": "ko_total_unchanged",
+   "expected": "40913",
+   "actual": "40913",
+   "pass": true
+  },
+  {
+   "name": "en_total_unchanged",
+   "expected": "15498",
+   "actual": "15498",
+   "pass": true
+  },
+  {
+   "name": "ko_pairless_unchanged",
+   "expected": "25415",
+   "actual": "25415",
+   "pass": true
+  },
+  {
+   "name": "target_new_hash_match",
+   "expected": "65",
+   "actual": "65",
+   "pass": true
+  },
+  {
+   "name": "target_old_hash_remains",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "target_updated_at_stale",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "non_function_byte_drift",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "official_clause_loss",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "non_target_canonical_checked",
+   "expected": "4479",
+   "actual": "4479",
+   "pass": true
+  },
+  {
+   "name": "non_target_canonical_drift",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "touched_rows_in_window",
+   "expected": "65",
+   "actual": "65",
+   "pass": true
+  },
+  {
+   "name": "touched_outside_manifest",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "agent9_hold_unchanged",
+   "expected": "348",
+   "actual": "348",
+   "pass": true
+  },
+  {
+   "name": "v3_unique_canonical",
+   "expected": "1037",
+   "actual": "1037",
+   "pass": true
+  },
+  {
+   "name": "v3_reconciles_v2",
+   "expected": "4544",
+   "actual": "4544",
+   "pass": true
+  },
+  {
+   "name": "v3_rows_missing_in_db",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "v3_overlaps_applied_targets",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "v3_holdreason_normalized",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "v3_required_fields_missing",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  },
+  {
+   "name": "en_targets_in_this_wo",
+   "expected": "0",
+   "actual": "0",
+   "pass": true
+  }
+ ],
+ "failures": [],
+ "driftedTargets": [],
+ "verdict": "PASS"
+}

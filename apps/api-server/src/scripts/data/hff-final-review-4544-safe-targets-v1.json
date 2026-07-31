@@ -1,0 +1,2952 @@
+{
+ "builtAt": "2026-07-31T06:24:02.344Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "phase": "§7·§10 — 안전 대상 patch 생성",
+ "candidates": 120,
+ "targets": 65,
+ "rejected": 55,
+ "effects": {
+  "insertOnly": 30,
+  "newCard": 35,
+  "clausesInserted": 337,
+  "cardsCreated": 105
+ },
+ "promotedFromHold": 35,
+ "promotionRejectTally": {
+  "SOURCE_CLOSE_WITHOUT_OPEN": 5,
+  "SOURCE_NESTED_OPEN_BRACKET": 4,
+  "MISSING_CLAUSE_WITHOUT_LABEL": 46
+ },
+ "promotedSamples": [
+  {
+   "canonicalId": "710c5309-1332-4317-b7bd-63b2fb8dcd1c",
+   "productName": "연골관절건강 콘드로이친 뮤코다당단백 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "0e4290ba-dcc8-4006-a020-9603d962c191",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "e4c848f8-cce3-42c3-b6e9-624d82ce5467",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "bdf9eb7e-664a-4b9f-b916-952bf4e3c058",
+   "productName": "관절편한 뮤코다당콘드로이친 1200 플러스",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "c8a1d105-9f14-410d-8b6e-02d1fcb06371",
+   "productName": "관절 튼튼 뮤코다당단백 콘드로이친+",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민B6",
+    "셀레늄",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "bba75652-7a63-4d12-b259-325b86cb27fc",
+   "productName": "관절연골엔 뮤코다당단백 콘드로이친 1500",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "아연",
+    "셀레늄",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "dd7d055b-48fb-4eab-9ced-88116350fc34",
+   "productName": "관절연골엔 보스웰리아 콘드로이친 뮤코다당단백",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "아연",
+    "셀레늄",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "f7387278-16c2-4a8a-a410-2e1ed2f51863",
+   "productName": "관절의 품격",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D"
+   ]
+  },
+  {
+   "canonicalId": "7207ecec-e567-4585-ad56-3704b216e171",
+   "productName": "Strong Bone MSM + NAG",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D"
+   ]
+  },
+  {
+   "canonicalId": "10f59f16-1d63-4792-9200-89bde551b13e",
+   "productName": "뮤코다당단백 콘드로이친 1200+비타민D+망간 트리플액션",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "72a9725d-3f83-465d-bfd7-756588e4a652",
+   "productName": "연골 콘드로이친 뮤코다당단백 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "7716d638-6b8a-45b0-8963-0701cd9ccdb3",
+   "productName": "관절연골건강 콘드로이친 뮤코다당단백 1500mg 함유",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "셀레늄",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "f22b949f-0110-4c3b-9179-f427595b2980",
+   "productName": "인테라 엠지투에이 관절연골케어 콘드로이친 뮤코다당단백 1400",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "0ed404ec-bf0b-4b96-b601-06f858751456",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1500 철갑상어 소 연골",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "아연",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "d57333f9-a179-40ea-bfa0-b4dc43a01d54",
+   "productName": "백세 관절튼튼 뮤코다당단백(콘드로이친) 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "a46f7365-7aba-408b-9501-d101e2dfd2ef",
+   "productName": "뮤코다당단백 콘드로이친 프라임",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D",
+    "비타민K",
+    "망간"
+   ]
+  },
+  {
+   "canonicalId": "1ba35437-429e-41e0-9e67-4f9b86493f37",
+   "productName": "Crystal Skin Premium Bovine Cartilage Boswellia Chondroitin 1200 크리스탈 스킨 프리미엄 소 연골 보스웰리아 콘드로이친 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "비타민D"
+   ]
+  },
+  {
+   "canonicalId": "8e8f379b-9f5e-4c19-bdf6-63f877aaf84c",
+   "productName": "관절엔 대한보감 콘드로이친 뮤코다당단백 1200",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "망간",
+    "비타민D",
+    "비타민K"
+   ]
+  },
+  {
+   "canonicalId": "89f8df53-7e78-495d-8816-0c960196da7a",
+   "productName": "관절나라",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "칼슘",
+    "마그네슘",
+    "아연",
+    "비타민D"
+   ]
+  },
+  {
+   "canonicalId": "b67afe19-d68b-4b94-8ea0-edbf65848038",
+   "productName": "관절연골엔 철갑상어 뮤코다당단백 콘드로이친 K",
+   "from": "INGREDIENT_CARD_NOT_FOUND",
+   "cards": [
+    "아연",
+    "셀레늄",
+    "망간",
+    "비타민K",
+    "비타민D"
+   ]
+  }
+ ],
+ "rejectedSamples": [
+  {
+   "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "reason": "SOURCE_CLOSE_WITHOUT_OPEN",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "f64560b0-e222-4473-a3ef-dd496123e860",
+   "productName": "바이오메라 면역젤리 튼튼대장 사과맛",
+   "reason": "SOURCE_NESTED_OPEN_BRACKET",
+   "from": "INGREDIENT_CARD_NOT_FOUND"
+  },
+  {
+   "canonicalId": "8f29b1c3-9573-4796-a977-617370686e4c",
+   "productName": "뷰티업필",
+   "reason": "SOURCE_NESTED_OPEN_BRACKET",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "7a7adad6-9ae7-4079-a62f-2e58b979f6db",
+   "productName": "면역피로탁",
+   "reason": "SOURCE_CLOSE_WITHOUT_OPEN",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "9763985b-b31f-4cac-96a7-17257e93b9fa",
+   "productName": "관절연골엔 구절초 프리미엄",
+   "reason": "SOURCE_NESTED_OPEN_BRACKET",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "b0aff3a3-7e33-46e2-acfc-f17f9d0a4462",
+   "productName": "슈퍼 쏘팔 옥타코사놀 플러스",
+   "reason": "SOURCE_CLOSE_WITHOUT_OPEN",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+   "productName": "차전자피 카테킨 다이어트",
+   "reason": "SOURCE_CLOSE_WITHOUT_OPEN",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "180b0189-dfe1-4c8c-9a4a-21c897979f44",
+   "productName": "이왕재 더블비타민 with 셀레늄 & 홍삼 ",
+   "reason": "SOURCE_CLOSE_WITHOUT_OPEN",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "944bf249-e896-4b26-81ea-d9e811abc9aa",
+   "productName": "아이클리어 루테인지아잔틴 아스타잔틴 미니",
+   "reason": "SOURCE_NESTED_OPEN_BRACKET",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "9d2fb20d-3c68-40fd-9bf3-19dd6523f1c0",
+   "productName": "아이편안 루테인지아잔틴",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "93fd7b02-ae3c-40ef-8873-5448725c2db6",
+   "productName": "NAG&엠에스엠",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "6821aea0-0652-4914-8481-dea68645fe83",
+   "productName": "현대약품 비오틴 플러스",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "fbce8a42-2e72-49f0-b53b-3e9d3f0498f0",
+   "productName": "관절연골케어 솔루션 골드라벨",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "f76dc35a-cdd4-4d3f-ae99-72b61f872f41",
+   "productName": "더 콜라겐 뷰티",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "ffefa116-76b5-465d-93b1-7f347fcda8b2",
+   "productName": "투퍼데이 관절&연골 뮤코다당·단백 콘드로이친1200",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "b47d67b0-1f4e-489d-8dc9-b7ef15fe2f1c",
+   "productName": "관절연골엔 소연골 콘드로이친 뮤코다당단백 1200",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "3f0a70ed-76cb-41af-9adf-b99c0ed6705f",
+   "productName": "비피도 핏 다이어트",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "3783c11c-ff7c-42f3-9330-a45cd83d29f7",
+   "productName": "젠스 프리미엄 콘드로이친 소연골 뮤코다당·단백 1200",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "166d15ee-05af-4750-9e95-85731bcd8c7c",
+   "productName": "관절엔MSM2000 글루코사민 비타민D 아연",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  },
+  {
+   "canonicalId": "912deda6-995f-4318-9da6-6737e6f5f220",
+   "productName": "유디 관절건강 MSM(UD ARTICULATION HEALTH MSM)",
+   "reason": "MISSING_CLAUSE_WITHOUT_LABEL",
+   "from": "MISSING_CLAUSE_WITHOUT_INGREDIENT_LABEL"
+  }
+ ],
+ "uniqueTargets": 65,
+ "targetsIndex": [
+  {
+   "canonicalId": "29e87505-a1ba-4ad4-8cfe-4010ea41e96f",
+   "productMasterId": "ddbcb306-f4f4-4824-bc4e-2a03e916c26c",
+   "candidateId": "fe600833-670a-4c7a-9131-29c980adf732",
+   "statementNo": "2019000939491",
+   "productName": "리얼퀸 센시다이어트",
+   "language": "ko",
+   "rendererFamily": "DRIVER",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "INSERT_INTO_INGREDIENT_CARD",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "DRIVER_GROUP",
+    "sectionH2": "주요 기능성",
+    "inserts": [
+     {
+      "ingredient": "녹차추출물",
+      "text": "기억력 개선･혈행 개선에 도움을 줄 수 있음"
+     }
+    ]
+   },
+   "oldContentHash": "1dfbafe919ad479b098cdc205d1ebb72939f35709ecab9f5989e879cbaa23ced",
+   "newContentHash": "3c34d40b791494f555ca7910ed3a4fee4f168066233a6ffda6e6ac64fccf421e",
+   "byteDelta": 33
+  },
+  {
+   "canonicalId": "8cfea319-1438-47eb-bd1c-2992643c3ff8",
+   "productMasterId": "7fb65740-7f53-4de0-ac9b-8b7e3d748914",
+   "candidateId": "6b00b46c-4beb-4dc9-8daf-de4162db99a9",
+   "statementNo": "200400150831232",
+   "productName": "와이즈 루테인아스타잔틴",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "INSERT_INTO_INGREDIENT_CARD",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": "비타민 D",
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요."
+     }
+    ]
+   },
+   "oldContentHash": "2cf9650418612324333771669a1de3fbf973fbcb3a859e6bc347edf281e201f9",
+   "newContentHash": "ec77d83839a722f7ad42e180c72ed1f27a9e5323a8442470d28258bca14b486e",
+   "byteDelta": 41
+  },
+  {
+   "canonicalId": "052f21bf-4ddf-4eff-af09-f9486c332087",
+   "productMasterId": "434fbec2-93ca-47f7-b45b-4ae9e30a9f6c",
+   "candidateId": "3ee7f7a8-3e83-4040-90db-9a989e38de1d",
+   "statementNo": "200400170211592",
+   "productName": "비타잉",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "8144e972069c157537b62eca56b68e2c20506769be498aace28370d5658ee4a8",
+   "newContentHash": "dad86a1a61007579a1a8dae64dce4cc6ba0cfde0751ad8fdd1564e79c2089544",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "fd947be4-81d9-4946-8f53-2a77dbc1d6f6",
+   "productMasterId": "51bed288-3e63-4f92-aa96-c0c13a3df5ed",
+   "candidateId": "66ff3300-b2c1-4d73-a8e2-88303030487f",
+   "statementNo": "20190009105415",
+   "productName": "쌩쌩 리포좀 비타민C",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "INSERT_INTO_INGREDIENT_CARD",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": "비타민 C",
+      "text": "칼슘과 인이 흡수되고 이용되는데 필요"
+     },
+     {
+      "ingredient": "비타민 C",
+      "text": "뼈의 형성과 유지에 필요"
+     },
+     {
+      "ingredient": "비타민 C",
+      "text": "골다공증발생 위험 감소에 도움을 줌"
+     }
+    ]
+   },
+   "oldContentHash": "02ba35d74dc84f701d5c27f788770a972b1cecf5a59839d8faa528d71bbe08c3",
+   "newContentHash": "4335fa3ee957ba912b44be6e54258ff17267e03b90f1cf5de27352bbef55ea87",
+   "byteDelta": 79
+  },
+  {
+   "canonicalId": "d09113a2-6c11-46d4-8959-21411aad6356",
+   "productMasterId": "4986da6e-8ed2-4c17-a4ad-81fac7f577cb",
+   "candidateId": "2fe2bfb3-de21-4e99-8202-b7e702e21b29",
+   "statementNo": "200400200061785",
+   "productName": "스킨액티브 콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "어두운 곳에서 시각 적응을 위해 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "상피세포의 성장과 발달에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "1e8663a55d504d764748d6dfd264870e712213856ff7840ae1a1a4a80f11d860",
+   "newContentHash": "d3a3afa34ce4375c89aefa3be2f5c080b1fcb91431ff5694a6c28500e6e9b1d0",
+   "byteDelta": 209
+  },
+  {
+   "canonicalId": "a746a3a0-643e-47ec-a5a6-962bbd87dc1b",
+   "productMasterId": "139511f5-76f3-4848-93c7-6f7a2bdc0475",
+   "candidateId": "4068b296-50c1-47d3-82bf-557dbc7c5d25",
+   "statementNo": "200400200061806",
+   "productName": "기능성 저분자 콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "9cfe74a10392d22fd7d18ae4a33e279a28f0776adda802d5433e4521c73bbb49",
+   "newContentHash": "b77f530b886eadbda6d415438324a6c42eeaecf5d0a2203f34a64a572625be1b",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "55a05ba3-be42-44c8-8261-9062e4123476",
+   "productMasterId": "e0c89ed6-eb3a-459d-ba8b-30c19f8a2324",
+   "candidateId": "4f2f3b46-428f-49fa-b0f5-a965ba1a0459",
+   "statementNo": "200400200061877",
+   "productName": "엔바이탈 피부탱탱 콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "3d8e8c86fafda7a3a6f0fd30b12dd4ae840a92619e41bed075c7852075492127",
+   "newContentHash": "9fc0ad4764accfb836c8f194d9729baae983e6b5b426a8188fc9bf894761f009",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "3d304407-6221-4e8c-95e2-e393d8bd73bd",
+   "productMasterId": "7819cc2f-7904-479b-bd66-5f8fce8babe3",
+   "candidateId": "b8ff0d76-e5f5-432d-94e8-ddf5bf924417",
+   "statementNo": "200400200061878",
+   "productName": "나를 위한 콜라겐 비오틴",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "어두운 곳에서 시각 적응을 위해 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "상피세포의 성장과 발달에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "e46c97de1c7e6c6f6a344429f502a47a74b70ba8a4eabaedf60b986d222322f0",
+   "newContentHash": "8b0fdfb0275199dfdcf02a693d28a5c9ad36b18b7d7c80bb38a9242db1bbe173",
+   "byteDelta": 209
+  },
+  {
+   "canonicalId": "e850b9d7-0e50-4f76-ab4c-2d94dfcc360c",
+   "productMasterId": "11950021-021c-4c08-a6a4-11a6dceed189",
+   "candidateId": "11549dbd-9f8e-4984-bbc7-97d343189efe",
+   "statementNo": "200400200061992",
+   "productName": "피부 탱탱 저분자콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     }
+    ]
+   },
+   "oldContentHash": "4b470243332de39cb103f1b6027ba57105c528e232fd31fe9a3ff8b764be6366",
+   "newContentHash": "c837154890d8006d8e6ff84a990fbf67a192bbe0d648c226baa1b26b15bec141",
+   "byteDelta": 84
+  },
+  {
+   "canonicalId": "fe096169-d3ac-43c4-803d-ad482352e34e",
+   "productMasterId": "a383d061-d51d-4e03-8bde-fc6d10ff0dbd",
+   "candidateId": "99324bf9-9f3b-4852-b134-871e913b9812",
+   "statementNo": "200400200062009",
+   "productName": "어린 피쉬콜라겐 비오틴 비타민C",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "572c506c5c614de068468c7dc327e0dea5873b6d2b1e6c5733079bc0e3a9618b",
+   "newContentHash": "2f96ba2d34ea589c3de1f44a21e3a6bbc55392f0d46cc3c9135c3ee4a26bf6af",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "328a3793-cc54-4114-a101-2bb48fcda3bb",
+   "productMasterId": "e4c94022-689d-43c4-91f7-e2e353531c77",
+   "candidateId": "97315f2d-d6e2-4772-b77a-ccfb612f3420",
+   "statementNo": "200400200062055",
+   "productName": "여에스더 어린콜라겐 레티놀A",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "어두운 곳에서 시각 적응을 위해 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "상피세포의 성장과 발달에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "0879b57092b06d9f70759ee1581f1afb88a337f1b6d446562061b72392eaa9f8",
+   "newContentHash": "7c830356a9b2bcb9d87c11be849699d28d2d6f6f3bcff5719ee0b8587dac69e6",
+   "byteDelta": 238
+  },
+  {
+   "canonicalId": "8a08f9d1-5882-4608-a711-3524a3670648",
+   "productMasterId": "2bed4c24-83dd-48fd-8d3f-e989194f1850",
+   "candidateId": "c0e4a482-e3dd-49a2-9ee0-0d6c308f8c71",
+   "statementNo": "200400200062113",
+   "productName": "어린콜라겐 레티놀A",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "어두운 곳에서 시각 적응을 위해 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "피부와 점막을 형성하고 기능을 유지하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "상피세포의 성장과 발달에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "f5dc9a0f90f70f5aff8da277545aa398ca34a20ef8535c0b11c91fff25ddae35",
+   "newContentHash": "d45dab6129cca38506a1ebbae0959931b913e69b315d870cdf5404115b58e49e",
+   "byteDelta": 238
+  },
+  {
+   "canonicalId": "852c2702-b47e-47e5-821b-3da52521969d",
+   "productMasterId": "c6b91a0a-2014-49d0-9a4b-84955ebf9df9",
+   "candidateId": "829273a2-5e22-4915-b964-81432cc4b6db",
+   "statementNo": "200400200062120",
+   "productName": "유한콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "d77f83bc74fd7f2ff8a609cdf2cd7ff79db6fc94de2511f3f54900dea403fc10",
+   "newContentHash": "802472814fe142e1a6f99a20d68b061993a74d80227eb0c0ed4b1e5b7598f7d3",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "443233f8-52c2-4974-9a5f-09b45b69a1a4",
+   "productMasterId": "ed8e21b0-8391-400a-b7b9-b748c48e8375",
+   "candidateId": "89cb9f57-8cfd-4fc0-8a83-dcc48579174a",
+   "statementNo": "200400200201100",
+   "productName": "웅진 오직 리포좀 비타민C 코어",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "3ca1491b22dd07bd1578ac312664481d51beae4d3d2dae3c10e33d70e43bd696",
+   "newContentHash": "c0e1d580acedd34490cef8828c9a5c0b565528eb91358c53d16957a8968d19ef",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "1757bddd-1b98-4b75-8551-6fefbeebd4c9",
+   "productMasterId": "655f8591-d3f3-4863-8c6a-521670d3a461",
+   "candidateId": "f9e4aaf7-05dd-4cb4-a8c2-28f1fba31ac5",
+   "statementNo": "200400200201186",
+   "productName": "츄어블비타민C200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "6bed0e952eb44ddd1048d5b7a59579930924f196343ccc032e06aa554b39acd5",
+   "newContentHash": "e3ff309de8a06cb24b1c81e8d2c2f6ccb08ce082c1a142205918cfdcdd4a2fc3",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "a29826e2-2a18-496e-9647-72f353d679df",
+   "productMasterId": "d624f3fc-e78b-4517-9dae-e0fcecd1531f",
+   "candidateId": "d265c0ae-c823-4e90-951d-bf4c4261bb57",
+   "statementNo": "200400200201353",
+   "productName": "비타민 B6 정제",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "단백질 및 아미노산 이용에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "27bd8fe44f6c6d649716d190f0992d6964a1871190b1e5e4222bc103a330a373",
+   "newContentHash": "14d9013281ff94c8e36983c15b211993853ab408b4a00ba2c84017abd9fd29d1",
+   "byteDelta": 26
+  },
+  {
+   "canonicalId": "f1ba05ef-8833-498c-8679-df6443d95c21",
+   "productMasterId": "aa6ed415-0e4e-41e8-926b-aa8bb491e740",
+   "candidateId": "b6cfcd36-5940-4f2e-8d93-d7585d7dd528",
+   "statementNo": "200400200201355",
+   "productName": "슈퍼 비타민C 3000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "95aee19b6c7e9f908715bef136619708029d6bed912e86f67ecd0e5cbad71228",
+   "newContentHash": "26ea0026e346a90156349193c3b585e0c4827597fd15c66d852264985a9cc35f",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "28e9edc2-8b6b-4908-93d4-68e32419ce36",
+   "productMasterId": "7e30d758-125e-454a-a3ed-c3b06bf92e5c",
+   "candidateId": "b74469e0-13be-447d-8340-44c44b88bc85",
+   "statementNo": "200400200201443",
+   "productName": "테라비타민C2000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "72c0f7c2cf2eda91494e64e79c4379f4cbaed71254c4576088b2f246a19b3d66",
+   "newContentHash": "b49adc88c332611bf3ccd175bfe944585bf6d8901c732d70aa0cbde4342bfdae",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "fdfbca72-bf02-4ae8-b2b7-41adc65b7499",
+   "productMasterId": "4f89ec69-847c-43d8-857c-f42e5df88bf4",
+   "candidateId": "3fda7b0b-b23c-4057-b117-e45670cdfee7",
+   "statementNo": "200400200201568",
+   "productName": "프라임도스 비타민C 2000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "a5aae8892213a5a8a20ec7a772e434f0ae8f6d4c6240925cf733e02e23b0ec07",
+   "newContentHash": "30adbb45b12cd3b14b674d4dde8f0814ccfc2454861a0efa1a5ac548cba9fb1b",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "934a266c-f775-4323-8e64-bdbd7589e790",
+   "productMasterId": "9fff64b8-5aa8-4509-a504-91e7e08909ac",
+   "candidateId": "36112674-90b9-4e5f-a37b-38b556bb4486",
+   "statementNo": "20040020020755",
+   "productName": "영국산 맥스 비타민C 1000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "9975c7f8acabe8269745b23be0ca1274c7ac4c086421d3e97425c7a9b280cd5e",
+   "newContentHash": "917ad553d82bf85e18b22d9144426f4d1b6648499448b8b4003c6a8c78bdff05",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "54fcdda6-e796-4b7b-b221-44b87846fe7d",
+   "productMasterId": "ce73fc86-c01b-46ff-9398-d501090bff4e",
+   "candidateId": "b17f9e34-fb9f-4f40-8b3d-20f188c6b855",
+   "statementNo": "20040020020793",
+   "productName": "바이탈케어 비타민C 1000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "57a0384f3ea2fc3a05634a5795f2e0b99769abee10b21c531f49da4535d114db",
+   "newContentHash": "78216e3d69ef71e7b5bb2f711ff4c6500f77cb6644744636d1786444439283e5",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "14bc0f3a-d8b7-4ef9-9bb2-28ea38025583",
+   "productMasterId": "42b4315a-2438-493c-b162-528b3b4ec496",
+   "candidateId": "8671f2fe-429f-4a14-ad49-ace248157f20",
+   "statementNo": "20040020020874",
+   "productName": "메가 비타민C3000",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "e93b9edd15f377da287b7d4b7e8c66f5ccf42e1fa54ee1452e5ca03e3c4098be",
+   "newContentHash": "23378021d3ce1e0acd2b6250b55c624efeabb277d83c77d274840f18dcf5b6b0",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "f36bc34e-c096-4b64-8450-f49bcdbd73c5",
+   "productMasterId": "43347bb9-6b12-453c-b6cf-9f6b4e70d05e",
+   "candidateId": "858db6d0-e166-47fc-a19b-955dd5abae4a",
+   "statementNo": "20130020024274",
+   "productName": "뷰틱 스킨 콜라겐",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "edbec6d8d385db245af6080abb5f9805531d9e65de380fff395c626fa4925619",
+   "newContentHash": "8dc106d85707d4994520d6ceb7e00ddb3a6e9b614729598fde24c8674f3c3b2d",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "0d9008b8-2045-432f-a3f8-132e2817be40",
+   "productMasterId": "17b43eaa-161f-4500-a447-c61972ad7b75",
+   "candidateId": "4b84e30c-3629-4cdd-9fe0-cf40e1108a36",
+   "statementNo": "20130020024277",
+   "productName": "뷰틱 스킨 콜라겐 시그니처",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "62fa0dc4e2868ff365c0becf2f1f084ae27dedcabd6c04c8df6b2583922afaf5",
+   "newContentHash": "a64492c76186103f61134a1574b59cdb89cef572baf6414dc52cb6df7cd51db5",
+   "byteDelta": 121
+  },
+  {
+   "canonicalId": "c9732772-8e9b-441a-887a-ceac2dd8af37",
+   "productMasterId": "228e7098-e9de-4563-a326-9cde721d675c",
+   "candidateId": "27510ef1-5af2-459a-aaf4-74d030d7e4ce",
+   "statementNo": "20130020024375",
+   "productName": "콘시로카 with 리포좀비타민C",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "결합조직 형성과 기능유지에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     }
+    ]
+   },
+   "oldContentHash": "605d68fcfdff73902782e0298f4dbfbffcebb0415a9c70eed2f2d3a9a9b89397",
+   "newContentHash": "4607ca50d1a31cb92471ed737a4d9da553d9e0941f04f239c98203bd8ba3eb52",
+   "byteDelta": 84
+  },
+  {
+   "canonicalId": "710c5309-1332-4317-b7bd-63b2fb8dcd1c",
+   "productMasterId": "6f9b989e-edd5-4524-b1e9-75fe62d6ddc0",
+   "candidateId": "c71ccb68-f0e8-40af-ae7a-a29f50b11248",
+   "statementNo": "200400150832066",
+   "productName": "연골관절건강 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "849bd8d03a8ae83a74b6ee4ce5656c42a94bd836fa1cb0b345ab77419976f9d3",
+   "newContentHash": "00cd3f40809ed1b34b7d7280e965acb2277de7c6700415cda1920f534cbdc49a",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "0e4290ba-dcc8-4006-a020-9603d962c191",
+   "productMasterId": "44963842-78ac-4055-b501-3113ab998266",
+   "candidateId": "4c504a29-ea61-4ccd-8072-e443d010080b",
+   "statementNo": "200400150832078",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "e695a28bb6bbc8cf5de05388aa1718f6f920d71afd0503fa3ca4c99896a8cc6f",
+   "newContentHash": "c1c8f36921768215c17bbc6ea3befc21463ef14afc3cd1ef991b26d896a38bff",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "e4c848f8-cce3-42c3-b6e9-624d82ce5467",
+   "productMasterId": "29cc5c6e-455d-4305-bdbc-1403ade090fd",
+   "candidateId": "b3898e9d-395b-40fd-96c3-c06f3e480151",
+   "statementNo": "200400150832099",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "3abc5b3e858fbe76f9bd9796947c449d938d6c0f6b521b5b7c5fe8c13d3a32f1",
+   "newContentHash": "a1a5644162a5da242f7ef6f39da5c8cd0fddb0f2b4b78cc2f7011da8f4ca4629",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "bdf9eb7e-664a-4b9f-b916-952bf4e3c058",
+   "productMasterId": "abfedd8c-607e-4318-ac02-84bde843bcce",
+   "candidateId": "2e1d5408-8dbb-4b02-ad66-3711aa22be16",
+   "statementNo": "200400150832101",
+   "productName": "관절편한 뮤코다당콘드로이친 1200 플러스",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "59618a638fb2179b418882aa785ade3bec66f4ef624afa794269f68dd185a2e3",
+   "newContentHash": "72b39c43a096893fbaa4669834143fa1de6b2f5aac51095402921a0fe57741bb",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "c8a1d105-9f14-410d-8b6e-02d1fcb06371",
+   "productMasterId": "3593f8f6-2d2d-4edc-82e4-3b4d453d1fa4",
+   "candidateId": "a01dab76-45cf-4a43-a94d-e97bade28d2a",
+   "statementNo": "200400150832104",
+   "productName": "관절 튼튼 뮤코다당단백 콘드로이친+",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민B6",
+      "clauses": [
+       "단백질 및 아미노산 이용에 필요",
+       "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "631c3c22df70e2d42a115aa4aee3142bc9a101d10486ff046402b7429bdbd40a",
+   "newContentHash": "772e3e790b3095374b08af3cd9c7483c4f734b30aa751704cdabe07cd258f95d",
+   "byteDelta": 410
+  },
+  {
+   "canonicalId": "bba75652-7a63-4d12-b259-325b86cb27fc",
+   "productMasterId": "9bc35897-ce80-48e3-9a5c-ab378913b565",
+   "candidateId": "c11167a8-04a0-4f30-858e-f1c19b55a635",
+   "statementNo": "200400150832138",
+   "productName": "관절연골엔 뮤코다당단백 콘드로이친 1500",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "34ef0af21325faef66da7e2c0bef96b3930e9eaba71917885e0d3521cac029af",
+   "newContentHash": "923df1fc4a9fa04d66817b7480656aa4a8cad6311fa668dd4fa4e3694273a9e5",
+   "byteDelta": 472
+  },
+  {
+   "canonicalId": "dd7d055b-48fb-4eab-9ced-88116350fc34",
+   "productMasterId": "e5da12ee-1432-45ab-8e8d-9abe65fc669f",
+   "candidateId": "6e759910-5047-4b0e-829a-9f6040c13192",
+   "statementNo": "200400150832141",
+   "productName": "관절연골엔 보스웰리아 콘드로이친 뮤코다당단백",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "e8a6f7dbf9813176b5179ce47a5be550fb1aae00769847b3247cd75b173a5032",
+   "newContentHash": "86902d691cb21249cdcf67e8f95a455f873307e48198b8138309e55c903c4be7",
+   "byteDelta": 472
+  },
+  {
+   "canonicalId": "f7387278-16c2-4a8a-a410-2e1ed2f51863",
+   "productMasterId": "01dcfe9a-d3b9-46a7-bc45-b9a5025d8f9e",
+   "candidateId": "1e9f703a-a581-46be-940e-3f750bfe71a8",
+   "statementNo": "200400150832147",
+   "productName": "관절의 품격",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "8bb96651a7fdff178ce45cdf8593a30691dba874b5e6c390387ff3dea63f26c1",
+   "newContentHash": "86075ab82e928c714b25ead0845b126f084c5e30beb3f5179e92a16aba1eb738",
+   "byteDelta": 123
+  },
+  {
+   "canonicalId": "7207ecec-e567-4585-ad56-3704b216e171",
+   "productMasterId": "b49d2a7e-b220-4d2e-bbaf-734530a7fa9c",
+   "candidateId": "bd42c707-6bde-48ff-8487-fb6540ed5020",
+   "statementNo": "200400150832177",
+   "productName": "Strong Bone MSM + NAG",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "44a328d8487438b03be7b412459256f95bdbd3eab4b9864f9fa3f30a926beaa0",
+   "newContentHash": "b34dcce20f37303cdc621251c6b9cc294dec3570aae226a05e28e707313e364a",
+   "byteDelta": 123
+  },
+  {
+   "canonicalId": "10f59f16-1d63-4792-9200-89bde551b13e",
+   "productMasterId": "17187b89-4479-43ae-8a8b-dfee03d17d4f",
+   "candidateId": "97f64a4b-3e5a-4905-a533-2c4c143e5418",
+   "statementNo": "200400150832186",
+   "productName": "뮤코다당단백 콘드로이친 1200+비타민D+망간 트리플액션",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "3b95f1d1b1be01063b39e2bbd8f0cb26728c27c524d1aecb1ff44ef2f4a28af9",
+   "newContentHash": "1ea6332224a87a674bfabcdaeef8c418092cc887efff6e9e046a415815712c7c",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "72a9725d-3f83-465d-bfd7-756588e4a652",
+   "productMasterId": "9a2a1e4a-00e0-4c17-8968-16eaa74ffdf6",
+   "candidateId": "f149c098-069c-4612-9051-21887708d84c",
+   "statementNo": "200400150832268",
+   "productName": "연골 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "364f99a45809fe7faac9b8921419d499b8f30cdd749cbbf0a5dddad8ba91b4bf",
+   "newContentHash": "e8fb908d04f0f4c19d8568772f1d59beb7a01c1a69308d641b981599addb4cb8",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "7716d638-6b8a-45b0-8963-0701cd9ccdb3",
+   "productMasterId": "90a833fe-43a7-432d-9881-11f9dfabd632",
+   "candidateId": "f9b3ef2a-35e4-4232-8cb6-9139cb50a73e",
+   "statementNo": "200400150832295",
+   "productName": "관절연골건강 콘드로이친 뮤코다당단백 1500mg 함유",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "cb6523bcc9c5142eee8d831555e073ccae45febeacbbf1f84279732f2f066914",
+   "newContentHash": "b7942d0a654b1c164e3313caa009cbfc27cb600d29c2a5ec6156d40079efe2b3",
+   "byteDelta": 386
+  },
+  {
+   "canonicalId": "f22b949f-0110-4c3b-9179-f427595b2980",
+   "productMasterId": "bed98fed-db70-472e-b76e-ee7af4e3be31",
+   "candidateId": "511efa3c-c3ba-445e-bb3c-b97d4452455f",
+   "statementNo": "200400150832298",
+   "productName": "인테라 엠지투에이 관절연골케어 콘드로이친 뮤코다당단백 1400",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "e4e41e4a3b2a11bd72fbe77305b5bcc5a8fc4e9477c38e0bbd060bf192a4c0e8",
+   "newContentHash": "de763ff56db2b0c21e93c18db789c6d59f2e44c6a0b8bbf293b92e3d968032f4",
+   "byteDelta": 230
+  },
+  {
+   "canonicalId": "0ed404ec-bf0b-4b96-b601-06f858751456",
+   "productMasterId": "f725234b-5c32-42ec-92c0-ebd78dca27f0",
+   "candidateId": "11bf7cb3-ccf4-4c07-88db-055f5e96b7b9",
+   "statementNo": "200400150832313",
+   "productName": "관절엔 콘드로이친 뮤코다당단백 1500 철갑상어 소 연골",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "a152f52964aaa81550691ccaa9b9de7dde8a2b4953f57531a370c88ed40c6211",
+   "newContentHash": "8953b875f184d017ff5b03c52fd97bb94e2a5c614e2b59eeb075cc8db17d16f9",
+   "byteDelta": 400
+  },
+  {
+   "canonicalId": "d57333f9-a179-40ea-bfa0-b4dc43a01d54",
+   "productMasterId": "2c77ca6a-6534-430e-aaf1-b2e37e7fb5f8",
+   "candidateId": "aee59666-1abc-4069-950b-a08bb6dc3c99",
+   "statementNo": "200400150832393",
+   "productName": "백세 관절튼튼 뮤코다당단백(콘드로이친) 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "f72cd765c665a5c296123ff4bb2077ab09ec5111b034794c94c9a7509f1c4e5b",
+   "newContentHash": "89414424f414882c6da03b898f0f7d1091e2dc532fbb5125f8a7baa6ba8d81c6",
+   "byteDelta": 314
+  },
+  {
+   "canonicalId": "a46f7365-7aba-408b-9501-d101e2dfd2ef",
+   "productMasterId": "57b023f1-bdd2-4f48-8a23-a156ad8bc6b9",
+   "candidateId": "d15f4eb5-967c-4466-aa04-b8f7ab48f3f3",
+   "statementNo": "200400150832490",
+   "productName": "뮤코다당단백 콘드로이친 프라임",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "e0a01a64191a6118061e542fda3dc70d4d781f2a87d4c805b16327f635e3d5ed",
+   "newContentHash": "e439901b44f1570b80f937d9085fa3677da3448717d63b9fffc831db3bc3f078",
+   "byteDelta": 314
+  },
+  {
+   "canonicalId": "1ba35437-429e-41e0-9e67-4f9b86493f37",
+   "productMasterId": "ef9eb743-7a7a-4449-8568-bef12df2be00",
+   "candidateId": "d43d0c62-8090-42f1-8ba9-b52b79c38832",
+   "statementNo": "200400150832525",
+   "productName": "Crystal Skin Premium Bovine Cartilage Boswellia Chondroitin 1200 크리스탈 스킨 프리미엄 소 연골 보스웰리아 콘드로이친 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "f3a16eff0f0dbcddf514a738cc9c1ca3c5be125b68848a9e77a3d836e187e1e7",
+   "newContentHash": "04eaa05012cd864751c45e8832063aa9481b23aace393d993e6a679495397c9f",
+   "byteDelta": 123
+  },
+  {
+   "canonicalId": "8e8f379b-9f5e-4c19-bdf6-63f877aaf84c",
+   "productMasterId": "459aaad9-3e2f-47f7-a68c-9ca8ad9c06bc",
+   "candidateId": "53f9d8c1-8151-47bb-93ee-62b72d8e3cda",
+   "statementNo": "200400170211891",
+   "productName": "관절엔 대한보감 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요,",
+       "에너지 이용에 필요,",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요,",
+       "뼈의 형성과 유지에 필요,",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요,",
+       "뼈의 구성에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "518a84b5adea39a5d776ef4428b9fbb5a6f4ca3acef071b438996df8f7670a71",
+   "newContentHash": "9e036a34c888bbcb825083e62d55fb31b3c78c21b06236ba065afeabb5a07ca6",
+   "byteDelta": 319
+  },
+  {
+   "canonicalId": "89f8df53-7e78-495d-8816-0c960196da7a",
+   "productMasterId": "275699fd-0ab3-43ec-8d34-e49c180eccdc",
+   "candidateId": "1a220d40-46e0-4966-8065-c72a0a2c1854",
+   "statementNo": "20040017038305",
+   "productName": "관절나라",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "칼슘",
+      "clauses": [
+       "뼈와 치아 형성에 필요",
+       "신경과 근육 기능 유지에 필요",
+       "정상적인 혈액응고에 필요",
+       "골다공증 발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "마그네슘",
+      "clauses": [
+       "에너지 이용에 필요",
+       "신경과 근육 기능 유지에 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "c033746899d6ff2b8a5cee73f959aba6559e70c24909346803ec0475dfae4c8e",
+   "newContentHash": "9fa1214af1488baa3870b0e8d45dc721a166539628d31b99ce339ad7835c7773",
+   "byteDelta": 436
+  },
+  {
+   "canonicalId": "b67afe19-d68b-4b94-8ea0-edbf65848038",
+   "productMasterId": "135dace3-e470-4a56-be9f-ddd151eb8a1a",
+   "candidateId": "101ab17b-8219-4b6f-b556-03b41117567a",
+   "statementNo": "200400200082718",
+   "productName": "관절연골엔 철갑상어 뮤코다당단백 콘드로이친 K",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "b8a10871728796e566f94f7d7452dc0c882a52c48fbeea7ba30954315c226e09",
+   "newContentHash": "697b9d9babd6bc97dab717535d2b429168bd8c84f118fde6676e0456b6960a51",
+   "byteDelta": 472
+  },
+  {
+   "canonicalId": "e98148bc-799f-4531-8820-f30d692ba834",
+   "productMasterId": "66b12b2d-14fe-4af1-abf8-da22281f672c",
+   "candidateId": "c86243ac-ec87-4aa1-a6b1-ee08bb70689d",
+   "statementNo": "200400200142174",
+   "productName": "관절케어 프로",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민C",
+      "clauses": [
+       "결합조직 형성과 기능유지에 필요",
+       "철의 흡수에 필요",
+       "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "8166e77718b2ccc3229d08bdfd136b58597affb6488bd462303cd8e4f4ab7779",
+   "newContentHash": "612219078aa0f059fc99399a7258f846330e4ac2072d68af5cbf1019946a6bec",
+   "byteDelta": 251
+  },
+  {
+   "canonicalId": "b07ecb59-90b7-4f03-aec5-857aa1c33193",
+   "productMasterId": "0cb710fc-b9d0-4479-836b-09f8bbaa16e9",
+   "candidateId": "b300b582-ddc7-4e2f-bc9b-2e53c601f4eb",
+   "statementNo": "20040020031563",
+   "productName": "관절 연골엔 콘드로이친 뮤코다당단백 1500",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "96f303c358a8c95253d3b84541fbee7dfd3eade40e135f706534f32e65268289",
+   "newContentHash": "36ff13e8221fd9326062ad9e842b55ee14c8dab77bf98908854d54c6f387f265",
+   "byteDelta": 231
+  },
+  {
+   "canonicalId": "5ed3ad3b-74e4-4292-bf9b-11034e2fff98",
+   "productMasterId": "bffdb056-c32e-4dbe-994c-f7d5739075a4",
+   "candidateId": "ab0e1b15-e517-422b-b246-e70b2378a05f",
+   "statementNo": "200700170351741",
+   "productName": "가족사랑 관절건강",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "fab0d56369c52e0b8ef6827fa0dbae9a5374d9571d1e680a2c58058b05f40755",
+   "newContentHash": "4ff18dbda76bf677d75e1d5630f409fb715ac5451a18e3ecf8c91e60b9f6376a",
+   "byteDelta": 123
+  },
+  {
+   "canonicalId": "8c74f198-3128-42f5-bdf2-a0c954542337",
+   "productMasterId": "9d330b7b-2ac5-4489-82cd-87acf6ad3f69",
+   "candidateId": "1693e642-559e-409c-b1f4-85e76df73005",
+   "statementNo": "200700170352665",
+   "productName": "더모이스처",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민A",
+      "clauses": [
+       "어두운 곳에서 시각 적응을 위해 필요",
+       "피부와 점막을 형성하고 기능을 유지하는데 필요",
+       "상피세포의 성장과 발달에 필요"
+      ]
+     },
+     {
+      "ingredient": "나이아신",
+      "clauses": [
+       "체내 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "판토텐산",
+      "clauses": [
+       "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비오틴",
+      "clauses": [
+       "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민C",
+      "clauses": [
+       "결합조직 형성과 기능유지에 필요",
+       "철의 흡수에 필요",
+       "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "ff783a2523300124a349174cad118cab9e7ffd80d543471bd9551933c772a5a9",
+   "newContentHash": "0098a04bf470c0023505bb27bccd69ca93c74572c254ffd349be54374a134c03",
+   "byteDelta": 487
+  },
+  {
+   "canonicalId": "1c68dd0c-4b4b-4b41-9622-793d6fee12d0",
+   "productMasterId": "775498d7-7371-495f-8fcf-3a358c58dcc7",
+   "candidateId": "3c10d202-5e58-4a4f-9b59-9e591ea276ef",
+   "statementNo": "2015000221753",
+   "productName": "관절콘드로이친뮤코다당단백1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "78b40900b0b70e37c54af61f676eb8ceab2a7d8f826d5015d51ec17cde8c5a07",
+   "newContentHash": "85189dffa6b9293efb79ab9f7a04c50adfae6d872810ec017ab3e811921dcb8e",
+   "byteDelta": 472
+  },
+  {
+   "canonicalId": "a006d2e6-23ce-4068-ba76-e443672b66bc",
+   "productMasterId": "f250cfa4-cc9a-45c6-a4bb-a704a056455f",
+   "candidateId": "4d165f00-b191-4f85-82b0-87e5a2720116",
+   "statementNo": "20190009483480",
+   "productName": "관절건강 MSM NAG 비타민D",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "df31c207cb8edcbebaa24c348b2f8f78d1bcc9ada4da072663b3caa156cfae5d",
+   "newContentHash": "08ee4830784aabab3ca5c8dd4d01d8fa444f2958eda9468d8c4aa1592179c057",
+   "byteDelta": 124
+  },
+  {
+   "canonicalId": "f8dc3af8-815c-4285-9754-e6d2d76ede55",
+   "productMasterId": "a97f48aa-baaa-4e4e-be7e-e581dc96e0f2",
+   "candidateId": "31cb6714-b8f0-4241-a19f-7a71f5d62f82",
+   "statementNo": "20190009483481",
+   "productName": "뼈 · 연골 · 관절엔 상어연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민 K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "b2c8530a626295757b4accc19e9edabcdcd5417033d94ca07af4b3f2d2d3e8b9",
+   "newContentHash": "e20d0111bcb82843e38711559625e6f1dc9314550b4f1bd8db162c807051ccf8",
+   "byteDelta": 474
+  },
+  {
+   "canonicalId": "05ca07a5-55bc-41a0-ac43-0f67bcae9258",
+   "productMasterId": "dc0c697c-d35d-4fa3-a208-d31bc96b9007",
+   "candidateId": "4554acf7-71a7-4f2f-badd-5831d3b6844f",
+   "statementNo": "20190009483574",
+   "productName": "관절튼튼 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민 K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "25d189178d9e1cdf16a1f98d08d31bf383d0461712b046bf69d4c83ab0767cc3",
+   "newContentHash": "ff72466c15722cb31d204e0809680fa87a729475a2c1bd72925c0edbfad82411",
+   "byteDelta": 316
+  },
+  {
+   "canonicalId": "680e726e-7b90-4b58-bd67-be302dc05eb3",
+   "productMasterId": "f8bd5ffc-903b-4beb-b203-f121296cbef3",
+   "candidateId": "e8769cd0-53b4-4459-8f04-d82080c5c976",
+   "statementNo": "20190009483575",
+   "productName": "소연골 콘드로이친 뮤코다당단백 1200",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민 K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "66213c2a35b9fd04bd7d4338e017decbf7c0f54afb3f31ae541cb00a09100618",
+   "newContentHash": "0c86b47ec305353f5c3088976ef23801823c017e3152c568194e80441fd63c70",
+   "byteDelta": 316
+  },
+  {
+   "canonicalId": "98eee489-f83d-4b96-b75a-5d13c52aee7b",
+   "productMasterId": "e14cb0f4-6e33-4c49-bffb-a352dd2bce1e",
+   "candidateId": "19ad9377-764f-4b2a-97b9-6fe5497425aa",
+   "statementNo": "20190009483651",
+   "productName": "관절튼튼 뮤코다당단백[콘드로이친] 비타민D 망간",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민 D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "37d505ad9c37e6ed3045a4a105bbe41b6d153f541b261d3c7f62c38636d3ee41",
+   "newContentHash": "bd0c58679e410223375a8f8dd4939a3218c617fac667facfdb3655c5fae53700",
+   "byteDelta": 231
+  },
+  {
+   "canonicalId": "0f39f8df-debb-4402-9de9-092c9a3d1559",
+   "productMasterId": "4872e986-6dd7-4a9c-9423-32ef27106acd",
+   "candidateId": "117bafde-5b55-4df7-bf1b-1ee9dbbfd838",
+   "statementNo": "20190009483685",
+   "productName": "팜스 슈퍼 바이오 히알루론산",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "원료별 공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민C",
+      "clauses": [
+       "결합조직 형성과 기능유지에 필요",
+       "철의 흡수에 필요",
+       "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민A",
+      "clauses": [
+       "어두운 곳에서 시각 적응을 위해 필요",
+       "피부와 점막을 형성하고 기능을 유지하는데 필요",
+       "상피세포의 성장과 발달에 필요"
+      ]
+     },
+     {
+      "ingredient": "판토텐산",
+      "clauses": [
+       "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "나이아신",
+      "clauses": [
+       "체내 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비오틴",
+      "clauses": [
+       "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "0e7d31c07fa23f48e5995f46140fbc43ae780b4b23aeff64537d73f6fc05b967",
+   "newContentHash": "a0a1057ad8c8933abbe3d378df96db0e048992b4e932bc5a40478616928d8c74",
+   "byteDelta": 487
+  },
+  {
+   "canonicalId": "685c679b-f88e-465b-bb2d-6582da4e4a52",
+   "productMasterId": "5b4653ca-b02b-4e5d-8b77-8c45773cd452",
+   "candidateId": "4d783afa-abd7-4a41-8b6f-6ea5f22dc757",
+   "statementNo": "20200016052251",
+   "productName": "뉴콘액티브",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민B1",
+      "clauses": [
+       "탄수화물과 에너지 대사에 필요"
+      ]
+     },
+     {
+      "ingredient": "나이아신",
+      "clauses": [
+       "체내 에너지 생성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민B6",
+      "clauses": [
+       "단백질 및 아미노산 이용에 필요",
+       "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민B2",
+      "clauses": [
+       "체내 에너지 생성에 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "ffe926ffb503b39242072476d25170d16343519f77541ce6625958ceaa149637",
+   "newContentHash": "02db0e51c17eb8352e1556a86c79988b0f0c9ad7beee2fc60d200d8252c61a69",
+   "byteDelta": 311
+  },
+  {
+   "canonicalId": "676c1e7a-b483-471b-a934-1b8e87fe3237",
+   "productMasterId": "57e63ce6-723e-4c9e-8f28-084038c96cb9",
+   "candidateId": "6a9b63b7-45d6-4430-9abd-20efc9a4019a",
+   "statementNo": "202200172208",
+   "productName": "닥터트루 프리미엄 뮤코다당단백 소연골 콘드로이친 1200 MAX",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "아연",
+      "clauses": [
+       "정상적인 면역기능에 필요",
+       "정상적인 세포분열에 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "셀렌",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "ef5c008afa644d21770b894552e1030feb2483b3eae1ea131f17d3e4c08c4335",
+   "newContentHash": "929a1f08ed4f04b5de3de6718e045f0528eeb65e68815417e2be849234fe3b0c",
+   "byteDelta": 471
+  },
+  {
+   "canonicalId": "89216247-0e5e-4155-bf72-7ed8a7c6ab4b",
+   "productMasterId": "48c001a4-de4d-4375-9706-143ed16016cd",
+   "candidateId": "edcdedc9-4564-4ee8-a450-ad886eac7c6e",
+   "statementNo": "200700170352511",
+   "productName": "더 콜라겐",
+   "language": "ko",
+   "rendererFamily": "DRIVER",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "DRIVER_GROUP",
+    "sectionH2": "주요 기능성",
+    "cards": [
+     {
+      "ingredient": "저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)",
+      "clauses": [
+       "피부 보습에 도움을 줄 수 있음",
+       "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "64fff12710ee16aa8843e604735526e28adc4a9f49a6be263cabc330d1604a8b",
+   "newContentHash": "30e76a81be7306752004acc11608e081bd6f4be5afc5f9f6af31efd93723d131",
+   "byteDelta": 182
+  },
+  {
+   "canonicalId": "f49f757f-4177-4408-9347-ab0e0f54afaf",
+   "productMasterId": "5a70bd17-3728-4501-bfed-8c4ce937186f",
+   "candidateId": "d793b363-cd5a-442e-9231-f1cbcf5a17eb",
+   "statementNo": "20130020008493",
+   "productName": "BNS슈퍼밸런스요오드",
+   "language": "ko",
+   "rendererFamily": "DRIVER",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "주요 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "(요오드)(1) 갑상선 호르몬의 합성에 필요,"
+     },
+     {
+      "ingredient": null,
+      "text": "(비타민B6)(1) 단백질 및 아미노산 이용에 필요,"
+     },
+     {
+      "ingredient": null,
+      "text": "(아연)(1) 정상적인 면역기능에 필요,"
+     }
+    ]
+   },
+   "oldContentHash": "74ec34c5b2661b75605cd55fc6587f2125486221a0afddb17648fdac308688cf",
+   "newContentHash": "11bb829f1569e3d010f710735d76db5ba49042a33e8006e0f2dd580ab902d2d4",
+   "byteDelta": 103
+  },
+  {
+   "canonicalId": "5ee31458-7254-42cb-ae4b-fb70f60972e9",
+   "productMasterId": "d3df3cc9-7d37-44c9-acf4-57b579951ae2",
+   "candidateId": "666bd7d4-27ff-407a-8227-64a902a3657b",
+   "statementNo": "202100187425",
+   "productName": "비타튼튼 젤리 어린이 멀티비타민 & 미네랄",
+   "language": "ko",
+   "rendererFamily": "DRIVER",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "주요 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "(비타민 B6 )(1) 단백질 및 아미노산 이용에 필요,"
+     }
+    ]
+   },
+   "oldContentHash": "4afbe9d370fcd8479f523140bbe4fbac03801c90ba0ba6cf7ed6828f049e9d95",
+   "newContentHash": "d50a124a41a7a7a9710f9ccc0b57f94832f29f5509e582a4acb994893023f51b",
+   "byteDelta": 40
+  },
+  {
+   "canonicalId": "97003e49-1d26-45e8-bf2d-b772ae9cdf71",
+   "productMasterId": "69f1f6e9-3096-469c-9915-65fb3557f561",
+   "candidateId": "aef82af7-08ed-4f5c-8257-a0eae184a79b",
+   "statementNo": "200400150832087",
+   "productName": "관절엔 뮤코다당단백 콘드로이친 1500",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "HOLD_AMBIGUOUS",
+   "fromReason": "INGREDIENT_CARD_NOT_FOUND",
+   "ops": [
+    "NEW_INGREDIENT_CARD"
+   ],
+   "detail": {
+    "mode": "PER_INGREDIENT",
+    "sectionH2": "공식 인정 기능성",
+    "cards": [
+     {
+      "ingredient": "비타민D",
+      "clauses": [
+       "칼슘과 인이 흡수되고 이용되는데 필요",
+       "뼈의 형성과 유지에 필요",
+       "골다공증발생 위험 감소에 도움을 줌"
+      ]
+     },
+     {
+      "ingredient": "비타민K",
+      "clauses": [
+       "정상적인 혈액응고에 필요",
+       "뼈의 구성에 필요"
+      ]
+     },
+     {
+      "ingredient": "셀레늄",
+      "clauses": [
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     },
+     {
+      "ingredient": "망간",
+      "clauses": [
+       "뼈 형성에 필요",
+       "에너지 이용에 필요",
+       "유해산소로부터 세포를 보호하는데 필요"
+      ]
+     }
+    ]
+   },
+   "oldContentHash": "8485d6c5741f9e50bc5832ea4bb293536f565aa5f9c225b7bae0ebd05375656d",
+   "newContentHash": "4b7851e027e1bb64f86be7a98781134e17e6e610acd2dfe80bca6f3ef1c013d5",
+   "byteDelta": 386
+  },
+  {
+   "canonicalId": "82637aa4-af88-4698-a510-d345e2a1587f",
+   "productMasterId": "d4ec25a2-4c98-4ce4-9472-6781daf7215a",
+   "candidateId": "bb6cb980-2630-4103-9789-2fa24c8141a2",
+   "statementNo": "200400200061133",
+   "productName": "비타민C 1000Q",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "4e7e93adcce5861ee8a8cface291cfab8ea4f61eacbb3e6695c32aefd408739f",
+   "newContentHash": "172412354c0a06a0d35c469acc877a424b0b16f7fbeac311409181cfeb3460b0",
+   "byteDelta": 18
+  },
+  {
+   "canonicalId": "c2a811d3-3eb5-4781-9271-9e61960443fe",
+   "productMasterId": "049ba0ed-8fdf-4833-a9ef-c1f83b890b29",
+   "candidateId": "c01eb967-4c4f-47cb-9a0a-2bca1eef0ac4",
+   "statementNo": "200400200061871",
+   "productName": "눈 건강 비타민A 츄어블",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "어두운 곳에서 시각 적응을 위해 필요"
+     },
+     {
+      "ingredient": null,
+      "text": "상피세포의 성장과 발달에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "cab273df793047db22c79e4bf5e42d5f2e9be94620c1af0d3a5c1ce96c8a880d",
+   "newContentHash": "2adb738bb9bd6fdd8e37121076b82981ebbf045e7b1cfeafea26c07a5253c1f1",
+   "byteDelta": 54
+  },
+  {
+   "canonicalId": "ce3e0a76-a898-4352-b21d-23ee921d7ef3",
+   "productMasterId": "fded93f8-10ae-49e2-a61e-4c4646f225c3",
+   "candidateId": "338013d4-9a67-478f-8802-9d51c2ac9519",
+   "statementNo": "2017288029585",
+   "productName": "애터미 비건 구미 비타민C",
+   "language": "ko",
+   "rendererFamily": "COMPOSITE",
+   "fromStatus": "SAFE_APPLY",
+   "fromReason": "APPEND_TO_FLAT_LIST",
+   "ops": [
+    "INSERT_CLAUSE"
+   ],
+   "detail": {
+    "mode": "FLAT",
+    "sectionH2": "공식 인정 기능성",
+    "inserts": [
+     {
+      "ingredient": null,
+      "text": "철의 흡수에 필요"
+     }
+    ]
+   },
+   "oldContentHash": "c9ed2c98e697cf5c121d628cdc305b1e52f50327bc260d9228c411e06bb730b6",
+   "newContentHash": "7ced65c27362fd39d9f816bc5a5a296255d8eefef34e4cefe008947801128a50",
+   "byteDelta": 18
+  }
+ ]
+}

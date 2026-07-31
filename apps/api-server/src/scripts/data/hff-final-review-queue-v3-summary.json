@@ -1,0 +1,45 @@
+{
+ "builtAt": "2026-07-31T06:30:48.335Z",
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "previousQueue": {
+  "file": "hff-final-review-queue-v2.jsonl",
+  "rows": 4544
+ },
+ "resolvedThisWo": {
+  "notReproducible": 3442,
+  "safeApplied": 65,
+  "total": 3507
+ },
+ "rows": 1037,
+ "uniqueCanonicalId": 1037,
+ "missingInDb": 0,
+ "byLanguage": {
+  "ko": 213,
+  "en": 824
+ },
+ "byHoldReason": {
+  "CANONICAL_STRUCTURE_UNSAFE": 10,
+  "NO_OFFICIAL_EN_GROUNDING": 819,
+  "PARTIAL_EN_GROUNDING": 5,
+  "SOURCE_REPAIR_REQUIRED": 15,
+  "AMBIGUOUS_FUNCTION_BOUNDARY": 71,
+  "AMBIGUOUS_INGREDIENT_OWNERSHIP": 117
+ },
+ "byFinalStatus": {
+  "HOLD_RENDERER": 10,
+  "HOLD_NO_EN_GROUNDING": 824,
+  "HOLD_AMBIGUOUS": 135,
+  "HOLD_SOURCE": 68
+ },
+ "byRendererFamily": {
+  "COMPOSITE": 191,
+  "UNKNOWN": 824,
+  "DRIVER": 22
+ },
+ "reconciliation": {
+  "v2": 4544,
+  "resolved": 3507,
+  "v3": 1037,
+  "balanced": true
+ }
+}

@@ -1,0 +1,30 @@
+{
+ "ranAt": "2026-07-31T06:27:39.670Z",
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "mode": "APPLY",
+ "verdict": "PASS",
+ "expectedUpdates": 65,
+ "actualUpdates": 65,
+ "effects": {
+  "insertOnly": 30,
+  "newCard": 35,
+  "clausesInserted": 337,
+  "cardsCreated": 105
+ },
+ "failed": [],
+ "error": null,
+ "snapshotBefore": {
+  "spd_all": "120140",
+  "ko_total": "40913",
+  "en_total": "15498"
+ },
+ "snapshotAfter": {
+  "spd_all": "120140",
+  "ko_total": "40913",
+  "en_total": "15498"
+ },
+ "writeScope": [
+  "shared_product_descriptions.content",
+  "shared_product_descriptions.updated_at"
+ ]
+}

@@ -1,0 +1,775 @@
+{
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "phase": "§7·§10 — 안전 대상 patch 생성",
+ "builtAt": "2026-07-31T06:24:02.344Z",
+ "targets": [
+  {
+   "canonicalId": "29e87505-a1ba-4ad4-8cfe-4010ea41e96f",
+   "productMasterId": "ddbcb306-f4f4-4824-bc4e-2a03e916c26c",
+   "language": "ko",
+   "oldContentHash": "1dfbafe919ad479b098cdc205d1ebb72939f35709ecab9f5989e879cbaa23ced",
+   "newContentHash": "3c34d40b791494f555ca7910ed3a4fee4f168066233a6ffda6e6ac64fccf421e",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>리얼퀸 센시다이어트</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">나이아신</span><ul><li>체내 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오.</li><li>간질환이 있거나 의약품 복용 시 전문가와 상담하시기 바랍니다.</li><li>카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있으니 주의하시기 바랍니다.</li><li>식사 후 섭취하십시오.</li><li>카페인을 함유한 식품의 섭취에 주의하십시오.</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.</li><li>의약품(항응고제) 복용 시 섭취에 주의하시기 바랍니다.</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상 : 고유의 향미가 있고 이미·이취가 없는 연한 황갈색의 장방형 코팅정제</div><div class=\"sd-item\">2) 카테킨 : 300mg / 1,000mg ( 표시량의 80~120% )</div><div class=\"sd-item\">3) 플라보놀 배당체 : 36mg / 1,000mg ( 표시량의 80~120% )</div><div class=\"sd-item\">4) 깅콜릭산(ginkgolic acid)(mg/kg) : 5.0 이하</div><div class=\"sd-item\">5) 비타민B2 : 0.42mg / 1,000 (표시량의 80~180%)</div><div class=\"sd-item\">6) 카페인 : 50,000 이하</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>",
+   "insertedHtml": [
+    "<li>기억력 개선･혈행 개선에 도움을 줄 수 있음</li>"
+   ]
+  },
+  {
+   "canonicalId": "8cfea319-1438-47eb-bd1c-2992643c3ff8",
+   "productMasterId": "7fb65740-7f53-4de0-ac9b-8b7e3d748914",
+   "language": "ko",
+   "oldContentHash": "2cf9650418612324333771669a1de3fbf973fbcb3a859e6bc347edf281e201f9",
+   "newContentHash": "ec77d83839a722f7ad42e180c72ed1f27a9e5323a8442470d28258bca14b486e",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인</span><span class=\"sd-badge is-solid\">아스타잔틴</span><span class=\"sd-badge is-solid\">비타민 A</span><span class=\"sd-badge is-solid\">비타민 D</span><span class=\"sd-badge is-solid\">비타민 E</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>와이즈 루테인아스타잔틴<small>루테인 · 아스타잔틴 · 비타민 A · 비타민 D · 비타민 E</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>루테인</b>, <b>아스타잔틴</b>, <b>비타민 A</b>, <b>비타민 D</b>, <b>비타민 E</b>를 주원료로 한 5원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>루테인</b>, <b>아스타잔틴</b>, <b>비타민 A</b>, <b>비타민 D</b>, <b>비타민 E</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 진빨간색의 내용물을 함유한 적갈색의 타원형 연질캡슐 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>아스타잔틴</b><ul class=\"sd-why\"><li>눈의 피로도 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 진빨간색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요.</li>"
+   ]
+  },
+  {
+   "canonicalId": "052f21bf-4ddf-4eff-af09-f9486c332087",
+   "productMasterId": "434fbec2-93ca-47f7-b45b-4ae9e30a9f6c",
+   "language": "ko",
+   "oldContentHash": "8144e972069c157537b62eca56b68e2c20506769be498aace28370d5658ee4a8",
+   "newContentHash": "dad86a1a61007579a1a8dae64dce4cc6ba0cfde0751ad8fdd1564e79c2089544",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타잉<small>비타민 C</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/①직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.②유통 중 인습되지 않도록 포장의 파손에 주의하십시오.③어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "fd947be4-81d9-4946-8f53-2a77dbc1d6f6",
+   "productMasterId": "51bed288-3e63-4f92-aa96-c0c13a3df5ed",
+   "language": "ko",
+   "oldContentHash": "02ba35d74dc84f701d5c27f788770a972b1cecf5a59839d8faa528d71bbe08c3",
+   "newContentHash": "4335fa3ee957ba912b44be6e54258ff17267e03b90f1cf5de27352bbef55ea87",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C 510mg</span><span class=\"sd-badge is-solid\">아연 8.5mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>쌩쌩 리포좀 비타민C<small>비타민 C · 아연</small></h1><p class=\"sd-meta\">(주)세종바이오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 C <b>510mg</b>, 아연 <b>8.5mg</b>를 표시량으로 담은 2원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 비타민 C <b>510mg</b>, 아연 <b>8.5mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고, 이미·이취가 없는 노란 하양색의 장방형 제피정제 · (주)세종바이오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 C</b> 표시량(510mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8.5mg/1000mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고, 이미·이취가 없는 노란 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 습기가 적고, 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2) 본 제품은 습기가 많은 곳이나 햇빛, 열 등에 노출되면 빨리 변색, 변질되므로 보관방법을 잘 지켜주십시오.3) 개봉 후에는 가능한 빨리 섭취하시기 바랍니다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>칼슘과 인이 흡수되고 이용되는데 필요</li>",
+    "<li>뼈의 형성과 유지에 필요</li>",
+    "<li>골다공증발생 위험 감소에 도움을 줌</li>"
+   ]
+  },
+  {
+   "canonicalId": "d09113a2-6c11-46d4-8959-21411aad6356",
+   "productMasterId": "4986da6e-8ed2-4c17-a4ad-81fac7f577cb",
+   "language": "ko",
+   "oldContentHash": "1e8663a55d504d764748d6dfd264870e712213856ff7840ae1a1a4a80f11d860",
+   "newContentHash": "d3a3afa34ce4375c89aefa3be2f5c080b1fcb91431ff5694a6c28500e6e9b1d0",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>스킨액티브 콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노란 주황색 또는 흐린 노란 주황색의 타원형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노란 주황색 또는 흐린 노란 주황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>어두운 곳에서 시각 적응을 위해 필요</li>",
+    "<li>피부와 점막을 형성하고 기능을 유지하는데 필요</li>",
+    "<li>상피세포의 성장과 발달에 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "a746a3a0-643e-47ec-a5a6-962bbd87dc1b",
+   "productMasterId": "139511f5-76f3-4848-93c7-6f7a2bdc0475",
+   "language": "ko",
+   "oldContentHash": "9cfe74a10392d22fd7d18ae4a33e279a28f0776adda802d5433e4521c73bbb49",
+   "newContentHash": "b77f530b886eadbda6d415438324a6c42eeaecf5d0a2203f34a64a572625be1b",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>기능성 저분자 콜라겐<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양 노란색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>(2) 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양 노란색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "55a05ba3-be42-44c8-8261-9062e4123476",
+   "productMasterId": "e0c89ed6-eb3a-459d-ba8b-30c19f8a2324",
+   "language": "ko",
+   "oldContentHash": "3d8e8c86fafda7a3a6f0fd30b12dd4ae840a92619e41bed075c7852075492127",
+   "newContentHash": "9fc0ad4764accfb836c8f194d9729baae983e6b5b426a8188fc9bf894761f009",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>엔바이탈 피부탱탱 콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "3d304407-6221-4e8c-95e2-e393d8bd73bd",
+   "productMasterId": "7819cc2f-7904-479b-bd66-5f8fce8babe3",
+   "language": "ko",
+   "oldContentHash": "e46c97de1c7e6c6f6a344429f502a47a74b70ba8a4eabaedf60b986d222322f0",
+   "newContentHash": "8b0fdfb0275199dfdcf02a693d28a5c9ad36b18b7d7c80bb38a9242db1bbe173",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>나를 위한 콜라겐 비오틴<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색 점박이가 있는 연한 분홍색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색 점박이가 있는 연한 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>어두운 곳에서 시각 적응을 위해 필요</li>",
+    "<li>피부와 점막을 형성하고 기능을 유지하는데 필요</li>",
+    "<li>상피세포의 성장과 발달에 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "e850b9d7-0e50-4f76-ab4c-2d94dfcc360c",
+   "productMasterId": "11950021-021c-4c08-a6a4-11a6dceed189",
+   "language": "ko",
+   "oldContentHash": "4b470243332de39cb103f1b6027ba57105c528e232fd31fe9a3ff8b764be6366",
+   "newContentHash": "c837154890d8006d8e6ff84a990fbf67a192bbe0d648c226baa1b26b15bec141",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>피부 탱탱 저분자콜라겐<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 분홍빛 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "fe096169-d3ac-43c4-803d-ad482352e34e",
+   "productMasterId": "a383d061-d51d-4e03-8bde-fc6d10ff0dbd",
+   "language": "ko",
+   "oldContentHash": "572c506c5c614de068468c7dc327e0dea5873b6d2b1e6c5733079bc0e3a9618b",
+   "newContentHash": "2f96ba2d34ea589c3de1f44a21e3a6bbc55392f0d46cc3c9135c3ee4a26bf6af",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">피쉬콜라겐펩타이드</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>어린 피쉬콜라겐 비오틴 비타민C<small>피쉬콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>피쉬콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>피쉬콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "328a3793-cc54-4114-a101-2bb48fcda3bb",
+   "productMasterId": "e4c94022-689d-43c4-91f7-e2e353531c77",
+   "language": "ko",
+   "oldContentHash": "0879b57092b06d9f70759ee1581f1afb88a337f1b6d446562061b72392eaa9f8",
+   "newContentHash": "7c830356a9b2bcb9d87c11be849699d28d2d6f6f3bcff5719ee0b8587dac69e6",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>여에스더 어린콜라겐 레티놀A<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍 또는 탁한 자줏빛 분홍색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍 또는 탁한 자줏빛 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>",
+    "<li>유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>어두운 곳에서 시각 적응을 위해 필요</li>",
+    "<li>피부와 점막을 형성하고 기능을 유지하는데 필요</li>",
+    "<li>상피세포의 성장과 발달에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "8a08f9d1-5882-4608-a711-3524a3670648",
+   "productMasterId": "2bed4c24-83dd-48fd-8d3f-e989194f1850",
+   "language": "ko",
+   "oldContentHash": "f5dc9a0f90f70f5aff8da277545aa398ca34a20ef8535c0b11c91fff25ddae35",
+   "newContentHash": "d45dab6129cca38506a1ebbae0959931b913e69b315d870cdf5404115b58e49e",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>어린콜라겐 레티놀A<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍 또는 탁한 자줏빛 분홍색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍 또는 탁한 자줏빛 분홍색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>",
+    "<li>유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>어두운 곳에서 시각 적응을 위해 필요</li>",
+    "<li>피부와 점막을 형성하고 기능을 유지하는데 필요</li>",
+    "<li>상피세포의 성장과 발달에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "852c2702-b47e-47e5-821b-3da52521969d",
+   "productMasterId": "c6b91a0a-2014-49d0-9a4b-84955ebf9df9",
+   "language": "ko",
+   "oldContentHash": "d77f83bc74fd7f2ff8a609cdf2cd7ff79db6fc94de2511f3f54900dea403fc10",
+   "newContentHash": "802472814fe142e1a6f99a20d68b061993a74d80227eb0c0ed4b1e5b7598f7d3",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>유한콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 연한 자줏빛 분홍색 또는 탁한 자줏빛 분홍색의 분말 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 연한 자줏빛 분홍색 또는 탁한 자줏빛 분홍색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "443233f8-52c2-4974-9a5f-09b45b69a1a4",
+   "productMasterId": "ed8e21b0-8391-400a-b7b9-b748c48e8375",
+   "language": "ko",
+   "oldContentHash": "3ca1491b22dd07bd1578ac312664481d51beae4d3d2dae3c10e33d70e43bd696",
+   "newContentHash": "c0e1d580acedd34490cef8828c9a5c0b565528eb91358c53d16957a8968d19ef",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>웅진 오직 리포좀 비타민C 코어<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 점박이가 있는 하양색의 장방형 제피정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 점박이가 있는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "1757bddd-1b98-4b75-8551-6fefbeebd4c9",
+   "productMasterId": "655f8591-d3f3-4863-8c6a-521670d3a461",
+   "language": "ko",
+   "oldContentHash": "6bed0e952eb44ddd1048d5b7a59579930924f196343ccc032e06aa554b39acd5",
+   "newContentHash": "e3ff309de8a06cb24b1c81e8d2c2f6ccb08ce082c1a142205918cfdcdd4a2fc3",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>츄어블비타민C200<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 보라색의 점박이가 있는 하양색의 원형정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 보라색의 점박이가 있는 하양색의 원형정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "a29826e2-2a18-496e-9647-72f353d679df",
+   "productMasterId": "d624f3fc-e78b-4517-9dae-e0fcecd1531f",
+   "language": "ko",
+   "oldContentHash": "27bd8fe44f6c6d649716d190f0992d6964a1871190b1e5e4222bc103a330a373",
+   "newContentHash": "14d9013281ff94c8e36983c15b211993853ab408b4a00ba2c84017abd9fd29d1",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B6</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>비타민 B6 정제<small>비타민 B6</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 B6</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 B6</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흐린 노랑색의 장방형 정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흐린 노랑색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>단백질 및 아미노산 이용에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "f1ba05ef-8833-498c-8679-df6443d95c21",
+   "productMasterId": "aa6ed415-0e4e-41e8-926b-aa8bb491e740",
+   "language": "ko",
+   "oldContentHash": "95aee19b6c7e9f908715bef136619708029d6bed912e86f67ecd0e5cbad71228",
+   "newContentHash": "26ea0026e346a90156349193c3b585e0c4827597fd15c66d852264985a9cc35f",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼 비타민C 3000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 하양색의 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "28e9edc2-8b6b-4908-93d4-68e32419ce36",
+   "productMasterId": "7e30d758-125e-454a-a3ed-c3b06bf92e5c",
+   "language": "ko",
+   "oldContentHash": "72c0f7c2cf2eda91494e64e79c4379f4cbaed71254c4576088b2f246a19b3d66",
+   "newContentHash": "b49adc88c332611bf3ccd175bfe944585bf6d8901c732d70aa0cbde4342bfdae",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>테라비타민C2000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 흰색의 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 흰색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "fdfbca72-bf02-4ae8-b2b7-41adc65b7499",
+   "productMasterId": "4f89ec69-847c-43d8-857c-f42e5df88bf4",
+   "language": "ko",
+   "oldContentHash": "a5aae8892213a5a8a20ec7a772e434f0ae8f6d4c6240925cf733e02e23b0ec07",
+   "newContentHash": "30adbb45b12cd3b14b674d4dde8f0814ccfc2454861a0efa1a5ac548cba9fb1b",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프라임도스 비타민C 2000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하양색의 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "934a266c-f775-4323-8e64-bdbd7589e790",
+   "productMasterId": "9fff64b8-5aa8-4509-a504-91e7e08909ac",
+   "language": "ko",
+   "oldContentHash": "9975c7f8acabe8269745b23be0ca1274c7ac4c086421d3e97425c7a9b280cd5e",
+   "newContentHash": "917ad553d82bf85e18b22d9144426f4d1b6648499448b8b4003c6a8c78bdff05",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>영국산 맥스 비타민C 1000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 흰노랑색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "54fcdda6-e796-4b7b-b221-44b87846fe7d",
+   "productMasterId": "ce73fc86-c01b-46ff-9398-d501090bff4e",
+   "language": "ko",
+   "oldContentHash": "57a0384f3ea2fc3a05634a5795f2e0b99769abee10b21c531f49da4535d114db",
+   "newContentHash": "78216e3d69ef71e7b5bb2f711ff4c6500f77cb6644744636d1786444439283e5",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>바이탈케어 비타민C 1000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑 하양 빛이 도는 흰색 장방형 정제 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑 하양 빛이 도는 흰색 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "14bc0f3a-d8b7-4ef9-9bb2-28ea38025583",
+   "productMasterId": "42b4315a-2438-493c-b162-528b3b4ec496",
+   "language": "ko",
+   "oldContentHash": "e93b9edd15f377da287b7d4b7e8c66f5ccf42e1fa54ee1452e5ca03e3c4098be",
+   "newContentHash": "23378021d3ce1e0acd2b6250b55c624efeabb277d83c77d274840f18dcf5b6b0",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>메가 비타민C3000<small>비타민 C</small></h1><p class=\"sd-meta\">엠에스바이오텍(주) 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하얀색 분말 · 엠에스바이오텍(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "f36bc34e-c096-4b64-8450-f49bcdbd73c5",
+   "productMasterId": "43347bb9-6b12-453c-b6cf-9f6b4e70d05e",
+   "language": "ko",
+   "oldContentHash": "edbec6d8d385db245af6080abb5f9805531d9e65de380fff395c626fa4925619",
+   "newContentHash": "8dc106d85707d4994520d6ceb7e00ddb3a6e9b614729598fde24c8674f3c3b2d",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뷰틱 스킨 콜라겐<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 1병</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1병</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 액상 · (주)서흥헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1병</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 적갈색의 액상</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "0d9008b8-2045-432f-a3f8-132e2817be40",
+   "productMasterId": "17b43eaa-161f-4500-a447-c61972ad7b75",
+   "language": "ko",
+   "oldContentHash": "62fa0dc4e2868ff365c0becf2f1f084ae27dedcabd6c04c8df6b2583922afaf5",
+   "newContentHash": "a64492c76186103f61134a1574b59cdb89cef572baf6414dc52cb6df7cd51db5",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뷰틱 스킨 콜라겐 시그니처<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 1병</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1병</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황갈색의 액상 · (주)서흥헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1병</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 액상</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>",
+    "<li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "c9732772-8e9b-441a-887a-ceac2dd8af37",
+   "productMasterId": "228e7098-e9de-4563-a326-9cde721d675c",
+   "language": "ko",
+   "oldContentHash": "605d68fcfdff73902782e0298f4dbfbffcebb0415a9c70eed2f2d3a9a9b89397",
+   "newContentHash": "4607ca50d1a31cb92471ed737a4d9da553d9e0941f04f239c98203bd8ba3eb52",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>콘시로카 with 리포좀비타민C<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색의 젤리 · (주)서흥헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) :   피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 노란 주황색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>결합조직 형성과 기능유지에 필요</li>",
+    "<li>철의 흡수에 필요</li>",
+    "<li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "710c5309-1332-4317-b7bd-63b2fb8dcd1c",
+   "productMasterId": "6f9b989e-edd5-4524-b1e9-75fe62d6ddc0",
+   "language": "ko",
+   "oldContentHash": "849bd8d03a8ae83a74b6ee4ce5656c42a94bd836fa1cb0b345ab77419976f9d3",
+   "newContentHash": "00cd3f40809ed1b34b7d7280e965acb2277de7c6700415cda1920f534cbdc49a",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>연골관절건강 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노랑색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노랑색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "0e4290ba-dcc8-4006-a020-9603d962c191",
+   "productMasterId": "44963842-78ac-4055-b501-3113ab998266",
+   "language": "ko",
+   "oldContentHash": "e695a28bb6bbc8cf5de05388aa1718f6f920d71afd0503fa3ca4c99896a8cc6f",
+   "newContentHash": "c1c8f36921768215c17bbc6ea3befc21463ef14afc3cd1ef991b26d896a38bff",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절엔 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "e4c848f8-cce3-42c3-b6e9-624d82ce5467",
+   "productMasterId": "29cc5c6e-455d-4305-bdbc-1403ade090fd",
+   "language": "ko",
+   "oldContentHash": "3abc5b3e858fbe76f9bd9796947c449d938d6c0f6b521b5b7c5fe8c13d3a32f1",
+   "newContentHash": "a1a5644162a5da242f7ef6f39da5c8cd0fddb0f2b4b78cc2f7011da8f4ca4629",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절튼튼 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 밝은 회황색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 밝은 회황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "bdf9eb7e-664a-4b9f-b916-952bf4e3c058",
+   "productMasterId": "abfedd8c-607e-4318-ac02-84bde843bcce",
+   "language": "ko",
+   "oldContentHash": "59618a638fb2179b418882aa785ade3bec66f4ef624afa794269f68dd185a2e3",
+   "newContentHash": "72b39c43a096893fbaa4669834143fa1de6b2f5aac51095402921a0fe57741bb",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절편한 뮤코다당콘드로이친 1200 플러스<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "c8a1d105-9f14-410d-8b6e-02d1fcb06371",
+   "productMasterId": "3593f8f6-2d2d-4edc-82e4-3b4d453d1fa4",
+   "language": "ko",
+   "oldContentHash": "631c3c22df70e2d42a115aa4aee3142bc9a101d10486ff046402b7429bdbd40a",
+   "newContentHash": "772e3e790b3095374b08af3cd9c7483c4f734b30aa751704cdabe07cd258f95d",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절 튼튼 뮤코다당단백 콘드로이친+<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 하얀색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "bba75652-7a63-4d12-b259-325b86cb27fc",
+   "productMasterId": "9bc35897-ce80-48e3-9a5c-ab378913b565",
+   "language": "ko",
+   "oldContentHash": "34ef0af21325faef66da7e2c0bef96b3930e9eaba71917885e0d3521cac029af",
+   "newContentHash": "923df1fc4a9fa04d66817b7480656aa4a8cad6311fa668dd4fa4e3694273a9e5",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절연골엔 뮤코다당단백 콘드로이친 1500<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노란색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "dd7d055b-48fb-4eab-9ced-88116350fc34",
+   "productMasterId": "e5da12ee-1432-45ab-8e8d-9abe65fc669f",
+   "language": "ko",
+   "oldContentHash": "e8a6f7dbf9813176b5179ce47a5be550fb1aae00769847b3247cd75b173a5032",
+   "newContentHash": "86902d691cb21249cdcf67e8f95a455f873307e48198b8138309e55c903c4be7",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절연골엔 보스웰리아 콘드로이친 뮤코다당단백<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란하얀색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 노란하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "f7387278-16c2-4a8a-a410-2e1ed2f51863",
+   "productMasterId": "01dcfe9a-d3b9-46a7-bc45-b9a5025d8f9e",
+   "language": "ko",
+   "oldContentHash": "8bb96651a7fdff178ce45cdf8593a30691dba874b5e6c390387ff3dea63f26c1",
+   "newContentHash": "86075ab82e928c714b25ead0845b126f084c5e30beb3f5179e92a16aba1eb738",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절의 품격<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 회황색 점박이가 있는 흰 노란색의 타원형 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 회황색 점박이가 있는 흰 노란색의 타원형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "7207ecec-e567-4585-ad56-3704b216e171",
+   "productMasterId": "b49d2a7e-b220-4d2e-bbaf-734530a7fa9c",
+   "language": "ko",
+   "oldContentHash": "44a328d8487438b03be7b412459256f95bdbd3eab4b9864f9fa3f30a926beaa0",
+   "newContentHash": "b34dcce20f37303cdc621251c6b9cc294dec3570aae226a05e28e707313e364a",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>Strong Bone MSM + NAG<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "10f59f16-1d63-4792-9200-89bde551b13e",
+   "productMasterId": "17187b89-4479-43ae-8a8b-dfee03d17d4f",
+   "language": "ko",
+   "oldContentHash": "3b95f1d1b1be01063b39e2bbd8f0cb26728c27c524d1aecb1ff44ef2f4a28af9",
+   "newContentHash": "1ea6332224a87a674bfabcdaeef8c418092cc887efff6e9e046a415815712c7c",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뮤코다당단백 콘드로이친 1200+비타민D+망간 트리플액션<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 연한 황갈색 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 연한 황갈색 점박이가 있는 흰노란색 또는 노란 하얀색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "72a9725d-3f83-465d-bfd7-756588e4a652",
+   "productMasterId": "9a2a1e4a-00e0-4c17-8968-16eaa74ffdf6",
+   "language": "ko",
+   "oldContentHash": "364f99a45809fe7faac9b8921419d499b8f30cdd749cbbf0a5dddad8ba91b4bf",
+   "newContentHash": "e8fb908d04f0f4c19d8568772f1d59beb7a01c1a69308d641b981599addb4cb8",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>연골 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 검정색 점박이가 있는 노란 하얀색 또는 밝은 회황색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 검정색 점박이가 있는 노란 하얀색 또는 밝은 회황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "7716d638-6b8a-45b0-8963-0701cd9ccdb3",
+   "productMasterId": "90a833fe-43a7-432d-9881-11f9dfabd632",
+   "language": "ko",
+   "oldContentHash": "cb6523bcc9c5142eee8d831555e073ccae45febeacbbf1f84279732f2f066914",
+   "newContentHash": "b7942d0a654b1c164e3313caa009cbfc27cb600d29c2a5ec6156d40079efe2b3",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절연골건강 콘드로이친 뮤코다당단백 1500mg 함유<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 흰노란색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 흰노란색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "f22b949f-0110-4c3b-9179-f427595b2980",
+   "productMasterId": "bed98fed-db70-472e-b76e-ee7af4e3be31",
+   "language": "ko",
+   "oldContentHash": "e4e41e4a3b2a11bd72fbe77305b5bcc5a8fc4e9477c38e0bbd060bf192a4c0e8",
+   "newContentHash": "de763ff56db2b0c21e93c18db789c6d59f2e44c6a0b8bbf293b92e3d968032f4",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>인테라 엠지투에이 관절연골케어 콘드로이친 뮤코다당단백 1400<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰 노란색 또는 밝은 회황색의 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰 노란색 또는 밝은 회황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "0ed404ec-bf0b-4b96-b601-06f858751456",
+   "productMasterId": "f725234b-5c32-42ec-92c0-ebd78dca27f0",
+   "language": "ko",
+   "oldContentHash": "a152f52964aaa81550691ccaa9b9de7dde8a2b4953f57531a370c88ed40c6211",
+   "newContentHash": "8953b875f184d017ff5b03c52fd97bb94e2a5c614e2b59eeb075cc8db17d16f9",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절엔 콘드로이친 뮤코다당단백 1500 철갑상어 소 연골<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란하얀색 또는 흰노란색의 타원형 제피 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란하얀색 또는 흰노란색의 타원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "d57333f9-a179-40ea-bfa0-b4dc43a01d54",
+   "productMasterId": "2c77ca6a-6534-430e-aaf1-b2e37e7fb5f8",
+   "language": "ko",
+   "oldContentHash": "f72cd765c665a5c296123ff4bb2077ab09ec5111b034794c94c9a7509f1c4e5b",
+   "newContentHash": "89414424f414882c6da03b898f0f7d1091e2dc532fbb5125f8a7baa6ba8d81c6",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>백세 관절튼튼 뮤코다당단백(콘드로이친) 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지며 이미, 이취가 없고 점박이가 있는 하얀색 또는 노란 하얀색의 타원형 제피 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지며 이미, 이취가 없고 점박이가 있는 하얀색 또는 노란 하얀색의 타원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    3
+   ]
+  },
+  {
+   "canonicalId": "a46f7365-7aba-408b-9501-d101e2dfd2ef",
+   "productMasterId": "57b023f1-bdd2-4f48-8a23-a156ad8bc6b9",
+   "language": "ko",
+   "oldContentHash": "e0a01a64191a6118061e542fda3dc70d4d781f2a87d4c805b16327f635e3d5ed",
+   "newContentHash": "e439901b44f1570b80f937d9085fa3677da3448717d63b9fffc831db3bc3f078",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뮤코다당단백 콘드로이친 프라임<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니며 이미, 이취가 없고 점박이가 있는 하얀색 또는 노란 하얀색의 타원형 제피 정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니며 이미, 이취가 없고 점박이가 있는 하얀색 또는 노란 하얀색의 타원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    3
+   ]
+  },
+  {
+   "canonicalId": "1ba35437-429e-41e0-9e67-4f9b86493f37",
+   "productMasterId": "ef9eb743-7a7a-4449-8568-bef12df2be00",
+   "language": "ko",
+   "oldContentHash": "f3a16eff0f0dbcddf514a738cc9c1ca3c5be125b68848a9e77a3d836e187e1e7",
+   "newContentHash": "04eaa05012cd864751c45e8832063aa9481b23aace393d993e6a679495397c9f",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>Crystal Skin Premium Bovine Cartilage Boswellia Chondroitin 1200 크리스탈 스킨 프리미엄 소 연골 보스웰리아 콘드로이친 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 흐린 황갈색의 환 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 흐린 황갈색의 환</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 36개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "8e8f379b-9f5e-4c19-bdf6-63f877aaf84c",
+   "productMasterId": "459aaad9-3e2f-47f7-a68c-9ca8ad9c06bc",
+   "language": "ko",
+   "oldContentHash": "518a84b5adea39a5d776ef4428b9fbb5a6f4ca3acef071b438996df8f7670a71",
+   "newContentHash": "9e036a34c888bbcb825083e62d55fb31b3c78c21b06236ba065afeabb5a07ca6",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절엔 대한보감 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/①직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오. ②유통 중 인습되지 않도록 포장의 파손에 주의하십시오. ③어린이의 손이 닿지 않는 곳에 보관하십시오</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    3
+   ]
+  },
+  {
+   "canonicalId": "89f8df53-7e78-495d-8816-0c960196da7a",
+   "productMasterId": "275699fd-0ab3-43ec-8d34-e49c180eccdc",
+   "language": "ko",
+   "oldContentHash": "c033746899d6ff2b8a5cee73f959aba6559e70c24909346803ec0475dfae4c8e",
+   "newContentHash": "9fa1214af1488baa3870b0e8d45dc721a166539628d31b99ce339ad7835c7773",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절나라<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">케이지랩 주식회사 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 케이지랩 주식회사 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 서늘한 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "b67afe19-d68b-4b94-8ea0-edbf65848038",
+   "productMasterId": "135dace3-e470-4a56-be9f-ddd151eb8a1a",
+   "language": "ko",
+   "oldContentHash": "b8a10871728796e566f94f7d7452dc0c882a52c48fbeea7ba30954315c226e09",
+   "newContentHash": "697b9d9babd6bc97dab717535d2b429168bd8c84f118fde6676e0456b6960a51",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절연골엔 철갑상어 뮤코다당단백 콘드로이친 K<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 투명 장방형 제피정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 투명 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "e98148bc-799f-4531-8820-f30d692ba834",
+   "productMasterId": "66b12b2d-14fe-4af1-abf8-da22281f672c",
+   "language": "ko",
+   "oldContentHash": "8166e77718b2ccc3229d08bdfd136b58597affb6488bd462303cd8e4f4ab7779",
+   "newContentHash": "612219078aa0f059fc99399a7258f846330e4ac2072d68af5cbf1019946a6bec",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절케어 프로<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">광동헬스바이오(주) 2공장 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 회색의 장방형 제피정제 · 광동헬스바이오(주) 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 노란 회색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온)</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "b07ecb59-90b7-4f03-aec5-857aa1c33193",
+   "productMasterId": "0cb710fc-b9d0-4479-836b-09f8bbaa16e9",
+   "language": "ko",
+   "oldContentHash": "96f303c358a8c95253d3b84541fbee7dfd3eade40e135f706534f32e65268289",
+   "newContentHash": "36ff13e8221fd9326062ad9e842b55ee14c8dab77bf98908854d54c6f387f265",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절 연골엔 콘드로이친 뮤코다당단백 1500<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">대동고려삼(주) 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 대동고려삼(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 습기와 직사광선을 피하여 서늘한 곳에 보관하십시오. 2) 제품 개봉 후에는 인습되지 않도록 주의하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "5ed3ad3b-74e4-4292-bf9b-11034e2fff98",
+   "productMasterId": "bffdb056-c32e-4dbe-994c-f7d5739075a4",
+   "language": "ko",
+   "oldContentHash": "fab0d56369c52e0b8ef6827fa0dbae9a5374d9571d1e680a2c58058b05f40755",
+   "newContentHash": "4ff18dbda76bf677d75e1d5630f409fb715ac5451a18e3ecf8c91e60b9f6376a",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>가족사랑 관절건강<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없으며 광택이 있고 점박이가 있는 노란색의 장방형 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li><li>피부보습에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없으며 광택이 있고 점박이가 있는 노란색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오. 2. 보관 취급 부주의로 인해 정제의 변질 및 변색의 가능성이 있으므로 보관에 주의하시기 바랍니다. 3. 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "8c74f198-3128-42f5-bdf2-a0c954542337",
+   "productMasterId": "9d330b7b-2ac5-4489-82cd-87acf6ad3f69",
+   "language": "ko",
+   "oldContentHash": "ff783a2523300124a349174cad118cab9e7ffd80d543471bd9551933c772a5a9",
+   "newContentHash": "0098a04bf470c0023505bb27bccd69ca93c74572c254ffd349be54374a134c03",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더모이스처<small>N-아세틸글루코사민 · 히알루론산</small></h1><p class=\"sd-meta\">코스맥스엔비티(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>N-아세틸글루코사민</b>, <b>히알루론산</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>N-아세틸글루코사민</b>, <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노랑색의 장방형 제피 정제 · 코스맥스엔비티(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 흰 노랑색의 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오.2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "1c68dd0c-4b4b-4b41-9622-793d6fee12d0",
+   "productMasterId": "775498d7-7371-495f-8fcf-3a358c58dcc7",
+   "language": "ko",
+   "oldContentHash": "78b40900b0b70e37c54af61f676eb8ceab2a7d8f826d5015d51ec17cde8c5a07",
+   "newContentHash": "85189dffa6b9293efb79ab9f7a04c50adfae6d872810ec017ab3e811921dcb8e",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절콘드로이친뮤코다당단백1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">농업회사법인지에이치내츄럴 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 검은 빨간색의 점박이가 있는 노란 하얀색 또는 흰 노란색의 타원형 제피정제 · 농업회사법인지에이치내츄럴 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 검은 빨간색의 점박이가 있는 노란 하얀색 또는 흰 노란색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.(실온유통)</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "a006d2e6-23ce-4068-ba76-e443672b66bc",
+   "productMasterId": "f250cfa4-cc9a-45c6-a4bb-a704a056455f",
+   "language": "ko",
+   "oldContentHash": "df31c207cb8edcbebaa24c348b2f8f78d1bcc9ada4da072663b3caa156cfae5d",
+   "newContentHash": "08ee4830784aabab3ca5c8dd4d01d8fa444f2958eda9468d8c4aa1592179c057",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절건강 MSM NAG 비타민D<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 노란하양색의 정제 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 노란하양색의 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "f8dc3af8-815c-4285-9754-e6d2d76ede55",
+   "productMasterId": "a97f48aa-baaa-4e4e-be7e-e581dc96e0f2",
+   "language": "ko",
+   "oldContentHash": "b2c8530a626295757b4accc19e9edabcdcd5417033d94ca07af4b3f2d2d3e8b9",
+   "newContentHash": "e20d0111bcb82843e38711559625e6f1dc9314550b4f1bd8db162c807051ccf8",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뼈 · 연골 · 관절엔 상어연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 연한 회황색의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 연한 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "05ca07a5-55bc-41a0-ac43-0f67bcae9258",
+   "productMasterId": "dc0c697c-d35d-4fa3-a208-d31bc96b9007",
+   "language": "ko",
+   "oldContentHash": "25d189178d9e1cdf16a1f98d08d31bf383d0461712b046bf69d4c83ab0767cc3",
+   "newContentHash": "ff72466c15722cb31d204e0809680fa87a729475a2c1bd72925c0edbfad82411",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절튼튼 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    3
+   ]
+  },
+  {
+   "canonicalId": "680e726e-7b90-4b58-bd67-be302dc05eb3",
+   "productMasterId": "f8bd5ffc-903b-4beb-b203-f121296cbef3",
+   "language": "ko",
+   "oldContentHash": "66213c2a35b9fd04bd7d4338e017decbf7c0f54afb3f31ae541cb00a09100618",
+   "newContentHash": "0c86b47ec305353f5c3088976ef23801823c017e3152c568194e80441fd63c70",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>소연골 콘드로이친 뮤코다당단백 1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    3
+   ]
+  },
+  {
+   "canonicalId": "98eee489-f83d-4b96-b75a-5d13c52aee7b",
+   "productMasterId": "e14cb0f4-6e33-4c49-bffb-a352dd2bce1e",
+   "language": "ko",
+   "oldContentHash": "37d505ad9c37e6ed3045a4a105bbe41b6d153f541b261d3c7f62c38636d3ee41",
+   "newContentHash": "bd0c58679e410223375a8f8dd4939a3218c617fac667facfdb3655c5fae53700",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절튼튼 뮤코다당단백[콘드로이친] 비타민D 망간<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    2
+   ]
+  },
+  {
+   "canonicalId": "0f39f8df-debb-4402-9de9-092c9a3d1559",
+   "productMasterId": "4872e986-6dd7-4a9c-9423-32ef27106acd",
+   "language": "ko",
+   "oldContentHash": "0e7d31c07fa23f48e5995f46140fbc43ae780b4b23aeff64537d73f6fc05b967",
+   "newContentHash": "a0a1057ad8c8933abbe3d378df96db0e048992b4e932bc5a40478616928d8c74",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>팜스 슈퍼 바이오 히알루론산<small>N-아세틸글루코사민 · 히알루론산</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>N-아세틸글루코사민</b>, <b>히알루론산</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>N-아세틸글루코사민</b>, <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 노란 하양의 장방형 제피정제 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 노란 하양의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 1)직사광선이나 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관하십시오. 2)영･유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "685c679b-f88e-465b-bb2d-6582da4e4a52",
+   "productMasterId": "5b4653ca-b02b-4e5d-8b77-8c45773cd452",
+   "language": "ko",
+   "oldContentHash": "ffe926ffb503b39242072476d25170d16343519f77541ce6625958ceaa149637",
+   "newContentHash": "02db0e51c17eb8352e1556a86c79988b0f0c9ad7beee2fc60d200d8252c61a69",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>뉴콘액티브<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1병</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1병</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1병</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "676c1e7a-b483-471b-a934-1b8e87fe3237",
+   "productMasterId": "57e63ce6-723e-4c9e-8f28-084038c96cb9",
+   "language": "ko",
+   "oldContentHash": "ef5c008afa644d21770b894552e1030feb2483b3eae1ea131f17d3e4c08c4335",
+   "newContentHash": "929a1f08ed4f04b5de3de6718e045f0528eeb65e68815417e2be849234fe3b0c",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>닥터트루 프리미엄 뮤코다당단백 소연골 콘드로이친 1200 MAX<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사 에이원바이옴 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 노랑색의 장뱡형 정제 · 주식회사 에이원바이옴 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 연한 노랑색의 장뱡형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1) 직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관, 유통하십시오. 2) 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    5
+   ]
+  },
+  {
+   "canonicalId": "89216247-0e5e-4155-bf72-7ed8a7c6ab4b",
+   "productMasterId": "48c001a4-de4d-4375-9706-143ed16016cd",
+   "language": "ko",
+   "oldContentHash": "64fff12710ee16aa8843e604735526e28adc4a9f49a6be263cabc330d1604a8b",
+   "newContentHash": "30e76a81be7306752004acc11608e081bd6f4be5afc5f9f6af31efd93723d131",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더 콜라겐</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민D</span><ul><li>칼슘과 인이 흡수되고 이용되는데 필요뼈의 형성과 유지에 필요골다공증발생 위험 감소에 도움을 줌</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민C</span><ul><li>결합조직 형성과 기능유지에 필요철의 흡수에 필요항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">아연</span><ul><li>정상적인 면역기능에 필요정상적인 세포분열에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">셀렌</span><ul><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div></div>\n  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 1포를 직접 또는 물에 섞어 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">비타민 D</span><ul><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">판토텐산</span><ul><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비오틴</span><ul><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>과량 섭취하지 않도록 주의할 것</li><li>신장질환이 있는 경우 섭취 전 전문가와 상담할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li><li>[저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)]</li><li>영∙유아, 어린이, 임산부 및 수유부는 섭취를 피할 것</li><li>특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의할 것</li></ul></div></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">성상 : 고유의 향미가 있고 이미, 이취가 없는 연한 분홍색의 분말</div><div class=\"sd-item\">대장균군: 음성</div><div class=\"sd-item\">Gly-Ala-Val-Gly-Pro-Ala: 표시량(2.475 mg/ 2g)의 80~120%</div><div class=\"sd-item\">비오틴: 표시량(30 μg/ 2g)의 80 ~ 180%</div><div class=\"sd-item\">판토텐산: 표시량(5 mg/ 2g)의 80 ~ 180%</div><div class=\"sd-item\">비타민C: 표시량(30 mg/ 2g)의 80 ~ 150%</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>",
+   "insertedHtml": [
+    1
+   ]
+  },
+  {
+   "canonicalId": "f49f757f-4177-4408-9347-ab0e0f54afaf",
+   "productMasterId": "5a70bd17-3728-4501-bfed-8c4ce937186f",
+   "language": "ko",
+   "oldContentHash": "74ec34c5b2661b75605cd55fc6587f2125486221a0afddb17648fdac308688cf",
+   "newContentHash": "11bb829f1569e3d010f710735d76db5ba49042a33e8006e0f2dd580ab902d2d4",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>BNS슈퍼밸런스요오드</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><ul class=\"sd-why\"><li>(요오드)(</li><li>갑상선 호르몬의 합성에 필요, (</li><li>에너지 생성에 필요, (</li><li>신경발달에 필요</li><li>(비타민B1)탄수화물과 에너지 대사에 필요</li><li>(비타민B2)체내 에너지 생성에 필요</li><li>(비타민B6)(</li><li>단백질 및 아미노산 이용에 필요, (</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>(비타민B12) 정상적인 엽산 대사에 필요</li><li>(아연)(</li><li>정상적인 면역기능에 필요, (</li><li>정상적인 세포분열에 필요</li><li>(셀레늄) 유해산소로부터 세포를 보호하는데 필요</li><li>(비타민 D) (</li><li>칼슘과 인이 흡수되고 이용되는데 필요, (</li><li>뼈의 형성과 유지에 필요, (</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul>\n  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 1정을 충분한 물과 함께 섭취 하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">성상 : 고유의 향미가 있고 이미, 이취가 없는 밝은 회황색의 장방형 제피정제</div><div class=\"sd-item\">요오드 : 표시량(2,400ug / 500mg)의 80~150%</div><div class=\"sd-item\">비타민B1 : 표시량(1.2mg/ 500mg)의 80~180%</div><div class=\"sd-item\">비타민B2 : 표시량(1.4mg/ 500mg)의 80~180%</div><div class=\"sd-item\">비타민B6 : 표시량(1.5mg/ 500mg)의 80~150%</div><div class=\"sd-item\">비타민B12 : 표시량(2.4ug /500mg)의 80~180%</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>",
+   "insertedHtml": [
+    "<li>(요오드)(1) 갑상선 호르몬의 합성에 필요,</li>",
+    "<li>(비타민B6)(1) 단백질 및 아미노산 이용에 필요,</li>",
+    "<li>(아연)(1) 정상적인 면역기능에 필요,</li>"
+   ]
+  },
+  {
+   "canonicalId": "5ee31458-7254-42cb-ae4b-fb70f60972e9",
+   "productMasterId": "d3df3cc9-7d37-44c9-acf4-57b579951ae2",
+   "language": "ko",
+   "oldContentHash": "4afbe9d370fcd8479f523140bbe4fbac03801c90ba0ba6cf7ed6828f049e9d95",
+   "newContentHash": "d50a124a41a7a7a9710f9ccc0b57f94832f29f5509e582a4acb994893023f51b",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비타튼튼 젤리 어린이 멀티비타민 &amp; 미네랄</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><ul class=\"sd-why\"><li>(비타민 B1) 탄수화물과 에너지 대사에 필요</li><li>(비타민 B2) 체내 에너지 생성에 필요</li><li>(비타민 B6 )(</li><li>단백질 및 아미노산 이용에 필요, (</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>(비타민D) (</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>(비타민E) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>(나이아신) 체내 에너지 생성에 필요</li><li>(아연) (</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>(셀렌) 유해산소로부터 세포를 보호하는데 필요</li><li>(마그네슘) (</li><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>(망간) (</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>(크롬) 체내 탄수화물, 지방, 단백질 대사에 관여</li></ul>\n  <h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 1포(15g)를 잘 씹어서 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li><li>손발 따끔거림, 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li><li>당뇨병이 있는 경우 섭취 전 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색의 젤리</div><div class=\"sd-item\">비타민 B1 : 0.5 mg / 15 g (표시량의 80~80%)</div><div class=\"sd-item\">비타민 B2 : 0.6 mg / 15 g (표시량의 80~180%)</div><div class=\"sd-item\">나이아신 : 7 mg NE / 15g (표시량의 80~150%)</div><div class=\"sd-item\">비타민 B6 : 0.7 mg / 15 g (표시량의 80~150%)</div><div class=\"sd-item\">비타민 D : 10 ㎍ / 15 g (표시량의 80~180%)</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>",
+   "insertedHtml": [
+    "<li>(비타민 B6 )(1) 단백질 및 아미노산 이용에 필요,</li>"
+   ]
+  },
+  {
+   "canonicalId": "97003e49-1d26-45e8-bf2d-b772ae9cdf71",
+   "productMasterId": "69f1f6e9-3096-469c-9915-65fb3557f561",
+   "language": "ko",
+   "oldContentHash": "8485d6c5741f9e50bc5832ea4bb293536f565aa5f9c225b7bae0ebd05375656d",
+   "newContentHash": "4b7851e027e1bb64f86be7a98781134e17e6e610acd2dfe80bca6f3ef1c013d5",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절엔 뮤코다당단백 콘드로이친 1500<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">주식회사한미양행 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 타원형 제피정제 · 주식회사한미양행 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 흰노란색 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    4
+   ]
+  },
+  {
+   "canonicalId": "82637aa4-af88-4698-a510-d345e2a1587f",
+   "productMasterId": "d4ec25a2-4c98-4ce4-9472-6781daf7215a",
+   "language": "ko",
+   "oldContentHash": "4e7e93adcce5861ee8a8cface291cfab8ea4f61eacbb3e6695c32aefd408739f",
+   "newContentHash": "172412354c0a06a0d35c469acc877a424b0b16f7fbeac311409181cfeb3460b0",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 3회</span></div>\n  <h1>비타민C 1000Q<small>비타민 C</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 3회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 3회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>진한 노란색의 제피정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 3회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 진한 노란색의 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "c2a811d3-3eb5-4781-9271-9e61960443fe",
+   "productMasterId": "049ba0ed-8fdf-4833-a9ef-c1f83b890b29",
+   "language": "ko",
+   "oldContentHash": "cab273df793047db22c79e4bf5e42d5f2e9be94620c1af0d3a5c1ce96c8a880d",
+   "newContentHash": "2adb738bb9bd6fdd8e37121076b82981ebbf045e7b1cfeafea26c07a5253c1f1",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 A</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>눈 건강 비타민A 츄어블<small>비타민 A</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 A</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 A</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰 보라 또는 연한 보라색의 원형 츄어블 정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 점박이가 있는 흰 보라 또는 연한 보라색의 원형 츄어블 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>어두운 곳에서 시각 적응을 위해 필요</li>",
+    "<li>상피세포의 성장과 발달에 필요</li>"
+   ]
+  },
+  {
+   "canonicalId": "ce3e0a76-a898-4352-b21d-23ee921d7ef3",
+   "productMasterId": "fded93f8-10ae-49e2-a61e-4c4646f225c3",
+   "language": "ko",
+   "oldContentHash": "c9ed2c98e697cf5c121d628cdc305b1e52f50327bc260d9228c411e06bb730b6",
+   "newContentHash": "7ced65c27362fd39d9f816bc5a5a296255d8eefef34e4cefe008947801128a50",
+   "oldContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 C</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>애터미 비건 구미 비타민C<small>비타민 C</small></h1><p class=\"sd-meta\">(주)서흥 오송2공장 제조 · 1일 1회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 C</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 C</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란색 또는 흐린 노란색의 레몬 모양 젤리 · (주)서흥 오송2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란색 또는 흐린 노란색의 레몬 모양 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>",
+   "insertedHtml": [
+    "<li>철의 흡수에 필요</li>"
+   ]
+  }
+ ]
+}

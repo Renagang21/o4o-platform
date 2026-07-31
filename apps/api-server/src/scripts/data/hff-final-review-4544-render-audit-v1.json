@@ -1,0 +1,32 @@
+{
+ "ranAt": "2026-07-31T06:26:25.526Z",
+ "wo": "WO-O4O-HFF-FINAL-REVIEW-QUEUE-4544-FULL-PRODUCTION-V1",
+ "applied": false,
+ "dbWrites": 0,
+ "coverage": "FULL_TARGETS",
+ "viewports": [
+  430,
+  820,
+  1280
+ ],
+ "totalTargets": 65,
+ "renderedDocs": 65,
+ "aggregate": {
+  "docs": 65,
+  "checks": 195,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "sectionMissing": 0,
+  "labelLost": 0,
+  "clauseLost": 0,
+  "unplannedAddition": 0,
+  "crossIngredientMix": 0,
+  "recognitionNoLost": 0,
+  "rawHtmlVisible": 0,
+  "bracketFragment": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}
