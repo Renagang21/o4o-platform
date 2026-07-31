@@ -13,6 +13,8 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import logger from '../../utils/logger.js';
 import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembership.js';
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
+// WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1
+import { sanitizeAdminUser } from './admin-user-sanitizer.js';
 
 // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1 +
 // WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
@@ -152,15 +154,13 @@ export class AdminUserController {
         }
       }
 
-      // Remove password from response, add roles
-      const sanitizedUsers = users.map(user => {
-        const { password, ...userWithoutPassword } = user;
-        return {
-          ...userWithoutPassword,
-          roles: roleMap[user.id] || [],
-          role: (roleMap[user.id] || [])[0] || 'user'
-        };
-      });
+      // WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1:
+      //   password 만 제거하던 방식을 공통 sanitizer 로 교체한다 (refreshTokenFamily 등 포함).
+      const sanitizedUsers = users.map(user => ({
+        ...sanitizeAdminUser(user),
+        roles: roleMap[user.id] || [],
+        role: (roleMap[user.id] || [])[0] || 'user'
+      }));
 
       const totalPages = Math.ceil(totalCount / Number(limit));
 
@@ -199,12 +199,10 @@ export class AdminUserController {
         return;
       }
 
-      // Remove password from response
-      const { password, ...userWithoutPassword } = user;
-
+      // WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1: 목록과 동일한 제외 계약
       res.json({
         success: true,
-        user: userWithoutPassword
+        user: sanitizeAdminUser(user)
       });
     } catch (error) {
       logger.error('Error fetching user:', error);
@@ -259,11 +257,9 @@ export class AdminUserController {
         // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
         await this.ensureServiceMemberships(existingUser.id, rolesToAssign);
 
-        const { password: _, ...userWithoutPassword } = existingUser;
-
         res.status(200).json({
           success: true,
-          user: userWithoutPassword,
+          user: sanitizeAdminUser(existingUser),
           message: 'Roles added to existing user',
           isExistingUser: true,
           passwordPolicy: 'KEEP_EXISTING_PASSWORD'
@@ -297,12 +293,9 @@ export class AdminUserController {
       // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Create service_memberships from roles
       await this.ensureServiceMemberships(savedUser.id, rolesToAssignNew);
 
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = savedUser;
-
       res.status(201).json({
         success: true,
-        user: userWithoutPassword,
+        user: sanitizeAdminUser(savedUser),
         message: 'User created successfully'
       });
     } catch (error) {
@@ -388,12 +381,9 @@ export class AdminUserController {
 
       const updatedUser = await userRepo.save(user);
 
-      // Remove password from response
-      const { password: _, ...userWithoutPassword } = updatedUser;
-
       res.json({
         success: true,
-        user: userWithoutPassword,
+        user: sanitizeAdminUser(updatedUser),
         message: 'User updated successfully'
       });
     } catch (error) {
