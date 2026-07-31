@@ -1,0 +1,12 @@
+{
+ "probedAt": "2026-07-31T12:08:29.311Z",
+ "rawFile": "mfds-health-functional-food-info-raw.jsonl (44,885행)",
+ "trackBMissingProbed": 343,
+ "foundInRaw": 343,
+ "notFoundInRaw": 0,
+ "rawHasSrvUse": 29,
+ "rawHasMainFnctn": 314,
+ "rawHasBoth": 0,
+ "conclusion": "결측은 ETL 손실이 아니라 **공식 원천 자체의 부재**. 데이터 복구로 해결 불가.",
+ "repairsApplied": 0
+}

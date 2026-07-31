@@ -1,0 +1,51 @@
+{
+ "verifiedAt": "2026-07-31T12:23:59.424Z",
+ "readOnlySession": true,
+ "trackA": {
+  "targets": 40,
+  "newHashMatch": 40,
+  "oldHashRemains": 0,
+  "clauseMissing": 0
+ },
+ "trackB": {
+  "targets": 5,
+  "linked": 5,
+  "canonicalCreated": 5,
+  "permitPresent": 5,
+  "permitDup": 0
+ },
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_touched": 0,
+  "hff_canonical": 40918
+ },
+ "canonicalDup": 0,
+ "outsideTouched": 0,
+ "expectedVsActual": {
+  "expected": {
+   "trackAUpdate": 40,
+   "productMasters": 5,
+   "candidateLinks": 5,
+   "newCanonicals": 5
+  },
+  "actual": {
+   "trackAUpdate": 40,
+   "productMasters": 5,
+   "candidateLinks": 5,
+   "newCanonicals": 5
+  }
+ },
+ "finalHold": {
+  "total": 476,
+  "byReason": {
+   "FINAL_HOLD_BOUNDARY_AMBIGUOUS": 124,
+   "FINAL_HOLD_SOURCE_CONFLICT": 9,
+   "FINAL_HOLD_OFFICIAL_SOURCE_MISSING": 343
+  }
+ },
+ "statusSum": 523,
+ "statusSumMatches523": true,
+ "verdict": "PASS",
+ "failedChecks": []
+}

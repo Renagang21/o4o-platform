@@ -1,0 +1,14 @@
+{
+ "builtAt": "2026-07-31T12:23:59.413Z",
+ "total": 476,
+ "byReason": {
+  "FINAL_HOLD_BOUNDARY_AMBIGUOUS": 124,
+  "FINAL_HOLD_SOURCE_CONFLICT": 9,
+  "FINAL_HOLD_OFFICIAL_SOURCE_MISSING": 343
+ },
+ "sourceMissingBreakdown": {
+  "SRV_USE": 314,
+  "MAIN_FNCTN": 29
+ },
+ "evidence": "MFDS raw JSONL(44,885행) 전량 대조 결과 343건 모두 원천 자체에 결측 — 데이터 복구 불가"
+}

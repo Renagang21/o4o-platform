@@ -1,0 +1,380 @@
+{
+ "builtAt": "2026-07-31T12:08:29.310Z",
+ "wo": "WO-O4O-HFF-KO-FINAL-HOLD-523-FULL-RESOLUTION-V1",
+ "trackA": [
+  {
+   "canonicalId": "b436560d-307f-482c-949e-2e6ef5f29d73",
+   "productMasterId": "c1834d6c-f0e7-4fc0-9243-76965a7eac73",
+   "oldContentHash": "88a6dbfa36019c76bb095dc056ed060728e10aedac846cd4eeaf6b8a7f51924a",
+   "newContentHash": "9b8fd00d974b0d6c9767d1dcee2b13407baf1472ae98bc08dac0d980f30ce33c",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 콜레스테롤 개선‧혈압조절에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음</li><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 콜레스테롤 개선‧혈압조절에 도움을 줄 수 있음</li><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li><li>식후 혈당상승 억제에 도움을 줄 수 있음</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "46848dea-bc82-4303-b254-e43c75ee6dba",
+   "productMasterId": "c2d07b5a-5915-4464-9e97-714453f82cfe",
+   "oldContentHash": "46fc4a2cc4d3422f3165a4a304fa6b153522b140d219c6f1c98986ec2cf54f31",
+   "newContentHash": "da8f6af756f062262209f5e067171d84dd52852eb57a3a08cc83b78d00aed11b",
+   "oldBlock": "<h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li><li>갱년기 여성의 건강에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비수리추출분말</b><ul class=\"sd-why\"><li>갱년기 남성건강에 도움을 줄 수 있음</li></ul></li><li><b>홍삼</b><ul class=\"sd-why\"><li>면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d9ec8670-76ba-454d-b220-6fb7877ff840",
+   "productMasterId": "252ea3e6-cb13-45b6-890f-d45c3c9c4d06",
+   "oldContentHash": "21eb54aaa8f15a5fd95f666df96f3220f494282f128f4221622c9fc8aa4384ae",
+   "newContentHash": "d1f20452009ca9fbb90295fe6d3dee06560d400033dee5b197595dddfc45c586",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골 건강·피부보습에 도움을 줄 수 있음</li></ul>\n  "
+  },
+  {
+   "canonicalId": "6b57e87e-56f0-4066-854e-711246d33ae4",
+   "productMasterId": "98352ee1-fc14-43de-a4b1-ab2fd144656e",
+   "oldContentHash": "66ee5373650af76929f12f28bc46d26260be019e28476db2c6a8a8cbb02b9be6",
+   "newContentHash": "4eee184ebabbf6334b2f99fd508fde624a0bb1f053987feda2b44a418de50371",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d6714db7-cc01-4766-90c6-f6ba8ba96e6e",
+   "productMasterId": "ed789cb0-c8d8-4b47-81c1-8c8298f7aace",
+   "oldContentHash": "40b65ea1d254f0ee2279b545e08bfb8632f876926a8d0ff3323db44cee843b4e",
+   "newContentHash": "dc3524860149a52f8d6b41e9355b4d5a1fc573a18c782dcb10f11fac86ccab15",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "9ee10890-55ac-43e6-b4e8-34d085914992",
+   "productMasterId": "e495669d-e347-48fe-bfa4-4e7d290cbfe1",
+   "oldContentHash": "5e42c9bbce347b0d04bb33518a0ec60b330f484a756003a5740ced5b37f363ed",
+   "newContentHash": "ecbe722638fc9335dc6f6ae1200b9b00dc6628409f572d330457a33087cc7494",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "3da07ee5-c606-473f-a7e3-16b3bb6ee4db",
+   "productMasterId": "0b3b6a3e-dbca-49d1-b03a-40fdf0079ffa",
+   "oldContentHash": "b44abfd0803f0d2a155aa07acc02a3dc989aabbae5958149f717f04376fc3331",
+   "newContentHash": "2ffad3c1262d6751e45170e0bb97ecb788a5a661ef18c5b9ace3669a719de560",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "39e1e41d-0aba-40f4-9c59-4abb047d3548",
+   "productMasterId": "3fd873af-49b4-48d0-9b85-9637b59fc34c",
+   "oldContentHash": "a272ee0bb519ceb207dec119613b43f404b556b0cc6c8325e5952be981a1cee2",
+   "newContentHash": "67eea39e637eb4a8962fcb5bc541bfecd50c59c9eb8d0cc9a965b4e694444775",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "b6eef84d-7c00-4297-8f63-5ce5e3278fc4",
+   "productMasterId": "6b31f869-8811-451b-bcab-ad1ddbd18481",
+   "oldContentHash": "a3e4747bf50c155b238d0957dbeb3bfde29713709f0f4f8eda18429990973175",
+   "newContentHash": "acd06960d44fd4c773c09e20f2debe259b840b923022feff4ef47195ad89da6d",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드AG(제2023-10호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음 (영문)</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요.</li><li>철의 흡수에 필요.</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "244998f5-fb12-42b2-8d18-9db9dc980885",
+   "productMasterId": "b5729b9a-0b9e-4d69-8a3e-8e2fdeaf98f5",
+   "oldContentHash": "c56efbd7f12b0693c27096cafe107496102128b27edcb626d5620e974d7a3a89",
+   "newContentHash": "86497648b833b9c9970cec9fff42f2368013c81af5e46d358975d88baefaf874",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d4405f7a-b8a5-40fc-a3df-956a0e2d69a1",
+   "productMasterId": "562c2915-ef40-4f16-a328-5d4a7715b7b4",
+   "oldContentHash": "67b74c7208a8a99efce6237913d3e6b43fa23f01d2707cf4db657723d17ae270",
+   "newContentHash": "7d3f93392ccb49d289a252c833fc0e38e15b1e0eb8cade704772cae3d8c2d2c6",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "8be88419-5dbf-4259-bdd0-1786ffeb5e09",
+   "productMasterId": "b4d0d2fd-b1a4-48dc-9e9a-159e2f5e26ae",
+   "oldContentHash": "ff54477f78c4d42a46d766ab65c3a7575c1abcf6f29271bbcd7f4f154d2f58a8",
+   "newContentHash": "ca5a999915ebd5efa19fa4b09d00b3f8bf084c687e1dc5ca2398cdcee4390c28",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음(영문)</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "ba3a1b14-06d1-43ca-a558-82d9ae2f5726",
+   "productMasterId": "bb1d39fa-7a39-4c30-9a57-baddf5959681",
+   "oldContentHash": "666f011670148421a5abe2a3f0670b0136e5ba6c5c7fb7ebec1cec2e5b35c2d4",
+   "newContentHash": "326773b77cdaeb0cde83716555409caea3683f7d613be7eb4685880fc1304a14",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d5f782c4-9375-4552-a40f-7cd443914bb6",
+   "productMasterId": "0e9a63f6-bfe2-4656-b66b-010e8eaceb88",
+   "oldContentHash": "bf7f172d4c315c89716f8847f4ab76bb0580971e73e32269fcfef7c0db2a1e9c",
+   "newContentHash": "c509054952df4cd59e7b5e570002882462658acf22452c061326cd0ccd4d58f1",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "3a95687d-3c65-4ffd-8252-e6341203dc40",
+   "productMasterId": "5816c43f-e801-4700-b259-a100d93a7cce",
+   "oldContentHash": "fad6b50cbe2695606e167649f0c4b9a793c7c9c898723811ccb3a260a3d495b3",
+   "newContentHash": "d9d8c488b5c1a4e566cf3cf402235c51eb118d6fd735332905fa3eb7a638f60b",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "8803471d-8243-4b77-9b55-0cd454e1c34e",
+   "productMasterId": "3ba029e0-a2c7-41c2-977a-ef0afaca86df",
+   "oldContentHash": "23a2d72cf861918286ff050e2bec59c60e85c1361a8c0d170306413d6bcadd90",
+   "newContentHash": "96b6f51783a26e007c7288b9f4ed47568cf378f4492c99491ee4e5594f6bb20f",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "50d7964f-d0f1-40f8-9cd6-95d13d69b57f",
+   "productMasterId": "77323dd0-7d6a-4bcb-b9c9-1be3a50a54b7",
+   "oldContentHash": "4477803ec9f24a03fd10eead195a84fb55abfb73c6512f0589210e2924dd05cc",
+   "newContentHash": "4a5b5cc06a622e00bf58bf8f9f8023beb1f74d1a5d4004b7822a5c1e0c34b947",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "ad7fda27-0d13-4a2c-bd88-811b05d99f96",
+   "productMasterId": "7d585f3d-13aa-4264-9760-6debed2ee1ce",
+   "oldContentHash": "b49a3b7d3a77f9e59fae331b4e314650b149d916cc49f7bdb24dda617181940c",
+   "newContentHash": "9c68cd69000b2a6b5b2431a9d37941b15bcb6334f8177a3dcd2d6d27e3eb45b8",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "0db5c6dc-4e62-490a-905b-6d86ba1d40e3",
+   "productMasterId": "f42f7d21-501c-4e1e-b9d5-b95a5adccf92",
+   "oldContentHash": "03eb3026ec0a6ba4f9bd26def19a87ccbeabfed97c5e06f275bf6e1116945a14",
+   "newContentHash": "e7e5aa14f43346fff3aaccecace8329871b43d26b9c8da6d34c4a1023ce14270",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 (제2023-33호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "044b6e22-bdc7-4cf9-bf39-c3ca3f005f31",
+   "productMasterId": "7b10866b-6cc7-477b-8602-0ba2a362ae61",
+   "oldContentHash": "d59989f725b41c187e2de06dad85de19b44c518f924c3ea4f77ed19919ea9795",
+   "newContentHash": "48f98eff700b9c31fe1bbbc364601f118802879fb110ccdead6ce64ae173751e",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "94b44583-cac6-465c-a54e-04e4c636cc1a",
+   "productMasterId": "dd623b20-263c-4225-84dc-df522bb03463",
+   "oldContentHash": "85663c7a6a4670c9c7b1f594b88cbe3c978244586fd9f7a63b1f50d4437ec638",
+   "newContentHash": "a8bafdf41957994b81bf4f5d167cd5264d6d74176842a0438bb48a60c46b771c",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-33호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "3751bdd0-1213-4c3d-9b5a-31c71fd637c5",
+   "productMasterId": "108215ec-55da-474c-8772-bc9ee1001452",
+   "oldContentHash": "fa0da32919c75b0bb19acee794bc1fe7131383a7ed30f994debb1b3c5807c90c",
+   "newContentHash": "1277d9154a36c510b735317a4654a854f63ffad0f7340403ffdcc9e39adaa347",
+   "oldBlock": "<h2>이 홍삼의 공식 기능성</h2><ul class=\"sd-fn\"><li>면역력 증진에 도움을 줄 수 있음</li><li>피로개선에 도움을 줄 수 있음</li><li>혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음</li><li>기억력 개선에 도움을 줄 수 있음</li><li>항산화에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음</li><li>면역력 증진･피로개선에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 3~80 mg</li><li>혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음 : 진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 2.4~80 mg</li></ul>\n  "
+  },
+  {
+   "canonicalId": "0981adc6-880b-4db0-9921-4530f5a7bee3",
+   "productMasterId": "ff701951-2bea-4bc0-beb9-b41ae222cb22",
+   "oldContentHash": "d0bd8ded5a147e2616601ad2d9a69866e70ef09e699fe5cf830baea9aab01dc9",
+   "newContentHash": "9f9afbf54fa039e7248c46c43e095371d28e7899e445acb8e31af6c617ee025b",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 콜레스테롤 개선·식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>단백질</b><ul class=\"sd-why\"><li>효소, 호르몬, 항체의 구성에 필요</li><li>체내 필수 영양성분이나 활성물질의 운반과 저장에 필요</li><li>체액, 산-염기의 균형 유지에 필요</li><li>에너지, 포도당, 지질의 합성에 필요</li></ul></li><li><b>귀리식이섬유</b><ul class=\"sd-why\"><li>혈중 콜레스테롤 개선·식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "6783fdbd-6698-4129-8084-852868c90543",
+   "productMasterId": "5fc0c04e-979a-4b86-ada7-f34e54c068f1",
+   "oldContentHash": "faf82cebf7d6254ef8f929087076cc1a95593256ac1dbf0a3c2e5c992fa48eb3",
+   "newContentHash": "05128990b83e192a02b18d878869e755a09079acf7faab54ba2c875e19df84de",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-33호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "7a1f31d2-3575-4c52-bf6a-bbbb1e77a627",
+   "productMasterId": "5c364cb4-a172-4076-baed-662555f6fc09",
+   "oldContentHash": "638ac68ef25db93a7d19e1d380d34eb82790b6e7838b198c7c38a3dfcba754dd",
+   "newContentHash": "56c429c63540893c8fbdf9fd53fe041603b1af0557b05ba9cb8e57858977c0ab",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후혈당상승 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>단백질</b><ul class=\"sd-why\"><li>효소, 호르몬, 항체의 구성에 필요</li><li>체내 필수 영양성분이나 활성물질의 운반과 저장에 필요</li><li>체액, 산-염기의 균형 유지에 필요</li><li>에너지, 포도당, 지질의 합성에 필요</li></ul></li><li><b>난소화성말토덱스트린 제품</b><ul class=\"sd-why\"><li>식후혈당상승 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "8bef74d4-455a-4f8d-a2b6-8aaec5bd599a",
+   "productMasterId": "703e8dcb-8370-4ff9-a7e7-4d473ca368eb",
+   "oldContentHash": "e8ea6dae9c094d31d1908b263a06066aff36156eeca1e6747db2a61d230627f8",
+   "newContentHash": "0902e09a0f0807f427791ce5d3e9daef8b5e1b15c7874a1cddc34eac98cead0f",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후혈당상승 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>단백질</b><ul class=\"sd-why\"><li>효소, 호르몬, 항체의 구성에 필요</li><li>체내 필수 영양성분이나 활성물질의 운반과 저장에 필요</li><li>체액, 산-염기의 균형 유지에 필요</li><li>에너지, 포도당, 지질의 합성에 필요</li></ul></li><li><b>난소화성말토덱스트린 제품</b><ul class=\"sd-why\"><li>식후혈당상승 억제에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "391e0945-86ef-461f-bac8-263bd48698ed",
+   "productMasterId": "4ff34b24-8aa1-4016-9e4c-a36acab3148c",
+   "oldContentHash": "3d1130ed87901a27b5fd42ccc7a33fcb1512975aaa4669e61154682682624db3",
+   "newContentHash": "63b0979e98757fd5e99e322dcd286297ab4d47a95e22054bf99c89c35f8bc97b",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정제2013-30호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "2fc13913-cbc8-41a0-a391-a0bd807d3ec2",
+   "productMasterId": "8d69f6ef-821d-4a0c-8f2d-b2817a745466",
+   "oldContentHash": "3965c3dab05e6e7dcb4429bda202869b4dd1616a689ab3320c4ed70da10ac815",
+   "newContentHash": "f4fff971c93b5626782df9500bdc1579e2a25e2fc3220e653ac43bd31ccac417",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정제2013-30호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "fd949076-4ebc-4368-9d05-cabb25f9a5c9",
+   "productMasterId": "f0ccf982-568e-41a8-957b-5329f24eef74",
+   "oldContentHash": "7092153294841361dd89dcc1bb1a2e3e8f40427d447ea97be1b2322601223951",
+   "newContentHash": "06fc95b2b1b1c745b67cc1e0f7bd37d126bd01879be8874da1ec1326a1ed7fb6",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>셀레늄(또는 셀렌)</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "828356c9-56bc-4a7b-a691-15730453a35d",
+   "productMasterId": "96079961-3005-4700-8341-b0a70435c729",
+   "oldContentHash": "b96627e8a298487d8ce5ae84a947cda7c6fc905a6372ca89a6d2d78a980c8893",
+   "newContentHash": "d35e2952eecbb3c13511f24c00f442687ac40b44b28c977f242383c86c562b45",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "2d97de40-ba5d-47e3-8642-df7efd8cba56",
+   "productMasterId": "9a9eb8c4-1f00-4030-85e9-a11a33b44d32",
+   "oldContentHash": "4eb9ec356c954f2a0c9b380ef4620cd02ef6bce32ed4d0b08315b1694fa26054",
+   "newContentHash": "c6b0258d967d663acc80239b1f9fde638fb3b35b0e330ebfb60f948d95505b55",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d544678e-92cd-4923-9289-d76561b92c3b",
+   "productMasterId": "ca808428-8f7e-435c-9741-c09ad7dbf2cc",
+   "oldContentHash": "78d48c65d34ea51826ef573a0bfb46327af606a544ca93de35cd096e2fc2b05a",
+   "newContentHash": "0d5dc98a50d6c2f76926e1609a47c0ca4d185d2c3facb94d1dc987d2eab201c4",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음, 자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "d9036017-a86e-4b1c-977b-0e0282e64a41",
+   "productMasterId": "6f9213f6-0443-4410-9a0c-5971e9ea73ac",
+   "oldContentHash": "97961f20bd6191e5374ecbbaabdef2350e44040f62a293e09187c8e30ac898fa",
+   "newContentHash": "908f09eec842fd9e55675aa9dbba85f84cbe5fedc7cb6558ef7870580df9abb6",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG(제2023-10호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>ⓛ결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "25a7fa16-6729-4f97-ac31-5f3815a216cf",
+   "productMasterId": "e18a1c88-dfb1-43df-803a-caa2a0259d14",
+   "oldContentHash": "7997e925a9a2aa32180aab376f6f615ec4be04af9e5bb9fcc89af905ff04b496",
+   "newContentHash": "dd9998c988f036fd1d051385ac723ede8ceeaebe9a7365b7204d4fff44a41b19",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG(제2023-10호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "0ff84b08-babd-46d0-bfbb-73ed11f321cb",
+   "productMasterId": "f24b719e-1177-4610-ace8-13741539e3ee",
+   "oldContentHash": "8c1bdd9c4023424705eddb57cb04086cef58a1a290de7626b1efc13c21759be2",
+   "newContentHash": "3ecbd2c7cdedfbe69e72e2bb7235b334ddea959519fdd390dd37daf24c29e795",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>귀리식이섬유</b><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li><li><b>단백질</b><ul class=\"sd-why\"><li>효소, 호르몬, 항체의 구성에 필요</li><li>체내 필수 영양성분이나 활성물질의 운반과 저장에 필요</li><li>체액, 산-염기의 균형 유지에 필요</li><li>에너지, 포도당, 지질의 합성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "3c043aa8-0beb-41cc-b4fd-55fb71392350",
+   "productMasterId": "b4c695cc-bc72-405e-a378-208dc1eeca64",
+   "oldContentHash": "07d38ce3249145691eb72299926091f827ad16e2a837f25b6d9741bacc2771dd",
+   "newContentHash": "e6a37daf93f4e5a1ca1e7957cae4cd28fb42c1cc6b11e8a771f3d591b3f21dc6",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "b188446e-4591-4268-b5e2-2f2651c455c4",
+   "productMasterId": "5fa16b06-5da0-4166-892d-8bf294bb7408",
+   "oldContentHash": "35f4c1f3557e57ade5da60d3bcbe9bbd525ed7c3689c99a9359b9c765af8cc8a",
+   "newContentHash": "5f8da5d7bfe57e9a919f2077dad0acf3c89caf75c2f866a2abe2d1dd703f7e0b",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드 AG</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요 / 철의 흡수에 필요 / 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "2824e48b-cad8-4e78-ab91-cd5f5c633c7d",
+   "productMasterId": "04117986-0616-47ce-aaf8-a7cfd9c36346",
+   "oldContentHash": "6d7b815fa6f57a32a926fb5e3e271c70ef092ab0149301ca6b202b2df8c13565",
+   "newContentHash": "53c6c000e6263b2c76fcdf1043bd6c280cc7925abf3b2557df7658acb98d0027",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>면역기능 증진에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>: (국문) 면역기능 증진에 도움을 줄 수 있음</li></ul>\n  "
+  },
+  {
+   "canonicalId": "d0b0d3b3-351e-47da-9422-9c1375053dfa",
+   "productMasterId": "52ba2e21-5251-4c05-a532-b904140a9c26",
+   "oldContentHash": "95999b02f3d8096aeafcbcadc64464d27b2f5c08b4103b7bbf2afc5f8475196e",
+   "newContentHash": "53bb45466335a353b936b65193517154343e74c8524aa68f6eb683889984cca8",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민C</b><ul class=\"sd-why\"><li>: (가) 결합조직 형성과 기능유지에 필요, (나) 철의 흡수에 필요, (다) 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>: (가) 정상적인 면역기능에 필요, (나) 정상적인 세포분열에 필요</li></ul></li><li><b>셀레늄(또는 셀렌)</b><ul class=\"sd-why\"><li>: 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>: (가) 칼슘과 인이 흡수되고 이용되는데 필요, (나) 뼈의 형성과 유지에 필요, (다) 골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>: 탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>: 체내 에너지 생성에 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>: (가) 단백질 및 아미노산 이용에 필요, (나) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "786c6475-672e-434e-bee5-7381f932fa81",
+   "productMasterId": "b9b35b5b-00b3-4dc5-a37a-2976db4fc6ce",
+   "oldContentHash": "9b4de6c2673de5b4bb3d10d59b9d04d86f1a5169c70db3d8797846c27052ec63",
+   "newContentHash": "db10230b64cae7a73e2afa9b3d450d57a253d78fa537c1d382666f387d850a6b",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  "
+  }
+ ],
+ "trackB": [
+  {
+   "candidateId": "bbd757b9-e568-463a-93a5-a854a34fc2cf",
+   "statementNo": "200400200072585",
+   "productName": "라이트다운"
+  },
+  {
+   "candidateId": "0ed3a364-f772-4f67-9367-29f76fe5ada7",
+   "statementNo": "200400200072604",
+   "productName": "프로메테우스"
+  },
+  {
+   "candidateId": "2f3ca452-72c4-4f44-b306-a57a0a7cd065",
+   "statementNo": "201000190041173",
+   "productName": "좋았던 그때로"
+  },
+  {
+   "candidateId": "386b79fc-1320-4b53-8112-9874c75ec3d9",
+   "statementNo": "201000190041175",
+   "productName": "위타민에너지(Weetamin Energy)"
+  },
+  {
+   "candidateId": "0ba346b2-2daf-42ec-ba5e-60cab53e67f6",
+   "statementNo": "20100019004646",
+   "productName": "초이스 멀티비타민 앤 미네랄 포 멘"
+  }
+ ],
+ "reversal": {
+  "A": "newBlock → oldBlock 치환 후 sha256 == oldContentHash",
+  "B": "SPD 삭제 + candidate 링크 해제 + ProductMaster 삭제"
+ },
+ "createdIds": {
+  "masters": [
+   "8d8b3220-5738-4a42-b2f8-85dcfe8428ad",
+   "c9422d31-0a33-4320-b8c4-ccd67ebc2b3e",
+   "bd695bde-fdaa-4e65-9745-036494857bdc",
+   "06f56208-fcce-4ea3-8ea9-0319d33da3fb",
+   "d77ac958-ccb6-4084-89fe-17ea43923e73"
+  ],
+  "spds": [
+   "f7ee3b70-be7e-4fe9-a1d1-5293071de157",
+   "8f52a568-c4d4-47e4-acfa-e366c2227309",
+   "080d3b0e-d846-4d83-8847-587f95281b0b",
+   "42ba8351-ea50-4c85-99a0-4aecb5f926c9",
+   "b0181347-6c7d-4e0d-8335-f72549a89333"
+  ],
+  "links": [
+   "bbd757b9-e568-463a-93a5-a854a34fc2cf",
+   "0ed3a364-f772-4f67-9367-29f76fe5ada7",
+   "2f3ca452-72c4-4f44-b306-a57a0a7cd065",
+   "386b79fc-1320-4b53-8112-9874c75ec3d9",
+   "0ba346b2-2daf-42ec-ba5e-60cab53e67f6"
+  ]
+ }
+}

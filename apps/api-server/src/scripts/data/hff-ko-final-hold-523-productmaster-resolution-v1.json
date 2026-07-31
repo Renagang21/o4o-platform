@@ -1,0 +1,41 @@
+{
+ "plannedCreates": 5,
+ "contract": "permit 로 기존 master 0건 + 공식 식별 단일 확정 시에만 생성",
+ "plan": [
+  {
+   "candidateId": "bbd757b9-e568-463a-93a5-a854a34fc2cf",
+   "statementNo": "200400200072585",
+   "productName": "라이트다운",
+   "maker": "(주)한국씨엔에스팜",
+   "reason": "permit 로 기존 master 0건 · 공식 식별 단일"
+  },
+  {
+   "candidateId": "0ed3a364-f772-4f67-9367-29f76fe5ada7",
+   "statementNo": "200400200072604",
+   "productName": "프로메테우스",
+   "maker": "(주)한국씨엔에스팜",
+   "reason": "permit 로 기존 master 0건 · 공식 식별 단일"
+  },
+  {
+   "candidateId": "2f3ca452-72c4-4f44-b306-a57a0a7cd065",
+   "statementNo": "201000190041173",
+   "productName": "좋았던 그때로",
+   "maker": "엔피케이(주)",
+   "reason": "permit 로 기존 master 0건 · 공식 식별 단일"
+  },
+  {
+   "candidateId": "386b79fc-1320-4b53-8112-9874c75ec3d9",
+   "statementNo": "201000190041175",
+   "productName": "위타민에너지(Weetamin Energy)",
+   "maker": "엔피케이(주)",
+   "reason": "permit 로 기존 master 0건 · 공식 식별 단일"
+  },
+  {
+   "candidateId": "0ba346b2-2daf-42ec-ba5e-60cab53e67f6",
+   "statementNo": "20100019004646",
+   "productName": "초이스 멀티비타민 앤 미네랄 포 멘",
+   "maker": "엔피케이(주)",
+   "reason": "permit 로 기존 master 0건 · 공식 식별 단일"
+  }
+ ]
+}

@@ -1,0 +1,28 @@
+{
+ "ranAt": "2026-07-31T12:11:28.690Z",
+ "applied": false,
+ "dbWrites": 0,
+ "docs": 45,
+ "trackA": 40,
+ "trackB": 5,
+ "wrapperProof": {
+  "withoutWrapper": "none",
+  "withWrapper": "860px",
+  "cssActuallyApplied": true
+ },
+ "aggregate": {
+  "checked": 135,
+  "pageOverflow": 0,
+  "elemOverflow": 0,
+  "clipped": 0,
+  "emptyNode": 0,
+  "undefinedClass": 0,
+  "expertMissing": 0,
+  "rawHtml": 0,
+  "markerVisible": 0,
+  "englishVisible": 0,
+  "fnSectionMissing": 0
+ },
+ "failures": [],
+ "verdict": "PASS"
+}
