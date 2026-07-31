@@ -1,0 +1,200 @@
+{
+ "purpose": "HFF ko 인수인계 정합 감사 — 원본 사람 검토 큐 3,858 ↔ 후속 WO 처리 결과 ↔ 현재 DB. read-only, DB write 0.",
+ "generatedAt": "2026-07-31T04:36:10.098Z",
+ "headCommit": "1bb21bd35",
+ "inventory": {
+  "originalQueue": 3858,
+  "pilot47Delta": 47,
+  "whyFamily825Delta": 825,
+  "whyFamily525Delta": 525,
+  "policyCleanupHumanReview": 13,
+  "remaining14Decisions": 14,
+  "agent9Hold": 348
+ },
+ "deltaStatusTally": {
+  "pilot47": {
+   "BLOCKED_STRUCTURE": 33,
+   "BLOCKED_SOURCE_DATA": 5,
+   "RESOLVED_NO_CHANGE": 3,
+   "RESOLVED_UPDATED": 6
+  },
+  "whyFamily825": {
+   "PENDING": 525,
+   "RESOLVED_UPDATED": 300
+  },
+  "whyFamily525": {
+   "RESOLVED_UPDATED": 511,
+   "PENDING": 14
+  }
+ },
+ "deltaCanonicalUpdated": {
+  "pilot47": 6,
+  "whyFamily825": 300,
+  "whyFamily525": 511
+ },
+ "deltaStillPending": {
+  "uniqueCandidateIds": 563,
+  "alsoInOriginalQueue": 176
+ },
+ "overlapWithOriginalQueue": [
+  {
+   "label": "pilot-47 delta",
+   "rows": 47,
+   "byCandidateId": 47,
+   "byCanonicalId": 47,
+   "candidateIdPresent": 47,
+   "canonicalIdPresent": 47
+  },
+  {
+   "label": "why-family 825 delta",
+   "rows": 825,
+   "byCandidateId": 143,
+   "byCanonicalId": 143,
+   "candidateIdPresent": 825,
+   "canonicalIdPresent": 825
+  },
+  {
+   "label": "why-family 525 delta",
+   "rows": 525,
+   "byCandidateId": 138,
+   "byCanonicalId": 138,
+   "candidateIdPresent": 525,
+   "canonicalIdPresent": 525
+  },
+  {
+   "label": "policy-cleanup 잔여 13",
+   "rows": 13,
+   "byCandidateId": 13,
+   "byCanonicalId": 13,
+   "candidateIdPresent": 13,
+   "canonicalIdPresent": 13
+  },
+  {
+   "label": "remaining-14 decisions",
+   "rows": 14,
+   "byCandidateId": 13,
+   "byCanonicalId": 13,
+   "candidateIdPresent": 14,
+   "canonicalIdPresent": 14
+  },
+  {
+   "label": "Agent 9 HOLD 348",
+   "rows": 348,
+   "byCandidateId": 0,
+   "byCanonicalId": 0,
+   "candidateIdPresent": 348,
+   "canonicalIdPresent": 0
+  }
+ ],
+ "resolvedFromOriginalQueue": {
+  "resolvedCandidateIds": 820,
+  "resolvedCanonicalIds": 820,
+  "originalQueueRowsNowResolved": 139
+ },
+ "originalQueueRemainingByReason": {
+  "INGREDIENT_FUNCTION_BOUNDARY_UNCLEAR": 973,
+  "SOURCE_CLAUSE_SEGMENTATION_UNCERTAIN": 3024,
+  "ENGLISH_PARALLEL_AMBIGUOUS": 242,
+  "FORM_FUNCTION_BOUNDARY_UNCLEAR": 1197,
+  "MALFORMED_BRACKET": 38,
+  "ENGLISH_ONLY_FUNCTION": 252,
+  "OFFICIAL_GROUP_RESTART_AMBIGUOUS": 4,
+  "FUNCTION_CONTAINER_NOT_IDENTIFIABLE": 45,
+  "MULTI_INGREDIENT_FLAT_STRUCTURE": 9,
+  "COMPOSITE_GROUP_BOUNDARY_UNCLEAR": 26,
+  "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH": 9,
+  "UNSUPPORTED_RENDERER_STRUCTURE": 12,
+  "OTHER_REVIEW_REQUIRED": 14
+ },
+ "focusReasonRows": {
+  "UNSUPPORTED_RENDERER_STRUCTURE": 68,
+  "FUNCTION_CONTAINER_NOT_IDENTIFIABLE": 101,
+  "CANONICAL_STRUCTURE_UNSAFE_TO_PATCH": 9
+ },
+ "transactionReadOnly": "on",
+ "dbNow": {
+  "hffKoCanonical": 40913,
+  "hffAllLanguages": [
+   {
+    "lang": "ko",
+    "n": 40913
+   },
+   {
+    "lang": "en",
+    "n": 15498
+   }
+  ],
+  "koWithFunctionHeading": 40900,
+  "koWithoutFunctionHeading": 13,
+  "koWhyFamily": 15371,
+  "koNonWhyFamily": 25542,
+  "koIreonBunkke": 127,
+  "koExpertFooterMissing": 127,
+  "koSdFunc": 8718,
+  "enTotal": 15498,
+  "enSdFunc": 8716,
+  "enWithFunctionHeading": 14672,
+  "enIreonBunkkeEquivalent": {
+   "sd_who": 15498,
+   "who_heading": 8848
+  }
+ },
+ "nonWhyFamily": {
+  "n": 25542,
+  "with_aud": 127,
+  "no_expert": 127,
+  "with_function": 25542,
+  "sd_item": 25542,
+  "sd_func": 78
+ },
+ "nonWhyFamilyH2": [
+  {
+   "h2": "확인 가능한 기준·규격 정보",
+   "n": 25415
+  },
+  {
+   "h2": "매장 전문가 문의 안내",
+   "n": 25415
+  },
+  {
+   "h2": "섭취량 및 섭취방법 (공식 표기 그대로)",
+   "n": 25415
+  },
+  {
+   "h2": "주요 기능성",
+   "n": 25415
+  },
+  {
+   "h2": "섭취 시 참고사항",
+   "n": 24733
+  },
+  {
+   "h2": "표시 기준",
+   "n": 127
+  },
+  {
+   "h2": "섭취방법 (공식 표기 그대로)",
+   "n": 127
+  },
+  {
+   "h2": "이런 분께",
+   "n": 127
+  },
+  {
+   "h2": "원료별 공식 인정 기능성",
+   "n": 78
+  },
+  {
+   "h2": "공식 인정 기능성",
+   "n": 49
+  }
+ ],
+ "koEnPairing": {
+  "ko_total": 40913,
+  "with_en_pair": 15498
+ },
+ "remaining13Verify": {
+  "found": 13,
+  "still_missing_function": 13
+ }
+}
