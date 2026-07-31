@@ -1,0 +1,79 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-GREEN-TO-EN-COVERAGE-AUDIT-V1",
+  "headAtStart": "898e7765",
+  "liveDbWrite": 0,
+  "populationContract": "V4 공식대상 − terminal/exclude → 영어 조건 없이 KO STORE canonical 보유 master 재구성",
+  "officialTargets": 3809,
+  "termExclude": 330,
+  "candidates": 3479,
+  "koPopulation": 3476,
+  "koCanonicalDuplicates": 0,
+  "classification": {
+    "A_EN_CANONICAL_CURRENT": 3236,
+    "B_EN_NEEDS_REVIEW": 0,
+    "D_EN_STALE": 0,
+    "E_EN_INCOMPLETE_OR_INVALID": 240,
+    "F_EN_MISSING": 0
+  },
+  "note_C": "C EN_DRAFT_ONLY 는 번역 JSON/draft 파일 자산 스캔이 필요해 본 패스에서 판정하지 않았다. 현재 F 에 포함돼 있으므로 F 는 상한값이다.",
+  "coverageRate": 93.1,
+  "byRoute": {
+    "oral": {
+      "A": 1634,
+      "B": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0
+    },
+    "ophthalmic": {
+      "A": 281,
+      "B": 0,
+      "D": 0,
+      "E": 33,
+      "F": 0
+    },
+    "topical": {
+      "A": 676,
+      "B": 0,
+      "D": 0,
+      "E": 182,
+      "F": 0
+    },
+    "vaginal": {
+      "A": 11,
+      "B": 0,
+      "D": 0,
+      "E": 12,
+      "F": 0
+    },
+    "oromucosal": {
+      "A": 25,
+      "B": 0,
+      "D": 0,
+      "E": 8,
+      "F": 0
+    },
+    "unknown": {
+      "A": 558,
+      "B": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0
+    },
+    "rectal": {
+      "A": 21,
+      "B": 0,
+      "D": 0,
+      "E": 5,
+      "F": 0
+    },
+    "oromucosal+vaginal": {
+      "A": 30,
+      "B": 0,
+      "D": 0,
+      "E": 0,
+      "F": 0
+    }
+  },
+  "systemStop": []
+}

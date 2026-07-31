@@ -1,0 +1,2406 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-GREEN-TO-EN-COVERAGE-AUDIT-V1",
+  "total": 240,
+  "rows": [
+    {
+      "masterId": "007b4844-d219-48c8-ab84-ec3c7b682fca",
+      "route": "topical",
+      "koSourceRef": "1a2d5f9d-44f6-2402-3cea-88a2f66b0510",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1a2d5f9d-44f6-2402-3cea-88a2f66b0510",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "011ee863-0947-4669-a4d1-32263a9914ad",
+      "route": "topical",
+      "koSourceRef": "16c4d92c-634b-f5a6-d832-831620c33d10",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "16c4d92c-634b-f5a6-d832-831620c33d10",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "06ec5495-87d4-48c7-8f6d-d0e3bab05a83",
+      "route": "topical",
+      "koSourceRef": "a12b466a-b9ad-dd9d-557f-d6b817a5a15c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a12b466a-b9ad-dd9d-557f-d6b817a5a15c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "route": "oromucosal",
+      "koSourceRef": "f63140ac-a303-fd56-11f4-28390b7d457e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f63140ac-a303-fd56-11f4-28390b7d457e",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "092df237-586f-4a5d-a6d9-24387c05ebf7",
+      "route": "topical",
+      "koSourceRef": "90f253ff-44b8-f2ee-6f70-b8f260d09bb4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "90f253ff-44b8-f2ee-6f70-b8f260d09bb4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0a0da1de-f2e3-4746-830b-35b86e50991a",
+      "route": "topical",
+      "koSourceRef": "f5814379-5a33-eacf-63d5-6a2629e9a395",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f5814379-5a33-eacf-63d5-6a2629e9a395",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0a2c7182-6ec3-4586-9ee4-a8905ef8cbed",
+      "route": "topical",
+      "koSourceRef": "93ee6760-c6b7-d6e2-118d-7d2a722ba347",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "93ee6760-c6b7-d6e2-118d-7d2a722ba347",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0adcd6d2-fbd2-4516-b5d4-15a4de9aab91",
+      "route": "topical",
+      "koSourceRef": "7e339f93-80e4-bb38-3376-e7e1aeaefb81",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7e339f93-80e4-bb38-3376-e7e1aeaefb81",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0b3c0790-a67e-4986-8799-2f400fcfa851",
+      "route": "topical",
+      "koSourceRef": "1e246e8e-2e63-f7b0-16c3-01ab69f8b142",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1e246e8e-2e63-f7b0-16c3-01ab69f8b142",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0c5d6f85-e8a7-4d72-a8b7-e9da4a5d8139",
+      "route": "topical",
+      "koSourceRef": "74d0fdeb-9ba4-acc7-dd6a-a852ffee4007",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "74d0fdeb-9ba4-acc7-dd6a-a852ffee4007",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0d6eba06-5373-47db-9639-73d6c3903eb6",
+      "route": "topical",
+      "koSourceRef": "97eb9bbc-3bd5-d2d5-2fa7-61d5f410941e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "97eb9bbc-3bd5-d2d5-2fa7-61d5f410941e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0d6f1fa3-0bc9-4466-917e-d8523984b7dd",
+      "route": "topical",
+      "koSourceRef": "39cbf61d-875d-3a1b-6f65-746b86740616",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "39cbf61d-875d-3a1b-6f65-746b86740616",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0d8652d7-8e64-4a26-b832-329fb4735583",
+      "route": "topical",
+      "koSourceRef": "f9bf32b4-475e-8880-866b-178301be34f6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f9bf32b4-475e-8880-866b-178301be34f6",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "0f13048a-58c7-4fa8-9c14-b880c17abab8",
+      "route": "rectal",
+      "koSourceRef": "376e4c6b-3ecc-d645-edfb-dac1e571af6c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "376e4c6b-3ecc-d645-edfb-dac1e571af6c",
+      "classification": "E",
+      "reason": "비경구(rectal)에 경구동사"
+    },
+    {
+      "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "route": "oromucosal",
+      "koSourceRef": "36a519ea-76cd-0f66-33e9-02997575a0d6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "36a519ea-76cd-0f66-33e9-02997575a0d6",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "105bda3d-ca30-49b5-a734-e0844adf9fbf",
+      "route": "ophthalmic",
+      "koSourceRef": "d511fca6-52d6-9092-25d1-735cee333f7c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d511fca6-52d6-9092-25d1-735cee333f7c",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "1095c58a-103d-4072-a63c-8ef8034c9fc8",
+      "route": "ophthalmic",
+      "koSourceRef": "98d3518c-4440-0987-b15a-70ae7d567ade",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "98d3518c-4440-0987-b15a-70ae7d567ade",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "12e68473-14c3-4496-b647-b675b2f2000e",
+      "route": "topical",
+      "koSourceRef": "36e43647-fdd5-725e-9e57-c2c5e0b3e74d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "36e43647-fdd5-725e-9e57-c2c5e0b3e74d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "12fed7d1-1c3a-415c-9427-0a16fa81e78f",
+      "route": "topical",
+      "koSourceRef": "899d288a-e718-052b-b2a7-01bb41025580",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "899d288a-e718-052b-b2a7-01bb41025580",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "14fc0a20-1596-4e98-8910-9bd4572779cb",
+      "route": "topical",
+      "koSourceRef": "35ffbf08-afb2-5803-ba01-d7c9eb072c59",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "35ffbf08-afb2-5803-ba01-d7c9eb072c59",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "15659f7d-a331-4fa8-9c15-f112fa8c5626",
+      "route": "ophthalmic",
+      "koSourceRef": "eef6d005-b098-445a-b1a6-cfd3d2bdef76",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "eef6d005-b098-445a-b1a6-cfd3d2bdef76",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "168f70dd-b39a-4b48-b421-8f5f0a6311d9",
+      "route": "topical",
+      "koSourceRef": "7f0946ee-c859-3f37-ec7a-30f4e87b23bf",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7f0946ee-c859-3f37-ec7a-30f4e87b23bf",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "16ca65c9-e768-4d06-b766-d8f236f88019",
+      "route": "topical",
+      "koSourceRef": "f2b9d70c-c6b1-46be-7286-3125afbd0c69",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f2b9d70c-c6b1-46be-7286-3125afbd0c69",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "17f38ea5-12a6-4979-8b99-46161e026685",
+      "route": "topical",
+      "koSourceRef": "fe5e9284-9d9a-706c-c389-c2a068c45a79",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fe5e9284-9d9a-706c-c389-c2a068c45a79",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "19f11338-677f-41e6-9181-aff2783163fd",
+      "route": "topical",
+      "koSourceRef": "bc57bf5c-b421-3df1-c214-15908fe1718b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bc57bf5c-b421-3df1-c214-15908fe1718b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "1c6f0b2b-68b2-4aa3-b3a2-02603d8b6f06",
+      "route": "topical",
+      "koSourceRef": "50443ffc-cd06-66a5-9869-2533e0dbd8cb",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "50443ffc-cd06-66a5-9869-2533e0dbd8cb",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "1c9135df-384f-41da-a751-f67dc3c7de20",
+      "route": "topical",
+      "koSourceRef": "3a171acc-8379-28d8-846e-d797ee248053",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3a171acc-8379-28d8-846e-d797ee248053",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "21de2d06-2e8d-49b5-8e6a-26f2aa2e4e77",
+      "route": "topical",
+      "koSourceRef": "97d466e8-96f0-791d-448a-7cad7ac5a11d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "97d466e8-96f0-791d-448a-7cad7ac5a11d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "220d46f6-38e0-4edb-b9cd-3bf832a5dd7e",
+      "route": "topical",
+      "koSourceRef": "53a205b6-c1dc-2a01-c346-499fccb5ffaa",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "53a205b6-c1dc-2a01-c346-499fccb5ffaa",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "23abad92-b5bb-4372-9c4d-2f4fa690e69c",
+      "route": "topical",
+      "koSourceRef": "319c41f6-63b6-14c7-fb7f-ce4c6a0c874c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "319c41f6-63b6-14c7-fb7f-ce4c6a0c874c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "23b3bfb0-bb5f-4a51-bc15-0a7edfd6ca66",
+      "route": "ophthalmic",
+      "koSourceRef": "9a75a5e8-3a97-4e82-71dc-b6927dc14026",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9a75a5e8-3a97-4e82-71dc-b6927dc14026",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "2478dd9a-7363-4acf-a65e-b4faef02735d",
+      "route": "topical",
+      "koSourceRef": "a157da59-94b1-2b40-a648-d447c145b1e0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a157da59-94b1-2b40-a648-d447c145b1e0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "2486df78-bb0c-41de-a14b-cbdb6beb4e3d",
+      "route": "topical",
+      "koSourceRef": "34811585-e693-e08a-dc1b-b20f95da05ee",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "34811585-e693-e08a-dc1b-b20f95da05ee",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "260ddc4d-7177-4f62-9954-5948130464ec",
+      "route": "topical",
+      "koSourceRef": "5abaf866-ba54-5ace-62a3-431a6616efd0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5abaf866-ba54-5ace-62a3-431a6616efd0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "27ca2eef-5343-4d2b-b196-2a6f98a21d5e",
+      "route": "topical",
+      "koSourceRef": "bcae3844-4393-904a-7874-77b6ba33ff0b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bcae3844-4393-904a-7874-77b6ba33ff0b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "2c0590c6-5403-4719-b9c0-26d1e8983127",
+      "route": "ophthalmic",
+      "koSourceRef": "bd85c0c4-bcd6-7b12-1b8e-724b71cf3be9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bd85c0c4-bcd6-7b12-1b8e-724b71cf3be9",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "2db31f8a-ea4e-4ff6-9103-95d5240945a3",
+      "route": "topical",
+      "koSourceRef": "245717c4-d23f-d8d1-4909-3517d848bc13",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "245717c4-d23f-d8d1-4909-3517d848bc13",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "2e1674c0-c159-432a-a093-08aa86325d83",
+      "route": "vaginal",
+      "koSourceRef": "37e4e6c2-7b44-0980-7261-e3acfd9711d7",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "37e4e6c2-7b44-0980-7261-e3acfd9711d7",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "2eb63f11-1f55-41a8-934a-f42a6df8a39d",
+      "route": "topical",
+      "koSourceRef": "96c60ba9-3844-5802-4879-bbbe34a64ed6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "96c60ba9-3844-5802-4879-bbbe34a64ed6",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "2ebe4c0f-5dbe-456a-a900-c8ab9600d27a",
+      "route": "ophthalmic",
+      "koSourceRef": "f886b820-eba8-a17a-ec9d-6bb76aa7286e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f886b820-eba8-a17a-ec9d-6bb76aa7286e",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "31e8cca5-582b-488f-9067-bf9d1e803618",
+      "route": "topical",
+      "koSourceRef": "f39db7c9-b208-afa5-bd5e-646ffd912501",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f39db7c9-b208-afa5-bd5e-646ffd912501",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "34ddfb7d-5840-4021-9131-1779a21f0b63",
+      "route": "vaginal",
+      "koSourceRef": "7bebd631-1782-84e1-fd95-19266423fc79",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7bebd631-1782-84e1-fd95-19266423fc79",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "36f2dacf-b745-4e00-ae1c-171bf292aaf8",
+      "route": "topical",
+      "koSourceRef": "5754f30a-d54f-4a7e-c20b-dc1f4b5ecc53",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5754f30a-d54f-4a7e-c20b-dc1f4b5ecc53",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "377c9118-1c8e-49eb-a8bf-7c7da9e2936f",
+      "route": "topical",
+      "koSourceRef": "f8af2aca-bf77-f34f-033b-8fc0f8c5d29a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f8af2aca-bf77-f34f-033b-8fc0f8c5d29a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "37c33da2-2816-4f01-9348-83f0bc3e6c9c",
+      "route": "topical",
+      "koSourceRef": "f3f3b71d-b831-6f4a-382b-11694481421b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f3f3b71d-b831-6f4a-382b-11694481421b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "39594aa3-833a-4cdc-8b38-fccc02356d5a",
+      "route": "topical",
+      "koSourceRef": "515af138-6f75-59ca-fca8-417a63bd378b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "515af138-6f75-59ca-fca8-417a63bd378b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
+      "route": "oromucosal",
+      "koSourceRef": "f259b971-a9b2-5e0f-8507-ef56bd02ecea",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f259b971-a9b2-5e0f-8507-ef56bd02ecea",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "3a6ab80f-73dd-4daf-bf21-271d28e1e1ba",
+      "route": "topical",
+      "koSourceRef": "fbd466e9-13ce-fc98-ec29-7899bdadb670",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fbd466e9-13ce-fc98-ec29-7899bdadb670",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "3ca630c0-6f28-49c7-bce2-ae124241ef3b",
+      "route": "topical",
+      "koSourceRef": "f2a19c78-508b-89a6-bc4a-8e8d7188bf8a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f2a19c78-508b-89a6-bc4a-8e8d7188bf8a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "3cafafd5-275b-43c1-b7c5-7b271c7b32fd",
+      "route": "topical",
+      "koSourceRef": "f10fd826-7c5a-2aa0-d285-2289f9c0a7a0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f10fd826-7c5a-2aa0-d285-2289f9c0a7a0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "3d8ca0b5-c555-4e22-9129-b7a34ce6f9c9",
+      "route": "topical",
+      "koSourceRef": "e168db02-8c25-6df7-c322-26841464e018",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e168db02-8c25-6df7-c322-26841464e018",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "3e051e5e-0f47-46a6-abca-e64ea6a7a80d",
+      "route": "topical",
+      "koSourceRef": "ca9aedaf-17ae-68b6-72ba-893dd618f267",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ca9aedaf-17ae-68b6-72ba-893dd618f267",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "3f2124f2-cf55-40a0-9b7a-4eb15aa07c48",
+      "route": "vaginal",
+      "koSourceRef": "f69612d4-112f-928f-5d61-3b0e41852236",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f69612d4-112f-928f-5d61-3b0e41852236",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "3f41a377-d5de-47b9-95f0-40a476b48d9e",
+      "route": "topical",
+      "koSourceRef": "037093da-2e31-2fcb-9d46-4c67a3443c6b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "037093da-2e31-2fcb-9d46-4c67a3443c6b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "412ae4c6-217e-435d-b5dd-8c6087dd486c",
+      "route": "topical",
+      "koSourceRef": "fee2d8e6-eedb-df1f-5ea2-597b1dd687bf",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fee2d8e6-eedb-df1f-5ea2-597b1dd687bf",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "42df1913-6233-43d4-b27f-b030e1c89293",
+      "route": "topical",
+      "koSourceRef": "76f1624a-475c-49d4-e8de-6cb294c8b394",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "76f1624a-475c-49d4-e8de-6cb294c8b394",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "43644c41-c340-44d1-bc2a-c072dc536a0a",
+      "route": "topical",
+      "koSourceRef": "cab28ce8-f3e2-ce1d-57a7-b12ae9a3914e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "cab28ce8-f3e2-ce1d-57a7-b12ae9a3914e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "44313617-b758-4ee5-88ac-a1e48aecc9f7",
+      "route": "topical",
+      "koSourceRef": "70cf8444-a7fb-3042-6a02-b431476ba279",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "70cf8444-a7fb-3042-6a02-b431476ba279",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "45b0d0cf-aaa0-49d6-a9ec-8af37dfb0e61",
+      "route": "topical",
+      "koSourceRef": "a79d61d6-9326-d754-a85b-628fde943fdd",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a79d61d6-9326-d754-a85b-628fde943fdd",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "4b61667c-2352-41bd-91dd-ceb423fdd57d",
+      "route": "topical",
+      "koSourceRef": "aa00bae6-3e8c-0c78-0b7f-73dca6071a4d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "aa00bae6-3e8c-0c78-0b7f-73dca6071a4d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "4c58525b-a541-4df8-8913-a49fefdc2f86",
+      "route": "topical",
+      "koSourceRef": "b14c7bdf-8807-cb6d-d308-0f7a5533ef7c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b14c7bdf-8807-cb6d-d308-0f7a5533ef7c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "4c650aa3-faa4-456a-bb50-3a5f4ecb0ea1",
+      "route": "ophthalmic",
+      "koSourceRef": "bbd93070-a530-2b08-f077-6f405f408268",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bbd93070-a530-2b08-f077-6f405f408268",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "4c698e9d-b5cf-4a2b-8e0c-5365017a6be6",
+      "route": "topical",
+      "koSourceRef": "72bd8117-5678-f846-6697-e62238ea1e96",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "72bd8117-5678-f846-6697-e62238ea1e96",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "4f5e107c-dea1-4a61-89ef-c4011fb898c0",
+      "route": "topical",
+      "koSourceRef": "8d9eb358-7a72-325c-2e22-f3a64acebbf9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8d9eb358-7a72-325c-2e22-f3a64acebbf9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "4fbcf15a-0c66-4b19-894f-43a55dddcb0c",
+      "route": "oromucosal",
+      "koSourceRef": "8995abbe-16d3-72fb-ecfd-172bc84c6b46",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8995abbe-16d3-72fb-ecfd-172bc84c6b46",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "514655f8-44de-4e14-99dc-fffcc87922b2",
+      "route": "oromucosal",
+      "koSourceRef": "3a4f3a82-a68c-e303-f813-0a44b65fac19",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3a4f3a82-a68c-e303-f813-0a44b65fac19",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "515b7810-5250-40c2-ba05-b846e6445135",
+      "route": "topical",
+      "koSourceRef": "268e9fb5-0460-f375-aea0-6eb008a85f95",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "268e9fb5-0460-f375-aea0-6eb008a85f95",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "524ddedc-7127-4571-aac5-08af006c65b3",
+      "route": "topical",
+      "koSourceRef": "6817281e-6251-6839-50b2-939e1d44fcf4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6817281e-6251-6839-50b2-939e1d44fcf4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "559df257-a69d-4a86-8af0-c4f54e2fe6c4",
+      "route": "topical",
+      "koSourceRef": "0bdc37e8-49cf-283e-929d-e69de3568fc7",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0bdc37e8-49cf-283e-929d-e69de3568fc7",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "55a6cba1-9bca-4589-a9f5-42b1933d4adb",
+      "route": "topical",
+      "koSourceRef": "cf15acd8-eda8-f86c-7e8e-ff09b6b0af22",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "cf15acd8-eda8-f86c-7e8e-ff09b6b0af22",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "55cfdc7e-ec6b-46d2-a34e-2360d28e4a94",
+      "route": "topical",
+      "koSourceRef": "9dc01c55-7c05-2d98-c6b5-d55d08987c04",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9dc01c55-7c05-2d98-c6b5-d55d08987c04",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "55ea29c3-da7d-44ab-8f4b-d351581fbeaf",
+      "route": "topical",
+      "koSourceRef": "36c007e8-19fd-c22f-c910-cf3f6038e36a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "36c007e8-19fd-c22f-c910-cf3f6038e36a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "583b0dfa-2d0d-4e90-8891-9a4a63749ba3",
+      "route": "topical",
+      "koSourceRef": "55f73dbb-dbf6-ba8f-78e0-7c27dd9b8f0c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "55f73dbb-dbf6-ba8f-78e0-7c27dd9b8f0c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "58a7c721-b581-4076-95b2-c0151a1e7a71",
+      "route": "topical",
+      "koSourceRef": "b250283b-5af1-a422-d364-99e32673745c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b250283b-5af1-a422-d364-99e32673745c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "59c20ec4-c020-4160-b482-2868b2721451",
+      "route": "topical",
+      "koSourceRef": "51f11695-14ce-daf9-9a0d-69229b1c5187",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "51f11695-14ce-daf9-9a0d-69229b1c5187",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5b69b5a4-b343-46b9-9c27-7704ed463844",
+      "route": "topical",
+      "koSourceRef": "f7f0c4ad-5d92-00ef-b614-105c2287a674",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f7f0c4ad-5d92-00ef-b614-105c2287a674",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5bdc1163-0ec3-4bbb-b837-84382b3a3024",
+      "route": "topical",
+      "koSourceRef": "b821c586-1b91-ec6a-9db4-57c0c105e9f8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b821c586-1b91-ec6a-9db4-57c0c105e9f8",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5bee7028-3fa1-479f-b0cd-2aa8c27e1d8a",
+      "route": "topical",
+      "koSourceRef": "d710ef12-89eb-eb12-f135-36ba452d30d0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d710ef12-89eb-eb12-f135-36ba452d30d0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5d02c03d-807e-4033-959f-5c457aa7504e",
+      "route": "topical",
+      "koSourceRef": "ec59f483-28af-8ad2-57df-0b6761bc9234",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ec59f483-28af-8ad2-57df-0b6761bc9234",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5d40f26a-6c00-4569-bee0-307022aab081",
+      "route": "topical",
+      "koSourceRef": "925ccf59-fd9a-8d59-7223-1eec77a9bfb8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "925ccf59-fd9a-8d59-7223-1eec77a9bfb8",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5dc595f0-e830-4619-a3d0-5c80172f20e4",
+      "route": "topical",
+      "koSourceRef": "6eb270bc-9b11-0abf-f1c3-f31f9f2b888e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6eb270bc-9b11-0abf-f1c3-f31f9f2b888e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5e644eeb-4b6e-408f-930c-ff7b204349c9",
+      "route": "topical",
+      "koSourceRef": "0eb199cd-0967-8978-5320-22ccedb59355",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0eb199cd-0967-8978-5320-22ccedb59355",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "5faa4acd-8a6e-4fce-b336-7a947c05255e",
+      "route": "topical",
+      "koSourceRef": "65717de0-7b68-c89d-73f0-1b0610ae81ab",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "65717de0-7b68-c89d-73f0-1b0610ae81ab",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "612435af-e7ab-44a6-91e5-8fb15f4f67ec",
+      "route": "ophthalmic",
+      "koSourceRef": "1f563869-1d83-8fc6-6a7e-75534699b4c8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1f563869-1d83-8fc6-6a7e-75534699b4c8",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "615492a6-f998-47ce-bb01-29ab3c75696a",
+      "route": "topical",
+      "koSourceRef": "d311a2ea-f96c-76a9-8504-e6b70e205270",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d311a2ea-f96c-76a9-8504-e6b70e205270",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "628105b4-64b2-46dc-8e88-b2ae9d1cc71c",
+      "route": "topical",
+      "koSourceRef": "80b0cf98-ced9-9831-5fd8-b23ebc700ce1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "80b0cf98-ced9-9831-5fd8-b23ebc700ce1",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "62c84588-acd5-4643-b418-a3d3f003f5df",
+      "route": "ophthalmic",
+      "koSourceRef": "8b74c424-feda-57c3-23d3-dfdeb5f7651e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8b74c424-feda-57c3-23d3-dfdeb5f7651e",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "638fef7b-6b2e-46c8-81bd-e4115778c3bd",
+      "route": "topical",
+      "koSourceRef": "1e57b6af-62fa-f41b-7323-05e9e4c84afc",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1e57b6af-62fa-f41b-7323-05e9e4c84afc",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "63b274b8-3ea4-4941-bab4-b533de0b0ce3",
+      "route": "topical",
+      "koSourceRef": "b7b142ef-2487-9238-0638-277dca994090",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b7b142ef-2487-9238-0638-277dca994090",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "64a1d1ff-e232-4b45-9541-d4fa59ae1a73",
+      "route": "ophthalmic",
+      "koSourceRef": "a9bc8933-ab96-9434-ca69-ad25bb181058",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a9bc8933-ab96-9434-ca69-ad25bb181058",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "66ef8b54-c1e8-453b-a903-b3df90cf38a4",
+      "route": "topical",
+      "koSourceRef": "c9c17d04-dca1-9512-caf3-0342accdc1a8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "c9c17d04-dca1-9512-caf3-0342accdc1a8",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "67ed050f-55d2-4aef-b63b-d589b2ada678",
+      "route": "topical",
+      "koSourceRef": "671f12df-7757-8023-1794-e58ab23cc6bc",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "671f12df-7757-8023-1794-e58ab23cc6bc",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "6b359ebb-b48b-4b5d-95ab-49524bc1d5bb",
+      "route": "topical",
+      "koSourceRef": "cdf46e5d-3c43-f5a0-aa40-ecea260f59a0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "cdf46e5d-3c43-f5a0-aa40-ecea260f59a0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "6c898b02-eace-40b4-82ac-b2d11bc2cffc",
+      "route": "topical",
+      "koSourceRef": "33816ea9-c219-f19c-7006-40e2e5b6a9d5",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "33816ea9-c219-f19c-7006-40e2e5b6a9d5",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "6cf97695-6914-43a0-b3a7-9ccf303bb935",
+      "route": "topical",
+      "koSourceRef": "ed3be7ab-295c-23ff-1a54-d55d0d337d31",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ed3be7ab-295c-23ff-1a54-d55d0d337d31",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "7077fce3-c693-4b50-ab68-9a937e913af2",
+      "route": "topical",
+      "koSourceRef": "7d08e1fd-9305-bef5-5da9-d019de00c962",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7d08e1fd-9305-bef5-5da9-d019de00c962",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "70b49f13-a622-492c-bd5a-8157e5180959",
+      "route": "topical",
+      "koSourceRef": "f7fee581-2d62-bcf5-8758-c050e9af295c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f7fee581-2d62-bcf5-8758-c050e9af295c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "71113f84-75bc-4f4b-99da-755a2d6e0fe3",
+      "route": "ophthalmic",
+      "koSourceRef": "016f3ca0-fc1b-57d8-1c68-7796d999a750",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "016f3ca0-fc1b-57d8-1c68-7796d999a750",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "7149ae65-32e3-4893-968a-6ae120fbb356",
+      "route": "oromucosal",
+      "koSourceRef": "82bb64b0-afb8-82b6-4bc3-872f864e1ba7",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "82bb64b0-afb8-82b6-4bc3-872f864e1ba7",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "73291247-1885-449c-a8dd-3b48c0046037",
+      "route": "topical",
+      "koSourceRef": "b2d508bf-26d1-a6d8-9c9e-c176980a7f44",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b2d508bf-26d1-a6d8-9c9e-c176980a7f44",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "73c556da-7af7-4c79-927f-fe69c9ac4a12",
+      "route": "ophthalmic",
+      "koSourceRef": "f4d2a630-556b-2775-0ed3-e3b4ae1e7ef4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f4d2a630-556b-2775-0ed3-e3b4ae1e7ef4",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "74141e05-4dc8-4f9f-a69f-66e78cfa3d72",
+      "route": "ophthalmic",
+      "koSourceRef": "b9f53a8d-b5ba-03aa-33e9-bfb15987a7fe",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b9f53a8d-b5ba-03aa-33e9-bfb15987a7fe",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "744ef0a1-4746-498c-b10b-b116c46bbd2c",
+      "route": "topical",
+      "koSourceRef": "3f1e4df4-e53c-252c-fbdc-5f9ec792015c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3f1e4df4-e53c-252c-fbdc-5f9ec792015c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "75f8bc8e-4a1f-487c-86bd-bdbb5829da9f",
+      "route": "ophthalmic",
+      "koSourceRef": "bb379ce8-732d-f623-9d1f-763effc9e95a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bb379ce8-732d-f623-9d1f-763effc9e95a",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "769360f2-24a9-4ebe-9f19-489105c3e7a4",
+      "route": "vaginal",
+      "koSourceRef": "64faa693-cd86-6981-8d04-2edee784c7c8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "64faa693-cd86-6981-8d04-2edee784c7c8",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "76ad8d2e-906d-46d1-9921-e1f466c3deaf",
+      "route": "topical",
+      "koSourceRef": "8851f36d-719e-83bf-06d5-9b3c033032d4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8851f36d-719e-83bf-06d5-9b3c033032d4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "76c0b215-88be-434a-8c78-72639921f0d3",
+      "route": "topical",
+      "koSourceRef": "95da010f-f307-ce80-cdd2-0d0b2b0c54a0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "95da010f-f307-ce80-cdd2-0d0b2b0c54a0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "77bf7a0d-8352-465b-9a34-657e847bde47",
+      "route": "topical",
+      "koSourceRef": "e5799a8e-5f83-9fd7-a53f-4f0c26a8e776",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e5799a8e-5f83-9fd7-a53f-4f0c26a8e776",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "78b9b965-e3e0-4892-9c99-c218fcd9fbea",
+      "route": "topical",
+      "koSourceRef": "2cbb4072-2159-ce86-a38f-f0b6af7ad2cf",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "2cbb4072-2159-ce86-a38f-f0b6af7ad2cf",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "7ad7c55b-419e-4bf6-b726-1bb3fb3e99a2",
+      "route": "ophthalmic",
+      "koSourceRef": "9a03c9f3-1a5c-134e-b14a-259f201741c1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9a03c9f3-1a5c-134e-b14a-259f201741c1",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "7b713090-5d8a-489d-b5ab-62790ef20632",
+      "route": "vaginal",
+      "koSourceRef": "ac76c9e2-47db-3ed1-1c40-638b5079dbf1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ac76c9e2-47db-3ed1-1c40-638b5079dbf1",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "7e87772d-3efa-4bd8-9baf-9e412c20e172",
+      "route": "topical",
+      "koSourceRef": "d42c9d27-b88e-3bb0-d285-14e7711a6699",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d42c9d27-b88e-3bb0-d285-14e7711a6699",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "80550086-7934-4dfd-8fcf-1f5f57df7e7a",
+      "route": "ophthalmic",
+      "koSourceRef": "7155c83f-ee83-d736-1f52-8859805c1887",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7155c83f-ee83-d736-1f52-8859805c1887",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "8281f7f7-55b0-4633-8c8a-4ae859f601ae",
+      "route": "oromucosal",
+      "koSourceRef": "2a8da621-4b79-f706-aa78-1dc5545ddc70",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "2a8da621-4b79-f706-aa78-1dc5545ddc70",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "8316fef5-4ef3-4739-9ea8-31437df1d815",
+      "route": "topical",
+      "koSourceRef": "54dd5c7b-4849-ee71-be90-c4ecfa56f994",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "54dd5c7b-4849-ee71-be90-c4ecfa56f994",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "86d6f37f-3f58-475c-a8a1-72b52861178b",
+      "route": "ophthalmic",
+      "koSourceRef": "14fb4d1b-d869-b5c4-8722-69622ad59d68",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "14fb4d1b-d869-b5c4-8722-69622ad59d68",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "873dd832-7e63-4258-b418-cecf2e6977ed",
+      "route": "topical",
+      "koSourceRef": "354dd57c-a8af-cd8a-e713-d9b2e04cf259",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "354dd57c-a8af-cd8a-e713-d9b2e04cf259",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "876fabea-204c-4e55-b1a0-de550b3024ee",
+      "route": "topical",
+      "koSourceRef": "83250235-9fb4-80b5-9153-7f0872825467",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "83250235-9fb4-80b5-9153-7f0872825467",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "87975f92-e701-4916-b5c7-b548978ec0fb",
+      "route": "topical",
+      "koSourceRef": "32068556-f388-4014-f892-ca0073b777a6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "32068556-f388-4014-f892-ca0073b777a6",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "882f5452-b1bc-4bb1-8be0-0c9b6e36e356",
+      "route": "topical",
+      "koSourceRef": "a4033e04-b6bf-e702-9b16-a3841862b4be",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a4033e04-b6bf-e702-9b16-a3841862b4be",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "892b3283-035b-41b4-beaa-776e0b4c8860",
+      "route": "ophthalmic",
+      "koSourceRef": "8e46ebf5-26bf-5117-927b-5fe72cd7328b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8e46ebf5-26bf-5117-927b-5fe72cd7328b",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "8940d9a3-9234-486e-a634-686dd4407acb",
+      "route": "topical",
+      "koSourceRef": "ca098773-a50d-acd4-ea48-d743184bcc3e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ca098773-a50d-acd4-ea48-d743184bcc3e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8a373133-906a-4c0f-9125-5495fd7672c2",
+      "route": "topical",
+      "koSourceRef": "5af70ab8-2877-39f2-2b9a-95c78f2c466a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5af70ab8-2877-39f2-2b9a-95c78f2c466a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8bd2e2e4-7b52-49a5-9417-068a7ec3ebd9",
+      "route": "ophthalmic",
+      "koSourceRef": "bca23292-55bd-ed61-4e96-440bb5c9162c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bca23292-55bd-ed61-4e96-440bb5c9162c",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "8d1f7218-e051-4eed-81c0-e2ba29be742a",
+      "route": "topical",
+      "koSourceRef": "a77d1907-6ab8-9aac-d7fa-29a15a4367f9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a77d1907-6ab8-9aac-d7fa-29a15a4367f9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8d983b6d-39e5-4ad8-8cc2-b4e28625337a",
+      "route": "topical",
+      "koSourceRef": "b0fb2c8d-e6aa-c078-085d-749458580437",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b0fb2c8d-e6aa-c078-085d-749458580437",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8dd6ccc1-e413-452a-a24c-18bd740f4f0b",
+      "route": "topical",
+      "koSourceRef": "9f2be116-96f0-a698-64da-d3fe3d1e3350",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9f2be116-96f0-a698-64da-d3fe3d1e3350",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8e34eda2-0ad6-401c-af99-cc5da6cf2042",
+      "route": "ophthalmic",
+      "koSourceRef": "d3cb8203-e726-b3c7-b79a-9075ca3794ad",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d3cb8203-e726-b3c7-b79a-9075ca3794ad",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "8ea3b9d8-f580-441f-a1fd-ef17e248e4a9",
+      "route": "topical",
+      "koSourceRef": "98da45a5-56f8-9963-ce3d-c069eaf885b9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "98da45a5-56f8-9963-ce3d-c069eaf885b9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8f646cce-0927-471a-af9d-41be6da47731",
+      "route": "topical",
+      "koSourceRef": "c7acb569-7566-40b6-b957-ce4197b0a8c8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "c7acb569-7566-40b6-b957-ce4197b0a8c8",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "8fdaddf6-c23c-442d-9a8e-ab03db3ceabb",
+      "route": "topical",
+      "koSourceRef": "c5b4f5aa-0682-db25-0700-6a84e5553e08",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "c5b4f5aa-0682-db25-0700-6a84e5553e08",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "91ee8c38-00d0-4b6a-a09c-b49169e55e31",
+      "route": "topical",
+      "koSourceRef": "fb4e7814-8a5b-f671-d571-2abce7ccefeb",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fb4e7814-8a5b-f671-d571-2abce7ccefeb",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "92327104-22cd-487e-a62b-1c4aa50b83fa",
+      "route": "topical",
+      "koSourceRef": "65ca3e3c-f498-7120-f6ab-e87a1a2f9ffe",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "65ca3e3c-f498-7120-f6ab-e87a1a2f9ffe",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "926fd7ba-ed87-459d-9719-e738f04943e9",
+      "route": "topical",
+      "koSourceRef": "09e31adb-b6a4-cca6-3043-752631966b4b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "09e31adb-b6a4-cca6-3043-752631966b4b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "93fc38ed-46d0-44f3-ae28-2cd27817334d",
+      "route": "topical",
+      "koSourceRef": "c06ed1d4-21f8-2b44-8865-a7317ed6094e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "c06ed1d4-21f8-2b44-8865-a7317ed6094e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9493bae3-8111-4599-83ca-291883f69f2b",
+      "route": "topical",
+      "koSourceRef": "99098e8b-fe93-2c48-2a6d-bacd6ba7a3a2",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "99098e8b-fe93-2c48-2a6d-bacd6ba7a3a2",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "969713d4-a0ed-47ef-984d-eb62517ea01a",
+      "route": "topical",
+      "koSourceRef": "72467112-1a10-0457-713f-3be902bd558f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "72467112-1a10-0457-713f-3be902bd558f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "96b22055-41fb-478b-bbd5-c7a3fb58865e",
+      "route": "ophthalmic",
+      "koSourceRef": "81da8d06-906b-db95-f379-96033d018226",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "81da8d06-906b-db95-f379-96033d018226",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "99bbcbcf-14b6-44d9-b5db-88a8827fd28f",
+      "route": "topical",
+      "koSourceRef": "6497f6d0-dc6d-a808-7747-247acb019f3c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6497f6d0-dc6d-a808-7747-247acb019f3c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9cc0c587-84c7-4afb-9733-b4ec51e80fb2",
+      "route": "topical",
+      "koSourceRef": "d48e569e-1ed5-a4d1-48a7-ff3b4655c9f2",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d48e569e-1ed5-a4d1-48a7-ff3b4655c9f2",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9e2b4ce2-dd92-461b-af25-253b893f4dcc",
+      "route": "topical",
+      "koSourceRef": "14c3826a-f720-a111-6f9e-c7634557ea4b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "14c3826a-f720-a111-6f9e-c7634557ea4b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9e611aa2-865e-4c58-be96-0af091832a8c",
+      "route": "topical",
+      "koSourceRef": "6c9ca2be-2c97-dea5-18c1-0e10ddac9e02",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6c9ca2be-2c97-dea5-18c1-0e10ddac9e02",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9e6d62f8-c966-4290-bec6-28dc3e5df46c",
+      "route": "topical",
+      "koSourceRef": "ae6ad19e-9aa1-6e24-9cd0-73aadb690863",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ae6ad19e-9aa1-6e24-9cd0-73aadb690863",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9f025f4e-b085-4d15-a9d9-8bf2aa438d4e",
+      "route": "topical",
+      "koSourceRef": "444e0670-3287-f615-19f6-4b0da39287de",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "444e0670-3287-f615-19f6-4b0da39287de",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "9fecd335-511a-4be6-bd0e-e8d13f7a58ec",
+      "route": "rectal",
+      "koSourceRef": "9ee26830-3b41-d98e-8c9e-9bbf8149da19",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9ee26830-3b41-d98e-8c9e-9bbf8149da19",
+      "classification": "E",
+      "reason": "비경구(rectal)에 경구동사"
+    },
+    {
+      "masterId": "a1ec51f0-f0b9-4e99-933c-d8d4e5f4ec5e",
+      "route": "topical",
+      "koSourceRef": "3fface89-f635-b7be-cb3f-c04397b095d2",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3fface89-f635-b7be-cb3f-c04397b095d2",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a2f5d35d-9cde-48db-ae0c-d26c3569874c",
+      "route": "topical",
+      "koSourceRef": "3784b7bd-1bbf-3ec9-2179-4d9fdf775e63",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3784b7bd-1bbf-3ec9-2179-4d9fdf775e63",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a39b5bfb-c189-422f-a572-147f8791a717",
+      "route": "rectal",
+      "koSourceRef": "57c4a397-c7d9-3bfb-05d8-2199d89d39c5",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "57c4a397-c7d9-3bfb-05d8-2199d89d39c5",
+      "classification": "E",
+      "reason": "비경구(rectal)에 경구동사"
+    },
+    {
+      "masterId": "a3a09785-4103-48d0-86a3-f2b6476f5aae",
+      "route": "topical",
+      "koSourceRef": "1405fcd3-b7a9-16ac-a047-b9e106979368",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1405fcd3-b7a9-16ac-a047-b9e106979368",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a40b1571-8328-4159-82f6-3d9f4e52872c",
+      "route": "topical",
+      "koSourceRef": "034ba28e-65a0-ec87-a457-374c12f9e334",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "034ba28e-65a0-ec87-a457-374c12f9e334",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a5bb0c67-6227-4c60-b734-e50f438a9ada",
+      "route": "ophthalmic",
+      "koSourceRef": "04de9214-b28d-d63c-dfde-7c2d362e6e52",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "04de9214-b28d-d63c-dfde-7c2d362e6e52",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "a62b9a33-5661-451f-a014-33c9d648a280",
+      "route": "topical",
+      "koSourceRef": "a5087130-426b-21ed-e8d3-fe232ad88ca3",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a5087130-426b-21ed-e8d3-fe232ad88ca3",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a70e294b-9ebe-46d6-9282-03984ff9e81f",
+      "route": "ophthalmic",
+      "koSourceRef": "e4dc85a0-b965-4f54-f440-0c8cd65b9f6d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e4dc85a0-b965-4f54-f440-0c8cd65b9f6d",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "a739ce1d-ad88-4547-9cca-df6eaf648955",
+      "route": "topical",
+      "koSourceRef": "6ff09a0c-f724-cfe1-aa22-7f9a910893c5",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6ff09a0c-f724-cfe1-aa22-7f9a910893c5",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "a73a519b-6b88-404d-a38d-8e66cb2bec31",
+      "route": "topical",
+      "koSourceRef": "da60a5d4-003e-db6e-2e1b-8b0e3b62129a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "da60a5d4-003e-db6e-2e1b-8b0e3b62129a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ab7421e9-42ec-4326-b6b1-ae57c9cb2ca1",
+      "route": "topical",
+      "koSourceRef": "2a736fda-0256-03fa-26f8-361041ab2927",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "2a736fda-0256-03fa-26f8-361041ab2927",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ad718cd1-3489-4b8f-9303-142959b44003",
+      "route": "ophthalmic",
+      "koSourceRef": "cb445259-411a-0d6d-208e-822d898869ee",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "cb445259-411a-0d6d-208e-822d898869ee",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "af278c3b-66e0-416f-9b79-51c6f125ca3e",
+      "route": "topical",
+      "koSourceRef": "e04c0de1-ae4e-e138-1dc8-2c8c20569175",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e04c0de1-ae4e-e138-1dc8-2c8c20569175",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b1143391-2f12-4b16-8b53-5598906d63b3",
+      "route": "topical",
+      "koSourceRef": "0622f89a-03d7-a5c5-1aca-ab23e8303c6c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0622f89a-03d7-a5c5-1aca-ab23e8303c6c",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b34a6a95-77bb-4b74-b45a-dd8fe7956b1e",
+      "route": "topical",
+      "koSourceRef": "79a1a17f-310b-ec95-58c7-9d2b9770bce1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "79a1a17f-310b-ec95-58c7-9d2b9770bce1",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b34fd3ff-6a6d-435b-b084-e65a9b3e49f8",
+      "route": "topical",
+      "koSourceRef": "8be643f4-ea2d-abb2-40dd-35681d5276a4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8be643f4-ea2d-abb2-40dd-35681d5276a4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b420e4b8-493f-4813-b2b9-f624365ad510",
+      "route": "topical",
+      "koSourceRef": "d7b475e2-1c83-b40a-ace3-8c5a246a625f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d7b475e2-1c83-b40a-ace3-8c5a246a625f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b435fb10-a13a-4f5c-8bfd-97f31d891ffa",
+      "route": "topical",
+      "koSourceRef": "534827d5-b984-9fb1-0899-1b7dd30052fc",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "534827d5-b984-9fb1-0899-1b7dd30052fc",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b4a45e26-09d7-405e-a6a9-0302e48c1af0",
+      "route": "topical",
+      "koSourceRef": "872b6f5f-b337-4c38-8e94-8bcbc78194e4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "872b6f5f-b337-4c38-8e94-8bcbc78194e4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b4f485cf-3957-4ae4-b301-7050bea9cdff",
+      "route": "topical",
+      "koSourceRef": "95fd596b-24c4-427b-a8ac-9606333d8a09",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "95fd596b-24c4-427b-a8ac-9606333d8a09",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b5176c31-0a93-43f9-b9fb-499a441f7d8e",
+      "route": "vaginal",
+      "koSourceRef": "100a6728-75d5-abba-70f4-e436e3206fb6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "100a6728-75d5-abba-70f4-e436e3206fb6",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "b6452374-5897-4717-a410-b5129fe18adc",
+      "route": "vaginal",
+      "koSourceRef": "e7857b2d-b67c-84fb-5267-79b21549abb4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e7857b2d-b67c-84fb-5267-79b21549abb4",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "b760cfdb-cc49-413a-8dee-41be494900ce",
+      "route": "topical",
+      "koSourceRef": "88dd62ee-69fc-df25-fc09-7c983c0dad09",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "88dd62ee-69fc-df25-fc09-7c983c0dad09",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b7f83aa3-df80-46bf-a637-2df5c9f3d818",
+      "route": "ophthalmic",
+      "koSourceRef": "f4eada55-5e72-c827-d6f7-0b63e0c5b692",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f4eada55-5e72-c827-d6f7-0b63e0c5b692",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "b805e3a8-652d-4cd2-afb4-af33f5516f8a",
+      "route": "topical",
+      "koSourceRef": "0656babf-1471-4527-212d-72f0222d6091",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0656babf-1471-4527-212d-72f0222d6091",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "b8708a41-bc40-4d1e-8540-1589116afc75",
+      "route": "ophthalmic",
+      "koSourceRef": "f251a28e-2fe0-f8ba-5bf0-b6123589578c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f251a28e-2fe0-f8ba-5bf0-b6123589578c",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "b9388500-78d5-41bf-9ead-c8362e06fe2b",
+      "route": "topical",
+      "koSourceRef": "5e50475c-8763-2f81-df10-d01cd6d39c23",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5e50475c-8763-2f81-df10-d01cd6d39c23",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ba0c1854-6dd0-44b5-93cc-6e6d5fc05227",
+      "route": "topical",
+      "koSourceRef": "ca5ca05e-bd21-bf4f-070c-a26768d0f8e6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ca5ca05e-bd21-bf4f-070c-a26768d0f8e6",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ba72c53e-5bde-4fe7-b453-7bee3ecd0a6d",
+      "route": "topical",
+      "koSourceRef": "133c1a5b-be16-927e-5093-eab085ba5392",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "133c1a5b-be16-927e-5093-eab085ba5392",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bc5d9499-fd5b-4e57-ba05-c4ef396043e7",
+      "route": "topical",
+      "koSourceRef": "22df14c7-c5b9-816c-c947-1ba2d438f95b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "22df14c7-c5b9-816c-c947-1ba2d438f95b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bc6103ef-df01-4d9f-9748-0f504dc08d36",
+      "route": "topical",
+      "koSourceRef": "1f1221c2-051b-2be9-8060-617b575ea11b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1f1221c2-051b-2be9-8060-617b575ea11b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bd54a42f-54b1-4640-aef0-88a1325e9639",
+      "route": "topical",
+      "koSourceRef": "6c9bf202-b573-e046-50e9-b9e63198515f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6c9bf202-b573-e046-50e9-b9e63198515f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bf419ace-13c8-4509-ac1d-adfef829cddd",
+      "route": "topical",
+      "koSourceRef": "05682a85-67b5-7ecc-ff0c-ab3d4c40516d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "05682a85-67b5-7ecc-ff0c-ab3d4c40516d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bfafe2d5-c45f-43ab-8812-8d8aa690cc6a",
+      "route": "topical",
+      "koSourceRef": "f2e46a7c-1cad-2906-21df-2ffb63e817d4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f2e46a7c-1cad-2906-21df-2ffb63e817d4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "bfe6bc64-45d9-46a7-8fe1-fc7c442ff8a5",
+      "route": "topical",
+      "koSourceRef": "1c41c6c4-568b-3559-8313-651753eb15bf",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1c41c6c4-568b-3559-8313-651753eb15bf",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c02828e0-8df6-4269-81a1-ccd5fd0f6e57",
+      "route": "topical",
+      "koSourceRef": "248b08a2-1b7a-1c05-a71e-183641be6a65",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "248b08a2-1b7a-1c05-a71e-183641be6a65",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c1e3be75-a99e-4312-a32e-087df7cc92ca",
+      "route": "topical",
+      "koSourceRef": "29fbb11e-1afc-3d5c-547d-d94ecd1873de",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "29fbb11e-1afc-3d5c-547d-d94ecd1873de",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c24fc292-483a-4a3d-9ac2-52257281d906",
+      "route": "topical",
+      "koSourceRef": "9c037068-875a-4279-402c-8d1a9b08523f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9c037068-875a-4279-402c-8d1a9b08523f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c260cb10-8e40-4d66-ba0b-2e560e695a3b",
+      "route": "rectal",
+      "koSourceRef": "5bb679c1-2fe3-5689-74c0-14c883f2a194",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5bb679c1-2fe3-5689-74c0-14c883f2a194",
+      "classification": "E",
+      "reason": "비경구(rectal)에 경구동사"
+    },
+    {
+      "masterId": "c363ccaa-61e1-4790-968d-bc3b72a52cb8",
+      "route": "topical",
+      "koSourceRef": "a0b4b713-f435-f78c-a96f-18e01377df46",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "a0b4b713-f435-f78c-a96f-18e01377df46",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c4abe3ab-cf00-4c3b-8b13-aaad9fed427f",
+      "route": "topical",
+      "koSourceRef": "904936ab-4dad-053d-1988-7fb8dd754610",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "904936ab-4dad-053d-1988-7fb8dd754610",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c4bb2c57-ce91-458d-8f52-a9f5fa8ede4a",
+      "route": "topical",
+      "koSourceRef": "fb071389-4b99-aba7-07da-261fa65b9d2a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fb071389-4b99-aba7-07da-261fa65b9d2a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c64b0e69-8f9b-4183-b076-a4dd4f42ed66",
+      "route": "topical",
+      "koSourceRef": "5442d8bf-162e-d5c8-6100-3fcd60b0e4c9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "5442d8bf-162e-d5c8-6100-3fcd60b0e4c9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "c873015c-c3fa-46f9-8e2d-4f3cdd8443b4",
+      "route": "ophthalmic",
+      "koSourceRef": "bd8e1805-c491-af0b-72e2-6e91af97ab56",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bd8e1805-c491-af0b-72e2-6e91af97ab56",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "c94c613a-6ae2-4529-ba85-edf2c7640de5",
+      "route": "vaginal",
+      "koSourceRef": "8ce7ea1a-a59d-670b-da8d-22c147192dfb",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8ce7ea1a-a59d-670b-da8d-22c147192dfb",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "cc4cd12b-0f91-4952-9733-0729ea2b41d8",
+      "route": "ophthalmic",
+      "koSourceRef": "e91fcd4b-9e21-52dd-628b-f299ea87fd0a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e91fcd4b-9e21-52dd-628b-f299ea87fd0a",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "cde600ff-e856-4c98-a7c9-8d7440ccd8fc",
+      "route": "topical",
+      "koSourceRef": "041c859c-f817-b304-95b1-75fcf80bd244",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "041c859c-f817-b304-95b1-75fcf80bd244",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ce47afb3-b808-47b3-aa78-b2e0e4b1a1c1",
+      "route": "topical",
+      "koSourceRef": "8a8a98ef-c401-2ce8-f42e-f9113ac36471",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8a8a98ef-c401-2ce8-f42e-f9113ac36471",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "cf5272a0-f094-4f26-be42-df5e528e8f36",
+      "route": "topical",
+      "koSourceRef": "3557069f-24b0-e8e8-675c-8eb581d7f74d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "3557069f-24b0-e8e8-675c-8eb581d7f74d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "cf7fae4a-67e0-4033-bcb2-6fc101d073ed",
+      "route": "topical",
+      "koSourceRef": "467112ea-0392-bffe-6f9f-e23a7ce76d7e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "467112ea-0392-bffe-6f9f-e23a7ce76d7e",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "cf8b12ab-d595-46e9-aa92-7cfb719f0613",
+      "route": "topical",
+      "koSourceRef": "052e3ca2-7895-d78d-cfd4-48e5bf6ec531",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "052e3ca2-7895-d78d-cfd4-48e5bf6ec531",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d1591e6c-e6bd-4334-be02-cfe367c901c9",
+      "route": "topical",
+      "koSourceRef": "eea8fa9c-8204-6aa4-7398-9ffe8b2b0edb",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "eea8fa9c-8204-6aa4-7398-9ffe8b2b0edb",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d1faae5d-0181-4ebd-a764-4c527575013a",
+      "route": "oromucosal",
+      "koSourceRef": "e379ad3f-b141-1cf9-60c8-13bffd19981e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "e379ad3f-b141-1cf9-60c8-13bffd19981e",
+      "classification": "E",
+      "reason": "비경구(oromucosal)에 경구동사"
+    },
+    {
+      "masterId": "d2980624-5274-4b16-aeb2-8c6427e8c700",
+      "route": "topical",
+      "koSourceRef": "fbf0fcd0-c6bf-558c-2185-727416be99cb",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fbf0fcd0-c6bf-558c-2185-727416be99cb",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d37e9668-5eff-4700-af08-47b212899e85",
+      "route": "topical",
+      "koSourceRef": "86ddfc20-52cc-a6eb-46eb-1b45d4dd6f6a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "86ddfc20-52cc-a6eb-46eb-1b45d4dd6f6a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d4d6083f-fc45-4678-bd9b-b6b63156543c",
+      "route": "topical",
+      "koSourceRef": "ac4b2ae0-36df-3f70-2be0-372260846e8f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ac4b2ae0-36df-3f70-2be0-372260846e8f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d77092c5-7e0a-467a-85fa-1af6f03c5fbd",
+      "route": "topical",
+      "koSourceRef": "9e72a9fd-b2cc-4610-83f6-44e4f1373c8a",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9e72a9fd-b2cc-4610-83f6-44e4f1373c8a",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d7d15936-e4e0-421f-95b9-8340779b245d",
+      "route": "topical",
+      "koSourceRef": "8cc8004b-db37-738e-2db2-0ce6e6bee377",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8cc8004b-db37-738e-2db2-0ce6e6bee377",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "d7e6147a-7fc4-461b-ac9c-7629d9977ae7",
+      "route": "topical",
+      "koSourceRef": "0f8fedeb-945d-9823-ab6c-cc54bc5fe807",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0f8fedeb-945d-9823-ab6c-cc54bc5fe807",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "db1f0cf6-b033-4579-a13c-044416a71b53",
+      "route": "topical",
+      "koSourceRef": "0dc1d581-e659-6d20-943c-d5b68ba7e68f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0dc1d581-e659-6d20-943c-d5b68ba7e68f",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ddc4c86c-3b7d-4d1b-b99f-ec502165498d",
+      "route": "topical",
+      "koSourceRef": "6976929f-7b31-ed90-f241-a66fbbb55359",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6976929f-7b31-ed90-f241-a66fbbb55359",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "df036d69-16c0-4b70-be60-902e3b82dfc5",
+      "route": "vaginal",
+      "koSourceRef": "ea8bff11-4997-305c-0080-45421978a1e6",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "ea8bff11-4997-305c-0080-45421978a1e6",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "df16380e-6149-4be0-81bd-af2122746565",
+      "route": "topical",
+      "koSourceRef": "fab4dca7-d98c-2e80-aa34-3a6bd6d26a10",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "fab4dca7-d98c-2e80-aa34-3a6bd6d26a10",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "df7c0ba9-1ce6-4746-949b-22f23af4d05a",
+      "route": "ophthalmic",
+      "koSourceRef": "6f377ec0-4734-5a9c-9267-7a77e8df028e",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "6f377ec0-4734-5a9c-9267-7a77e8df028e",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "dfda9204-6046-4446-a7ba-14b0c7edc7f1",
+      "route": "topical",
+      "koSourceRef": "987def60-5d07-4dd0-f836-694e8c74e950",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "987def60-5d07-4dd0-f836-694e8c74e950",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "e411ec40-7abf-4bdf-8867-f8066adfa932",
+      "route": "topical",
+      "koSourceRef": "b881a4ea-6e72-1536-5ad0-5e897f703ac0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "b881a4ea-6e72-1536-5ad0-5e897f703ac0",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "e5c9d902-0727-4a8b-b455-7eece078b0d3",
+      "route": "topical",
+      "koSourceRef": "62b6f412-e806-a374-f976-45b46e0118a3",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "62b6f412-e806-a374-f976-45b46e0118a3",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "e634d6d2-c741-405d-9995-fdf7f5959e76",
+      "route": "topical",
+      "koSourceRef": "c46254f8-189c-9584-5456-e7202bf5b915",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "c46254f8-189c-9584-5456-e7202bf5b915",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "e7d127db-bc62-454f-b86c-b7bb9a2841f5",
+      "route": "topical",
+      "koSourceRef": "74927338-2b10-ff18-6aba-05a72ffac1e1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "74927338-2b10-ff18-6aba-05a72ffac1e1",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "e9711c20-ce5e-4ded-af6e-b2e47bf814ae",
+      "route": "topical",
+      "koSourceRef": "8dc0e20b-8f5b-e358-4529-3e7bf2fcfd0b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "8dc0e20b-8f5b-e358-4529-3e7bf2fcfd0b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ea8bd70b-5134-48e2-9977-1b722e11b95e",
+      "route": "topical",
+      "koSourceRef": "0c95377a-dc16-094a-e9df-4e5d56a26183",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "0c95377a-dc16-094a-e9df-4e5d56a26183",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "eb25a98d-8188-4455-94f8-773813b9bc13",
+      "route": "ophthalmic",
+      "koSourceRef": "076352a6-cce8-2826-d5cd-7f65ff6ee9f0",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "076352a6-cce8-2826-d5cd-7f65ff6ee9f0",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "ec37dccc-f43d-4a3d-88b1-74948094bcfe",
+      "route": "topical",
+      "koSourceRef": "894420f7-4deb-c6c8-f1de-d34445e083e8",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "894420f7-4deb-c6c8-f1de-d34445e083e8",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ed04c26a-1486-408b-baaa-58914e738646",
+      "route": "topical",
+      "koSourceRef": "414e8184-8872-072f-d289-bcda9ad2bf32",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "414e8184-8872-072f-d289-bcda9ad2bf32",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ed5e3811-cfa2-428c-a834-2aef08bc8468",
+      "route": "topical",
+      "koSourceRef": "bbdd2926-f7e0-ba3d-c396-efce0caa9cc9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "bbdd2926-f7e0-ba3d-c396-efce0caa9cc9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "eeb17ea2-f956-4598-845d-b12012672666",
+      "route": "topical",
+      "koSourceRef": "87254012-2f2a-2daa-5b8a-6518d39b1458",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "87254012-2f2a-2daa-5b8a-6518d39b1458",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ef097553-86e5-4765-9d4d-6ed086b99b8d",
+      "route": "topical",
+      "koSourceRef": "361084de-0c0e-d4f7-51d8-beb9afd705d7",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "361084de-0c0e-d4f7-51d8-beb9afd705d7",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ef5b3229-4f52-4d42-b039-3abe076a5964",
+      "route": "topical",
+      "koSourceRef": "d5d8285e-1e7d-71a8-7d46-9a8cea7ffde9",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "d5d8285e-1e7d-71a8-7d46-9a8cea7ffde9",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "f028ac59-f27a-45bf-8ce3-3cc059fd8e0c",
+      "route": "topical",
+      "koSourceRef": "672a4f00-ebf0-691b-7cab-98e675419620",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "672a4f00-ebf0-691b-7cab-98e675419620",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "f0a99b56-ea6a-4739-9298-bb58efc9e220",
+      "route": "vaginal",
+      "koSourceRef": "aad857bc-fa88-2e0b-cd73-40955eac8c14",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "aad857bc-fa88-2e0b-cd73-40955eac8c14",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "f1558fec-b45a-46a0-b18b-6910bd188ec7",
+      "route": "vaginal",
+      "koSourceRef": "f0316a83-f915-0cbe-149b-bf8d3942b11c",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f0316a83-f915-0cbe-149b-bf8d3942b11c",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "f515dec3-d6e6-46e0-b87c-72f483d8bf73",
+      "route": "topical",
+      "koSourceRef": "49659010-a08b-ed5d-6c48-78887da020f1",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "49659010-a08b-ed5d-6c48-78887da020f1",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "f93abe36-c4fa-42c7-83a9-9cbf8d3e0c37",
+      "route": "topical",
+      "koSourceRef": "2b1a651d-aa28-c0bc-5ff6-4def4746538b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "2b1a651d-aa28-c0bc-5ff6-4def4746538b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fb29a06e-dd37-4380-be96-21b205cb4761",
+      "route": "vaginal",
+      "koSourceRef": "7a4e460f-ca5a-71a8-4ee2-bb5cd454fce5",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "7a4e460f-ca5a-71a8-4ee2-bb5cd454fce5",
+      "classification": "E",
+      "reason": "비경구(vaginal)에 경구동사"
+    },
+    {
+      "masterId": "fb5d30e4-fd7c-4a3c-9874-1c4ce94ebfc1",
+      "route": "topical",
+      "koSourceRef": "98fa72ea-1cc9-df3a-e63e-c9dbb7455e31",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "98fa72ea-1cc9-df3a-e63e-c9dbb7455e31",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fc0e3aef-3ad2-46ad-bb3f-f90466cf397d",
+      "route": "topical",
+      "koSourceRef": "4749aa51-870f-aed4-2d64-c98b3ff3bf6d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "4749aa51-870f-aed4-2d64-c98b3ff3bf6d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fca6e02e-663a-443a-b3e7-4e6f71c8d6c2",
+      "route": "topical",
+      "koSourceRef": "f059e1ef-394c-5f81-5839-738593b419c4",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "f059e1ef-394c-5f81-5839-738593b419c4",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fd0d9648-ccf1-40b8-ba25-37e3286f25ae",
+      "route": "ophthalmic",
+      "koSourceRef": "85bce0df-a227-57b3-7475-02578dffd86f",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "85bce0df-a227-57b3-7475-02578dffd86f",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "fd9567cc-cff5-4c81-9e0b-985d0d09396f",
+      "route": "ophthalmic",
+      "koSourceRef": "028f3665-b615-f048-f4b3-36ed4049a7f5",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "028f3665-b615-f048-f4b3-36ed4049a7f5",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    },
+    {
+      "masterId": "fdddeae4-1ca7-4332-9204-64d7bdbbd259",
+      "route": "topical",
+      "koSourceRef": "4631f258-d6de-911a-1992-627989999968",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "4631f258-d6de-911a-1992-627989999968",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fe831502-4835-4164-9a0d-3a57e62f4717",
+      "route": "topical",
+      "koSourceRef": "275bc7de-695c-a934-9be3-0fe84c7eb114",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "275bc7de-695c-a934-9be3-0fe84c7eb114",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "fef7ba33-5049-4228-8eeb-84a4739dc10f",
+      "route": "topical",
+      "koSourceRef": "1dfad2b4-62e9-dbed-e7de-318f46fcc00b",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1dfad2b4-62e9-dbed-e7de-318f46fcc00b",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ff6a27ed-4ec1-4b8a-ad32-fdda1fe16052",
+      "route": "rectal",
+      "koSourceRef": "9acec731-6f35-fe61-6ba1-371821105689",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "9acec731-6f35-fe61-6ba1-371821105689",
+      "classification": "E",
+      "reason": "비경구(rectal)에 경구동사"
+    },
+    {
+      "masterId": "ff78cb6a-960a-4bfe-9e37-a05b804629ba",
+      "route": "topical",
+      "koSourceRef": "818ce13a-0bc8-7301-d04b-4aac36d2af6d",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "818ce13a-0bc8-7301-d04b-4aac36d2af6d",
+      "classification": "E",
+      "reason": "비경구(topical)에 경구동사"
+    },
+    {
+      "masterId": "ff9d3c00-988d-43fc-bcc0-26a4e31566fa",
+      "route": "ophthalmic",
+      "koSourceRef": "1a6c47e9-568f-43c9-542b-83137fce5d92",
+      "enCount": 1,
+      "enStatus": "canonical",
+      "enSourceRef": "1a6c47e9-568f-43c9-542b-83137fce5d92",
+      "classification": "E",
+      "reason": "비경구(ophthalmic)에 경구동사"
+    }
+  ]
+}
