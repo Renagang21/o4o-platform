@@ -22,6 +22,38 @@ function toCanonicalServiceKey(rolePrefix: string): string {
   return resolveCanonicalServiceKey(rolePrefix);
 }
 
+/**
+ * 관리자 사용자 검색 대상 필드 — WO-O4O-ADMIN-USER-SEARCH-500-FIX-V1
+ *
+ * ⚠️ **여기에는 User 엔티티에 실제로 매핑된 속성만 넣는다.**
+ *   이전 구현은 존재하지 않는 `company` 를 참조했다. TypeORM 은 매핑되지 않은 속성을
+ *   치환하지 못해 SQL 에 `user.company` 를 그대로 남기는데, `user` 는 PostgreSQL 예약어
+ *   (niladic USER 함수)라 따옴표 없이 쓰이면 `syntax error at or near "."` 로 실패했다.
+ *   매핑된 속성만 `"user"."x"` 로 치환되므로 오탈자·삭제된 컬럼이 곧바로 500 이 된다.
+ *   `admin-user-search.test.ts` 가 이 배열의 모든 항목이 실제 컬럼인지 검사한다.
+ *
+ * 검색 계약: 이메일 · 이름 · 전화번호.
+ *   한글 이름은 대부분 `name` 컬럼에 있다(`firstName`/`lastName` 은 nullable 이고 비어 있는 경우가 많다).
+ *   NULL 컬럼은 `NULL ILIKE ...` → NULL 로 평가되어 매칭에서 자연 제외된다(오류 아님).
+ */
+export const ADMIN_USER_SEARCH_FIELDS = [
+  'name',
+  'firstName',
+  'lastName',
+  'email',
+  'phone',
+] as const;
+
+/** 검색어 정규화 — 앞뒤 공백 제거, 공백만 입력하면 '검색 없음'과 동일하게 취급한다. */
+export function normalizeUserSearch(search: unknown): string {
+  return typeof search === 'string' ? search.trim() : '';
+}
+
+/** 검색 WHERE 절 — 파라미터는 `:search` 하나로 바인딩한다(raw interpolation 금지). */
+export function buildUserSearchWhere(alias: string): string {
+  return `(${ADMIN_USER_SEARCH_FIELDS.map((f) => `${alias}.${f} ILIKE :search`).join(' OR ')})`;
+}
+
 export class AdminUserController {
 
   // WO-O4O-OPERATOR-CREATION-FLOW-FIX-V1: Ensure service_memberships exist for each role's service
@@ -73,12 +105,10 @@ export class AdminUserController {
       const userRepo = AppDataSource.getRepository(User);
       const queryBuilder = userRepo.createQueryBuilder('user');
 
-      // Apply search filter
-      if (search) {
-        queryBuilder.where(
-          '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search OR user.company ILIKE :search)',
-          { search: `%${search}%` }
-        );
+      // Apply search filter — WO-O4O-ADMIN-USER-SEARCH-500-FIX-V1
+      const searchTerm = normalizeUserSearch(search);
+      if (searchTerm) {
+        queryBuilder.where(buildUserSearchWhere('user'), { search: `%${searchTerm}%` });
       }
 
       // WO-OPERATOR-FIX-V1: role filter via role_assignments
