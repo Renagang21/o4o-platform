@@ -4,7 +4,7 @@
 > 선행 WO: [`WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1`](../work-orders/WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1.md) (완료 — `489f497de` · `b3f2ef807`)
 > 실행 전 HEAD: `796eee02f7b0e2a31a546858d4ebaa1823c1ce19`
 > 실행 일자: 2026-07-30
-> 판정: **PASS (실제 DB write smoke 미실행 — 사유 §10)**
+> 판정: **PASS** — 2026-07-31 사후 E2E 로 §10 미실행 항목 전부 실측 완료 (§13)
 
 ---
 
@@ -200,6 +200,8 @@ migration 은 멱등이며 down 에서 seed 3행 + 서비스 1행만 제거한�
 | migration 실제 실행 | main 배포 시 CI/CD 자동 실행 (PRODUCTION-MIGRATION-STANDARD) |
 
 > **판정 주의:** 위 미실행 항목은 전부 DB mutation 또는 배포 후 E2E 에 해당한다. WO 실행 지시에 따라 이를 실패로 판정하지 않으며, §12 후속 작업으로 남긴다.
+>
+> **2026-07-31 갱신:** migration 실제 실행 · 백엔드 런타임 부팅을 제외한 위 항목은 **§13 사후 E2E 에서 프로덕션 실측으로 전부 닫혔다.**
 
 ---
 
@@ -239,4 +241,74 @@ pnpm-lock.yaml                                                               (�
 
 ---
 
+## 13. 사후 E2E 보완 — 반려 경로 (2026-07-31, 프로덕션 실측)
+
+> 사용자 승인 범위: 프로덕션 전용 `[E2E_TEST]` store_owner 테스트 계정 2개 생성.
+> **DB 직접 상태 변경 없이 기존 회원가입 · 가입 신청 · 운영자 승인/반려 API 만 사용**했다.
+> 계정 A(승인 경로)의 상품 조회 검증은 [`CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 §11`](CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1.md) 에 기록한다.
+
+### 13-1. 생성 식별자
+
+| 계정 | 이메일 | userId | membershipId | role_assignment id | 최종 상태 |
+|------|--------|--------|--------------|--------------------|-----------|
+| A (승인) | `e2e.test.pharmacyhub.owner.active@example.com` | `5ee37566-2a51-4929-8b3d-ccc58ce9e014` | `3b11670e-b818-4066-92ae-bff59acdc530` | `fda73284-f88e-4b7d-af81-3f18d7777b2e` | membership `active` · `pharmacy-hub:store_owner` |
+| B (반려) | `e2e.test.pharmacyhub.owner.rejected@example.com` | `0d028c2e-d2f9-4bbe-bf54-eaa99162e611` | `adff519a-1077-44e5-89f6-a614a4a3741b` | `6eb0fa4c-0b79-4f85-a6b8-ed4d59797563` | membership `rejected` · 반려 사유 보존 |
+
+- 이름 · 약국명에 `[E2E_TEST]` 접두. 실제 연락처 · 실제 약국 정보 미사용 (`010-0000-010x`, `@example.com`).
+- **비밀번호는 저장소 · 본 문서 · 채팅 어디에도 기록하지 않았다.**
+- read-only 실측(`cloud-sql-proxy` SELECT)으로 확인: 두 계정 모두 `service_memberships` 1행(`pharmacy-hub`) · `role_assignments` 1행뿐 — **다른 서비스 membership · role 부여 0**.
+- 삭제하지 않고 회귀 테스트용으로 유지한다. 상품 · 주문 생성 없음.
+
+### 13-2. 검증 결과
+
+| # | 시나리오 | 결과 |
+|:-:|---------|------|
+| 1 | 신규 가입 신청 (store_owner) ×2 | ✅ 201 · `status=pending` · membership `role='pharmacy-hub:store_owner'` (prefixed 저장) |
+| 2 | 운영자 콘솔 pending 목록 · 상세 | ✅ 200 · 신청자/약국명/신청 역할/신청 일시 정상 표시 |
+| 3 | **승인** (계정 A) | ✅ 200 · membership `active` · `approvedBy`/`approvedAt` 기록 |
+| 4 | 승인 후 재로그인 | ✅ 200 · JWT roles 에 `pharmacy-hub:store_owner` |
+| 5 | 승인 후 `/join/status` | ✅ `status=active` · `approvedAt` 표시 |
+| 6 | 승인 후 `/store-owner/ping` | ✅ 200 (역할별 진입 가능) |
+| 7 | **반려** (계정 B, 사유 입력) | ✅ 200 · membership `rejected` · `rejection_reason` 저장 |
+| 8 | 반려 후 `/join/status` | ✅ `status=rejected` + **반려 사유 원문 반환** |
+| 9 | 반려 후 `/store-owner/ping` · `/store-owner/products` | ✅ **403 `MEMBERSHIP_NOT_ACTIVE`** (차단 확인) |
+| 10 | 반려 후 재신청 | ✅ 409 `ALREADY_REJECTED` |
+| 11 | 운영자 콘솔 `status=rejected` 목록 · 상세 | ✅ 200 · 반려 사유 노출 |
+| 12 | serviceKey 격리 | ✅ 두 계정 모두 pharmacy-hub 외 membership · role 0 |
+
+→ §10 의 미실행 항목(가입 write · 승인/반려 write · 중복 409 · `role_assignments` 실부여 · 역할별 진입) **전부 실측으로 닫았다.**
+
+### 13-2-B. 실브라우저 스모크 (배포된 `pharmacy-hub-web` Cloud Run)
+
+| 화면 | 계정 A (active) | 계정 B (rejected) |
+|------|-----------------|-------------------|
+| 로그인 후 홈 | ✅ `가입 상태: active` | ✅ `가입 상태: rejected · 신청 상태 확인` 링크 노출 |
+| `/join/status` | ✅ "가입이 승인되었습니다" + 신청/승인 일시 + 진입 CTA | ✅ "가입 신청이 반려되었습니다" + **반려 사유 원문 표시** |
+| `/store-owner` | ✅ 역할 진입 성공 + "공급 상품 보기" 링크 | ✅ `이용 권한 없음` + "반려 사유 확인" CTA (MembershipGate 차단) |
+| `/store-owner/products` | ✅ 1행 · `9,900원` · **"서비스 공급가 적용"** 배지 · 미제공 Offer 미노출 | ✅ 차단 |
+| console / page error | ✅ 0건 | ✅ 0건 |
+
+→ D3(잔존 role_assignment)에도 불구하고 **UI 차단은 membership 상태 기준**으로 정상 동작한다 (`MembershipGate`).
+
+### 13-3. 검증 중 확정한 결함 3건 (본 WO 에서 수정하지 않음)
+
+| # | 결함 | 실측 근거 | 영향 |
+|:-:|------|----------|------|
+| D1 | **신규 가입자는 반려 사유 화면에 도달할 수 없다** | 반려 직후 로그인 → **403 `ACCOUNT_NOT_ACTIVE`**. 신규 등록은 `users.status='pending'` 으로 생성되고 `users.status` 를 `active` 로 바꾸는 것은 **승인 경로뿐**이다. `rejectMembership` 은 `users` 를 건드리지 않으므로 pending 상태가 영구히 남는다. | `/join/status` 의 rejected 분기(§6-B)가 **신규 가입자에게는 dead path**. 게다가 `LoginPage` 는 `SERVICE_NOT_MEMBER` 만 한글 안내로 매핑하므로 사용자에게 영문 `Account is not active` 가 그대로 노출된다. |
+| D2 | **`MembershipApprovalService.rejectMembership` 의 `UPDATE … RETURNING` 결과 해석 오류 (공유 Core)** | reject 응답 `data` 가 `{"roleType":null}` 뿐 — `id`/`userId`/`status`/`role` 전부 `undefined`. TypeORM PostgresQueryRunner 는 UPDATE 시 `result.raw = [rows, rowCount]` 를 반환하므로 `result[0]` 은 **행이 아니라 행 배열**이다 (`node_modules/typeorm/driver/postgres/PostgresQueryRunner.js:200-203`). | ① 반려 응답 payload 결손 ② `result.length === 0` 이 항상 false → **404 `MEMBERSHIP_NOT_REJECTABLE` 도달 불가** ③ `membership.service_key === 'kpa-society'` 가 항상 false → **KPA `kpa_members` 반려 동기화(WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1)가 실제로는 한 번도 실행되지 않는다** ④ `REJECTION_SUCCESS` 로그의 userId/serviceKey 가 undefined. **DB 반려 자체는 정상 수행된다.** `approveMembership` 은 `SELECT … FOR UPDATE` 분리 패턴이라 영향 없다. |
+| D3 | **반려가 `role_assignments` 를 비활성화하지 않는다** | 반려 후 재로그인 JWT: `roles=["pharmacy-hub:store_owner"]`, `GET /me/access` → `entryPoints.storeOwner=true` (membershipStatus 는 `rejected`). read-only 실측에서도 `role_assignments.is_active=true` 잔존. | 실제 접근은 membership 기반 guard 가 403 으로 막으므로 **권한 누수는 없다**. 다만 역할 배열만 보고 분기하는 소비처(진입점 노출 등)는 오판할 수 있다. |
+
+> D2 는 `MembershipApprovalService` = **4개 서비스 공유 Core** 다. CLAUDE.md §1 Shared Module Change Rule 에 따라
+> 전 소비처(neture / glycopharm / k-cosmetics / kpa-society / pharmacy-hub) 영향을 먼저 식별해야 하므로
+> 본 사후 E2E 에서 수정하지 않고 별도 WO 로 넘긴다. D1 · D3 도 정책 판단이 필요해 동일하게 분리한다.
+
+### 13-4. 절차 준수
+
+- 프로덕션 DB write 는 **전부 기존 API 경로**(회원가입 · 가입 신청 · 승인 · 반려)로만 발생했다. 직접 SQL mutation 0건.
+- 식별자 확인용 SQL 은 `SELECT` 만 사용했다 (`cloud-sql-proxy` · 조회 후 프로세스 종료).
+- 계정 B 는 반려 사유 표시를 **도달 가능한 경로**로 확인하기 위해 `승인 → 반려` 순서로 상태를 전이시켰다 (D1 때문에 최초 신청 직후 반려로는 로그인 자체가 불가). 사용 API 는 승인 · 반려 2개뿐이며 DB 직접 변경은 없다.
+
+---
+
 *작성: 2026-07-30 · WO-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 실행 결과*
+*보완: 2026-07-31 — §13 사후 E2E (반려 경로) 추가*

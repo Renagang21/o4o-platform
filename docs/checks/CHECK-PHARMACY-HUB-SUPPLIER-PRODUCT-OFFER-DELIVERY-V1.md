@@ -291,7 +291,7 @@ Market Trial 연결 0 · serviceKey 충돌 0.
 
 최종 상태: Offer A = 제공 중(`is_active=true`, 서비스 단가 9,900 유지), Offer B = 미제공·비활성.
 
-### 8-3. 미검증 1건
+### 8-3. 미검증 1건 → **2026-07-31 해소 (§11 참조)**
 
 **약국 경영자 상품 조회의 HTTP 200 경로** — `pharmacy-hub:store_owner` 역할로 로그인 가능한 계정이 없다.
 
@@ -327,3 +327,60 @@ pharmacyhub.co.kr DNS · 소비자 기능
 5. 배송지 부가 기능
 6. `pharmacyhub.co.kr` DNS 연결
 7. (참고) 공급자 화면의 **활성 상태는 표시 전용**이다. 활성화·상품 수정은 Neture 공급자 원장 경로다. Pharmacy-Hub 안에서 활성화까지 다루려면 별도 WO 로 범위를 정해야 한다.
+
+---
+
+## 11. 사후 E2E 보완 — 약국 경영자 조회 200 경로 (2026-07-31, 프로덕션 실측)
+
+§8-3 의 미검증 1건("`pharmacy-hub:store_owner` 로 **로그인 가능한** 계정이 없다")을 닫았다.
+사용자 승인 아래 프로덕션 전용 `[E2E_TEST]` 계정을 **기존 회원가입 · 가입 신청 · 운영자 승인 API 로만** 생성했다
+(DB 직접 상태 변경 0건). 반려 경로 검증은 [`CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §13`](CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1.md) 에 기록했다.
+
+### 11-1. 사용한 신원
+
+| 항목 | 값 |
+|------|------|
+| 이메일 | `e2e.test.pharmacyhub.owner.active@example.com` (`[E2E_TEST]` 라벨 · 실제 약국 정보 미사용) |
+| userId | `5ee37566-2a51-4929-8b3d-ccc58ce9e014` |
+| membershipId | `3b11670e-b818-4066-92ae-bff59acdc530` (`pharmacy-hub` · `active`) |
+| role_assignment id | `fda73284-f88e-4b7d-af81-3f18d7777b2e` (`pharmacy-hub:store_owner`) |
+| 경로 | 회원가입 → 가입 신청(pending) → 운영자 승인 → **재로그인** |
+
+비밀번호는 저장소 · 본 문서 · 채팅에 기록하지 않았다. 다른 서비스 membership · role 부여 0 (read-only SELECT 확인).
+
+### 11-2. 결과 — §8-3 항목 CLOSED
+
+| # | 검증 | 결과 |
+|:-:|------|------|
+| 1 | 승인 후 재로그인 JWT | ✅ `roles=["pharmacy-hub:store_owner"]` |
+| 2 | `GET /pharmacy-hub/store-owner/ping` | ✅ **200** |
+| 3 | `GET /pharmacy-hub/store-owner/products` | ✅ **200** · `total=1` |
+| 4 | 제공 중 Offer 노출 | ✅ `3bb54519-834c-46e0-873c-0f5d18365615` (`[E2E_TEST] 파머시허브 검증상품 A`) 1건 |
+| 5 | **적용 단가 9,900** | ✅ 상세 `effectiveUnitPrice=9900`, `pharmacyHubUnitPrice=9900`, `priceGeneral=12000` → **서비스별 단가 우선 적용 확인** |
+| 6 | **미제공 대조 Offer 미노출** | ✅ `a9b823f8-…`(Offer B, `service_keys={}`·비활성) 목록·상세 모두 **미반환** |
+| 7 | `GET /store-owner/products/:offerId` 상세 | ✅ 200 · `offerId`/`masterId`/`supplierId`/규제구분/단가 정상 |
+| 8 | 비활성 membership 계정의 동일 조회 | ✅ 403 `MEMBERSHIP_NOT_ACTIVE` |
+
+→ §8-3 에서 SQL 대체 검증으로만 확인했던 노출 게이트가 **실제 HTTP 200 응답으로 동일 결과**임을 확인했다.
+§5-2 의 게이트 실측(1건 · 9,900)과 API 응답이 일치한다.
+
+### 11-3. 실브라우저 스모크 (배포된 `pharmacy-hub-web` Cloud Run)
+
+승인된 store_owner 계정으로 로그인 → `/store-owner` → `/store-owner/products` 실제 렌더 확인:
+
+```
+Pharmacy-Hub 공급 상품 · 필터(전체/의약품/건강기능식품/의약외품/화장품/일반) · 공급자 필터
+[E2E_TEST] 파머시허브 검증상품 A 20260730-2340 | [E2E_TEST] 검증제조사 · 바코드 없음
+GENERAL | (주)쓰라이프존 | 9,900원  "서비스 공급가 적용"
+```
+
+- 목록 **1행만** 표시 — 미제공 Offer B 미노출 (음성 대조군 화면 확인)
+- 서비스별 단가 배지(`서비스 공급가 적용`) 정상 노출 → 기본가 12,000 이 아닌 **9,900 적용** 확인
+- console / page error **0건**
+- `/store-owner` 역할 진입점에서 "공급 상품 보기" 링크로 도달 확인
+
+이로써 §8-3 미검증 항목은 **API · 화면 양쪽에서 CLOSED** 다.
+
+---
+
+*보완: 2026-07-31 — §11 사후 E2E (약국 경영자 조회 200 경로) 추가*

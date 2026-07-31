@@ -139,7 +139,12 @@ write-path 규약과 일치한다 — `MembershipApprovalService` 가 이 값을
 ⚠️ **승인 직후 stale JWT**: 승인 전에 발급된 access token 은 역할이 반영되지 않아 scope guard 가
 403 을 준다. 승인 후 재로그인이 필요하다 (구조상 정상 — 프론트 CTA 안내 확인 권장).
 
-### 4-3. 미검증 2건 (차단 사유 있음)
+### 4-3. 미검증 2건 (차단 사유 있음) → **2026-07-31 전부 해소**
+
+> 사용자 승인 아래 `[E2E_TEST]` 전용 store_owner 계정 2개를 기존 API 로 생성해 두 항목을 모두 닫았다.
+> 결과: [`CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1 §13`](../checks/CHECK-PHARMACY-HUB-MEMBERSHIP-JOIN-AND-APPROVAL-V1.md) (반려 경로 · 결함 3건) ·
+> [`CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 §11`](../checks/CHECK-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1.md) (약국 경영자 조회 200 · 브라우저 진입).
+> `renagang21@gmail.com` 비밀번호 불일치는 **우회**했을 뿐 여전히 유효하다 — 해당 계정은 검증에 쓰지 않는다.
 
 | 항목 | 차단 사유 |
 |------|-----------|
