@@ -1,0 +1,48 @@
+{
+  "wo": "WO-O4O-OTC-STORE-EN-CANONICAL-BULK-AUDIT-TRANSLATE-APPLY-BATCH-5000-V1",
+  "batchId": "otc-en-audit-omission-verify",
+  "mode": "READ-ONLY",
+  "liveDbWrite": 0,
+  "startedAt": "2026-07-31T23:55:42.885Z",
+  "populationTotal": 22011,
+  "populationMasters": 22011,
+  "duplicateCanonicalMasters": 0,
+  "batchProductMasters": 22011,
+  "batchKoDescriptions": 22011,
+  "existingEn": 22011,
+  "enMissing": 0,
+  "classification": {
+    "PASS_EXISTING": 21339,
+    "REVIEW_REQUIRED": 672
+  },
+  "defectCodes": {},
+  "softSignals": {
+    "NUMERIC_VALUE_MISSING_IN_EN": 534,
+    "DOSE_LIMIT_SENTENCE_MISSING": 10,
+    "POSSIBLE_ROUTE_VERB_ISSUE": 128
+  },
+  "translationApiCalls": 0,
+  "translationSucceeded": 0,
+  "translationValidationFailed": 0,
+  "plannedNewEn": 0,
+  "plannedUpdateEn": 0,
+  "plannedDbWrites": 0,
+  "totalsReconcile": {
+    "sum": 22011,
+    "manifest": 22011,
+    "ok": true
+  },
+  "bySourceType": {
+    "mfds_drug_otc": {
+      "PASS_EXISTING": 15314,
+      "REVIEW_REQUIRED": 594
+    },
+    "mfds_drug_otc_nutrition_combo": {
+      "PASS_EXISTING": 3545
+    },
+    "o4o_drug_otc_topical": {
+      "PASS_EXISTING": 2480,
+      "REVIEW_REQUIRED": 78
+    }
+  }
+}
