@@ -1,10 +1,14 @@
 import { Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
-import { AppRouteGuard } from '@/components/AppRouteGuard';
 
-// Cosmetics Partner Extension Pages
-const CosmeticsPartnerRouter = lazy(() => import('@/pages/cosmetics-partner/CosmeticsPartnerRouter'));
+// WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1:
+//   과거 K-Cosmetics 인플루언서·제휴판매 기능(Cosmetics Partner)의 관리자 라우트를 제거했다.
+//   본체 패키지 @o4o/cosmetics-partner-extension 은 이미 삭제된 상태에서 화면·앱 등록만 남아 있었고,
+//   화면이 호출하던 /partner/routines · /partner/earnings · /cosmetics-partner/commission-policies
+//   백엔드 라우트도 존재하지 않아 동작 불가였다.
+//   Partner 는 Neture 서비스의 활동 주체이며, Cosmetics 는 분야이지 별도 Partner 계정 유형이 아니다.
+//   현재 Neture 공급자·파트너·인플루언서 기능은 이 제거와 무관하며 변경하지 않았다.
 
 // Cosmetics Products Pages (Phase 7-H)
 const CosmeticsProductsRouter = lazy(() => import('@/pages/cosmetics-products/CosmeticsProductsRouter'));
@@ -31,20 +35,6 @@ const PageLoader = () => (
  */
 export function ServiceRoutes() {
   return [
-    // Cosmetics Partner Extension - Partner/Influencer for Cosmetics
-    <Route key="/cosmetics-partner/*" path="/cosmetics-partner/*" element={
-      <AdminProtectedRoute requiredRoles={['partner', 'admin']}>
-        {/* WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1:
-            canonical appId = 'cosmetics-partner' (운영 app_registry · seed · 내부 AppGuard 기준).
-            기존 'cosmetics-partner-extension' 은 레지스트리에 없어 항상 app-disabled 로 차단됐다. */}
-        <AppRouteGuard appId="cosmetics-partner">
-          <Suspense fallback={<PageLoader />}>
-            <CosmeticsPartnerRouter />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-
     // Cosmetics Products - Products/Brands Management (Phase 7-H)
     <Route key="/cosmetics-products/*" path="/cosmetics-products/*" element={
       <AdminProtectedRoute requiredRoles={['admin']}>

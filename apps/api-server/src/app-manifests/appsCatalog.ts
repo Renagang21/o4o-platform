@@ -346,24 +346,12 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['cosmetics'],
     incompatibleWith: ['dropshipping-yaksa'], // 다른 dropshipping extension과 충돌
   },
-  {
-    // WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1:
-    //   canonical appId 를 'cosmetics-partner' 로 확정한다.
-    //   운영 app_registry / seed(SeedDefaultApps) / 내부 AppGuard 가 이미 이 값을 쓰고 있었고,
-    //   카탈로그·라우트 가드만 'cosmetics-partner-extension' 으로 남아 화면이 항상 차단됐다.
-    //   (동명 패키지는 존재하지 않으며, 카탈로그에 'cosmetics-partner' 중복 항목도 없다.)
-    appId: 'cosmetics-partner',
-    name: 'Cosmetics Partner Extension',
-    version: '1.0.0',
-    description: '화장품 파트너/인플루언서 관리 - 루틴 추천, 샘플 관리, AI 도구',
-    category: 'commerce',
-    tags: ['화장품', 'cosmetics', 'partner', 'influencer', 'routine', 'sample'],
-    type: 'extension',
-    status: 'active', // Phase 8 완료 - 2024-12 Active 전환
-    dependencies: { 'dropshipping-cosmetics': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['cosmetics', 'partnerops'],
-  },
+  // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1:
+  //   'cosmetics-partner' (화장품 파트너/인플루언서 관리) 카탈로그 항목을 제거했다.
+  //   본체 패키지 @o4o/cosmetics-partner-extension 은 이미 삭제되었고 관리자 화면·백엔드
+  //   라우트도 남아 있지 않아 설치 가능한 실체가 없는 항목이었다.
+  //   Partner 는 Neture 서비스의 활동 주체이며 Cosmetics 는 분야이므로,
+  //   별도 Cosmetics Partner 앱을 다시 등록하지 않는다.
   {
     appId: 'cosmetics-seller-extension',
     name: '화장품 판매원 관리',
@@ -385,8 +373,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'supplier', 'brand', 'price', 'campaign'],
     type: 'extension',
-    // WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1: 의존 대상 appId 정합화
-    dependencies: { 'dropshipping-core': '>=1.0.0', 'dropshipping-cosmetics': '>=1.0.0', 'cosmetics-partner': '>=1.0.0' },
+    // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1: 제거된 'cosmetics-partner' 의존 참조 삭제
+    dependencies: { 'dropshipping-core': '>=1.0.0', 'dropshipping-cosmetics': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'supplierops'],
   },
