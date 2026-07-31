@@ -49,7 +49,7 @@ export class CosmeticsStoreRepository {
       qb.andWhere('store.region = :region', { region: query.region });
     }
 
-    qb.orderBy('store.created_at', 'DESC');
+    qb.orderBy('store.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [stores, total] = await qb.getManyAndCount();
@@ -96,7 +96,7 @@ export class CosmeticsStoreRepository {
       qb.andWhere('app.status = :status', { status: query.status });
     }
 
-    qb.orderBy('app.created_at', 'DESC');
+    qb.orderBy('app.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [applications, total] = await qb.getManyAndCount();
@@ -224,7 +224,10 @@ export class CosmeticsStoreRepository {
     qb.leftJoinAndSelect('listing.product', 'product');
     qb.leftJoinAndSelect('product.brand', 'brand');
     qb.where('listing.store_id = :storeId', { storeId });
-    qb.orderBy('listing.sort_order', 'ASC').addOrderBy('listing.created_at', 'DESC');
+    // WO-O4O-COSMETICS-PRODUCTS-500-RECOVERY-V1:
+    //   join + skip/take 조합이라 orderBy 에 DB 컬럼명을 주면 distinct 페이지네이션 경로에서
+    //   TypeError(databaseName) 로 500. entity property 로 교정 (metadata 재현으로 확인).
+    qb.orderBy('listing.sortOrder', 'ASC').addOrderBy('listing.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [listings, total] = await qb.getManyAndCount();

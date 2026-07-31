@@ -53,7 +53,7 @@ export class CosmeticsRepository {
     }
 
     qb.leftJoinAndSelect('brand.lines', 'lines', 'lines.is_active = true');
-    qb.orderBy('brand.sort_order', 'ASC').addOrderBy('brand.name', 'ASC');
+    qb.orderBy('brand.sortOrder', 'ASC').addOrderBy('brand.name', 'ASC');
 
     return qb.getMany();
   }
@@ -83,7 +83,7 @@ export class CosmeticsRepository {
     }
 
     qb.andWhere('line.is_active = true');
-    qb.orderBy('line.sort_order', 'ASC').addOrderBy('line.name', 'ASC');
+    qb.orderBy('line.sortOrder', 'ASC').addOrderBy('line.name', 'ASC');
 
     return qb.getMany();
   }
@@ -138,19 +138,23 @@ export class CosmeticsRepository {
     }
 
     // Sorting
-    const sortField = query.sort || 'created_at';
+    // WO-O4O-COSMETICS-PRODUCTS-500-RECOVERY-V1:
+    //   orderBy 는 DB 컬럼명이 아니라 **entity property** 를 받아야 한다.
+    //   skip/take + join 이 함께 쓰이면 TypeORM 은 distinct 페이지네이션 경로
+    //   (SelectQueryBuilder.createOrderByCombinedWithSelectExpression)로 들어가는데,
+    //   거기서 findColumnWithPropertyPath() 결과를 가드 없이 .databaseName 으로 읽는다.
+    //   'product.created_at' 처럼 컬럼명을 주면 undefined 가 되어 TypeError 로 전체 요청이 500.
+    //   허용 sort 값만 property 로 매핑하고, 사용자 입력을 orderBy 문자열에 직접 넣지 않는다.
     const sortOrder = (query.order?.toUpperCase() || 'DESC') as 'ASC' | 'DESC';
+    const sortPropertyByField: Record<string, string> = {
+      created_at: 'product.createdAt',
+      price: 'product.basePrice',
+      name: 'product.name',
+    };
+    const sortProperty =
+      sortPropertyByField[query.sort ?? ''] ?? sortPropertyByField.created_at;
 
-    switch (sortField) {
-      case 'price':
-        qb.orderBy('product.base_price', sortOrder);
-        break;
-      case 'name':
-        qb.orderBy('product.name', sortOrder);
-        break;
-      default:
-        qb.orderBy('product.created_at', sortOrder);
-    }
+    qb.orderBy(sortProperty, sortOrder);
 
     // Pagination
     qb.skip(skip).take(limit);
@@ -179,7 +183,8 @@ export class CosmeticsRepository {
       { search: searchTerm }
     );
 
-    qb.orderBy('product.created_at', 'DESC');
+    // WO-O4O-COSMETICS-PRODUCTS-500-RECOVERY-V1: entity property 사용 (findAllProducts 주석 참조)
+    qb.orderBy('product.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [products, total] = await qb.getManyAndCount();
@@ -283,7 +288,7 @@ export class CosmeticsRepository {
       qb.where('log.product_id = :productId', { productId: query.product_id });
     }
 
-    qb.orderBy('log.created_at', 'DESC');
+    qb.orderBy('log.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [logs, total] = await qb.getManyAndCount();
@@ -303,7 +308,7 @@ export class CosmeticsRepository {
       qb.where('log.product_id = :productId', { productId: query.product_id });
     }
 
-    qb.orderBy('log.created_at', 'DESC');
+    qb.orderBy('log.createdAt', 'DESC');
     qb.skip(skip).take(limit);
 
     const [logs, total] = await qb.getManyAndCount();
