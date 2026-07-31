@@ -16,6 +16,7 @@ const GLOS = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-glossary-v1.json`,
 const MANUAL = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-manual-glossary-v1.json`, 'utf8'));
 const MANUAL2 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-manual-glossary-2-v1.json`, 'utf8'));
 const TOP = JSON.parse(fs.readFileSync(`${D}/hff-en-top1000-translations-v1.json`, 'utf8'));
+const N326 = JSON.parse(fs.readFileSync(`${D}/hff-en-nonusage326-translations-v1.json`, 'utf8'));
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -59,6 +60,13 @@ for (const [kind, m] of Object.entries(MANUAL2.dict ?? {})) for (const [k, v] of
 for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(TOP[kind] ?? {})) DICT[kind][key(k)] = v;
 // usage 문장은 clause / meta 양쪽 슬롯에서 모두 쓰인다
 for (const [k, v] of Object.entries(TOP.usage ?? {})) { DICT.clause[key(k)] = v; DICT.meta[key(k)] = v; }
+// 5) 비-USAGE 326종 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(N326[kind] ?? {})) DICT[kind][key(k)] = v;
+// standard 문구는 clause 슬롯에서 쓰인다
+for (const [k, v] of Object.entries(N326.standard ?? {})) { DICT.clause[key(k)] = v; DICT.meta[key(k)] = v; }
+// 주의사항·기능성 문구는 clause / meta 어느 슬롯에서도 등장한다
+for (const [k, v] of Object.entries(N326.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(N326.label ?? {})) DICT.clause[key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────
 const CNT = { 정: 'tablet', 캡슐: 'capsule', 포: 'stick pack', 스푼: 'spoonful', 알: 'piece', 병: 'bottle', 개: 'piece', 매: 'sheet', 방울: 'drop' };

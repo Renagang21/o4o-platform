@@ -1,0 +1,47 @@
+{
+ "verifiedAt": "2026-07-31T23:30:00.131Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 1961,
+ "newHashMatch": 1951,
+ "hangulInFnSection": 0,
+ "targetFieldDrift": 0,
+ "koCanonicalDrift": 0,
+ "globals": {
+  "spd_all": 122083,
+  "ko_canon": 40918,
+  "en_canon": 17458,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 23460,
+  "en_without_fn": 21
+ },
+ "expectedEnDelta": 392,
+ "actualEnDelta": 392,
+ "statusSum": 4209,
+ "sum4209": true,
+ "byStatus": {
+  "HOLD_TRANSLATION": 2237,
+  "RESOLVED_NO_CHANGE": 11,
+  "UPDATED_EXISTING_EN": 1,
+  "CREATED_NEW_EN": 1960
+ },
+ "expectedUnlockFromSelection": 853,
+ "actualUnlocked": 1961,
+ "finalHold": 2237,
+ "holdDup": 0,
+ "failedChecks": [
+  "HASH:01a88c3b-b90d-46a8-9a6b-6e6886c01edb",
+  "HASH:03399a92-b0ca-4aea-bea3-d4b0b0aa989d",
+  "HASH:03bfb629-52cd-4e24-95f0-988189a429b7",
+  "HASH:0c67df87-0d52-488e-8485-a66c9dade37c",
+  "HASH:18804153-638d-463f-b01c-3ab80991d7bf",
+  "HASH:1ac0e98d-ef22-4faf-8c98-9208ed7be2d2",
+  "HASH:1c1b055d-03c9-4c7b-9c23-46d6602a613e",
+  "HASH:207a5b00-a31d-43c4-88c2-1edadd425e0d",
+  "HASH:240e673e-a481-4f8f-8627-1469810e3041",
+  "HASH:25542600-0328-499b-b648-4a8fe8d21d75"
+ ],
+ "globalsOk": true,
+ "verdict": "FAIL"
+}
