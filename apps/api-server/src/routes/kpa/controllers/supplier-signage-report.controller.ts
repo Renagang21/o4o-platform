@@ -99,8 +99,11 @@ export function createSupplierSignageReportController(
    *   page       default 1
    *   limit      default 20, max 100
    */
+  // 마운트: kpa.routes.ts `router.use('/supplier/signage', ...)`
+  // → 실제 경로 `/api/v1/kpa/supplier/signage/reports` (문서화된 계약 · 프론트 SignageReport.tsx 와 동일).
+  //   과거에는 '/' 로 등록되어 계약 경로가 404 였다.
   router.get(
-    '/',
+    '/reports',
     asyncHandler(async (req: Request, res: Response): Promise<void> => {
       const user = (req as any).user as { id: string };
       const q = req.query as ReportQuery;

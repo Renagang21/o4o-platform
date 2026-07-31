@@ -22,17 +22,17 @@ interface Brand {
 }
 
 async function fetchBrands(): Promise<{ data: Brand[] }> {
-  const response = await authClient.api.get('/api/v1/neture/admin/brands');
+  const response = await authClient.api.get('/neture/admin/brands');
   return response.data;
 }
 
 async function createBrand(data: { name: string; slug: string; manufacturerName?: string; countryOfOrigin?: string }): Promise<{ data: Brand }> {
-  const response = await authClient.api.post('/api/v1/neture/admin/brands', data);
+  const response = await authClient.api.post('/neture/admin/brands', data);
   return response.data;
 }
 
 async function deleteBrand(id: string): Promise<void> {
-  await authClient.api.delete(`/api/v1/neture/admin/brands/${id}`);
+  await authClient.api.delete(`/neture/admin/brands/${id}`);
 }
 
 function slugify(text: string): string {

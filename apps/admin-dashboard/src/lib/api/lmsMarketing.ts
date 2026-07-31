@@ -7,7 +7,7 @@
 
 import { authClient } from '@o4o/auth-client';
 
-const API_BASE = '/api/v1/lms/marketing';
+const API_BASE = '/lms/marketing';
 
 // ===== Types =====
 

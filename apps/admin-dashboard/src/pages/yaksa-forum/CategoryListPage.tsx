@@ -57,7 +57,7 @@ const CategoryListPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<CategoryListResponse>('/api/v1/yaksa/admin/categories');
+      const response = await api.get<CategoryListResponse>('/yaksa/admin/categories');
       if (response.data) {
         setCategories(response.data.data);
       }

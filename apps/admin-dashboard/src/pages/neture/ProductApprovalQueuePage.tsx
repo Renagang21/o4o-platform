@@ -77,7 +77,7 @@ export default function ProductApprovalQueuePage() {
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/api/v1/neture/admin/products');
+      const response = await authClient.api.get('/neture/admin/products');
       if (response.data?.success) setProducts(response.data.data || []);
     } catch {
       toast.error('상품 목록을 불러오는데 실패했습니다');
@@ -90,7 +90,7 @@ export default function ProductApprovalQueuePage() {
 
   const handleApprove = async (id: string) => {
     try {
-      await authClient.api.post(`/api/v1/neture/admin/products/${id}/approve`);
+      await authClient.api.post(`/neture/admin/products/${id}/approve`);
       toast.success('상품이 승인되었습니다');
       fetchProducts();
     } catch {
@@ -100,7 +100,7 @@ export default function ProductApprovalQueuePage() {
 
   const handleReject = async (id: string, reason?: string) => {
     try {
-      await authClient.api.post(`/api/v1/neture/admin/products/${id}/reject`, { reason });
+      await authClient.api.post(`/neture/admin/products/${id}/reject`, { reason });
       toast.success('상품이 거절되었습니다');
       fetchProducts();
     } catch {
@@ -132,7 +132,7 @@ export default function ProductApprovalQueuePage() {
     if (pendingIds.length === 0) return;
 
     const result = await approveBatch.executeBatch(
-      (batchIds) => authClient.api.post('/api/v1/neture/admin/products/batch-approve', { ids: batchIds }),
+      (batchIds) => authClient.api.post('/neture/admin/products/batch-approve', { ids: batchIds }),
       pendingIds,
     );
     if (result.successCount > 0) {
@@ -148,7 +148,7 @@ export default function ProductApprovalQueuePage() {
     if (pendingIds.length === 0) return;
 
     const result = await rejectBatch.executeBatch(
-      (batchIds) => authClient.api.post('/api/v1/neture/admin/products/batch-reject', { ids: batchIds, reason }),
+      (batchIds) => authClient.api.post('/neture/admin/products/batch-reject', { ids: batchIds, reason }),
       pendingIds,
     );
     if (result.successCount > 0) {

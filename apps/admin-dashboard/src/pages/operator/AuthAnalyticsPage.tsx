@@ -39,7 +39,7 @@ interface AuthLogsResponse {
 async function fetchAuthLogs(status?: string): Promise<AuthLogEntry[]> {
   const params: Record<string, string> = { limit: '200' };
   if (status) params.status = status;
-  const res = await authClient.api.get<AuthLogsResponse>('/api/v1/operator/analytics/auth/logs', { params });
+  const res = await authClient.api.get<AuthLogsResponse>('/operator/analytics/auth/logs', { params });
   return res.data?.data ?? [];
 }
 

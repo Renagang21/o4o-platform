@@ -103,7 +103,7 @@ const SupplierAuthorizationInbox = () => {
       if (selectedProduct !== 'all') params.productId = selectedProduct;
       if (selectedStatus !== 'all') params.status = selectedStatus;
 
-      const response = await authClient.api.get('/api/v1/ds/supplier/authorizations/inbox', { params });
+      const response = await authClient.api.get('/ds/supplier/authorizations/inbox', { params });
 
       if (response.data?.success) {
         setRequests(response.data.data.requests || []);
@@ -122,7 +122,7 @@ const SupplierAuthorizationInbox = () => {
   const fetchProducts = async () => {
     try {
       // Fetch supplier's products for filtering
-      const response = await authClient.api.get('/api/v1/ds/supplier/products');
+      const response = await authClient.api.get('/ds/supplier/products');
       if (response.data?.success) {
         setProducts(response.data.data.products || []);
       }
@@ -163,7 +163,7 @@ const SupplierAuthorizationInbox = () => {
 
     try {
       await authClient.api.post(
-        `/api/v1/ds/supplier/authorizations/${modalState.authorization.id}/approve`,
+        `/ds/supplier/authorizations/${modalState.authorization.id}/approve`,
         {
           approvedBy: user?.id || 'supplier-admin',
         }
@@ -188,7 +188,7 @@ const SupplierAuthorizationInbox = () => {
 
     try {
       await authClient.api.post(
-        `/api/v1/ds/supplier/authorizations/${modalState.authorization.id}/reject`,
+        `/ds/supplier/authorizations/${modalState.authorization.id}/reject`,
         {
           rejectedBy: user?.id || 'supplier-admin',
           reason: modalState.reason,

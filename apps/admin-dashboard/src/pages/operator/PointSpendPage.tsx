@@ -113,7 +113,7 @@ async function spendPoint(params: {
   payoutType: PayoutType;
   description: string;
 }): Promise<SpendResponse['data']> {
-  const res = await authClient.api.post<SpendResponse>('/api/v1/points/admin/spend', params);
+  const res = await authClient.api.post<SpendResponse>('/points/admin/spend', params);
   return res.data.data;
 }
 
@@ -122,7 +122,7 @@ async function fetchTransactions(
   page: number,
 ): Promise<TransactionsResponse['data']> {
   const res = await authClient.api.get<TransactionsResponse>(
-    '/api/v1/points/admin/transactions',
+    '/points/admin/transactions',
     { params: { userId, page: String(page), limit: String(HISTORY_PAGE_SIZE) } },
   );
   return res.data.data;
@@ -133,7 +133,7 @@ async function grantPoint(params: {
   amount: number;
   description: string;
 }): Promise<GrantResponse['data']> {
-  const res = await authClient.api.post<GrantResponse>('/api/v1/points/admin/grant', params);
+  const res = await authClient.api.post<GrantResponse>('/points/admin/grant', params);
   return res.data.data;
 }
 

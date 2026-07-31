@@ -158,7 +158,7 @@ const CosmeticsPartnerRoutines: React.FC = () => {
   const fetchRoutines = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await authClient.api.get('/api/v1/partner/routines');
+      const response = await authClient.api.get('/partner/routines');
       if (response.data?.data) {
         setRoutines(response.data.data);
       }
@@ -325,7 +325,7 @@ const CosmeticsPartnerRoutines: React.FC = () => {
   const confirmDeleteRoutine = async () => {
     if (showDeleteConfirm?.type === 'routine' && showDeleteConfirm.routineId) {
       try {
-        await authClient.api.delete(`/api/v1/partner/routines/${showDeleteConfirm.routineId}`);
+        await authClient.api.delete(`/partner/routines/${showDeleteConfirm.routineId}`);
         setToast({ message: '루틴이 삭제되었습니다.', type: 'success' });
         fetchRoutines();
       } catch (err) {
@@ -352,7 +352,7 @@ const CosmeticsPartnerRoutines: React.FC = () => {
 
   const handleCreateRoutine = async () => {
     try {
-      await authClient.api.post('/api/v1/partner/routines', createForm);
+      await authClient.api.post('/partner/routines', createForm);
       setShowCreateModal(false);
       setShowPreview(false);
       setCreateForm({
@@ -393,7 +393,7 @@ const CosmeticsPartnerRoutines: React.FC = () => {
 
   const handlePublishToggle = async (routine: PartnerRoutine) => {
     try {
-      await authClient.api.patch(`/api/v1/partner/routines/${routine.id}/publish`, {
+      await authClient.api.patch(`/partner/routines/${routine.id}/publish`, {
         isPublished: !routine.isPublished,
       });
       setToast({

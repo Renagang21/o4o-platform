@@ -106,7 +106,7 @@ export default function CosmeticsRoutinesPage() {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/api/v1/partner/routines');
+      const response = await authClient.api.get('/partner/routines');
 
       if (response.data.success) {
         setRoutines(response.data.data || []);
@@ -129,7 +129,7 @@ export default function CosmeticsRoutinesPage() {
     if (!deleteTarget) return;
 
     try {
-      await authClient.api.delete(`/api/v1/partner/routines/${deleteTarget.id}`);
+      await authClient.api.delete(`/partner/routines/${deleteTarget.id}`);
       await loadRoutines();
       setDeleteTarget(null);
     } catch (err: any) {
@@ -156,7 +156,7 @@ export default function CosmeticsRoutinesPage() {
       if (selectedRoutine) {
         // Update existing routine
         const response = await authClient.api.put(
-          `/api/v1/partner/routines/${selectedRoutine.id}`,
+          `/partner/routines/${selectedRoutine.id}`,
           {
             title: routineData.title,
             description: routineData.description,
@@ -175,7 +175,7 @@ export default function CosmeticsRoutinesPage() {
         }
       } else {
         // Create new routine
-        const response = await authClient.api.post('/api/v1/partner/routines', {
+        const response = await authClient.api.post('/partner/routines', {
           title: routineData.title,
           description: routineData.description,
           steps: routineData.steps,

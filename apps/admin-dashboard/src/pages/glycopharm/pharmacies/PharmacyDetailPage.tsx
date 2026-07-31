@@ -89,7 +89,7 @@ const PharmacyDetailPage: React.FC = () => {
     setError(null);
     try {
       const response = await api.get<PharmacyDetailResponse>(
-        `/api/v1/glycopharm/admin/pharmacies/${pharmacyId}`
+        `/glycopharm/admin/pharmacies/${pharmacyId}`
       );
       if (response.data) {
         setPharmacy(response.data.data);
@@ -116,7 +116,7 @@ const PharmacyDetailPage: React.FC = () => {
     setUpdating(true);
     try {
       const response = await api.patch<PharmacyDetailResponse>(
-        `/api/v1/glycopharm/admin/pharmacies/${pharmacyId}/status`,
+        `/glycopharm/admin/pharmacies/${pharmacyId}/status`,
         { status: newStatus }
       );
       if (response.data) {

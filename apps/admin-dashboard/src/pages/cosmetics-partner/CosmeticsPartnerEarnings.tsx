@@ -110,8 +110,8 @@ const CosmeticsPartnerEarnings: React.FC = () => {
     setLoading(true);
     try {
       const [summaryRes, recordsRes] = await Promise.all([
-        authClient.api.get('/api/v1/partner/earnings/summary'),
-        authClient.api.get('/api/v1/partner/earnings'),
+        authClient.api.get('/partner/earnings/summary'),
+        authClient.api.get('/partner/earnings'),
       ]);
       if (summaryRes.data?.data) setSummary(summaryRes.data.data);
       if (recordsRes.data?.data) setRecords(recordsRes.data.data);
@@ -194,7 +194,7 @@ const CosmeticsPartnerEarnings: React.FC = () => {
   const handleWithdraw = async () => {
     setIsSubmitting(true);
     try {
-      await authClient.api.post('/api/v1/partner/earnings/withdraw', withdrawForm);
+      await authClient.api.post('/partner/earnings/withdraw', withdrawForm);
       setShowWithdrawModal(false);
       setWithdrawStep(1);
       setWithdrawForm({ amount: 0, bankName: '', accountNumber: '', accountHolder: '' });

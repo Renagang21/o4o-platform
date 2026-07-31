@@ -76,7 +76,7 @@ export default function StorefrontProductDetailPage() {
     try {
       setLoading(true);
 
-      const response = await authClient.api.get(`/api/v1/storefront/${slug}/products/${id}`);
+      const response = await authClient.api.get(`/storefront/${slug}/products/${id}`);
 
       if (response.data?.success) {
         const data = response.data.data;

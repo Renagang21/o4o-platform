@@ -61,22 +61,22 @@ interface MasterFormData {
 
 // API functions
 async function fetchMaster(id: string): Promise<{ data: ProductMasterDetail }> {
-  const response = await authClient.api.get(`/api/v1/neture/admin/masters/${id}`);
+  const response = await authClient.api.get(`/neture/admin/masters/${id}`);
   return response.data;
 }
 
 async function updateMaster(id: string, data: Record<string, unknown>): Promise<{ data: ProductMasterDetail }> {
-  const response = await authClient.api.patch(`/api/v1/neture/admin/masters/${id}`, data);
+  const response = await authClient.api.patch(`/neture/admin/masters/${id}`, data);
   return response.data;
 }
 
 async function fetchCategories(): Promise<{ data: CategoryRef[] }> {
-  const response = await authClient.api.get('/api/v1/neture/admin/categories');
+  const response = await authClient.api.get('/neture/admin/categories');
   return response.data;
 }
 
 async function fetchBrands(): Promise<{ data: BrandRef[] }> {
-  const response = await authClient.api.get('/api/v1/neture/admin/brands');
+  const response = await authClient.api.get('/neture/admin/brands');
   return response.data;
 }
 

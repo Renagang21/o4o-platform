@@ -53,7 +53,7 @@ export default function ChannelOpsDashboard() {
       const params = new URLSearchParams();
       if (serviceKeyFilter) params.set('serviceKey', serviceKeyFilter);
 
-      const url = `/api/v1/admin/channels/ops${params.toString() ? `?${params}` : ''}`;
+      const url = `/admin/channels/ops${params.toString() ? `?${params}` : ''}`;
       const response = await authClient.api.get<ChannelOpsResponse>(url);
       const responseData = response.data;
 

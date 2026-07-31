@@ -16,7 +16,7 @@ import type {
 } from './types';
 
 const api = authClient.api;
-const BASE_PATH = '/api/v1/dropshipping/offers';
+const BASE_PATH = '/dropshipping/offers';
 
 export const offerApi = {
   /**

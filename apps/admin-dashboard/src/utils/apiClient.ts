@@ -46,15 +46,16 @@ class ApiClient {
     const response = await fetch(fullUrl, {
       ...restOptions,
       headers: finalHeaders as HeadersInit,
+      // Phase 6-7 Cookie Auth Primary: 이 레거시 클라이언트는 localStorage 토큰만 보냈다.
+      // 쿠키 전략에서는 localStorage 가 비어 있어 항상 401 → 강제 로그아웃이었다.
+      credentials: 'include',
     });
 
-    // Handle 401 errors (unauthorized)
+    // 401 을 여기서 로그아웃으로 확정하지 않는다.
+    //   이 클라이언트에는 refresh 절차가 없어, access token 만 만료된 정상 세션도
+    //   localStorage 를 비우고 /login 으로 하드 이동시켜 세션을 잃게 만들었다.
+    //   인증 만료 판정과 로그아웃은 canonical 인증 계약(authClient / 라우트 가드)이 담당한다.
     if (response.status === 401 && !skipAuth) {
-      // Clear tokens and redirect to login
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
       throw new Error('Unauthorized');
     }
 

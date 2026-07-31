@@ -73,7 +73,7 @@ const ProductStatusPage: React.FC = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const response = await api.get(`/api/v1/cosmetics/products/${productId}`);
+      const response = await api.get(`/cosmetics/products/${productId}`);
       if (response.data?.data) {
         setData(response.data.data);
         setNewStatus(response.data.data.status);
@@ -106,7 +106,7 @@ const ProductStatusPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const response = await api.patch(`/api/v1/cosmetics/admin/products/${productId}/status`, {
+      const response = await api.patch(`/cosmetics/admin/products/${productId}/status`, {
         status: newStatus,
         reason: reason || undefined,
       });

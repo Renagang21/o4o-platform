@@ -67,17 +67,17 @@ const TYPE_OPTIONS = [
 ];
 
 async function fetchPartner(id: string): Promise<{ data: Partner }> {
-  const response = await authClient.api.get(`/api/v1/neture/admin/partners/${id}`);
+  const response = await authClient.api.get(`/neture/admin/partners/${id}`);
   return response.data;
 }
 
 async function createPartner(data: Partial<Partner>): Promise<{ data: Partner }> {
-  const response = await authClient.api.post('/api/v1/neture/admin/partners', data);
+  const response = await authClient.api.post('/neture/admin/partners', data);
   return response.data;
 }
 
 async function updatePartner(id: string, data: Partial<Partner>): Promise<{ data: Partner }> {
-  const response = await authClient.api.patch(`/api/v1/neture/admin/partners/${id}`, data);
+  const response = await authClient.api.patch(`/neture/admin/partners/${id}`, data);
   return response.data;
 }
 

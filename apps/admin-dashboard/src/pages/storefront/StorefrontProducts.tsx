@@ -74,7 +74,7 @@ export default function StorefrontProducts() {
     try {
       setLoading(true);
 
-      const response = await authClient.api.get(`/api/v1/storefront/${slug}/products`);
+      const response = await authClient.api.get(`/storefront/${slug}/products`);
 
       if (response.data?.success) {
         setPartner(response.data.data.partner);

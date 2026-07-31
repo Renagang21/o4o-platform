@@ -20,10 +20,10 @@ interface DictionaryItem {
 }
 
 const TAB_CONFIG = [
-  { id: 'skin-types', label: '피부 타입', endpoint: '/api/v1/cosmetics/dictionary/skin-types' },
-  { id: 'concerns', label: '피부 고민', endpoint: '/api/v1/cosmetics/dictionary/concerns' },
-  { id: 'ingredients', label: '성분', endpoint: '/api/v1/cosmetics/dictionary/ingredients' },
-  { id: 'categories', label: '카테고리', endpoint: '/api/v1/cosmetics/dictionary/categories' },
+  { id: 'skin-types', label: '피부 타입', endpoint: '/cosmetics/dictionary/skin-types' },
+  { id: 'concerns', label: '피부 고민', endpoint: '/cosmetics/dictionary/concerns' },
+  { id: 'ingredients', label: '성분', endpoint: '/cosmetics/dictionary/ingredients' },
+  { id: 'categories', label: '카테고리', endpoint: '/cosmetics/dictionary/categories' },
 ] as const;
 
 export default function CosmeticsDictionaryPage() {

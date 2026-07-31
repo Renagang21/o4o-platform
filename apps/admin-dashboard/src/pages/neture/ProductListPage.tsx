@@ -31,7 +31,7 @@ interface ProductMasterItem {
 }
 
 async function fetchMasters(): Promise<{ data: ProductMasterItem[] }> {
-  const response = await authClient.api.get('/api/v1/neture/admin/masters');
+  const response = await authClient.api.get('/neture/admin/masters');
   return response.data;
 }
 

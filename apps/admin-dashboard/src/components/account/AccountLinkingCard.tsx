@@ -53,7 +53,10 @@ export const AccountLinkingCard: React.FC<AccountLinkingCardProps> = ({ onSucces
     try {
       // OAuth 연동은 실제로는 OAuth 플로우를 시작해야 함
       // 여기서는 데모를 위한 구현
-      window.location.href = `/api/v1/auth/oauth/${provider}/link`;
+      // 브라우저 전체 이동이므로 API 서버 절대 URL 이 필요하다.
+      // admin 오리진 기준 상대 경로는 SPA 라우터로 떨어져 OAuth 플로우가 시작되지 않는다.
+      const apiBase = (authClient.api.defaults.baseURL ?? '').replace(/\/+$/, '');
+      window.location.href = `${apiBase}/auth/oauth/${provider}/link`;
     } catch (error) {
       toast({
         title: '오류',

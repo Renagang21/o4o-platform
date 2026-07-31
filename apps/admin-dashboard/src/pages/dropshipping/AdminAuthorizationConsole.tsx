@@ -114,7 +114,7 @@ const AdminAuthorizationConsole = () => {
   const fetchAuthorizations = async () => {
     try {
       setLoading(true);
-      const response = await authClient.api.get('/api/v1/ds/admin/authorizations', {
+      const response = await authClient.api.get('/ds/admin/authorizations', {
         params: filters,
       });
 
@@ -134,7 +134,7 @@ const AdminAuthorizationConsole = () => {
 
   const fetchAuditLogs = async (authorizationId: string) => {
     try {
-      const response = await authClient.api.get(`/api/v1/ds/admin/authorizations/${authorizationId}/audit`);
+      const response = await authClient.api.get(`/ds/admin/authorizations/${authorizationId}/audit`);
 
       if (response.data?.success) {
         setAuditLogs(response.data.data.logs || []);
@@ -171,7 +171,7 @@ const AdminAuthorizationConsole = () => {
 
     try {
       await authClient.api.post(
-        `/api/v1/ds/admin/authorizations/${revokeModal.authorization.id}/revoke`,
+        `/ds/admin/authorizations/${revokeModal.authorization.id}/revoke`,
         {
           revokedBy: user?.id || 'admin',
           reason: revokeModal.reason,

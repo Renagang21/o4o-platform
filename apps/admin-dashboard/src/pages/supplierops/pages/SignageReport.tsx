@@ -22,7 +22,9 @@ import PageHeader from '../../../components/common/PageHeader';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const API_BASE = '/api/v1/kpa/supplier/signage/reports';
+// authClient.api 의 baseURL 은 이미 `/api/v1` 을 포함한다 (packages/auth-client/src/client.ts getApiUrl).
+// 백엔드 마운트: kpa.routes.ts `router.use('/supplier/signage', ...)` + controller `GET /reports`.
+const API_BASE = '/kpa/supplier/signage/reports';
 
 const KPA_SERVICES = [
   { value: '', label: '전체 서비스' },
@@ -159,7 +161,7 @@ export default function SignageReport() {
     {
       key: 'serviceKey',
       header: '서비스',
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm font-medium text-gray-900">{row.serviceKey}</span>
       ),
     },
@@ -167,7 +169,7 @@ export default function SignageReport() {
       key: 'playCount',
       header: '재생 수',
       width: 100,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm text-gray-700">{row.playCount.toLocaleString()}</span>
       ),
     },
@@ -175,7 +177,7 @@ export default function SignageReport() {
       key: 'estimatedPlayTimeSeconds',
       header: '예상 재생 시간',
       width: 130,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm text-gray-500">{fmtTime(row.estimatedPlayTimeSeconds)}</span>
       ),
     },
@@ -183,7 +185,7 @@ export default function SignageReport() {
       key: 'uniqueStoreCount',
       header: '참여 매장 수',
       width: 110,
-      render: (row) => (
+      render: (_value, row) => (
         // 매장 수만 숫자로 표시 — 개별 매장 정보 절대 미노출
         <span className="text-sm text-gray-700">{row.uniqueStoreCount.toLocaleString()}개</span>
       ),
@@ -196,7 +198,7 @@ export default function SignageReport() {
     {
       key: 'title',
       header: '미디어 제목',
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm font-medium text-gray-900">{row.title || '(제목 없음)'}</span>
       ),
     },
@@ -204,7 +206,7 @@ export default function SignageReport() {
       key: 'playCount',
       header: '재생 수',
       width: 100,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm text-gray-700">{row.playCount.toLocaleString()}</span>
       ),
     },
@@ -212,7 +214,7 @@ export default function SignageReport() {
       key: 'estimatedPlayTimeSeconds',
       header: '예상 재생 시간',
       width: 130,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm text-gray-500">{fmtTime(row.estimatedPlayTimeSeconds)}</span>
       ),
     },
@@ -225,7 +227,7 @@ export default function SignageReport() {
       key: 'date',
       header: '날짜',
       width: 130,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm text-gray-600">{row.date}</span>
       ),
     },
@@ -233,7 +235,7 @@ export default function SignageReport() {
       key: 'playCount',
       header: '재생 수',
       width: 100,
-      render: (row) => (
+      render: (_value, row) => (
         <span className="text-sm font-medium text-gray-900">{row.playCount.toLocaleString()}</span>
       ),
     },

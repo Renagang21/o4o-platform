@@ -11,7 +11,7 @@
 
 import { authClient } from '@o4o/auth-client';
 
-const BASE = '/api/v1/store/tablet/operator';
+const BASE = '/store/tablet/operator';
 
 // ============================================
 // Types

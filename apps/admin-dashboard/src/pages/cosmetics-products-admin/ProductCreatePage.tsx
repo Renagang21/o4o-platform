@@ -108,7 +108,7 @@ const ProductCreatePage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const response = await api.post('/api/v1/cosmetics/admin/products', formData);
+      const response = await api.post('/cosmetics/admin/products', formData);
       if (response.data) {
         navigate('/cosmetics-products');
       }

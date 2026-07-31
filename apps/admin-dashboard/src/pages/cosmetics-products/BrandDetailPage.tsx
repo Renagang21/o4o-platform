@@ -69,7 +69,7 @@ const BrandDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<BrandDetailResponse>(`/api/v1/cosmetics/brands/${brandId}`);
+      const response = await api.get<BrandDetailResponse>(`/cosmetics/brands/${brandId}`);
       if (response.data) {
         setBrand(response.data.data);
       }

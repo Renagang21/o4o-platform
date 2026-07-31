@@ -190,8 +190,9 @@ const BulkImportPage: React.FC = () => {
               <p className="font-medium text-blue-900">엑셀 템플릿 사용을 권장합니다</p>
               <p className="text-blue-700 mt-0.5">상품명은 제품 포장에 표시된 공식 명칭 기준으로 입력해 주세요 (예: 타이레놀정 500mg)</p>
             </div>
+            {/* 브라우저 직접 이동 → API 서버 절대 URL 필요 (admin 오리진 상대경로는 SPA 라우터로 떨어져 404) */}
             <a
-              href="/api/v1/neture/supplier/products/template"
+              href={`${(authClient.api.defaults.baseURL ?? '').replace(/\/+$/, '')}/neture/supplier/products/template`}
               className="flex-shrink-0 ml-4 flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-700 bg-white border border-blue-300 rounded-lg hover:bg-blue-50"
             >
               <Download className="w-4 h-4" />

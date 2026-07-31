@@ -164,9 +164,10 @@ router.get('/report', async (req: Request, res: Response, next: NextFunction) =>
     const report = await serviceMonitor.generateReport(format);
 
     if (format === 'csv') {
-      res.setHeader('Content-Type', 'text/csv');
+      // charset + BOM 이 없으면 Excel 이 시스템 기본 인코딩(CP949)으로 읽어 한글이 깨진다.
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename=service-validation-report.csv');
-      return res.send(report);
+      return res.send('\ufeff' + report);
     }
 
     res.json({

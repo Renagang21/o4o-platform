@@ -120,7 +120,7 @@ const PostListPage: React.FC = () => {
   // Fetch categories for filter dropdown
   const fetchCategories = useCallback(async () => {
     try {
-      const response = await api.get<CategoryListResponse>('/api/v1/yaksa/admin/categories');
+      const response = await api.get<CategoryListResponse>('/yaksa/admin/categories');
       if (response.data) {
         setCategories(response.data.data);
       }
@@ -151,7 +151,7 @@ const PostListPage: React.FC = () => {
         params.set('q', searchTerm);
       }
 
-      const response = await api.get<PostListResponse>(`/api/v1/yaksa/admin/posts?${params.toString()}`);
+      const response = await api.get<PostListResponse>(`/yaksa/admin/posts?${params.toString()}`);
 
       if (response.data) {
         setPosts(response.data.data);

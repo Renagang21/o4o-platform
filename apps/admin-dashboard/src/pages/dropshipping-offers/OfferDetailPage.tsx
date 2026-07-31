@@ -63,7 +63,7 @@ const OfferDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<OfferDetailResponse>(`/api/v1/dropshipping/offers/${offerId}`);
+      const response = await api.get<OfferDetailResponse>(`/dropshipping/offers/${offerId}`);
       if (response.data) {
         setItem(response.data.data);
       }

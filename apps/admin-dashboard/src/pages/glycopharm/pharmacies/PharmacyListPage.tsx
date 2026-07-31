@@ -91,7 +91,7 @@ const PharmacyListPage: React.FC = () => {
       }
 
       const response = await api.get<PharmacyListResponse>(
-        `/api/v1/glycopharm/admin/pharmacies?${params.toString()}`
+        `/glycopharm/admin/pharmacies?${params.toString()}`
       );
       if (response.data) {
         setPharmacies(response.data.data);

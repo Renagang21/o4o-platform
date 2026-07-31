@@ -113,7 +113,7 @@ const ProductDetailPage: React.FC = () => {
     setError(null);
     try {
       const response = await api.get<ProductDetailResponse>(
-        `/api/v1/glycopharm/admin/products/${productId}`
+        `/glycopharm/admin/products/${productId}`
       );
       if (response.data) {
         setProduct(response.data.data);
@@ -140,7 +140,7 @@ const ProductDetailPage: React.FC = () => {
     setUpdating(true);
     try {
       const response = await api.patch<ProductDetailResponse>(
-        `/api/v1/glycopharm/admin/products/${productId}/status`,
+        `/glycopharm/admin/products/${productId}/status`,
         { status: newStatus }
       );
       if (response.data) {

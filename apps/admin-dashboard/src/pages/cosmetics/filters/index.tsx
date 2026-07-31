@@ -35,7 +35,7 @@ export default function CosmeticsFiltersPage() {
       setLoading(true);
       setError(null);
 
-      const response = await authClient.api.get('/api/v1/cosmetics/filters');
+      const response = await authClient.api.get('/cosmetics/filters');
 
       if (response.data.success) {
         setFilters(response.data.data || []);
@@ -65,7 +65,7 @@ export default function CosmeticsFiltersPage() {
       // Update each filter
       const results = await Promise.allSettled(
         filters.map((filter) =>
-          authClient.api.put(`/api/v1/cosmetics/filters/${filter.id}`, filter)
+          authClient.api.put(`/cosmetics/filters/${filter.id}`, filter)
         )
       );
 

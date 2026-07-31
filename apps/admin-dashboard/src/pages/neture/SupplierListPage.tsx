@@ -61,20 +61,20 @@ const IDENTITY_STATUS_LABELS: Record<string, string> = {
 };
 
 async function fetchSuppliers(params: { status?: string }): Promise<Supplier[]> {
-  const response = await authClient.api.get('/api/v1/neture/admin/suppliers', { params });
+  const response = await authClient.api.get('/neture/admin/suppliers', { params });
   return response.data;
 }
 
 async function approveSupplier(id: string): Promise<void> {
-  await authClient.api.post(`/api/v1/neture/admin/suppliers/${id}/approve`);
+  await authClient.api.post(`/neture/admin/suppliers/${id}/approve`);
 }
 
 async function rejectSupplier(id: string): Promise<void> {
-  await authClient.api.post(`/api/v1/neture/admin/suppliers/${id}/reject`);
+  await authClient.api.post(`/neture/admin/suppliers/${id}/reject`);
 }
 
 async function deactivateSupplier(id: string): Promise<void> {
-  await authClient.api.post(`/api/v1/neture/admin/suppliers/${id}/deactivate`);
+  await authClient.api.post(`/neture/admin/suppliers/${id}/deactivate`);
 }
 
 const SupplierListPage: React.FC = () => {

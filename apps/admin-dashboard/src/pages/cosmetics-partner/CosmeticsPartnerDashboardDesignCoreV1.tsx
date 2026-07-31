@@ -99,7 +99,7 @@ export default function CosmeticsPartnerDashboardDesignCoreV1({
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get(`/api/v1/partner/dashboard/summary?period=${period}`);
+      const response = await api.get(`/partner/dashboard/summary?period=${period}`);
       if (response.data?.data) {
         setSummary(response.data.data);
       }

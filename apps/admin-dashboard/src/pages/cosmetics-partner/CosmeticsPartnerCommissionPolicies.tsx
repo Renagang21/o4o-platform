@@ -86,7 +86,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
   const fetchPolicies = useCallback(async () => {
     try {
       setLoading(true);
-      const response = await api.get(`/api/v1/cosmetics-partner/commission-policies?page=${page}&limit=10`);
+      const response = await api.get(`/cosmetics-partner/commission-policies?page=${page}&limit=10`);
       if (response.data.success) {
         const result: PaginatedResult = response.data.data;
         setPolicies(result.items);
@@ -101,7 +101,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
 
   const fetchStatistics = useCallback(async () => {
     try {
-      const response = await api.get('/api/v1/cosmetics-partner/commission-policies/statistics');
+      const response = await api.get('/cosmetics-partner/commission-policies/statistics');
       if (response.data.success) {
         setStatistics(response.data.data);
       }
@@ -128,7 +128,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
         effectiveTo: formData.effectiveTo || undefined,
       };
 
-      const response = await api.post('/api/v1/cosmetics-partner/commission-policies', payload);
+      const response = await api.post('/cosmetics-partner/commission-policies', payload);
       if (response.data.success) {
         setShowCreateModal(false);
         resetForm();
@@ -155,7 +155,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
         effectiveTo: formData.effectiveTo || undefined,
       };
 
-      const response = await api.put(`/api/v1/cosmetics-partner/commission-policies/${editingPolicy.id}`, payload);
+      const response = await api.put(`/cosmetics-partner/commission-policies/${editingPolicy.id}`, payload);
       if (response.data.success) {
         setEditingPolicy(null);
         resetForm();
@@ -169,7 +169,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
 
   const handleToggleActive = async (policy: CommissionPolicy) => {
     try {
-      const response = await api.patch(`/api/v1/cosmetics-partner/commission-policies/${policy.id}/active`, {
+      const response = await api.patch(`/cosmetics-partner/commission-policies/${policy.id}/active`, {
         isActive: !policy.isActive,
       });
       if (response.data.success) {
@@ -185,7 +185,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
     if (!confirm('정말 이 정책을 삭제하시겠습니까?')) return;
 
     try {
-      const response = await api.delete(`/api/v1/cosmetics-partner/commission-policies/${id}`);
+      const response = await api.delete(`/cosmetics-partner/commission-policies/${id}`);
       if (response.data.success) {
         fetchPolicies();
         fetchStatistics();
@@ -197,7 +197,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
 
   const handleDuplicate = async (id: string) => {
     try {
-      const response = await api.post(`/api/v1/cosmetics-partner/commission-policies/${id}/duplicate`);
+      const response = await api.post(`/cosmetics-partner/commission-policies/${id}/duplicate`);
       if (response.data.success) {
         fetchPolicies();
         fetchStatistics();
@@ -209,7 +209,7 @@ const CosmeticsPartnerCommissionPolicies: React.FC = () => {
 
   const handleSimulate = async () => {
     try {
-      const response = await api.post('/api/v1/cosmetics-partner/commission/simulate', {
+      const response = await api.post('/cosmetics-partner/commission/simulate', {
         ...simulateData,
         productId: simulateData.productId || undefined,
         campaignId: simulateData.campaignId || undefined,

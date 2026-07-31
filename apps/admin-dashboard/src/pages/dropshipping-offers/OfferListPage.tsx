@@ -89,7 +89,7 @@ const OfferListPage: React.FC = () => {
         params.set('q', searchTerm);
       }
 
-      const response = await api.get<OfferListResponse>(`/api/v1/dropshipping/offers?${params.toString()}`);
+      const response = await api.get<OfferListResponse>(`/dropshipping/offers?${params.toString()}`);
 
       if (response.data) {
         setItems(response.data.data);

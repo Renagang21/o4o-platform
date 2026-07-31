@@ -16,8 +16,8 @@ import type {
 } from './types';
 
 const api = authClient.api;
-const BASE_PATH = '/api/v1/cosmetics/products';
-const ADMIN_PATH = '/api/v1/cosmetics/admin/products';
+const BASE_PATH = '/cosmetics/products';
+const ADMIN_PATH = '/cosmetics/admin/products';
 
 export const productAdminApi = {
   /**

@@ -106,7 +106,7 @@ export default function StorefrontRoutineDetailPage() {
     try {
       setLoading(true);
 
-      const response = await authClient.api.get(`/api/v1/storefront/${slug}/routines/${id}`);
+      const response = await authClient.api.get(`/storefront/${slug}/routines/${id}`);
 
       if (response.data?.success) {
         const data = response.data.data;

@@ -661,7 +661,7 @@ function Step5Output({
         onClick={() => {
           if (!state.productId) return;
           const qrUrl = state.form.includeQr && state.form.qrUrl ? state.form.qrUrl : undefined;
-          const url = popApi.getPdfUrl(state.productId, state.layout, qrUrl);
+          const url = popApi.getPdfAbsoluteUrl(state.productId, state.layout, qrUrl);
           window.open(url, '_blank');
         }}
         disabled={!state.productId}

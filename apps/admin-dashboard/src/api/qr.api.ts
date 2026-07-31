@@ -85,7 +85,7 @@ export const qrApi = {
     if (params?.search) query.set('search', params.search);
 
     const response = await authClient.api.get<any>(
-      `/api/v1/pharmacy/qr/source/products?${query.toString()}`,
+      `/pharmacy/qr/source/products?${query.toString()}`,
     );
     const data = response.data?.data;
     return {
@@ -105,7 +105,7 @@ export const qrApi = {
     if (params?.limit) query.set('limit', String(params.limit));
 
     const response = await authClient.api.get<any>(
-      `/api/v1/pharmacy/qr?${query.toString()}`,
+      `/pharmacy/qr?${query.toString()}`,
     );
     const data = response.data?.data;
     return {
@@ -120,7 +120,7 @@ export const qrApi = {
    * QR 코드 생성
    */
   async create(payload: CreateQrPayload): Promise<QrCode> {
-    const response = await authClient.api.post<any>('/api/v1/pharmacy/qr', payload);
+    const response = await authClient.api.post<any>('/pharmacy/qr', payload);
     return response.data?.data;
   },
 
@@ -128,7 +128,7 @@ export const qrApi = {
    * QR 코드 삭제 (soft-delete)
    */
   async remove(id: string): Promise<void> {
-    await authClient.api.delete(`/api/v1/pharmacy/qr/${id}`);
+    await authClient.api.delete(`/pharmacy/qr/${id}`);
   },
 
   /**
@@ -136,7 +136,7 @@ export const qrApi = {
    */
   async downloadImage(id: string, format: 'png' | 'svg' = 'png', size = 256): Promise<Blob> {
     const response = await authClient.api.get<Blob>(
-      `/api/v1/pharmacy/qr/${id}/image?format=${format}&size=${size}`,
+      `/pharmacy/qr/${id}/image?format=${format}&size=${size}`,
       { responseType: 'blob' } as any,
     );
     return response.data as unknown as Blob;
@@ -147,7 +147,7 @@ export const qrApi = {
    */
   async downloadFlyer(id: string, template: 1 | 4 | 8 = 1): Promise<Blob> {
     const response = await authClient.api.get<Blob>(
-      `/api/v1/pharmacy/qr/${id}/flyer?template=${template}`,
+      `/pharmacy/qr/${id}/flyer?template=${template}`,
       { responseType: 'blob' } as any,
     );
     return response.data as unknown as Blob;

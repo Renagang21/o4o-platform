@@ -78,7 +78,7 @@ const CosmeticsPartnerLinks: React.FC = () => {
   const fetchLinks = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await api.get('/api/v1/partner/links');
+      const response = await api.get('/partner/links');
       if (response.data?.data) {
         setLinks(response.data.data);
       }
@@ -179,7 +179,7 @@ const CosmeticsPartnerLinks: React.FC = () => {
 
   const handleCreateLink = async () => {
     try {
-      await api.post('/api/v1/partner/links', createForm);
+      await api.post('/partner/links', createForm);
       setShowCreateModal(false);
       setCreateForm({ urlSlug: '', linkType: 'product', targetId: '', campaignId: '' });
       setSearchParams({});
@@ -219,7 +219,7 @@ const CosmeticsPartnerLinks: React.FC = () => {
   const handleDeleteLink = async (id: string) => {
     if (!confirm('이 링크를 삭제하시겠습니까?')) return;
     try {
-      await api.delete(`/api/v1/partner/links/${id}`);
+      await api.delete(`/partner/links/${id}`);
       fetchLinks();
     } catch (err) {
       // Demo: just remove from state

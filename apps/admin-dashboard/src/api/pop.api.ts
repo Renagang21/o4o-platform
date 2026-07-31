@@ -67,7 +67,7 @@ export const popApi = {
     query.set('all', 'true');
 
     const response = await authClient.api.get<any>(
-      `/api/v1/operator/products?${query.toString()}`,
+      `/operator/products?${query.toString()}`,
     );
 
     const data = response.data;
@@ -99,7 +99,7 @@ export const popApi = {
     type: 'pop_short' | 'pop_long',
   ): Promise<void> {
     await authClient.api.post(
-      `/api/v1/products/${productId}/ai-contents/generate/${type}`,
+      `/products/${productId}/ai-contents/generate/${type}`,
       {},
     );
   },
@@ -109,19 +109,29 @@ export const popApi = {
    */
   async getAiContents(productId: string): Promise<AiContent[]> {
     const response = await authClient.api.get<any>(
-      `/api/v1/products/${productId}/ai-contents`,
+      `/products/${productId}/ai-contents`,
     );
     return response.data?.data || [];
   },
 
   /**
-   * PDF URL 반환 (blob 다운로드용)
+   * PDF URL 반환 (blob 다운로드용) — authClient.api 기준 상대 경로.
+   * authClient.api 의 baseURL 이 이미 `/api/v1` 을 포함하므로 접두어를 붙이지 않는다.
    */
   getPdfUrl(productId: string, layout: PopLayout, qrUrl?: string): string {
-    const base = `/api/v1/products/${productId}/pop/${layout}`;
+    const base = `/products/${productId}/pop/${layout}`;
     const params = new URLSearchParams();
     if (qrUrl) params.set('qrUrl', qrUrl);
     return params.toString() ? `${base}?${params.toString()}` : base;
+  },
+
+  /**
+   * PDF 절대 URL — window.open / a[href] 등 axios 를 거치지 않는 브라우저 직접 이동용.
+   * getPdfUrl 은 API 서버 baseURL 기준 상대 경로라 그대로 열면 admin 오리진으로 이동한다.
+   */
+  getPdfAbsoluteUrl(productId: string, layout: PopLayout, qrUrl?: string): string {
+    const base = (authClient.api.defaults.baseURL ?? '').replace(/\/+$/, '');
+    return `${base}${this.getPdfUrl(productId, layout, qrUrl)}`;
   },
 
   /**

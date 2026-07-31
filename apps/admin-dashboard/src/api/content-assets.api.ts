@@ -133,7 +133,7 @@ interface ApiResponse<T> {
 }
 
 class ContentAssetsApi {
-  private readonly basePath = '/api/v1/content/assets';
+  private readonly basePath = '/content/assets';
 
   /**
    * Get list of content assets

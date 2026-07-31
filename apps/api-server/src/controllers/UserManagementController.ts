@@ -456,10 +456,12 @@ export class UserManagementController {
       const csv = parser.parse(csvData);
 
       // Set response headers
-      res.setHeader('Content-Type', 'text/csv');
+      // charset + BOM 이 없으면 Excel 이 시스템 기본 인코딩(한국어 Windows=CP949)으로 읽어
+      // 한글 이름·조직명이 깨진다.
+      res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', 'attachment; filename=users-export.csv');
 
-      res.send(csv);
+      res.send('\ufeff' + csv);
     } catch (error) {
       logger.error('Error exporting users:', error);
       res.status(500).json({

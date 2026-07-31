@@ -73,7 +73,7 @@ const ProductEditPage: React.FC = () => {
     setLoading(true);
     setFetchError(null);
     try {
-      const response = await api.get(`/api/v1/cosmetics/products/${productId}`);
+      const response = await api.get(`/cosmetics/products/${productId}`);
       if (response.data?.data) {
         setFormData(response.data.data);
       }
@@ -106,7 +106,7 @@ const ProductEditPage: React.FC = () => {
     setSubmitError(null);
 
     try {
-      const response = await api.put(`/api/v1/cosmetics/admin/products/${productId}`, formData);
+      const response = await api.put(`/cosmetics/admin/products/${productId}`, formData);
       if (response.data) {
         navigate('/cosmetics-products');
       }

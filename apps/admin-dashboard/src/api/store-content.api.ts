@@ -113,8 +113,8 @@ interface ApiResponse<T> {
 // ============================================
 
 class StoreContentApi {
-  private readonly basePath = '/api/v1/lms/store-contents';
-  private readonly templatePath = '/api/v1/lms/templates';
+  private readonly basePath = '/lms/store-contents';
+  private readonly templatePath = '/lms/templates';
 
   // --- StoreContent CRUD ---
 
@@ -238,7 +238,7 @@ class StoreContentApi {
   }): Promise<StoreContentBlock | null> {
     try {
       const response = await authClient.api.patch<ApiResponse<{ block: StoreContentBlock }>>(
-        `/api/v1/lms/store-content-blocks/${blockId}`,
+        `/lms/store-content-blocks/${blockId}`,
         data,
       );
       if (response.data?.success) {
@@ -368,7 +368,7 @@ class StoreContentApi {
   async getContentAnalytics(storeContentId: string): Promise<ContentAnalyticsStats | null> {
     try {
       const response = await authClient.api.get<ApiResponse<ContentAnalyticsStats>>(
-        `/api/v1/lms/content-analytics/content/${storeContentId}`,
+        `/lms/content-analytics/content/${storeContentId}`,
       );
       if (response.data?.success) {
         return response.data.data;
@@ -386,7 +386,7 @@ class StoreContentApi {
     metadata?: Record<string, any>,
   ): Promise<void> {
     try {
-      await authClient.api.post('/api/v1/lms/content-analytics/track', {
+      await authClient.api.post('/lms/content-analytics/track', {
         storeContentId,
         eventType,
         metadata,

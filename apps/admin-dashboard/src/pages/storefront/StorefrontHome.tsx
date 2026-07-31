@@ -71,8 +71,8 @@ export default function StorefrontHome() {
       setError(null);
 
       const [response, policyResponse] = await Promise.all([
-        authClient.api.get(`/api/v1/storefront/${slug}`),
-        authClient.api.get(`/api/v1/stores/${slug}/policies`).catch(() => null),
+        authClient.api.get(`/storefront/${slug}`),
+        authClient.api.get(`/stores/${slug}/policies`).catch(() => null),
       ]);
 
       if (response.data?.success) {
@@ -89,7 +89,7 @@ export default function StorefrontHome() {
 
       // Check if this is an old slug that should redirect
       try {
-        const resolveRes = await authClient.api.get(`/api/v1/stores/resolve/${slug}`);
+        const resolveRes = await authClient.api.get(`/stores/resolve/${slug}`);
         if (resolveRes.data?.data?.redirect && resolveRes.data?.data?.newSlug) {
           navigate(`/storefront/${resolveRes.data.data.newSlug}`, { replace: true });
           return;

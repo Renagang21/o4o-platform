@@ -71,7 +71,7 @@ const BrandListPage: React.FC = () => {
         params.set('is_active', 'false');
       }
 
-      const response = await api.get<BrandListResponse>(`/api/v1/cosmetics/brands?${params.toString()}`);
+      const response = await api.get<BrandListResponse>(`/cosmetics/brands?${params.toString()}`);
       if (response.data) {
         setBrands(response.data.data);
       }

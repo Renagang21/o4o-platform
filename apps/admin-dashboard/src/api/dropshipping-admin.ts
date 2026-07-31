@@ -164,7 +164,7 @@ export async function getOrderRelays(
   if (filters.limit) params.set('limit', String(filters.limit));
 
   const queryString = params.toString();
-  const url = `/api/v1/dropshipping/admin/order-relays${queryString ? `?${queryString}` : ''}`;
+  const url = `/dropshipping/admin/order-relays${queryString ? `?${queryString}` : ''}`;
 
   const response = await api.get<PaginatedResponse<OrderRelay>>(url);
   return response.data;
@@ -172,7 +172,7 @@ export async function getOrderRelays(
 
 export async function getOrderRelay(id: string): Promise<SingleResponse<OrderRelay>> {
   const response = await api.get<SingleResponse<OrderRelay>>(
-    `/api/v1/dropshipping/admin/order-relays/${id}`
+    `/dropshipping/admin/order-relays/${id}`
   );
   return response.data;
 }
@@ -184,7 +184,7 @@ export async function updateOrderRelayStatus(
   shippingInfo?: Record<string, any>
 ): Promise<SingleResponse<OrderRelay>> {
   const response = await api.patch<SingleResponse<OrderRelay>>(
-    `/api/v1/dropshipping/admin/order-relays/${id}/status`,
+    `/dropshipping/admin/order-relays/${id}/status`,
     { status, reason, shippingInfo }
   );
   return response.data;
@@ -192,7 +192,7 @@ export async function updateOrderRelayStatus(
 
 export async function getOrderRelayLogs(id: string): Promise<ListResponse<OrderRelayLog>> {
   const response = await api.get<ListResponse<OrderRelayLog>>(
-    `/api/v1/dropshipping/admin/order-relays/${id}/logs`
+    `/dropshipping/admin/order-relays/${id}/logs`
   );
   return response.data;
 }
@@ -220,7 +220,7 @@ export async function getSettlementBatches(
   if (filters.limit) params.set('limit', String(filters.limit));
 
   const queryString = params.toString();
-  const url = `/api/v1/dropshipping/admin/settlements/batches${queryString ? `?${queryString}` : ''}`;
+  const url = `/dropshipping/admin/settlements/batches${queryString ? `?${queryString}` : ''}`;
 
   const response = await api.get<PaginatedResponse<SettlementBatch>>(url);
   return response.data;
@@ -228,42 +228,42 @@ export async function getSettlementBatches(
 
 export async function getSettlementBatch(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.get<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}`
+    `/dropshipping/admin/settlements/batches/${id}`
   );
   return response.data;
 }
 
 export async function getSettlementBatchLogs(id: string): Promise<ListResponse<SettlementLog>> {
   const response = await api.get<ListResponse<SettlementLog>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/logs`
+    `/dropshipping/admin/settlements/batches/${id}/logs`
   );
   return response.data;
 }
 
 export async function calculateSettlement(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/calculate`
+    `/dropshipping/admin/settlements/batches/${id}/calculate`
   );
   return response.data;
 }
 
 export async function confirmSettlement(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/confirm`
+    `/dropshipping/admin/settlements/batches/${id}/confirm`
   );
   return response.data;
 }
 
 export async function startProcessingSettlement(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/start-processing`
+    `/dropshipping/admin/settlements/batches/${id}/start-processing`
   );
   return response.data;
 }
 
 export async function markSettlementAsPaid(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/mark-paid`
+    `/dropshipping/admin/settlements/batches/${id}/mark-paid`
   );
   return response.data;
 }
@@ -273,7 +273,7 @@ export async function markSettlementAsFailed(
   reason: string
 ): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/mark-failed`,
+    `/dropshipping/admin/settlements/batches/${id}/mark-failed`,
     { reason }
   );
   return response.data;
@@ -281,7 +281,7 @@ export async function markSettlementAsFailed(
 
 export async function retrySettlement(id: string): Promise<SingleResponse<SettlementBatch>> {
   const response = await api.post<SingleResponse<SettlementBatch>>(
-    `/api/v1/dropshipping/admin/settlements/batches/${id}/retry`
+    `/dropshipping/admin/settlements/batches/${id}/retry`
   );
   return response.data;
 }

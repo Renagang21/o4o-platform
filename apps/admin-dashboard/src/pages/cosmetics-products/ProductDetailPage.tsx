@@ -119,7 +119,7 @@ const ProductDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<ProductDetailResponse>(`/api/v1/cosmetics/products/${productId}`);
+      const response = await api.get<ProductDetailResponse>(`/cosmetics/products/${productId}`);
       if (response.data) {
         setProduct(response.data.data);
       }

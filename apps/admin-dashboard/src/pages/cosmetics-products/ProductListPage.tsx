@@ -138,7 +138,7 @@ const ProductListPage: React.FC = () => {
   // Fetch brands for filter dropdown
   const fetchBrands = useCallback(async () => {
     try {
-      const response = await api.get<BrandListResponse>('/api/v1/cosmetics/brands');
+      const response = await api.get<BrandListResponse>('/cosmetics/brands');
       if (response.data) {
         setBrands(response.data.data);
       }
@@ -170,9 +170,9 @@ const ProductListPage: React.FC = () => {
       let response: { data: ProductListResponse };
       if (searchTerm.length >= 2) {
         params.set('q', searchTerm);
-        response = await api.get<ProductListResponse>(`/api/v1/cosmetics/products/search?${params.toString()}`);
+        response = await api.get<ProductListResponse>(`/cosmetics/products/search?${params.toString()}`);
       } else {
-        response = await api.get<ProductListResponse>(`/api/v1/cosmetics/products?${params.toString()}`);
+        response = await api.get<ProductListResponse>(`/cosmetics/products?${params.toString()}`);
       }
 
       if (response.data) {

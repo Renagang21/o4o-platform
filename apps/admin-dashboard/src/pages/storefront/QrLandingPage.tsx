@@ -64,7 +64,7 @@ export default function QrLandingPage() {
     try {
       setLoading(true);
 
-      const response = await authClient.api.get(`/api/v1/storefront/qr/${slug}`);
+      const response = await authClient.api.get(`/storefront/qr/${slug}`);
 
       if (response.data?.success) {
         setData(response.data.data);

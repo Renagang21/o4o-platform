@@ -96,16 +96,16 @@ async function fetchPartners(params: {
   type?: string;
   status?: string;
 }): Promise<ListPartnersResponse> {
-  const response = await authClient.api.get('/api/v1/neture/admin/partners', { params });
+  const response = await authClient.api.get('/neture/admin/partners', { params });
   return response.data;
 }
 
 async function deletePartner(id: string): Promise<void> {
-  await authClient.api.delete(`/api/v1/neture/admin/partners/${id}`);
+  await authClient.api.delete(`/neture/admin/partners/${id}`);
 }
 
 async function updatePartnerStatus(id: string, status: string): Promise<void> {
-  await authClient.api.patch(`/api/v1/neture/admin/partners/${id}/status`, { status });
+  await authClient.api.patch(`/neture/admin/partners/${id}/status`, { status });
 }
 
 const PartnerListPage: React.FC = () => {

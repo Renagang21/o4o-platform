@@ -82,7 +82,8 @@ export const CommissionHistory: FC<CommissionHistoryProps> = ({ partnerUserId })
       ].join(','))
     ].join('\n');
 
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    // BOM 없이는 Excel 이 CSV 를 시스템 기본 인코딩(한국어 Windows=CP949)으로 읽어 한글이 깨진다.
+    const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
     link.download = `commission_history_${new Date().toISOString().split('T')[0]}.csv`;

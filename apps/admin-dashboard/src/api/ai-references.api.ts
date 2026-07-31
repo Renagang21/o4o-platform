@@ -43,7 +43,7 @@ class AIReferencesApi {
    */
   async list(params?: { type?: string; status?: string }): Promise<AIReference[]> {
     try {
-      const response = await authClient.api.get('/api/v1/ai/references', { params });
+      const response = await authClient.api.get('/ai/references', { params });
       return response.data?.data || [];
     } catch (error) {
       console.error('Error fetching AI references:', error);
@@ -56,7 +56,7 @@ class AIReferencesApi {
    */
   async get(id: string): Promise<AIReference | null> {
     try {
-      const response = await authClient.api.get(`/api/v1/ai/references/${id}`);
+      const response = await authClient.api.get(`/ai/references/${id}`);
       return response.data?.data || null;
     } catch (error) {
       console.error(`Error fetching reference ${id}:`, error);
@@ -69,7 +69,7 @@ class AIReferencesApi {
    */
   async create(data: CreateReferenceDto): Promise<AIReference | null> {
     try {
-      const response = await authClient.api.post('/api/v1/ai/references', data);
+      const response = await authClient.api.post('/ai/references', data);
       return response.data?.data || null;
     } catch (error) {
       console.error('Error creating reference:', error);
@@ -82,7 +82,7 @@ class AIReferencesApi {
    */
   async update(id: string, data: UpdateReferenceDto): Promise<AIReference | null> {
     try {
-      const response = await authClient.api.put(`/api/v1/ai/references/${id}`, data);
+      const response = await authClient.api.put(`/ai/references/${id}`, data);
       return response.data?.data || null;
     } catch (error) {
       console.error(`Error updating reference ${id}:`, error);
@@ -95,7 +95,7 @@ class AIReferencesApi {
    */
   async delete(id: string): Promise<void> {
     try {
-      await authClient.api.delete(`/api/v1/ai/references/${id}`);
+      await authClient.api.delete(`/ai/references/${id}`);
     } catch (error) {
       console.error(`Error deleting reference ${id}:`, error);
       throw error;

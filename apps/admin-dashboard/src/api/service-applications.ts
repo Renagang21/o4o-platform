@@ -88,7 +88,7 @@ export interface ReviewApplicationResponse {
 function getApiBasePath(service: ServiceType): string {
   switch (service) {
     case 'glycopharm':
-      return '/api/v1/glycopharm/applications';
+      return '/glycopharm/applications';
     default:
       throw new Error(`Unknown service type: ${service}`);
   }

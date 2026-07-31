@@ -101,7 +101,7 @@ const PostDetailPage: React.FC = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get<PostDetailResponse>(`/api/v1/yaksa/admin/posts/${postId}`);
+      const response = await api.get<PostDetailResponse>(`/yaksa/admin/posts/${postId}`);
       if (response.data) {
         setPost(response.data.data);
       }

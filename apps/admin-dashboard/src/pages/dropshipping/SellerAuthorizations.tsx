@@ -73,7 +73,7 @@ const SellerAuthorizations = () => {
     try {
       setLoading(true);
       const params = selectedStatus !== 'all' ? { status: selectedStatus } : {};
-      const response = await authClient.api.get('/api/v1/ds/seller/authorizations', { params });
+      const response = await authClient.api.get('/ds/seller/authorizations', { params });
 
       if (response.data?.success) {
         setAuthorizations(response.data.data.authorizations || []);
@@ -91,7 +91,7 @@ const SellerAuthorizations = () => {
 
   const fetchLimits = async () => {
     try {
-      const response = await authClient.api.get('/api/v1/ds/seller/limits');
+      const response = await authClient.api.get('/ds/seller/limits');
 
       if (response.data?.success) {
         setLimits(response.data.data);
@@ -106,7 +106,7 @@ const SellerAuthorizations = () => {
     if (!confirm('이 승인 요청을 취소하시겠습니까?')) return;
 
     try {
-      await authClient.api.delete(`/api/v1/ds/seller/authorizations/${authorizationId}`);
+      await authClient.api.delete(`/ds/seller/authorizations/${authorizationId}`);
       toast.success('승인 요청이 취소되었습니다.');
       fetchAuthorizations();
       fetchLimits();

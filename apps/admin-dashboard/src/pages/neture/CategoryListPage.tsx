@@ -23,22 +23,22 @@ interface Category {
 }
 
 async function fetchCategories(): Promise<{ data: Category[] }> {
-  const response = await authClient.api.get('/api/v1/neture/admin/categories');
+  const response = await authClient.api.get('/neture/admin/categories');
   return response.data;
 }
 
 async function createCategory(data: { name: string; slug: string; parentId?: string; sortOrder?: number }): Promise<{ data: Category }> {
-  const response = await authClient.api.post('/api/v1/neture/admin/categories', data);
+  const response = await authClient.api.post('/neture/admin/categories', data);
   return response.data;
 }
 
 async function updateCategory(id: string, data: Partial<Category>): Promise<{ data: Category }> {
-  const response = await authClient.api.patch(`/api/v1/neture/admin/categories/${id}`, data);
+  const response = await authClient.api.patch(`/neture/admin/categories/${id}`, data);
   return response.data;
 }
 
 async function deleteCategory(id: string): Promise<void> {
-  await authClient.api.delete(`/api/v1/neture/admin/categories/${id}`);
+  await authClient.api.delete(`/neture/admin/categories/${id}`);
 }
 
 function slugify(text: string): string {

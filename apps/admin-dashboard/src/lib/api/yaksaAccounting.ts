@@ -158,7 +158,7 @@ export interface ExportData {
 
 // ========== API Functions ==========
 
-const API_BASE = '/api/v1/yaksa/accounting';
+const API_BASE = '/yaksa/accounting';
 
 /**
  * 지출 목록 조회

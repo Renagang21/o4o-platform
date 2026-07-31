@@ -74,7 +74,7 @@ function serviceLabel(key: string): string {
 // ── API ──────────────────────────────────────────────────────────────────────
 
 async function fetchBudgets(): Promise<BudgetSummary[]> {
-  const res = await authClient.api.get<ListBudgetsResponse>('/api/v1/points/budget');
+  const res = await authClient.api.get<ListBudgetsResponse>('/points/budget');
   return res.data.data.budgets;
 }
 
@@ -85,7 +85,7 @@ async function allocateBudget(params: {
 }): Promise<BudgetSummary> {
   const { serviceKey, ...body } = params;
   const res = await authClient.api.post<AllocateResponse>(
-    `/api/v1/points/budget/${serviceKey}/allocate`,
+    `/points/budget/${serviceKey}/allocate`,
     body,
   );
   return res.data.data;
@@ -96,7 +96,7 @@ async function fetchTransactions(
   page: number,
 ): Promise<TransactionsResponse['data']> {
   const res = await authClient.api.get<TransactionsResponse>(
-    `/api/v1/points/budget/${serviceKey}/transactions`,
+    `/points/budget/${serviceKey}/transactions`,
     { params: { page: String(page), limit: '20' } },
   );
   return res.data.data;

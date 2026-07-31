@@ -129,7 +129,7 @@ const ProductListPage: React.FC = () => {
       }
 
       const response = await api.get<ProductListResponse>(
-        `/api/v1/glycopharm/admin/products?${params.toString()}`
+        `/glycopharm/admin/products?${params.toString()}`
       );
 
       if (response.data) {
