@@ -1,0 +1,6 @@
+{
+ "builtAt": "2026-07-31T21:54:48.440Z",
+ "count": 0,
+ "rollback": [],
+ "note": "DB write 가 없어 rollback 대상이 없다."
+}

@@ -1,0 +1,47 @@
+{
+ "builtAt": "2026-07-31T21:54:48.420Z",
+ "total": 4209,
+ "byTrack": {
+  "EXISTING_EN_HOLD": 33,
+  "NEW_EN": 4176
+ },
+ "byReason": {
+  "TRANSLATION_ASSET_MISSING": 3117,
+  "TRANSLATION_AMBIGUOUS": 1092
+ },
+ "dup": 0,
+ "remainingUniquePhrases": 4362,
+ "remainingByCategory": {
+  "CAUTION": {
+   "unique": 1157,
+   "docs": 4332,
+   "occ": 4348
+  },
+  "CLAUSE": {
+   "unique": 1560,
+   "docs": 5145,
+   "occ": 5258
+  },
+  "STANDARD": {
+   "unique": 70,
+   "docs": 145,
+   "occ": 145
+  },
+  "USAGE": {
+   "unique": 1239,
+   "docs": 1653,
+   "occ": 1653
+  },
+  "META": {
+   "unique": 63,
+   "docs": 110,
+   "occ": 110
+  },
+  "LABEL": {
+   "unique": 273,
+   "docs": 453,
+   "occ": 590
+  }
+ },
+ "note": "번역 자산이 확정되지 않은 문구가 남아 생성하지 않았다. 삭제·terminal 처리가 아니다."
+}

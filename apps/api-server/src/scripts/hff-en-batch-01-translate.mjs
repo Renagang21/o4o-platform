@@ -7,6 +7,7 @@
  * 근거가 없는 슬롯이 하나라도 있으면 그 문서는 생성하지 않고 HOLD 한다.
  */
 import fs from 'node:fs';
+import { applyFrames } from './hff-en-hold4209-frames.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
 const ASSETS = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-translation-assets-v1.json`, 'utf8'));
@@ -20,15 +21,27 @@ export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
 
 // 열거 구분자·마커·종결부호는 의미가 아니라 표기다. 사전 조회 키에서만 통일한다(원문은 보존).
 const MARK = /[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮➀➁➂➃➄]|\(\s*\d+\s*\)|^\s*\d+\s*[).]|\s\d\s*[).]/g;
-export const key = (s) => norm(s)
-  .replace(/[·․⋅ㆍ•∙‧・･]/g, '·')
-  .replace(MARK, ' ')
-  .replace(/[,，、]/g, '·')
-  .replace(/[.。]\s*$/, '')
-  .replace(/^[\s:：·]+/, '')
-  .replace(/[\s·]+$/, '')
-  .replace(/\s/g, '')
-  .replace(/·+/g, '·');
+// 지시형 어미는 표기 차이일 뿐 의미가 같다. 사전 조회 키에서만 하나로 모은다(원문은 보존).
+//   상담할 것 / 상담하십시오 / 상담하시기 바랍니다 / 상담한다  → 상담할것
+// `~할 수 있음`(가능성)과 `~할 것`(지시)은 서로 다른 의미이므로 섞지 않는다.
+const ENDING = [
+  [/(?:하시기\s*바랍니다|하시길\s*바랍니다|하기\s*바랍니다|해\s*주시기\s*바랍니다|하여\s*주시기\s*바랍니다)$/, '할것'],
+  [/(?:하지\s*마십시오|하지\s*마세요|하지\s*말\s*것|하지\s*않는다)$/, '하지말것'],
+  [/(?:하십시오|하세요|합니다|한다|하여야\s*함|해야\s*함|할\s*것|하시오)$/, '할것'],
+  [/(?:입니다|이다)$/, '임'],
+  [/(?:있습니다)$/, '있음'],
+];
+export const key = (s) => {
+  let v = norm(s)
+    .replace(/[·․⋅ㆍ•∙‧・･]/g, '·')
+    .replace(MARK, ' ')
+    .replace(/[,，、]/g, '·')
+    .replace(/[.。]\s*$/, '')
+    .replace(/^[\s:：·]+/, '')
+    .replace(/[\s·]+$/, '');
+  for (const [re, to] of ENDING) { const n = v.replace(re, to); if (n !== v) { v = n; break; } }
+  return v.replace(/\s/g, '').replace(/·+/g, '·');
+};
 
 const DICT = {
   clause: {}, label: {}, heading: {}, foot: {}, badge: {}, intro: {}, meta: {},
@@ -108,9 +121,20 @@ export function lookup(kind, text) {
     const m = norm(text).match(t.re);
     if (m) return { en: t.en(m), how: `tpl:${t.id}` };
   }
+  if (kind === 'clause' || kind === 'meta' || kind === 'badge') {
+    const fr = applyFrames(k);
+    if (fr) return { en: fr, how: 'frame' };
+  }
   if (kind === 'clause') {
     const c = composeClause(k);
     if (c) return { en: c, how: 'compose' };
+    // `비타민B1: 탄수화물과 에너지 대사에 필요` — 라벨과 절이 한 li 에 붙은 형태
+    const lc = k.match(/^([^:：]{2,30})[:：](.+)$/);
+    if (lc) {
+      const L = DICT.label[key(lc[1])] ?? DICT.label[lc[1]];
+      const C = DICT.clause[lc[2]] ?? composeClause(lc[2]);
+      if (L && C) return { en: `${L}: ${C}`, how: 'labelClause' };
+    }
     // 다른 슬롯 사전에 같은 문자열이 있으면 재사용 (라벨/절 공용 문구)
     for (const alt of ['label', 'meta', 'badge']) if (DICT[alt][k]) return { en: DICT[alt][k], how: `dict:${alt}` };
   }

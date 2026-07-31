@@ -1,0 +1,29 @@
+{
+ "appliedAt": "2026-07-31T21:54:48.440Z",
+ "mode": "NO_APPLY",
+ "reason": "SAFE 대상 0 — 번역 자산이 확정되지 않은 문구가 남아 생성 기준을 통과한 문서가 없다",
+ "expectedUpdate": 0,
+ "actualUpdate": 0,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "rolledBack": false,
+ "before": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 25420,
+  "en_without_fn": 33
+ },
+ "after": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 25420,
+  "en_without_fn": 33
+ },
+ "countsUnchanged": true
+}

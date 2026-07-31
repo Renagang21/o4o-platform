@@ -1,0 +1,39 @@
+{
+ "verifiedAt": "2026-07-31T21:54:48.439Z",
+ "readOnly": true,
+ "separateSession": true,
+ "dbWrites": 0,
+ "safeTargets": 0,
+ "expectedUpdate": 0,
+ "actualUpdate": 0,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "koCanonicalDrift": 0,
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 25420,
+  "en_without_fn": 33
+ },
+ "expected": {
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "spd_all": 120123,
+  "en_dup": 0
+ },
+ "statusSum": 4209,
+ "sum4209": true,
+ "byStatus": {
+  "HOLD_TRANSLATION": 4209
+ },
+ "finalHold": 4209,
+ "holdDup": 0,
+ "remainingUniquePhrases": 4362,
+ "failedChecks": [],
+ "globalsOk": true,
+ "verdict": "PASS"
+}
