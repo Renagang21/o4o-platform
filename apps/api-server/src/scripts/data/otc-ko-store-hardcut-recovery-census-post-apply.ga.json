@@ -1,0 +1,324 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-STORE-HARDCUT-RECOVERY-V1",
+  "kind": "ko-store-hardcut-recovery-census",
+  "generatedFrom": "LIVE",
+  "mode": "READ-ONLY",
+  "population": {
+    "koStoreCanonical": 15908,
+    "distinctMasterId": 15908,
+    "duplicateCanonicalMasters": 0,
+    "masterJoinMissing": 0,
+    "masterNotActive": 0,
+    "masterRegulatoryTypes": [
+      {
+        "t": "DRUG",
+        "c": "otc",
+        "n": 15908
+      }
+    ],
+    "wrongTypeOrLangMixedIn": 0,
+    "sourceRefNull": 0,
+    "baselineExpected": 15908
+  },
+  "populationMatchesBaseline": true,
+  "officialSourceLoaded": 14636,
+  "officialSourceStatus": {
+    "deprecated": 14636
+  },
+  "detectedSpikes": [
+    {
+      "kind": "tile:선택 포인트",
+      "len": 64,
+      "count": 8711,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "tile:선택 포인트",
+      "len": 72,
+      "count": 2998,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "warn:li",
+      "len": 260,
+      "count": 2114,
+      "neighbourMedian": 33
+    },
+    {
+      "kind": "foot",
+      "len": 61,
+      "count": 1127,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "warn:li",
+      "len": 259,
+      "count": 450,
+      "neighbourMedian": 42
+    },
+    {
+      "kind": "tile:주의 대상",
+      "len": 62,
+      "count": 314,
+      "neighbourMedian": 7
+    },
+    {
+      "kind": "intake",
+      "len": 164,
+      "count": 225,
+      "neighbourMedian": 13
+    },
+    {
+      "kind": "intro",
+      "len": 165,
+      "count": 192,
+      "neighbourMedian": 7
+    },
+    {
+      "kind": "tile:작용",
+      "len": 165,
+      "count": 192,
+      "neighbourMedian": 6
+    },
+    {
+      "kind": "summaryField",
+      "len": 165,
+      "count": 192,
+      "neighbourMedian": 6
+    },
+    {
+      "kind": "tile:주요 증상",
+      "len": 77,
+      "count": 164,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "intake",
+      "len": 223,
+      "count": 154,
+      "neighbourMedian": 20
+    },
+    {
+      "kind": "intake",
+      "len": 224,
+      "count": 149,
+      "neighbourMedian": 20
+    },
+    {
+      "kind": "tile:작용",
+      "len": 120,
+      "count": 129,
+      "neighbourMedian": 14
+    },
+    {
+      "kind": "intake",
+      "len": 260,
+      "count": 125,
+      "neighbourMedian": 2
+    },
+    {
+      "kind": "warn:li",
+      "len": 262,
+      "count": 117,
+      "neighbourMedian": 13
+    },
+    {
+      "kind": "warn:li",
+      "len": 429,
+      "count": 107,
+      "neighbourMedian": 16
+    },
+    {
+      "kind": "intake",
+      "len": 199,
+      "count": 91,
+      "neighbourMedian": 6
+    },
+    {
+      "kind": "tile:주요 증상",
+      "len": 70,
+      "count": 89,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "intro",
+      "len": 170,
+      "count": 84,
+      "neighbourMedian": 4
+    },
+    {
+      "kind": "intro",
+      "len": 153,
+      "count": 80,
+      "neighbourMedian": 9
+    },
+    {
+      "kind": "tile:작용",
+      "len": 170,
+      "count": 79,
+      "neighbourMedian": 4
+    },
+    {
+      "kind": "intro",
+      "len": 152,
+      "count": 77,
+      "neighbourMedian": 9
+    },
+    {
+      "kind": "tile:작용",
+      "len": 153,
+      "count": 76,
+      "neighbourMedian": 7
+    },
+    {
+      "kind": "summaryField",
+      "len": 153,
+      "count": 76,
+      "neighbourMedian": 6
+    },
+    {
+      "kind": "tile:주의 대상",
+      "len": 63,
+      "count": 66,
+      "neighbourMedian": 7
+    },
+    {
+      "kind": "tile:주의 대상",
+      "len": 102,
+      "count": 57,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "warn:li",
+      "len": 385,
+      "count": 56,
+      "neighbourMedian": 7
+    },
+    {
+      "kind": "intake",
+      "len": 402,
+      "count": 54,
+      "neighbourMedian": 0
+    },
+    {
+      "kind": "tile:주요 증상",
+      "len": 96,
+      "count": 54,
+      "neighbourMedian": 0
+    }
+  ],
+  "classification": {
+    "total": 15908,
+    "clean": 13528,
+    "defective": 2380,
+    "summaryNull": 1577,
+    "noIntro": 0,
+    "officialMissing": 1272,
+    "byKind": {
+      "HC-BODY-CAUTION": 2378,
+      "HC-BODY-DOSAGE": 155,
+      "HC-BODY-INDICATION": 2
+    },
+    "docsByKind": {
+      "HC-BODY-CAUTION": 2378,
+      "HC-BODY-DOSAGE": 155,
+      "HC-BODY-INDICATION": 2
+    },
+    "docsPrimary": {
+      "HC-BODY-CAUTION": 2378,
+      "HC-BODY-DOSAGE": 2
+    },
+    "unterminatedButFaithfulCopy": 17,
+    "unterminatedUnmatched": 8
+  },
+  "mutualExclusiveOk": true,
+  "defectOccurrences": 2535,
+  "defectDocs": 2380,
+  "byCutLen": {
+    "259": 367,
+    "260": 2156,
+    "282": 6,
+    "337": 6
+  },
+  "byUnitKind": {
+    "warn:li": 2378,
+    "intake": 155,
+    "intro": 2
+  },
+  "autoRecoverableOccurrences": 2535,
+  "humanReviewOccurrences": 8,
+  "notOurDefectOccurrences": 17,
+  "totalsReconcile": {
+    "clean": 13528,
+    "defective": 2380,
+    "sum": 15908,
+    "population": 15908,
+    "ok": true
+  },
+  "unmatchedSamples": [
+    {
+      "masterId": "21545c0e-30b1-4710-93cd-41ad2f925593",
+      "unitKind": "warn:li",
+      "len": 455,
+      "hasOfficial": true,
+      "officialLen": 1397,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "532033db-ffe4-41b8-9b00-0c048d1e89cf",
+      "unitKind": "warn:li",
+      "len": 451,
+      "hasOfficial": true,
+      "officialLen": 1399,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "70e55625-a062-4f0f-917e-939d1c3071f1",
+      "unitKind": "warn:li",
+      "len": 455,
+      "hasOfficial": true,
+      "officialLen": 1397,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "a6adcd05-80f5-4afa-8889-c12b8b461803",
+      "unitKind": "warn:li",
+      "len": 265,
+      "hasOfficial": true,
+      "officialLen": 582,
+      "tail": "녹내장, 빈도불명의 시야흐림, 드물게 중심성장액맥락망막병증 등이 나타날 경우 의사 또는 약사와 상의하십시오,"
+    },
+    {
+      "masterId": "d3eb9352-399c-4192-b67a-4ce852a8b2ae",
+      "unitKind": "warn:li",
+      "len": 451,
+      "hasOfficial": true,
+      "officialLen": 1399,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "d5ae787a-ebd9-4f07-9409-0dea881f6761",
+      "unitKind": "warn:li",
+      "len": 455,
+      "hasOfficial": true,
+      "officialLen": 1397,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "e3b983c7-d425-46c3-b912-f6a8d26576dc",
+      "unitKind": "warn:li",
+      "len": 451,
+      "hasOfficial": true,
+      "officialLen": 1399,
+      "tail": "기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침이 있는 사람은 의사 또는 약사와 상의하십시오"
+    },
+    {
+      "masterId": "f0a574b3-7ad4-4ff5-b319-d217cde37e4d",
+      "unitKind": "warn:li",
+      "len": 265,
+      "hasOfficial": true,
+      "officialLen": 582,
+      "tail": "녹내장, 빈도불명의 시야흐림, 드물게 중심성장액맥락망막병증 등이 나타날 경우 의사 또는 약사와 상의하십시오,"
+    }
+  ]
+}

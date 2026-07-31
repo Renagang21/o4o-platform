@@ -1,0 +1,34 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-STORE-HARDCUT-RECOVERY-V1",
+  "kind": "checkpoint",
+  "every": 100,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 100,
+      "lastMasterId": "64e0a0f8-6195-48d2-b187-55042ef5ee67",
+      "green": 100,
+      "exception": 0,
+      "writeActual": 100,
+      "at": "2026-07-31T13:25:47.745Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 200,
+      "lastMasterId": "cd1e446f-7ca9-47d3-af45-33cd910daff7",
+      "green": 200,
+      "exception": 0,
+      "writeActual": 200,
+      "at": "2026-07-31T13:25:52.363Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 250,
+      "lastMasterId": "ffd51a5b-3c10-44ef-8598-37c8a0326835",
+      "green": 250,
+      "exception": 0,
+      "writeActual": 250,
+      "at": "2026-07-31T13:25:54.673Z"
+    }
+  ]
+}

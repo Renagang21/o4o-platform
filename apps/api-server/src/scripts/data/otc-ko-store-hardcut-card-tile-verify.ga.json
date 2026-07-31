@@ -1,0 +1,112 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-STORE-HARDCUT-RECOVERY-V1",
+  "kind": "card-tile-verify",
+  "mode": "READ-ONLY",
+  "since": "2026-07-31 13:25:26.087164+00",
+  "planDigest": "01196348d7f80c3a6783debdb212b1f0b38e8aa2317cb25ce9b191550c6fb383",
+  "gates": {
+    "G0 KO canonical 모집단": {
+      "expect": 15908,
+      "actual": 15908,
+      "pass": true
+    },
+    "G11 KO canonical 중복 master": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G1 계획 건수": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G2 본문 해시 = 계획 newHash": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G7 역패치 복원 → 적용 전 해시 일치": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G3 대상 작용 타일 = 새 값": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G3b 대상 120자 고정 절단 잔존": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G5 hero 배지 ↔ 새 타일 동기화": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G6 summary 컬럼 NULL 유지(요약 신규 생성 0)": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G9 새 타일이 효능 첫 줄의 접두": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G10 새 타일 문장 종결": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G12 상태·타입·언어·sourceRef·삭제 드리프트": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G15 비의약품 master 혼입": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G4 KO 전수 120자 타일 절단 잔존": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G8 본문 260 절단(범위 밖) 불변": {
+      "expect": 2029,
+      "actual": 2029,
+      "pass": true
+    },
+    "G13 적용 창 이후 KO 갱신 총건": {
+      "expect": 250,
+      "actual": 250,
+      "pass": true
+    },
+    "G13b 적용 창 이후 대상 밖 KO 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G14 적용 창 이후 EN 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G14b 적용 창 이후 타 source_type 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G16 EN canonical 총건 불변": {
+      "expect": 15908,
+      "actual": 15908,
+      "pass": true
+    }
+  },
+  "failedGates": 0,
+  "failures": [],
+  "pass": true
+}

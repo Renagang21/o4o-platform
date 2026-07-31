@@ -1,0 +1,17 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-KO-STORE-HARDCUT-RECOVERY-V1",
+  "kind": "card-tile-rebuild-plan",
+  "mode": "dry-run",
+  "planDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "koCanonicalTotal": 15908,
+  "summaryPresent": 14331,
+  "summaryNullNotCut": 0,
+  "alreadyRebuilt": 1577,
+  "target": 0,
+  "blocked": 0,
+  "badgeReplaced": 0,
+  "lenBuckets": {},
+  "blockedByCode": {},
+  "blockedRows": [],
+  "rows": []
+}
