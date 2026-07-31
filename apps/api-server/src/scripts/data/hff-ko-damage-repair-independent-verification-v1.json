@@ -1,0 +1,33 @@
+{
+ "verifiedAt": "2026-07-31T23:53:24.721Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 798,
+ "newHashMatch": 798,
+ "oldHashRemains": 0,
+ "fieldDrift": 0,
+ "rollbackManifestOk": 798,
+ "emptyClauseDocs": 0,
+ "globals": {
+  "spd_all": 122267,
+  "ko_canon": 40918,
+  "en_canon": 17642,
+  "pm": 40948,
+  "ko_dup": 0
+ },
+ "expected": {
+  "ko_canon": 40918,
+  "en_canon": 17642,
+  "spd_all": 122267,
+  "pm": 40948,
+  "ko_dup": 0
+ },
+ "residueAfterRepairWholeCorpus": {
+  "openParen": 5,
+  "markerOnly": 5,
+  "english": 9
+ },
+ "failedChecks": [],
+ "globalsOk": true,
+ "verdict": "PASS"
+}

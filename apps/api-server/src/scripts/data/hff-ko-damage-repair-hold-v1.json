@@ -1,0 +1,93 @@
+{
+ "builtAt": "2026-07-31T23:49:47.804Z",
+ "count": 14,
+ "holds": [
+  {
+   "canonicalId": "13b10e8a-86d7-47b5-b8fc-15bb55414239",
+   "productMasterId": "c1144b3a-7351-4cf4-8cf4-a9c90356cbed",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄"
+   ]
+  },
+  {
+   "canonicalId": "2622d3fb-d289-4e0b-b144-835b6fb79c24",
+   "productMasterId": "f8896492-66cd-4c62-8c77-94d7ecb1ef44",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "27999d7b-d8e8-45b8-8e3e-5cd52b8ef2fd",
+   "productMasterId": "a1b89f41-dec4-49ad-8d29-9fbce75d7bb7",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄"
+   ]
+  },
+  {
+   "canonicalId": "d82abfdd-0d20-43fe-9aed-59ae0a2f51d7",
+   "productMasterId": "49b3fbde-4d06-4af2-9471-939edd0c7fa8",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "85228dd7-47d2-4f25-89ee-dbd7241494d2",
+   "productMasterId": "0fb4edd0-af22-4dd5-b9e6-51805c10f4f3",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "17d80cd6-2fe1-4467-9e47-c3c216820a97",
+   "productMasterId": "30a26ed2-3c1d-4b6c-8753-25fca9ebead4",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "bdfc9bb6-fa9d-4676-8507-3de491ad8bb9",
+   "productMasterId": "914fa599-9b16-40ef-bc5e-0c17f11cd4a3",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "58feb6b2-3362-4544-87d6-e8b10803a7d1",
+   "productMasterId": "3272d507-ae0e-4c88-8b90-10554d26ef29",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "6b7a485f-1def-4f9a-b198-6e680f55357f",
+   "productMasterId": "e4d4338e-f933-4200-ae17-841ec94885e1",
+   "reason": "WOULD_EMPTY_LIST"
+  },
+  {
+   "canonicalId": "056a5ed2-6002-4154-9498-90a2024495ca",
+   "productMasterId": "ec7368d0-4968-4d43-8581-8c867391e006",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄"
+   ]
+  },
+  {
+   "canonicalId": "0c34bf5d-1686-401a-84fe-856570baa6b2",
+   "productMasterId": "96efeeb0-7777-4300-83d0-bf1435d1eec8",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음 ③ 장 건강에 도움"
+   ]
+  },
+  {
+   "canonicalId": "47c5f062-8a6f-4260-9aff-6abd9aff5647",
+   "productMasterId": "e4382b69-9da1-4576-b743-d2446c213c44",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음"
+   ]
+  },
+  {
+   "canonicalId": "6ad55ecf-5c2e-4d6a-8561-d047d5dffe5a",
+   "productMasterId": "79c5f717-0c38-4507-afad-580c88322331",
+   "reason": "EMBEDDED_MARKER_NEEDS_SOURCE",
+   "samples": [
+    "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음"
+   ]
+  },
+  {
+   "canonicalId": "8654606a-990d-4d75-83d5-8933b5e31d7d",
+   "reason": "RENDER_RESIDUE_DUPLICATE_LI"
+  }
+ ]
+}

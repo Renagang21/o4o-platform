@@ -1,0 +1,23 @@
+{
+ "appliedAt": "2026-07-31T23:52:01.588Z",
+ "mode": "APPLY",
+ "shardSize": 200,
+ "shards": 4,
+ "expectedUpdate": 798,
+ "actualUpdate": 798,
+ "skipped": [],
+ "rolledBackShards": 0,
+ "before": {
+  "spd_all": 122267,
+  "ko_canon": 40918,
+  "en_canon": 17642,
+  "pm": 40948
+ },
+ "after": {
+  "spd_all": 122267,
+  "ko_canon": 40918,
+  "en_canon": 17642,
+  "pm": 40948
+ },
+ "countsUnchanged": true
+}
