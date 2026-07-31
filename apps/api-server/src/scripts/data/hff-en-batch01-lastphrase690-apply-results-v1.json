@@ -1,0 +1,28 @@
+{
+ "appliedAt": "2026-07-31T23:09:21.030Z",
+ "mode": "NO_APPLY",
+ "reason": "마지막 문구 690종 번역을 완료하지 못해 coverage 100% 문서가 없다",
+ "expectedUpdate": 0,
+ "actualUpdate": 0,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "skipped": 0,
+ "before": {
+  "spd_all": 121691,
+  "ko_canon": 40918,
+  "en_canon": 17066,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 23852,
+  "en_without_fn": 22
+ },
+ "after": {
+  "spd_all": 121691,
+  "ko_canon": 40918,
+  "en_canon": 17066,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 23852,
+  "en_without_fn": 22
+ }
+}

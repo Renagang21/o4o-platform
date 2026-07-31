@@ -1,0 +1,23 @@
+{
+ "builtAt": "2026-07-31T23:06:09.305Z",
+ "totalUniqueRemaining": 3884,
+ "byCategory": {
+  "CLAUSE": 1491,
+  "CAUTION": 1105,
+  "USAGE": 957,
+  "STANDARD": 45,
+  "LABEL": 251,
+  "META": 35
+ },
+ "lastPhraseSet": 690,
+ "documentsByMissingCount": {
+  "0": 16,
+  "1": 853,
+  "2": 609,
+  "3": 425,
+  "4-5": 427,
+  "11+": 76,
+  "6-10": 224
+ },
+ "note": "이번 라운드는 690종 번역을 완료하지 못했다. 다음 라운드 완료 조건은 이 690종 전량 확정이다."
+}

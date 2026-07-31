@@ -66,7 +66,21 @@ const WHO = [
   [/^성인\s*/, 'Adults'], [/^15세\s*이하의?\s*어린이는?\s*/, 'Children aged 15 or under'],
 ];
 
+// `1일 1회 2정 … 1일 2회 1정 …` 처럼 두 가지 섭취법을 병기하는 형식.
+// 각각을 독립 파싱해 모두 성공할 때만 결합한다.
 export function parseUsage(koRaw) {
+  const whole = (koRaw ?? '').replace(/\s+/g, ' ').trim();
+  const alts = whole.split(/(?<=[.。])\s*(?=1일\s*\d)|,\s*(?=1일\s*\d+\s*회,)|\s+또는\s+(?=1일\s*\d)/)
+    .map((x) => x.trim()).filter(Boolean);
+  if (alts.length === 2 && alts.every((a) => /1일\s*\d/.test(a))) {
+    const a = parseOne(alts[0]), b = parseOne(alts[1]);
+    if (a && b) return `${a.replace(/\.$/, '')}. Alternatively, ${b.replace(/^Take /, 'take ')}`;
+    return null;
+  }
+  return parseOne(koRaw);
+}
+
+function parseOne(koRaw) {
   let s = (koRaw ?? '').replace(/\s+/g, ' ').trim().replace(/[.。]\s*$/, '');
   if (!s || /[A-Za-z]{5,}/.test(s)) return null;
   let who = null;

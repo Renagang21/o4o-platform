@@ -1,0 +1,6229 @@
+{
+ "builtAt": "2026-07-31T23:06:09.305Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "basis": "2,630 HOLD 현재 상태에서 재산출",
+ "lastPhraseCount": 690,
+ "expectedUnlock": 853,
+ "byCategory": {
+  "CLAUSE": 119,
+  "CAUTION": 148,
+  "USAGE": 364,
+  "STANDARD": 3,
+  "LABEL": 41,
+  "META": 15
+ },
+ "deterministic": true,
+ "phrases": [
+  {
+   "uniquePhraseId": "830042997951b5e9",
+   "kind": "clause",
+   "koText": "세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "normalizedKoText": "세포와혈액생성에필요·태아신경관의정상발달에필요·혈액의호모시스테인수준을정상으로유지하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 89,
+   "documentsWithOneMissingPhrase": 18
+  },
+  {
+   "uniquePhraseId": "8166ddee57094c63",
+   "kind": "clause",
+   "koText": "카페인 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의",
+   "normalizedKoText": "카페인함유음료(커피·홍차·녹차등)와의병용섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 33,
+   "documentsWithOneMissingPhrase": 17
+  },
+  {
+   "uniquePhraseId": "897eded646895bdc",
+   "kind": "clause",
+   "koText": "(1) 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 (2) 배변활동 원활에 도움을 줄 수 있음 (3) 장 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "유산균증식및유해균억제에도움을줄수있음배변활동원활에도움을줄수있음장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 15,
+   "documentsWithOneMissingPhrase": 15
+  },
+  {
+   "uniquePhraseId": "6f1eb6a15377f468",
+   "kind": "clause",
+   "koText": "특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의할 것",
+   "normalizedKoText": "특정질환(알레르기체질등)이있는분은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 94,
+   "documentsWithOneMissingPhrase": 11
+  },
+  {
+   "uniquePhraseId": "a736ac561e03711d",
+   "kind": "clause",
+   "koText": "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요",
+   "normalizedKoText": "뼈형성에필요·에너지이용에필요·유해산소로부터세포를보호하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 72,
+   "documentsWithOneMissingPhrase": 8
+  },
+  {
+   "uniquePhraseId": "06e2e5bb309d6cc3",
+   "kind": "clause",
+   "koText": "(3) 당뇨, 혈압 등의 질환이 있거나 의약품 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "당뇨·혈압등의질환이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 7
+  },
+  {
+   "uniquePhraseId": "ccbb2cf530b98fea",
+   "kind": "clause",
+   "koText": "세포와 혈액생성에 필요 / 태아 신경관의 정상 발달에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "normalizedKoText": "세포와혈액생성에필요/태아신경관의정상발달에필요/혈액의호모시스테인수준을정상으로유지하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 22,
+   "documentsWithOneMissingPhrase": 5
+  },
+  {
+   "uniquePhraseId": "d49061ecd22a9e91",
+   "kind": "clause",
+   "koText": "수술 전후에는 섭취에 주의할 것",
+   "normalizedKoText": "수술전후에는섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 14,
+   "documentsWithOneMissingPhrase": 5
+  },
+  {
+   "uniquePhraseId": "12af4aa5dc6c6535",
+   "kind": "clause",
+   "koText": "(6) 수술 전후에는 섭취에 주의",
+   "normalizedKoText": "수술전후에는섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 5
+  },
+  {
+   "uniquePhraseId": "9f09adc8c9956291",
+   "kind": "clause",
+   "koText": "어두운 곳에서 시각 적응을 위해 필요 / 피부와 점막을 형성하고 기능을 유지하는데 필요 / 상피세포의 성장과 발달에 필요",
+   "normalizedKoText": "어두운곳에서시각적응을위해필요/피부와점막을형성하고기능을유지하는데필요/상피세포의성장과발달에필요",
+   "category": "CLAUSE",
+   "documentCount": 17,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "9c4f5a336e58b982",
+   "kind": "clause",
+   "koText": "어린이 경우는 목에 걸릴 우려가 있으니 보호자의 관리 아래 섭취하여 주시기 바랍니다.",
+   "normalizedKoText": "어린이경우는목에걸릴우려가있으니보호자의관리아래섭취할것",
+   "category": "CLAUSE",
+   "documentCount": 13,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "dd56ca8db1e7bb3f",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제를 액상과 함께 섭취(1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제를액상과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "9e6a69e26ecd9f74",
+   "kind": "clause",
+   "koText": "필수지방산의 보충",
+   "normalizedKoText": "필수지방산의보충",
+   "category": "CLAUSE",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "bc0b48db8d078837",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여 정제+연질캡슐을 액상과 함께 섭취 or 물과 함께 섭취(1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여정제+연질캡슐을액상과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "c6b943fddfffba68",
+   "kind": "clause",
+   "koText": "유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활 유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활유익한 유산균의 증식, 유해균 억제 또는 배변활동 원활",
+   "normalizedKoText": "유익한유산균의증식·유해균억제또는배변활동원활유익한유산균의증식·유해균억제또는배변활동원활유익한유산균의증식·유해균억제또는배변활동원활",
+   "category": "CLAUSE",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 4
+  },
+  {
+   "uniquePhraseId": "d3e9a57a9f8747cc",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2캡슐을충분한물과함께섭취하십시오.1일2회·1회1캡슐을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 10,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "87872ee02e4c2287",
+   "kind": "clause",
+   "koText": "기능성 내용 : 항산화･높은 혈압 감소에 도움을 줄 수 있음",
+   "normalizedKoText": "기능성내용:항산화·높은혈압감소에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "9034feedb762975d",
+   "kind": "clause",
+   "koText": "특이체질,알레르기체질의경우에는간혹개인에따라과민반응을나타낼수있으므로",
+   "normalizedKoText": "특이체질·알레르기체질의경우에는간혹개인에따라과민반응을나타낼수있으므로",
+   "category": "CAUTION",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "f3d7c0142cd8e22a",
+   "kind": "clause",
+   "koText": "섭취전 제품에 이상이 있는 경우에는 섭취하지 마십시오.",
+   "normalizedKoText": "섭취전제품에이상이있는경우에는섭취하지말것",
+   "category": "STANDARD",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "22eea090b7033c3b",
+   "kind": "clause",
+   "koText": "(시행일 2026.01.01)",
+   "normalizedKoText": "(시행일2026.01.01)",
+   "category": "CLAUSE",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "5be9ee6bd7072062",
+   "kind": "label",
+   "koText": "판토텐산/비오틴/비타민B12/비타민B1/비타민B2",
+   "normalizedKoText": "판토텐산/비오틴/비타민B12/비타민B1/비타민B2",
+   "category": "LABEL",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "3229a81a0f2b3363",
+   "kind": "meta",
+   "koText": "(1) 최종제품일 경우 : 1일 1회, 1회 1g을 식후에 물이나 음용수와 함께 섭취 (2) 원료성제품일 경우 : 건강기능식품 원료로 사용",
+   "normalizedKoText": "최종제품일경우:1일1회·1회1g을식후에물이나음용수와함께섭취원료성제품일경우:건강기능식품원료로사용",
+   "category": "USAGE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "47cba91f10a05f4c",
+   "kind": "clause",
+   "koText": "알레르기 체질 등은 개앤에 따라 과민반응을 나타낼 수 있음",
+   "normalizedKoText": "알레르기체질등은개앤에따라과민반응을나타낼수있음",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "738e091750348065",
+   "kind": "label",
+   "koText": "엠에스엠(MSM)",
+   "normalizedKoText": "엠에스엠(MSM)",
+   "category": "LABEL",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 3
+  },
+  {
+   "uniquePhraseId": "c715d64dae1d517e",
+   "kind": "clause",
+   "koText": "알레르기 반응이 나타나는 경우에는 섭취 중단하십시오.",
+   "normalizedKoText": "알레르기반응이나타나는경우에는섭취중단할것",
+   "category": "CAUTION",
+   "documentCount": 22,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "faa67cf71a5153fd",
+   "kind": "clause",
+   "koText": "대두에 알레르기를 나타내는 사람은 섭취에 주의할 것",
+   "normalizedKoText": "대두에알레르기를나타내는사람은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 19,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "246a697f07d47001",
+   "kind": "clause",
+   "koText": "의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담",
+   "normalizedKoText": "의약품(혈압강하제·부정맥치료제·고지혈증치료제·항응고제등)을복용하시는분은섭취전의사와상담",
+   "category": "CAUTION",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "b2896f94701bd48e",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "26b1f92349dc06b0",
+   "kind": "clause",
+   "koText": "용기 안의 실리카겔(방습제)은 절대 드시지 마십시오.",
+   "normalizedKoText": "용기안의실리카겔(방습제)은절대드시지마십시오",
+   "category": "CLAUSE",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "4720ccc3c630c6f2",
+   "kind": "clause",
+   "koText": "임산부와 수유부는 섭취를 피하는 것이 좋습니다.",
+   "normalizedKoText": "임산부와수유부는섭취를피하는것이좋습니다",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "e99aee0b60e24e6c",
+   "kind": "clause",
+   "koText": "우유, 유제품 및 기타 제품에 대해 알레르기가 있는 사람은 섭취에 주의",
+   "normalizedKoText": "우유·유제품및기타제품에대해알레르기가있는사람은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "7a9796a997c7189f",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 3캡슐을 충분한 물과 함께 섭취하십시오.1일 3회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회3캡슐을충분한물과함께섭취하십시오.1일3회·1회1캡슐을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "4be054e67f0ab608",
+   "kind": "clause",
+   "koText": "파우치 포장 그대로 전자레인지에 가열하지 마십시오.",
+   "normalizedKoText": "파우치포장그대로전자레인지에가열하지말것",
+   "category": "CLAUSE",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "3f5faf65a3d2d5a2",
+   "kind": "clause",
+   "koText": "임산부와 수유기 여성, 유아, 어린이는 섭취에 주의",
+   "normalizedKoText": "임산부와수유기여성·유아·어린이는섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "49e452bd3b510c2e",
+   "kind": "clause",
+   "koText": "과다 섭취 시 구토, 위장운동 증가 등의 부작용을 일으킬 수 있음",
+   "normalizedKoText": "과다섭취시구토·위장운동증가등의부작용을일으킬수있음",
+   "category": "CLAUSE",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "efae331f9b7a5d94",
+   "kind": "clause",
+   "koText": "기능성 내용 : 항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "기능성내용:항산화·체지방감소·혈중콜레스테롤개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "15d10dae9665cbae",
+   "kind": "clause",
+   "koText": "섭취량 및 섭취방법을 확인한 후 섭취하시고, 기타 제품관련 사항은 소비자 상담실로 문의 하십시오.",
+   "normalizedKoText": "섭취량및섭취방법을확인한후섭취하시고·기타제품관련사항은소비자상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "b3453c6d84227fff",
+   "kind": "label",
+   "koText": "루테인 제품",
+   "normalizedKoText": "루테인제품",
+   "category": "LABEL",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "be152906afd50eea",
+   "kind": "clause",
+   "koText": "[자일로올리고당(xylooligosaccharide) 분말(제2009-80호)]",
+   "normalizedKoText": "[자일로올리고당(xylooligosaccharide)분말(제2009-80호)]",
+   "category": "CLAUSE",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "118aea6dd74efdab",
+   "kind": "clause",
+   "koText": "밀 알레르기를 나타내는 사람은 섭취에 주의",
+   "normalizedKoText": "밀알레르기를나타내는사람은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "1a3e3b287ba0e970",
+   "kind": "clause",
+   "koText": "특이체질 및 알레르기 체질의 경우 성분을 확인하신 후 섭취하십시오.",
+   "normalizedKoText": "특이체질및알레르기체질의경우성분을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "32b3bacfb49a0fe8",
+   "kind": "clause",
+   "koText": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 * 프로바이오틱스",
+   "normalizedKoText": "항산화작용을하여유해산소로부터세포를보호하는데필요*프로바이오틱스",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "3baec2f8750d98ca",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정을 충분한 물과 함께 섭취 하십시오, 1일 2회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정을충분한물과함께섭취하십시오·1일2회·1회1정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "58c7545b208831ad",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 섭취 시 불편할 수 있으므로 충분한 물과 함께 섭취하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "normalizedKoText": "알레르기체질이신분은성분확인후섭취하십시오.섭취시불편할수있으므로충분한물과함께섭취하십시오.제품개봉시포장재에의해상처를입을수있으니주의하시고이상반응이있을시제품에기재된고객상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "ae563458c5d1938b",
+   "kind": "clause",
+   "koText": "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음/건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "혈중중성지질개선·혈행개선에도움을줄수있음/건조한눈을개선하여눈건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "c11c697a0f0a9c68",
+   "kind": "clause",
+   "koText": "May help to reduce body fat, 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "Mayhelptoreducebodyfat·유산균증식및유해균억제·배변활동원활·장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "cc1859fc01769d5b",
+   "kind": "clause",
+   "koText": "프로폴리스에 알레르기를 나타내는 사람은 섭취에 주의, 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "normalizedKoText": "프로폴리스에알레르기를나타내는사람은섭취에주의·이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "d40d7003c7151b89",
+   "kind": "clause",
+   "koText": "항산화 작용에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화작용에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "15aa7a197ca23837",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병을 물 300 mL 또는 기호에 따라 희석하여 섭취",
+   "normalizedKoText": "1일1회·1회1병을물300mL또는기호에따라희석하여섭취",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "214e84087fddd17a",
+   "kind": "label",
+   "koText": "마리골드꽃추출물(루테인)",
+   "normalizedKoText": "마리골드꽃추출물(루테인)",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "27c16d9e8a5d3e45",
+   "kind": "label",
+   "koText": "마리골드꽃추출물(지아잔틴함유)",
+   "normalizedKoText": "마리골드꽃추출물(지아잔틴함유)",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "4cb4375867278ca4",
+   "kind": "meta",
+   "koText": "1일 2회 1회당 0.5 mL(3회 분무)씩 구강에 분사하여 섭취",
+   "normalizedKoText": "1일2회1회당5mL(3회분무)씩구강에분사하여섭취",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "58749ae67e91fcb2",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물과 함께 또는 직접 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물과함께또는직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "74e674eac1f1ef60",
+   "kind": "label",
+   "koText": "Lactobacillus acidophilus YT1 (제2019-22호)",
+   "normalizedKoText": "LactobacillusacidophilusYT1(제2019-22호)",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "7789cedddcdaaa9a",
+   "kind": "meta",
+   "koText": "1일 3회, 1회당 0.5mL(3회 분무)씩 구강에 분사하여 섭취",
+   "normalizedKoText": "1일3회·1회당5mL(3회분무)씩구강에분사하여섭취",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "840ac1928e5c3632",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 한스푼(1g) 씩 먹는 물에 타거나 직접 섭취하십시오. 15세 이하의 어린이는 위 섭취량의 절반 정도를 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회한스푼(1g)씩먹는물에타거나직접섭취하십시오.15세이하의어린이는위섭취량의절반정도를섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "9398c2e38d8a51ab",
+   "kind": "clause",
+   "koText": "질환이 있거나 의약품 복용 시 전문가와 상담하십시오. 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다. 어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도하십시오. 이상 사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
+   "normalizedKoText": "질환이있거나의약품복용시전문가와상담하십시오.알레르기체질등은개인에따라과민반응을나타낼수있습니다.어린이가함부로섭취하지않도록일일섭취량방법을지도하십시오.이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "94c776c292e8aa0c",
+   "kind": "label",
+   "koText": "비타민B1/비타민B2",
+   "normalizedKoText": "비타민B1/비타민B2",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "9911f36ca634faa0",
+   "kind": "clause",
+   "koText": "임산부 및 수유 여성은 섭취에 주의하십시오.",
+   "normalizedKoText": "임산부및수유여성은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "9ea2f2d7b06db2d7",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 충분한 물과 함께 섭취하거나 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를충분한물과함께섭취하거나물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "a50623d9ad767f8f",
+   "kind": "label",
+   "koText": "바나바추출물",
+   "normalizedKoText": "바나바추출물",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "b1b8d46bdc6f26bc",
+   "kind": "meta",
+   "koText": "1일 1회, 1회에 한 포(10g)를 그대로 섭취한다",
+   "normalizedKoText": "1일1회·1회에한포(10g)를그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "c02dc7d1340adf4e",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제+ 연질캡슐을 액상과 함께 섭취 or 물과 함께 섭취(1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제+연질캡슐을액상과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "c407fffe5c7dff3c",
+   "kind": "clause",
+   "koText": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음",
+   "normalizedKoText": "유산균증식및유해균억제에도움을줄수있음배변활동원활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "d5e713d5b4a4eb48",
+   "kind": "clause",
+   "koText": "배변활동 원활에 도움을 줄 수 있음 ➂장건강에 도움을 줄 수 있음",
+   "normalizedKoText": "배변활동원활에도움을줄수있음장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "f23d031ba9c598ae",
+   "kind": "meta",
+   "koText": "1회 섭취시 동봉된 스푼을 이용하여 60g을 우유나 두유, 물에 혼합하여 하루 2회 드십시오.",
+   "normalizedKoText": "1회섭취시동봉된스푼을이용하여60g을우유나두유·물에혼합하여하루2회드십시오",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "fa7ff3b059e13911",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화의 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화의건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "fc55dc2a701e1930",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 200ml에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물200ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "ff94a2426165e196",
+   "kind": "clause",
+   "koText": "(시행일:2026.1.1.)",
+   "normalizedKoText": "(시행일:2026.1.1.)",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 2
+  },
+  {
+   "uniquePhraseId": "d463991064a96281",
+   "kind": "clause",
+   "koText": "철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요",
+   "normalizedKoText": "철의운반과이용에필요·유해산소로부터세포를보호하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 51,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f130709d10ba0179",
+   "kind": "clause",
+   "koText": "피로회복",
+   "normalizedKoText": "피로회복",
+   "category": "CLAUSE",
+   "documentCount": 32,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "189a6a7d55883546",
+   "kind": "clause",
+   "koText": "혈소판 응집 억제를 통한 혈액흐름에 도움",
+   "normalizedKoText": "혈소판응집억제를통한혈액흐름에도움",
+   "category": "CLAUSE",
+   "documentCount": 26,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4c0f0acebc7797d9",
+   "kind": "clause",
+   "koText": "(2) 과잉섭취 시 위장장애나 불면증을 유발할 수 있음",
+   "normalizedKoText": "과잉섭취시위장장애나불면증을유발할수있음",
+   "category": "CLAUSE",
+   "documentCount": 17,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d2c1dbfe12d45940",
+   "kind": "clause",
+   "koText": "일일섭취량 이상으로 섭취 시 위장장애(구토와 위장운동 증가)가 발생할 수 있습니다.",
+   "normalizedKoText": "일일섭취량이상으로섭취시위장장애(구토와위장운동증가)가발생할수있음",
+   "category": "STANDARD",
+   "documentCount": 17,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ce4346625f73f2d6",
+   "kind": "clause",
+   "koText": "제품의 개봉 또는 섭취시포장재에의해상처를입을수있으니주의하시기바랍니다.",
+   "normalizedKoText": "제품의개봉또는섭취시포장재에의해상처를입을수있으니주의할것",
+   "category": "CAUTION",
+   "documentCount": 12,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f1274354d6127b08",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1정을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정을충분한물과함께섭취하십시오.1일2회·1회1정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 11,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6f95ff64f34abebb",
+   "kind": "clause",
+   "koText": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 * 비타민D",
+   "normalizedKoText": "항산화작용을하여유해산소로부터세포를보호하는데필요*비타민D",
+   "category": "CLAUSE",
+   "documentCount": 10,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3bcc8021b2d57297",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질인 경우 소비자 상담실에 문의하신 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "특이체질·알레르기체질인경우소비자상담실에문의하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "53e3803579e03503",
+   "kind": "clause",
+   "koText": "임산부와 수유기 여성은 섭취를 피하는 것이 좋습니다.",
+   "normalizedKoText": "임산부와수유기여성은섭취를피하는것이좋습니다",
+   "category": "CAUTION",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cdc1c94ce67c2938",
+   "kind": "clause",
+   "koText": "아연 : (가) 정상적인 면역기능에 필요 (나) 정상적인 세포분열에 필요",
+   "normalizedKoText": "아연:(가)정상적인면역기능에필요(나)정상적인세포분열에필요",
+   "category": "CLAUSE",
+   "documentCount": 9,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a54d2aed08e1ba88",
+   "kind": "clause",
+   "koText": "특이체질 또는 알레르기 체질인 경우에는 원료의 성분을 확인하고 섭취하십시오.",
+   "normalizedKoText": "특이체질또는알레르기체질인경우에는원료의성분을확인하고섭취할것",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ce2bdd8d67d57d80",
+   "kind": "clause",
+   "koText": "특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원재료를 확인 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "특이체질또는알레르기체질인경우에는개인에따라과민반응을나타낼수있으므로원재료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dce05ce77b809514",
+   "kind": "clause",
+   "koText": "임산부와 수유부는 섭취에 주의하십시오.",
+   "normalizedKoText": "임산부와수유부는섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f78f4797c9a40571",
+   "kind": "clause",
+   "koText": "영·유아·어린이는 섭취 전 의사와 상담한 후 섭취 할 것",
+   "normalizedKoText": "영·유아·어린이는섭취전의사와상담한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 8,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "17ac628d8a76f69f",
+   "kind": "clause",
+   "koText": "특정 성분에 알레르기가 있으신 분은 원재료명을 확인 후 섭취하십시오.",
+   "normalizedKoText": "특정성분에알레르기가있으신분은원재료명을확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1ba39d04e5a865e3",
+   "kind": "clause",
+   "koText": "(1) 영·유아·어린이는 섭취 전 전문가와 상담한 후 섭취할 것(면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있다는 기능성을 표시·판매하는 경우에 한함)",
+   "normalizedKoText": "영·유아·어린이는섭취전전문가와상담한후섭취할것(면역과민반응에의한피부상태개선에도움을줄수있다는기능성을표시·판매하는경우에한함)",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3fb2ad2a784bf334",
+   "kind": "clause",
+   "koText": "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음 (생리활성기능 2등급)",
+   "normalizedKoText": "면역과민반응에의한피부상태개선에도움을줄수있음(생리활성기능2등급)",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "90a97a1523c956c6",
+   "kind": "clause",
+   "koText": "실리카겔은 섭취하지 마십시오.",
+   "normalizedKoText": "실리카겔은섭취하지말것",
+   "category": "CLAUSE",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "aa6f27ad05e13e7d",
+   "kind": "clause",
+   "koText": "질환이 있거나 의약품 복용 시 전문가와 상담 후 섭취하십시오.",
+   "normalizedKoText": "질환이있거나의약품복용시전문가와상담후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e689d174b12f2d6e",
+   "kind": "clause",
+   "koText": "특정 단백질에 알레르기를 나타내는 경우에는 섭취에 주의하십시오.",
+   "normalizedKoText": "특정단백질에알레르기를나타내는경우에는섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 7,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1bb98693d18f3b17",
+   "kind": "clause",
+   "koText": "이상사례 발생 시 섭취를 중단하고 전문가와 상의하십시오.",
+   "normalizedKoText": "이상사례발생시섭취를중단하고전문가와상의할것",
+   "category": "CAUTION",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7a5e5a8941ec571d",
+   "kind": "clause",
+   "koText": "임산부, 수유여성, 어린이는 섭취에 주의",
+   "normalizedKoText": "임산부·수유여성·어린이는섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9a1a64e2f1945530",
+   "kind": "clause",
+   "koText": "식이섬유 보충",
+   "normalizedKoText": "식이섬유보충",
+   "category": "CLAUSE",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c0d5d8d85142d6b2",
+   "kind": "clause",
+   "koText": "임산부 및 수유 여성은 섭취에 주의",
+   "normalizedKoText": "임산부및수유여성은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 6,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "17a63f169d7cf512",
+   "kind": "meta",
+   "koText": "1일, 1회, 1회 1포(멀티팩)를 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일·1회·1회1포(멀티팩)를물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "45c2fe76854ab216",
+   "kind": "clause",
+   "koText": "면역과민반응에 의한 코 상태 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "면역과민반응에의한코상태개선에도움을줄수있음",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5ff13b6b57f71e6b",
+   "kind": "clause",
+   "koText": "과량 섭취시 부작용이 있을 수 있으며, 특정 원료에 알레르기가 있거나 질병 치료나 약물투여 중인 분들은 섭취 전 전문가와 상의하십시오.",
+   "normalizedKoText": "과량섭취시부작용이있을수있으며·특정원료에알레르기가있거나질병치료나약물투여중인분들은섭취전전문가와상의할것",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7265b1ff51355fee",
+   "kind": "clause",
+   "koText": "갑상선 호르몬의 합성에 필요 / 에너지 생성에 필요 / 신경발달에 필요",
+   "normalizedKoText": "갑상선호르몬의합성에필요/에너지생성에필요/신경발달에필요",
+   "category": "CLAUSE",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "863f9edb7bda224e",
+   "kind": "clause",
+   "koText": "게 또는 새우에 알레르기가 있는 사람은 섭취에 주의하십시오.",
+   "normalizedKoText": "게또는새우에알레르기가있는사람은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a0b8ed7fcd732d1c",
+   "kind": "clause",
+   "koText": "(1) 임산부와 수유부는 섭취를 피하세요.",
+   "normalizedKoText": "임산부와수유부는섭취를피할것",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a329375700affc60",
+   "kind": "clause",
+   "koText": "질병치료 중인 분은 섭취 전 의사와 상담 후 섭취하십시오.",
+   "normalizedKoText": "질병치료중인분은섭취전의사와상담후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "afb3aebe9369d4d1",
+   "kind": "clause",
+   "koText": "영·유아·어린이는 섭취 전 전문가와 상담한 후 섭취하십시오.",
+   "normalizedKoText": "영·유아·어린이는섭취전전문가와상담한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d31ba4a17f0bae22",
+   "kind": "clause",
+   "koText": "(1) 어린이, 임산부와 수유부는 섭취를 피하는 것이 좋습니다.",
+   "normalizedKoText": "어린이·임산부와수유부는섭취를피하는것이좋습니다",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f0c04379f164532a",
+   "kind": "clause",
+   "koText": "갑각류(게, 새우 등)에 알레르기를 나타내는 사람은 섭취에 주의",
+   "normalizedKoText": "갑각류(게·새우등)에알레르기를나타내는사람은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 5,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "26c1644e97f81a7e",
+   "kind": "clause",
+   "koText": "임산부, 수유부 및 어린이는 섭취에 주의하십시오.",
+   "normalizedKoText": "임산부·수유부및어린이는섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "344b9089e9b978d0",
+   "kind": "clause",
+   "koText": "* 은행잎 추출물",
+   "normalizedKoText": "*은행잎추출물",
+   "category": "CLAUSE",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3c0eb115a80d4fae",
+   "kind": "clause",
+   "koText": "유당불내증이 있는 사람은 섭취에 주의",
+   "normalizedKoText": "유당불내증이있는사람은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "67b99bceee32a9eb",
+   "kind": "clause",
+   "koText": "체내 에너지 성성에 필요.",
+   "normalizedKoText": "체내에너지성성에필요",
+   "category": "CLAUSE",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7e173f65402104f3",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "특이체질·알레르기체질의경우는간혹개인에따라과민반응을나타낼수있으므로원료를확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ea0fb3466b559dc",
+   "kind": "clause",
+   "koText": "소비기한이 경과된 제품은 섭취하지 않도록 주의하십시오.",
+   "normalizedKoText": "소비기한이경과된제품은섭취하지않도록주의할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a7c402e545abc77b",
+   "kind": "clause",
+   "koText": "손발 따끔거림 작열감 또는 저림 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
+   "normalizedKoText": "손발따끔거림작열감또는저림등의이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b10130fdaf23a393",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질인경우개인에따라과민반응을나타낼수있으므로원료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc38d1d7f0312ed1",
+   "kind": "label",
+   "koText": "녹차추출물 제품",
+   "normalizedKoText": "녹차추출물제품",
+   "category": "LABEL",
+   "documentCount": 4,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "09b48f6909611c6e",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제 2정을 액상과 함께 섭취 (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제2정을액상과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "17a321b4ae09317e",
+   "kind": "label",
+   "koText": "Lactobacillus sakei Probio65(제2013-17호)",
+   "normalizedKoText": "LactobacillussakeiProbio65(제2013-17호)",
+   "category": "LABEL",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "259c96d0fc18c3b9",
+   "kind": "clause",
+   "koText": "과민반응에 의한 코 상태(코 가려움, 재채기, 콧물) 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "과민반응에의한코상태(코가려움·재채기·콧물)개선에도움을줄수있음",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "408444f8c5af4cdb",
+   "kind": "meta",
+   "koText": "건강기능식품 원료로 사용한다.",
+   "normalizedKoText": "건강기능식품원료로사용할것",
+   "category": "META",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4685da42a5249f0a",
+   "kind": "meta",
+   "koText": "1일2회,1회 2정을 충분한 물과 함께 섭취하시오.",
+   "normalizedKoText": "1일2회·1회2정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "468c93ffa5d5a57f",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질의 경우 성분를 확인하시고 섭취하여 주시기 바랍니다.",
+   "normalizedKoText": "특이체질·알레르기체질의경우성분를확인하시고섭취할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4f98092277243a61",
+   "kind": "clause",
+   "koText": "알콜성 손상으로부터 간을 보호하는데 도움을 줄 수 있음(생리활성기능 2등급)",
+   "normalizedKoText": "알콜성손상으로부터간을보호하는데도움을줄수있음(생리활성기능2등급)",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "56d7766c46499a94",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질이신 분은 성분을 확인한 후 섭취하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질이신분은성분을확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5fd4290d358148a4",
+   "kind": "clause",
+   "koText": "임산부, 수유 여성, 어린이는 섭취에 주의하십시오.",
+   "normalizedKoText": "임산부·수유여성·어린이는섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "67f3181283c43e09",
+   "kind": "clause",
+   "koText": "동봉된 방습제를 섭취하지 않도록 주의하십시오.",
+   "normalizedKoText": "동봉된방습제를섭취하지않도록주의할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "818a251e5c027122",
+   "kind": "label",
+   "koText": "비타민B1,B2,B12, 판토텐산, 비오틴",
+   "normalizedKoText": "비타민B1·B2·B12·판토텐산·비오틴",
+   "category": "LABEL",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "886a54348ab4494b",
+   "kind": "clause",
+   "koText": "용기안의 습기방지제는 먹지 마십시오.",
+   "normalizedKoText": "용기안의습기방지제는먹지마십시오",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8f8adef7556b3838",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 경우 성분을 확인하고 섭취",
+   "normalizedKoText": "알레르기체질이신경우성분을확인하고섭취",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b6c16141cb69af3a",
+   "kind": "clause",
+   "koText": "ⓛ정상적인 면역기능에 필요",
+   "normalizedKoText": "ⓛ정상적인면역기능에필요",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b7f2694319399c35",
+   "kind": "clause",
+   "koText": "근육, 결합조직 등 신체조직의 구성성분 / 효소, 호르몬, 항체의 구성에 필요 / 체내 필수 영양성분이나 활성물질의 운반과 저장에 필요 / 체액, 산-염기의 균형 유지에 필요 / 에너지, 포도당, 지질의 합성에 필요",
+   "normalizedKoText": "근육·결합조직등신체조직의구성성분/효소·호르몬·항체의구성에필요/체내필수영양성분이나활성물질의운반과저장에필요/체액·산-염기의균형유지에필요/에너지·포도당·지질의합성에필요",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c24b2c118be2f143",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2정을 충분한 물과 함께 섭취하십시오. 1일 1회, 1회 4정을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2정을충분한물과함께섭취하십시오.1일1회·1회4정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d87cfd830f3080f3",
+   "kind": "clause",
+   "koText": "특이체질 등 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "특이체질등알레르기체질인경우는간혹개인에따라과민반응을나타낼수있으므로원료를확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f69a745205810b26",
+   "kind": "clause",
+   "koText": "흡습의 우려가 있으니 개봉한 제품은 바로 섭취하시기 바랍니다.",
+   "normalizedKoText": "흡습의우려가있으니개봉한제품은바로섭취할것",
+   "category": "CLAUSE",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f94ef328cb89d74e",
+   "kind": "label",
+   "koText": "비오틴/비타민B1/비타민B2",
+   "normalizedKoText": "비오틴/비타민B1/비타민B2",
+   "category": "LABEL",
+   "documentCount": 3,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "00d38db987f04a4a",
+   "kind": "clause",
+   "koText": "혈중 콜레스테롤 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "normalizedKoText": "혈중콜레스테롤개선에도움을줄수있음(생리활성기능2등급)",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "154cb62234688c6f",
+   "kind": "clause",
+   "koText": "개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니 주의",
+   "normalizedKoText": "개봉또는섭취시포장재에의해상처를입을수있으니주의",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "15bcea88d5b3ed7c",
+   "kind": "clause",
+   "koText": "(3) 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취.",
+   "normalizedKoText": "특정성분에알레르기가있으신분은원료명을확인후섭취",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1937676ebdbad7e8",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1캡슐씩 또는 1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1캡슐씩또는1일1회·1회2캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "22f3d235f55eed8b",
+   "kind": "clause",
+   "koText": "* 칼륨",
+   "normalizedKoText": "*칼륨",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "282ab47fab211ab1",
+   "kind": "clause",
+   "koText": "노화로 인해 감소된 인지기능 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "노화로인해감소된인지기능개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "28ad59171b680eb6",
+   "kind": "clause",
+   "koText": "정제가 기도에 걸릴 수 있으니 섭취 시 유의하십시오.",
+   "normalizedKoText": "정제가기도에걸릴수있으니섭취시유의할것",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2c623534b1983dea",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 충분한 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를충분한물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2ead8564f0f3b4a4",
+   "kind": "clause",
+   "koText": "장 건강에 도움을 줄 수 있음 * 히알루론산",
+   "normalizedKoText": "장건강에도움을줄수있음*히알루론산",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "31a7ef6819575dec",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 충분한 양의 음용수와 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를충분한양의음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "343037f6533533ea",
+   "kind": "meta",
+   "koText": "1일 3회,1회 1스푼(1g)을 온수 또는 냉수에 타거나 직접 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회1스푼(1g)을온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "350fd1a3177f195c",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2스푼(1스푼:1g)을 적당량의 온수 또는 냉수에 타서 기호에 따라 감미료나 꿀 등을 넣은 후 잘 저어서 음용하십시오.",
+   "normalizedKoText": "1일2회·1회2스푼(1스푼:1g)을적당량의온수또는냉수에타서기호에따라감미료나꿀등을넣은후잘저어서음용할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "371abc0545b8f93c",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질의 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질의경우간혹개인에따라과민반응을나타낼수있으므로원료를확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3848591a0c1bf932",
+   "kind": "clause",
+   "koText": "과량으로 섭취 시 설사를 유발할 수도 있습니다. 섭취방법을 준수하십시오. 특이체질이거나 특정성분에 알레르기가 있으신 분은 원료를 확인 후 섭취하십시오.",
+   "normalizedKoText": "과량으로섭취시설사를유발할수도있습니다.섭취방법을준수하십시오.특이체질이거나특정성분에알레르기가있으신분은원료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "39af906b15eb445c",
+   "kind": "clause",
+   "koText": "섭취량 및 섭취방법을 확인 후 섭취하여 주십시오.",
+   "normalizedKoText": "섭취량및섭취방법을확인후섭취하여주십시오",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3ae9cc0f676b15f8",
+   "kind": "label",
+   "koText": "프로바이오틱스 HY7714",
+   "normalizedKoText": "프로바이오틱스HY7714",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3bf660a6ab090870",
+   "kind": "clause",
+   "koText": "임산부, 수유여성, 어린이는 섭취를 피하십시오.",
+   "normalizedKoText": "임산부·수유여성·어린이는섭취를피할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3f17c5bac7d3a053",
+   "kind": "clause",
+   "koText": "제품 내 별도포장된 방습제 섭취 금지. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것.",
+   "normalizedKoText": "제품내별도포장된방습제섭취금지.이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "458014975b96eb1f",
+   "kind": "clause",
+   "koText": "당료치료제 및 혈액항응고제 복용 시 섭취에 주의",
+   "normalizedKoText": "당료치료제및혈액항응고제복용시섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4935851097f2593f",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포 또는 1일 1회, 1회 2포를 식사 후에 드십시오.",
+   "normalizedKoText": "1일2회·1회1포또는1일1회·1회2포를식사후에드십시오",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "493b242df2cf4482",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화.갱년기 여성의 건강에 도움을 줄수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화.갱년기여성의건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "53543a2774a0e5bc",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1g을 온수나 냉수에 넣어 잘 녹인 후 음용함.",
+   "normalizedKoText": "1일2회·1회1g을온수나냉수에넣어잘녹인후음용함",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5facba64f153e322",
+   "kind": "clause",
+   "koText": "임산부와 수유부, 질병치료 중인 분은 섭취 전 의사와 상담 후 섭취하십시오.",
+   "normalizedKoText": "임산부와수유부·질병치료중인분은섭취전의사와상담후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6148104fe3fb9de5",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 30ml씩 원액을 공복에 섭취하시거나 물에 타서 함께 드십시오.",
+   "normalizedKoText": "1일3회·1회30ml씩원액을공복에섭취하시거나물에타서함께드십시오",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "617e8d0659bdce91",
+   "kind": "clause",
+   "koText": "산화환원 효소의 활성에 필요",
+   "normalizedKoText": "산화환원효소의활성에필요",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6407c190e2d128a9",
+   "kind": "label",
+   "koText": "비타민B12, 비타민B1, 비타민B2",
+   "normalizedKoText": "비타민B12·비타민B1·비타민B2",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "67751b416c96ad34",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "71e3f22f9cc0ac66",
+   "kind": "clause",
+   "koText": "수술 전후, 출혈성 질환이 있거나 의약품(항응고제 등) 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "수술전후·출혈성질환이있거나의약품(항응고제등)복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "77f1ff8bcf05c53e",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 200~300mL의 물에 녹여 드십시오.",
+   "normalizedKoText": "1일1회·1회1포를200~300mL의물에녹여드십시오",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "780c905a8f30d9c2",
+   "kind": "clause",
+   "koText": "알레르기 체칠 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
+   "normalizedKoText": "알레르기체칠등은개인에따라과민반응을나타낼수있음",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8a18573ff795caca",
+   "kind": "clause",
+   "koText": "알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으니 섭취에 주의하십시오.",
+   "normalizedKoText": "알레르기체질등은개인에따라과민반응을나타낼수있으니섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8ceca0f6f1a6bd00",
+   "kind": "clause",
+   "koText": "이상사례가 발생시 섭취를 중단하고 전문가와 상담하십시오.",
+   "normalizedKoText": "이상사례가발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8e6e511c43dc5ce7",
+   "kind": "label",
+   "koText": "루테인지아잔틴복합추출물20%(기능성원료인정 제2013-23호)",
+   "normalizedKoText": "루테인지아잔틴복합추출물20%(기능성원료인정제2013-23호)",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "91fb1ee74b69c365",
+   "kind": "meta",
+   "koText": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취 2) 원료성 : 건강기능식품, 식품에 적당량 사용한다.",
+   "normalizedKoText": "최종제품:1일1회·1회1g을그대로섭취하거나냉온수에타서섭취원료성:건강기능식품·식품에적당량사용할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "92bcbca434ff99ce",
+   "kind": "clause",
+   "koText": "의약품(당뇨치료제,혈액응고제) 복용시 섭취에 주의",
+   "normalizedKoText": "의약품(당뇨치료제·혈액응고제)복용시섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "96e3558f3f497d89",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캅셀씩 음용수와 함께 섭취",
+   "normalizedKoText": "1일2회·1회2캅셀씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9767a899fdcc3fec",
+   "kind": "clause",
+   "koText": "간 ･ 신장 ･ 심장질환 알레르기 및 천식이 있거나 의약품 복용 시, 전문가와 상담하시기 바랍니다.",
+   "normalizedKoText": "간·신장·심장질환알레르기및천식이있거나의약품복용시·전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a3735ea4ab1a7e11",
+   "kind": "label",
+   "koText": "효모베타글루칸",
+   "normalizedKoText": "효모베타글루칸",
+   "category": "LABEL",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a9705264cc28ef41",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정을 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회2정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af4f16ac69609ffd",
+   "kind": "meta",
+   "koText": "1일 2회 1회 1정을 물 120~200ml에 녹여 드십시오",
+   "normalizedKoText": "1일2회1회1정을물120~200ml에녹여드십시오",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b345ca7f139eccfb",
+   "kind": "clause",
+   "koText": "뚜껑 안쪽에 부착된 방습제는 파손되지 않도록 주의하시고 절대 섭취하지 마십시오.",
+   "normalizedKoText": "뚜껑안쪽에부착된방습제는파손되지않도록주의하시고절대섭취하지말것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b79414bfb71f379d",
+   "kind": "clause",
+   "koText": "질환이 있거나 의약품 복용 시 전문가와 상의하시길 바랍니다.",
+   "normalizedKoText": "질환이있거나의약품복용시전문가와상의할것",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b8ab01213863a7e9",
+   "kind": "clause",
+   "koText": "제품 개봉 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의바랍니다.",
+   "normalizedKoText": "제품개봉또는섭취시포장재에의한상처를입을수있으니주의바랍니다",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c57cebf1547a4fc1",
+   "kind": "clause",
+   "koText": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 * 아연",
+   "normalizedKoText": "항산화작용을하여유해산소로부터세포를보호하는데필요*아연",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cab51516a928e182",
+   "kind": "clause",
+   "koText": "(2) 특정질환(알레르기 체질)이 있는 분은 섭취에 주의할 것",
+   "normalizedKoText": "특정질환(알레르기체질)이있는분은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cc44be9866a873ff",
+   "kind": "clause",
+   "koText": "비타민A -",
+   "normalizedKoText": "비타민A-",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cd1e8488a21e3c64",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포 또는 1일 1회, 1회 2포를 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포또는1일1회·1회2포를충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cfa506e4ac34e584",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 0.6 mL(4회 분무)를 구강에 분무하여 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회6mL(4회분무)를구강에분무하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1b9cd4e345ed669",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 연질(500mg)+정제(700mg)를 액상(20ml)과 함께 섭취 or 물과 함께 섭취 (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·연질(500mg)+정제(700mg)를액상(20ml)과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e815986597ddd930",
+   "kind": "clause",
+   "koText": "(1) 프로바이오틱스 : 유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음 (2) 아연 :",
+   "normalizedKoText": "프로바이오틱스:유산균증식및유해균억제·배변활동원활·장건강에도움을줄수있음아연:",
+   "category": "CLAUSE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ee5484e42f2ab21b",
+   "kind": "meta",
+   "koText": "1일 1회, 1회에 1캅셀씩 음용수와 함께 섭취",
+   "normalizedKoText": "1일1회·1회에1캅셀씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f072c35e0509218f",
+   "kind": "clause",
+   "koText": "개봉시 손이 다치지 않도록 주의하시기 바랍니다.",
+   "normalizedKoText": "개봉시손이다치지않도록주의할것",
+   "category": "CAUTION",
+   "documentCount": 2,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "014282879fffab86",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질인 경우 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오",
+   "normalizedKoText": "특이체질·알레르기체질인경우개인에따라과민반응을나타낼수있으므로원료를확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "02308c2b166de447",
+   "kind": "clause",
+   "koText": "의약품(당뇨치료제, 혈액항응고제)복용 시에는 섭취에 주의",
+   "normalizedKoText": "의약품(당뇨치료제·혈액항응고제)복용시에는섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "023728f5aa175b7c",
+   "kind": "meta",
+   "koText": "1일 2회, 1포(30ml)를 200ml의 물이나 우유에 희석하여 섭취하십시오.",
+   "normalizedKoText": "1일2회·1포(30ml)를200ml의물이나우유에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "029440eb4cf77225",
+   "kind": "meta",
+   "koText": "1일2회,1회1포(10g)을 직접 섭취하거나, 냉온수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(10g)을직접섭취하거나·냉온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "02ead3de7e0a06b7",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1스틱(5g)씩 충분한 물과 함께 씹어드십시오. 1일 1회, 1회 1스틱(15g)씩 충분한 물과 함께 씹어드십시오.",
+   "normalizedKoText": "1일3회·1회1스틱(5g)씩충분한물과함께씹어드십시오.1일1회·1회1스틱(15g)씩충분한물과함께씹어드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "034db24d82b9b92b",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(6 g)를 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일2회·1회1포(6g)를충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "043c077503360903",
+   "kind": "label",
+   "koText": "판토텐산/비타민B1/비타민B2/비타민B12/비오틴",
+   "normalizedKoText": "판토텐산/비타민B1/비타민B2/비타민B12/비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "048390cff39eea94",
+   "kind": "clause",
+   "koText": "기억력 , 혈행 개선에 도움을 줄 수 있음기억력 , 혈행 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "기억력·혈행개선에도움을줄수있음기억력·혈행개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "04cb28effe1c632c",
+   "kind": "meta",
+   "koText": "1일 2회,1회 1포를 충분한 음용수와 함께 섭취한다.",
+   "normalizedKoText": "1일2회·1회1포를충분한음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "05de631b695251e8",
+   "kind": "clause",
+   "koText": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에",
+   "normalizedKoText": "의약품(당뇨치료제·혈액항응고제)복용시섭취에",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0603059bccdee3c1",
+   "kind": "clause",
+   "koText": "결합조직의 형성과 기능유지에 필요",
+   "normalizedKoText": "결합조직의형성과기능유지에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0621b6e819cffabd",
+   "kind": "meta",
+   "koText": "1일2회, 1회(1g)을 그대로 섭취하거나 음료수 또는 물(25ml정도)에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회(1g)을그대로섭취하거나음료수또는물(25ml정도)에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "06fd0f282065779e",
+   "kind": "label",
+   "koText": "코엔자임Q10제품",
+   "normalizedKoText": "코엔자임Q10제품",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "06fd8c16c6bbf819",
+   "kind": "clause",
+   "koText": "신장질환이 있는 사람은 섭취 전 전문가와 상담 후 섭취하십시오.",
+   "normalizedKoText": "신장질환이있는사람은섭취전전문가와상담후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0732b5de3884c285",
+   "kind": "clause",
+   "koText": "대두에 알레르기를 나타내는 사람은 섭취에 주의 임산부 수유부 섭취에 주의 의약품(혈액항응고제) 복용 시 섭취에 주의 수술 전후 섭취에 주의",
+   "normalizedKoText": "대두에알레르기를나타내는사람은섭취에주의임산부수유부섭취에주의의약품(혈액항응고제)복용시섭취에주의수술전후섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "073db2360414c5b9",
+   "kind": "meta",
+   "koText": "1일 1회, 1캡슐 물과 함께 섭취",
+   "normalizedKoText": "1일1회·1캡슐물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "078124615cab64be",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐을 적당량의 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1캡슐을적당량의물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "07be7e03522de7bf",
+   "kind": "clause",
+   "koText": "[NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)]",
+   "normalizedKoText": "[NAG(엔에이지·N-아세틸글루코사민·N-Acetylglucosamine)]",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "09df2fdf521826ea",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1스틱(5,200mg) 충분한 물과 합께 섭취",
+   "normalizedKoText": "1일2회·1회1스틱(5·200mg)충분한물과합께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0a02ebbd65525202",
+   "kind": "meta",
+   "koText": "일 1회, 1회당 3캡슐 물과 함께 섭취한다.",
+   "normalizedKoText": "일1회·1회당3캡슐물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0a137278b8844d29",
+   "kind": "meta",
+   "koText": "성인 1일 3회, 1회 1g 을 냉,온수에 타서 음용하십시오",
+   "normalizedKoText": "성인1일3회·1회1g을냉·온수에타서음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0a8eddb8f7761592",
+   "kind": "clause",
+   "koText": "상피세표의 성장과 발달에 필요",
+   "normalizedKoText": "상피세표의성장과발달에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0ac7ccadf1ca2ec5",
+   "kind": "meta",
+   "koText": "1일 1회, 1스푼(1g)을 그대로 섭취하거나 음용수에 타서 섭취한다.",
+   "normalizedKoText": "1일1회·1스푼(1g)을그대로섭취하거나음용수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0acdbb537252c59b",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(5g)를 짜서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(5g)를짜서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0b50bc0151942b8f",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2.5g을 그냥 드시거나 기호에 따라 냉수 또는 온수에 타서 드십시오",
+   "normalizedKoText": "1일2회·1회5g을그냥드시거나기호에따라냉수또는온수에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0b58f599ad1e2d7a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1정(1,100mg)를 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1정(1·100mg)를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0c4eab66cc617c50",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 500mL 물에 타서 섭취.",
+   "normalizedKoText": "1일1회·1회1포를500mL물에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0d33628f611f7af4",
+   "kind": "meta",
+   "koText": "정제 2정(1정 500mg)을 액상(30g)과 함께 1일 1회, 1포씩 섭취 하십시오.",
+   "normalizedKoText": "정제2정(1정500mg)을액상(30g)과함께1일1회·1포씩섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0da677e96d2301d7",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정씩 충분한 물과 함께 섭취 또는 1일 2회, 1회 1정씩 충분한 물과 함께 섭취",
+   "normalizedKoText": "1일1회·1회2정씩충분한물과함께섭취또는1일2회·1회1정씩충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "0ed236d587b477f4",
+   "kind": "label",
+   "koText": "자일로올리고당분말",
+   "normalizedKoText": "자일로올리고당분말",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1068b916550d994e",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 섭취 시 불편할 수 있으므로 충분한 물과 함께 섭취하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 섭취 후 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "normalizedKoText": "알레르기체질이신분은성분확인후섭취하십시오.섭취시불편할수있으므로충분한물과함께섭취하십시오.제품개봉시포장재에의해상처를입을수있으니주의하시고섭취후이상반응이있을시제품에기재된고객상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "10848b8bb449788e",
+   "kind": "clause",
+   "koText": "임산부와 수유부는 섭취 전 의사와 상담하십시오.",
+   "normalizedKoText": "임산부와수유부는섭취전의사와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "10ad91d9c3b6a5ae",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 5정을 씹어서 섭취하거나 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일3회·1회5정을씹어서섭취하거나충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1112ad14b5be9876",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(2g)를 적당량의 물과 함께 섭취",
+   "normalizedKoText": "1일1회·1회1포(2g)를적당량의물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "11b8cf0327860986",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(70ml)를 기호에 맞게 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(70ml)를기호에맞게섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "124d922785cc191e",
+   "kind": "meta",
+   "koText": "1일 1회 3 g을 온수 또는 냉수에 타거나 직접 섭취",
+   "normalizedKoText": "1일1회3g을온수또는냉수에타거나직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1275aa89aae6ae12",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1정 충분한 물과 함깨 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1정충분한물과함깨섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1392ad7e988c0086",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 32g을 물이나 음료에 혼합하여 음용",
+   "normalizedKoText": "1일1회·1회32g을물이나음료에혼합하여음용",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "149de789815da6a1",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 5g 정도(동봉된 스푼 이용)를 냉수 또는 온수에 용해 또는 물과 함께 직접 섭취.",
+   "normalizedKoText": "1일2회·1회5g정도(동봉된스푼이용)를냉수또는온수에용해또는물과함께직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "14c8fe4f079572fd",
+   "kind": "label",
+   "koText": "마리골드꽃추출물(지아잔틴함유)(제2026-9호)",
+   "normalizedKoText": "마리골드꽃추출물(지아잔틴함유)(제2026-9호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "15950597535407cd",
+   "kind": "clause",
+   "koText": "(EPA 및 DHA 함유 유지)",
+   "normalizedKoText": "(EPA및DHA함유유지)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "15bd568dec303bb9",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 2g을 그대로 또는 냉온수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회2g을그대로또는냉온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "15cb5c6d5f3eb24c",
+   "kind": "meta",
+   "koText": "1회 2캡슐씩, 1일 2회 물과 함께 섭취",
+   "normalizedKoText": "1회2캡슐씩·1일2회물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1645d7fde0c1df26",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캅셀(350mg)을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1캅셀(350mg)을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "166f5a0be414ec44",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 온수 100ml 물에 타서 섭취 하십시오.",
+   "normalizedKoText": "1일2회·1회1포를온수100ml물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "188ab1b0f2bf002a",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 10g씩을 온수 120ml에 녹여서 섭취",
+   "normalizedKoText": "1일3회·1회10g씩을온수120ml에녹여서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "18a615d7afbeeb54",
+   "kind": "meta",
+   "koText": "1일 3회 0.55ml(스포이드=약20방울)을 물, 우유, 주스 등과 섞어서 섭취",
+   "normalizedKoText": "1일3회55ml(스포이드=약20방울)을물·우유·주스등과섞어서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "191950503cd705a5",
+   "kind": "clause",
+   "koText": "흡연자는 섭취 시 전문가와 상담할 건",
+   "normalizedKoText": "흡연자는섭취시전문가와상담할건",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "19362ee2873a08a3",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 식전 식후 어느 때나 물 없이 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를식전식후어느때나물없이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1938fcd1c9c33f3b",
+   "kind": "meta",
+   "koText": "성인 : 1일 3회, 1회 2포 (2그램), 소아 : 1일 2회, 1회 1포 (1그램)",
+   "normalizedKoText": "성인:1일3회·1회2포(2그램)·소아:1일2회·1회1포(1그램)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "19480b81d62b9bfd",
+   "kind": "clause",
+   "koText": "특정성분에 민감하거나 알레르기 체질이신경우 성분을 확인후 섭취하시기 바랍니다",
+   "normalizedKoText": "특정성분에민감하거나알레르기체질이신경우성분을확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "194874e20f5f4adf",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(3g)를 직접 또는 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1포(3g)를직접또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "19774c887f8c735f",
+   "kind": "clause",
+   "koText": "과량 섭취하지 않도록 주의하십시오. 특히 6세 이하는 과량섭취하지 않도록 주의하십시오.",
+   "normalizedKoText": "과량섭취하지않도록주의하십시오.특히6세이하는과량섭취하지않도록주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1981cd26f81b9caa",
+   "kind": "meta",
+   "koText": "① 1일 1회, 1회 1g(동봉된 스푼 이용)을 그대로 또는 온수나 냉수에 타서 섭취하십시오. ② 원료로 사용할 때에는 건강기능식품 최종제품의 기능성 내용, 1일 섭취량 규격 및 요건에 맞도록 사용한다.",
+   "normalizedKoText": "1일1회·1회1g(동봉된스푼이용)을그대로또는온수나냉수에타서섭취하십시오.원료로사용할때에는건강기능식품최종제품의기능성내용·1일섭취량규격및요건에맞도록사용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1981e24c9d37adc8",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(70ml)씩 섭취하여 주십시오.",
+   "normalizedKoText": "1일1회·1회1포(70ml)씩섭취하여주십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "199c1b2fc5e99450",
+   "kind": "clause",
+   "koText": "피로회복에 도움을 줄 수 있음",
+   "normalizedKoText": "피로회복에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "19a082e68945423a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물(400ml)에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물(400ml)에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1a18e6d807b260cd",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1캡슐 또는 1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취",
+   "normalizedKoText": "1일2회·1회1캡슐또는1일1회·1회2캡슐을충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1aa92964302395ab",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(10mL)를 직접 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1포(10mL)를직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1aafb0d40708bed5",
+   "kind": "clause",
+   "koText": "섭취 시 목에 걸릴 수 있으므로 반드시 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "섭취시목에걸릴수있으므로반드시충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1b4ca3c7c4a440fa",
+   "kind": "meta",
+   "koText": "1일3회, 1회 1g물 미온수에 타거나 직접 섭취하십시오.15세 이하의 어린이는 성인섭취량의 1/2를 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회1g물미온수에타거나직접섭취하십시오.15세이하의어린이는성인섭취량의1/2를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1cfb726783ef4d70",
+   "kind": "meta",
+   "koText": "프락토올리고당으로서 3~8g",
+   "normalizedKoText": "프락토올리고당으로서3~8g",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1d1cd62c75fece12",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 25g(3스푼)을 물 또는 우유에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회25g(3스푼)을물또는우유에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "1d23af47faf72238",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포씩 물과 함께 씹어드십시오.",
+   "normalizedKoText": "1일2회·1회1포씩물과함께씹어드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "20ea3ba1ef5252b7",
+   "kind": "clause",
+   "koText": "항산화에 도움을 줄 수 있음 2.구강에서의 항균작용에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화에도움을줄수있음구강에서의항균작용에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "20f7158ac1b059aa",
+   "kind": "clause",
+   "koText": "항산화·작용에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화·작용에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "21814587da0b1ce5",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1포씩 온수 또는 냉수 한컵에 넣고 녹인 후 섭취",
+   "normalizedKoText": "1일3회·1회1포씩온수또는냉수한컵에넣고녹인후섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "221de1d8e0fdcba7",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐(350mg)을 물과 같이 섭취한다.",
+   "normalizedKoText": "1일1회·1회1캡슐(350mg)을물과같이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "22209e3d49f3bdbd",
+   "kind": "meta",
+   "koText": "1일 5회, 1회 1포 냉‧온수에 타서 섭취",
+   "normalizedKoText": "1일5회·1회1포냉·온수에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "22f3f252c64e9c96",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 5 g을 직접 섭취하거나 온수 또는 냉수에 타서 섭취하십시오",
+   "normalizedKoText": "1일1회·1회5g을직접섭취하거나온수또는냉수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "22fd061a9c0f0654",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 300~500 mL에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물300~500mL에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2324dceadf1c97a1",
+   "kind": "clause",
+   "koText": "비타민D:1. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "비타민D:1.고칼슘혈증이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2328766ad4a8e136",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(3g)를 직접 섭취하거나 물과 같이 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(3g)를직접섭취하거나물과같이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "238597b41a8ba6fc",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1환(3.75g)을 공복에 씹어서 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1환(3.75g)을공복에씹어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "238ea81bdbe1b3fc",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1스포이드(0.564ml)씩 따뜻한 물, 차, 우유등에 섞어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회1스포이드(0.564ml)씩따뜻한물·차·우유등에섞어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "23a33bca5590110c",
+   "kind": "label",
+   "koText": "비타민B12/판토텐산/비타민B1/비타민B2",
+   "normalizedKoText": "비타민B12/판토텐산/비타민B1/비타민B2",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "23fc5a7c75444e9b",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 섭취시 불편할 수 있으므로 물과 함께 섭취 하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을시 제품에 기재된 고객상담실로 문의하십시오.",
+   "normalizedKoText": "알레르기체질이신분은성분확인후섭취하십시오.섭취시불편할수있으므로물과함께섭취하십시오.제품개봉또는섭취시포장재에의해상처를입을수있으니주의하시고이상반응이있을시제품에기재된고객상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "241beb39351bd8f7",
+   "kind": "meta",
+   "koText": "1일 2회,1회에 동봉된 스푼(1.5g)을 이용하여 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회에동봉된스푼(1.5g)을이용하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "244520aa99ae722d",
+   "kind": "clause",
+   "koText": "알레르기나 특이체질이신 경우 성분을 확인하신 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "알레르기나특이체질이신경우성분을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2465489c39dcbd0a",
+   "kind": "clause",
+   "koText": "천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으니, 보관에 주의해주십시오.",
+   "normalizedKoText": "천연색소가사용되어빛에의한제품변색또는묻어나올수있으니·보관에주의해주십시오",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "249ace41e6cd55b0",
+   "kind": "clause",
+   "koText": "어린이가 함부로 섭취하지 않도록 일일섭취량 및 섭취방법을 지도하십시오.",
+   "normalizedKoText": "어린이가함부로섭취하지않도록일일섭취량및섭취방법을지도할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "249c6d3aa2398e2a",
+   "kind": "meta",
+   "koText": "1회 1회, 1회 2정 충분한 물과 함께 섭취한다.",
+   "normalizedKoText": "1회1회·1회2정충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "24bc21dbe8f7535f",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물(200 ml)에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물(200ml)에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "25993c532d25323a",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 물에 타서 드십시오",
+   "normalizedKoText": "1일2회·1회1포를물에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2632504a1b9efa6b",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 섭취 전 성분을 확인한 후 섭취하십시오.",
+   "normalizedKoText": "알레르기체질이신분은섭취전성분을확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "26698a046df1bf77",
+   "kind": "meta",
+   "koText": "1일2회,1회1포(12g)을 직접 섭취하거나, 냉온수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(12g)을직접섭취하거나·냉온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "27f95e9d20f58dce",
+   "kind": "meta",
+   "koText": "소중한 당신, 그리고 홍삼을 1일 1회, 1회 1포(70g)를 섭취한다.",
+   "normalizedKoText": "소중한당신·그리고홍삼을1일1회·1회1포(70g)를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "28079b343a8eb74a",
+   "kind": "clause",
+   "koText": "임산부와 수유부는 섭취를 피하는 것이 좋습니다. / 항혈전제를 복용하시는 분은 의사와 상의하시기 바랍니다. / 에스트로겐 호르몬에 민감한 사람은 섭취에 주의하시기 바랍니다. /특이체질, 알레르기 체질의 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "normalizedKoText": "임산부와수유부는섭취를피하는것이좋습니다./항혈전제를복용하시는분은의사와상의하시기바랍니다./에스트로겐호르몬에민감한사람은섭취에주의하시기바랍니다./특이체질·알레르기체질의경우성분을확인하시고섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2869c23ae15648c5",
+   "kind": "clause",
+   "koText": "임신, 수유부나 질병으로 치료중이신 분은 섭취 전 전문가와 상의하십시오.",
+   "normalizedKoText": "임신·수유부나질병으로치료중이신분은섭취전전문가와상의할것",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "288c77b63410e46f",
+   "kind": "meta",
+   "koText": "1일 1회, 1포 직접 섭취",
+   "normalizedKoText": "1일1회·1포직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "28e5bd9d82b13441",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물에 타서 섭취하십시오. * 물 또는 우유 150ml~200ml에 스틱 1포 섭취 추천",
+   "normalizedKoText": "1일1회·1회1포를물에타서섭취하십시오.*물또는우유150ml~200ml에스틱1포섭취추천",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "293c23c9986c2512",
+   "kind": "clause",
+   "koText": "당뇨치료제 및 혈액응고제 복용 시 섭취에 주의하여 주십시오.",
+   "normalizedKoText": "당뇨치료제및혈액응고제복용시섭취에주의하여주십시오",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2ab1ba683a5b2331",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병을 뚜껑을 돌려 분말을 액상에 떨어뜨려 잘 흔들어 섞은 후 그대로 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1병을뚜껑을돌려분말을액상에떨어뜨려잘흔들어섞은후그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2aec7507e48fde4e",
+   "kind": "label",
+   "koText": "Collactive 콜라겐펩타이드(제2012-24호)",
+   "normalizedKoText": "Collactive콜라겐펩타이드(제2012-24호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2b4591de2ff97637",
+   "kind": "meta",
+   "koText": "1일 2회,1회 2캡슐을 충분한 물과함께 섭취.",
+   "normalizedKoText": "1일2회·1회2캡슐을충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2caa44df106e170a",
+   "kind": "label",
+   "koText": "MSM제품",
+   "normalizedKoText": "MSM제품",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2df161f75deef6e5",
+   "kind": "meta",
+   "koText": "1일 1회. 1회 한포를 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회.1회한포를물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2e4a9e001aab9c00",
+   "kind": "meta",
+   "koText": "1일 1~2회, 1회 1정을 120ml~150ml의 물에 녹여서 섭취(음용)하십시오.",
+   "normalizedKoText": "1일1~2회·1회1정을120ml~150ml의물에녹여서섭취(음용)할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2ea09148afc0c0f1",
+   "kind": "clause",
+   "koText": "혈액의 호모시스테인 수준을 정상적으로 유지하는데 필요",
+   "normalizedKoText": "혈액의호모시스테인수준을정상적으로유지하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2ece74c82ab586dc",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캅셀(1100mg)을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2캅셀(1100mg)을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2f386dcdb49fcf92",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐을 식전 30분 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1캡슐을식전30분물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2fa58007b08aaa45",
+   "kind": "meta",
+   "koText": "1일 3회, 1회에 동봉된 스푼(1스푼 5g정도)을 이용하여 1스푼(5g)을 그대로 또는 냉ㆍ온수에 타서 섭취하십시오",
+   "normalizedKoText": "1일3회·1회에동봉된스푼(1스푼5g정도)을이용하여1스푼(5g)을그대로또는냉·온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "2fea8e584689598b",
+   "kind": "clause",
+   "koText": "특정질환, 특이체질, 알레르기 체질인 경우에는 성분을 확인한 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "특정질환·특이체질·알레르기체질인경우에는성분을확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "305aa6e3786a3ffd",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병(21g)[액상(20g) + 정제 2정(1,000mg)]",
+   "normalizedKoText": "1일1회·1회1병(21g)[액상(20g)+정제2정(1·000mg)]",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "30a4f909fb79b999",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g을 그대로 또는 물에 타서 섭취하세요.",
+   "normalizedKoText": "1일1회·1회1g을그대로또는물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "30c14120fe127a35",
+   "kind": "meta",
+   "koText": "1일 3회 1회 1g씩 직접섭취 하거나, 냉수 또는 온수에 용해 후 섭취",
+   "normalizedKoText": "1일3회1회1g씩직접섭취하거나·냉수또는온수에용해후섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "30d8e88bf4d51f96",
+   "kind": "meta",
+   "koText": "1일 3회 1회당 0.5 mL(3회 분무)씩 구강에 분사하여 섭취",
+   "normalizedKoText": "1일3회1회당5mL(3회분무)씩구강에분사하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "310bf4e00a049ed8",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 기호에 맞게 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를기호에맞게섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "311d266319114cb3",
+   "kind": "meta",
+   "koText": "정제 2정(1000mg)을 액상 30ml과 함께 1일 1회, 1회 1포씩 섭취하십시오.",
+   "normalizedKoText": "정제2정(1000mg)을액상30ml과함께1일1회·1회1포씩섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "31b78d7aa050993d",
+   "kind": "meta",
+   "koText": "1일3회,1회100g을 물 또는 우유, 기타음료와 함께 혼합하여 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회100g을물또는우유·기타음료와함께혼합하여흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "31e192ff3bc83d0b",
+   "kind": "meta",
+   "koText": "용도 용법: 1일 1회 ,1회 8g씩 섭취하십시오.",
+   "normalizedKoText": "용도용법:1일1회·1회8g씩섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "33deebbaab5f4cde",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2포 또는 1일 2회, 1회 1포를 그대로 혹은 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2포또는1일2회·1회1포를그대로혹은물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "33f4f2159c69b001",
+   "kind": "meta",
+   "koText": "일 3회, 1회 1스푼(1g)을 온수 또는 냉수에 타거나 직접 섭취하십시오.",
+   "normalizedKoText": "일3회·1회1스푼(1g)을온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3560f2958c831525",
+   "kind": "clause",
+   "koText": "정상적인 세포분열에 필요 프로바이오틱스",
+   "normalizedKoText": "정상적인세포분열에필요프로바이오틱스",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "36479f83d37bcf22",
+   "kind": "meta",
+   "koText": "1일3회,1회100g을 우유,두유,생수및 기타음료에 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회100g을우유·두유·생수및기타음료에흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "371a076d5c662b72",
+   "kind": "meta",
+   "koText": "1일 5회, 1회 0.7g(1스포이드)을 구강에 직접섭취 또는 물에 희석해서 구강에 머금은 후 섭취 하십시오.",
+   "normalizedKoText": "1일5회·1회7g(1스포이드)을구강에직접섭취또는물에희석해서구강에머금은후섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "373909aa5a087b32",
+   "kind": "meta",
+   "koText": "1일3회 1회 100g을 물또는 음료,기타 음료와 함께 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일3회1회100g을물또는음료·기타음료와함께흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "37eed62e8211dcc6",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캡슐 또는 1일 1회, 1회 4캡슐을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2캡슐또는1일1회·1회4캡슐을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "381aa5a6253bffc0",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병(20mL)를 흔든 후 뚜껑을 열어 그대로 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1병(20mL)를흔든후뚜껑을열어그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3858fb9ff0430b89",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐을 물과 함께 섭취하여 드십시오.",
+   "normalizedKoText": "1일1회·1회1캡슐을물과함께섭취하여드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "38c0709d830a5a40",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1g(약 5회) 을 구강에 분무하여 섭취",
+   "normalizedKoText": "1일2회·1회1g(약5회)을구강에분무하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "38c758fc24546b0c",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포씩 음용수와 함께 섭취",
+   "normalizedKoText": "1일2회·1회1포씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3989b6534ed9e68c",
+   "kind": "clause",
+   "koText": "우유성분의 알러지 체질이신 경우 성분을 확인하시고 섭취하여 주시기 바랍니다.",
+   "normalizedKoText": "우유성분의알러지체질이신경우성분을확인하시고섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3a10f5d234c39c02",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포씩 냉수 200 mL에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포씩냉수200mL에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3a3922ce81352112",
+   "kind": "meta",
+   "koText": "1일 1회 1포를 200~250 mL의 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회1포를200~250mL의물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3b4bd59a4bbc8775",
+   "kind": "clause",
+   "koText": "항산화 항균작용에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화항균작용에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3b5cc9f6da043371",
+   "kind": "clause",
+   "koText": "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요,체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "normalizedKoText": "혈액의호모시스테인수준을정상으로유지하는데필요·체지방감소에도움을줄수있음(생리활성기능2등급)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3baaad3a4e148170",
+   "kind": "meta",
+   "koText": "1일 3회, 동봉된 스푼을 이용하여 1회 1g(티스푼)을 물에 타서 섭취하시기 바랍니다.",
+   "normalizedKoText": "1일3회·동봉된스푼을이용하여1회1g(티스푼)을물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3ce49013eea60e8b",
+   "kind": "clause",
+   "koText": "동봉된 방습제는 절대 섭취하지 마십시오.",
+   "normalizedKoText": "동봉된방습제는절대섭취하지말것",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3d50dce473954cf9",
+   "kind": "meta",
+   "koText": "1회 1캡슐씩, 1일 2회 물과 함께 섭취",
+   "normalizedKoText": "1회1캡슐씩·1일2회물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3d8c0a6942f16c1b",
+   "kind": "clause",
+   "koText": "어린이, 임산부 및 수유부는 섭취를 피할 것, 알레르기 반응이 나타나는 경우에는 섭취를 중단, 소비기한을 확인하시고 섭취량 및 섭취방법을 준수, 이상사례 발생 시 섭취를 중단하고 의사와 상담할 것",
+   "normalizedKoText": "어린이·임산부및수유부는섭취를피할것·알레르기반응이나타나는경우에는섭취를중단·소비기한을확인하시고섭취량및섭취방법을준수·이상사례발생시섭취를중단하고의사와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3de2e135c7332592",
+   "kind": "clause",
+   "koText": "알레르기 등 특이체질의 경우에는 제품성분을 확인하신 후 섭취하십시오.",
+   "normalizedKoText": "알레르기등특이체질의경우에는제품성분을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3f5f48e51a9e249a",
+   "kind": "clause",
+   "koText": "알레르기 체질 등은 개인에 따라 과민반응을 일으킬 수 있습니다.",
+   "normalizedKoText": "알레르기체질등은개인에따라과민반응을일으킬수있음",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3f686d42a1393cb9",
+   "kind": "clause",
+   "koText": "EPA 및 DHP 함유 유지",
+   "normalizedKoText": "EPA및DHP함유유지",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3fac8ab4578ac110",
+   "kind": "clause",
+   "koText": "유산균의 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있음.",
+   "normalizedKoText": "유산균의증식및유해균억제·배변활동원활·장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "3fe92bbbe0429d6a",
+   "kind": "clause",
+   "koText": "유통기한이 경괴된 제품은 섭취하지 말것",
+   "normalizedKoText": "유통기한이경괴된제품은섭취하지말것",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "41326ee656051337",
+   "kind": "clause",
+   "koText": "유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
+   "normalizedKoText": "유익균증식및배변활동원활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "415fff529fbea5b5",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2캡슐을 물과 함께 섭취한다. 또는 1일 2회, 1회 1캡슐을 물과 함께 섭취한다.",
+   "normalizedKoText": "1일1회·1회2캡슐을물과함께섭취한다.또는1일2회·1회1캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "41b08e1fbe31b82b",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 0.5ml(3회 분무)를 구강에 분무하여 섭취하십시오",
+   "normalizedKoText": "1일3회·1회5ml(3회분무)를구강에분무하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "41ec944a27545401",
+   "kind": "meta",
+   "koText": "건강기능식품 및 식품을 제조하는데 적당량 사용",
+   "normalizedKoText": "건강기능식품및식품을제조하는데적당량사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4220a87ba8e28480",
+   "kind": "clause",
+   "koText": "캡슐은 섭취 시 목에 걸릴 수 있으므로 반드시 액상 또는 물과 함께 섭취하십시오.",
+   "normalizedKoText": "캡슐은섭취시목에걸릴수있으므로반드시액상또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "426750cbfb27ce53",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(10ml)씩 그대로 또는 물에 타서 섭취하세요.",
+   "normalizedKoText": "1일1회·1회1포(10ml)씩그대로또는물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4280a33fbee79c51",
+   "kind": "clause",
+   "koText": "의약품(혈당강하제) 복용 시 섭취에 주의하십시오.",
+   "normalizedKoText": "의약품(혈당강하제)복용시섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4329be1cd8662cdb",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g(1스푼)을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1g(1스푼)을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "43b44a7b9fd9dec4",
+   "kind": "clause",
+   "koText": "특정 또는 특이체질의 경우 성분을 확인한 후 섭취하십시오.",
+   "normalizedKoText": "특정또는특이체질의경우성분을확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "43ffaf3e239347e0",
+   "kind": "clause",
+   "koText": "\"장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음\"(기타기능 Ⅱ)",
+   "normalizedKoText": "\"장내유익균증식·유해균억제·배변활동에도움을줄수있음\"(기타기능Ⅱ)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "44bc5776d18ce24c",
+   "kind": "meta",
+   "koText": "1일 1회 1환(4 g)을 입안에서 녹여 천천히 섭취하십시오.",
+   "normalizedKoText": "1일1회1환(4g)을입안에서녹여천천히섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "458b73c6e44ce68b",
+   "kind": "meta",
+   "koText": "1일 1회 1포씩 미온수에 타서 섭취 또는 직접 섭취",
+   "normalizedKoText": "1일1회1포씩미온수에타서섭취또는직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4682c3cc6f80a793",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(2.7g)을 식사 후에 드십시오",
+   "normalizedKoText": "1일2회·1회1포(2.7g)을식사후에드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "468cf87076852bec",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 직접 혹은 100 ml 물에 타서 드세요.",
+   "normalizedKoText": "1일1회·1회1포를직접혹은100ml물에타서드세요",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "469c8ca0dda6d5dc",
+   "kind": "clause",
+   "koText": "중성지질 개선 • 혈행 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "중성지질개선·혈행개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "476ed1bc17a15ea4",
+   "kind": "meta",
+   "koText": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취, 2) 원료성 제품 : 건강기능식품 및 식품에 적당량 사용한다.",
+   "normalizedKoText": "최종제품:1일1회·1회1g을그대로섭취하거나냉온수에타서섭취·원료성제품:건강기능식품및식품에적당량사용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "47d134b360e55c36",
+   "kind": "clause",
+   "koText": "장내 유익균 증식 및 배변활동 원활 및 장건강에 도움을 줄 수 있음",
+   "normalizedKoText": "장내유익균증식및배변활동원활및장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "47ef713aea6e5633",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1스푼(1g 기준)씩 온수 또는 냉수에 타거나 직접 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회1스푼(1g기준)씩온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "47f70308ad002fd9",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 40 g을 물 또는 우유, 기타음료와 혼합하여 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회40g을물또는우유·기타음료와혼합하여흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4985246dde8bd931",
+   "kind": "clause",
+   "koText": "배변활동 원활에 도움을 줄 수 있음. 장 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "배변활동원활에도움을줄수있음.장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "49c279367457103c",
+   "kind": "clause",
+   "koText": "원료상태에 따라 정제의 색상에 차이가 있을 수 있으나 유용 성분의 차이는 없습니다.",
+   "normalizedKoText": "원료상태에따라정제의색상에차이가있을수있으나유용성분의차이는없습니다",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "49f4168d98c2a2a7",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(10 g)를 물에 희석하여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(10g)를물에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "49fefe8367709a50",
+   "kind": "clause",
+   "koText": "항산화에 도움을 줄 수 있음 / 높은 혈압 감소에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화에도움을줄수있음/높은혈압감소에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4a4ff45bcd275625",
+   "kind": "clause",
+   "koText": "정상적이 면역기능에 필요.",
+   "normalizedKoText": "정상적이면역기능에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4a7a391ac8f697a5",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오.(530mg)",
+   "normalizedKoText": "1일3회·1회1캡슐을충분한물과함께섭취하십시오.(530mg)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4a7c993d91e4a476",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1g을 그대로 드시거나 온수 또는 냉수에 타서 드십시오.",
+   "normalizedKoText": "1일2회·1회1g을그대로드시거나온수또는냉수에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4ae4b12a37c85876",
+   "kind": "meta",
+   "koText": "1일 2회, 1회에 2캅셀을 물과 함께 섭취한다.",
+   "normalizedKoText": "1일2회·1회에2캅셀을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4b2a62b0a7cb12cc",
+   "kind": "meta",
+   "koText": "1일 1회 , 1회 2정(1,800 mg)을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정(1·800mg)을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4b7bab736a9384a0",
+   "kind": "meta",
+   "koText": "동봉된스푼을이용하여1일3회,한스픈(1g상당)을온수또는냉수와함께섭취/ 건강기능식품원료로사용",
+   "normalizedKoText": "동봉된스푼을이용하여1일3회·한스픈(1g상당)을온수또는냉수와함께섭취/건강기능식품원료로사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4baff5201040c2b9",
+   "kind": "label",
+   "koText": "스페인감초추출물",
+   "normalizedKoText": "스페인감초추출물",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4be2957d1c7d98e6",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정을 물고 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정을물고함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4d3ef6df3655c6d6",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 연질(600mg)+정제(750mg)를 액상(20ml)과 함께 섭취 or 물과 함께 섭취 (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·연질(600mg)+정제(750mg)를액상(20ml)과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4d5da1f818c15258",
+   "kind": "meta",
+   "koText": "1일 3회, 1회에 동봉된 수저(한 수저 당 1g)를 이용하여 1g씩 냉.온수에 타서 섭취한다.",
+   "normalizedKoText": "1일3회·1회에동봉된수저(한수저당1g)를이용하여1g씩냉.온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4d5dff464ff65f19",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1g 을 미온수에 타서 섭취 또는 직접 섭취",
+   "normalizedKoText": "1일2회·1회1g을미온수에타서섭취또는직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4df61b2a11b5c063",
+   "kind": "meta",
+   "koText": "1일 1회 1포를 직접 또는 온수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회1포를직접또는온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4e25089e6724d741",
+   "kind": "meta",
+   "koText": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취 2) 원료성 제품 : 해당 없음",
+   "normalizedKoText": "최종제품:1일1회·1회1g을그대로섭취하거나냉온수에타서섭취원료성제품:해당없음",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4f3112d416ac2722",
+   "kind": "clause",
+   "koText": "[EPA 및 DHA 함유 유지, 비오틴, 비타민D, 크롬, 판토텐산, 비타민B12, 비타민B1, 비타민B2, 비타민K]이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "normalizedKoText": "[EPA및DHA함유유지·비오틴·비타민D·크롬·판토텐산·비타민B12·비타민B1·비타민B2·비타민K]이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4fb4af41191abc5e",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(7g)를 반드시 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(7g)를반드시충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "4fd740c51fc95c54",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2포를 충분한 물에 녹여서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2포를충분한물에녹여서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "50fecfc07e258676",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1캡슐을 충분한 물과 함께 섭취하십시오. 1일 1회, 1회 2캡슐을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1캡슐을충분한물과함께섭취하십시오.1일1회·1회2캡슐을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "517137f90c15d533",
+   "kind": "meta",
+   "koText": "1일 1회, 1포(13g)를 흔들어 섭취하십시오",
+   "normalizedKoText": "1일1회·1포(13g)를흔들어섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5199661296a90271",
+   "kind": "clause",
+   "koText": "제2009-40호",
+   "normalizedKoText": "제2009-40호",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "52d9e248d010f6b0",
+   "kind": "meta",
+   "koText": "식품 및 건강기능식품의 원료로 사용",
+   "normalizedKoText": "식품및건강기능식품의원료로사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5370b84f3c11db21",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 0.55g(약 3회 분사)를 구강에 분무하여 섭취",
+   "normalizedKoText": "1일3회·1회55g(약3회분사)를구강에분무하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "53e120169d145aa5",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 원료 성분을 확인하신 후 섭취하십시오. 제품 개봉 또는 섭취 시 포장재에의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "normalizedKoText": "알레르기체질이신분은원료성분을확인하신후섭취하십시오.제품개봉또는섭취시포장재에의해상처를입을수있으니주의하시고이상반응이있을시제품에기재된고객상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "54c2a4007f8593e5",
+   "kind": "meta",
+   "koText": "1일 3회 동봉된 스푼을 이용하여 1회 1스푼(1g)을 물에 타서 섭취거나 기호에 따라 꿀이나 감미료를 첨가하여 섭취하십시오.",
+   "normalizedKoText": "1일3회동봉된스푼을이용하여1회1스푼(1g)을물에타서섭취거나기호에따라꿀이나감미료를첨가하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "550805580dba1a3d",
+   "kind": "label",
+   "koText": "판토텐산/비타민B12/비타민B1/비타민B2/비오틴",
+   "normalizedKoText": "판토텐산/비타민B12/비타민B1/비타민B2/비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "55770ec48a1b6bfd",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 연질(500mg)+정제(1,000mg)를 액상(20ml)과 함께 섭취 or 물과 함께 섭취 (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·연질(500mg)+정제(1·000mg)를액상(20ml)과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "558f08eb241c4a6b",
+   "kind": "clause",
+   "koText": "특정성분에 알레르기 체질이거나 특이체질인 경우 성분을 확인하여 섭취바랍니다.",
+   "normalizedKoText": "특정성분에알레르기체질이거나특이체질인경우성분을확인하여섭취바랍니다",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "563b0f79a9672697",
+   "kind": "meta",
+   "koText": "1회 1스틱(30g), 1일 1회 섭취 / 그대로 섭취하거나 물에 희석하여 섭취",
+   "normalizedKoText": "1회1스틱(30g)·1일1회섭취/그대로섭취하거나물에희석하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5652a795f9477a5b",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1ml(약 5회 분사)를 충분히 흔들어 구강에 직접 분무하여 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1ml(약5회분사)를충분히흔들어구강에직접분무하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "57aa1a2691a7bf6d",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제1+정제2를 액상과 함께 섭취 or 물과 함께 섭취(1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제1+정제2를액상과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "57c2baca9c69ad88",
+   "kind": "meta",
+   "koText": "1회 25g을 우유나 두유, 물, 쥬스에 혼합하여 하루 3회 섭취하십시오.",
+   "normalizedKoText": "1회25g을우유나두유·물·쥬스에혼합하여하루3회섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "57d4122f3763ebe4",
+   "kind": "meta",
+   "koText": "1일 2회 610mg, 1회에 13 방울을 온수1컵(100ml이상)에 타서 드십시오.",
+   "normalizedKoText": "1일2회610mg·1회에13방울을온수1컵(100ml이상)에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "59b239f754ed3466",
+   "kind": "clause",
+   "koText": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다. 과량으로 섭취 시 설사를 유발할 수도 있습니다.",
+   "normalizedKoText": "특정질환·특이체질·알레르기체질·임산부의경우에는간혹개인에따라과민반응이나타날수있으므로원료를확인하시고·섭취전에전문가와상담하시기바랍니다.과량으로섭취시설사를유발할수도있음",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "59e715ac042c73ed",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정을 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일2회·1회1정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5a2ead05b0084730",
+   "kind": "clause",
+   "koText": "특정원료에 알레르기가 잇거나 질병치료, 약물투여 중인 분은 섭쉬 전 전문가와 상의하십시오.",
+   "normalizedKoText": "특정원료에알레르기가잇거나질병치료·약물투여중인분은섭쉬전전문가와상의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5a85abe562aa1521",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(6.5g)를 씹어서 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(6.5g)를씹어서충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5aa6e395798c7ab8",
+   "kind": "meta",
+   "koText": "물 또는 차와 함께 섭취",
+   "normalizedKoText": "물또는차와함께섭취",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5bb9b8c9ae5f12f7",
+   "kind": "clause",
+   "koText": "지방 탄수화물, 단백질 대사와 에너지 생성에 필요",
+   "normalizedKoText": "지방탄수화물·단백질대사와에너지생성에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5c78190fcd26cc83",
+   "kind": "label",
+   "koText": "판토텐산/비오틴/비타민B1",
+   "normalizedKoText": "판토텐산/비오틴/비타민B1",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5c85d52830061081",
+   "kind": "meta",
+   "koText": "1일 45g을 물과 함께 섭취/동봉 스픈(15g)으로 3회 섭취",
+   "normalizedKoText": "1일45g을물과함께섭취/동봉스픈(15g)으로3회섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5ce6d980bf763de5",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2g을 적당량의 온수 또는 냉수에 타서 섭취",
+   "normalizedKoText": "1일2회·1회2g을적당량의온수또는냉수에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5d3401c95100d4ab",
+   "kind": "meta",
+   "koText": "1일1회,1회 34g을 우유,두유,생수및 기타음료와 함께 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회34g을우유·두유·생수및기타음료와함께흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5d3d7562abd5ea71",
+   "kind": "clause",
+   "koText": "간.신장.심장질환, 알레르기 및 천식이 있거나 의약품 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "간.신장.심장질환·알레르기및천식이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5d4b437eddf29ae6",
+   "kind": "meta",
+   "koText": "원료로서 사용",
+   "normalizedKoText": "원료로서사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5e5dc95b07b9fad4",
+   "kind": "clause",
+   "koText": "유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ②배변활동 원활에 도움을 줄 수 있음 ③장건강에 도움을 줄 수 있음,① 유산균 증식 및 유해균 억제에 도움을 줄 수 있음 ② 배변활동 원활에 도움을 줄 수 있음",
+   "normalizedKoText": "유산균증식및유해균억제에도움을줄수있음배변활동원활에도움을줄수있음장건강에도움을줄수있음·유산균증식및유해균억제에도움을줄수있음배변활동원활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5ef106ae40609c01",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제1,2를 액상과 함께 섭취 or 물과 함께 섭취(1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제1·2를액상과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5f9873d5613800e0",
+   "kind": "clause",
+   "koText": "간·신장·심장질환, 알레르기 및 천식, 질환이 있거나 의약품 복용 시 전문가와 상담하십시오.",
+   "normalizedKoText": "간·신장·심장질환·알레르기및천식·질환이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "5ff1b4873ed3e96e",
+   "kind": "meta",
+   "koText": "1일2회, 1회 동봉된 스픈으로 1스푼(1g)을 온수나 냉수에 넣어 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회동봉된스픈으로1스푼(1g)을온수나냉수에넣어섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "600a23de7e372a4c",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(8g)를 물 200ml~250ml에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(8g)를물200ml~250ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "60d19ff83afe4632",
+   "kind": "label",
+   "koText": "마리골드꽃주정추출물(지아잔틴함유)(제2025-70호)",
+   "normalizedKoText": "마리골드꽃주정추출물(지아잔틴함유)(제2025-70호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "60d30ebdb7df39a2",
+   "kind": "label",
+   "koText": "풋사과추출물 애플페논 (Applephenon)",
+   "normalizedKoText": "풋사과추출물애플페논(Applephenon)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "61e35a822d01b9f4",
+   "kind": "clause",
+   "koText": "차전자피식이섬유]",
+   "normalizedKoText": "차전자피식이섬유]",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "623ba033ccc761c0",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1 포(3 g)을 한 컵(약 100 mL)의 온수 또는 냉수에 넣어드십시오",
+   "normalizedKoText": "1일3회·1회1포(3g)을한컵(약100mL)의온수또는냉수에넣어드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "623ee1ae0ba19553",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2스푼(35g)을 250ml 물에 잘 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2스푼(35g)을250ml물에잘흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6287444e6b34d0eb",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 직접 섭취하거나 물과 같이 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를직접섭취하거나물과같이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "62986cefe7d921fa",
+   "kind": "clause",
+   "koText": "천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으나, 제품 품질에는 이상이 없으니 안심하고 드십시오.",
+   "normalizedKoText": "천연색소가사용되어빛에의한제품변색또는묻어나올수있으나·제품품질에는이상이없으니안심하고드십시오",
+   "category": "STANDARD",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "62d3f42c7d06f3ae",
+   "kind": "clause",
+   "koText": "원료의 특성 상 개봉 후 빠른 시일 내 섭취 바랍니다.",
+   "normalizedKoText": "원료의특성상개봉후빠른시일내섭취바랍니다",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "62fe2804e9c85bb3",
+   "kind": "clause",
+   "koText": "과량 섭취하지 않도로 주의할 것",
+   "normalizedKoText": "과량섭취하지않도로주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "630bd0108560094c",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 물(150~250 ml)에 녹여서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를물(150~250ml)에녹여서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "63709a8735d0e3be",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(7g)를 300ml~500ml 이상의 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(7g)를300ml~500ml이상의물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "64741cb96188228f",
+   "kind": "meta",
+   "koText": "1일 3회 1회 35g(50cc 2스푼)을 먹는 물 200ml와 함께 섭취",
+   "normalizedKoText": "1일3회1회35g(50cc2스푼)을먹는물200ml와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "65809efdc6e9bc0e",
+   "kind": "clause",
+   "koText": "건조한 눈을 개선하여 눈 건강에 도움을 수 있음",
+   "normalizedKoText": "건조한눈을개선하여눈건강에도움을수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "65cf31762ee05ee6",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 300ml 이상의 물에 잘 섞어서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를300ml이상의물에잘섞어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "69061cc962f77007",
+   "kind": "clause",
+   "koText": "항산화 ➅ 갱년기 여성의 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화➅갱년기여성의건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "69314519c9a8f17b",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캡슐을 물과 함께 섭취하십시오. / 1일 1회, 1회 4캡슐을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2캡슐을물과함께섭취하십시오./1일1회·1회4캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6a3410b26f993775",
+   "kind": "clause",
+   "koText": "요로에 유해균 흡착 억제로 요로건강에 도움을 줄 수 있음",
+   "normalizedKoText": "요로에유해균흡착억제로요로건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6a8d91981bc62a1e",
+   "kind": "meta",
+   "koText": "1일 2회,1회1포(6.000mg)을 충분한 음용수와 함께 섭취한다.",
+   "normalizedKoText": "1일2회·1회1포(6.000mg)을충분한음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6aeba7fea2cbc6e7",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 60g씩 물 또는 음용수에 타서 섭취한다.",
+   "normalizedKoText": "1일1회·1회60g씩물또는음용수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6bbb3867ecfc61ce",
+   "kind": "clause",
+   "koText": "신장질환이 있는 경우 섭치 전 전문가와 상담할 것",
+   "normalizedKoText": "신장질환이있는경우섭치전전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6ca94479f43cdbff",
+   "kind": "label",
+   "koText": "보스웰리아추출물등복합물(Flexir)",
+   "normalizedKoText": "보스웰리아추출물등복합물(Flexir)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6cfa8f0f3e1cc21c",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캡슐씩 충분한 물과 함께 섭취하십시오.충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2캡슐씩충분한물과함께섭취하십시오.충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6daccc46088cf976",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정씩 충분한 물과 함께 섭취하십시오. 1일 2회, 1회 1정씩 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정씩충분한물과함께섭취하십시오.1일2회·1회1정씩충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6dbe6c6958a62e87",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(10 mL)를 그대로 섭취하시기 바랍니다.",
+   "normalizedKoText": "1일1회·1회1포(10mL)를그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6dfade29d32eb964",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2캡슐씩 음용수와 함께 섭취하십시오",
+   "normalizedKoText": "1일1회·1회2캡슐씩음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6eb228d207a6dc69",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 300mL에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물300mL에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "6fbfc4493c69131e",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 6정을 씹어서 물과 함께 섭취.",
+   "normalizedKoText": "1일2회·1회6정을씹어서물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "70610bcb623e8069",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1팩을 충분한 물과 함께 섭취.",
+   "normalizedKoText": "1일1회·1회1팩을충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "722ebd13f98c22d1",
+   "kind": "clause",
+   "koText": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "normalizedKoText": "알레르기체질이신분은성분확인후섭취하십시오.제품개봉시포장재에의해상처를입을수있으니주의하시고이상반응이있을시제품에기재된고객상담실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "72634bf4dce71c78",
+   "kind": "label",
+   "koText": "비타민B1,2, 12, 판토텐산, 비오틴",
+   "normalizedKoText": "비타민B1·2·12·판토텐산·비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "745d49818fcf99cb",
+   "kind": "meta",
+   "koText": "1일, 1회, 1회 1정을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일·1회·1회1정을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "75cbb2a8fe461054",
+   "kind": "meta",
+   "koText": "1일 1회, 1회, 2정을 충분한 물과 함께 섭취한다.",
+   "normalizedKoText": "1일1회·1회·2정을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7657dce97d25015f",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 확인 후 섭취하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질인경우간혹개인에따라과민반응을나타낼수있으므로확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "77575c4df6e880f2",
+   "kind": "meta",
+   "koText": "1일3회 1회 한스푼(1g)씩 온수 또는 냉수 80ml에 넣고 저은 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "1일3회1회한스푼(1g)씩온수또는냉수80ml에넣고저은후섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7762ea3d179e62ab",
+   "kind": "meta",
+   "koText": "성인 1일 3회, 1회 1g을 동봉된 스푼을 이용하여 떠서 직접 드시거나, 음용수 80ml에 타서 드십시오.",
+   "normalizedKoText": "성인1일3회·1회1g을동봉된스푼을이용하여떠서직접드시거나·음용수80ml에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "787f7887b93553e5",
+   "kind": "meta",
+   "koText": "1일2회, 1회1캅셀씩 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1캅셀씩물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "78a6e7f2d9c01d80",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1 g을 물에 타서 섭취",
+   "normalizedKoText": "1일3회·1회1g을물에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "794ac8614a37af54",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 그대로 섭취하거나 또는 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1포를그대로섭취하거나또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7957bc371371a0d9",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 동봉된 스푼(1g)을 사용하여 직접 또는 냉, 온수에 타서 섭취하십시오",
+   "normalizedKoText": "1일2회·1회동봉된스푼(1g)을사용하여직접또는냉·온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "79596f124517c01c",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 2캡슐(1,000mg)을 충분한 물과 함께 섭취하십오.",
+   "normalizedKoText": "1일3회·1회2캡슐(1·000mg)을충분한물과함께섭취하십오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "79c7fb08d2d2e131",
+   "kind": "clause",
+   "koText": "(병포장 시) 습기방지제(방습제)는 먹지 마십시오.",
+   "normalizedKoText": "(병포장시)습기방지제(방습제)는먹지마십시오",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "79d75853f227abbb",
+   "kind": "label",
+   "koText": "비타민B1,B2, 판토텐산 B12, 비오틴",
+   "normalizedKoText": "비타민B1·B2·판토텐산B12·비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7a517711221f637d",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 3g을 직접 또는 온, 냉수에 타서 섭취 하십시오.",
+   "normalizedKoText": "1일2회·1회3g을직접또는온·냉수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7b14c061f396e40d",
+   "kind": "meta",
+   "koText": "1일 1회 2g(동봉된 스푼 1스푼)을 그대로 또는 냉/온수에 용해하여 섭취",
+   "normalizedKoText": "1일1회2g(동봉된스푼1스푼)을그대로또는냉/온수에용해하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7b38d9ec6262e7b9",
+   "kind": "meta",
+   "koText": "2g 1일 2회 1회당 1분말 ,",
+   "normalizedKoText": "2g1일2회1회당1분말",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7b7f0e043c272798",
+   "kind": "clause",
+   "koText": "원료로 사용시 개봉 후 오염우려가 있으니 신속하게 사용하고, 남은 것은 밀봉 후 냉장 또는 냉동보관한다.",
+   "normalizedKoText": "원료로사용시개봉후오염우려가있으니신속하게사용하고·남은것은밀봉후냉장또는냉동보관할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7bb0398b4e741bd1",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병을 식사와 상관 없이 상부캡을 눌러 분말과 액상을 혼합하여 음용하여 주시기 바랍니다.",
+   "normalizedKoText": "1일1회·1회1병을식사와상관없이상부캡을눌러분말과액상을혼합하여음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7bd34ab0254be9ad",
+   "kind": "clause",
+   "koText": "알레르기 등 특이체질의 경우 원료의 성분을 확인 후 섭취하십시오.",
+   "normalizedKoText": "알레르기등특이체질의경우원료의성분을확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7cca0aad5c026909",
+   "kind": "meta",
+   "koText": "1일 1회 , 1회 1포(2g)씩 입안에서 녹여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(2g)씩입안에서녹여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7daea70882d4cdfd",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정씩 취침 1~2시간 전 녹여서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정씩취침1~2시간전녹여서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7f368997c9d13c5c",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 35 g을 물이나 음료에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회35g을물이나음료에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "7fd0b0761dda9192",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 6방울(0.150ml) 내용물이 잘 섞이게 충분히 흔든 후 본체 병뚜껑을 열고 동봉된 드로퍼로 갈아 끼우십시오. 드로퍼의 뚜껑을 열고 드로퍼의 상단을 엄지와 검지로 살짝 힘을 주어 6방울을 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회6방울(0.150ml)내용물이잘섞이게충분히흔든후본체병뚜껑을열고동봉된드로퍼로갈아끼우십시오.드로퍼의뚜껑을열고드로퍼의상단을엄지와검지로살짝힘을주어6방울을섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "80a950918b83f46a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병 / 정제와 액상을 함께 섭취 또는 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1병/정제와액상을함께섭취또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "80e474c48f760ec5",
+   "kind": "meta",
+   "koText": "1일 1회/1회 1포, 직접 섭취하시거나, 물에 희석하여 음용하십시오",
+   "normalizedKoText": "1일1회/1회1포·직접섭취하시거나·물에희석하여음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8295311d24aa7842",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2정(500mg*2)씩 물과 함께 드십시오.",
+   "normalizedKoText": "1일2회·1회2정(500mg*2)씩물과함께드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "836b625bf40d6c02",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 150ml에 타서 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1포를물150ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "83aa885e35e2d560",
+   "kind": "meta",
+   "koText": "연질 2캡슐(800mg)을 액상(25g)과 함께 1일 1회, 1회 1병씩 섭취",
+   "normalizedKoText": "연질2캡슐(800mg)을액상(25g)과함께1일1회·1회1병씩섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "83ae92b02c0e2b58",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 직접 섭취하거나 음용수와 혼합하여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를직접섭취하거나음용수와혼합하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "83c160f46060b6c5",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정 또는 1회 1포(2정)을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2정또는1회1포(2정)을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8458eab6c8a21eee",
+   "kind": "clause",
+   "koText": "특이 체질 또는 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
+   "normalizedKoText": "특이체질또는알레르기체질등은개인에따라과민반응을나타낼수있음",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8478f5b3de024d72",
+   "kind": "clause",
+   "koText": "혈전용해제를 복용하시는 분은 의사와 상담하여 주시기 바랍니다",
+   "normalizedKoText": "혈전용해제를복용하시는분은의사와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8525c5d1a7edfc50",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 300ml~500ml이상의 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를300ml~500ml이상의물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "861405e23d5f63e3",
+   "kind": "clause",
+   "koText": "유산균 증식 및 유해균 억제·배변활동 월활에 도움을 줄 수 있음.",
+   "normalizedKoText": "유산균증식및유해균억제·배변활동월활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8640e4fceacd9ddb",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1스푼(5g)을 온수나 냉수에 넣어 잘 혼합하여 음용하십시오.",
+   "normalizedKoText": "1일3회·1회1스푼(5g)을온수나냉수에넣어잘혼합하여음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "865680938912f74d",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1g을 직접 또는 물과 함께 섭취한다.",
+   "normalizedKoText": "1일3회·1회1g을직접또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "87d296e43e8f8037",
+   "kind": "clause",
+   "koText": "알레르기 체질 등은 개인에 따라 과민반응이 나타낼 수 있음",
+   "normalizedKoText": "알레르기체질등은개인에따라과민반응이나타낼수있음",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "881cb792b0405525",
+   "kind": "clause",
+   "koText": "어린이, 임산부 및 수유부는 섭취를 피할 것. 수술 전후, 의약품(항응고제) 복용 시 전문가와 상담할 것. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "normalizedKoText": "어린이·임산부및수유부는섭취를피할것.수술전후·의약품(항응고제)복용시전문가와상담할것.이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "88cb6229724e631b",
+   "kind": "clause",
+   "koText": "특정 성분에 알레르기가 있으신 분은 원료명을 확인하시고 섭취하십시오. 섭취시 불편할 수 있으므로 물과 함께 섭취하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을시 제품에 기재된 고객만족실로 문의하십시오.",
+   "normalizedKoText": "특정성분에알레르기가있으신분은원료명을확인하시고섭취하십시오.섭취시불편할수있으므로물과함께섭취하십시오.제품개봉또는섭취시포장재에의해상처를입을수있으니주의하시고이상반응이있을시제품에기재된고객만족실로문의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "893d9bdd4761013c",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 물에 섞어서 섭취하십시오.1일 1회, 1회 2포를 물에 섞어서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를물에섞어서섭취하십시오.1일1회·1회2포를물에섞어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "89ff8fa176209fba",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병을 섭취하십시오. or 1일 1회, 1회 1병을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1병을섭취하십시오.or1일1회·1회1병을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8b23177fa184fedf",
+   "kind": "clause",
+   "koText": "제품 개봉 및 섭취 시 포장재에 의해 다칠 수 있으니 주의하십시오. 특이체질 및 알레르기 체질이신 분은 섭취 전 성분을 확인하고 섭취하십시오. 질환 보유자 또는 약물 복용 중이신 분은 섭취 전에 의사, 약사 등 전문가와 상담하십시오.",
+   "normalizedKoText": "제품개봉및섭취시포장재에의해다칠수있으니주의하십시오.특이체질및알레르기체질이신분은섭취전성분을확인하고섭취하십시오.질환보유자또는약물복용중이신분은섭취전에의사·약사등전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8c9f91492a44a569",
+   "kind": "meta",
+   "koText": "식품 및 건강기능식품 제조 시 일일 섭취량에 적합한 양을 사용",
+   "normalizedKoText": "식품및건강기능식품제조시일일섭취량에적합한양을사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8e82614ee2a89838",
+   "kind": "clause",
+   "koText": "제품 개봉 시 내용물이 튈 수 있으니 주의하여 천천히 개봉하십시오.",
+   "normalizedKoText": "제품개봉시내용물이튈수있으니주의하여천천히개봉할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8e98501e0993e527",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1캅셀(400mg)을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1캅셀(400mg)을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "8fb6ea424ced39e9",
+   "kind": "clause",
+   "koText": "질환이 있거나 현재 질병치료 및 약물복용 중이신 분은 전문의와 상담할 것",
+   "normalizedKoText": "질환이있거나현재질병치료및약물복용중이신분은전문의와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "90761cda75b032d4",
+   "kind": "clause",
+   "koText": "간 건강에 도움을 줄 수 있음[1) (2) (다)의 제조방법에 한함]",
+   "normalizedKoText": "간건강에도움을줄수있음[1)(다)의제조방법에한함]",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "90bff27de75934c6",
+   "kind": "meta",
+   "koText": "1일 3회 1회 1g을 직접 섭취또는 냉온수에 꿀이나 기타 감미료를 넣어 음용.",
+   "normalizedKoText": "1일3회1회1g을직접섭취또는냉온수에꿀이나기타감미료를넣어음용",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "917e2ee1dfdd77e1",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 3g을 직접 또는 냉, 온수에 타서 섭취하십시오",
+   "normalizedKoText": "1일1회·1회3g을직접또는냉·온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "934589b0e2d30ba6",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(7g)를 물에 타서 잘 저어서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(7g)를물에타서잘저어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9432dec6129f1ba0",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화에줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "94cf1d16aeacfdc0",
+   "kind": "clause",
+   "koText": "간,신장.심장질환, 알레르기 및 천식이 있거나 의약품 복용 시 전문가와 상담할 것.",
+   "normalizedKoText": "간·신장.심장질환·알레르기및천식이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "959261c5287d44b5",
+   "kind": "clause",
+   "koText": "천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으니 보관 시 유의해 주십시오.",
+   "normalizedKoText": "천연색소가사용되어빛에의한제품변색또는묻어나올수있으니보관시유의해주십시오",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "95f4ffad53b7f9f6",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정 아침에는 데이정제(800 mg), 저녁에는 나이트정제(1,500 mg)를 각각 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1정아침에는데이정제(800mg)·저녁에는나이트정제(1·500mg)를각각물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9661ceafbf94083c",
+   "kind": "meta",
+   "koText": "1일 45g을 섭취/동봉 스픈(15g)으로 3회 섭취",
+   "normalizedKoText": "1일45g을섭취/동봉스픈(15g)으로3회섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "96be3f5264757392",
+   "kind": "label",
+   "koText": "발효율피추출분말(제2021-4호)",
+   "normalizedKoText": "발효율피추출분말(제2021-4호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "96c5885eba919a13",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2포를 물에 혼합하여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2포를물에혼합하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "973bec7d824bbb75",
+   "kind": "clause",
+   "koText": "의약품(당뇨치료제,혈액응고재) 복용시 섭취에 주의",
+   "normalizedKoText": "의약품(당뇨치료제·혈액응고재)복용시섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "97981ead5da9d899",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 충분한 물과 함께 드십시오.",
+   "normalizedKoText": "1일2회·1회1포를충분한물과함께드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "979beb20e5713f4a",
+   "kind": "clause",
+   "koText": "특이제질, 알레르기 체질, 질병 치료 중인 분은 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "normalizedKoText": "특이제질·알레르기체질·질병치료중인분은개인에따라과민반응을나타낼수있으므로원료를확인한후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "98a296af6c99431b",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1g을 온수 또는 냉수에 넣어 잘 녹인 후 섭취하십시오.(단, 어린이는 성인의 1/2를 음용함)",
+   "normalizedKoText": "1일2회·1회1g을온수또는냉수에넣어잘녹인후섭취하십시오.(단·어린이는성인의1/2를음용함)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "98e3ead29d86a096",
+   "kind": "clause",
+   "koText": "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다골증발생 위험 감소에 도움을 줌",
+   "normalizedKoText": "칼슘과인이흡수되고이용되는데필요·뼈의형성과유지에필요·골다골증발생위험감소에도움을줌",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "98fdeb3429a33262",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(5 g)를 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일2회·1회1포(5g)를충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9a3fcbcd37f9fced",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(3g)씩 그대로 혹은 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(3g)씩그대로혹은충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9a585b9b2f0630a1",
+   "kind": "clause",
+   "koText": "반드시 충분한 물과 함께 섭취할 것, 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것",
+   "normalizedKoText": "반드시충분한물과함께섭취할것·이상사례발생시섭취를중단하고전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ab321805f36ace2",
+   "kind": "clause",
+   "koText": "제품의 일부 갈색 입자는 프로바이오틱스 원료이므로 안심하고 드셔도 됩니다.",
+   "normalizedKoText": "제품의일부갈색입자는프로바이오틱스원료이므로안심하고드셔도됩니다",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ab787070a05f2d4",
+   "kind": "meta",
+   "koText": "1일 1회, 1병(100mL)을 섭취하십시오.",
+   "normalizedKoText": "1일1회·1병(100mL)을섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9af5972a5f4fae96",
+   "kind": "meta",
+   "koText": "1일 1회 , 1회 1포(5g)씩 입안에서 녹여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(5g)씩입안에서녹여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9b518bc4ba06ed62",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g을 온수 또는 냉수에 타서 드시거나 직접 섭취하십시오. (15세 이하의 어린이는 위 섭취량의 절반정도를 섭취하십시오.)",
+   "normalizedKoText": "1일1회·1회1g을온수또는냉수에타서드시거나직접섭취하십시오.(15세이하의어린이는위섭취량의절반정도를섭취하십시오.)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ba078bf8841d779",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(2 g)씩 그대로 또는 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1포(2g)씩그대로또는물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9c0a8fec877982f6",
+   "kind": "meta",
+   "koText": "1일 1회, 1회에 한 포(15g)를 그대로 섭취한다.",
+   "normalizedKoText": "1일1회·1회에한포(15g)를그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9c9096363461d46f",
+   "kind": "clause",
+   "koText": "특이체질이거나 알러지체질의 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료명을 확인하신 후 섭취하십시오.",
+   "normalizedKoText": "특이체질이거나알러지체질의경우에는개인에따라과민반응을나타낼수있으므로원료명을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ccd032a9fa1c13e",
+   "kind": "clause",
+   "koText": "배변활동 원활에 도움을 줄 수 있음 비타민B6",
+   "normalizedKoText": "배변활동원활에도움을줄수있음비타민B6",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9cd91f71e7ea74a9",
+   "kind": "clause",
+   "koText": "혈중 중성지질·혈행 개선에 도움을 줄 수 있음",
+   "normalizedKoText": "혈중중성지질·혈행개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9ceefea9532d52f2",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질의 경우에는 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인 후 섭취하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질의경우에는개인에따라과민반응이나타날수있으므로원료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9df03ea858ec9965",
+   "kind": "clause",
+   "koText": "특정질환, 특이체질이거나 알러지 체질의 경우에는 간혹 개인에 따라 과민 반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하십시오.",
+   "normalizedKoText": "특정질환·특이체질이거나알러지체질의경우에는간혹개인에따라과민반응을나타낼수있으므로원료를확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9df4bf0b18ab9e18",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1.5g(2스포이드)를 물에 희석해서 섭취하세요.",
+   "normalizedKoText": "1일2회·1회5g(2스포이드)를물에희석해서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9e82a7a2f08e83e9",
+   "kind": "meta",
+   "koText": "1일 2회, 1회에 동봉된 스푼(1스푼 5g정도)을 이용하여 1스푼(5g)을 그대로 또는 냉ㆍ온수에 타서 섭취하십시오",
+   "normalizedKoText": "1일2회·1회에동봉된스푼(1스푼5g정도)을이용하여1스푼(5g)을그대로또는냉·온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9f15106ff85f5732",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 물 또는 우유, 이유식 등에 타거나 직접 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를물또는우유·이유식등에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "9fea6401ea5ff48c",
+   "kind": "clause",
+   "koText": "스트레스로 인한 피로개선에 도움을 줄 수 있음.,",
+   "normalizedKoText": "스트레스로인한피로개선에도움을줄수있음.",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a0964d170af503bf",
+   "kind": "clause",
+   "koText": "NAG : 관절 및 연골 건강에 도움을 줄 수 있음 MSM : 관절 및 연골건강에 도움을 줄 수 있음 칼슘 :",
+   "normalizedKoText": "NAG:관절및연골건강에도움을줄수있음MSM:관절및연골건강에도움을줄수있음칼슘:",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a0c29c65e17b0e57",
+   "kind": "meta",
+   "koText": "식품의 원료",
+   "normalizedKoText": "식품의원료",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a25cdb1bac377640",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 5g을 직접 또는 냉.온수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회5g을직접또는냉.온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a2947e0548465f12",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 식후에 섭취하십시오.가루를 먹을 수 있는 어린이라면 입에 넣고 침으로 녹여 먹을 수 있도록 해주시고, 가루를 못 먹는 아기라면 젖병에 적당한 양의 물이나 분유에 녹여먹을 수 있도록 해주세요.1일 1회, 1회 1포를 식후에 섭취",
+   "normalizedKoText": "1일1회·1회1포를식후에섭취하십시오.가루를먹을수있는어린이라면입에넣고침으로녹여먹을수있도록해주시고·가루를못먹는아기라면젖병에적당한양의물이나분유에녹여먹을수있도록해주세요.1일1회·1회1포를식후에섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a31f55884cf81848",
+   "kind": "meta",
+   "koText": "1일 3회 , 1회 1g을 온수 또는 냉수에 타거나 직접 섭취 하십시오",
+   "normalizedKoText": "1일3회·1회1g을온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a325cf4d2e32d41f",
+   "kind": "meta",
+   "koText": "시간과 관계없이 일상생활 중 1일 1회, 1회 1포를 섭취하십시오.",
+   "normalizedKoText": "시간과관계없이일상생활중1일1회·1회1포를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a3387ad16423f79b",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1스푼(1g)씩 그대로 섭취하거나 온수 또는 냉수 80ml에 녹여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1스푼(1g)씩그대로섭취하거나온수또는냉수80ml에녹여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a3e330035cd07692",
+   "kind": "meta",
+   "koText": "1일2회, 1회1포(30ml)를 약200ml의 물에타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(30ml)를약200ml의물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a436c3e5a8b76d6c",
+   "kind": "clause",
+   "koText": "특이체질 또는 알레르기 체질인 경우에는 성분을 확인한 후 섭취",
+   "normalizedKoText": "특이체질또는알레르기체질인경우에는성분을확인한후섭취",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a4f7ae62c3ace813",
+   "kind": "meta",
+   "koText": "(1포: 2g) 1일 2회, 1회 1포를 직접 섭취하거나 물과 같이 섭취하십시오",
+   "normalizedKoText": "(1포:2g)1일2회·1회1포를직접섭취하거나물과같이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a526e0f5013b3647",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 핼액흐름·기억력개선·항산화·갱년기 여성의 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한핼액흐름·기억력개선·항산화·갱년기여성의건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a544c1cb7fa88cf4",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 동봉한 스푼을 이용하여 2g 직접 또는 물에 희석하여 섭취하십시오",
+   "normalizedKoText": "1일2회·1회동봉한스푼을이용하여2g직접또는물에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a586a90bd418f787",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한혈액흐름·기억력개선·항산화",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a5d3232216650836",
+   "kind": "label",
+   "koText": "비타민B1, 비타민B2, 비타민B12, 비오틴",
+   "normalizedKoText": "비타민B1·비타민B2·비타민B12·비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a61867b11ca6b915",
+   "kind": "clause",
+   "koText": "특이체질, 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취 하십시오.",
+   "normalizedKoText": "특이체질·알레르기체질인경우에는개인에따라과민반응을나타낼수있으므로원료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a618b00c67b60c6d",
+   "kind": "meta",
+   "koText": "고유의 향미가 있고 이미, 이취가 없는 선명한 주황 또는 밝은 적갈색의 액상",
+   "normalizedKoText": "고유의향미가있고이미·이취가없는선명한주황또는밝은적갈색의액상",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a61958df56d2bd6a",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포 (3,000mg/포)를 기호에 따라 온수(50~80ml)에 타서 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포(3·000mg/포)를기호에따라온수(50~80ml)에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a68f58842e72b104",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 0.6ml(4회 분무)를 구강에 분무하여 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회6ml(4회분무)를구강에분무하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a6b9e91d1449330b",
+   "kind": "label",
+   "koText": "판토텐산/비타민B12/비오틴/비타민B1/비타민B2",
+   "normalizedKoText": "판토텐산/비타민B12/비오틴/비타민B1/비타민B2",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a82b867f183a7ebe",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1스틱(5,000mg), 1포를 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1스틱(5·000mg)·1포를충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a85bb633dc94db50",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 연질(600mg)+정제(700mg)를 액상(20ml)과 함께 섭취 or 물과 함께 섭취 (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·연질(600mg)+정제(700mg)를액상(20ml)과함께섭취or물과함께섭취(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a8b26f73c156992e",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 30g을 물, 우유 또는 두유 200ml에 잘 풀어서 섭취",
+   "normalizedKoText": "1일1회·1회30g을물·우유또는두유200ml에잘풀어서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a8ca38168779cddb",
+   "kind": "meta",
+   "koText": "1일 2회, 스포이드로 1회 2ml씩 섭취 (2ml는 4스포이드입니다.)",
+   "normalizedKoText": "1일2회·스포이드로1회2ml씩섭취(2ml는4스포이드입니다.)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a97fceb815d408a8",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 동봉된 1스푼(3g)을 직접 섭취하거나,냉.온수에 타서 섭취하십시오",
+   "normalizedKoText": "1일3회·1회동봉된1스푼(3g)을직접섭취하거나·냉.온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "a9a635cc93cd8bc9",
+   "kind": "meta",
+   "koText": "1일 5회, 1회 1스푼(5g)을 그대로 섭취하거나 음용수에 타서 섭취한다.",
+   "normalizedKoText": "1일5회·1회1스푼(5g)을그대로섭취하거나음용수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "aae7ced76483cdd9",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 45g을 물이나 음료에 혼합하여 음용",
+   "normalizedKoText": "1일1회·1회45g을물이나음료에혼합하여음용",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ab1dbc1f2a6cc1aa",
+   "kind": "meta",
+   "koText": "1일 1~2회 한포(15g)씩 직접섭취하십시오",
+   "normalizedKoText": "1일1~2회한포(15g)씩직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ab273e410cdff5fd",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(20mL)을 그대로 음용",
+   "normalizedKoText": "1일1회·1회1포(20mL)을그대로음용",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "abbb7c24a90bc0f9",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 30g을 그대로 혹은 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회30g을그대로혹은충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "acf635188da6e70f",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1병(16.37g)을 식사와 관계 없이 상부캡을 눌러 분말과 액상을 혼합하여 섭취하여 주시기 바랍니다.",
+   "normalizedKoText": "1일1회·1회1병(16.37g)을식사와관계없이상부캡을눌러분말과액상을혼합하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ae7a72d229255f4f",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정(420mg)씩 그대로 씹어서 섭취하시거나 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일2회·1회1정(420mg)씩그대로씹어서섭취하시거나물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af11cc44498a06c0",
+   "kind": "meta",
+   "koText": "1일 1회 1병을 식사와 관계 없이 상부캡을 눌러 분말과 액상을 혼합하여 음용하여 주시기 바랍니다.",
+   "normalizedKoText": "1일1회1병을식사와관계없이상부캡을눌러분말과액상을혼합하여음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af13277c0423ea3d",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 4g씩(1포) 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회·1회4g씩(1포)물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af20ea60f2fb1e63",
+   "kind": "meta",
+   "koText": "1회 섭취시 동봉된 스푼을 이용하여 100g을 우유나 두유, 물에 혼합하여 하루 3회 드십시오.",
+   "normalizedKoText": "1회섭취시동봉된스푼을이용하여100g을우유나두유·물에혼합하여하루3회드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af4a9e2df58d65cf",
+   "kind": "meta",
+   "koText": "1일 1회 1포( 4,000mg)를 식사전 공복에 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회1포(4·000mg)를식사전공복에물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "af967a6f2f270a24",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g을 온수나 냉수에 넣어 잘 녹인 후 음용함",
+   "normalizedKoText": "1일1회·1회1g을온수나냉수에넣어잘녹인후음용함",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "afc1406776543207",
+   "kind": "meta",
+   "koText": "1. 원료성 : 건강기능식품, 식품에 적당량 사용한다. 2. 최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수에 타서 섭취",
+   "normalizedKoText": "원료성:건강기능식품·식품에적당량사용한다.최종제품:1일1회·1회1g(동봉된숟가락사용)을그대로섭취하거나냉온수에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b0d27291414a5ec5",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(5g)를 식사 후 충분한 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일2회·1회1포(5g)를식사후충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b13e545c32a6e509",
+   "kind": "meta",
+   "koText": "제품의 원료로 사용.",
+   "normalizedKoText": "제품의원료로사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b1c0bdd89a752f46",
+   "kind": "clause",
+   "koText": "특정질환, 특이체질, 알레르기체질, 임산부의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인 후 섭취하십시오.",
+   "normalizedKoText": "특정질환·특이체질·알레르기체질·임산부의경우에는간혹개인에따라과민반응이나타날수있으므로원료를확인후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b213dd1f2f9d3760",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 100ml에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물100ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b2afdc29fc359c20",
+   "kind": "clause",
+   "koText": "콜레우스 포스콜리 추출물(제2012-5호)",
+   "normalizedKoText": "콜레우스포스콜리추출물(제2012-5호)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b2e32adf85d9bc95",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2스푼(4g/2스푼) 동봉된 스푼을 이용하여 직접 또는 냉,온수에 녹여서 섭취하십시오. (1일 섭취량 : 8g)",
+   "normalizedKoText": "1일2회·1회2스푼(4g/2스푼)동봉된스푼을이용하여직접또는냉·온수에녹여서섭취하십시오.(1일섭취량:8g)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b30664d56bcb6b2a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 150~200 mL에 넣어 잘 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물150~200mL에넣어잘흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b389a0c6221e1a0c",
+   "kind": "clause",
+   "koText": "임산부, 수유여성, 질병치료 중인 분은 섭취전 의사와 상담후 섭취하십시오.",
+   "normalizedKoText": "임산부·수유여성·질병치료중인분은섭취전의사와상담후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b3bc51bbb13d7106",
+   "kind": "label",
+   "koText": "핀토텐산",
+   "normalizedKoText": "핀토텐산",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b500fcb6057e768d",
+   "kind": "meta",
+   "koText": "식품 및 건강기능식품 원료로 사용",
+   "normalizedKoText": "식품및건강기능식품원료로사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b516b7b9c2f8ca0a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 6드롭(0.15ml)을 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회6드롭(0.15ml)을섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b534d8530724a427",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1캡슐을 물과 함께 섭취하십시오. 또는, 1일 1회, 1회 2캡슐을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1캡슐을물과함께섭취하십시오.또는·1일1회·1회2캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b57a569cd91fdcd8",
+   "kind": "meta",
+   "koText": "성인 1일 3회, 1회 1g을 온수 또는 냉수에 타서 드십시오.",
+   "normalizedKoText": "성인1일3회·1회1g을온수또는냉수에타서드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b5ac968c6b87f0dd",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 0.15ml 씩 1회를 구강에 직접 분무하여 섭취하십시오",
+   "normalizedKoText": "1일3회·1회15ml씩1회를구강에직접분무하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b5b6b26444b34473",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(5g)씩 물과 함께 씹어드십시오.",
+   "normalizedKoText": "1일2회·1회1포(5g)씩물과함께씹어드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b62fec71468b0713",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물(350ml)에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물(350ml)에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b72a6a869fc1b3e7",
+   "kind": "meta",
+   "koText": "1일 2회, 1회에 한 포(12g)를 그대로 섭취한다.",
+   "normalizedKoText": "1일2회·1회에한포(12g)를그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b74feb02561045be",
+   "kind": "clause",
+   "koText": "면역력 증진･피로개선에 도움을 줄 수 있음/혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선에도움을줄수있음/혈소판응집억제를통한혈액흐름·기억력개선·항산화에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b77881b6e9cf852f",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 또는 음료 300~500ml에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포를물또는음료300~500ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b797eb27a0338b09",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 3정을 물과 함께 섭취하거나 씹어서 섭취",
+   "normalizedKoText": "1일3회·1회3정을물과함께섭취하거나씹어서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b7b273a12e18c95c",
+   "kind": "clause",
+   "koText": "(1) 알레르기 반응을 보이는 사람의 경우 섭취전 성분 확인 필요함 (2) 임산부, 수유부, 어린이의 섭취는 전문의와 상담 후 섭취를 권장함",
+   "normalizedKoText": "알레르기반응을보이는사람의경우섭취전성분확인필요함임산부·수유부·어린이의섭취는전문의와상담후섭취를권장함",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b875ce9b41bd970b",
+   "kind": "clause",
+   "koText": "습기방지제(방습제)는 먹지 마십시오",
+   "normalizedKoText": "습기방지제(방습제)는먹지마십시오",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b886f121ac9c38bc",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐을 충분한 물과 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1캡슐을충분한물과섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b8bc9129e97ee933",
+   "kind": "meta",
+   "koText": "성인 1일 1회, 1회 1포(10ml)를 직접 드시거나 음용수에 희석하여 섭취하십시오.",
+   "normalizedKoText": "성인1일1회·1회1포(10ml)를직접드시거나음용수에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b8c0402ef0d835e2",
+   "kind": "label",
+   "koText": "루테인지아잔틴(개별인정형 제2018-4호)",
+   "normalizedKoText": "루테인지아잔틴(개별인정형제2018-4호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b8f528b62ca68996",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1매를 씹거나 삼키지 말고 입안에서 천천히 녹여 섭취하십시오",
+   "normalizedKoText": "1일3회·1회1매를씹거나삼키지말고입안에서천천히녹여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b9658f6defc195fe",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2g을 식사 전, 후 관계없이 온수 또는 냉수로 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회2g을식사전·후관계없이온수또는냉수로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "b9f6cfde0f3aa3cf",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(15ml)를 섭취하여주십시오.",
+   "normalizedKoText": "1일1회·1회1포(15ml)를섭취하여주십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ba3b4484362b48be",
+   "kind": "clause",
+   "koText": "의약품 항응고제 항혈소판제 혈압강하제 등 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "의약품항응고제항혈소판제혈압강하제등복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ba62631d74b532df",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 직접 섭취하거나, 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1포를직접섭취하거나·물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ba79ad214c89580e",
+   "kind": "clause",
+   "koText": "면역력 증진·피로개선·혈소판 응집억제를 통한 핼액흐름·기억력개선·항산화에 도움을 줄 수 있음",
+   "normalizedKoText": "면역력증진·피로개선·혈소판응집억제를통한핼액흐름·기억력개선·항산화에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bce5bd3e36030d93",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포[정제 2정(연한 노랑색의 제피정제 1정, 하양색의 제피정제 1정), 연질 3캡슐(투명한 연질캡슐 1캡슐, 적갈색의 연질캡슐 1캡슐, 진한 빨강색의 연질캡슐 1캡슐)]을 충분한 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1포[정제2정(연한노랑색의제피정제1정·하양색의제피정제1정)·연질3캡슐(투명한연질캡슐1캡슐·적갈색의연질캡슐1캡슐·진한빨강색의연질캡슐1캡슐)]을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bd60f352dfa65d58",
+   "kind": "meta",
+   "koText": "성인 1일 1회, 1포(10ml)를 섭취하십시오",
+   "normalizedKoText": "성인1일1회·1포(10ml)를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bd6380d18c30fc55",
+   "kind": "label",
+   "koText": "보스웰리아추출물(SERRATRIN)(제2022-17호)",
+   "normalizedKoText": "보스웰리아추출물(SERRATRIN)(제2022-17호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bd99432610ff1a61",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(20 g)을 물이나 음료에 타서 섭취하십시오",
+   "normalizedKoText": "1일2회·1회1포(20g)을물이나음료에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bdc7787266bf60f8",
+   "kind": "clause",
+   "koText": "간혹 식물성 성분에 의한 침전이 생길 수 있으나 변질이 아니오니 안심하시고 잘 흔들어 드십시오.",
+   "normalizedKoText": "간혹식물성성분에의한침전이생길수있으나변질이아니오니안심하시고잘흔들어드십시오",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "be1a1e7f89042ed8",
+   "kind": "clause",
+   "koText": "[EPA 및 DHA 함유 유지",
+   "normalizedKoText": "[EPA및DHA함유유지",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "be7d2bd5ed450209",
+   "kind": "meta",
+   "koText": "1일 1회 캔에 동봉된 스푼을 이용하여 물 150~200mL에 본 제품 3스푼(38g) 또는 스틱 2포(38g)을 개봉하여 넣은 후 혼합하여 음용한다.",
+   "normalizedKoText": "1일1회캔에동봉된스푼을이용하여물150~200mL에본제품3스푼(38g)또는스틱2포(38g)을개봉하여넣은후혼합하여음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "bee50b98ac4e36e2",
+   "kind": "clause",
+   "koText": "알러지 및 특이체질이신 분은 제품성분을 확인하신 후 섭취하십시오",
+   "normalizedKoText": "알러지및특이체질이신분은제품성분을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c00730fea8bf5ec0",
+   "kind": "clause",
+   "koText": "세포의 혈액생성에 필요 / 태아 신경관의 정상 발달에 필요 / 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요",
+   "normalizedKoText": "세포의혈액생성에필요/태아신경관의정상발달에필요/혈액의호모시스테인수준을정상으로유지하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c0874794e27cfce2",
+   "kind": "clause",
+   "koText": "단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는 필요",
+   "normalizedKoText": "단백질및아미노산이용에필요·혈액의호모시스테인수준을정상으로유지하는필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c1839afdef73175a",
+   "kind": "meta",
+   "koText": "1일 1회 1병(50mL)씩 그대로 섭취하십시오.",
+   "normalizedKoText": "1일1회1병(50mL)씩그대로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c2fc812830d80278",
+   "kind": "meta",
+   "koText": "1일3회, 1회 5환(1.15g)을 충분한 물과 함께 섭취",
+   "normalizedKoText": "1일3회·1회5환(1.15g)을충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c309c23a68851e31",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 6g(1포)씩 충분한 물과 함께 섭취",
+   "normalizedKoText": "1일2회·1회6g(1포)씩충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c31bb68c66668b73",
+   "kind": "meta",
+   "koText": "1일 1회, 1회에 2캅셀씩 음용수와 함께 섭취",
+   "normalizedKoText": "1일1회·1회에2캅셀씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c37c846b4a9dbf98",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 2캡슐(1000mg)을 충분한물과함께섭취하십시오.",
+   "normalizedKoText": "1일3회·1회2캡슐(1000mg)을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c42e65ee6e2c3c50",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정을 씹어서 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1정을씹어서물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c53b1acbaed968b1",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1캅셀 또는 1일 1회, 1회 3캅셀을 음용수와 함께 섭취",
+   "normalizedKoText": "1일3회·1회1캅셀또는1일1회·1회3캅셀을음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c5a1720f10f145cd",
+   "kind": "clause",
+   "koText": "면연력 증진,피로개선에 도움을 줄 수 있음",
+   "normalizedKoText": "면연력증진·피로개선에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c6cc784cb0bee64c",
+   "kind": "meta",
+   "koText": "1일 2회 1회 1캅셀을 물과 함께 섭취하십시오",
+   "normalizedKoText": "1일2회1회1캅셀을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c7f84782c1300fd3",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(20g)를 우유 또는 두유 150ml에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(20g)를우유또는두유150ml에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c9590f04db7bb5a9",
+   "kind": "clause",
+   "koText": "특이체질 및 알러지체질인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하십시오.",
+   "normalizedKoText": "특이체질및알러지체질인경우에는간혹개인에따라과민반응을나타낼수있으므로원료를확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "c9ef535da1230479",
+   "kind": "clause",
+   "koText": "임산부와 수유부는 섭취시 주의하십시오.",
+   "normalizedKoText": "임산부와수유부는섭취시주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cac4a81305b385c0",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포를 반드시 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회1포를반드시충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cb0526540a701e69",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1 g을 물에 타서 섭취하거나 기호에 따라 벌꿀 또는 감미료 등을 넣어 섭취",
+   "normalizedKoText": "1일3회·1회1g을물에타서섭취하거나기호에따라벌꿀또는감미료등을넣어섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cb68874e797e9f0c",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1환(3.75g)을 천천히 입안에서 녹여 씹어서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1환(3.75g)을천천히입안에서녹여씹어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "cb9d63e14b2cb74a",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1포(5,500mg)을 충분한 음용수와 함께 섭취한다.",
+   "normalizedKoText": "1일2회·1회1포(5·500mg)을충분한음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ccd05efdc03ab8dc",
+   "kind": "clause",
+   "koText": "(1) 반드시 충분한 물과 함께 섭취하십시오.(액상제외)",
+   "normalizedKoText": "반드시충분한물과함께섭취하십시오.(액상제외)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ce47dcfab904eb6c",
+   "kind": "meta",
+   "koText": "충분한 물과 함께 천천히 씹어서 드세요",
+   "normalizedKoText": "충분한물과함께천천히씹어서드세요",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ce7e0f100ccc2589",
+   "kind": "clause",
+   "koText": "유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음 유산균 증식 및 유해균 억제, 배변활동 원활에 도움을 줄 수 있음",
+   "normalizedKoText": "유산균증식및유해균억제·배변활동원활에도움을줄수있음유산균증식및유해균억제·배변활동원활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ce935c9d6adf6140",
+   "kind": "meta",
+   "koText": "성인 1일 3회,1회 3g(1포)씩 온수 또는 냉수에 타서 섭취",
+   "normalizedKoText": "성인1일3회·1회3g(1포)씩온수또는냉수에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d02712b015dc046c",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포 씹어서 물과 함께 섭취",
+   "normalizedKoText": "1일1회·1회1포씹어서물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d0b93242c83db3f3",
+   "kind": "clause",
+   "koText": "당뇨병의 치료 및 예방에 사용될 수 없으므로 당뇨병 치료가 필요한 경우에는 의사와 상담 하에 사용하여야 합니다.",
+   "normalizedKoText": "당뇨병의치료및예방에사용될수없으므로당뇨병치료가필요한경우에는의사와상담하에사용하여야할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d155e93fa063607c",
+   "kind": "label",
+   "koText": "과채유래유산균(L.plantarum CJLP133)(기능성원료인정제2013-11호)",
+   "normalizedKoText": "과채유래유산균(L.plantarumCJLP133)(기능성원료인정제2013-11호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d1b7c9cff6418410",
+   "kind": "meta",
+   "koText": "식품원료로 사용",
+   "normalizedKoText": "식품원료로사용",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d1c6dc15521f5186",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(25g)을 150~200ml의 물 또는 우유, 두유에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(25g)을150~200ml의물또는우유·두유에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d25df5d21faf4c47",
+   "kind": "clause",
+   "koText": "신경과 근육 유지에 필요",
+   "normalizedKoText": "신경과근육유지에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d2d57ca3f16b10fe",
+   "kind": "clause",
+   "koText": "임산부, 수유부, 어린이 및 수술전후 환자는 섭취에 주의하십시오. 의약품(항응고제) 복용 시 섭취에 주의하십시오.",
+   "normalizedKoText": "임산부·수유부·어린이및수술전후환자는섭취에주의하십시오.의약품(항응고제)복용시섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d2d64486bdfb5b33",
+   "kind": "meta",
+   "koText": "물이나 우유, 음료에 혼합하여 섭취",
+   "normalizedKoText": "물이나우유·음료에혼합하여섭취",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d2f0bfc896dc4370",
+   "kind": "clause",
+   "koText": "제품 내 별도포장된 방습제 섭취 금지. 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것. 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것.",
+   "normalizedKoText": "제품내별도포장된방습제섭취금지.이상사례발생시섭취를중단하고전문가와상담할것.고칼슘혈증이있거나의약품복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d30444397339a211",
+   "kind": "meta",
+   "koText": "1일 2회 12g씩 직접 섭취하십시오.",
+   "normalizedKoText": "1일2회12g씩직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d41ba15bee2a623f",
+   "kind": "clause",
+   "koText": "사용(섭취)상 주의사항: 고온다습한 환경에서의 사용을 가급적 삼간다.",
+   "normalizedKoText": "사용(섭취)상주의사항:고온다습한환경에서의사용을가급적삼간다",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d4df0c83d5bb6ade",
+   "kind": "meta",
+   "koText": "1일 6회, 1회 1포(50ml) 씩을 물에 희석하여 섭취하십시오.",
+   "normalizedKoText": "1일6회·1회1포(50ml)씩을물에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d4eefeab6f02c72b",
+   "kind": "clause",
+   "koText": "반드시 충분한 물과 함께 희석해서 섭취할 것 (액상제외)",
+   "normalizedKoText": "반드시충분한물과함께희석해서섭취할것(액상제외)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d5616aca646e2bb3",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2.8g{700mg×3정(가르시니아캄보지아추출물,노란 하얀~노란회색의 제피정제)+700mg×1정(녹차추출물, 회연두색의 제피정제)}을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회8g{700mg×3정(가르시니아캄보지아추출물·노란하얀~노란회색의제피정제)+700mg×1정(녹차추출물·회연두색의제피정제)}을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d590f0a46204af10",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2정을 충분한 물과 함께 섭취 or 1일 2회, 1회 1정을 충분한 물과 함께 섭취.",
+   "normalizedKoText": "1일1회·1회2정을충분한물과함께섭취or1일2회·1회1정을충분한물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d66fd919e3c444d7",
+   "kind": "meta",
+   "koText": "뚜껑을 개봉하여, 정제를 액상과 함께 섭취하십시오. (1일 1회, 1회 1병)",
+   "normalizedKoText": "뚜껑을개봉하여·정제를액상과함께섭취하십시오.(1일1회·1회1병)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d702d468024fa06c",
+   "kind": "meta",
+   "koText": "1일 3회 1회3캅셀씩 음용수 와 함께 섭취",
+   "normalizedKoText": "1일3회1회3캅셀씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "d96919435df02402",
+   "kind": "clause",
+   "koText": "유해산소로부터 세포를 보호하는데 필요,보스웰리아추출물: 관절 및 연골건강에 도움을 줄 수 있음 (생리활성기능 2등급)",
+   "normalizedKoText": "유해산소로부터세포를보호하는데필요·보스웰리아추출물:관절및연골건강에도움을줄수있음(생리활성기능2등급)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "db9e26fc554b53db",
+   "kind": "clause",
+   "koText": "제품의 일부 갈색.연한 자주색 등의 입자는 프로바이오틱스 및 농축.추출물분말이므로 안심하고 드셔도 됩니다.",
+   "normalizedKoText": "제품의일부갈색.연한자주색등의입자는프로바이오틱스및농축.추출물분말이므로안심하고드셔도됩니다",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc07b3d3a8d7ad83",
+   "kind": "label",
+   "koText": "판토펜산/비타민B1/비타민B2/비오틴",
+   "normalizedKoText": "판토펜산/비타민B1/비타민B2/비오틴",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc1b3392c6d7bc3c",
+   "kind": "meta",
+   "koText": "1일 1회,1회에 1.7g을 섭취/ 스포이드형 PET 병을 가볍게 3번 눌러서 섭취",
+   "normalizedKoText": "1일1회·1회에7g을섭취/스포이드형PET병을가볍게3번눌러서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc2c2f38546d05bd",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1스푼(10g)을 따뜻한 물에 희석하여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1스푼(10g)을따뜻한물에희석하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc2cd9aebeefa4fb",
+   "kind": "clause",
+   "koText": "특정질환(알레르기 체질 등)은 섭취에 주의",
+   "normalizedKoText": "특정질환(알레르기체질등)은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dc513eb6706ce6d6",
+   "kind": "meta",
+   "koText": "1일 1회 1포를 섭취하시고, 기호에 따라 물이나 주스와 함께 섭취하세요.",
+   "normalizedKoText": "1일1회1포를섭취하시고·기호에따라물이나주스와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dcc7667aa9966122",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(1.5g)를 직접 섭취하거나, 물, 음료 등과 같이 섭취한다.",
+   "normalizedKoText": "1일1회·1회1포(1.5g)를직접섭취하거나·물·음료등과같이섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dd1eed9af0128bf0",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g를 온수 또는 냉수에 타서 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1g를온수또는냉수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dda3c73181a7e0f5",
+   "kind": "meta",
+   "koText": "1일 1회 1캡슐을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회1캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dded9f6196794d7f",
+   "kind": "meta",
+   "koText": "1일 3회,1회 1스픈(1g)을 온수 또는 냉수에 타거나 직접 섭취 하십시오.",
+   "normalizedKoText": "1일3회·1회1스픈(1g)을온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "de5ccf9c9491ab0a",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 40g을 물, 우유 또는 두유 300ml에 잘 풀어서 섭취",
+   "normalizedKoText": "1일1회·1회40g을물·우유또는두유300ml에잘풀어서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "de956bcf92cafa32",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2포를 물 120~150ml에 잘 용해하여 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회2포를물120~150ml에잘용해하여섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dea5baacdc860702",
+   "kind": "meta",
+   "koText": "1일 1회,1회 1포(20 mL)를 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1포(20mL)를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "dfa177b09f80d7d4",
+   "kind": "clause",
+   "koText": "뼈 성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요",
+   "normalizedKoText": "뼈성에필요·에너지이용에필요·유해산소로부터세포를보호하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1669b0eb14dd54a",
+   "kind": "meta",
+   "koText": "1일 2회,1회 1포(7g)을 충분한 음용수와 함께 섭취한다.",
+   "normalizedKoText": "1일2회·1회1포(7g)을충분한음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1899e5412cb568e",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정씩 또는 1일 1회, 1회 2정씩을 음용수와 함께 섭취",
+   "normalizedKoText": "1일2회·1회1정씩또는1일1회·1회2정씩을음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1a110f2d9c725d2",
+   "kind": "clause",
+   "koText": "흡습성이 매우 높은 제품이므로 제품 개봉 후 내용물이 굳을 염려가 있으니 바로 섭취하십시오.",
+   "normalizedKoText": "흡습성이매우높은제품이므로제품개봉후내용물이굳을염려가있으니바로섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1b4d99887c14457",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 2캡슐(1,200mg)을 충분한 물과 함께 섭취하십오.",
+   "normalizedKoText": "1일3회·1회2캡슐(1·200mg)을충분한물과함께섭취하십오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1d520b0c41fe169",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캡슐(450mg)을 충분한 물과 함깨 섭취하십시오",
+   "normalizedKoText": "1일1회·1회1캡슐(450mg)을충분한물과함깨섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1d78eebc5461ae5",
+   "kind": "clause",
+   "koText": "고온다습한 환경에서의 사용을 가급적 삼간다. 직접섭취 시, 뜨거운 음식과 함께 섭취하지 않는다.",
+   "normalizedKoText": "고온다습한환경에서의사용을가급적삼간다.직접섭취시·뜨거운음식과함께섭취하지말것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e1e52df0cc75be7f",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 온수 1컵(80∼100㎖)에 홍삼농축액 1스푼 (약 1g)을 넣은 후 필요에 따라 설탕 및 꿀을 넣어서 음용할 것",
+   "normalizedKoText": "1일3회·1회온수1컵(80∼100㎖)에홍삼농축액1스푼(약1g)을넣은후필요에따라설탕및꿀을넣어서음용할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e3800f543abf3d06",
+   "kind": "meta",
+   "koText": "1일 1회, 동봉된 스푼으로 3스푼(3g)을 직접 또는 냉,온수에 타서 섭취 하십시오.",
+   "normalizedKoText": "1일1회·동봉된스푼으로3스푼(3g)을직접또는냉·온수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e47aabb6f4904aa8",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 4정을 오전에 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회4정을오전에물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e48a811ebe5249b0",
+   "kind": "meta",
+   "koText": "250mg / 1일 2회, 1회 2캡슐을 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "250mg/1일2회·1회2캡슐을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e495ed5b36d6e95a",
+   "kind": "meta",
+   "koText": "1일 2회 1회 1정(750mg)을 물과 함께 또는 씹어서 섭취하십시오.",
+   "normalizedKoText": "1일2회1회1정(750mg)을물과함께또는씹어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e4ebd384a6a58dd5",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1캅셀을 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1캅셀을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e5a194b3893d8208",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 40g을 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회40g을물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e67ce15049de8fd2",
+   "kind": "clause",
+   "koText": "질병 치료 중인 분은 섭취에 주의하십시오.",
+   "normalizedKoText": "질병치료중인분은섭취에주의할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e6d5a807baa5e7d2",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(25g)를 적당량(150~200mL)의 물에 타서 섭취하시기 바랍니다.",
+   "normalizedKoText": "1일1회·1회1포(25g)를적당량(150~200mL)의물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e6fc1f613b004a86",
+   "kind": "meta",
+   "koText": "1일2회, 1회캡슐을 물과함께 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회캡슐을물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e749b784df65b9a4",
+   "kind": "clause",
+   "koText": "알러지 체질일 경우 성분을 확인하신 후 섭취할 것",
+   "normalizedKoText": "알러지체질일경우성분을확인하신후섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e7f897ab8a4e43dd",
+   "kind": "clause",
+   "koText": "정제나 캡슐은 원료의 특성에 따라 색이 변할수 있으나 품질에는 영향이 없는 자연스러운 현상이므로 안심하고 섭취하십시오.",
+   "normalizedKoText": "정제나캡슐은원료의특성에따라색이변할수있으나품질에는영향이없는자연스러운현상이므로안심하고섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e8fd44a76e880659",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(병)를 물에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(병)를물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e93675dbc8f81f9d",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 한스푼 (1g)씩 먹는 물에 타거나 직접 섭취하십시오.15세 이하의 어린이는 위 섭취량의 절반 정도를 섭취하십시오.",
+   "normalizedKoText": "1일2회·1회한스푼(1g)씩먹는물에타거나직접섭취하십시오.15세이하의어린이는위섭취량의절반정도를섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "e9948af4c6849262",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 5환을 충분한 양의 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회5환을충분한양의물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ea5f4639af4f2e73",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(7 g)를 충분한 물과 함께 섭취 하십시오.",
+   "normalizedKoText": "1일1회·1회1포(7g)를충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ea72b2ea384b2c37",
+   "kind": "label",
+   "koText": "비타민B1, 비타민B2,루테인지아잔틴복합추출물",
+   "normalizedKoText": "비타민B1·비타민B2·루테인지아잔틴복합추출물",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "eb5cf904d90540d8",
+   "kind": "meta",
+   "koText": "1일1회, 1회 3정(900mg)을 씹어서 섭취하여 주십시오.",
+   "normalizedKoText": "1일1회·1회3정(900mg)을씹어서섭취하여주십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ec5a435b6fb6a185",
+   "kind": "meta",
+   "koText": "동봉된 스푼을 이용하여 1일3회, 1회당 한스푼(1g 상당)씩 온수 또는 냉수 80ml에 넣고 저은 후 섭취하십시오.",
+   "normalizedKoText": "동봉된스푼을이용하여1일3회·1회당한스푼(1g상당)씩온수또는냉수80ml에넣고저은후섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ee0269fa99d8d205",
+   "kind": "meta",
+   "koText": "1일 1회 , 1회 1캡슐을 물과 함께 섭취",
+   "normalizedKoText": "1일1회·1회1캡슐을물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "eec97dd55959db0d",
+   "kind": "clause",
+   "koText": "갱년기 여성의 건강에 도움을 줄 수 있음(기타기능Ⅱ)",
+   "normalizedKoText": "갱년기여성의건강에도움을줄수있음(기타기능Ⅱ)",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f0335cfe94e374ac",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 3g(동봉된 스푼 이용)을 직접 또는 온수나 냉수에 타서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회3g(동봉된스푼이용)을직접또는온수나냉수에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f151e4985fd93761",
+   "kind": "meta",
+   "koText": "해당 분말을 캡슐, 분말 등의 제형으로 만든 후, 물과 함께 섭취 혹은 직접 섭취",
+   "normalizedKoText": "해당분말을캡슐·분말등의제형으로만든후·물과함께섭취혹은직접섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f15ef6c2adfb03aa",
+   "kind": "meta",
+   "koText": "이미, 이취가 없으며 고유의 향미를 지닌 미황색 유상내용물을 함유한 투명 연질캡슐.",
+   "normalizedKoText": "이미·이취가없으며고유의향미를지닌미황색유상내용물을함유한투명연질캡슐",
+   "category": "META",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f17c0a02c69cda3f",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 3 g을 충분한 물과 함께 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회3g을충분한물과함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f1cb381e2f0303d4",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(3g)을 음용수와 함께 섭취",
+   "normalizedKoText": "1일1회·1회1포(3g)을음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f212496d8c423e1f",
+   "kind": "clause",
+   "koText": "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 * 프로바이오틱스 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음",
+   "normalizedKoText": "항산화작용을하여유해산소로부터세포를보호하는데필요*프로바이오틱스유산균증식및유해균억제·배변활동원활·장건강에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f25ebe6659499ab0",
+   "kind": "clause",
+   "koText": "항산화 작용을 하여 유해산소로부터 세포를 보로하는데 필요",
+   "normalizedKoText": "항산화작용을하여유해산소로부터세포를보로하는데필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f270a7390a5d30b3",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1스푼(1g)을 온수 또는 냉수에 타거나 직접 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1스푼(1g)을온수또는냉수에타거나직접섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f2d931ea2e6cd1ed",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포를 물 250~300mL에 희석하여 섭취.",
+   "normalizedKoText": "1일1회·1회1포를물250~300mL에희석하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f47f907620decb2f",
+   "kind": "clause",
+   "koText": "특이체질 등 알러지 체질의 경우 성분을 확인하시고 섭취하십시오.",
+   "normalizedKoText": "특이체질등알러지체질의경우성분을확인하시고섭취할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f6129600156b8c4d",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(2g)을 온수 또는 냉수에 타서 섭취",
+   "normalizedKoText": "1일1회·1회1포(2g)을온수또는냉수에타서섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f6a8ca01c558bda1",
+   "kind": "meta",
+   "koText": "-성인1일1회1포 3g을 씹어먹거나, 냉수 또는 온수에 타서 드십시오. -15세이하는 성인의 절반정도 드십시오",
+   "normalizedKoText": "-성인1일1회1포3g을씹어먹거나·냉수또는온수에타서드십시오.-15세이하는성인의절반정도드십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f6b976b45ee33810",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포 씩 섭취해 주십시오.",
+   "normalizedKoText": "1일1회·1회1포씩섭취해주십시오",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f78c9cdac60cafe1",
+   "kind": "clause",
+   "koText": "수술 전후, 출혈성 질환이 있거나 의약품(항응고제) 복용 시 전문가와 상담하신 후 섭취하신시오.",
+   "normalizedKoText": "수술전후·출혈성질환이있거나의약품(항응고제)복용시전문가와상담하신후섭취하신시오",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f812508956ff162b",
+   "kind": "meta",
+   "koText": "동봉된 스푼을 이용하여 1일 2회, 1회당 한스푼(1g 상당)씩 온수 또는 냉수 80ml에 넣고 저은 후 섭취",
+   "normalizedKoText": "동봉된스푼을이용하여1일2회·1회당한스푼(1g상당)씩온수또는냉수80ml에넣고저은후섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f846fd3a3c810ab2",
+   "kind": "meta",
+   "koText": "[스틱] 1일 1회, 1회 1포를 물에 타서 섭취하십시오. [병 포장] 1일 1회, 1회 30g(약 4스푼)을 물에 타서 섭취하십시오.",
+   "normalizedKoText": "[스틱]1일1회·1회1포를물에타서섭취하십시오.[병포장]1일1회·1회30g(약4스푼)을물에타서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f8a0ab4822e20d57",
+   "kind": "meta",
+   "koText": "동봉된 스푼을 이용하여 1일3회 1회 네스푼(4g)씩 온수 또는 냉수 80ml에 넣고 저은 후 섭취하시기 바랍니다.",
+   "normalizedKoText": "동봉된스푼을이용하여1일3회1회네스푼(4g)씩온수또는냉수80ml에넣고저은후섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f8a79ea89f23a481",
+   "kind": "meta",
+   "koText": "1일3회,1회 100g을 우유,두유,생수및 기타음료와 함께 흔들어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회100g을우유·두유·생수및기타음료와함께흔들어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f8b2857e6f8b9811",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 3캅셀씩 음용수와 함께 섭취한다.",
+   "normalizedKoText": "1일1회·1회3캅셀씩음용수와함께섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "f947e919b810659b",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1스푼(1g)을 한잔의 냉수 또는 온수에 넣은 후 잘 저어서 섭취하십시오.",
+   "normalizedKoText": "1일3회·1회1스푼(1g)을한잔의냉수또는온수에넣은후잘저어서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fa3a0ec10a33659c",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1g을 식후에 물이나 음용수와 함께 섭취",
+   "normalizedKoText": "1일1회·1회1g을식후에물이나음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fb2ab7cd2ab37290",
+   "kind": "clause",
+   "koText": "에너지 생성에 필요,철 – 체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요",
+   "normalizedKoText": "에너지생성에필요·철–체내산소운반과혈액생성에필요·에너지생성에필요",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fb63d6b1db095b82",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 2캅셀을 식후에 물과 함께 섭취",
+   "normalizedKoText": "1일2회·1회2캅셀을식후에물과함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fc65a39cf2aec4ee",
+   "kind": "clause",
+   "koText": "게에 알레르기가 있는 사람은 섭취에 주의",
+   "normalizedKoText": "게에알레르기가있는사람은섭취에주의",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fd7a6a71104c7278",
+   "kind": "clause",
+   "koText": "의약품(항응고제, 향혈소판제, 혈압강하제 등) 복용 시 전문가와 상담할 것",
+   "normalizedKoText": "의약품(항응고제·향혈소판제·혈압강하제등)복용시전문가와상담할것",
+   "category": "CAUTION",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fdc7ec6d29117c99",
+   "kind": "meta",
+   "koText": "1일 3회, 1회 1g 정도를 냉수 또는 온수에 용해하여 섭취",
+   "normalizedKoText": "1일3회·1회1g정도를냉수또는온수에용해하여섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fdfd62f8b333b949",
+   "kind": "meta",
+   "koText": "섭취량은 1일 3회 5.4ml, 동봉된 스포이드를 이용하여 1회에 63~65방울(1.8ml)을 구강내 섭취",
+   "normalizedKoText": "섭취량은1일3회4ml·동봉된스포이드를이용하여1회에63~65방울(1.8ml)을구강내섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "fe59d17c1e5c64d5",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 2스푼 (34g)을 물 120~150ml에 잘 용해하여 섭취하십시오. (1스푼 17g)",
+   "normalizedKoText": "1일1회·1회2스푼(34g)을물120~150ml에잘용해하여섭취하십시오.(1스푼17g)",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ff1b48d4e819d8ee",
+   "kind": "label",
+   "koText": "핑거루트추출분말(판두라틴)(제2013-5호)",
+   "normalizedKoText": "핑거루트추출분말(판두라틴)(제2013-5호)",
+   "category": "LABEL",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ffb198cd94f7fb71",
+   "kind": "clause",
+   "koText": "혈중 콜레스테롤 개선",
+   "normalizedKoText": "혈중콜레스테롤개선",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ffbec95d51763f72",
+   "kind": "clause",
+   "koText": "난소화성말토덱스트린 - 배변활동 원활에 도움을 줄 수 있음",
+   "normalizedKoText": "난소화성말토덱스트린-배변활동원활에도움을줄수있음",
+   "category": "CLAUSE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ffc92212120c8aa2",
+   "kind": "meta",
+   "koText": "1일 2회, 1회 1정씩 음용수와 함께 섭취 또는 1일1회, 1회2정씩 음용수와 함께 섭취",
+   "normalizedKoText": "1일2회·1회1정씩음용수와함께섭취또는1일1회·1회2정씩음용수와함께섭취",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  },
+  {
+   "uniquePhraseId": "ffdd916eb3ebab26",
+   "kind": "meta",
+   "koText": "1일 1회, 1회 1포(80ml)을 직접 섭취하시거나 따뜻하게 데워서 섭취하십시오.",
+   "normalizedKoText": "1일1회·1회1포(80ml)을직접섭취하시거나따뜻하게데워서섭취할것",
+   "category": "USAGE",
+   "documentCount": 1,
+   "documentsWithOneMissingPhrase": 1
+  }
+ ]
+}

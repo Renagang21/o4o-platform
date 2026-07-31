@@ -1,0 +1,37 @@
+{
+ "verifiedAt": "2026-07-31T23:09:21.031Z",
+ "readOnly": true,
+ "separateSession": true,
+ "dbWrites": 0,
+ "population": 2630,
+ "expected": 2630,
+ "matches": true,
+ "blockers": {
+  "NO_ENTRY": 2614,
+  "NUMBER_ONLY": 16
+ },
+ "falseGate": 0,
+ "cleanBlocked": 0,
+ "lastPhraseSet": 690,
+ "expectedUnlock": 853,
+ "translatedThisRound": 0,
+ "expectedUpdate": 0,
+ "actualUpdate": 0,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "koCanonicalDrift": 0,
+ "globals": {
+  "spd_all": 121691,
+  "ko_canon": 40918,
+  "en_canon": 17066,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 23852,
+  "en_without_fn": 22
+ },
+ "globalsOk": true,
+ "holdDup": 0,
+ "statusSum": 2630,
+ "sum2630": true,
+ "verdict": "PASS"
+}
