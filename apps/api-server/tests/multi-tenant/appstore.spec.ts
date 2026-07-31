@@ -50,7 +50,8 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(appIds).toContain('dropshipping-cosmetics');
             expect(appIds).toContain('sellerops');
             expect(appIds).toContain('supplierops');
-            expect(appIds).toContain('cosmetics-partner-extension');
+            // WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1: canonical appId 정합화
+            expect(appIds).toContain('cosmetics-partner');
 
             // Global apps available to all
             expect(appIds).toContain('organization-forum');

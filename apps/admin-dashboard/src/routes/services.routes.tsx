@@ -34,7 +34,10 @@ export function ServiceRoutes() {
     // Cosmetics Partner Extension - Partner/Influencer for Cosmetics
     <Route key="/cosmetics-partner/*" path="/cosmetics-partner/*" element={
       <AdminProtectedRoute requiredRoles={['partner', 'admin']}>
-        <AppRouteGuard appId="cosmetics-partner-extension">
+        {/* WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1:
+            canonical appId = 'cosmetics-partner' (운영 app_registry · seed · 내부 AppGuard 기준).
+            기존 'cosmetics-partner-extension' 은 레지스트리에 없어 항상 app-disabled 로 차단됐다. */}
+        <AppRouteGuard appId="cosmetics-partner">
           <Suspense fallback={<PageLoader />}>
             <CosmeticsPartnerRouter />
           </Suspense>

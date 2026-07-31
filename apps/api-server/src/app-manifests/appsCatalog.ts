@@ -347,7 +347,12 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     incompatibleWith: ['dropshipping-yaksa'], // 다른 dropshipping extension과 충돌
   },
   {
-    appId: 'cosmetics-partner-extension',
+    // WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1:
+    //   canonical appId 를 'cosmetics-partner' 로 확정한다.
+    //   운영 app_registry / seed(SeedDefaultApps) / 내부 AppGuard 가 이미 이 값을 쓰고 있었고,
+    //   카탈로그·라우트 가드만 'cosmetics-partner-extension' 으로 남아 화면이 항상 차단됐다.
+    //   (동명 패키지는 존재하지 않으며, 카탈로그에 'cosmetics-partner' 중복 항목도 없다.)
+    appId: 'cosmetics-partner',
     name: 'Cosmetics Partner Extension',
     version: '1.0.0',
     description: '화장품 파트너/인플루언서 관리 - 루틴 추천, 샘플 관리, AI 도구',
@@ -380,7 +385,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'supplier', 'brand', 'price', 'campaign'],
     type: 'extension',
-    dependencies: { 'dropshipping-core': '>=1.0.0', 'dropshipping-cosmetics': '>=1.0.0', 'cosmetics-partner-extension': '>=1.0.0' },
+    // WO-O4O-ADMIN-COSMETICS-PARTNER-APPID-CANONICAL-ALIGNMENT-V1: 의존 대상 appId 정합화
+    dependencies: { 'dropshipping-core': '>=1.0.0', 'dropshipping-cosmetics': '>=1.0.0', 'cosmetics-partner': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'supplierops'],
   },
