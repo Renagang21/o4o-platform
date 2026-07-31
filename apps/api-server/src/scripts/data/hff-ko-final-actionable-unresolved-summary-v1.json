@@ -1,0 +1,11 @@
+{
+ "builtAt": "2026-07-31T12:43:29.949Z",
+ "total": 80,
+ "byReason": {
+  "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL": 10,
+  "CANONICAL_STRUCTURE_REQUIRES_REDESIGN": 11,
+  "OFFICIAL_SOURCE_CONFLICT": 58,
+  "BOUNDARY_REQUIRES_HUMAN_APPROVAL": 1
+ },
+ "note": "공식 원천 부재 343건은 본 큐에 포함하지 않는다(동결 유지)."
+}

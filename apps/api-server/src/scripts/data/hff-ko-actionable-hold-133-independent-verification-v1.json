@@ -1,0 +1,40 @@
+{
+ "verifiedAt": "2026-07-31T12:43:29.952Z",
+ "readOnlySession": true,
+ "targets": 51,
+ "newHashMatch": 51,
+ "oldHashRemains": 0,
+ "rollbackReversalOk": 51,
+ "clauseMissing": 0,
+ "outsideTargetDrift": 0,
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "canon_dup": 0
+ },
+ "enDocsTouched": 0,
+ "newCanonicals": 0,
+ "productMastersCreated": 0,
+ "candidateLinks": 0,
+ "statusSum": 133,
+ "statusSumMatches133": true,
+ "tally": {
+  "FINAL_HOLD_INGREDIENT_OWNERSHIP_AMBIGUOUS": 10,
+  "FINAL_HOLD_CANONICAL_STRUCTURE_UNSAFE": 11,
+  "FINAL_HOLD_SOURCE_CONFLICT": 58,
+  "FINAL_HOLD_BOUNDARY_AMBIGUOUS": 1,
+  "SAFE_UPDATE": 51,
+  "RESOLVED_NO_CHANGE": 2
+ },
+ "finalUnresolved": 80,
+ "unresolvedByReason": {
+  "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL": 10,
+  "CANONICAL_STRUCTURE_REQUIRES_REDESIGN": 11,
+  "OFFICIAL_SOURCE_CONFLICT": 58,
+  "BOUNDARY_REQUIRES_HUMAN_APPROVAL": 1
+ },
+ "verdict": "PASS",
+ "failedChecks": []
+}

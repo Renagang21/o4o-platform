@@ -1,0 +1,416 @@
+{
+ "builtAt": "2026-07-31T12:42:14.276Z",
+ "wo": "WO-O4O-HFF-KO-FINAL-ACTIONABLE-HOLD-133-HUMAN-RESOLUTION-V1",
+ "expectedUpdate": 51,
+ "reversal": "newBlock → oldBlock 치환 후 sha256 == oldContentHash",
+ "targets": [
+  {
+   "canonicalId": "442ff030-e298-42a8-a806-03f5453635fc",
+   "productMasterId": "1edb7cb1-985a-45f4-ba0d-b692659edd95",
+   "oldContentHash": "859a8158674ad6a13e7d38591095e8ac32942a86789b09f45a39abc1b8247e9d",
+   "newContentHash": "7bda76d0b851ddcc00bdc22d5694c1a7f68d71f46b06918fcbb8b495e290cb1e",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음 (: N-아세틸글루코사민으로서 0.5~1 g)</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "ca8069d9-a023-40f5-a92b-d2c0743b5a94",
+   "productMasterId": "5ff689b6-60cd-40ac-92f3-f9ba6a05dc98",
+   "oldContentHash": "62b8dc7a50c1cea43534421e321da24bf7b2df71076932a0d50f2633eddce5d0",
+   "newContentHash": "762db7d2b06df869159e321ddde8a5c068eca106eef42cbc9a01dd04c7c51834",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음 (: N-아세틸글루코사민으로서 0.5~1 g)</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "fbce8a42-2e72-49f0-b53b-3e9d3f0498f0",
+   "productMasterId": "6dc01a36-252a-48aa-955a-08a244aa8181",
+   "oldContentHash": "ba33510dcf0911a10b7a3561637dea1353b9762d22cdf92cfad5f526268c5958",
+   "newContentHash": "1552ad4ff5b08497e5c60ec364a4360da4ff8eb46d01fd0e54cbfe1661c4421f",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "5db06f7c-dd23-48c1-a9c1-c7e436fffbf2",
+   "productMasterId": "f9e416f7-8918-4a7c-85d9-e36ff65f31c1",
+   "oldContentHash": "dfc09c36396b77a614a15015e6084a60906540dc86d01d87fcc45ff88fdedb63",
+   "newContentHash": "23d7ef8268a32321a94af31187caa9999b073a9a9a487bd1a2e4519c9f4a37c0",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음 (: N-아세틸글루코사민으로서 0.5~1 g)</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "42792a05-0aa6-46a5-b9fb-0a90bd9fc446",
+   "productMasterId": "89db5041-8055-4690-8c6f-dd3fe9f84dae",
+   "oldContentHash": "81e7ff26b34cbdcedd25869901f10aaf9f54163f6a38c904bc3e2a66be909185",
+   "newContentHash": "1de5e07ce4a45d3d0bbfe1c2b61be02e7b3009e0d5b92f8898aad6223ff7cbbf",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>비타민E : 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>나이아신 : 체내 에너지 생성에 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "f76dc35a-cdd4-4d3f-ae99-72b61f872f41",
+   "productMasterId": "7fefe343-7eca-4268-925a-9f15c5e2f287",
+   "oldContentHash": "247fd6a27459dc1f7797ec12cef9258a12733c511507a9edcd1b0efd54e9a8b9",
+   "newContentHash": "7eb097af843f49ad85903aed222164be30c68b8eabfa95433fc66df38c52697c",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>콜라겐펩타이드</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>저분자콜라겐펩타이드GT(제2022-6호) : (국문) 피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li><li>히알루론산 : 피부보습에 도움을 줄 수 있음</li><li>셀레늄 : 유해산소로부터 세포를 보호하는데 필요</li><li>판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>비오틴 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "b47d67b0-1f4e-489d-8dc9-b7ef15fe2f1c",
+   "productMasterId": "26fc88d4-48d3-479e-9c0a-b47fc3c60af0",
+   "oldContentHash": "3e51b7cd5badc475be02a825aaed3d56b1cf68b6e1100d0c5b069ff7a932b1d4",
+   "newContentHash": "1d6f7b758a74c084f0e513439c6af72758e87fb65f6c0a7ba5bd354690a156a2",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "3783c11c-ff7c-42f3-9330-a45cd83d29f7",
+   "productMasterId": "79bb3fc4-0393-444b-b9b4-db535ffca1d8",
+   "oldContentHash": "c5a1beb5a12d403d70b21bbf619baa51f029416bd5abe8b1de6c2ae689be415a",
+   "newContentHash": "69d1aa21eeecf33f8a21ed2e5acdf035d4b4eb9de4f5989872002a78c7ade1d0",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>탄수화물과 에너지 대사에 필요</li><li>체내 에너지 생성에 필요</li><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "912deda6-995f-4318-9da6-6737e6f5f220",
+   "productMasterId": "ba82f900-e5d7-480c-a11b-3c4e33189b8e",
+   "oldContentHash": "85a395ad3920854c9f5c764caf749f22ada81d8786c1875d8eab4193108f236a",
+   "newContentHash": "d8908731aadf214faaef5b74fdacaa57d5343b5a2edf124209498ec5afad12e6",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "338e2292-6037-4014-82b9-5a21a84b528c",
+   "productMasterId": "076906fd-4bd8-4b5d-aa58-4e5acc44de4d",
+   "oldContentHash": "d7d73e4d5e1bfc0bb5b7170e282ac0a712b597705335d8e3d3742cc64b21b81a",
+   "newContentHash": "3ebed60cb6a17e14c6533a4bdb82a2b69bad90af55a8ab739eaa07761f3bc0fe",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>엠에스엠(MSM, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "1a4a6afa-862e-4e2d-989e-84333a4a5dcf",
+   "productMasterId": "091f1860-7b5b-4c8d-b59b-7fc8074a32e4",
+   "oldContentHash": "0132c92da4845bc49def72a14d68603006202fe02f4fac3797589d848526cc5b",
+   "newContentHash": "bd27aeb5a42edae9c2c2683f7e98be54cc273d31696493952358fb1cfbd15b28",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "0a44c175-d1e6-4612-94ef-66b7582f90c4",
+   "productMasterId": "71d40307-d04b-4fd9-964e-2c684a9d4fad",
+   "oldContentHash": "e43abef7eb51d75d176de8474b020cda8516176946d7cb23a8ace1fd04fece8c",
+   "newContentHash": "10d1030ba2a5a7c0f91f0b1d3cf2646e264e0d05b48bf920ea48f0c239cefde0",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "cf91a27d-3e83-4c09-a930-701728269fa0",
+   "productMasterId": "1c4bcd93-30f5-4c43-9302-655aff2c015f",
+   "oldContentHash": "cb76806bcf87cdba235113596a9e331485442359abf6cfdb5718d20f475c68e1",
+   "newContentHash": "b8dcd9d0089bb61673b8ea83d7125c5fa6ca172a2e7435b58a246d8b81db4c14",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음\n -피부보습에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li><li>피부보습에 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "fbf5c109-3a65-4015-94f5-ed30d5d0188c",
+   "productMasterId": "9563eb69-5e2d-46e5-9e37-249e4469707e",
+   "oldContentHash": "251aa22bb106be721591f0186503b0cc1c00ee3e0b549524ff79a6985e60eefd",
+   "newContentHash": "9a7f16f3f7ccaeb36c1936e4e1717383871c93abecf8219415b1f8625d437fe2",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "8b88f04f-14dc-4872-a3c5-e6516dec3d14",
+   "productMasterId": "8e4d9371-4b25-41cc-96ef-49059ba63e9d",
+   "oldContentHash": "b5d8da76debd7a0b7303e98c96e161f5619272afd9b746c9eb2f73278b4b4587",
+   "newContentHash": "6f35b3fd9bd2ffd1d1d0be1b2cb93df8b2d65c5219ac2649e2af7f903bfc14b9",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "9f46dba4-849d-4f35-8d52-24fa38fb4304",
+   "productMasterId": "130b3285-3857-4cb5-b382-621ffa5ebf7a",
+   "oldContentHash": "16ee080d6e0288098c78e5db307a69ccb07b3009d1b0cf3cbce14361741f4f41",
+   "newContentHash": "d4bffff52a47471fe0e691de016b6971da9c9c0f127791f784e1e41c230dfb1e",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "cf11f905-1b07-4980-8f17-422854309c74",
+   "productMasterId": "660a47d2-310a-48bf-a1ce-8253ce514777",
+   "oldContentHash": "0e41a65c632fed94fd49ffa79a345c263155e395a0d76b99bcd7041028798416",
+   "newContentHash": "a268682e9791b67a3c136aa54e2b1e217b0a25f77942a8bb71b317725ca4c943",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "5cd57865-2e78-4823-936a-c537bc363a4f",
+   "productMasterId": "bba27e2d-b5f7-49d4-89a3-8c016fb6583b",
+   "oldContentHash": "83ffdc9e8fe84054334a6cb96df049a5733be9e8fe18d1dd3389d35e6324cdfd",
+   "newContentHash": "b89a17364a7d73918aec1863708036b70508ac3041d0d9c280b58d733cf373cb",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "549c7e42-d029-4140-9b7a-53c3aeafeb5f",
+   "productMasterId": "a7abe934-97e7-44d3-8cdf-f4a3f7b9eb44",
+   "oldContentHash": "2eb677c03929e6f32e23de64467fc3388816107b2e33becbbeda762edb18f593",
+   "newContentHash": "adba1a51dd0b97b169a70d4dbf8f3d24aee41bd907669ecb4abdfb82748be309",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>모로오렌지추출분말(Morosil®)(제2021-7호)</b><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>바나바잎추출물</b><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "4cd6f9a2-cb72-452d-b237-fde5c6b25d33",
+   "productMasterId": "00712243-a341-4ee5-a212-2a72fa4e31ea",
+   "oldContentHash": "4b1261a496ec422f145ba96f0b807c30a32124d4f1a8d448c8147eafef9a60fb",
+   "newContentHash": "a86349976b64e085841e5ab1bfcef25b253b7f29aaec2158f780f3a8dc4c1d03",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>모로오렌지추출분말(Morosil®)(제2021-7호)</b><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>바나바잎추출물</b><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "fe1e7b97-b098-4ef9-acc0-86472bfd2fce",
+   "productMasterId": "129880c1-2ee0-4aa6-8fba-2c98c2826c6e",
+   "oldContentHash": "849f337e4df97c7c4a5f16634e7b0530b34d1bbb1694ed8d1e3b6ab482df0156",
+   "newContentHash": "3eb1d420f5b99bed0f5726551fd7b88f6ef50f2a8fa638f4c1f4a3dc56a03329",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>오메가3</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음 2.건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "99b069bf-5531-4097-9941-385453f3383d",
+   "productMasterId": "199b7a4a-7740-4a35-8fea-363d5bee79aa",
+   "oldContentHash": "f83e1d00834bba19c12fb776e7f73551dfb471879f44d0733340a2547acde48a",
+   "newContentHash": "7577a150bfa8066b730cb449a150579a9038cf863381c8a181c8e43a53015cab",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>단백질 대사와 에너지 생성에 필요\n\n \n피부 보습에 도움을 줄 수 있음\n자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>저분자 피쉬 콜라겐 펩타이드 (Naticol® BPMG)(제2023-25호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "202b5c1a-1350-419d-af52-f41ba0882632",
+   "productMasterId": "3143f835-1c40-41ab-84c8-5e846e7474d2",
+   "oldContentHash": "776afb62162d4baf9cfa7e16435688fbd93281391314e4ff534af9a6b71f03ad",
+   "newContentHash": "6ec735ce9baf9db2d1335393a3799af3492bf385afad0390366fd3c23a9901a4",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul>\n  "
+  },
+  {
+   "canonicalId": "944d311d-fb8f-4797-b7fa-8d8835b86dc4",
+   "productMasterId": "a5166e1a-65cc-46c2-a26c-699fe8216bcd",
+   "oldContentHash": "a074db45fbeed25881dc9825e4806b7137422817a90347beaba8c7b0c733ade7",
+   "newContentHash": "96cd36513ae42ca346cd95916273e23996770358d0e65b3fb041897c7a9e1ebf",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "687b309d-ca57-422b-b115-64f639453873",
+   "productMasterId": "60415323-d241-4e36-b92e-56ddb19b5874",
+   "oldContentHash": "76fc042f82dfacdad63f95107eb2e49e8ee6e434148313edf25544b168e84e99",
+   "newContentHash": "22cc5e7182de19d7f70ece4a71b12cfd640aeb10ff442662addb4a19695676b1",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul>\n  "
+  },
+  {
+   "canonicalId": "a85fedd1-aeca-42df-93bd-6c435c6e910e",
+   "productMasterId": "8685ccfe-d140-4828-8276-470ac77ab28c",
+   "oldContentHash": "d59389fe316b6bcda0d17ebaa6b0bf8f8a5221b0752326718790829bad739075",
+   "newContentHash": "92306b3ebf7631fee6d6ad732cf24d003ec40d6e271bb9944f9a8b8a4122cd99",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>난소화성말토덱스트린 : 식후 혈당상승 억제·혈중 중성지질 개선·배변활동 원활에 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>L-카르니틴타르트레이트 : 체지방 감소에 도움을 줄 수 있음</li><li>운동으로 인한 피로 개선에 도움을 줄 수 있음.</li><li>난소화성말토덱스트린 : 식후 혈당상승 억제·혈중 중성지질 개선·배변활동 원활에 도움을 줄 수 있음.</li></ul>\n  "
+  },
+  {
+   "canonicalId": "a07cba24-92e9-4a37-91e3-e59c97e9e74e",
+   "productMasterId": "eaa29a8c-e5ec-4360-93c7-8a7fdea9705c",
+   "oldContentHash": "89648b5ce7eac459fab3874b23a91e39b1bf1a919936165bd12f8cea5e1c95e5",
+   "newContentHash": "5e4b615fad1d561ea867a1d0fb275be6fb4c10058b3093b8fa11e41677a64123",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "018890bc-1c17-44cd-aa96-2c233b898b6f",
+   "productMasterId": "226489ec-6f23-4e81-9565-0aeb4fad16da",
+   "oldContentHash": "c5a3ab748e8980a294ce31014bf679edb8a3346874db2e7387aef6a879e23af4",
+   "newContentHash": "f634ea31b5c64c1ccef438da88c6c6080663b1fc822586cdc73463b7bde72bfe",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "d82f3a3d-5b7c-4016-884d-3e47bdcb89b8",
+   "productMasterId": "df8e436a-6364-4349-8b0f-41c60da1e6e7",
+   "oldContentHash": "5fab7e23f2aa163c44f7e33a3ab2d1eff570ca50f4a826bba7df1be9144b1618",
+   "newContentHash": "c377ad6a95dd3b7b7bdfc91b256bb7b849709f2d02007e148349ef4ff267f9d8",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "522f3482-9de5-4fdc-8118-0528e95007ee",
+   "productMasterId": "d56bb3e9-009b-47dc-954e-30e8d6f3367a",
+   "oldContentHash": "42540262a84ac475f79fdfd862cccbf4f4cc9bfed92bea3726dd25d0dce0239b",
+   "newContentHash": "bb260c818a7ef8c0ad33fdcfd142c31488782e0c50913623374ca49a4db79a89",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "6ffa240e-ee2b-4928-ab40-627f8ab35b88",
+   "productMasterId": "284975ff-7b3b-4b8d-8b27-22ddbac8f973",
+   "oldContentHash": "e44e6aee278a5c0f867b68b87294ac2f15aa54fdc056aefe7d79a86bde23fa3a",
+   "newContentHash": "449834da1ed81f4ed73ca3dafcb7649b7b98a60f222c6dd94b97a548f949eaaa",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "5b5eb0c1-445b-4e43-8759-673819902b55",
+   "productMasterId": "71fce03e-f22d-495d-aff2-88bd93f72008",
+   "oldContentHash": "c405026269ce99feff95268efbd142a4b04b3877dc6b75cc68be96e4b10c599a",
+   "newContentHash": "f6ab3c44033c2f657c9539150ff48b6a1ce9e1241c36d2af9dcda858737f4f06",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2013-30호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "28a4194f-8dc8-4b03-938c-e6ce230e699c",
+   "productMasterId": "1c49fbe1-378a-47dc-bb5a-1585de2c7b8b",
+   "oldContentHash": "cde1938b72f4429fce459cfdf7816d747eb38eb2230df93def368159bfd9e54b",
+   "newContentHash": "03ebcd6953ab17b4b48d0719c733c440d6bfc888ac580d34ec581a7a0c3e1690",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "98e2cad9-304f-4869-bb5d-3cf8fb01b32f",
+   "productMasterId": "f0b5ccd0-8dc4-4e4c-83f2-7baae582c2b2",
+   "oldContentHash": "d8e3730e1ae306761754ffcbbb154f487250f945f26e29f73493f2ae2a95988d",
+   "newContentHash": "e68a9bf07fbf4aabc71f13bb6dd9250931f41f990a8e8e27635fbbeec3fea1a3",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "b4915e93-1c41-484a-b9b1-eec5ec5b3308",
+   "productMasterId": "5c33db7b-ba79-4372-b3d4-5afbdd440fb7",
+   "oldContentHash": "7baabe2fd0748227af5ccc9c294ece01045f0356fa9d1ff2fe426c3c2755b758",
+   "newContentHash": "48a817114de476ccf075a3a5b37f1bf234cb7a8d85c287c964aca49b8bef1f7c",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정 제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "a2b7dbc9-3747-492e-a901-2e70b7ad5063",
+   "productMasterId": "bf070c85-5656-4895-8534-b9925f4876a0",
+   "oldContentHash": "b7342f93be52037a7d51ee4ce4e116e8dfa7f3b9b7b3460a49038a738a05cfe6",
+   "newContentHash": "c54c878b5f58faa760279455bbab438cc75360a07f1f3cee5e32556682f36cc0",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(기능성원료인정제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "53c288a9-d39f-449e-b04c-42d009908671",
+   "productMasterId": "3613ceb9-44ac-4116-9bd7-2652251999e5",
+   "oldContentHash": "36476687ffe666c32f6ef7836b94232611275eb615635b8e3aa53f2ef6eadd5f",
+   "newContentHash": "5ca3108d62d4280740c22d088908db340718b07c76c0bf322f1ab88306745756",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-14호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "35905a7d-04ce-4d5d-b770-76399741ae34",
+   "productMasterId": "a7b56630-752f-490c-bbc2-40449a2ac9aa",
+   "oldContentHash": "1b70fff69c775b28b061cef16b326022b66f8c9bd853561ea3c4cfeac4154ff5",
+   "newContentHash": "f53985c1caaa1aef07db24403bb7cf18a383e18bbc1845e620bd2b597cb47cc5",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>ⓛ뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>ⓛ에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>ⓛ정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>ⓛ칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  "
+  },
+  {
+   "canonicalId": "8bdf509b-6e7d-42fa-a6bd-f5613f97ff57",
+   "productMasterId": "74235e01-524a-4ced-b65a-413b4b0a8fd3",
+   "oldContentHash": "f2d2088a6680c505f608dea774140111f44e9dc11aba61267f8d6b0cb256a9ef",
+   "newContentHash": "ca0041a49e9f02ba74c928d08867038dd1622f1b4f165becfc1a9c0de4dc802b",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차 카테킨</b><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음</li><li>체지방 감소에 도움을 줄 수 있음3. 혈중 콜레스테롤 개손에 도움을 줄 수 있음</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>항산화에 도움을 줄 수 있음 2.체지방 감소에 도움을 줄 수 있음3. 혈중 콜레스테롤 개손에 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "eacecdce-9ac6-468b-aa9c-ea3b4871acf3",
+   "productMasterId": "35895628-a874-4364-b754-c59760437f01",
+   "oldContentHash": "d36dd3ca0add8b92f8fd91a5a58f56e148d3833cbfa899fc444362d3400260f7",
+   "newContentHash": "c49089558dc37f40134b2bedf668402e2d11e288aeef9a7c6ddbdc6a631ff5eb",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>MSM(엠에스엠·디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li><li>피부보습에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>관절 및 연골 건강･피부보습에 도움을 줄 수 있음</li></ul>\n  "
+  },
+  {
+   "canonicalId": "7223312a-f49b-4ddd-9c5d-75a30848e546",
+   "productMasterId": "ef32d1be-2868-4763-bc25-7fc4bde2c3e9",
+   "oldContentHash": "afd71e9e4916cdb135f5f33f0df45e91f804667fd0fe69ba2b358689a25c3589",
+   "newContentHash": "ce2978da4b3766ff441fd95471f91a8125d54d69eb3546c74da5f21be8297b15",
+   "oldBlock": "<h2>마그네슘 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul>\n  ",
+   "newBlock": "<h2>마그네슘 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>마그네슘 : 1. 에너지 이용에 필요 2. 신경과 근육 기능 유지에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "112b5a6b-3730-4a09-94ed-42e8aed07e76",
+   "productMasterId": "4a23f1fe-e84f-487d-9a68-5c7d3e5136d5",
+   "oldContentHash": "3ac44d06f5dcd799ea2fb4bfa48bcd7055e944cfc0e157599062b352043beea7",
+   "newContentHash": "0ccf300e4213c70935cfb0f79a82171c533a4704024fe60b0d6334776427e344",
+   "oldBlock": "<h2>철 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>체내 산소운반과 혈액생성에 필요</li><li>에너지 생성에 필요</li></ul>\n  ",
+   "newBlock": "<h2>철 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>철 : 1. 체내 산소운반과 혈액생성에 필요 2. 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "54902c44-ea51-471d-b1df-35c51eb03810",
+   "productMasterId": "bd4e9175-c3ee-4107-937e-6cae7e4ac892",
+   "oldContentHash": "4e5e93284767914a634bdc343885882c98ba92a052e4f21dcba0e21a80be7ca3",
+   "newContentHash": "3dd0493e36639b0925aaa5549fddfa8b48ade72960ce6ef7243c5750ea61c0ab",
+   "oldBlock": "<h2>아연 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  ",
+   "newBlock": "<h2>아연 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-why\"><li>아연 - 정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "8f8d15ad-e090-46eb-b371-7c7d40102d56",
+   "productMasterId": "b222861b-542d-4f6c-afa0-b259b33265e6",
+   "oldContentHash": "1619040de17071ef479a64cabba6f9448a827fa62f0544dad09903d2f91dfd64",
+   "newContentHash": "ffb9037a5453db2ae9f0adf47786cf0a822c9c02f8084707351a994184051e8c",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>(뮤코다당･단백)관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "21972fc4-b5b8-41ca-ad3e-026d332e9d62",
+   "productMasterId": "e33e155f-1ffe-404a-8c13-4ae45ad038f6",
+   "oldContentHash": "bf1e1891522b4ddb58e32a635983d848b54f93ff5e368b6e8b48d1aa64fd2469",
+   "newContentHash": "88546f2064b9b79ddb52524b91172590d0a2d6939a44bb250bb2c3d0b9672d91",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백(콘드로이친)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>(뮤코다당･단백)관절 및 연골건강에 도움을 줄 수 있음</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "84e867a1-4f77-43d8-8d65-0c0a7119d3aa",
+   "productMasterId": "1a39e56d-c682-46a2-aecd-144e2dd0d456",
+   "oldContentHash": "c623ff98c23fd81dfb3671d4beba35ed50caa461b7b9483ef3aafc467c5075c8",
+   "newContentHash": "dc2c276fce7511189d1aedd4614cfd997567a7d88132618f4643ee5926940e46",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>골다공증발생 위험 감소에 도움을 줌</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줄 수 있음</li></ul>\n  "
+  },
+  {
+   "canonicalId": "4c2f864c-70d5-42ce-ac9d-ca850f04a5cd",
+   "productMasterId": "2274ab38-28d9-4c5a-abf4-9779204b123b",
+   "oldContentHash": "4a75bc8ba26a96cc6926eae952a957cdc89c5b56a8bf7a6efbc3021777a9a2ad",
+   "newContentHash": "2b7d91668713e8139176c4c9263d16194a31a513e9170916a2c70afc4ab5c86e",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "cc2fe697-4d2d-43e1-bbd3-4f828b831e9a",
+   "productMasterId": "d04eef97-6917-4cea-8fdf-4b694377284d",
+   "oldContentHash": "f762f69effb8179effc79d40f4448f628846b343d0410bc1bbb03604225dfe9c",
+   "newContentHash": "633efd977f0ae8b5915a54a536510e5a6060fa01f5e9cd28ffb7fe065f6d60b9",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "4e12c99d-ca60-4424-acaa-1a75c1199a52",
+   "productMasterId": "39dc3a25-9af3-485e-9d7f-884d9c06fd7c",
+   "oldContentHash": "49dc1e6015cf35efd335b5c5dd600881e386b2af8e34b3919c5e3108c63c2dae",
+   "newContentHash": "3f35d9d48edd2bddb9261314863f201533d36aaa9fba60a9d344368bd8d35748",
+   "oldBlock": "<h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul>\n  \n  ",
+   "newBlock": "<h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-why\"><li>N-아세틸글루코사민제품 : 관절 및 연골건강에 도움을 줄 수 있음</li><li>비타민B6 : 단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>비타민B1 : 탄수화물과 에너지 대사에 필요</li><li>비타민B12 : 정상적인 엽산 대사에 필요</li><li>마그네슘 : 에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>EPA 및 DHA 함유유지 :  혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음</li></ul>\n  \n  "
+  },
+  {
+   "canonicalId": "795eafa1-1c87-47d5-8c45-7e0809ee0b66",
+   "productMasterId": "707e05db-c416-4714-96c4-07cf6f26135a",
+   "oldContentHash": "b9497ab19d526756285933c39751e75fb5c5875d980b2b7b20192a0a0276204c",
+   "newContentHash": "0f70a6120a5772f25dd41f6cae6118eb4c7f179c694497f6b3e135f4a529c88f",
+   "oldBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul>\n  ",
+   "newBlock": "<h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  "
+  },
+  {
+   "canonicalId": "794d8c15-5519-4a61-a566-4978462c8f14",
+   "productMasterId": "94daa1fe-5ffd-4b63-aa1b-717edeba165b",
+   "oldContentHash": "5c989c7aed4e7ca76bb137dc2b9752e764e73e926ffa8acf9519380a25213ba2",
+   "newContentHash": "572c6159d6e19a0d1048323c67f03c3005c2765bc898249843b3f7b8c32adad1",
+   "oldBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>가르시니아캄보지아 추출물</b><ul class=\"sd-why\"><li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul>\n  ",
+   "newBlock": "<h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>총(-)-Hydroxycitric acid</b><ul class=\"sd-why\"><li>: 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>: 탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>: 체내 에너지 생성에 필요</li></ul></li><li><b>판토텐산, 비오틴</b><ul class=\"sd-why\"><li>: 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul>\n  "
+  }
+ ]
+}
