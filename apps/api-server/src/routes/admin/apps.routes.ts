@@ -110,6 +110,62 @@ router.get('/', async (req: Request, res: Response, next: NextFunction) => {
 });
 
 /**
+ * WO-O4O-ADMIN-APPS-SERVICE-GROUPS-ROUTE-ORDER-FIX-V1
+ *
+ * ⚠️ 아래 `/:appId` 는 **정적 경로를 모두 흡수하는 catch-all** 이다.
+ *    Express 는 선언 순서대로 매칭하므로, `/:appId` 뒤에 선언된 정적 경로
+ *    (`/service-groups`, `/service-groups/stats`, `/by-service/:serviceGroup`)는
+ *    appId='service-groups' 등으로 잡혀 "앱 없음" 404 가 났다.
+ *    (관측: admin 앱스토어 화면에서 GET /api/v1/admin/apps/service-groups → 404)
+ *    → 정적 경로를 `/:appId` **앞으로** 이동한다. 핸들러 로직·응답 계약은 변경 없음.
+ *
+ * 신규 정적 경로를 추가할 때는 반드시 이 지점보다 위에 선언할 것.
+ */
+
+/**
+ * GET /api/admin/apps/service-groups
+ * Get all service group metadata for UI display
+ */
+router.get('/service-groups', async (req: Request, res: Response) => {
+  try {
+    // Sort by priority
+    const sortedMeta = [...SERVICE_GROUP_META].sort((a, b) => a.priority - b.priority);
+    return res.json({
+      ok: true,
+      data: sortedMeta,
+    });
+  } catch (error: any) {
+    logger.error('[ServiceGroups] Failed to get service group metadata:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
+ * GET /api/admin/apps/service-groups/stats
+ * Get statistics for all service groups
+ */
+router.get('/service-groups/stats', async (req: Request, res: Response) => {
+  try {
+    const stats = getServiceGroupStats();
+    return res.json({
+      ok: true,
+      data: stats,
+    });
+  } catch (error: any) {
+    logger.error('[ServiceGroups] Failed to get service group stats:', error);
+    return res.status(500).json({
+      ok: false,
+      error: 'FETCH_FAILED',
+      message: error.message || 'Unknown error',
+    });
+  }
+});
+
+/**
  * GET /api/admin/apps/:appId
  * Get specific app status
  */
@@ -555,47 +611,13 @@ router.post('/install-remote', async (req: Request, res: Response) => {
 // =============================================================================
 
 /**
- * GET /api/admin/apps/service-groups
- * Get all service group metadata for UI display
+ * WO-O4O-ADMIN-APPS-SERVICE-GROUPS-ROUTE-ORDER-FIX-V1:
+ *   `/service-groups` 와 `/service-groups/stats` 는 `/:appId` 보다 위(파일 상단)로 이동했다.
+ *   여기서 다시 선언하면 중복이므로 제거한다.
+ *
+ * 아래 `/by-service/:serviceGroup` 은 정적 접두어(`by-service`)를 가져
+ * `/:appId` 와 충돌하지 않는다(단일 세그먼트 매칭이므로 흡수되지 않음) — 위치 유지.
  */
-router.get('/service-groups', async (req: Request, res: Response) => {
-  try {
-    // Sort by priority
-    const sortedMeta = [...SERVICE_GROUP_META].sort((a, b) => a.priority - b.priority);
-    return res.json({
-      ok: true,
-      data: sortedMeta,
-    });
-  } catch (error: any) {
-    logger.error('[ServiceGroups] Failed to get service group metadata:', error);
-    return res.status(500).json({
-      ok: false,
-      error: 'FETCH_FAILED',
-      message: error.message || 'Unknown error',
-    });
-  }
-});
-
-/**
- * GET /api/admin/apps/service-groups/stats
- * Get statistics for all service groups
- */
-router.get('/service-groups/stats', async (req: Request, res: Response) => {
-  try {
-    const stats = getServiceGroupStats();
-    return res.json({
-      ok: true,
-      data: stats,
-    });
-  } catch (error: any) {
-    logger.error('[ServiceGroups] Failed to get service group stats:', error);
-    return res.status(500).json({
-      ok: false,
-      error: 'FETCH_FAILED',
-      message: error.message || 'Unknown error',
-    });
-  }
-});
 
 /**
  * GET /api/admin/apps/by-service/:serviceGroup
