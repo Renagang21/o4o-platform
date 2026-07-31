@@ -1,0 +1,10 @@
+{
+ "builtAt": "2026-07-31T13:24:32.963Z",
+ "total": 6,
+ "byReason": {
+  "INGREDIENT_OWNERSHIP_UNRESOLVED": 5,
+  "CANONICAL_REDESIGN_REQUIRED": 1
+ },
+ "dup": 0,
+ "note": "공식 원천 부재 343건은 이 큐에 포함되지 않는다 (FINAL_HOLD_OFFICIAL_SOURCE_MISSING 동결 유지)."
+}

@@ -1,0 +1,42 @@
+{
+ "verifiedAt": "2026-07-31T13:24:32.965Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 50,
+ "newHashMatch": 50,
+ "oldHashRemains": 0,
+ "rollbackReversalOk": 50,
+ "clauseNotVerbatim": 0,
+ "targetFieldDrift": 0,
+ "outsideTargetDrift": 0,
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "canon_dup": 0
+ },
+ "globalsExpected": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "canon_dup": 0
+ },
+ "statusSum": 80,
+ "statusSumMatches80": true,
+ "byStatus": {
+  "RESOLVED_UPDATED": 50,
+  "RESOLVED_NO_CHANGE": 24,
+  "FINAL_HOLD_INGREDIENT_OWNERSHIP_UNRESOLVED": 5,
+  "FINAL_HOLD_CANONICAL_REDESIGN_REQUIRED": 1
+ },
+ "finalUnresolved": 6,
+ "unresolvedByReason": {
+  "INGREDIENT_OWNERSHIP_UNRESOLVED": 5,
+  "CANONICAL_REDESIGN_REQUIRED": 1
+ },
+ "failedChecks": [],
+ "globalsUnchanged": true,
+ "verdict": "PASS"
+}

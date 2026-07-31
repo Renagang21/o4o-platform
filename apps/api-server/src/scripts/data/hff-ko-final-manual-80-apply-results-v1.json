@@ -1,0 +1,21 @@
+{
+ "appliedAt": "2026-07-31T13:23:38.896Z",
+ "mode": "APPLY",
+ "expectedUpdate": 50,
+ "actualUpdate": 50,
+ "skipped": [],
+ "rolledBack": false,
+ "before": {
+  "spd_all": "120123",
+  "ko_canon": "40918",
+  "en_canon": "15498",
+  "pm_hff": "40948"
+ },
+ "after": {
+  "spd_all": "120123",
+  "ko_canon": "40918",
+  "en_canon": "15498",
+  "pm_hff": "40948"
+ },
+ "countsUnchanged": true
+}

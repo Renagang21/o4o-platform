@@ -1,0 +1,3065 @@
+{
+ "builtAt": "2026-07-31T13:22:18.146Z",
+ "count": 50,
+ "targets": [
+  {
+   "candidateId": "9c19161d-1b32-4d5b-ba2f-d551cb17aa98",
+   "canonicalId": "42570f16-75ac-4f90-8e06-86433a618e37",
+   "productMasterId": "a6f62962-9404-48f2-973c-4beeb35d22de",
+   "statementNo": "2009001702357",
+   "productName": "유렉스 프로바이오틱스 (Urex Plus Vcap-5)",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 2,
+   "officialLabels": 1,
+   "officialClauses": 2,
+   "currentGroups": 0,
+   "currentLabels": 0,
+   "currentClauses": 0,
+   "hasFnSection": false,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "core",
+   "sectionCreated": true,
+   "status": "RESOLVED_UPDATED",
+   "why": "FUNCTION_SECTION_CREATED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "유산균 증식을 통한 여성 질 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "2f5b79b9114e33d0f49d47c39d0b6b3c82cfefca62e957c63eb10b3f5e7c0794",
+   "newContentHash": "7d9fc72d0a4fa2bdb19143c9660dc0d8566962092ab6db6d721bbdd41e00541c",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">170mg당 10억 CFU 이상</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>유렉스 프로바이오틱스 (Urex Plus Vcap-5)<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)빅솔 반월공장 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>170mg당 10억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>입니다. <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>170mg당 10억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노랑 하양색의 내용물을 함유한 하양색의 경질캡슐 · (주)빅솔 반월공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><div class=\"sd-core\"><div class=\"sd-item\"><ul><li>유산균 증식을 통한 여성 질 건강에 도움을 줄 수 있음</li><li>유산균 증식 및 유해균 억제·배변활동 원활·장건강에 도움을 줄 수 있음</li></ul></div></div><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 이상 ( 170mg당 10억 CFU 이상 )</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노랑 하양색의 내용물을 함유한 하양색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온보관 / 직사광선을 받지 않는 곳에 실온보관</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "e0acdaf0-47cb-4cc4-abd9-0c88708ea966",
+   "canonicalId": "d10f757e-2140-4699-9b01-cc31139fe0be",
+   "productMasterId": "1285a160-51b0-4aaf-8314-7d2a28ca35b4",
+   "statementNo": "2019000939480",
+   "productName": "쾌변엔 천둥이 더블케어",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 3,
+   "currentGroups": 0,
+   "currentLabels": 0,
+   "currentClauses": 0,
+   "hasFnSection": false,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "core",
+   "sectionCreated": true,
+   "status": "RESOLVED_UPDATED",
+   "why": "FUNCTION_SECTION_CREATED",
+   "restoredClauses": 3,
+   "groups": [
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "락추로스 파우더(Lactulose Powder)",
+     "clauses": [
+      "제2009-40호",
+      "유익균 증식, 유해균 억제에 도움을 줄 수 있습니다"
+     ]
+    }
+   ],
+   "oldContentHash": "275fa541e4e5b83868db7cae4189bc0edd1c38193daf40986fd1ed3851c1b0c9",
+   "newContentHash": "4c004c7f4fceb325b6983cdf48d9888ab51c90ec1c6e11ccceaa5c3011cf580d",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">1800mg당 10억 CFU 이상</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>쾌변엔 천둥이 더블케어<small>프로바이오틱스 · 장 건강</small></h1><p class=\"sd-meta\">(주)미누스토리 제조 · 1일 2회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품의 표시 기준은 <b>1800mg당 10억 CFU 이상</b>입니다. 공식 섭취방법은 <b>1일 2회, 1회 2캡슐</b>입니다. <b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다. 유산균 증식 및 유해균 억제, 배변활동 원활, 장 건강에 도움을 줄 수 있는 프로바이오틱스를 담았습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>표시 기준: <b>1800mg당 10억 CFU 이상</b></li><li><b>1캡슐의 중량은 공식 표기에 없어</b> 단위당 균수는 계산하지 않았습니다</li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 포함한 연한 노란 연두색의 경질캡슐 · (주)미누스토리 제조</li></ul>\n  <h2>공식 인정 기능성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">프로바이오틱스</span><ul><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">락추로스 파우더(Lactulose Powder)</span><ul><li>제2009-40호</li><li>유익균 증식, 유해균 억제에 도움을 줄 수 있습니다</li></ul></div></div><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>프로바이오틱스 수</b> 표시량 이상 ( 1800mg당 10억 CFU 이상 )</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 내용물을 포함한 연한 노란 연두색의 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월까지</div><div class=\"sd-item\"><b>보관</b> 실온/ 1) 직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오.2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 어린이가 함부로 섭취하지 않도록 일일섭취량·방법을 지도 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "6b4c3fab-1f3a-4c15-bed2-225cc3b35162",
+   "canonicalId": "93ddd335-3d2a-4110-948b-0a916f1e3bd1",
+   "productMasterId": "2e066612-fe9b-4e7b-9e8c-ddb9fb5c2b5c",
+   "statementNo": "200400170061205",
+   "productName": "내추럴 어드밴스드 다이어트 ",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 7,
+   "officialLabels": 7,
+   "officialClauses": 12,
+   "currentGroups": 6,
+   "currentLabels": 6,
+   "currentClauses": 11,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "core",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "자몽추출물등 복합물(Sinetrol)(제2019-24호)",
+     "clauses": [
+      "체지방 감소에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민 C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "562366accb61f5ad60397dd4ca805f8a28c939a558153980338a59368bc3bb65",
+   "newContentHash": "dd71fcb122f56c52735f14d1b85e732f11643063f9395fcc42b565ff8b57aa44",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>내추럴 어드밴스드 다이어트</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">자몽추출물등 복합물(Sinetrol)(제2019-24호)</span><ul><li>체지방 감소에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 C</span><ul><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 A</span><ul><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B12</span><ul><li>정상적인 엽산 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B6</span><ul><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B1</span><ul><li>탄수화물과 에너지 대사에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">비타민 B2</span><ul><li>체내 에너지 생성에 필요</li></ul></div></div><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 2정을 물과 함께 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>영·유아, 어린이, 임산부 및 수유부는 섭취에 주의</li><li>특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li><li>의약품(혈압강하제, 부정맥치료제, 고지혈증치료제, 항응고제 등)을 복용하시는 분은 섭취 전 의사와 상담</li><li>카페인을 함유한 식품의 섭취에 주의할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상: 고유의 향미가 있고 이미, 이취가 없는 어두운 갈색의 점박이와 흰색의 점박이를 함유한 흐린 황갈색의 장방형 제피정제</div><div class=\"sd-item\">2) Naringin : 표시량 ｛202.4mg/1,600mg｝의 80~120%</div><div class=\"sd-item\">3) Hesperidin : 표시량 ｛87.3mg/1,600mg｝의 80~120%</div><div class=\"sd-item\">4) Naringin/Hesperidin 비율: 1.5~3.5</div><div class=\"sd-item\">5) Caffeine : 표시량 ｛20.6mg/1,600mg｝의 80~120%</div><div class=\"sd-item\">6) 비타민C : 표시량 ｛100mg/1,600mg｝의 80~150%</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "85522bcf-42e7-47bf-bc88-535cbd0c7252",
+   "canonicalId": "82e28593-9d81-40bf-a171-e7ab8ca75b26",
+   "productMasterId": "27f7ca99-c1e8-41ec-845c-6d38cfffefb1",
+   "statementNo": "20190009483373",
+   "productName": "차전자피 카테킨 다이어트",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "core",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "차전자피식이섬유",
+     "clauses": [
+      "혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+      "배변활동 원활에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "녹차추출물",
+     "clauses": [
+      "항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "e0c62fc22279abe4d26d69b9048d34e0712e49558e93b516446fa152d3f790c0",
+   "newContentHash": "cd50db28e7a30aaeabd1db02144f47c6b7069cee76202d0d2616e1b7d97a62a2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>차전자피 카테킨 다이어트</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-item\"><span class=\"sd-tag\">차전자피식이섬유</span><ul><li>혈중 콜레스테롤 개선에 도움을 줄 수 있음</li><li>배변활동 원활에 도움을 줄 수 있음</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">녹차추출물</span><ul><li>항산화･체지방 감소･혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></div><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span></span><p class=\"sd-meta\">1일 2회, 1회 1포를 충분한 물과 함께 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>반드시 충분한 물과 함께 섭취할 것</li><li>어린이, 임산부 및 수유부는 섭취를 피할 것</li><li>간질환이 있거나 의약품 복용 시 전문가와 상담할 것</li><li>카페인이 함유되어 있어 초조감, 불면 등을 나타낼 수 있음</li><li>식사 후 섭취할 것</li><li>카페인을 함유한 식품의 섭취에 주의할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색의 환</div><div class=\"sd-item\">2) 차전자피 식아섬유 : 표시량(7.2g/12g)의 80% 이상</div><div class=\"sd-item\">3) 카테킨 : 표시량(0.3g/12g)의 80~120%</div><div class=\"sd-item\">4) 에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 300이하</div><div class=\"sd-item\">5) 카페인(mg/kg) : 50,000 이하</div><div class=\"sd-item\">6) 초산에틸(mg/kg) : 50.0 이하</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "fbcd093b-017d-46a5-89e6-e178da56aa90",
+   "canonicalId": "6f3b2178-951f-472c-8f9f-1598c28e6065",
+   "productMasterId": "0ea69c12-810b-4fbf-93a0-8eab0d0cf3ef",
+   "statementNo": "2019001029743",
+   "productName": "에너씨슬 퍼펙트샷",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 2,
+   "rendererFamily": "core",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "나이아신, 비타민B6, 비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요, 체내 에너지 생성에 필요, 단백질 및 아미노산 이용에 필요"
+     ]
+    },
+    {
+     "label": "밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산",
+     "clauses": [
+      "간건강에 도움을 줄수 있음, 정상적인 엽산 대사에 필요, 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요, 체내 에너지 생성에 필요, 세포와 혈액생성에 필요, 태아신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "84068d33e23bef3f2cd4ed9668fad4d4016f273d9e830411625319abd1e46393",
+   "newContentHash": "3fd7a1d3f8eb5c48dac9c0894a60ba8a63a5b8edbf1e9484d850b2fbdc55f84d",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일1회</span></div>\n  <h1>에너씨슬 퍼펙트샷</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-item\"><span class=\"sd-tag\">나이아신, 비타민B6, 비타민B1</span><ul><li>탄수화물과 에너지 대사에 필요, 체내 에너지 생성에 필요, 단백질 및 아미노산 이용에 필요</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">밀크씨슬(카르두스 마리아누스) 추출물, 비타민B12, 비오틴, 판토텐산, 비타민B2, 엽산</span><ul><li>간건강에 도움을 줄수 있음, 정상적인 엽산 대사에 필요, 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요, 체내 에너지 생성에 필요, 세포와 혈액생성에 필요, 태아신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></div><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일1회</span></span><p class=\"sd-meta\">1일1회, 1회 1포(정제:550mg*2개+액상:20g)를 섭취 하십시오</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>어린이,임산부 및 수유부는 섭취를 피하십시오</li><li>알레르기 반응이 나타나는 경우에는 섭취를 중단하십시오</li><li>설사,위통 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭취에 주의</li><li>이상사례 발생시 섭취를 중단하고 전문가와 상담할 것</li><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 장방형 제피정제</div><div class=\"sd-item\">2) 실리마린 : 표시량(130mg / 21.1g)의 80~120%</div><div class=\"sd-item\">3) 비타민b12 : 표시량(500ug/21.1g)80~180%</div><div class=\"sd-item\">4) 비오틴 : 표시량(300ug/21.1g)80~180%</div><div class=\"sd-item\">5) 판토텐산 : 표시량(10mg/21.1g)80~180%</div><div class=\"sd-item\">6) 비타민b2 : 표시량(10mg/21.1g)80~180%</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "b11656ed-c18d-4489-9b59-31fe9b74d97b",
+   "canonicalId": "944bf249-e896-4b26-81ea-d9e811abc9aa",
+   "productMasterId": "57632fea-ad3e-4fab-ba84-82541078e006",
+   "statementNo": "200600200081043",
+   "productName": "아이클리어 루테인지아잔틴 아스타잔틴 미니",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 10,
+   "officialLabels": 9,
+   "officialClauses": 10,
+   "currentGroups": 9,
+   "currentLabels": 9,
+   "currentClauses": 15,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": -6,
+   "groups": [
+    {
+     "label": "헤마토코쿠스추출물",
+     "clauses": [
+      "눈의 피로도 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "판토텐산",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+     ]
+    }
+   ],
+   "oldContentHash": "7e566bd2eec29e361f89260a351c8b4ad8eff121c1cee1c0ddf4ef0b6c35aac0",
+   "newContentHash": "45482b1ff786525673fd9148be980668f23cf2dbbb6c3d7c56e26bd33dd529e9",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인</span><span class=\"sd-badge is-solid\">비타민 E</span><span class=\"sd-badge is-solid\">아연</span><span class=\"sd-badge is-solid\">판토텐산</span><span class=\"sd-badge is-solid\">비타민 A</span><span class=\"sd-badge is-solid\">비타민 B6</span><span class=\"sd-badge is-solid\">비타민 B1</span><span class=\"sd-badge is-solid\">비타민 B2</span><span class=\"sd-badge is-solid\">비타민 D</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이클리어 루테인지아잔틴 아스타잔틴 미니<small>루테인 · 비타민 E · 아연 · 판토텐산 · 비타민 A · 비타민 B6 · 비타민 B1 · 비타민 B2 · 비타민 D</small></h1><p class=\"sd-meta\">주식회사 노바렉스2공장 제조 · 1일 1회 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>루테인</b>, <b>비타민 E</b>, <b>아연</b>, <b>판토텐산</b>, <b>비타민 A</b>, <b>비타민 B6</b>, <b>비타민 B1</b>, <b>비타민 B2</b>, <b>비타민 D</b>를 주원료로 한 9원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1캡슐</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>루테인</b>, <b>비타민 E</b>, <b>아연</b>, <b>판토텐산</b>, <b>비타민 A</b>, <b>비타민 B6</b>, <b>비타민 B1</b>, <b>비타민 B2</b>, <b>비타민 D</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미∙이취가 없는 진한 빨간색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 주식회사 노바렉스2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>헤마토코쿠스추출물</b><ul class=\"sd-why\"><li>눈의 피로도 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미∙이취가 없는 진한 빨간색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "f9e007d8-43de-4454-b110-e89281bfa622",
+   "canonicalId": "c981688c-aebf-4aa8-a1f2-c7d53be7e499",
+   "productMasterId": "d7378ab2-aeb5-4afe-986e-3e4082a6c4a9",
+   "statementNo": "20172880193439",
+   "productName": "건기남의 올레유러핀",
+   "track": "D",
+   "queueReason": "BOUNDARY_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "올리브잎주정추출물(제2014-9호)",
+     "clauses": [
+      "혈압 조절에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "바나바잎추출물",
+     "clauses": [
+      "식후 혈당상승 억제에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "be9ed38fff8688c77879bc7f0415f286b5ff5c03fd42c55d9840935971a69c51",
+   "newContentHash": "77fd5bbd6e0663cea468d3b2a1a86f131547b9c997890865624d77e4232cf5dc",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">바나바잎추출물</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>건기남의 올레유러핀<small>바나바잎추출물</small></h1><p class=\"sd-meta\">대원헬스케어 주식회사 2공장 제조 · 1일 1회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>바나바잎추출물</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>바나바잎추출물</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제 · 대원헬스케어 주식회사 2공장 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>올리브잎주정추출물(제2014-9호)</b><ul class=\"sd-why\"><li>혈압 조절에 도움을 줄 수 있음</li></ul></li><li><b>바나바잎추출물</b><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 초록색의 타원형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선과 고온다습한 곳을 피하여 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "08adcbd8-55c2-4106-890a-15b475dff55b",
+   "canonicalId": "9be27fe0-3e33-4638-986e-68cf4cf685fe",
+   "productMasterId": "c8a93cfb-7500-4a15-830d-fd5c64010566",
+   "statementNo": "20040020016660",
+   "productName": "프로메가 알티지 오메가3 듀얼 플러스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 9,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 7,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 3,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "EPA 및 DHA 함유유지",
+     "clauses": [
+      "혈중 중성지질 개선, 혈행 개선에 도움을 줄 수 있음",
+      "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "bd2f1c511022e1f7d6a5c9b1fbf3b8648882f3882a2cfca349cbb54e9dc93016",
+   "newContentHash": "2ff7d9cc2cc48567786e99d49a7fe6100fbfed51986fc210c27e6c9645304b16",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>프로메가 알티지 오메가3 듀얼 플러스</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><ul class=\"sd-func\"><li><b>EPA 및 DHA 함유유지</b><ul class=\"sd-why\"><li>혈중 중성지질 개선, 혈행 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 2캡슐(1.04g)을 충분한 물과 함께 섭취하십시오.</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>의약품(항응고제, 항혈소판제, 혈압강하제 등) 복용 시 전문가와 상담하십시오.</li><li>개인에 따라 피부 관련 이상반응이 발생할 수 있습니다.</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.</li><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담하십시오.</li><li>특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상: 고유의 향미가 있고 이미, 이취가 없는 연한 노란색의 내용물을 함유한 투명한 타원형 장용성 연질캡슐</div><div class=\"sd-item\">2) EPA와 DHA의 합 : 표시량(600mg/1.04g)의 80~120%</div><div class=\"sd-item\">3) 비타민A : 표시량(700μgRAE/1.04g)의 80~150%</div><div class=\"sd-item\">4) 비타민D : 표시량(10μg/1.04g)의 80~180%</div><div class=\"sd-item\">5) 비타민E: 표시량(11mg α-TE/1.04g)의 80~150%</div><div class=\"sd-item\">6) 납(mg/kg): 3.0 이하</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "26c69a99-6908-441a-994e-a16881942a10",
+   "canonicalId": "55a0dfe6-89a9-452d-8a96-66ce27fcdd1f",
+   "productMasterId": "c6b76982-c76d-45c8-a3ec-cf2a14cae4c0",
+   "statementNo": "20040015070461",
+   "productName": "비피유 비피더스 면역플러스 프로바이오틱스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 7,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 10,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 6,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": -3,
+   "groups": [
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "8b3ab8e6ec0cf7e98935af41470e4d809e44dcceb2d3b9f47214dfb979f04ac8",
+   "newContentHash": "0ec93da72dbeab9fec22327c092198acffa2213a98202aba45f8f7eff0e36169",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>비피유 비피더스 면역플러스 프로바이오틱스</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><ul class=\"sd-func\"><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li></ul><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 1캅셀을 물과 함께 섭취 (식후에 섭취를 권장)</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>프로바이오틱스</li><li>질환이 있거나 의약품 복용 시 전문가와 상담할 것</li><li>알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있음</li><li>어린이가 함부로 섭취하지 않도록 일일섭취량 방법을 지도할 것</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li><li>비타민D</li><li>고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">고유의 향미가 있고 이미, 이취가 없는 흰노란색의 분말을 함유한 흰색의 장용성 경질캡슐</div><div class=\"sd-item\">프로바이오틱스 수 : 표시량(10,000,000,000(100억)CFU / 450mg)의 이상</div><div class=\"sd-item\">비타민D : 표시량(15㎍(600 IU)/450mg)의 80~ 180%</div><div class=\"sd-item\">아연 : 표시량(8.5mg/450mg)의 80~150%</div><div class=\"sd-item\">나이아신 : 표시량(15mgNE/450mg)의 80~150%</div><div class=\"sd-item\">대장균군 : 음성</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "20d5a9ba-5f64-4992-827a-f252e2b74e94",
+   "canonicalId": "bf0028a1-3685-4973-84c0-43600cf1ca15",
+   "productMasterId": "bdc8f2c7-0a9e-4cbf-ad1a-2e908a2516e3",
+   "statementNo": "20040016020211",
+   "productName": "아스타루테인 블루",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 8,
+   "currentGroups": 4,
+   "currentLabels": 4,
+   "currentClauses": 6,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "마리골드꽃추출물",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "헤마토코쿠스 추출물",
+     "clauses": [
+      "눈의 피로도 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민 E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "베타카로틴",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "1810d0b755982afefa060327cfc2bcfb8b30968a4a1355768a12cc735a0c13ac",
+   "newContentHash": "855ae2655f790b7f888b1cf0ddcbe0d534930afc09af2eaaf975d6817741ec65",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 20mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">헤마토코쿠스추출물(아스타잔틴) 4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아스타루테인 블루<small>루테인 · 비타민 A · 비타민 E · 헤마토코쿠스추출물(아스타잔틴)</small></h1><p class=\"sd-meta\">(주)케이지앤에프 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>, 비타민 E <b>11mg</b>, 헤마토코쿠스추출물(아스타잔틴) <b>4mg</b>를 표시량으로 담은 4원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>20mg</b>, 비타민 A <b>700μg</b>, 비타민 E <b>11mg</b>, 헤마토코쿠스추출물(아스타잔틴) <b>4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 진한 빨간색의 내용물을 함유한 검은색의 타원형 연질캡슐 · (주)케이지앤에프 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마리골드꽃추출물</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>헤마토코쿠스 추출물</b><ul class=\"sd-why\"><li>눈의 피로도 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>베타카로틴</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(20mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/500mg)의 80~150%</div><div class=\"sd-item\"><b>헤마토코쿠스추출물(아스타잔틴)</b> 표시량(4mg/500mg)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 진한 빨간색의 내용물을 함유한 검은색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관하십시오. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "a5b7cde5-36fb-4179-b599-6aa72f9b2c66",
+   "canonicalId": "9d2fb20d-3c68-40fd-9bf3-19dd6523f1c0",
+   "productMasterId": "2162b543-01f2-4049-a458-2a2961c4b4c5",
+   "statementNo": "200400200061301",
+   "productName": "아이편안 루테인지아잔틴",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 7,
+   "officialLabels": 7,
+   "officialClauses": 10,
+   "currentGroups": 7,
+   "currentLabels": 7,
+   "currentClauses": 10,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "루테인지아잔틴복합추출물",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "d35d95904a624f67251d4b91888b3c3a540d5f533f3e89a5dcbe1a864c497b3e",
+   "newContentHash": "756f360f4d461f1c2115c979a9b4dd81ff57bb31ef1d7833088598846e8ef932",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">루테인 18.181mg</span><span class=\"sd-badge is-solid\">비타민 A 210μg</span><span class=\"sd-badge is-solid\">비타민 B1 0.36mg</span><span class=\"sd-badge is-solid\">비타민 B2 0.42mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>아이편안 루테인지아잔틴<small>루테인 · 비타민 A · 비타민 B1 · 비타민 B2 · 비타민 E · 셀레늄 · 아연</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 루테인 <b>18.181mg</b>, 비타민 A <b>210μg</b>, 비타민 B1 <b>0.36mg</b>, 비타민 B2 <b>0.42mg</b>, 비타민 E <b>3.3mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 7원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 루테인 <b>18.181mg</b>, 비타민 A <b>210μg</b>, 비타민 B1 <b>0.36mg</b>, 비타민 B2 <b>0.42mg</b>, 비타민 E <b>3.3mg</b>, 셀레늄 <b>16.5μg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>루테인지아잔틴복합추출물</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>루테인</b> 표시량(18.181mg/0.5g)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(210μg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(0.36mg/0.5g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B2</b> 표시량(0.42mg/0.5g)의 80~180%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨간 주황색의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "8c9e6116-b184-4a2c-894c-5c2007d8f15d",
+   "canonicalId": "93fd7b02-ae3c-40ef-8873-5448725c2db6",
+   "productMasterId": "84bbc1b8-8e83-4693-9ade-abd9136fbbe0",
+   "statementNo": "200400200061700",
+   "productName": "NAG&엠에스엠",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 11,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 9,
+   "groups": [
+    {
+     "label": "디메틸설폰)",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요",
+      "신경과 근육 기능 유지에 필요",
+      "정상적인 혈액응고에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "N-Acetylglucosamine)",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "마그네슘",
+     "clauses": [
+      "에너지 이용에 필요",
+      "신경과 근육 기능 유지에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    }
+   ],
+   "oldContentHash": "830569dae521093a637d0706858e03a9775c20d149b9b28d8347ca75d85e1b0b",
+   "newContentHash": "fa1b2bce9f7612e93d13775b9a9f6cf84622105655a498715b9b5a0eda7d534b",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>NAG&amp;엠에스엠<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 하얀색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-Acetylglucosamine)</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 하얀색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "8c2e89d4-3922-4c0f-8bbf-72748977407e",
+   "canonicalId": "6821aea0-0652-4914-8481-dea68645fe83",
+   "productMasterId": "3cbe046a-6e6f-41f3-a61f-90f772981169",
+   "statementNo": "200400200061776",
+   "productName": "현대약품 비오틴 플러스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 11,
+   "officialLabels": 11,
+   "officialClauses": 21,
+   "currentGroups": 11,
+   "currentLabels": 11,
+   "currentClauses": 21,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "판토텐산",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "엽산",
+     "clauses": [
+      "세포와 혈액생성에 필요",
+      "태아 신경관의 정상 발달에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "aef98f272a62cc20300ae06032c31a32c5de88da4706d2d7dd6cc75bd30c2b44",
+   "newContentHash": "818b8121b8af963be956d55a4f3bc9616af15ff1909557ea074fe3fda2407396",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 2mg</span><span class=\"sd-badge is-solid\">나이아신 21mg</span><span class=\"sd-badge is-solid\">비오틴 5000μg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 B1 2mg</span><span class=\"sd-badge is-solid\">비타민 C 50mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">셀레늄 100μg</span><span class=\"sd-badge is-solid\">아연 8mg</span><span class=\"sd-badge is-solid\">엽산 200μg</span><span class=\"sd-badge is-solid\">판토텐산 40mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>현대약품 비오틴 플러스<small>구리 · 나이아신 · 비오틴 · 비타민 A · 비타민 B1 · 비타민 C · 비타민 D · 셀레늄 · 아연 · 엽산 · 판토텐산</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>2mg</b>, 나이아신 <b>21mg</b>, 비오틴 <b>5000μg</b>, 비타민 A <b>700μg</b>, 비타민 B1 <b>2mg</b>, 비타민 C <b>50mg</b>, 비타민 D <b>10μg</b>, 셀레늄 <b>100μg</b>, 아연 <b>8mg</b>, 엽산 <b>200μg</b>, 판토텐산 <b>40mg</b>를 표시량으로 담은 11원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 구리 <b>2mg</b>, 나이아신 <b>21mg</b>, 비오틴 <b>5000μg</b>, 비타민 A <b>700μg</b>, 비타민 B1 <b>2mg</b>, 비타민 C <b>50mg</b>, 비타민 D <b>10μg</b>, 셀레늄 <b>100μg</b>, 아연 <b>8mg</b>, 엽산 <b>200μg</b>, 판토텐산 <b>40mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 밝은 연두 또는 연두색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(2mg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>나이아신</b> 표시량(21mg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>비오틴</b> 표시량(5000μg/0.7g)의 80~180%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>비타민 B1</b> 표시량(2mg/0.7g)의 80~180%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(50mg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/0.7g)의 80~180%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(100μg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(8mg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(200μg/0.7g)의 80~150%</div><div class=\"sd-item\"><b>판토텐산</b> 표시량(40mg/0.7g)의 80~180%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 밝은 연두 또는 연두색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "571b6062-87ab-45cc-938c-00149fdd6978",
+   "canonicalId": "f8ffd2eb-8f39-4ca6-a1da-b948fc390f8d",
+   "productMasterId": "4c94e2b7-70a7-4342-a17c-776146099936",
+   "statementNo": "200400200061834",
+   "productName": "데일리 뷰티팩",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 5,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 3,
+   "groups": [
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음",
+      "자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "Lactobacillus sakei Probio65(제2013-17호)",
+     "clauses": [
+      "면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "코엔자임Q10",
+     "clauses": [
+      "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "c4ccb6e60afeebd136ed037a148a32a6e3e5b80b491e17c102bbcb51f346e298",
+   "newContentHash": "18696cd018206b6dafde4dbee1304673adba7f0f3961bab4bd358dd3aa3a1bb5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>데일리 뷰티팩<small>히알루론산</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 보라색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음</li></ul></li><li><b>Lactobacillus sakei Probio65(제2013-17호)</b><ul class=\"sd-why\"><li>면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 보라색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "96413683-4b27-468c-84eb-72f5ca37f6f0",
+   "canonicalId": "88218dc2-aa4b-4d1b-ae1b-f30ca915b410",
+   "productMasterId": "dfd03a2e-095d-4755-bc65-63f4b7fad78a",
+   "statementNo": "200400200062102",
+   "productName": "위클리 스킨핏",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 23,
+   "officialLabels": 23,
+   "officialClauses": 43,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 41,
+   "groups": [
+    {
+     "label": "저분자콜라겐펩타이드AG(제2023-10호)",
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음",
+      "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "EPA 및 DHA 함유 유지",
+     "clauses": [
+      "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음",
+      "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "테아닌",
+     "clauses": [
+      "스트레스로 인한 긴장완화에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+      "체내 산소운반과 혈액생성에 필요",
+      "에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "셀레늄",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "크롬",
+     "clauses": [
+      "체내 탄수화물, 지방, 단백질 대사에 관여"
+     ]
+    },
+    {
+     "label": "몰리브덴",
+     "clauses": [
+      "산화･환원 효소의 활성에 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "망간",
+     "clauses": [
+      "뼈 형성에 필요",
+      "에너지 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "판토텐산",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민K",
+     "clauses": [
+      "정상적인 혈액응고에 필요",
+      "뼈의 구성에 필요"
+     ]
+    },
+    {
+     "label": "비타민B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "엽산",
+     "clauses": [
+      "세포와 혈액생성에 필요",
+      "태아 신경관의 정상 발달에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "요오드",
+     "clauses": [
+      "갑상선 호르몬의 합성에 필요",
+      "에너지 생성에 필요",
+      "신경발달에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "c7b9baba92f2009b6370dabac59cd39a43f3ff607ebbf3904c5fe1916c83c6fd",
+   "newContentHash": "b4664173b65005591814c4bc22f621152ebbae91dbcee34f7dda4ebf796ea9c9",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>위클리 스킨핏<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>콜라겐펩타이드</b></li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드AG(제2023-10호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>EPA 및 DHA 함유 유지</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>테아닌</b><ul class=\"sd-why\"><li>스트레스로 인한 긴장완화에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>체내 산소운반과 혈액생성에 필요</li><li>에너지 생성에 필요</li></ul></li><li><b>셀레늄</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>크롬</b><ul class=\"sd-why\"><li>체내 탄수화물, 지방, 단백질 대사에 관여</li></ul></li><li><b>몰리브덴</b><ul class=\"sd-why\"><li>산화･환원 효소의 활성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>요오드</b><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요</li><li>에너지 생성에 필요</li><li>신경발달에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "4c8e641a-5fcd-4b67-b93a-b79b8e336e09",
+   "canonicalId": "f94c5ce4-7519-4e89-ad62-864487619046",
+   "productMasterId": "e74fcc8d-59be-46b9-9ad6-0b4afa5d40eb",
+   "statementNo": "200600200032960",
+   "productName": "센트룸 원데이팩 우먼 2030",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 23,
+   "officialLabels": 23,
+   "officialClauses": 24,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 23,
+   "groups": [
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "EPA 및 DHA 함유 유지",
+     "clauses": [
+      "혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민 A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민 E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 K",
+     "clauses": [
+      "정상적인 혈액응고에 필요, 뼈의 구성에 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "판토텐산",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "엽산",
+     "clauses": [
+      "세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌",
+      "철 : 체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "요오드",
+     "clauses": [
+      "갑상선 호르몬의 합성에 필요, 에너지 생성에 필요, 신경발달에 필요"
+     ]
+    },
+    {
+     "label": "망간",
+     "clauses": [
+      "뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "몰리브덴",
+     "clauses": [
+      "산화･환원 효소의 활성에 필요"
+     ]
+    },
+    {
+     "label": "크롬",
+     "clauses": [
+      "체내 탄수화물, 지방, 단백질 대사에 관여"
+     ]
+    }
+   ],
+   "oldContentHash": "55ba56772c84a989b4f59791e2c9b3bd2ad11b4ddde55e3f8d58a259fb1af957",
+   "newContentHash": "b4d54fc51e96cbd0d5bd09ef64516a5beeb46d4be6808a5165f4a3068bb3b7f2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>센트룸 원데이팩 우먼 2030<small>히알루론산</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 장타원형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>EPA 및 DHA 함유 유지</b><ul class=\"sd-why\"><li>혈중 중성지질 개선･혈행 개선･건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요, 뼈의 구성에 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요, 태아 신경관의 정상 발달에 필요, 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌</li><li>철 : 체내 산소운반과 혈액생성에 필요, 에너지 생성에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>요오드</b><ul class=\"sd-why\"><li>갑상선 호르몬의 합성에 필요, 에너지 생성에 필요, 신경발달에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>몰리브덴</b><ul class=\"sd-why\"><li>산화･환원 효소의 활성에 필요</li></ul></li><li><b>크롬</b><ul class=\"sd-why\"><li>체내 탄수화물, 지방, 단백질 대사에 관여</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 자줏빛 분홍색의 장타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "4e785869-c3b5-4f4a-ae32-4d10b38c7fbc",
+   "canonicalId": "ffefa116-76b5-465d-93b1-7f347fcda8b2",
+   "productMasterId": "b7e25c79-1113-4855-a106-d568ad460484",
+   "statementNo": "20130020024388",
+   "productName": "투퍼데이 관절&연골 뮤코다당·단백 콘드로이친1200",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 10,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 9,
+   "groups": [
+    {
+     "label": "뮤코다당·단백",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "52e4a214637fffd15908ff2e4552a16ff1c7753160ec833974d1fb2eedfb0eb7",
+   "newContentHash": "d281a57b11fe3df71a375e22815e6eff923e248505df16a3093d548df72b6531",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>투퍼데이 관절&amp;연골 뮤코다당·단백 콘드로이친1200<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 회황색 또는 연한 노란색의 장방형 제피정제 · (주)서흥헬스케어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당·단백</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 회황색 또는 연한 노란색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "0b032073-bdaa-43c4-a8fa-3e6bf381755f",
+   "canonicalId": "508edd34-30b0-48e9-a57b-daba0ca4cff9",
+   "productMasterId": "8dcf5c1a-4cad-4267-ab67-4572dc52349e",
+   "statementNo": "20130020024513",
+   "productName": "이알하나 ERr731 프리미엄 앰플 샷",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 13,
+   "officialLabels": 13,
+   "officialClauses": 19,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 17,
+   "groups": [
+    {
+     "label": "저분자콜라겐펩타이드GT(제2022-6호)",
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음",
+      "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "가르시니아캄보지아 추출물",
+     "clauses": [
+      "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "EPA 및 DHA 함유 유지",
+     "clauses": [
+      "혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "은행잎 추출물",
+     "clauses": [
+      "기억력 개선·혈행 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "마리골드꽃추출물(지아잔틴함유)(제2024-25호)",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "루바브뿌리추출물(ERr731Ⓡ)(제2024-17호)",
+     "clauses": [
+      "갱년기 여성 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민K",
+     "clauses": [
+      "정상적인 혈액응고에 필요",
+      "뼈의 구성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "eb34c0c3ef15b2e7e325186721c239f759d98c950fdbe961104ea10c94d2cebc",
+   "newContentHash": "f81ba4a91b7e03ba92a12c26a82d0c5fed3ee5f186ecee4ad73d41d9ff79834f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>이알하나 ERr731 프리미엄 앰플 샷<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)서흥헬스케어 제조 · 1일 1회 1회 1병</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1병</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐 · (주)서흥헬스케어 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드GT(제2022-6호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>가르시니아캄보지아 추출물</b><ul class=\"sd-why\"><li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>EPA 및 DHA 함유 유지</b><ul class=\"sd-why\"><li>혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>은행잎 추출물</b><ul class=\"sd-why\"><li>기억력 개선·혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>마리골드꽃추출물(지아잔틴함유)(제2024-25호)</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>루바브뿌리추출물(ERr731Ⓡ)(제2024-17호)</b><ul class=\"sd-why\"><li>갱년기 여성 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1병</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없으며 밝은 적갈색의 점도가 있는 내용물을 함유한 흑갈색 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "756d2054-79a9-4db1-8b04-0bd794a4f072",
+   "canonicalId": "166d15ee-05af-4750-9e95-85731bcd8c7c",
+   "productMasterId": "d23e8f96-fd69-46ab-a798-0e09ba3f8dc3",
+   "statementNo": "2019001602489",
+   "productName": "관절엔MSM2000 글루코사민 비타민D 아연",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 7,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 5,
+   "groups": [
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)",
+     "clauses": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "58e671ede3702da1e0436f028795c556b2943f169c60a006c6552867b760ad1c",
+   "newContentHash": "cee8ea311286c140e15c1aeaf3005637d469fc6b42cf789b3e74229f6eebabf1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절엔MSM2000 글루코사민 비타민D 아연<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">주식회사 뉴트리플래닛 제조 · 1일 2회 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하얀색의 장방형 정제 · 주식회사 뉴트리플래닛 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>NAG(엔에이지, N-아세틸글루코사민, N-Acetylglucosamine)</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하얀색의 장방형 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "582f5161-f1db-49dd-b4a1-7f0402b91aa5",
+   "canonicalId": "e143926f-8d62-4daa-b9ae-588a055295ed",
+   "productMasterId": "30f161b9-6bd3-4820-b056-4a692952096a",
+   "statementNo": "20040015162286",
+   "productName": "컷앤핏 트리플 다이어트",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "가르시니아캄보지아추출물",
+     "clauses": [
+      "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "콜레우스포스콜리추출물",
+     "clauses": [
+      "체지방 감소에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "89399388cc49cb981a5246bc9b57edd2b41117bb26fde4f21a7dab83ae1d6fae",
+   "newContentHash": "00227c3f9811f9a53a1853c0b398760baf153099858b934ef72302abd9055b94",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>컷앤핏 트리플 다이어트<small>히알루론산</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 흰노랑색의 타원형 제피정제 · (주)허브큐어 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>가르시니아캄보지아추출물</b><ul class=\"sd-why\"><li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌</li></ul></li><li><b>콜레우스포스콜리추출물</b><ul class=\"sd-why\"><li>체지방 감소에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 흰노랑색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 서늘한 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "23414fb4-d5c6-41db-b780-23ac4bf5a7d2",
+   "canonicalId": "4cc20bab-d62b-4a6e-9029-8fdf5199eb82",
+   "productMasterId": "9921a64d-f718-436d-ad1c-94bc4af23d09",
+   "statementNo": "200400200022048",
+   "productName": "무브케어",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 4,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "N-아세틸글루코사민",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "엠에스엠",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌"
+     ]
+    }
+   ],
+   "oldContentHash": "2441fd3496de9244c07ad43f521f087f1c47a7aa10f392695ae3412d5e0aad63",
+   "newContentHash": "53c41f7c57ceb18cde30d4d94df55c6b38657f62d26cf431a679cdc039d2c172",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>무브케어<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>엠에스엠</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "e1312b21-d7f1-427d-8bfd-86eddb5be87d",
+   "canonicalId": "1ca40c7f-460a-49ec-8593-baa03a734f5f",
+   "productMasterId": "d750c713-3c6b-44fa-9802-bc02a5f797ab",
+   "statementNo": "200400200023200",
+   "productName": "피부N365",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "로즈마리추출물등복합물",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "8937885d1d33f8e5ceda5fb569d5e345c99ac181ec3231a0b2e087a7a935828f",
+   "newContentHash": "33fd587f762a4909cc6c0f9f4e28b4ccb29ea51a7db5b31b772b8caf9ca054a5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>피부N365<small>히알루론산</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 3캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3캡슐</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>로즈마리추출물등복합물</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "00c89e23-6d75-4f65-9255-c900a8824263",
+   "canonicalId": "bab7eab8-7627-4001-ad82-ef567ca234c1",
+   "productMasterId": "bd9f0d55-8ee5-4f2b-a9ce-7745ac977f98",
+   "statementNo": "200400200023414",
+   "productName": "더마뷰티 스킨부스터",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 5,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 3,
+   "groups": [
+    {
+     "label": "로즈마리추출물등복합물",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "cf5be177768b1dcd8a2e2421e2c14019a54a70e957c71d22915a62c01629a1be",
+   "newContentHash": "46753f2a8ccb132cbbef196e9dde33cd4298f59d6e78810e956292a8a0b6f2ad",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더마뷰티 스킨부스터<small>히알루론산</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>로즈마리추출물등복합물</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 갈색의 내용물을 함유한 갈흑색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "8f01874b-1828-40fa-bf11-46b931baf776",
+   "canonicalId": "84760022-f1bf-4e29-8617-10c8904f1788",
+   "productMasterId": "a421746b-ba23-4565-8de3-41f9d911852e",
+   "statementNo": "200400200023577",
+   "productName": "피부엔 로즈마리 히알루론산",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 4,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "로즈마리추출물등복합물",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "97cd85b2eae2211fae0a28f7650d31d6ef3b91be720752cad75dee2c2fc82216",
+   "newContentHash": "1b5e62279de0a14d5d7a2a42963a42d370b47ebed1c321833079793d49681709",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>피부엔 로즈마리 히알루론산<small>히알루론산</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 진한 갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐 · 코스맥스바이오(주) 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>로즈마리추출물등복합물</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 진한 갈색의 내용물을 함유한 갈흑색의 장방형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "f3e3b7d2-d8ae-4087-b538-999bbaaeeb42",
+   "canonicalId": "532032cf-d82b-444f-8c70-69080197174a",
+   "productMasterId": "dfd016b0-cc8b-4a4e-84ad-8e3af5822823",
+   "statementNo": "200400200082459",
+   "productName": "글로우 콜렉티브 콜라겐",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 0,
+   "officialClauses": 6,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 5,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "4c8a4bbf539749370368569243e0090a2ddefcde70e8a1a5cee837d5738e7356",
+   "newContentHash": "766f1205b17cd4f9e72ab6ab5ab2f19d41603dd40989de2b26862c158292dbeb",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>글로우 콜렉티브 콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 탁한 자줏빛 분홍색 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 탁한 자줏빛 분홍색 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오. 제품은 직사광선을 피하고 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단할 수 있도록 뚜껑을 꼭 닫아 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "ca2be4f0-6819-4990-8f87-9b9c145606fb",
+   "canonicalId": "4c638b21-e11b-41c0-a53b-2769390286e6",
+   "productMasterId": "b139b6a5-7aea-4233-89f5-6377dfd72256",
+   "statementNo": "200400200082543",
+   "productName": "더 콜렉티브 콜라겐",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 6,
+   "officialLabels": 0,
+   "officialClauses": 11,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 10,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "6cbb6031b9569ac9d66434a200f0da72b3611cb73890a187cff499b80806b839",
+   "newContentHash": "a3f228663a62ac563d9f1c3373f5823dd9a314729cca03bbdbd074b9152f7c49",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>더 콜렉티브 콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 연한 자줏빛 분홍색 장방형 제피 정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 노란 하얀색의 연한 자줏빛 분홍색 장방형 제피 정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오. 영.유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "742a0232-256e-4c5c-9f85-652c7b824aa8",
+   "canonicalId": "240c8401-87ff-4e7a-9141-d2f597457b08",
+   "productMasterId": "579bf1b0-efa6-48bd-9995-ecb9dfabad45",
+   "statementNo": "200600200031462",
+   "productName": "애터미 터마신 MSM",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "강황 추출물(터마신)(기능성원료인정제2014-2호)",
+     "clauses": [
+      "관절건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "디메틸설폰)",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "331fe78f20f23673e86f4ba03ac0b83f05b83085a330c258529b5318d45d9569",
+   "newContentHash": "042e56329c6c185129b47f97d2a00d3bea6a3bb2bff4e84120b473ea7c35bb36",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>애터미 터마신 MSM<small>MSM(엠에스엠·디메틸설폰)</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>MSM(엠에스엠·디메틸설폰)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 황갈색의 타원형 제피정제 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>강황 추출물(터마신)(기능성원료인정제2014-2호)</b><ul class=\"sd-why\"><li>관절건강에 도움을 줄 수 있음</li></ul></li><li><b>디메틸설폰)</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 황갈색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기가 적고 직사광선을 받지 않는 실온에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "13064c7d-eeba-40e4-a35e-f51bbb77eb29",
+   "canonicalId": "7324a80b-9393-44f8-af57-67470c05bb3e",
+   "productMasterId": "25c949ba-2ce5-4113-a6b4-7ce7cf8ffe51",
+   "statementNo": "201600100024",
+   "productName": "조인트365 리프리놀",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "리프리놀-초록입홍합추출오일(2009-49호)",
+     "clauses": [
+      "관절 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "f9b2ec4c18ff8df2732130629b1f0a4e45a36ce08c0d25281a7eec680f9434f6",
+   "newContentHash": "ae89f318aa4e994b75594bb0557c75deb9eec74afc2077cea0e8a6d6d7f20c70",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">초록입홍합추출오일</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>조인트365 리프리놀<small>초록입홍합추출오일</small></h1><p class=\"sd-meta\">(주)바이오스타줄기세포기술연구원 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>초록입홍합추출오일</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>초록입홍합추출오일</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 투명한 타원형 연질캡슐 · (주)바이오스타줄기세포기술연구원 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>리프리놀-초록입홍합추출오일(2009-49호)</b><ul class=\"sd-why\"><li>관절 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황색의 내용물을 함유한 투명한 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "504cbb3c-fb9b-42ae-81a9-90f8dea41659",
+   "canonicalId": "7b8880db-503b-495a-b085-476cb7c9d26a",
+   "productMasterId": "2dc76ef2-5fdd-4fa8-8102-cac1dd8a8914",
+   "statementNo": "2006001532626",
+   "productName": "셀로맥스 알로푸룬쾌변주스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 2,
+   "officialLabels": 1,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "core",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "난소화성말토덱스트린",
+     "clauses": [
+      "식후 혈당상승 억제･배변활동 원활에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "0a19cd9df6c9957099906c479a4e9bab3b802690f9213b7381e5ac7b81409905",
+   "newContentHash": "700efdbeca81522c06777584ce3f7c298ae5bbd8ab797a43424c8feff87b0538",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>셀로맥스 알로푸룬쾌변주스</h1><p class=\"sd-meta\">건강기능식품 · 공식 인정 기능성 기반 매장 설명서</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다.</p>\n  <h2>주요 기능성</h2><div class=\"sd-item\"><ul><li>식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음</li><li>식후 혈당상승 억제･배변활동 원활에 도움을 줄 수 있음</li></ul></div><h2>섭취량 및 섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span></span><p class=\"sd-meta\">1일 1회, 1회 1포(100mL)를 그대로 음용</p></div>\n  <h2>섭취 시 참고사항</h2><div class=\"sd-item\"><ul><li>(3) 섭취 시 주의사항</li><li>반드시 충분한 물과 함께 섭취할 것(액상제외)</li><li>이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것</li></ul></div>\n  <h2>확인 가능한 기준·규격 정보</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 성상 : 고유의 색택과 향미를 가지며 이취,이미가 없는 갈색의 액상</div><div class=\"sd-item\">2) 난소화성말토덱스트린 식이섬유 : 4.2g / 100ml , 최종제품 : 표시량의 80%이상</div><div class=\"sd-item\">3) 납(mg/kg) : 1.0 이하</div><div class=\"sd-item\">4) 카드뮴(mg/kg) : 0.3 이하</div><div class=\"sd-item\">5) 일반세균 : 100 CFU/ml 이하</div><div class=\"sd-item\">6) 대장균군 : 음성</div></div>\n  <h2>매장 전문가 문의 안내</h2><div class=\"sd-cta\"><p>섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.</p></div></div>\n  <div class=\"sd-foot\">제품 표시사항을 함께 확인하십시오.</div></div>"
+  },
+  {
+   "candidateId": "ca6bd307-ec58-4908-98a9-3b33d779216c",
+   "canonicalId": "14b1b490-4711-432c-a261-71482463e550",
+   "productMasterId": "7fe47d99-24de-48a7-9d36-e40c64ba56e2",
+   "statementNo": "20040015162137",
+   "productName": "관절 365",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 14,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 3,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 11,
+   "groups": [
+    {
+     "label": "엠에스엠",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음",
+      "N-아세틸글루코사민 -",
+      "관절 및 연골 건강·피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요",
+      "신경과 근육 기능 유지에 필요",
+      "정상적인 혈액응고에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "마그네슘",
+     "clauses": [
+      "에너지 이용에 필요",
+      "신경과 근육 기능 유지에 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    }
+   ],
+   "oldContentHash": "4843ec054d0835376068f64c8ac7afb89b26d7d95d1523f914d5e69727c6c56e",
+   "newContentHash": "efb98aec7056a1b9516df8133213d1505acb30f5a39a16cb8d87c485ec7d89e0",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절 365<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미,이취가 없는 불규칙한 점박이가 있는 연한 노란 주황색의 타원형 제피정제 · (주)허브큐어 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>엠에스엠</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li><li>N-아세틸글루코사민 -</li><li>관절 및 연골 건강·피부보습에 도움을 줄 수 있음</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미,이취가 없는 불규칙한 점박이가 있는 연한 노란 주황색의 타원형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 섭취 전 제품 표시사항을 확인 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "bf841617-5bab-415e-9117-2b1ca71d2ee5",
+   "canonicalId": "7f372926-cd54-4860-915d-2539fe377c04",
+   "productMasterId": "b760a6f5-92d0-4b46-bb87-7880bde56305",
+   "statementNo": "2004001516271",
+   "productName": "식이섬유화이버캡",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 1,
+   "officialLabels": 1,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "차전자피 제품",
+     "clauses": [
+      "콜레스테롤 개선",
+      "배변활동 원활"
+     ]
+    }
+   ],
+   "oldContentHash": "1a11b159ef42aa74c3d602f1824845f85d0154e23919b735aa066cb849396c7e",
+   "newContentHash": "2e596724f0ed08862553c7a843d601e4b4f695088380621f905c3acc9319c9e9",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">차전자피식이섬유</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>식이섬유화이버캡<small>차전자피식이섬유</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회 1회 6캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>차전자피식이섬유</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 6캡슐</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>차전자피식이섬유</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>갈색분말을 내용물로 한 투명의 경질캡셀 - · (주)허브큐어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li><li>배변활동 원활</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 6캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 갈색분말을 내용물로 한 투명의 경질캡셀 -</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 제조일로부터 24개월</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "956d9fa3-8396-4381-b0de-a5a6f5c6dbe1",
+   "canonicalId": "a05f472c-77b9-4901-a87f-d7cb85f25368",
+   "productMasterId": "c1d30f2f-c77c-498d-8be2-40be69360e49",
+   "statementNo": "2004001516277",
+   "productName": "식이섬유화이버플러스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 1,
+   "officialLabels": 1,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "차전자피 제품",
+     "clauses": [
+      "콜레스테롤 개선",
+      "배변활동 원활"
+     ]
+    }
+   ],
+   "oldContentHash": "17f02b2f90f8f6c20b8f31a65a1fa0343a24f931fc89fb86ece288389b92f6a4",
+   "newContentHash": "0e36605bd25e63851a0a558d6d2fe484df6d36cfd3711a6e8f32d65dc7d920f2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">차전자피식이섬유</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>식이섬유화이버플러스<small>차전자피식이섬유</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>차전자피식이섬유</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>차전자피식이섬유</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>(주)허브큐어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li><li>배변활동 원활</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 제조일로부터 24개월</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "fbce5c73-5bf8-4573-bf59-1df5b9d4cb69",
+   "canonicalId": "319c9cc1-820d-4e2f-8725-f9f946fc445f",
+   "productMasterId": "2c96a594-c092-4af1-9c15-9e0f1fcb79b2",
+   "statementNo": "2004001516278",
+   "productName": "화이버오렌지향",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 1,
+   "officialLabels": 1,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 1,
+   "groups": [
+    {
+     "label": "차전자피 제품",
+     "clauses": [
+      "콜레스테롤 개선",
+      "배변활동 원활"
+     ]
+    }
+   ],
+   "oldContentHash": "6aa1a77529b7570296d145c9e9233b5a26313e393c92438ce74d8dd8dd376316",
+   "newContentHash": "2880397d47cb3316bdf164dc7abfddd2e468247d959634a33bc8d4d9d8091c6f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">차전자피식이섬유</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>화이버오렌지향<small>차전자피식이섬유</small></h1><p class=\"sd-meta\">(주)허브큐어 제조 · 1일 2회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>차전자피식이섬유</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>차전자피식이섬유</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>갈색의분말 · (주)허브큐어 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>콜레스테롤 개선</li><li>배변활동 원활</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 갈색의분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 2년</div><div class=\"sd-item\"><b>보관</b> 제조일로부터 24개월</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "fb9694b1-f7ab-4679-87c6-706c982ec094",
+   "canonicalId": "7fd8f074-2dd0-4869-b1a7-050d83e565e5",
+   "productMasterId": "739974df-3331-4a83-a602-371e05338aa3",
+   "statementNo": "200400170061844",
+   "productName": "방탄젤리",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 1,
+   "officialLabels": 0,
+   "officialClauses": 1,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 4,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 4,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": -3,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "443acadca280c078d53e62a598d6aeb03534ad418ad60aa7097a03e591993436",
+   "newContentHash": "6d38eb910b98e07e4411377fec17c7cea945f8c3f7b451ff3d90f2b37e3d7cd1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">식이섬유 6g</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>방탄젤리<small>식이섬유</small></h1><p class=\"sd-meta\">(주)알피바이오 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 식이섬유 <b>6g</b>를 표시량으로 담았습니다(표시 기준 20g당). 식이섬유의 기능성은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 식이섬유 <b>6g</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 스틱형 젤리 · (주)알피바이오 제조</li></ul>\n  <h2>식이섬유 기능성 (공식 인정)</h2><ul class=\"sd-why\"><li>식후 혈당상승 억제･혈중 중성지질 개선･배변활동 원활에 도움을 줄 수 있음</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>식이섬유</b> 표시량(6g/20g)의 80% 이상</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 연한 노랑색의 스틱형 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 1) 제품은 직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관 소비하여야 한다. 2) 제품은 소비 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "df6734df-30a6-40fa-96b7-0a938de9bda8",
+   "canonicalId": "eb17747f-cabc-4116-ac48-7bcab50abda9",
+   "productMasterId": "dddcbb91-e7db-45e3-8b53-0d90dbabf812",
+   "statementNo": "200400170211814",
+   "productName": "촉촉어린콜라겐비오틴",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 6,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 4,
+   "groups": [
+    {
+     "label": "저분자콜라겐펩타이드(제2023-33호)",
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음",
+      "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "46850ec7a15d1aacf4afe4b914120302c54de185ca101991f18fb7cea8fe9a28",
+   "newContentHash": "13f5c60b1367cb1df51d3b75a1372ee31d630ccb32ee861a1c52752fec06094f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>촉촉어린콜라겐비오틴<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말 · (주)비오팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-33호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/① 직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.② 제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다.③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "f95133ba-0ede-43f6-a3fa-a38cb056a898",
+   "canonicalId": "63c56c03-f83a-48f1-9131-e204ef123a87",
+   "productMasterId": "19568cbd-d1b0-41a5-989d-2ce48891c09a",
+   "statementNo": "200400170211846",
+   "productName": "트루 뼈건강 칼마디",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 8,
+   "currentGroups": 3,
+   "currentLabels": 3,
+   "currentClauses": 9,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": -1,
+   "groups": [
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요",
+      "신경과 근육 기능 유지에 필요",
+      "정상적인 혈액응고에 필요 4)골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "마그네슘",
+     "clauses": [
+      "에너지 이용에 필요",
+      "신경과 근육 기능 유지에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    }
+   ],
+   "oldContentHash": "7d6a08b69be7e658c4eea5911045b35ef0601def2bd374932c89e5cdc6274b6f",
+   "newContentHash": "87715f52c56384e3213bbb098b130bce0e2395d2b0ffe6423c2b4ccb972c4d53",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">마그네슘 150mg</span><span class=\"sd-badge is-solid\">비타민 D 10μg</span><span class=\"sd-badge is-solid\">칼슘 300mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트루 뼈건강 칼마디<small>마그네슘 · 비타민 D · 칼슘</small></h1><p class=\"sd-meta\">(주)비오팜 제조 · 1일 1회 1정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 마그네슘 <b>150mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b>를 표시량으로 담은 3원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1정) 섭취로 마그네슘 <b>150mg</b>, 비타민 D <b>10μg</b>, 칼슘 <b>300mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 장방형 제피정제 · (주)비오팜 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요 4)골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>마그네슘</b> 표시량(150mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 D</b> 표시량(10μg/1500mg)의 80~180%</div><div class=\"sd-item\"><b>칼슘</b> 표시량(300mg/1500mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 점박이가 있는 하양색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 실온/(1)직사광선 및 고온 다습한 곳을 피하여 실온에 보관하십시오.(2)유통 중 인습되지 않도록 포장의 파손에 주의하십시오.(3)어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "139afef9-81a7-4d4b-81a6-a37db8080bf6",
+   "canonicalId": "d637e6d8-4031-488e-9903-8c3bc6cf53e9",
+   "productMasterId": "49a50f44-7015-4ebe-8e57-6551088a9d16",
+   "statementNo": "200400200021905",
+   "productName": "스마일렌 식물성오메가3  ",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 2,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 3,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": -1,
+   "groups": [
+    {
+     "label": "EPA및DHA함유유지",
+     "clauses": [
+      "건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음, 혈중 중성지질 개선 ․ 혈행 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "8cd42eb1e78d631c368b000c13ea947b32415bb4ae8f84d5c278968d50c64aba",
+   "newContentHash": "2f22d0243386f3d0d556fe71f25337d9e17b2439195b4353cf6c35a728d5a6b2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 E</span><span class=\"sd-badge is-solid\">오메가3</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>스마일렌 식물성오메가3<small>비타민 E · 오메가3</small></h1><p class=\"sd-meta\">코스맥스바이오(주) 제조 · 1일 1회 1회 2캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>비타민 E</b>, <b>오메가3</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2캡슐</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>비타민 E</b>, <b>오메가3</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다. · 코스맥스바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>EPA및DHA함유유지</b><ul class=\"sd-why\"><li>건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음, 혈중 중성지질 개선 ․ 혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다.</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년.</div><div class=\"sd-item\"><b>보관</b> 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "04e28d55-b0b6-4de9-a13c-8a4ef729bab7",
+   "canonicalId": "ce5cddfd-83da-4a1c-8a17-5490c4d4c1ad",
+   "productMasterId": "a511bf7a-8787-4344-b69c-8d2e32a31d62",
+   "statementNo": "200400200061246",
+   "productName": "코큐텐밸런스",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 6,
+   "officialLabels": 6,
+   "officialClauses": 9,
+   "currentGroups": 6,
+   "currentLabels": 6,
+   "currentClauses": 9,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "코엔자임Q10",
+     "clauses": [
+      "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "엽산",
+     "clauses": [
+      "세포와 혈액생성에 필요",
+      "태아 신경관의 정상 발달에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "ed59d3f0df8bdabe8adeced18f35acdc5f6c98a6ccacfc721f8b1543a71aaec2",
+   "newContentHash": "315a7ff37bc5d380911ecf3e1c1adf72e94c0ad6d3ab4972a10dcffdbf3b52bb",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">비타민 B12 25μg</span><span class=\"sd-badge is-solid\">비타민 B6 1.5mg</span><span class=\"sd-badge is-solid\">비타민 E 11mg</span><span class=\"sd-badge is-solid\">셀레늄 16.5μg</span><span class=\"sd-badge is-solid\">엽산 400μg</span><span class=\"sd-badge is-solid\">코엔자임Q10 100mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>코큐텐밸런스<small>비타민 B12 · 비타민 B6 · 비타민 E · 셀레늄 · 엽산 · 코엔자임Q10</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 비타민 B12 <b>25μg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 셀레늄 <b>16.5μg</b>, 엽산 <b>400μg</b>, 코엔자임Q10 <b>100mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 비타민 B12 <b>25μg</b>, 비타민 B6 <b>1.5mg</b>, 비타민 E <b>11mg</b>, 셀레늄 <b>16.5μg</b>, 엽산 <b>400μg</b>, 코엔자임Q10 <b>100mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 주황의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐 · (주)서흥 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li><li><b>비타민B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>비타민 B12</b> 표시량(25μg/0.5g)의 80~180%</div><div class=\"sd-item\"><b>비타민 B6</b> 표시량(1.5mg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(11mg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>셀레늄</b> 표시량(16.5μg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>엽산</b> 표시량(400μg/0.5g)의 80~150%</div><div class=\"sd-item\"><b>코엔자임Q10</b> 표시량(100mg/0.5g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 주황의 점도가 있는 내용물을 함유한 흑갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일부터 24개월</div><div class=\"sd-item\"><b>보관</b> ① 제품은 직사광선을 피하고, 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "85ba9226-77d3-4172-a5ec-a34f56bba88c",
+   "canonicalId": "d7d90a1d-b67f-4d02-bc20-fe96547335ef",
+   "productMasterId": "33f64338-6108-4995-a79e-bbac93df05ff",
+   "statementNo": "200400200061882",
+   "productName": "관절엔 뮤코다당단백 콘드로이친",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 4,
+   "officialClauses": 9,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 8,
+   "groups": [
+    {
+     "label": "뮤코다당･단백",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "망간",
+     "clauses": [
+      "뼈 형성에 필요",
+      "에너지 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민K",
+     "clauses": [
+      "정상적인 혈액응고에 필요",
+      "뼈의 구성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "3859acee2648187500641d3e3cd42349e1b2a3b531b9337d7f6620fb314367d8",
+   "newContentHash": "9d3dabd51ccddb5ce970e745cb0b48fa85b63b698db5d8c484ebc954fbedb776",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">뮤코다당·단백(콘드로이친)</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>관절엔 뮤코다당단백 콘드로이친<small>뮤코다당·단백(콘드로이친)</small></h1><p class=\"sd-meta\">(주)서흥 제조 · 1일 1회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>뮤코다당·단백(콘드로이친)</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 2정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>뮤코다당·단백(콘드로이친)</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 흰노랑 또는 회황색의 장방형 제피정제 · (주)서흥 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>뮤코다당･단백</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 흰노랑 또는 회황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> (1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. (2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "1443ee1d-78c3-4539-9353-8c06b99f4b22",
+   "canonicalId": "4575275e-111d-4bdf-b9a1-6c951d741c71",
+   "productMasterId": "34d2c9da-f4f4-4561-814b-405dfdb09e29",
+   "statementNo": "200400200073171",
+   "productName": "피부보습 건강엔 어린콜라겐 & 비오틴",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "저분자콜라겐펩타이드(제2023-33호)",
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음/자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요/철의 흡수에 필요/항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "f903584d3a2a7ebc4c18b3c0f1b1fb6a485958ef2e641e163d7767b28aabdb7d",
+   "newContentHash": "7d6bed0341381e42455e2abdfd1d9a9cbe834f045aa7cf69197f65f7942c442f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">저분자콜라겐펩타이드</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>피부보습 건강엔 어린콜라겐 &amp; 비오틴<small>저분자콜라겐펩타이드</small></h1><p class=\"sd-meta\">(주)한국씨엔에스팜 제조 · 1일 2회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>저분자콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>저분자콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 연한 노랑색의 분말 · (주)한국씨엔에스팜 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>저분자콜라겐펩타이드(제2023-33호)</b><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음/자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요/철의 흡수에 필요/항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 연한 노랑색의 분말</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "9339a7ef-d88b-4e92-b9ec-4d29e7a67b05",
+   "canonicalId": "52bc5dbb-e61e-4a4a-80dc-8953149b6e76",
+   "productMasterId": "d7c6e343-5dbf-4b86-b645-fb2bbaecf902",
+   "statementNo": "200400200082244",
+   "productName": "에버콜라겐 블랙F",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 4,
+   "officialLabels": 0,
+   "officialClauses": 6,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "FLAT_CLAUSES_RESTORED",
+   "restoredClauses": 4,
+   "groups": [
+    {
+     "label": null,
+     "clauses": [
+      "피부 보습에 도움을 줄 수 있음",
+      "자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": null,
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "460b001147069c701b2133a660b09ddd14aaaa77ba042c8da4fc800c15aed6b7",
+   "newContentHash": "80432df5f7e0c7dd99158f349f0547bd0891ed162fbdf44c18524c2402941035",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>에버콜라겐 블랙F<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">주식회사 노바렉스 제조 · 1일 1회 1회 3정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 3정</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 분홍빛 하얀색 타원형의 투명 제피정제 · 주식회사 노바렉스 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-why\"><li>피부 보습에 도움을 줄 수 있음</li><li>자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음</li><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 3정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미·이취가 없는 점박이를 함유한 분홍빛 하얀색 타원형의 투명 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "01bea8bf-64ff-49a3-99e2-6e8079dcc117",
+   "canonicalId": "41c9ec34-8d2e-41fa-879c-a4af4fece64c",
+   "productMasterId": "b384e6eb-d40a-4f2d-b906-785979d34faf",
+   "statementNo": "20040020013416",
+   "productName": "화애락 글로우 부스터",
+   "track": "B",
+   "queueReason": "CANONICAL_STRUCTURE_REQUIRES_REDESIGN",
+   "officialGroups": 5,
+   "officialLabels": 5,
+   "officialClauses": 7,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 5,
+   "groups": [
+    {
+     "label": "홍삼",
+     "clauses": [
+      "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "로즈마리추출물등복합물",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "코엔자임Q10",
+     "clauses": [
+      "항산화·높은 혈압 감소에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "5c9a2b272da708cb3ed12f39b3aa6f14c60ce9e37aacf5a7d5bef08613b7ccf9",
+   "newContentHash": "9b0d2717be1076883daf4b13eb206a4d686eb103b94f3132e0f9c2649a93f814",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>화애락 글로우 부스터<small>히알루론산</small></h1><p class=\"sd-meta\">(주)한국인삼공사 제조 · 1일 1회 1회 1병</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1병</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 진한 갈색의 액상 · (주)한국인삼공사 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>홍삼</b><ul class=\"sd-why\"><li>면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음</li></ul></li><li><b>로즈마리추출물등복합물</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부 건강 유지에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>코엔자임Q10</b><ul class=\"sd-why\"><li>항산화·높은 혈압 감소에 도움을 줄 수 있음</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1병</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 진한 갈색의 액상</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 2년</div><div class=\"sd-item\"><b>보관</b> 고온다습한 곳에 두시면 변질 및 피막이 녹을 수 있으므로 직사광선을 피하여 실온에 보관하십시오. 개봉 후에는 변질될 수 있으므로 바로 섭취하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "2cc29228-254e-47c0-87c1-9557d61926de",
+   "canonicalId": "60af5e6b-68bc-4d66-8458-f97ead22d45d",
+   "productMasterId": "f8bd23da-c890-4fb7-95c5-50d52f8d2030",
+   "statementNo": "200600200032444",
+   "productName": "하루엔진 포 우먼",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 13,
+   "officialLabels": 13,
+   "officialClauses": 13,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 12,
+   "groups": [
+    {
+     "label": "녹차추출물",
+     "clauses": [
+      "항산화∙체지방감소∙혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "은행잎 추출물",
+     "clauses": [
+      "기억력 개선∙혈행 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "프로바이오틱스",
+     "clauses": [
+      "유산균 증식 및 유해균 억제∙배변활동 원활∙장건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "히알루론산",
+     "clauses": [
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민 A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요 , 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "비타민 C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민 D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민 E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "34fbd0f5b560e01e5e38f8cd8e377021dec752a776114107024767efc728e79f",
+   "newContentHash": "d7df11ad39cda1e75eb18ab8cb8d09d46de608160059951cb3eeeb53d77942d2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">히알루론산</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루엔진 포 우먼<small>히알루론산</small></h1><p class=\"sd-meta\">콜마비앤에이치(주)음성공장 제조 · 1일 1회</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>히알루론산</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>히알루론산</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 흰색의 장방형 경질캡슐 · 콜마비앤에이치(주)음성공장 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>녹차추출물</b><ul class=\"sd-why\"><li>항산화∙체지방감소∙혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>은행잎 추출물</b><ul class=\"sd-why\"><li>기억력 개선∙혈행 개선에 도움을 줄 수 있음</li></ul></li><li><b>프로바이오틱스</b><ul class=\"sd-why\"><li>유산균 증식 및 유해균 억제∙배변활동 원활∙장건강에 도움을 줄 수 있음</li></ul></li><li><b>히알루론산</b><ul class=\"sd-why\"><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>비타민 A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요, 피부와 점막을 형성하고 기능을 유지하는데 필요, 상피세포의 성장과 발달에 필요</li></ul></li><li><b>비타민 B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>비타민 B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요 , 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민 B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>비타민 C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민 D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요, 뼈의 형성과 유지에 필요, 골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민 E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 노란 하얀색의 분말을 함유한 흰색의 장방형 경질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> - 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 고온다습한 곳과 직사광선을 피하여 실온에 보관하십시오. - 어린이의 손에 닿지 않도록 주의하시기 바랍니다.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "806c70b9-c738-44aa-b172-041078c7f44a",
+   "canonicalId": "9fb15061-4925-4da9-a7a2-2e134872c4aa",
+   "productMasterId": "5233a742-0b7d-4ca3-9bf4-6423232d2d2c",
+   "statementNo": "20130015151103",
+   "productName": "트루엔 듀얼액상콜라겐",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 3,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 2,
+   "groups": [
+    {
+     "label": "(국문)",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음",
+      "피부보습에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "피쉬콜라겐펩타이드",
+     "clauses": [
+      "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음, 피부보습에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "15e16378d715af85d486595fafce8fdc8049615aeaf8233793244408c02ebc30",
+   "newContentHash": "0eb476ddbd273bb125b41fc8c29f8adfb06d51b5df18c3a4b8b6bc63643ddbb7",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">콜라겐펩타이드</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>트루엔 듀얼액상콜라겐<small>콜라겐펩타이드</small></h1><p class=\"sd-meta\">주식회사웰파인 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>콜라겐펩타이드</b>을(를) 주원료로 한 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>입니다. 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>콜라겐펩타이드</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 노란색의 점도가 있는 액상 · 주식회사웰파인 제조</li></ul>\n  <h2>공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>(국문)</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음</li><li>피부보습에 도움을 줄 수 있음</li></ul></li><li><b>피쉬콜라겐펩타이드</b><ul class=\"sd-why\"><li>자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음, 피부보습에 도움을 줄 수 있음</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 노란색의 점도가 있는 액상</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 직사광선을 피하고 습기가 없는 서늘한 곳에 실온 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "b8e3b585-dd59-4bb4-ae9c-d15dba628bd6",
+   "canonicalId": "c74539ad-c615-43e3-8111-d1ceadfb038d",
+   "productMasterId": "7cbd7bbf-4c23-4133-ad18-6974f4d881f2",
+   "statementNo": "20130015151111",
+   "productName": "우리아이 항균엔 프로폴리스 먹짱",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 2,
+   "officialLabels": 2,
+   "officialClauses": 2,
+   "currentGroups": 1,
+   "currentLabels": 0,
+   "currentClauses": 4,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": -2,
+   "groups": [
+    {
+     "label": "프로폴리스추출물",
+     "clauses": [
+      "항산화·구강에서의 항균작용에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요, 정상적인 세포분열에 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "00465a0dcde11d4f198edc7ee78bafec6840402452bac5e3ed20fa6bc6cf669d",
+   "newContentHash": "afc3bca932c7b10aecc6d2b0a4f26a7fc16df48abad1f99918d1b2a4ba873f81",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">아연 4mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>우리아이 항균엔 프로폴리스 먹짱<small>아연</small></h1><p class=\"sd-meta\">주식회사웰파인 제조 · 1일 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 1일 섭취량(1회 · 1포)에 아연 <b>4mg</b>를 표시량으로 담았습니다(표시 기준 15g당). 아연의 영양기능은 아래 공식 인정 범위와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1포) 섭취로 아연 <b>4mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 연한 연두색의 젤리 · 주식회사웰파인 제조</li></ul>\n  <h2>아연 영양기능 (공식 인정 기능성)</h2><ul class=\"sd-func\"><li><b>프로폴리스추출물</b><ul class=\"sd-why\"><li>항산화·구강에서의 항균작용에 도움을 줄 수 있음</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요, 정상적인 세포분열에 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>아연</b> 표시량(4mg/15g)의 80~120%</div><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 연한 연두색의 젤리</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 18개월</div><div class=\"sd-item\"><b>보관</b> 제조일로부터 18개월</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "b90a1974-a557-4d51-8cee-82774f4d6fa3",
+   "canonicalId": "22eaec0d-0166-41c6-b045-840363cb0234",
+   "productMasterId": "99b2ea82-427a-4817-ac88-25948c7f3beb",
+   "statementNo": "20172880193109",
+   "productName": "관절탱탱 MSM 비타프로젝트",
+   "track": "A",
+   "queueReason": "OFFICIAL_SOURCE_CONFLICT",
+   "officialGroups": 3,
+   "officialLabels": 3,
+   "officialClauses": 5,
+   "currentGroups": 2,
+   "currentLabels": 2,
+   "currentClauses": 2,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 3,
+   "groups": [
+    {
+     "label": "엠에스엠",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "N-아세틸글루코사민",
+     "clauses": [
+      "관절 및 연골 건강에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "55ea1b9b3b9ccbb6663a1ce5ac29278972e45c54e4bfabac2ff51f563fcc7310",
+   "newContentHash": "295ae17a540ccaa9ba1171967e7b6bd5441eb36c6a6423c1138d2c682cfd7164",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">MSM(엠에스엠·디메틸설폰)</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 2회</span></div>\n  <h1>관절탱탱 MSM 비타프로젝트<small>MSM(엠에스엠·디메틸설폰) · N-아세틸글루코사민</small></h1><p class=\"sd-meta\">대원헬스케어 주식회사 2공장 제조 · 1일 2회 1회 2정</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b>를 주원료로 한 2원료 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 2회, 1회 2정</b>이며, 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>주원료: <b>MSM(엠에스엠·디메틸설폰)</b>, <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제 · 대원헬스케어 주식회사 2공장 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>엠에스엠</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골 건강에 도움을 줄 수 있음</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 2회</span><span class=\"sd-tag\">1회 2정</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 이미, 이취가 없고 고유의 향미가 있는 흰색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월</div><div class=\"sd-item\"><b>보관</b> 습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "597ef05e-f482-4f3c-bced-c18b1eb33535",
+   "canonicalId": "8a71f804-2b4a-4367-b230-c2bd3067f7f0",
+   "productMasterId": "a6fcfd54-f00c-4a12-bd9b-2125ebc12626",
+   "statementNo": "20190009483689",
+   "productName": "루테인지아잔틴",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 6,
+   "officialLabels": 6,
+   "officialClauses": 12,
+   "currentGroups": 6,
+   "currentLabels": 6,
+   "currentClauses": 12,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "마리골드꽃추출물(지아잔틴함유)(제2024-25호)",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "e3f108a5560d86052d02e2b75b346bfd080c93d917a2fb3ea1bcbec04c17cee8",
+   "newContentHash": "3ed4ada4056487484dee7709138910b33d5148508c00f522aa3ae527fc6c27eb",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.24mg</span><span class=\"sd-badge is-solid\">루테인 10mg</span><span class=\"sd-badge is-solid\">비타민 A 240μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>루테인지아잔틴<small>구리 · 루테인 · 비타민 A · 비타민 C · 비타민 E · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>240μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>240μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마리골드꽃추출물(지아잔틴함유)(제2024-25호)</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.24mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>루테인</b> 표시량(10mg/350mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(240μg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 빨강색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "3764d3cf-182a-45f0-ab94-850cee2239eb",
+   "canonicalId": "0cde6f8c-784b-4021-a859-64cc079e7836",
+   "productMasterId": "663a4714-60bb-4088-abf3-33f858eba8e9",
+   "statementNo": "20190009483717",
+   "productName": "슈퍼 클리어 눈 건강 루테인지아잔틴",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 6,
+   "officialLabels": 6,
+   "officialClauses": 12,
+   "currentGroups": 6,
+   "currentLabels": 6,
+   "currentClauses": 12,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "마리골드꽃추출물(지아잔틴함유)(제2025-7호)",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "0e4914243a1eba3d8708bfda17114e7e7dd7838ca96027534835bc4231408a56",
+   "newContentHash": "2fb1c3874f8663abd846776bc410523b5491c122cbe5f9081cb1cf9fe8c1707d",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.24mg</span><span class=\"sd-badge is-solid\">루테인 10mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>슈퍼 클리어 눈 건강 루테인지아잔틴<small>구리 · 루테인 · 비타민 A · 비타민 C · 비타민 E · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 적갈색의 타원형 연질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마리골드꽃추출물(지아잔틴함유)(제2025-7호)</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.24mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>루테인</b> 표시량(10mg/350mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "f8ea29da-6447-4943-b19e-832b0d5f9868",
+   "canonicalId": "c7e4cc67-1691-40c0-a110-12a6e5f5fb3f",
+   "productMasterId": "8615a7cc-4de6-4aa1-92ce-382e5a91fdd8",
+   "statementNo": "20190009483850",
+   "productName": "하루틴 눈건강 루테인지아잔틴",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 6,
+   "officialLabels": 6,
+   "officialClauses": 12,
+   "currentGroups": 6,
+   "currentLabels": 6,
+   "currentClauses": 12,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 1,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 0,
+   "groups": [
+    {
+     "label": "마리골드꽃추출물(지아잔틴함유)(제2025-7호)",
+     "clauses": [
+      "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민E",
+     "clauses": [
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "비타민A",
+     "clauses": [
+      "어두운 곳에서 시각 적응을 위해 필요",
+      "피부와 점막을 형성하고 기능을 유지하는데 필요",
+      "상피세포의 성장과 발달에 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    }
+   ],
+   "oldContentHash": "86440e97b08c7bf2cd01eb07f1d096813f027418473468bf79f339d0baa37477",
+   "newContentHash": "9cdd768e1467515141c93d73096a2392a03e862d4cb6dfdf6ad4ec591a706c53",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">구리 0.24mg</span><span class=\"sd-badge is-solid\">루테인 10mg</span><span class=\"sd-badge is-solid\">비타민 A 700μg</span><span class=\"sd-badge is-solid\">비타민 C 30mg</span><span class=\"sd-badge is-solid\">비타민 E 3.3mg</span><span class=\"sd-badge is-solid\">아연 2.55mg</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>하루틴 눈건강 루테인지아잔틴<small>구리 · 루테인 · 비타민 A · 비타민 C · 비타민 E · 아연</small></h1><p class=\"sd-meta\">우리바이오(주) 제조 · 1일 1회 1캡슐</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b>를 표시량으로 담은 6원료 복합 건강기능식품입니다. 각 원료의 공식 인정 기능성은 아래와 같습니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>1일 1회(1캡슐) 섭취로 구리 <b>0.24mg</b>, 루테인 <b>10mg</b>, 비타민 A <b>700μg</b>, 비타민 C <b>30mg</b>, 비타민 E <b>3.3mg</b>, 아연 <b>2.55mg</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 적갈색의 타원형 연질캡슐 · 우리바이오(주) 제조</li></ul>\n  <h2>원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>마리골드꽃추출물(지아잔틴함유)(제2025-7호)</b><ul class=\"sd-why\"><li>노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민E</b><ul class=\"sd-why\"><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>비타민A</b><ul class=\"sd-why\"><li>어두운 곳에서 시각 적응을 위해 필요</li><li>피부와 점막을 형성하고 기능을 유지하는데 필요</li><li>상피세포의 성장과 발달에 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li></ul><h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1캡슐</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>구리</b> 표시량(0.24mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>루테인</b> 표시량(10mg/350mg)의 80~120%</div><div class=\"sd-item\"><b>비타민 A</b> 표시량(700μg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 C</b> 표시량(30mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>비타민 E</b> 표시량(3.3mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>아연</b> 표시량(2.55mg/350mg)의 80~150%</div><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 빨강색의 내용물을 함유한 적갈색의 타원형 연질캡슐</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> 실온 및 실온유통</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 어린이 손이 닿지 않는 곳에 보관 · 자세한 주의사항은 제품 표시사항을 확인하십시오 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  },
+  {
+   "candidateId": "2ee22636-9697-47e2-adf0-69a4579dd2ea",
+   "canonicalId": "2fa64df6-492a-46f8-a269-f014e6acd9a6",
+   "productMasterId": "e34cf0d7-8f3b-4256-9f19-4e6510e2d775",
+   "statementNo": "20200016052347",
+   "productName": "올인원 헬스팩",
+   "track": "C",
+   "queueReason": "INGREDIENT_OWNERSHIP_REQUIRES_HUMAN_APPROVAL",
+   "officialGroups": 21,
+   "officialLabels": 21,
+   "officialClauses": 37,
+   "currentGroups": 1,
+   "currentLabels": 1,
+   "currentClauses": 1,
+   "hasFnSection": true,
+   "droppedCorruptClauses": 0,
+   "rendererFamily": "why",
+   "status": "RESOLVED_UPDATED",
+   "why": "SOURCE_LABEL_GROUPS_RESTORED",
+   "restoredClauses": 36,
+   "groups": [
+    {
+     "label": "밀크씨슬추출물",
+     "clauses": [
+      "간 건강에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "비타민C",
+     "clauses": [
+      "결합조직 형성과 기능유지에 필요",
+      "철의 흡수에 필요",
+      "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B6",
+     "clauses": [
+      "단백질 및 아미노산 이용에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비타민B1",
+     "clauses": [
+      "탄수화물과 에너지 대사에 필요"
+     ]
+    },
+    {
+     "label": "나이아신",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민B2",
+     "clauses": [
+      "체내 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "판토텐산",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "비타민B12",
+     "clauses": [
+      "정상적인 엽산 대사에 필요"
+     ]
+    },
+    {
+     "label": "아연",
+     "clauses": [
+      "정상적인 면역기능에 필요",
+      "정상적인 세포분열에 필요"
+     ]
+    },
+    {
+     "label": "망간",
+     "clauses": [
+      "뼈 형성에 필요",
+      "에너지 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "셀렌",
+     "clauses": [
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "구리",
+     "clauses": [
+      "철의 운반과 이용에 필요",
+      "유해산소로부터 세포를 보호하는데 필요"
+     ]
+    },
+    {
+     "label": "엽산",
+     "clauses": [
+      "세포와 혈액생성에 필요",
+      "태아 신경관의 정상 발달에 필요",
+      "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요"
+     ]
+    },
+    {
+     "label": "비오틴",
+     "clauses": [
+      "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요"
+     ]
+    },
+    {
+     "label": "칼슘",
+     "clauses": [
+      "뼈와 치아 형성에 필요",
+      "신경과 근육 기능 유지에 필요",
+      "정상적인 혈액응고에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "마그네슘",
+     "clauses": [
+      "에너지 이용에 필요",
+      "신경과 근육 기능 유지에 필요"
+     ]
+    },
+    {
+     "label": "비타민D",
+     "clauses": [
+      "칼슘과 인이 흡수되고 이용되는데 필요",
+      "뼈의 형성과 유지에 필요",
+      "골다공증발생 위험 감소에 도움을 줌"
+     ]
+    },
+    {
+     "label": "비타민K",
+     "clauses": [
+      "정상적인 혈액응고에 필요",
+      "뼈의 구성에 필요"
+     ]
+    },
+    {
+     "label": "녹차추출물",
+     "clauses": [
+      "항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "바나바잎추출물",
+     "clauses": [
+      "식후 혈당상승 억제에 도움을 줄 수 있음"
+     ]
+    },
+    {
+     "label": "N-아세틸글루코사민",
+     "clauses": [
+      "관절 및 연골건강에 도움을 줄 수 있음"
+     ]
+    }
+   ],
+   "oldContentHash": "1fec05859e3ded709fb0f2aa6f65f5ee0cba288a779e9bafff1aba1ca6d246d5",
+   "newContentHash": "62ed96daf01f74d10cc0c50aed3b2781f49ae98c570148306ad818d940545fce",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">건강기능식품</span><span class=\"sd-badge is-solid\">N-아세틸글루코사민</span><span class=\"sd-badge\">1일 1회</span></div>\n  <h1>올인원 헬스팩<small>N-아세틸글루코사민</small></h1><p class=\"sd-meta\">주식회사 상상바이오 제조 · 1일 1회 1회 1포</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">이 제품은 <b>N-아세틸글루코사민</b> 등 공식 인정 기능성 원료를 담은 복합 건강기능식품입니다. 공식 섭취방법은 <b>1일 1회, 1회 1포</b>이며, 아래 공식 인정 기능성을 <b>삭제 없이 모두</b> 안내합니다.</p>\n  <h2>왜 이 제품인가</h2><ul class=\"sd-why\"><li>관절·피부 기능성 원료: <b>N-아세틸글루코사민</b></li><li>대장균군 음성 — 식약처 신고 기준 적합</li><li>고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 노란 주황색의 장방형 제피정제 · 주식회사 상상바이오 제조</li></ul>\n  <h2>관절·피부 원료별 공식 인정 기능성</h2><ul class=\"sd-func\"><li><b>밀크씨슬추출물</b><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li></ul></li><li><b>비타민C</b><ul class=\"sd-why\"><li>결합조직 형성과 기능유지에 필요</li><li>철의 흡수에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>비타민B6</b><ul class=\"sd-why\"><li>단백질 및 아미노산 이용에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비타민B1</b><ul class=\"sd-why\"><li>탄수화물과 에너지 대사에 필요</li></ul></li><li><b>나이아신</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>비타민B2</b><ul class=\"sd-why\"><li>체내 에너지 생성에 필요</li></ul></li><li><b>판토텐산</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>비타민B12</b><ul class=\"sd-why\"><li>정상적인 엽산 대사에 필요</li></ul></li><li><b>아연</b><ul class=\"sd-why\"><li>정상적인 면역기능에 필요</li><li>정상적인 세포분열에 필요</li></ul></li><li><b>망간</b><ul class=\"sd-why\"><li>뼈 형성에 필요</li><li>에너지 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>셀렌</b><ul class=\"sd-why\"><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>구리</b><ul class=\"sd-why\"><li>철의 운반과 이용에 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li></ul></li><li><b>엽산</b><ul class=\"sd-why\"><li>세포와 혈액생성에 필요</li><li>태아 신경관의 정상 발달에 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li></ul></li><li><b>비오틴</b><ul class=\"sd-why\"><li>지방, 탄수화물, 단백질 대사와 에너지 생성에 필요</li></ul></li><li><b>칼슘</b><ul class=\"sd-why\"><li>뼈와 치아 형성에 필요</li><li>신경과 근육 기능 유지에 필요</li><li>정상적인 혈액응고에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>마그네슘</b><ul class=\"sd-why\"><li>에너지 이용에 필요</li><li>신경과 근육 기능 유지에 필요</li></ul></li><li><b>비타민D</b><ul class=\"sd-why\"><li>칼슘과 인이 흡수되고 이용되는데 필요</li><li>뼈의 형성과 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li></ul></li><li><b>비타민K</b><ul class=\"sd-why\"><li>정상적인 혈액응고에 필요</li><li>뼈의 구성에 필요</li></ul></li><li><b>녹차추출물</b><ul class=\"sd-why\"><li>항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음</li></ul></li><li><b>바나바잎추출물</b><ul class=\"sd-why\"><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul></li><li><b>N-아세틸글루코사민</b><ul class=\"sd-why\"><li>관절 및 연골건강에 도움을 줄 수 있음</li></ul></li></ul><h2>함께 표시된 공식 기능성 (원문 보존)</h2><ul class=\"sd-why\"><li>간 건강에 도움을 줄 수 있음</li><li>결합조직 형성과 기능유지에 필요</li><li>항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요</li><li>혈액의 호모시스테인 수준을 정상으로 유지하는데 필요</li><li>유해산소로부터 세포를 보호하는데 필요</li><li>신경과 근육 기능 유지에 필요</li><li>골다공증발생 위험 감소에 도움을 줌</li><li>뼈의 형성과 유지에 필요</li><li>항산화 ･ 체지방 감소 ･ 혈중 콜레스테롤 개선에 도움을 줄 수 있음</li><li>식후 혈당상승 억제에 도움을 줄 수 있음</li></ul>\n  <h2>섭취방법 (공식 표기 그대로)</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">1일 1회</span><span class=\"sd-tag\">1회 1포</span><span class=\"sd-tag\">물과 함께</span></span></div>\n  <h2>표시 기준</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>성상</b> 고유의 향미가 있고 이미, 이취가 없는 불규칙한 점박이를 포함한 노란 주황색의 장방형 제피정제</div><div class=\"sd-item\"><b>대장균군</b> 음성</div><div class=\"sd-item\"><b>유통기한</b> 제조일로부터 24개월까지</div><div class=\"sd-item\"><b>보관</b> ① 직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오. ③ 어린이의 손이 닿지 않는 곳에 보관하십시오.</div></div>\n  </div><div class=\"sd-foot\"><b>섭취 시 주의사항</b> · 임산부·수유부는 섭취 전 전문가와 상담 · 질환이 있거나 의약품 복용 시 전문가와 상담 · 알레르기 체질 등은 개인에 따라 과민반응 가능 · 이상사례 발생 시 섭취를 중단하고 전문가와 상담 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오</div></div>"
+  }
+ ]
+}
