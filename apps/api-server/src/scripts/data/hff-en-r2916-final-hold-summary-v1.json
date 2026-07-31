@@ -1,0 +1,13 @@
+{
+ "builtAt": "2026-07-31T22:54:05.239Z",
+ "total": 2630,
+ "byTrack": {
+  "EXISTING_EN_HOLD": 22,
+  "NEW_EN": 2608
+ },
+ "byReason": {
+  "TRANSLATION_ASSET_MISSING": 2562,
+  "TRANSLATION_AMBIGUOUS": 68
+ },
+ "dup": 0
+}

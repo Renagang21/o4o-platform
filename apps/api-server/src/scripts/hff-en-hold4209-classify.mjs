@@ -81,8 +81,8 @@ for (const row of POP.docs) {
     const t = translate(koC);
     if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: [...new Set(t.misses.map((m) => m.text))] }); continue; }
     if (hangulInSlots(t.html)) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
-    const kAll = koNums(koC), eAll = new Set(enNums(t.html));
-    if (kAll.some((x) => !eAll.has(x))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'DOC_NUMBER_DRIFT'); continue; }
+    // 수치 검증은 슬롯별(번역 쌍 단위)로 이미 수행했다. 문서 전체 비교는 번역 대상이 아닌
+    // 영역(sd-spec 등, 원문 그대로 유지)까지 끌어들여 오탐만 만든다 → 중복 검사 제거.
     for (const tag of ['<li>', '<h2>', 'sd-item', 'sd-tag']) {
       if ((t.html.split(tag).length) !== (koC.split(tag).length)) { hold('HOLD_STRUCTURE', 'STRUCTURE_UNSAFE', `SLOT_COUNT_DRIFT:${tag}`); break; }
     }

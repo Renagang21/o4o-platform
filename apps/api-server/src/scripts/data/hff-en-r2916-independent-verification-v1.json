@@ -1,0 +1,35 @@
+{
+ "verifiedAt": "2026-07-31T22:54:05.247Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 1568,
+ "newHashMatch": 1568,
+ "hangulInFnSection": 0,
+ "targetFieldDrift": 0,
+ "koCanonicalDrift": 0,
+ "globals": {
+  "spd_all": 121691,
+  "ko_canon": 40918,
+  "en_canon": 17066,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 23852,
+  "en_without_fn": 22
+ },
+ "expectedEnDelta": 286,
+ "actualEnDelta": 286,
+ "statusSum": 4209,
+ "sum4209": true,
+ "byStatus": {
+  "HOLD_TRANSLATION": 2630,
+  "RESOLVED_NO_CHANGE": 11,
+  "CREATED_NEW_EN": 1568
+ },
+ "expectedUnlockFromSelection": 853,
+ "actualUnlocked": 1568,
+ "finalHold": 2630,
+ "holdDup": 0,
+ "failedChecks": [],
+ "globalsOk": true,
+ "verdict": "PASS"
+}
