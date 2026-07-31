@@ -1,0 +1,48 @@
+{
+ "appliedAt": "2026-07-31T22:22:12.133Z",
+ "mode": "APPLY",
+ "shardSize": 500,
+ "shards": [
+  {
+   "from": 0,
+   "size": 500,
+   "updated": 11,
+   "inserted": 489,
+   "rolledBack": false
+  },
+  {
+   "from": 500,
+   "size": 500,
+   "updated": 0,
+   "inserted": 500,
+   "rolledBack": false
+  },
+  {
+   "from": 1000,
+   "size": 293,
+   "updated": 0,
+   "inserted": 293,
+   "rolledBack": false
+  }
+ ],
+ "expectedUpdate": 11,
+ "actualUpdate": 11,
+ "expectedInsert": 1282,
+ "actualInsert": 1282,
+ "skipped": [],
+ "before": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948
+ },
+ "after": {
+  "spd_all": 121405,
+  "ko_canon": 40918,
+  "en_canon": 16780,
+  "pm_hff": 40948
+ },
+ "koUnchanged": true,
+ "enDelta": 1282,
+ "pmUnchanged": true
+}

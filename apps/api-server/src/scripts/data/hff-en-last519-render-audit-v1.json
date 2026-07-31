@@ -1,0 +1,45 @@
+{
+ "renderedAt": "2026-07-31T22:21:13.256Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documentsTotal": 1293,
+ "documentsRendered": 283,
+ "structureSignatures": 95,
+ "coverage": "signature-exhaustive + high-risk full",
+ "documents": 283,
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "renders": 849,
+ "wrapperProof": {
+  "withoutWrapper": "",
+  "withWrapper": "860px",
+  "borderRadius": "20px",
+  "heroPadding": "28px 22px 24px",
+  "badgeRadius": "14px",
+  "cssActuallyApplied": true
+ },
+ "counters": {
+  "pageOverflow": 0,
+  "elementOverflow": 0,
+  "clipped": 0,
+  "emptyH2": 0,
+  "emptyUl": 0,
+  "emptyLi": 0,
+  "emptySection": 0,
+  "undefinedClass": 0,
+  "rawHtml": 0,
+  "hangulVisible": 0,
+  "markerVisible": 0,
+  "labelLost": 0,
+  "licenseNoLost": 0,
+  "clauseLost": 0,
+  "expertNoteMissing": 0,
+  "fnSectionMissing": 0
+ },
+ "totalIssues": 0,
+ "verdict": "PASS",
+ "failures": []
+}

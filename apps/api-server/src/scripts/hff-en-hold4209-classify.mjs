@@ -29,6 +29,12 @@ const enIds = POP.docs.map((r) => r.enCanonicalId).filter(Boolean);
 for (let i = 0; i < enIds.length; i += 800) for (const r of (await c.query('SELECT id, content FROM shared_product_descriptions WHERE id = ANY($1)', [enIds.slice(i, i + 800)])).rows) en.set(r.id, r.content);
 await c.end();
 
+// 번역 대상 슬롯 안에 한국어가 남았는지만 본다.
+// 제품명(h1)·제조사명 등 고유명사는 기존 승인 EN canonical 도 한국어를 유지한다.
+function hangulInSlots(html) {
+  for (const { re } of SLOT_RE) for (const m of html.matchAll(re)) if (HANGUL.test(norm(m[2]))) return true;
+  return false;
+}
 function translate(html) {
   const misses = [];
   let out = html;
@@ -64,7 +70,7 @@ for (const row of POP.docs) {
     if (/<h2>[^<]*unction[^<]*<\/h2>/.test(enC)) { results.push({ ...base, status: 'RESOLVED_NO_CHANGE', why: 'EN_ALREADY_HAS_FUNCTIONS' }); continue; }
     const t = translate(fn);
     if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: t.misses.map((m) => m.text) }); continue; }
-    if (HANGUL.test(norm(t.html))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
+    if (hangulInSlots(t.html)) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
     const h2s = [...enC.matchAll(/<h2>/g)].map((m) => m.index);
     const at = h2s.length >= 2 ? h2s[1] : enC.indexOf('<div class="sd-foot"');
     if (at < 0) { hold('HOLD_STRUCTURE', 'STRUCTURE_UNSAFE', 'NO_INSERT_POINT'); continue; }
@@ -74,7 +80,7 @@ for (const row of POP.docs) {
   } else {
     const t = translate(koC);
     if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: [...new Set(t.misses.map((m) => m.text))] }); continue; }
-    if (HANGUL.test(norm(t.html))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
+    if (hangulInSlots(t.html)) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
     const kAll = koNums(koC), eAll = new Set(enNums(t.html));
     if (kAll.some((x) => !eAll.has(x))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'DOC_NUMBER_DRIFT'); continue; }
     for (const tag of ['<li>', '<h2>', 'sd-item', 'sd-tag']) {

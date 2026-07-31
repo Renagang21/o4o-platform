@@ -67,13 +67,16 @@ const times = (n) => (n === '1' ? 'once' : n === '2' ? 'twice' : `${n} times`);
 
 const TEMPLATES = [
   { id: 'directions', kinds: ['meta', 'clause'],
-    re: /^1일\s*(\d+)\s*회,?\s*1회\s*([\d.~\-]+)\s*(정|캡슐|포|스푼|알|병|개|매|방울)(?:\([^)]*\))?\s*(?:씩|을|를)?\s*(충분한\s*)?(물과 함께|직접 또는 물과 함께|그대로 혹은 물과 함께|직접 섭취하거나 물과 함께|씹어서|직접|그대로|입안에서 녹여)?\s*(?:섭취(?:하십시오|합니다|한다|하세요|할 것)?)\.?$/,
+    re: /^1일\s*(\d+)\s*회,?\s*1회\s*([\d.~\-]+)\s*(정|캡슐|포|스푼|알|병|개|매|방울)(?:\s*\([^)]*\))?\s*(?:씩|을|를)?\s*(충분한\s*)?(물과 함께|직접 또는 물과 함께|그대로 혹은 물과 함께|직접 섭취하거나 물과 함께|씹어서|직접|그대로|입안에서 녹여)?\s*(?:섭취(?:하십시오|합니다|한다|하세요|할 것)?)\.?$/,
     en: (m) => {
       const how = { '물과 함께': ' with water', '직접 또는 물과 함께': ' directly or with water',
         '그대로 혹은 물과 함께': ' as is or with water', '직접 섭취하거나 물과 함께': ' directly or with water',
         '씹어서': ' by chewing', '직접': ' directly', '그대로': ' as is', '입안에서 녹여': ' by letting it dissolve in the mouth' }[m[5]] ?? '';
       const plenty = m[4] && /물/.test(m[5] ?? '') ? ' with plenty of water' : how;
-      return `Take ${m[2]} ${CNT[m[3]]}${m[2] === '1' ? '' : 's'} ${times(m[1])} a day${m[4] && /물/.test(m[5] ?? '') ? ' with plenty of water' : how}.`;
+      // 괄호 용량은 실제 섭취량 정보다. 누락하면 안 된다.
+      const cap = (norm(m[0]).match(/\(\s*(?:1[가-힣]+\s*당\s*)?([\d.,~\-]+\s*(?:g|kg|mg|㎎|ml|mL|㎖|L|cc))\s*\)/) ?? [])[1];
+      const dose = `${m[2]} ${CNT[m[3]]}${m[2] === '1' ? '' : 's'}${cap ? ` (${cap.replace(/\s/g, '')})` : ''}`;
+      return `Take ${dose} ${times(m[1])} a day${m[4] && /물/.test(m[5] ?? '') ? ' with plenty of water' : how}.`;
     } },
   { id: 'cfu', kinds: ['badge', 'label', 'clause', 'meta'],
     re: /^([\d.,]+\s*(?:mg|g|㎎|mL|ml|정|캡슐|포))당\s*([\d.,]+\s*(?:억|만|천)?)\s*CFU\s*이상$/,
@@ -160,6 +163,8 @@ export const SLOT_RE = [
   { kind: 'meta', re: /(<p class="sd-meta">)([\s\S]*?)(<\/p>)/g },
   { kind: 'badge', re: /(<span class="sd-badge[^"]*">)([\s\S]*?)(<\/span>)/g },
   { kind: 'label', re: /(<span class="sd-tag">)([\s\S]*?)(<\/span>)/g },
+  // WAE family 의 원료 라벨: <li><b>라벨</b><ul class="sd-why">…
+  { kind: 'label', re: /(<li>\s*<b>)([\s\S]*?)(<\/b>)/g },
   { kind: 'foot', re: /(<div class="sd-foot">)([\s\S]*?)(<\/div>)/g },
   { kind: 'clause', re: /(<li>)((?:(?!<li>|<\/li>)[\s\S])*?)(<\/li>)/g },
 ];
