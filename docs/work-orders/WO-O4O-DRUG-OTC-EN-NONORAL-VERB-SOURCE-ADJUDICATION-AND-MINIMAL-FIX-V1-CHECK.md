@@ -1,16 +1,16 @@
 # WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1 — CHECK
 
-- 상태: **판정 완결 / 교정 착수 전 보고 (HOLD)**
+- 상태: **판정 + 최소 교정 COMPLETE / PASS**
 - 실행일: 2026-07-31
-- 착수 HEAD: `f182a4212` (origin/main 과 동일)
-- **LIVE DB write: 0** (전 과정 `SET default_transaction_read_only = on`)
-- 범위: 비경구 제품 EN 경구동사 검출 240건의 **문장 단위 판정**
-- KO 본문 하드컷 2,535 · 사람 검토 8 · summary NULL 1,577 · 인접 계열 6,465 · zh/ja: **미착수(범위 밖)**
+- 착수 HEAD: `f182a4212` (origin/main 과 동일) · 판정 단계 커밋 `09dd966ca`(write 0) · 교정 단계: 본 CHECK 커밋
+- **LIVE DB write: 49행**(확정 오역 69 문장의 동사 토큰 교정만). 판정 전 구간은 read-only
+- 범위: 비경구 제품 EN 경구동사 **문장 단위 판정 + 확정 오역 최소 교정**
+- KO 본문 하드컷 2,535 · KO 사람 검토 8 · summary NULL 1,577 · zh/ja: **미착수(범위 밖)**
 
-> **왜 교정을 실행하지 않고 멈췄는가**
-> WO §9 는 "기존의 안전한 번역 교정 runner 가 있으면 재사용하고, **없거나 설명서 전체를 재저장해
-> 비대상 필드까지 바꿀 가능성이 있으면 신규 DB write 를 진행하지 말고 보고**" 로 apply 를 게이트한다.
-> 저장소 실측 결과 재사용 가능한 runner 가 없다(§7). 확정 오역 52 문장의 최소 교정안까지 만들어 두고 멈췄다.
+> **진행 순서**
+> 1. 판정을 먼저 완결하고 **DB write 0 인 상태로 보고**했다. WO §9("기존 안전 runner 가 없으면 신규 DB write 금지, 보고")에 걸렸기 때문이다(§7).
+> 2. 사용자가 ① **전용 runner 신규 제작 후 교정** ② **route 원장 누락 300건도 지금 함께 판정** 을 승인했다.
+> 3. 승인 범위대로 540 전수 판정 → 확정 오역 **69 문장 / 49 설명서** 를 최소 교정하고 20 게이트로 독립검증했다(§11~§12).
 
 ---
 
@@ -161,6 +161,30 @@ KO : 실수로 이 약을 먹었을 경우 즉시 의사 등 전문가의 도움
 
 ---
 
+## 6-A. 승인 후 확장 — route 원장 누락 300건 포함 540 전수 판정
+
+`--scope all540` 로 **동일 검출 술어 + route 원장 7종**을 써서 비경구 전수를 재현했다.
+
+| 지표 | input240 | **all540** |
+|---|---:|---:|
+| 대상 master | 240 | **540** |
+| 검출 문장 | 337 | **934** |
+| `VALID_SOURCE_GROUNDED` | 222 | 392 |
+| `DETECTOR_FALSE_POSITIVE` | 60 | 337 |
+| `INVALID_ROUTE_VERB` | 52 | **69** |
+| `AMBIGUOUS_REVIEW` | 3 | 136 |
+| `SOURCE_OR_LINKAGE_BLOCKED` | 0 | 0 |
+| 합계 검증 | PASS | **PASS (934)** |
+
+**교차 일관성**: 540 판정 안의 원래 240 부분집합은 `INVALID` **52** 로 단독 실행 결과와 정확히 일치한다.
+새로 드러난 확정 오역은 **17 문장 / 13 설명서**(rectal 6 · oromucosal 6 · topical 5)이며,
+문형은 전부 §5 의 기존 5개 문형과 동일했다(신규 문형 0).
+
+`AMBIGUOUS_REVIEW` 가 3 → 136 으로 늘어난 것은 새 300건에 **여러 문장을 한 `<li>` 로 병합한 저작 산출물**이 많아
+섹션 문장 수가 어긋나기 때문이다. 자동 교정에서 제외했고 §13 에 검토 대상으로 남겼다.
+
+---
+
 ## 7. 교정 runner 실측 — 재사용 가능한 것이 없다
 
 | 후보 | 재사용 가부 | 근거 |
@@ -169,7 +193,7 @@ KO : 실수로 이 약을 먹었을 경우 즉시 의사 등 전문가의 도움
 | [otc-en-summary-rebuild.ga.ts](../../apps/api-server/src/scripts/otc-en-summary-rebuild.ga.ts) | **불가** | in-place 2지점 치환 구조는 적합하나 대상 규칙이 **요약 120자 하드컷 전용**이다. 문장 단위 동사 교정 대상을 다루지 못한다. |
 | 그 외 `drug-otc-*-fix` 계열 | **불가** | 성분·경고 특정 그룹 전용(예: albendazole 상호작용) — 범용 문장 교정기가 아니다. |
 
-→ WO §9 게이트에 걸려 **DB write 를 진행하지 않았다.** dry-run/apply/post-verify 원장은 존재하지 않는다(없는 것을 만들면 허위 증거가 된다).
+→ 1차 보고 시점에는 WO §9 게이트에 걸려 DB write 를 하지 않았다. **사용자 승인 후 전용 runner 를 신규 제작**했다(§11).
 
 ---
 
@@ -177,11 +201,15 @@ KO : 실수로 이 약을 먹었을 경우 즉시 의사 등 전문가의 도움
 
 | 항목 | 규모 | 성격 |
 |---|---:|---|
-| 확정 오역 교정 | 52 문장 / 36 설명서 | 승인 시 착수 |
-| 사람 검토 | 3 문장 | li 병합으로 대응 문장 특정 불가 |
-| **route 원장 누락으로 감사에서 빠진 비경구 master** | **300** (동일 조건 540 − 240) | 원 감사가 `nr26`·`route535` prep 원장을 로드하지 않았다. 같은 결함 유형이 있을 수 있어 **재감사 권장** |
+| 확정 오역 교정 | 69 문장 / 49 설명서 | **완료** (§11~§12) |
+| 사람 검토 `AMBIGUOUS_REVIEW` | **136 문장 / 136 설명서** | li 병합으로 대응 KO 문장 특정 불가 — 자동 교정 제외 |
+| route 원장 누락 300건 | 판정 완료 | 신규 확정 오역 17 문장 포함해 이번에 함께 교정 |
 | KO 본문 하드컷 | 2,535 | 별도 WO(HOLD) |
 | zh · ja | 미착수 | 범위 밖 |
+
+> **원 감사의 구조적 누락(기록)** — `otc-en-coverage-audit.ga.ts` 는 route 를 V4 prep 원장 5종에서만 읽는다.
+> 저장소에는 `otc-v4-nr26-prep` · `otc-v4-route535-prep` 이 더 있고, 이들을 포함하면 같은 술어로 **540** 이 나온다.
+> route 미상(`unknown`)은 검출 조건에서 제외되므로 **300건이 조용히 감사 밖에 있었다.** 이후 EN 감사는 원장 7종을 모두 로드해야 한다.
 
 ---
 
@@ -194,8 +222,78 @@ KO : 실수로 이 약을 먹었을 경우 즉시 의사 등 전문가의 도움
 | `data/otc-en-nonoral-verb-invalid-targets.ga.json` | `INVALID_ROUTE_VERB` 52행 — 교정 대상만 |
 | `data/otc-en-nonoral-verb-review-blocked.ga.json` | `AMBIGUOUS_REVIEW` 3행 — 사람 검토 |
 | `data/otc-en-nonoral-verb-summary.ga.json` | route별·판정별 요약 + 합계 검증 |
+| `data/otc-en-nonoral-verb-*-all540.ga.json` | 540 전수 판정 원장 3종(전체 934행 · 교정대상 69 · 검토 136) |
+| [otc-en-nonoral-verb-fix.ga.ts](../../apps/api-server/src/scripts/otc-en-nonoral-verb-fix.ga.ts) | 최소 교정 러너 (dry-run / rollback-test / apply) |
+| [otc-en-nonoral-verb-fix-verify.ga.ts](../../apps/api-server/src/scripts/otc-en-nonoral-verb-fix-verify.ga.ts) | 독립검증기 20 게이트 (READ-ONLY · 러너·판정기 미import) |
+| `data/otc-en-nonoral-verb-fix-plan.ga.json` | **apply 계획 원장(고정 보존)** + `run-*` 불변 사본 |
+| `data/otc-en-nonoral-verb-fix-result.ga.json` | rollback-test / apply 결과 |
+| `data/otc-en-nonoral-verb-fix-idempotency.ga.json` | **멱등 재실행 결과(계획 원장과 분리)** |
+| `data/otc-en-nonoral-verb-fix-checkpoint.ga.json` | 25건 단위 체크포인트 |
+| `data/otc-en-nonoral-verb-fix-verify.ga.json` | 독립검증 20 게이트 결과 |
 
-## 10. 실행한 명령과 결과
+---
+
+## 11. 교정 실행 — 확정 오역 69 문장 / 49 설명서
+
+[otc-en-nonoral-verb-fix.ga.ts](../../apps/api-server/src/scripts/otc-en-nonoral-verb-fix.ga.ts)
+
+**판정 원장을 신뢰하지 않는다.** 원장에서 가져오는 것은 대상 후보뿐이고, 쓰기 전에 LIVE 에서 다시 증명한다.
+
+| 가드 | 내용 |
+|---|---|
+| G-a | 옛 문장이 현재 본문에 **정확히 1회** 존재 |
+| **G-b diff guard** | 옛→새 차이가 **허용된 동사 토큰 치환뿐**(take→use, taking→using …). 토큰 수 동일, 그 외 토큰 byte 동일 → **숫자·연령·기간·용량·금기·질환명은 구조적으로 변경 불가** |
+| G-c | 교정 후 제품 대상 경구동사 잔여 0 |
+| G-d | 역패치 복원 → 적용 전 해시와 byte 일치 |
+| G-e | 길이 델타 = 치환분 합 |
+| G-f | h2·li 수 · sd-* 마커 불변 · EN 본문 한글 혼입 0 |
+
+### 11-1. 실행 게이트
+
+| 단계 | 결과 |
+|---|---|
+| dry-run 2회 byte-identical | plan sha256 `e3ee871563df3c5c…` · planDigest `f9c324ebe06526df…` · 대상 49 설명서 / 69 문장 / blocked **0** |
+| rollback-test 49 | PASS **49** / residue **0** / writeActual **0** |
+| **LIVE apply** | GREEN **49** / exception 0 / **writeActual 49** / KO write **0** / 타 언어 write **0** / audit **0행** |
+| 독립검증 20 게이트 | **failed 0 · failures 0** |
+| 멱등 재실행 | 대상 **0** · write 0 · **계획 원장 byte 보존**(결과는 `-idempotency` 파일로 분리) |
+| 판정 재실행(all540) | `INVALID_ROUTE_VERB` **69 → 0** |
+
+DB write 계약: 행 단위 트랜잭션 + `SAVEPOINT`, `UPDATE … SET content, updated_at`,
+**낙관적 잠금 `md5(content)=oldHash` + `language='en'` 고정 조건**, `rowCount=1` 아니면 차단.
+
+---
+
+## 12. 독립검증 20 게이트 (별도 코드 경로)
+
+핵심 증명(**G4**): LIVE 본문에서 **새 문장만** 옛 문장으로 되돌리면 md5 가 적용 전 해시와 byte 일치한다(49/49).
+
+| 게이트 | 기대 | 실측 |
+|---|---:|---:|
+| G0 EN canonical 총건 | 15,908 | 15,908 |
+| G0b KO canonical 총건 | 15,908 | 15,908 |
+| G1 / G1b / G1c 계획 설명서·문장 | 49 / 69 / 69 | 49 / 69 / 69 |
+| G2 본문 해시 = 계획 newHash | 49 | 49 |
+| G3 옛 문장 소거 | 69 | 69 |
+| G3b 새 문장 유일 존재 | 69 | 69 |
+| G4 역패치 → 적용 전 해시 일치 | 49 | 49 |
+| G5 확정 오역 문형 잔존 | 0 | 0 |
+| G9 숫자·연령·기간 토큰 드리프트 | 0 | 0 |
+| G10 구조(h2·li·sd-*) 드리프트 | 0 | 0 |
+| G11 상태·타입·언어·sourceRef·master 드리프트 | 0 | 0 |
+| G12 EN 본문 한글 혼입 | 0 | 0 |
+| G14 EN canonical 중복 master | 0 | 0 |
+| G6 적용 창 이후 EN 갱신 총건 | 49 | 49 |
+| G6b 적용 창 이후 **대상 밖** EN 갱신 | 0 | 0 |
+| G7 적용 창 이후 **KO 갱신** | 0 | 0 |
+| G7b 적용 창 이후 타 언어 갱신 | 0 | 0 |
+| G7c 적용 창 이후 타 source_type 갱신 | 0 | 0 |
+
+적용 창 기준 시각 = `2026-07-31 14:20:34.895287+00`(apply 직전 DB `now()`). 직전 `mfds_drug_otc` 최종 갱신은 `13:25:54` 였다.
+
+---
+
+## 13. 실행한 명령과 결과
 
 | 명령 | 결과 |
 |---|---|
@@ -203,5 +301,12 @@ KO : 실수로 이 약을 먹었을 경우 즉시 의사 등 전문가의 도움
 | proxy 기동(`--port 5524`) | ready |
 | 모집단 재현 | 240/240 일치 · 누락 0 · 추가 0 |
 | `tsx … otc-en-nonoral-verb-adjudication.ga.ts` | 337 판정 · 합계 PASS |
+| `tsx … --scope all540` | 934 판정 · 합계 PASS · INVALID 69 |
+| `tsx … otc-en-nonoral-verb-fix.ga.ts` (dry-run ×2) | 49 설명서 / 69 문장 · blocked 0 · plan byte-identical |
+| `tsx … --rollback-test` | RBT PASS 49 · residue 0 · write 0 |
+| `OTC_EN_VERB_FIX=CONFIRM … --apply --confirm` | GREEN 49 · **writeActual 49** · exception 0 |
+| `tsx … otc-en-nonoral-verb-fix-verify.ga.ts --since …` | 20 게이트 **failed 0** |
+| `tsx … otc-en-nonoral-verb-fix.ga.ts` (멱등) | 대상 0 · write 0 · 계획 원장 보존 |
 | `tsc --noEmit -p tsconfig.json` | 오류 12건 — **전부 기존 스크립트**. 본 WO 산출물 0건 |
-| DB write | **0** |
+| 판정 단계 DB write | **0** |
+| 교정 단계 DB write | **49행**(EN만) |

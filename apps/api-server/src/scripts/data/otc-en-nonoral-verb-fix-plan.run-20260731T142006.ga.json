@@ -1,0 +1,924 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1",
+  "kind": "en-verb-fix-plan",
+  "mode": "dry-run",
+  "planDigest": "f9c324ebe06526dfbe96bd216b16d8f995b01b51d029cdae75775b18ff5659d1",
+  "ledgerTargets": 69,
+  "targetDescriptions": 49,
+  "targetSentences": 69,
+  "alreadyFixed": 0,
+  "blocked": 0,
+  "blockedByCode": {},
+  "byRoute": {
+    "topical": 37,
+    "rectal": 6,
+    "ophthalmic": 4,
+    "oromucosal": 2
+  },
+  "rows": [
+    {
+      "masterId": "0d8652d7-8e64-4a26-b832-329fb4735583",
+      "descId": "5a03b7f1-c8d5-4f4b-9c00-fc3a3b0aa64e",
+      "route": "topical",
+      "oldHash": "da1513d5dc091dec3d53fbd8d8130248",
+      "newHash": "dac2af52c36c36e781ee3c784eac5f7a",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If you take this medicine by mistake, consult a doctor or pharmacist.",
+          "new": "If you use this medicine by mistake, consult a doctor or pharmacist.",
+          "ko": "실수로 이 약을 사용한 경우에는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "1026e687-70da-426c-a4c7-020024fe1436",
+      "descId": "74a31805-8bfa-4dc6-aa87-4b99f556cd64",
+      "route": "rectal",
+      "oldHash": "e84244be9e46c9a549c0a3af75f10e89",
+      "newHash": "40bb34e2e6b746d5a0845a2b995190fa",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "12e68473-14c3-4496-b647-b675b2f2000e",
+      "descId": "829c8dd0-77b0-4f4d-a642-3bb00996a93d",
+      "route": "topical",
+      "oldHash": "89c1945bde85d95614b5ea9e22017edc",
+      "newHash": "77d67e40aa38bfe2cb1c8d3b0e787c09",
+      "deltaChars": -3,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients who are hypersensitive to this medicine or have been in the past, and patients who are allergic to aspirin or other non-steroidal anti-inflammatory analgesics (asthma, hives, or rhinitis) or have been in the past, must not take this medicine.",
+          "new": "Patients who are hypersensitive to this medicine or have been in the past, and patients who are allergic to aspirin or other non-steroidal anti-inflammatory analgesics (asthma, hives, or rhinitis) or have been in the past, must not use this medicine.",
+          "ko": "이 약에 과민증 환자 또는 경험자, 아스피린 또는 다른 비스테로이드성 소염진통제에 알레르기(천식, 두드러기 또는 비염) 환자 또는 경험자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, women who are pregnant or may be pregnant, breastfeeding women, and children should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, women who are pregnant or may be pregnant, breastfeeding women, and children should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 소아는 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with other anti-inflammatory analgesics.",
+          "new": "Do not use this medicine together with other anti-inflammatory analgesics.",
+          "ko": "다른 소염진통제와 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "14fc0a20-1596-4e98-8910-9bd4572779cb",
+      "descId": "8549ecb3-19f1-407e-ab2e-14b8c01e4265",
+      "route": "topical",
+      "oldHash": "13355bdd061a188ea65dac27aa370556",
+      "newHash": "9409096a9c1128b2e7aac588c60def12",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "발진·발적(충혈되어 붉어짐), 부종(부기), 자극감, 가려움, 기관지 경련 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "168f70dd-b39a-4b48-b421-8f5f0a6311d9",
+      "descId": "a7dbb3ff-667f-4cec-9497-20945e850b7c",
+      "route": "topical",
+      "oldHash": "0a7a408737ab3055d1660a200231d293",
+      "newHash": "fb67d2e9faa1635a1bedd471883f4dbc",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this drug should not take this drug.",
+          "new": "Patients hypersensitive to this drug should not use this drug.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "19f11338-677f-41e6-9181-aff2783163fd",
+      "descId": "15aee1c0-d896-40b4-ab4a-885864638a55",
+      "route": "topical",
+      "oldHash": "13355bdd061a188ea65dac27aa370556",
+      "newHash": "9409096a9c1128b2e7aac588c60def12",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "발진·발적(충혈되어 붉어짐), 부종(부기), 자극감, 가려움, 기관지 경련 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "1ff3155d-0968-438a-a2d0-ac9b259a8b0f",
+      "descId": "8988db60-059b-4dd9-8f49-9c443618e2df",
+      "route": "topical",
+      "oldHash": "5aadaf4fdbcc0566afd2f0cd8dd98c31",
+      "newHash": "5690b0d2af223eb8ccd7997506640c99",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "드물게 쇽(구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적 등), 때때로 발진, 두드러기 등의 과민증상 및 고농도에서 자극감, 광감작 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "22ab7f2d-f486-4a2f-8a9c-faa08e6d64d9",
+      "descId": "e23c90d4-9228-4e22-a0c5-aaf23d401b5e",
+      "route": "topical",
+      "oldHash": "5aadaf4fdbcc0566afd2f0cd8dd98c31",
+      "newHash": "5690b0d2af223eb8ccd7997506640c99",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "드물게 쇽(구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적 등), 때때로 발진, 두드러기 등의 과민증상 및 고농도에서 자극감, 광감작 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "2bde0eed-e7df-48f3-9275-dec9e3a279a3",
+      "descId": "286e779b-3a0a-4391-a6c4-9de164da24a2",
+      "route": "rectal",
+      "oldHash": "aa63ee49a6c49f159afba54bfb299821",
+      "newHash": "32e5e90c5c57b840092600c2e76eb04e",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "3f41a377-d5de-47b9-95f0-40a476b48d9e",
+      "descId": "b3d804fe-6a1c-40b4-a2ed-4d4bfccdef24",
+      "route": "topical",
+      "oldHash": "0a7a408737ab3055d1660a200231d293",
+      "newHash": "fb67d2e9faa1635a1bedd471883f4dbc",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this drug should not take this drug.",
+          "new": "Patients hypersensitive to this drug should not use this drug.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "4c58525b-a541-4df8-8913-a49fefdc2f86",
+      "descId": "3a088d58-ebe9-4d01-a03f-9d10ab568dae",
+      "route": "topical",
+      "oldHash": "63f1a0ebf9c1953ce6b830dfb0abdaf7",
+      "newHash": "2712e3b4b458b93cf10477330e0ef039",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for about 7 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for about 7 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "7일정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "515b7810-5250-40c2-ba05-b846e6445135",
+      "descId": "8edfe521-bffd-44b0-bceb-66326e0c3c1b",
+      "route": "topical",
+      "oldHash": "9ee20e60e334c034344351a96643a690",
+      "newHash": "b73c9b4530ec643f122c88bfe0cdb90a",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for 5 to 6 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for 5 to 6 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "583b0dfa-2d0d-4e90-8891-9a4a63749ba3",
+      "descId": "f5de127a-d38b-45ce-a825-e650e7a31977",
+      "route": "topical",
+      "oldHash": "d40bc784a78b7538993686cb5d8b4d41",
+      "newHash": "0ca0c9051901c094a202257b0dad068f",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "59c20ec4-c020-4160-b482-2868b2721451",
+      "descId": "f39b84b3-b618-4418-94ce-0264d73775f7",
+      "route": "topical",
+      "oldHash": "df3c72dfadfc34663545418671923c11",
+      "newHash": "f9e8ac8be34cf69750a15bfa349c3d8f",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients who are hypersensitive to this medicine must not take this medicine.",
+          "new": "Patients who are hypersensitive to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, women who are pregnant or may be pregnant, breastfeeding women and children should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, women who are pregnant or may be pregnant, breastfeeding women and children should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 소아는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "5b69b5a4-b343-46b9-9c27-7704ed463844",
+      "descId": "472fd567-59b6-4ece-8a19-0a5d1a7055d7",
+      "route": "topical",
+      "oldHash": "b11393cf0963ca57034d124bbe7ebec8",
+      "newHash": "4debc64ab603ccce9e432e8c558bbe4c",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "5bdc1163-0ec3-4bbb-b837-84382b3a3024",
+      "descId": "7331243d-ed9d-43df-bbd0-070170042cbd",
+      "route": "topical",
+      "oldHash": "b5601d8cc1f57eb0eabf997eb515bf77",
+      "newHash": "971ecba9d9a4b90f5f4a110a7332f776",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 갑상선 질환 경험자 및 환자, 신부전 환자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "5d02c03d-807e-4033-959f-5c457aa7504e",
+      "descId": "01a679fb-e7df-4119-b9af-e24f0559b54a",
+      "route": "topical",
+      "oldHash": "822dfb8c91885e32791f7a3e97d98d37",
+      "newHash": "edf876ac0ec02b41d7993621c4715040",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "If you take this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "new": "If you use this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "ko": "혈압강하제, 항우울약과 함께 사용 시 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "5e2682c6-9de4-4c81-914d-ab1037ed857d",
+      "descId": "f60979bc-d19a-40e5-b665-dd0f107c4801",
+      "route": "rectal",
+      "oldHash": "962ab2248f60a7f3347993390a8e2249",
+      "newHash": "d2746d5277ff0d6951ad179aade8d625",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "62c84588-acd5-4643-b418-a3d3f003f5df",
+      "descId": "5bad343b-aea3-4bdb-b8b4-060726853cde",
+      "route": "ophthalmic",
+      "oldHash": "9d448dbf3c969394540d968bf42ede5c",
+      "newHash": "3ff8454e975dbe8c3f90779922161690",
+      "deltaChars": -4,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine or with such a history, patients receiving MAO inhibitors (antidepressants, antipsychotics, mood regulators, antiparkinsonian agents, etc.), patients taking antidepressants that affect noradrenaline transmission, and newborns and infants under 2 years of age must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine or with such a history, patients receiving MAO inhibitors (antidepressants, antipsychotics, mood regulators, antiparkinsonian agents, etc.), patients taking antidepressants that affect noradrenaline transmission, and newborns and infants under 2 years of age must not use this medicine.",
+          "ko": "이 약에 과민증 환자 또는 경험자, MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등)를 투여받고 있는 환자, 노르아드레날린 전달에 영향을 주는 항우울제를 사용 중인 환자, 신생아 및 2세 미만의 영아는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients who are pregnant or breastfeeding, children aged 2 years and over but under 5 years, patients with severe cardiovascular disease, depression, cerebral insufficiency or coronary insufficiency, Raynaud's phenomenon, orthostatic hypotension, or thromboangiitis obliterans, patients with liver or kidney impairment, and patients who develop a delayed ocular hypersensitivity reaction should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients who are pregnant or breastfeeding, children aged 2 years and over but under 5 years, patients with severe cardiovascular disease, depression, cerebral insufficiency or coronary insufficiency, Raynaud's phenomenon, orthostatic hypotension, or thromboangiitis obliterans, patients with liver or kidney impairment, and patients who develop a delayed ocular hypersensitivity reaction should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임신 또는 수유 중인 환자, 2세 이상 5세 미만의 소아, 중증의 심혈관계, 우울증, 뇌부전이나 관상동맥부전, 레이노드현상, 기립저혈압, 폐쇄혈전혈관염을 가진 환자, 간장애, 신장애 환자, 지연형 안구 과민반응이 나타나는 환자는 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Possible side effects",
+          "old": "If eye pain, changes in vision, or persistent redness or irritation of the eye occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If eye pain, changes in vision, or persistent redness or irritation of the eye occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "눈 통증, 시력 변화, 지속적인 눈의 충혈 또는 자극이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Interactions",
+          "old": "Consult a doctor or pharmacist if you take it together with alcohol, barbiturates, opiates, tranquilizers, anesthetics, beta blockers (ophthalmic or systemic), antihypertensive agents, or cardiac glycosides.",
+          "new": "Consult a doctor or pharmacist if you use it together with alcohol, barbiturates, opiates, tranquilizers, anesthetics, beta blockers (ophthalmic or systemic), antihypertensive agents, or cardiac glycosides.",
+          "ko": "알코올, 바르비탈류, 아편류, 안정제, 마취제, 베타차단제(안과용, 전신용), 혈압강하제, 강심배당체 등과 함께 사용 시 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "678a7f11-e64e-4f08-b183-88dd57b6bbed",
+      "descId": "73d40689-db7c-4453-94c5-7b92105677a6",
+      "route": "topical",
+      "oldHash": "c2771901c1ebb3613274b3920b312d05",
+      "newHash": "0e51bfbc5552f76a527c5819f38897e8",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If a temporary feeling of irritation or redness (congested and reddened skin) occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If a temporary feeling of irritation or redness (congested and reddened skin) occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "일시적으로 자극감이나 발적(충혈되어 붉어짐) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "6c898b02-eace-40b4-82ac-b2d11bc2cffc",
+      "descId": "e85690f0-48c9-46bb-a43e-7d5fbc953916",
+      "route": "topical",
+      "oldHash": "d40bc784a78b7538993686cb5d8b4d41",
+      "newHash": "0ca0c9051901c094a202257b0dad068f",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "70b49f13-a622-492c-bd5a-8157e5180959",
+      "descId": "b16abda0-7354-4b71-b610-96c7c16775cb",
+      "route": "topical",
+      "oldHash": "afa636fa3c0f64ca383e3d68fce18aa3",
+      "newHash": "e0c49e82e198a9c90e746ea4efe25732",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If you take this medicine by mistake, consult a doctor or pharmacist.",
+          "new": "If you use this medicine by mistake, consult a doctor or pharmacist.",
+          "ko": "실수로 이 약을 사용한 경우에는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "75f8bc8e-4a1f-487c-86bd-bdbb5829da9f",
+      "descId": "e1c8b5f3-9d36-48e7-a5ac-e9fd0276fe68",
+      "route": "ophthalmic",
+      "oldHash": "a8ac0cc091ed007c13f5dc76608c0b9b",
+      "newHash": "6792e2fb4c9bcc0a8f01e72487dea27b",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients with hypersensitivity to this medicine must not take this medicine.",
+          "new": "Patients with hypersensitivity to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약은 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients with hypersensitivity to the propylene glycol component, patients with severe eye pain, people who have experienced allergic symptoms from eye drops (redness of the eye, itching, swelling (puffiness), reddening of the eye, etc.), people with an allergic constitution, and patients with glaucoma should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients with hypersensitivity to the propylene glycol component, patients with severe eye pain, people who have experienced allergic symptoms from eye drops (redness of the eye, itching, swelling (puffiness), reddening of the eye, etc.), people with an allergic constitution, and patients with glaucoma should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 프로필렌글리콜 성분에 과민증 환자, 눈의 통증이 심한 환자, 안약에 의한 알레르기증상(눈의 충혈, 가려움, 부종(부기), 충혈되어 붉어짐 등) 경험자, 알레르기 체질, 녹내장 환자는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "7e87772d-3efa-4bd8-9baf-9e412c20e172",
+      "descId": "c0cd7d39-3290-49db-b3de-c766058a336d",
+      "route": "topical",
+      "oldHash": "afa636fa3c0f64ca383e3d68fce18aa3",
+      "newHash": "e0c49e82e198a9c90e746ea4efe25732",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If you take this medicine by mistake, consult a doctor or pharmacist.",
+          "new": "If you use this medicine by mistake, consult a doctor or pharmacist.",
+          "ko": "실수로 이 약을 사용한 경우에는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "8390ec4f-4d1d-4f7f-9f86-cf1e63f0bb60",
+      "descId": "b1ffdd6d-1ecc-4d30-991f-a085f7e03bb6",
+      "route": "oromucosal",
+      "oldHash": "d3cb5f54d576f67245a8a7d9c3eeb90f",
+      "newHash": "56a1deb3ad66aa28908cfdc670dddd61",
+      "deltaChars": -3,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients with hypersensitivity to this medicine and patients with an egg white allergy must not take this medicine.",
+          "new": "Patients with hypersensitivity to this medicine and patients with an egg white allergy must not use this medicine.",
+          "ko": "이 약에 과민증 환자, 난백 알레르기 환자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients with hypersensitivity to propylene glycol, anyone who has experienced an allergic reaction, and people with atopic dermatitis or bronchial asthma should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients with hypersensitivity to propylene glycol, anyone who has experienced an allergic reaction, and people with atopic dermatitis or bronchial asthma should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 프로필렌글리콜에 과민증 환자, 알레르기 반응 경험자, 아토피피부염, 기관지천식이 있는 사람은 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Possible side effects",
+          "old": "If symptoms such as diarrhoea, mucocutaneous ocular syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell's syndrome), fever, erythema, itching or eye congestion are observed, or if rash and redness accompanied by high fever or burn-like oedema occurs, or occasionally rash or redness, or rarely shock, pallor of the face, coldness of the limbs, a drop in blood pressure, cyanosis, loss of consciousness or stomatitis, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If symptoms such as diarrhoea, mucocutaneous ocular syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell's syndrome), fever, erythema, itching or eye congestion are observed, or if rash and redness accompanied by high fever or burn-like oedema occurs, or occasionally rash or redness, or rarely shock, pallor of the face, coldness of the limbs, a drop in blood pressure, cyanosis, loss of consciousness or stomatitis, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "설사, 스피부점막안증후군(스티븐스-존슨 증후군), 독성표피괴사용해(리엘증후군), 발열, 홍반, 가려움, 안충혈 등의 증상이 인정되는 경우 및 고열을 동반하는, 발진·발적, 화상모양의 수종, 때때로 발진, 발적, 드물게 쇼크, 안면창백, 사지냉감, 혈압강하, 청색증, 의식불명, 구내염이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "892b3283-035b-41b4-beaa-776e0b4c8860",
+      "descId": "414e6353-851e-4052-9c41-507e05dc5b86",
+      "route": "ophthalmic",
+      "oldHash": "9d448dbf3c969394540d968bf42ede5c",
+      "newHash": "3ff8454e975dbe8c3f90779922161690",
+      "deltaChars": -4,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine or with such a history, patients receiving MAO inhibitors (antidepressants, antipsychotics, mood regulators, antiparkinsonian agents, etc.), patients taking antidepressants that affect noradrenaline transmission, and newborns and infants under 2 years of age must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine or with such a history, patients receiving MAO inhibitors (antidepressants, antipsychotics, mood regulators, antiparkinsonian agents, etc.), patients taking antidepressants that affect noradrenaline transmission, and newborns and infants under 2 years of age must not use this medicine.",
+          "ko": "이 약에 과민증 환자 또는 경험자, MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등)를 투여받고 있는 환자, 노르아드레날린 전달에 영향을 주는 항우울제를 사용 중인 환자, 신생아 및 2세 미만의 영아는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients who are pregnant or breastfeeding, children aged 2 years and over but under 5 years, patients with severe cardiovascular disease, depression, cerebral insufficiency or coronary insufficiency, Raynaud's phenomenon, orthostatic hypotension, or thromboangiitis obliterans, patients with liver or kidney impairment, and patients who develop a delayed ocular hypersensitivity reaction should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients who are pregnant or breastfeeding, children aged 2 years and over but under 5 years, patients with severe cardiovascular disease, depression, cerebral insufficiency or coronary insufficiency, Raynaud's phenomenon, orthostatic hypotension, or thromboangiitis obliterans, patients with liver or kidney impairment, and patients who develop a delayed ocular hypersensitivity reaction should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임신 또는 수유 중인 환자, 2세 이상 5세 미만의 소아, 중증의 심혈관계, 우울증, 뇌부전이나 관상동맥부전, 레이노드현상, 기립저혈압, 폐쇄혈전혈관염을 가진 환자, 간장애, 신장애 환자, 지연형 안구 과민반응이 나타나는 환자는 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Possible side effects",
+          "old": "If eye pain, changes in vision, or persistent redness or irritation of the eye occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If eye pain, changes in vision, or persistent redness or irritation of the eye occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "눈 통증, 시력 변화, 지속적인 눈의 충혈 또는 자극이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Interactions",
+          "old": "Consult a doctor or pharmacist if you take it together with alcohol, barbiturates, opiates, tranquilizers, anesthetics, beta blockers (ophthalmic or systemic), antihypertensive agents, or cardiac glycosides.",
+          "new": "Consult a doctor or pharmacist if you use it together with alcohol, barbiturates, opiates, tranquilizers, anesthetics, beta blockers (ophthalmic or systemic), antihypertensive agents, or cardiac glycosides.",
+          "ko": "알코올, 바르비탈류, 아편류, 안정제, 마취제, 베타차단제(안과용, 전신용), 혈압강하제, 강심배당체 등과 함께 사용 시 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "8d1f7218-e051-4eed-81c0-e2ba29be742a",
+      "descId": "4d3fd103-1998-465b-97be-fe9e416e2fef",
+      "route": "topical",
+      "oldHash": "b5601d8cc1f57eb0eabf997eb515bf77",
+      "newHash": "971ecba9d9a4b90f5f4a110a7332f776",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 갑상선 질환 경험자 및 환자, 신부전 환자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "91ee8c38-00d0-4b6a-a09c-b49169e55e31",
+      "descId": "77cb7aba-800a-4fc8-9a9f-acff2e2c942c",
+      "route": "topical",
+      "oldHash": "822dfb8c91885e32791f7a3e97d98d37",
+      "newHash": "edf876ac0ec02b41d7993621c4715040",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "If you take this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "new": "If you use this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "ko": "혈압강하제, 항우울약과 함께 사용 시 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "9493bae3-8111-4599-83ca-291883f69f2b",
+      "descId": "19b6e446-72a9-475d-9b7b-96f748ca1255",
+      "route": "topical",
+      "oldHash": "e134af9bad292b06731a7bf83da0c308",
+      "newHash": "5b732265af733ea190cae136fb3dc181",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine and children under 6 years of age must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine and children under 6 years of age must not use this medicine.",
+          "ko": "이 약에 과민증, 6세 미만의 소아는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, pregnant women and breastfeeding women and children aged 6 years and over but under 12 years should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, pregnant women and breastfeeding women and children aged 6 years and over but under 12 years should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 수유부, 만 6세 이상~만 12세 미만의 소아는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "9e8dd2ba-6e7e-434f-8921-ba0ecb9396c6",
+      "descId": "24b916de-bd06-4bc2-b095-983335bb07a6",
+      "route": "topical",
+      "oldHash": "5aadaf4fdbcc0566afd2f0cd8dd98c31",
+      "newHash": "5690b0d2af223eb8ccd7997506640c99",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If shock occurs rarely (nausea, malaise, cold sweat, dizziness, chest tightness, difficulty breathing, redness and the like), or if hypersensitivity symptoms such as rash or hives occur occasionally, or if a feeling of irritation occurs at high concentrations, or if photosensitisation occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "드물게 쇽(구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적 등), 때때로 발진, 두드러기 등의 과민증상 및 고농도에서 자극감, 광감작 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "a1ec51f0-f0b9-4e99-933c-d8d4e5f4ec5e",
+      "descId": "ce1d51bc-8025-4fb0-8077-1e8d08140624",
+      "route": "topical",
+      "oldHash": "b5601d8cc1f57eb0eabf997eb515bf77",
+      "newHash": "971ecba9d9a4b90f5f4a110a7332f776",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 갑상선 질환 경험자 및 환자, 신부전 환자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "a70e294b-9ebe-46d6-9282-03984ff9e81f",
+      "descId": "fcd3f191-9d00-429d-b225-a0a6ae336104",
+      "route": "ophthalmic",
+      "oldHash": "a8ac0cc091ed007c13f5dc76608c0b9b",
+      "newHash": "6792e2fb4c9bcc0a8f01e72487dea27b",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients with hypersensitivity to this medicine must not take this medicine.",
+          "new": "Patients with hypersensitivity to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약은 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients with hypersensitivity to the propylene glycol component, patients with severe eye pain, people who have experienced allergic symptoms from eye drops (redness of the eye, itching, swelling (puffiness), reddening of the eye, etc.), people with an allergic constitution, and patients with glaucoma should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients with hypersensitivity to the propylene glycol component, patients with severe eye pain, people who have experienced allergic symptoms from eye drops (redness of the eye, itching, swelling (puffiness), reddening of the eye, etc.), people with an allergic constitution, and patients with glaucoma should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 프로필렌글리콜 성분에 과민증 환자, 눈의 통증이 심한 환자, 안약에 의한 알레르기증상(눈의 충혈, 가려움, 부종(부기), 충혈되어 붉어짐 등) 경험자, 알레르기 체질, 녹내장 환자는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "ad9b6b26-e5a6-493b-91ee-e555075b9bf1",
+      "descId": "3c36f720-4073-4ed5-a866-e1a986fe2853",
+      "route": "rectal",
+      "oldHash": "aa63ee49a6c49f159afba54bfb299821",
+      "newHash": "32e5e90c5c57b840092600c2e76eb04e",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "b420e4b8-493f-4813-b2b9-f624365ad510",
+      "descId": "775329ce-f2c7-4b18-9f95-2d2ff0a0d186",
+      "route": "topical",
+      "oldHash": "da1513d5dc091dec3d53fbd8d8130248",
+      "newHash": "dac2af52c36c36e781ee3c784eac5f7a",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If you take this medicine by mistake, consult a doctor or pharmacist.",
+          "new": "If you use this medicine by mistake, consult a doctor or pharmacist.",
+          "ko": "실수로 이 약을 사용한 경우에는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "c4abe3ab-cf00-4c3b-8b13-aaad9fed427f",
+      "descId": "649ce341-2c02-4e9f-a16b-7e82a6e996c3",
+      "route": "topical",
+      "oldHash": "e134af9bad292b06731a7bf83da0c308",
+      "newHash": "5b732265af733ea190cae136fb3dc181",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine and children under 6 years of age must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine and children under 6 years of age must not use this medicine.",
+          "ko": "이 약에 과민증, 6세 미만의 소아는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, pregnant women and breastfeeding women and children aged 6 years and over but under 12 years should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, pregnant women and breastfeeding women and children aged 6 years and over but under 12 years should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 수유부, 만 6세 이상~만 12세 미만의 소아는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "cc518fd9-fbd8-4366-a29b-9d53ca8ce4d3",
+      "descId": "7cb0542a-49f8-4e98-91e9-df1ae46290e9",
+      "route": "rectal",
+      "oldHash": "e84244be9e46c9a549c0a3af75f10e89",
+      "newHash": "40bb34e2e6b746d5a0845a2b995190fa",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "d2980624-5274-4b16-aeb2-8c6427e8c700",
+      "descId": "c69e04ea-cc88-4043-9485-bce68d32ad8c",
+      "route": "topical",
+      "oldHash": "822dfb8c91885e32791f7a3e97d98d37",
+      "newHash": "edf876ac0ec02b41d7993621c4715040",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "If you take this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "new": "If you use this medicine together with antihypertensive medicines or antidepressants, consult a doctor or pharmacist.",
+          "ko": "혈압강하제, 항우울약과 함께 사용 시 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "d37e9668-5eff-4700-af08-47b212899e85",
+      "descId": "89aa7568-d322-4965-86a4-6f384c97dad6",
+      "route": "topical",
+      "oldHash": "63f1a0ebf9c1953ce6b830dfb0abdaf7",
+      "newHash": "2712e3b4b458b93cf10477330e0ef039",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for about 7 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for about 7 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "7일정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "d4d6083f-fc45-4678-bd9b-b6b63156543c",
+      "descId": "8c73378a-984d-4677-a912-5f1a07fea16b",
+      "route": "topical",
+      "oldHash": "63f1a0ebf9c1953ce6b830dfb0abdaf7",
+      "newHash": "2712e3b4b458b93cf10477330e0ef039",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for about 7 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for about 7 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "7일정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "d7e6147a-7fc4-461b-ac9c-7629d9977ae7",
+      "descId": "8982d44d-78e4-4e26-98bf-bc985554227e",
+      "route": "topical",
+      "oldHash": "9ee20e60e334c034344351a96643a690",
+      "newHash": "b73c9b4530ec643f122c88bfe0cdb90a",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for 5 to 6 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for 5 to 6 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "daf0b47a-a8ab-4704-a30e-a10d1b556b79",
+      "descId": "83fdb3e5-4785-42b7-abbd-0cfab9ae005a",
+      "route": "topical",
+      "oldHash": "c2771901c1ebb3613274b3920b312d05",
+      "newHash": "0e51bfbc5552f76a527c5819f38897e8",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If a temporary feeling of irritation or redness (congested and reddened skin) occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If a temporary feeling of irritation or redness (congested and reddened skin) occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "일시적으로 자극감이나 발적(충혈되어 붉어짐) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "dfda9204-6046-4446-a7ba-14b0c7edc7f1",
+      "descId": "418313b3-4eb9-4b13-8665-013a42fd3b86",
+      "route": "topical",
+      "oldHash": "89c1945bde85d95614b5ea9e22017edc",
+      "newHash": "77d67e40aa38bfe2cb1c8d3b0e787c09",
+      "deltaChars": -3,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients who are hypersensitive to this medicine or have been in the past, and patients who are allergic to aspirin or other non-steroidal anti-inflammatory analgesics (asthma, hives, or rhinitis) or have been in the past, must not take this medicine.",
+          "new": "Patients who are hypersensitive to this medicine or have been in the past, and patients who are allergic to aspirin or other non-steroidal anti-inflammatory analgesics (asthma, hives, or rhinitis) or have been in the past, must not use this medicine.",
+          "ko": "이 약에 과민증 환자 또는 경험자, 아스피린 또는 다른 비스테로이드성 소염진통제에 알레르기(천식, 두드러기 또는 비염) 환자 또는 경험자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, women who are pregnant or may be pregnant, breastfeeding women, and children should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, women who are pregnant or may be pregnant, breastfeeding women, and children should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 소아는 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with other anti-inflammatory analgesics.",
+          "new": "Do not use this medicine together with other anti-inflammatory analgesics.",
+          "ko": "다른 소염진통제와 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "e634d6d2-c741-405d-9995-fdf7f5959e76",
+      "descId": "7e009f5c-1fbe-48bf-b5aa-19e0ac4a7f0d",
+      "route": "topical",
+      "oldHash": "b11393cf0963ca57034d124bbe7ebec8",
+      "newHash": "4debc64ab603ccce9e432e8c558bbe4c",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients hypersensitive to this medicine must not take this medicine.",
+          "new": "Patients hypersensitive to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "e9711c20-ce5e-4ded-af6e-b2e47bf814ae",
+      "descId": "75a38df8-a62d-4865-aff7-d0a3c1fc65bd",
+      "route": "topical",
+      "oldHash": "13355bdd061a188ea65dac27aa370556",
+      "newHash": "9409096a9c1128b2e7aac588c60def12",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Possible side effects",
+          "old": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If rash and redness (congested and reddened skin), swelling (edema), irritation, itching, or bronchospasm occurs, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "발진·발적(충혈되어 붉어짐), 부종(부기), 자극감, 가려움, 기관지 경련 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "ec37dccc-f43d-4a3d-88b1-74948094bcfe",
+      "descId": "5b0d0097-ab54-4d3c-8fb0-afc15fee63ee",
+      "route": "topical",
+      "oldHash": "df3c72dfadfc34663545418671923c11",
+      "newHash": "f9e8ac8be34cf69750a15bfa349c3d8f",
+      "deltaChars": -2,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients who are hypersensitive to this medicine must not take this medicine.",
+          "new": "Patients who are hypersensitive to this medicine must not use this medicine.",
+          "ko": "이 약에 과민증 환자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, women who are pregnant or may be pregnant, breastfeeding women and children should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, women who are pregnant or may be pregnant, breastfeeding women and children should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 소아는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "f44ecba7-226f-4bce-9655-42195fc21144",
+      "descId": "6576105a-dfb9-42b3-8031-da9b087dfecb",
+      "route": "rectal",
+      "oldHash": "962ab2248f60a7f3347993390a8e2249",
+      "newHash": "d2746d5277ff0d6951ad179aade8d625",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Interactions",
+          "old": "Do not take this medicine together with antihypertensive medicines or antidepressants.",
+          "new": "Do not use this medicine together with antihypertensive medicines or antidepressants.",
+          "ko": "혈압강하제, 항우울약과 함께 사용하지 마십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "f47c5422-ed78-4d06-a593-dbf9fbc9ab08",
+      "descId": "f67245cb-5dd2-4420-a5e7-919adf02ebd1",
+      "route": "oromucosal",
+      "oldHash": "d3cb5f54d576f67245a8a7d9c3eeb90f",
+      "newHash": "56a1deb3ad66aa28908cfdc670dddd61",
+      "deltaChars": -3,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Patients with hypersensitivity to this medicine and patients with an egg white allergy must not take this medicine.",
+          "new": "Patients with hypersensitivity to this medicine and patients with an egg white allergy must not use this medicine.",
+          "ko": "이 약에 과민증 환자, 난백 알레르기 환자는 이 약을 사용하지 마십시오."
+        },
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, patients with hypersensitivity to propylene glycol, anyone who has experienced an allergic reaction, and people with atopic dermatitis or bronchial asthma should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, patients with hypersensitivity to propylene glycol, anyone who has experienced an allergic reaction, and people with atopic dermatitis or bronchial asthma should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 프로필렌글리콜에 과민증 환자, 알레르기 반응 경험자, 아토피피부염, 기관지천식이 있는 사람은 의사 또는 약사와 상의하십시오."
+        },
+        {
+          "section": "Possible side effects",
+          "old": "If symptoms such as diarrhoea, mucocutaneous ocular syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell's syndrome), fever, erythema, itching or eye congestion are observed, or if rash and redness accompanied by high fever or burn-like oedema occurs, or occasionally rash or redness, or rarely shock, pallor of the face, coldness of the limbs, a drop in blood pressure, cyanosis, loss of consciousness or stomatitis, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If symptoms such as diarrhoea, mucocutaneous ocular syndrome (Stevens-Johnson syndrome), toxic epidermal necrolysis (Lyell's syndrome), fever, erythema, itching or eye congestion are observed, or if rash and redness accompanied by high fever or burn-like oedema occurs, or occasionally rash or redness, or rarely shock, pallor of the face, coldness of the limbs, a drop in blood pressure, cyanosis, loss of consciousness or stomatitis, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "설사, 스피부점막안증후군(스티븐스-존슨 증후군), 독성표피괴사용해(리엘증후군), 발열, 홍반, 가려움, 안충혈 등의 증상이 인정되는 경우 및 고열을 동반하는, 발진·발적, 화상모양의 수종, 때때로 발진, 발적, 드물게 쇼크, 안면창백, 사지냉감, 혈압강하, 청색증, 의식불명, 구내염이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "fb5d30e4-fd7c-4a3c-9874-1c4ce94ebfc1",
+      "descId": "fb53cc99-ef88-4df1-9cc9-b97f20c23392",
+      "route": "topical",
+      "oldHash": "63f1a0ebf9c1953ce6b830dfb0abdaf7",
+      "newHash": "2712e3b4b458b93cf10477330e0ef039",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "If there is no improvement in symptoms after using it for about 7 days, stop taking it immediately and consult a doctor or pharmacist.",
+          "new": "If there is no improvement in symptoms after using it for about 7 days, stop using it immediately and consult a doctor or pharmacist.",
+          "ko": "7일정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    },
+    {
+      "masterId": "ff78cb6a-960a-4bfe-9e37-a05b804629ba",
+      "descId": "13408176-8cd9-4213-8da5-6fb0b27c21cd",
+      "route": "topical",
+      "oldHash": "b5601d8cc1f57eb0eabf997eb515bf77",
+      "newHash": "971ecba9d9a4b90f5f4a110a7332f776",
+      "deltaChars": -1,
+      "edits": [
+        {
+          "section": "Precautions for use",
+          "old": "Before taking this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "new": "Before using this medicine, people who have had thyroid disease and patients with it, patients with renal failure, women who are pregnant or may be pregnant, and breastfeeding women should consult a doctor or pharmacist.",
+          "ko": "이 약을 사용하기 전에 갑상선 질환 경험자 및 환자, 신부전 환자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부는 의사 또는 약사와 상의하십시오."
+        }
+      ]
+    }
+  ]
+}

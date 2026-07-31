@@ -1,0 +1,52 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1",
+  "kind": "en-nonoral-verb-adjudication",
+  "scope": "all540",
+  "mode": "READ-ONLY",
+  "liveDbWrite": 0,
+  "inputRows": 240,
+  "inputDistinctMasters": 507,
+  "productMasters": 507,
+  "descriptions": 507,
+  "detectedSentences": 867,
+  "adjudications": 867,
+  "byVerdict": {
+    "VALID_SOURCE_GROUNDED": 394,
+    "INVALID_ROUTE_VERB": 0,
+    "AMBIGUOUS_REVIEW": 136,
+    "DETECTOR_FALSE_POSITIVE": 337
+  },
+  "byVerdictRoute": {
+    "VALID_SOURCE_GROUNDED": {
+      "topical": 311,
+      "rectal": 27,
+      "oromucosal": 13,
+      "ophthalmic": 29,
+      "vaginal": 14
+    },
+    "AMBIGUOUS_REVIEW": {
+      "topical": 131,
+      "oromucosal": 5
+    },
+    "DETECTOR_FALSE_POSITIVE": {
+      "topical": 318,
+      "oromucosal": 8,
+      "vaginal": 3,
+      "ophthalmic": 8
+    }
+  },
+  "docsByVerdict": {
+    "VALID_SOURCE_GROUNDED": 355,
+    "INVALID_ROUTE_VERB": 0,
+    "AMBIGUOUS_REVIEW": 136,
+    "DETECTOR_FALSE_POSITIVE": 316
+  },
+  "fixTargetDescriptions": 0,
+  "fixTargetSentences": 0,
+  "humanReviewSentences": 136,
+  "totalsReconcile": {
+    "sum": 867,
+    "adjudications": 867,
+    "ok": true
+  }
+}

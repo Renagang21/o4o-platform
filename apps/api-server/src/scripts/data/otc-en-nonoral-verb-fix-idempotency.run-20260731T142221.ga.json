@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1",
+  "kind": "en-verb-fix-idempotency",
+  "mode": "dry-run",
+  "planDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "ledgerTargets": 69,
+  "targetDescriptions": 0,
+  "targetSentences": 0,
+  "alreadyFixed": 49,
+  "blocked": 0,
+  "blockedByCode": {},
+  "byRoute": {},
+  "rows": []
+}

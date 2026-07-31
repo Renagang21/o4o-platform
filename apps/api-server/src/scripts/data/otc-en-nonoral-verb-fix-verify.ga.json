@@ -1,0 +1,112 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1",
+  "kind": "en-verb-fix-verify",
+  "mode": "READ-ONLY",
+  "since": "2026-07-31 14:20:34.895287+00",
+  "planDigest": "f9c324ebe06526dfbe96bd216b16d8f995b01b51d029cdae75775b18ff5659d1",
+  "gates": {
+    "G0 EN canonical 총건": {
+      "expect": 15908,
+      "actual": 15908,
+      "pass": true
+    },
+    "G0b KO canonical 총건": {
+      "expect": 15908,
+      "actual": 15908,
+      "pass": true
+    },
+    "G1 계획 설명서 수": {
+      "expect": 49,
+      "actual": 49,
+      "pass": true
+    },
+    "G1b 계획 문장 수": {
+      "expect": 69,
+      "actual": 69,
+      "pass": true
+    },
+    "G14 EN canonical 중복 master": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G2 본문 해시 = 계획 newHash": {
+      "expect": 49,
+      "actual": 49,
+      "pass": true
+    },
+    "G4 역패치 복원 → 적용 전 해시 일치": {
+      "expect": 49,
+      "actual": 49,
+      "pass": true
+    },
+    "G3 옛 문장 소거": {
+      "expect": 69,
+      "actual": 69,
+      "pass": true
+    },
+    "G3b 새 문장 유일 존재": {
+      "expect": 69,
+      "actual": 69,
+      "pass": true
+    },
+    "G5 확정 오역 문형 잔존 문서": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G9 숫자·연령·기간 토큰 드리프트": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G10 구조(h2·li·sd-*) 드리프트": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G11 상태·타입·언어·sourceRef·master 드리프트": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G12 EN 본문 한글 혼입": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G1c 편집 문장 총수": {
+      "expect": 69,
+      "actual": 69,
+      "pass": true
+    },
+    "G6 적용 창 이후 EN 갱신 총건": {
+      "expect": 49,
+      "actual": 49,
+      "pass": true
+    },
+    "G6b 적용 창 이후 대상 밖 EN 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G7 적용 창 이후 KO 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G7b 적용 창 이후 타 언어 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    },
+    "G7c 적용 창 이후 타 source_type 갱신": {
+      "expect": 0,
+      "actual": 0,
+      "pass": true
+    }
+  },
+  "failedGates": 0,
+  "failures": [],
+  "pass": true
+}

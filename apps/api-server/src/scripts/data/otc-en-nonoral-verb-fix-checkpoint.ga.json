@@ -1,0 +1,25 @@
+{
+  "wo": "WO-O4O-DRUG-OTC-EN-NONORAL-VERB-SOURCE-ADJUDICATION-AND-MINIMAL-FIX-V1",
+  "kind": "checkpoint",
+  "every": 25,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 25,
+      "lastDescId": "b1ffdd6d-1ecc-4d30-991f-a085f7e03bb6",
+      "green": 25,
+      "exception": 0,
+      "writeActual": 25,
+      "at": "2026-07-31T14:20:51.228Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 49,
+      "lastDescId": "13408176-8cd9-4213-8da5-6fb0b27c21cd",
+      "green": 49,
+      "exception": 0,
+      "writeActual": 49,
+      "at": "2026-07-31T14:20:52.354Z"
+    }
+  ]
+}

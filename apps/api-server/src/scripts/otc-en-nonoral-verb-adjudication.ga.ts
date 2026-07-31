@@ -32,10 +32,26 @@ const P = (f: string): string => path.join(DATA, f);
 const J = (f: string): any => JSON.parse(fs.readFileSync(P(f), 'utf8'));
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
 
-const OUT_ALL = P('otc-en-nonoral-verb-adjudication.ga.json');
-const OUT_INVALID = P('otc-en-nonoral-verb-invalid-targets.ga.json');
-const OUT_REVIEW = P('otc-en-nonoral-verb-review-blocked.ga.json');
-const OUT_SUMMARY = P('otc-en-nonoral-verb-summary.ga.json');
+/**
+ * scope=input240 : 기존 감사 입력 240건(원 감사가 로드한 route 원장 5종 기준)
+ * scope=all540   : route 원장 7종 전부를 써서 **동일 검출 조건**으로 재현한 비경구 전수
+ *                  (원 감사가 `nr26`·`route535` 원장을 로드하지 않아 300건이 빠져 있었다)
+ */
+const SCOPE = (arg('--scope') || 'input240') as 'input240' | 'all540';
+const SFX = SCOPE === 'all540' ? '-all540' : '';
+const OUT_ALL = P(`otc-en-nonoral-verb-adjudication${SFX}.ga.json`);
+const OUT_INVALID = P(`otc-en-nonoral-verb-invalid-targets${SFX}.ga.json`);
+const OUT_REVIEW = P(`otc-en-nonoral-verb-review-blocked${SFX}.ga.json`);
+const OUT_SUMMARY = P(`otc-en-nonoral-verb-summary${SFX}.ga.json`);
+const ROUTE_LEDGERS_ORIGINAL = ['otc-v4-carryover72-prep.ga.json', 'otc-v4-finalall-prep.ga.json', 'otc-v4-next2000-prep.ga.json', 'otc-v4-pilot-500-prep.ga.json', 'otc-v4-pilot-100-prep.ga.json'];
+const ROUTE_LEDGERS_EXTRA = ['otc-v4-nr26-prep.ga.json', 'otc-v4-route535-prep.ga.json'];
+function routeMap(files: string[]): Map<string, string> {
+  const m = new Map<string, string>();
+  for (const f of files) {
+    try { for (const r of J(f).rows || []) if (r.route && !m.has(r.masterId)) m.set(r.masterId, r.route); } catch { /* 없으면 skip */ }
+  }
+  return m;
+}
 
 /* ── 텍스트 추출 ─────────────────────────────────────────────────────────────── */
 const unesc = (s: string): string => s.replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&gt;/g, '>').replace(/&lt;/g, '<').replace(/&amp;/g, '&');
@@ -161,11 +177,26 @@ async function main(): Promise<void> {
   const port = parseInt(arg('--port') || process.env.PROXY_PORT || '5524', 10);
   const input = J('otc-en-coverage-incomplete-list.ga.json');
   const inputRows: any[] = input.rows;
-  const ids = inputRows.map((r) => r.masterId);
-  const routeBy = new Map<string, string>(inputRows.map((r) => [r.masterId, r.route]));
-
   const pool = new Pool({ host: '127.0.0.1', port, database: 'o4o_platform', max: 4, user: process.env.DB_USERNAME || 'o4o_api', password: process.env.DB_PASSWORD });
   await pool.query('SET default_transaction_read_only = on');
+
+  let ids: string[], routeBy: Map<string, string>;
+  if (SCOPE === 'input240') {
+    ids = inputRows.map((r) => r.masterId);
+    routeBy = new Map<string, string>(inputRows.map((r) => [r.masterId, r.route]));
+  } else {
+    /* 원 검출기와 **동일한 술어**로 비경구 전수를 재현한다(코호트가 아니라 데이터가 대상을 정한다) */
+    routeBy = routeMap([...ROUTE_LEDGERS_ORIGINAL, ...ROUTE_LEDGERS_EXTRA]);
+    const hits = (await pool.query(
+      `SELECT s.master_id::text mid FROM shared_product_descriptions s
+        WHERE s.description_type='STORE' AND s.language='en' AND s.source_type='mfds_drug_otc'
+          AND s.status='canonical' AND s.deleted_at IS NULL
+          AND s.content ~* '\\m(take|takes|taken|taking|swallow|orally|by mouth)\\M'`)).rows as any[];
+    ids = hits.map((h) => h.mid).filter((m) => {
+      const rt = routeBy.get(m); return !!rt && rt !== 'oral' && rt !== 'unknown';
+    }).sort();
+  }
+  void ROUTE_LEDGERS_ORIGINAL;
 
   const leaflets = (await pool.query(
     `SELECT s.master_id::text mid, s.id::text id, COALESCE(s.language,'ko') lang, s.content,
@@ -302,7 +333,7 @@ async function main(): Promise<void> {
   }
   const docsOf = (pred: (r: any) => boolean): number => new Set(rows.filter(pred).map((r) => r.masterId)).size;
   const summary = {
-    wo: WO, kind: 'en-nonoral-verb-adjudication', mode: 'READ-ONLY', liveDbWrite: 0,
+    wo: WO, kind: 'en-nonoral-verb-adjudication', scope: SCOPE, mode: 'READ-ONLY', liveDbWrite: 0,
     inputRows: inputRows.length, inputDistinctMasters: new Set(ids).size,
     productMasters: new Set(rows.map((r) => r.masterId)).size,
     descriptions: new Set(rows.map((r) => r.enDescriptionId).filter(Boolean)).size,
