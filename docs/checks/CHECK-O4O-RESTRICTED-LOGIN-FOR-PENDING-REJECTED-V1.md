@@ -203,9 +203,50 @@ cloud-sql-proxy 경유 **read-only SELECT** (2026-07-31, `o4o_platform`).
 | 식별 | 이름 `[E2E_TEST] 제한로그인` / 이메일 `e2e-restricted-*@example.com` |
 | 생성 경로 | `POST /api/v1/auth/register` (serviceKey=pharmacy-hub, role=store_owner) |
 | 반려 경로 | `PATCH /api/v1/pharmacy-hub/operator/memberships/{id}/reject` |
-| 현재 상태 | `users.status=pending` / membership `rejected` — **잔존**(정리 필요 시 별도 판단) |
+| 최종 상태 | **정리 완료 (삭제됨)** — 아래 §7-A-1-a 참조 |
 
 > 비밀번호는 저장소·본 문서·채팅 어디에도 기록하지 않았다.
+
+#### 7-A-1-a. 테스트 계정 정리 (2026-07-31, `WO-O4O-RESTRICTED-LOGIN-E2E-TEST-ACCOUNT-CLEANUP-V1`)
+
+| 항목 | 내용 |
+|---|---|
+| 정리 일시 | 2026-07-31 |
+| 정리 방식 | **공식 관리자 API 단독** — DB 직접 mutation 0 |
+| 사용 API | `DELETE /api/v1/admin/users/88a9fd90-62b6-403e-9c9b-957cbc710b27` |
+| 권한 | `renariver21@gmail.com` (`platform:super_admin`) — 활성 `platform:*` 보유 유일 계정. 역할 임시 부여 없음 |
+| 응답 | `200 { success: true, message: "User deleted successfully" }` |
+| 삭제 유형 | **하드 삭제** (`AdminUserController.deleteUser` 는 hard delete 를 먼저 시도하고 FK 위반 시에만 비활성화로 폴백한다. 본 대상은 `NO ACTION` FK 참조가 0건이라 hard 경로로 완료) |
+
+**사전 확인 (read-only)** — 전부 예상과 일치해 진행:
+
+- `userId` 정확 일치 · 이름 `[E2E_TEST] 제한로그인` · 이메일 `e2e-restricted-20260731@example.com`
+- `membershipId` 정확 일치 · `service_key=pharmacy-hub` · `status=rejected`
+- **다른 서비스 membership 없음** (pharmacy-hub 1건이 전부) · `role_assignments` 0건
+- 실사용 데이터 연결 0: `forum_post`/`forum_comment`/`kpa_*_profiles`/`kpa_pharmacy_requests`/`neture_suppliers`/`organization_members` 모두 0
+- `users` 참조 FK 중 `NO ACTION` 인 5개 테이블(`forum_post.author_id`, `forum_comment.author_id`, `kpa_*`)에 대상 row 0 → 관계 정합성 보장 확인 후 실행
+
+**사후 상태 (read-only 검증)**
+
+| 대상 | 결과 |
+|---|---|
+| `users` row | 0 (삭제됨) |
+| `service_memberships` (user 기준 / id 기준) | 0 / 0 — FK `CASCADE` 로 정리 |
+| `role_assignments` | 0 |
+| `service_credentials` | 1 → 0 — FK `CASCADE` 로 정리 |
+| 세션/refresh | `refreshTokenFamily` 가 users row 와 함께 제거 → 재발급 불가 |
+| `GET /admin/users/{id}` | **404 `User not found`** |
+| 삭제 계정 로그인 | **401 `INVALID_USER`** (`User account not found or has been deactivated`) |
+
+**영향 범위 (다른 데이터 무변경 확인)**
+
+- `users` 총계 41 → **40** (정확히 1건)
+- `pharmacy-hub` membership 6 → **5** (정확히 1건)
+- 다른 계정 정상: `sohae2100@gmail.com`·`sohae21@naver.com`·`renagang21@gmail.com`·`renariver21@gmail.com` 전부 `isActive=true` 유지
+- 다른 `[E2E_TEST]` 계정 2건 · Pharmacy-Hub 상품 테스트 데이터 · OTC/HFF 병행 작업물 **미접촉**
+
+> 부수 발견(본 WO 범위 밖): `GET /api/v1/admin/users?search=...` 가 검색어 유무와 무관하게 500 을 반환한다.
+> 검색 없는 목록(`GET /api/v1/admin/users`)과 단건 조회는 200 이며, 본 정리와 무관한 기존 결함이다.
 
 ### 7-A-2. API 스모크 결과
 
