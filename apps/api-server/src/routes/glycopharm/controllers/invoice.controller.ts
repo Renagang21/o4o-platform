@@ -46,6 +46,16 @@ function checkAuth(req: Request, res: Response): string | null {
   return user.id;
 }
 
+/**
+ * WO-O4O-GLYCOPHARM-BILLING-INVOICES-RECOVERY-V1:
+ *   5xx 응답이 `error.message` 를 그대로 실어 relation·schema·SQL 등 내부 DB 정보가
+ *   클라이언트로 새어나갔다. 진단 정보는 console.error 로 서버 로그에만 남기고
+ *   응답에는 일반화된 문구만 반환한다.
+ *   의도된 도메인 응답(400 검증 / 404 NOT_FOUND / 409 DUPLICATE·INVALID_STATUS)의
+ *   메시지는 그대로 유지한다. 적용 범위는 이 invoice 컨트롤러로 한정한다.
+ */
+const INVOICE_INTERNAL_ERROR_MESSAGE = 'Failed to process invoice request';
+
 export function createInvoiceController(
   dataSource: DataSource,
   requireAuth: AuthMiddleware,
@@ -98,7 +108,7 @@ export function createInvoiceController(
         const status = error.message?.includes('already exists') ? 409 : 500;
         res.status(status).json({
           success: false,
-          error: error.message,
+          error: status === 409 ? error.message : INVOICE_INTERNAL_ERROR_MESSAGE,
           code: status === 409 ? 'DUPLICATE_INVOICE' : 'INTERNAL_ERROR',
         });
       }
@@ -126,7 +136,7 @@ export function createInvoiceController(
           : 500;
         res.status(status).json({
           success: false,
-          error: error.message,
+          error: status === 500 ? INVOICE_INTERNAL_ERROR_MESSAGE : error.message,
           code: status === 404 ? 'NOT_FOUND' : status === 409 ? 'INVALID_STATUS' : 'INTERNAL_ERROR',
         });
       }
@@ -154,7 +164,7 @@ export function createInvoiceController(
         res.json({ success: true, data: invoice });
       } catch (error: any) {
         console.error('Failed to get invoice:', error);
-        res.status(500).json({ success: false, error: error.message, code: 'INTERNAL_ERROR' });
+        res.status(500).json({ success: false, error: INVOICE_INTERNAL_ERROR_MESSAGE, code: 'INTERNAL_ERROR' });
       }
     },
   );
@@ -171,24 +181,21 @@ export function createInvoiceController(
         const userId = checkAuth(req, res);
         if (!userId) return;
 
-        let invoices: any[] = [];
-        try {
-          invoices = await invoiceService.listInvoices({
-            status: req.query.status as any,
-            pharmacyId: req.query.pharmacyId as string,
-            supplierId: req.query.supplierId as string,
-            periodFrom: req.query.periodFrom as string,
-            periodTo: req.query.periodTo as string,
-          });
-        } catch (dbErr: any) {
-          // safeQuery: glycopharm_billing_invoices 테이블 미존재 시 빈 결과 반환
-          console.warn('[Invoices] Table may not exist, returning empty:', dbErr.message);
-        }
+        // WO-O4O-GLYCOPHARM-BILLING-INVOICES-RECOVERY-V1:
+        //   내부 try/catch 가 조회 실패를 삼키고 빈 목록을 반환해 장애를 감췄다 → 제거.
+        //   조회 실패는 아래 catch 로 전파되어 일반화된 5xx 가 된다.
+        const invoices = await invoiceService.listInvoices({
+          status: req.query.status as any,
+          pharmacyId: req.query.pharmacyId as string,
+          supplierId: req.query.supplierId as string,
+          periodFrom: req.query.periodFrom as string,
+          periodTo: req.query.periodTo as string,
+        });
 
         res.json({ success: true, data: invoices });
       } catch (error: any) {
         console.error('Failed to list invoices:', error);
-        res.status(500).json({ success: false, error: error.message, code: 'INTERNAL_ERROR' });
+        res.status(500).json({ success: false, error: INVOICE_INTERNAL_ERROR_MESSAGE, code: 'INTERNAL_ERROR' });
       }
     },
   );

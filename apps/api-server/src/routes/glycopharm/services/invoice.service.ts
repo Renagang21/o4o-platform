@@ -230,22 +230,22 @@ export class InvoiceService {
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-    try {
-      const rows = await this.dataSource.query(
-        `SELECT i.*, p.name AS pharmacy_name
-         FROM glycopharm_billing_invoices i
-         LEFT JOIN organizations p ON p.id = i.pharmacy_id
-         ${where}
-         ORDER BY i.created_at DESC`,
-        values,
-      );
+    // WO-O4O-GLYCOPHARM-BILLING-INVOICES-RECOVERY-V1:
+    //   기존에는 이 조회를 try/catch 로 감싸 어떤 오류든 삼키고 빈 배열을 돌려줬다.
+    //   그 결과 `glycopharm_billing_invoices` 테이블이 운영에 아예 없는 동안에도
+    //   API 가 200 { data: [] } 를 반환해 "청구서가 없는 정상 상태"처럼 위장했고,
+    //   장애가 탐지되지 않았다.
+    //   조회 실패는 삼키지 않고 호출자로 전파한다 — 실제 0건과 조회 실패를 구분해야 한다.
+    const rows = await this.dataSource.query(
+      `SELECT i.*, p.name AS pharmacy_name
+       FROM glycopharm_billing_invoices i
+       LEFT JOIN organizations p ON p.id = i.pharmacy_id
+       ${where}
+       ORDER BY i.created_at DESC`,
+      values,
+    );
 
-      return rows.map((r: any) => this.mapRow(r, r.pharmacy_name));
-    } catch (err: any) {
-      // safeQuery: glycopharm_billing_invoices 테이블 미존재 시 빈 배열 반환
-      console.warn('[InvoiceService] glycopharm_billing_invoices table may not exist:', err.message);
-      return [];
-    }
+    return rows.map((r: any) => this.mapRow(r, r.pharmacy_name));
   }
 
   private mapRow(row: any, pharmacyName?: string): InvoiceResult {
