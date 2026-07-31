@@ -46,6 +46,8 @@ import adminUsersRoutes from '../routes/admin/users.routes.js';
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1 — ⚠️ 측정 후 제거할 임시 진단 라우트
+import proxyChainDiagnosticsRoutes from '../routes/admin/proxy-chain-diagnostics.routes.js';
 import serviceMonitorRoutes from '../routes/service-monitor.routes.js';
 
 // ============================================================================
@@ -170,6 +172,8 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/users', adminUsersRoutes);
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
+  // ⚠️ 임시: trust proxy hop 수 실측용. 측정 확정 후 제거한다.
+  app.use('/api/v1/admin/diagnostics', proxyChainDiagnosticsRoutes);
   app.use('/api/v1/service/monitor', serviceMonitorRoutes);
 
   logger.info('✅ Core API routes registered');
