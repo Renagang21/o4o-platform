@@ -188,6 +188,49 @@ cloud-sql-proxy 경유 **read-only SELECT** (2026-07-31, `o4o_platform`).
 
 ---
 
+## 7-A. 배포 후 프로덕션 검증 (2026-07-31)
+
+- 커밋 `bf7090884` → GitHub Actions **Deploy API Server (Cloud Run) success**
+- Cloud Run 리비전 `o4o-core-api-03047-dsk` (100% traffic)
+- 프론트: **Deploy Web Services success**, `pharmacy-hub-web`
+
+### 7-A-1. E2E 테스트 계정 (실 회원가입 API 사용 — DB 직접 변경 없음)
+
+| 항목 | 값 |
+|---|---|
+| userId | `88a9fd90-62b6-403e-9c9b-957cbc710b27` |
+| membershipId | `689625d9-5d80-4a94-9513-8fd4cf875381` |
+| 식별 | 이름 `[E2E_TEST] 제한로그인` / 이메일 `e2e-restricted-*@example.com` |
+| 생성 경로 | `POST /api/v1/auth/register` (serviceKey=pharmacy-hub, role=store_owner) |
+| 반려 경로 | `PATCH /api/v1/pharmacy-hub/operator/memberships/{id}/reject` |
+| 현재 상태 | `users.status=pending` / membership `rejected` — **잔존**(정리 필요 시 별도 판단) |
+
+> 비밀번호는 저장소·본 문서·채팅 어디에도 기록하지 않았다.
+
+### 7-A-2. API 스모크 결과
+
+| 시나리오 | 기대 | 실측 |
+|---|---|---|
+| normal 로그인 (active) | JWT claim `normal` | `accountAccess=normal`, roles 10 ✅ |
+| normal 계정 API 6종 | 403 없음 | `/auth/me`·`/auth/services`·`/kpa/me/membership`·`/pharmacy-hub/me/access` 200 (미존재 경로만 404) ✅ |
+| **pending 로그인** | **성공 + 제한 JWT** | HTTP 200, `status=pending`, `accountAccess=restricted`, claim roles `[]` ✅ (기존엔 403 `ACCOUNT_NOT_ACTIVE`) |
+| restricted allowlist 4종 | 200 | `/auth/me`·`/auth/services`·`/pharmacy-hub/join/status`·`/pharmacy-hub/me/access` 200 ✅ |
+| restricted 비허용 | 403 `ACCOUNT_ACCESS_RESTRICTED` | `/dashboard/assets`·`/cpt/types`·`/pharmacy-hub/operator/memberships`·`POST /forum/posts`·`PATCH /auth/me/profile` 전부 403 + 지정 code/message ✅ |
+| query 우회 | 차단 | `/products?x=/api/v1/auth/me` → allowlist 미통과 ✅ |
+| `optionalAuth` 공개 경로 | 비로그인 취급(200) | `GET /forum/posts` 200 — 공개 목록이므로 정상 ✅ |
+| `/auth/me` 최소 응답 | role/scope 비움 | `roles=[]`, `scopes=[]`, `role='user'`, memberships 는 유지(`pharmacy-hub/pending`) ✅ |
+| `/me/access` 정규화 | entryPoints 전부 false | `{storeOwner:false, supplier:false, operator:false}`, `roles=[]`, `accountAccess=restricted` ✅ |
+| refresh | 제한 claim 유지 | HTTP 200, 재발급 claim `restricted` ✅ |
+| **반려 후 재로그인** | 로그인 + 반려 사유 열람 | 로그인 200(restricted) → `/join/status` `status=rejected`, `rejectionReason` 노출 ✅ **(WO 핵심 목표 달성)** |
+
+### 7-A-3. 브라우저 스모크 (Playwright, 실제 배포 화면)
+
+`https://pharmacy-hub-web-*.run.app/login` 에서 pending 계정 로그인 →
+**`/join/status` 로 이동**, "승인 대기 중입니다" + 신청 역할/일시 표시.
+상품·주문·콘텐츠 진입 링크 없음(`처음으로` 링크만) ✅
+
+---
+
 ## 8. WO §10 중지 조건 판정
 
 | # | 조건 | 판정 |
