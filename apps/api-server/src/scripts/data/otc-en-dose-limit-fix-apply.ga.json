@@ -1,0 +1,4014 @@
+{
+ "summary": {
+  "wo": "WO-O4O-OTC-STORE-EN-DOSE-LIMIT-AND-REPETITION-MINIMAL-FIX-V1",
+  "mode": "APPLY",
+  "inputStats": {
+   "dose": 225,
+   "repetition": 3,
+   "distinctTargets": 228,
+   "overlap": 0
+  },
+  "planned": 218,
+  "plannedByKind": {
+   "DOSE_LIMIT_RESTORED": 215,
+   "REPETITION_REMOVED": 3
+  },
+  "skipped": 10,
+  "skipByCode": {
+   "REVIEW_REQUIRED": 10
+  },
+  "green": 218,
+  "concurrent": 0,
+  "exception": 0
+ },
+ "plans": [
+  {
+   "enId": "c6b7ff4c-8d36-407a-9d4f-f8ecd3d0a0f6",
+   "koId": "a0d82c37-d3fd-44b5-afa5-52564957fce8",
+   "masterId": "022ab630-8cb8-44e0-b84f-4f650f7b6d9b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "521cf986-32d7-4423-8c82-8c172dc71374",
+   "koId": "b0a1906b-b16c-407a-a42f-8ce308f46489",
+   "masterId": "0366c1dc-2126-4b29-85dc-c8c709d5f541",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69fe64054578320db663bf36d18e571a",
+   "newHash": "90091907517a3803b080f151f45a4c7e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "da3b428b-79cf-4d19-975d-6971ebfb8129",
+   "koId": "e2da9da8-e1f4-44c4-8dd2-66a61a900d49",
+   "masterId": "03caaaf4-1166-4ef5-8a14-96309ddb09a8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ec9a75a1-b00e-4408-80e3-d843f8bd3827",
+   "koId": "cd09b415-9df4-4314-a303-7de6a14499f8",
+   "masterId": "04c22a8d-99ac-4c85-8a70-4cd5be900799",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "17c1133b-63bd-4cb5-961e-a0c9b79f3560",
+   "koId": "2a22f89b-fe1f-49bc-b325-343f4fb7c53b",
+   "masterId": "0504f04a-ebfe-4331-9f01-10d16f0b2cf6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3b97ed2b-23f6-4f81-b508-d4d9bdd18d3a",
+   "koId": "55c5cfae-8bd5-4387-91e8-b4d1b9fd9c9f",
+   "masterId": "054a62aa-cb5b-49b1-ad97-761db18e6cd2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb2bf91304404000df867b7deda4c492",
+   "newHash": "b6f3c2daad8d4935e23777c8c7b75bed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4994a854-aa20-4e8d-94af-f1d3f225bd35",
+   "koId": "0df723ca-484b-4ab7-a6da-ddf2702d2ff0",
+   "masterId": "05e156a6-fe80-4170-8d2b-073484b6a0d6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4bc6b27abda255fc0e8bf6a1956c3439",
+   "newHash": "406e9318225b15cbae6c622a5820b941",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "16780a72-3d88-48e5-9b17-e9b1e82e5e0a",
+   "koId": "6c077afb-bd91-4a13-9f91-42cede9a75b4",
+   "masterId": "07be7d41-2cf0-4224-a0b6-7f6a1387739f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "687c72ed1364f0e7663ba399b3fb7ebf",
+   "newHash": "594b20a38198b33a1558b88cb5f9272d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c763c9f7-54c1-4974-917b-3787c66533e7",
+   "koId": "668c19be-792d-45d4-8bb9-6bca1e22d766",
+   "masterId": "08b2c47b-d9f4-4618-a95e-717749e93cb8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bc3ed3befaf12d9b0be453e7962f9ecf",
+   "newHash": "9e3dc4f8ab9c04372e2f0e3a7ce969a0",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f8d35f75-f647-4d18-b81e-2f6d4214fe8f",
+   "koId": "8cf8482c-31dc-440d-8d54-3a80afe9d0c0",
+   "masterId": "0b89a172-52f4-4f29-93bd-f0da720b3a93",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3e26e23805a2e0174cc4f58f247a11",
+   "newHash": "1370ccc00b390f78d92bbdf73f858196",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "db143e7a-523f-4182-8502-cd8c6a5ea415",
+   "koId": "c2e60778-1ecf-49c3-ad3d-a23e4a6dd525",
+   "masterId": "0d2ce21f-8487-477b-9881-fa08c940918d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "dc308cdeab74e6d20d0273814dedc5f7",
+   "newHash": "fb71b0f49fd6a7f845b41e09191651e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "29cfe1cd-5a35-4b3e-a951-1a19de867fe3",
+   "koId": "723f8572-0937-42fd-a587-3acaea54ab1c",
+   "masterId": "0f68189f-205f-4b8c-89d4-7b9deb40afa2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "84462682-20cb-457a-aad6-66b0cc37b15f",
+   "koId": "e1280c47-1af1-49b9-be83-1934b3010ad0",
+   "masterId": "0fba5b58-087d-43b2-9b67-de892f046f1a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "29a4e65d-d87a-43de-91f2-01586d71c33c",
+   "koId": "5a596ef3-3946-4e98-ab2a-51377dc246a2",
+   "masterId": "12192eae-e938-45ae-ae53-e84d1098f383",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "abed842481d653f41caf59497d06c5cd",
+   "newHash": "8ff9584e31c587de0a7a15488af7d660",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "64cfb0fb-6793-48c5-a5dc-5cecd672f41b",
+   "koId": "af11229f-4bb6-4eb3-9f8a-66b480e92bcd",
+   "masterId": "12a6866b-63d6-4509-ba10-807737fca084",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "dc308cdeab74e6d20d0273814dedc5f7",
+   "newHash": "fb71b0f49fd6a7f845b41e09191651e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9a392a4f-0f79-48fa-8ed7-0d7a88677e3f",
+   "koId": "89c19c97-dbb3-4bf7-94f4-1a1e6272ed22",
+   "masterId": "15045f1b-f614-4f9a-a3d6-58da3ff2443e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "dee0381750a5b4bae1d2d5408556c921",
+   "newHash": "2c1c7298491bc7f4fa1fabc8cb9e1d28",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3b5333d4-bd1a-4e87-80a5-8639e4a2496f",
+   "koId": "2cd6e4fb-3348-4966-b7d9-877dfd2f1396",
+   "masterId": "15e34876-7b44-4754-8da9-6d75676bf1e9",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8c1d1091-59eb-4fca-9299-43ced874757e",
+   "koId": "5125dfb7-d5d9-499b-8d62-93c3eecb053b",
+   "masterId": "18fe0173-e428-4ce0-9ff5-43e7cf07d375",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b655b40a-d6e7-4ad7-8aed-c67beda66473",
+   "koId": "d59a83cb-b835-4283-8e17-790e81c5d233",
+   "masterId": "1a4933db-4ca2-46eb-b586-35d828e25aa1",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "97e11660-355a-4e01-a15b-927485fc9499",
+   "koId": "7c11cdaa-fd0f-4270-8f24-9488e93f0a15",
+   "masterId": "1bf48e30-b1d5-46d8-a16d-e22ae0765ba0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "cc282e15-d243-4c6a-834a-0c71c9d8d16e",
+   "koId": "9762b7ad-f935-4e90-a80e-ffb2eaa6990b",
+   "masterId": "1c30dfa6-8142-4cec-951f-60814e9c9563",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d01fb678b6b8d567235059435e4ace",
+   "newHash": "fecbae54c989893202325f4269e8bbab",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "79d5cff0-eee4-4849-b968-e7b83c625682",
+   "koId": "6392a3ef-f783-4f9d-90d6-2733ee8d5fc9",
+   "masterId": "1cca549d-f3b0-4af1-873a-414e6dbff9a2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "fc02779b-2980-4cf5-8e12-165bc0d466fd",
+   "koId": "3c1e756e-71ac-471c-bb0e-d4df95a22f38",
+   "masterId": "1cf20a41-7213-43c9-a500-2b00d02df4f7",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bc3ed3befaf12d9b0be453e7962f9ecf",
+   "newHash": "9e3dc4f8ab9c04372e2f0e3a7ce969a0",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "11fec479-ea58-4c64-82f0-1a47b7ca6089",
+   "koId": "9588be39-12c3-4b4e-b758-5931ac131784",
+   "masterId": "1d5ffcd6-b171-42c3-8158-69af8cee63f8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bed7913d8dac0b26ab77f0e4b3f068df",
+   "newHash": "eef10e358409692eaaa7e0ab8f9fe5d8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "40f91c02-40bf-4c0d-95b9-95afd665d6ff",
+   "koId": "3376f95d-b59c-45f8-838d-1401a52a49f0",
+   "masterId": "1dc58aea-2c25-45d9-bf4f-f918a6d2795c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "93ddde55d8d55fd72151c831fb7afcb7",
+   "newHash": "7912692eb6e86463a22f844ba2d8c5fa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ff2ccabe-67f6-4536-8fc2-90e6c67c9076",
+   "koId": "0d1e3b91-c1e6-44ff-8fdc-f7123ee0bac0",
+   "masterId": "1e683b2a-cd13-4689-9323-8e5c1af5ff35",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1c02b9a7d1e87aaea373b6d30bdd7cea",
+   "newHash": "bf8f3239dfd9b6afc3858020b756467f",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "37e3f58f-c4c5-4c9b-8866-dd558380bf45",
+   "koId": "de20ef66-b233-4d08-a4f4-b504544f2fd5",
+   "masterId": "1fcde953-6a92-4081-8395-a83d65d78e0b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9d29a96087367a8ac7b447a343f90495",
+   "newHash": "6a7d6a84674af82d983c2cd043d42828",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "4132e8e9-7cb0-4820-8adf-49678cfc4775",
+   "koId": "d2d81c52-f5a4-47c1-a240-fb949272f730",
+   "masterId": "2009f99b-ad37-4aa4-a9ef-9bb00d85c967",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d9118593b0d1dd99a0d231979fbc4e2d",
+   "newHash": "449b8fcd0e1c49e44980c148eec46adb",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "89d98762-0f9f-4d20-9ddc-719452ba4391",
+   "koId": "d2e24b94-e8fd-4567-9911-15f996a24b23",
+   "masterId": "21a65fac-2bb2-45cd-81c9-a921ebc1602d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "687c72ed1364f0e7663ba399b3fb7ebf",
+   "newHash": "594b20a38198b33a1558b88cb5f9272d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "70a1b5c4-8be9-43d4-b1f5-ddcc42348d52",
+   "koId": "f4ab4ca0-30da-48ec-aba7-fbdd3b4f2f97",
+   "masterId": "2208a20e-4ce7-4182-a28e-bf8f0ae45d25",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "139c4171-739b-4811-aefb-c0c03f8685a3",
+   "koId": "95885f1e-f42c-4eb1-ae06-414e81332a7d",
+   "masterId": "235dc106-a0c3-4cde-923b-cb711f1be4b4",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1c02b9a7d1e87aaea373b6d30bdd7cea",
+   "newHash": "bf8f3239dfd9b6afc3858020b756467f",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "fa1bc118-5245-4afb-8a7c-ebce0a31a494",
+   "koId": "05e3de22-3c19-4105-ae03-35ed67a8fdac",
+   "masterId": "23b5ce44-41b6-42a5-bbc7-4c07001bb0e3",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "a16601e6-ceb1-4431-b7aa-a0ffbc1e158d",
+   "koId": "dff6efc1-6659-4b6e-8808-08dcbb9ec4f3",
+   "masterId": "23eddf82-85fb-4cb0-a144-3ccf19895b0f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "60c5009307f39cd884f856b9625e117d",
+   "newHash": "1799492b7aa54c0f9efcf9f526d54d62",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "ae79b22c-898c-47f4-b3df-a3804e7888ad",
+   "koId": "fb96748c-0c52-42ea-bd5e-cb373f0e89a8",
+   "masterId": "24cc8d94-9693-4977-b597-9397461e2f84",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "3a640e50d8b326af143425e7229c3218",
+   "newHash": "e9ddcabbfd078cd2ca47709b319c7696",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "a9ef7801-772a-4789-b6e7-58820be03010",
+   "koId": "75fc03ed-553c-410a-9a5e-9704df811031",
+   "masterId": "24e19c91-7091-4b49-8226-218c1ad99aa4",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "559ece5b4e68573223249a17db3f26c8",
+   "newHash": "4b7f6f200275f8e2390503571b7ad109",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "93e76c4c-b315-4769-a66d-f9fb151495f2",
+   "koId": "7345400d-d4f2-4283-ab58-114ce4f4fa27",
+   "masterId": "27162fe4-04f8-4c8d-88be-a6f6944a7be6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "129d60d13ffa2de9722d2092da91d471",
+   "newHash": "de24bcceaa86606a4977b38a7a84aeb7",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "240d832c-ce7e-481c-a134-489fd35a6a48",
+   "koId": "4e49d6b1-25bb-4782-ae6c-56fd25149538",
+   "masterId": "275f11cd-77b4-4aaa-9981-144544c8937f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "21d10510-0f54-42d5-b51b-ae3ee9e52625",
+   "koId": "496eee7a-2cb6-4439-9e93-0e20e727187f",
+   "masterId": "292ba17a-b25d-4c9d-b294-a1b6a1660015",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69bf93a1a14dd4b40c4ec434bc1209e0",
+   "newHash": "81da716146950c9ff06aca2034f6997e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c0bfbb3b-4cbf-47a1-a493-6728ee4f00e5",
+   "koId": "42f4da4b-2b90-487e-9ed1-a2b12b9c6f53",
+   "masterId": "29a4315c-9de2-4d03-8f1e-5f4508eb8bc6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ac1db65f-8868-4960-9e92-6c2289478297",
+   "koId": "8b367380-24b1-4566-865c-33f0d1013d6e",
+   "masterId": "2b0643a1-071e-421d-a3ca-9cdbb1f5a5e0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9425817aa140b0e9f52cda5339d3dde0",
+   "newHash": "ec92dc0b0b7144ac9df7c0bebc18dec3",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9462f5b6-adc9-40d6-aac6-5fca91259215",
+   "koId": "853c6ce5-301f-4140-b15b-139dec481155",
+   "masterId": "2ca74bf0-a03e-4bc2-ac6d-495bbb01370f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6cae1733-18b5-4bbf-9e49-ed4d83504a7f",
+   "koId": "5d407f52-6f87-4cd0-bf33-22e9054937b8",
+   "masterId": "31771018-d6f7-4709-859b-2cd194c46ad0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "85e76f8ef106cf38c56b5a6cc8fa91c0",
+   "newHash": "e994f0db8f52857352ebde6ba14dbe51",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "26c9e6fa-ce0b-47a9-a20b-530a8ba29ff8",
+   "koId": "bacd4787-8c0e-4c40-9c82-419ab43dc6dd",
+   "masterId": "335ac66d-c980-45b9-80d4-ee344248180f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d9643a955d94e0d6e9b23795d65d7f",
+   "newHash": "51e7b0c7534eebc4fc58eba238d717aa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c54e090a-984d-44b6-9d48-e94033c7c325",
+   "koId": "6733a7a9-8957-4c4d-98e1-b1bab6a739aa",
+   "masterId": "33ad420d-0524-4c9d-bb53-771bc9686869",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "129d60d13ffa2de9722d2092da91d471",
+   "newHash": "de24bcceaa86606a4977b38a7a84aeb7",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f1305df3-51c3-421c-9f85-8d020b848962",
+   "koId": "4a3958c7-a94b-4fef-8086-49e7cf53d228",
+   "masterId": "3470da75-713d-4ff6-b9d1-fbbf028096a0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1e02e3373bd3f4443c7e3d71d7614b5e",
+   "newHash": "d384a06d84daf464ac0427915f1b1a11",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "531daaa3-5cc1-4fc7-b83c-e70723c02053",
+   "koId": "f2e6491c-49b7-480b-b90a-0f220aa9b741",
+   "masterId": "35b06cbc-2c95-4237-90c5-bdfbefea639e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9e4fec435d0c9a0f0c502c871a5f34de",
+   "newHash": "ef0bdf3cf47d232ae6510847ed8fe9cf",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c7be042d-ddbd-4897-9999-01576b2a26c3",
+   "koId": "459b2447-2689-4a2d-b54a-403021fc027c",
+   "masterId": "35e15f8a-af82-499c-aaee-068ce502a027",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d9118593b0d1dd99a0d231979fbc4e2d",
+   "newHash": "449b8fcd0e1c49e44980c148eec46adb",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4d752cd2-207f-4666-867e-b4c127d09526",
+   "koId": "5fd4d437-ef11-4872-af86-df47b3a9a1da",
+   "masterId": "36060773-c039-4b5d-a620-a115123cecca",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9e4fec435d0c9a0f0c502c871a5f34de",
+   "newHash": "ef0bdf3cf47d232ae6510847ed8fe9cf",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "7c111086-dd63-4893-aac2-42661922f3f4",
+   "koId": "aadf2aa6-8e1a-4584-b3f9-5279cb688841",
+   "masterId": "366bbde1-813d-46e2-9bca-c4786436593c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1e02e3373bd3f4443c7e3d71d7614b5e",
+   "newHash": "d384a06d84daf464ac0427915f1b1a11",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "5c6d7532-e98e-4e83-8329-c48b16260ad4",
+   "koId": "f7d0e38f-76b5-42b3-b767-6a33168bc8f5",
+   "masterId": "39bd9ece-0980-4521-8849-d80922965f4f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "7daf4a3b-7006-49ee-8f2b-0b2d719a19a9",
+   "koId": "30a16fb0-5e00-42e2-b217-114fdc0a7157",
+   "masterId": "3a35679f-3cde-4fe8-9ee9-6f866e0ce685",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ad68b434-35a8-44a9-958f-bbf08c057f46",
+   "koId": "02a5ad5e-f319-457e-ba27-8ca4383ffb59",
+   "masterId": "3bf749e7-e55d-4cf8-bb0c-de25b3207798",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e7eccb9d58ed62db6c18e0526afa9b4f",
+   "newHash": "709d2566d3467b28e82292f97b378aa1",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "a100708c-d195-4838-a8bc-b975a0c6c724",
+   "koId": "1bc4a29b-a6f4-4c1d-85d1-e0e2bedda3f2",
+   "masterId": "3bf83818-e8ac-4e76-9c11-50813c7fecd0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9425817aa140b0e9f52cda5339d3dde0",
+   "newHash": "ec92dc0b0b7144ac9df7c0bebc18dec3",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "23a92541-aa7f-4a73-aed6-df6bad8616ea",
+   "koId": "774ab1f1-2649-461d-a976-29884f826e14",
+   "masterId": "3d147a61-6d55-4ebd-b7ff-f356460973f8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ce001068-8988-4377-84ad-06c6f593392a",
+   "koId": "2f2da5bf-fd85-471a-8cab-6176217f58d2",
+   "masterId": "3d8f7034-4799-4118-8070-5ecdbe19c339",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "33957fba0182e754ceaf41e9ed0dd838",
+   "newHash": "6bd4c62843af9f2fef72b95ea99efc0e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4aa92e94-d057-4105-abf8-275c4e4d5963",
+   "koId": "d3f1c9db-3814-46d6-9d59-293adc5390c5",
+   "masterId": "3fd7f772-45f1-47bc-ac12-13138c6a663d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "79339b7759e39da9dfc90018213346e8",
+   "newHash": "f607fbbb9aeaa1fb722f1465f01a6a43",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1078c406-7582-472d-bd7a-d7170c8d8536",
+   "koId": "c735780c-6827-467e-9c9a-10ccdbb32942",
+   "masterId": "427ec5af-eb57-4e60-a73c-2ce631578714",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e408dbd83d5214739dd0236c4442ba69",
+   "newHash": "0b6e4a94fcc43a16d2e273ada3e6f00b",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c0954a0e-3306-4ec3-be13-3e3c9c36653f",
+   "koId": "ca8a5418-fa78-49b3-aa43-3d7f5f54b77a",
+   "masterId": "428ec85a-e67d-4c7b-bc8a-38ca9471b955",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "687c72ed1364f0e7663ba399b3fb7ebf",
+   "newHash": "594b20a38198b33a1558b88cb5f9272d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3cf684fd-d2da-441c-b276-f2797767db3d",
+   "koId": "4ce62516-f25b-462e-be88-92f53378e3ab",
+   "masterId": "45a65011-637c-4d88-9017-aadb3d994e0f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "932bde1e61b9e0144afaf16b69b9edd6",
+   "newHash": "47d7fe60cf0575b2885eac5777020639",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8f3ede94-c2b1-449e-843b-3c1e3c81e8c2",
+   "koId": "a02b7f88-c446-4500-a575-06b7824cb1fe",
+   "masterId": "4716094d-75df-4663-834b-f2fae7235771",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "606cd0cd89d4c39345be29f9895517d4",
+   "newHash": "f70d3723799f9f87cb300a17b7afb2e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "2d0ed6cc-b3fc-48ea-bebc-82e08737f26c",
+   "koId": "3e150c06-345d-4aec-9674-d36b92a61669",
+   "masterId": "47a1582e-347a-4643-90b6-5a12126c4fe7",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "53217d4e684640269427d2da56feaaf0",
+   "newHash": "b70ba74b655ae11249187e2b33a95103",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "0bce6d62-f8b0-4729-94ce-4ce295272c4a",
+   "koId": "704754a1-7145-4ec7-96da-965feefcaffd",
+   "masterId": "499b7f3d-306d-461c-b30f-649400a32c3f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "93ddde55d8d55fd72151c831fb7afcb7",
+   "newHash": "7912692eb6e86463a22f844ba2d8c5fa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b0520a9f-65ad-4372-9093-cae14884fc3f",
+   "koId": "981ed79b-0b6b-412b-a1fa-f1fd4ee1ef0e",
+   "masterId": "49e0b809-6b57-4f0d-b2a5-08d020eaf8d0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "6761d1e668e04fb26b8da2e8af59ee26",
+   "newHash": "d54dbf1a6cb8ddf2c0b8d12426148cf4",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "cd2132e6-1fb3-462f-8d6f-4ee0800933b9",
+   "koId": "58b3e8ac-0df3-46a5-98ab-a6a120f86989",
+   "masterId": "4b5bbf85-727c-43ac-ade3-2b776ac3971e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69bf93a1a14dd4b40c4ec434bc1209e0",
+   "newHash": "81da716146950c9ff06aca2034f6997e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "64052935-261b-4bbb-854a-9572b6e8707f",
+   "koId": "33a3e9af-1efe-4ace-b9d5-6dcde70f1a40",
+   "masterId": "4db4b671-b395-49aa-b876-c10b10e1e3d4",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9fcbe37fc0ce6a9a3132b26b9a753486",
+   "newHash": "0e5c8fbaf281f8cb8ed35e9f3afdeafa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d6e579e3-9a82-4bca-8ce1-177d61cfdf2b",
+   "koId": "df420eae-8765-4bc5-bd38-e14b5f587af9",
+   "masterId": "4de30c3c-de8d-49c8-856c-b64317c7efb8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d9118593b0d1dd99a0d231979fbc4e2d",
+   "newHash": "449b8fcd0e1c49e44980c148eec46adb",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "79b74302-c332-4ce0-8628-87d25a9d4856",
+   "koId": "e8158874-01a1-448e-bdd4-d73716ff6665",
+   "masterId": "4e6db2dd-1021-4986-a6b7-43de6c863b57",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5d589ca029323523b3e7c72590131114",
+   "newHash": "e132f6cbf8f703fe23a72dca0d9fb76a",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "26c2b07b-0d7b-48b3-8c60-bc6f82588599",
+   "koId": "220fd4ad-3973-4c98-89e5-cdce76fc5c62",
+   "masterId": "4ffa3473-1777-4a63-9e02-9bff58282c99",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "94abd10a-1626-46dc-b72c-57df8d3825f3",
+   "koId": "030feb5c-d06b-4272-8f5e-2aa147b78f88",
+   "masterId": "52459bca-08a0-47eb-89cf-8224a2c53f7c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "aee8513c-48d0-4051-bbaf-bf2474ff2e25",
+   "koId": "3a59558b-0e6f-4ce6-b33c-c0b9181a08e2",
+   "masterId": "5245d297-59d9-4206-8be6-4f441446a3df",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3147446ec8781b8eb69203cbd08b9e",
+   "newHash": "44ac159d02788094e7ce16d623f68fb5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "6cec001e-e983-4584-b4c1-36c6bbd62dc7",
+   "koId": "9e3e1e37-123b-43ae-89e5-2bf9559c116f",
+   "masterId": "53e99277-213e-4992-8689-13958c84c56d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9425817aa140b0e9f52cda5339d3dde0",
+   "newHash": "ec92dc0b0b7144ac9df7c0bebc18dec3",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b1ad0b22-fe35-4f64-9f09-4a1826c5c07c",
+   "koId": "1b2e6dd6-f8f6-4a8d-977f-732d9a762227",
+   "masterId": "5533ad63-e877-4837-8954-fd89f670671a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "7f48f0db-9ab6-4999-bf30-aa44686a83d6",
+   "koId": "b96bee0b-00e0-4687-be2d-0a5e16b909d4",
+   "masterId": "56699b3c-f4c0-479c-94dd-1415f6261597",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e7eccb9d58ed62db6c18e0526afa9b4f",
+   "newHash": "709d2566d3467b28e82292f97b378aa1",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "0862be81-b8bd-4f5a-bf64-c27bd37053db",
+   "koId": "6dc10237-4b71-4c78-9713-d84f10f8a6ce",
+   "masterId": "585084a7-83b7-4fd8-ae12-41d9024a6f78",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c031e7aa-8313-44a1-8360-0831a6175785",
+   "koId": "36fe8d87-2fab-4b16-b82c-beb105541d76",
+   "masterId": "58cd6b45-7c43-44b0-bb97-7459d20781d9",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "559ece5b4e68573223249a17db3f26c8",
+   "newHash": "4b7f6f200275f8e2390503571b7ad109",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "5a89f56e-a0d3-4765-91ff-abea377623c3",
+   "koId": "796a6061-2bad-4f22-99a1-880dbddc632a",
+   "masterId": "599ea89e-dc6e-4cbf-99d6-67b3c9037980",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "40288e0837b5181e6736f83fe585ca06",
+   "newHash": "c4f7839b30f784bbcde71461027ad835",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "a5bb8263-49b5-43c0-9abf-d0a55f026b17",
+   "koId": "43559820-4a98-480a-8588-e0ee4ed3b990",
+   "masterId": "59ca6d3a-4fad-4c2a-aad2-0a079b956511",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bc3ed3befaf12d9b0be453e7962f9ecf",
+   "newHash": "9e3dc4f8ab9c04372e2f0e3a7ce969a0",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "255aa34c-b973-4152-bf36-f62f404073a8",
+   "koId": "ba4f3425-8e83-4215-be6b-a4e5e2c88bfd",
+   "masterId": "5c173c9e-d955-4de1-8721-925dc33ea048",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9d29a96087367a8ac7b447a343f90495",
+   "newHash": "6a7d6a84674af82d983c2cd043d42828",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "510211cd-4d7e-417f-9fce-a6e2c8f62553",
+   "koId": "09353528-6a16-4de2-a189-68b0802c6c19",
+   "masterId": "5c83e5c2-7dbb-42fd-a94e-515e11d75504",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "31333d96-7fcc-4abd-8fee-7960ceb80943",
+   "koId": "bcabf896-f05c-4b64-8cfe-abcf47bf24d7",
+   "masterId": "5d091d82-0e80-4d4f-bc35-6048e0f1cce8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b44162f7-c577-49d4-80ce-4fbb9377554d",
+   "koId": "cbec89c2-8fff-4f2c-b7cd-7ab503ca58cd",
+   "masterId": "5d3fdc2d-1531-49a1-a698-5929c76dfb0b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "e5076bbb-baf2-4543-acce-e83831b71bb0",
+   "koId": "b53fb8d0-55b4-469d-b87c-d5054e7ee714",
+   "masterId": "5eb87dd8-1164-4397-9eaf-9dddf873a8e2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "56bcefe0b8d347875a9a817a5ce0bf01",
+   "newHash": "385ef5f499c8b94d02bcba6e8ffa49e8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "da80e9c8-606b-4f00-91a1-9ebc10ae8083",
+   "koId": "ed5fdf56-84c3-4378-880a-b27d6cc94ded",
+   "masterId": "5f55fe7a-2436-425d-9d90-7dc8ac7e4e8d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "606cd0cd89d4c39345be29f9895517d4",
+   "newHash": "f70d3723799f9f87cb300a17b7afb2e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "29dd8575-3f02-476b-9dd5-d22e54e8016a",
+   "koId": "037591c3-0146-464b-9fb3-aed3947dce9a",
+   "masterId": "62228505-d9fe-474a-9724-16b924232ccc",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6ca563c9-4e73-4ad6-bc8f-fc7247a34162",
+   "koId": "8fc72655-1b91-4a9f-9ab3-473f281d1da1",
+   "masterId": "647f82f0-c85c-452a-8e55-62cc61b67cc8",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "3a640e50d8b326af143425e7229c3218",
+   "newHash": "e9ddcabbfd078cd2ca47709b319c7696",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6f09d4e8-19a0-401f-87f3-be5170c01646",
+   "koId": "dbc720f8-add7-4af7-a115-8d01ac3e979b",
+   "masterId": "64b239b6-e8c7-42da-a1d4-99ad6ff56053",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1c894339f62a9e4e272f149bbe8027c4",
+   "newHash": "c613fc4e2d182aba142f30b0cba7443e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6ce43d5f-24ba-4281-9afb-47a2e9df6466",
+   "koId": "66388c3c-e38d-44d7-b27d-450b040ee992",
+   "masterId": "655a3122-e636-4a36-a461-32944e7acc4f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d8d95882-81ea-431a-899a-3db166b1b366",
+   "koId": "23a979be-fd78-40b9-a236-c31bd0057661",
+   "masterId": "65b9e494-54e3-4ece-ba46-2c9fd9aed658",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8b531725-63e5-4045-93f1-b2e5b54b4fb8",
+   "koId": "8fd1a779-30a6-49ee-83a6-7b9d42345657",
+   "masterId": "65eb6924-7fa3-444b-91ba-85244bb7cb14",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "5f7c9884-d4e5-4a3a-8420-74d2f7a0fb11",
+   "koId": "23d1c9e7-435a-4757-bb62-86710cfc12ab",
+   "masterId": "672acce6-8086-4bdc-bc1e-5ab66b17e48b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d01fb678b6b8d567235059435e4ace",
+   "newHash": "fecbae54c989893202325f4269e8bbab",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "5d458e2c-55d3-4f3a-8956-475bd54d2bd5",
+   "koId": "d76a5f2e-f38e-4cf2-a790-9e99af1e55d2",
+   "masterId": "674967e4-42ed-4e74-8109-d8cb668a0157",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "56bcefe0b8d347875a9a817a5ce0bf01",
+   "newHash": "385ef5f499c8b94d02bcba6e8ffa49e8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1f4c257d-1e1d-4bb6-b170-c527cb7f9bda",
+   "koId": "226856cb-3b2e-418f-be62-812615700092",
+   "masterId": "677d0786-6fc2-4d9c-9972-9c88f664ec8b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "85ecbd4bebfa3c9ba4cca9a64e7447eb",
+   "newHash": "e7320fa298bdfbfa0251fcb64e78a78f",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f63c884e-39a9-453f-bd05-7533395051cf",
+   "koId": "dc48eb0f-d1c8-4568-9c99-e921203cace0",
+   "masterId": "68c1a870-bbc2-4f64-bfd8-4af83f0ee9b3",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "33957fba0182e754ceaf41e9ed0dd838",
+   "newHash": "6bd4c62843af9f2fef72b95ea99efc0e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9158deb0-1d27-4587-8da2-1f7494239001",
+   "koId": "b5c3f519-bba1-4f45-8796-6b09e0c3b94f",
+   "masterId": "68fe7e13-ab27-460b-b331-2b118bf48ab1",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "32af36a3-5a4a-4d6c-a593-14f7a13459ac",
+   "koId": "628987e2-a21a-4334-9f1a-e5f4770c9dc9",
+   "masterId": "6a41b970-0ed0-4021-b977-db907723c86e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "dee0381750a5b4bae1d2d5408556c921",
+   "newHash": "2c1c7298491bc7f4fa1fabc8cb9e1d28",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f6162df5-6249-4d88-a484-42ef6b00c152",
+   "koId": "fd1e906f-51c8-495f-81f4-64295b8c1f3b",
+   "masterId": "6b20bca7-344f-49fe-9715-6836eb3b5daf",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b73387a5-15a0-40a2-a3ce-0c80b642a094",
+   "koId": "b594b697-5e18-4f88-8f8c-0f6fa69c2814",
+   "masterId": "6b299861-b7d2-47ea-a6f7-3b90bbccc2ba",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "33a07ec3-7f8a-43d8-bade-48bf66d7e36b",
+   "koId": "99687d53-1b39-4369-a39f-5830583163e3",
+   "masterId": "6bcbf512-a818-48d3-8d81-b70e3d5c6b56",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5d589ca029323523b3e7c72590131114",
+   "newHash": "e132f6cbf8f703fe23a72dca0d9fb76a",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "dd1d1a02-eb12-448c-ae16-c9b6c2b9c028",
+   "koId": "a036f2bc-e34b-4b3f-bdb7-503701a04fff",
+   "masterId": "6d5005a4-1a5b-413b-a61e-ea85330bdd3e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1c894339f62a9e4e272f149bbe8027c4",
+   "newHash": "c613fc4e2d182aba142f30b0cba7443e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "0c3b0969-deba-4867-a7af-35cb1fb5677e",
+   "koId": "72fde840-8d88-4a87-8521-37e17a159178",
+   "masterId": "6e02353f-5dd5-453b-868d-d775fe6704f2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1f074de496727f5419fc6ba9d661c5a2",
+   "newHash": "01b46016c81979d7dec6dc070fd7ad8a",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "a1a0a7ca-4ff5-4f8e-b6b2-0f7b4e814cef",
+   "koId": "d259f1d5-1ae2-489d-84a0-41101389bff0",
+   "masterId": "6f18f24e-982e-4950-8a4e-a89943afb481",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5013605593c8008554157378791a494c",
+   "newHash": "0a380c1f322ad62b0c59f3a37c93b867",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "e95e0adf-2f55-4946-bde3-5981f438e532",
+   "koId": "a8f0c508-d36c-466f-bb5e-056851fa92de",
+   "masterId": "71193124-3429-4ec2-b062-7fb4ec7a9898",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "77df0c3dbe9c63f9a800317f57cc43dc",
+   "newHash": "cf607dd6ea25eb4f7f3e925fb0df5e61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "6ac86b18-2f72-4af6-8d8a-42c48c8a562d",
+   "koId": "faa2005b-f4c0-4985-b9cc-687edb985da1",
+   "masterId": "712f1a64-a388-4019-b422-258ddc5d4690",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "2a750b4e-72bd-4775-acbb-87e970fc8913",
+   "koId": "7f8f3856-c971-4742-b600-75d9c958fe69",
+   "masterId": "7200a617-9747-4149-a882-4e1211bf842f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4a7f3194-4ae1-4228-a01c-4ba321c4caa8",
+   "koId": "b8853457-3129-4e0e-a765-9a4d99a162f9",
+   "masterId": "72b6a342-f014-4c32-9913-f102ff526baf",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d14845fd429b09467f28cb0429a253ec",
+   "newHash": "eceb3d7cc9bb66f396e1c6cbd098fa17",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "af97b2b4-aa45-429f-92e7-c7dda457f333",
+   "koId": "c758705e-0cbf-484a-821b-f81db6532e3d",
+   "masterId": "73b9a052-d06a-4d74-9c6c-484cb8fe4734",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bd83ea8faf49629cc21621f78e35c22b",
+   "newHash": "2d3e3302c934ec25f3251d564e0ab1b5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "db79adcd-715c-4763-b5c9-848f10c089ad",
+   "koId": "d1b0872c-a862-43b3-b5e0-6fd132e0acc4",
+   "masterId": "755f6246-bb28-4d47-a82e-7c62c93a3c4a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3e26e23805a2e0174cc4f58f247a11",
+   "newHash": "1370ccc00b390f78d92bbdf73f858196",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f7ac35a8-0769-4e12-83de-3ee8a627843f",
+   "koId": "4f6e685c-1d31-4222-b395-b2a0e032b932",
+   "masterId": "75eb2bc9-d150-4fbd-ac32-f04dd2ae5ce0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "04ecedc8082f3c07e579a10a604073ce",
+   "newHash": "1f9fa0931675d6b964a54f8905746928",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "b1abee0a-1dbd-44eb-a4e7-eebb9e2207e4",
+   "koId": "e16c5d38-33f8-4f81-9be8-c0cbb7cde14b",
+   "masterId": "764b9864-b545-4567-b8e7-d137bb4b50bc",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "769178fa-4a37-476b-b151-0b4b9e97cf09",
+   "koId": "e983cd96-c5ef-4de9-aaa4-d38fb98714a3",
+   "masterId": "7b2a5137-99ca-41cc-979b-65448bb6b40c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "91fbca46-1a66-495b-bf94-28d6f8486154",
+   "koId": "b3235fed-beaa-4a11-ae15-e76eaf19ba80",
+   "masterId": "7ce6fa4e-26b8-48c7-aa47-e63479b1b05b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "a075e1aa-6f8d-48c4-a59c-e08343f002a2",
+   "koId": "3564ef65-0f16-43d7-9621-0c781e2bcb89",
+   "masterId": "8130a142-c5c5-4292-a276-93e4b26c4fe3",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3147446ec8781b8eb69203cbd08b9e",
+   "newHash": "44ac159d02788094e7ce16d623f68fb5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "ea6a6b6d-0dec-42a7-9846-334ee957f6ff",
+   "koId": "98015ea5-a254-4d80-adae-0c38a8ca1c01",
+   "masterId": "83636fb6-49aa-43ae-a53d-653cbda2d421",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d01fb678b6b8d567235059435e4ace",
+   "newHash": "fecbae54c989893202325f4269e8bbab",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "26f3e2a7-0f6f-412e-9f65-08272dc60db3",
+   "koId": "68d9b9f6-8911-4289-802e-04df8f9eeb90",
+   "masterId": "84766df2-30ca-43f0-b86c-c594e56f383b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "02035a42-b0b4-4a77-8938-8484da54aa75",
+   "koId": "7d1411ab-bd6a-463f-a374-ac5fc7544103",
+   "masterId": "84a7d79f-5374-4bcb-ad87-4dff88d27a6f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3136b7ac-bb5b-4580-8b88-4eebb7a67973",
+   "koId": "5ff1c0fb-b960-4dc3-8a92-0da44c2519d6",
+   "masterId": "8a4eb39b-1604-44ef-bc56-d298dfd230a6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69fe64054578320db663bf36d18e571a",
+   "newHash": "90091907517a3803b080f151f45a4c7e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "b95b1231-acea-4a1d-a36d-fae18229cd46",
+   "koId": "d41f087d-3f6f-4290-a573-7e59e61f887d",
+   "masterId": "8ab588e9-338d-48ec-b92c-9c3f00b5d934",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9e4fec435d0c9a0f0c502c871a5f34de",
+   "newHash": "ef0bdf3cf47d232ae6510847ed8fe9cf",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "fea15ddd-6f57-45fe-9d5a-f62aeb8e39fb",
+   "koId": "6389448e-119f-4118-99ef-fde82089d919",
+   "masterId": "8ca1a08e-16da-442b-b35d-2390538b30cc",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9d29a96087367a8ac7b447a343f90495",
+   "newHash": "6a7d6a84674af82d983c2cd043d42828",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "c66e52c1-c727-4ac9-b39e-0728271a8723",
+   "koId": "374cbffd-c12a-4abf-8dbd-853e29c4e1d5",
+   "masterId": "8ca8456e-a9f7-4bfc-b2df-555922beacd5",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb2bf91304404000df867b7deda4c492",
+   "newHash": "b6f3c2daad8d4935e23777c8c7b75bed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4aafe0b9-c031-45c0-a8b2-a94fc59c6626",
+   "koId": "1f02a5a0-125a-4d35-8863-c0b21b373a31",
+   "masterId": "8d824a74-ae83-4e1f-9bec-fd0ceeed6937",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "5a9d9740-f8f8-4980-8204-0973e18bd7fa",
+   "koId": "86ee63f1-8aa5-4cd4-912c-916d261c6262",
+   "masterId": "8df733b3-6172-468f-972e-02fd3deacf6a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f8d3a510e609c126af63f2ea9114c42a",
+   "newHash": "60720d017900bf9bccdddb4fadd3fba9",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "e9fc63f8-1642-45e4-95e6-82d64e402f7b",
+   "koId": "0e2343bd-0447-4c58-87cd-9e42751739c8",
+   "masterId": "8f011b0c-c1e7-423f-8b55-870054e5798a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c5e5130e-864a-4c7a-a00b-e70a2f55fd7f",
+   "koId": "733b3b22-e762-41b4-8c4b-56c16da3a404",
+   "masterId": "8f537da0-257a-4659-863a-1daac2250bad",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5013605593c8008554157378791a494c",
+   "newHash": "0a380c1f322ad62b0c59f3a37c93b867",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "f1f4d555-9dc9-43c5-aa17-c59ded1aab9f",
+   "koId": "c5704143-47e1-4b97-8b33-84ccff61d293",
+   "masterId": "8f97b8e5-cec6-43cd-b7c8-b91f2435e2c9",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bc3ed3befaf12d9b0be453e7962f9ecf",
+   "newHash": "9e3dc4f8ab9c04372e2f0e3a7ce969a0",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3cdcf914-3dc1-4bb1-bc97-5395435a817a",
+   "koId": "0abba655-6288-47ba-8c72-3422dd9ba490",
+   "masterId": "929870ca-87a2-4002-98b8-0c679433ee94",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "dee0381750a5b4bae1d2d5408556c921",
+   "newHash": "2c1c7298491bc7f4fa1fabc8cb9e1d28",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6a941375-2d50-4603-8d40-e8152a39a180",
+   "koId": "02f930ad-863f-4977-a23b-2d3e5035c72e",
+   "masterId": "935e1001-1da6-4ba6-83ea-dc3f274a89c4",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "56bcefe0b8d347875a9a817a5ce0bf01",
+   "newHash": "385ef5f499c8b94d02bcba6e8ffa49e8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "626f9f3c-01c3-4ec4-867e-91105993058e",
+   "koId": "249e1892-6cfc-46f7-a51e-072378402090",
+   "masterId": "97cea1c9-9397-42ea-8514-dcf6d1de1991",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "3a640e50d8b326af143425e7229c3218",
+   "newHash": "e9ddcabbfd078cd2ca47709b319c7696",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "00d89b56-08e7-406a-ae13-a0e86e1d00c2",
+   "koId": "a099558c-6588-4805-84a6-1fd34a2dca6e",
+   "masterId": "98620047-7d73-4ebd-a16c-705c95aa1469",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "6761d1e668e04fb26b8da2e8af59ee26",
+   "newHash": "d54dbf1a6cb8ddf2c0b8d12426148cf4",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4b9a673d-3e68-496b-8109-36f2d378acde",
+   "koId": "77eba146-0824-471c-8efd-69a9321b0e28",
+   "masterId": "9cba37b3-4daf-4329-bdd4-0b01b69a356c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bd83ea8faf49629cc21621f78e35c22b",
+   "newHash": "2d3e3302c934ec25f3251d564e0ab1b5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "61992adc-144a-42bc-8044-82a64b4418fe",
+   "koId": "4fe1359c-fd80-499e-9d5e-cde3ff586ab5",
+   "masterId": "9ee16f0c-b50b-4cd8-aef1-46aba10893fe",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9425817aa140b0e9f52cda5339d3dde0",
+   "newHash": "ec92dc0b0b7144ac9df7c0bebc18dec3",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "627f7891-6346-44cc-8697-7b6fa4feef32",
+   "koId": "028f59b0-d8fa-493a-89a3-303a61272829",
+   "masterId": "9fed2065-6e8d-46ba-9b9e-222f1a19326b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bd83ea8faf49629cc21621f78e35c22b",
+   "newHash": "2d3e3302c934ec25f3251d564e0ab1b5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "16a31a79-5d14-4c95-98e5-d92107866dc2",
+   "koId": "45e26d56-63ff-4a8a-a87b-6d6cd7b8e483",
+   "masterId": "a067a393-46dc-4305-ae5f-fc2239f1cc3f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4bc6b27abda255fc0e8bf6a1956c3439",
+   "newHash": "406e9318225b15cbae6c622a5820b941",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c8b5f826-9caa-4a63-b225-e9c650ef14bc",
+   "koId": "3482d244-ed5f-492b-bdf2-abc47fce7c9b",
+   "masterId": "a0db8425-68e6-4d8a-aba3-ccfc4dbaab8a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb2bf91304404000df867b7deda4c492",
+   "newHash": "b6f3c2daad8d4935e23777c8c7b75bed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "15f8c4fa-e9a6-4541-9ea3-33d25ed64b8c",
+   "koId": "47dcddd0-5ec8-4ad2-9489-c5010a2d9872",
+   "masterId": "a16cc1cb-15cd-4a4e-9c43-7b4c98223b38",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d01fb678b6b8d567235059435e4ace",
+   "newHash": "fecbae54c989893202325f4269e8bbab",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9ad8f65e-4cff-4b50-ae57-cdde00dc5c57",
+   "koId": "86321dbf-a4a6-4c96-9fb6-bd078e3badca",
+   "masterId": "a1c9387a-63c9-4b01-abe0-c264e6f6c3c3",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d5e2c5b8-b5ab-4e56-bcfb-ddf1327e783e",
+   "koId": "3bf2ba6d-bbaa-4e19-8774-62826a4c87f9",
+   "masterId": "a1e97bd5-a712-4ba8-9cdc-d8afc3b345f7",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f3d9643a955d94e0d6e9b23795d65d7f",
+   "newHash": "51e7b0c7534eebc4fc58eba238d717aa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "291da911-0e91-44c2-96f3-dde346dbd3d4",
+   "koId": "2537bee5-5724-423d-b9e8-67013c3f95b7",
+   "masterId": "a2301a50-3481-416b-b031-302317f0413d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69fe64054578320db663bf36d18e571a",
+   "newHash": "90091907517a3803b080f151f45a4c7e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "3e6f459c-679f-49a7-becd-40bd80139df4",
+   "koId": "e8c86aef-50c8-431a-b4dd-f3776a8999d4",
+   "masterId": "a2683869-7d63-404c-beae-c807d2d9386d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3e26e23805a2e0174cc4f58f247a11",
+   "newHash": "1370ccc00b390f78d92bbdf73f858196",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b4098e50-b60f-49f5-9b2f-37f1d2d76180",
+   "koId": "dc142912-f05d-498e-a31c-c3c050860672",
+   "masterId": "a2bf408e-4ccb-40cf-928c-a7cc6d89246a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1e1983c1-9a85-4f6a-b33b-e308fabd690e",
+   "koId": "b85e911a-cff2-4104-ba85-b903b1b9e9b3",
+   "masterId": "a398acf7-2ef7-458f-b1a9-98c856cb3de4",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "52a086d2-dc12-45b4-bf14-199562e5d61d",
+   "koId": "86b77edf-46d0-4dbc-bb30-dd0fa86c8e05",
+   "masterId": "a3e88cbe-fa41-4028-9a54-97f551bcbe30",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bed7913d8dac0b26ab77f0e4b3f068df",
+   "newHash": "eef10e358409692eaaa7e0ab8f9fe5d8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d1b716b7-dbe3-4adc-829b-4de79fb28725",
+   "koId": "034e7e3f-ff7a-4c8f-8025-5d7e3444518d",
+   "masterId": "a525301d-1ee5-4505-9bbd-fa1f2ef71dc0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "53217d4e684640269427d2da56feaaf0",
+   "newHash": "b70ba74b655ae11249187e2b33a95103",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "60c60152-ab8c-4566-ba94-3c9196da507e",
+   "koId": "0c8e859f-c37f-4495-853a-117c7e52c4dc",
+   "masterId": "a671fc54-e5a0-4864-b936-69a0e60eb2b6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f8d3a510e609c126af63f2ea9114c42a",
+   "newHash": "60720d017900bf9bccdddb4fadd3fba9",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "0c40bb44-86cd-42e8-9b5a-891604df5749",
+   "koId": "d1177e5e-95d7-4233-9e73-d773fd48dcda",
+   "masterId": "a84fd652-b88c-4f45-abf7-e2d698a21127",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "15386cc7-a097-45c2-b8d7-2b6c3cc82e36",
+   "koId": "e4e4647c-5425-425a-a48f-bb513c665315",
+   "masterId": "a8ddf335-7cf8-4628-aec0-ba44604beeaf",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9249b6c0ae4adbcb2fdc9f5caf60f1c2",
+   "newHash": "9ab286a3b13ed877c6190af87de40c42",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "13105ae3-d12a-432e-a5c3-7220d7b3ba99",
+   "koId": "6df8cd8a-665f-4a49-8f87-381646f03ed2",
+   "masterId": "a8df704f-9ae8-4769-90b9-18c14d265568",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9f94525c37689abb6b44412ddb033ac2",
+   "newHash": "f2bde0ab31d547030ac3efd9474bcf61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "038f91dd-87c6-4650-a11f-01dbbf4075e8",
+   "koId": "643fa41a-8674-4642-a17f-9a120a6d8d24",
+   "masterId": "a930876c-51e9-4c7c-8b97-2e5ff84ecc3b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "6761d1e668e04fb26b8da2e8af59ee26",
+   "newHash": "d54dbf1a6cb8ddf2c0b8d12426148cf4",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "59a3a80f-9c6f-4986-a72c-351beff154a9",
+   "koId": "fb78c879-3ece-472b-b322-7a057ba36143",
+   "masterId": "aa6a5f14-0c06-4cd9-a69a-a2685cf473ed",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "f8d3a510e609c126af63f2ea9114c42a",
+   "newHash": "60720d017900bf9bccdddb4fadd3fba9",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d1178186-eccf-4916-ae9a-b1040c636753",
+   "koId": "b5c95867-c6ca-4fd1-a2de-892b9720afb8",
+   "masterId": "ac9169f6-f7e8-47a2-b84c-7f7df07a36f0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8c87ac603f4235cb77ac42f2a1507241",
+   "newHash": "74da43a4cd4e632a5a28c0c32899e2ed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "07b5405e-abdc-4bad-8867-a8a530e51045",
+   "koId": "f47c0b45-92fe-4639-8929-3fe4046437a2",
+   "masterId": "aca18028-fd07-432d-98da-9e63aa568830",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "60c5009307f39cd884f856b9625e117d",
+   "newHash": "1799492b7aa54c0f9efcf9f526d54d62",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "ba3b4c54-bfde-4c72-90c5-c6f7ca80710c",
+   "koId": "e87dbec2-ad71-4e8e-b99c-1a8942a42a31",
+   "masterId": "ad555370-e260-4365-97fa-c00c274c9014",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c8839065-fc75-424c-aeeb-b4a6f6f9e7a1",
+   "koId": "0efbd24b-608d-4b43-a2ec-77a9c8b05cd1",
+   "masterId": "afc81848-b3bc-45e7-8d09-7866dba2c243",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "4f1742adb75b63e247fb887df8e46a99",
+   "newHash": "453cf8be685ca01754d2537482031593",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "621bd893-3492-4ffe-98c8-29717b94b2d4",
+   "koId": "835286d1-b6ac-4477-b1d7-76d4207465a0",
+   "masterId": "b0b57940-94cc-4f46-80da-302fa5f53a8a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d14845fd429b09467f28cb0429a253ec",
+   "newHash": "eceb3d7cc9bb66f396e1c6cbd098fa17",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b5ebd586-326d-4456-a7a2-c58b21ff89a8",
+   "koId": "3746da18-d11b-4120-9176-9e421433ff02",
+   "masterId": "b189312f-25f0-482d-9d88-402d86000a5b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "43bbda9e-ca8a-4e54-9233-77995b2cb346",
+   "koId": "5ad121e7-135d-4f34-bfec-85f0bd6a256b",
+   "masterId": "b1c59556-c2fa-4635-9402-d0defb5f983f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "bed7913d8dac0b26ab77f0e4b3f068df",
+   "newHash": "eef10e358409692eaaa7e0ab8f9fe5d8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "0ca77a9e-4b2d-4c84-bf5b-e330842acad8",
+   "koId": "672e0be9-0e7e-4c4c-8ccc-c5841f0970e1",
+   "masterId": "b1e92ffb-126f-4464-9b77-d2b9994c8db0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e04b26849b6f78b5757cff3216d9613d",
+   "newHash": "ff7271b103eaa645401054cc7185a526",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6be270d6-b99b-48d8-9a2e-c8373dad559f",
+   "koId": "6a26e1c7-dbfa-4d81-ad23-c890cd157685",
+   "masterId": "b3286609-1935-4d0f-b95a-a6cf74375b6b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c64c63ed-55ef-4fad-aa12-2038012a4d33",
+   "koId": "8eb0ebc7-8ba6-4f3a-afd5-62c485471d7f",
+   "masterId": "b420bd1f-77a0-4c44-aa3e-0630f0c8b4db",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4e40214e-e882-49cb-8856-c1531146d91e",
+   "koId": "ad3f29b5-573d-4ff8-93ce-121e52ded673",
+   "masterId": "b7af0325-f744-4df7-82e2-5bc1a5b2c517",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "129d60d13ffa2de9722d2092da91d471",
+   "newHash": "de24bcceaa86606a4977b38a7a84aeb7",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "83db2fbf-81ad-4e97-b621-d6ddb22e600b",
+   "koId": "fc63d1a6-f4c8-41cb-943e-8b276cdfcab8",
+   "masterId": "b9347253-2c91-42fe-88e1-3d53875923b6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e408dbd83d5214739dd0236c4442ba69",
+   "newHash": "0b6e4a94fcc43a16d2e273ada3e6f00b",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8346468c-94bb-42d8-8c1a-6306ecfbb88d",
+   "koId": "cde58161-cac0-4613-88c9-e1c4e8ea0158",
+   "masterId": "b9438f4e-4a67-412d-b843-6fc63b24e168",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3e26e23805a2e0174cc4f58f247a11",
+   "newHash": "1370ccc00b390f78d92bbdf73f858196",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9d6d7415-7b55-460d-af07-1dd4b03c2b01",
+   "koId": "3aa011d7-ca26-428a-aaa5-39ff533428d7",
+   "masterId": "babd156b-0e82-4583-ad5e-f7ddfe84eb9e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "3a640e50d8b326af143425e7229c3218",
+   "newHash": "e9ddcabbfd078cd2ca47709b319c7696",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "24262c65-d436-4761-92f7-f030b935905f",
+   "koId": "362c5c1d-7b94-4524-be61-cf1e298cf288",
+   "masterId": "bb70a960-0887-4f1d-81d6-2da5216b8c26",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d9118593b0d1dd99a0d231979fbc4e2d",
+   "newHash": "449b8fcd0e1c49e44980c148eec46adb",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "4c150730-a140-469c-b52c-014f8c70c8b2",
+   "koId": "94ee0e9f-b4b9-4def-8a1a-f00e025c4f2c",
+   "masterId": "bcfebd2b-786c-4506-8dc4-87e079e46c0d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "abed842481d653f41caf59497d06c5cd",
+   "newHash": "8ff9584e31c587de0a7a15488af7d660",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8abcbe0c-275c-4727-bb5a-1d0bc8e16751",
+   "koId": "20d0095a-98fa-4fde-b287-094370543416",
+   "masterId": "bd90899d-19e5-40fd-8ef9-33ddf7027616",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9425817aa140b0e9f52cda5339d3dde0",
+   "newHash": "ec92dc0b0b7144ac9df7c0bebc18dec3",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "a8f70b67-ad0e-4dad-be3b-3a17bbf196d7",
+   "koId": "95ada8a5-2e9d-4016-a906-0cbcd66e3339",
+   "masterId": "bdddce64-c1ee-44e6-978a-810f4d53462a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9fcbe37fc0ce6a9a3132b26b9a753486",
+   "newHash": "0e5c8fbaf281f8cb8ed35e9f3afdeafa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "7e471d5a-02a7-4d42-858f-e141ceca4978",
+   "koId": "29051bd5-c032-4f31-8d40-9c603e2dd111",
+   "masterId": "be8d8f87-3e3f-4028-aa17-2c5274545a77",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "13c19a285f902b593587333bf0b40847",
+   "newHash": "6d9dbb161a63a33900b5115d302bdb61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "fc2b5fb2-a10e-4429-be16-50ef14c23a39",
+   "koId": "772063e2-1004-44b7-8fec-691eeb723e98",
+   "masterId": "bf8647bd-5322-4b9a-aa6f-f646d1be9e1c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3319a38c-8647-4479-9e07-0fd062dfe642",
+   "koId": "21fba39a-4496-4a52-affc-2fa5eca56b6f",
+   "masterId": "bfca8a21-4400-4f58-bb9d-52347fca5108",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9f94525c37689abb6b44412ddb033ac2",
+   "newHash": "f2bde0ab31d547030ac3efd9474bcf61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "60adaced-60a2-403e-8676-640643664ac7",
+   "koId": "b5af0252-7fc9-4ba2-88ee-6cd9fc7eb2ce",
+   "masterId": "c2dfe9ea-f80f-44dc-9fef-e2601fd51a6d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "6761d1e668e04fb26b8da2e8af59ee26",
+   "newHash": "d54dbf1a6cb8ddf2c0b8d12426148cf4",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c7068f04-b34a-496e-b3dc-332dd3971b5d",
+   "koId": "02cbc5de-3dc2-42f0-b1e7-866c20642334",
+   "masterId": "c4b92fe9-e17c-4cb9-8273-d785de756696",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "129d60d13ffa2de9722d2092da91d471",
+   "newHash": "de24bcceaa86606a4977b38a7a84aeb7",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "9ef0cd74-187e-4909-9992-0ffbd61f5c23",
+   "koId": "0431a6f0-13c3-40e5-a135-9ca3d9f09131",
+   "masterId": "c50c109a-4614-4ca9-bd1c-258b7495f707",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69bf93a1a14dd4b40c4ec434bc1209e0",
+   "newHash": "81da716146950c9ff06aca2034f6997e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "57b3720e-b03f-490c-975f-1a3772023747",
+   "koId": "71edc88f-20fb-49b3-8f3b-d8864fbf6910",
+   "masterId": "c59b2b78-d0f6-4375-a432-5be0eb179add",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1f074de496727f5419fc6ba9d661c5a2",
+   "newHash": "01b46016c81979d7dec6dc070fd7ad8a",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "bdcfd61f-9ecc-444d-a602-67bd2e206f45",
+   "koId": "e52ab9ab-1059-461e-8aad-e2096bfb0db3",
+   "masterId": "c811bbf6-d8c5-46d0-bc99-2936a0495527",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3147446ec8781b8eb69203cbd08b9e",
+   "newHash": "44ac159d02788094e7ce16d623f68fb5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "5bf4ed1f-4d54-4a47-9f65-001a49b82fa1",
+   "koId": "8be51647-432d-429d-b4e2-7dad5e15f63b",
+   "masterId": "c8a83507-1782-48ee-b2ed-93f2c41921b7",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1b7a5a71-b67c-4ddb-8cc5-d2ecce80a00e",
+   "koId": "5ad8cedc-1b3e-4fbd-8621-ea532084a313",
+   "masterId": "ca8da7d8-df8e-45d1-98ac-3f0777876f5f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "02a51b62-1c7e-4c4b-8999-a7636907da3b",
+   "koId": "cb6fe854-4739-4770-965d-b9c7a1a3c642",
+   "masterId": "cb2ff90e-16fe-42ee-9464-20993a4c9fdc",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b2b5c991-1ac6-416f-84ce-c08e41156e40",
+   "koId": "96b867c2-bd8a-4676-98ca-bef631b956ae",
+   "masterId": "cc68573d-3591-4559-bc9c-cfeeef5badb7",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5ac12ae6591fd3f19815c10b483f8aec",
+   "newHash": "356c993f7aa9d8448d2432be31c28343",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "89a0b860-7d0b-4ffd-8bfc-86825bde2159",
+   "koId": "b826a9a1-763d-49d2-a709-751cc7325ac8",
+   "masterId": "ce8864d6-9d25-4ed1-9120-4d63799fb570",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b2533035-5b64-4e01-95e2-8cc0fbb640a1",
+   "koId": "6884dea9-e937-4a58-83e6-c584dee9fa1f",
+   "masterId": "cf561964-8007-4a76-ac0d-5d45aa9f71c2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb2bf91304404000df867b7deda4c492",
+   "newHash": "b6f3c2daad8d4935e23777c8c7b75bed",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "edfd01b2-22af-4cff-bce1-21c2d3cb338c",
+   "koId": "814f0359-4ec0-462d-9d67-759b36103a6b",
+   "masterId": "cfb4f9a4-8286-432c-9a45-5ac5e6c57fc2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "932bde1e61b9e0144afaf16b69b9edd6",
+   "newHash": "47d7fe60cf0575b2885eac5777020639",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "83820571-ae2a-40f6-bee0-30e5deaa551d",
+   "koId": "47f001e5-4af6-4ed0-a917-cd17cc274a88",
+   "masterId": "d01e1ff0-fd96-47d5-9e63-d6c192f07c3a",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "b59e1b2f40a00acfcb6fb2d106cc58a5",
+   "newHash": "5786488d8cdbeb50aad42325234801ae",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1b228fca-bd38-4bbd-b53b-1dd5c4b96c1d",
+   "koId": "d0f1dda0-38bb-4425-aaeb-043523cdbd22",
+   "masterId": "d1516d74-1f8b-4adc-88a7-c44d417f8b05",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "932bde1e61b9e0144afaf16b69b9edd6",
+   "newHash": "47d7fe60cf0575b2885eac5777020639",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "efbba8d7-b783-471f-bafa-8ed9441cff04",
+   "koId": "30bb5a8a-ad1b-4319-a82f-d97a6d8078f6",
+   "masterId": "d1e97e90-3e48-4a7e-ade9-2eb13517e709",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5d589ca029323523b3e7c72590131114",
+   "newHash": "e132f6cbf8f703fe23a72dca0d9fb76a",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "c2a51453-39b3-4830-bee0-3d91b465d160",
+   "koId": "6a7ae5f7-0216-4060-bc9d-3227c0bfad3b",
+   "masterId": "d24440e5-4dc5-4eba-9ace-eb72fbbb9500",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "60c5009307f39cd884f856b9625e117d",
+   "newHash": "1799492b7aa54c0f9efcf9f526d54d62",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "905441f9-63f0-46bf-84e4-30f53ffc603f",
+   "koId": "92992e1c-f1b8-4e72-9635-59355a22981a",
+   "masterId": "d3039a2a-45bd-4435-b47f-c567792f7f08",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "40288e0837b5181e6736f83fe585ca06",
+   "newHash": "c4f7839b30f784bbcde71461027ad835",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "b45af0ce-ed2a-47ef-ad58-ac95c9b00d33",
+   "koId": "d4e413ee-e809-4a26-ba95-47d61519d50f",
+   "masterId": "d4b6ce2b-24da-4012-9671-d9d02979ec08",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "58e88321-5c05-4f83-956d-b46f9bd778be",
+   "koId": "7bbdd590-e21d-4e80-9a0d-c4db5ac945bd",
+   "masterId": "d51a2679-ef74-45e7-bf81-754b071c3568",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "04ecedc8082f3c07e579a10a604073ce",
+   "newHash": "1f9fa0931675d6b964a54f8905746928",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "3331634b-d92e-4483-a47d-8e0cf410834c",
+   "koId": "529e538f-0f80-4d2b-ad4e-d498d5d06648",
+   "masterId": "d98386e1-91d4-45de-aff5-55e243ffabe9",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "aa0b40bffdd46b8b0b96a04a1a3bd82a",
+   "newHash": "172168d08c3bf45a12b35d3fa50bbf22",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "dba47e3d-826a-4696-99c2-d36653189c47",
+   "koId": "8e4f2495-2966-469d-9749-1c1fb1df4c51",
+   "masterId": "d9f9dc22-fd06-45e9-b8d4-0a5b0cc1c02b",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "77df0c3dbe9c63f9a800317f57cc43dc",
+   "newHash": "cf607dd6ea25eb4f7f3e925fb0df5e61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "205bf60a-4c53-4754-b3ab-19de9ef0b3a5",
+   "koId": "3d220bab-791a-451b-b93a-3f20373d23b7",
+   "masterId": "da50bb3b-8da8-472e-bd80-31409dc34741",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "62460e0a80f8896f57b26f090415ace4",
+   "newHash": "0cf015bc86809c13ab08e1d88ec63510",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6b58d178-af16-4567-bcf0-e330f1fb326c",
+   "koId": "5bab98b2-1a9e-4171-b448-d8b84b5f3a4f",
+   "masterId": "dc060452-2fb1-4c25-aa34-31cd87a4fa6c",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d14845fd429b09467f28cb0429a253ec",
+   "newHash": "eceb3d7cc9bb66f396e1c6cbd098fa17",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "6d388062-86d4-4961-84c9-241666aa7399",
+   "koId": "f0a5ecad-6368-4640-bc10-2d51ad3d35ad",
+   "masterId": "dc7728bb-c84d-4e61-a28a-128361e82be9",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "69bf93a1a14dd4b40c4ec434bc1209e0",
+   "newHash": "81da716146950c9ff06aca2034f6997e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d02542b8-ce2e-407c-b4d6-bc81ff859810",
+   "koId": "93ab3451-094c-4885-b858-52130a5a33ff",
+   "masterId": "dce2c264-5f39-473a-84ff-69cb78b71418",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "7a448257f3352df1289b9b26e9d11dd7",
+   "newHash": "ac52a2c6e60f1c55d0327527983fae86",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "22695e2a-0e34-4e67-9c96-3c1b2ee59969",
+   "koId": "05b8c072-9d4e-4255-a406-5f16bf86413a",
+   "masterId": "e05ea613-a7e6-44ca-92b0-2e0b20f0d4ae",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "1c894339f62a9e4e272f149bbe8027c4",
+   "newHash": "c613fc4e2d182aba142f30b0cba7443e",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "3390fd4a-1c3c-4610-8121-b5f1db1fef15",
+   "koId": "7d38832c-108a-40ff-bbdb-02c74add336b",
+   "masterId": "e107854f-267b-4a21-ad19-14a4842a0c97",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "8d154c702efa65cba444a1198fc97a74",
+   "newHash": "6e0939602ec985d4d2acb0300d6df8e6",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f7faca31-0ffa-4b5c-9b4d-b421d295e2a3",
+   "koId": "b24b5393-ba33-4b0b-8f86-78d8503c7223",
+   "masterId": "e13fe32e-5729-4d9d-a9dc-6205f40cd45d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9f94525c37689abb6b44412ddb033ac2",
+   "newHash": "f2bde0ab31d547030ac3efd9474bcf61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "1cf27f62-4501-46cc-b7da-3cb41a5b858d",
+   "koId": "b2e2a468-9fbb-47dd-b79c-96f1e03a1a26",
+   "masterId": "e15938cd-901f-4dc8-b18d-361cb4729715",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "79339b7759e39da9dfc90018213346e8",
+   "newHash": "f607fbbb9aeaa1fb722f1465f01a6a43",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "635c4ba4-66a4-4844-b2c0-17a1efee37c0",
+   "koId": "10259be0-32bd-4312-8570-122196a98f4d",
+   "masterId": "e191ffe4-f21a-4e72-bf26-49aa837c2ca1",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "56bcefe0b8d347875a9a817a5ce0bf01",
+   "newHash": "385ef5f499c8b94d02bcba6e8ffa49e8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8e4c9774-b136-4371-a52b-52fd76706f3f",
+   "koId": "496dabac-5b86-4005-9965-403c77c96502",
+   "masterId": "e6cc54bc-4bbf-4ab1-8d61-fc1f39928432",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "13c19a285f902b593587333bf0b40847",
+   "newHash": "6d9dbb161a63a33900b5115d302bdb61",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "efc514aa-b930-4c1d-8dff-9944d69cd106",
+   "koId": "af1442bc-9286-4af8-9da2-2186f5291186",
+   "masterId": "e710cd9d-7149-46a0-aa62-c30c6512fc38",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9e4fec435d0c9a0f0c502c871a5f34de",
+   "newHash": "ef0bdf3cf47d232ae6510847ed8fe9cf",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d7051f1f-7e13-415b-980d-eea345f619cc",
+   "koId": "c6f8a8b5-5e8e-4306-ae3c-71074e5ed44c",
+   "masterId": "e9b2a551-4547-46ee-9688-ccc712a40ee0",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "7a448257f3352df1289b9b26e9d11dd7",
+   "newHash": "ac52a2c6e60f1c55d0327527983fae86",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "c44134a8-4fe7-4c6e-92e9-3671cb86e143",
+   "koId": "2d9ac556-553b-42d2-ac7e-12a504a3778d",
+   "masterId": "e9cf4273-06fa-4e17-b641-145666772f2e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "fcb8009cf321d9da7454a8d075b7bade",
+   "newHash": "358e028f4c8692907bd6758f7a514469",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "fa4c8f82-1f00-4929-a0be-aa4f54c46d5a",
+   "koId": "47080fb9-1f59-4743-b2e7-5f70f57e9b91",
+   "masterId": "ea152e80-bb52-4caf-a60d-f411f03b251f",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9fcbe37fc0ce6a9a3132b26b9a753486",
+   "newHash": "0e5c8fbaf281f8cb8ed35e9f3afdeafa",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "57495322-33cc-41cb-99fa-7a3289315f4e",
+   "koId": "89cd02ab-2575-4865-bef3-2f2c93a8ee9e",
+   "masterId": "ecc3e7df-2d7d-4085-8810-7a32d58d5b46",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "d14845fd429b09467f28cb0429a253ec",
+   "newHash": "eceb3d7cc9bb66f396e1c6cbd098fa17",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "91b4d098-c39b-4956-bef3-5b7d2e1a0246",
+   "koId": "df7337a1-c8e4-424d-ab5c-44d8c3696c4d",
+   "masterId": "ee24d0a7-a823-4c32-b9bd-363dca926902",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "fcb8009cf321d9da7454a8d075b7bade",
+   "newHash": "358e028f4c8692907bd6758f7a514469",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "b388aea2-b5f4-45fd-bf9c-5235a8ddc5e8",
+   "koId": "e9a1a5ba-6f62-4a0f-b6fb-44a0b6e3fe91",
+   "masterId": "f4dfc45a-2686-461e-9277-3e7e00b5710e",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "87ac2472-fc48-4886-86cd-2e9bdff576e6",
+   "koId": "215999f6-01c2-4c20-af4e-b7eb87a99f13",
+   "masterId": "f52486c0-bed1-4742-8a97-fdfec4b84f37",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "56bcefe0b8d347875a9a817a5ce0bf01",
+   "newHash": "385ef5f499c8b94d02bcba6e8ffa49e8",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "d5117acb-add9-4f35-b8af-33998f93f012",
+   "koId": "af9f8b63-6b62-4ced-8b0e-feddd821746c",
+   "masterId": "f615e324-bd1d-41d8-af45-4b2c69fdbac2",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e0b8a95afa3990aee0cce1505874b738",
+   "newHash": "59802b6e9676d0e13e055822c391f97d",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "069000cb-0d78-45fe-b7ba-9134622a8e03",
+   "koId": "e3c14815-1211-44cb-897c-81d73a90f742",
+   "masterId": "f648101d-f56c-4240-a3ed-fff20537bdb5",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "e04b26849b6f78b5757cff3216d9613d",
+   "newHash": "ff7271b103eaa645401054cc7185a526",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "ff1769aa-6dd4-41dd-8490-80c96f709ccc",
+   "koId": "c4c948a9-6da8-4f58-8ce2-9c47749a573b",
+   "masterId": "f6e9a80a-c361-4f02-8548-624cbcfc8e62",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "5b3147446ec8781b8eb69203cbd08b9e",
+   "newHash": "44ac159d02788094e7ce16d623f68fb5",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg)."
+  },
+  {
+   "enId": "7ce0ae84-c211-499f-8239-6eaea0c6cbbc",
+   "koId": "cfb66457-88df-4589-b1c3-f0f5200e658c",
+   "masterId": "f7117b1d-23a5-4e94-babb-7155eebd3915",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "85e76f8ef106cf38c56b5a6cc8fa91c0",
+   "newHash": "e994f0db8f52857352ebde6ba14dbe51",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "e55d16a9-97cb-401f-8b99-b9c32fb516c9",
+   "koId": "92a1de39-6071-417c-9a32-76f27318ffd1",
+   "masterId": "f76bac99-5c77-475e-8cfe-1087d334ba11",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "85ecbd4bebfa3c9ba4cca9a64e7447eb",
+   "newHash": "e7320fa298bdfbfa0251fcb64e78a78f",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "424fbdb2-d598-4be3-8308-92d6a4fdd5f5",
+   "koId": "ebc232e9-0ac8-40d6-bf41-f85744e599f5",
+   "masterId": "fd5e088a-bdaf-4e55-98c5-83aeb39b082d",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "cb611188278e7f803beb3aa0221435aa",
+   "newHash": "6888754efe8298cc345967c82f1ea1d2",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "8f73c99c-85f2-4c54-81f0-666ccd11da0a",
+   "koId": "2d314cec-bbc3-4530-b6cd-d98a93550a3b",
+   "masterId": "ff665963-3115-48da-a759-923f18646ec6",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ],
+   "oldHash": "9249b6c0ae4adbcb2fdc9f5caf60f1c2",
+   "newHash": "9ab286a3b13ed877c6190af87de40c42",
+   "note": "Do not take more than the maximum daily dose of acetaminophen (4,000 mg). Doing so may cause liver damage."
+  },
+  {
+   "enId": "f609c338-d7c5-4779-bfff-d721657c38ac",
+   "koId": "61c6eac2-5e18-4929-8054-a3a364082803",
+   "masterId": "05607729-c6b6-48c4-bf87-fe55f653efee",
+   "kind": [
+    "REPETITION_REMOVED"
+   ],
+   "oldHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "newHash": "6c05b975cbe87eaacb8092969bbab4ec",
+   "note": ""
+  },
+  {
+   "enId": "2a0fef06-15b2-4f61-8dd2-1e31fb1652e7",
+   "koId": "1b8bae11-870a-4bef-a66a-306d48a17fb3",
+   "masterId": "3a22651c-be36-4f42-8101-06b98314c24c",
+   "kind": [
+    "REPETITION_REMOVED"
+   ],
+   "oldHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "newHash": "6c05b975cbe87eaacb8092969bbab4ec",
+   "note": ""
+  },
+  {
+   "enId": "5e471f40-d89a-462a-8215-e90a23cdf504",
+   "koId": "26b43a33-f4df-4c2d-9133-6376795473d3",
+   "masterId": "ce44a4dd-33fb-4fc5-8435-346846e87b01",
+   "kind": [
+    "REPETITION_REMOVED"
+   ],
+   "oldHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "newHash": "6c05b975cbe87eaacb8092969bbab4ec",
+   "note": ""
+  }
+ ],
+ "skips": [
+  {
+   "enId": "64504084-252a-4b3f-99ba-171a1c6b5c42",
+   "masterId": "0070d541-ab09-45d6-b9b2-321f01475530",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "d5453d8d-44bd-4d63-89e5-9ae35fed8e7c",
+   "masterId": "02a66992-8ffa-48be-9a74-0de4c9d2be88",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "1ef4685f-afd9-4086-8f15-71aacf4c4765",
+   "masterId": "0e9aad5d-65f4-4855-92a6-067aee628632",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "7b2381c1-3e24-4150-b901-5ad7e3ae786d",
+   "masterId": "0fca1795-39f3-4465-a9ed-75d19c607a46",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "55b2b5d7-cec9-41bc-8549-1ad9aefccad0",
+   "masterId": "117f0b10-4a8e-4df1-8e98-6f52f8aca72a",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "3204c689-2735-4ce0-8dba-43991a3e6b90",
+   "masterId": "16fd3aff-8398-44c3-a89f-29cc076616a4",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "e9288a03-2740-4ddd-9685-9689694b03ca",
+   "masterId": "9ffaadb7-b659-4efc-8609-6b493247baab",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "e20b6a21-4b4d-4e6c-b0ce-adef9e84b319",
+   "masterId": "e7918e68-81d2-46da-bd0d-d0630478e19d",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "191d1865-b971-4a24-9ae5-52e93ece4804",
+   "masterId": "e7d40db6-a07e-40c6-8347-564d2647ec76",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  },
+  {
+   "enId": "1eadd6b5-20f5-4b12-bda7-7c72c3d29392",
+   "masterId": "ed53403d-ceed-4377-b0df-22d73c1546bf",
+   "code": "REVIEW_REQUIRED",
+   "detail": "KO 상한 파싱 실패"
+  }
+ ],
+ "results": [
+  {
+   "enId": "c6b7ff4c-8d36-407a-9d4f-f8ecd3d0a0f6",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "521cf986-32d7-4423-8c82-8c172dc71374",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "da3b428b-79cf-4d19-975d-6971ebfb8129",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ec9a75a1-b00e-4408-80e3-d843f8bd3827",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "17c1133b-63bd-4cb5-961e-a0c9b79f3560",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3b97ed2b-23f6-4f81-b508-d4d9bdd18d3a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4994a854-aa20-4e8d-94af-f1d3f225bd35",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "16780a72-3d88-48e5-9b17-e9b1e82e5e0a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c763c9f7-54c1-4974-917b-3787c66533e7",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f8d35f75-f647-4d18-b81e-2f6d4214fe8f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "db143e7a-523f-4182-8502-cd8c6a5ea415",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "29cfe1cd-5a35-4b3e-a951-1a19de867fe3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "84462682-20cb-457a-aad6-66b0cc37b15f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "29a4e65d-d87a-43de-91f2-01586d71c33c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "64cfb0fb-6793-48c5-a5dc-5cecd672f41b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9a392a4f-0f79-48fa-8ed7-0d7a88677e3f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3b5333d4-bd1a-4e87-80a5-8639e4a2496f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8c1d1091-59eb-4fca-9299-43ced874757e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b655b40a-d6e7-4ad7-8aed-c67beda66473",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "97e11660-355a-4e01-a15b-927485fc9499",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "cc282e15-d243-4c6a-834a-0c71c9d8d16e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "79d5cff0-eee4-4849-b968-e7b83c625682",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "fc02779b-2980-4cf5-8e12-165bc0d466fd",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "11fec479-ea58-4c64-82f0-1a47b7ca6089",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "40f91c02-40bf-4c0d-95b9-95afd665d6ff",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ff2ccabe-67f6-4536-8fc2-90e6c67c9076",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "37e3f58f-c4c5-4c9b-8866-dd558380bf45",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4132e8e9-7cb0-4820-8adf-49678cfc4775",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "89d98762-0f9f-4d20-9ddc-719452ba4391",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "70a1b5c4-8be9-43d4-b1f5-ddcc42348d52",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "139c4171-739b-4811-aefb-c0c03f8685a3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "fa1bc118-5245-4afb-8a7c-ebce0a31a494",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a16601e6-ceb1-4431-b7aa-a0ffbc1e158d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ae79b22c-898c-47f4-b3df-a3804e7888ad",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a9ef7801-772a-4789-b6e7-58820be03010",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "93e76c4c-b315-4769-a66d-f9fb151495f2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "240d832c-ce7e-481c-a134-489fd35a6a48",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "21d10510-0f54-42d5-b51b-ae3ee9e52625",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c0bfbb3b-4cbf-47a1-a493-6728ee4f00e5",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ac1db65f-8868-4960-9e92-6c2289478297",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9462f5b6-adc9-40d6-aac6-5fca91259215",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6cae1733-18b5-4bbf-9e49-ed4d83504a7f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "26c9e6fa-ce0b-47a9-a20b-530a8ba29ff8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c54e090a-984d-44b6-9d48-e94033c7c325",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f1305df3-51c3-421c-9f85-8d020b848962",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "531daaa3-5cc1-4fc7-b83c-e70723c02053",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c7be042d-ddbd-4897-9999-01576b2a26c3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4d752cd2-207f-4666-867e-b4c127d09526",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "7c111086-dd63-4893-aac2-42661922f3f4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5c6d7532-e98e-4e83-8329-c48b16260ad4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "7daf4a3b-7006-49ee-8f2b-0b2d719a19a9",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ad68b434-35a8-44a9-958f-bbf08c057f46",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a100708c-d195-4838-a8bc-b975a0c6c724",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "23a92541-aa7f-4a73-aed6-df6bad8616ea",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ce001068-8988-4377-84ad-06c6f593392a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4aa92e94-d057-4105-abf8-275c4e4d5963",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1078c406-7582-472d-bd7a-d7170c8d8536",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c0954a0e-3306-4ec3-be13-3e3c9c36653f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3cf684fd-d2da-441c-b276-f2797767db3d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8f3ede94-c2b1-449e-843b-3c1e3c81e8c2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "2d0ed6cc-b3fc-48ea-bebc-82e08737f26c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "0bce6d62-f8b0-4729-94ce-4ce295272c4a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b0520a9f-65ad-4372-9093-cae14884fc3f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "cd2132e6-1fb3-462f-8d6f-4ee0800933b9",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "64052935-261b-4bbb-854a-9572b6e8707f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d6e579e3-9a82-4bca-8ce1-177d61cfdf2b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "79b74302-c332-4ce0-8628-87d25a9d4856",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "26c2b07b-0d7b-48b3-8c60-bc6f82588599",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "94abd10a-1626-46dc-b72c-57df8d3825f3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "aee8513c-48d0-4051-bbaf-bf2474ff2e25",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6cec001e-e983-4584-b4c1-36c6bbd62dc7",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b1ad0b22-fe35-4f64-9f09-4a1826c5c07c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "7f48f0db-9ab6-4999-bf30-aa44686a83d6",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "0862be81-b8bd-4f5a-bf64-c27bd37053db",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c031e7aa-8313-44a1-8360-0831a6175785",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5a89f56e-a0d3-4765-91ff-abea377623c3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a5bb8263-49b5-43c0-9abf-d0a55f026b17",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "255aa34c-b973-4152-bf36-f62f404073a8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "510211cd-4d7e-417f-9fce-a6e2c8f62553",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "31333d96-7fcc-4abd-8fee-7960ceb80943",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b44162f7-c577-49d4-80ce-4fbb9377554d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "e5076bbb-baf2-4543-acce-e83831b71bb0",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "da80e9c8-606b-4f00-91a1-9ebc10ae8083",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "29dd8575-3f02-476b-9dd5-d22e54e8016a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6ca563c9-4e73-4ad6-bc8f-fc7247a34162",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6f09d4e8-19a0-401f-87f3-be5170c01646",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6ce43d5f-24ba-4281-9afb-47a2e9df6466",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d8d95882-81ea-431a-899a-3db166b1b366",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8b531725-63e5-4045-93f1-b2e5b54b4fb8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5f7c9884-d4e5-4a3a-8420-74d2f7a0fb11",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5d458e2c-55d3-4f3a-8956-475bd54d2bd5",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1f4c257d-1e1d-4bb6-b170-c527cb7f9bda",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f63c884e-39a9-453f-bd05-7533395051cf",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9158deb0-1d27-4587-8da2-1f7494239001",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "32af36a3-5a4a-4d6c-a593-14f7a13459ac",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f6162df5-6249-4d88-a484-42ef6b00c152",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b73387a5-15a0-40a2-a3ce-0c80b642a094",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "33a07ec3-7f8a-43d8-bade-48bf66d7e36b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "dd1d1a02-eb12-448c-ae16-c9b6c2b9c028",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "0c3b0969-deba-4867-a7af-35cb1fb5677e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a1a0a7ca-4ff5-4f8e-b6b2-0f7b4e814cef",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "e95e0adf-2f55-4946-bde3-5981f438e532",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6ac86b18-2f72-4af6-8d8a-42c48c8a562d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "2a750b4e-72bd-4775-acbb-87e970fc8913",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4a7f3194-4ae1-4228-a01c-4ba321c4caa8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "af97b2b4-aa45-429f-92e7-c7dda457f333",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "db79adcd-715c-4763-b5c9-848f10c089ad",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f7ac35a8-0769-4e12-83de-3ee8a627843f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b1abee0a-1dbd-44eb-a4e7-eebb9e2207e4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "769178fa-4a37-476b-b151-0b4b9e97cf09",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "91fbca46-1a66-495b-bf94-28d6f8486154",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a075e1aa-6f8d-48c4-a59c-e08343f002a2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ea6a6b6d-0dec-42a7-9846-334ee957f6ff",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "26f3e2a7-0f6f-412e-9f65-08272dc60db3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "02035a42-b0b4-4a77-8938-8484da54aa75",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3136b7ac-bb5b-4580-8b88-4eebb7a67973",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b95b1231-acea-4a1d-a36d-fae18229cd46",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "fea15ddd-6f57-45fe-9d5a-f62aeb8e39fb",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c66e52c1-c727-4ac9-b39e-0728271a8723",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4aafe0b9-c031-45c0-a8b2-a94fc59c6626",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5a9d9740-f8f8-4980-8204-0973e18bd7fa",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "e9fc63f8-1642-45e4-95e6-82d64e402f7b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c5e5130e-864a-4c7a-a00b-e70a2f55fd7f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f1f4d555-9dc9-43c5-aa17-c59ded1aab9f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3cdcf914-3dc1-4bb1-bc97-5395435a817a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6a941375-2d50-4603-8d40-e8152a39a180",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "626f9f3c-01c3-4ec4-867e-91105993058e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "00d89b56-08e7-406a-ae13-a0e86e1d00c2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4b9a673d-3e68-496b-8109-36f2d378acde",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "61992adc-144a-42bc-8044-82a64b4418fe",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "627f7891-6346-44cc-8697-7b6fa4feef32",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "16a31a79-5d14-4c95-98e5-d92107866dc2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c8b5f826-9caa-4a63-b225-e9c650ef14bc",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "15f8c4fa-e9a6-4541-9ea3-33d25ed64b8c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9ad8f65e-4cff-4b50-ae57-cdde00dc5c57",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d5e2c5b8-b5ab-4e56-bcfb-ddf1327e783e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "291da911-0e91-44c2-96f3-dde346dbd3d4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3e6f459c-679f-49a7-becd-40bd80139df4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b4098e50-b60f-49f5-9b2f-37f1d2d76180",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1e1983c1-9a85-4f6a-b33b-e308fabd690e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "52a086d2-dc12-45b4-bf14-199562e5d61d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d1b716b7-dbe3-4adc-829b-4de79fb28725",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "60c60152-ab8c-4566-ba94-3c9196da507e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "0c40bb44-86cd-42e8-9b5a-891604df5749",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "15386cc7-a097-45c2-b8d7-2b6c3cc82e36",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "13105ae3-d12a-432e-a5c3-7220d7b3ba99",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "038f91dd-87c6-4650-a11f-01dbbf4075e8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "59a3a80f-9c6f-4986-a72c-351beff154a9",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d1178186-eccf-4916-ae9a-b1040c636753",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "07b5405e-abdc-4bad-8867-a8a530e51045",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ba3b4c54-bfde-4c72-90c5-c6f7ca80710c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c8839065-fc75-424c-aeeb-b4a6f6f9e7a1",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "621bd893-3492-4ffe-98c8-29717b94b2d4",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b5ebd586-326d-4456-a7a2-c58b21ff89a8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "43bbda9e-ca8a-4e54-9233-77995b2cb346",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "0ca77a9e-4b2d-4c84-bf5b-e330842acad8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6be270d6-b99b-48d8-9a2e-c8373dad559f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c64c63ed-55ef-4fad-aa12-2038012a4d33",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4e40214e-e882-49cb-8856-c1531146d91e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "83db2fbf-81ad-4e97-b621-d6ddb22e600b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8346468c-94bb-42d8-8c1a-6306ecfbb88d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9d6d7415-7b55-460d-af07-1dd4b03c2b01",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "24262c65-d436-4761-92f7-f030b935905f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "4c150730-a140-469c-b52c-014f8c70c8b2",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8abcbe0c-275c-4727-bb5a-1d0bc8e16751",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "a8f70b67-ad0e-4dad-be3b-3a17bbf196d7",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "7e471d5a-02a7-4d42-858f-e141ceca4978",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "fc2b5fb2-a10e-4429-be16-50ef14c23a39",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3319a38c-8647-4479-9e07-0fd062dfe642",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "60adaced-60a2-403e-8676-640643664ac7",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c7068f04-b34a-496e-b3dc-332dd3971b5d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "9ef0cd74-187e-4909-9992-0ffbd61f5c23",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "57b3720e-b03f-490c-975f-1a3772023747",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "bdcfd61f-9ecc-444d-a602-67bd2e206f45",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "5bf4ed1f-4d54-4a47-9f65-001a49b82fa1",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1b7a5a71-b67c-4ddb-8cc5-d2ecce80a00e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "02a51b62-1c7e-4c4b-8999-a7636907da3b",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b2b5c991-1ac6-416f-84ce-c08e41156e40",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "89a0b860-7d0b-4ffd-8bfc-86825bde2159",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b2533035-5b64-4e01-95e2-8cc0fbb640a1",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "edfd01b2-22af-4cff-bce1-21c2d3cb338c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "83820571-ae2a-40f6-bee0-30e5deaa551d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1b228fca-bd38-4bbd-b53b-1dd5c4b96c1d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "efbba8d7-b783-471f-bafa-8ed9441cff04",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c2a51453-39b3-4830-bee0-3d91b465d160",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "905441f9-63f0-46bf-84e4-30f53ffc603f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b45af0ce-ed2a-47ef-ad58-ac95c9b00d33",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "58e88321-5c05-4f83-956d-b46f9bd778be",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3331634b-d92e-4483-a47d-8e0cf410834c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "dba47e3d-826a-4696-99c2-d36653189c47",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "205bf60a-4c53-4754-b3ab-19de9ef0b3a5",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6b58d178-af16-4567-bcf0-e330f1fb326c",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "6d388062-86d4-4961-84c9-241666aa7399",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d02542b8-ce2e-407c-b4d6-bc81ff859810",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "22695e2a-0e34-4e67-9c96-3c1b2ee59969",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "3390fd4a-1c3c-4610-8121-b5f1db1fef15",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f7faca31-0ffa-4b5c-9b4d-b421d295e2a3",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "1cf27f62-4501-46cc-b7da-3cb41a5b858d",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "635c4ba4-66a4-4844-b2c0-17a1efee37c0",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8e4c9774-b136-4371-a52b-52fd76706f3f",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "efc514aa-b930-4c1d-8dff-9944d69cd106",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d7051f1f-7e13-415b-980d-eea345f619cc",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "c44134a8-4fe7-4c6e-92e9-3671cb86e143",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "fa4c8f82-1f00-4929-a0be-aa4f54c46d5a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "57495322-33cc-41cb-99fa-7a3289315f4e",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "91b4d098-c39b-4956-bef3-5b7d2e1a0246",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "b388aea2-b5f4-45fd-bf9c-5235a8ddc5e8",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "87ac2472-fc48-4886-86cd-2e9bdff576e6",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "d5117acb-add9-4f35-b8af-33998f93f012",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "069000cb-0d78-45fe-b7ba-9134622a8e03",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "ff1769aa-6dd4-41dd-8490-80c96f709ccc",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "7ce0ae84-c211-499f-8239-6eaea0c6cbbc",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "e55d16a9-97cb-401f-8b99-b9c32fb516c9",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "424fbdb2-d598-4be3-8308-92d6a4fdd5f5",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "8f73c99c-85f2-4c54-81f0-666ccd11da0a",
+   "status": "GREEN",
+   "kind": [
+    "DOSE_LIMIT_RESTORED"
+   ]
+  },
+  {
+   "enId": "f609c338-d7c5-4779-bfff-d721657c38ac",
+   "status": "GREEN",
+   "kind": [
+    "REPETITION_REMOVED"
+   ]
+  },
+  {
+   "enId": "2a0fef06-15b2-4f61-8dd2-1e31fb1652e7",
+   "status": "GREEN",
+   "kind": [
+    "REPETITION_REMOVED"
+   ]
+  },
+  {
+   "enId": "5e471f40-d89a-462a-8215-e90a23cdf504",
+   "status": "GREEN",
+   "kind": [
+    "REPETITION_REMOVED"
+   ]
+  }
+ ]
+}
