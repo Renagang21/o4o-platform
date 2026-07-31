@@ -24,16 +24,30 @@ interface ForumCategory {
   order: number;
 }
 
+/**
+ * WO-O4O-ADMIN-FORUM-BOARD-LIST-RENDER-FIX-V1:
+ *   목록 API(`GET /api/v1/forum/posts`)의 실제 응답 계약에 맞춘다.
+ *   - `author` 는 leftJoin 이라 **null 일 수 있다**(작성자 삭제 등).
+ *     백엔드는 이를 위해 flat `authorName`(fallback '시스템')을 함께 내려준다.
+ *   - `category` 는 **응답에 포함되지 않는다.** 포럼 모델이
+ *     WO-O4O-FORUM-CATEGORY-CLEANUP-V1 에서 `forumId`(forum_category_requests) 축으로 정리되면서
+ *     `post.category` 조인이 사라졌다. 타입만 남아 있어 렌더에서 undefined 접근으로 터졌다.
+ *   → 두 필드 모두 optional 로 정정하고 렌더는 아래에서 방어적으로 처리한다.
+ */
 interface ForumPost {
   id: string;
   title: string;
   content: string;
-  author: {
+  author?: {
     id: string;
     name: string;
     avatar?: string;
-  };
-  category: ForumCategory;
+  } | null;
+  /** 백엔드 flat 필드 (author 부재 시 '시스템') */
+  authorName?: string;
+  /** 현재 목록 API 응답에 미포함 — forumId 축으로 이전됨 */
+  category?: ForumCategory | null;
+  forumId?: string | null;
   status: 'published' | 'draft' | 'pending' | 'reported';
   views: number;
   replyCount: number;
@@ -235,7 +249,10 @@ const ForumBoardList: FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <Badge variant={"outline" as const}>{post.category.name}</Badge>
+                      {/* WO-O4O-ADMIN-FORUM-BOARD-LIST-RENDER-FIX-V1:
+                          목록 API 가 category 를 내려주지 않는다(forumId 축으로 이전).
+                          undefined 접근으로 페이지 전체가 ErrorBoundary 로 떨어지던 지점. */}
+                      <Badge variant={"outline" as const}>{post.category?.name ?? '-'}</Badge>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <OrganizationBadge
@@ -245,10 +262,14 @@ const ForumBoardList: FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-2">
+                        {/* WO-O4O-ADMIN-FORUM-BOARD-LIST-RENDER-FIX-V1:
+                            author 는 leftJoin 이라 null 가능. 백엔드 flat authorName('시스템' fallback) 우선 사용. */}
                         <div className="w-8 h-8 bg-modern-primary text-white rounded-full flex items-center justify-center text-xs font-medium">
-                          {post.author.name.charAt(0)}
+                          {(post.authorName ?? post.author?.name ?? '시스템').charAt(0)}
                         </div>
-                        <span className="text-sm text-modern-text-primary">{post.author.name}</span>
+                        <span className="text-sm text-modern-text-primary">
+                          {post.authorName ?? post.author?.name ?? '시스템'}
+                        </span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
