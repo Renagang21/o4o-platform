@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { securityAuditService, isIPBlocked, logSecurityEvent } from '../services/SecurityAuditService.js';
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { suspiciousFieldNames } from '../utils/security-log-redaction.js';
 
 /**
  * Security middleware to check blocked IPs and log security events
@@ -98,7 +100,12 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
   
   if (suspicious) {
     const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
-    
+
+    // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
+    //   기존에는 details 에 query/body/params **전문**을 담았다. 위 탐지 패턴에 `--` · `;` · `|`
+    //   가 포함돼 있어 비밀번호에 그런 문자가 들어가면 로그인 요청이 걸리고 **비밀번호가
+    //   그대로 로그에 적재**됐다 (이 경로의 winston 로거에는 redaction 이 없다).
+    //   → 값은 남기지 않고 **걸린 필드 이름만** 기록한다.
     logSecurityEvent({
       type: 'security.sql_injection',
       severity: 'critical',
@@ -108,9 +115,12 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
       resource: req.path,
       result: 'blocked',
       details: {
-        query: req.query,
-        body: req.body,
-        params: req.params
+        method: req.method,
+        matchedFields: {
+          query: suspiciousFieldNames(req.query, checkValue),
+          body: suspiciousFieldNames(req.body, checkValue),
+          params: suspiciousFieldNames(req.params, checkValue)
+        }
       }
     });
     

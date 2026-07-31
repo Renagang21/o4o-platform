@@ -13,6 +13,8 @@ import { Request, Response, NextFunction } from 'express';
 import { ApiError } from '../utils/api-error.js';
 import { env } from '../utils/env-validator.js';
 import logger from '../utils/logger.js';
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { redactSensitive } from '../utils/security-log-redaction.js';
 
 // WO-O4O-MIDDLEWARE-CONSOLIDATION-V1: 표준 구현 re-export (29 importers)
 export { asyncHandler } from './errorHandler.middleware.js';
@@ -24,13 +26,16 @@ export function errorHandler(
   res: Response,
   next: NextFunction
 ): void {
+  // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
+  //   이 로거(utils/logger.ts, winston)에는 redaction 이 없다. 요청 전문을 그대로 남기면
+  //   비밀번호·토큰이 오류 로그에 적재되므로 민감 키를 치환해서 기록한다.
   logger.error({
     message: error.message,
     stack: error.stack,
     path: req.path,
     method: req.method,
-    body: req.body,
-    query: req.query,
+    body: redactSensitive(req.body),
+    query: redactSensitive(req.query),
     ip: req.ip,
   });
 
