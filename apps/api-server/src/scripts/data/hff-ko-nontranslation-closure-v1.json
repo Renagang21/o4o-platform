@@ -1,0 +1,24 @@
+{
+ "builtAt": "2026-07-31T13:43:24.858Z",
+ "track": "HFF_KO_NONTRANSLATION",
+ "status": "CLOSED",
+ "totalHffKoTargets": 41261,
+ "koCanonicalProduced": 40918,
+ "resolvedThisWo": 4,
+ "noChangeThisWo": 0,
+ "finalManualHold": 2,
+ "officialSourceMissingFrozen": 343,
+ "totalUnresolved": 345,
+ "coverageRate": "99.16%",
+ "byRetryCondition": {
+  "공식 식약처 원천의 MAIN_FNCTN 또는 SRV_USE 갱신": 343,
+  "제조사 표시사항 원본 확보 또는 공식 원천에 원료 라벨 포함": 2
+ },
+ "translationScopeHandedOver": {
+  "enCanonicalExisting": 15498,
+  "enFunctionHold": 824,
+  "koWithoutEnPair": 25415,
+  "note": "번역 트랙은 이 WO 범위 밖이며 이번 작업에서 한 건도 변경하지 않았다."
+ },
+ "closureStatement": "한국어 비번역 생산 트랙을 종료한다. 남은 대상은 모두 공식 원천 갱신 또는 사람 권한 판단이 선행되어야 하며, 플랫폼 측에서 자동으로 진행할 수 있는 작업은 없다."
+}

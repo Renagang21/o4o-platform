@@ -1,0 +1,44 @@
+{
+ "verifiedAt": "2026-07-31T13:43:24.859Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 4,
+ "newHashMatch": 4,
+ "oldHashRemains": 0,
+ "rollbackReversalOk": 4,
+ "clauseNotVerbatim": 0,
+ "targetFieldDrift": 0,
+ "outsideTargetDrift": 0,
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "hff_candidates": 41261,
+  "canon_dup": 0
+ },
+ "globalsExpected": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "canon_dup": 0
+ },
+ "statusSum": 6,
+ "statusSumMatches6": true,
+ "byStatus": {
+  "FINAL_PERMANENT_HOLD_INGREDIENT_OWNERSHIP": 2,
+  "RESOLVED_UPDATED": 4
+ },
+ "permanentHoldRows": 2,
+ "frozen343": 343,
+ "holdFileDup": 0,
+ "closureTotals": {
+  "totalUnresolved": 345,
+  "coverageRate": "99.16%"
+ },
+ "closureMathOk": true,
+ "failedChecks": [],
+ "globalsUnchanged": true,
+ "verdict": "PASS"
+}

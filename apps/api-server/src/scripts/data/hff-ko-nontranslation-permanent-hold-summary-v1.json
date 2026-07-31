@@ -1,0 +1,11 @@
+{
+ "builtAt": "2026-07-31T13:43:24.847Z",
+ "manualAuthorityHold": 2,
+ "officialSourceMissingFrozen": 343,
+ "totalUnresolved": 345,
+ "byStatus": {
+  "FINAL_PERMANENT_HOLD_INGREDIENT_OWNERSHIP": 2
+ },
+ "dup": 0,
+ "note": "영구 HOLD 는 삭제·terminal 처리가 아니다. 기존 canonical 은 현재 상태를 유지한다."
+}

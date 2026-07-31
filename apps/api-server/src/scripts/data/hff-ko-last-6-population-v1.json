@@ -1,0 +1,210 @@
+{
+ "builtAt": "2026-07-31T13:34:00.181Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "checks": {
+  "total": 6,
+  "expected": 6,
+  "matches": true,
+  "byReason": {
+   "INGREDIENT_OWNERSHIP_UNRESOLVED": 5,
+   "CANONICAL_REDESIGN_REQUIRED": 1
+  },
+  "candidateIdDup": 0,
+  "canonicalIdDup": 0,
+  "dbMissing": 0,
+  "allKo": true,
+  "allStore": true,
+  "allCanonical": true,
+  "allHffSource": true,
+  "masterIdAllMatch": true,
+  "officialSourceMissingMixedIn": 0,
+  "byFamily": {
+   "why": 5,
+   "fn": 1
+  },
+  "sdFnFamilyTotalDocs": 269
+ },
+ "problems": [],
+ "rows": [
+  {
+   "candidateId": "7637a6c1-2899-4378-9dbc-e7c37356e91e",
+   "statementNo": "20110020099300",
+   "productName": "대관절 만보 천보",
+   "entrps": "주식회사 아리너스",
+   "productMasterId": "0dc66d43-b934-4386-9e27-234dfb99698a",
+   "canonicalId": "92fab4ee-3f2e-4b99-954e-953aa6501fbe",
+   "queueReason": "INGREDIENT_OWNERSHIP_UNRESOLVED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "877b615947d68dca1e9af287d874ac92c49abd1bc4fa5dd17c514e976248bd9f",
+   "rendererFamily": "why",
+   "fnHeading": "원료별 공식 인정 기능성",
+   "currentClauses": [
+    "관절 및 연골 건강에 도움을 줄 수 있음",
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "currentLabels": [
+    "뮤코다당·단백(콘드로이친)",
+    "N-아세틸글루코사민"
+   ],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  },
+  {
+   "candidateId": "b76e68c3-c3cf-4b3e-b3f9-066e4b153e48",
+   "statementNo": "2018000391573",
+   "productName": "관절엔 소연골 뮤코다당단백(콘드로이친) 1200",
+   "entrps": "(주)팜투팜2공장",
+   "productMasterId": "020bdf14-9a56-4997-b84e-bcc8a1b675af",
+   "canonicalId": "43d81d1b-a18e-4a40-9a04-aaeda426ec80",
+   "queueReason": "INGREDIENT_OWNERSHIP_UNRESOLVED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "809d1df8cb459afcec195d5ddfce9280de852eb62eb319dca11a68b1fb6462d4",
+   "rendererFamily": "why",
+   "fnHeading": "공식 인정 기능성",
+   "currentClauses": [
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "currentLabels": [
+    "뮤코다당·단백(콘드로이친)"
+   ],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  },
+  {
+   "candidateId": "476f3066-22ce-4f0d-b8a6-0074230852e8",
+   "statementNo": "20190009483475",
+   "productName": "뼈 · 연골 · 관절엔 소연골 뮤코다당·단백(콘드로이친) 1200 비타민D 비타민K 망간",
+   "entrps": "우리바이오(주)",
+   "productMasterId": "c4abcaba-11d1-41bd-aa36-c3dc1296874b",
+   "canonicalId": "7c034e39-fa0b-4f74-9e5f-668ec0de053b",
+   "queueReason": "INGREDIENT_OWNERSHIP_UNRESOLVED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "c715b363f8effeb967b9465c9d76bf0700a25a89ac740313a05409eb836604ed",
+   "rendererFamily": "why",
+   "fnHeading": "공식 인정 기능성",
+   "currentClauses": [
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "currentLabels": [
+    "뮤코다당·단백(콘드로이친)"
+   ],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  },
+  {
+   "candidateId": "5cc4652f-052d-4220-a664-046c7f64f525",
+   "statementNo": "20220011370142",
+   "productName": "성균관 소연골 뮤코다당 단백[콘드로이친]1200",
+   "entrps": "동서바이오팜(주) 안성공장",
+   "productMasterId": "c4d1c02d-a7f3-4c53-8b28-a432ae6d6c64",
+   "canonicalId": "675fab37-f3ea-4500-b9df-fd5224d7ff64",
+   "queueReason": "INGREDIENT_OWNERSHIP_UNRESOLVED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "6830f5993b70bd9d63d439fa9ed8637d65aece418740c0cbd8e9cfd6e2635b4f",
+   "rendererFamily": "why",
+   "fnHeading": "공식 인정 기능성",
+   "currentClauses": [
+    "관절 및 연골 건강에 도움을 줄 수 있음"
+   ],
+   "currentLabels": [
+    "뮤코다당·단백(콘드로이친)"
+   ],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  },
+  {
+   "candidateId": "91790887-422e-4b26-845e-403df166febe",
+   "statementNo": "20040020001412",
+   "productName": "로젠빈 우먼밸런스",
+   "entrps": "풀무원건강생활(주)",
+   "productMasterId": "b23a2e8a-0d10-400a-b70b-96aa5c4feebd",
+   "canonicalId": "8e2761d2-3a37-4950-9865-83505c55c8f9",
+   "queueReason": "INGREDIENT_OWNERSHIP_UNRESOLVED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "18d1e071ccd3e97ce4044c4210a1ff003fa1ca371ce67698cb21f9bd90b10c47",
+   "rendererFamily": "why",
+   "fnHeading": "관절·피부 원료별 공식 인정 기능성",
+   "currentClauses": [
+    "피부보습에 도움을 줄 수 있음",
+    "자외선에 의한 피부손상으로부터 피부건강을 유지하는데 도움을 줄 수 있음"
+   ],
+   "currentLabels": [
+    "히알루론산"
+   ],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  },
+  {
+   "candidateId": "d8d88237-10a5-4c29-a74a-b7d358f6192f",
+   "statementNo": "2013001515171",
+   "productName": "장인정신 에브리데이 튼튼지니어스 홍삼젤리",
+   "entrps": "주식회사웰파인",
+   "productMasterId": "25b9878d-656b-4268-92f1-6e325a37123b",
+   "canonicalId": "eec27226-244e-4175-bf13-fe6406772fb5",
+   "queueReason": "CANONICAL_REDESIGN_REQUIRED",
+   "candidatePresent": true,
+   "canonicalPresent": true,
+   "language": "ko",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceType": "o4o_hff_generated",
+   "masterIdMatches": true,
+   "canonicalHash": "45b47e53e99b6c556eaaa5207a4178e38f767bd72b008bee864e3b4b5a3edd1a",
+   "rendererFamily": "fn",
+   "fnHeading": "이 홍삼의 공식 기능성",
+   "currentClauses": [
+    "면역력 증진에 도움을 줄 수 있음",
+    "피로개선에 도움을 줄 수 있음",
+    "혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음",
+    "기억력 개선에 도움을 줄 수 있음",
+    "항산화에 도움을 줄 수 있음"
+   ],
+   "currentLabels": [],
+   "officialFnPresent": true,
+   "officialSrvPresent": true,
+   "officialRawm": "",
+   "officialPrimaryFnclty": ""
+  }
+ ]
+}
