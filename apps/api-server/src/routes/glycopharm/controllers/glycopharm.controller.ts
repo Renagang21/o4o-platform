@@ -576,6 +576,17 @@ export function createGlycopharmController(
   // ============================================================================
 
   /**
+   * WO-O4O-GLYCOPHARM-FEATURED-PRODUCTS-TABLE-RECOVERY-V1:
+   *   featured-products 경로의 INTERNAL_ERROR 응답이 `error.message` 를 그대로 실어
+   *   `relation "public.glycopharm_featured_products" does not exist` 처럼
+   *   relation·schema 명이 클라이언트에 노출됐다.
+   *   진단 정보는 서버 로그에만 남기고, 응답에는 일반화된 문구만 반환한다.
+   *   (ALREADY_EXISTS / NOT_FOUND 등 서비스가 의도적으로 던지는 도메인 메시지는 그대로 유지)
+   *   적용 범위는 이 5개 핸들러로 한정한다 — 전역 오류 처리는 건드리지 않는다.
+   */
+  const FEATURED_INTERNAL_ERROR_MESSAGE = 'Failed to process featured products request';
+
+  /**
    * GET /operator/featured-products - List featured products
    */
   router.get(
@@ -602,7 +613,7 @@ export function createGlycopharmController(
         console.error('Failed to list featured products:', error);
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: FEATURED_INTERNAL_ERROR_MESSAGE },
         });
       }
     }
@@ -651,7 +662,7 @@ export function createGlycopharmController(
         } else {
           res.status(500).json({
             success: false,
-            error: { code: 'INTERNAL_ERROR', message: error.message },
+            error: { code: 'INTERNAL_ERROR', message: FEATURED_INTERNAL_ERROR_MESSAGE },
           });
         }
       }
@@ -682,7 +693,7 @@ export function createGlycopharmController(
         console.error('Failed to reorder featured products:', error);
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: FEATURED_INTERNAL_ERROR_MESSAGE },
         });
       }
     }
@@ -722,7 +733,7 @@ export function createGlycopharmController(
         console.error('Failed to update featured product:', error);
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: FEATURED_INTERNAL_ERROR_MESSAGE },
         });
       }
     }
@@ -756,7 +767,7 @@ export function createGlycopharmController(
         console.error('Failed to remove featured product:', error);
         res.status(500).json({
           success: false,
-          error: { code: 'INTERNAL_ERROR', message: error.message },
+          error: { code: 'INTERNAL_ERROR', message: FEATURED_INTERNAL_ERROR_MESSAGE },
         });
       }
     }
