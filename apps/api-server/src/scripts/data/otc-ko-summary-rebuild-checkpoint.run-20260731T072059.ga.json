@@ -1,0 +1,61 @@
+{
+  "wo": "WO-O4O-OTC-KO-SUMMARY-HARDCUT-CENSUS-AND-CARD-REBUILD-V1",
+  "kind": "checkpoint",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 200,
+      "lastMasterId": "2b33fa5d-0564-4402-99f1-700afb0badfe",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:13.808Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 400,
+      "lastMasterId": "546c6fbd-e2f2-4514-849e-0441a58370c8",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:22.825Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 600,
+      "lastMasterId": "7937063e-daab-4d5e-91c1-afd2cad76e2d",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:31.766Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 800,
+      "lastMasterId": "a36be683-7816-4af4-acc6-8d2040d5bdfc",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:40.860Z"
+    },
+    {
+      "checkpoint": 5,
+      "processed": 1000,
+      "lastMasterId": "ccf8b1ac-29d1-4e60-b72c-0712feeb1fab",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:50.063Z"
+    },
+    {
+      "checkpoint": 6,
+      "processed": 1193,
+      "lastMasterId": "ffe5f4e0-d599-4e2a-8658-1dac7c506dea",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T07:21:58.702Z"
+    }
+  ]
+}

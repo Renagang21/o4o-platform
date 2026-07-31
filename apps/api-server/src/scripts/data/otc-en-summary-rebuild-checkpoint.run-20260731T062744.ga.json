@@ -1,0 +1,124 @@
+{
+  "wo": "WO-O4O-OTC-EN-SUMMARY-HARDCUT-REMOVAL-AND-2522-CARD-REBUILD-V1",
+  "kind": "checkpoint",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 200,
+      "lastMasterId": "12e68473-14c3-4496-b647-b675b2f2000e",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:27:56.313Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 400,
+      "lastMasterId": "27ca2eef-5343-4d2b-b196-2a6f98a21d5e",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:05.743Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 600,
+      "lastMasterId": "3bc0c303-d39f-4cf8-ad06-2ff299aa2ded",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:15.351Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 800,
+      "lastMasterId": "4f5002b2-b580-4ffd-ba18-2035ac7e2186",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:24.824Z"
+    },
+    {
+      "checkpoint": 5,
+      "processed": 1000,
+      "lastMasterId": "641e73d9-261a-4c7f-9121-389ae4069c2d",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:34.553Z"
+    },
+    {
+      "checkpoint": 6,
+      "processed": 1200,
+      "lastMasterId": "78ff1ee5-5a58-4481-950d-b5b642994729",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:45.156Z"
+    },
+    {
+      "checkpoint": 7,
+      "processed": 1400,
+      "lastMasterId": "8dd6ccc1-e413-452a-a24c-18bd740f4f0b",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:28:55.036Z"
+    },
+    {
+      "checkpoint": 8,
+      "processed": 1600,
+      "lastMasterId": "a2d55b80-2fb7-4a25-b756-198e621509df",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:04.571Z"
+    },
+    {
+      "checkpoint": 9,
+      "processed": 1800,
+      "lastMasterId": "b5f2ba99-b8ff-4fad-be41-17db9d54b857",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:14.190Z"
+    },
+    {
+      "checkpoint": 10,
+      "processed": 2000,
+      "lastMasterId": "c9bc2190-30d2-45ac-95fb-e3b6ae804345",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:24.002Z"
+    },
+    {
+      "checkpoint": 11,
+      "processed": 2200,
+      "lastMasterId": "dfffd5ad-1340-40a7-94ef-2ec99fbceab0",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:33.660Z"
+    },
+    {
+      "checkpoint": 12,
+      "processed": 2400,
+      "lastMasterId": "f4941450-814e-4f5d-b538-55e6cdc2fb2d",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:42.903Z"
+    },
+    {
+      "checkpoint": 13,
+      "processed": 2522,
+      "lastMasterId": "ffe5f4e0-d599-4e2a-8658-1dac7c506dea",
+      "green": 0,
+      "exception": 0,
+      "writeActual": 0,
+      "at": "2026-07-31T06:29:48.784Z"
+    }
+  ]
+}

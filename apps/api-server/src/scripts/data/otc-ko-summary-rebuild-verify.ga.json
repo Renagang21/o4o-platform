@@ -1,0 +1,164 @@
+{
+  "wo": "WO-O4O-OTC-KO-SUMMARY-HARDCUT-CENSUS-AND-CARD-REBUILD-V1",
+  "kind": "independent-verification",
+  "planDigest": "7250846ccc588555a758b4ec4902f31ca0fa5bcd961d12dde717f54d6044113d",
+  "applyWindowStart": "2026-07-31 07:34:00",
+  "gates": [
+    {
+      "id": "G1",
+      "desc": "계획 건수(적용 전 원장)",
+      "expect": 1193,
+      "actual": 1193,
+      "ok": true
+    },
+    {
+      "id": "G1b",
+      "desc": "2차 apply GREEN(1차는 체크포인트로 대체)",
+      "expect": 798,
+      "actual": 798,
+      "ok": true
+    },
+    {
+      "id": "G0",
+      "desc": "KO STORE OTC canonical 모집단",
+      "expect": 15908,
+      "actual": 15908,
+      "ok": true
+    },
+    {
+      "id": "G2",
+      "desc": "본문 해시 = 계획 newHash",
+      "expect": 1193,
+      "actual": 1193,
+      "ok": true
+    },
+    {
+      "id": "G2b",
+      "desc": "저장 summary = 계획 newSummary",
+      "expect": 1193,
+      "actual": 1193,
+      "ok": true
+    },
+    {
+      "id": "G3",
+      "desc": "재조립 대상 문장 중간 절단 잔존",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G4",
+      "desc": "KO 전수 120자 하드컷 잔존",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G5",
+      "desc": "hero 배지 ↔ 저장 summary 불일치",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G5b",
+      "desc": "작용 타일 ↔ 저장 summary 불일치",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G6",
+      "desc": "적용 창 이후 EN canonical 갱신",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G7",
+      "desc": "역패치 복원 → 적용 전 해시 일치",
+      "expect": 1193,
+      "actual": 1193,
+      "ok": true
+    },
+    {
+      "id": "G8",
+      "desc": "잔여 본문 수치·연령·기간 토큰 드리프트",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G9",
+      "desc": "경고 목록 항목 수 드리프트",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G10",
+      "desc": "매장 전문가(약사) 문의 안내 소실",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G11",
+      "desc": "KO canonical 중복 master",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G12",
+      "desc": "sourceRef/언어/상태/타입 드리프트",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G13",
+      "desc": "적용 창 이후 대상 밖 KO 갱신",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G13b",
+      "desc": "적용 창 이후 KO 갱신 총건",
+      "expect": 1193,
+      "actual": 1193,
+      "ok": true
+    },
+    {
+      "id": "G14",
+      "desc": "기존 정상 KO 중 갱신",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G15",
+      "desc": "비의약품 master 혼입",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G16",
+      "desc": "새 요약이 효능 첫 줄의 접두가 아님",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    },
+    {
+      "id": "G17",
+      "desc": "새 요약이 옛 요약을 포함하지 않음",
+      "expect": 0,
+      "actual": 0,
+      "ok": true
+    }
+  ],
+  "failed": 0,
+  "reverseFailSample": []
+}

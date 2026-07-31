@@ -1,0 +1,18 @@
+{
+  "wo": "WO-O4O-OTC-KO-SUMMARY-HARDCUT-CENSUS-AND-CARD-REBUILD-V1",
+  "kind": "summary-rebuild-plan",
+  "mode": "dry-run",
+  "planDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "koCanonicalTotal": 15908,
+  "summaryNull": 1577,
+  "displayPass": 4185,
+  "alreadyRebuilt": 10146,
+  "target": 0,
+  "blocked": 0,
+  "tileReplaced": 0,
+  "byRoute": {},
+  "lenBuckets": {},
+  "blockedRows": [],
+  "blockedByCode": {},
+  "rows": []
+}

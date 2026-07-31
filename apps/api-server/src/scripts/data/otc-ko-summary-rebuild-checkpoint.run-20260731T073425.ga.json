@@ -1,0 +1,16 @@
+{
+  "wo": "WO-O4O-OTC-KO-SUMMARY-HARDCUT-CENSUS-AND-CARD-REBUILD-V1",
+  "kind": "checkpoint",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 200,
+      "lastMasterId": "2b33fa5d-0564-4402-99f1-700afb0badfe",
+      "green": 200,
+      "exception": 0,
+      "writeActual": 200,
+      "at": "2026-07-31T07:34:42.171Z"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "wo": "WO-O4O-OTC-KO-SUMMARY-HARDCUT-CENSUS-AND-CARD-REBUILD-V1",
+  "kind": "checkpoint",
+  "every": 200,
+  "checkpoints": [
+    {
+      "checkpoint": 1,
+      "processed": 200,
+      "lastMasterId": "77e4d7f6-93ed-4172-83cd-f147c8ccc705",
+      "green": 200,
+      "exception": 0,
+      "writeActual": 200,
+      "at": "2026-07-31T07:35:54.968Z"
+    },
+    {
+      "checkpoint": 2,
+      "processed": 400,
+      "lastMasterId": "a217237c-a5ac-4e20-95e7-30d8c1d47504",
+      "green": 400,
+      "exception": 0,
+      "writeActual": 400,
+      "at": "2026-07-31T07:36:05.107Z"
+    },
+    {
+      "checkpoint": 3,
+      "processed": 600,
+      "lastMasterId": "cbce9b63-0a9f-4a19-a0b7-2cf7831282d7",
+      "green": 600,
+      "exception": 0,
+      "writeActual": 600,
+      "at": "2026-07-31T07:36:14.836Z"
+    },
+    {
+      "checkpoint": 4,
+      "processed": 798,
+      "lastMasterId": "ffe5f4e0-d599-4e2a-8658-1dac7c506dea",
+      "green": 798,
+      "exception": 0,
+      "writeActual": 798,
+      "at": "2026-07-31T07:36:24.734Z"
+    }
+  ]
+}
