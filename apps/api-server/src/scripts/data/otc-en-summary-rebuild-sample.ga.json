@@ -1,0 +1,1024 @@
+{
+  "wo": "WO-O4O-OTC-EN-SUMMARY-HARDCUT-REMOVAL-AND-2522-CARD-REBUILD-V1",
+  "kind": "sample-verification",
+  "total": 40,
+  "planDigest": "91e07ae39edde34bba06a4725d5a1b14c8d5e712ca8a9882d4dca1f0ac43a8d1",
+  "samples": [
+    {
+      "masterId": "002063d6-2bea-4975-9fab-7d13bba0a19f",
+      "productName": "디알클리어점안액(카르복시메틸셀룰로오스나트륨)",
+      "route": "ophthalmic",
+      "tags": [
+        "BOUNDARY_CUT"
+      ],
+      "koEfficacyFirstLine": "이 약은 안구건조증이나 바람·태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감을 일시적으로 완화 및 안구자극감 예방에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by ",
+      "newSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "lenOld": 120,
+      "lenNew": 210,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "015425b9-10e6-4344-99b7-f76eec68544c",
+      "productName": "원타임프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+      "route": "ophthalmic",
+      "tags": [
+        "BOUNDARY_CUT"
+      ],
+      "koEfficacyFirstLine": "이 약은 안구건조증이나 바람·태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감의 일시적 완화와 안구자극감 예방에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by ",
+      "newSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "lenOld": 120,
+      "lenNew": 210,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0157af47-6f06-4ceb-80c4-d82bb953ea5f",
+      "productName": "원타임프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+      "route": "ophthalmic",
+      "tags": [
+        "BOUNDARY_CUT"
+      ],
+      "koEfficacyFirstLine": "이 약은 안구건조증이나 바람·태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감의 일시적 완화와 안구자극감 예방에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by ",
+      "newSummary": "This medicine is used for the temporary relief of a burning sensation, a feeling of irritation and discomfort caused by dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "lenOld": 120,
+      "lenNew": 210,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "dry eye syndrome or by exposure to wind and sun, and for the prevention of eye irritation.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "00218d5c-d6d4-4206-bb80-bd131525d960",
+      "productName": "미리놀과립(아세틸시스테인)",
+      "route": "oral",
+      "tags": [
+        "BOUNDARY_CUT",
+        "LIST",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 급ㆍ만성기관지염, 기관지천식, 후두염, 부비동염, 낭성섬유증의 질환에서 객담배출곤란에 사용합니다.",
+      "oldSummary": "This medicine is used for difficulty in expectoration in diseases such as acute and chronic bronchitis, bronchial asthma",
+      "newSummary": "This medicine is used for difficulty in expectoration in diseases such as acute and chronic bronchitis, bronchial asthma, laryngitis, sinusitis, and cystic fibrosis.",
+      "lenOld": 120,
+      "lenNew": 165,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": ", laryngitis, sinusitis, and cystic fibrosis.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "003431b9-ebb0-4e19-86b1-fd30dfcaa1f7",
+      "productName": "한풍콜드액",
+      "route": "oral",
+      "tags": [
+        "BOUNDARY_CUT",
+        "OPEN_PAREN",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 감기의 여러 증상(콧물, 코막힘, 재채기, 인후통, 오한, 발열, 두통, 관절통, 근육통)의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, chills",
+      "newSummary": "This medicine is used to relieve various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, chills, fever, headache, joint pain, muscle pain).",
+      "lenOld": 120,
+      "lenNew": 164,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": ", fever, headache, joint pain, muscle pain).",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "00421b9b-e8a2-49a2-b45a-00a7e45b3643",
+      "productName": "코르텍골드구강붕해필름",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 코감기(급성비염), 알레르기성 비염 또는 부비강염에 의한 코막힘, 콧물, 재채기, 눈물, 목의 통증, 머리 무거움의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve nasal congestion, runny nose, sneezing, watery eyes, throat pain and a feeling of heavi",
+      "newSummary": "This medicine is used to relieve nasal congestion, runny nose, sneezing, watery eyes, throat pain and a feeling of heaviness in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "lenOld": 120,
+      "lenNew": 208,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ness in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "productName": "지노베타딘질좌제(포비돈요오드)",
+      "route": "vaginal",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 칸디다성 질염, 트리코모나스성 질염, 비특이성 및 혼합감염에 의한 질염, 산부인과 수술전 처치에 사용합니다.",
+      "oldSummary": "This medicine is used for candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-specific and mixed infectio",
+      "newSummary": "This medicine is used for candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-specific and mixed infection, and preparation before obstetric and gynecological surgery.",
+      "lenOld": 120,
+      "lenNew": 182,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "n, and preparation before obstetric and gynecological surgery.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0b4d72b4-d0de-48ee-b2b5-5495ed404c9d",
+      "productName": "지노클렌질세정액",
+      "route": "vaginal",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 칸디다성 질염, 트리코모나스성 질염, 비특이성 및 혼합감염에 의한 질염, 산부인과 수술 전 처치의 국소치료와 살균성 질세정, 국소세척 및 방취에 사용합니다.",
+      "oldSummary": "This medicine is used for the local treatment of candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-spec",
+      "newSummary": "This medicine is used for the local treatment of candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-specific and mixed infection and preparation before obstetric and gynecological surgery, and for germicidal vaginal washing, local washing and deodorizing.",
+      "lenOld": 120,
+      "lenNew": 271,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ific and mixed infection and preparation before obstetric and gynecological surgery, and for germicidal vaginal washing, local washing and deodorizing.",
+      "wrap": {
+        "mobile360": 6,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "14c98ced-8e13-4c1d-951b-785a740b6f5c",
+      "productName": "지노클렌질세정액",
+      "route": "vaginal",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 칸디다성 질염, 트리코모나스성 질염, 비특이성 및 혼합감염에 의한 질염, 산부인과 수술 전 처치의 국소치료와 살균성 질세정, 국소세척 및 방취에 사용합니다.",
+      "oldSummary": "This medicine is used for the local treatment of candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-spec",
+      "newSummary": "This medicine is used for the local treatment of candidal vaginitis, trichomonal vaginitis, vaginitis caused by non-specific and mixed infection and preparation before obstetric and gynecological surgery, and for germicidal vaginal washing, local washing and deodorizing.",
+      "lenOld": 120,
+      "lenNew": 271,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ific and mixed infection and preparation before obstetric and gynecological surgery, and for germicidal vaginal washing, local washing and deodorizing.",
+      "wrap": {
+        "mobile360": 6,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "00715e89-8b9e-418c-97de-199ee077a9fe",
+      "productName": "구미포비돈세정액7.5%(포비돈요오드)",
+      "route": "topical",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 수술자의 손 및 팔의 살균소독, 수술부위의 살균소독에 사용합니다.",
+      "oldSummary": "This medicine is used for the sterilization and disinfection of the surgeon's hands and arms and for the sterilization a",
+      "newSummary": "This medicine is used for the sterilization and disinfection of the surgeon's hands and arms and for the sterilization and disinfection of the surgical site.",
+      "lenOld": 120,
+      "lenNew": 157,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "nd disinfection of the surgical site.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "007b4844-d219-48c8-ab84-ec3c7b682fca",
+      "productName": "코마키텐나잘스프레이",
+      "route": "topical",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 코감기(급성 비염), 알레르기성 비염 또는 부비동염에 의한 코막힘, 콧물, 재채기, 머리무거움 증상의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve the symptoms of nasal congestion, runny nose, sneezing and a feeling of heaviness in th",
+      "newSummary": "This medicine is used to relieve the symptoms of nasal congestion, runny nose, sneezing and a feeling of heaviness in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "lenOld": 120,
+      "lenNew": 198,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "e head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "00fdc1b1-336b-42b3-b26c-c7b75635b7f0",
+      "productName": "태극케토코나졸크림",
+      "route": "topical",
+      "tags": [
+        "BOUNDARY_CUT",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 백선(체부백선, 완선, 족부백선), 피부칸디다증, 어루러기, 지루피부염의 피부진균증에 사용합니다.",
+      "oldSummary": "This medicine is used for tinea (tinea corporis, tinea cruris, tinea pedis), cutaneous candidiasis, tinea versicolor and",
+      "newSummary": "This medicine is used for tinea (tinea corporis, tinea cruris, tinea pedis), cutaneous candidiasis, tinea versicolor and the dermatomycosis of seborrheic dermatitis.",
+      "lenOld": 120,
+      "lenNew": 165,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": " the dermatomycosis of seborrheic dermatitis.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0181e3ea-a445-407f-a647-b92d5eb4c479",
+      "productName": "헥사메딘액0.12%(클로르헥시딘글루콘산염액)",
+      "route": "oromucosal",
+      "tags": [
+        "MID_WORD",
+        "LIST",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 보철(의치)에 의한 염증, 아구창 등의 구강내 칸디다감염증, 치은염, 인두염, 아프타성 구내염에 의한 염증 완화와 치근막 수술후 살균소독에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngit",
+      "newSummary": "This medicine is used to relieve inflammation caused by dentures, oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for sterilization and disinfection after periodontal membrane surgery.",
+      "lenOld": 120,
+      "lenNew": 222,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "is and aphthous stomatitis, and for sterilization and disinfection after periodontal membrane surgery.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0b486f63-8cf0-46fb-8626-250593c9cd5a",
+      "productName": "이바넨큐액(디클로페낙)",
+      "route": "oromucosal",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 치은염(잇몸염), 구내염(입안염), 인두염 등의 구강인두의 염증, 치과 보존치료 또는 발치 후 염증의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve inflammation of the mouth and the pharynx such as gingivitis, stomatitis and pharyngiti",
+      "newSummary": "This medicine is used to relieve inflammation of the mouth and the pharynx such as gingivitis, stomatitis and pharyngitis, and inflammation after conservative dental treatment or tooth extraction.",
+      "lenOld": 120,
+      "lenNew": 196,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "s, and inflammation after conservative dental treatment or tooth extraction.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "226c39c1-45b7-4d2e-b6c1-e29fe38158eb",
+      "productName": "오스템클로르헥시딘액0.12%(클로르헥시딘글루콘산염액)",
+      "route": "oromucosal",
+      "tags": [
+        "MID_WORD",
+        "LIST",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 보철(의치)에 의한 염증, 아구창 등의 구강내 칸디다감염증, 치은염, 인두염, 아프타성 구내염에 의한 염증 완화와 치근막 수술 후 살균소독에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve inflammation caused by prostheses (dentures), oral candidiasis such as thrush, gingivit",
+      "newSummary": "This medicine is used to relieve inflammation caused by prostheses (dentures), oral candidiasis such as thrush, gingivitis, pharyngitis and aphthous stomatitis, and for bactericidal disinfection after periodontal ligament surgery.",
+      "lenOld": 120,
+      "lenNew": 230,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "is, pharyngitis and aphthous stomatitis, and for bactericidal disinfection after periodontal ligament surgery.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "03a20337-efc0-4604-887e-7ce2c9cdeb02",
+      "productName": "둘코락스좌약(비사코딜)",
+      "route": "rectal",
+      "tags": [
+        "BOUNDARY_CUT",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 급·만성변비, 수술·분만전후 및 X-선 촬영 시 장내분변 제거에 사용합니다.",
+      "oldSummary": "This medicine is used for acute and chronic constipation and for removing faeces from the bowel before and after surgery",
+      "newSummary": "This medicine is used for acute and chronic constipation and for removing faeces from the bowel before and after surgery or delivery and at the time of X-ray imaging.",
+      "lenOld": 120,
+      "lenNew": 166,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": " or delivery and at the time of X-ray imaging.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "083f3a40-3ef8-4a96-84b6-7d2a8126aa3f",
+      "productName": "푸레파인마일드좌제",
+      "route": "rectal",
+      "tags": [
+        "MID_WORD",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 치열, 치핵의 아픔, 가려움, 부종(부기), 출혈의 일시적 완화에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of the pain, itching, swelling and bleeding of anal fissure and hemorrhoi",
+      "newSummary": "This medicine is used for the temporary relief of the pain, itching, swelling and bleeding of anal fissure and hemorrhoids.",
+      "lenOld": 120,
+      "lenNew": 123,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ds.",
+      "wrap": {
+        "mobile360": 3,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0b7e6fad-1120-42e3-986c-d9760e87f68d",
+      "productName": "둘코락스좌약(비사코딜)",
+      "route": "rectal",
+      "tags": [
+        "BOUNDARY_CUT",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 급·만성변비, 수술·분만전후 및 X-선 촬영 시 장내분변 제거에 사용합니다.",
+      "oldSummary": "This medicine is used for acute and chronic constipation and for removing faeces from the bowel before and after surgery",
+      "newSummary": "This medicine is used for acute and chronic constipation and for removing faeces from the bowel before and after surgery or delivery and at the time of X-ray imaging.",
+      "lenOld": 120,
+      "lenNew": 166,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": " or delivery and at the time of X-ray imaging.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0f97cc81-b2bc-4db3-af8f-79f9b62f4902",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "route": "nasal",
+      "tags": [
+        "MID_WORD",
+        "OPEN_PAREN"
+      ],
+      "koEfficacyFirstLine": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "oldSummary": "This medicine is used for nasal cavity irrigation for a stuffy nose caused by nasal mucous discharge or purulent (suppur",
+      "newSummary": "This medicine is used for nasal cavity irrigation for a stuffy nose caused by nasal mucous discharge or purulent (suppurative) conditions.",
+      "lenOld": 120,
+      "lenNew": 138,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ative) conditions.",
+      "wrap": {
+        "mobile360": 3,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "47847806-0b95-4006-a02f-95dac648695a",
+      "productName": "나자린플러스분무액(염화나트륨)",
+      "route": "nasal",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척과 비점막 건조 증상의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used for washing out the nasal cavity (inside the nose) in a blocked nose caused by nasal mucosal disch",
+      "newSummary": "This medicine is used for washing out the nasal cavity (inside the nose) in a blocked nose caused by nasal mucosal discharge or purulent (festering) discharge, and to relieve dryness of the nasal mucosa.",
+      "lenOld": 120,
+      "lenNew": 203,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "arge or purulent (festering) discharge, and to relieve dryness of the nasal mucosa.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "54f32457-d496-4a38-bcf1-e8e8809059f4",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "route": "nasal",
+      "tags": [
+        "MID_WORD",
+        "OPEN_PAREN"
+      ],
+      "koEfficacyFirstLine": "이 약은 코점막 분비물 또는 화농(곪음)성으로 인한 코막힘에 비강(코안)세척에 사용합니다.",
+      "oldSummary": "This medicine is used for nasal cavity irrigation for a stuffy nose caused by nasal mucous discharge or purulent (suppur",
+      "newSummary": "This medicine is used for nasal cavity irrigation for a stuffy nose caused by nasal mucous discharge or purulent (suppurative) conditions.",
+      "lenOld": 120,
+      "lenNew": 138,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ative) conditions.",
+      "wrap": {
+        "mobile360": 3,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "00a49157-6ded-488f-a647-db37bfc773a8",
+      "productName": "아웃콜에프캡슐",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "OPEN_PAREN",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 감기의 여러 증상(콧물, 코막힘, 재채기, 인후통, 기침, 가래, 오한(춥고 떨리는 증상), 발열, 두통, 관절통, 근육통)의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, co",
+      "newSummary": "This medicine is used to relieve the various symptoms of a cold (runny nose, nasal congestion, sneezing, sore throat, cough, phlegm, chills (feeling cold and shivering), fever, headache, joint pain, muscle pain).",
+      "lenOld": 120,
+      "lenNew": 212,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ugh, phlegm, chills (feeling cold and shivering), fever, headache, joint pain, muscle pain).",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "01398122-2790-4db7-84af-ddb1354d3f47",
+      "productName": "조아이부프로펜400밀리그람정",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "OPEN_PAREN",
+        "LIST",
+        "VERY_LONG",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 류마티양 관절염, 연소성 류마티양 관절염, 골관절염(퇴행성 관절질환), 감기로 인한 발열 및 동통(통증), 요통, 월경곤란증, 수술 후 동통(통증), 강직성 척추염, 두통, 치통, 근육통, 신경통, 급성통풍, 건선성 관절염, 연조직손상(염좌, 좌상), 비관절 류마티스질환(건염, 건초염, 활액낭염)에 사용합니다.",
+      "oldSummary": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint diseas",
+      "newSummary": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), fever and pain caused by a cold, low back pain, dysmenorrhea, postoperative pain, ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, contusion) and non-articular rheumatic disease (tendinitis, tenosynovitis, bursitis).",
+      "lenOld": 120,
+      "lenNew": 421,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "e), fever and pain caused by a cold, low back pain, dysmenorrhea, postoperative pain, ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, contusion) and non-articular rheumatic disease (tendinitis, tenosynovitis, bursitis).",
+      "wrap": {
+        "mobile360": 9,
+        "tablet768": 5
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "017425ec-6996-453b-a054-d23168684cbd",
+      "productName": "임팩스피드액",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "MULTI_SENTENCE",
+        "NUMERIC",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B2, B6 보급에 사용합니다.",
+      "oldSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when phy",
+      "newSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when physical strength is reduced during or after an illness. This medicine is used to relieve the symptoms of angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "lenOld": 120,
+      "lenNew": 298,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "sical strength is reduced during or after an illness. This medicine is used to relieve the symptoms of angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "wrap": {
+        "mobile360": 7,
+        "tablet768": 4
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "02241d64-4d7c-43e8-bb7b-04413a4be730",
+      "productName": "광동벤포파워제트액",
+      "route": "oral",
+      "tags": [
+        "BOUNDARY_CUT",
+        "NUMERIC",
+        "LIST",
+        "VERY_LONG"
+      ],
+      "koEfficacyFirstLine": "이 약은 육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로와 아연의 보급에 사용합니다.",
+      "oldSummary": "This medicine is used to supply vitamin B1, B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when",
+      "newSummary": "This medicine is used to supply vitamin B1, B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when physical strength is reduced during or after an illness, to relieve the symptoms of neuralgia, muscle pain, joint pain (low back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis, and for beriberi, eye fatigue and the supply of zinc.",
+      "lenOld": 120,
+      "lenNew": 409,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": " physical strength is reduced during or after an illness, to relieve the symptoms of neuralgia, muscle pain, joint pain (low back pain, stiff shoulders, etc.), angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis, and for beriberi, eye fatigue and the supply of zinc.",
+      "wrap": {
+        "mobile360": 9,
+        "tablet768": 5
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0362e7db-96be-4679-a653-cb5b25bfff68",
+      "productName": "알로판400mg정(이부프로펜)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "OPEN_PAREN",
+        "LIST",
+        "VERY_LONG",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 류마티양 관절염, 연소성 류마티양 관절염, 골관절염(퇴행성 관절질환), 감기로 인한 발열 및 동통, 요통, 월경곤란증, 수술후 동통과 강직성 척추염, 두통, 치통, 근육통, 신경통, 급성통풍, 건선성 관절염, 연조직손상(염좌, 좌상), 비관절 류마티스질환(건염, 건초염, 활액낭염)에 사용합니다.",
+      "oldSummary": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint diseas",
+      "newSummary": "This medicine is used for rheumatoid arthritis, juvenile rheumatoid arthritis, osteoarthritis (degenerative joint disease), fever and pain due to a cold, low back pain, dysmenorrhea, post-operative pain and ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, contusion), and non-articular rheumatic diseases (tendinitis, tenosynovitis, bursitis).",
+      "lenOld": 120,
+      "lenNew": 424,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "e), fever and pain due to a cold, low back pain, dysmenorrhea, post-operative pain and ankylosing spondylitis, headache, toothache, muscle pain, neuralgia, acute gout, psoriatic arthritis, soft tissue injury (sprain, contusion), and non-articular rheumatic diseases (tendinitis, tenosynovitis, bursitis).",
+      "wrap": {
+        "mobile360": 10,
+        "tablet768": 5
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0469b0a2-c12c-40b9-8d56-8458e0b23322",
+      "productName": "마그포스스피드액",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "NUMERIC"
+      ],
+      "koEfficacyFirstLine": "이 약은 육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B2, B6 보급에 사용합니다.",
+      "oldSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when phy",
+      "newSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when physical strength is reduced during or after an illness.",
+      "lenOld": 120,
+      "lenNew": 173,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "sical strength is reduced during or after an illness.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "0473405d-9ea7-4044-9d6e-bc3c175fcdac",
+      "productName": "동성비타비플러스액",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "NUMERIC",
+        "AGE_DURATION",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 육체피로, 임신 및 수유기, 노년기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 E, B1, B2, B6의 보급에 사용합니다.",
+      "oldSummary": "This medicine is used to supply vitamin E, B1, B2 and B6 in physical fatigue, during pregnancy and breast-feeding, in ol",
+      "newSummary": "This medicine is used to supply vitamin E, B1, B2 and B6 in physical fatigue, during pregnancy and breast-feeding, in old age, and when physical strength is reduced during or after an illness.",
+      "lenOld": 120,
+      "lenNew": 192,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "d age, and when physical strength is reduced during or after an illness.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "059f825d-1991-48ff-a751-b9493b161512",
+      "productName": "포타겔현탁액(디옥타헤드랄스멕타이트)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "NUMERIC",
+        "AGE_DURATION",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 성인의 식도, 위·십이지장과 관련된 통증의 완화, 성인의 급·만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+      "oldSummary": "This drug is used for the relief of pain related to the esophagus, stomach, and duodenum in adults, acute and chronic di",
+      "newSummary": "This drug is used for the relief of pain related to the esophagus, stomach, and duodenum in adults, acute and chronic diarrhea in adults, and acute diarrhea in children aged 24 months or older.",
+      "lenOld": 120,
+      "lenNew": 193,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "arrhea in adults, and acute diarrhea in children aged 24 months or older.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "07328517-17c3-4dad-9301-7357390e16d1",
+      "productName": "다이톱현탁액(디옥타헤드랄스멕타이트)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "NUMERIC",
+        "AGE_DURATION",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 성인의 식도, 위·십이지장과 관련된 통증의 완화, 성인의 급·만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+      "oldSummary": "This drug is used for the relief of pain related to the esophagus, stomach, and duodenum in adults, acute and chronic di",
+      "newSummary": "This drug is used for the relief of pain related to the esophagus, stomach, and duodenum in adults, acute and chronic diarrhea in adults, and acute diarrhea in children aged 24 months or older.",
+      "lenOld": 120,
+      "lenNew": 193,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "arrhea in adults, and acute diarrhea in children aged 24 months or older.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "07e38ca8-24ad-4030-a005-7214b5c9b548",
+      "productName": "임팩스피드액",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "MULTI_SENTENCE",
+        "NUMERIC",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B2, B6 보급에 사용합니다.",
+      "oldSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when phy",
+      "newSummary": "This medicine is used to supply vitamin B2 and B6 in physical fatigue, during pregnancy and breast-feeding, and when physical strength is reduced during or after an illness. This medicine is used to relieve the symptoms of angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "lenOld": 120,
+      "lenNew": 298,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "sical strength is reduced during or after an illness. This medicine is used to relieve the symptoms of angular cheilitis, cheilitis, stomatitis, glossitis, eczema and dermatitis.",
+      "wrap": {
+        "mobile360": 7,
+        "tablet768": 4
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "14584216-e5fa-4df0-8da5-81bc9d9d9d9d",
+      "productName": "타세놀키즈시럽(아세트아미노펜)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "MULTI_SENTENCE",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 감기로 인한 발열 및 통증, 두통, 신경통, 근육통, 월경통, 삔 통증에 사용합니다.",
+      "oldSummary": "This medicine is used for fever and pain due to colds, headache, neuralgia, muscle pain, menstrual pain, and pain from s",
+      "newSummary": "This medicine is used for fever and pain due to colds, headache, neuralgia, muscle pain, menstrual pain, and pain from sprains. This medicine is used for toothache, joint pain, and rheumatic pain.",
+      "lenOld": 120,
+      "lenNew": 196,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "prains. This medicine is used for toothache, joint pain, and rheumatic pain.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "008ca661-455a-482b-a89f-5b68a23857dc",
+      "productName": "생큐환",
+      "route": "oral",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 자양강장과 육체피로, 병중ㆍ병후, 임신ㆍ수유기의 비타민 C보급에 사용합니다.",
+      "oldSummary": "This medicine is used as a nutritional tonic and to supply vitamin C in physical fatigue, during and after an illness, a",
+      "newSummary": "This medicine is used as a nutritional tonic and to supply vitamin C in physical fatigue, during and after an illness, and during pregnancy and breast-feeding.",
+      "lenOld": 120,
+      "lenNew": 159,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "nd during pregnancy and breast-feeding.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "01129495-6dbb-4cf6-bc44-0425d1a7fad6",
+      "productName": "콜대원키즈노즈에스시럽",
+      "route": "oral",
+      "tags": [
+        "MID_WORD",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 눈의 가려움, 눈물, 콧물, 코 또는 인후(목구멍)의 가려움, 재채기, 코막힘 및 부비동 울혈의 일시적 완화에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of itching of the eyes, watery eyes, runny nose, itching of the nose or t",
+      "newSummary": "This medicine is used for the temporary relief of itching of the eyes, watery eyes, runny nose, itching of the nose or the throat, sneezing, nasal congestion and sinus congestion.",
+      "lenOld": 120,
+      "lenNew": 179,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "he throat, sneezing, nasal congestion and sinus congestion.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "011ee863-0947-4669-a4d1-32263a9914ad",
+      "productName": "오트리빈에스비강분무액(옥시메타졸린염산염)",
+      "route": "topical",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 코감기(급성 비염), 알레르기성 비염 또는 부비동염에 의한 코막힘, 콧물, 재채기, 머리무거움 증상의 완화에 사용합니다.",
+      "oldSummary": "This medicine is used to relieve the symptoms of nasal congestion, runny nose, sneezing and a feeling of heaviness in th",
+      "newSummary": "This medicine is used to relieve the symptoms of nasal congestion, runny nose, sneezing and a feeling of heaviness in the head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "lenOld": 120,
+      "lenNew": 198,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "e head caused by a head cold (acute rhinitis), allergic rhinitis or sinusitis.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 3
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "012903c2-bdfb-474b-861e-042c01c45f4c",
+      "productName": "신신파스아렉스",
+      "route": "topical",
+      "tags": [
+        "MID_WORD",
+        "LIST",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 어깨결림, 허리통, 신경통, 류마티스, 타박상, 염좌(삠), 근육통, 관절통의 진통 · 소염에 사용합니다.",
+      "oldSummary": "This medicine is used for the analgesic and anti-inflammatory treatment of stiff shoulders, low back pain, neuralgia, rh",
+      "newSummary": "This medicine is used for the analgesic and anti-inflammatory treatment of stiff shoulders, low back pain, neuralgia, rheumatism, bruises, sprains, muscle pain and joint pain.",
+      "lenOld": 120,
+      "lenNew": 175,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "eumatism, bruises, sprains, muscle pain and joint pain.",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "012979ab-ca63-4fda-b210-3e8e1e64577e",
+      "productName": "뉴베인액(트록세루틴)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 정맥ㆍ림프 순환장애로 인한 하지(다리) 중압감, 통증, 하지(다리)불안, 치질과 관련된 여러 증상에 사용합니다.",
+      "oldSummary": "This medicine is used for a feeling of heaviness in the legs, pain and restless legs caused by venous and lymphatic circ",
+      "newSummary": "This medicine is used for a feeling of heaviness in the legs, pain and restless legs caused by venous and lymphatic circulation disorder, and for the various symptoms related to hemorrhoids.",
+      "lenOld": 120,
+      "lenNew": 190,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ulation disorder, and for the various symptoms related to hemorrhoids.",
+      "wrap": {
+        "mobile360": 5,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "01628248-a3df-43b2-b959-fd76cff8301d",
+      "productName": "에너텐션액(L-아스파르트산-L-아르기닌수화물)",
+      "route": "oral",
+      "tags": [
+        "MID_WORD"
+      ],
+      "koEfficacyFirstLine": "이 약은 정신적·신체적 기능무력 증상의 보조요법, 회복기간(아미노산 결핍상태) 동안의 보조요법에 사용합니다.",
+      "oldSummary": "This medicine is used as supportive therapy for symptoms of mental and physical asthenia and as supportive therapy durin",
+      "newSummary": "This medicine is used as supportive therapy for symptoms of mental and physical asthenia and as supportive therapy during the recovery period (a state of amino acid deficiency).",
+      "lenOld": 120,
+      "lenNew": 177,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "g the recovery period (a state of amino acid deficiency).",
+      "wrap": {
+        "mobile360": 4,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "01a30c7b-69dd-49c8-a737-b927182ade72",
+      "productName": "한창멸균포비돈스왑스틱",
+      "route": "topical",
+      "tags": [
+        "MID_WORD",
+        "LONG_TERM"
+      ],
+      "koEfficacyFirstLine": "이 약은 찢긴 상처, 화상, 창상의 살균소독, 궤양, 농양의 살균소독, 감염피부면의 소독, 수술부위의 살균소독, 주사 및 카테터부위의 소독에 사용합니다.",
+      "oldSummary": "This medicine is used for the sterilization and disinfection of torn wounds, burns and wounds, the sterilization and dis",
+      "newSummary": "This medicine is used for the sterilization and disinfection of torn wounds, burns and wounds, the sterilization and disinfection of ulcers and abscesses, the disinfection of infected skin surfaces, the sterilization and disinfection of surgical sites, and the disinfection of injection and catheter sites.",
+      "lenOld": 120,
+      "lenNew": 306,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "infection of ulcers and abscesses, the disinfection of infected skin surfaces, the sterilization and disinfection of surgical sites, and the disinfection of injection and catheter sites.",
+      "wrap": {
+        "mobile360": 7,
+        "tablet768": 4
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    },
+    {
+      "masterId": "01a6bba3-a1c7-472e-9f23-48922e87df31",
+      "productName": "한미치쏙크림",
+      "route": "topical",
+      "tags": [
+        "MID_WORD",
+        "LIST"
+      ],
+      "koEfficacyFirstLine": "이 약은 치열·치핵의 아픔·가려움·부종(부기)·출혈의 일시적 완화에 사용합니다.",
+      "oldSummary": "This medicine is used for the temporary relief of the pain, itching, swelling and bleeding of anal fissure and hemorrhoi",
+      "newSummary": "This medicine is used for the temporary relief of the pain, itching, swelling and bleeding of anal fissure and hemorrhoids.",
+      "lenOld": 120,
+      "lenNew": 123,
+      "endsAtSentence": true,
+      "oldIsPrefixOfNew": true,
+      "addedTail": "ds.",
+      "wrap": {
+        "mobile360": 3,
+        "tablet768": 2
+      },
+      "replacedAt": [
+        "sd-hero .sd-badge",
+        "At a glance \"How it works\" tile"
+      ]
+    }
+  ]
+}

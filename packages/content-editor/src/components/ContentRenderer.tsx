@@ -198,6 +198,8 @@ const storeDescriptionCss = `
 .store-desc-content .sd-hero{padding:28px 22px 24px;text-align:center;background:linear-gradient(180deg,var(--sd-chip),transparent)}
 .store-desc-content .sd-badges{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
 .store-desc-content .sd-badge{font-size:12.5px;font-weight:700;border-radius:999px;padding:5px 12px;line-height:1;background:transparent;border:1px solid var(--sd-chip-line);color:var(--sd-blue)}
+/* 요약 배지는 문장 전체를 담는다 — 고정 길이 절단 대신 줄바꿈으로 처리한다(축약·은폐 금지). */
+.store-desc-content .sd-badge:not(.is-solid){line-height:1.45;padding:7px 14px;border-radius:14px;max-width:100%;white-space:normal;overflow-wrap:break-word;text-align:center}
 .store-desc-content .sd-badge.is-solid{background:var(--sd-blue-deep);color:#fff;border-color:transparent}
 .store-desc-content .sd-hero h1{margin:0;font-size:32px;font-weight:800;letter-spacing:-.01em;color:var(--sd-navy);text-wrap:balance}
 .store-desc-content .sd-hero h1 small{display:block;font-size:15px;font-weight:600;color:var(--sd-blue);letter-spacing:.01em;margin-top:9px}

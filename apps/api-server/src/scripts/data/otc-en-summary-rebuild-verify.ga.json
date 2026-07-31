@@ -1,0 +1,156 @@
+{
+  "wo": "WO-O4O-OTC-EN-SUMMARY-HARDCUT-REMOVAL-AND-2522-CARD-REBUILD-V1",
+  "kind": "independent-verification",
+  "planDigest": "91e07ae39edde34bba06a4725d5a1b14c8d5e712ca8a9882d4dca1f0ac43a8d1",
+  "applyStartedAt": "2026-07-31T06:44:15.111Z",
+  "gates": [
+    {
+      "id": "G0",
+      "name": "대상 코호트 EN canonical 총건",
+      "expected": 3476,
+      "actual": 3476,
+      "pass": true
+    },
+    {
+      "id": "G1",
+      "name": "입력(계획) 건수",
+      "expected": 2522,
+      "actual": 2522,
+      "pass": true
+    },
+    {
+      "id": "G2",
+      "name": "적용 합계(요약·본문 해시 일치)",
+      "expected": 2522,
+      "actual": 2522,
+      "pass": true
+    },
+    {
+      "id": "G3",
+      "name": "단어/문장 중간 절단(코호트 3,476)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G3b",
+      "name": "종결부호 없는 원문(첫 줄 전체 채택)",
+      "expected": 3,
+      "actual": 3,
+      "pass": true
+    },
+    {
+      "id": "G4",
+      "name": "120자 하드컷 잔존",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G5",
+      "name": "slice(0,120) 파생 패턴 잔존",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G6",
+      "name": "KO canonical 변경",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G6b",
+      "name": "플랫폼 전체 EN OTC 하드컷 잔존",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G7",
+      "name": "역패치 → 적용전 해시 일치(본문 6섹션 무변경)",
+      "expected": 2522,
+      "actual": 2522,
+      "pass": true
+    },
+    {
+      "id": "G8",
+      "name": "잔여 본문 수치·연령·기간 토큰 드리프트",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G9",
+      "name": "route 표현 소실",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G10",
+      "name": "footer/CTA 누락",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G11",
+      "name": "canonical 중복(master,type,lang)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G12",
+      "name": "sourceRef/언어/상태/타입 드리프트",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G13",
+      "name": "대상 밖 update",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G13b",
+      "name": "적용 시각 이후 갱신 총건",
+      "expected": 2522,
+      "actual": 2522,
+      "pass": true
+    },
+    {
+      "id": "G14",
+      "name": "기존 정상 EN 건수",
+      "expected": 954,
+      "actual": 954,
+      "pass": true
+    },
+    {
+      "id": "G14b",
+      "name": "기존 정상 EN 중 갱신된 행",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G15",
+      "name": "비의약품 master 혼입",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    },
+    {
+      "id": "G16",
+      "name": "저장 summary ↔ 본문 표시 불일치(EN 전체)",
+      "expected": 0,
+      "actual": 0,
+      "pass": true
+    }
+  ],
+  "pass": true
+}
