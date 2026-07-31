@@ -30,6 +30,35 @@ export interface ApproveResult {
   service_key: string;
   role: string;
   status: string;
+  /** WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: 반려 응답 정합성 */
+  rejection_reason?: string | null;
+}
+
+/**
+ * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1
+ *
+ * TypeORM 0.3.x pg driver 는 SELECT 는 rows 를, UPDATE/DELETE 는 `[rows, rowCount]` 를 반환한다
+ * (typeorm/driver/postgres/PostgresQueryRunner.js — `result.raw = [raw.rows, raw.rowCount]`).
+ * 따라서 `UPDATE ... RETURNING` 결과에 `.length` / `[0]` 을 그대로 쓰면
+ *   - length 가 항상 2 → "대상 없음" 분기(404)가 도달 불가
+ *   - [0] 이 행이 아니라 rows 배열 → 이후 필드가 전부 undefined
+ * 가 된다. 이 helper 로 driver 반환 형태를 행 배열로 정규화한다.
+ */
+function normalizeReturningRows<T = any>(result: unknown): T[] {
+  if (!result) return [];
+  if (Array.isArray(result)) {
+    // UPDATE/DELETE ... RETURNING → [rows, rowCount]
+    if (result.length === 2 && Array.isArray(result[0]) && typeof result[1] === 'number') {
+      return result[0] as T[];
+    }
+    return result as T[];
+  }
+  // useStructuredResult 경로 (QueryResult)
+  const records = (result as any).records;
+  if (Array.isArray(records)) return records as T[];
+  const raw = (result as any).raw;
+  if (Array.isArray(raw)) return normalizeReturningRows<T>(raw);
+  return [];
 }
 
 export interface RejectParams {
@@ -89,7 +118,135 @@ export interface ReactivateResult {
   userId: string;
 }
 
+/**
+ * service_memberships.role → role_assignments.role 매핑 (승인 시 실제로 부여되는 역할).
+ *
+ * WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
+ *   K-Cosmetics 판매자 = 매장 경영자. canonical role 은 cosmetics:store_owner.
+ *   write-path 정규화(auth-register) 이전에 생성된 legacy 'seller' 변종 멤버십도
+ *   승인 시점에 정규화하여 cosmetics:store_owner 가 부여되도록 한다
+ *   (2026-09 BackfillStoreOwnerRoles / CleanupKCosmeticsSellerRole 통합 마이그레이션 정렬).
+ *
+ * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1:
+ *   승인 경로에 인라인으로만 있던 매핑을 공통화한다. 반려 시 비활성화 대상 역할을
+ *   승인 시 부여한 역할과 동일하게 계산해야 legacy k-cosmetics 멤버십에서도
+ *   role 회수가 누락되지 않는다.
+ *
+ * role 이 비어 있으면 null 을 반환한다 (반려 경로에서는 role 변경을 skip).
+ */
+function resolveGrantedRole(serviceKey: string, role: string | null | undefined): string | null {
+  if (!role) return null;
+  if (
+    serviceKey === 'k-cosmetics' &&
+    ['seller', 'cosmetics:seller', 'k-cosmetics:seller'].includes(role)
+  ) {
+    return 'cosmetics:store_owner';
+  }
+  return role;
+}
+
 export class MembershipApprovalService {
+
+  /**
+   * role_assignments 활성화 (승인·재활성화 공통).
+   *
+   * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1 §4.3:
+   *   제약은 `unique_active_role_per_user UNIQUE (user_id, role, is_active)` 이다.
+   *   따라서 기존 `INSERT ... ON CONFLICT ON CONSTRAINT ... DO UPDATE SET is_active = true` 는
+   *   비활성 row `(u, r, false)` 와 충돌하지 않아 `(u, r, true)` 를 **새로 INSERT** 하고,
+   *   그 뒤 다시 반려/정지하면 `(u, r, false)` 가 중복되어 23505 로 실패한다.
+   *   → 활성 row 확인 → 비활성 row 재활성화 → 없을 때만 INSERT 순서로 교체한다 (migration 불필요).
+   */
+  private async activateRoleAssignment(
+    queryRunner: import('typeorm').QueryRunner,
+    userId: string,
+    role: string,
+    assignedBy: string | null
+  ): Promise<'already_active' | 'reactivated' | 'created'> {
+    const active = normalizeReturningRows(
+      await queryRunner.query(
+        `UPDATE role_assignments SET updated_at = NOW()
+         WHERE user_id = $1 AND role = $2 AND is_active = true
+         RETURNING id`,
+        [userId, role]
+      )
+    );
+    if (active.length > 0) return 'already_active';
+
+    const reactivated = normalizeReturningRows(
+      await queryRunner.query(
+        `UPDATE role_assignments SET is_active = true, updated_at = NOW()
+         WHERE id = (
+           SELECT id FROM role_assignments
+           WHERE user_id = $1 AND role = $2 AND is_active = false
+           ORDER BY updated_at DESC LIMIT 1
+         )
+         RETURNING id`,
+        [userId, role]
+      )
+    );
+    if (reactivated.length > 0) return 'reactivated';
+
+    await queryRunner.query(
+      `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
+       VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
+       ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
+       DO UPDATE SET updated_at = NOW(), is_active = true`,
+      [userId, role, assignedBy]
+    );
+    return 'created';
+  }
+
+  /**
+   * role_assignments 비활성화 (반려·정지 공통). row 는 보존하고 is_active 만 false 로 내린다.
+   *
+   * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1 §4.2:
+   *   `unique_active_role_per_user UNIQUE (user_id, role, is_active)` 때문에, 과거 upsert 로
+   *   `(u, r, true)` 와 `(u, r, false)` 가 동시에 존재하는 legacy row 쌍이 있으면 단순 UPDATE 가
+   *   23505 로 실패한다. 이 경우에만 중복된 비활성 row 를 정리해 단일 row 로 합치고 (역할 자체는
+   *   `(u, r, false)` 로 계속 남는다) 경고 로그를 남긴다.
+   *
+   * @returns 비활성화된 row 수
+   */
+  private async deactivateRoleAssignment(
+    queryRunner: import('typeorm').QueryRunner,
+    userId: string,
+    role: string
+  ): Promise<number> {
+    const activeRows = normalizeReturningRows<{ id: string }>(
+      await queryRunner.query(
+        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = true`,
+        [userId, role]
+      )
+    );
+    if (activeRows.length === 0) return 0;
+
+    const inactiveRows = normalizeReturningRows<{ id: string }>(
+      await queryRunner.query(
+        `SELECT id FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
+        [userId, role]
+      )
+    );
+    if (inactiveRows.length > 0) {
+      logger.warn('[ROLE] duplicate active/inactive assignment pair consolidated', {
+        userId, role, activeRows: activeRows.length, inactiveRows: inactiveRows.length,
+      });
+      await queryRunner.query(
+        `DELETE FROM role_assignments WHERE user_id = $1 AND role = $2 AND is_active = false`,
+        [userId, role]
+      );
+    }
+
+    const updated = normalizeReturningRows(
+      await queryRunner.query(
+        `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+         WHERE user_id = $1 AND role = $2 AND is_active = true
+         RETURNING id`,
+        [userId, role]
+      )
+    );
+    return updated.length;
+  }
 
   /**
    * Approve a service membership (atomic: membership + user + role_assignment)
@@ -170,27 +327,9 @@ export class MembershipApprovalService {
       );
 
       // STEP3: Ensure role_assignment exists (idempotent — ON CONFLICT updates timestamp)
-      let memberRole = membership.role || 'member';
-      // WO-O4O-KCOSMETICS-SELLER-STORE-OWNER-WRITEPATH-FIX-V1:
-      //   K-Cosmetics 판매자 = 매장 경영자. canonical role 은 cosmetics:store_owner.
-      //   write-path 정규화(auth-register) 이전에 생성된 legacy 'seller' 변종 멤버십도
-      //   승인 시점에 정규화하여 cosmetics:store_owner 가 부여되도록 한다
-      //   (2026-09 BackfillStoreOwnerRoles / CleanupKCosmeticsSellerRole 통합 마이그레이션 정렬).
-      if (
-        membership.service_key === 'k-cosmetics' &&
-        ['seller', 'cosmetics:seller', 'k-cosmetics:seller'].includes(memberRole)
-      ) {
-        memberRole = 'cosmetics:store_owner';
-      }
-      logger.info('[APPROVAL][STEP3] role INSERT', { userId, role: memberRole });
-
-      await queryRunner.query(
-        `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-         VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-         ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
-         DO UPDATE SET updated_at = NOW(), is_active = true`,
-        [userId, memberRole, approvedBy]
-      );
+      const memberRole = resolveGrantedRole(membership.service_key, membership.role) || 'member';
+      const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, approvedBy);
+      logger.info('[APPROVAL][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
 
       // STEP4: WO-O4O-KPA-MEMBERSHIP-SYNC-FIX-V1 — kpa_members upsert on approve
       //   service_memberships 가 KPA 가입 상태 SSOT. kpa_members 는 domain profile (optional).
@@ -288,71 +427,135 @@ export class MembershipApprovalService {
   }
 
   /**
-   * Reject a service membership.
-   * Returns the rejected membership row, or null if not found.
+   * Reject a service membership (atomic: membership + role_assignment + domain projection).
+   * Returns the rejected membership row, or null if not found / not rejectable.
+   *
+   * WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1
+   * - D2: 기존 구현은 `AppDataSource.query(UPDATE ... RETURNING)` 결과를 행 배열로 오해했다
+   *       (실제 반환 = `[rows, rowCount]`). 그 결과 404 분기 도달 불가 · 응답 필드 undefined ·
+   *       KPA 동기화 미실행. approveMembership 과 동일한 SELECT ... FOR UPDATE → UPDATE 패턴으로 교체.
+   * - D3: 반려 시 해당 membership 의 role 만 is_active=false 로 회수한다 (row 삭제 없음).
+   *       다른 서비스의 role_assignments 는 절대 변경하지 않는다.
+   * - users.status 는 변경하지 않는다 (D1 정책은 본 WO 범위 밖 — 별도 IR).
    */
   async rejectMembership(params: RejectParams): Promise<ApproveResult | null> {
     const { membershipId, reason, isPlatformAdmin, serviceKeys } = params;
+    const queryRunner = AppDataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
 
     try {
-      const result = isPlatformAdmin
-        ? await AppDataSource.query(
-            `UPDATE service_memberships
-             SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
-             WHERE id = $2 AND status IN ('pending', 'active')
-             RETURNING id, user_id, service_key, role, status`,
-            [reason, membershipId]
+      // STEP0: SELECT membership FOR UPDATE (행 잠금 + 안전한 데이터 획득)
+      const selectResult = isPlatformAdmin
+        ? await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE id = $1 AND status IN ('pending', 'active')
+             FOR UPDATE`,
+            [membershipId]
           )
-        : await AppDataSource.query(
-            `UPDATE service_memberships
-             SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
-             WHERE id = $2 AND status IN ('pending', 'active') AND service_key = ANY($3)
-             RETURNING id, user_id, service_key, role, status`,
-            [reason, membershipId, serviceKeys]
+        : await queryRunner.query(
+            `SELECT id, user_id, service_key, role, status
+             FROM service_memberships
+             WHERE id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)
+             FOR UPDATE`,
+            [membershipId, serviceKeys]
           );
 
-      if (result.length === 0) {
+      if (!selectResult || selectResult.length === 0) {
+        logger.warn('[REJECTION][STEP0] membership not found or not rejectable', {
+          membershipId, isPlatformAdmin, serviceKeys,
+        });
+        await queryRunner.rollbackTransaction();
         return null;
       }
 
-      const membership = result[0] as ApproveResult;
+      const membership = selectResult[0] as ApproveResult;
+      const userId = membership.user_id;
+      const statusBefore = membership.status;
 
-      // WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync (best-effort)
-      //   기존 rejectMembership 은 단일 statement (transaction 미사용) 패턴이므로 동일 스타일 유지.
-      //   sync 실패 시 reject 자체는 성공으로 간주하고 warning 로그만 남김
-      //   (kpa_members 가 pending 으로 남아도 서비스 접근에 영향 없음 — service_memberships 가 SSOT).
-      if (membership.service_key === 'kpa-society' && membership.user_id) {
-        try {
-          await AppDataSource.query(
-            `UPDATE kpa_members
-             SET status = 'rejected', updated_at = NOW()
-             WHERE user_id = $1 AND status IN ('pending', 'active')`,
-            [membership.user_id]
-          );
-        } catch (syncError) {
-          logger.warn('[ApprovalService] REJECTION_KPA_SYNC_FAILED', {
-            membershipId,
-            userId: membership.user_id,
-            error: syncError instanceof Error ? syncError.message : String(syncError),
-          });
+      logger.info('[REJECTION][STEP0] membership locked', {
+        membershipId: membership.id,
+        userId,
+        serviceKey: membership.service_key,
+        role: membership.role,
+        statusBefore,
+      });
+
+      // STEP1: Reject membership
+      await queryRunner.query(
+        `UPDATE service_memberships
+         SET status = 'rejected', rejection_reason = $1, updated_at = NOW()
+         WHERE id = $2`,
+        [reason, membershipId]
+      );
+
+      // STEP2: Deactivate the role granted by THIS membership only.
+      //   승인 시 부여한 역할과 동일한 계산(resolveGrantedRole)을 사용한다.
+      //   membership.role 이 없으면 반려는 그대로 수행하고 role 변경만 건너뛴다.
+      const grantedRole = resolveGrantedRole(membership.service_key, membership.role);
+      let deactivatedRole: string | null = null;
+      if (!grantedRole) {
+        logger.warn('[REJECTION][STEP2] membership.role is empty — role deactivation skipped', {
+          membershipId, userId, serviceKey: membership.service_key,
+        });
+      } else if (!userId) {
+        logger.error('[REJECTION][STEP2] user_id is null — role deactivation skipped', {
+          membershipId, serviceKey: membership.service_key,
+        });
+      } else {
+        const affected = await this.deactivateRoleAssignment(queryRunner, userId, grantedRole);
+        if (affected > 0) {
+          deactivatedRole = grantedRole;
         }
+        logger.info('[REJECTION][STEP2] role DEACTIVATE', {
+          userId, role: grantedRole, affected,
+        });
       }
 
-      logger.info('[ApprovalService] REJECTION_SUCCESS', {
+      // STEP3: WO-O4O-KPA-MEMBERSHIP-STATUS-SYNC-V1 — kpa_members projection sync
+      //   service_memberships 가 SSOT. KPA 전용 보조 원장이므로 다른 서비스로 확장하지 않는다.
+      //   WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1 §4.4 에 따라 동일 트랜잭션에서 처리
+      //   (기존에는 D2 로 인해 이 분기가 한 번도 실행되지 않았다).
+      if (membership.service_key === 'kpa-society' && userId) {
+        logger.info('[REJECTION][STEP3] kpa_members projection sync', { userId });
+        await queryRunner.query(
+          `UPDATE kpa_members
+           SET status = 'rejected', updated_at = NOW()
+           WHERE user_id = $1 AND status IN ('pending', 'active')`,
+          [userId]
+        );
+      }
+
+      await queryRunner.commitTransaction();
+
+      // 커밋 후 결과에 상태·사유 반영
+      membership.status = 'rejected';
+      membership.rejection_reason = reason ?? null;
+
+      logger.info('[REJECTION][SUCCESS]', {
         membershipId,
-        userId: membership.user_id,
+        userId,
         reason,
         serviceKey: membership.service_key,
+        statusBefore,
+        deactivatedRole,
       });
 
       return membership;
     } catch (error) {
-      logger.error('[ApprovalService] REJECTION_FAILED', {
+      await queryRunner.rollbackTransaction();
+      const err = error instanceof Error ? error : new Error(String(error));
+      logger.error('[REJECTION][FAILED]', {
         membershipId,
-        error: error instanceof Error ? error.message : String(error),
-        stack: error instanceof Error ? error.stack : undefined,
+        errorMessage: err.message,
+        errorCode: (error as any)?.code,
+        errorDetail: (error as any)?.detail,
+        stack: err.stack,
       });
       throw error;
+    } finally {
+      await queryRunner.release();
     }
   }
 
@@ -418,15 +621,13 @@ export class MembershipApprovalService {
       // STEP2: Deactivate role_assignments for each membership role
       const deactivatedRoles: string[] = [];
       for (const membership of selectResult) {
-        if (membership.role) {
-          logger.info('[SUSPEND][STEP2] role DEACTIVATE', { userId, role: membership.role });
-
-          await queryRunner.query(
-            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-             WHERE user_id = $1 AND role = $2 AND is_active = true`,
-            [userId, membership.role]
-          );
-          deactivatedRoles.push(membership.role);
+        // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: 승인 시 부여한 역할과 동일하게 계산 +
+        //   legacy 중복 row 로 인한 unique constraint 충돌 방어 (deactivateRoleAssignment 공통화)
+        const grantedRole = resolveGrantedRole(membership.service_key, membership.role);
+        if (grantedRole) {
+          const affected = await this.deactivateRoleAssignment(queryRunner, userId, grantedRole);
+          logger.info('[SUSPEND][STEP2] role DEACTIVATE', { userId, role: grantedRole, affected });
+          deactivatedRoles.push(grantedRole);
         }
       }
 
@@ -440,13 +641,16 @@ export class MembershipApprovalService {
       const hasKpaSocietyMembership = selectResult.some((m: any) => m.service_key === 'kpa-society');
       if (hasKpaSocietyMembership) {
         logger.info('[SUSPEND][STEP2.5] kpa:store_owner DEACTIVATE', { userId });
-        const storeOwnerRows = await queryRunner.query(
-          `UPDATE role_assignments SET is_active = false, updated_at = NOW()
-           WHERE user_id = $1 AND role = $2 AND is_active = true
-           RETURNING id`,
-          [userId, 'kpa:store_owner']
+        // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
+        const storeOwnerRows = normalizeReturningRows(
+          await queryRunner.query(
+            `UPDATE role_assignments SET is_active = false, updated_at = NOW()
+             WHERE user_id = $1 AND role = $2 AND is_active = true
+             RETURNING id`,
+            [userId, 'kpa:store_owner']
+          )
         );
-        if ((storeOwnerRows?.length ?? 0) > 0) {
+        if (storeOwnerRows.length > 0) {
           deactivatedRoles.push('kpa:store_owner');
         }
       }
@@ -566,16 +770,9 @@ export class MembershipApprovalService {
       // STEP3: Reactivate role_assignments for each membership role
       const reactivatedRoles: string[] = [];
       for (const membership of selectResult) {
-        const memberRole = membership.role || 'member';
-        logger.info('[REACTIVATE][STEP3] role UPSERT', { userId, role: memberRole });
-
-        await queryRunner.query(
-          `INSERT INTO role_assignments (user_id, role, assigned_by, is_active, valid_from, created_at, updated_at)
-           VALUES ($1, $2, $3, true, NOW(), NOW(), NOW())
-           ON CONFLICT ON CONSTRAINT "unique_active_role_per_user"
-           DO UPDATE SET updated_at = NOW(), is_active = true`,
-          [userId, memberRole, reactivatedBy]
-        );
+        const memberRole = resolveGrantedRole(membership.service_key, membership.role) || 'member';
+        const roleOutcome = await this.activateRoleAssignment(queryRunner, userId, memberRole, reactivatedBy);
+        logger.info('[REACTIVATE][STEP3] role ACTIVATE', { userId, role: memberRole, outcome: roleOutcome });
         reactivatedRoles.push(memberRole);
       }
 
@@ -595,13 +792,16 @@ export class MembershipApprovalService {
         const isPharmacyOwner = profileRows?.[0]?.activity_type === 'pharmacy_owner';
         if (isPharmacyOwner) {
           logger.info('[REACTIVATE][STEP3.5] kpa:store_owner RESTORE candidate', { userId });
-          const restoredRows = await queryRunner.query(
-            `UPDATE role_assignments SET is_active = true, updated_at = NOW()
-             WHERE user_id = $1 AND role = $2 AND is_active = false
-             RETURNING id`,
-            [userId, 'kpa:store_owner']
+          // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
+          const restoredRows = normalizeReturningRows(
+            await queryRunner.query(
+              `UPDATE role_assignments SET is_active = true, updated_at = NOW()
+               WHERE user_id = $1 AND role = $2 AND is_active = false
+               RETURNING id`,
+              [userId, 'kpa:store_owner']
+            )
           );
-          if ((restoredRows?.length ?? 0) > 0) {
+          if (restoredRows.length > 0) {
             reactivatedRoles.push('kpa:store_owner');
           }
         }
@@ -812,14 +1012,17 @@ export class MembershipApprovalService {
           );
 
           // owner: soft-cleanup (left_at=NOW) — kpa:store_owner role 비활성과 정렬
-          const ownerCleanupRows = await queryRunner.query(
-            `UPDATE organization_members
-             SET left_at = NOW(), updated_at = NOW()
-             WHERE user_id = $1 AND organization_id = $2 AND role = 'owner' AND left_at IS NULL
-             RETURNING id`,
-            [userId, kpaOrgId]
+          // WO-O4O-MEMBERSHIP-REJECTION-CORE-CORRECTNESS-V1: UPDATE ... RETURNING 반환 형태 정규화
+          const ownerCleanupRows = normalizeReturningRows(
+            await queryRunner.query(
+              `UPDATE organization_members
+               SET left_at = NOW(), updated_at = NOW()
+               WHERE user_id = $1 AND organization_id = $2 AND role = 'owner' AND left_at IS NULL
+               RETURNING id`,
+              [userId, kpaOrgId]
+            )
           );
-          const ownerSoftCleanupCount = ownerCleanupRows?.length ?? 0;
+          const ownerSoftCleanupCount = ownerCleanupRows.length;
           if (ownerSoftCleanupCount > 0) {
             logger.info('[WITHDRAW][STEP4] owner role soft-cleanup applied', {
               userId,

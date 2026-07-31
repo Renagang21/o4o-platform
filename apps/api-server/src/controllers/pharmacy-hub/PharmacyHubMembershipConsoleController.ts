@@ -298,9 +298,11 @@ export class PharmacyHubMembershipConsoleController {
         data: {
           id: membership.id,
           userId: membership.user_id,
+          serviceKey: membership.service_key,
           status: membership.status,
           role: membership.role,
           roleType: toRoleType(membership.role),
+          rejectionReason: membership.rejection_reason ?? reason,
         },
       });
     } catch (error) {
