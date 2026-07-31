@@ -1,0 +1,40 @@
+{
+ "verifiedAt": "2026-07-31T14:49:56.213Z",
+ "readOnly": true,
+ "separateSession": true,
+ "targets": 791,
+ "newHashMatch": 791,
+ "oldHashRemains": 0,
+ "fnSectionPresent": 791,
+ "hangulInFnSection": 0,
+ "targetFieldDrift": 0,
+ "koCanonicalDrift": 0,
+ "globals": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "ko_without_en": 25420,
+  "en_without_fn": 33
+ },
+ "expected": {
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948,
+  "en_dup": 0,
+  "spd_all": 120123
+ },
+ "batchStatusSum": 5000,
+ "sum5000": true,
+ "byStatus": {
+  "UPDATED_EXISTING_EN": 791,
+  "HOLD_TRANSLATION": 4209
+ },
+ "finalHold": 4209,
+ "holdDup": 0,
+ "enCanonicalDelta": 0,
+ "failedChecks": [],
+ "globalsOk": true,
+ "verdict": "PASS"
+}

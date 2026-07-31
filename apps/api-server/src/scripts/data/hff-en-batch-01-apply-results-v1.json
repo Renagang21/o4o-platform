@@ -1,0 +1,55 @@
+{
+ "appliedAt": "2026-07-31T14:48:25.853Z",
+ "mode": "APPLY",
+ "shardSize": 200,
+ "shards": [
+  {
+   "from": 0,
+   "size": 200,
+   "updated": 200,
+   "inserted": 0,
+   "rolledBack": false
+  },
+  {
+   "from": 200,
+   "size": 200,
+   "updated": 200,
+   "inserted": 0,
+   "rolledBack": false
+  },
+  {
+   "from": 400,
+   "size": 200,
+   "updated": 200,
+   "inserted": 0,
+   "rolledBack": false
+  },
+  {
+   "from": 600,
+   "size": 191,
+   "updated": 191,
+   "inserted": 0,
+   "rolledBack": false
+  }
+ ],
+ "expectedUpdate": 791,
+ "actualUpdate": 791,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "skipped": [],
+ "before": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948
+ },
+ "after": {
+  "spd_all": 120123,
+  "ko_canon": 40918,
+  "en_canon": 15498,
+  "pm_hff": 40948
+ },
+ "koUnchanged": true,
+ "enDelta": 0,
+ "pmUnchanged": true
+}

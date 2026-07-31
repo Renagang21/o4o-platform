@@ -1,0 +1,14 @@
+{
+ "builtAt": "2026-07-31T14:49:56.212Z",
+ "measuredFromDb": true,
+ "koWithoutEn": 25420,
+ "enWithoutFunctionSection": 33,
+ "totalTranslationScopeRemaining": 25453,
+ "batch01Held": 4209,
+ "breakdown": {
+  "Batch 01 에서 EN 생성됨": 0,
+  "Batch 01 에서 EN 기능성 복구됨": 791,
+  "Batch 01 HOLD (용어집 확장 후 재시도)": 4209
+ },
+ "note": "단순 차감이 아니라 현재 DB 기준 실측값이다."
+}

@@ -1,0 +1,18 @@
+{
+ "builtAt": "2026-07-31T14:49:56.204Z",
+ "total": 4209,
+ "byTrack": {
+  "EXISTING_EN_HOLD": 33,
+  "NEW_EN": 4176
+ },
+ "byReason": {
+  "TRANSLATION_AMBIGUOUS": 4209
+ },
+ "dup": 0,
+ "missingKinds": {
+  "meta": 1971,
+  "clause": 3228,
+  "label": 401
+ },
+ "note": "번역 근거(고정 용어집)가 없는 문구가 남아 있어 생성하지 않았다. 삭제·terminal 처리가 아니다."
+}
