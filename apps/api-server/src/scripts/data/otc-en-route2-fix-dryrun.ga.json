@@ -1,0 +1,26 @@
+{
+ "summary": {
+  "mode": "dry-run",
+  "planned": 2,
+  "skipped": 0,
+  "skipCodes": [],
+  "green": 0
+ },
+ "plans": [
+  {
+   "enId": "58277610-613f-4079-9c6b-7d096499a118",
+   "master": "3488a456-36ee-4a97-940f-7c93d957cec1",
+   "oldHash": "790341c517dc3c3772da26c875054c8b",
+   "newHash": "bb2389831e12e126460c3dced596d4cf",
+   "edits": 1
+  },
+  {
+   "enId": "64aa14cd-4a78-4916-b08a-e8c74028b549",
+   "master": "f52cb286-ebe2-462a-8940-443b1d0a929d",
+   "oldHash": "790341c517dc3c3772da26c875054c8b",
+   "newHash": "bb2389831e12e126460c3dced596d4cf",
+   "edits": 1
+  }
+ ],
+ "results": []
+}

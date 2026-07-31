@@ -1,0 +1,2478 @@
+{
+ "total": 130,
+ "byVerdict": {
+  "REAL_ROUTE_VERB": 130
+ },
+ "rows": [
+  {
+   "masterId": "02342db7-70a4-481a-96d3-c862017edb5d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "12c37f9c-e77e-414d-a679-99bd39909cb4",
+   "enDescriptionId": "2d9eca34-edab-4454-9ca6-87bc19c16e53",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "03ba12c8-e4fc-4617-9288-66e859fb9f20",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "0999592c-dccf-47bc-aede-59da782b65c4",
+   "enDescriptionId": "7e40f3d7-f672-4432-aedf-fe2f868c4a8c",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "0565c8df-8f6b-46bd-b836-a8d95f2b9bd8",
+   "productName": "큐앤큐헥시코올탈지면볼액",
+   "koDescriptionId": "baddbd8b-8ece-4cd8-9e8a-bdded9251422",
+   "enDescriptionId": "947a6313-4620-4469-b2da-3b6b6940e741",
+   "koHash": "075c0d1aa336292c2ffb088f2b27638e",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "05a44fc0-3581-432b-9498-d08e38b1b779",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "9ca177cb-f158-49ca-8b1b-6fd4fd46fc7b",
+   "enDescriptionId": "52c17226-00b1-48f8-8d33-841d31e66e8d",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "05f7b15d-1d2f-40d4-887a-d406a7888693",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "2e4e723d-5999-4aa0-b470-85375ff8a0b5",
+   "enDescriptionId": "657dc72c-fc05-4648-be67-9c7d3020520f",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "0cd5a7fb-e355-40b9-874c-d402fc9402aa",
+   "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+   "koDescriptionId": "e7b08aea-9303-4e72-8d42-0ccabf3bfbf4",
+   "enDescriptionId": "480c18a7-cef8-4af5-b31d-ba4404befcf1",
+   "koHash": "cb455869eee4fbf3fc0e494c25ca04c8",
+   "enHash": "1384f6dc64021907414bfa74ae9eb50c",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "0d8ad428-1f1f-4a2f-b98c-b9d5781a60d7",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "13719b7c-fae6-46e9-a87e-eabe1315fda9",
+   "enDescriptionId": "bf3a2e31-4cb9-4ce3-b296-5aaf3044da8c",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "0deb76c9-59d5-4d82-9aa7-41771f4cb16d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "fa49e1de-cd71-4217-8e7b-b81a0bc83cf9",
+   "enDescriptionId": "5d012528-bf3c-428c-9276-ea0f43fc2295",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "0eacb4bd-636b-4480-9aca-6436fd185641",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "bfe865db-ef90-4cb9-b0b6-5f797e6c3131",
+   "enDescriptionId": "cea6871a-9a12-45db-bec4-f155d776cd58",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "1186c652-716a-49a6-93a3-7cf8929229cb",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "c7c781e1-5ce1-41d1-a4fe-aca0a76e22ee",
+   "enDescriptionId": "77560780-1502-4d02-b15c-d5e74544eb00",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "120423aa-e658-443e-aafd-3124b53eb62c",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "3fe48a50-3ffa-4c39-8778-27f2286a4146",
+   "enDescriptionId": "5c4158bd-84d5-419a-b783-9557f3303e1b",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "15365c55-51b6-444e-9081-dc79dc8f8757",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "23d8a450-8013-49c9-8df6-dae880957622",
+   "enDescriptionId": "01d0c846-b9c4-4341-aba9-3fd2d11e5900",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "160b7362-9347-4175-b622-b52411db87b0",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "67683e25-b351-4705-b1f6-b2fab036d3cf",
+   "enDescriptionId": "16053cd3-7e1e-4056-a02b-773e93823596",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "1961a91a-911f-471b-94e4-476abde9e507",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "cfdd049a-325b-4e2a-9558-106dd361c892",
+   "enDescriptionId": "ee46e5e9-8f7f-4d9b-861c-ada8f38f1fcf",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "197b876f-afad-4092-8439-150c5255063d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b330de0f-5c3f-43e8-bbb9-71c5b17bc48f",
+   "enDescriptionId": "cde4b77f-d6ac-4ffb-b1da-a7eca58b7160",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "1b9cb7de-c776-4177-8b29-6d13b4f8c87c",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "7a794813-a6ec-4a97-ae0b-82d76d07f410",
+   "enDescriptionId": "adf919b0-0c92-4f6b-8dcd-3ba7395eba9f",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "1c69a8f0-8492-40f5-8ca5-7d8da1ef5924",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "36ce794c-3e28-41bf-ba1c-af82917a2dcb",
+   "enDescriptionId": "7d76f9f5-704c-4675-ba01-2b7e56ed4595",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "20bc2398-465f-4dc4-b9e8-dcf8e2544eb7",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "6600b0a8-c5b2-4aac-a967-9df69ca18c38",
+   "enDescriptionId": "043b680b-577a-4ee1-91a9-ccc87a9eb33e",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "20c50ea2-36b7-40d2-9b39-0c442e58ff55",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "8471c19f-a33b-4527-887f-10ab6fb2f970",
+   "enDescriptionId": "c06a03f2-4268-439b-9bff-b854b5344c45",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "20dd6a17-fd34-4f0f-8967-5931aa298386",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "31c0c117-103a-42a7-80c6-548e563a9389",
+   "enDescriptionId": "67ef90b0-b1d2-42da-b304-2ef43bd4270e",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "21c15ccc-ddaa-4d56-bf1b-e2ffb53b5ab9",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "3b6b1718-b715-41eb-80d4-f0b130c7fc41",
+   "enDescriptionId": "8772089d-7619-4f68-a8a3-0d5f3f4e390b",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "21ddd61d-79e5-471e-8edf-c6cf161220d7",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "9c6c81b4-74d9-4172-9fac-b7bbb2e0cce9",
+   "enDescriptionId": "43d3293b-9bf4-4af5-94d6-1b20a31fc24a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "2987ba0a-0ec8-4a71-84e7-1f8807d07a5b",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b574ffdb-499a-4180-9347-fcd9f2cc753f",
+   "enDescriptionId": "27f9f462-0b33-45b9-918e-68fc0aecc754",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "2d75c1cc-a628-4e76-ad6a-a9eeb5a3f9c4",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "2651e975-6719-41a6-8a53-88b7303edb0d",
+   "enDescriptionId": "9b141ab7-0cd7-42a5-9fd4-629c8f1e07e9",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "2eff3518-af3a-41c5-856b-a155eb502bc2",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "10afe911-93a0-4677-9ed5-ddca9fdeed2b",
+   "enDescriptionId": "d09400ee-0d5b-4402-9f22-40fd3ae66c91",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "306f5a76-6273-4604-b327-734917d710a3",
+   "productName": "그린헥시딘스틱스왑액",
+   "koDescriptionId": "00ce9055-fa1d-414b-a047-3307bec9e1b0",
+   "enDescriptionId": "380df3b5-cff3-427f-b578-5583e8840454",
+   "koHash": "b21312efbfeb0e9288004323532be173",
+   "enHash": "785c67340bf6d326a6f2f6130643968d",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "308cd6ea-e76c-4141-b808-e60860d7da3b",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "77eb961e-a0f8-425b-898b-86810f303f5b",
+   "enDescriptionId": "c67129d5-6bcf-43b6-aa32-46d276d31b63",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "309cf581-b5b6-4e1d-b673-80faaa9f65d3",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "c1128217-b671-476c-a2a8-bc724c43f074",
+   "enDescriptionId": "92e054f6-a813-4ac6-85fb-c5b7ba181da0",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "3488a456-36ee-4a97-940f-7c93d957cec1",
+   "productName": "헤모프란크림(프라목신염산염)",
+   "koDescriptionId": "266bd058-9ffc-43bc-a740-746eae6b2b28",
+   "enDescriptionId": "58277610-613f-4079-9c6b-7d096499a118",
+   "koHash": "27b11ba2cee275c755346d198de461fb",
+   "enHash": "790341c517dc3c3772da26c875054c8b",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Consult a pharmacist if you take it together with an antihypertensive medicine or an antidepressant."
+   ]
+  },
+  {
+   "masterId": "35d03206-1d66-4be7-aab9-7407ddf86407",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "66c86e9a-8911-4052-af9b-d4cd31599ffe",
+   "enDescriptionId": "c583810a-8971-4ab9-b15a-1c1a4df73b65",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "37c63960-1521-4c4b-b16a-c53fe651ea92",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "2ad5f1a8-2a3c-4f03-a055-7338b39b5f92",
+   "enDescriptionId": "74521724-2275-4c02-85d0-bee968f721f6",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "3d4aef26-af3d-4e11-9010-68a8ab8cc545",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "258327e5-8f80-4cc4-b221-29bcbc814df5",
+   "enDescriptionId": "12c1a242-314d-416e-8214-4b665cd2c0d4",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "41d2d914-34d5-4853-b3e5-70d5266beb33",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b9e3108a-8b13-4eb5-ba8a-a1769a4ac381",
+   "enDescriptionId": "7af15038-0001-4e32-9361-74847ae4ace6",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "42309736-9ccf-4f0d-9c90-49f81e15d91a",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "eaf30c1f-e5ca-4d68-8dda-4d4e959c758b",
+   "enDescriptionId": "e6b226ae-0277-4de0-afaa-9c688d4fcc84",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "4b082da8-f6fb-481d-94f6-39fd303c5f90",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "e6f31498-0d94-446f-9fb0-b5402a9a02ec",
+   "enDescriptionId": "6e0efecf-6e7a-44f6-ab00-f967d948d904",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "4baf8d25-5dfd-4f5f-9da1-d26c70f32ab4",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "ec5e78af-c98b-41b2-8d53-f2403ea19cbb",
+   "enDescriptionId": "64583f52-b8e0-43a1-ba9d-01add93ea342",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "53925f96-624a-42eb-a4f1-f8c91918a5b7",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "75852cda-5814-4b4f-8503-a6507a24c780",
+   "enDescriptionId": "af51ac58-3730-48c2-99f2-bd098f598cf3",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "554cfb9c-d7ec-464e-a609-0b21fbd6e430",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "6dfb2666-1e49-4bf9-a1cd-5cdf90b8a42b",
+   "enDescriptionId": "7f86ecec-318b-4f72-b7a8-d92b87f89397",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "56c3f425-62ca-4717-a7b4-d5150e3d57bb",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "bd02c77c-6ddd-4a57-81bd-78e241420b22",
+   "enDescriptionId": "e35991c9-7384-4a09-864f-006d731c0bee",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "57f3cd72-a425-4bbe-993f-89a8979961b7",
+   "productName": "그린헥시딘스틱스왑액",
+   "koDescriptionId": "5e603f4a-bd8a-47d8-bcb5-026376ec166d",
+   "enDescriptionId": "148cefd9-6b36-4177-9ed5-27654ba55c59",
+   "koHash": "b21312efbfeb0e9288004323532be173",
+   "enHash": "785c67340bf6d326a6f2f6130643968d",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "5d6f6208-5366-4815-9228-f51d7bc73ea5",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "797b0401-97ec-4137-8c6f-52b32c1e5e31",
+   "enDescriptionId": "5c9e1a7f-abec-42f8-bbc8-b0fe8fe0c73f",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "5dbfe65d-1f2f-402d-bfb8-4c6e2ad33310",
+   "productName": "큐앤큐헥시코올탈지면볼액",
+   "koDescriptionId": "f4a55fa5-9f02-4319-af65-64e64c0ca70b",
+   "enDescriptionId": "cfb01925-feca-45a1-90ce-127f0af33e16",
+   "koHash": "075c0d1aa336292c2ffb088f2b27638e",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "683e7cd6-24b8-45b0-be10-7e2469c8ae9d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "fe0aa487-4dd6-4507-954e-76c6379963c0",
+   "enDescriptionId": "dd8b7dea-ca88-4b9e-af3f-abb26fbf6a7b",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "68ef703b-2cff-4228-90e8-785172d889cd",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "014b2522-23ab-4b93-9a63-b9925678f7f1",
+   "enDescriptionId": "ae027f80-bcb8-4929-a8d8-f19efcc38f4f",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "695cf26b-b1f1-4037-8da4-a4278bb44326",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "8ef87598-4f3c-4bd1-b8fa-dbc91cdce452",
+   "enDescriptionId": "5da77fc6-0222-4a12-82d3-8367697fabd3",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "6b784026-7f1f-40e4-b2e7-b47c2ad4180d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "784c9a0d-3a12-4940-9dc5-8eab6da9436a",
+   "enDescriptionId": "63a22fda-0e6d-4b4a-938f-66c7a548b0de",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "6c2416da-e005-42e7-9b0a-2c5f68af3ed3",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "d000e484-11f9-4e87-9353-223ab84baf8a",
+   "enDescriptionId": "2f118fe9-b9d5-403d-a70d-fe3277120c68",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "6c9245dd-b8e7-4f1c-8f69-698410d20905",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b08ee011-0bdf-443e-bb06-91f29d7ba0a3",
+   "enDescriptionId": "d7591fb7-3e21-4a01-b18b-48373deb7edb",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "6f1741ee-3732-427f-9b62-f74d8f823cd0",
+   "productName": "큐앤큐헥시코올탈지면볼액",
+   "koDescriptionId": "a9869d5a-29fc-4df6-b9cb-6541278503bb",
+   "enDescriptionId": "f84f802e-a871-4f01-ae25-66f0c58a46dc",
+   "koHash": "075c0d1aa336292c2ffb088f2b27638e",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "706d91e0-76fe-4208-98bf-3845895627d0",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "31ca7df7-8576-4307-9a9b-fd799ed40a3d",
+   "enDescriptionId": "5327d63f-7864-4af2-a40d-138e15c97cff",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "707ab127-fb4c-4ea0-8a00-6863fbd13863",
+   "productName": "그린헥시딘스틱스왑액",
+   "koDescriptionId": "d5227f72-36b7-45bb-ae82-c8e9a2e28b28",
+   "enDescriptionId": "7c010da6-5dc1-45e4-882a-bdb5568e8d2e",
+   "koHash": "b21312efbfeb0e9288004323532be173",
+   "enHash": "785c67340bf6d326a6f2f6130643968d",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "721ac702-7f65-46bb-89e9-3b1a10172592",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1046b9bb-a4ac-4467-91bd-fe80bbd5f1d7",
+   "enDescriptionId": "39db33ca-1bea-4294-b7c1-7b8d312fbf4a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "72b45d8d-82e9-4a18-8fdb-395d3bf1cdd9",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "ca41fb3a-8a1d-4034-894a-3c061bb375dc",
+   "enDescriptionId": "05a179dd-ae57-420e-8d98-0582a7661118",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "75ccc059-7f24-495f-9600-f8fdf59afd99",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "f0f969f9-76ec-4055-b6ff-fb8d87687242",
+   "enDescriptionId": "74c52be5-5b6c-465d-bf86-4f2091051e57",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "788774ef-bb47-4133-9e28-8c1b2805c9ad",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "31c1815b-e185-472c-8d2a-ca9ed5b6288e",
+   "enDescriptionId": "a6eadab4-1a30-4284-84bf-6d10d7a9f429",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "7a92c82f-a379-478a-b782-57e7fb6136db",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "26df6b20-c5dd-48e8-b62b-c06537fdd50a",
+   "enDescriptionId": "602ceaca-828e-4688-ab65-67a8bbc0a604",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "7a97898a-43a1-4962-b2f3-1a021d90d947",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "10785b62-72f3-4dbf-a4ec-557a7b4991ca",
+   "enDescriptionId": "b0ccddbf-3e43-43d7-ac5c-1abecbd4a608",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "7d0afc09-0dd9-44c8-a52d-039672e9abd4",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "d18768c4-7792-446a-a563-c881bcee694b",
+   "enDescriptionId": "0d10f69b-4dad-4ddc-9e5e-d43e29bbff9a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "7fdd7881-6766-42e7-839e-a8af40b259ac",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "cb75f6ae-5e2b-47fa-9984-3a338d5a2388",
+   "enDescriptionId": "82ceb992-0cb3-4d68-b4ff-577c7eca4bcf",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "7fe2ef66-723d-459f-bc2a-1ed43830b71f",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "31875575-e328-4c80-af6c-38a25f88d161",
+   "enDescriptionId": "2fa04e65-9337-48b1-b169-6390969c4375",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "84167875-4668-4c04-ad8e-75f747811dc9",
+   "productName": "큐앤큐헥시코올탈지면볼액",
+   "koDescriptionId": "06f4b25c-85b8-44fa-a5b4-9c53646ef954",
+   "enDescriptionId": "1cdbc4e0-7ec6-4e77-a1b2-9c4fdf31bcc0",
+   "koHash": "075c0d1aa336292c2ffb088f2b27638e",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "87b8b6bb-c602-4242-9b4c-3ef9bd9845fc",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "f08a02df-bd3c-4e10-87ba-6511056d06ba",
+   "enDescriptionId": "6e1161db-dd73-400c-b4bf-7230c5d474b8",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "88a87e4b-6ef1-4b83-9cdf-cce8a5aea432",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "a8bbdd96-1b68-4499-9aaf-d5aca6a20ec4",
+   "enDescriptionId": "fd8669ae-e16d-4c96-aa22-6d7f6e242327",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "8b5801aa-2138-45eb-917d-3e7e2d8177ef",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "3b0d21c9-5093-48aa-8a0d-05cf125f9331",
+   "enDescriptionId": "22e64e28-a722-4f80-8793-9fe1974e83eb",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "8c97a2cb-3df0-41b1-adf7-ed468dacf9a0",
+   "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+   "koDescriptionId": "6988fd95-898a-4d35-b5cb-5d15ea1876a1",
+   "enDescriptionId": "7d9b84e2-10be-43d7-8060-e4ae635415c2",
+   "koHash": "cb455869eee4fbf3fc0e494c25ca04c8",
+   "enHash": "1384f6dc64021907414bfa74ae9eb50c",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "8ed60dbc-772c-4cbb-aa09-cde12b26d79a",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "296a036d-a9e0-4a15-ae3c-7ab74a6c0ea8",
+   "enDescriptionId": "a5d73778-69d0-4ef5-af2c-8278803d27bb",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "8f0f7461-67bc-4d73-bfab-537cc8a08102",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "dbdab359-1439-4ac3-a05b-e93e4bc65885",
+   "enDescriptionId": "37580c62-4ec8-46b2-8114-7d2788b4df9d",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "8f5990bd-21ac-4432-9751-ec829404f32a",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "4d5e7429-5cb3-406a-8835-957054c38733",
+   "enDescriptionId": "6149852c-a107-499c-ab12-6baef763a455",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "9180ea4c-61e1-49ff-b521-30a92837fcc8",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "cbc98c4f-8a31-4dc8-ad5e-14364fc380a4",
+   "enDescriptionId": "12e2ed98-d32e-42f1-88c5-6d9bc6cf0dc1",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "927a56a1-1fde-4bbe-b368-9ea1e4f216a4",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "c26cb20c-be77-4d17-bacc-ce040631c16d",
+   "enDescriptionId": "9bfb1ecd-79be-48e4-9453-98780319ea1e",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "94773b05-cde1-40e9-8f5f-ac0c810780e6",
+   "productName": "헥시타놀2%액",
+   "koDescriptionId": "e665af49-6a63-40af-b9ce-250d69cf4b82",
+   "enDescriptionId": "bd1740a1-a0a6-4265-adcd-f79fd41c4d8a",
+   "koHash": "b3fda9b081fb9ecde85b7b2996216bef",
+   "enHash": "e43ac8e9e315dbe63da4879c4675bbc4",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "95463829-a4d6-4974-a832-7684c8cb8afb",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "99b2c76b-26ec-42ae-b821-d6f7096360e7",
+   "enDescriptionId": "f82a9e0f-5119-44fd-9e39-61fd67a23ecb",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "955d1a6f-ef18-4e59-b5e3-4aaab6669787",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "b0c262ac-eec1-43f9-8fe0-7a07032a0107",
+   "enDescriptionId": "8ad69374-3578-45c5-bf3f-e89aa003d50c",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "95fae3bb-7c4b-4daa-b521-82b71c395267",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "cc89469e-3d01-44f2-9321-6f206ab37b81",
+   "enDescriptionId": "dd1912a5-8b89-4d38-ad2b-8ac8068d3de9",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "97d7184a-ed8a-4e2f-812c-8a1a6d04877e",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "862f03f0-3d92-4a65-8e25-dab159a68c11",
+   "enDescriptionId": "8289b4a1-ff73-48a6-a330-6ad8d1589058",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "9aa0a3f5-7a04-4393-8411-d7acfc0838a2",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "f2c57ac8-6f8c-4015-be77-d68304b0dd62",
+   "enDescriptionId": "718d5846-6925-4f93-8936-d6415da1a974",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "9df237af-e613-4b5c-9baa-2c05de03032b",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "a11a5bff-58e1-46ba-997b-4c350a3350cd",
+   "enDescriptionId": "34d034d1-8a65-47d2-8c50-dd8f6239fb33",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "9f75ff5a-5d4f-497b-af02-393198fbc45b",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "13168997-9d1a-4fc0-9760-2ab5c40a9ac8",
+   "enDescriptionId": "2a8f8aae-3fe7-4260-8828-427670fdc02d",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "a2ed92a2-fa52-40a7-a3b0-e65fc8d47adf",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "6277e2b9-54a4-42ec-b696-f8665159ce80",
+   "enDescriptionId": "f8a131c7-90c5-46cf-b2d8-d29a4186bc2a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "a3de66fa-2cff-4e4e-8cca-ceb058f8b8c6",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "41fa0ebb-2fdd-4966-b08d-cc7023f9a5e3",
+   "enDescriptionId": "30e9023f-bd58-4b5b-9180-f8989b0ae2d0",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "a5c28beb-6028-4a7c-bb73-1c52e8047265",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1bd697f9-9b2d-4103-9c1f-854493d001c0",
+   "enDescriptionId": "92272705-95f0-4d8e-bffd-f1beed55ea7b",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "a8f8b178-0dde-4f5f-bd2b-b83cc69acb49",
+   "productName": "헥시타놀2%스틱스왑액",
+   "koDescriptionId": "756b94a7-860b-4c29-a4d1-635df7d6b116",
+   "enDescriptionId": "0169f7b1-6329-42cf-b023-4f2d9e17969e",
+   "koHash": "4be343cae8655c06f856b12b43fbb081",
+   "enHash": "4371daa44e5190b33615674fe6f76d72",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ab263dd5-0d63-4e69-8417-8d851ea74753",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1418745a-ef42-4ecb-b26c-0d439e4ac6a4",
+   "enDescriptionId": "35277792-4206-404d-94b3-8b68cc6a6263",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ab370537-e880-429c-8385-95c1a1d0946f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "798290d1-fa10-4f02-9341-d9391bd6de82",
+   "enDescriptionId": "f73aa812-5b4b-4af2-803d-56135c05c7b7",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "aeb63b67-2177-4bab-b90f-58ad62b90ae0",
+   "productName": "그린헥시딘스틱스왑액",
+   "koDescriptionId": "3e9f5ace-5229-4aab-b36d-d1f840ccb4e6",
+   "enDescriptionId": "763d5238-5d93-4de9-ba59-5a9e4060249b",
+   "koHash": "b21312efbfeb0e9288004323532be173",
+   "enHash": "785c67340bf6d326a6f2f6130643968d",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "afeee643-3f07-46bf-9766-76b962acb323",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "a7f9cc18-e63d-413e-bc14-acb32ea7e278",
+   "enDescriptionId": "3f54a57c-8d4d-4d54-a278-67f30a58babe",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b041d4ed-0598-4d6a-b0c7-17b5a200f98f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "21c89ea7-01e8-4a8a-9026-0ab19bb24931",
+   "enDescriptionId": "a10888bb-54ea-4161-aa91-af362f4eef1e",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b0fca3d4-05ca-4e11-86b3-e2946703ae4e",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "9b8cf2fe-02e4-4398-b504-de218e0d7a91",
+   "enDescriptionId": "71d1586a-b0da-4511-ab51-7b4d4d4026ae",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b416ad70-f0ff-4b3f-a6c9-c83fadaa766c",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "5355ce02-d5de-451b-b30f-18d97879aa5e",
+   "enDescriptionId": "8f9ebe82-3364-487c-96a8-339095d0e005",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b51454b9-53b8-4c99-ace8-6fa74fb60c93",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "da06f558-5b7e-4dff-9176-c04ff78985c7",
+   "enDescriptionId": "beeac26c-79c2-4c68-9874-ca93ac523705",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b73adc0d-64d3-47b7-8217-bcbc33180bde",
+   "productName": "헥시타놀2%액",
+   "koDescriptionId": "723adcf2-4341-4ece-972b-eb4f7b814d64",
+   "enDescriptionId": "9373a5b1-d185-4296-8479-f569af2215ad",
+   "koHash": "b3fda9b081fb9ecde85b7b2996216bef",
+   "enHash": "e43ac8e9e315dbe63da4879c4675bbc4",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "b9985e48-cf04-4024-b966-65cbcc99eb44",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b77efb5e-d8d5-41d3-8562-e3a4c4eda650",
+   "enDescriptionId": "a8e84618-9d37-4c66-8217-60a5950440a1",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ba479971-a20c-43d0-b7dc-ee700010010c",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "96365237-a7cc-4560-973a-ae7069fa8980",
+   "enDescriptionId": "f34e294d-b45e-42d0-a4f4-99806c443564",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "bb59b91b-68bf-4e22-b5ab-d6f5aaabb742",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "3e7c1e7b-1d17-45bb-be0c-b8d2232917c2",
+   "enDescriptionId": "9acbb615-cbda-49e0-9a3d-300d0845eac6",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "be60f40a-1fa4-4b4a-9ace-1a86f8e7900d",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "d5823a80-d0d8-4967-802d-0b0d2faa56c8",
+   "enDescriptionId": "5cee9bcd-f52b-4bf9-a88d-99e46506fb37",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "bed93936-8247-455e-91d5-40a460201469",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "8790c115-d03c-480f-a665-219cbd3a771e",
+   "enDescriptionId": "2ab0c2ca-abd0-42f2-98e4-ee8a32e2c08f",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c2d8690a-717f-4602-aade-0b667524f3ca",
+   "productName": "헥시타놀2%액",
+   "koDescriptionId": "2b3241b0-dd35-4397-ab8e-47fe7860765f",
+   "enDescriptionId": "05a10d71-44a0-4d24-878c-33dfcf1ea04c",
+   "koHash": "b3fda9b081fb9ecde85b7b2996216bef",
+   "enHash": "e43ac8e9e315dbe63da4879c4675bbc4",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c4491fbb-44a6-4eff-8610-166e0129f3bb",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "4eecf99e-ad8a-440a-95b4-0a67e031ffde",
+   "enDescriptionId": "175bb13a-92ab-4c7b-bd59-630678e3e138",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c4ad6269-84c3-4e6a-b2c3-6421e4e4b87b",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "2363557d-968a-4159-a93d-04d47fa28ac3",
+   "enDescriptionId": "fbd333f3-8b53-4fb8-8b62-0bbec5055332",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c5057c9f-b87d-4e54-be85-1b8b323a276f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "dbe23d56-9a01-419a-ad21-f78a520ee68b",
+   "enDescriptionId": "20135419-b82b-418e-9352-54c85560ea36",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c53036bd-7f2c-473c-8f9c-e74fc80a54fc",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "a5d4f61d-550a-4fe5-87b6-128ddd340035",
+   "enDescriptionId": "13cb8217-ef0f-4437-9b75-2759a2ff3054",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "c90df8dd-bdf6-4936-ab85-a0a84e93817c",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "66083036-3ffa-4d1d-917d-95fe991cc690",
+   "enDescriptionId": "62929753-a29b-4017-9dee-62ee0d74128a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ca1a8276-f0cc-4c20-b1c9-9bfebfc82beb",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "17721bf5-1c1e-4415-97f0-605783b69572",
+   "enDescriptionId": "3730eb07-2197-4a63-badb-d63451a6d55b",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ce35795f-fc57-40bf-a297-3ee0724ed84a",
+   "productName": "헥시타놀2%스틱스왑액",
+   "koDescriptionId": "ea0745fb-339b-4b4f-ae2c-51f7b1819911",
+   "enDescriptionId": "2df7e4ce-24a4-4c9e-8812-1488852515f5",
+   "koHash": "4be343cae8655c06f856b12b43fbb081",
+   "enHash": "4371daa44e5190b33615674fe6f76d72",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "d0c3dfb5-57ca-4572-a0d2-962024fe5ae4",
+   "productName": "헥시타놀2%스틱스왑액",
+   "koDescriptionId": "bbe4f93d-8d30-45cc-8aea-feb8878be388",
+   "enDescriptionId": "a37a3022-fde9-469d-a5e0-c79d38a9fa3d",
+   "koHash": "4be343cae8655c06f856b12b43fbb081",
+   "enHash": "4371daa44e5190b33615674fe6f76d72",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "d41c98c9-8989-4121-964f-cb04acd4d776",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1149fc69-4a86-4fef-8544-b80f3e4ef95d",
+   "enDescriptionId": "6179bf8e-f69a-453d-bc52-055536a39707",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "d58824d9-9eba-4630-b24d-e940ebcc7948",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "02b07693-c5b9-4ea1-a130-3c19e8130527",
+   "enDescriptionId": "80770b52-cfea-4c5a-8b94-62ba1ed7e03c",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "d8e16f95-061a-4a85-bbbb-3f04c0bd37ab",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "d006c05d-f4dc-4737-90ba-88cdebb1a0dc",
+   "enDescriptionId": "fe9fcc74-cac6-45b5-8f16-c830a6401ae1",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "dc6ab6a3-f15c-429f-947d-5e5b20a9a29f",
+   "productName": "큐앤큐헥시코올탈지면볼액",
+   "koDescriptionId": "8150fbdb-d02e-4a42-a0e0-74c637765513",
+   "enDescriptionId": "0d452aa6-bbf8-4e34-ad84-36cb26ce29e5",
+   "koHash": "075c0d1aa336292c2ffb088f2b27638e",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "dce4c57d-8472-4ef3-b26c-8bdda0c36a2f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1d13c798-4ab6-4401-aeee-84ea5ac6213a",
+   "enDescriptionId": "d8feb1f1-5fde-41b7-899b-d61f278a8a8d",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "de406921-06e3-486d-aa3d-c99616c73dae",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "2ff3049e-3794-4839-a505-d7b914526a46",
+   "enDescriptionId": "efbc5a1b-29da-4d1d-851e-2b02846a84a5",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "e356acc0-6108-4147-a2c4-1d8a64138225",
+   "productName": "헥시와입스2%(클로르헥시딘글루콘산염)",
+   "koDescriptionId": "158a555a-899e-4070-b7f5-4dc4fee9b831",
+   "enDescriptionId": "f4aaf877-4bfe-472e-b18f-f68b358c49d3",
+   "koHash": "cb455869eee4fbf3fc0e494c25ca04c8",
+   "enHash": "1384f6dc64021907414bfa74ae9eb50c",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use it externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "e3ed2cb4-ee73-49b8-b70a-4542f195330c",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "57bb6cfe-d5e5-475c-9fcf-114d62d34552",
+   "enDescriptionId": "1ebd49a0-5844-4ebb-bf3f-9e8dee76e0c2",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "e3f4e07e-be9d-4a51-a5e5-e544ee41a45a",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "42b93d50-5bd6-4918-b426-1d6c17eaa696",
+   "enDescriptionId": "9e0d1de0-cb93-479e-a7be-dfc017018711",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "e9e3a016-e303-4334-b6c1-e1e20d58ce5f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "8ccddfab-64ad-4349-ae36-9b88d7d065c3",
+   "enDescriptionId": "98d0bf1a-2ff6-4e3c-9ba6-9ede79771d5f",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "e9ecbd43-3e46-4530-b170-a9acbc7bb5aa",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "25f015a6-f3e9-44c8-b79b-c6290693ffc7",
+   "enDescriptionId": "a950b553-02b8-4fc1-8a96-d8bc43202c77",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ecbaf854-3648-406a-8119-b4d6f173556f",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "40c0f167-60d9-4674-b389-4cb3cf1e76cf",
+   "enDescriptionId": "c29218ee-ed3c-4726-909a-bdb30c5ae58f",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ed246bb7-6ba5-4ce7-8e67-ca0ffc40ebab",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "23988890-af66-4ef4-8f45-79431e6d8870",
+   "enDescriptionId": "cf1a2e6e-ef58-4cd8-86d4-c055b420a157",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ee117a3e-2f20-4dd6-be63-463ae74b8772",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "f01f7272-71ee-4cb3-9c15-880c3aec85de",
+   "enDescriptionId": "1f698789-6a37-40dd-9108-f3070e418dd4",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ef3fdc4b-238e-4b6e-9d54-6c54b87e7df3",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "a30b2526-9530-423e-983e-234fd3cf83b9",
+   "enDescriptionId": "fd356e0a-e9ee-43c2-adc6-978fe1cdd067",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f0591041-ce76-44c3-aeca-75e5d0e5cc38",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "a4d6e371-4053-44df-afdf-2405d1fab5e0",
+   "enDescriptionId": "3ee7039e-6a0a-4e38-baed-d774e8be8ff2",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f0c2cac6-000f-4fe9-b035-4c6ee546d5e5",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "91b7d794-3bc9-4a55-9215-66e0fb4decd3",
+   "enDescriptionId": "866312bb-0240-4561-9dcf-ae4eca729ea7",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f52cb286-ebe2-462a-8940-443b1d0a929d",
+   "productName": "헤모프란크림(프라목신염산염)",
+   "koDescriptionId": "8b8cd21e-8898-4a1c-bce8-5e4fb1c73314",
+   "enDescriptionId": "64aa14cd-4a78-4916-b08a-e8c74028b549",
+   "koHash": "27b11ba2cee275c755346d198de461fb",
+   "enHash": "790341c517dc3c3772da26c875054c8b",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Consult a pharmacist if you take it together with an antihypertensive medicine or an antidepressant."
+   ]
+  },
+  {
+   "masterId": "f59691f8-7ea4-49b8-bb72-1b3fb61b7aa2",
+   "productName": "헥시타놀2%스틱스왑액",
+   "koDescriptionId": "bb0c1862-33e2-4d90-b591-430e1ced969f",
+   "enDescriptionId": "fdb1bf4e-5f69-461d-b14a-b44487693403",
+   "koHash": "4be343cae8655c06f856b12b43fbb081",
+   "enHash": "4371daa44e5190b33615674fe6f76d72",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f65eef63-aff0-4d7f-87a0-a37ac7ce97d5",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "c0f08c95-8f5a-4b7d-82dd-4a49e226dbe0",
+   "enDescriptionId": "1d86417e-f827-487c-aa06-34eb83f7f202",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f671bd4b-ef86-4e39-9c08-9d7992c1f4fd",
+   "productName": "헥시타놀2%스틱스왑액",
+   "koDescriptionId": "14bcb03c-fbbc-43c6-847d-5894a22ef1d0",
+   "enDescriptionId": "a8d8c98f-d7d0-4756-999a-aac4d2c264a9",
+   "koHash": "4be343cae8655c06f856b12b43fbb081",
+   "enHash": "4371daa44e5190b33615674fe6f76d72",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "f9b8cbf1-0706-4554-b570-3bd2f0955424",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "b592cabb-0b6a-425f-af8c-b41f50bde428",
+   "enDescriptionId": "2c4ed180-dea7-4751-8ee6-f4bf70ab9c4d",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "fc736472-7f10-4bbc-9e89-af389287a43c",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "d3db6104-7ad4-40e1-a94c-26c89be17afa",
+   "enDescriptionId": "e9b82681-1097-4413-8db5-ea61ea3ee76a",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ff0db792-9045-4623-b48c-108ba0d00988",
+   "productName": "큐앤큐헥시코올탈지면액",
+   "koDescriptionId": "1285b952-68f5-492a-a87b-1d37c6d38245",
+   "enDescriptionId": "fe2924ae-323a-477c-890f-c8bf166d2bf8",
+   "koHash": "41a0a7cd564dc329e19cc548cac2ec2c",
+   "enHash": "ab37fe8e22e65687bd5a66eaffd1de22",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  },
+  {
+   "masterId": "ffc7a2fd-779f-4939-a21e-56d485b222a5",
+   "productName": "큐앤큐헥시코올거즈액",
+   "koDescriptionId": "8136a130-5b79-4404-ba27-d3fd99abca7c",
+   "enDescriptionId": "579008fa-44ef-4f41-bfbe-662ed1171d34",
+   "koHash": "e5bb88f7239d31570430d64ae791c447",
+   "enHash": "a434bfdd85e7d4d78876b313d45aec23",
+   "originalSignals": [
+    "POSSIBLE_ROUTE_VERB_ISSUE"
+   ],
+   "triage": "REVIEW_ROUTE",
+   "lost": [],
+   "lostDose": [],
+   "lostAge": [],
+   "routeVerdict": "REAL_ROUTE_VERB",
+   "hitSentences": [
+    "Use this medicine externally only; do not take it and do not inject it."
+   ]
+  }
+ ]
+}
