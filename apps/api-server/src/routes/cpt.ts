@@ -6,6 +6,15 @@ import { FormsController } from '../controllers/cpt/FormsController.js';
 import { authenticate } from '../middleware/auth.middleware.js';
 import { requireAdmin } from '../middleware/auth.middleware.js';
 
+/**
+ * WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1
+ *
+ * CPT 는 admin-dashboard 전용 기능이다 (소비처: apps/admin-dashboard/src/features/cpt-acf).
+ * CPT type / field-group / taxonomy 쓰기는 이미 `requireAdmin` 이었으나,
+ * post / term / form 쓰기와 form submission 조회는 `authenticate` 만 걸려 있어
+ * 임의의 로그인 사용자가 생성·수정·삭제하고 제출 데이터를 열람할 수 있었다.
+ * 인접 라우트의 기존 정책(코드 근거)에 맞춰 동일하게 `requireAdmin` 으로 정렬한다.
+ */
 const router: Router = Router();
 
 // ============= Custom Post Type Routes =============
@@ -34,13 +43,13 @@ router.get('/:slug/posts', authenticate, CPTController.getPostsByCPT);
 router.get('/:slug/posts/:postId', authenticate, CPTController.getPostById);
 
 // Create new post
-router.post('/:slug/posts', authenticate, CPTController.createPost);
+router.post('/:slug/posts', authenticate, requireAdmin, CPTController.createPost);
 
 // Update post
-router.put('/:slug/posts/:postId', authenticate, CPTController.updatePost);
+router.put('/:slug/posts/:postId', authenticate, requireAdmin, CPTController.updatePost);
 
 // Delete post
-router.delete('/:slug/posts/:postId', authenticate, CPTController.deletePost);
+router.delete('/:slug/posts/:postId', authenticate, requireAdmin, CPTController.deletePost);
 
 // Publish post
 // router.patch('/:slug/posts/:postId/publish', authenticateToken, CPTController.publishPost);
@@ -108,16 +117,16 @@ router.get('/taxonomies/:taxonomyId/terms', authenticate, taxonomiesController.g
 router.get('/terms/:id', authenticate, taxonomiesController.getTermById.bind(taxonomiesController));
 
 // Create new term
-router.post('/taxonomies/:taxonomyId/terms', authenticate, taxonomiesController.createTerm.bind(taxonomiesController));
+router.post('/taxonomies/:taxonomyId/terms', authenticate, requireAdmin, taxonomiesController.createTerm.bind(taxonomiesController));
 
 // Update term
-router.put('/terms/:id', authenticate, taxonomiesController.updateTerm.bind(taxonomiesController));
+router.put('/terms/:id', authenticate, requireAdmin, taxonomiesController.updateTerm.bind(taxonomiesController));
 
 // Delete term
-router.delete('/terms/:id', authenticate, taxonomiesController.deleteTerm.bind(taxonomiesController));
+router.delete('/terms/:id', authenticate, requireAdmin, taxonomiesController.deleteTerm.bind(taxonomiesController));
 
 // Assign terms to object
-router.post('/term-relationships', authenticate, taxonomiesController.assignTermsToObject.bind(taxonomiesController));
+router.post('/term-relationships', authenticate, requireAdmin, taxonomiesController.assignTermsToObject.bind(taxonomiesController));
 
 // Get object terms
 router.get('/objects/:objectType/:objectId/terms', authenticate, taxonomiesController.getObjectTerms.bind(taxonomiesController));
@@ -138,22 +147,22 @@ router.get('/forms/:id', authenticate, formsController.getFormById.bind(formsCon
 router.get('/forms/name/:name', formsController.getFormByName.bind(formsController));
 
 // Create new form
-router.post('/forms', authenticate, formsController.createForm.bind(formsController));
+router.post('/forms', authenticate, requireAdmin, formsController.createForm.bind(formsController));
 
 // Update form
-router.put('/forms/:id', authenticate, formsController.updateForm.bind(formsController));
+router.put('/forms/:id', authenticate, requireAdmin, formsController.updateForm.bind(formsController));
 
 // Delete form
-router.delete('/forms/:id', authenticate, formsController.deleteForm.bind(formsController));
+router.delete('/forms/:id', authenticate, requireAdmin, formsController.deleteForm.bind(formsController));
 
 // Duplicate form
-router.post('/forms/:id/duplicate', authenticate, formsController.duplicateForm.bind(formsController));
+router.post('/forms/:id/duplicate', authenticate, requireAdmin, formsController.duplicateForm.bind(formsController));
 
 // Update form status
-router.patch('/forms/:id/status', authenticate, formsController.updateFormStatus.bind(formsController));
+router.patch('/forms/:id/status', authenticate, requireAdmin, formsController.updateFormStatus.bind(formsController));
 
 // Get form submissions
-router.get('/forms/:id/submissions', authenticate, formsController.getFormSubmissions.bind(formsController));
+router.get('/forms/:id/submissions', authenticate, requireAdmin, formsController.getFormSubmissions.bind(formsController));
 
 // Submit form (public access)
 router.post('/forms/:id/submit', formsController.submitForm.bind(formsController));

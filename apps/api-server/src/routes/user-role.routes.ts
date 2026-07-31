@@ -20,6 +20,29 @@ router.get('/:userId/permissions', authenticate, async (req: Request, res: Respo
   try {
     const { userId } = req.params;
 
+    // WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1:
+    // 경로의 :userId 는 클라이언트가 지정한 식별자다. 로그인만으로 타 사용자의
+    // 역할·권한 목록을 열람할 수 없어야 한다 (본인 또는 플랫폼 관리자만 허용).
+    const actorId = (req as any).user?.id as string | undefined;
+    if (!actorId) {
+      return res.status(401).json({ success: false, error: 'Authentication required', code: 'UNAUTHORIZED' });
+    }
+    if (actorId !== userId) {
+      const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
+      const isPlatformAdmin = await roleAssignmentService.hasAnyRole(actorId, [
+        'platform:admin',
+        'platform:super_admin',
+      ]);
+      if (!isPlatformAdmin) {
+        logger.warn('[userRole] cross-user permission read denied', { actorUserId: actorId, targetUserId: userId });
+        return res.status(403).json({
+          success: false,
+          error: '다른 사용자의 권한 정보를 조회할 수 없습니다.',
+          code: 'FORBIDDEN',
+        });
+      }
+    }
+
     const userRepository = AppDataSource.getRepository(User);
     const user = await userRepository.findOne({
       where: { id: userId },

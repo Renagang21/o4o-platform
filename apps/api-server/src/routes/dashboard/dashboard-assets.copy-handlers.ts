@@ -20,6 +20,7 @@ import type {
   CopyAssetResponse,
   CopyOptions,
 } from './dashboard-assets.types.js';
+import { checkDashboardAccess, respondAccessDenied } from '../../utils/dashboard-access.guard.js';
 
 /**
  * POST /api/v1/dashboard/assets/copy
@@ -49,6 +50,19 @@ export function createCopyAssetHandler(dataSource: DataSource) {
             code: 'INVALID_REQUEST',
             message: 'sourceType, sourceId, targetDashboardId는 필수입니다.',
           },
+        });
+        return;
+      }
+
+      // WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1:
+      // targetDashboardId 는 복사 대상 지정에만 사용하고, 쓰기 권한은 서버가 재검증한다.
+      // (검증 없이는 임의 로그인 사용자가 타인의 대시보드에 자산을 주입할 수 있었다.)
+      const access = await checkDashboardAccess(dataSource, user, targetDashboardId);
+      if (!access.allowed) {
+        respondAccessDenied(res, access, {
+          userId: user?.id,
+          target: targetDashboardId,
+          action: 'dashboard-assets:copy',
         });
         return;
       }

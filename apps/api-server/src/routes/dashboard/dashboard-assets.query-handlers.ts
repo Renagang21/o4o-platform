@@ -10,6 +10,7 @@ import type { DataSource } from 'typeorm';
 import { CmsMedia } from '@o4o-apps/cms-core';
 import type { AuthRequest } from '../../middleware/auth.middleware.js';
 import { deriveDashboardStatus, computeExposure } from './dashboard-assets.types.js';
+import { checkDashboardAccess, respondAccessDenied } from '../../utils/dashboard-access.guard.js';
 
 /**
  * GET /api/v1/dashboard/assets
@@ -22,19 +23,11 @@ export function createListAssetsHandler(dataSource: DataSource) {
       const user = req.user;
       const { dashboardId, sourceType, status, sort } = req.query;
 
-      if (!user) {
-        res.status(401).json({
-          success: false,
-          error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' },
-        });
-        return;
-      }
-
-      if (!dashboardId) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' },
-        });
+      // WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1:
+      // dashboardId 는 조회 대상 지정에만 사용하고, 접근 허용 여부는 서버가 재검증한다.
+      const access = await checkDashboardAccess(dataSource, user, dashboardId);
+      if (!access.allowed) {
+        respondAccessDenied(res, access, { userId: user?.id, target: dashboardId, action: 'dashboard-assets:list' });
         return;
       }
 
@@ -158,13 +151,9 @@ export function createGetCopiedSourceIdsHandler(dataSource: DataSource) {
       const user = req.user;
       const { dashboardId } = req.query;
 
-      if (!user) {
-        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
-        return;
-      }
-
-      if (!dashboardId) {
-        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+      const access = await checkDashboardAccess(dataSource, user, dashboardId);
+      if (!access.allowed) {
+        respondAccessDenied(res, access, { userId: user?.id, target: dashboardId, action: 'dashboard-assets:copied-source-ids' });
         return;
       }
 
@@ -204,13 +193,9 @@ export function createGetKpiHandler(dataSource: DataSource) {
       const user = req.user;
       const { dashboardId } = req.query;
 
-      if (!user) {
-        res.status(401).json({ success: false, error: { code: 'UNAUTHORIZED', message: '로그인이 필요합니다.' } });
-        return;
-      }
-
-      if (!dashboardId) {
-        res.status(400).json({ success: false, error: { code: 'INVALID_REQUEST', message: 'dashboardId는 필수입니다.' } });
+      const access = await checkDashboardAccess(dataSource, user, dashboardId);
+      if (!access.allowed) {
+        respondAccessDenied(res, access, { userId: user?.id, target: dashboardId, action: 'dashboard-assets:kpi' });
         return;
       }
 

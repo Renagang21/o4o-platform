@@ -208,7 +208,11 @@ export class CPTController {
       const { slug } = req.params;
       const userId = req.user?.id || '';
 
-      const result = await cptService.createPost(slug, req.body, userId);
+      // WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1:
+      // payload 의 id/authorId 는 무시한다 (id 를 실으면 save() 가 타 게시물을 덮어쓴다).
+      const { id: _ignoredId, authorId: _ignoredAuthorId, ...safeBody } = req.body ?? {};
+
+      const result = await cptService.createPost(slug, safeBody, userId);
 
       if (!result.success) {
         return res.status(400).json(result);
@@ -232,7 +236,13 @@ export class CPTController {
     try {
       const { postId } = req.params;
 
-      const result = await cptService.updatePost(postId, req.body);
+      // WO-O4O-AUTH-ONLY-ROUTE-GUARD-HARDENING-V1:
+      // 클라이언트가 보낸 식별자·소유권 필드는 신뢰하지 않는다.
+      // (updatePost 는 Object.assign 으로 payload 를 그대로 병합하므로
+      //  authorId 를 실으면 작성자 위조가 가능했다.)
+      const { id: _ignoredId, authorId: _ignoredAuthorId, ...safeBody } = req.body ?? {};
+
+      const result = await cptService.updatePost(postId, safeBody);
 
       if (!result.success) {
         return res.status(404).json(result);
