@@ -2,12 +2,13 @@ import { Request, Response, NextFunction } from 'express';
 import { securityAuditService, isIPBlocked, logSecurityEvent } from '../services/SecurityAuditService.js';
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
 import { suspiciousFieldNames } from '../utils/security-log-redaction.js';
+import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 
 /**
  * Security middleware to check blocked IPs and log security events
  */
 export function securityMiddleware(req: Request, res: Response, next: NextFunction) {
-  const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+  const ipAddress = getTrustedClientIp(req);
   
   // Check if IP is blocked
   if (isIPBlocked(ipAddress)) {
@@ -49,7 +50,7 @@ export function securityMiddleware(req: Request, res: Response, next: NextFuncti
  * Enhanced authentication failure handler
  */
 export function handleAuthFailure(req: Request, error: string, userEmail?: string) {
-  const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+  const ipAddress = getTrustedClientIp(req);
   
   logSecurityEvent({
     type: 'auth.failed_login',
@@ -99,7 +100,7 @@ export function sqlInjectionDetection(req: Request, res: Response, next: NextFun
     Object.values(req.params || {}).some(checkValue);
   
   if (suspicious) {
-    const ipAddress = req.ip || req.socket.remoteAddress || 'unknown';
+    const ipAddress = getTrustedClientIp(req);
 
     // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
     //   기존에는 details 에 query/body/params **전문**을 담았다. 위 탐지 패턴에 `--` · `;` · `|`

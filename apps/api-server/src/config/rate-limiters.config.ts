@@ -1,3 +1,5 @@
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp, normalizeIp } from '../utils/trusted-client-ip.js';
 import rateLimit from 'express-rate-limit';
 
 /**
@@ -9,21 +11,19 @@ import rateLimit from 'express-rate-limit';
  * Get client IP for rate limiting (handles proxy environments)
  */
 function getClientIP(req: any): string {
-  if (process.env.NODE_ENV === 'production') {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (forwarded) {
-      return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
-    }
-  }
-  return req.ip || 'unknown';
+  // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
+  //   기존 구현은 프로덕션에서 X-Forwarded-For **첫 값**을 그대로 썼다. 최좌측은 클라이언트가
+  //   주입할 수 있어 rate-limit 키를 바꿔치기하거나(제한 우회) 타인 키를 소진시킬 수 있었다.
+  //   trust proxy 판정을 거친 값만 쓰도록 공통 헬퍼로 통일한다.
+  return getTrustedClientIp(req);
 }
 
 /**
  * Skip rate limiting for localhost
  */
 function isLocalhost(req: any): boolean {
-  const ip = req.ip || '';
-  return ip === '127.0.0.1' || ip === '::1' || ip === '::ffff:127.0.0.1';
+  const ip = normalizeIp(req.ip);
+  return ip === '127.0.0.1' || ip === '::1';
 }
 
 /**

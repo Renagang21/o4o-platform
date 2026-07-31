@@ -3,6 +3,8 @@
  * WO-O4O-SURVEY-CORE-PHASE1-V1
  */
 
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import type { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { SurveyService } from '../services/SurveyService.js';
@@ -39,7 +41,7 @@ export class SurveyResponseController extends BaseController {
         return BaseController.error(res, new Error('login required'), 401);
       }
 
-      const ipAddress = (req.headers['x-forwarded-for'] as string)?.split(',')[0]?.trim() || req.socket?.remoteAddress;
+      const ipAddress = getTrustedClientIp(req);
       const userAgent = req.headers['user-agent'];
 
       const response = await SurveyResponseService.getInstance().submitResponse(

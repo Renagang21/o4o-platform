@@ -5,6 +5,8 @@
  * Extracted from unified-store-public.routes.ts
  */
 
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import rateLimit from 'express-rate-limit';
@@ -611,11 +613,7 @@ export const tabletRequestLimiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
-  keyGenerator: (req: any) => {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (forwarded) {
-      return Array.isArray(forwarded) ? forwarded[0] : forwarded.split(',')[0].trim();
-    }
-    return req.ip || 'unknown';
-  },
+  // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
+  //   XFF 첫 값 직접 파싱 금지 — 클라이언트가 주입 가능해 rate-limit 우회에 쓰인다.
+  keyGenerator: (req: any) => getTrustedClientIp(req),
 });

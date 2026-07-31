@@ -4,6 +4,8 @@
  * Split from auth.controller.ts (WO-O4O-AUTH-CONTROLLER-SPLIT-V1)
  * Freeze: WO-O4O-CORE-FREEZE-V1 (2026-03-11)
  */
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../../../utils/trusted-client-ip.js';
 import { Request, Response } from 'express';
 import { BaseController } from '../../../common/base.controller.js';
 import { authenticationService } from '../../../services/authentication.service.js';
@@ -48,7 +50,7 @@ export class AuthLoginController extends BaseController {
   static async login(req: Request, res: Response): Promise<any> {
     const { email, password, serviceKey, deviceId, includeLegacyTokens } = req.body as LoginRequestDto & { includeLegacyTokens?: boolean };
     const userAgent = req.headers['user-agent'] || 'Unknown';
-    const ipAddress = req.ip || req.socket.remoteAddress || 'Unknown';
+    const ipAddress = getTrustedClientIp(req);
 
     // Cross-origin requests need tokens in response body since cookies won't work
     const isCrossOrigin = isCrossOriginRequest(req);

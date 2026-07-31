@@ -6,6 +6,8 @@
  * - Redis 없으면 메모리 기반 rate limiting 사용
  */
 
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
 import { Request, Response } from 'express';
 import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.js';
@@ -80,7 +82,7 @@ export const apiLimiter = rateLimit({
   store: getRedisStore('rl:api:'),
   keyGenerator: (req: Request) => {
     const userId = (req as any).user?.id || 'anonymous';
-    return `${req.ip}:${userId}`;
+    return `${getTrustedClientIp(req)}:${userId}`;
   },
 });
 
@@ -108,7 +110,7 @@ export const dynamicLimiter = (tier: 'free' | 'basic' | 'premium' = 'free') => {
     message: `요청 한도를 초과했습니다. (${tier} 플랜: 분당 ${config.max}개)`,
     store: getRedisStore(`rl:${tier}:`),
     keyGenerator: (req: Request) => {
-      const userId = (req as any).user?.id || req.ip;
+      const userId = (req as any).user?.id || getTrustedClientIp(req);
       return `${userId}`;
     },
   });
@@ -121,7 +123,7 @@ export class SmartRateLimiter {
 
   middleware() {
     return async (req: Request, res: Response, next: Function) => {
-      const ip = req.ip || 'unknown';
+      const ip = getTrustedClientIp(req);
       const now = Date.now();
 
       if (this.suspiciousIPs.has(ip)) {

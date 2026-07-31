@@ -41,12 +41,18 @@ import { setupMiddlewares, getAllowedOrigins } from './bootstrap/setup-middlewar
 import { registerCoreRoutes, registerDomainRoutes } from './bootstrap/register-routes.js';
 import { setupGracefulShutdown } from './bootstrap/setup-shutdown.js';
 import { globalErrorHandler } from './common/middleware/global-error.middleware.js';
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { resolveTrustedProxyHops } from './utils/trusted-client-ip.js';
 
 // ============================================================================
 // APP & SERVER CREATION
 // ============================================================================
 const app: Application = express();
-app.set('trust proxy', true);
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1:
+//   기존 `true` 는 req.ip 를 X-Forwarded-For **최좌측**(클라이언트가 주입 가능한 위치)으로 만든다.
+//   프로덕션 실측 결과 체인은 [<주입값>,] <client-ip>, <lb-ip> 이므로 신뢰 hop 수는 2 다.
+//   상세 근거는 utils/trusted-client-ip.ts 주석 참조.
+app.set('trust proxy', resolveTrustedProxyHops());
 
 const httpServer = createServer(app);
 

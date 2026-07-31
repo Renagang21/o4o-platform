@@ -1,3 +1,5 @@
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 import { Request, Response, NextFunction } from 'express';
 import { RedisService } from '../services/redis.service.js';
 
@@ -16,7 +18,7 @@ export function rateLimitMiddleware(options: RateLimitOptions) {
       windowMs,
       max,
       message = 'Too many requests, please try again later.',
-      keyGenerator = (req) => req.ip || 'unknown'
+      keyGenerator = (req) => getTrustedClientIp(req)
     } = options;
 
     const key = `ratelimit:${keyGenerator(req)}:${req.path}`;

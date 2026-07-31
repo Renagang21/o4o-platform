@@ -17,6 +17,8 @@
  * - GET /api/v1/channels/:id/contents - Get current contents for channel
  */
 
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../../utils/trusted-client-ip.js';
 import { Router, Request, Response } from 'express';
 import { DataSource } from 'typeorm';
 import { Channel, ChannelType, ChannelStatus, CmsContent, CmsContentSlot, ChannelPlaybackLog, ChannelHeartbeat } from '@o4o-apps/cms-core';
@@ -748,7 +750,8 @@ export function createChannelRoutes(dataSource: DataSource): Router {
       }
 
       // Extract IP address from request
-      const ipAddress = req.ip || req.headers['x-forwarded-for']?.toString().split(',')[0] || null;
+      // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1: XFF 첫 값 폴백 제거
+      const ipAddress = getTrustedClientIp(req);
 
       // Create heartbeat record
       const heartbeat = heartbeatRepo.create({

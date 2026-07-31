@@ -15,6 +15,8 @@
  * entitlement gate: 쓰기(POST/PATCH/status) 는 FOREIGN_VISITOR_SALES_SUPPORT ACTIVE 필요. GET(목록/상세/svg) 허용.
  * ⚠️ landing 본 구현/scan event/결제 와 무관. Neture partner 와 별개.
  */
+// WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
+import { getTrustedClientIp } from '../../utils/trusted-client-ip.js';
 import { Router } from 'express';
 import type { Request, Response } from 'express';
 import type { DataSource } from 'typeorm';
@@ -57,8 +59,8 @@ export function createForeignVisitorPartnerQrCodeRoutes(dataSource: DataSource):
   function deriveScanMeta(req: Request): {
     ipHash: string | null; userAgentHash: string | null; userAgentSummary: string | null; referrer: string | null;
   } {
-    const xff = typeof req.headers['x-forwarded-for'] === 'string' ? req.headers['x-forwarded-for'] : '';
-    const clientIp = (xff.split(',')[0] || '').trim() || req.ip || req.socket?.remoteAddress || '';
+    // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1: XFF 첫 값 직접 파싱 금지
+    const clientIp = getTrustedClientIp(req);
     const ua = typeof req.headers['user-agent'] === 'string' ? req.headers['user-agent'] : '';
     const ref = typeof req.headers['referer'] === 'string' ? req.headers['referer'] : '';
     return {
