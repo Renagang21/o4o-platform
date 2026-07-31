@@ -1,0 +1,78 @@
+{
+ "wo": "WO-O4O-OTC-STORE-EN-CANONICAL-BULK-AUDIT-TRANSLATE-APPLY-BATCH-5000-V1",
+ "batchId": "otc-en-audit-batch02-05",
+ "classification": "RETRANSLATED_INVALID",
+ "total": 2,
+ "rows": [
+  {
+   "batchId": "otc-en-audit-batch02-05",
+   "seq": 38,
+   "masterId": "3a22651c-be36-4f42-8101-06b98314c24c",
+   "productName": "일양아이콤연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "koDescriptionId": "1b8bae11-870a-4bef-a66a-306d48a17fb3",
+   "enDescriptionId": "2a0fef06-15b2-4f61-8dd2-1e31fb1652e7",
+   "koSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "enSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "koHash": "08ea81fe0b44448b28e61ccdb3af0ef3",
+   "enHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "classification": "RETRANSLATED_INVALID",
+   "reason": "확정 결함: ABNORMAL_REPETITION",
+   "defectCodes": [
+    "ABNORMAL_REPETITION"
+   ],
+   "softSignals": [],
+   "detail": {
+    "repeated": [],
+    "koUnitNumCount": 12,
+    "lostNums": [],
+    "lostDoseNums": [],
+    "enKoTextRatio": 2.69,
+    "koLiCount": 7,
+    "enLiCount": 10,
+    "enSummaryEmpty": false
+   },
+   "translationExecuted": false,
+   "translationModel": null,
+   "translationHash": null,
+   "applyTarget": false,
+   "humanReview": false,
+   "blockedReason": null
+  },
+  {
+   "batchId": "otc-en-audit-batch02-05",
+   "seq": 12774,
+   "masterId": "ce44a4dd-33fb-4fc5-8435-346846e87b01",
+   "productName": "일양아이콤연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "koDescriptionId": "26b43a33-f4df-4c2d-9133-6376795473d3",
+   "enDescriptionId": "5e471f40-d89a-462a-8215-e90a23cdf504",
+   "koSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "enSourceRef": "cdfd414a-af37-6fca-509d-70a468cc9438",
+   "koHash": "08ea81fe0b44448b28e61ccdb3af0ef3",
+   "enHash": "aaba9fa9e2367b3590318effbe64c2fb",
+   "classification": "RETRANSLATED_INVALID",
+   "reason": "확정 결함: ABNORMAL_REPETITION",
+   "defectCodes": [
+    "ABNORMAL_REPETITION"
+   ],
+   "softSignals": [],
+   "detail": {
+    "repeated": [],
+    "koUnitNumCount": 12,
+    "lostNums": [],
+    "lostDoseNums": [],
+    "enKoTextRatio": 2.69,
+    "koLiCount": 7,
+    "enLiCount": 10,
+    "enSummaryEmpty": false
+   },
+   "translationExecuted": false,
+   "translationModel": null,
+   "translationHash": null,
+   "applyTarget": false,
+   "humanReview": false,
+   "blockedReason": null
+  }
+ ]
+}

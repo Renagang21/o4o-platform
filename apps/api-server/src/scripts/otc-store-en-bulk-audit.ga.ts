@@ -29,7 +29,9 @@ import { createHash } from 'node:crypto';
 import { Pool } from 'pg';
 
 const WO = 'WO-O4O-OTC-STORE-EN-CANONICAL-BULK-AUDIT-TRANSLATE-APPLY-BATCH-5000-V1';
-const BATCH_ID = 'otc-en-audit-batch-01';
+/** `--label` 로 배치를 분리한다. batch01 원장은 덮어쓰지 않는다. */
+const LABEL = (() => { const i = process.argv.indexOf('--label'); return i >= 0 ? process.argv[i + 1] : 'batch01'; })();
+const BATCH_ID = `otc-en-audit-${LABEL}`;
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
 const P = (f: string): string => path.join(DATA, f);
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
@@ -216,6 +218,7 @@ function auditPair(r: Row): { defects: string[]; soft: string[]; detail: Record<
 async function main(): Promise<void> {
   const port = parseInt(arg('--port') || process.env.PROXY_PORT || '5542', 10);
   const batchSize = parseInt(arg('--batch-size') || '5000', 10);
+  const offset = parseInt(arg('--offset') || '0', 10);
   const startedAt = new Date().toISOString();
   const pool = new Pool({ host: '127.0.0.1', port, database: 'o4o_platform', max: 4, statement_timeout: 900000, user: process.env.DB_USERNAME || 'o4o_api', password: process.env.DB_PASSWORD });
   await pool.query('SET default_transaction_read_only = on');
@@ -252,12 +255,12 @@ async function main(): Promise<void> {
       WHERE k.deleted_at IS NULL AND k.description_type='STORE' AND k.status='canonical'
         AND COALESCE(k.language,'ko')='ko' AND k.source_type = ANY($1)
       ORDER BY k.master_id, k.id
-      LIMIT $2`, [AUTHORED, batchSize])).rows as Row[];
+      LIMIT $2 OFFSET $3`, [AUTHORED, batchSize, offset])).rows as Row[];
   await pool.end();
 
   /* ── manifest(불변) ─────────────────────────────────────────────────────── */
   const manifest = {
-    wo: WO, batchId: BATCH_ID, startedAt, headAtStart: process.env.HEAD_AT_START ?? null,
+    wo: WO, batchId: BATCH_ID, startedAt, offset, headAtStart: process.env.HEAD_AT_START ?? null,
     populationContract: {
       conditions: "deleted_at IS NULL · description_type='STORE' · status='canonical' · language=ko · source_type ∈ authored3 · ProductMaster 연결 · master당 canonical 1",
       authoredSourceTypes: AUTHORED,
@@ -274,7 +277,7 @@ async function main(): Promise<void> {
       koHash: md5(r.koContent), enHash: r.enContent ? md5(r.enContent) : null,
     })),
   };
-  fs.writeFileSync(P('otc-store-en-audit-batch01-manifest.ga.json'), JSON.stringify(manifest, null, 1) + '\n', 'utf8');
+  fs.writeFileSync(P(`otc-store-en-audit-${LABEL}-manifest.ga.json`), JSON.stringify(manifest, null, 1) + '\n', 'utf8');
 
   /* ── 판정 ────────────────────────────────────────────────────────────────── */
   const ledger: any[] = [];
@@ -330,12 +333,12 @@ async function main(): Promise<void> {
     bySourceType: ledger.reduce((a: any, x) => { (a[x.sourceType] ||= {})[x.classification] = ((a[x.sourceType] || {})[x.classification] || 0) + 1; return a; }, {}),
   };
 
-  fs.writeFileSync(P('otc-store-en-audit-batch01-ledger.ga.json'), JSON.stringify({ wo: WO, batchId: BATCH_ID, total: ledger.length, rows: ledger }, null, 1) + '\n', 'utf8');
+  fs.writeFileSync(P(`otc-store-en-audit-${LABEL}-ledger.ga.json`), JSON.stringify({ wo: WO, batchId: BATCH_ID, total: ledger.length, rows: ledger }, null, 1) + '\n', 'utf8');
   for (const [c, f] of [['PASS_EXISTING', 'pass-existing'], ['TRANSLATED_MISSING', 'translated-missing'], ['RETRANSLATED_INVALID', 'retranslate-invalid'], ['REVIEW_REQUIRED', 'review-required']] as const) {
     const rowsC = byClass(c);
-    fs.writeFileSync(P(`otc-store-en-audit-batch01-${f}.ga.json`), JSON.stringify({ wo: WO, batchId: BATCH_ID, classification: c, total: rowsC.length, rows: c === 'PASS_EXISTING' ? rowsC.map((x) => ({ seq: x.seq, masterId: x.masterId, koDescriptionId: x.koDescriptionId, enDescriptionId: x.enDescriptionId, enHash: x.enHash })) : rowsC }, null, 1) + '\n', 'utf8');
+    fs.writeFileSync(P(`otc-store-en-audit-${LABEL}-${f}.ga.json`), JSON.stringify({ wo: WO, batchId: BATCH_ID, classification: c, total: rowsC.length, rows: c === 'PASS_EXISTING' ? rowsC.map((x) => ({ seq: x.seq, masterId: x.masterId, koDescriptionId: x.koDescriptionId, enDescriptionId: x.enDescriptionId, enHash: x.enHash })) : rowsC }, null, 1) + '\n', 'utf8');
   }
-  fs.writeFileSync(P('otc-store-en-audit-batch01-summary.ga.json'), JSON.stringify(summary, null, 2) + '\n', 'utf8');
+  fs.writeFileSync(P(`otc-store-en-audit-${LABEL}-summary.ga.json`), JSON.stringify(summary, null, 2) + '\n', 'utf8');
   console.log(JSON.stringify(summary, null, 2));
 }
 main().catch((e) => { console.error('FATAL', e instanceof Error ? e.message : e); process.exit(1); });
