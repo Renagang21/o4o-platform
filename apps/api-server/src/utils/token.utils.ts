@@ -5,6 +5,7 @@ import { AccessTokenPayload, RefreshTokenPayload, AuthTokens, TokenType } from '
 import type { ServiceUserData, GuestUserData } from '../types/account-linking.js';
 import logger from './logger.js';
 import { deriveUserScopes } from './scope-assignment.utils.js';
+import { resolveAccountAccess } from '../common/auth/account-access.policy.js';
 
 /**
  * Token Utility Module
@@ -94,6 +95,11 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
     permissions: user.permissions || [],
     scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     memberships: memberships || [], // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
+    //   users.status 에서 파생되는 계정 접근 상태. 프론트 분기용 힌트이며
+    //   서버측 판정은 항상 DB users.status 로 다시 수행한다 (claim 위조 무의미).
+    //   'blocked' 상태는 애초에 토큰을 발급하지 않으므로 여기서는 restricted 로 접힌다.
+    accountAccess: resolveAccountAccess(user.status) === 'normal' ? 'normal' : 'restricted',
     // WO-O4O-AUTH-JWT-SECURITY-REFINE-V1: domain 제거 (미사용, 하드코딩 'neture.co.kr')
     tokenType: 'user',  // Phase 1: Service User 인증 기반
     iss: jwtIssuer,     // Phase 2.5: Server isolation

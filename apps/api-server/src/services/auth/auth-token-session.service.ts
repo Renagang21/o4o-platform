@@ -7,6 +7,7 @@ import * as tokenUtils from '../../utils/token.utils.js';
 import * as cookieUtils from '../../utils/cookie.utils.js';
 import { SessionSyncService } from '../sessionSyncService.js';
 import { freshenUserContext } from './auth-context.helper.js';
+import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -65,6 +66,22 @@ export class AuthTokenSessionService {
     if (!user) {
       const error = new Error('User not found or inactive') as Error & { code: string };
       error.code = 'USER_NOT_FOUND';
+      throw error;
+    }
+
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-A:
+    //   refresh 시 DB 최신 users.status 로 접근 상태를 재판정한다.
+    //   pending → 제한 토큰 재발급 / active·approved → 정상 토큰 (아래 generateTokens 가 파생)
+    //   inactive·suspended·rejected → refresh 거부 (승인 취소·정지가 즉시 반영된다)
+    if (resolveAccountAccess(user.status) === 'blocked') {
+      logger.warn('[refreshTokens] refresh rejected by account status', {
+        userId: user.id,
+        status: user.status,
+      });
+      const error = new Error('계정 상태가 유효하지 않습니다. 다시 로그인해 주세요.') as Error & {
+        code: string;
+      };
+      error.code = 'ACCOUNT_NOT_ACTIVE';
       throw error;
     }
 

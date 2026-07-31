@@ -149,6 +149,14 @@ export interface AccessTokenPayload {
   scopes?: string[];
   /** 서비스별 멤버십 상태 (WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1) */
   memberships?: { serviceKey: string; status: string; role?: string }[];
+  /**
+   * 계정 접근 상태 (WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1)
+   *   'normal'     — users.status active|approved
+   *   'restricted' — users.status pending (제한 로그인)
+   * optional 이다: 본 WO 이전에 발급된 토큰은 이 claim 이 없으며 기존과 동일하게 동작한다.
+   * **권한 판정 SSOT 는 이 claim 이 아니라 DB users.status 다** (requireAuth 가 매 요청 재조회).
+   */
+  accountAccess?: 'normal' | 'restricted';
   domain?: string;
   sub?: string; // JWT standard claim
   // Phase 2.5: Server isolation claims

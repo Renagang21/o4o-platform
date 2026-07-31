@@ -36,6 +36,7 @@ import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
 import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
+import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 
@@ -78,13 +79,18 @@ export function createPharmacyHubRoutes(): Router {
     const membershipStatus =
       memberships.find((m) => m.serviceKey === SERVICE_KEY)?.status ?? 'none';
     const roles: string[] = Array.isArray(user.roles) ? user.roles : [];
-    const serviceRoles = roles.filter((r) => r.startsWith(`${SERVICE_KEY}:`));
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:
+    //   users.status=pending(restricted) 이면 DB role 이 잔존해도 진입점을 열지 않는다.
+    //   (실제 차단은 중앙 가드가 담당하고, 여기서는 진입점 표시를 정규화한다 — §7.1)
+    const restricted = resolveAccountAccess(user.status) === 'restricted';
+    const serviceRoles = restricted ? [] : roles.filter((r) => r.startsWith(`${SERVICE_KEY}:`));
 
     return res.json({
       success: true,
       data: {
         serviceKey: SERVICE_KEY,
         membershipStatus,
+        accountAccess: restricted ? 'restricted' : 'normal',
         roles: serviceRoles,
         entryPoints: {
           storeOwner: serviceRoles.includes(`${SERVICE_KEY}:store_owner`),

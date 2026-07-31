@@ -330,6 +330,12 @@ export class User {
       role: (this.roles?.[0] as UserRole) || UserRole.USER,
       roles: this.roles?.length > 0 ? [...this.roles] : [],
       status: this.status,
+      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
+      //   프론트가 로그인 직후 제한 계정 안내 화면으로 분기하기 위한 계정 접근 상태.
+      //   status 와 1:1 파생값이며 별도 저장 컬럼이 아니다.
+      accountAccess: (this.status === UserStatus.ACTIVE || this.status === UserStatus.APPROVED
+        ? 'normal'
+        : 'restricted') as 'normal' | 'restricted',
       permissions: this.getAllPermissions(),
       scopes: [] as string[],
       pharmacistFunction: null as string | null,

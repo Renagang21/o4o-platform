@@ -13,6 +13,10 @@ import { deriveUserScopes } from '../../../utils/scope-assignment.utils.js';
 import { roleAssignmentService } from '../services/role-assignment.service.js';
 import { getCachedRoles, setCachedRoles } from '../utils/role-cache.js';
 import { derivePharmacistQualification } from './auth-helpers.js';
+import {
+  projectRestrictedUser,
+  resolveAccountAccess,
+} from '../../../common/auth/account-access.policy.js';
 
 export class AuthAccountController extends BaseController {
   /**
@@ -89,6 +93,12 @@ export class AuthAccountController extends BaseController {
           [req.user.id]
         );
       } catch { ud.memberships = []; }
+
+      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D:
+      //   restricted 계정은 role/scope 를 노출하지 않는다 (membership 상태만 유지).
+      if (resolveAccountAccess(req.user.status) === 'restricted') {
+        projectRestrictedUser(ud);
+      }
 
       return BaseController.ok(res, { user: userData });
     } catch (error: any) {
@@ -282,6 +292,11 @@ export class AuthAccountController extends BaseController {
           [req.user.id]
         );
       } catch { ud.memberships = []; }
+
+      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-D
+      if (resolveAccountAccess(req.user.status) === 'restricted') {
+        projectRestrictedUser(ud);
+      }
     }
 
     return BaseController.ok(res, {

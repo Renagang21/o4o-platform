@@ -32,6 +32,7 @@ import {
   injectRolesIntoPublicData,
 } from './auth-context.helper.js';
 import { ActionLogService } from '@o4o/action-log-core';
+import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
 import logger from '../../utils/logger.js';
 
 /**
@@ -217,7 +218,11 @@ export class AuthLoginService {
     }
 
     // Check account status
-    if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
+    //   pending 계정은 로그인 자체를 막지 않고 **제한 JWT** 를 발급한다.
+    //   일반 서비스 기능 차단은 requireAuth 의 중앙 default-deny 정책이 담당한다.
+    //   inactive / suspended / rejected 는 기존과 동일하게 로그인 차단.
+    if (resolveAccountAccess(user.status) === 'blocked') {
       await this.logLoginAttempt(user.id, email, ipAddress, userAgent, false, 'account_inactive');
       throw new AccountInactiveError(user.status);
     }
@@ -330,7 +335,9 @@ export class AuthLoginService {
       const user = existingLinkedAccount.user;
 
       // Check account status
-      if (user.status !== UserStatus.ACTIVE && user.status !== UserStatus.APPROVED) {
+      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: OAuth 경로도 동일 정책
+      //   (pending → 제한 로그인, blocked → 차단).
+      if (resolveAccountAccess(user.status) === 'blocked') {
         throw new AccountInactiveError(user.status);
       }
 

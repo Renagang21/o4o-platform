@@ -10,6 +10,65 @@ import { User } from '../../../modules/auth/entities/User.js';
 import { verifyAccessToken, isServiceToken } from '../../../utils/token.utils.js';
 import logger from '../../../utils/logger.js';
 import { AuthRequest, extractToken } from './auth-context.helpers.js';
+import {
+  ACCOUNT_ACCESS_RESTRICTED_CODE,
+  ACCOUNT_ACCESS_RESTRICTED_MESSAGE,
+  isRestrictedRequestAllowed,
+  resolveAccountAccess,
+  type AccountAccess,
+} from '../../auth/account-access.policy.js';
+
+/**
+ * WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-B — 중앙 제한 접근 가드
+ *
+ * 적용 지점을 requireAuth 내부로 둔 이유:
+ *   api-server 는 `/api/v1` 단일 마운트가 아니라 라우터별 마운트 구조라
+ *   `app.use('/api/v1', guard)` 로 전 인증 경계를 덮을 수 없다.
+ *   반면 인증된 요청은 예외 없이 requireAuth / requirePlatformUser 를 통과하고
+ *   (req.user 대입 지점이 이 파일 외에는 dev-auth·home-preview 뿐),
+ *   requireAuth 는 매 요청 users 를 재조회하므로 **DB status 기준 판정**이 가능하다.
+ *   → 라우트 278개 개별 수정 없이 default-deny 를 단일 지점에서 강제한다.
+ *
+ * 판정 SSOT 는 DB `users.status` 다. JWT claim(accountAccess)은 프론트 힌트일 뿐이고
+ * 서버 판정에 사용하지 않으므로, claim 이 없는 기존 토큰도 정상 동작한다 (§7.3 / §10-⑦).
+ *
+ * @returns 응답을 이미 보냈으면 true (호출측은 즉시 return)
+ */
+function enforceAccountAccess(req: AuthRequest, res: Response, user: { id: string; status: unknown }): boolean {
+  const decision = resolveAccountAccess(user.status);
+
+  if (decision === 'blocked') {
+    logger.warn('[accountAccess] blocked account rejected', {
+      userId: user.id,
+      status: String(user.status),
+      path: req.originalUrl,
+      method: req.method,
+    });
+    res.status(403).json({
+      success: false,
+      error: '이용할 수 없는 계정 상태입니다.',
+      code: 'ACCOUNT_NOT_ACTIVE',
+    });
+    return true;
+  }
+
+  if (decision === 'restricted' && !isRestrictedRequestAllowed(req.method, req.originalUrl)) {
+    logger.warn('[accountAccess] restricted account denied', {
+      userId: user.id,
+      path: req.originalUrl,
+      method: req.method,
+    });
+    res.status(403).json({
+      success: false,
+      error: ACCOUNT_ACCESS_RESTRICTED_MESSAGE,
+      code: ACCOUNT_ACCESS_RESTRICTED_CODE,
+    });
+    return true;
+  }
+
+  (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = decision;
+  return false;
+}
 
 /**
  * Require Authentication Middleware
@@ -83,6 +142,9 @@ export const requireAuth = async (
       });
     }
 
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
+    if (enforceAccountAccess(req, res, user)) return;
+
     // Phase3-E: Assign roles from JWT payload (set at login from role_assignments table)
     user.roles = payload.roles || [];
     // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1: Assign memberships from JWT payload
@@ -147,9 +209,19 @@ export const optionalAuth = async (
       relations: ['linkedAccounts'],
     });
 
-    if (user && user.isActive) {
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
+    //   optionalAuth 는 비로그인도 통과하는 공개 경로용이다. 제한/차단 계정은
+    //   403 을 내는 대신 **비로그인과 동일하게 취급**한다 (개인화·본인 스코프 write 차단).
+    //   허용 경로(/auth/status)는 아래 attach 를 통해 정상 동작한다.
+    const optionalAccess = user ? resolveAccountAccess(user.status) : 'blocked';
+    const optionalAllowed =
+      optionalAccess === 'normal' ||
+      (optionalAccess === 'restricted' && isRestrictedRequestAllowed(req.method, req.originalUrl));
+
+    if (user && user.isActive && optionalAllowed) {
       // Phase3-E: Assign roles from JWT payload
       user.roles = payload.roles || [];
+      (req as AuthRequest & { accountAccess?: AccountAccess }).accountAccess = optionalAccess as AccountAccess;
       req.user = user;
     }
 
@@ -237,6 +309,9 @@ export const requirePlatformUser = async (
         code: 'USER_INACTIVE',
       });
     }
+
+    // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1: 중앙 default-deny
+    if (enforceAccountAccess(req, res, user)) return;
 
     // Phase3-E: Assign roles from JWT payload
     user.roles = payload.roles || [];

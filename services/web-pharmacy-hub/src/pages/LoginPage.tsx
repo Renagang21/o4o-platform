@@ -26,8 +26,12 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      await login(email, password);
-      navigate('/');
+      const loggedIn = await login(email, password);
+      // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-F:
+      //   제한 로그인 계정(users.status=pending)은 가입 상태 확인 화면으로만 보낸다.
+      //   상품·주문·콘텐츠 진입점은 노출하지 않는다.
+      const accountAccess = (loggedIn as { accountAccess?: string } | null)?.accountAccess;
+      navigate(accountAccess === 'restricted' ? '/join/status' : '/');
     } catch (err) {
       const wrapped = err as Error & { code?: string };
       setError(
