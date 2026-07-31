@@ -1,0 +1,11 @@
+{
+ "builtAt": "2026-07-31T23:42:11.035Z",
+ "total": 2038,
+ "byReason": {
+  "TRANSLATION_ASSET_MISSING": 1675,
+  "HOLD_KO_SOURCE_DAMAGED": 303,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 60
+ },
+ "koWithoutEn": 23276,
+ "enWithoutFn": 6
+}

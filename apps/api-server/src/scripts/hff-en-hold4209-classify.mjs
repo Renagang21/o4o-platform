@@ -13,6 +13,10 @@ const POP = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-hold-4209-populatio
 const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
 const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const HANGUL = /[가-힣ㄱ-ㅎㅏ-ㅣ]/;
+// KO canonical 에 남은 손상 조각. 번역 대상이 아니라 KO 측 수정 대상이다.
+const DAMAGED = (t) => /[(:：\[]\s*$/.test(t) || /^[*※]\s*\S/.test(t) || /^\(국문\)$|^\(영문\)$/.test(t)
+  || /^\s*\(\s*[가나다라마]\s*\)/.test(t) || /[:：]\s*$/.test(t) || t.length < 4
+  || /^[A-Za-z][A-Za-z ,.'()\/-]{10,}$/.test(t);
 const UNIT = String.raw`mg|g|㎎|kg|ug|㎍|μg|mcg|IU|kcal|mL|ml|L|CFU|%|억|만|천`;
 const koNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT})`, 'g')) ?? [])
   .map((x) => x.replace(/[,\s]/g, '').replace(/억/g, 'E8').replace(/만/g, 'E4').replace(/천/g, 'E3'));
@@ -43,7 +47,7 @@ function translate(html) {
       const t = norm(inner);
       if (!t) return whole;
       const r = lookup(kind, inner);
-      if (!r) { misses.push({ kind, text: t }); return whole; }
+      if (!r) { misses.push({ kind, text: t, why: DAMAGED(t) ? 'KO_DAMAGED' : undefined }); return whole; }
       // 수치 검증: KO 의 단위 수치가 EN 에 **모두 존재**해야 한다(순서·중복은 표현 차이).
       const ka = koNums(inner), eb = new Set(enNums(r.en));
       if (ka.some((x) => !eb.has(x))) { misses.push({ kind, text: t, why: 'NUMBER_DRIFT' }); return whole; }
@@ -69,7 +73,7 @@ for (const row of POP.docs) {
     if (!fn) { hold('HOLD_SOURCE', 'KO_SOURCE_CONFLICT', 'KO_FN_SECTION_MISSING'); continue; }
     if (/<h2>[^<]*unction[^<]*<\/h2>/.test(enC)) { results.push({ ...base, status: 'RESOLVED_NO_CHANGE', why: 'EN_ALREADY_HAS_FUNCTIONS' }); continue; }
     const t = translate(fn);
-    if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: t.misses.map((m) => m.text) }); continue; }
+    if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why === 'KO_DAMAGED') ? 'HOLD_KO_SOURCE_DAMAGED' : t.misses.some((m) => m.why === 'NUMBER_DRIFT') ? 'HOLD_NUMBER_STRUCTURE_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: t.misses.map((m) => m.text) }); continue; }
     if (hangulInSlots(t.html)) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
     const h2s = [...enC.matchAll(/<h2>/g)].map((m) => m.index);
     const at = h2s.length >= 2 ? h2s[1] : enC.indexOf('<div class="sd-foot"');
@@ -79,7 +83,7 @@ for (const row of POP.docs) {
     safe.push({ ...base, op: 'UPDATE', oldContentHash: sha(enC), newContentHash: sha(newContent), newContent });
   } else {
     const t = translate(koC);
-    if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: [...new Set(t.misses.map((m) => m.text))] }); continue; }
+    if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why === 'KO_DAMAGED') ? 'HOLD_KO_SOURCE_DAMAGED' : t.misses.some((m) => m.why === 'NUMBER_DRIFT') ? 'HOLD_NUMBER_STRUCTURE_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: [...new Set(t.misses.map((m) => m.text))] }); continue; }
     if (hangulInSlots(t.html)) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
     // 수치 검증은 슬롯별(번역 쌍 단위)로 이미 수행했다. 문서 전체 비교는 번역 대상이 아닌
     // 영역(sd-spec 등, 원문 그대로 유지)까지 끌어들여 오탐만 만든다 → 중복 검사 제거.
