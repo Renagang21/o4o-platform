@@ -8,12 +8,14 @@
  */
 import fs from 'node:fs';
 import { applyFrames } from './hff-en-hold4209-frames.mjs';
+import { parseUsage } from './hff-en-usage-parser.mjs';
 
 const D = 'apps/api-server/src/scripts/data';
 const ASSETS = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-translation-assets-v1.json`, 'utf8'));
 const GLOS = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-glossary-v1.json`, 'utf8'));
 const MANUAL = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-manual-glossary-v1.json`, 'utf8'));
 const MANUAL2 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-01-manual-glossary-2-v1.json`, 'utf8'));
+const TOP = JSON.parse(fs.readFileSync(`${D}/hff-en-top1000-translations-v1.json`, 'utf8'));
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -53,6 +55,10 @@ for (const [kind, m] of Object.entries(GLOS.fixed ?? {})) for (const [k, v] of O
 // 3) 이번 batch 에서 확정한 수동 용어집
 for (const [kind, m] of Object.entries(MANUAL.dict ?? {})) for (const [k, v] of Object.entries(m)) DICT[kind][key(k)] = v;
 for (const [kind, m] of Object.entries(MANUAL2.dict ?? {})) for (const [k, v] of Object.entries(m)) DICT[kind][key(k)] = v;
+// 4) 이번 라운드에서 확정한 신규 전문 번역 (top1000)
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(TOP[kind] ?? {})) DICT[kind][key(k)] = v;
+// usage 문장은 clause / meta 양쪽 슬롯에서 모두 쓰인다
+for (const [k, v] of Object.entries(TOP.usage ?? {})) { DICT.clause[key(k)] = v; DICT.meta[key(k)] = v; }
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────
 const CNT = { 정: 'tablet', 캡슐: 'capsule', 포: 'stick pack', 스푼: 'spoonful', 알: 'piece', 병: 'bottle', 개: 'piece', 매: 'sheet', 방울: 'drop' };
@@ -124,6 +130,10 @@ export function lookup(kind, text) {
   if (kind === 'clause' || kind === 'meta' || kind === 'badge') {
     const fr = applyFrames(k);
     if (fr) return { en: fr, how: 'frame' };
+  }
+  if (kind === 'clause' || kind === 'meta') {
+    const u = parseUsage(norm(text));
+    if (u) return { en: u, how: 'usageParser' };
   }
   if (kind === 'clause') {
     const c = composeClause(k);

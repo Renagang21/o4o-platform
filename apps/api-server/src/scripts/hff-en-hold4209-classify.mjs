@@ -38,7 +38,9 @@ function translate(html) {
       if (!t) return whole;
       const r = lookup(kind, inner);
       if (!r) { misses.push({ kind, text: t }); return whole; }
-      if (koNums(inner).join('|') !== enNums(r.en).join('|')) { misses.push({ kind, text: t, why: 'NUMBER_DRIFT' }); return whole; }
+      // 수치 검증: KO 의 단위 수치가 EN 에 **모두 존재**해야 한다(순서·중복은 표현 차이).
+      const ka = koNums(inner), eb = new Set(enNums(r.en));
+      if (ka.some((x) => !eb.has(x))) { misses.push({ kind, text: t, why: 'NUMBER_DRIFT' }); return whole; }
       return open + esc(r.en) + close;
     });
   }
@@ -73,7 +75,8 @@ for (const row of POP.docs) {
     const t = translate(koC);
     if (t.misses.length) { hold('HOLD_TRANSLATION', t.misses.some((m) => m.why) ? 'TRANSLATION_AMBIGUOUS' : 'TRANSLATION_ASSET_MISSING', t.misses.slice(0, 5).map((m) => `${m.kind}:${m.why ?? 'NO_ENTRY'}:${m.text.slice(0, 60)}`), { unresolvedPhrases: [...new Set(t.misses.map((m) => m.text))] }); continue; }
     if (HANGUL.test(norm(t.html))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'HANGUL_REMAINS'); continue; }
-    if (koNums(koC).join('|') !== enNums(t.html).join('|')) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'DOC_NUMBER_DRIFT'); continue; }
+    const kAll = koNums(koC), eAll = new Set(enNums(t.html));
+    if (kAll.some((x) => !eAll.has(x))) { hold('HOLD_TRANSLATION', 'TRANSLATION_AMBIGUOUS', 'DOC_NUMBER_DRIFT'); continue; }
     for (const tag of ['<li>', '<h2>', 'sd-item', 'sd-tag']) {
       if ((t.html.split(tag).length) !== (koC.split(tag).length)) { hold('HOLD_STRUCTURE', 'STRUCTURE_UNSAFE', `SLOT_COUNT_DRIFT:${tag}`); break; }
     }
