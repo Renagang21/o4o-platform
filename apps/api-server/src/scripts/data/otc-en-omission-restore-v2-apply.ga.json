@@ -1,0 +1,1224 @@
+{
+ "summary": {
+  "mode": "APPLY",
+  "input": 141,
+  "planned": 62,
+  "sentencesInserted": 66,
+  "byRule": {
+   "ERDOSTEINE_CONTRA": 3,
+   "ELDERLY_EDEMA_THYROID2": 3,
+   "SKIN_ADVERSE_STOP": 4,
+   "MAO_AGE_CONTRA": 5,
+   "NO_IMPROVE_CONSULT_RANGE": 3,
+   "SALICYLATE_CONTRA_FULL": 6,
+   "ERDOSTEINE_CONTRA2": 3,
+   "NO_CONTINUOUS_USE_DAYS2": 3,
+   "TINEA_PEDIS_AGE": 4,
+   "NO_USE_UNDER_AGE": 4,
+   "LAXATIVE_CONSULT": 4,
+   "IBU_HIGHDOSE_AVOID": 12,
+   "NO_IMPROVE_STOP_RANGE2": 4,
+   "SALICYLATE_CONTRA_SHORT": 4,
+   "HYPERCALC_CONTRA": 4
+  },
+  "skipped": 79,
+  "skipByCode": {
+   "NO_RULE_MATCH": 79
+  },
+  "green": 62
+ },
+ "plans": [
+  {
+   "enId": "d47ed156-fc7d-434f-a442-e12d2ee1fb5b",
+   "master": "0020a063-7176-411f-8a97-ee9c97c7c807",
+   "product": "엘도비캡슐(에르도스테인)",
+   "oldHash": "a79a68aa50b1640f3a376a8788d7b983",
+   "newHash": "e9ce82711629d410563f669ee18134d5",
+   "rules": [
+    "ERDOSTEINE_CONTRA"
+   ]
+  },
+  {
+   "enId": "1ff49f39-738c-484f-a4bd-479af00dece2",
+   "master": "037c5dde-67f8-4340-9650-c05d1ab44c80",
+   "product": "케이녹시액5%(미녹시딜)",
+   "oldHash": "8886d2a69bd90f9b4348bd92b1b02b64",
+   "newHash": "ccca71a77d0e2694d8d3121dba174454",
+   "rules": [
+    "ELDERLY_EDEMA_THYROID2"
+   ]
+  },
+  {
+   "enId": "64028595-20bd-4e6e-90c7-8aee841aeb23",
+   "master": "06fc5494-1deb-4844-a183-0e773a353433",
+   "product": "미녹시폼에어로솔5%(미녹시딜)",
+   "oldHash": "12866f3ca8b2be578eca5d09154d7abc",
+   "newHash": "cd1e979319efa6e82e3fc274319ca845",
+   "rules": [
+    "SKIN_ADVERSE_STOP"
+   ]
+  },
+  {
+   "enId": "475c5f1c-b492-4d43-9702-c7eba13b5774",
+   "master": "076dcfea-76b1-443e-87fa-bd9f40e854ca",
+   "product": "코메키나캡슐",
+   "oldHash": "a588bd7c1e959513b06ac8d9402d289f",
+   "newHash": "67cbea1186412111c8485b424b6a4238",
+   "rules": [
+    "MAO_AGE_CONTRA"
+   ]
+  },
+  {
+   "enId": "c4043aa8-f3fb-4093-ab9c-97c3a085512f",
+   "master": "0a1045b9-e4eb-401d-bde2-b6d36038eeaf",
+   "product": "버물리에스액",
+   "oldHash": "c9b7673efc9f2b6bc4d43a533852fe9d",
+   "newHash": "fb37f41fd92d7cf99515a0b7238ab49d",
+   "rules": [
+    "NO_IMPROVE_CONSULT_RANGE"
+   ]
+  },
+  {
+   "enId": "4f7a5cf3-4b7b-4837-957f-9145b4a76345",
+   "master": "0cc8d3c8-e611-4d37-88f0-56e791757c53",
+   "product": "비엘피린장용정100밀리그램(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "12c0e2cf-e150-4e0d-af12-52e55434beb7",
+   "master": "0d95554d-6bb8-41fb-be07-9ba242516a39",
+   "product": "에도스캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA2"
+   ]
+  },
+  {
+   "enId": "ce3e0b32-d558-49c4-b211-f595b072ba24",
+   "master": "129b8938-cfa0-40d8-925c-85467be4ac3e",
+   "product": "나리스타자일로점비액(자일로메타졸린염산염)",
+   "oldHash": "6561badbfc39495592045e6d4dea0d30",
+   "newHash": "404a0335f55733185fbc9396be5e4cc1",
+   "rules": [
+    "NO_CONTINUOUS_USE_DAYS2"
+   ]
+  },
+  {
+   "enId": "b8050602-73c3-4b3c-9d9b-f2a0e1edc741",
+   "master": "1391f67e-94f8-4714-88e9-e1b163725ea7",
+   "product": "제로무원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "13e9a053d5dfd386a5175a0d4c01081a",
+   "rules": [
+    "TINEA_PEDIS_AGE",
+    "NO_USE_UNDER_AGE"
+   ]
+  },
+  {
+   "enId": "7cfec54c-1b0d-4a32-8f37-40c0ccfa33d8",
+   "master": "1abf1739-2064-4b0d-b822-f96b19a31134",
+   "product": "비엘피린장용정100밀리그램(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "10d30b06-aa94-49fe-9670-3534476238f0",
+   "master": "24af99e3-d0c5-4fe1-90fc-ad6bd6d038fc",
+   "product": "나리스타자일로점비액(자일로메타졸린염산염)",
+   "oldHash": "6561badbfc39495592045e6d4dea0d30",
+   "newHash": "404a0335f55733185fbc9396be5e4cc1",
+   "rules": [
+    "NO_CONTINUOUS_USE_DAYS2"
+   ]
+  },
+  {
+   "enId": "e6f16662-3bbb-4d3e-a868-baf2f8bd5fa4",
+   "master": "250323b4-aad6-4285-9e04-fd7e4f1236a8",
+   "product": "미녹시폼에어로솔5%(미녹시딜)",
+   "oldHash": "12866f3ca8b2be578eca5d09154d7abc",
+   "newHash": "cd1e979319efa6e82e3fc274319ca845",
+   "rules": [
+    "SKIN_ADVERSE_STOP"
+   ]
+  },
+  {
+   "enId": "ea1dd6ab-037e-48a8-9a03-54d6659cc9bf",
+   "master": "2aa54fba-8bba-46ce-9acd-6627d0e05732",
+   "product": "비코엑스장용정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "63ff179e3f5db3d4fb642f185fc422eb",
+   "rules": [
+    "LAXATIVE_CONSULT"
+   ]
+  },
+  {
+   "enId": "a57b99f1-af46-49f2-a0eb-f7fcaa3f5336",
+   "master": "2c77cca2-8bcf-42d2-b295-6ad1aa577d5c",
+   "product": "이부프렌드프로연질캡슐",
+   "oldHash": "4d71d5fb3dc30dce49444c98f97cfb0c",
+   "newHash": "d378a4c157b288691b7460e2aa83974a",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "8fc6ac1c-5eec-43d2-bfa8-3384b79c463c",
+   "master": "2eeaefd6-c6a7-4f2e-b35b-4e6b4c26169f",
+   "product": "에도스캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA2"
+   ]
+  },
+  {
+   "enId": "14c7a827-36d7-4890-822a-b97f7f804caa",
+   "master": "35e44530-cb57-45cd-8f44-7739fc2ef496",
+   "product": "코메키나캡슐",
+   "oldHash": "a588bd7c1e959513b06ac8d9402d289f",
+   "newHash": "67cbea1186412111c8485b424b6a4238",
+   "rules": [
+    "MAO_AGE_CONTRA"
+   ]
+  },
+  {
+   "enId": "67be9b02-0215-48fe-95dc-5c27cee53e48",
+   "master": "37723c4f-9e50-43b8-8112-70976e146e53",
+   "product": "코메키나캡슐",
+   "oldHash": "a588bd7c1e959513b06ac8d9402d289f",
+   "newHash": "67cbea1186412111c8485b424b6a4238",
+   "rules": [
+    "MAO_AGE_CONTRA"
+   ]
+  },
+  {
+   "enId": "a09fb966-2f7c-4ae4-bfb5-15ca98419eb4",
+   "master": "3c22a60a-b2bd-4d0c-bd33-df8b229bafbc",
+   "product": "닥터로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "9cd7411f935a0f3ec09fcb7db0c03697",
+   "rules": [
+    "NO_IMPROVE_STOP_RANGE2"
+   ]
+  },
+  {
+   "enId": "2e8f12d4-022e-4270-9f6d-e73e933d24c9",
+   "master": "3e246088-72cc-4f69-9323-d2e73c1af4ce",
+   "product": "파인펜정",
+   "oldHash": "7f19dcba8228fc31d2a26baa15295a9e",
+   "newHash": "f1dff53b22b41bf2dcb816f9bb908bdf",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "40f34a6a-0144-443d-9a1f-e3784a9d32ee",
+   "master": "42b3b653-30b5-4599-8c62-3b68193f7efc",
+   "product": "레이디퀸연질캡슐",
+   "oldHash": "75f6313c645974bab8cad34c1dd6e144",
+   "newHash": "ac1d6e42a573805e797a21444736def8",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "e2825fbc-06ad-4722-bea4-6cf3d88a7f1e",
+   "master": "44033271-7f9e-4a8a-86c6-3affa01bd18e",
+   "product": "코메키나캡슐",
+   "oldHash": "a588bd7c1e959513b06ac8d9402d289f",
+   "newHash": "67cbea1186412111c8485b424b6a4238",
+   "rules": [
+    "MAO_AGE_CONTRA"
+   ]
+  },
+  {
+   "enId": "6eb33ad3-6cc7-49bb-b0f0-098c146ea8a6",
+   "master": "47189dbd-dc74-4b54-a2ce-cec8b7b3f415",
+   "product": "엘도비캡슐(에르도스테인)",
+   "oldHash": "a79a68aa50b1640f3a376a8788d7b983",
+   "newHash": "e9ce82711629d410563f669ee18134d5",
+   "rules": [
+    "ERDOSTEINE_CONTRA"
+   ]
+  },
+  {
+   "enId": "8cd8e771-9efb-485b-b67f-d8644b93a41f",
+   "master": "47eec3f4-de72-4bee-9992-5da4cd28b354",
+   "product": "레이디퀸연질캡슐",
+   "oldHash": "75f6313c645974bab8cad34c1dd6e144",
+   "newHash": "ac1d6e42a573805e797a21444736def8",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "6af53e73-ed35-4d00-936a-b3fb0bff775a",
+   "master": "4e371b12-c628-467e-9cde-efe292a8e855",
+   "product": "보령바이오아스피린장용정100밀리그램",
+   "oldHash": "c013c65a8ec0af38296113c7a5974c84",
+   "newHash": "02155a652c9c56c64af98d5919ae404f",
+   "rules": [
+    "SALICYLATE_CONTRA_SHORT"
+   ]
+  },
+  {
+   "enId": "19728786-ebd2-4937-8fad-d730789628f8",
+   "master": "53f033df-16e1-4cfd-8ffd-ffeea7839dce",
+   "product": "비타케어에프정",
+   "oldHash": "c4c19dff496804d12627070024323765",
+   "newHash": "355ad6b2444f78e7113cfb20b6516e7d",
+   "rules": [
+    "HYPERCALC_CONTRA"
+   ]
+  },
+  {
+   "enId": "bc2343cb-e2fb-4e78-97b4-7e638d4e13ab",
+   "master": "546c6fbd-e2f2-4514-849e-0441a58370c8",
+   "product": "비엘피린장용정100밀리그램(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "4f01a44d-0184-4f25-970a-b49fac5394ef",
+   "master": "54d85881-903b-46c9-b988-64bbeea49538",
+   "product": "케이녹시액5%(미녹시딜)",
+   "oldHash": "8886d2a69bd90f9b4348bd92b1b02b64",
+   "newHash": "ccca71a77d0e2694d8d3121dba174454",
+   "rules": [
+    "ELDERLY_EDEMA_THYROID2"
+   ]
+  },
+  {
+   "enId": "e6028cce-5dad-4d19-98e2-083e330d3327",
+   "master": "5a9c9d70-fa15-4e1d-97db-a4867331f335",
+   "product": "버물리에스액",
+   "oldHash": "c9b7673efc9f2b6bc4d43a533852fe9d",
+   "newHash": "fb37f41fd92d7cf99515a0b7238ab49d",
+   "rules": [
+    "NO_IMPROVE_CONSULT_RANGE"
+   ]
+  },
+  {
+   "enId": "1fb6eb9d-cf09-40fb-91f0-120e8dd60d00",
+   "master": "62c19efc-3650-4486-a30d-346aad3f2f8f",
+   "product": "비카린엠장용정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "63ff179e3f5db3d4fb642f185fc422eb",
+   "rules": [
+    "LAXATIVE_CONSULT"
+   ]
+  },
+  {
+   "enId": "e70eabf6-611e-40b8-ad5d-ee07580512d5",
+   "master": "67444947-b58d-4044-af80-4835b991bdf8",
+   "product": "닥터로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "9cd7411f935a0f3ec09fcb7db0c03697",
+   "rules": [
+    "NO_IMPROVE_STOP_RANGE2"
+   ]
+  },
+  {
+   "enId": "b2e5c3e4-e04d-4852-83bf-2ab8e98aa09b",
+   "master": "67c28107-34fa-4cd1-85d5-a964478dabe4",
+   "product": "코스맥스아스피린장용정100mg(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "0875c915-5f69-4fac-b5e1-9949d49efc7d",
+   "master": "6cd59706-a85b-41d5-bf1d-a07c6cf477e7",
+   "product": "이브엔연질캡슐",
+   "oldHash": "75f6313c645974bab8cad34c1dd6e144",
+   "newHash": "ac1d6e42a573805e797a21444736def8",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "cb2f2830-e9e8-460c-8e6f-a9fc89f11b51",
+   "master": "70f454c6-47bc-41e9-8fc1-b12027b8e225",
+   "product": "레이디퀸연질캡슐",
+   "oldHash": "75f6313c645974bab8cad34c1dd6e144",
+   "newHash": "ac1d6e42a573805e797a21444736def8",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "2fb93c95-608f-4573-ace7-89f59768e591",
+   "master": "72eae5bf-c6dd-467e-a7db-a86db21f90d9",
+   "product": "페인엔젤레이디연질캡슐",
+   "oldHash": "7cda593b56a079ab28713ac6038e2d71",
+   "newHash": "6f015af1ff78de8ce1bc93172549c336",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "b506e3b2-9ffe-4984-8a93-bf78016f1553",
+   "master": "7460f321-7835-4d73-9463-09f097a74962",
+   "product": "이브엔연질캡슐",
+   "oldHash": "75f6313c645974bab8cad34c1dd6e144",
+   "newHash": "ac1d6e42a573805e797a21444736def8",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "c6100d16-54fc-4b4e-8d5f-63b07251ac6b",
+   "master": "7686cc0f-1bd3-42c5-bdaa-ecc80c0949c9",
+   "product": "닥터로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "9cd7411f935a0f3ec09fcb7db0c03697",
+   "rules": [
+    "NO_IMPROVE_STOP_RANGE2"
+   ]
+  },
+  {
+   "enId": "0f6420cc-0632-4b99-9597-1bb42df8eca5",
+   "master": "77d22483-23b1-4895-99f5-a374296c5a48",
+   "product": "버물리에스액",
+   "oldHash": "c9b7673efc9f2b6bc4d43a533852fe9d",
+   "newHash": "fb37f41fd92d7cf99515a0b7238ab49d",
+   "rules": [
+    "NO_IMPROVE_CONSULT_RANGE"
+   ]
+  },
+  {
+   "enId": "4dfd5864-b84b-4f15-a03e-c220868d1328",
+   "master": "848cfa8f-873c-4409-9f51-d34ef817bb5f",
+   "product": "비카린엠장용정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "63ff179e3f5db3d4fb642f185fc422eb",
+   "rules": [
+    "LAXATIVE_CONSULT"
+   ]
+  },
+  {
+   "enId": "f866aa8e-a26a-4b08-9bbd-ee9eedf9f476",
+   "master": "8de15bd1-4880-42f9-aafb-0cda0683152e",
+   "product": "나리스타자일로점비액(자일로메타졸린염산염)",
+   "oldHash": "6561badbfc39495592045e6d4dea0d30",
+   "newHash": "404a0335f55733185fbc9396be5e4cc1",
+   "rules": [
+    "NO_CONTINUOUS_USE_DAYS2"
+   ]
+  },
+  {
+   "enId": "02b0ab3d-06da-4eb8-b888-e34641dbc6a3",
+   "master": "9f5d7342-2f96-4e0d-a1c3-f836274ecc2b",
+   "product": "파인펜정",
+   "oldHash": "7f19dcba8228fc31d2a26baa15295a9e",
+   "newHash": "f1dff53b22b41bf2dcb816f9bb908bdf",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "f887005c-9640-44b3-b45e-0e6fb9d16c80",
+   "master": "9fa37e13-98f7-408e-96d5-e8af1a937aad",
+   "product": "제로무원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "13e9a053d5dfd386a5175a0d4c01081a",
+   "rules": [
+    "TINEA_PEDIS_AGE",
+    "NO_USE_UNDER_AGE"
+   ]
+  },
+  {
+   "enId": "b9acfb1e-97c3-43c5-8c99-ce01fdcb6500",
+   "master": "a271ad1d-14ae-4731-b134-a8bf73facc7d",
+   "product": "비타케어에프정",
+   "oldHash": "c4c19dff496804d12627070024323765",
+   "newHash": "355ad6b2444f78e7113cfb20b6516e7d",
+   "rules": [
+    "HYPERCALC_CONTRA"
+   ]
+  },
+  {
+   "enId": "8cf7ef14-bea6-4651-8d0e-8f61b8fbb409",
+   "master": "a4344378-eb40-4861-9ba4-542c84eab38f",
+   "product": "보령바이오아스피린장용정100밀리그램",
+   "oldHash": "c013c65a8ec0af38296113c7a5974c84",
+   "newHash": "02155a652c9c56c64af98d5919ae404f",
+   "rules": [
+    "SALICYLATE_CONTRA_SHORT"
+   ]
+  },
+  {
+   "enId": "c11ea2b1-4422-4036-a4f2-c475ed835e9a",
+   "master": "a7bb5df1-afa1-426b-aad7-83c9a82d43bd",
+   "product": "보령바이오아스피린장용정100밀리그램",
+   "oldHash": "c013c65a8ec0af38296113c7a5974c84",
+   "newHash": "02155a652c9c56c64af98d5919ae404f",
+   "rules": [
+    "SALICYLATE_CONTRA_SHORT"
+   ]
+  },
+  {
+   "enId": "c0361f0d-09b7-4e2b-bfea-c1542f730fc3",
+   "master": "aad33e6f-ce14-484c-90c0-3fa7a38a1e1c",
+   "product": "케이녹시액5%(미녹시딜)",
+   "oldHash": "8886d2a69bd90f9b4348bd92b1b02b64",
+   "newHash": "ccca71a77d0e2694d8d3121dba174454",
+   "rules": [
+    "ELDERLY_EDEMA_THYROID2"
+   ]
+  },
+  {
+   "enId": "6bc90ff9-7c44-4df2-b32f-664189fcf766",
+   "master": "ad6b3bcc-a4c3-4940-9870-0173d4499c2c",
+   "product": "이부프렌드프로연질캡슐",
+   "oldHash": "4d71d5fb3dc30dce49444c98f97cfb0c",
+   "newHash": "d378a4c157b288691b7460e2aa83974a",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "d48eefdc-2118-47f4-bc0b-b4de01cebda8",
+   "master": "ba3554df-ea52-4c04-b677-5507798d4b0c",
+   "product": "코스맥스아스피린장용정100mg(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "f51ba49b-98dc-40d0-94cd-bf0b1e04eea7",
+   "master": "ba45fd47-eadd-49c8-b259-c9f94be4ae79",
+   "product": "페인엔젤레이디연질캡슐",
+   "oldHash": "7cda593b56a079ab28713ac6038e2d71",
+   "newHash": "6f015af1ff78de8ce1bc93172549c336",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "20ff119a-8f44-4054-8857-7432cd71ed99",
+   "master": "bade60ec-efc0-4ee7-a34f-ad9879ec2adf",
+   "product": "제로무원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "13e9a053d5dfd386a5175a0d4c01081a",
+   "rules": [
+    "TINEA_PEDIS_AGE",
+    "NO_USE_UNDER_AGE"
+   ]
+  },
+  {
+   "enId": "07d4c446-9d05-44ee-9a2c-744dd1ff15a8",
+   "master": "c0df255b-cb40-475b-8b17-1d06185e5aa5",
+   "product": "미녹시폼에어로솔5%(미녹시딜)",
+   "oldHash": "12866f3ca8b2be578eca5d09154d7abc",
+   "newHash": "cd1e979319efa6e82e3fc274319ca845",
+   "rules": [
+    "SKIN_ADVERSE_STOP"
+   ]
+  },
+  {
+   "enId": "41e26c9c-cc55-4047-9654-6789636ce82f",
+   "master": "c17c4340-c76c-4036-8bd8-4283e6f831b4",
+   "product": "코메키나캡슐",
+   "oldHash": "a588bd7c1e959513b06ac8d9402d289f",
+   "newHash": "67cbea1186412111c8485b424b6a4238",
+   "rules": [
+    "MAO_AGE_CONTRA"
+   ]
+  },
+  {
+   "enId": "bc6fed8c-2196-45b0-ad22-392d97a6d30a",
+   "master": "c4a6b02e-8d3e-43c9-a006-241730b9e814",
+   "product": "코스맥스아스피린장용정100mg(아스피린)",
+   "oldHash": "78c9fb79a94cddfe252237d6baf261be",
+   "newHash": "12b325f164a2fce649ed007bdb7cd147",
+   "rules": [
+    "SALICYLATE_CONTRA_FULL"
+   ]
+  },
+  {
+   "enId": "c97404fd-c114-4f5e-83c4-8a4015bc677c",
+   "master": "cbd8dac0-b965-4da0-9ca6-01d08bf86b06",
+   "product": "제로무원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "13e9a053d5dfd386a5175a0d4c01081a",
+   "rules": [
+    "TINEA_PEDIS_AGE",
+    "NO_USE_UNDER_AGE"
+   ]
+  },
+  {
+   "enId": "5c22ee59-f33b-4748-8321-59a465ad4646",
+   "master": "cc940fb7-53cb-42ad-abb3-0c2414b37c29",
+   "product": "비코엑스장용정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "63ff179e3f5db3d4fb642f185fc422eb",
+   "rules": [
+    "LAXATIVE_CONSULT"
+   ]
+  },
+  {
+   "enId": "3d230a9f-7b68-4197-a474-df0811c2e699",
+   "master": "cec842e0-d600-4245-9386-11940d88dea9",
+   "product": "미녹시폼에어로솔5%(미녹시딜)",
+   "oldHash": "12866f3ca8b2be578eca5d09154d7abc",
+   "newHash": "cd1e979319efa6e82e3fc274319ca845",
+   "rules": [
+    "SKIN_ADVERSE_STOP"
+   ]
+  },
+  {
+   "enId": "1715af99-01c7-498b-ae45-e05f0b41975f",
+   "master": "d28b9ed8-31a4-4a99-836c-db2722bdeead",
+   "product": "보령바이오아스피린장용정100밀리그램",
+   "oldHash": "c013c65a8ec0af38296113c7a5974c84",
+   "newHash": "02155a652c9c56c64af98d5919ae404f",
+   "rules": [
+    "SALICYLATE_CONTRA_SHORT"
+   ]
+  },
+  {
+   "enId": "caa63288-ba08-4fac-91e4-b4a2ee9315d1",
+   "master": "d44f44da-a3b3-48ec-9c55-429645aaee2a",
+   "product": "페인엔젤레이디연질캡슐",
+   "oldHash": "7cda593b56a079ab28713ac6038e2d71",
+   "newHash": "6f015af1ff78de8ce1bc93172549c336",
+   "rules": [
+    "IBU_HIGHDOSE_AVOID"
+   ]
+  },
+  {
+   "enId": "4cce6df9-4718-41dd-aa28-aedbfdccd6be",
+   "master": "da0ff81f-757e-4380-93d0-983dcac57469",
+   "product": "아노덱스정",
+   "oldHash": "c4c19dff496804d12627070024323765",
+   "newHash": "355ad6b2444f78e7113cfb20b6516e7d",
+   "rules": [
+    "HYPERCALC_CONTRA"
+   ]
+  },
+  {
+   "enId": "013dccca-9fb5-4bd7-8357-5040b934d581",
+   "master": "dc32bde5-ebb6-4844-b0d9-d03c906c5caa",
+   "product": "엘도비캡슐(에르도스테인)",
+   "oldHash": "a79a68aa50b1640f3a376a8788d7b983",
+   "newHash": "e9ce82711629d410563f669ee18134d5",
+   "rules": [
+    "ERDOSTEINE_CONTRA"
+   ]
+  },
+  {
+   "enId": "7251fe64-726b-48e4-9c2e-49b59ed7b80c",
+   "master": "dd93ac7d-a1e5-4b6b-bbdf-6f64e3b58ef7",
+   "product": "아노덱스정",
+   "oldHash": "c4c19dff496804d12627070024323765",
+   "newHash": "355ad6b2444f78e7113cfb20b6516e7d",
+   "rules": [
+    "HYPERCALC_CONTRA"
+   ]
+  },
+  {
+   "enId": "557f5ae2-4be9-462c-9313-74e6cd6dbd9e",
+   "master": "f8554aab-2829-481e-97d0-87849e34ffa2",
+   "product": "닥터로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "9cd7411f935a0f3ec09fcb7db0c03697",
+   "rules": [
+    "NO_IMPROVE_STOP_RANGE2"
+   ]
+  },
+  {
+   "enId": "0a76dcb4-591b-485e-ae3d-2651cdb466b3",
+   "master": "f9ce1762-3729-4e3c-87d1-a9f395bf7dba",
+   "product": "에도스캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA2"
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "e74c81a5-90e6-4bb0-844d-c386e56bdcad",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4a4bf9eb-2148-4314-b2f2-d2cebcc31ecd",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b519d363-8817-47c4-b8e2-cea1ca656a18",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "fe6e26ee-ef90-48db-8564-803419641aa9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b8fc69f3-542f-4897-90bc-e4b4fe5da1ab",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "38f71af4-1e15-4d53-b0ef-e2d2b2a55b44",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f6847f12-1d99-4c3e-9d42-32311810f475",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "7e61c799-6604-4f85-89ba-925cd2a3ae68",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e31bd6c9-b7b4-405f-b78a-2c351095d6e8",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "1ff2dc8b-d0a8-441b-95e7-4abdfaf0ba5a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "051573d8-dd21-4817-8947-5e066fc8ea59",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "7fde92c0-9547-4917-831e-ecb8e8f88b3d",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2c8bd12d-caf9-496f-83de-473bfc2cea2a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e7e07068-aaa8-4d60-8707-f69a24c670e3",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "63e29351-4a63-40db-899d-dc28bce793e4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "554c9a78-b0f8-4da1-a81e-eedf7e93d52a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e231aee1-41c9-4a6e-b72f-f8b46166ce3b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "59b3d916-f76f-4a76-adae-26b33b39dd3b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "80b30a79-ad02-4981-a174-56bf65e7b3c6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "c7cca0b4-c2d8-4aa6-8db2-5b994b4b0804",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b163b249-2432-499d-83d7-3143c76bfee6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "7ef692ff-fb11-47e7-85dc-f13d44422cc1",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f51aed3a-e6da-47e8-863d-aac60cafcf0e",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "c27f7f1e-5dd2-4d61-82bd-4b470ea116e1",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f0d9a86b-ad5d-4535-b77e-bfc308215ac6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b74cfdd6-00dd-4a71-a7c4-794604521278",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "6f884096-dcd0-4759-9ddb-c657392c6dcb",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "93ad31d4-fc1c-42ee-9e83-4880344738e2",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5f8de2e8-0cc8-46c3-a3fb-65bfb9fb1ef9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "599c1ec9-c098-4c90-b7e6-9c37ff6f924a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "909d8a1b-6882-4dde-9536-d7c3174893de",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "ec2b600b-1467-4c9f-a7be-490b895078de",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "10f691b3-79bd-48e9-90be-0b4d2db6d7ec",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "59b640d0-2b5c-4db3-a904-1747c794f72a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "752b74e3-f668-49ef-8ad0-1a190714822f",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8a6306fa-1209-44ec-a4e8-5b0d0b0f3c54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4b30f687-e7c4-411f-8928-cc03faa0d31c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4980e958-39ae-4c5f-bd17-4c22dc7c5ca6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d8174793-f39e-4d71-9d4a-7dd9df8c8200",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b388ba59-003b-4d08-90de-a843012df31a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "66add10b-29bf-40cb-a2f3-66392e4d3997",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e93da3cf-20c7-4b1b-bd48-b8aa46efe342",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2e41fefd-2e0b-4308-b77b-a74a3ead4ee5",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b286ebf7-d8ac-449e-97c7-85419da4b134",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2cd2e2d2-8e30-49da-a3de-8c661a7444c5",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "87e2acb2-cc97-4324-8d5f-41705f336fe7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "64b5c9b4-1641-4b67-bcb3-85a4e5a42936",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "1659b70f-34a6-4f27-9a9e-91fb03b112ec",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f35c4e54-cd89-4570-b503-334ab7120d33",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5e0891a5-c03e-4057-b2be-b7e64b1dcfc4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "813dd3ae-b222-414b-a9dc-a32d58816391",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "892b6fa4-662e-42f7-9f10-8e11e79ff77e",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "dd6a5f3c-3f43-45b0-a036-f4983efdc461",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "56db902f-21c4-440d-aa21-1981e253598c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e67f3c8e-188b-4ba9-b062-6353493d39c6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "bcada9a7-b49b-4849-b0d6-bcc5f6c3ec13",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d00e7179-16c1-4473-99c3-9186cc200405",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b6e5eab0-1c6c-4ca5-b2b3-97bb0964a24f",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "aae69d5e-a534-40b5-b0d3-dad41337544b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "99c5b095-b128-4221-be6c-957c388da59b",
+   "code": "NO_RULE_MATCH"
+  }
+ ],
+ "results": [
+  {
+   "enId": "d47ed156-fc7d-434f-a442-e12d2ee1fb5b",
+   "status": "GREEN"
+  },
+  {
+   "enId": "1ff49f39-738c-484f-a4bd-479af00dece2",
+   "status": "GREEN"
+  },
+  {
+   "enId": "64028595-20bd-4e6e-90c7-8aee841aeb23",
+   "status": "GREEN"
+  },
+  {
+   "enId": "475c5f1c-b492-4d43-9702-c7eba13b5774",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c4043aa8-f3fb-4093-ab9c-97c3a085512f",
+   "status": "GREEN"
+  },
+  {
+   "enId": "4f7a5cf3-4b7b-4837-957f-9145b4a76345",
+   "status": "GREEN"
+  },
+  {
+   "enId": "12c0e2cf-e150-4e0d-af12-52e55434beb7",
+   "status": "GREEN"
+  },
+  {
+   "enId": "ce3e0b32-d558-49c4-b211-f595b072ba24",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b8050602-73c3-4b3c-9d9b-f2a0e1edc741",
+   "status": "GREEN"
+  },
+  {
+   "enId": "7cfec54c-1b0d-4a32-8f37-40c0ccfa33d8",
+   "status": "GREEN"
+  },
+  {
+   "enId": "10d30b06-aa94-49fe-9670-3534476238f0",
+   "status": "GREEN"
+  },
+  {
+   "enId": "e6f16662-3bbb-4d3e-a868-baf2f8bd5fa4",
+   "status": "GREEN"
+  },
+  {
+   "enId": "ea1dd6ab-037e-48a8-9a03-54d6659cc9bf",
+   "status": "GREEN"
+  },
+  {
+   "enId": "a57b99f1-af46-49f2-a0eb-f7fcaa3f5336",
+   "status": "GREEN"
+  },
+  {
+   "enId": "8fc6ac1c-5eec-43d2-bfa8-3384b79c463c",
+   "status": "GREEN"
+  },
+  {
+   "enId": "14c7a827-36d7-4890-822a-b97f7f804caa",
+   "status": "GREEN"
+  },
+  {
+   "enId": "67be9b02-0215-48fe-95dc-5c27cee53e48",
+   "status": "GREEN"
+  },
+  {
+   "enId": "a09fb966-2f7c-4ae4-bfb5-15ca98419eb4",
+   "status": "GREEN"
+  },
+  {
+   "enId": "2e8f12d4-022e-4270-9f6d-e73e933d24c9",
+   "status": "GREEN"
+  },
+  {
+   "enId": "40f34a6a-0144-443d-9a1f-e3784a9d32ee",
+   "status": "GREEN"
+  },
+  {
+   "enId": "e2825fbc-06ad-4722-bea4-6cf3d88a7f1e",
+   "status": "GREEN"
+  },
+  {
+   "enId": "6eb33ad3-6cc7-49bb-b0f0-098c146ea8a6",
+   "status": "GREEN"
+  },
+  {
+   "enId": "8cd8e771-9efb-485b-b67f-d8644b93a41f",
+   "status": "GREEN"
+  },
+  {
+   "enId": "6af53e73-ed35-4d00-936a-b3fb0bff775a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "19728786-ebd2-4937-8fad-d730789628f8",
+   "status": "GREEN"
+  },
+  {
+   "enId": "bc2343cb-e2fb-4e78-97b4-7e638d4e13ab",
+   "status": "GREEN"
+  },
+  {
+   "enId": "4f01a44d-0184-4f25-970a-b49fac5394ef",
+   "status": "GREEN"
+  },
+  {
+   "enId": "e6028cce-5dad-4d19-98e2-083e330d3327",
+   "status": "GREEN"
+  },
+  {
+   "enId": "1fb6eb9d-cf09-40fb-91f0-120e8dd60d00",
+   "status": "GREEN"
+  },
+  {
+   "enId": "e70eabf6-611e-40b8-ad5d-ee07580512d5",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b2e5c3e4-e04d-4852-83bf-2ab8e98aa09b",
+   "status": "GREEN"
+  },
+  {
+   "enId": "0875c915-5f69-4fac-b5e1-9949d49efc7d",
+   "status": "GREEN"
+  },
+  {
+   "enId": "cb2f2830-e9e8-460c-8e6f-a9fc89f11b51",
+   "status": "GREEN"
+  },
+  {
+   "enId": "2fb93c95-608f-4573-ace7-89f59768e591",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b506e3b2-9ffe-4984-8a93-bf78016f1553",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c6100d16-54fc-4b4e-8d5f-63b07251ac6b",
+   "status": "GREEN"
+  },
+  {
+   "enId": "0f6420cc-0632-4b99-9597-1bb42df8eca5",
+   "status": "GREEN"
+  },
+  {
+   "enId": "4dfd5864-b84b-4f15-a03e-c220868d1328",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f866aa8e-a26a-4b08-9bbd-ee9eedf9f476",
+   "status": "GREEN"
+  },
+  {
+   "enId": "02b0ab3d-06da-4eb8-b888-e34641dbc6a3",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f887005c-9640-44b3-b45e-0e6fb9d16c80",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b9acfb1e-97c3-43c5-8c99-ce01fdcb6500",
+   "status": "GREEN"
+  },
+  {
+   "enId": "8cf7ef14-bea6-4651-8d0e-8f61b8fbb409",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c11ea2b1-4422-4036-a4f2-c475ed835e9a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c0361f0d-09b7-4e2b-bfea-c1542f730fc3",
+   "status": "GREEN"
+  },
+  {
+   "enId": "6bc90ff9-7c44-4df2-b32f-664189fcf766",
+   "status": "GREEN"
+  },
+  {
+   "enId": "d48eefdc-2118-47f4-bc0b-b4de01cebda8",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f51ba49b-98dc-40d0-94cd-bf0b1e04eea7",
+   "status": "GREEN"
+  },
+  {
+   "enId": "20ff119a-8f44-4054-8857-7432cd71ed99",
+   "status": "GREEN"
+  },
+  {
+   "enId": "07d4c446-9d05-44ee-9a2c-744dd1ff15a8",
+   "status": "GREEN"
+  },
+  {
+   "enId": "41e26c9c-cc55-4047-9654-6789636ce82f",
+   "status": "GREEN"
+  },
+  {
+   "enId": "bc6fed8c-2196-45b0-ad22-392d97a6d30a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c97404fd-c114-4f5e-83c4-8a4015bc677c",
+   "status": "GREEN"
+  },
+  {
+   "enId": "5c22ee59-f33b-4748-8321-59a465ad4646",
+   "status": "GREEN"
+  },
+  {
+   "enId": "3d230a9f-7b68-4197-a474-df0811c2e699",
+   "status": "GREEN"
+  },
+  {
+   "enId": "1715af99-01c7-498b-ae45-e05f0b41975f",
+   "status": "GREEN"
+  },
+  {
+   "enId": "caa63288-ba08-4fac-91e4-b4a2ee9315d1",
+   "status": "GREEN"
+  },
+  {
+   "enId": "4cce6df9-4718-41dd-aa28-aedbfdccd6be",
+   "status": "GREEN"
+  },
+  {
+   "enId": "013dccca-9fb5-4bd7-8357-5040b934d581",
+   "status": "GREEN"
+  },
+  {
+   "enId": "7251fe64-726b-48e4-9c2e-49b59ed7b80c",
+   "status": "GREEN"
+  },
+  {
+   "enId": "557f5ae2-4be9-462c-9313-74e6cd6dbd9e",
+   "status": "GREEN"
+  },
+  {
+   "enId": "0a76dcb4-591b-485e-ae3d-2651cdb466b3",
+   "status": "GREEN"
+  }
+ ]
+}
