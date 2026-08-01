@@ -82,10 +82,12 @@ export class PharmacyHubOrderController {
     const limit = Math.min(Math.max(Number(req.query.limit) || 20, 1), MAX_LIMIT);
 
     try {
+      // ⚠️ checkout_orders 는 camelCase 컬럼이다 ("buyerId"/"orderNumber"/"totalAmount"…).
+      //    따옴표 없이 snake_case 로 쓰면 42703 으로 실패한다.
       const [countRow] = await AppDataSource.query(
         `SELECT COUNT(*)::int AS total
            FROM checkout_orders
-          WHERE buyer_id = $1::uuid
+          WHERE "buyerId" = $1::uuid
             AND metadata->>'serviceKey' = $2`,
         [buyerId, SERVICE_KEY],
       );
@@ -93,18 +95,18 @@ export class PharmacyHubOrderController {
 
       const items = await AppDataSource.query(
         `SELECT id::text                    AS "orderId",
-                order_number                AS "orderNumber",
-                supplier_id                 AS "supplierId",
+                "orderNumber",
+                "supplierId",
                 status,
-                total_amount                AS "totalAmount",
+                "totalAmount",
                 subtotal,
-                shipping_fee                AS "shippingFee",
+                "shippingFee",
                 jsonb_array_length(items)   AS "itemCount",
-                created_at                  AS "createdAt"
+                "createdAt"
            FROM checkout_orders
-          WHERE buyer_id = $1::uuid
+          WHERE "buyerId" = $1::uuid
             AND metadata->>'serviceKey' = $2
-          ORDER BY created_at DESC
+          ORDER BY "createdAt" DESC
           LIMIT ${limit} OFFSET ${(page - 1) * limit}`,
         [buyerId, SERVICE_KEY],
       );
@@ -139,21 +141,21 @@ export class PharmacyHubOrderController {
     try {
       const [row] = await AppDataSource.query(
         `SELECT co.id::text                 AS "orderId",
-                co.order_number             AS "orderNumber",
-                co.supplier_id              AS "supplierId",
+                co."orderNumber",
+                co."supplierId",
                 COALESCE(org.name, '공급자') AS "supplierName",
                 co.status,
                 co.subtotal,
-                co.shipping_fee             AS "shippingFee",
-                co.total_amount             AS "totalAmount",
+                co."shippingFee",
+                co."totalAmount",
                 co.items,
                 co.metadata->>'note'        AS "note",
-                co.created_at               AS "createdAt"
+                co."createdAt"
            FROM checkout_orders co
-           LEFT JOIN neture_suppliers ns ON ns.id::text = co.supplier_id
+           LEFT JOIN neture_suppliers ns ON ns.id::text = co."supplierId"
            LEFT JOIN organizations org    ON org.id = ns.organization_id
           WHERE co.id = $1::uuid
-            AND co.buyer_id = $2::uuid
+            AND co."buyerId" = $2::uuid
             AND co.metadata->>'serviceKey' = $3`,
         [orderId, buyerId, SERVICE_KEY],
       );
