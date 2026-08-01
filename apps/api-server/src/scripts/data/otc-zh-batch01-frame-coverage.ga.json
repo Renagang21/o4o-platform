@@ -1,0 +1,110 @@
+{
+ "lang": "zh",
+ "batch": "zh-batch-01",
+ "frameGlossaryUnits": 57,
+ "inventory": {
+  "distinctUnits": 16340,
+  "totalOcc": 105594
+ },
+ "frameCoverage": {
+  "units": 2387,
+  "unitsPct": 14.6,
+  "occ": 52775,
+  "occPct": 50
+ },
+ "byKind": {
+  "h2": {
+   "units": 27,
+   "covered": 11,
+   "occ": 15877,
+   "coveredOcc": 15356
+  },
+  "tag": {
+   "units": 7,
+   "covered": 7,
+   "occ": 18482,
+   "coveredOcc": 18482
+  },
+  "badge": {
+   "units": 1153,
+   "covered": 24,
+   "occ": 8549,
+   "coveredOcc": 4130
+  },
+  "tile": {
+   "units": 2902,
+   "covered": 1186,
+   "occ": 18482,
+   "coveredOcc": 9686
+  },
+  "foot": {
+   "units": 14,
+   "covered": 4,
+   "occ": 4295,
+   "coveredOcc": 2482
+  },
+  "warn": {
+   "units": 5653,
+   "covered": 0,
+   "occ": 19227,
+   "coveredOcc": 0
+  },
+  "intake": {
+   "units": 2163,
+   "covered": 0,
+   "occ": 6920,
+   "coveredOcc": 0
+  },
+  "h1": {
+   "units": 1709,
+   "covered": 0,
+   "occ": 4569,
+   "coveredOcc": 0
+  },
+  "small": {
+   "units": 1241,
+   "covered": 1155,
+   "occ": 3395,
+   "coveredOcc": 2639
+  },
+  "intro": {
+   "units": 1337,
+   "covered": 0,
+   "occ": 4569,
+   "coveredOcc": 0
+  },
+  "meta": {
+   "units": 134,
+   "covered": 0,
+   "occ": 1229,
+   "coveredOcc": 0
+  }
+ },
+ "sampleDocs": 200,
+ "sampleFullyCovered": 0,
+ "sampleGapsByKind": {
+  "badge": 183,
+  "meta": 62,
+  "small": 45,
+  "intro": 184,
+  "tile": 400,
+  "intake": 184,
+  "warn": 756,
+  "foot": 59,
+  "h2": 18
+ },
+ "contract": {
+  "source": "KO canonical (EN 은 참고 검증용, 번역 입력 아님)",
+  "method": "KO HTML 템플릿 유지 + 텍스트 슬롯 치환 → 표준 디자인 자동 계승",
+  "holdRule": "근거 없는 슬롯 1개라도 있으면 문서 생성 금지(부분 번역 금지)",
+  "lengthPolicy": "글자 수 제한·축약·요약·절단 금지",
+  "store": {
+   "language": "zh",
+   "descriptionType": "STORE",
+   "status": "canonical",
+   "sourceTypeFollowsKo": true
+  },
+  "canonicalDupGuard": "uniq_shared_product_descriptions_canonical_per_master_type_lang (부분 유니크) + INSERT WHERE NOT EXISTS",
+  "outOfScopeWrite": "KO·EN·타 언어·ProductMaster 무변경"
+ }
+}
