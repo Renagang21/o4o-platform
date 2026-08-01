@@ -9,6 +9,8 @@
  * Partner Commission 계산은 CommissionEngine에 위임.
  */
 
+// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
 
@@ -53,12 +55,14 @@ export class PartnerCommissionService {
        JOIN neture_seller_partner_contracts nspc ON nspc.recruitment_id = npr.id
          AND nspc.contract_status = 'active'
        WHERE o.id = $1
+         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: Neture 파트너 커미션은 Neture 주문만 대상
+         AND ${netureOrderServiceScopeSql('o', '$2')}
          AND NOT EXISTS (
            SELECT 1 FROM partner_commissions pc
            WHERE pc.partner_id = nspc.partner_id AND pc.order_id = o.id AND pc.status != 'cancelled'
          )
        GROUP BY nspc.partner_id, spo.supplier_id, o.id, o.order_number, nspc.id, nspc.commission_rate`,
-      [orderId],
+      [orderId, NETURE_FULFILLMENT_SERVICE_KEY],
     );
 
     if (rows.length === 0) {
@@ -231,8 +235,10 @@ export class PartnerCommissionService {
            SELECT 1 FROM partner_commissions pc
            WHERE pc.partner_id = nspc.partner_id AND pc.order_id = o.id AND pc.status != 'cancelled'
          )
+         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: Neture 파트너 커미션은 Neture 주문만 대상
+         AND ${netureOrderServiceScopeSql('o', '$3')}
        GROUP BY nspc.partner_id, spo.supplier_id, o.id, o.order_number, nspc.id, nspc.commission_rate`,
-      [periodStart, periodEnd],
+      [periodStart, periodEnd, NETURE_FULFILLMENT_SERVICE_KEY],
     );
 
     if (rows.length === 0) {

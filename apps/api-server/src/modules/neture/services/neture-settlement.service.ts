@@ -8,6 +8,8 @@
  * Platform Fee 계산은 CommissionEngine에 위임.
  */
 
+// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
 import logger from '../../../utils/logger.js';
 // WO-O4O-NETURE-SUPPLIER-BACKEND-LEGACY-SHELL-AND-NOTIFICATION-FINAL-RETIREMENT-V1:
@@ -177,9 +179,13 @@ export class NetureSettlementService {
            SELECT 1 FROM neture_settlement_orders nso
            WHERE nso.order_id = o.id
          )
+         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
+         --   공용 fulfillment 원장에는 여러 서비스 주문이 담긴다. Neture 정산은
+         --   Neture 주문만 집계해야 한다(미표기 = neture). 다른 서비스 정산은 각자 축에서 처리한다.
+         AND ${netureOrderServiceScopeSql('o', '$3')}
        GROUP BY spo.supplier_id
        HAVING SUM(oi.total_price) > 0`,
-      [periodStart, periodEnd],
+      [periodStart, periodEnd, NETURE_FULFILLMENT_SERVICE_KEY],
     );
 
     if (supplierAggregates.length === 0) {
