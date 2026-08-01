@@ -1,0 +1,192 @@
+{
+ "summary": {
+  "mode": "APPLY",
+  "input": 24,
+  "planned": 7,
+  "sentencesInserted": 7,
+  "byRule": {
+   "CHICKENPOX_FLU_CONSULT_V5": 2,
+   "LAXATIVE_CONSULT_V5": 2,
+   "SKIN_TEST_48H": 2,
+   "NO_IMPROVE_DAYS_ORAL_V5": 1
+  },
+  "skipped": 17,
+  "skipByCode": {
+   "NO_RULE_MATCH": 13,
+   "ALREADY_PRESENT": 4
+  },
+  "green": 7
+ },
+ "plans": [
+  {
+   "enId": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "master": "9af17284-96ed-4aec-9baf-180baae97da2",
+   "product": "엠피스에프정",
+   "oldHash": "f84c5ef807fcbcb8cca9a8d1c37f4b1c",
+   "newHash": "bee96f8fd598afe46abfa5ed9bb02042",
+   "rules": [
+    "CHICKENPOX_FLU_CONSULT_V5"
+   ]
+  },
+  {
+   "enId": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "master": "ad5455d3-bf36-4b6a-ad75-e4370845203b",
+   "product": "디센트에스정",
+   "oldHash": "1a46c2b0467b4f783f44ddc0b7b40581",
+   "newHash": "81012e9370cb6ce85a7cd3081f9aab7b",
+   "rules": [
+    "LAXATIVE_CONSULT_V5"
+   ]
+  },
+  {
+   "enId": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "master": "c78b76d2-5782-4c16-923b-5f85b16483d2",
+   "product": "로라샷연질캡슐(로라타딘)",
+   "oldHash": "ea6624ca3ed810dc5864edcd890c3b40",
+   "newHash": "21f630fce88b9910db2a812ad73dc7d6",
+   "rules": [
+    "SKIN_TEST_48H"
+   ]
+  },
+  {
+   "enId": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "master": "dd09f04b-0b51-46a4-99b1-73875c98fa4d",
+   "product": "위엔젤더블액션현탁액",
+   "oldHash": "f32089c26eecfd2bba839cb173ffd2cd",
+   "newHash": "23448bef715e417ff5f3d4c12ef63e39",
+   "rules": [
+    "NO_IMPROVE_DAYS_ORAL_V5"
+   ]
+  },
+  {
+   "enId": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "master": "e5fc63d8-46f8-4a8d-acd9-e5a370093b5c",
+   "product": "로라샷연질캡슐(로라타딘)",
+   "oldHash": "ea6624ca3ed810dc5864edcd890c3b40",
+   "newHash": "21f630fce88b9910db2a812ad73dc7d6",
+   "rules": [
+    "SKIN_TEST_48H"
+   ]
+  },
+  {
+   "enId": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "master": "ead5face-5ba2-4c9b-a9f4-59aa3aaaadb5",
+   "product": "엠피스에프정",
+   "oldHash": "f84c5ef807fcbcb8cca9a8d1c37f4b1c",
+   "newHash": "bee96f8fd598afe46abfa5ed9bb02042",
+   "rules": [
+    "CHICKENPOX_FLU_CONSULT_V5"
+   ]
+  },
+  {
+   "enId": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "master": "ee5483f9-1d0e-4077-9346-c47ec5ee6b1f",
+   "product": "디센트에스정",
+   "oldHash": "1a46c2b0467b4f783f44ddc0b7b40581",
+   "newHash": "81012e9370cb6ce85a7cd3081f9aab7b",
+   "rules": [
+    "LAXATIVE_CONSULT_V5"
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "051573d8-dd21-4817-8947-5e066fc8ea59",
+   "code": "ALREADY_PRESENT"
+  },
+  {
+   "id": "e7e07068-aaa8-4d60-8707-f69a24c670e3",
+   "code": "ALREADY_PRESENT"
+  },
+  {
+   "id": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f51aed3a-e6da-47e8-863d-aac60cafcf0e",
+   "code": "ALREADY_PRESENT"
+  },
+  {
+   "id": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d00e7179-16c1-4473-99c3-9186cc200405",
+   "code": "ALREADY_PRESENT"
+  },
+  {
+   "id": "99c5b095-b128-4221-be6c-957c388da59b",
+   "code": "NO_RULE_MATCH"
+  }
+ ],
+ "results": [
+  {
+   "enId": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "status": "GREEN"
+  },
+  {
+   "enId": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "status": "GREEN"
+  },
+  {
+   "enId": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "status": "GREEN"
+  },
+  {
+   "enId": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "status": "GREEN"
+  },
+  {
+   "enId": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "status": "GREEN"
+  }
+ ]
+}
