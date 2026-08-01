@@ -1,0 +1,86 @@
+{
+ "policy": "NO_LENGTH_LIMIT — 길이는 결함이 아니며 축약·절단하지 않는다",
+ "population": 22011,
+ "structureOk": 22011,
+ "structureBad": 0,
+ "structureBadSample": [],
+ "tilesOver300": 575,
+ "tilesOver300Handling": "축약하지 않음 — 원문 보존. 렌더 표시만 확인",
+ "lengthExtremes": {
+  "docLen": 9489,
+  "liPerDoc": 24,
+  "liLen": 2523,
+  "tileLen": 900
+ },
+ "rendererClippingRisks": [],
+ "rendererWrapGuards": [
+  ".store-desc-content .sd-badge:not(.is-solid){line-height:1.45;padding:7px 14px;border-radius:14px;max-width:100%;white-s"
+ ],
+ "rendererVerdict": "NO_CLIPPING_RULE",
+ "renderPreview": "scratchpad/otc-render-nolimit.html",
+ "renderCases": [
+  {
+   "label": "최장 문서",
+   "enId": "56294f68-b673-4cc4-b80c-56e50af7ea93",
+   "product": "이큐펜키즈아이시럽(이부프로펜)",
+   "docLen": 9489,
+   "liN": 11,
+   "liMax": 2454,
+   "tileMax": 457
+  },
+  {
+   "label": "주의 항목 최다",
+   "enId": "464f7fa6-2f79-4127-8873-01714a5ebb54",
+   "product": "프리노즈에스정",
+   "docLen": 6806,
+   "liN": 24,
+   "liMax": 677,
+   "tileMax": 167
+  },
+  {
+   "label": "최장 항목",
+   "enId": "00b48ead-83af-4dff-bbf6-c0c83a058152",
+   "product": "애니펜정150밀리그람(덱시부프로펜)",
+   "docLen": 8709,
+   "liN": 12,
+   "liMax": 2523,
+   "tileMax": 199
+  },
+  {
+   "label": "최장 타일",
+   "enId": "5e1f33bf-b5b9-4ce3-9b13-e9f13ba6b0c3",
+   "product": "마그라민액티브맥스연질캡슐",
+   "docLen": 6836,
+   "liN": 9,
+   "liMax": 651,
+   "tileMax": 900
+  },
+  {
+   "label": "장문 타일 900자",
+   "enId": "9aa6c5ad-8727-4388-b7ad-fec58670ae47",
+   "product": "마그라민액티브맥스연질캡슐",
+   "docLen": 6836,
+   "liN": 9,
+   "liMax": 651,
+   "tileMax": 900
+  },
+  {
+   "label": "장문 타일 891자",
+   "enId": "660dc96e-3f4f-4ad9-bc51-95bb7d2a1f8c",
+   "product": "마그라민트리플액션정",
+   "docLen": 6303,
+   "liN": 8,
+   "liMax": 471,
+   "tileMax": 891
+  },
+  {
+   "label": "장문 타일 891자",
+   "enId": "03d9d87b-020d-4e71-84b4-2b13019caae7",
+   "product": "마그라민트리플액션정",
+   "docLen": 6303,
+   "liN": 8,
+   "liMax": 471,
+   "tileMax": 891
+  }
+ ]
+}
