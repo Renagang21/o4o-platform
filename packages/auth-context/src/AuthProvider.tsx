@@ -98,9 +98,29 @@ export const AuthProvider: FC<AuthProviderProps> = ({
           // If no cached user, do blocking verification
           try {
             const response = await authClient.api.get('/auth/status');
-            const statusData = response.data as any;
 
-            if (statusData.authenticated && statusData.user) {
+            // WO-O4O-ADMIN-AUTH-STATUS-ENVELOPE-FIX-V1
+            //   백엔드는 표준 봉투로 응답한다(CLAUDE.md §8):
+            //     { success: true, data: { authenticated, user } }
+            //   기존 코드는 봉투를 벗기지 않고 response.data.authenticated 를 읽어
+            //   항상 undefined → "세션 만료" 로 오판 → 유효한 세션 캐시를 삭제 →
+            //   AdminProtectedRoute 가 /login 으로 보냈다(새로고침·새 탭·딥링크 전부).
+            //   근거: IR-O4O-ADMIN-DEEP-LINK-REFRESH-AUTH-BOOTSTRAP-V1
+            //
+            //   봉투/비봉투 양쪽을 모두 허용한다. `data` 가 없으면 본문 자체를 쓴다.
+            const responseBody = response.data as any;
+            const statusData = (responseBody?.data ?? responseBody) as any;
+
+            // 세 상태를 명확히 구분한다.
+            //   A. 인증 복원 성공      authenticated === true 이고 user 가 있다
+            //   B. 서버가 미인증 확인  authenticated === false (명시적)
+            //   C. 판정 불가           그 외(구조 이상 / boolean 아님 / true 인데 user 없음)
+            //   C 에서는 캐시를 삭제하지 않는다 — 일시적 응답 이상으로 정상 세션을 파기하지 않기 위해.
+            const isAuthenticatedFlag =
+              typeof statusData?.authenticated === 'boolean' ? statusData.authenticated : null;
+
+            if (isAuthenticatedFlag === true && statusData?.user) {
+              // A. 인증 복원 성공
               const userWithDates = {
                 ...statusData.user,
                 createdAt: statusData.user.createdAt || new Date().toISOString(),
@@ -110,10 +130,17 @@ export const AuthProvider: FC<AuthProviderProps> = ({
               if (!cachedUser || cachedUser.id !== userWithDates.id) {
                 setUser(userWithDates);
               }
-            } else {
-              // Session expired - clear user
+            } else if (isAuthenticatedFlag === false) {
+              // B. 서버가 명시적으로 미인증이라고 확인 → 정상 로그아웃 (기존 동작 유지)
               setUser(null);
               localStorage.removeItem('admin-auth-storage');
+            } else {
+              // C. 판정 불가 — 세션 만료로 단정하지 않는다.
+              //    캐시가 없으면 미인증 상태로 두되(무한 loading 방지), 캐시는 지우지 않는다.
+              //    guard 는 isLoading=false 이후 자체 유예로 판단하므로 무한 redirect 도 생기지 않는다.
+              if (!cachedUser) {
+                setUser(null);
+              }
             }
           } catch (apiError: any) {
             // API call failed - check if it's a definitive auth failure (401)
