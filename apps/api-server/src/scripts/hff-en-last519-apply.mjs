@@ -12,7 +12,7 @@ const APPLY = process.argv.includes('--apply') && process.env.HFF_EN_L519_APPLY_
 if (RENDER.verdict !== 'PASS') { console.error('RENDER_NOT_PASS'); process.exit(1); }
 if (RENDER.verdict !== "PASS") { console.error("RENDER_NOT_PASS"); process.exit(1); }
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5547', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5551', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
 await c.connect();
 const globals = async () => (await c.query(`
   SELECT (SELECT count(*)::int FROM shared_product_descriptions WHERE deleted_at IS NULL) spd_all,

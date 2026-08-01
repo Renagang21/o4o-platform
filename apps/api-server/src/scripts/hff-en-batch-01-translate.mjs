@@ -19,6 +19,9 @@ const TOP = JSON.parse(fs.readFileSync(`${D}/hff-en-top1000-translations-v1.json
 const N326 = JSON.parse(fs.readFileSync(`${D}/hff-en-nonusage326-translations-v1.json`, 'utf8'));
 const R2237 = JSON.parse(fs.readFileSync(`${D}/hff-en-r2237-translations-v1.json`, 'utf8'));
 const NEXT = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-next-translations-v1.json`, 'utf8'));
+const R3 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r3-translations-v1.json`, 'utf8'));
+const R4 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r4-translations-v1.json`, 'utf8'));
+const R5 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r5-translations-v1.json`, 'utf8'));
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -78,6 +81,21 @@ for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entr
 for (const [k, v] of Object.entries(NEXT.clause ?? {})) DICT.meta[key(k)] = v;
 for (const [k, v] of Object.entries(NEXT.label ?? {})) DICT.clause[key(k)] = v;
 for (const [k, v] of Object.entries(NEXT.meta ?? {})) DICT.clause[key(k)] = v;
+// 8) round 3 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R3[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R3.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R3.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R3.meta ?? {})) DICT.clause[key(k)] = v;
+// 9) round 4 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R4[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R4.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R4.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R4.meta ?? {})) DICT.clause[key(k)] = v;
+// 10) round 5 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R5[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R5.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R5.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R5.meta ?? {})) DICT.clause[key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────
 const CNT = { 정: 'tablet', 캡슐: 'capsule', 포: 'stick pack', 스푼: 'spoonful', 알: 'piece', 병: 'bottle', 개: 'piece', 매: 'sheet', 방울: 'drop' };
