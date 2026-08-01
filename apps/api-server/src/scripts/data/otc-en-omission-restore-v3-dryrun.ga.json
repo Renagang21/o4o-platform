@@ -1,0 +1,547 @@
+{
+ "summary": {
+  "mode": "dry-run",
+  "input": 79,
+  "planned": 33,
+  "sentencesInserted": 33,
+  "byRule": {
+   "DIALYSIS_CONTRA": 2,
+   "TINEA_SPECIES_AGE": 2,
+   "NO_IMPROVE_RANGE_CONSULT2": 2,
+   "LAXATIVE_CONSULT_V3A": 3,
+   "ACET_MAX_DOSE_V3": 2,
+   "NO_USE_UNDER_AGE_V3": 2,
+   "SOY_PEANUT_CONTRA": 2,
+   "RHINITIS_CONSULT": 3,
+   "ERDOSTEINE_CONTRA_V3": 3,
+   "NO_IMPROVE_DAYS_ORAL": 3,
+   "LAXATIVE_CONSULT_V3B": 3,
+   "NO_IMPROVE_RANGE_TILDE": 3,
+   "GALACTOSE_CONTRA": 3
+  },
+  "skipped": 46,
+  "skipByCode": {
+   "NO_RULE_MATCH": 46
+  },
+  "green": 0
+ },
+ "plans": [
+  {
+   "enId": "e74c81a5-90e6-4bb0-844d-c386e56bdcad",
+   "master": "00f7db7b-a6ab-4e8d-aa30-3328d154bd18",
+   "product": "속펜하겐정",
+   "oldHash": "975e338e8a9b1550a69fa9aa40e7deb5",
+   "newHash": "6206736e5b03060df199983763ad1c24",
+   "rules": [
+    "DIALYSIS_CONTRA"
+   ]
+  },
+  {
+   "enId": "4a4bf9eb-2148-4314-b2f2-d2cebcc31ecd",
+   "master": "061b2bf1-2286-4fd0-beb3-28a085fa297f",
+   "product": "미카실원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "8af6441f4888cd67f447935d1009d1b5",
+   "rules": [
+    "TINEA_SPECIES_AGE"
+   ]
+  },
+  {
+   "enId": "b519d363-8817-47c4-b8e2-cea1ca656a18",
+   "master": "0aac55ac-02a9-4ab7-a72f-a1b3df6d271e",
+   "product": "에이로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "19a92b3c0fcb2f7170fa54f2147e9fbb",
+   "rules": [
+    "NO_IMPROVE_RANGE_CONSULT2"
+   ]
+  },
+  {
+   "enId": "fe6e26ee-ef90-48db-8564-803419641aa9",
+   "master": "0d6760fd-8b97-4db3-8d41-f6f6651f513c",
+   "product": "세노비아에프정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "119e95ea920aea441f20ba0727d9b742",
+   "rules": [
+    "LAXATIVE_CONSULT_V3A"
+   ]
+  },
+  {
+   "enId": "b8fc69f3-542f-4897-90bc-e4b4fe5da1ab",
+   "master": "1343fa2e-ed21-4811-a8a6-b82c6de8f971",
+   "product": "샤이닝정",
+   "oldHash": "76c74d4d297ae4b5ec1ebdee205a223c",
+   "newHash": "ca8f03c81e0ce792d0e4f87b8cf7f967",
+   "rules": [
+    "ACET_MAX_DOSE_V3"
+   ]
+  },
+  {
+   "enId": "38f71af4-1e15-4d53-b0ef-e2d2b2a55b44",
+   "master": "150cb4d6-7ce8-4262-9e29-11bff4bca782",
+   "product": "바르지오원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "6d29d8dfcdf142f2985a2c9755d36b52",
+   "rules": [
+    "NO_USE_UNDER_AGE_V3"
+   ]
+  },
+  {
+   "enId": "f6847f12-1d99-4c3e-9d42-32311810f475",
+   "master": "19cc1837-7a05-4c64-8ccf-77d26d925ea2",
+   "product": "비타임트리플엠지정",
+   "oldHash": "91850b6a5526e9f033db092d20595b7f",
+   "newHash": "507bac2742ac213f4d1677d3a43668c9",
+   "rules": [
+    "SOY_PEANUT_CONTRA"
+   ]
+  },
+  {
+   "enId": "7e61c799-6604-4f85-89ba-925cd2a3ae68",
+   "master": "1b84afcd-5fb9-4272-af26-8f9b171a9065",
+   "product": "알러나딘정60밀리그램",
+   "oldHash": "0a95873d44edc52e7163bfc15d8312c8",
+   "newHash": "2da09e3fb7ead5f601b31d0219273f59",
+   "rules": [
+    "RHINITIS_CONSULT"
+   ]
+  },
+  {
+   "enId": "7fde92c0-9547-4917-831e-ecb8e8f88b3d",
+   "master": "2ad273cb-8f00-4a6b-bafd-f537b01bc477",
+   "product": "엘도원캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA_V3"
+   ]
+  },
+  {
+   "enId": "2c8bd12d-caf9-496f-83de-473bfc2cea2a",
+   "master": "30ca38bf-900f-4991-a343-4ebe146075a1",
+   "product": "락스타더블캡슐(락토바실루스카제이변종람노수스의동결건조배양물)",
+   "oldHash": "9adf42050f7289a5538332079a080718",
+   "newHash": "f1ee6693102c53562d6b7406af1136e6",
+   "rules": [
+    "NO_IMPROVE_DAYS_ORAL"
+   ]
+  },
+  {
+   "enId": "63e29351-4a63-40db-899d-dc28bce793e4",
+   "master": "3b6c09d7-0661-4fe7-bce6-1dca2abbbd36",
+   "product": "샤이닝정",
+   "oldHash": "76c74d4d297ae4b5ec1ebdee205a223c",
+   "newHash": "ca8f03c81e0ce792d0e4f87b8cf7f967",
+   "rules": [
+    "ACET_MAX_DOSE_V3"
+   ]
+  },
+  {
+   "enId": "e231aee1-41c9-4a6e-b72f-f8b46166ce3b",
+   "master": "3eefffef-f328-4335-96f1-6196dec4f39b",
+   "product": "미카실원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "8af6441f4888cd67f447935d1009d1b5",
+   "rules": [
+    "TINEA_SPECIES_AGE"
+   ]
+  },
+  {
+   "enId": "80b30a79-ad02-4981-a174-56bf65e7b3c6",
+   "master": "4121f000-556f-440d-89d3-712963ddeb6d",
+   "product": "세노비아에프정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "119e95ea920aea441f20ba0727d9b742",
+   "rules": [
+    "LAXATIVE_CONSULT_V3A"
+   ]
+  },
+  {
+   "enId": "c27f7f1e-5dd2-4d61-82bd-4b470ea116e1",
+   "master": "565f8efb-66a8-4e2d-9661-96ec2940f309",
+   "product": "씨락정",
+   "oldHash": "23e0fe85bb3a664a3528b2cb39950e3a",
+   "newHash": "6d45670cdc290c7505bbe9afc7cc0456",
+   "rules": [
+    "LAXATIVE_CONSULT_V3B"
+   ]
+  },
+  {
+   "enId": "b74cfdd6-00dd-4a71-a7c4-794604521278",
+   "master": "5f20b309-8094-4872-857e-3eae59189889",
+   "product": "씨락정",
+   "oldHash": "23e0fe85bb3a664a3528b2cb39950e3a",
+   "newHash": "6d45670cdc290c7505bbe9afc7cc0456",
+   "rules": [
+    "LAXATIVE_CONSULT_V3B"
+   ]
+  },
+  {
+   "enId": "6f884096-dcd0-4759-9ddb-c657392c6dcb",
+   "master": "62267abb-dbb2-4e7b-b155-f8b186544dc3",
+   "product": "엘도원캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA_V3"
+   ]
+  },
+  {
+   "enId": "599c1ec9-c098-4c90-b7e6-9c37ff6f924a",
+   "master": "6a831cd7-b15c-4c2b-99dc-7315bb9c7ce3",
+   "product": "엘도원캡슐(에르도스테인)",
+   "oldHash": "d2c185097742b096f135ef486b4a68ba",
+   "newHash": "4b5613a481f463db26ac481582ea08de",
+   "rules": [
+    "ERDOSTEINE_CONTRA_V3"
+   ]
+  },
+  {
+   "enId": "10f691b3-79bd-48e9-90be-0b4d2db6d7ec",
+   "master": "807235a3-9b73-457a-9718-834d397b8721",
+   "product": "알러나딘정60밀리그램",
+   "oldHash": "0a95873d44edc52e7163bfc15d8312c8",
+   "newHash": "2da09e3fb7ead5f601b31d0219273f59",
+   "rules": [
+    "RHINITIS_CONSULT"
+   ]
+  },
+  {
+   "enId": "752b74e3-f668-49ef-8ad0-1a190714822f",
+   "master": "89af4ddc-0e86-4e51-a0e2-9a1941cf9c9f",
+   "product": "락스타더블캡슐(락토바실루스카제이변종람노수스의동결건조배양물)",
+   "oldHash": "9adf42050f7289a5538332079a080718",
+   "newHash": "f1ee6693102c53562d6b7406af1136e6",
+   "rules": [
+    "NO_IMPROVE_DAYS_ORAL"
+   ]
+  },
+  {
+   "enId": "4b30f687-e7c4-411f-8928-cc03faa0d31c",
+   "master": "8de4628f-5d64-4a1b-925f-35dcb18465bd",
+   "product": "알러나딘정60밀리그램",
+   "oldHash": "0a95873d44edc52e7163bfc15d8312c8",
+   "newHash": "2da09e3fb7ead5f601b31d0219273f59",
+   "rules": [
+    "RHINITIS_CONSULT"
+   ]
+  },
+  {
+   "enId": "4980e958-39ae-4c5f-bd17-4c22dc7c5ca6",
+   "master": "8f405a2a-cbbe-4e88-a5de-8b54ecd90cd9",
+   "product": "락스타더블캡슐(락토바실루스카제이변종람노수스의동결건조배양물)",
+   "oldHash": "9adf42050f7289a5538332079a080718",
+   "newHash": "f1ee6693102c53562d6b7406af1136e6",
+   "rules": [
+    "NO_IMPROVE_DAYS_ORAL"
+   ]
+  },
+  {
+   "enId": "e93da3cf-20c7-4b1b-bd48-b8aa46efe342",
+   "master": "a1d89894-3be1-4408-835b-38ffa8e26b12",
+   "product": "속펜하겐정",
+   "oldHash": "975e338e8a9b1550a69fa9aa40e7deb5",
+   "newHash": "6206736e5b03060df199983763ad1c24",
+   "rules": [
+    "DIALYSIS_CONTRA"
+   ]
+  },
+  {
+   "enId": "2e41fefd-2e0b-4308-b77b-a74a3ead4ee5",
+   "master": "abb4fed4-7c88-4626-895e-43d18111ca08",
+   "product": "엠피신연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "8c5996e419f4bb365673f4b41d1def26",
+   "rules": [
+    "NO_IMPROVE_RANGE_TILDE"
+   ]
+  },
+  {
+   "enId": "2cd2e2d2-8e30-49da-a3de-8c661a7444c5",
+   "master": "b4656ca2-4448-4a53-aece-750bd3f34808",
+   "product": "비타임트리플엠지정",
+   "oldHash": "91850b6a5526e9f033db092d20595b7f",
+   "newHash": "507bac2742ac213f4d1677d3a43668c9",
+   "rules": [
+    "SOY_PEANUT_CONTRA"
+   ]
+  },
+  {
+   "enId": "64b5c9b4-1641-4b67-bcb3-85a4e5a42936",
+   "master": "b5d2fef9-e67c-4693-990c-d5c47432ca82",
+   "product": "씨락정",
+   "oldHash": "23e0fe85bb3a664a3528b2cb39950e3a",
+   "newHash": "6d45670cdc290c7505bbe9afc7cc0456",
+   "rules": [
+    "LAXATIVE_CONSULT_V3B"
+   ]
+  },
+  {
+   "enId": "1659b70f-34a6-4f27-9a9e-91fb03b112ec",
+   "master": "b5e1e837-0f9c-43bb-8b4e-d4602fd0c67f",
+   "product": "엠피신연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "8c5996e419f4bb365673f4b41d1def26",
+   "rules": [
+    "NO_IMPROVE_RANGE_TILDE"
+   ]
+  },
+  {
+   "enId": "f35c4e54-cd89-4570-b503-334ab7120d33",
+   "master": "b609f343-b68c-4579-9d8b-e93f7520d71e",
+   "product": "바르지오원스외용액(테르비나핀염산염)",
+   "oldHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "newHash": "6d29d8dfcdf142f2985a2c9755d36b52",
+   "rules": [
+    "NO_USE_UNDER_AGE_V3"
+   ]
+  },
+  {
+   "enId": "5e0891a5-c03e-4057-b2be-b7e64b1dcfc4",
+   "master": "b905c073-0f11-4718-a106-1b9a2627787f",
+   "product": "락토프린정",
+   "oldHash": "d81f17fe9e03aebe01e2fcf6c195713f",
+   "newHash": "c39e459691ccea0792289742c998be59",
+   "rules": [
+    "GALACTOSE_CONTRA"
+   ]
+  },
+  {
+   "enId": "892b6fa4-662e-42f7-9f10-8e11e79ff77e",
+   "master": "c3686e75-bbce-4acb-96f7-42b139e9542a",
+   "product": "엠피신연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "8c5996e419f4bb365673f4b41d1def26",
+   "rules": [
+    "NO_IMPROVE_RANGE_TILDE"
+   ]
+  },
+  {
+   "enId": "dd6a5f3c-3f43-45b0-a036-f4983efdc461",
+   "master": "c81d75f2-0461-417d-81c2-e6f104ca5233",
+   "product": "락토프린정",
+   "oldHash": "d81f17fe9e03aebe01e2fcf6c195713f",
+   "newHash": "c39e459691ccea0792289742c998be59",
+   "rules": [
+    "GALACTOSE_CONTRA"
+   ]
+  },
+  {
+   "enId": "e67f3c8e-188b-4ba9-b062-6353493d39c6",
+   "master": "d033097f-38d8-4ec2-ad55-4f59f12a4587",
+   "product": "에이로반연고(무피로신)",
+   "oldHash": "f2547c1bd7c6f9c83d12cc2a1b7e67b6",
+   "newHash": "19a92b3c0fcb2f7170fa54f2147e9fbb",
+   "rules": [
+    "NO_IMPROVE_RANGE_CONSULT2"
+   ]
+  },
+  {
+   "enId": "bcada9a7-b49b-4849-b0d6-bcc5f6c3ec13",
+   "master": "d0be0986-6647-4271-8c38-6bebb030d3bb",
+   "product": "락토프린정",
+   "oldHash": "d81f17fe9e03aebe01e2fcf6c195713f",
+   "newHash": "c39e459691ccea0792289742c998be59",
+   "rules": [
+    "GALACTOSE_CONTRA"
+   ]
+  },
+  {
+   "enId": "aae69d5e-a534-40b5-b0d3-dad41337544b",
+   "master": "f20fd419-c3c7-4387-aa01-06fa3cc37edc",
+   "product": "세노비아에프정",
+   "oldHash": "d0af76ceeb1d300984b8a91a50fd20d9",
+   "newHash": "119e95ea920aea441f20ba0727d9b742",
+   "rules": [
+    "LAXATIVE_CONSULT_V3A"
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e31bd6c9-b7b4-405f-b78a-2c351095d6e8",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "1ff2dc8b-d0a8-441b-95e7-4abdfaf0ba5a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "051573d8-dd21-4817-8947-5e066fc8ea59",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e7e07068-aaa8-4d60-8707-f69a24c670e3",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "554c9a78-b0f8-4da1-a81e-eedf7e93d52a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "59b3d916-f76f-4a76-adae-26b33b39dd3b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "c7cca0b4-c2d8-4aa6-8db2-5b994b4b0804",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b163b249-2432-499d-83d7-3143c76bfee6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "7ef692ff-fb11-47e7-85dc-f13d44422cc1",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f51aed3a-e6da-47e8-863d-aac60cafcf0e",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f0d9a86b-ad5d-4535-b77e-bfc308215ac6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "93ad31d4-fc1c-42ee-9e83-4880344738e2",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5f8de2e8-0cc8-46c3-a3fb-65bfb9fb1ef9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "909d8a1b-6882-4dde-9536-d7c3174893de",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "ec2b600b-1467-4c9f-a7be-490b895078de",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "59b640d0-2b5c-4db3-a904-1747c794f72a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8a6306fa-1209-44ec-a4e8-5b0d0b0f3c54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d8174793-f39e-4d71-9d4a-7dd9df8c8200",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b388ba59-003b-4d08-90de-a843012df31a",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "66add10b-29bf-40cb-a2f3-66392e4d3997",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b286ebf7-d8ac-449e-97c7-85419da4b134",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "87e2acb2-cc97-4324-8d5f-41705f336fe7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "813dd3ae-b222-414b-a9dc-a32d58816391",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "56db902f-21c4-440d-aa21-1981e253598c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d00e7179-16c1-4473-99c3-9186cc200405",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b6e5eab0-1c6c-4ca5-b2b3-97bb0964a24f",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "99c5b095-b128-4221-be6c-957c388da59b",
+   "code": "NO_RULE_MATCH"
+  }
+ ],
+ "results": []
+}
