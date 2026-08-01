@@ -1,17 +1,17 @@
 {
  "batch": "zh-batch-01",
- "appliedPlans": 973,
- "zhRowsChecked": 973,
+ "appliedPlans": 1093,
+ "zhRowsChecked": 1093,
  "failures": {},
  "failureSample": {},
  "recentlyUpdatedCanonicalByLang": [
   {
    "lang": "en",
-   "n": 246
+   "n": 899
   },
   {
    "lang": "zh",
-   "n": 148
+   "n": 268
   }
  ],
  "verdict": "GREEN"

@@ -3,22 +3,22 @@
   "mode": "dry-run",
   "lang": "zh",
   "batch": "zh-batch-01",
-  "mappedUnits": 1151,
+  "mappedUnits": 1538,
   "docsScanned": 5000,
-  "planned": 973,
-  "hold": 4027,
+  "planned": 1093,
+  "hold": 3907,
   "holdByCode": {
-   "UNRESOLVED_SLOT": 4027
+   "UNRESOLVED_SLOT": 3907
   },
   "unresolvedSlotOccByKind": {
-   "badge": 3356,
-   "h1": 3801,
+   "badge": 3157,
+   "h1": 3699,
    "small": 756,
-   "meta": 1219,
-   "intro": 3708,
-   "tile": 7585,
-   "intake": 5220,
-   "warn": 17371,
+   "meta": 1216,
+   "intro": 3493,
+   "tile": 7383,
+   "intake": 4991,
+   "warn": 16697,
    "foot": 1120
   },
   "gateFailed": 0,
@@ -50,7 +50,7 @@
    "koId": "da38e092-a204-4c1e-8d8e-77f8266c4453",
    "masterId": "0015084b-d47e-4107-bc0b-52a8f612aa47",
    "code": "UNRESOLVED_SLOT",
-   "missing": 13
+   "missing": 12
   },
   {
    "koId": "fa25754a-be43-46ec-84e4-c63b055f3029",
@@ -62,13 +62,13 @@
    "koId": "30072c59-d04f-4ab8-bb51-a119c16eba20",
    "masterId": "002063d6-2bea-4975-9fab-7d13bba0a19f",
    "code": "UNRESOLVED_SLOT",
-   "missing": 7
+   "missing": 2
   },
   {
    "koId": "93d53d3c-fb90-4e54-b4ca-71a06a6d6483",
    "masterId": "00218d5c-d6d4-4206-bb80-bd131525d960",
    "code": "UNRESOLVED_SLOT",
-   "missing": 8
+   "missing": 4
   },
   {
    "koId": "09c52ebc-9477-4b94-b0dd-1a3a6b6654bd",
@@ -98,7 +98,7 @@
    "koId": "2c4df798-6410-4e7a-9972-22b53c099c78",
    "masterId": "003431b9-ebb0-4e19-86b1-fd30dfcaa1f7",
    "code": "UNRESOLVED_SLOT",
-   "missing": 19
+   "missing": 18
   },
   {
    "koId": "c70d7ba0-1432-4540-a58b-fdcacbfca96c",
@@ -122,7 +122,7 @@
    "koId": "bf5e728c-1a8e-4d8e-9ba4-2c9c5bc7fa92",
    "masterId": "0044748c-e724-4783-8105-9034be750ca3",
    "code": "UNRESOLVED_SLOT",
-   "missing": 9
+   "missing": 8
   },
   {
    "koId": "bc2e1f6a-79b9-4a1b-9405-d33bcb41cd18",
@@ -146,7 +146,7 @@
    "koId": "a9d4a7f2-8442-4271-be70-0fd15b0938e2",
    "masterId": "00495313-75f5-479f-b938-226d255b6f73",
    "code": "UNRESOLVED_SLOT",
-   "missing": 9
+   "missing": 8
   }
  ],
  "plans": [
@@ -1024,6 +1024,15 @@
    "bytes": 1191
   },
   {
+   "koId": "e855e981-9982-4386-9041-98f06eaa2857",
+   "masterId": "05b7da68-c29b-4fe9-8cd4-fc2aea89108c",
+   "product": "아이크롬점안액(크로몰린나트륨)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "13c215bd-74a7-2155-b835-626145e46222",
+   "summary": "本药用于春季角膜炎或结膜炎、变应性结膜炎。",
+   "bytes": 1170
+  },
+  {
    "koId": "d842918d-ea01-4198-966f-93c9626f996e",
    "masterId": "05c7521c-06fc-4ebc-beae-467bad5db6d6",
    "product": "테르비쿨크림",
@@ -1058,6 +1067,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "b826ba0a-834f-4b2b-8b4c-7aad918503c6",
+   "masterId": "05e2f460-b5ad-44fc-861f-b27b87e56b6d",
+   "product": "새크라손크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
   },
   {
    "koId": "2f4acf17-e3a9-4b45-aed8-99289b9b462c",
@@ -2572,6 +2590,15 @@
    "bytes": 1167
   },
   {
+   "koId": "38437e2d-c306-4c80-8a2e-ff863e68116d",
+   "masterId": "0fb08acc-0bc0-4273-bfd2-38cc9a7fb220",
+   "product": "레스톤크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
+  },
+  {
    "koId": "4e953f56-b220-40bc-a5cf-f7dcdc2de20f",
    "masterId": "0fb67b26-9297-47a2-95a3-4a7f26f044fa",
    "product": "리버타인액",
@@ -2606,6 +2633,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "7b923798-eab7-41d5-9446-c30ba803d173",
+   "masterId": "0fc422ea-b08d-494b-a0fe-e0fc3d0b321f",
+   "product": "데마코트에스크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dc4ad2fa-ddae-768c-4181-246e4b548058",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1698
   },
   {
    "koId": "2a6d9187-4c3f-4431-a840-52a01063f92f",
@@ -3218,6 +3254,15 @@
    "sourceRefId": "8180d1dc-af59-98c9-bf34-a16e0a434e79",
    "summary": "本药用于因黏液分泌障碍引起的急性、慢性支气管炎，喘息性支气管炎。",
    "bytes": 1286
+  },
+  {
+   "koId": "7bfdf481-3773-4943-bf5c-b345757d0610",
+   "masterId": "131fa852-aca7-4960-a423-072b7b8d9b05",
+   "product": "베타겐지크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
   },
   {
    "koId": "cfcb8bf3-13db-4b8a-8e4e-895f20b22f35",
@@ -3841,6 +3886,15 @@
    "bytes": 678
   },
   {
+   "koId": "c47529f5-2ef6-4f42-b22e-8ff92d9e7648",
+   "masterId": "16348d5e-540d-45de-9ed5-4ba7f78aa539",
+   "product": "카라밴크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
+  },
+  {
    "koId": "b278c5a0-3eee-4353-82eb-8e0086ecfd7d",
    "masterId": "1645eb9c-e780-47c6-8333-7376e3bacdde",
    "product": "아락실과립",
@@ -3884,6 +3938,15 @@
    "sourceRefId": "223cf114-8074-11a9-fcc7-b52975c9ff13",
    "summary": "本药用于酸反流、烧心、因胃内容物反流引起的消化不良（例如餐后、妊娠期、伴有反流性食管炎时）。",
    "bytes": 1361
+  },
+  {
+   "koId": "f2044d30-0658-41d0-82a4-47187ed4802c",
+   "masterId": "16c04638-8fb9-4681-a9f1-a7e411b0943f",
+   "product": "이테란과립(아세틸시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d476104d-c4fd-2727-8b73-3649bbc6ef76",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1508
   },
   {
    "koId": "75e300a9-6a67-4f37-8e99-e8252743226c",
@@ -4012,6 +4075,15 @@
    "bytes": 672
   },
   {
+   "koId": "020e0a14-5a1b-4615-81ab-f1fb40585eb6",
+   "masterId": "17907b71-f3d8-417e-b408-c87b475c4a0a",
+   "product": "뉴브이로토이엑스점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ac59ea5e-faa8-6011-a04f-c297e50eed59",
+   "summary": "本药用于眼疲劳，结膜充血，眼病预防（游泳后、灰尘或汗液进入眼中时等），紫外线及其他光线所致眼部炎症（雪盲（因雪（snow）引起的眼部炎症）等），睑缘炎（眼睑炎）（眼睑糜烂），佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1520
+  },
+  {
    "koId": "ebc10cc1-57b9-4968-836c-b0c852d91522",
    "masterId": "1790f303-7e5f-4365-bdc7-bcb2873e5fba",
    "product": "티티아민정(수출명:JECOMVITATABLETBEEFIXIMINTABLET)",
@@ -4028,6 +4100,15 @@
    "sourceRefId": "939d298f-9c97-45a6-941d-411abd03c932",
    "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部僵硬）的镇痛 · 消炎（抗炎）。",
    "bytes": 936
+  },
+  {
+   "koId": "a8dc8dc7-c6cc-4f8e-86b4-cea91522a8fc",
+   "masterId": "17a300b5-9cef-4e07-80ae-ab709ba327e0",
+   "product": "부스코판당의정(브롬화부틸스코폴라민)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6b3c923e-d68e-a790-1d55-c02f769f6efa",
+   "summary": "本药用于胃·十二指肠溃疡、食管痉挛、幽门痉挛、胃炎、肠炎、肠绞痛、痉挛性便秘、功能性腹泻、胆囊炎、胆管炎、胆石症、胆道运动障碍、胆囊切除后遗症、尿路结石、膀胱炎、痛经。",
+   "bytes": 1599
   },
   {
    "koId": "aee9b6af-10de-4ad1-85d8-1373ab2c7582",
@@ -4138,6 +4219,15 @@
    "bytes": 1196
   },
   {
+   "koId": "45db4a25-2845-4e0d-93e1-eb5b45cb539a",
+   "masterId": "182313db-dd89-49ed-842b-d1b16ead88fb",
+   "product": "장쾌락시럽(락툴로오스농축액)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "65f0e2d0-cc88-8bc6-b9ee-bb0663ef06f3",
+   "summary": "本药用于慢性便秘，婴幼儿及儿童的便秘，分娩后的便秘。",
+   "bytes": 1461
+  },
+  {
    "koId": "00e249de-4fd8-420f-85cf-622681088222",
    "masterId": "1824f282-1795-4b2e-8e7c-1232a5722dbd",
    "product": "메가알파브이정",
@@ -4145,6 +4235,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "bd976061-5fec-4c03-9f11-af2d7b913751",
+   "masterId": "182fbd44-ca2a-481c-aebf-5339d6dc59b3",
+   "product": "세토펜정80밀리그램(아세트아미노펜)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "df27f00a-177b-2115-87ed-02ffca8747c8",
+   "summary": "本药用于感冒引起的发热及疼痛、头痛、神经痛、肌肉痛、痛经、扭伤痛（扭伤的疼痛）以及牙痛、关节痛、风湿样疼痛。",
+   "bytes": 1876
   },
   {
    "koId": "b9b6a4a1-119f-4494-85dc-9c9f4de1518a",
@@ -4165,6 +4264,15 @@
    "bytes": 1004
   },
   {
+   "koId": "d2cecbdd-e926-463f-be65-cfb1148b1b54",
+   "masterId": "183acc9e-70d7-4c97-8b15-b382df06ef49",
+   "product": "넬슨로라타딘정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "06112b50-8a58-8c7a-39bb-68d06174d7cd",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1364
+  },
+  {
    "koId": "ebc662c2-2699-47b4-815c-d43216171cf9",
    "masterId": "183d5947-bcd8-4c58-966e-d87fcbed5779",
    "product": "칼디프라임정",
@@ -4172,6 +4280,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "76c00b7e-70f8-49af-8340-73c17c63d58a",
+   "masterId": "1842e7b4-bee7-4b03-b117-ade8c41e77a8",
+   "product": "넬슨로라타딘정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "06112b50-8a58-8c7a-39bb-68d06174d7cd",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1364
   },
   {
    "koId": "c7a2ccbd-79e8-4389-b4c1-04c3d3b7db8e",
@@ -4237,6 +4354,15 @@
    "bytes": 1609
   },
   {
+   "koId": "f7dadd25-d693-4747-bbbf-fea78b2d874f",
+   "masterId": "189951ce-3c2e-4b94-b54d-8dd1a8b8f7a5",
+   "product": "한방파프자생고에이카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "146a5674-73aa-4117-8a6e-4d407ca0fffb",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮的镇痛·消炎。",
+   "bytes": 1000
+  },
+  {
    "koId": "717edb17-90fe-4fbf-8036-e0c9be6d73a5",
    "masterId": "18a12f2a-5a33-4e59-80be-4007bc3818b3",
    "product": "로이비타연질캡슐",
@@ -4255,6 +4381,24 @@
    "bytes": 1098
   },
   {
+   "koId": "a14f29b4-c00b-4360-8995-ad1bd106ea50",
+   "masterId": "18b63e46-6a4f-4ca1-972b-f790dfa197d8",
+   "product": "메카인정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b43ba6cc-8adb-ca3e-dcba-217f3ada5c15",
+   "summary": "本药用于晕动病引起的头晕·呕吐·头痛等的预防及缓解。",
+   "bytes": 1397
+  },
+  {
+   "koId": "ff25f6ef-397d-46d3-82dd-6494da49a6a9",
+   "masterId": "18b69284-3c15-4c79-881d-fd762f1527ea",
+   "product": "올비틸아이시럽",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "55d22316-38a5-06b6-3b39-cc7d28d8f216",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期的维生素 A、D、E、B1、B2、B6、C 的补充，眼干燥感的缓解，夜盲症（夜间视物不清的症状），骨骼、牙齿发育不良、佝偻病的预防。",
+   "bytes": 1714
+  },
+  {
    "koId": "1fdec760-8352-40cd-9bbf-839b4e117eb3",
    "masterId": "18c9a933-efc1-4a3b-b0c9-582e72646aaa",
    "product": "바이놀크림(아시클로버)",
@@ -4262,6 +4406,15 @@
    "sourceRefId": "8f2f4fa7-190b-4ee2-8e8d-d0405d2cbd42",
    "summary": "本药用于单纯疱疹（水疱）病毒感染症（包括初发及复发性生殖器疱疹（水疱）与唇疱疹（水疱））。",
    "bytes": 1272
+  },
+  {
+   "koId": "83346e3a-9aa2-4005-bb45-722b289786f4",
+   "masterId": "18cc7461-5b10-4d5c-b292-0040f56dead0",
+   "product": "유니쎈타액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
+   "bytes": 1284
   },
   {
    "koId": "1102ca5f-3173-4f60-b07f-399afd2264b3",
@@ -4363,6 +4516,15 @@
    "bytes": 740
   },
   {
+   "koId": "e6245af3-e308-4321-8f0c-812309e9e9ed",
+   "masterId": "194e8eb4-74d4-4313-925b-963a856edce2",
+   "product": "지노콜시럽(구연산부타미레이트)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1e120cd3-281e-c670-4c28-a86db556265e",
+   "summary": "本药用于急性咳嗽、痉挛性咳嗽、吸烟性咳嗽，以及支气管镜检查前后的镇咳。",
+   "bytes": 1203
+  },
+  {
    "koId": "3945f688-6dde-4781-a7a1-8e0ce6538c22",
    "masterId": "1953859d-2fcc-4d19-9241-2f4c46e7947c",
    "product": "하노백연질캡슐1000아이유(비타민이)",
@@ -4370,6 +4532,15 @@
    "sourceRefId": "6343c0f5-cfe9-434b-925a-d42ae1cc86d8",
    "summary": "用于维生素 E 缺乏症，末梢循环功能障碍，更年期肩·颈僵硬，手足麻木·手足冰冷，间歇性跛行，冻疮等症状的缓解。",
    "bytes": 685
+  },
+  {
+   "koId": "f75d4af1-146c-4649-9798-566e005fd75d",
+   "masterId": "195a217d-e4f7-4058-ae49-4395152627c3",
+   "product": "키즈빅골드츄어블정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "06ef91be-d5b0-99be-dce3-fd1e1fd49ad0",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期的维生素 A、D、E、B1、B2、B6、C 的补充，眼干燥感的缓解，夜盲症（夜间视物不清的症状），骨骼、牙齿发育不良、佝偻病的预防与锌的补充。",
+   "bytes": 1908
   },
   {
    "koId": "085327cb-ab14-49b8-8959-3d291b3261fe",
@@ -4388,6 +4559,15 @@
    "sourceRefId": "b21c54a6-e248-477f-bc23-f5f1a6701587",
    "summary": "用于体力疲劳·体力下降·发育期·老年期的维生素 D·E·B1·B2·B6·C 补充，佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 740
+  },
+  {
+   "koId": "c6a888a6-82bf-4ed9-bed2-8b3b9a3fcb37",
+   "masterId": "196eb9bb-1d31-4948-9d67-25ebefe74f55",
+   "product": "파워액티브정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b823284d-60a6-a72a-58b3-95bd923cfe2e",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期的维生素 D、E、B1、B2、B6、C 的补充，以及骨骼、牙齿发育不良、佝偻病的预防，神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等），脚气病，眼疲劳，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解与锌的补充。",
+   "bytes": 1932
   },
   {
    "koId": "b8094fe0-008d-4758-80a9-dcf92a084d3c",
@@ -4444,6 +4624,15 @@
    "bytes": 672
   },
   {
+   "koId": "eceed8ae-0c86-42a0-8429-3748308d1f1a",
+   "masterId": "19fc2ace-c69c-45ba-bfd8-0601e49da968",
+   "product": "명심고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "3630ffaf-778d-41e0-b663-47e517c2cd33",
+   "summary": "本药用于腰（腰部）痛、挫伤、扭伤（扭挫伤）、肩痛（肩部僵硬）、关节痛、肌肉痛、肌肉疲劳、冻伤、骨折痛的镇痛、消炎（抗炎）。",
+   "bytes": 970
+  },
+  {
    "koId": "22c63403-98b7-480f-9c58-c9c8497dc7c3",
    "masterId": "1a08779d-3ae3-4025-a6f3-a291a6880c27",
    "product": "알세진정10밀리그램(세티리진염산염)",
@@ -4480,6 +4669,15 @@
    "bytes": 1284
   },
   {
+   "koId": "2b5ad8bd-c993-49af-bb06-35d14b13a815",
+   "masterId": "1a6b9692-6355-4b28-88c2-63a34fe3d10b",
+   "product": "파마시메티콘액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e6fc79a8-206a-3068-a0a1-1c6c8146d790",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1397
+  },
+  {
    "koId": "764501cf-33b1-4107-8abd-de852c3b3d73",
    "masterId": "1a6fb551-5c72-4c3d-bf71-53829229a488",
    "product": "아세틸란캡슐(아세틸시스테인)",
@@ -4487,6 +4685,15 @@
    "sourceRefId": "0304c664-f9af-c03c-0b81-27c7c8c1eeb3",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "446a4047-7ec0-4366-bf18-b0cc75b66985",
+   "masterId": "1a7090b5-9c87-4f3f-9e76-ea37236f586a",
+   "product": "그랑페롤연질캡슐1000아이유(비타민이프리퍼레이션)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e04202d4-e849-5b40-5493-5ef8ff4d51f8",
+   "summary": "本药用于维生素 E 缺乏症，末梢循环功能障碍及更年期时肩·颈僵硬，手足麻木（手脚发麻）·手足冰冷（手脚发凉），间歇性跛行（时有跛行），冻伤等症状的缓解。",
+   "bytes": 1382
   },
   {
    "koId": "3c498a6f-1e8d-45fa-9fdb-c114f1258209",
@@ -4516,6 +4723,24 @@
    "bytes": 1437
   },
   {
+   "koId": "f5a0bb51-fe51-4527-8bd1-19675f2f4726",
+   "masterId": "1a8f3605-71bf-4dda-82c9-2f9aa45b6053",
+   "product": "리쥬비넥스크림(폴리데옥시리보뉴클레오티드나트륨)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "d197a69c-8e55-4dc8-9760-ddb2765369cd",
+   "summary": "本药用于皮肤及结缔组织营养不足，或因营养不足而易发生溃疡的疾病（例：创口、营养供给）。",
+   "bytes": 881
+  },
+  {
+   "koId": "2874849b-d450-4628-8ef0-c1e8ac24b3f9",
+   "masterId": "1a948fb3-a47e-48bd-9a8e-36a93c6cc5a7",
+   "product": "카라밴크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
+  },
+  {
    "koId": "397f176b-fbb0-427c-af6a-90450e2849f2",
    "masterId": "1aa306e3-7f46-4761-87f6-808c2118726c",
    "product": "타라부틴정(트리메부틴말레산염)(수출명:뉴트리소젠정)",
@@ -4534,6 +4759,24 @@
    "bytes": 1030
   },
   {
+   "koId": "c76bad7c-ccf1-4416-8088-55a1045922b8",
+   "masterId": "1ab05579-3ae5-4368-9b5f-f6885148ced5",
+   "product": "마그밀에스정(산화마그네슘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "221fab31-48a4-d6b4-19e2-5da15fb80d95",
+   "summary": "本药用于胃·十二指肠溃疡、胃炎、胃酸过多的制酸作用及症状改善，便秘症。",
+   "bytes": 1334
+  },
+  {
+   "koId": "27b4d599-b497-48e4-b96f-3efc22e9ff50",
+   "masterId": "1ada2cad-6293-420b-8bf4-d05bca90fdf7",
+   "product": "티어하이리프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)&nbsp;",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7e26bf92-e492-001e-36d4-da0fac344900",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1286
+  },
+  {
    "koId": "480dc206-338d-4db0-925a-c49d103dc62c",
    "masterId": "1ae5c153-4f65-493e-8e20-249bf8a71791",
    "product": "에스엠크림9.6%(리도카인)",
@@ -4541,6 +4784,15 @@
    "sourceRefId": "11c0a41b-8676-ef20-d037-d1e034d94398",
    "summary": "本药用于降低男性生殖器触觉的敏感性。",
    "bytes": 1236
+  },
+  {
+   "koId": "9c63c6b0-72fb-4c3a-aa23-d88a66861d26",
+   "masterId": "1aea8959-d735-4d6b-94fa-915f73439e69",
+   "product": "광동동의한방고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "b2ef84a6-4ada-4d82-84aa-64777b551b27",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、骨折痛、关节痛、腰痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎（抗炎）。",
+   "bytes": 996
   },
   {
    "koId": "0f234faa-b2c8-492d-a565-1584bcadacdc",
@@ -4561,6 +4813,15 @@
    "bytes": 1002
   },
   {
+   "koId": "863877cb-6850-4c75-80b1-e94482639cb7",
+   "masterId": "1b1b0d0c-d444-489d-8191-d776a2a6cd7f",
+   "product": "아이톡점안액(트레할로스수화물)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d68c8b63-1df6-d98b-ccdf-bb85ac122f91",
+   "summary": "本药用于因风、烟雾、污染、灰尘、干热、空调、航空旅行、长时间使用电脑而引起的眼干燥（不适感、刺痛感、刺激）或眼疲劳。",
+   "bytes": 1342
+  },
+  {
    "koId": "3a5c01c3-79de-4ad2-aa6d-3dbd7dc58197",
    "masterId": "1b1e82e7-beaa-4758-990c-b74e9f6d2768",
    "product": "테마롤연질캡슐",
@@ -4577,6 +4838,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "a7de1295-2b8f-4a68-913e-8d890edfdadc",
+   "masterId": "1b3368e2-db7c-474c-833f-d8d863076806",
+   "product": "폴비정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "097109c2-baaa-8d4d-06b7-fd59f17223d3",
+   "summary": "本药用于妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B6 的补充，以及口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解。",
+   "bytes": 1352
   },
   {
    "koId": "5fb423f8-0056-4a1b-943d-6e2082b2c3ff",
@@ -4622,6 +4892,15 @@
    "sourceRefId": "bd51ef10-4404-f001-9a47-da3afc958415",
    "summary": "本药用于单纯疱疹（水疱）病毒感染症（包括初发及复发性生殖器疱疹（水疱）与唇疱疹（水疱））。",
    "bytes": 1423
+  },
+  {
+   "koId": "9b101a54-e9d0-48e9-952e-797775eee53d",
+   "masterId": "1b68c95c-5941-4a49-945b-4a6a4b7b0c96",
+   "product": "아웃콜목골드캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7e4a0e54-2558-c23e-11f0-cb57c8e3d50a",
+   "summary": "本药用于缓解感冒的多种症状（流涕、鼻塞、打喷嚏、咽喉（喉咙）痛、咳嗽、寒战、发热、头痛、关节痛、肌肉痛）。",
+   "bytes": 2007
   },
   {
    "koId": "571c4c2c-b832-439d-bb27-d70549037edb",
@@ -4676,6 +4955,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "c12af4b6-1f35-4ee2-b611-6aa0b4fd70f6",
+   "masterId": "1bacff96-2b29-488e-92f1-cd4639488546",
+   "product": "징키스틴캡슐(히스티딘아연이수화물)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c25d59cb-d024-0ec4-b0b0-b16383dc7382",
+   "summary": "本药用于锌的补充。",
+   "bytes": 1176
   },
   {
    "koId": "b8acb671-06c5-4c40-95f5-0bce7646aa49",
@@ -4741,6 +5029,24 @@
    "bytes": 1462
   },
   {
+   "koId": "682a729a-58a0-43a4-b062-a684549770fa",
+   "masterId": "1bf556c8-cf77-4eea-825e-14a3bccc11cf",
+   "product": "카디톤액(L-카르니틴)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb51542-7a81-7254-6cf2-c97efe38b75c",
+   "summary": "本药用于原发性、继发性肉碱缺乏症，以及心绞痛、急性心肌梗死等缺血性心脏疾病所致的心肌代谢障碍。",
+   "bytes": 1210
+  },
+  {
+   "koId": "2e29d657-73a1-4bac-853a-80dd5b1ee255",
+   "masterId": "1c03bfa4-f8cc-421d-8c96-c888d3d6387a",
+   "product": "리안점안액(폴리데옥시리보뉴클레오티드나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a0f53bca-ad05-abfe-1294-41923e203d94",
+   "summary": "本药用于因营养不足所致角膜、结膜溃疡性疾病的营养供给，以及因佩戴隐形眼镜等所致角膜、结膜的微小损伤。",
+   "bytes": 1265
+  },
+  {
    "koId": "eec0f259-e0c7-4cb7-bb27-b9acc6f0ba95",
    "masterId": "1c06e783-388d-4441-af81-df6f3a909808",
    "product": "세나서트2밀리그람질정",
@@ -4748,6 +5054,24 @@
    "sourceRefId": "1b1de560-8201-dc54-ea1c-2d1ffa029a09",
    "summary": "本药用于细菌性阴道病。",
    "bytes": 1095
+  },
+  {
+   "koId": "046ba5e0-9df0-43ed-b627-7353d0efc884",
+   "masterId": "1c0c1a58-0a01-471c-9c20-d3ea634faeeb",
+   "product": "제로프리액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "426eac6f-316b-0024-ebcb-e885e2f59fb3",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
+  },
+  {
+   "koId": "7387aabb-abf4-4a66-936b-9df1454bd613",
+   "masterId": "1c0fb126-b7bb-40b3-b383-39c02f54ca81",
+   "product": "엔도콜액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "35d10ce0-8cd9-64de-0c3c-a0beeec9001a",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
   },
   {
    "koId": "53bb0906-07e1-4416-b836-ca6626d5ad17",
@@ -4858,6 +5182,24 @@
    "bytes": 1437
   },
   {
+   "koId": "ef28c8fb-52d6-4caa-8527-51ce9908ee37",
+   "masterId": "1cabd837-a424-4f16-93a8-fd2e8e4018df",
+   "product": "버물리키드크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4d1b799c-dcc7-c7f8-49e4-38c939db05c7",
+   "summary": "本药用于瘙痒、皮炎、湿疹、荨麻疹、痱子、冻伤、虫咬、糜烂。",
+   "bytes": 1216
+  },
+  {
+   "koId": "b9eba8e5-8f2d-40c3-87c6-891ce92af10e",
+   "masterId": "1cd16afb-7456-4d95-8895-69f94c8f6afb",
+   "product": "동성디알클린점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "66b13b67-4066-acbe-8e78-8535f73fe093",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1286
+  },
+  {
    "koId": "50637c37-ebfb-481d-a9fc-c2bf0b11352c",
    "masterId": "1cd42e78-5431-41a5-be60-45e949611e32",
    "product": "테라플루콜드앤코프나이트타임건조시럽",
@@ -4865,6 +5207,15 @@
    "sourceRefId": "3ec6d352-75b7-2be8-b111-f141b98bfc57",
    "summary": "本药用于缓解感冒的多种症状（流涕、鼻塞、打喷嚏、咽喉痛（喉咙疼痛）、寒战（发冷发抖的症状）（寒冷）、发热、头痛、关节痛、肌肉痛）。",
    "bytes": 2256
+  },
+  {
+   "koId": "77bb31ab-5a30-44c6-be93-f783571240cf",
+   "masterId": "1cd816b9-958b-4876-bc31-05ff1456ff10",
+   "product": "라이센드플러스액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "354e4d61-7132-ba14-5b00-6105fb4a0c65",
+   "summary": "本药用于头虱、阴虱、体虱感染症的治疗。",
+   "bytes": 1271
   },
   {
    "koId": "82409d8d-3944-4656-a8ec-91fd7855023c",
@@ -4903,6 +5254,33 @@
    "bytes": 672
   },
   {
+   "koId": "3e451298-b89c-4d93-8673-49f07326552d",
+   "masterId": "1d076530-363c-416e-bb29-4e0047d2362f",
+   "product": "타치온정50밀리그램(글루타티온(환원형))",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "71fb9b6c-5e88-1ddc-356d-e76c5ae83721",
+   "summary": "本药用于药物中毒、自体中毒。",
+   "bytes": 1043
+  },
+  {
+   "koId": "925e099d-ae53-497c-b59b-c8f7030141b2",
+   "masterId": "1d153d7d-00e3-438a-a93a-7c69380bc871",
+   "product": "액트에버정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "93a294b9-0021-dd17-0639-3e41e90643a9",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期，骨骼、牙齿发育不良、佝偻病的预防，脚气病，眼疲劳，神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等）症状的缓解。",
+   "bytes": 1586
+  },
+  {
+   "koId": "8c142baa-ecc9-4b63-8513-4cea6880ffb0",
+   "masterId": "1d207d08-190e-40bb-9ea8-3aa5499e50d0",
+   "product": "제일한방파프수에스카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9a9f464a-8356-401c-9c13-f74b7a8c5e6b",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎。",
+   "bytes": 1035
+  },
+  {
    "koId": "0a52da07-87a6-4dca-b3d0-c7e8803cd918",
    "masterId": "1d412ab4-002e-4a34-afe7-2555bc02f48d",
    "product": "큐엔데카연질캡슐",
@@ -4919,6 +5297,15 @@
    "sourceRefId": "5408235f-c032-cb91-9a9c-b88991ba431a",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "e2e96f1c-c46b-47da-90a5-611a224d7880",
+   "masterId": "1d61a794-a1b2-41e9-aa05-cd7142097a7f",
+   "product": "메부라틴정150밀리그람(트리메부틴말레산염)(수출명:MEBURATINTablet150mg)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "5cd9f5b8-c7f8-dda9-27ac-fd43f88c7182",
+   "summary": "本药用于食管反流及食管裂孔疝、胃十二指肠炎、胃·十二指肠溃疡所致的消化功能异常（腹痛、消化不良、恶心、呕吐），肠易激综合征及痉挛性结肠，小儿疾病（习惯性呕吐、非感染性肠道通过障碍（便秘、腹泻））。",
+   "bytes": 1617
   },
   {
    "koId": "1a60bf33-6f5b-4323-940d-a452a53bae45",
@@ -4957,6 +5344,15 @@
    "bytes": 1437
   },
   {
+   "koId": "38a80bcd-4105-40c0-b77e-000f66eb17b4",
+   "masterId": "1d7fabc1-24dc-4780-8d07-75370839963b",
+   "product": "산타몬플러스캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "5854f352-43d8-5c99-e523-ae93c4eed42c",
+   "summary": "本药用于妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B6 的补充，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎的缓解，以及缺铁性贫血的预防及治疗。",
+   "bytes": 1526
+  },
+  {
    "koId": "e12aa1ff-25f9-44dc-9560-95f53fbad3ef",
    "masterId": "1d8c238c-a48c-471f-9e2d-a1df5bf0cb43",
    "product": "토프롤연질캡슐(수출용)(수출명:GINSENG-TAMINKINETONMIOGINSENG)",
@@ -4984,6 +5380,33 @@
    "bytes": 740
   },
   {
+   "koId": "e98eb624-52d1-4165-a485-30201d0ea35d",
+   "masterId": "1dba952b-a247-4219-b3a9-dc726758211b",
+   "product": "헤모퀸골드엠캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "85fb6d58-5aa9-e9e0-2ccb-b116f70004e3",
+   "summary": "本药用于缺铁性贫血的预防及治疗。",
+   "bytes": 1384
+  },
+  {
+   "koId": "00c99ced-72a4-4fd9-b30c-4dad036c1b02",
+   "masterId": "1dbde0fb-da33-492e-a4de-94f489f780a4",
+   "product": "리만50000엠겔",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "89081df5-9dc2-22cf-5934-921ddb2dc7e6",
+   "summary": "本药用于静脉曲张所致症状（疼痛、沉重感、下肢水肿、小腿肌肉痉挛），事故或运动所致钝性损伤（血肿、挫伤（淤青）、挫伤、拉伤、扭伤、肿胀、肌肉及韧带疼痛），以及浅表性（位于表面的）静脉炎、血栓性静脉炎、血管硬化疗法（sclerotherapy）后的治疗。",
+   "bytes": 1558
+  },
+  {
+   "koId": "e7f926da-7012-49bb-983e-76f6ccda3386",
+   "masterId": "1dcb014d-595c-4d05-bc55-46c6a1909c2e",
+   "product": "호르반내복액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "feca0c12-b339-4af3-e8e5-a940c0c284db",
+   "summary": "本药用于滋养强壮、体力疲劳、病中、病后、发热性·消耗性疾病、食欲不振、营养障碍等情况下的营养补充、滋养强壮、体质虚弱。",
+   "bytes": 1407
+  },
+  {
    "koId": "1ac2311a-3a79-454e-b798-6a3a300b3483",
    "masterId": "1dccf43b-dfa9-4048-bb48-2ccab71178f0",
    "product": "노루모에이스산",
@@ -5009,6 +5432,15 @@
    "sourceRefId": "345685ed-6a5e-7d4f-f20f-4d8c80048891",
    "summary": "本药用于消化不良、食欲减退（食欲不振）、过食、积食、促进消化、消化不良所致的胃部（上腹部）胀满感。",
    "bytes": 1296
+  },
+  {
+   "koId": "43cfae3e-cf99-404f-b895-efe616b48f0d",
+   "masterId": "1ddd38d6-d1fa-4fd3-b04c-91c94b110928",
+   "product": "보나링에이정(디멘히드리네이트)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "530d1c34-c00d-0bb6-d5fd-cb636823b08c",
+   "summary": "本药用于晕动病·梅尼埃综合征·放射性宿醉所致的恶心·呕吐·头晕，以及术后恶心·呕吐。",
+   "bytes": 1480
   },
   {
    "koId": "85f950a1-997f-4dc4-b907-f0df43cdb60f",
@@ -5045,6 +5477,15 @@
    "sourceRefId": "0304c664-f9af-c03c-0b81-27c7c8c1eeb3",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "6fdf99f1-f0c7-467f-92dc-0a03d8dcb0c2",
+   "masterId": "1e390a73-5659-4680-98d3-7f8a83f06f02",
+   "product": "한방파프자생고에이카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "b5fb18ac-6a6b-4cf8-a7f0-51e568a3e3c3",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮的镇痛·消炎。",
+   "bytes": 1000
   },
   {
    "koId": "110f446c-5b0b-40b4-bce3-82ad0098d1bd",
@@ -5101,6 +5542,15 @@
    "bytes": 738
   },
   {
+   "koId": "17471da0-c924-477f-924a-b30c18126585",
+   "masterId": "1e7ccb12-4d3d-4f9f-a181-6e0aab19b813",
+   "product": "제일한방파프수카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "963172d7-f4c3-4ee1-862c-f4a6215bc274",
+   "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）、冻疮的镇痛 · 消炎。",
+   "bytes": 1023
+  },
+  {
    "koId": "54920594-3056-489e-9f54-e6d9d58fc980",
    "masterId": "1e837fc6-beb6-4658-aec9-2bd785a8dc53",
    "product": "테라쿨크림",
@@ -5119,6 +5569,15 @@
    "bytes": 740
   },
   {
+   "koId": "827593ee-f440-4c71-a285-9db17a9fe4a3",
+   "masterId": "1e936e19-b688-4677-9212-8168470cb27c",
+   "product": "액티비씨정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d60b3a33-f718-730a-a9bc-7bc86a90590b",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 B1、B2、B6、C、E 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等），脚气病，眼疲劳，阳光·皮肤病等所致色素沉着（黄褐斑、雀斑）的缓解，牙龈出血、鼻出血（流鼻血）的预防。",
+   "bytes": 1797
+  },
+  {
    "koId": "40b555fb-ed8f-40e2-b9ff-973547d4b507",
    "masterId": "1ea1f2ca-0970-4bf9-8b64-9accea3e099a",
    "product": "차마트리제정(트리메부틴말리산염)",
@@ -5128,6 +5587,15 @@
    "bytes": 1378
   },
   {
+   "koId": "74b17205-b7b0-4351-80c5-2a6b19bc8821",
+   "masterId": "1eae2cb9-dada-45f5-99d4-0c1ec04c32bc",
+   "product": "크린팝카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "7a028947-a231-476b-a066-a5b2f44a37a4",
+   "summary": "本药用于挫伤、扭伤、腰（腰部）痛、肩部僵硬、肌肉痛、关节痛的镇痛 · 消炎（抗炎）。",
+   "bytes": 1025
+  },
+  {
    "koId": "17b1076a-af57-4dd7-a520-f119604cfa00",
    "masterId": "1ed328aa-06da-4864-ab2b-38f7192c92e3",
    "product": "엘칸정330밀리그램(엘-카르니틴)",
@@ -5135,6 +5603,15 @@
    "sourceRefId": "4becfe6a-a846-d256-9fcd-2846124438d3",
    "summary": "本药用于原发性、继发性肉碱缺乏症，以及心绞痛、急性心肌梗死等缺血性心脏疾病所致的心肌代谢障碍。",
    "bytes": 1241
+  },
+  {
+   "koId": "55074fb7-760e-4c82-b5ae-c39447653698",
+   "masterId": "1ed791da-b38f-41d9-9851-7a2a705c6b31",
+   "product": "제일한방파프수카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "5119bb57-7eae-4eb6-a992-1093b91d3592",
+   "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）、冻疮的镇痛 · 消炎。",
+   "bytes": 1023
   },
   {
    "koId": "5654dccb-6393-4de8-8633-97017c9db529",
@@ -5155,6 +5632,15 @@
    "bytes": 1806
   },
   {
+   "koId": "2d12d8bd-cf49-4f39-b62e-981fd76f7daf",
+   "masterId": "1f488d31-8b6e-4ceb-a146-7e16b348dc41",
+   "product": "팩트라민정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e7f544f5-e543-29b7-1c2f-e7882ad75512",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 E、B1、B2、B6、C 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等）症状的缓解，脚气病，眼疲劳，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解与锌的补充。",
+   "bytes": 1759
+  },
+  {
    "koId": "f5bb78d7-ccff-48b7-8497-abf8af4e8c09",
    "masterId": "1f62de9b-0e8e-4cef-a0fd-2d965fff36ab",
    "product": "본프로탑정",
@@ -5171,6 +5657,15 @@
    "sourceRefId": "b21c54a6-e248-477f-bc23-f5f1a6701587",
    "summary": "用于体力疲劳·体力下降·发育期·老年期的维生素 D·E·B1·B2·B6·C 补充，佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 740
+  },
+  {
+   "koId": "028c36e6-db85-41d5-b0fc-85f2de55e51d",
+   "masterId": "1f6f6b85-e77d-4bab-a512-3c24e69d8e72",
+   "product": "더마화이트정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2b81ba41-3b61-36d9-ecd4-e6735fb3edf9",
+   "summary": "本药用于黄褐斑。",
+   "bytes": 1334
   },
   {
    "koId": "ba037e90-bbbd-4a99-ac36-67cc9e4be64e",
@@ -5227,6 +5722,15 @@
    "bytes": 738
   },
   {
+   "koId": "c7316c64-bf73-4e09-9043-db2351679d09",
+   "masterId": "1f9e7bc4-f107-4f9a-b70d-a53b187eea71",
+   "product": "위스타산",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "437f6067-ca41-7155-ad43-df944e2fe3fa",
+   "summary": "本药用于饮酒过量、烧心、胃部嗳气、过食、胃痛、胃部不适感、消化不良、促进消化、食欲不振、胃弱、胃酸过多、胃·腹部（肚子部位）胀满感、恶心（胃部反胃、宿醉、饮酒后的恶心、反胃）、呕吐、胸口灼痛、嗳气、胃部沉重感。",
+   "bytes": 1499
+  },
+  {
    "koId": "4a323588-3e2a-4708-afc5-ff020e886cf2",
    "masterId": "1fa68f0d-92f1-4e4d-9fec-e9f070afc962",
    "product": "지피동의고카타플라스마",
@@ -5236,6 +5740,24 @@
    "bytes": 1005
   },
   {
+   "koId": "09d8a66a-3261-494f-9ae3-defc9467c6e5",
+   "masterId": "1fa79745-f236-4322-8103-f5363939d9d8",
+   "product": "레비타점안액(폴리소르베이트80)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8d1da72a-e771-30d5-aa51-89d682a05a01",
+   "summary": "本药用于缓解眼干燥症状、暂时减轻刺激。",
+   "bytes": 1165
+  },
+  {
+   "koId": "d0c26e10-c606-4cae-ac23-61738b96176c",
+   "masterId": "1fbb90b4-cebc-46f3-b580-95cdae419248",
+   "product": "리안점안액(폴리데옥시리보뉴클레오티드나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a0f53bca-ad05-abfe-1294-41923e203d94",
+   "summary": "本药用于因营养不足所致角膜、结膜溃疡性疾病的营养供给，以及因佩戴隐形眼镜等所致角膜、结膜的微小损伤。",
+   "bytes": 1265
+  },
+  {
    "koId": "e0fd8da9-7598-40b4-96af-173078533b89",
    "masterId": "1fc8d555-7748-4353-9024-1ad220407621",
    "product": "케이엠시프겔",
@@ -5243,6 +5765,15 @@
    "sourceRefId": "6e00b50b-0670-ad01-9f44-95d40f5eb7f8",
    "summary": "本药用于轻微（轻度）肌肉疼痛的暂时缓解。",
    "bytes": 1189
+  },
+  {
+   "koId": "93852001-c8b3-479d-9926-9ee9c3703ec7",
+   "masterId": "1fd1db70-d36e-49de-a9b6-8bf26cbb9f0d",
+   "product": "에너골드액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "51a76530-9c32-2df2-c12b-362628159ed3",
+   "summary": "本药用于成人的病态性体重减轻，无明显原因的衰弱，食欲不振，无力症，病后（患病后恢复期）恢复期，因类固醇制剂长期治疗、甲状腺功能亢进症治疗等引起的代谢抑制状态，肝脏疾病及肾脏疾病所致的低蛋白血症。儿童用于早产儿、婴幼儿、儿童因营养缺乏所致的各种症状，生长迟缓，低体重，体重减轻，营养不良，食欲不振，感染后虚弱期。",
+   "bytes": 1632
   },
   {
    "koId": "965fda24-df43-49b9-81ab-172e0142f695",
@@ -5308,6 +5839,15 @@
    "bytes": 672
   },
   {
+   "koId": "cb483840-02c5-4fce-ba0a-696de0ee7a5f",
+   "masterId": "2073f19c-8221-45a8-aa55-155998145adc",
+   "product": "바실루비캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "418c5bcc-2085-d0b2-c4d4-063dde2895f3",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1209
+  },
+  {
    "koId": "8175ed72-7762-4cdf-841f-47cbc6b969a9",
    "masterId": "20875115-30b0-48e8-bb4d-be4e8be2b572",
    "product": "한방만의고카타플라스마",
@@ -5315,6 +5855,24 @@
    "sourceRefId": "7362130b-d68d-4dc1-aa9b-1f5494f3ea73",
    "summary": "本药用于挫伤、扭伤、肩部僵硬、肌肉痛、关节痛、肌肉疲劳、腰痛、冻伤、骨折痛。",
    "bytes": 1041
+  },
+  {
+   "koId": "b58cf30c-d1c6-40df-b4a9-92bb58d69217",
+   "masterId": "20885399-1b33-406d-835a-308438dfa23a",
+   "product": "신신파스아렉스마일드카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "341b1f6c-8529-4e2b-ad9d-92c222eaa3b0",
+   "summary": "本药用于挫伤、扭伤、腰痛、肩部僵硬、肌肉痛、关节痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
+   "koId": "b392f21e-45ff-4f64-8547-050c49a073f8",
+   "masterId": "208fea79-cba5-4842-9faf-808827d51533",
+   "product": "아이리스플러스점안액(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1efd95c8-dcdb-0d71-1daa-d8b5868e41d2",
+   "summary": "本药用于眼疲劳，泪液的补充（眼干燥），佩戴硬性隐形眼镜或软性隐形眼镜时的不适感，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1338
   },
   {
    "koId": "bd89de4c-04af-4057-b1dd-95f7244c3b2a",
@@ -5351,6 +5909,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "31235c90-2001-4ec4-b409-e0d22ac9cdcc",
+   "masterId": "20b64d17-46f5-47cb-95ad-0cc5744bd536",
+   "product": "유니쎈타액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
+   "bytes": 1284
   },
   {
    "koId": "a55fe8f5-dfae-423c-9f98-cdec96408642",
@@ -5452,6 +6019,24 @@
    "bytes": 1097
   },
   {
+   "koId": "4f97bd16-abea-4519-9eaa-a8a66c32879e",
+   "masterId": "216c41af-ae41-470e-a216-e6390049b896",
+   "product": "덴타포스캡슐(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b512553f-3e8e-d425-fcf9-aaae4cee23e2",
+   "summary": "本药用于牙周治疗后牙龈炎，轻度·中度牙周炎的辅助治疗。",
+   "bytes": 1489
+  },
+  {
+   "koId": "b4ff3ceb-5b23-4314-b03b-d3eb87dc247f",
+   "masterId": "217ddbdf-9499-4cab-b32e-44873f5b42c8",
+   "product": "마데카솔케어연고",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "16abe159-9839-a88f-93e8-a91e24292d26",
+   "summary": "本药用于由新霉素敏感菌继发感染的皮肤疾病（小的裂伤、擦伤、缝合的伤口、浅表性 2 度以下的烧伤）的早期治疗。",
+   "bytes": 1374
+  },
+  {
    "koId": "d618beaa-a419-47a9-9a4c-a810965f0b79",
    "masterId": "218301cb-5938-457d-a089-f63a272d2a58",
    "product": "아겔레스-브이연질캡슐",
@@ -5497,6 +6082,15 @@
    "bytes": 679
   },
   {
+   "koId": "401dcdee-52e6-4905-a82f-432b74e491cf",
+   "masterId": "219cac7e-7275-46ad-ae56-f67ae6a09490",
+   "product": "아이루비로즈점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "5332c3ab-71c8-d469-0803-eb175b258dfc",
+   "summary": "本药用于眼疲劳，结膜充血，游泳后眼部不适感或灰尘、汗液进入眼中时，紫外线及其他光线所致眼部炎症，眼睑糜烂，佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1387
+  },
+  {
    "koId": "741dfd7b-23b6-4749-85b2-11c73475dbc7",
    "masterId": "21a0736c-2763-42d6-847d-344c1716a2e8",
    "product": "생기톤연질캡슐",
@@ -5533,6 +6127,15 @@
    "bytes": 760
   },
   {
+   "koId": "6dc2f43a-d5fd-4447-a0b5-621cc27796f2",
+   "masterId": "21befae6-d087-4a7a-88fd-5c8a5949471e",
+   "product": "유니쎈타액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
+   "bytes": 1284
+  },
+  {
    "koId": "abb34881-40d8-4032-8523-df5982e24dfa",
    "masterId": "21c56ebc-0cfc-455d-a40b-9b1dc74655fa",
    "product": "칼스카이정",
@@ -5549,6 +6152,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "9e8090c4-36d8-4247-94cc-411562089498",
+   "masterId": "21cceb76-dc99-44bf-ab9e-498ef0218a20",
+   "product": "펙소딘정60밀리그램(펙소페나딘염산염)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4ef755b3-816a-f25b-cf1c-75dbd8aa4d47",
+   "summary": "本药用于暂时缓解因花粉过敏或其他上呼吸道过敏引起的流涕、打喷嚏、眼部瘙痒及流泪、鼻或喉咙瘙痒症状。",
+   "bytes": 1352
   },
   {
    "koId": "50abf963-2061-43e9-88d1-618d7b75e675",
@@ -5578,6 +6190,15 @@
    "bytes": 760
   },
   {
+   "koId": "047308e7-0ca6-4eea-bf53-f3bc788e2c1b",
+   "masterId": "21f09c38-7a28-462d-9d13-462ee15e4070",
+   "product": "진한고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "22aa8566-d777-4ecc-b1e3-a96499c5bdfb",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、骨折痛、肩部僵硬、冻伤、关节痛、腰痛、肌肉疲劳。",
+   "bytes": 982
+  },
+  {
    "koId": "09937001-6a48-452d-9e36-a81398e340b7",
    "masterId": "21fc19e8-41bf-4599-9f39-afc4434ff831",
    "product": "지테인캡슐(에르도스테인)",
@@ -5605,6 +6226,15 @@
    "bytes": 718
   },
   {
+   "koId": "99723734-d3b9-4118-a2e7-3879721b4f3e",
+   "masterId": "2239c5ef-973f-4c32-add6-98e94d20ccdb",
+   "product": "신신파스아렉스마일드카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "44c92591-5967-42fd-9711-fad3f329bbdd",
+   "summary": "本药用于挫伤、扭伤、腰痛、肩部僵硬、肌肉痛、关节痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
    "koId": "69f04f60-7c27-444e-8a3f-f39e8b79710d",
    "masterId": "223b0a8d-6f8b-4439-b22f-c591d3a18f08",
    "product": "엘도라온캡슐(에르도스테인)",
@@ -5612,6 +6242,24 @@
    "sourceRefId": "bc7b09b0-74b4-e593-d5fa-4167e5d2751d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1255
+  },
+  {
+   "koId": "52f12133-683b-4c9e-bb31-c2251f30f883",
+   "masterId": "224012f7-fc74-44e7-95f2-50a657bd0c0e",
+   "product": "튜란트과립200mg(아세틸시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d476104d-c4fd-2727-8b73-3649bbc6ef76",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1508
+  },
+  {
+   "koId": "f72c5ad1-b38b-4d17-97c7-982b6b2a7309",
+   "masterId": "2269f4b7-6d2d-4431-9b20-794b04e84fea",
+   "product": "원기쏘플러스정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9ee91fb2-e9a4-4e77-cfda-e2a09ad4cc54",
+   "summary": "本药用于消化不良、食欲减退（食欲不振）、过食、积食、促进消化、消化不良所致的胃部胀满感、整肠、便秘、稀便、腹部胀满感、肠内异常发酵、胃部胀满感、恶心、呕吐。",
+   "bytes": 1460
   },
   {
    "koId": "6af19af6-5bf8-4af6-90bd-66d8eabb97af",
@@ -5713,6 +6361,15 @@
    "bytes": 738
   },
   {
+   "koId": "842a4899-949c-4827-8998-8fda93b90b48",
+   "masterId": "22d2c01f-5c41-4c92-9854-e7b824653553",
+   "product": "아몰지에이크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
+  },
+  {
    "koId": "1feb733c-9748-445b-af48-e10fd69f47ef",
    "masterId": "22d80cd3-9215-4036-9ae6-be90f32a8bc3",
    "product": "칼디프라임큐정",
@@ -5749,6 +6406,15 @@
    "bytes": 738
   },
   {
+   "koId": "ff59a58f-4c92-4fec-b10d-8536429b8959",
+   "masterId": "23139f8f-6af9-48b8-aa54-c4b50334a7ce",
+   "product": "트립리신정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cee8f7f7-3c66-bd53-14bb-a9e4cdb42e4d",
+   "summary": "本药用于手术及外伤后、乳汁淤积时炎症性水肿的缓解。",
+   "bytes": 1227
+  },
+  {
    "koId": "0ae25129-7eaf-4b64-b7c2-54188fc2b764",
    "masterId": "231673eb-7d40-4827-a314-e97f0788010d",
    "product": "칼시톤정100/1000",
@@ -5756,6 +6422,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "c017d32d-87b9-4306-a834-c97355fe592f",
+   "masterId": "231cbe82-0f5f-4c9f-8174-c2f6e322662e",
+   "product": "알코타민정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "32ec5dfe-a016-5628-8542-7492232bcca8",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B1 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等）症状的缓解，脚气病，眼疲劳。",
+   "bytes": 1286
   },
   {
    "koId": "37b156d8-0640-4365-b628-53e16cb06668",
@@ -5801,6 +6476,15 @@
    "sourceRefId": "0b98e6f8-d22e-adc7-5c36-22c03d30fb4d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1227
+  },
+  {
+   "koId": "c77df6c8-76a9-42db-8944-dfdd5aab0667",
+   "masterId": "238b952f-6d9e-4651-9dd6-4a5b8f1ea385",
+   "product": "신신파스아렉스마일드카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "97504c65-1ed9-4c9c-aee2-f753bde1800d",
+   "summary": "本药用于挫伤、扭伤、腰痛、肩部僵硬、肌肉痛、关节痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
   },
   {
    "koId": "547e7da5-ed95-4dae-af44-856da63089a5",
@@ -5855,6 +6539,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "0916512a-85dd-4db7-8236-c1e1e78cbc97",
+   "masterId": "23f48cd5-ad41-42b4-a4ba-14e802285734",
+   "product": "자하생력액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
+   "bytes": 1284
   },
   {
    "koId": "de519bf4-a48c-4294-aef2-bffcd09b5fc5",
@@ -5929,6 +6622,15 @@
    "bytes": 718
   },
   {
+   "koId": "be740662-06bb-465e-9240-6054d8f5e6b6",
+   "masterId": "2464e073-092d-4c70-87d4-4e16a783611e",
+   "product": "장쾌락시럽(락툴로오스농축액)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "65f0e2d0-cc88-8bc6-b9ee-bb0663ef06f3",
+   "summary": "本药用于慢性便秘，婴幼儿及儿童的便秘，分娩后的便秘。",
+   "bytes": 1461
+  },
+  {
    "koId": "a02dcf5b-cc2d-4063-a460-49fe43fa69d5",
    "masterId": "246b9ddd-e4c2-4b45-89be-3af9685267fc",
    "product": "베타메드연질캡슐",
@@ -5972,6 +6674,15 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "2be91cdc-e841-480c-9177-0c746467efa5",
+   "masterId": "24a4f772-14da-4f5b-8be9-d93755a41106",
+   "product": "명심고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9016a667-5f19-4dee-acc9-c119d7fba1aa",
+   "summary": "本药用于腰（腰部）痛、挫伤、扭伤（扭挫伤）、肩痛（肩部僵硬）、关节痛、肌肉痛、肌肉疲劳、冻伤、骨折痛的镇痛、消炎（抗炎）。",
+   "bytes": 970
   },
   {
    "koId": "0444a56b-9bb1-4785-871f-78c1e44668b8",
@@ -6082,6 +6793,15 @@
    "bytes": 672
   },
   {
+   "koId": "30642e82-e533-43ee-a443-13088bedbae0",
+   "masterId": "256501d8-43b9-49c7-9869-2efa1a9b787c",
+   "product": "신신파스아렉스마일드카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "aee9ce5f-40b0-481a-b166-7a69a79aa333",
+   "summary": "本药用于挫伤、扭伤、腰痛、肩部僵硬、肌肉痛、关节痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
    "koId": "d3b6aa51-0c63-42eb-9460-83f6d46c8dec",
    "masterId": "257c326d-60c5-4ac5-9d5f-b2c35070a268",
    "product": "알드라민정(세티리진염산염)",
@@ -6098,6 +6818,15 @@
    "sourceRefId": "e40a4664-fb56-4ce5-83fd-8f810d31258d",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎（抗炎）。",
    "bytes": 1013
+  },
+  {
+   "koId": "777b279e-f693-49d6-86c9-95b0a17dcbc6",
+   "masterId": "25a3c7ec-569f-4d3e-99cf-55c6b4b8a154",
+   "product": "한방파프자생고에이카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "8d48e7c4-2760-4033-9811-b7ff144120a0",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮的镇痛·消炎。",
+   "bytes": 1000
   },
   {
    "koId": "b811499c-beee-4987-8e45-9b2167825017",
@@ -6406,6 +7135,15 @@
    "bytes": 1446
   },
   {
+   "koId": "32dfb32e-bf14-4bca-a349-44550b7c3bee",
+   "masterId": "279c1edb-b30c-4118-9428-10e35d0836fd",
+   "product": "아이리스플러스점안액(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1efd95c8-dcdb-0d71-1daa-d8b5868e41d2",
+   "summary": "本药用于眼疲劳，泪液的补充（眼干燥），佩戴硬性隐形眼镜或软性隐形眼镜时的不适感，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1338
+  },
+  {
    "koId": "4739d241-41aa-42d7-97ff-cb6f877e384d",
    "masterId": "279c2b34-3ef1-406b-baed-6ef7bc435fb8",
    "product": "챔프시럽(아세트아미노펜)",
@@ -6469,6 +7207,15 @@
    "bytes": 1227
   },
   {
+   "koId": "2586b76a-eb80-4132-8222-ecc5e3fb6bef",
+   "masterId": "280b406a-f817-4b94-acaa-fe65be62e8e3",
+   "product": "명심고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "8dcbb031-d1f9-4322-a9f4-d08c4a8b94c5",
+   "summary": "本药用于腰（腰部）痛、挫伤、扭伤（扭挫伤）、肩痛（肩部僵硬）、关节痛、肌肉痛、肌肉疲劳、冻伤、骨折痛的镇痛、消炎（抗炎）。",
+   "bytes": 970
+  },
+  {
    "koId": "e818dd3f-c258-4e4c-a6e5-930788b9bedb",
    "masterId": "2822d0e0-a1b8-450f-82ab-bda13d1998e9",
    "product": "글루타틴정100mg(글루타티온(환원형))",
@@ -6476,6 +7223,15 @@
    "sourceRefId": "1c342d96-5a37-822d-6a09-0d1122383bee",
    "summary": "本药用于药物中毒、自体中毒。",
    "bytes": 1112
+  },
+  {
+   "koId": "a356bce6-1e60-44ec-81be-23f78a5aa393",
+   "masterId": "28353c9b-a8b3-4ce6-87b4-f9d4f2fd4b76",
+   "product": "물린디키드크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4d1b799c-dcc7-c7f8-49e4-38c939db05c7",
+   "summary": "本药用于瘙痒、皮炎、湿疹、荨麻疹、痱子、冻伤、虫咬、糜烂。",
+   "bytes": 1216
   },
   {
    "koId": "4909aaeb-597b-4948-b1c7-20f13f1b158f",
@@ -6631,6 +7387,33 @@
    "bytes": 1084
   },
   {
+   "koId": "9eb6b54a-703f-4a7b-918e-0aa301343964",
+   "masterId": "293b36ab-d5a7-4340-89fa-c10dfa5f9b95",
+   "product": "부스코판당의정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6b3c923e-d68e-a790-1d55-c02f769f6efa",
+   "summary": "本药用于胃·十二指肠溃疡、食管痉挛、幽门痉挛、胃炎、肠炎、肠绞痛、痉挛性便秘、功能性腹泻、胆囊炎、胆管炎、胆石症、胆道运动障碍、胆囊切除后遗症、尿路结石、膀胱炎、痛经。",
+   "bytes": 1599
+  },
+  {
+   "koId": "30124664-17c9-4dea-95ce-ace6164a5759",
+   "masterId": "2949e706-732f-4e15-afee-54518db9f031",
+   "product": "카디톤액(L-카르니틴)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb51542-7a81-7254-6cf2-c97efe38b75c",
+   "summary": "本药用于原发性、继发性肉碱缺乏症，以及心绞痛、急性心肌梗死等缺血性心脏疾病所致的心肌代谢障碍。",
+   "bytes": 1210
+  },
+  {
+   "koId": "1fc96c40-82bd-4366-9b41-ca3e0d97841b",
+   "masterId": "295a4c65-6736-4592-a922-71834e0ba4fc",
+   "product": "세스틴크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
+  },
+  {
    "koId": "7555fde3-23e5-4c86-acd4-8a1b2f82c572",
    "masterId": "29894766-77dc-4e05-ac65-f79c8f50e654",
    "product": "뉴란스비플러스정",
@@ -6739,6 +7522,15 @@
    "bytes": 1030
   },
   {
+   "koId": "c8121a29-3baf-4119-994d-0c7ea3fc88d2",
+   "masterId": "2a68a4e5-dd6e-4423-ad47-5a237e3a3d3c",
+   "product": "아이톡점안액(트레할로스수화물)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d68c8b63-1df6-d98b-ccdf-bb85ac122f91",
+   "summary": "本药用于因风、烟雾、污染、灰尘、干热、空调、航空旅行、长时间使用电脑而引起的眼干燥（不适感、刺痛感、刺激）或眼疲劳。",
+   "bytes": 1342
+  },
+  {
    "koId": "28f0d7c8-4c37-4dbb-8316-5de3c347d9fe",
    "masterId": "2a8dbe5d-e413-4d2e-9914-184fd3499c34",
    "product": "바이코비정",
@@ -6800,6 +7592,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "33b4545e-6f76-44e5-a03a-fdae239f7d3e",
+   "masterId": "2b029e84-e32f-4d81-af72-e65898bd7cae",
+   "product": "혜민고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "a96a9fa9-6d8e-4173-98d0-ff515adef878",
+   "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）、冻疮的镇痛 · 消炎。",
+   "bytes": 1028
   },
   {
    "koId": "ff2ccb04-0dc0-462a-80ac-9c15488efa40",
@@ -6899,6 +7700,24 @@
    "sourceRefId": "d5095918-1ae9-4047-97c7-b7c20571d5ce",
    "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）的镇痛 • 消炎（抗炎）。",
    "bytes": 1002
+  },
+  {
+   "koId": "41f11988-d8ab-42e1-9342-afd34b8d1832",
+   "masterId": "2bb20b1f-839a-4ec6-9208-dbf0a1802010",
+   "product": "티어웰점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7e26bf92-e492-001e-36d4-da0fac344900",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1286
+  },
+  {
+   "koId": "36800be7-9d58-4acc-acc3-c6af1f51424f",
+   "masterId": "2bbe3e98-f131-4ae1-a475-1e5ab4c462b6",
+   "product": "한방통치고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "3363f8ce-76c4-42d5-9588-b06726aff29f",
+   "summary": "本药用于腰（腰部）痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1007
   },
   {
    "koId": "8b266fbe-d0fd-46ee-aa8e-f6c9a4a0fba9",
@@ -7090,6 +7909,15 @@
    "bytes": 1271
   },
   {
+   "koId": "4974b296-f4c9-4667-805e-7d05a790708b",
+   "masterId": "2d8ea816-5d79-4754-a794-9cafae523a35",
+   "product": "혜민고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "21a8c5be-de32-400a-9d22-0ec8f26fc4e0",
+   "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）、冻疮的镇痛 · 消炎。",
+   "bytes": 1028
+  },
+  {
    "koId": "33230365-334c-4051-8b4b-d5397b05e99b",
    "masterId": "2d9035c5-fa8f-4d28-934c-279be4daabe4",
    "product": "마그빌정",
@@ -7252,6 +8080,15 @@
    "bytes": 1437
   },
   {
+   "koId": "eb4d51ac-5e69-4661-b468-821d1eae92d7",
+   "masterId": "2e6b25a0-3124-42bb-b314-eeb946b1d410",
+   "product": "타치온정50밀리그램(글루타티온(환원형))",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "71fb9b6c-5e88-1ddc-356d-e76c5ae83721",
+   "summary": "本药用于药物中毒、自体中毒。",
+   "bytes": 1043
+  },
+  {
    "koId": "598a77bb-32ed-4535-bcd7-127666883490",
    "masterId": "2e6bf6f5-1fa1-4fdb-801c-6aa64a0ed57c",
    "product": "엘도스타캡슐(에르도스테인)",
@@ -7270,6 +8107,15 @@
    "bytes": 1191
   },
   {
+   "koId": "db190e63-5193-429d-802e-23d3182f1f6f",
+   "masterId": "2e849302-46bd-411a-bcb1-c353bb6a1ab6",
+   "product": "쎄코론지크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dac2becc-1095-9832-6e5f-7d850e76d7e1",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1694
+  },
+  {
    "koId": "e8be8273-293b-4c92-a7e8-f7b543e6cf1a",
    "masterId": "2e8f93da-1fb7-4fff-a8b4-e1271340336a",
    "product": "기스톱정",
@@ -7286,6 +8132,15 @@
    "sourceRefId": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 D·E·C 补充，末梢血液循环障碍·手足冰冷的缓解，黄褐斑·雀斑等色素沉着的缓解，牙龈出血·鼻出血的预防。",
    "bytes": 679
+  },
+  {
+   "koId": "6591b1cc-929e-4ad1-a8cb-4fa43eef42d6",
+   "masterId": "2eb2e164-0f74-48a6-acfa-18f4b6371bdf",
+   "product": "속크린산",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "437f6067-ca41-7155-ad43-df944e2fe3fa",
+   "summary": "本药用于饮酒过量、烧心、胃部嗳气、过食、胃痛、胃部不适感、消化不良、促进消化、食欲不振、胃弱、胃酸过多、胃·腹部（肚子部位）胀满感、恶心（胃部反胃、宿醉、饮酒后的恶心、反胃）、呕吐、胸口灼痛、嗳气、胃部沉重感。",
+   "bytes": 1499
   },
   {
    "koId": "a10ad300-4955-4b4d-bd0b-c52ef4719a44",
@@ -7358,6 +8213,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "2629f2b8-116d-4abb-9e7c-c1528fb52f0a",
+   "masterId": "2f0e83e2-408b-4424-afb1-98bc59a37ce2",
+   "product": "리안점안액(폴리데옥시리보뉴클레오티드나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a0f53bca-ad05-abfe-1294-41923e203d94",
+   "summary": "本药用于因营养不足所致角膜、结膜溃疡性疾病的营养供给，以及因佩戴隐形眼镜等所致角膜、结膜的微小损伤。",
+   "bytes": 1265
   },
   {
    "koId": "c75294c8-abb0-4473-b51c-b0d1b7c6fb9d",
@@ -7558,6 +8422,15 @@
    "bytes": 1227
   },
   {
+   "koId": "1b89bdb9-7729-49cd-bc0a-f38b71cb98e3",
+   "masterId": "30c155b7-f39a-4f41-a0a3-f37fbcb3adc2",
+   "product": "리안점안액(폴리데옥시리보뉴클레오티드나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a0f53bca-ad05-abfe-1294-41923e203d94",
+   "summary": "本药用于因营养不足所致角膜、结膜溃疡性疾病的营养供给，以及因佩戴隐形眼镜等所致角膜、结膜的微小损伤。",
+   "bytes": 1265
+  },
+  {
    "koId": "ee1efbcc-5891-4593-98fb-ed1d57ed0365",
    "masterId": "30d6f3f5-71cc-428e-a336-cb1a207a34e8",
    "product": "파워겔(리도카인)",
@@ -7610,6 +8483,15 @@
    "sourceRefId": "eab00a6d-303f-4404-984b-a492feba30fc",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎（抗炎）。",
    "bytes": 1030
+  },
+  {
+   "koId": "3a245cfe-dff5-49bb-bef6-683e2be79c33",
+   "masterId": "31213028-7fb2-4d54-aaed-9d02fc52a148",
+   "product": "메카인정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b43ba6cc-8adb-ca3e-dcba-217f3ada5c15",
+   "summary": "本药用于晕动病引起的头晕·呕吐·头痛等的预防及缓解。",
+   "bytes": 1397
   },
   {
    "koId": "8cfdeb50-22c2-44a7-b1c8-11dd1c33f5ec",
@@ -7702,6 +8584,15 @@
    "bytes": 718
   },
   {
+   "koId": "58a9d431-2d97-46e7-a691-bf1d440361f6",
+   "masterId": "31a7e960-109a-4594-8bc6-fcdc5fac9856",
+   "product": "신신파스아렉스마일드카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "40f86437-e732-47ed-bc4a-efce62f65cae",
+   "summary": "本药用于挫伤、扭伤、腰痛、肩部僵硬、肌肉痛、关节痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
    "koId": "41814b14-433f-4748-9f46-d4b7c8be0005",
    "masterId": "31bc39df-7fae-4720-89e5-3ce840a9a600",
    "product": "뉴에르도테캡슐(에르도스테인)",
@@ -7747,6 +8638,15 @@
    "bytes": 983
   },
   {
+   "koId": "570eab6f-9d44-44f9-906c-2321333dcbca",
+   "masterId": "31e85dc3-c506-410f-bbe4-d2b06e644a9e",
+   "product": "알코타민정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "32ec5dfe-a016-5628-8542-7492232bcca8",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B1 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等）症状的缓解，脚气病，眼疲劳。",
+   "bytes": 1286
+  },
+  {
    "koId": "ec2abe3d-4c4a-4fab-9057-54740ddc5549",
    "masterId": "31e8de99-ffea-4b89-b6a7-c74d4163a27d",
    "product": "이치레스큐플라스타",
@@ -7756,6 +8656,15 @@
    "bytes": 1165
   },
   {
+   "koId": "1ca8537b-3ad7-48ad-8314-bda2c7e80271",
+   "masterId": "31e9479d-bbc9-45bd-93cc-19381f61e7db",
+   "product": "장쾌락시럽(락툴로오스농축액)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "65f0e2d0-cc88-8bc6-b9ee-bb0663ef06f3",
+   "summary": "本药用于慢性便秘，婴幼儿及儿童的便秘，分娩后的便秘。",
+   "bytes": 1461
+  },
+  {
    "koId": "99844cb9-b676-469c-a884-d660174846a1",
    "masterId": "31f37723-fdc8-4d00-be30-4bb29b27a574",
    "product": "혈앤보연질캡슐",
@@ -7763,6 +8672,24 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "f211fee9-45ab-4c5b-8835-2f81438da023",
+   "masterId": "31f5b881-d646-4283-9062-2f92b8c8bdde",
+   "product": "라이센드플러스액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "354e4d61-7132-ba14-5b00-6105fb4a0c65",
+   "summary": "本药用于头虱、阴虱、体虱感染症的治疗。",
+   "bytes": 1271
+  },
+  {
+   "koId": "167104aa-f67a-4831-b18d-e5a010fec05e",
+   "masterId": "31fcaaed-fd98-463c-a500-17de953fdf64",
+   "product": "베데스타-지크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
   },
   {
    "koId": "69f7ce5a-58e2-472c-a4f0-b85d81036908",
@@ -7783,6 +8710,24 @@
    "bytes": 738
   },
   {
+   "koId": "920332ee-17d9-4e9c-b5d8-12513e45479a",
+   "masterId": "3222a62d-2868-4860-91e2-a2d580fcb02c",
+   "product": "제일한방파프수에스카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "6ebaaf71-7d2e-4111-ad2e-ac7ae68c7e45",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎。",
+   "bytes": 1035
+  },
+  {
+   "koId": "fc06c7e2-952f-48f6-9ec9-9cd1aff9e06e",
+   "masterId": "322d9033-7609-43fd-9259-e428a0761af8",
+   "product": "더마화이트정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2b81ba41-3b61-36d9-ecd4-e6735fb3edf9",
+   "summary": "本药用于黄褐斑。",
+   "bytes": 1334
+  },
+  {
    "koId": "e71c6fe9-4ef6-48fd-bdea-a4c3f1fabff4",
    "masterId": "322f8356-29ce-4b1d-a787-0f3096eb2219",
    "product": "에버트린액1g(시트룰린말산염)",
@@ -7790,6 +8735,15 @@
    "sourceRefId": "364ee76a-4e1d-d2e9-72af-45f2d7392e12",
    "summary": "本药用于功能无力症的辅助治疗。",
    "bytes": 1191
+  },
+  {
+   "koId": "a95a27bf-c0e9-41ec-8a32-4be5c6e4709d",
+   "masterId": "3234e18b-2948-4de1-96b3-f7aaecea9239",
+   "product": "유니쎈타액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
+   "bytes": 1284
   },
   {
    "koId": "8a2b6df4-b111-4ad6-a21d-30978aa4dd9a",
@@ -7837,6 +8791,15 @@
    "bytes": 738
   },
   {
+   "koId": "e203b72a-4917-4009-9461-24ba0004e7ae",
+   "masterId": "32633f75-cd23-4705-bf75-00108d5da760",
+   "product": "제로프리액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "426eac6f-316b-0024-ebcb-e885e2f59fb3",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
+  },
+  {
    "koId": "6e4a40e5-da76-4389-bc1d-b284bd8008e8",
    "masterId": "3263a967-9d6d-4ceb-af57-b67e1eaafbf1",
    "product": "아벤스액",
@@ -7853,6 +8816,15 @@
    "sourceRefId": "b21c54a6-e248-477f-bc23-f5f1a6701587",
    "summary": "用于体力疲劳·体力下降·发育期·老年期的维生素 D·E·B1·B2·B6·C 补充，佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 740
+  },
+  {
+   "koId": "ce89db17-d115-41d9-a83b-f59bd1636dec",
+   "masterId": "328bf879-0ccd-48ca-8296-6e20483d6d29",
+   "product": "리쥬비넥스크림(폴리데옥시리보뉴클레오티드나트륨)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "c17d5a2e-828a-4c78-bccd-388f39775135",
+   "summary": "本药用于皮肤及结缔组织营养不足，或因营养不足而易发生溃疡的疾病（例：创口、营养供给）。",
+   "bytes": 881
   },
   {
    "koId": "e177c3e4-7001-4158-b816-3ab89d77295f",
@@ -8287,6 +9259,15 @@
    "bytes": 718
   },
   {
+   "koId": "7e174d0a-ca51-4464-b20c-415d8bdc6363",
+   "masterId": "35a3aa9e-0fc5-43db-a1b4-b156b8d4adba",
+   "product": "제로프리액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "426eac6f-316b-0024-ebcb-e885e2f59fb3",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
+  },
+  {
    "koId": "b35aa8ab-8160-4657-950a-9744c53ed6d9",
    "masterId": "35aa7198-6ab8-4b64-b8cd-9dbe77c1e4dc",
    "product": "글로큐텐연질캡슐",
@@ -8377,6 +9358,15 @@
    "bytes": 1227
   },
   {
+   "koId": "d8a85163-f3b3-4765-845e-4ff9fa14f6dd",
+   "masterId": "36499eb3-a451-4e2d-9b0a-06a0f1ee06b4",
+   "product": "부스코판당의정(브롬화부틸스코폴라민)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6b3c923e-d68e-a790-1d55-c02f769f6efa",
+   "summary": "本药用于胃·十二指肠溃疡、食管痉挛、幽门痉挛、胃炎、肠炎、肠绞痛、痉挛性便秘、功能性腹泻、胆囊炎、胆管炎、胆石症、胆道运动障碍、胆囊切除后遗症、尿路结石、膀胱炎、痛经。",
+   "bytes": 1599
+  },
+  {
    "koId": "6a689c91-2447-4ec0-b175-fee2173d8b65",
    "masterId": "364f6e1d-ced6-4a67-a63f-a10df7124104",
    "product": "토비클연질캡슐",
@@ -8458,6 +9448,15 @@
    "bytes": 1437
   },
   {
+   "koId": "121cc273-1ebe-4f3f-bea6-39e2f35dec06",
+   "masterId": "36b36e1a-d304-4c9f-a92b-002754f0772c",
+   "product": "엔도콜액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "35d10ce0-8cd9-64de-0c3c-a0beeec9001a",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
+  },
+  {
    "koId": "566c0d9e-6a03-4bf7-90ff-a5664669ae36",
    "masterId": "36b61c2c-436c-4a6a-bda4-cc94e002c858",
    "product": "포스톤정",
@@ -8474,6 +9473,15 @@
    "sourceRefId": "0b98e6f8-d22e-adc7-5c36-22c03d30fb4d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1227
+  },
+  {
+   "koId": "f440c3b5-cd5b-4cfb-9599-32cd7c55f59f",
+   "masterId": "36bc2bc7-18f0-4b10-83bf-012a7fca14c7",
+   "product": "데마코트에스크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dc4ad2fa-ddae-768c-4181-246e4b548058",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1698
   },
   {
    "koId": "d0fff6b9-d126-43fd-abc3-f91b34ad2ecb",
@@ -8501,6 +9509,15 @@
    "sourceRefId": "26608aa1-4186-4d35-ba03-4db93e03c13e",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎。",
    "bytes": 1030
+  },
+  {
+   "koId": "7d99e969-04bb-49a1-89f9-03842fd4f182",
+   "masterId": "36ec5159-5561-4f8d-8fae-e224f403a134",
+   "product": "티어웰점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7e26bf92-e492-001e-36d4-da0fac344900",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1286
   },
   {
    "koId": "df400275-084d-45db-9741-3aacbcf36ace",
@@ -8600,6 +9617,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "300b91e6-3920-49ab-a2d0-70c57ba0f0df",
+   "masterId": "37b5cb13-33ef-4f5e-9c82-665d19c54c39",
+   "product": "새크라손크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1681
   },
   {
    "koId": "1b9927f9-6f51-4626-9ae6-497eeee3a04b",
@@ -8710,6 +9736,15 @@
    "bytes": 1236
   },
   {
+   "koId": "0dd1fa5e-40f9-44d7-b5f4-c2603286e966",
+   "masterId": "38508530-73ac-4b83-9883-0b04bb3fe67c",
+   "product": "한국유나이티드산화마그네슘정250mg",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "221fab31-48a4-d6b4-19e2-5da15fb80d95",
+   "summary": "本药用于胃·十二指肠溃疡、胃炎、胃酸过多的制酸作用及症状改善，便秘症。",
+   "bytes": 1334
+  },
+  {
    "koId": "ce09d010-1d05-401d-8e03-d2180d880827",
    "masterId": "3858fa36-21d0-43c3-80a7-fbb08a36fbc0",
    "product": "네로민정",
@@ -8746,6 +9781,15 @@
    "bytes": 740
   },
   {
+   "koId": "d9890c1c-931c-44e2-a6e6-fd77177538be",
+   "masterId": "38a50f4a-8b1f-4377-935f-51506f4d4158",
+   "product": "타치온정50밀리그램(글루타티온(환원형))",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "71fb9b6c-5e88-1ddc-356d-e76c5ae83721",
+   "summary": "本药用于药物中毒、自体中毒。",
+   "bytes": 1043
+  },
+  {
    "koId": "21dec7ac-9bfa-49fc-b28b-49cce89edaaa",
    "masterId": "38bf03b8-f9e1-4990-b86d-e462bc63084a",
    "product": "비타킨정",
@@ -8773,6 +9817,24 @@
    "bytes": 740
   },
   {
+   "koId": "2b4af9ca-0488-4d84-83b5-83363aae27c9",
+   "masterId": "38c9197b-e40c-4577-ae5f-63b551506707",
+   "product": "파마시메티콘액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e6fc79a8-206a-3068-a0a1-1c6c8146d790",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1397
+  },
+  {
+   "koId": "bbdcf2dd-631a-4d5a-ad4b-b4418538f6ae",
+   "masterId": "38cdd817-2a1a-4702-966c-034590cddd2e",
+   "product": "모이스뷰점안액(트레할로스수화물)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d68c8b63-1df6-d98b-ccdf-bb85ac122f91",
+   "summary": "本药用于因风、烟雾、污染、灰尘、干热、空调、航空旅行、长时间使用电脑而引起的眼干燥（不适感、刺痛感、刺激）或眼疲劳。",
+   "bytes": 1342
+  },
+  {
    "koId": "c2b7cc40-69b2-4b27-8ac1-8b7464ea1100",
    "masterId": "3901fc1b-3aa4-496d-b656-27a43b5ba8fd",
    "product": "휴니즈아세틸시스테인캡슐200mg",
@@ -8789,6 +9851,15 @@
    "sourceRefId": "0304c664-f9af-c03c-0b81-27c7c8c1eeb3",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "d2570ec1-145d-45fa-8e44-c058b335c420",
+   "masterId": "391dd58e-89d2-45ed-b2c5-3b86bfbca0ea",
+   "product": "제로프리액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "426eac6f-316b-0024-ebcb-e885e2f59fb3",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
+   "bytes": 1394
   },
   {
    "koId": "61fedea0-3eea-4ea0-9834-9c59d0aa7db1",
@@ -8834,6 +9905,15 @@
    "sourceRefId": "0b98e6f8-d22e-adc7-5c36-22c03d30fb4d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1227
+  },
+  {
+   "koId": "e4ca5aac-0f6c-44a0-97fa-89524ee49eee",
+   "masterId": "393ba034-ad7e-45ff-8774-e43f93239f02",
+   "product": "버물리키드크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4d1b799c-dcc7-c7f8-49e4-38c939db05c7",
+   "summary": "本药用于瘙痒、皮炎、湿疹、荨麻疹、痱子、冻伤、虫咬、糜烂。",
+   "bytes": 1216
   },
   {
    "koId": "1eb04cbc-3dfe-4ef0-9997-c0f79ab2a587",
