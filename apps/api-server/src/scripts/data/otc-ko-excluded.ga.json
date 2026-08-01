@@ -1,0 +1,912 @@
+{
+ "note": "KO_EXCLUDED — 일반의약품 번역 대상 아님",
+ "total": 90,
+ "byReason": {
+  "NOT_OTC_PRESCRIPTION_ONLY": 42,
+  "NOT_OTC_GENERAL_GOODS": 14,
+  "NOT_OTC_HEALTH_FUNCTIONAL_FOOD": 30,
+  "DRUG_CATEGORY_UNDETERMINED": 4
+ },
+ "docs": [
+  {
+   "koId": "90f65fa6-0cce-49cd-8693-f1f07a9d97c4",
+   "masterId": "4e3ac48a-dee8-41be-863f-1cfd79dfcc21",
+   "name": "코솝점안액",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "43f7b0e7-d141-4647-b5ab-cbd00d9a1865",
+   "masterId": "786d9487-dad9-4a78-aa13-e9be58562bc8",
+   "name": "코솝점안액",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "57ce129d-50d3-4003-a9a1-2263209e9795",
+   "masterId": "dc8e4243-fa0d-4af8-b6c6-64e12a16ff9a",
+   "name": "코솝점안액",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "318fa6ea-9b96-41c3-8a6c-53f4d67aaa70",
+   "masterId": "f69fad53-2247-4c18-89ab-b98a49ea21e7",
+   "name": "코솝점안액",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "aebc348f-e3b8-45dd-a4a8-790cef0fcbd2",
+   "masterId": "1ad8e59a-7a18-4baa-96bf-d2db7458a1e9",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "f8548c00-555c-404b-a20a-01eaa44a1f3f",
+   "masterId": "1ca12a30-0e31-47ab-a6fd-fa2d2b6219ff",
+   "name": "알파간피점안액0.15%(주석산브리모니딘)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "a7c70f2b-a8e8-40a9-8798-3249ee54b918",
+   "masterId": "1ee79007-f3c5-4e57-899a-b83eb09f6d57",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "5f6d8362-c356-4501-9a9b-559ea5a60705",
+   "masterId": "5c8d3179-b3d0-4ade-bbd1-6d9dd7b43d06",
+   "name": "알파간피점안액0.15%(주석산브리모니딘)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "2e718227-a209-40ee-b7b8-55be9ac2821f",
+   "masterId": "7307d983-7f26-412b-92b6-17700b128d53",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "51e7955c-eaff-4b6d-9486-f2b22666bf69",
+   "masterId": "a1f2981e-c4c2-4d0c-96b1-a0896ad59599",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "cb707dae-617b-49b0-9b1b-7e4fc708a616",
+   "masterId": "a3732ecb-f285-4488-807b-8496a6d994b8",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "45788bf7-7a83-4e9c-8371-30d08166c1fc",
+   "masterId": "a56e5a8f-f008-49bc-ad99-6d846ea05d5f",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "86559612-4fc8-4cf1-982a-96336fdd78d3",
+   "masterId": "ea11771c-769b-45b1-aa52-2a33263b9ba2",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "83f0a87f-f698-4caf-8d35-af94a3a88d2b",
+   "masterId": "fe7a6aa3-ea17-4ff4-90d0-0598ef2d8812",
+   "name": "알파간피점안액0.15%(브리모니딘타르타르산염)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "1d816adf-0043-4c09-8dac-8ef6cc5b20f2",
+   "masterId": "f1eed8f0-0b4d-40e2-9ba1-fae74e21cfb3",
+   "name": "천효 천문동 발효진액",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "be535e2b-bf83-4bd6-ae7a-0e53e6f80c38",
+   "masterId": "9bb6ffc9-bd1b-4c54-9cca-c25908434cb0",
+   "name": "연년익수 춘",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "d76ab8f7-9503-4002-9487-01b7616a9dbc",
+   "masterId": "a7f5272d-7099-491f-b2e8-21d5e13f44f5",
+   "name": "파워 본 케이투 엔 디 5000",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "d7da1738-5e26-4a2b-9293-323d4065f4d9",
+   "masterId": "0a47e0bc-38d0-45ae-9e6a-15a71ff80e1d",
+   "name": "징코Q 마그시아",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "0d9cfb83-cb6b-4c54-8177-6f451a5f8561",
+   "masterId": "744444c9-37bc-4b28-b8b7-7792b55affff",
+   "name": "리포좀 식물성 멜라토닌 함유 멜라치오 5",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "b5d246a1-f962-4ba2-9680-82f92153ebb9",
+   "masterId": "ff8d26c1-577d-4bd0-b4a0-bf68fe88920a",
+   "name": "리포좀 콜라겐 위드 글루타치온",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ec2a0676-1bdc-45fb-bc04-924fccac4369",
+   "masterId": "f5f88abb-17d6-405c-9450-cc8cb9d0b066",
+   "name": "맨 파워 포텐",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "9a2f24a4-3b52-4902-9e21-a904e7f20e4b",
+   "masterId": "66a16b58-05e5-4ac1-af3f-81c94a05c1d8",
+   "name": "유기농 여주 담은 청정 한방 흑염소 진액 골드",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "cf2ed9ae-eca4-43f4-815f-9624b76c0d8b",
+   "masterId": "fae6c67c-dad5-451c-937c-1b6caed61002",
+   "name": "콸콸포맨",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "a60bf895-4dc9-426e-8d3f-d450de3876c4",
+   "masterId": "86ea4d45-f041-4113-83d4-336e45cb09c4",
+   "name": "리얼 매스틱 1300",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "53789801-5354-4be3-aaa6-224dda7b1d49",
+   "masterId": "29286920-36ec-4fe8-a49d-fc72871d4cf5",
+   "name": "로얄파워민 프로",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ba968268-0a20-4618-994f-e38b82966bd3",
+   "masterId": "ff92d6bd-087b-40fa-8cd0-153b3752dde9",
+   "name": "프리미엄 알티지 오메가3",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "bee50f8c-9e67-4edf-9f37-598ebb6ebff8",
+   "masterId": "cb26c8b3-121c-4cd6-9730-3f5538421895",
+   "name": "코큐텐 액티브",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "6d32d383-d108-41f9-8ce6-711444fd36e4",
+   "masterId": "1536c584-4ff6-47a6-9532-600c8eb2bcb6",
+   "name": "아렉스 알부민",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ea57f4eb-9844-4131-9746-f4ead405a946",
+   "masterId": "069f70af-43c8-48bb-ba94-a7897bace32d",
+   "name": "프리미엄 헤파에이스 400",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ab391aed-75cb-42e8-bda3-93c336c1a9cc",
+   "masterId": "9e90fe4f-dcf1-457a-934a-006ee2925701",
+   "name": "리얼 리포좀 글루타치온 컴플렉스",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "e1014081-5c74-4729-886b-c4934161baf5",
+   "masterId": "869ddb7e-3116-4dc7-9751-91963cae7b87",
+   "name": "청정 한방 흑염소 진액 골드",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "63ed6d53-4db9-4401-88e0-d66b600ec9cd",
+   "masterId": "144335cd-74dc-4999-b31a-bef21354854d",
+   "name": "콸콸포맨 천문동 액상차",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "b275196d-0508-4dbc-81b0-fd4ddc36576a",
+   "masterId": "3e46616f-b2ff-4788-b974-08792fd2c0f3",
+   "name": "아스타잔틴 루테인 600",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "1c07da3b-f15d-4281-a8cf-9f1377a06ba7",
+   "masterId": "55c1c894-04f7-493d-806c-981ecfe96719",
+   "name": "프리미엄 맥스 크릴오일",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "1d78a4bb-0a34-4a6a-8615-1f51e56f6139",
+   "masterId": "325c2ad9-4e3f-4870-84e2-e7c558e52223",
+   "name": "징코Q젠시아",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "10f427d2-71fc-426a-8731-9bea49f25fb3",
+   "masterId": "7a5764c6-5870-419e-97b3-40be8e86703b",
+   "name": "프리미엄 브레인 솔루션 에스",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "138ebe14-f61e-4910-a336-53cebf3105cd",
+   "masterId": "9440c2ac-0ec1-404f-b6d1-c36a5e7c4fb6",
+   "name": "듀얼케어 락토바이옴",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "e8398ef7-65de-4abe-a718-19971b14241c",
+   "masterId": "90e00d92-d21f-4d8e-8ee0-4b9cd636f9cf",
+   "name": "이가돌 맥스",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "c961b5ac-0a1f-42a2-9650-9fc7ce72ac4f",
+   "masterId": "55391213-31d2-44ac-ba29-404f2bbbae86",
+   "name": "프리미어 파이토 대마종자유1100",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "d7be23b4-ece0-4b4a-b898-0eedc8e7d9cf",
+   "masterId": "9d3abd99-b484-4437-90f1-3160bd15e56f",
+   "name": "알부민 PDRN 더블케어",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_GENERAL_GOODS",
+   "reg": "일반",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "f1696a17-935c-421b-8de1-12d19045f198",
+   "masterId": "fa5141ee-bec7-4314-9ad8-6d9d0ea7aaaa",
+   "name": "면역엔 이뮨 부스터 α",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "6620dd21-30e1-4ea3-a020-fceb2deb90fa",
+   "masterId": "a583b71b-c6ab-4440-b421-abe0c6f50e3b",
+   "name": "락토밸런스 프로바이오틱스 + 아연",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "c28f42be-21dc-4b25-933d-831228435c41",
+   "masterId": "50414d47-ff50-430b-8010-c6ca0450add8",
+   "name": "모어 플러스 & 비오틴",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "65e8b12b-f64d-471d-8ec8-d6cb00ea3887",
+   "masterId": "0e33ec09-f20e-4cb8-8f3a-1930b3235bf6",
+   "name": "데일리 퍼플 키즈 멀티비타젤리",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "5ce86de3-35f6-4e70-943d-80b9144c9a3a",
+   "masterId": "5fd84bbc-3b7d-4ba5-a943-0f956ef2a8be",
+   "name": "rTG 오메가-3 퓨어",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "6d4293ff-3461-4aa1-bf6c-b06df3b1a000",
+   "masterId": "71f4aff3-e7a4-43fb-abca-f75c81ba5b25",
+   "name": "뉴 마그네슘350+B6",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "eecfc450-ada3-4701-9f30-a1897fd875c6",
+   "masterId": "43f3d87d-2879-4809-80df-1a547691e978",
+   "name": "마더스케어 철분제 플러스",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "95f46719-6c4e-4cc8-93bf-6e0dbbaf1dcd",
+   "masterId": "26283b92-d9fd-44a8-82b6-e4ab59f5569f",
+   "name": "비오틴 효모 더 채움",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "46ea952d-e391-4a8c-85a4-edc751273cf3",
+   "masterId": "f6b37061-9dbc-4263-bb3b-308d21f1d5d9",
+   "name": "매일습관 종합비타민미네랄",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "59ac0b79-1d89-4f69-a60e-53c6306c2005",
+   "masterId": "8a588f35-7fb3-4b74-b1c6-14051715069e",
+   "name": "리얼가르시니아골드",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "0256d224-2325-424f-a704-128588510fd6",
+   "masterId": "6372295a-ec65-4aff-beb5-26fa985a1bfd",
+   "name": "로젠빈 요로건강",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "10d611ef-4de5-4023-978b-d7666faa40db",
+   "masterId": "144f455a-dea1-4dad-bc00-d8f8b4ca700a",
+   "name": "통라이프 하이칼슘+마그네슘+비타민D+K",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "0819bef4-5b4b-4036-a083-7ddb43430039",
+   "masterId": "d18f2b62-5f56-437b-ab77-ee35e782e419",
+   "name": "빌베리 업",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "fd391a5d-2c14-42e8-b1fb-793f6b75e4fd",
+   "masterId": "62bcc519-8e5a-49d9-9e39-8dd04ae2642b",
+   "name": "정직한 MSM",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "11918ca8-ad4d-4b47-8d95-38dfbc388ae4",
+   "masterId": "e9895ba9-efc8-47e5-946b-e069be8c6a04",
+   "name": "여에스더 유산균 & 혈당케어",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "3e6c3ee1-6fa9-4b46-b5fb-017e1c3e61f7",
+   "masterId": "4c524481-b3ad-4ff9-8b14-13a4d18a64ea",
+   "name": "네오메딕스 맨포뮬러",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ef622fd8-858e-4bf3-8569-340ee9adac50",
+   "masterId": "c19e8b56-1e13-4dd7-b9a0-4c04712d8c60",
+   "name": "광동 덴탈엔탑",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "212e95af-051d-4795-b0ee-c9a530f5099a",
+   "masterId": "a40ed33b-17d8-4eac-a70c-e1f5445dbbba",
+   "name": "라이프토콜 요오드 아이오딘",
+   "sourceType": "manual",
+   "reason": "NOT_OTC_HEALTH_FUNCTIONAL_FOOD",
+   "reg": "건강기능식품",
+   "cat": null,
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "7a026ecf-cf51-48cd-9563-d4e5cba2d490",
+   "masterId": "bd53ce41-9750-46d7-80db-06a071a9aaf2",
+   "name": "메코마그민500정",
+   "sourceType": "mfds_easy_drug",
+   "reason": "DRUG_CATEGORY_UNDETERMINED",
+   "reg": "DRUG",
+   "cat": "drug_unspecified",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "3fc83c74-9251-402c-81ab-85d0d7dee48f",
+   "masterId": "3683e251-cfbc-478b-bf0f-bf80222147ce",
+   "name": "메코마그민500정",
+   "sourceType": "mfds_easy_drug",
+   "reason": "DRUG_CATEGORY_UNDETERMINED",
+   "reg": "DRUG",
+   "cat": "drug_unspecified",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "2af444c1-09a2-4fcc-af65-816a1989ff6e",
+   "masterId": "ddaf4f23-e488-40d9-9d43-002f3e6f7495",
+   "name": "크라비트점안액(레보플록사신수화물)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "75e5d392-6fa4-4630-bf22-980e2aecb466",
+   "masterId": "4a1ddf89-01d3-4098-8a4b-427a889cf153",
+   "name": "크라비트점안액(레보플록사신수화물)",
+   "sourceType": "mfds_easy_drug",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "5ad09d61-8f92-464b-9142-c77fa73b3e8f",
+   "masterId": "8034eb5d-f083-4fe1-87a0-cc5bf4623180",
+   "name": "메코마그민500정",
+   "sourceType": "mfds_easy_drug",
+   "reason": "DRUG_CATEGORY_UNDETERMINED",
+   "reg": "DRUG",
+   "cat": "drug_unspecified",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "6a143a89-93c4-4d80-ac9d-771a7f6e5685",
+   "masterId": "cc86ce3d-25e2-498d-b062-849fe74e0ecf",
+   "name": "메코마그민500정",
+   "sourceType": "mfds_easy_drug",
+   "reason": "DRUG_CATEGORY_UNDETERMINED",
+   "reg": "DRUG",
+   "cat": "drug_unspecified",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "8f471df7-e395-4905-bc72-0dd06d4b9360",
+   "masterId": "46db2687-24ed-4f98-9fb6-31912894df10",
+   "name": "스몰크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "15c43b61-af79-4973-81b2-e9089f76161d",
+   "masterId": "614e5580-b3b4-4a1e-a3db-7cd0969ed925",
+   "name": "유라미크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "85975f97-dcca-4fd0-b391-1ea34db8213e",
+   "masterId": "8b77f6e4-e7d0-4405-a84c-c57a705385e4",
+   "name": "유라미크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "8de15492-b838-4d44-b5fa-747bb0288626",
+   "masterId": "cb5433dd-6a13-4c8e-8410-f8ff3d463724",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "eb4a6570-73f5-44c6-b7cd-7a57a99dc059",
+   "masterId": "ed4d4e8b-8244-4805-8850-0b2fdeb724a1",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "c6cae9c0-1162-4d11-a68f-beca3c3e3f62",
+   "masterId": "1a98e4de-3dde-4b8a-876d-1db176504b55",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "350feec6-9422-4049-8e77-45f0c0b2498b",
+   "masterId": "3f89e902-00ae-4754-b169-c3d02df97fc5",
+   "name": "스몰크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ede7e32f-3f3e-4354-8c4e-918f2ec369dc",
+   "masterId": "b3d8f157-7673-4afd-b69d-fe45d1953120",
+   "name": "보송크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "de5226a6-9e73-4e11-8420-0701e4a6c60c",
+   "masterId": "bb5ac840-c1b4-4df8-a5a7-cbe11a41a13c",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "33bf1a56-6d9d-459d-a5bf-5795965c8be2",
+   "masterId": "0300dd83-0054-4d72-975b-aedbb98c0e50",
+   "name": "보송크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "856e5648-f0ae-4351-af50-83e1974e355e",
+   "masterId": "7274bbc7-76ff-4319-bf48-dd28ff950f53",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "ca9c149d-521b-4378-81b2-39e05c7484f7",
+   "masterId": "c13f9575-bbf6-4590-8fcf-1c5c7f6c99c1",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "de2f3257-eaf5-4d10-bdb8-38cb21c2e963",
+   "masterId": "3ca4fed2-6ff8-4836-a5c2-69a770bb4db6",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "78fc43c6-b846-43b9-9817-57d4571c82e3",
+   "masterId": "93fc4109-bedf-44fd-bb7b-9d012208e2b1",
+   "name": "보송크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "60a09542-7f1d-4ed0-852c-d60824bb02d5",
+   "masterId": "b8171a2e-03b9-483f-b458-ef4820caecb7",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "a5d48361-713d-4489-a939-5d08c33b9a9f",
+   "masterId": "e4fbfce9-2a74-45ad-b428-f373c787dfc0",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "3a92e3cf-3452-4918-92bc-78925814895a",
+   "masterId": "e59b6399-7812-430c-8933-41db3bb2c42a",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "1bcf0a02-3200-475f-9f87-638e5eae2a81",
+   "masterId": "45d2c7cb-ed68-4050-9548-539326abc0e3",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "10d2c594-4f44-4edd-ad75-830f5249d358",
+   "masterId": "750f68b6-47d4-4a7b-b2d8-7d8d8241408e",
+   "name": "삼아리도멕스크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "b61b4475-3471-4b1e-ba9c-e2978a934045",
+   "masterId": "9ae414c4-eccb-45a8-930d-33d082762ca1",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "117bc115-7420-4cef-8b2e-8c01464f5c1e",
+   "masterId": "b06e2887-baa4-4c1c-9ca5-fd5ac720123e",
+   "name": "베로아크림(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "a34c64e0-d099-4b94-8127-8d640c70e038",
+   "masterId": "537c8977-411e-47ce-aa14-bd04f3a8a3af",
+   "name": "삼아리도멕스로션(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "f5bf126b-d1e4-4dc6-9326-9df0200f36b6",
+   "masterId": "53cf6022-b2dd-405d-b715-e9725832a3d1",
+   "name": "삼아리도멕스로션(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "2b49509b-c2ca-4c14-8980-a55297a23415",
+   "masterId": "781c63b1-ade6-4019-b967-92a1f7b3b450",
+   "name": "삼아리도멕스로션(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "4dbf3207-efea-4711-927c-c44b522342a8",
+   "masterId": "93f48084-0bb8-444f-99a3-f8457c4cf4ac",
+   "name": "삼아리도멕스로션(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  },
+  {
+   "koId": "33d366ce-25a3-4e9b-8a5c-16be58d4561d",
+   "masterId": "a81c78e2-01aa-4647-a05b-2663ca15f893",
+   "name": "삼아리도멕스로션(프레드니솔론발레로아세테이트)",
+   "sourceType": "o4o_drug_otc_topical",
+   "reason": "NOT_OTC_PRESCRIPTION_ONLY",
+   "reg": "DRUG",
+   "cat": "rx",
+   "pmStatus": "ACTIVE"
+  }
+ ]
+}

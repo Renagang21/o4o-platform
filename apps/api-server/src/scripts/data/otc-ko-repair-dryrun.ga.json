@@ -1,0 +1,15 @@
+{
+ "summary": {
+  "mode": "dry-run (DB write 0)",
+  "repairUnits": 0,
+  "eligibleMasters": 0,
+  "docsPlanned": 0,
+  "docsRejected": 0,
+  "rejectByGate": {},
+  "updated": 0,
+  "guardMiss": 0
+ },
+ "applied": [],
+ "plan": [],
+ "rejected": []
+}

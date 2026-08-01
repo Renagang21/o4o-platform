@@ -1,0 +1,61 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "readyReverify": {
+  "checked": 20093,
+  "blocked": 0,
+  "emptySlot": 0,
+  "badTags": 0,
+  "noSlots": 0,
+  "failures": []
+ },
+ "appliedDocs": 67,
+ "appliedWindow": {
+  "from": "2026-08-01T00:57:03.625Z",
+  "to": "2026-08-01T00:57:04.951Z"
+ },
+ "otcKoTouchedInWindow": 67,
+ "unexpectedKoWrites": [],
+ "windowOtherSessions": [
+  {
+   "source_type": "o4o_hff_generated",
+   "lang": "en",
+   "n": 147
+  }
+ ],
+ "canonicalByLanguage": [
+  {
+   "lang": "en",
+   "n": 62079
+  },
+  {
+   "lang": "ko",
+   "n": 63326
+  },
+  {
+   "lang": "zh",
+   "n": 1318
+  }
+ ],
+ "otcZhCanonical": 1289,
+ "enPopulationReconciliation": {
+  "note": "직전 EN 조사는 관심 슬롯 집합에 TERMINATED 를 넣지 않았다. EN canonical 은 수정하지 않았다.",
+  "koBlockedDocsBefore": 1148,
+  "enAuditPopulation": 1133,
+  "docsWithOnlyTerminatedInterest": 3867,
+  "reportedEnAudit": 1137,
+  "reportedKoBlocked": 1148,
+  "difference": 11
+ },
+ "checks": {
+  "KO_READY 전건 재판정 — 절단 0": true,
+  "KO_READY 빈 슬롯 0": true,
+  "KO_READY 태그 골격 정상": true,
+  "KO_READY 슬롯 없음 0": true,
+  "KO_READY 검사 건수 = 원장 건수": true,
+  "OTC KO 변경 = 적용 원장과 정확히 일치 (대상 밖 KO write 0)": true,
+  "적용 건수 = 원장 건수": true,
+  "EN·zh 는 UPDATE 가드로 구조적 차단 (language=ko)": true,
+  "기존 OTC zh canonical 1,289 불변": true
+ },
+ "verdict": "VERIFIED"
+}

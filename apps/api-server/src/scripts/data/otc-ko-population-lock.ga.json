@@ -1,0 +1,55 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "populationDefinition": "product_masters.regulatory_type=DRUG AND drug_category=otc AND status=ACTIVE",
+ "accounting": {
+  "officialTargetMasters": 57572,
+  "koCanonicalDocsTotal": 22408,
+  "onTargetDocs": 22318,
+  "offTargetDocs": 90,
+  "KO_READY": 20093,
+  "KO_HOLD": 2225,
+  "KO_EXCLUDED": 90,
+  "KO_NOT_AUTHORED": 35254,
+  "identity": "57572 = 22318(저작) + 35254(미저작)",
+  "lockIdentity": "22408 = 20093 + 2225 + 90"
+ },
+ "holdReason": {
+  "TRUNCATION_HARD_CUT_RESIDUE": 1333,
+  "TITLE_SLOT_MISSING": 333,
+  "TRUNCATION_OPEN_DELIMITER": 18,
+  "TRUNCATION_INCOMPLETE_GRAMMAR": 339,
+  "TRUNCATION_INCOMPLETE_WORD": 265
+ },
+ "exclReason": {
+  "NOT_OTC_PRESCRIPTION_ONLY": 42,
+  "NOT_OTC_GENERAL_GOODS": 14,
+  "NOT_OTC_HEALTH_FUNCTIONAL_FOOD": 30,
+  "DRUG_CATEGORY_UNDETERMINED": 4
+ },
+ "duplicateCanonicalMasters": 0,
+ "canonicalByLanguage": [
+  {
+   "lang": "en",
+   "n": 62079
+  },
+  {
+   "lang": "ko",
+   "n": 63326
+  },
+  {
+   "lang": "zh",
+   "n": 1318
+  }
+ ],
+ "readySlotChecks": 452321,
+ "checks": {
+  "세 집합 합계 = KO 기준본 전체": true,
+  "집합 간 중복 0": true,
+  "공식 대상 회계 (대상 = 저작 + 미저작)": true,
+  "canonical 중복 0": true,
+  "KO_READY 절단 판정 0": true,
+  "KO_READY 빈 슬롯 0": true,
+  "KO_READY 태그 골격 정상": true
+ },
+ "verdict": "ACCOUNTING_OK"
+}
