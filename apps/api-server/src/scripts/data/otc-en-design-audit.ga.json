@@ -1,0 +1,30 @@
+{
+ "population": 22011,
+ "standardApplied": 22011,
+ "gapsDocs": 0,
+ "byCode": {},
+ "distribution": {
+  "liPerDoc": {
+   "median": 6,
+   "p95": 14,
+   "max": 24
+  },
+  "liLen": {
+   "median": 120,
+   "p95": 557,
+   "max": 2523
+  },
+  "tileLen": {
+   "median": 56,
+   "p95": 167,
+   "max": 900
+  },
+  "docLen": {
+   "median": 2985,
+   "p95": 6491,
+   "max": 9489
+  }
+ },
+ "gapsSample": [],
+ "gaps": []
+}

@@ -1,0 +1,1218 @@
+{
+ "summary": {
+  "mode": "dry-run",
+  "scanned": 22011,
+  "planned": 0,
+  "tilesShortened": 0,
+  "skipped": 583,
+  "skipByCode": {
+   "FIRST_SENTENCE_STILL_LONG": 583
+  },
+  "green": 0,
+  "concurrent": 0
+ },
+ "plans": [],
+ "skips": [
+  {
+   "id": "714e9d7f-909e-4f84-a2ee-902cdfb59c74",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 306
+  },
+  {
+   "id": "0ff676e2-4c7e-4aec-bc50-238129b46b2e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 416
+  },
+  {
+   "id": "67f86654-460a-4d25-a94a-5dd432ecb3c0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 306
+  },
+  {
+   "id": "7bc4e7c5-f825-4725-9349-868a5ecc6b98",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 465
+  },
+  {
+   "id": "11144978-a691-42a4-8063-2f61fcd1c276",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 334
+  },
+  {
+   "id": "5da1f91c-851d-43f4-ad30-5bbf323d154c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 334
+  },
+  {
+   "id": "010d6808-567e-4250-b450-6caa8723f649",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 334
+  },
+  {
+   "id": "a3242a1c-3fa8-4851-9eea-fc26601b4b44",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "b0c0bcbb-2383-4fab-88b2-bc99e1eb4b25",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 380
+  },
+  {
+   "id": "d2aec1a7-a17f-413c-9fb5-4d45d5473ece",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 380
+  },
+  {
+   "id": "e640407d-53e1-4ce3-b6ac-91f13d97c027",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 380
+  },
+  {
+   "id": "349b183b-c7ac-42c7-bcd8-a9c40f658fe4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 306
+  },
+  {
+   "id": "7a534f24-8b3e-4c6e-ac63-63dccb3d628c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 349
+  },
+  {
+   "id": "c6da01f8-7ea6-4d91-a491-18dfe8d252b1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 465
+  },
+  {
+   "id": "a765e2ff-c398-41bf-a4ec-3262f6a243e1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 422
+  },
+  {
+   "id": "02624f39-13df-49ee-98f3-44c89556433d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 412
+  },
+  {
+   "id": "8258c1d7-504b-4745-8bd5-412f4224edec",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 383
+  },
+  {
+   "id": "798bf5ed-f584-4dfa-b26e-56cb7bccda78",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 327
+  },
+  {
+   "id": "bf0b29cd-cd43-432d-9798-67f5049eec40",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "ba81b727-4f4d-492a-aac9-cc87c0222b7b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 323
+  },
+  {
+   "id": "740ab40b-e7a5-46e1-8dd4-f788773f1811",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "8ae06607-142a-476a-9416-ccd21d9beb6b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 424
+  },
+  {
+   "id": "09a074d3-95b5-45f6-9f0b-44ed359d0e71",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 621
+  },
+  {
+   "id": "9b8aba07-6fb7-4587-877b-b6942ecf858a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 330
+  },
+  {
+   "id": "f3a5048f-efc0-409a-8546-a2038d096156",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 330
+  },
+  {
+   "id": "9eb1c18c-4f6e-4c3e-9972-884c2c7f86a2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 333
+  },
+  {
+   "id": "f445d47b-d1dc-4e29-98e7-1dbc749ce01a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 412
+  },
+  {
+   "id": "b5e55ad5-c0f5-426b-8a43-12fca4aa4bbc",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "987da0f5-4da8-4789-9986-e75b7e0f1f63",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 342
+  },
+  {
+   "id": "305eb250-aa26-4eeb-b216-2d778a2a46ba",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 351
+  },
+  {
+   "id": "a4e690c9-f673-4a6b-a2cb-447d072469f4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "1d3acb4c-ddb2-47a1-938a-b6502c0871e4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 516
+  },
+  {
+   "id": "5984aa68-73ae-490a-8df5-d8254e425bce",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "0c0c6abd-fcf0-43bd-a994-54bbb65c900a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 416
+  },
+  {
+   "id": "2ae88889-e5bd-42ba-8033-1cd084c585a6",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 446
+  },
+  {
+   "id": "0b2c1dc8-f837-4757-998b-99c6b0ab1fca",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 456
+  },
+  {
+   "id": "0c10913f-3ea4-4d3a-b59d-986993f88856",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 438
+  },
+  {
+   "id": "dceef1c8-2325-49f5-8cff-0e1f1699162d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 330
+  },
+  {
+   "id": "a9120cf4-8dd5-4af8-907e-6b753940a71c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 306
+  },
+  {
+   "id": "f0d80c93-84c9-4c3f-8694-f352ea9f2624",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 416
+  },
+  {
+   "id": "6b20ee7f-371b-4430-afb4-038541a64ae3",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 696
+  },
+  {
+   "id": "76da0fbf-4020-4a95-939a-c612ab671b52",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 438
+  },
+  {
+   "id": "bcaee9a3-8ba6-4f70-bc83-648fb66fb89a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 336
+  },
+  {
+   "id": "df7a275d-ffc1-42a9-8351-397c462a395c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "72b454be-192c-4096-a10b-693722f6bc77",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "44414186-2309-46e5-b139-ad86cede539b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "3339a494-011c-4af4-8cc3-a445a9ce773f",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 316
+  },
+  {
+   "id": "fde47194-9b71-44d5-956c-9bc9557f5849",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 424
+  },
+  {
+   "id": "c5e4a7fe-be33-4e72-9704-c247cd3d69de",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 750
+  },
+  {
+   "id": "0ee0d979-3ad0-41b9-86db-5ebecad83e4e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 479
+  },
+  {
+   "id": "53ae7901-6ee0-4793-a8d2-164dfdb8e41b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 435
+  },
+  {
+   "id": "a354c9e6-5e44-4225-95f5-85f79b2399bf",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "3559b116-6da2-4cac-944e-3c31f9791e8d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 442
+  },
+  {
+   "id": "56294f68-b673-4cc4-b80c-56e50af7ea93",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 457
+  },
+  {
+   "id": "ded78c3c-2987-4f6c-8114-84f3854e8e2f",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 336
+  },
+  {
+   "id": "b22ca4af-9764-413c-85e9-f91a5c3e47ed",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 412
+  },
+  {
+   "id": "9d134633-e061-4ac3-a97c-f56ca6aef802",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 519
+  },
+  {
+   "id": "6762bb9d-b2c7-4d9a-a51b-068fca80a7a6",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 359
+  },
+  {
+   "id": "4038b8d3-4b2e-476e-9ad0-f806caac622a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 302
+  },
+  {
+   "id": "07e353ae-1c81-4413-801a-d383b1f00243",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 306
+  },
+  {
+   "id": "1484bb0b-1df0-4389-ba8d-6f02f84318cd",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 336
+  },
+  {
+   "id": "b1a3175e-4477-4674-b714-71913a0d6def",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "5fb6963c-4faa-4bb1-9c5a-a05e1a87167e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "24a2fd6b-ff93-4b0f-be6b-5c78285ebf76",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "0275abb9-37a7-4a36-8c4b-017b63972a63",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "9d688d20-6651-4e57-b98e-b4e9d33b2a08",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "f092a6b0-1908-4cb7-8515-56c3c5313a07",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "c6c67244-8ebb-4765-b1b7-a1c38c80f2f5",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "470892bd-7f5c-4535-a58b-efbb7a2a4164",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 355
+  },
+  {
+   "id": "3ce2ca2d-f87f-47fa-9797-dea3b78e1ddf",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "627bcace-e456-416a-9c11-cae969b33336",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "1e93d96c-bb7d-4c9b-9ee4-d60d8aeb5df1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "f8235570-57b7-457a-8536-7506b9ef7faa",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "61c7d346-ab25-4110-82b9-ed0eb08836fa",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "d8fe6f7d-782e-4c5d-9ee4-784d5cc470f8",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "d47b3cad-62ff-4979-8f46-1b33addcb18b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 602
+  },
+  {
+   "id": "d01fa539-cc79-4ce7-a2ee-86cbf1e1363c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "cab9d5ce-76ea-45d6-b8ef-b8838d6d5af2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "cd656dc0-0d03-4fc8-bccf-580cb7adee69",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "eaa7e934-c9cc-4a9b-b9f0-60e6dabf8fe0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "bb048545-b619-4ddb-bc35-8a6c42cb19f0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "c8614c5e-8f10-4324-863c-28aaa8e5f8e4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "76291d1f-de05-485e-b5c8-07b4de836238",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 370
+  },
+  {
+   "id": "c2bb3de2-58bb-42f1-af15-eb63e8e4cd6a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "27653fb4-36e8-4373-b2c5-90bebf031cb3",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "df3d38e5-a9e5-44d1-a499-c9dd4aa02136",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "2985ca79-2eb1-4fb6-9019-0c603c28a45b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "cdecd34c-7bf4-4d58-b258-a0a68fdc594a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "cb197c40-4681-4540-ba4b-15664adaa4ca",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 353
+  },
+  {
+   "id": "8eeda392-7070-45b3-9ff6-77d37bc832d0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "395fda93-f056-430b-b838-9ce0bc2fc656",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "03fa3efe-5343-468c-956d-ff5856dc0afb",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "b251e5ff-adbd-4157-b99f-62136b1a8fa2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "4bca9fad-0742-4f41-b75c-0fa696e9eb15",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "a30bdbcc-9bd8-4244-b924-727d3bd6ab5e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 445
+  },
+  {
+   "id": "d52857c4-1d9d-4021-a3e8-9da5c994f7bb",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "ea5cd212-818a-44fa-a0cb-975d42723c62",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "cbf5f05f-1cc0-4ccb-aac8-d6a664a23c4e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "337a954d-3c14-4388-b7dd-43a638680ebd",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "3105cc4e-c928-48c3-ac46-1e9315feffee",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "84151d30-4439-44aa-9bff-6ec05d31cb40",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "c796c160-1a3b-4d4b-84f9-3cf38ae98edf",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "f9366117-c6d0-4a69-9ee6-09998d865a45",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "27a32866-a1de-4a7f-8c4d-f67ab48e48a2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "ec420f32-0bde-4548-906f-825b57e897c8",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "7a5822c0-cf4d-415f-8a5c-ef04d574639c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "3b27247d-ea52-42d1-a6ba-110b2112e734",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "324b281b-a93e-49d4-bd22-865b29b33fc2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "3467efc6-149f-48b9-84ce-6e9a4d8df1d3",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "13736d29-2275-4055-a21a-742a7d852465",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "cf9d9fb2-b139-44f6-8f95-ca27cfd3a0fd",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "1f280351-e17a-47ab-8ab5-df14f9cb05ef",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "df0f1c5d-63bc-47dc-92eb-f13b6c982fd0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "c20c0db5-00e5-4c4d-95c9-aaba16108ce4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "01add190-4391-480e-ac2f-e55ba2824d3c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "9dca469d-4cf3-45f4-992b-ebe8ee1cd52b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "b1624fe2-e8b6-4d22-9e62-34e0423bf465",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "17dc52f4-401f-4769-8821-b8f96767cff1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "bb04fc97-2640-4782-bc7c-58d5b5d3da71",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 313
+  },
+  {
+   "id": "49da62c4-5c07-43ea-b5dd-cdc5a9852739",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "2e52ab7a-5a96-4664-9b8a-134b6a4416a5",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "f269ad85-1427-4dbe-8683-c5e1f60fbc63",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "23d0e2d5-c50a-4207-a898-4b97a70d64d5",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "8bb44d96-cd71-403b-a33e-b03eeadc58f3",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "a2928ee5-746f-494a-9cb6-d12bcdbdc40b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "472fd567-59b6-4ece-8a19-0a5d1a7055d7",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "How it works",
+   "len": 305
+  },
+  {
+   "id": "879a6c96-3344-4fe0-ba7c-1edd8e156415",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "24dffd6c-d293-436b-a591-4654f7e99c41",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "df228097-02df-481d-92d8-cedb0efb935e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "05a2219e-8d97-4912-a9e7-156e03937a21",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "a8e3257f-5910-4623-bcdb-57165cae758e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 317
+  },
+  {
+   "id": "5cab2ce7-3c22-445c-b17d-371fbf002c81",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 403
+  },
+  {
+   "id": "ebe4088b-a3aa-43b5-a17d-d889adf9ac47",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 403
+  },
+  {
+   "id": "e119c1bd-450b-4264-8443-802b463ddfd4",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 403
+  },
+  {
+   "id": "830456a7-c59f-4177-bd21-cff93561da6d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 403
+  },
+  {
+   "id": "46deea11-14f6-4db3-84ef-bf31adcf993f",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 403
+  },
+  {
+   "id": "3512d0cf-37b5-4c04-8b5e-4a492d1d033d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 465
+  },
+  {
+   "id": "e182897a-be4f-414f-aaa0-ffb0a070e757",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 465
+  },
+  {
+   "id": "bf7bee6f-db1b-48b7-8677-b463a1776e9c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 465
+  },
+  {
+   "id": "22a21522-a28e-4fd9-843e-52311bf86a38",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 465
+  },
+  {
+   "id": "eeb9fb86-f9f6-445d-98fc-8f38a8507182",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 465
+  },
+  {
+   "id": "f6620b68-1896-4b9e-814b-78ac16f7559c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 311
+  },
+  {
+   "id": "a8dcb6e9-9aa5-4a73-acfa-b9ff3b003f74",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 311
+  },
+  {
+   "id": "bdaf348a-3fcf-4806-9ea7-0fa4b05561f6",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 311
+  },
+  {
+   "id": "1913e8ca-16a8-49f9-9f45-a6b4c0033237",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 311
+  },
+  {
+   "id": "fd7f988c-e555-4fb5-aefc-4c78895a252c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 311
+  },
+  {
+   "id": "f7ba9b13-c0ec-4f1e-8382-f1033b1cedd1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 322
+  },
+  {
+   "id": "38ffc5c7-9395-4877-96f3-796995d0876d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 322
+  },
+  {
+   "id": "b68d8638-09a5-4668-a739-e6356b535880",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 322
+  },
+  {
+   "id": "df1205c7-68f4-4bd5-ad69-b207b95c3aba",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "7de7f65c-ee74-4787-b119-2562d7092c2b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "fee5f7eb-ead9-4c63-a066-733d00112d29",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "f9f935d7-7c2e-4de4-8330-966cb8a97001",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "f1f3b6fb-f123-4813-a572-0bc4f932bce0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "67e26733-d972-4851-9cf6-3c6679882bba",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "49b3b6b0-6c38-4f1f-af88-2fdbd7ba0007",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "60ceb10f-d7ad-4be8-9f64-dca5f80e9eef",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "3a07ec48-530e-4ce7-9ed0-32174d54d170",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "bccaca7d-04bb-4cef-9de3-f2fc0801c636",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "8b243c6a-0da8-4627-910e-8b7a49640a1c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "dabec1ed-10aa-4802-b76e-6b0b5cb6e557",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "a905a875-d1fe-459c-b77c-c5d7b64892ce",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "9b1ac91c-89c1-4825-a759-dcd1f46a133d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "bb4dd80f-eda1-49c0-a5dd-6bb8e75e3b42",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "460d7475-aef6-4e5e-8a81-5db74188be1d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "07922e46-970c-4fd0-8698-f02c528b80b0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "0fedeb32-50f1-470f-8d66-f1b494bcedb1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "6e8c7c32-4c61-40b1-8959-60f176de4e52",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "7d0942c3-8404-4ba4-bf20-59dd4a8ef424",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 390
+  },
+  {
+   "id": "efb339f4-eba3-4ecb-ae69-15b86a18060a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "efb339f4-eba3-4ecb-ae69-15b86a18060a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 384
+  },
+  {
+   "id": "18d41a23-e0e7-4673-ab03-4e654f31a830",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "18d41a23-e0e7-4673-ab03-4e654f31a830",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 384
+  },
+  {
+   "id": "614c3b06-b950-48e5-a827-8c5286b701a1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "614c3b06-b950-48e5-a827-8c5286b701a1",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 384
+  },
+  {
+   "id": "7764f7b1-cafb-4e89-9fd0-fe51d3a3656e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "7764f7b1-cafb-4e89-9fd0-fe51d3a3656e",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 384
+  },
+  {
+   "id": "5c50d3b0-fa85-4333-a0ed-10997252ccf0",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "f867bf57-cbc4-4b2d-9ad7-f6d32c5c53ff",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "5cea9dd2-d647-44a7-8eb7-ef7f1e081084",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "27964460-9436-46d1-bfe6-34cf81c75828",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "ffa78f8a-65f2-481c-9018-e31caf6ba6f2",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "c093f60b-2886-4342-b46a-31dd52e71284",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "a75c130c-9d56-4488-b54b-6a4a6eaf3f24",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "b54c42b2-ee59-4666-8ccc-e9fe5932b89b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "a644b46c-6487-4342-a09e-b165c2e5832c",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "1a622747-4901-46a8-822b-fcfa4446a392",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "7fe8d77c-471d-40f3-9b2e-37c99b45c332",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "90217c15-2949-4827-905f-b050f06754ef",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "3a6c3d2d-dce1-45e8-8ee7-fb49322941d3",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "ca73f719-f7a3-406f-aca1-87c0e1a6c43f",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "e4654233-c278-4d14-a521-6e8dadc67159",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "2b357326-61e3-4217-9e0a-e97b03451b1b",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "79532767-f394-4eea-898b-34f12f5fd864",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "05f9f941-6fab-4113-b08f-cef61ef77111",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "2920144a-27a4-4834-a9b6-4703d81e9876",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "f5019ed9-1a49-45b2-8db6-37fb59b0c06a",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 305
+  },
+  {
+   "id": "3f3e0e5b-2123-451a-a63e-865cec9afe0d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 301
+  },
+  {
+   "id": "3f3e0e5b-2123-451a-a63e-865cec9afe0d",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Caution for",
+   "len": 322
+  },
+  {
+   "id": "660a0203-57de-46dc-9b7f-b0a082f58c4f",
+   "code": "FIRST_SENTENCE_STILL_LONG",
+   "tag": "Main symptoms",
+   "len": 301
+  }
+ ],
+ "results": []
+}

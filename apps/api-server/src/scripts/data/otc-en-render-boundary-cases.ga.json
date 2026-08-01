@@ -1,0 +1,50 @@
+{
+ "cssBytes": 14946,
+ "cases": [
+  {
+   "label": "최장 문서",
+   "enId": "56294f68-b673-4cc4-b80c-56e50af7ea93",
+   "product": "이큐펜키즈아이시럽(이부프로펜)",
+   "docLen": 9489,
+   "liN": 11,
+   "liMax": 2454,
+   "tileMax": 457
+  },
+  {
+   "label": "주의 항목 최다",
+   "enId": "464f7fa6-2f79-4127-8873-01714a5ebb54",
+   "product": "프리노즈에스정",
+   "docLen": 6806,
+   "liN": 24,
+   "liMax": 677,
+   "tileMax": 167
+  },
+  {
+   "label": "최장 항목",
+   "enId": "00b48ead-83af-4dff-bbf6-c0c83a058152",
+   "product": "애니펜정150밀리그람(덱시부프로펜)",
+   "docLen": 8709,
+   "liN": 12,
+   "liMax": 2523,
+   "tileMax": 199
+  },
+  {
+   "label": "최장 타일",
+   "enId": "5e1f33bf-b5b9-4ce3-9b13-e9f13ba6b0c3",
+   "product": "마그라민액티브맥스연질캡슐",
+   "docLen": 6836,
+   "liN": 9,
+   "liMax": 651,
+   "tileMax": 900
+  },
+  {
+   "label": "중앙값 대표",
+   "enId": "16bbcd20-55d5-4dc0-b290-7770d9316bc9",
+   "product": "모가프텐트로키(플루르비프로펜)",
+   "docLen": 2985,
+   "liN": 1,
+   "liMax": 770,
+   "tileMax": 154
+  }
+ ]
+}
