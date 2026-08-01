@@ -194,7 +194,24 @@ Neture 대상 데이터가 0건이라 **수치가 달라질 여지 자체가 없
 | 부분 취소·부분 환불 | V1 범위 밖 (§8) |
 | 파트너 커미션 타입 불일치 | 직전 WO 에서 보고한 `WO-O4O-PARTNER-COMMISSION-PRODUCT-ID-TYPE-ALIGNMENT-V1` 미착수 |
 
-## 11. 중지 조건 최종 판정
+## 11. 배포 검증 (프로덕션 LIVE)
+
+커밋 `b8ddda3b7` → `Deploy API Server (Cloud Run)` run `30688473808` **success**.
+
+| 검증 | 결과 |
+|---|---|
+| `GET /health` | ✅ 200 |
+| `POST /pharmacy-hub/store-owner/payments/prepare` | ✅ 401 `AUTH_REQUIRED` (마운트됨) |
+| `GET /pharmacy-hub/supplier/orders` | ✅ 401 `AUTH_REQUIRED` |
+| `GET /pharmacy-hub/operator/fulfillment/stuck` | ✅ 401 `AUTH_REQUIRED` |
+| 대조: 존재하지 않는 경로 | ✅ **404** — 위 401 이 라우팅 성공임을 증명 |
+| 결제 이벤트 핸들러 기동 | ✅ 로그 `[PharmacyHubPaymentEventHandler] Initialized (serviceKey=pharmacy-hub)` |
+
+> 결제 완주 E2E(실 카드 승인)는 **PG 실결제**를 발생시키므로 수행하지 않았다.
+> 결제 전 구간(주문 생성·그룹 로딩·라우팅·핸들러 구독)과 결제 후 구간의 쿼리는
+> 각각 §6·§7 에서 검증했다.
+
+## 12. 중지 조건 최종 판정
 
 | 조건 | 판정 |
 |---|---|
