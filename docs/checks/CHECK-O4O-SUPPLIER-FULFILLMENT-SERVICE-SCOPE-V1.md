@@ -154,10 +154,64 @@ Limit
 
 | # | 항목 | 성격 |
 |---|------|------|
-| 1 | **정산·커미션 경로 미적용** — `neture-settlement.service`(4) · `partner-commission.service`(2) 가 `neture_orders` 를 서비스 구분 없이 집계한다. 현재 0행이라 영향은 없지만, **Phase 2 로 Pharmacy-Hub 주문이 들어오면 Neture 정산에 합산된다.** 정산 정책 판단이 필요해 이번 범위에서 제외했다 | **Phase 2 전 필수** |
-| 2 | `operator-dashboard.controller` 가 존재하지 않는 `neture.neture_orders` 를 조회한다(항상 실패 → `.catch`). 별도 정비 대상 | 무해하나 정리 필요 |
-| 3 | 결제·환불 정책 · 배송비 정책 미확정 | Phase 2 착수 전 결정 |
-| 4 | 미bridge paid 주문 재시도 경로 없음 (IR §6-3) | Phase 2 범위 |
+| 1 | ~~정산·커미션 경로 미적용~~ | ✅ **§8 에서 완료** |
+| 2 | `operator-dashboard.controller` 가 존재하지 않는 `neture.neture_orders` 를 조회한다(항상 실패 → `.catch`) | 무해하나 정리 필요 |
+| 3 | **⚠️ 정산·커미션 생성 쿼리가 스키마 미한정으로 이미 실패 중** — §8-3 | **금액 경로 — 별도 판단** |
+| 4 | 결제·환불 정책 · 배송비 정책 미확정 | Phase 2 착수 전 결정 |
+| 5 | 미bridge paid 주문 재시도 경로 없음 (IR §6-3) | Phase 2 범위 |
+
+---
+
+## 8. 정산 축 보완 (추가 작업)
+
+§7-1 로 남겨둔 정산·커미션 경계를 이어서 닫았다 (커밋 `90f3b9c88`).
+
+### 8-1. 적용 3지점
+
+| 파일 | 지점 |
+|------|------|
+| `neture-settlement.service.ts` | 정산 생성 집계 (기간별 supplier aggregate) |
+| `partner-commission.service.ts` | 단건 주문 커미션 산정 |
+| `partner-commission.service.ts` | 기간 배치 커미션 산정 |
+
+같은 SSOT 헬퍼(`netureOrderServiceScopeSql`)를 재사용했다.
+
+### 8-2. 의도적 미적용 2지점
+
+| 지점 | 사유 |
+|------|------|
+| 정산 상세 조회 2곳 (`settlement_id` 기준) | `neture_settlement_orders` junction 으로 **이미 스코프**되어 있다. 필터를 넣으면 **기존 정산에 속한 주문이 가려질 수 있다** |
+| per-order 판매액 조회 (`o.id = ANY($1)`) | orderIds 가 §8-1 의 필터된 집계에서 오므로 **전이적으로 스코프**된다 |
+
+> 보수적 기본값: **Neture 정산은 Neture 주문만 집계한다**(미표기 = neture).
+> 이 변경은 Pharmacy-Hub 의 정산 정책을 정하지 않는다 — **합산되지 않게만** 막는다.
+
+### 8-3. ⚠️ 조사 중 발견한 기존 결함 (수정하지 않음)
+
+`neture-settlement.service.ts` · `partner-commission.service.ts` 는
+`JOIN neture_order_items`(스키마 미한정)를 쓰는데,
+
+```
+실제 테이블 : neture.neture_order_items
+search_path : "$user", public       (역할 o4o_api 에 rolconfig override 없음)
+```
+
+→ **정산 생성·커미션 산정 쿼리는 이번 변경과 무관하게 이미 `relation does not exist` 로 실패한다.**
+(공급자 조회 쪽은 `neture.neture_order_items` 로 한정되어 있어 정상이다.)
+
+수정하면 **죽어 있던 금액 계산 경로가 살아나는 동작 변경**이므로 이번 WO 에서 고치지 않았다.
+정산 운영 정책과 함께 별도로 판단해야 한다.
+
+이 때문에 §8-1 의 필터는 **현재 실행되지 않는 코드 경로에 들어간 방어 조치**다.
+스키마 한정 버전으로 바꿔 프로덕션에서 직접 실행해 **필터 문법과 실행 가능성은 확인**했다(0건).
+
+### 8-4. 검증
+
+| 항목 | 결과 |
+|---|---|
+| `tsc --noEmit -p tsconfig.build.json` | ✅ 0 errors |
+| 필터 포함 집계 쿼리 프로덕션 실행 (스키마 한정) | ✅ 정상 · 0건 |
+| 정산 원장 건수 불변 | ✅ `neture_settlements` 0 · `neture_settlement_orders` 0 · `partner_commissions` 0 · `neture_orders` 0 |
 
 **다음 WO**: `WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1` — 단, 위 1번(정산 축 서비스 경계)과
 3번(결제·환불·배송비 정책)을 먼저 닫아야 한다.
