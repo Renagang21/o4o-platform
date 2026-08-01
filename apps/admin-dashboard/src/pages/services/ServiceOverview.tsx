@@ -201,11 +201,17 @@ export default function ServiceOverview() {
   const [expandedGroups, setExpandedGroups] = useState<string[]>([]);
   const queryClient = useQueryClient();
 
+  // WO-O4O-ADMIN-API-DOUBLE-PREFIX-RESIDUAL-FIX-V1:
+  //   authClient base 가 이미 /api/v1 이라 선행 '/v1' 을 붙이면 /api/v1/v1/... 로 404.
+  //   백엔드 mount = /api/v1/service/monitor (register-routes.ts:176),
+  //   하위 endpoint = summary · tenants · apps · themes · warnings · validate(POST) · report.
+  //   이 화면은 react-query queryFn 에 try/catch 가 없어 실패가 빈 카드로만 보였고
+  //   콘솔 오류도 남지 않아 선행 triage 에서 정상(READY)으로 오판됐다.
   // Fetch system summary
   const { data: summary, isLoading: loadingSummary } = useQuery({
     queryKey: ['service-monitor', 'summary'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: SystemSummary }>('/v1/service/monitor/summary');
+      const response = await authClient.api.get<{ success: boolean; data: SystemSummary }>('/service/monitor/summary');
       return response.data.data;
     },
     refetchInterval: 60000
@@ -215,7 +221,7 @@ export default function ServiceOverview() {
   const { data: tenantsData, isLoading: loadingTenants } = useQuery({
     queryKey: ['service-monitor', 'tenants'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: { tenants: TenantInfo[] } }>('/v1/service/monitor/tenants');
+      const response = await authClient.api.get<{ success: boolean; data: { tenants: TenantInfo[] } }>('/service/monitor/tenants');
       return response.data.data.tenants;
     }
   });
@@ -224,7 +230,7 @@ export default function ServiceOverview() {
   const { data: appsMatrix, isLoading: loadingApps } = useQuery({
     queryKey: ['service-monitor', 'apps'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: AppsMatrix }>('/v1/service/monitor/apps');
+      const response = await authClient.api.get<{ success: boolean; data: AppsMatrix }>('/service/monitor/apps');
       return response.data.data;
     }
   });
@@ -233,7 +239,7 @@ export default function ServiceOverview() {
   const { data: themesData, isLoading: loadingThemes } = useQuery({
     queryKey: ['service-monitor', 'themes'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: { themes: ThemeStatus[] } }>('/v1/service/monitor/themes');
+      const response = await authClient.api.get<{ success: boolean; data: { themes: ThemeStatus[] } }>('/service/monitor/themes');
       return response.data.data.themes;
     }
   });
@@ -242,7 +248,7 @@ export default function ServiceOverview() {
   const { data: warningsData, isLoading: loadingWarnings } = useQuery({
     queryKey: ['service-monitor', 'warnings'],
     queryFn: async () => {
-      const response = await authClient.api.get<{ success: boolean; data: { warnings: ValidationWarning[] } }>('/v1/service/monitor/warnings');
+      const response = await authClient.api.get<{ success: boolean; data: { warnings: ValidationWarning[] } }>('/service/monitor/warnings');
       return response.data.data.warnings;
     }
   });
@@ -250,7 +256,7 @@ export default function ServiceOverview() {
   // Run validation mutation
   const validateMutation = useMutation({
     mutationFn: async () => {
-      const response = await authClient.api.post<{ success: boolean; data: ValidationResult }>('/v1/service/monitor/validate');
+      const response = await authClient.api.post<{ success: boolean; data: ValidationResult }>('/service/monitor/validate');
       return response.data.data;
     },
     onSuccess: () => {
@@ -261,7 +267,7 @@ export default function ServiceOverview() {
   // Export report
   const handleExportReport = async (format: 'json' | 'csv') => {
     try {
-      const response = await authClient.api.get(`/v1/service/monitor/report?format=${format}`, {
+      const response = await authClient.api.get(`/service/monitor/report?format=${format}`, {
         responseType: format === 'csv' ? 'blob' : 'json'
       });
 
