@@ -1,0 +1,786 @@
+{
+ "total": 46,
+ "rows": [
+  {
+   "masterId": "11463d24-3c78-4903-abf0-541951a545e0",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "2220f2ee-f3ea-4a68-9645-0937fcc61092",
+   "enDescriptionId": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "21ff836d-e6ee-4436-89d9-ce508de0bfe3",
+   "productName": "물린더겔",
+   "koDescriptionId": "98e256b8-a537-46b1-816f-5e11b9bb35b0",
+   "enDescriptionId": "e31bd6c9-b7b4-405f-b78a-2c351095d6e8",
+   "koHash": "e77e0471333e974a797939deddc1a473",
+   "enHash": "c2955616276a7c3f1093812311a6258e",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1일",
+    "6일"
+   ],
+   "missingKoSentences": [
+    "1일 수회 환부에 바릅니다.",
+    "증상이 개선되면 가능한 빠른 시일 내에 사용을 중지하십시오.5~6일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오."
+   ]
+  },
+  {
+   "masterId": "281e52af-6233-40f7-8583-d94460d5a66f",
+   "productName": "목앤스프레이",
+   "koDescriptionId": "b90a2755-d719-4579-ad22-e6bfc066609b",
+   "enDescriptionId": "1ff2dc8b-d0a8-441b-95e7-4abdfaf0ba5a",
+   "koHash": "a4780a6ed417ab9f2b508b62022ba242",
+   "enHash": "78df9a5f02d1d9cc9346c65da5157b3a",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "6일"
+   ],
+   "missingKoSentences": [
+    "5~6일을 사용하였으나 증상의 개선이 없는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D50600CSI) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "2a0ba90a-4744-464f-8c20-9206f3902d5f",
+   "productName": "피엠원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "e74418b0-7362-4629-9892-9f14db1da1ed",
+   "enDescriptionId": "051573d8-dd21-4817-8947-5e066fc8ea59",
+   "koHash": "b47d0e5b84f80818a37ab4bdf63d0eee",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세",
+    "15세"
+   ],
+   "missingKoSentences": [
+    "만 15세 이상 및 성인은 단 1회 환부(질환부위)에 바릅니다.",
+    "테르비나핀 및 이 약에 과민증 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부, 유·소아, 15세 미만의 소아는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "321944bb-2826-4942-9790-781f9f70e86c",
+   "productName": "프리좀원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "f12f1699-d8d9-481e-86cd-1de3525447e8",
+   "enDescriptionId": "e7e07068-aaa8-4d60-8707-f69a24c670e3",
+   "koHash": "d6b0d053935964d6e5e020a75a88adfa",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 15세 미만의 유·소아는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "3668bfd5-bf2f-44c5-85fd-54978dbc3477",
+   "productName": "조아파모티딘정10밀리그램",
+   "koDescriptionId": "3a4b8d25-d50d-401b-aff3-8fe43d0645e3",
+   "enDescriptionId": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "koHash": "aae16d77f37c55826a27cb48276eb132",
+   "enHash": "592be4a848ecb9bbc329bb6820a59eb4",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈(혈액구토)이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번히 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "3b9297da-aedf-4e74-b643-1dd944afa638",
+   "productName": "코드에이연질캡슐",
+   "koDescriptionId": "0dd2ee10-1294-40c4-82d4-84f16f719845",
+   "enDescriptionId": "554c9a78-b0f8-4da1-a81e-eedf7e93d52a",
+   "koHash": "c7d1821b42afc260b28a21e35e2f40c7",
+   "enHash": "00f29496a611c03800eed04e1ae8133a",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "3개월",
+    "3개월",
+    "1세"
+   ],
+   "missingKoSentences": [
+    "이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,노년기의 비타민 A,B1,B2의 보급,눈의 건조감의 완화,야맹증,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화에 사용합니다.",
+    "만 8세 이상 및 성인은 1회 2캡슐씩,1일 2회 복용합니다.",
+    "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다."
+   ]
+  },
+  {
+   "masterId": "4042d78d-b5bb-452b-8339-d59ce03ed31f",
+   "productName": "비사큐정",
+   "koDescriptionId": "086820ab-ed2d-4f4a-9049-c83dc94899c9",
+   "enDescriptionId": "59b3d916-f76f-4a76-adae-26b33b39dd3b",
+   "koHash": "90fc66365a4e45ab0d21aaf1e4057bde",
+   "enHash": "86211005d4396014df8ea5dc41b9ccb3",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 심한 복통(배 아픔) 또는 구역,구토,임부 또는 임신하고 있을 가능성이 있는 여성,신장장애 환자,나트륨 제한 식이를 하는 사람,직장의 출혈 혹은 장부전 경험자,만 10세 이하의 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "47b86fda-ce88-4632-a90b-ceed94c5fc95",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "ffed962d-80e4-445b-aff5-bc2a65f6c0ae",
+   "enDescriptionId": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "48162c48-7301-4efd-88b6-6f69908f28c4",
+   "productName": "코드에이연질캡슐",
+   "koDescriptionId": "758734e2-ebd4-464c-8e1e-1ada884f282d",
+   "enDescriptionId": "c7cca0b4-c2d8-4aa6-8db2-5b994b4b0804",
+   "koHash": "c7d1821b42afc260b28a21e35e2f40c7",
+   "enHash": "00f29496a611c03800eed04e1ae8133a",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "3개월",
+    "3개월",
+    "1세"
+   ],
+   "missingKoSentences": [
+    "이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,노년기의 비타민 A,B1,B2의 보급,눈의 건조감의 완화,야맹증,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화에 사용합니다.",
+    "만 8세 이상 및 성인은 1회 2캡슐씩,1일 2회 복용합니다.",
+    "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다."
+   ]
+  },
+  {
+   "masterId": "49463a47-2a3d-4022-814c-adf8f19a5c34",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "787187ae-cc13-4185-a30a-565417e2e9e8",
+   "enDescriptionId": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "4dc9bea0-70ac-44a3-a4a0-63a041d3e420",
+   "productName": "아로마솔크림",
+   "koDescriptionId": "b31758e7-279f-4e2e-bf1a-91297e74f378",
+   "enDescriptionId": "b163b249-2432-499d-83d7-3143c76bfee6",
+   "koHash": "336b797319eb40bc054b5ee263c78d2e",
+   "enHash": "d2472a262485381bccb0e3fd6fd3fd72",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1일",
+    "6일"
+   ],
+   "missingKoSentences": [
+    "1일 수회 적당량을 환부에 바르거나 가제 등에 묻혀서 붙입니다.",
+    "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.5~6일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오."
+   ]
+  },
+  {
+   "masterId": "4e572cab-2cb8-44a8-87a5-d144e0c76110",
+   "productName": "슬리펠정25밀리그램(디펜히드라민염산염)",
+   "koDescriptionId": "072aeb44-5054-4fb4-b332-edbc202dbb65",
+   "enDescriptionId": "7ef692ff-fb11-47e7-85dc-f13d44422cc1",
+   "koHash": "f4efae99e73cbb434df2de7317ee7063",
+   "enHash": "bb72fff764fc73fc4726174701e63398",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증,천식발작,폐기종,만성기관지염에 의한 호흡곤란,녹내장,전립선 비대 등 하부 요로 폐색성 질환,협착성 소화성 궤양 또는 유문십이지장 폐색 환자,15세 미만의 소아,뇌전증 등의 경련성 질환,크롬친화성세포종 환자,수유부,일상적 불면,불면증 진단,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(A27002ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "51b66ae7-cd1c-47c8-ac23-c2a69c965be4",
+   "productName": "프리좀원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "727f966f-f60a-425d-8ac5-792fa95b28fb",
+   "enDescriptionId": "f51aed3a-e6da-47e8-863d-aac60cafcf0e",
+   "koHash": "d6b0d053935964d6e5e020a75a88adfa",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 15세 미만의 유·소아는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "56aef42c-cedd-49fe-8e04-59c1161f972d",
+   "productName": "메이놀정",
+   "koDescriptionId": "04b9a792-333f-447d-9c7b-bcfbc27e0b26",
+   "enDescriptionId": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "koHash": "108871249f497c8057d72c30313bab15",
+   "enHash": "928ec03610b4a47ae51094d68d8ea20c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "반드시 필요한 경우 이외에는 만 10세 이하의 어린이 분류 일반의약품 · 장용정 작용 이 약은 변비와 변비에 따른 식욕부진(식욕감퇴),복부팽만,장내이상발효,치질의 완화에 사용합니다.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "5cd94989-3255-468c-a965-391ef7da9755",
+   "productName": "크로아존엔정",
+   "koDescriptionId": "6ecb5ba2-fbc7-45aa-a71b-b609769cb5b1",
+   "enDescriptionId": "f0d9a86b-ad5d-4535-b77e-bfc308215ac6",
+   "koHash": "3f174756de33551349528e58b53bcb9f",
+   "enHash": "98613c70527342a0d5d1fcf35549b6f7",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "14세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 알레르기 체질,약에 의한 발열,발진,관절통,천식,가려움증 등의 알레르기 증상 경험자,수두 또는 인플루엔자에 감염되어 있거나 의심되는 영아,유아 및 (14세 이하) 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D33500ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "62793c6d-2962-4419-bf2c-18b8443039f8",
+   "productName": "목앤스프레이",
+   "koDescriptionId": "614ecb22-07dd-4353-bfda-77faea412838",
+   "enDescriptionId": "93ad31d4-fc1c-42ee-9e83-4880344738e2",
+   "koHash": "a4780a6ed417ab9f2b508b62022ba242",
+   "enHash": "78df9a5f02d1d9cc9346c65da5157b3a",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "6일"
+   ],
+   "missingKoSentences": [
+    "5~6일을 사용하였으나 증상의 개선이 없는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D50600CSI) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "64fa3041-2811-4da2-b737-3555392ae415",
+   "productName": "조아파모티딘정10밀리그램",
+   "koDescriptionId": "b71eb2f7-1b5b-4db9-ad96-06b93e1812dd",
+   "enDescriptionId": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "koHash": "aae16d77f37c55826a27cb48276eb132",
+   "enHash": "592be4a848ecb9bbc329bb6820a59eb4",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈(혈액구토)이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번히 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "6513ee80-8f95-4ff3-accb-6b7faf94613b",
+   "productName": "아로마솔크림",
+   "koDescriptionId": "102c7c8b-6a38-4900-940c-e669f040bcca",
+   "enDescriptionId": "5f8de2e8-0cc8-46c3-a3fb-65bfb9fb1ef9",
+   "koHash": "336b797319eb40bc054b5ee263c78d2e",
+   "enHash": "d2472a262485381bccb0e3fd6fd3fd72",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1일",
+    "6일"
+   ],
+   "missingKoSentences": [
+    "1일 수회 적당량을 환부에 바르거나 가제 등에 묻혀서 붙입니다.",
+    "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.5~6일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오."
+   ]
+  },
+  {
+   "masterId": "710b023e-ab78-4d82-b83b-19200afb6733",
+   "productName": "베비잘시럽(이부프로펜)",
+   "koDescriptionId": "69e8692f-d15e-4552-a20d-8face300c8f6",
+   "enDescriptionId": "909d8a1b-6882-4dde-9536-d7c3174893de",
+   "koHash": "41333ab05230072c36d940ef2570ce35",
+   "enHash": "c51c20ca82c1743a53012f56baba5736",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1회",
+    "1일",
+    "1일"
+   ],
+   "missingKoSentences": [
+    "류마티양 관절염,골관절염,강직성 척추염,연조직손상,비관절 류마티스질환,급성통풍,건선성 관절염에 성인은 1회 200,600 mg씩,1일 3~4회 복용합니다.",
+    "1일 최고 3,200 mg까지 복용할 수 있습니다.",
+    "연소성 류마티양 관절염에 체중(kg)당 1회 30~40 mg씩,1일 3~4회 분할 복용합니다."
+   ]
+  },
+  {
+   "masterId": "71d5da65-aee8-4d2c-9864-91569f2cedd2",
+   "productName": "포세라정",
+   "koDescriptionId": "e7089b69-a4b1-4cab-b375-b3a90c216932",
+   "enDescriptionId": "ec2b600b-1467-4c9f-a7be-490b895078de",
+   "koHash": "a7a5d291ed0d4ced398dfadfb0a009ab",
+   "enHash": "1f78cd13448dc5ad75ecdbdff3b07694",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "7세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자,투석 요법을 받고 있는 환자,고마그네슘혈증,고인산혈증,변비,장협착증,급성 충수염,임신초기 3개월 이내의 여성,만 7세 미만의 소아는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(558200ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "8225ee69-8088-414a-83a5-bdcd199c7096",
+   "productName": "메이놀정",
+   "koDescriptionId": "091dfb03-2402-4668-8555-f5cb3f4dea13",
+   "enDescriptionId": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "koHash": "108871249f497c8057d72c30313bab15",
+   "enHash": "928ec03610b4a47ae51094d68d8ea20c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "반드시 필요한 경우 이외에는 만 10세 이하의 어린이 분류 일반의약품 · 장용정 작용 이 약은 변비와 변비에 따른 식욕부진(식욕감퇴),복부팽만,장내이상발효,치질의 완화에 사용합니다.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "88087cc8-45db-4cf0-b7b0-8c41408a266e",
+   "productName": "액티브메가비타정",
+   "koDescriptionId": "8604d43a-07ca-4cc0-81a5-7a8272df02d8",
+   "enDescriptionId": "59b640d0-2b5c-4db3-a904-1747c794f72a",
+   "koHash": "bfe24cb62ba934c2621f66b074d91873",
+   "enHash": "5e96233137e6023f62788014ce5435c7",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "12개월"
+   ],
+   "missingKoSentences": [
+    "이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,발육기,노년기의 비타민 D,E,B1,B2,B6,C의 보급,뼈,이의 발육불량,구루병의 예방,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화,아연의 보급에 사용합니다.",
+    "이 약에 과민증 환자,고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태)환자,유육종증(원인을 알 수 없는 전신 염증질환),신장결석,심한 증상의 신부전 환자,만 12개월 미만의 젖먹이,갈락토오스 불내성,Lapp 유당(젖당)분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.",
+    "이 약을 복용하기 전에 고옥살산뇨증 환자(요중에 과량의 수산염이 배설되는 상태),임부 및 임신하고 있을 가능성이 있는 여성,수유부,미 분류 일반의약품 · 정 작용 이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,발육기,노년기의 비타민 D,E,B1,B2,B6,C의 보급,뼈,이의 발육불량,구루병의 예방,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화,아연의 보급에 사용합니다."
+   ]
+  },
+  {
+   "masterId": "8a26cfd1-912a-4657-9bd1-a3ae2d174ba7",
+   "productName": "팜편안엠정",
+   "koDescriptionId": "d889162c-28b3-4d3d-9930-deb64e6d4bc4",
+   "enDescriptionId": "8a6306fa-1209-44ec-a4e8-5b0d0b0f3c54",
+   "koHash": "dca822f6f046dd822a3364b32206a8e0",
+   "enHash": "932ed8823c4b5b639db45b89ed0298f2",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "1회",
+    "1회",
+    "1일",
+    "1일",
+    "65세"
+   ],
+   "missingKoSentences": [
+    "만 15세 이상~만 80세 미만 성인은 1회 2정씩,복용합니다.",
+    "필요시 4시간 간격으로 1회 2정씩,1일 3회까지 복용할 수 있습니다.",
+    "단,1일 3회(6정)을 초과하여 복용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "8b8c5e0a-d9bd-432d-bcaa-b3b6a8b1cec6",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "04298d5c-5653-496b-86bf-7d227f378adc",
+   "enDescriptionId": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "97e81f3e-5aa2-4763-bea5-558406c2c8af",
+   "productName": "도나펜에프연질캡슐",
+   "koDescriptionId": "2aee59f5-28f1-4262-a3f1-85fa59ea58a9",
+   "enDescriptionId": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "koHash": "9da740293d924cf161ef96035a26583e",
+   "enHash": "50c878eccd5e1b2bba509187f7193349",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "lost": [
+    "2,400mg",
+    "2,400mg"
+   ],
+   "missingKoSentences": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허혈성 심장질환,말초동맥질환,뇌혈관질환을 가진 환자는 고용량 이부프로펜(1일 2,400 mg) 복용을 피해야 하며,심혈관계 위험 요소(고혈압,고지혈증,당뇨병,흡연 등)를 가지고 있는 환자는 고용량 이부프로펜(1일 2,400 mg) 복용이 필요한 경우 이 약을 복용하기 전에 의사 또는 분류 일반의약품 · 연질캡슐 작용 이 약은 두통,치통,발치후 동통(통증),인후(목구멍)통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통,오한(춥고 떨리는 증상),발열시의 해열에 사용합니다.",
+    "선택 포인트 동일 일반명코드(D52700ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "98a3df15-0d39-4ecd-a734-14401f99a8d9",
+   "productName": "액티브메가비타정",
+   "koDescriptionId": "89207a61-70cc-4480-8c6a-789e79243bec",
+   "enDescriptionId": "d8174793-f39e-4d71-9d4a-7dd9df8c8200",
+   "koHash": "bfe24cb62ba934c2621f66b074d91873",
+   "enHash": "5e96233137e6023f62788014ce5435c7",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "12개월"
+   ],
+   "missingKoSentences": [
+    "이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,발육기,노년기의 비타민 D,E,B1,B2,B6,C의 보급,뼈,이의 발육불량,구루병의 예방,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화,아연의 보급에 사용합니다.",
+    "이 약에 과민증 환자,고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태)환자,유육종증(원인을 알 수 없는 전신 염증질환),신장결석,심한 증상의 신부전 환자,만 12개월 미만의 젖먹이,갈락토오스 불내성,Lapp 유당(젖당)분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.",
+    "이 약을 복용하기 전에 고옥살산뇨증 환자(요중에 과량의 수산염이 배설되는 상태),임부 및 임신하고 있을 가능성이 있는 여성,수유부,미 분류 일반의약품 · 정 작용 이 약은 육체피로,임신,수유기,병중,병후(병을 앓는 동안이나 회복 후)의 체력저하 시,발육기,노년기의 비타민 D,E,B1,B2,B6,C의 보급,뼈,이의 발육불량,구루병의 예방,각기,눈의 피로,신경통,근육통,관절통(요통,어깨결림 등),구각염(입꼬리염),구순염(입술염),구내염(입안염),설염(혀염),습진,피부염의 완화,아연의 보급에 사용합니다."
+   ]
+  },
+  {
+   "masterId": "9a6d219b-1f71-4b3d-900d-6d706cc0d649",
+   "productName": "비사큐정",
+   "koDescriptionId": "36994612-6da1-4c7b-b79a-36bd99555b10",
+   "enDescriptionId": "b388ba59-003b-4d08-90de-a843012df31a",
+   "koHash": "90fc66365a4e45ab0d21aaf1e4057bde",
+   "enHash": "86211005d4396014df8ea5dc41b9ccb3",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 심한 복통(배 아픔) 또는 구역,구토,임부 또는 임신하고 있을 가능성이 있는 여성,신장장애 환자,나트륨 제한 식이를 하는 사람,직장의 출혈 혹은 장부전 경험자,만 10세 이하의 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "9af17284-96ed-4aec-9baf-180baae97da2",
+   "productName": "엠피스에프정",
+   "koDescriptionId": "db76cd6c-4be8-46dc-86bd-0466b141ef52",
+   "enDescriptionId": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "koHash": "0f94cbe90414fc7e23d519cb93a2eefa",
+   "enHash": "f84c5ef807fcbcb8cca9a8d1c37f4b1c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "14세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 알레르기 체질,약에 의한 발열,발진,관절통,천식,가려움증 등의 알레르기 증상 경험자,수두 또는 인플루엔자에 감염되어 있거나 의심되는 영아,유아 및 어린이 (14세 이하)는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D33500ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "9e784ea3-9257-473c-8fdf-bdd102588e17",
+   "productName": "슬리펠정25밀리그램(디펜히드라민염산염)",
+   "koDescriptionId": "7ecb4d8f-0628-4ab8-bc08-7adbaeb32241",
+   "enDescriptionId": "66add10b-29bf-40cb-a2f3-66392e4d3997",
+   "koHash": "f4efae99e73cbb434df2de7317ee7063",
+   "enHash": "bb72fff764fc73fc4726174701e63398",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증,천식발작,폐기종,만성기관지염에 의한 호흡곤란,녹내장,전립선 비대 등 하부 요로 폐색성 질환,협착성 소화성 궤양 또는 유문십이지장 폐색 환자,15세 미만의 소아,뇌전증 등의 경련성 질환,크롬친화성세포종 환자,수유부,일상적 불면,불면증 진단,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(A27002ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "ad5455d3-bf36-4b6a-ad75-e4370845203b",
+   "productName": "디센트에스정",
+   "koDescriptionId": "7c101c36-57af-47dc-aa61-ef05490744cc",
+   "enDescriptionId": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "koHash": "65b42cd3464800a5e12d984c59b9aa8d",
+   "enHash": "1a46c2b0467b4f783f44ddc0b7b40581",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 심한 복통 또는 구역,구토 환자,임부 또는 임신하고 있을 가능성이 있는 여성,신장장애 환자,나트륨 제한 식이를 하는 사람,직장의 출혈 혹은 장부전 경험자,만 10세 이하의 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "b16b183d-267a-4ba8-8a9d-f3bfc70ad34b",
+   "productName": "물린더겔",
+   "koDescriptionId": "8fc07944-954e-4c6c-b91a-9882caa7de75",
+   "enDescriptionId": "b286ebf7-d8ac-449e-97c7-85419da4b134",
+   "koHash": "e77e0471333e974a797939deddc1a473",
+   "enHash": "c2955616276a7c3f1093812311a6258e",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1일",
+    "6일"
+   ],
+   "missingKoSentences": [
+    "1일 수회 환부에 바릅니다.",
+    "증상이 개선되면 가능한 빠른 시일 내에 사용을 중지하십시오.5~6일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오."
+   ]
+  },
+  {
+   "masterId": "b506a718-34ec-4e0f-89e2-0bf5f82d94c1",
+   "productName": "포세라정",
+   "koDescriptionId": "5361d2e4-dae7-4577-9179-3b8338d6abea",
+   "enDescriptionId": "87e2acb2-cc97-4324-8d5f-41705f336fe7",
+   "koHash": "a7a5d291ed0d4ced398dfadfb0a009ab",
+   "enHash": "1f78cd13448dc5ad75ecdbdff3b07694",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "7세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자,투석 요법을 받고 있는 환자,고마그네슘혈증,고인산혈증,변비,장협착증,급성 충수염,임신초기 3개월 이내의 여성,만 7세 미만의 소아는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(558200ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "bfb9973e-5dfb-44e3-819a-cdacc0965a81",
+   "productName": "팜편안엠정",
+   "koDescriptionId": "deb633e5-008a-43e8-aadb-516126cd6763",
+   "enDescriptionId": "813dd3ae-b222-414b-a9dc-a32d58816391",
+   "koHash": "dca822f6f046dd822a3364b32206a8e0",
+   "enHash": "932ed8823c4b5b639db45b89ed0298f2",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "1회",
+    "1회",
+    "1일",
+    "1일",
+    "65세"
+   ],
+   "missingKoSentences": [
+    "만 15세 이상~만 80세 미만 성인은 1회 2정씩,복용합니다.",
+    "필요시 4시간 간격으로 1회 2정씩,1일 3회까지 복용할 수 있습니다.",
+    "단,1일 3회(6정)을 초과하여 복용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "c78b76d2-5782-4c16-923b-5f85b16483d2",
+   "productName": "로라샷연질캡슐(로라타딘)",
+   "koDescriptionId": "d6d34af4-7070-49f5-bdfa-517cabd54629",
+   "enDescriptionId": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "koHash": "b87a7bf464445f6743b4ba3f44a99fd3",
+   "enHash": "ea6624ca3ed810dc5864edcd890c3b40",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "48시간"
+   ],
+   "missingKoSentences": [
+    "피부시험 실시 약 48시간 전에는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(185401ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "c8505a8a-4de5-468f-bbc6-ddd118df53a2",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "7b0bc2e7-214f-4467-903c-a2fc93c0eb2a",
+   "enDescriptionId": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "cfcb00ad-b704-4835-a3ba-a2b6ddb03e4d",
+   "productName": "베비잘시럽(이부프로펜)",
+   "koDescriptionId": "7ef01986-39ee-4886-87b2-b5227dffbe8e",
+   "enDescriptionId": "56db902f-21c4-440d-aa21-1981e253598c",
+   "koHash": "41333ab05230072c36d940ef2570ce35",
+   "enHash": "c51c20ca82c1743a53012f56baba5736",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1회",
+    "1일",
+    "1일"
+   ],
+   "missingKoSentences": [
+    "류마티양 관절염,골관절염,강직성 척추염,연조직손상,비관절 류마티스질환,급성통풍,건선성 관절염에 성인은 1회 200,600 mg씩,1일 3~4회 복용합니다.",
+    "1일 최고 3,200 mg까지 복용할 수 있습니다.",
+    "연소성 류마티양 관절염에 체중(kg)당 1회 30~40 mg씩,1일 3~4회 분할 복용합니다."
+   ]
+  },
+  {
+   "masterId": "d195e32a-ba8f-4e8b-9619-8fc8227ff7b0",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "279712e2-489b-427f-91a8-952e8d603ae0",
+   "enDescriptionId": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "dd09f04b-0b51-46a4-99b1-73875c98fa4d",
+   "productName": "위엔젤더블액션현탁액",
+   "koDescriptionId": "827b7424-aeeb-4834-8307-01241e2ad34b",
+   "enDescriptionId": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "koHash": "fbe3b42c3b65c3c3568ccbcb035c6a64",
+   "enHash": "f32089c26eecfd2bba839cb173ffd2cd",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "1회",
+    "1일",
+    "7일"
+   ],
+   "missingKoSentences": [
+    "만 12세 이상 및 성인은 1회 10~20 mL씩,1일 4회 식후 및 취침 전에 복용합니다.",
+    "7일 동안 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D46100ALQ) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "e271f05c-e3ec-49ed-b7b0-024f51711456",
+   "productName": "도나펜에프연질캡슐",
+   "koDescriptionId": "66441b05-7e53-4882-92e7-831b2113e572",
+   "enDescriptionId": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "koHash": "9da740293d924cf161ef96035a26583e",
+   "enHash": "50c878eccd5e1b2bba509187f7193349",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "lost": [
+    "2,400mg",
+    "2,400mg"
+   ],
+   "missingKoSentences": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허혈성 심장질환,말초동맥질환,뇌혈관질환을 가진 환자는 고용량 이부프로펜(1일 2,400 mg) 복용을 피해야 하며,심혈관계 위험 요소(고혈압,고지혈증,당뇨병,흡연 등)를 가지고 있는 환자는 고용량 이부프로펜(1일 2,400 mg) 복용이 필요한 경우 이 약을 복용하기 전에 의사 또는 분류 일반의약품 · 연질캡슐 작용 이 약은 두통,치통,발치후 동통(통증),인후(목구멍)통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통,오한(춥고 떨리는 증상),발열시의 해열에 사용합니다.",
+    "선택 포인트 동일 일반명코드(D52700ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "e31d019b-cc81-4cbc-aa70-7c959ca10aad",
+   "productName": "피엠원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "bec7332f-02d8-4437-afce-1212756f60d6",
+   "enDescriptionId": "d00e7179-16c1-4473-99c3-9186cc200405",
+   "koHash": "b47d0e5b84f80818a37ab4bdf63d0eee",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세",
+    "15세"
+   ],
+   "missingKoSentences": [
+    "만 15세 이상 및 성인은 단 1회 환부(질환부위)에 바릅니다.",
+    "테르비나핀 및 이 약에 과민증 환자 또는 경험자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부, 유·소아, 15세 미만의 소아는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "e409f176-21f4-4c88-9e99-6c099e3757dd",
+   "productName": "크로아존엔정",
+   "koDescriptionId": "e0de74e3-0d74-45e5-972e-54507169fbe3",
+   "enDescriptionId": "b6e5eab0-1c6c-4ca5-b2b3-97bb0964a24f",
+   "koHash": "3f174756de33551349528e58b53bcb9f",
+   "enHash": "98613c70527342a0d5d1fcf35549b6f7",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "14세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 알레르기 체질,약에 의한 발열,발진,관절통,천식,가려움증 등의 알레르기 증상 경험자,수두 또는 인플루엔자에 감염되어 있거나 의심되는 영아,유아 및 (14세 이하) 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D33500ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "e5fc63d8-46f8-4a8d-acd9-e5a370093b5c",
+   "productName": "로라샷연질캡슐(로라타딘)",
+   "koDescriptionId": "094a31f0-7c0c-40d8-a6f6-6cb006eb8f93",
+   "enDescriptionId": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "koHash": "b87a7bf464445f6743b4ba3f44a99fd3",
+   "enHash": "ea6624ca3ed810dc5864edcd890c3b40",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "lost": [
+    "48시간"
+   ],
+   "missingKoSentences": [
+    "피부시험 실시 약 48시간 전에는 이 약을 복용하지 마십시오.",
+    "선택 포인트 동일 일반명코드(185401ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "ead5face-5ba2-4c9b-a9f4-59aa3aaaadb5",
+   "productName": "엠피스에프정",
+   "koDescriptionId": "de3e95f8-b64d-4f57-b8d7-246394452383",
+   "enDescriptionId": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "koHash": "0f94cbe90414fc7e23d519cb93a2eefa",
+   "enHash": "f84c5ef807fcbcb8cca9a8d1c37f4b1c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "14세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 알레르기 체질,약에 의한 발열,발진,관절통,천식,가려움증 등의 알레르기 증상 경험자,수두 또는 인플루엔자에 감염되어 있거나 의심되는 영아,유아 및 어린이 (14세 이하)는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(D33500ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "ee5483f9-1d0e-4077-9346-c47ec5ee6b1f",
+   "productName": "디센트에스정",
+   "koDescriptionId": "93c15fe4-cfd4-4266-9b5a-b11f72256581",
+   "enDescriptionId": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "koHash": "65b42cd3464800a5e12d984c59b9aa8d",
+   "enHash": "1a46c2b0467b4f783f44ddc0b7b40581",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 심한 복통 또는 구역,구토 환자,임부 또는 임신하고 있을 가능성이 있는 여성,신장장애 환자,나트륨 제한 식이를 하는 사람,직장의 출혈 혹은 장부전 경험자,만 10세 이하의 어린이는 의사 또는 약사와 상의하십시오.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "fcb865d8-c91b-41fd-a507-ef2376edf064",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "df78e92d-115e-4764-b6ea-11a5cc80859c",
+   "enDescriptionId": "99c5b095-b128-4221-be6c-957c388da59b",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  }
+ ]
+}

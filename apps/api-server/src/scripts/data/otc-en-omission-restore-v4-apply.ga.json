@@ -1,0 +1,436 @@
+{
+ "summary": {
+  "mode": "APPLY",
+  "input": 46,
+  "planned": 22,
+  "sentencesInserted": 22,
+  "byRule": {
+   "STOP_WHEN_IMPROVED_THEN_CONSULT": 2,
+   "NO_IMPROVE_USED_RANGE": 2,
+   "VITAMIN_A_BIRTH_DEFECT": 2,
+   "LAXATIVE_CONSULT_V4": 2,
+   "GUARDIAN_THEN_CONSULT": 2,
+   "ANTICHOLINERGIC_CONTRA": 2,
+   "CHICKENPOX_FLU_CONSULT": 2,
+   "IBU_MAX_DAILY": 2,
+   "MAGNESIUM_CONTRA": 2,
+   "HYPERCALC_STONE_CONTRA": 2,
+   "MAX_DAILY_TABLETS": 2
+  },
+  "skipped": 24,
+  "skipByCode": {
+   "NO_RULE_MATCH": 24
+  },
+  "green": 22
+ },
+ "plans": [
+  {
+   "enId": "e31bd6c9-b7b4-405f-b78a-2c351095d6e8",
+   "master": "21ff836d-e6ee-4436-89d9-ce508de0bfe3",
+   "product": "물린더겔",
+   "oldHash": "c2955616276a7c3f1093812311a6258e",
+   "newHash": "83eefdeeea0557364f9c6381be58d74f",
+   "rules": [
+    "STOP_WHEN_IMPROVED_THEN_CONSULT"
+   ]
+  },
+  {
+   "enId": "1ff2dc8b-d0a8-441b-95e7-4abdfaf0ba5a",
+   "master": "281e52af-6233-40f7-8583-d94460d5a66f",
+   "product": "목앤스프레이",
+   "oldHash": "78df9a5f02d1d9cc9346c65da5157b3a",
+   "newHash": "f37464cbf83459f1518f14ce1a50c00c",
+   "rules": [
+    "NO_IMPROVE_USED_RANGE"
+   ]
+  },
+  {
+   "enId": "554c9a78-b0f8-4da1-a81e-eedf7e93d52a",
+   "master": "3b9297da-aedf-4e74-b643-1dd944afa638",
+   "product": "코드에이연질캡슐",
+   "oldHash": "00f29496a611c03800eed04e1ae8133a",
+   "newHash": "557f640bbe0c778023b1dd0074503a2c",
+   "rules": [
+    "VITAMIN_A_BIRTH_DEFECT"
+   ]
+  },
+  {
+   "enId": "59b3d916-f76f-4a76-adae-26b33b39dd3b",
+   "master": "4042d78d-b5bb-452b-8339-d59ce03ed31f",
+   "product": "비사큐정",
+   "oldHash": "86211005d4396014df8ea5dc41b9ccb3",
+   "newHash": "26dd629a63018e85b54ddee3e82a3763",
+   "rules": [
+    "LAXATIVE_CONSULT_V4"
+   ]
+  },
+  {
+   "enId": "c7cca0b4-c2d8-4aa6-8db2-5b994b4b0804",
+   "master": "48162c48-7301-4efd-88b6-6f69908f28c4",
+   "product": "코드에이연질캡슐",
+   "oldHash": "00f29496a611c03800eed04e1ae8133a",
+   "newHash": "557f640bbe0c778023b1dd0074503a2c",
+   "rules": [
+    "VITAMIN_A_BIRTH_DEFECT"
+   ]
+  },
+  {
+   "enId": "b163b249-2432-499d-83d7-3143c76bfee6",
+   "master": "4dc9bea0-70ac-44a3-a4a0-63a041d3e420",
+   "product": "아로마솔크림",
+   "oldHash": "d2472a262485381bccb0e3fd6fd3fd72",
+   "newHash": "868d5cec527c30b7c1b6ca99a0d6983b",
+   "rules": [
+    "GUARDIAN_THEN_CONSULT"
+   ]
+  },
+  {
+   "enId": "7ef692ff-fb11-47e7-85dc-f13d44422cc1",
+   "master": "4e572cab-2cb8-44a8-87a5-d144e0c76110",
+   "product": "슬리펠정25밀리그램(디펜히드라민염산염)",
+   "oldHash": "bb72fff764fc73fc4726174701e63398",
+   "newHash": "3b380b4919e668e3ac48322cb2727345",
+   "rules": [
+    "ANTICHOLINERGIC_CONTRA"
+   ]
+  },
+  {
+   "enId": "f0d9a86b-ad5d-4535-b77e-bfc308215ac6",
+   "master": "5cd94989-3255-468c-a965-391ef7da9755",
+   "product": "크로아존엔정",
+   "oldHash": "98613c70527342a0d5d1fcf35549b6f7",
+   "newHash": "9b53bd306d53942cd2d945334163093f",
+   "rules": [
+    "CHICKENPOX_FLU_CONSULT"
+   ]
+  },
+  {
+   "enId": "93ad31d4-fc1c-42ee-9e83-4880344738e2",
+   "master": "62793c6d-2962-4419-bf2c-18b8443039f8",
+   "product": "목앤스프레이",
+   "oldHash": "78df9a5f02d1d9cc9346c65da5157b3a",
+   "newHash": "f37464cbf83459f1518f14ce1a50c00c",
+   "rules": [
+    "NO_IMPROVE_USED_RANGE"
+   ]
+  },
+  {
+   "enId": "5f8de2e8-0cc8-46c3-a3fb-65bfb9fb1ef9",
+   "master": "6513ee80-8f95-4ff3-accb-6b7faf94613b",
+   "product": "아로마솔크림",
+   "oldHash": "d2472a262485381bccb0e3fd6fd3fd72",
+   "newHash": "868d5cec527c30b7c1b6ca99a0d6983b",
+   "rules": [
+    "GUARDIAN_THEN_CONSULT"
+   ]
+  },
+  {
+   "enId": "909d8a1b-6882-4dde-9536-d7c3174893de",
+   "master": "710b023e-ab78-4d82-b83b-19200afb6733",
+   "product": "베비잘시럽(이부프로펜)",
+   "oldHash": "c51c20ca82c1743a53012f56baba5736",
+   "newHash": "cf3b153a720aa4eec75909ceee0bc251",
+   "rules": [
+    "IBU_MAX_DAILY"
+   ]
+  },
+  {
+   "enId": "ec2b600b-1467-4c9f-a7be-490b895078de",
+   "master": "71d5da65-aee8-4d2c-9864-91569f2cedd2",
+   "product": "포세라정",
+   "oldHash": "1f78cd13448dc5ad75ecdbdff3b07694",
+   "newHash": "ff93fc7fc6e85b5fc36836ab427ac3a6",
+   "rules": [
+    "MAGNESIUM_CONTRA"
+   ]
+  },
+  {
+   "enId": "59b640d0-2b5c-4db3-a904-1747c794f72a",
+   "master": "88087cc8-45db-4cf0-b7b0-8c41408a266e",
+   "product": "액티브메가비타정",
+   "oldHash": "5e96233137e6023f62788014ce5435c7",
+   "newHash": "53693464938f1c365b883fcb83ca1b12",
+   "rules": [
+    "HYPERCALC_STONE_CONTRA"
+   ]
+  },
+  {
+   "enId": "8a6306fa-1209-44ec-a4e8-5b0d0b0f3c54",
+   "master": "8a26cfd1-912a-4657-9bd1-a3ae2d174ba7",
+   "product": "팜편안엠정",
+   "oldHash": "932ed8823c4b5b639db45b89ed0298f2",
+   "newHash": "b75a615d3d5858a9043adbe5c3f5299e",
+   "rules": [
+    "MAX_DAILY_TABLETS"
+   ]
+  },
+  {
+   "enId": "d8174793-f39e-4d71-9d4a-7dd9df8c8200",
+   "master": "98a3df15-0d39-4ecd-a734-14401f99a8d9",
+   "product": "액티브메가비타정",
+   "oldHash": "5e96233137e6023f62788014ce5435c7",
+   "newHash": "53693464938f1c365b883fcb83ca1b12",
+   "rules": [
+    "HYPERCALC_STONE_CONTRA"
+   ]
+  },
+  {
+   "enId": "b388ba59-003b-4d08-90de-a843012df31a",
+   "master": "9a6d219b-1f71-4b3d-900d-6d706cc0d649",
+   "product": "비사큐정",
+   "oldHash": "86211005d4396014df8ea5dc41b9ccb3",
+   "newHash": "26dd629a63018e85b54ddee3e82a3763",
+   "rules": [
+    "LAXATIVE_CONSULT_V4"
+   ]
+  },
+  {
+   "enId": "66add10b-29bf-40cb-a2f3-66392e4d3997",
+   "master": "9e784ea3-9257-473c-8fdf-bdd102588e17",
+   "product": "슬리펠정25밀리그램(디펜히드라민염산염)",
+   "oldHash": "bb72fff764fc73fc4726174701e63398",
+   "newHash": "3b380b4919e668e3ac48322cb2727345",
+   "rules": [
+    "ANTICHOLINERGIC_CONTRA"
+   ]
+  },
+  {
+   "enId": "b286ebf7-d8ac-449e-97c7-85419da4b134",
+   "master": "b16b183d-267a-4ba8-8a9d-f3bfc70ad34b",
+   "product": "물린더겔",
+   "oldHash": "c2955616276a7c3f1093812311a6258e",
+   "newHash": "83eefdeeea0557364f9c6381be58d74f",
+   "rules": [
+    "STOP_WHEN_IMPROVED_THEN_CONSULT"
+   ]
+  },
+  {
+   "enId": "87e2acb2-cc97-4324-8d5f-41705f336fe7",
+   "master": "b506a718-34ec-4e0f-89e2-0bf5f82d94c1",
+   "product": "포세라정",
+   "oldHash": "1f78cd13448dc5ad75ecdbdff3b07694",
+   "newHash": "ff93fc7fc6e85b5fc36836ab427ac3a6",
+   "rules": [
+    "MAGNESIUM_CONTRA"
+   ]
+  },
+  {
+   "enId": "813dd3ae-b222-414b-a9dc-a32d58816391",
+   "master": "bfb9973e-5dfb-44e3-819a-cdacc0965a81",
+   "product": "팜편안엠정",
+   "oldHash": "932ed8823c4b5b639db45b89ed0298f2",
+   "newHash": "b75a615d3d5858a9043adbe5c3f5299e",
+   "rules": [
+    "MAX_DAILY_TABLETS"
+   ]
+  },
+  {
+   "enId": "56db902f-21c4-440d-aa21-1981e253598c",
+   "master": "cfcb00ad-b704-4835-a3ba-a2b6ddb03e4d",
+   "product": "베비잘시럽(이부프로펜)",
+   "oldHash": "c51c20ca82c1743a53012f56baba5736",
+   "newHash": "cf3b153a720aa4eec75909ceee0bc251",
+   "rules": [
+    "IBU_MAX_DAILY"
+   ]
+  },
+  {
+   "enId": "b6e5eab0-1c6c-4ca5-b2b3-97bb0964a24f",
+   "master": "e409f176-21f4-4c88-9e99-6c099e3757dd",
+   "product": "크로아존엔정",
+   "oldHash": "98613c70527342a0d5d1fcf35549b6f7",
+   "newHash": "9b53bd306d53942cd2d945334163093f",
+   "rules": [
+    "CHICKENPOX_FLU_CONSULT"
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "051573d8-dd21-4817-8947-5e066fc8ea59",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e7e07068-aaa8-4d60-8707-f69a24c670e3",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f51aed3a-e6da-47e8-863d-aac60cafcf0e",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "646948ee-2bd9-4440-a26c-51d929e20ae6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "4f1fb908-6624-4371-8c1e-f7dec7f0d7dd",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "3f867d5f-3d95-4f9b-844b-47a1c4e802d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f41196ef-2271-4d45-b26b-fb7b4acd92f6",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "d00e7179-16c1-4473-99c3-9186cc200405",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "bdb2d4d9-e8ff-418d-a04f-bf34522441d7",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "8d12be0a-5ff2-419b-a37a-c4d70475be27",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "f334baba-a081-49bd-b2d1-81e36204b842",
+   "code": "NO_RULE_MATCH"
+  },
+  {
+   "id": "99c5b095-b128-4221-be6c-957c388da59b",
+   "code": "NO_RULE_MATCH"
+  }
+ ],
+ "results": [
+  {
+   "enId": "e31bd6c9-b7b4-405f-b78a-2c351095d6e8",
+   "status": "GREEN"
+  },
+  {
+   "enId": "1ff2dc8b-d0a8-441b-95e7-4abdfaf0ba5a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "554c9a78-b0f8-4da1-a81e-eedf7e93d52a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "59b3d916-f76f-4a76-adae-26b33b39dd3b",
+   "status": "GREEN"
+  },
+  {
+   "enId": "c7cca0b4-c2d8-4aa6-8db2-5b994b4b0804",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b163b249-2432-499d-83d7-3143c76bfee6",
+   "status": "GREEN"
+  },
+  {
+   "enId": "7ef692ff-fb11-47e7-85dc-f13d44422cc1",
+   "status": "GREEN"
+  },
+  {
+   "enId": "f0d9a86b-ad5d-4535-b77e-bfc308215ac6",
+   "status": "GREEN"
+  },
+  {
+   "enId": "93ad31d4-fc1c-42ee-9e83-4880344738e2",
+   "status": "GREEN"
+  },
+  {
+   "enId": "5f8de2e8-0cc8-46c3-a3fb-65bfb9fb1ef9",
+   "status": "GREEN"
+  },
+  {
+   "enId": "909d8a1b-6882-4dde-9536-d7c3174893de",
+   "status": "GREEN"
+  },
+  {
+   "enId": "ec2b600b-1467-4c9f-a7be-490b895078de",
+   "status": "GREEN"
+  },
+  {
+   "enId": "59b640d0-2b5c-4db3-a904-1747c794f72a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "8a6306fa-1209-44ec-a4e8-5b0d0b0f3c54",
+   "status": "GREEN"
+  },
+  {
+   "enId": "d8174793-f39e-4d71-9d4a-7dd9df8c8200",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b388ba59-003b-4d08-90de-a843012df31a",
+   "status": "GREEN"
+  },
+  {
+   "enId": "66add10b-29bf-40cb-a2f3-66392e4d3997",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b286ebf7-d8ac-449e-97c7-85419da4b134",
+   "status": "GREEN"
+  },
+  {
+   "enId": "87e2acb2-cc97-4324-8d5f-41705f336fe7",
+   "status": "GREEN"
+  },
+  {
+   "enId": "813dd3ae-b222-414b-a9dc-a32d58816391",
+   "status": "GREEN"
+  },
+  {
+   "enId": "56db902f-21c4-440d-aa21-1981e253598c",
+   "status": "GREEN"
+  },
+  {
+   "enId": "b6e5eab0-1c6c-4ca5-b2b3-97bb0964a24f",
+   "status": "GREEN"
+  }
+ ]
+}
