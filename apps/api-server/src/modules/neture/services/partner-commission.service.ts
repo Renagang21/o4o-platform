@@ -49,7 +49,7 @@ export class PartnerCommissionService {
          nspc.commission_rate,
          SUM(oi.total_price)::int AS order_amount
        FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        JOIN neture_partner_recruitments npr ON npr.product_id = spo.master_id
        JOIN neture_seller_partner_contracts nspc ON nspc.recruitment_id = npr.id
@@ -223,7 +223,7 @@ export class PartnerCommissionService {
          nspc.commission_rate,
          SUM(oi.total_price)::int AS order_amount
        FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        JOIN neture_partner_recruitments npr ON npr.product_id = spo.master_id
        JOIN neture_seller_partner_contracts nspc ON nspc.recruitment_id = npr.id

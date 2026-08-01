@@ -164,7 +164,7 @@ export class NetureSettlementService {
          COUNT(DISTINCT o.id)::int AS order_count,
          SUM(oi.total_price)::int AS total_sales
        FROM neture_orders o
-       JOIN neture_order_items oi ON oi.order_id = o.id
+       JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
        WHERE o.status = 'delivered'
          AND (
@@ -219,7 +219,7 @@ export class NetureSettlementService {
       const orderSales = await this.dataSource.query(
         `SELECT o.id AS order_id, SUM(oi.total_price)::int AS supplier_sales_amount
          FROM neture_orders o
-         JOIN neture_order_items oi ON oi.order_id = o.id
+         JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE o.id = ANY($1::uuid[]) AND spo.supplier_id = $2
          GROUP BY o.id`,
