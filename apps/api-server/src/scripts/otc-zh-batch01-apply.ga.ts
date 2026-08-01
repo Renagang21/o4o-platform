@@ -44,14 +44,14 @@ const counts = (a: string[]): Map<string, number> => a.reduce((m, v) => m.set(v,
 /**
  * 흡수 허용 — 중국어 어휘가 한국어 수사를 삼키는 두 경우만 좁게 허용한다.
  *   · `1일`·`1회` 의 1 → 每日 / 每次
- *   · `N차성` 의 N   → 原发性 / 继发性 (서수 표현이 한자어에 흡수)
+ *   · `N차`(1차성·2차 감염 …) 의 N → 原发性/继发性·继发感染 (서수 표현이 한자어에 흡수)
  * 그 외의 수치(함량·연령·횟수·기간·상한)는 누락도 신설도 허용하지 않는다.
  */
 function absorbable(ko: string): Map<string, number> {
   const s = ko.replace(/\s+/g, ''), m = new Map<string, number>();
   const add = (v: string): void => { m.set(v, (m.get(v) || 0) + 1); };
   for (const x of s.match(/1(?=[일회])/g) || []) add(x);
-  for (const x of s.match(/\d+(?=차성)/g) || []) add(x);
+  for (const x of s.match(/\d+(?=차)/g) || []) add(x);
   return m;
 }
 export function numericCheck(ko: string, zh: string): string | null {

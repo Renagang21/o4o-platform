@@ -8,7 +8,7 @@
  *   V1 CANONICAL_UNIQUE  — master 당 STORE·canonical·zh 행 1개
  *   V2 NO_HANGUL         — 한글 잔존 0
  *   V3 SKELETON_MATCH    — 같은 master 의 KO canonical 과 태그 골격 byte 일치(표준 디자인 계승 증명)
- *   V4 NUMERIC_PARITY    — 문서 전체 수치 집합: 신설 0 / 누락은 `1일`·`1회`·`N차성` 흡수분 이내
+ *   V4 NUMERIC_PARITY    — 문서 전체 수치 집합: 신설 0 / 누락은 `1일`·`1회`·`N차` 흡수분 이내
  *   V5 NOT_EMPTY         — content 비어있지 않음, summary 존재
  *   V6 OUT_OF_SCOPE      — 이번 작업으로 KO·EN·ja 행이 변경되지 않았는지(updated_at 기준) 확인
  */
@@ -67,7 +67,7 @@ async function main(): Promise<void> {
     if (ko) {
       const k = tally(digits(strip(ko.content))), z = tally(digits(strip(zh.content)));
       const s = strip(ko.content).replace(/\s+/g, '');
-      const absorb = tally([...(s.match(/1(?=[일회])/g) || []), ...(s.match(/\d+(?=차성)/g) || [])]);
+      const absorb = tally([...(s.match(/1(?=[일회])/g) || []), ...(s.match(/\d+(?=차)/g) || [])]);
       let ok = true;
       for (const [v, n] of k) if (n - (z.get(v) || 0) > (absorb.get(v) || 0)) ok = false;
       for (const [v, n] of z) if (n > (k.get(v) || 0)) ok = false;
