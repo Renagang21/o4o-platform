@@ -1,0 +1,34 @@
+{
+ "appliedAt": "2026-08-01T10:06:25.562Z",
+ "mode": "APPLY",
+ "shardSize": 500,
+ "shards": [
+  {
+   "from": 0,
+   "size": 16,
+   "updated": 0,
+   "inserted": 16,
+   "rolledBack": false
+  }
+ ],
+ "expectedUpdate": 0,
+ "actualUpdate": 0,
+ "expectedInsert": 16,
+ "actualInsert": 16,
+ "skipped": [],
+ "before": {
+  "spd_all": 146153,
+  "ko_canon": 40918,
+  "en_canon": 40239,
+  "pm_hff": 40948
+ },
+ "after": {
+  "spd_all": 146169,
+  "ko_canon": 40918,
+  "en_canon": 40255,
+  "pm_hff": 40948
+ },
+ "koUnchanged": true,
+ "enDelta": 16,
+ "pmUnchanged": true
+}

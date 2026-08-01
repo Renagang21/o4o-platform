@@ -1,0 +1,29 @@
+{
+ "wo": "WO-O4O-HFF-EN-BATCH-05-ALL-REMAINING-6244-DIRECT-BULK-PRODUCTION-AND-CLOSURE-V1",
+ "closedAt": "2026-08-01T10:08:08.032Z",
+ "batch": 5,
+ "population": 6244,
+ "completed": 6157,
+ "hold": 87,
+ "sumCheck": true,
+ "holdByIssueType": {
+  "NUMBER_STRUCTURE_AMBIGUOUS": 59,
+  "KO_SOURCE_DAMAGED": 27,
+  "TRANSLATION_AMBIGUOUS": 1
+ },
+ "forbiddenHoldPresent": [],
+ "appliedRounds": {
+  "lastMode": "APPLY",
+  "lastShards": [
+   {
+    "from": 0,
+    "size": 16,
+    "updated": 0,
+    "inserted": 16,
+    "rolledBack": false
+   }
+  ]
+ },
+ "hffEnCanonicalTotalLive": 40255,
+ "hffKoCanonicalTotalLive": 40918
+}

@@ -1,0 +1,39 @@
+{
+ "closedAt": "2026-08-01T10:08:08.032Z",
+ "scope": "HFF EN 매장 설명서 생산 트랙 (Batch 01~05)",
+ "koCanonicalTotal": 40918,
+ "enCanonicalTotal": 40255,
+ "remainingUntranslated": 663,
+ "deferredIssueQueueTotal": 663,
+ "remainingMinusQueue": 0,
+ "producibleRemainderExhausted": true,
+ "perBatch": {
+  "batch01": {
+   "population": null,
+   "completed": 4899,
+   "hold": null
+  },
+  "batch02": {
+   "population": 5000,
+   "completed": 4878,
+   "hold": 122
+  },
+  "batch03": {
+   "population": 5000,
+   "completed": 4806,
+   "hold": 194
+  },
+  "batch04": {
+   "population": 5000,
+   "completed": 4841,
+   "hold": 159
+  },
+  "batch05": {
+   "population": 6244,
+   "completed": 6157,
+   "hold": 87
+  }
+ },
+ "note": "잔여는 통합 문제 큐(실제 문제 유형)로만 남는다. 큐 해소 전제조건은 큐 summary 의 requiredNextAction/retryCondition 을 따른다.",
+ "queueReproductionEligible": 0
+}

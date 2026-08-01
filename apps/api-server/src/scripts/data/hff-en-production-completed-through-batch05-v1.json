@@ -1,0 +1,31 @@
+{
+ "builtAt": "2026-08-01T10:08:08.032Z",
+ "perBatch": {
+  "batch01": {
+   "population": null,
+   "completed": 4899,
+   "hold": null
+  },
+  "batch02": {
+   "population": 5000,
+   "completed": 4878,
+   "hold": 122
+  },
+  "batch03": {
+   "population": 5000,
+   "completed": 4806,
+   "hold": 194
+  },
+  "batch04": {
+   "population": 5000,
+   "completed": 4841,
+   "hold": 159
+  },
+  "batch05": {
+   "population": 6244,
+   "completed": 6157,
+   "hold": 87
+  }
+ },
+ "hffEnCanonicalTotalLive": 40255
+}
