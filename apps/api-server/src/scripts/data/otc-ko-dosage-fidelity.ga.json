@@ -1,0 +1,2573 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "total": 22408,
+ "verdictCount": {
+  "MATCH": 11700,
+  "NO_RAW": 2977,
+  "FREQ_UNPARSEABLE": 7544,
+  "FREQ_MISMATCH": 61,
+  "FREQ_AND_AGE_MISMATCH": 26,
+  "AGE_FLOOR_MISMATCH": 85,
+  "RAW_NO_DOSAGE": 15
+ },
+ "bySource": {
+  "mfds_drug_otc_nutrition_combo": {
+   "MATCH": 1626,
+   "NO_RAW": 1661,
+   "FREQ_UNPARSEABLE": 99,
+   "FREQ_MISMATCH": 61,
+   "FREQ_AND_AGE_MISMATCH": 26,
+   "AGE_FLOOR_MISMATCH": 72
+  },
+  "o4o_drug_otc_topical": {
+   "MATCH": 1219,
+   "FREQ_UNPARSEABLE": 1339
+  },
+  "mfds_drug_otc": {
+   "MATCH": 8712,
+   "FREQ_UNPARSEABLE": 5906,
+   "NO_RAW": 1272,
+   "AGE_FLOOR_MISMATCH": 13,
+   "RAW_NO_DOSAGE": 5
+  },
+  "mfds_easy_drug": {
+   "MATCH": 143,
+   "FREQ_UNPARSEABLE": 200,
+   "RAW_NO_DOSAGE": 10
+  },
+  "manual": {
+   "NO_RAW": 44
+  }
+ },
+ "mismatchTotal": 172,
+ "mismatches": [
+  {
+   "koId": "ce3db95e-6a6c-494b-aae1-4947a62d14b4",
+   "mid": "0a2f5dca-d95b-4138-9d68-d46061204c08",
+   "name": "이베다정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "d4d02b32-bfd2-45e4-9547-4210ce55997f",
+   "mid": "138c3d9d-edf2-4c13-b3fd-f442bb30487f",
+   "name": "이베다정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "b15938e9-dafd-4167-bc8f-bf14b8e8e440",
+   "mid": "13d41846-277f-4200-b7af-21ca4d300c6b",
+   "name": "액티넘이엑스골드정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "e1defb81-de77-4a24-8f31-79b84fc223bd",
+   "mid": "1e0bc0c0-a843-4df1-97ce-fbbbca28bb4a",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "ef1a4133-fb32-4d56-9d66-a8e699da0362",
+   "mid": "209afd1e-4348-48ea-904a-04a9d1072eb0",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "56680b6e-384e-43ff-88bc-a86f57e49626",
+   "mid": "2108cf68-1f2b-42b8-ab52-2fb1ac07a4a1",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "d406dc2e-dbb6-470f-adbd-afafb2ce0a34",
+   "mid": "22ad9575-0786-41d3-be48-3bba688ea0dd",
+   "name": "액티넘이엑스골드정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "d34511e0-683e-487c-8389-46eb97de902c",
+   "mid": "2e54629f-1751-4a78-b7ab-687928ec1dfc",
+   "name": "액티넘이엑스골드정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "4e3c1e5b-da2c-4e00-9b33-18be938c8ab5",
+   "mid": "3fc252fb-ea80-4b11-bc90-1222079d011f",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "3f04941f-1f3f-45e6-ae87-70c66d47924f",
+   "mid": "4d88fea9-08d8-417f-a80d-6f11d879430e",
+   "name": "도미다프리미엄정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "25d96b83-8ea2-4198-b1f6-b532398b521e",
+   "mid": "624a2f5a-b9d8-4fbd-8872-05ab9e8205c2",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "72b1c765-5350-4fc9-97c5-88c195887198",
+   "mid": "6966f1a0-c943-4bdc-8b05-3b33f128be42",
+   "name": "도미다프리미엄정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "07c7313e-d712-45b0-8184-ed5840e62ed6",
+   "mid": "6af271f2-99b4-49a7-9890-0b462e28db20",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "27c1fe43-c3d5-43f2-a267-6ccecf1dd17e",
+   "mid": "728f614d-b503-4c6c-b836-782fc8e11b88",
+   "name": "벤포벨정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "07224883-7c27-42d3-a492-5c6a2baf3225",
+   "mid": "a201d598-a8a1-4657-a185-8cfab6770bcd",
+   "name": "이베다정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "dd06cc50-756b-4210-bde9-a854bb880f5d",
+   "mid": "b51f9d1b-5c3b-496a-aba8-6f2aaedac893",
+   "name": "도미다프리미엄정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "f63a5d1a-e9b9-4c22-a473-b1ace0c3e2a5",
+   "mid": "bb12ffac-0dfe-4e29-924c-801ae8b4fc01",
+   "name": "이베다정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "7dd14dec-4604-4bb0-a248-1e66848246d2",
+   "mid": "d3598f95-eb1d-4662-a610-e07c809b80da",
+   "name": "액티넘이엑스골드정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "17dc5c22-0292-4514-9e60-28a7861d1ecc",
+   "mid": "fac3da66-6d10-42f7-8c15-f4db41cf73e7",
+   "name": "액티넘이엑스골드정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "22d723a7-8411-4436-80dd-f6449aaa6281",
+   "mid": "fbdf811c-d0d0-4534-8cf2-00a235391db4",
+   "name": "도미다프리미엄정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "80d16395-fce6-4f71-b035-868aa4cef495",
+   "mid": "12c7c8b1-488d-459c-8a6f-c2eb74b4e6ff",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "26dc2759-82bf-440f-adfe-19a9885386bf",
+   "mid": "218c49bd-cfe1-4834-842d-4376d32510bb",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "99e354bb-9a74-4fe6-b9ba-ec9ce9645dce",
+   "mid": "3d246587-f631-4c3d-86b9-7e28d4456ae5",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "451996cc-79b6-42c5-9988-0e9690ccdaae",
+   "mid": "5843b2a6-b26f-4a37-a20e-a47d5c2593aa",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "84594e29-42a0-4d73-b946-be62da8059bb",
+   "mid": "5898dcc6-1b6b-4300-83da-36acf9112e35",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "3a15e5eb-f850-44c7-9640-c5e4d821292d",
+   "mid": "6358cece-1245-496a-929b-0e71a6cf6785",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "0ad87fcd-6df7-495e-8535-6483cae53737",
+   "mid": "7b48fc40-04fa-4e4a-aa7a-7fd40ecb7471",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "2d36f1ab-4a49-4427-bed5-fff9ff9f8f0d",
+   "mid": "867e21af-d6b3-4c97-bc4e-75c39784fed8",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "c02e426a-15eb-4634-9316-78252e4b73c6",
+   "mid": "963cb1ff-b476-4bd5-ad0f-2cd2ebc4d664",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "0ceb511e-d69e-4dfa-b689-a87f90930ad3",
+   "mid": "9fb03f58-9acc-4d1a-97ea-608e50cad0b1",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "bcb0b352-6c49-4046-a5b6-4a930784c2db",
+   "mid": "ba862b4a-035f-4480-92aa-57a3db02895d",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "d4f11892-0be1-434a-883e-bd1b93cef61c",
+   "mid": "d10fccd8-fd7c-4fac-8359-67cee2604764",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "747bd33a-fdc5-4d46-bf91-7d3b555aa37a",
+   "mid": "eac91f40-ada3-4a0c-a6a1-1cb50c0bca14",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "9d597cc2-7574-468c-b12f-3d88adf9e218",
+   "mid": "ef159d82-1bf1-47b5-8342-83826cb5cd04",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "b986326a-8575-449a-b700-cacf8895a3a9",
+   "mid": "ffa2cecf-6929-4404-88b4-bdade47d7c40",
+   "name": "카비드츄어블정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일1회"
+   ],
+   "rawAgeFloor": 3,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "b530579d-d470-490d-be48-0dd4118fe033",
+   "mid": "0943151d-eb44-4daf-8e6a-f0a5e8b3d97f",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "194a7153-4c89-485a-8a93-32c87fb26560",
+   "mid": "0c8cf466-a9af-4253-9de3-2b5e4679b69d",
+   "name": "슬림비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "d2f2cd0d-1d87-42a3-bc27-26525b1d33a1",
+   "mid": "0de0766a-9a19-4d2d-b5a0-0465e1991e14",
+   "name": "세종비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "b9b6a4a1-119f-4494-85dc-9c9f4de1518a",
+   "mid": "1834be70-2262-4e1a-8dee-702b746a8d97",
+   "name": "세종비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "85385cdf-3d5e-4372-867f-3d03f8de7f58",
+   "mid": "1c59da03-b39d-457a-b3dc-fd8fedfa19cf",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "d52143d2-8d59-42ab-9615-40a176f23e75",
+   "mid": "292844f6-453a-4e43-9785-bd06aa0027b7",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "28f0d7c8-4c37-4dbb-8316-5de3c347d9fe",
+   "mid": "2a8dbe5d-e413-4d2e-9914-184fd3499c34",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "819b9a6b-f24e-4196-a579-0a9f96bcf8f1",
+   "mid": "379ffc2a-393a-4c1d-b231-a35af3da37cf",
+   "name": "슬림비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "5aa8a022-cc01-4da0-866c-4c3713dfb48d",
+   "mid": "3d9f5964-3239-45f3-a54d-f4df95fcbcc7",
+   "name": "뉴젠비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "ad880339-52b1-4cca-a943-2e0960850b75",
+   "mid": "3e842eca-9b3b-4610-85a9-b78b152b9dcd",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "42bab658-b4c5-4d9f-bfdb-7720f0c1528e",
+   "mid": "5811728b-726d-4f3a-9ad9-950d415d5837",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "9c2a4cf9-9093-4d34-8f70-5ec6199f72fb",
+   "mid": "5a2892bb-aca7-479a-a28f-1f63878e3185",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "02b66b12-a83f-4235-a085-fb205e75a010",
+   "mid": "6b6c744e-5781-442c-a4f8-573c9a3ec6ea",
+   "name": "비트리플정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "2e192448-976a-4a6d-b0aa-b67a80b5c100",
+   "mid": "77275634-8384-4374-a95c-f08ee377ad82",
+   "name": "세종비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "fe5c83f2-2dbc-4dc3-9546-df649bd94b63",
+   "mid": "785b904d-e210-417c-9219-15ba03b6cf20",
+   "name": "뉴젠비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "a618c06d-7835-45c8-a8f8-33f983e75e6f",
+   "mid": "7b5495c4-e1b0-402c-99e3-7225dbcd9524",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4441e796-6ed0-4aca-9e65-311ea65535a7",
+   "mid": "7e0d266a-3450-4915-961a-5abcfceab750",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "10bf2aed-b585-45b2-afd2-f72a32e00bbc",
+   "mid": "7fef1817-6b26-4f6d-9514-10efb9f8c585",
+   "name": "슬림비플러스정(비매품)",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "cbb2ba02-d151-457c-b117-cad0ad9a87d7",
+   "mid": "86f1c926-542a-4052-8778-b62a647c7063",
+   "name": "세종비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "1b251c2f-a532-4ecc-ae6a-d20fd2a242ae",
+   "mid": "884898b9-15aa-4cfc-abca-b1f3db160a01",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "bcaf9874-1f46-49e9-b4d3-45bedda399c0",
+   "mid": "8ffda187-725e-41b8-ad9c-74817bf9d936",
+   "name": "슬림비플러스정(비매품)",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "52c6ba61-89f4-4935-85b8-02762652c403",
+   "mid": "92d7f0a8-545d-44ce-a4bb-f8eead31410b",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4b5a6c0f-67c4-4817-8665-5da05e1421c8",
+   "mid": "9844042e-c6de-48a9-a352-d62454611404",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "9e63d752-d2b8-4c97-9087-9dadb5990279",
+   "mid": "9b0853db-98d6-4d1e-8a36-4e4298d97191",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4875ca75-4d4b-4a67-b9c2-93bdfdb7f09e",
+   "mid": "9da6623f-3df7-4fe1-bcdc-0b104039bf2e",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "ac346606-e115-40c1-a981-34ad6bb44e06",
+   "mid": "a1422ebd-87cf-4181-a774-dfdb65a12c03",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "677c0a41-44d0-483f-96a3-d210083baaf2",
+   "mid": "bc712f25-ec71-4345-b9e4-d51f122ea431",
+   "name": "슬림비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "f84bb762-024b-467e-9b2b-598df16ca47c",
+   "mid": "be723be3-ad61-49d0-8490-9762ceac35d4",
+   "name": "세종비싸이모정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4620471d-fe44-446e-bb29-e9664130b3b7",
+   "mid": "c7822a99-ade2-4d96-98c0-9f6e2d2dcc92",
+   "name": "비트리플정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "f02a1225-e81d-4d66-9b0a-6708a0ab46cc",
+   "mid": "d20a259b-bfae-4be4-9cf8-45bd9fffa4e4",
+   "name": "슬림비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "939c52f6-e861-45be-ac8b-12df425320a4",
+   "mid": "d59c38e5-a0c8-4d5c-83f8-1a7e813df178",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "99293a9a-acdb-412c-88db-f33797c48a38",
+   "mid": "d63b7071-08d7-451b-91ca-9f7ca22107b9",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "fd771db2-f5ea-4093-bebc-7c91924fbeca",
+   "mid": "d860282f-7241-4c9b-97de-3b71bf11e561",
+   "name": "비트리플정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "3c49fc32-8c0d-46f5-a799-ee0ab9edd72b",
+   "mid": "e0dab554-76b6-421f-a13b-42d70e105fca",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "08a444e8-b8e5-4ead-a37d-f194a9e7f250",
+   "mid": "e1c4fdc0-d78a-4095-b14a-ca974ea5a125",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "87193414-90e5-4e90-b12f-3a7d88e16293",
+   "mid": "e32734cf-2bee-408f-9ef2-e02224cff5f9",
+   "name": "애드원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "062dca6e-b653-4b92-83fc-94a3ef1c63f0",
+   "mid": "ee6605b3-ca69-4e70-b9cc-4e0691db24c4",
+   "name": "비트리플정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "0fd17818-ca6c-449f-b832-c461a231ac07",
+   "mid": "f5709037-3030-43d0-a75c-f3b5bd15dd15",
+   "name": "바이코비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 15,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "1541050a-0a58-407a-a199-ed9f77d12f1c",
+   "mid": "ff55fe66-8f50-4e19-bf82-4a43486d6cd0",
+   "name": "에센비정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "8819693a-f9dd-4d74-9c43-b5d63af8fc4b",
+   "mid": "0090d9a7-35ee-4b96-925e-d332b12982d0",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "bc93ee2c-956c-40e9-9b75-d6dadc482ed3",
+   "mid": "0d5d8b6a-983a-43ea-a08f-46d75bca54e1",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "9b31942d-f4c5-42bf-9c26-95b9a9fa520e",
+   "mid": "168c0ce7-4e9f-4c30-8c29-e5dc591a6a7a",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "ce09d010-1d05-401d-8e03-d2180d880827",
+   "mid": "3858fa36-21d0-43c3-80a7-fbb08a36fbc0",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "b8ab28e9-c1c2-4d62-ab88-498cb8af6648",
+   "mid": "46120be8-6b8f-403d-8b39-eec8c60758e3",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "3128ea22-502e-485f-b52c-4a78f42c4043",
+   "mid": "6fd6594a-996e-4979-8bc1-5b0cc690e592",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "951ecc47-160f-47e4-9c39-434526ebc523",
+   "mid": "8011dedb-b543-41ab-864b-2e28c7551b60",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "96af9e88-634e-4980-9b5a-7fe0a1c58523",
+   "mid": "8a22ea24-8e67-4e60-8ad5-dad61ece9f87",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "43afd749-b88c-485e-b8ff-17ed0ce9fa77",
+   "mid": "9386265a-b9ce-47ed-8c9f-9680b0c7121c",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "3b4835f4-7ba7-4a30-b4d2-68fbfa2a4aa1",
+   "mid": "98348b73-c81e-4c85-b356-1e5c653773be",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "53f9f9ce-58dd-4ee4-8979-4a7583bd31f6",
+   "mid": "ae5e4f05-9868-47c1-a626-27372e1b22ed",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "3ab80d35-b428-4585-83f3-138d4d7484eb",
+   "mid": "aebffcfc-a2de-404f-b2de-f3d7a9f68ba2",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "1d59bc38-93bc-41e4-ad37-9267c29c234e",
+   "mid": "ce409f87-121f-460d-ab6f-2c97ad58ebdc",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "b0c1d170-fa30-44a6-bdcf-d5defa2e0962",
+   "mid": "ce7ed6d1-e995-45d9-b399-ec004bfb17f6",
+   "name": "네로민정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 8
+  },
+  {
+   "koId": "2995da0e-301e-4657-bb4d-e07d3ff62c3d",
+   "mid": "023501b1-4431-47db-a568-f124941d44b1",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "579743bc-7da9-4226-a058-4abb0d73f7ba",
+   "mid": "051103f4-1144-4152-8465-de19b2c5e827",
+   "name": "마투탑플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "2f4acf17-e3a9-4b45-aed8-99289b9b462c",
+   "mid": "05ecce7a-fb1b-4012-b3c5-36b99e423082",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "7dfd46ba-a8fb-4177-98d2-236a5e094418",
+   "mid": "132b1201-0320-48c5-a686-812e655b9eac",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "79698d8f-e55c-4ed3-bcbc-82759142250e",
+   "mid": "17307607-f513-456d-b3de-0292f577024a",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "382ef363-c218-4b83-aca7-abcd6d905829",
+   "mid": "17c3b1f6-47e9-4daf-bd0e-a4d602039b57",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "86daadac-ca5c-4d66-bd69-f285f0ed125b",
+   "mid": "22c1324d-ca91-425e-9272-74f690203697",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "385674f1-e626-489d-85ff-82feaef07604",
+   "mid": "34e498b9-910f-4736-bb45-079bad96ba26",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "2c35a1dd-d8ea-4ba6-8342-6d0bf6e245fb",
+   "mid": "37cc387b-6c03-4ee4-b04d-d4640f650eb6",
+   "name": "씨엔큐플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "15c431a5-d390-43d4-b4fe-9f9e6717df1a",
+   "mid": "39748ac5-aaa3-470a-8901-99b80db9d117",
+   "name": "마투탑플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4ea747f5-96d3-414c-a816-347fd1931a33",
+   "mid": "3a5d1288-4ff3-43bd-b9d0-da320e8a693c",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "7ec514fd-e544-478d-ac8b-244d7d81f4d5",
+   "mid": "3ce54366-5f89-406e-bb7a-3bf202765427",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4c3bf943-70ea-4810-9dac-9fa51ea00cc0",
+   "mid": "3df4065b-fe74-400a-a57a-a75675abd3b9",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "03f8a571-f474-412e-a45e-761b86474ddc",
+   "mid": "43a9835f-a4a9-4f78-8c53-ce504ad232f8",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "939cf290-1be2-40e4-bd25-26e1606ee834",
+   "mid": "4992ada9-c296-427c-bc7c-856d25219c1b",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "a423fb0b-3998-4b24-bd6b-63adff59e549",
+   "mid": "4d57a121-a71e-45f2-867f-25ff846d0d99",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "687d992a-6a4a-44ec-95a4-c941d3682b6b",
+   "mid": "537005a2-2b01-4540-ab7f-c398ce95e2d0",
+   "name": "씨엔큐플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4e678f5a-f42d-44d5-9e18-804fd39f4c39",
+   "mid": "5aea1365-4adc-4b31-894c-6a23a23f536c",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "37dd89c5-03ac-4dc8-aae5-5f8fdfc6ba6d",
+   "mid": "5b419898-2e2b-4f4c-8245-074efbda10f3",
+   "name": "씨엔큐플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "8b82e989-c236-4fe5-97ec-6f549d9081e9",
+   "mid": "5d5d6264-74fb-4aa9-82b3-759cfc8a1094",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "92ee6e26-9aba-4f6c-b3d1-c647ed54789d",
+   "mid": "61ffae81-614a-4f1c-8138-5ce59d2e92fb",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "30225443-a2a1-4554-8e26-1960735e7af1",
+   "mid": "63501af6-54b1-465f-9939-2813908593b9",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "2f948f64-9289-453b-9daf-32b4db1c5f2e",
+   "mid": "681d1003-32d5-4fad-ad20-2e3f5a274db3",
+   "name": "씨엔큐플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4c426ffa-4d13-4421-8b84-8cd3dc9dc641",
+   "mid": "70962b6d-9a5d-4a04-8a78-ddc0a273347d",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "52fe1eb8-42e1-4bba-8652-bfef6f2e5169",
+   "mid": "72d2269a-cd1c-4d79-92f3-a1c66cbca75c",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "16c60f58-f764-4b54-a6e7-a6dc20a84822",
+   "mid": "7864fa8b-651e-4280-bd6b-a6a20ffef49c",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "9cba7487-24a0-47f8-a150-2f7573f3c8d7",
+   "mid": "7bf01313-f212-4a15-8cb0-a043291309b6",
+   "name": "마투탑플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "03c444b6-6a2e-4da8-85f6-fd9edb805c6d",
+   "mid": "8779896d-bb34-4ca0-a7a4-09df4ce632ec",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "6d0c2614-798d-443e-8ad8-8e7b0a62c17b",
+   "mid": "8d31c076-64d7-4464-8e0a-961606a44c82",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "0963e94d-d1c8-4a00-b4bb-ba3d1cfbd4ee",
+   "mid": "9a904775-0463-4605-8969-2c4addee61e8",
+   "name": "마투탑플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "a9339a9e-1f9f-4b65-a956-4cecd897612e",
+   "mid": "9c29d7f5-0b7b-4748-840b-05d203e73a5f",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "5e770bd2-2f6a-43bf-8dca-fea18cf9baa1",
+   "mid": "9c39d7c8-2a04-407c-8880-0d4137a6597e",
+   "name": "조인콘사민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "5f9c13ac-5230-49b5-b149-83deefe22316",
+   "mid": "9e8b8160-58fe-4470-b9a7-288280753b7b",
+   "name": "마투탑플러스연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "1f4c1cb5-e901-4044-ac55-52034162e419",
+   "mid": "a75bb650-5f8c-4dbd-b350-e045befaa023",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "cc69ca8a-d1e5-4019-8d72-59e01e933bd6",
+   "mid": "a8d2b174-cab1-49f3-b995-e481c35140e8",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "2c3bd055-2e23-4ec3-bbdf-4520afa12fc6",
+   "mid": "ab227c7b-d748-455c-9b9d-11fe1e680740",
+   "name": "조인콘사민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "52888155-a0ba-4cee-98c2-d844364e10a6",
+   "mid": "ac5dafcf-93ac-42ce-9968-828902292ba9",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "0a71837f-8df8-4bd7-ae78-8170c30e7ca5",
+   "mid": "aef758ab-6a35-4ae6-87f9-a90d42db830c",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "d28bfd85-dd75-483c-ba3d-3bf38181baf9",
+   "mid": "af1770dd-51d3-4828-90d4-9a5f4193984d",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "1123cb94-436a-4269-bb1a-609420f4e97d",
+   "mid": "bba20078-ce53-4112-b996-2479d617427d",
+   "name": "알부타민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": null,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "b8e227a0-9053-4db5-9cb4-2ce29c875699",
+   "mid": "bde8f582-c488-41eb-bf25-c4c664697fd6",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "6d7e424f-e844-4b95-844c-13b705717604",
+   "mid": "c5f9c376-04f8-42a3-8a69-07c3c2a7f655",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "b705e2f0-e504-48d7-8280-6892cb07a041",
+   "mid": "d64c39fb-d845-4432-acac-55cceb14be7c",
+   "name": "조인콘사민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "0ea83e35-185e-4ad3-a97f-6478833b60ec",
+   "mid": "e13fa9cb-56e6-4323-868f-e99457e34266",
+   "name": "로페랄연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_AND_AGE_MISMATCH",
+   "rawFreq": [
+    "1일3회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "12f037a3-7877-479d-96d6-8d73f384ce09",
+   "mid": "e4dd92ca-953e-4387-8ea0-a8d65672588f",
+   "name": "메가콘사민-에프연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "f3541e0c-44dc-4a52-ba2b-627c114338e1",
+   "mid": "e5691abb-3fce-4f85-a95c-fbc9cfc03b0c",
+   "name": "콘티아민연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "510ee72d-46db-48f7-a547-22d20d86861a",
+   "mid": "e801f8fc-604c-41aa-9ddb-d8ea74f20ed7",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "f19f74a1-eba1-4849-a550-ae88aed82a61",
+   "mid": "ea5b737b-fc42-49a1-8369-1aaf72b77e7a",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "c57a476b-d5e1-48da-b636-4e81a09cc1c4",
+   "mid": "fbb17486-8ff8-4373-955b-e0dc3ef3b607",
+   "name": "뉴콘틴연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "92017705-7fa2-4650-8481-c25b684d9a5f",
+   "mid": "fcb432d6-a4ac-4bfd-8e6a-f28d6134dbfc",
+   "name": "조인스탑연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [
+    "1일2회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "abc1dcb6-ed49-4e0f-bc34-829ef1959e00",
+   "mid": "02c02e78-39c8-433c-bb3b-d154065138ab",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "9554c84e-fd62-4f06-9734-51cced37abc6",
+   "mid": "0422b9e2-b2f8-4057-ad38-d7a1b4ba6598",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "e9275d2d-edf7-41e0-b2a2-cd0bc8a7356f",
+   "mid": "15b95f6e-0d18-49c2-a2ab-12b4c5188553",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "c2879814-e8c5-4af8-b2fe-7f9c32ebfc04",
+   "mid": "18006742-0ae3-4982-ab61-f09e5a31f0c0",
+   "name": "웰시연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "1b36352f-f82f-4ff1-ae58-c81f7952bd86",
+   "mid": "45c36aad-6238-43b8-b970-1cf5ba47d64b",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "3f975e24-31e9-4f2c-9062-56ce3c8b3a06",
+   "mid": "484485d8-8379-4866-8926-c1ac2e3a9bd3",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "93b833f7-1164-4779-8e42-f81cacf672f4",
+   "mid": "56d60f03-de12-4f00-a21b-dbba7ac9aa43",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "93da7932-0d60-4edb-88b6-dffc6c7308f6",
+   "mid": "5e09a27a-c71e-4f7d-9076-3ecb63c5c773",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "0ed640f5-0cad-407d-9cfa-6d9aac0755ee",
+   "mid": "621f5523-bad4-4477-ba6e-caabf5c008fd",
+   "name": "웰시연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "83dcff12-f36c-4e60-a0dc-7575ad8c0a2f",
+   "mid": "6222afb7-dc53-4bc3-a674-0dd4f5e2380a",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "0a298152-7b4f-4835-a1d5-7f3f7806489c",
+   "mid": "7955930f-8883-44c4-8deb-247ad8c115f0",
+   "name": "웰시연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "15353fbd-b2ff-46d8-be9d-13869d2e96b2",
+   "mid": "85cbc026-af60-46cd-8428-528d33b903b8",
+   "name": "웰시연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "9da9734c-3869-4990-8195-d0cb7343d1a3",
+   "mid": "b7360bd6-ce33-4441-9596-c7fec34120da",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "10abc538-b842-4102-bace-56480651759f",
+   "mid": "becf4172-5452-4ff7-952f-aadd8332b856",
+   "name": "웰시연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "e127b8ba-857b-47c2-be55-731fff8b4eae",
+   "mid": "c2f02f76-3731-412d-a650-f10de306c4d5",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "319257d9-4b67-4fd0-ba95-7a9558cd0d63",
+   "mid": "c952ab09-0ebe-4e33-874a-366fab20c344",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "6c99a670-6c6c-4ef9-ae64-5dbede3ae977",
+   "mid": "ca0d52d4-2402-40b4-8fb2-8a8726bd765d",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "b1b2bff9-3aea-43a4-a7fc-38b55dd12df1",
+   "mid": "d4091be8-556f-40af-896a-53348f42d021",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "262ac23e-db97-4311-ba6b-46b8e125d032",
+   "mid": "f2ec1efd-8d06-408f-868f-ebfff32c7a4d",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "0d421751-1654-40c0-a64c-cbd3435e3e24",
+   "mid": "f569f6c1-7b64-49cd-82cf-4d37ebd250af",
+   "name": "눈모아연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 7,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "49c8b6e0-6817-4eaf-8163-1ae9aa594e57",
+   "mid": "f637a6ff-c3e6-4f23-8c17-a99ee22637e7",
+   "name": "자임큐텐연질캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "verdict": "FREQ_MISMATCH",
+   "rawFreq": [
+    "1일1회"
+   ],
+   "koFreq": [
+    "1일2회"
+   ],
+   "rawAgeFloor": 12,
+   "koAgeFloor": null
+  },
+  {
+   "koId": "85c58959-8fe5-4ad7-a7a1-05e9f6a82362",
+   "mid": "0f13a9a8-1425-490a-8d42-073ca3aa053f",
+   "name": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "409510a7-00e4-4be4-aa3d-36637abfb877",
+   "mid": "1131564e-2600-4385-9c29-57d38148324b",
+   "name": "락토필캡슐300밀리그램(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "3e9b5e98-e0ff-462f-9497-42945ed0c175",
+   "mid": "27da5cdd-3ea0-4a00-9045-e6dc1e5d0fd8",
+   "name": "아시토바캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "7711663b-a76b-4a01-a9b7-687eff2c8c4a",
+   "mid": "3321bff2-82e4-47ed-a843-90e1bb0524c9",
+   "name": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "e0faf794-d793-413d-838a-ceacdf3345d0",
+   "mid": "367b923e-d0a3-45a5-92a8-a879cfebb07d",
+   "name": "락토필캡슐300밀리그램(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "4870a161-dd47-4830-b721-789dd0c5c3a4",
+   "mid": "416d87fa-0847-460e-982d-f12386710bdc",
+   "name": "아시토바캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "020ce978-5ce7-4bd0-9665-81e648a1a3e1",
+   "mid": "4fd4d6ef-0921-4872-9fc1-115a3e2a762f",
+   "name": "아시토바캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "aab9cbdf-1c77-4f60-99cf-e9e43b79f0be",
+   "mid": "67b5467f-8c3f-4a46-9b84-ac513cd375e1",
+   "name": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "c1c240b9-46d2-46cb-a953-8e83a10aac22",
+   "mid": "6b587abb-10c9-4fcc-807a-234fac3df9e4",
+   "name": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "88b030a4-f5e1-4d5d-93c8-1ed9bbe5e8bf",
+   "mid": "76a93fb6-a5dc-4d02-9587-3a18a8ca6ec8",
+   "name": "안티비오캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "ff58ef95-d914-432e-993d-f2a7f7efba44",
+   "mid": "bf138001-0f2b-4814-bd2e-df1827108516",
+   "name": "아시토바캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "fe741896-563e-49a3-8017-2d9a1a7af90e",
+   "mid": "cea084b4-06fd-467f-af9a-182dc47d7a64",
+   "name": "락토필캡슐300밀리그램(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  },
+  {
+   "koId": "f9f6b278-d49e-4fe4-9ecf-ec586061fdac",
+   "mid": "e9c9629b-3c1e-4a39-ae5f-f7068dbbf66d",
+   "name": "아시토바캡슐300mg(락토바실루스아시도필루스균)",
+   "sourceType": "mfds_drug_otc",
+   "verdict": "AGE_FLOOR_MISMATCH",
+   "rawFreq": [],
+   "koFreq": [],
+   "rawAgeFloor": 8,
+   "koAgeFloor": 12
+  }
+ ]
+}

@@ -1,0 +1,56 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "accounting": {
+  "total": 22408,
+  "KO_DIRECT_VALID": 18268,
+  "KO_EXPANDED_VALID": 944,
+  "KO_HOLD": 2362,
+  "KO_INVALID": 834,
+  "identity": "22408 = 18268 + 944 + 2362 + 834",
+  "balanced": true
+ },
+ "reasonCount": {
+  "DOSAGE_TOKEN_NOT_IN_SOURCE": 120,
+  "EXPANDED_REVIEW_REQUIRED": 1033,
+  "EXPANDED_SAFE_MATCH": 944,
+  "EXPANDED_LINEAGE_UNKNOWN": 383,
+  "RAW_ON_MASTER_NO_CONTRADICTION": 18268,
+  "EXPANDED_UNSAFE_MISMATCH": 572,
+  "FREQ_MISMATCH": 61,
+  "FREQ_AND_AGE_MISMATCH": 26,
+  "AGE_NOT_IN_SOURCE": 359,
+  "AGE_FLOOR_MISMATCH": 85,
+  "EFFICACY_COVERAGE_LOW": 16,
+  "OFF_TARGET_MASTER": 90,
+  "NO_LINEAGE_NO_ANCHOR": 1,
+  "PROHIBITION_LOST": 261,
+  "AGE_CRITERIA_ALL_LOST": 323,
+  "NUMERIC_NOT_IN_SOURCE": 7
+ },
+ "bySourceCls": {
+  "mfds_drug_otc_nutrition_combo": {
+   "KO_HOLD": 796,
+   "KO_EXPANDED_VALID": 333,
+   "KO_DIRECT_VALID": 1687,
+   "KO_INVALID": 729
+  },
+  "o4o_drug_otc_topical": {
+   "KO_DIRECT_VALID": 2532,
+   "KO_INVALID": 26
+  },
+  "mfds_drug_otc": {
+   "KO_DIRECT_VALID": 13716,
+   "KO_HOLD": 1566,
+   "KO_EXPANDED_VALID": 611,
+   "KO_INVALID": 15
+  },
+  "mfds_easy_drug": {
+   "KO_DIRECT_VALID": 333,
+   "KO_INVALID": 20
+  },
+  "manual": {
+   "KO_INVALID": 44
+  }
+ },
+ "verdict": "ACCOUNTING_OK"
+}
