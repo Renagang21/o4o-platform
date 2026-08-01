@@ -42,10 +42,37 @@ interface NoticeItem {
   createdAt: string;
 }
 
+/**
+ * WO-O4O-ADMIN-HUB-NOTICES-CRASH-FIX-V1
+ *
+ * 이 화면이 쓰는 `GET /kpa/news/admin/list` 의 실제 응답 계약은 **평면형** 이다
+ * (apps/api-server/src/routes/kpa/kpa.routes.ts:1230):
+ *   { success, data: NoticeItem[], total, page, limit, totalPages }
+ *
+ * 기존 코드는 형제 화면(HubContentsPage) 의 `pagination: { ... }` **중첩형** 을 그대로 옮겨와
+ * `data.pagination.totalPages` 를 읽었고, `pagination` 이 undefined 라
+ * 조회가 **성공할 때마다** TypeError 로 화면이 크래시했다.
+ *
+ * 두 화면의 endpoint 는 계약이 서로 다르다 —
+ *   /hub/contents        → 중첩형 pagination (HubContentsPage 는 정상)
+ *   /kpa/news/admin/list → 평면형 (이 화면)
+ * 따라서 여기서만 실제 계약에 맞춘다. 백엔드 계약은 변경하지 않는다.
+ */
 interface ListResponse {
   success: boolean;
   data: NoticeItem[];
-  pagination: { page: number; limit: number; total: number; totalPages: number };
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+/** 응답이 계약을 위반했을 때(= 정상 빈 목록이 아님) 구분하기 위한 오류 */
+export class NoticeContractError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'NoticeContractError';
+  }
 }
 
 interface NoticeFormData {
@@ -70,11 +97,37 @@ const EMPTY_FORM: NoticeFormData = {
 
 // ── API ──────────────────────────────────────────────────────────────────────
 
-async function fetchNotices(page: number): Promise<ListResponse> {
+export async function fetchNotices(page: number): Promise<ListResponse> {
   const res = await authClient.api.get<ListResponse>(API_LIST, {
     params: { serviceKey: 'kpa-society', type: 'notice', page, limit: 20 },
   });
-  return res.data;
+  const body = res.data;
+
+  // 계약 검증: `data` 가 배열이 아니면 **정상 빈 목록이 아니라 계약 위반**이다.
+  // 빈 배열로 위장하면 오류가 "공지 0건" 으로 보여 원인이 숨는다 → 오류 상태로 올린다.
+  if (!body || !Array.isArray(body.data)) {
+    throw new NoticeContractError('공지 목록 응답 구조가 예상과 다릅니다.');
+  }
+  return body;
+}
+
+/**
+ * 페이지 수 산출. 표시 전용이며 목록 데이터를 위조하지 않는다.
+ * 1) 계약대로 평면 `totalPages` 사용
+ * 2) 누락 시 total/limit 로 보정
+ * 3) 그래도 알 수 없으면 1 (페이지네이션 UI 를 숨김)
+ */
+export function resolveTotalPages(body: ListResponse | undefined): number {
+  if (!body) return 1;
+  if (typeof body.totalPages === 'number' && Number.isFinite(body.totalPages) && body.totalPages > 0) {
+    return body.totalPages;
+  }
+  const total = Number(body.total);
+  const limit = Number(body.limit);
+  if (Number.isFinite(total) && Number.isFinite(limit) && limit > 0) {
+    return Math.max(1, Math.ceil(total / limit));
+  }
+  return 1;
 }
 
 async function createNotice(data: NoticeFormData): Promise<void> {
@@ -90,6 +143,15 @@ async function createNotice(data: NoticeFormData): Promise<void> {
 
 async function updateNotice(id: string, data: Partial<NoticeFormData & { status: string }>): Promise<void> {
   await authClient.api.put(API_UPDATE(id), data);
+}
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+
+/** 날짜 표시. null/undefined/파싱 불가 값을 '—' 로 안전 처리한다. */
+export function formatDate(value: string | null | undefined): string {
+  if (!value) return '—';
+  const d = new Date(value);
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('ko-KR');
 }
 
 // ── Status Badge ─────────────────────────────────────────────────────────────
@@ -265,10 +327,15 @@ export default function HubNoticeListPage() {
   const [page, setPage] = useState(1);
   const [modalItem, setModalItem] = useState<NoticeItem | null | 'new'>(null);
 
-  const { data, isLoading, isError, refetch } = useQuery({
+  const { data, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['hub-notices', page],
     queryFn: () => fetchNotices(page),
   });
+
+  // 화면 상태를 명시적으로 구분한다: loading / error(계약 위반 포함) / empty / 정상 목록
+  const isContractError = error instanceof NoticeContractError;
+  const items = data?.data ?? [];
+  const totalPages = resolveTotalPages(data);
 
   const archiveMutation = useMutation({
     mutationFn: (id: string) => updateNotice(id, { status: 'archived' }),
@@ -318,9 +385,7 @@ export default function HubNoticeListPage() {
       header: '종료일',
       width: 120,
       render: (row) => (
-        <span className="text-xs text-gray-500">
-          {row.expiresAt ? new Date(row.expiresAt).toLocaleDateString('ko-KR') : '—'}
-        </span>
+        <span className="text-xs text-gray-500">{formatDate(row.expiresAt)}</span>
       ),
     },
     {
@@ -328,9 +393,7 @@ export default function HubNoticeListPage() {
       header: '등록일',
       width: 110,
       render: (row) => (
-        <span className="text-xs text-gray-500">
-          {new Date(row.createdAt).toLocaleDateString('ko-KR')}
-        </span>
+        <span className="text-xs text-gray-500">{formatDate(row.createdAt)}</span>
       ),
     },
     {
@@ -387,17 +450,28 @@ export default function HubNoticeListPage() {
         <div className="py-12 text-center text-sm text-gray-400">불러오는 중...</div>
       ) : isError ? (
         <div className="rounded border border-red-200 bg-red-50 p-6 text-center text-sm text-red-600">
-          데이터를 불러오는 중 오류가 발생했습니다.
+          <p>
+            {isContractError
+              ? '공지 목록 응답이 예상한 형식과 달라 표시할 수 없습니다.'
+              : '데이터를 불러오는 중 오류가 발생했습니다.'}
+          </p>
+          <button
+            onClick={() => refetch()}
+            className="mt-3 rounded border border-red-300 px-3 py-1 text-xs text-red-700 hover:bg-red-100"
+          >
+            다시 시도
+          </button>
         </div>
       ) : (
+        // 데이터 0건은 오류가 아니라 정상 empty state 로 표시한다.
         <BaseTable<NoticeItem>
           columns={columns}
-          data={data?.data ?? []}
+          data={items}
           emptyMessage="등록된 공지가 없습니다."
         />
       )}
 
-      {data && data.pagination.totalPages > 1 && (
+      {!isError && totalPages > 1 && (
         <div className="mt-4 flex justify-center gap-2">
           <button
             className="rounded border px-3 py-1 text-sm disabled:opacity-40"
@@ -407,12 +481,12 @@ export default function HubNoticeListPage() {
             이전
           </button>
           <span className="px-3 py-1 text-sm text-gray-600">
-            {page} / {data.pagination.totalPages}
+            {page} / {totalPages}
           </span>
           <button
             className="rounded border px-3 py-1 text-sm disabled:opacity-40"
-            onClick={() => setPage((p) => Math.min(data.pagination.totalPages, p + 1))}
-            disabled={page >= data.pagination.totalPages}
+            onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+            disabled={page >= totalPages}
           >
             다음
           </button>

@@ -68,10 +68,16 @@
 |---|---:|---|
 | **READY** | **4** | 독립 업무 화면 · 파라미터 없음 · API/권한 정상 · 메뉴 연결만으로 사용 가능 |
 | **NEEDS_FIX** | **5** | 업무 화면으로 유효하나 API·권한·데이터에 선행 수정 필요 |
-| **INTERNAL** | **3** | 상위 허브(`/admin/yaksa`)의 하위 화면 — 메뉴 불필요 |
+| **INTERNAL** | **2** | 상위 허브(`/admin/yaksa`)의 하위 화면 — 메뉴 불필요 (`accounting`·`fees`) |
 | **DUPLICATE** | **2** | 기존 메뉴 화면과 역할 중복 |
 | **TEST_DEBUG / MOCKUP** | **2** | 목업·진단용 |
 | *(미재검증)* | 143 | 선행 triage 분류 유지 (파라미터·상세·비활성 등) |
+
+> **합계 정정 (2026-08-01)**: 최초 작성 시 INTERNAL 을 3 으로 적어 합계가 16 이 되었으나,
+> `/admin/yaksa/members` 를 DUPLICATE 와 INTERNAL 에 **이중 계상**한 오류였다.
+> 분류는 상호배타이며 `/admin/yaksa/members` 의 확정 분류는 **DUPLICATE**(동일 백엔드 endpoint) 다.
+> INTERNAL = `accounting`·`fees` **2건**. 따라서 **4+5+2+2+2 = 15** 로 정밀 검증 15건과 일치한다.
+> 후보 판정·선정 결과에는 영향 없다.
 
 ---
 
