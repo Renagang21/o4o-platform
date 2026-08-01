@@ -46,6 +46,8 @@ import adminUsersRoutes from '../routes/admin/users.routes.js';
 import adminPlatformAccountsRoutes from '../routes/admin/platform-accounts.routes.js';
 // WO-O4O-PLATFORM-GLOBAL-USERS-READONLY-LIST-V1: 전체 사용자 read-only 조회(투영, additive)
 import adminPlatformUsersRoutes from '../routes/admin/platform-users.routes.js';
+// WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
+import adminSecurityBlockedIpsRoutes from '../routes/admin/security-blocked-ips.routes.js';
 import serviceMonitorRoutes from '../routes/service-monitor.routes.js';
 
 // ============================================================================
@@ -170,6 +172,7 @@ export async function registerCoreRoutes(app: Application): Promise<void> {
   app.use('/api/v1/admin/users', adminUsersRoutes);
   app.use('/api/v1/admin/platform-accounts', adminPlatformAccountsRoutes);
   app.use('/api/v1/admin/platform-users', adminPlatformUsersRoutes);
+  app.use('/api/v1/admin/security', adminSecurityBlockedIpsRoutes);
   app.use('/api/v1/service/monitor', serviceMonitorRoutes);
 
   logger.info('✅ Core API routes registered');

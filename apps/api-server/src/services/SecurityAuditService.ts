@@ -1,5 +1,32 @@
 import logger from '../utils/logger.js';
 import { AppDataSource } from '../database/connection.js';
+// WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1
+import { normalizeIp } from '../utils/trusted-client-ip.js';
+
+/** TTL 이 붙은 IP 차단 레코드 */
+export interface BlockedIpRecord {
+  ip: string;
+  blockedAt: number;
+  blockedUntil: number;
+  reason?: string;
+  source?: string;
+}
+
+/** 기본 차단 유지 시간 — 60분 */
+export const DEFAULT_IP_BLOCK_TTL_MS = 60 * 60 * 1000;
+
+/**
+ * 차단 TTL. `SECURITY_IP_BLOCK_TTL_MS` 로 조정하되, 0 이하·비정수·과도한 값은
+ * 기본값으로 폴백한다(상한 24시간) — 잘못된 설정이 사실상 영구 차단이 되지 않게 한다.
+ */
+export function resolveIpBlockTtlMs(raw = process.env.SECURITY_IP_BLOCK_TTL_MS): number {
+  const n = Number(raw);
+  const MAX = 24 * 60 * 60 * 1000;
+  if (!raw || !Number.isFinite(n) || !Number.isInteger(n) || n <= 0 || n > MAX) {
+    return DEFAULT_IP_BLOCK_TTL_MS;
+  }
+  return n;
+}
 
 export interface SecurityEvent {
   id: string;
@@ -81,7 +108,13 @@ class SecurityAuditService {
   private events: SecurityEvent[] = [];
   private rules: SecurityRule[] = [];
   private ipRiskCache: Map<string, { risk: string; timestamp: Date }> = new Map();
-  private blockedIPs: Set<string> = new Set();
+  /**
+   * WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1:
+   *   기존 `Set<string>` 은 만료 개념이 없어 한 번 차단되면 인스턴스가 교체될 때까지
+   *   무기한 유지됐다(해제 수단도 없었다). 만료시각을 가진 Map 으로 교체한다.
+   *   키는 `normalizeIp` 로 정규화해 표기 차이로 중복 레코드가 생기지 않게 한다.
+   */
+  private blockedIPs: Map<string, BlockedIpRecord> = new Map();
   private failedLoginAttempts: Map<string, { count: number; firstAttempt: Date }> = new Map();
 
   constructor() {
@@ -106,7 +139,12 @@ class SecurityAuditService {
         name: 'SQL Injection Attempt',
         enabled: true,
         condition: {
-          eventType: ['security.sql_injection']
+          eventType: ['security.sql_injection'],
+          // WO-O4O-SECURITY-IP-BLOCK-TTL-AND-UNBLOCK-V1:
+          //   기존에는 임계값이 없어 **오탐 1회로 즉시 차단**됐다. 탐지 패턴이
+          //   `(or|and).*=` · `--` · `;` 처럼 넓어 정상 요청도 걸릴 수 있다.
+          //   1회 탐지는 해당 요청만 400 으로 막고(미들웨어가 처리), 반복될 때만 차단한다.
+          threshold: { count: 3, minutes: 5 }
         },
         action: 'block',
         severity: 'critical'
@@ -226,7 +264,7 @@ class SecurityAuditService {
   private async executeRuleAction(event: SecurityEvent, rule: SecurityRule): Promise<void> {
     switch (rule.action) {
       case 'block':
-        this.blockIP(event.ipAddress);
+        this.blockIP(event.ipAddress, { reason: rule.name, source: rule.id });
         await this.logEvent({
           type: 'security.intrusion_attempt',
           severity: rule.severity,
@@ -284,7 +322,7 @@ class SecurityAuditService {
     if (attempts.count >= 5) {
       const timeDiff = Date.now() - attempts.firstAttempt.getTime();
       if (timeDiff < 15 * 60000) { // 15 minutes
-        this.blockIP(ipAddress);
+        this.blockIP(ipAddress, { reason: 'Multiple failed login attempts', source: 'trackFailedLogin' });
       }
     }
 
@@ -302,18 +340,84 @@ class SecurityAuditService {
     }
   }
 
-  blockIP(ipAddress: string): void {
-    this.blockedIPs.add(ipAddress);
-    logger.warn(`[SECURITY] Blocked IP: ${ipAddress}`);
+  /**
+   * IP 차단 — TTL 이 붙는다. 이미 차단된 IP 가 재탐지되면 **만료시각을 연장**하고
+   * 중복 레코드를 만들지 않는다.
+   */
+  blockIP(ipAddress: string, meta?: { reason?: string; source?: string }): void {
+    const key = normalizeIp(ipAddress) || 'unknown';
+    const now = Date.now();
+    const ttl = resolveIpBlockTtlMs();
+    const existing = this.blockedIPs.get(key);
+    const blockedUntil = Math.max(existing?.blockedUntil ?? 0, now + ttl);
+
+    this.blockedIPs.set(key, {
+      ip: key,
+      blockedAt: existing?.blockedAt ?? now,
+      blockedUntil,
+      reason: meta?.reason ?? existing?.reason,
+      source: meta?.source ?? existing?.source,
+    });
+
+    logger.warn(
+      `[SECURITY] ${existing ? 'Re-blocked (TTL extended)' : 'Blocked'} IP: ${key} until ${new Date(blockedUntil).toISOString()}`,
+    );
   }
 
-  unblockIP(ipAddress: string): void {
-    this.blockedIPs.delete(ipAddress);
-    logger.info(`[SECURITY] Unblocked IP: ${ipAddress}`);
+  /** 관리자 수동 해제. 실제로 제거됐는지(`changed`) 돌려줘 멱등 응답을 만들 수 있게 한다. */
+  unblockIP(ipAddress: string): boolean {
+    const key = normalizeIp(ipAddress) || 'unknown';
+    const changed = this.blockedIPs.delete(key);
+    if (changed) logger.info(`[SECURITY] Unblocked IP: ${key}`);
+    return changed;
   }
 
+  /** 차단 판정 — 만료된 레코드는 이 시점에 제거한다 (lazy expiration, 별도 cron 없음). */
   isIPBlocked(ipAddress: string): boolean {
-    return this.blockedIPs.has(ipAddress);
+    const key = normalizeIp(ipAddress) || 'unknown';
+    const record = this.blockedIPs.get(key);
+    if (!record) return false;
+    if (record.blockedUntil <= Date.now()) {
+      this.blockedIPs.delete(key);
+      logger.info(`[SECURITY] IP block expired: ${key}`);
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * 현재 인스턴스의 차단 목록 (관리자 조회용). 조회 시 만료분을 함께 정리한다.
+   * ⚠️ in-memory 라 **현재 Cloud Run 인스턴스 범위**다 — 인스턴스 간 공유되지 않는다.
+   */
+  getBlockedIPs(): Array<{
+    ip: string;
+    blockedAt: string;
+    blockedUntil: string;
+    remainingSeconds: number;
+    reason?: string;
+    source?: string;
+  }> {
+    const now = Date.now();
+    const out: Array<{
+      ip: string; blockedAt: string; blockedUntil: string;
+      remainingSeconds: number; reason?: string; source?: string;
+    }> = [];
+
+    for (const [key, record] of this.blockedIPs.entries()) {
+      if (record.blockedUntil <= now) {
+        this.blockedIPs.delete(key);
+        continue;
+      }
+      out.push({
+        ip: record.ip,
+        blockedAt: new Date(record.blockedAt).toISOString(),
+        blockedUntil: new Date(record.blockedUntil).toISOString(),
+        remainingSeconds: Math.ceil((record.blockedUntil - now) / 1000),
+        reason: record.reason,
+        source: record.source,
+      });
+    }
+    return out.sort((a, b) => b.remainingSeconds - a.remainingSeconds);
   }
 
   getIPRisk(ipAddress: string): 'low' | 'medium' | 'high' | 'blocked' {
