@@ -52,6 +52,11 @@ const R915 = [1,2,3,4,5,6,7,8,9,10,11,12].map((n) => {
   const f = `${D}/hff-en-b02-r915-t${n}-translations-v1.json`;
   return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
 });
+// Batch 03 직접 번역 라운드 (파일이 없으면 빈 객체로 시작한다)
+const B03 = Array.from({ length: 30 }, (_, i) => i + 1).map((n) => {
+  const f = `${D}/hff-en-b03-t${n}-translations-v1.json`;
+  return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+});
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -214,6 +219,10 @@ for (const src of [B6.clause ?? {}, B6.meta ?? {}, B6.label ?? {}])
 // 36) Batch 02 잔여 915 직접 번역 (t1~)
 for (const T of R915)
   for (const src of [T.clause ?? {}, T.meta ?? {}, T.label ?? {}, T.intro ?? {}])
+    for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 37) Batch 03 직접 번역 (t1~)
+for (const T of B03)
+  for (const src of [T.clause ?? {}, T.meta ?? {}, T.label ?? {}, T.intro ?? {}, T.badge ?? {}, T.heading ?? {}])
     for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────

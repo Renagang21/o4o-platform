@@ -1,0 +1,28 @@
+{
+ "wo": "WO-O4O-HFF-EN-BATCH-03-5000-DIRECT-BULK-PRODUCTION-AND-DEFERRED-ISSUE-QUEUE-V1",
+ "closedAt": "2026-08-01T07:51:14.190Z",
+ "batch": 3,
+ "population": 5000,
+ "completed": 4806,
+ "hold": 194,
+ "sumCheck": true,
+ "holdByIssueType": {
+  "NUMBER_STRUCTURE_AMBIGUOUS": 56,
+  "KO_SOURCE_DAMAGED": 138
+ },
+ "forbiddenHoldPresent": [],
+ "appliedRounds": {
+  "lastMode": "APPLY",
+  "lastShards": [
+   {
+    "from": 0,
+    "size": 13,
+    "updated": 0,
+    "inserted": 13,
+    "rolledBack": false
+   }
+  ]
+ },
+ "hffEnCanonicalTotalLive": 29257,
+ "hffKoCanonicalTotalLive": 40918
+}

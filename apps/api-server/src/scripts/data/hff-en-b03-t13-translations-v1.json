@@ -1,0 +1,31 @@
+{
+  "clause": {
+    "&lt;프로바이오틱스&gt;": "[Probiotics]",
+    "&lt;프로바이오틱스 HY7714&gt;": "[Probiotics HY7714]",
+    "&lt;자일로올리고당(xylooligosaccharide) 분말&gt;": "[Xylooligosaccharide powder]",
+    "&lt;테아닌&gt;": "[Theanine]",
+    "&lt;아쉬아간다 추출물(ShodenⓇ)(제2022-27호)&gt;": "[Ashwagandha extract (Shoden®) (Notification No. 2022-27)]",
+    "&lt;가르시니아캄보지아 추출물&gt;": "[Garcinia cambogia extract]",
+    "&lt;가르시니아캄보지아 추출물&gt;탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음": "[Garcinia cambogia extract] May help reduce body fat by inhibiting the conversion of carbohydrates into fat",
+    "&lt;프로바이오틱스&gt;유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄 수 있음": "[Probiotics] May help promote the growth of lactic acid bacteria and inhibit harmful bacteria, support smooth bowel movements, and support gut health",
+    "&lt;칼슘&gt;": "[Calcium]",
+    "&lt;마그네슘&gt;": "[Magnesium]",
+    "&lt;비타민K&gt;": "[Vitamin K]",
+    "골다공증발생 위험 감소에 도움을 줌 &lt;마그네슘&gt;": "Helps reduce the risk of osteoporosis [Magnesium]",
+    "골다공증발생 위험 감소에 도움을 줌 &lt;비타민K&gt;": "Helps reduce the risk of osteoporosis [Vitamin K]",
+    "&lt;밀크씨슬&gt;": "[Milk thistle]",
+    "&lt;홍삼&gt;": "[Red ginseng]"
+  },
+  "label": {
+    "양춘사추출물, 바나바잎추출물": "Amomum villosum extract, Banaba leaf extract"
+  },
+  "meta": {
+    "1일 1회, 1회 45g을 물이나 음료에 혼합하여 음용한다.": "Mix 45 g into water or a beverage and drink, 1 time a day.",
+    "1일 1회, 1회 2스푼(40g)씩 물또는 우유와 함께 섭취하십시오": "Take 2 spoonfuls (40 g) with water or milk, 1 time a day",
+    "1일 1회, 1회 1포를 350ml의 물에 타서 섭취하십시오.": "Take 1 stick pack mixed in 350 mL of water, 1 time a day.",
+    "1일 1회, 1회 2정씩 또는 1일 2회, 1회 1정씩 음용수와 함께 섭취하십시오": "Take 2 tablets 1 time a day, or 1 tablet 2 times a day, with drinking water",
+    "1일 1회, 1회 1정씩 음용수와 함께 섭취한다.": "Take 1 tablet with drinking water, 1 time a day.",
+    "1일 1회, 1회 2정씩 음용수와 함께 섭취한다.": "Take 2 tablets with drinking water, 1 time a day.",
+    "1일 1회, 1회 2정을 씹어서 물과 함께 섭취 하십시오.": "Chew 2 tablets and take them with water, 1 time a day."
+  }
+}
