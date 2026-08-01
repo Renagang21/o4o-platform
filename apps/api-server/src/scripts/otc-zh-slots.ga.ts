@@ -25,7 +25,9 @@ export const uid = (kind: string, text: string): string =>
  */
 const SENTENCE_KINDS = new Set(['intro', 'tile', 'intake', 'warn', 'foot', 'para', 'badge', 'li']);
 export const isTruncatedKo = (kind: string, text: string): boolean =>
-  SENTENCE_KINDS.has(kind) && text.length > 40 && !/[.!?。」』)\]]$/.test(text);
+  SENTENCE_KINDS.has(kind) && text.length > 40 && !/[.!?。]$/.test(text);
+/* 닫는 괄호는 종결부호로 인정하지 않는다 — `…베타차단제(아테놀올,메토프로롤,프로프라놀롤)` 처럼
+   열거 괄호에서 잘린 하드컷이 종결로 오인돼 통과하던 사례가 실재한다. */
 
 type El = { tag: string; cls: string };
 const VOID = /^(br|hr|img|input|meta|link|source|col)$/;
