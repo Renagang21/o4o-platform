@@ -85,9 +85,60 @@ WO 의 중지 조건 두 가지가 실제로 발생해 **HOLD** 로 남겼다.
 
 ---
 
-## 6. 프로덕션 검증
+## 6. 프로덕션 검증 (배포 후, read-only)
 
-*(배포 후 기록 — 아래 §6-1 참조)*
+배포: `Deploy Admin Dashboard (Cloud Run)` **success** (commit `951567cb3`)
+
+### 6-1. 서비스 현황 `/admin/services/overview` · `/admin/services`
+
+| 조회 API | 변경 전 | 변경 후 |
+|---|---|---|
+| `/service/monitor/tenants` | 404 (이중) | **200** |
+| `/service/monitor/apps` | 404 (이중) | **200** |
+| `/service/monitor/themes` | 404 (이중) | **200** |
+| `/service/monitor/warnings` | 404 (이중) | **200** |
+| `/service/monitor/summary` | 404 (이중) | **500** ← 별개 결함 |
+
+- **404 = 0건 · 이중 프리픽스 = 0건** → 본 WO 의 교정 목표는 달성됐다.
+- 화면은 `Service Monitoring Dashboard` 헤더와 탭(Services Overview / Apps Matrix / Themes / Warnings)이
+  렌더되고 본문은 `No Services Found` 빈 상태다.
+
+### 6-2. `/summary` 500 의 원인 — **범위 밖 별개 결함**
+
+Cloud Run 로그:
+
+```
+[ServiceMonitor] Failed to get system summary: relation "sites" does not exist
+[ServiceMonitor] Error getting themes status:  relation "sites" does not exist
+[ServiceMonitor] Error building apps matrix:   relation "sites" does not exist
+[ServiceMonitor] Validation failed:            relation "sites" does not exist
+```
+
+**운영 DB 에 `sites` 테이블이 없다.** `themes`·`apps`·`warnings` 가 200 인 것은 핸들러가
+예외를 삼키고 빈 결과를 돌려주기 때문이고, `summary` 만 500 으로 표면화된다.
+
+즉 화면의 `No Services Found` 는 **"서비스가 없다" 가 아니라 "조회가 실패했다"** 는 뜻이다.
+이는 선행 감사에서 다룬 **schema drift 계열** 문제이며, 본 WO 의 제외 범위(백엔드·DB)라 손대지 않았다.
+
+### 6-3. 정산 2화면 (HOLD 확인)
+
+| 화면 | 결과 |
+|---|---|
+| `/dashboard/seller/settlements` | **접근 권한이 없습니다** — API 호출 0건 |
+| `/dashboard/supplier/settlements` | **접근 권한이 없습니다** — API 호출 0건 |
+
+역할 전용 화면이라 platform super_admin 으로도 진입 불가. HOLD 판정이 재확인됐다.
+
+### 6-4. 화면별 최종 상태
+
+| 화면 | 조회 API | 렌더 | 콘솔 | 쓰기 미실행 | **최종 판정** |
+|---|---|---|---|:--:|---|
+| 서비스 현황 | 4×200 / 1×500 (`sites` 부재) | 헤더·탭 정상, 본문 빈 상태 | 2 | ✅ | **READY_AFTER_FIX** |
+| 판매자 정산 | 호출 0 (권한 거부) | 권한 안내 | 0 | ✅ | **HOLD** |
+| 공급자 정산 | 호출 0 (권한 거부) | 권한 안내 | 0 | ✅ | **HOLD** |
+
+**서비스 현황은 메뉴 연결 대상으로 승격하지 않는다** — 프리픽스는 고쳐졌으나
+`sites` 테이블 부재로 실제 데이터를 표시하지 못하므로 `READY` 가 아니다.
 
 ---
 
@@ -95,7 +146,11 @@ WO 의 중지 조건 두 가지가 실제로 발생해 **HOLD** 로 남겼다.
 
 - **쓰기 API 미실행** — `POST /service/monitor/validate` 는 경로만 교정하고 버튼을 누르지 않았다.
 - **정산 2화면 미검증** — 권한 거부로 화면 진입 자체가 불가하고, 백엔드도 부재/불일치라 수정 대상이 아니다.
+- **`sites` 테이블 부재의 영향 범위 미조사** — ServiceMonitor 외에 어떤 기능이 이 테이블을 참조하는지 확인하지 않았다.
 - **후속 WO 후보**
+  - `ADMIN-SERVICE-MONITOR-SITES-TABLE-DISPOSITION` — 운영 DB 에 `sites` 테이블이 없다.
+    선행 감사에서 다룬 schema drift 계열이므로, 테이블 생성 필요성·참조 범위·
+    ServiceMonitor 의 예외 삼킴(200 으로 위장) 처리까지 함께 판정해야 한다. **P1 후보**
   - `ADMIN-SETTLEMENT-SCREEN-DISPOSITION` — 판매자/공급자 정산 화면의 처분(구현·경로교정·제거) 판정.
     공급자는 `/neture/supplier/settlements` 로 경로 교정 + `preview` 구현 여부 결정이 필요하고,
     판매자는 백엔드 자체가 없어 업무 필요성 판단이 선행되어야 한다.
