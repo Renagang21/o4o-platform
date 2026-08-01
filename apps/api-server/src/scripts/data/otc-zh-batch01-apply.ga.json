@@ -3,28 +3,28 @@
   "mode": "APPLY",
   "lang": "zh",
   "batch": "zh-batch-01",
-  "mappedUnits": 1538,
+  "mappedUnits": 2271,
   "docsScanned": 5000,
-  "planned": 1093,
-  "hold": 3907,
+  "planned": 1289,
+  "hold": 3711,
   "holdByCode": {
-   "UNRESOLVED_SLOT": 3907
+   "UNRESOLVED_SLOT": 3711
   },
   "unresolvedSlotOccByKind": {
-   "badge": 3157,
-   "h1": 3699,
+   "badge": 2826,
+   "h1": 3448,
    "small": 756,
-   "meta": 1216,
-   "intro": 3493,
-   "tile": 7383,
-   "intake": 4991,
-   "warn": 16697,
+   "meta": 1052,
+   "intro": 3055,
+   "tile": 6888,
+   "intake": 4610,
+   "warn": 15716,
    "foot": 1120
   },
   "gateFailed": 0,
   "gateFailByCode": {},
   "inserted": 0,
-  "alreadyExists": 1093
+  "alreadyExists": 1289
  },
  "fails": [],
  "holdSample": [
@@ -62,13 +62,13 @@
    "koId": "30072c59-d04f-4ab8-bb51-a119c16eba20",
    "masterId": "002063d6-2bea-4975-9fab-7d13bba0a19f",
    "code": "UNRESOLVED_SLOT",
-   "missing": 2
+   "missing": 1
   },
   {
    "koId": "93d53d3c-fb90-4e54-b4ca-71a06a6d6483",
    "masterId": "00218d5c-d6d4-4206-bb80-bd131525d960",
    "code": "UNRESOLVED_SLOT",
-   "missing": 4
+   "missing": 1
   },
   {
    "koId": "09c52ebc-9477-4b94-b0dd-1a3a6b6654bd",
@@ -196,6 +196,15 @@
    "bytes": 740
   },
   {
+   "koId": "f6cbd2fc-3f8a-475d-8b16-fd547ca4e6ab",
+   "masterId": "005aeac2-e9b3-4b32-9c28-ba82f23b5286",
+   "product": "오라메디연고{수출명:오라메디파스타(ORAMEDYPASTE)}",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dd3a890b-9623-e9b9-dbea-0241ce6faca6",
+   "summary": "本药用于缓解慢性剥脱性牙龈炎，伴有糜烂或溃疡的难治性口腔炎及舌炎所致的炎症。",
+   "bytes": 1477
+  },
+  {
    "koId": "e934cccc-69b6-417b-ab98-a69c5af0fc86",
    "masterId": "007c0b29-cadc-4703-8588-4d9c95fbb8ab",
    "product": "레날비타정",
@@ -203,6 +212,15 @@
    "sourceRefId": "db7c085e-d233-499c-bb99-56f2e9efcd58",
    "summary": "用于体力疲劳·体力下降时的维生素 B1·B2·B6·C 补充，神经痛·肌肉痛·关节痛，口角炎·唇炎·口腔炎·舌炎，脚气病·眼疲劳，色素沉着的缓解，牙龈·鼻出血的预防。",
    "bytes": 678
+  },
+  {
+   "koId": "33e967ab-a68a-4ac0-9f5a-07d3bdd61d53",
+   "masterId": "007c7892-cc8a-4859-8c96-25974e974398",
+   "product": "진양펠비낙카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "57ebf5ac-cf94-4c7e-8c4b-6918885b250d",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1217
   },
   {
    "koId": "8819693a-f9dd-4d74-9c43-b5d63af8fc4b",
@@ -304,6 +322,15 @@
    "bytes": 718
   },
   {
+   "koId": "7180ac25-274e-4ecb-8ed6-73e60cc2cd90",
+   "masterId": "0157611a-578f-4340-a050-0de0f3411e30",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "4c11443c-eafa-484b-8ddb-ecec32b7c009",
    "masterId": "01643f54-99ae-4006-81eb-1addf4bfd63d",
    "product": "바로비크림(아시클로버)",
@@ -331,6 +358,15 @@
    "bytes": 718
   },
   {
+   "koId": "69501252-b3f2-45ad-9c24-903a464d5b51",
+   "masterId": "0174ed73-59b2-4d65-b9cf-741db90ea9b9",
+   "product": "루비로펜카타플라스마(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "8e664d39-1620-43e6-be89-3cb6f1b95af8",
+   "summary": "本药用于退行性关节炎（骨（骨骼）关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1214
+  },
+  {
    "koId": "50c6eafb-5545-4b8a-8b9a-17a27b6881f5",
    "masterId": "017b0f90-f267-488c-a88e-29adbdfe8a3a",
    "product": "하니칼정",
@@ -338,6 +374,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "b390a7e0-9a82-4dc9-afbc-b798d7933a54",
+   "masterId": "01857732-146d-461a-8f4e-842b7352625a",
+   "product": "어의고첩카타플라스마(수출명:HERBALPLASTER)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6a3b3e05-ee3b-4fac-afd8-0bef2c6a57a3",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、腰痛、肩部僵硬、神经痛、风湿性疼痛、冻疮的镇痛 · 消炎。",
+   "bytes": 1566
   },
   {
    "koId": "969d4d32-1579-4b82-8220-40bbee08f79b",
@@ -367,6 +412,15 @@
    "bytes": 1402
   },
   {
+   "koId": "803e94a0-0f0f-4a33-96ea-d23af0161132",
+   "masterId": "01c8f942-56b3-4b4d-b30c-f0343f8d1657",
+   "product": "파워스탑플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9241e812-1159-44a3-89e3-64170ecdd1d8",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
+  },
+  {
    "koId": "57f6ab74-3497-4561-8c94-831648561a21",
    "masterId": "01c92bba-f52e-45c2-a16d-37c5bfa572a9",
    "product": "폴리자민연질캡슐",
@@ -383,6 +437,15 @@
    "sourceRefId": "87dee02c-5376-464b-8d32-349ce9a464d9",
    "summary": "本药用于肝脏疾病的辅助治疗。",
    "bytes": 1210
+  },
+  {
+   "koId": "50329a23-a87e-4ef6-967a-d22d6f72ccd7",
+   "masterId": "01e0b0dd-f807-4460-8fc5-1ae643b7f634",
+   "product": "광동만수고골드플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "da2c938c-267b-4918-a5f5-c124c226008f",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮（冻伤）的镇痛 · 消炎（抗炎）。",
+   "bytes": 992
   },
   {
    "koId": "49d1394b-bf09-4123-8835-8d613915aeef",
@@ -419,6 +482,15 @@
    "sourceRefId": "72925934-6ad7-4950-8e79-a72d582f29b4",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、神经痛、风湿性疼痛的镇痛·消炎（抗炎）。",
    "bytes": 1012
+  },
+  {
+   "koId": "5b77fe6a-23af-4bce-8d36-64cf40669e39",
+   "masterId": "022ba77b-40a2-4824-8b89-c546ecca5440",
+   "product": "록센플라스타(록소프로펜나트륨수화물)(수출명:LoxenPlaster)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2f052ee2-8c9e-3c1d-036a-0fc690a0c991",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肌肉痛、外伤后肿胀、疼痛的镇痛·消炎。",
+   "bytes": 1525
   },
   {
    "koId": "2995da0e-301e-4657-bb4d-e07d3ff62c3d",
@@ -565,6 +637,33 @@
    "bytes": 738
   },
   {
+   "koId": "f3f44ca1-3b68-489c-a945-72f1061b2cfe",
+   "masterId": "02eae3f1-4b07-4457-b919-f66c7b0ea140",
+   "product": "인테스캡슐(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "757fd0d9-1bd5-d966-6528-49cd0bfd92e7",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1753
+  },
+  {
+   "koId": "a9715886-146c-47b0-a41c-8401e70f0f33",
+   "masterId": "02fc72e0-83ce-41dd-9b07-09ed1869608c",
+   "product": "하이아이프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
+   "koId": "5d75c6cb-261e-4f59-8a26-fc81faee3964",
+   "masterId": "03003c0b-555b-4402-a7f4-0c81009f0f59",
+   "product": "광동만수고골드플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "87dfcf68-b26a-43f3-aa32-71dc646c0f77",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮（冻伤）的镇痛 · 消炎（抗炎）。",
+   "bytes": 992
+  },
+  {
    "koId": "46850c49-2306-4b98-947d-05af4c403fd3",
    "masterId": "030981de-cce6-41ac-a5f0-c7968972c083",
    "product": "케어스민정",
@@ -628,6 +727,15 @@
    "bytes": 740
   },
   {
+   "koId": "9e5633aa-2597-47d7-95e1-8443f0263ce9",
+   "masterId": "0370f584-d563-4d75-a560-e66c4e877ce0",
+   "product": "파워스탑플러스카타플라스마(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "1ef58c68-1465-48e9-bbfc-cb1b680f872f",
+   "summary": "本药用于退行性关节炎（骨（骨骼）关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1214
+  },
+  {
    "koId": "9a9c54e7-42ac-4eda-8688-22eb3d788f66",
    "masterId": "037415d8-82d6-4452-8649-eecce4ed80ce",
    "product": "엠코발캡슐(메코발라민)",
@@ -644,6 +752,15 @@
    "sourceRefId": "e4902a03-763f-b370-15a2-89d157df474a",
    "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹部症状（腹胀感、吞气症等）。",
    "bytes": 1263
+  },
+  {
+   "koId": "9bcb3003-305a-4672-a875-525b72e45cd3",
+   "masterId": "0397edeb-fcbe-4dfa-96ad-4e24facfb818",
+   "product": "가레오액(디히드록시디부틸에테르)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8ba73268-7649-a07f-242c-c16a940827d8",
+   "summary": "本药用于改善消化不良症状（腹部胀满感、消化迟缓、嗳气、恶心）。",
+   "bytes": 1245
   },
   {
    "koId": "57f54d28-b0ad-49e7-b55d-3c8d6f8fce9e",
@@ -673,6 +790,33 @@
    "bytes": 1222
   },
   {
+   "koId": "abf8400c-0e4b-4402-a486-83b150f85dc9",
+   "masterId": "03b61040-7839-49e4-b789-d9b5629a083d",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
+   "koId": "357d54f0-d737-4f0a-b969-aae500a7982d",
+   "masterId": "03b9eb6b-76dd-4e51-87de-97bd095b43ac",
+   "product": "아이지크림(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "721f1dc4-9125-ad0c-c3e0-3ed071cc1c39",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2043
+  },
+  {
+   "koId": "a843efba-d3a5-4099-9b6a-7e4bb09292e7",
+   "masterId": "03bb7633-361d-461c-aa5f-4b126fcb9125",
+   "product": "알파로반연고(무피로신)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "00af2483-2393-4342-9b37-a9c564073a69",
+   "summary": "本药用于由包括耐甲氧西林菌株在内的金黄色葡萄球菌、其他葡萄球菌、链球菌等大多数皮肤感染症病原菌，大肠杆菌及流感嗜血杆菌等革兰阴性菌，以及脓疱疮、毛囊炎、疖病、感染性湿疹等细菌性皮肤感染症，外伤及烧伤中的细菌性皮肤感染症。",
+   "bytes": 1223
+  },
+  {
    "koId": "86f75b55-a434-40ad-884b-089ea72e26e1",
    "masterId": "03d268ac-2b0b-451c-9d21-079eda0e3bb7",
    "product": "두스카정",
@@ -680,6 +824,24 @@
    "sourceRefId": "5eb7b13f-e8c5-04fd-43bd-bb1bddcc5826",
    "summary": "本药用于食欲不振（食欲减退）、腹胀、肠内异常发酵、痔疮。",
    "bytes": 1301
+  },
+  {
+   "koId": "695988d4-e9d1-4bc2-83c5-5e6656b324e8",
+   "masterId": "03f23a3e-3626-414a-8323-e7bef2a1c835",
+   "product": "뮤코다인캅셀200밀리그람(아세틸시스테인)(수출용)명:COTURANCape.200mg)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "3817cfc2-bceb-9a92-d4e1-08a23accef7f",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1753
+  },
+  {
+   "koId": "eaf36e47-3d70-4ce8-858e-a26e3b2bdb55",
+   "masterId": "03fae94d-49a1-4761-bb47-1cc82943e2e2",
+   "product": "덴티에프캡슐(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "0cb29809-3775-b373-c653-55272938b2f4",
+   "summary": "本药用于牙周治疗后牙龈炎，轻度·中度牙周炎的辅助治疗。",
+   "bytes": 1629
   },
   {
    "koId": "f6bc80bf-0037-42c9-b27f-af1e0fa0934f",
@@ -871,6 +1033,15 @@
    "bytes": 679
   },
   {
+   "koId": "a02cee39-0f37-411c-bd2e-7c0b0b85c857",
+   "masterId": "05089703-9ca0-4f17-aa91-4d2d666930c5",
+   "product": "에쟈스민정(로라타딘)(수출명:Bolorate)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "3e9b1340-5050-3048-2efa-58208d36a826",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1685
+  },
+  {
    "koId": "579743bc-7da9-4226-a058-4abb0d73f7ba",
    "masterId": "051103f4-1144-4152-8465-de19b2c5e827",
    "product": "마투탑플러스연질캡슐",
@@ -943,6 +1114,15 @@
    "bytes": 1196
   },
   {
+   "koId": "1096d9ab-7faa-46fb-b792-33b8812e5998",
+   "masterId": "05464adc-cc54-48e1-be4f-66123c9f09b7",
+   "product": "케펜텍플라스타(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "3d1b6541-af05-4718-b8e2-b153eccba203",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1301
+  },
+  {
    "koId": "714809f5-5196-4094-be7c-4e3c9c72ff7d",
    "masterId": "0552c20a-86e1-4b53-aeb1-1aaf588b0e57",
    "product": "칼스모아정",
@@ -995,6 +1175,15 @@
    "sourceRefId": "ba3b0744-5cce-6517-c0ce-fda8d264141d",
    "summary": "本药用于消化不良、食欲减退（食欲不振）、过食、积食、促进消化、消化不良所致的胃部胀满感。",
    "bytes": 1241
+  },
+  {
+   "koId": "9656e6e0-7c86-4a15-a53a-498aab432eac",
+   "masterId": "05870ec0-c8d1-40ad-9c86-1614bfcd9411",
+   "product": "아셈지크림(수출명:라밴덤크림비겐덤크림)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "0eb52f8a-fd63-0ad6-19e9-a10645b35f17",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2083
   },
   {
    "koId": "e5f74382-197a-4f5d-8a23-53250083adf7",
@@ -1105,6 +1294,15 @@
    "bytes": 672
   },
   {
+   "koId": "570ce2a0-37de-4951-bb2e-56ac24c8d954",
+   "masterId": "061b2bf1-2286-4fd0-beb3-28a085fa297f",
+   "product": "미카실원스외용액(테르비나핀염산염)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "b4e810bc-25a5-47cf-93eb-bbe1750f55c0",
+   "summary": "本药用于由 Trichophyton（T. rubrum、T. mentagrophytes、T. verrucosum、T. violaceum）、Microsporum canis 及 Epidermophyton floccosum 等皮肤癣菌引起的皮肤感染症（足癣（仅限 15 岁以上青少年及成人））。",
+   "bytes": 1555
+  },
+  {
    "koId": "d8b756a4-9977-4ba7-a181-ea19c68d852b",
    "masterId": "061edd83-f342-420d-b530-3a71bc3c46c9",
    "product": "엘레비트정",
@@ -1159,6 +1357,15 @@
    "bytes": 1275
   },
   {
+   "koId": "32b1a275-9bd9-4709-9f4e-12519e23ac1e",
+   "masterId": "0664b268-6f11-4cbe-9389-db5395d2a436",
+   "product": "카복텔라점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e12b1a7b-80e4-ce49-137f-5ff5a10a8df4",
+   "summary": "本药用于暂时缓解眼干燥或因暴露于风·阳光而产生的灼热症状、刺激感、不适感。",
+   "bytes": 1536
+  },
+  {
    "koId": "22cfbeb0-4225-40d2-9cdc-fae9f5255b48",
    "masterId": "066b1e16-b833-4903-b8e5-dd9fec79d7c2",
    "product": "마그네타연질캡슐",
@@ -1202,6 +1409,15 @@
    "sourceRefId": "6f143bbc-ff49-4ffc-9271-42e50cf2e84d",
    "summary": "用于坏血病的预防·治疗，妊娠·哺乳期及病中病后体力下降·体力疲劳时的维生素 C 补充，牙龈·鼻出血等毛细血管出血，色素沉着等推定为维生素 C 缺乏的情形。",
    "bytes": 726
+  },
+  {
+   "koId": "9c0e923e-347d-4e63-80fd-677c99212c95",
+   "masterId": "06c9c5b9-511d-4fef-9033-fd30aa1f9ca4",
+   "product": "제이카인프리미움겔(리도카인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e68db88c-6a6d-1ea5-c736-050317a5debd",
+   "summary": "本药用于降低男性生殖器触觉的敏感性。",
+   "bytes": 1311
   },
   {
    "koId": "0e0dbbcc-1203-4dcf-b479-ca9a02727749",
@@ -1393,6 +1609,24 @@
    "bytes": 1236
   },
   {
+   "koId": "af88bf2c-3ee6-4e6a-8cad-922c5f5eb589",
+   "masterId": "0788e727-b255-49be-8edd-e3d8456688e7",
+   "product": "한방동의고플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "42f26cd7-8990-4ec7-817c-7a9fa1664caa",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮（冻伤）的镇痛 · 消炎（抗炎）。",
+   "bytes": 1066
+  },
+  {
+   "koId": "61258a7d-ba72-4322-b811-93fd1b69642e",
+   "masterId": "07896474-6fc5-4fdc-955a-8a92c2e1991d",
+   "product": "로리딘정(로라티딘)[수출명:LORIDIN-ILJINTAB.)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "3e9b1340-5050-3048-2efa-58208d36a826",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1685
+  },
+  {
    "koId": "0a36e111-48a6-4737-a5a7-7e2f66e27aef",
    "masterId": "078d6197-a8e4-40d7-9b39-cd2b128cae69",
    "product": "더존오팔레센스10%(카바마이드퍼옥사이드)",
@@ -1447,6 +1681,24 @@
    "bytes": 1214
   },
   {
+   "koId": "57d139fc-5f42-4dd6-a5ec-b2f2225450e1",
+   "masterId": "07cb5931-eba5-4a50-ac1e-c7ae9af9811b",
+   "product": "제일한방테이핑파프카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "fec32cc1-601d-488c-a41f-a10f12ee8370",
+   "summary": "本药用于腰痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
+   "koId": "770bbafc-fa64-4d17-a5f4-ba2b125756a0",
+   "masterId": "07d1998e-63cc-4c1b-881e-841e6d00acb4",
+   "product": "후루무실캡슐200밀리그람(아세틸시스테인)(수출명:아스틴캡슐)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c5bd9a34-44cd-f482-baf7-69be4c36d57e",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1748
+  },
+  {
    "koId": "87cf028a-5dba-422e-95e1-686d7e8f0e39",
    "masterId": "07d61c71-e925-469f-88d0-97e5c2b57203",
    "product": "오랄비타정",
@@ -1474,6 +1726,24 @@
    "bytes": 1685
   },
   {
+   "koId": "27f95134-e461-4fc4-aab3-20b75310b938",
+   "masterId": "07f2414c-a818-4b29-b769-a9c6107d8575",
+   "product": "아이파프케어팝카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "8178788f-15c1-4716-a2e8-b68a55421ba4",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎及腱鞘炎、腱周炎、网球肘等肱骨上髁炎、肌肉痛、外伤后肿胀及创伤后浮肿或疼痛的镇痛及消炎。",
+   "bytes": 1474
+  },
+  {
+   "koId": "22f65108-a0c1-477c-a8ca-7f67d6f86c8a",
+   "masterId": "0819760f-01fc-4514-aa83-f6400b0e556b",
+   "product": "맥스클리어점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "8b545588-d865-49a6-8cc7-ee97a28a1c3c",
    "masterId": "0825f1b9-531c-417a-8506-b73e1f74e00d",
    "product": "모아타민골드비백정",
@@ -1481,6 +1751,15 @@
    "sourceRefId": "3b945d41-8eb8-1b06-e605-5e8e3f86da0f",
    "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期的维生素 B1、B2、B6、C、D 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等），口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解，脚气病，眼疲劳，骨骼、牙齿发育不良、佝偻病的预防与锌的补充。",
    "bytes": 1734
+  },
+  {
+   "koId": "b6f20db0-4ee3-41d4-9e8d-e13e8906387a",
+   "masterId": "08261761-4db0-420b-892a-5c400ffc38e9",
+   "product": "바이오탑디듀얼캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6f839396-5249-9013-e4a5-015e6e954cd1",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1272
   },
   {
    "koId": "71a9734d-d365-4980-86a5-71c02496c3df",
@@ -1564,6 +1843,15 @@
    "bytes": 1246
   },
   {
+   "koId": "1b5fb6fe-8fa3-4a9f-9a2a-d9283f8d38a0",
+   "masterId": "088a36bf-cee2-4a38-92bf-2575c00a5c8a",
+   "product": "뉴비낙플라스타(펠비낙)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "1f0fb2db-c338-4856-9f45-92ca7edf3d83",
+   "summary": "本药用于退行性关节炎（骨（骨骼）关节炎）、肩关节周围炎、腱（肌腱）·腱鞘炎（腱滑膜炎）、腱（肌腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1215
+  },
+  {
    "koId": "024746b0-b6e7-4684-a4eb-e08f68e620f9",
    "masterId": "088b6c11-c65f-4350-abd0-0e890f6afeeb",
    "product": "한방동의고카타플라스마",
@@ -1571,6 +1859,24 @@
    "sourceRefId": "6b805463-1627-40e6-b066-59cc90faa0af",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎。",
    "bytes": 1022
+  },
+  {
+   "koId": "d30faf17-08b1-450f-8735-5dc2c92d8395",
+   "masterId": "08a1eb4a-ecdf-4e16-aebc-2d44360f38c2",
+   "product": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "143bfc69-f3f0-39b2-211e-9c9bdfe6ea88",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱·腱鞘炎、腱周炎、肱骨上髁炎（网球肘等）、肌肉痛、外伤后肿胀·疼痛的镇痛·消炎。",
+   "bytes": 1714
+  },
+  {
+   "koId": "3a4e8533-c967-4966-8ae5-e92cbaf8d723",
+   "masterId": "08a7247b-2e1d-4712-bdbc-7a5768dc8de3",
+   "product": "파프케이플러스카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "cbdc0e01-64ea-4d7c-ba84-8e6db5a0b0c4",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱·腱鞘炎（腱滑膜炎）、腱周炎、肱骨上髁炎（网球肘等）、肌肉痛、外伤后浮肿·疼痛的镇痛·消炎。",
+   "bytes": 1362
   },
   {
    "koId": "0d38a369-6779-4c66-b2d0-1f77cbca33aa",
@@ -1598,6 +1904,24 @@
    "sourceRefId": "b0df13a4-0e5e-41fa-1f91-ec76e04e1199",
    "summary": "本药用于便秘，以及便秘伴随的食欲不振（食欲减退）、腹部（肚子部位）胀满、肠内异常发酵、痔疮的缓解。",
    "bytes": 1419
+  },
+  {
+   "koId": "0bfe274b-f5bf-4dfd-952c-1cc58b2247aa",
+   "masterId": "08e24900-9357-47ec-9a55-b296a1d6466a",
+   "product": "해동본방황제고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "09c639d6-483e-4541-aaf1-b308b8805904",
+   "summary": "本药用于腰痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
+   "koId": "c41a383d-410f-4c61-859b-0276c403b7d7",
+   "masterId": "08f10d1f-e2ff-4eb6-9e33-c729c064a586",
+   "product": "팝업플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "8a36ab78-ea93-4be9-82a9-db1ce1471d64",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
   },
   {
    "koId": "008e7a56-17e6-4d38-bbbf-0c61a38c9ddc",
@@ -1636,6 +1960,24 @@
    "bytes": 726
   },
   {
+   "koId": "04a0fdd9-6e82-4e0e-98ae-1ba5fbc3e1db",
+   "masterId": "092a8f96-7f17-4f73-acd5-d9326734aa42",
+   "product": "제이테르빈크림(테르비나핀염산염)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "a646aba9-12b3-4b96-a90d-03d71545438f",
+   "summary": "本药用于由皮肤癣菌引起的皮肤真菌感染症（足癣、股癣（腹股沟癣）、体癣），以及由糠秕马拉色菌引起的花斑癣及皮肤念珠菌病。",
+   "bytes": 1336
+  },
+  {
+   "koId": "e04775b8-7fb6-4d08-8e8c-d17cec3135a0",
+   "masterId": "09394a9d-674f-4264-9bd0-c67fb53b39b9",
+   "product": "카보아이점안액1%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c2a7cc69-b43a-756c-7fdc-50dc34204304",
+   "summary": "本药用于暂时缓解眼干燥或因暴露于风·阳光而产生的灼热症状、刺激感、不适感。",
+   "bytes": 1526
+  },
+  {
    "koId": "b530579d-d470-490d-be48-0dd4118fe033",
    "masterId": "0943151d-eb44-4daf-8e6a-f0a5e8b3d97f",
    "product": "에센비정",
@@ -1654,6 +1996,15 @@
    "bytes": 1013
   },
   {
+   "koId": "462a97d6-815c-4bd8-82c4-193a4e9c073c",
+   "masterId": "094dcce6-0a11-4ff9-a32c-5f04ddfc6f23",
+   "product": "라미렉스크림(테르비나핀염산염)(수출명:LafineCream)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "bab5ad28-3d9a-3f47-f8f6-304a6191a758",
+   "summary": "本药用于由皮肤癣菌引起的皮肤真菌感染症（足癣、股癣（腹股沟癣）、体癣），以及由糠秕马拉色菌引起的花斑癣及皮肤念珠菌病。",
+   "bytes": 1728
+  },
+  {
    "koId": "0275ba51-f895-4b39-9c87-481f02a95855",
    "masterId": "095851f7-d218-414e-9260-74b2a8cad72a",
    "product": "스테신캅셀(아세틸시스테인)",
@@ -1663,6 +2014,15 @@
    "bytes": 1437
   },
   {
+   "koId": "0ce80a27-c32a-4ac0-8dde-054f86548b07",
+   "masterId": "0978ecfd-f693-4be0-afd9-f7b00cb35787",
+   "product": "가레오액(디히드록시디부틸에테르)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8ba73268-7649-a07f-242c-c16a940827d8",
+   "summary": "本药用于改善消化不良症状（腹部胀满感、消化迟缓、嗳气、恶心）。",
+   "bytes": 1245
+  },
+  {
    "koId": "bf85e9bc-5720-4fce-891c-26d41b83eee6",
    "masterId": "09959479-1e21-40dc-8729-ee785e4412cf",
    "product": "고리튼정",
@@ -1670,6 +2030,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "c2eb72e6-35db-4fcb-ac9c-5ac9d81d9b32",
+   "masterId": "099d4a04-a988-44c5-8680-4d8737a66035",
+   "product": "제일쿨파프(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "11a14a20-f87b-2c15-6ba1-da4a3fd81375",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、神经痛、风湿性疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1603
   },
   {
    "koId": "cd206285-2681-422b-82fb-2a042aedd2f7",
@@ -1699,6 +2068,24 @@
    "bytes": 740
   },
   {
+   "koId": "9cae4577-90e6-4076-a810-bf3a782e24f3",
+   "masterId": "09d5575b-dab0-438b-ab6c-9f2c3dfc5965",
+   "product": "리나치올캡슐375밀리그램(카르보시스테인)(수출명:HyundiolCapsule375Mg)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ad3d3cd8-5e63-26fa-d4f3-62beaeef0c18",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难及慢性鼻窦炎的排脓。",
+   "bytes": 1630
+  },
+  {
+   "koId": "37cab04e-2394-4da6-9507-a89688af672c",
+   "masterId": "09eaac0d-ca98-4935-80e0-6585b9044de0",
+   "product": "청수고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "035498ad-0742-4bd7-a1df-9e01b55822f3",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮的镇痛 · 消炎。",
+   "bytes": 1055
+  },
+  {
    "koId": "59bb179f-dcfb-44eb-94e7-c469a7e9f9bb",
    "masterId": "09f6e931-4fbb-4d9a-92f5-783f3622599f",
    "product": "칼시탄정",
@@ -1715,6 +2102,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "c41a73c7-06e8-4b69-8c7f-c754d9cab545",
+   "masterId": "0a09da22-724f-4e39-b53c-73b9ac3c7d1a",
+   "product": "제놀골드플라스타(케토프로펜)(수출군납명:케넨서플라스타)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c19f7860-cfec-60c6-fdab-e6e1f2ef9e22",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎（肌腱炎）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1819
   },
   {
    "koId": "b4f541b3-ff20-4e36-87de-bbee322577e6",
@@ -1798,6 +2194,15 @@
    "bytes": 1598
   },
   {
+   "koId": "25c3a0c4-3d72-42b5-8bd2-5e8fa9ed2957",
+   "masterId": "0aac55ac-02a9-4ab7-a72f-a1b3df6d271e",
+   "product": "에이로반연고(무피로신)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9cad7c65-1fe1-4fb2-b2cb-dd3143a30560",
+   "summary": "本药用于由包括耐甲氧西林菌株在内的金黄色葡萄球菌、其他葡萄球菌、链球菌等大多数皮肤感染症病原菌，大肠杆菌及流感嗜血杆菌等革兰阴性菌等有效菌种，以及脓疱疮、毛囊炎、疖病、感染性湿疹等细菌性皮肤感染症，外伤及烧伤中的细菌性皮肤感染症。",
+   "bytes": 1278
+  },
+  {
    "koId": "e86b2916-43f8-460d-b6ba-abe1a3ed54a9",
    "masterId": "0aace74f-6375-4736-a308-81d102228822",
    "product": "포탈락시럽(락티톨일수화물)",
@@ -1823,6 +2228,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "67f3f119-5f25-44b5-bc90-081c000b57de",
+   "masterId": "0ac4339a-c2ac-4bae-bb52-ab1394700645",
+   "product": "제놀골드플라스타(케토프로펜)(수출군납명:케넨서플라스타)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c19f7860-cfec-60c6-fdab-e6e1f2ef9e22",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎（肌腱炎）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1819
   },
   {
    "koId": "418dc1ab-3e30-41eb-9871-fe5f0a88ea65",
@@ -1886,6 +2300,15 @@
    "sourceRefId": "db03f757-e212-632e-ea7f-37ccf4a6fce2",
    "summary": "本药用于手术、截肢、烧伤、事故后的增生性及瘢痕疙瘩性、活动受限性或影响美观的皮肤损伤时的创口及瘢痕，外伤性挛缩，瘢痕性狭窄。",
    "bytes": 1498
+  },
+  {
+   "koId": "b968d1ec-79a0-4dae-9d82-098bd68fc181",
+   "masterId": "0af1ac01-ddee-4e9f-a89f-11faeb4ac7e0",
+   "product": "아이파프케어팝카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "94aaebe4-bbb4-49d1-aef2-a48283ab24ea",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎及腱鞘炎、腱周炎、网球肘等肱骨上髁炎、肌肉痛、外伤后肿胀及创伤后浮肿或疼痛的镇痛及消炎。",
+   "bytes": 1474
   },
   {
    "koId": "a9f8a5a5-374b-452c-bbdf-9036f3b8a70f",
@@ -2086,6 +2509,15 @@
    "bytes": 760
   },
   {
+   "koId": "62aa808a-0e7e-4f5e-ba41-6fc9abc1c994",
+   "masterId": "0c3d3ab3-da39-4ae9-9ccd-a39897a60edb",
+   "product": "맥스클리어점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "a06ab4eb-b580-4f20-b080-f3851a8a55d8",
    "masterId": "0c3f9614-a535-45a1-9e84-7d11a23be865",
    "product": "엘다인캡슐(에르도스테인)",
@@ -2257,6 +2689,15 @@
    "bytes": 1437
   },
   {
+   "koId": "88e77683-e0bb-488d-b6a1-f1881297e8d5",
+   "masterId": "0d39f3a6-adf1-4e49-b937-83cca5f8dee7",
+   "product": "오큐시스모이스처점안액1.0%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b9704e8d-34d2-7d4a-ce70-3056411bdce1",
+   "summary": "本药用于暂时缓解眼干燥或因暴露于风·阳光而产生的灼热症状、刺激感、不适感。",
+   "bytes": 1536
+  },
+  {
    "koId": "5639deab-a013-46ef-9568-b61a8b496c77",
    "masterId": "0d45724e-9e6c-48bd-acd4-37e5f138e0ab",
    "product": "셀크페롤연질캡슐",
@@ -2356,6 +2797,24 @@
    "bytes": 738
   },
   {
+   "koId": "bbb5eb1b-4301-4b89-9c97-3400b2176f2b",
+   "masterId": "0def6434-9b1e-40ba-8b6e-b547bef93228",
+   "product": "맥스클리어점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
+   "koId": "799bbe59-593a-403b-97ca-599d8358dd07",
+   "masterId": "0df00070-8390-4221-bfba-206738737413",
+   "product": "가레오액(디히드록시디부틸에테르)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8ba73268-7649-a07f-242c-c16a940827d8",
+   "summary": "本药用于改善消化不良症状（腹部胀满感、消化迟缓、嗳气、恶心）。",
+   "bytes": 1245
+  },
+  {
    "koId": "4e0f103f-78f9-4ade-981e-1ed9ddc2a097",
    "masterId": "0e4c03c6-cb3d-448a-937d-85211cef37da",
    "product": "엘도스테인캡슐(에르도스테인)",
@@ -2453,6 +2912,15 @@
    "sourceRefId": "1fb07d14-fe02-54ca-7de9-68571476337c",
    "summary": "本药用于胃·十二指肠溃疡、胃炎、胃酸过多、烧心、恶心、呕吐、胃痛、反酸的制酸作用及症状改善。",
    "bytes": 1714
+  },
+  {
+   "koId": "be5af08d-5365-4c53-a77a-9c76e670ffca",
+   "masterId": "0ee61a8d-91a2-4d6c-9dcd-8c542db24003",
+   "product": "메디락에스장용캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4fff0d6a-035b-c2ef-9ef5-fcaf434531d1",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1264
   },
   {
    "koId": "a4ded263-ce91-4e69-bb71-953bab84a42b",
@@ -2833,6 +3301,15 @@
    "bytes": 1323
   },
   {
+   "koId": "87b99d01-cb97-4009-9436-95e0e19bfab6",
+   "masterId": "10d6a1c1-a5d5-47b2-961f-cc909277d471",
+   "product": "라이트프레쉬점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "4ceacc90-6827-456e-ade7-325afb122e32",
    "masterId": "10df1c6f-db32-4784-b103-04a351acdc4b",
    "product": "감마마그빅연질캡슐",
@@ -2840,6 +3317,15 @@
    "sourceRefId": "cad1b255-7f3e-5e9f-df9a-68bd343ba06f",
    "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 E、B1、B6 的补充，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉）症状的缓解，神经痛、肌肉痛、关节痛（腰痛、肩痛等），口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解，脚气病，眼疲劳与镁缺乏所致的肌肉痉挛。",
    "bytes": 1747
+  },
+  {
+   "koId": "7118bfd8-df25-471b-95e6-c02436a4f5f2",
+   "masterId": "10e79a6f-d5f4-4efd-aa9b-e8acb85c307f",
+   "product": "후라신연고(푸시딘산나트륨)(수출명:라푸신연고(푸시딘산나트륨))(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1d16571b-6715-2f1b-dbb3-97403ef0f7dd",
+   "summary": "本药用于由葡萄球菌、链球菌、棒状杆菌、梭菌引起的脓疱疮，感染性湿疹样皮炎，寻常痤疮（普通痤疮），毛囊炎，疖及疖病，化脓性汗腺炎，脓疱疮性湿疹，以及烧伤·外伤·缝合伤口·植皮创面的继发感染。",
+   "bytes": 1663
   },
   {
    "koId": "95b7e4ff-e692-42b3-9519-8d7da658aad6",
@@ -2876,6 +3362,15 @@
    "sourceRefId": "1b1de560-8201-dc54-ea1c-2d1ffa029a09",
    "summary": "本药用于细菌性阴道病。",
    "bytes": 1095
+  },
+  {
+   "koId": "f3df6cba-db42-471b-8c9b-f316b74218ae",
+   "masterId": "111cfcff-1727-445f-a514-66481c4aa63e",
+   "product": "청나점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "bf281566-175c-0066-e796-b83365bd0d82",
+   "summary": "本药用于眼疲劳，结膜充血，游泳后眼部不适感或灰尘、汗液进入眼中时，紫外线及其他光线所致眼部炎症，眼睑糜烂，佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1536
   },
   {
    "koId": "9d98e3d1-a86e-40a2-a955-33199d5fb97a",
@@ -2930,6 +3425,15 @@
    "sourceRefId": "0304c664-f9af-c03c-0b81-27c7c8c1eeb3",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "6f791a4f-06cb-4874-9671-c67846865f3b",
+   "masterId": "116295b0-8f72-494b-92e1-b440cfa2e1e0",
+   "product": "라이트프레쉬점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "4d0ccd83-7558-4fb3-adfd-b66aa9401270",
@@ -3085,6 +3589,15 @@
    "bytes": 1714
   },
   {
+   "koId": "f983a67f-adc7-4cfa-8b05-70f1ba048f17",
+   "masterId": "12290db1-8d6c-485c-aa5d-6af33251a91f",
+   "product": "하이아이프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "cb108e74-0e4a-4b93-b803-9cc8dd32ed58",
    "masterId": "123055d6-1473-469a-b815-6b47d1591172",
    "product": "비맥스비비정",
@@ -3238,6 +3751,15 @@
    "bytes": 1214
   },
   {
+   "koId": "299ad005-4df4-477d-98b7-f65771b96b71",
+   "masterId": "12ffe692-31f4-4b6c-9f75-7398e06d2411",
+   "product": "케펜텍플라스타(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "48e1a9bc-6068-4db1-838e-46ec727b8545",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1301
+  },
+  {
    "koId": "98fda674-55ec-439e-8135-7cb4a8f653cc",
    "masterId": "130b3ebc-3baf-42c2-bd4f-10efcc770e50",
    "product": "진생고카타플라스마",
@@ -3272,6 +3794,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "dda9ca8f-d8bb-42ce-9da9-523bb076cbdd",
+   "masterId": "1322c30c-03eb-46f0-a438-5a092c59a364",
+   "product": "쎄레코트크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1dfa6f97-6905-c420-95ab-0610a3974ed3",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1687
   },
   {
    "koId": "13f9fef0-d465-451d-b24e-dd3f359d3970",
@@ -3317,6 +3848,15 @@
    "sourceRefId": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 D·E·C 补充，末梢血液循环障碍·手足冰冷的缓解，黄褐斑·雀斑等色素沉着的缓解，牙龈出血·鼻出血的预防。",
    "bytes": 679
+  },
+  {
+   "koId": "55f2593d-2ac8-4668-981f-7ecde3634457",
+   "masterId": "1356cfb3-c388-4d3b-a347-e510d6f205bb",
+   "product": "아이지크림(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "721f1dc4-9125-ad0c-c3e0-3ed071cc1c39",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2043
   },
   {
    "koId": "66ff3fdf-029e-4511-aaf7-13b0e22ad9eb",
@@ -3580,6 +4120,15 @@
    "bytes": 760
   },
   {
+   "koId": "fb1f8631-f516-4f68-9532-ae0001f056de",
+   "masterId": "14db70c3-963a-479e-9a35-158b2a68f96c",
+   "product": "라이트프레쉬점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "8f4aaab7-4ae0-4f53-b86d-e785568443d3",
    "masterId": "14df929e-79e0-4d9c-bd7b-5201403bd2ea",
    "product": "크램스탑연질캡슐",
@@ -3769,6 +4318,24 @@
    "bytes": 1238
   },
   {
+   "koId": "48ace741-612b-4e38-a26f-e231e56759ad",
+   "masterId": "15a16f34-114a-4f73-b68a-758c58b5baf8",
+   "product": "제이테르빈크림(테르비나핀염산염)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9020b1f0-f192-4ae1-b02c-bd2a799cdf19",
+   "summary": "本药用于由皮肤癣菌引起的皮肤真菌感染症（足癣、股癣（腹股沟癣）、体癣），以及由糠秕马拉色菌引起的花斑癣及皮肤念珠菌病。",
+   "bytes": 1336
+  },
+  {
+   "koId": "6c9633ca-849a-42de-87f1-0defe0858f18",
+   "masterId": "15a5a306-455c-4523-aa97-ac5c0097fd3b",
+   "product": "오큐시스모이스처점안액1.0%(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b9704e8d-34d2-7d4a-ce70-3056411bdce1",
+   "summary": "本药用于暂时缓解眼干燥或因暴露于风·阳光而产生的灼热症状、刺激感、不适感。",
+   "bytes": 1536
+  },
+  {
    "koId": "a6e52924-122d-4558-98d6-511eec872443",
    "masterId": "15b82cdf-9790-47e1-b34a-e4dc72a6ef6c",
    "product": "씨티엠액(시트룰린말산염)",
@@ -3886,6 +4453,15 @@
    "bytes": 678
   },
   {
+   "koId": "c1525484-ef4d-4f6a-b032-368cdd064869",
+   "masterId": "15ffd570-2e0c-46cc-9f72-4ac2dc95536c",
+   "product": "세브론시럽(아세틸시스테인)(수출명:뮤시스틴시럽스파탐시럽)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "03635f28-20ff-8a39-d072-ec0231b2490c",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1702
+  },
+  {
    "koId": "c47529f5-2ef6-4f42-b22e-8ff92d9e7648",
    "masterId": "16348d5e-540d-45de-9ed5-4ba7f78aa539",
    "product": "카라밴크림",
@@ -3976,6 +4552,15 @@
    "bytes": 760
   },
   {
+   "koId": "ca5688f6-833b-4a90-95aa-6b4cd0a467e8",
+   "masterId": "16e2270b-c0ef-46f9-aa86-3db35fbabc86",
+   "product": "맥스클리어점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "5e6d57b9-dcc9-465d-9448-4a71f5709a02",
    "masterId": "16fd2434-bf1e-471d-a7f6-19d18c01b962",
    "product": "머슬린액(시트룰린말산염)",
@@ -4046,6 +4631,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "ce86d2c0-1035-460f-801a-32a3f50b4d24",
+   "masterId": "17228f71-d9d0-48cb-9296-ff01b3db14af",
+   "product": "룩스씨엠씨점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "79698d8f-e55c-4ed3-bcbc-82759142250e",
@@ -4129,6 +4723,15 @@
    "bytes": 672
   },
   {
+   "koId": "addfccd4-3190-45ac-a1d3-516efab3eefd",
+   "masterId": "17c0d733-53bf-434d-b23a-ee1dcb228d3d",
+   "product": "케펜텍플라스타(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "29e9fd59-9233-462c-b0cc-4932bc94058a",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1301
+  },
+  {
    "koId": "382ef363-c218-4b83-aca7-abcd6d905829",
    "masterId": "17c3b1f6-47e9-4daf-bd0e-a4d602039b57",
    "product": "조인스탑연질캡슐",
@@ -4163,6 +4766,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "c8d88b25-aaa9-4235-b7f1-1cd6b797c29d",
+   "masterId": "17fa1e67-620c-4f77-8e6e-3c2ee0275d34",
+   "product": "루페인플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "fd8c27a1-67cc-40a8-ad16-9ebaa0683320",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
   },
   {
    "koId": "50ff3192-e177-4e0e-8111-691b60f0b87a",
@@ -4309,6 +4921,15 @@
    "bytes": 718
   },
   {
+   "koId": "5b54c4ee-f456-415b-a896-6a0e4e0dc12f",
+   "masterId": "1859ad34-5785-46a9-881f-9d14b7c1b721",
+   "product": "파워스탑플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "d1f3286a-ab36-4389-8e2a-4d1733f81ffb",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
+  },
+  {
    "koId": "b7d504ee-0213-4e38-b172-5ffc06116816",
    "masterId": "185b08c5-96e8-472b-ac2a-95924002b654",
    "product": "알바스테인캡슐(에르도스테인)",
@@ -4381,6 +5002,15 @@
    "bytes": 1098
   },
   {
+   "koId": "6424f595-8f8e-4a38-b721-4bba6bd04fb8",
+   "masterId": "18b15420-1a41-4465-9fb5-ad56572df387",
+   "product": "쎌스톤크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1dfa6f97-6905-c420-95ab-0610a3974ed3",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1687
+  },
+  {
    "koId": "a14f29b4-c00b-4360-8995-ad1bd106ea50",
    "masterId": "18b63e46-6a4f-4ca1-972b-f790dfa197d8",
    "product": "메카인정",
@@ -4396,6 +5026,15 @@
    "sourceType": "mfds_drug_otc",
    "sourceRefId": "55d22316-38a5-06b6-3b39-cc7d28d8f216",
    "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，发育期，老年期的维生素 A、D、E、B1、B2、B6、C 的补充，眼干燥感的缓解，夜盲症（夜间视物不清的症状），骨骼、牙齿发育不良、佝偻病的预防。",
+   "bytes": 1714
+  },
+  {
+   "koId": "267f2027-ee8f-494e-bac3-836b11bb6814",
+   "masterId": "18c66c4a-44fc-4adc-8081-6c497554cbce",
+   "product": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "143bfc69-f3f0-39b2-211e-9c9bdfe6ea88",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱·腱鞘炎、腱周炎、肱骨上髁炎（网球肘等）、肌肉痛、外伤后肿胀·疼痛的镇痛·消炎。",
    "bytes": 1714
   },
   {
@@ -4460,6 +5099,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "38eda75d-edc3-4a28-a583-1afd869aaf5c",
+   "masterId": "190d28d3-136f-4de3-994f-89cf8be8da10",
+   "product": "하이아이프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "f550a316-7715-4b99-9a05-526180606752",
@@ -4876,6 +5524,15 @@
    "bytes": 738
   },
   {
+   "koId": "168e7530-b5dd-4df2-becc-e8f0a2f60367",
+   "masterId": "1b571741-6d51-4d47-aaac-36bbb2791d4f",
+   "product": "메디락에스장용캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4fff0d6a-035b-c2ef-9ef5-fcaf434531d1",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1264
+  },
+  {
    "koId": "34a047d0-0807-491c-93dc-e3c9b827b6df",
    "masterId": "1b594fe5-daf4-4243-8902-764cd7a3d4d9",
    "product": "셀벤토연질캡슐",
@@ -4883,6 +5540,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "36897546-3e6d-4fe1-a542-7f2dce373e5f",
+   "masterId": "1b610244-a584-4577-a121-6d8c6c2fc694",
+   "product": "파프케이플러스카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "70d4ab95-84db-4faf-83fb-d9c1c8cab2ca",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱·腱鞘炎（腱滑膜炎）、腱周炎、肱骨上髁炎（网球肘等）、肌肉痛、外伤后浮肿·疼痛的镇痛·消炎。",
+   "bytes": 1362
   },
   {
    "koId": "ae362766-1be4-4955-b620-e7bcb94f4141",
@@ -5101,6 +5767,15 @@
    "bytes": 738
   },
   {
+   "koId": "8e6eb80d-ea10-4d88-a75a-635eb26428c3",
+   "masterId": "1c30f660-5dc9-4ffa-8713-1ef50e2c16d4",
+   "product": "베나치오액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d7c1d3ca-e72a-e39d-2509-1c623af831da",
+   "summary": "本药用于食欲减退（食欲不振）、胃部胀满感、消化不良、过食、积食、恶心、呕吐。",
+   "bytes": 1440
+  },
+  {
    "koId": "7deef12e-038d-423b-b20a-9543cd7ac85e",
    "masterId": "1c331b01-3b8f-49ee-91f2-7facbdaa4988",
    "product": "에스엠크림9.6%(리도카인)",
@@ -5182,6 +5857,15 @@
    "bytes": 1437
   },
   {
+   "koId": "8a4def0d-31fc-4f03-b355-9ee0f7cb9186",
+   "masterId": "1ca9ec22-6651-422b-8a12-7d00d1ba0855",
+   "product": "베나치오액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d7c1d3ca-e72a-e39d-2509-1c623af831da",
+   "summary": "本药用于食欲减退（食欲不振）、胃部胀满感、消化不良、过食、积食、恶心、呕吐。",
+   "bytes": 1440
+  },
+  {
    "koId": "ef28c8fb-52d6-4caa-8527-51ce9908ee37",
    "masterId": "1cabd837-a424-4f16-93a8-fd2e8e4018df",
    "product": "버물리키드크림",
@@ -5189,6 +5873,15 @@
    "sourceRefId": "4d1b799c-dcc7-c7f8-49e4-38c939db05c7",
    "summary": "本药用于瘙痒、皮炎、湿疹、荨麻疹、痱子、冻伤、虫咬、糜烂。",
    "bytes": 1216
+  },
+  {
+   "koId": "23ec245d-280c-4eeb-a3fc-69b27f67cc99",
+   "masterId": "1cbb6702-8b65-4546-a29c-436d8a4d739a",
+   "product": "엘스킨크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a798cff8-5c72-44f4-7692-d6b3ef33a87e",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1721
   },
   {
    "koId": "b9eba8e5-8f2d-40c3-87c6-891ce92af10e",
@@ -5380,6 +6073,15 @@
    "bytes": 740
   },
   {
+   "koId": "48d263e3-2f8d-476e-9b3e-30acbb3291a5",
+   "masterId": "1db01a32-5ffc-4914-a535-675e53c3d366",
+   "product": "쎌스톤크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1dfa6f97-6905-c420-95ab-0610a3974ed3",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1687
+  },
+  {
    "koId": "e98eb624-52d1-4165-a485-30201d0ea35d",
    "masterId": "1dba952b-a247-4219-b3a9-dc726758211b",
    "product": "헤모퀸골드엠캡슐",
@@ -5423,6 +6125,15 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "5a98c74c-5352-42ae-a951-20b27992f461",
+   "masterId": "1dd47e87-c660-42c8-9319-76ac2e78a31d",
+   "product": "하이아이프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "c5b86dc4-1c6f-43c4-8108-eb406b280c56",
@@ -5623,6 +6334,15 @@
    "bytes": 760
   },
   {
+   "koId": "df0e7f86-31ea-4543-afb1-92184f1832af",
+   "masterId": "1f061ba1-e0ae-4a4f-9172-c5115aad9847",
+   "product": "메디락에스산",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ef2ec43f-473f-82a7-45c7-c53cf329c557",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1327
+  },
+  {
    "koId": "ca469e0c-55ed-4bbb-b3e6-13e32a98102c",
    "masterId": "1f1a0d06-c504-41e1-937b-154743c8171e",
    "product": "우루큐백클래식정",
@@ -5666,6 +6386,15 @@
    "sourceRefId": "2b81ba41-3b61-36d9-ecd4-e6735fb3edf9",
    "summary": "本药用于黄褐斑。",
    "bytes": 1334
+  },
+  {
+   "koId": "8952cd06-ba93-4f2f-ac37-1bb451057d6a",
+   "masterId": "1f6fd494-5e1c-4d05-9a3a-c3fe2974674c",
+   "product": "베타엠크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "fcfe487c-9439-c5c0-4a6b-6622f569a9ed",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣））与 1 度烧伤。",
+   "bytes": 1622
   },
   {
    "koId": "ba037e90-bbbd-4a99-ac36-67cc9e4be64e",
@@ -5794,6 +6523,15 @@
    "bytes": 678
   },
   {
+   "koId": "6fc641d4-7d55-4f64-b0ed-089aeef616b9",
+   "masterId": "1fee734c-84dd-4c60-923b-d7ad601d811b",
+   "product": "플루비톱카타플라스마(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "1f783f30-4209-4427-b5cf-6e202a270f16",
+   "summary": "本药用于退行性关节炎（骨（骨骼）关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1214
+  },
+  {
    "koId": "7c94747a-895a-43c3-811b-8efedc552d72",
    "masterId": "1fee7c21-5f68-4937-83c6-cc4152913dbf",
    "product": "셀카신연질캡슐",
@@ -5909,6 +6647,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "56384e14-f03c-4d83-b56e-0531c5250224",
+   "masterId": "20b3c712-c6ba-40b8-b390-c76f485527ed",
+   "product": "한방동의고플라스타",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "95fef607-f094-4071-a7f7-5fe661ea344b",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮（冻伤）的镇痛 · 消炎（抗炎）。",
+   "bytes": 1066
   },
   {
    "koId": "31235c90-2001-4ec4-b409-e0d22ac9cdcc",
@@ -6037,6 +6784,15 @@
    "bytes": 1374
   },
   {
+   "koId": "9e53cd3f-7aa4-431d-becd-33b2c1df0b02",
+   "masterId": "217fe030-6803-41f5-a265-746c2f2e3332",
+   "product": "메디락에스산",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ef2ec43f-473f-82a7-45c7-c53cf329c557",
+   "summary": "本药用于整肠、便秘、稀便、腹部胀满感、肠内异常发酵。",
+   "bytes": 1327
+  },
+  {
    "koId": "d618beaa-a419-47a9-9a4c-a810965f0b79",
    "masterId": "218301cb-5938-457d-a089-f63a272d2a58",
    "product": "아겔레스-브이연질캡슐",
@@ -6136,6 +6892,15 @@
    "bytes": 1284
   },
   {
+   "koId": "73e85c99-8a7d-44f7-98c8-ed1eb21175b5",
+   "masterId": "21bf01f7-f622-4576-b9b0-593de3cc02d9",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "abb34881-40d8-4032-8523-df5982e24dfa",
    "masterId": "21c56ebc-0cfc-455d-a40b-9b1dc74655fa",
    "product": "칼스카이정",
@@ -6224,6 +6989,15 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "9b732129-798f-4c43-87d2-02ba94dcf8aa",
+   "masterId": "2226cacc-c9e0-489f-948d-efc000cec874",
+   "product": "파워스탑플러스카타플라스마(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "15326c5a-cf3c-47ac-bf5d-32f56e16661b",
+   "summary": "本药用于退行性关节炎（骨（骨骼）关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1214
   },
   {
    "koId": "99723734-d3b9-4118-a2e7-3879721b4f3e",
@@ -6451,6 +7225,15 @@
    "bytes": 1210
   },
   {
+   "koId": "d00c6c28-f369-4cbf-be30-63ccc40d589c",
+   "masterId": "2339f7ed-b173-4824-9209-e467a2348373",
+   "product": "팝업플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "ab1d756a-2478-48f0-bcb8-23f79c78395e",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
+  },
+  {
    "koId": "0d844655-a98c-40ac-9e25-1f8cefc2b6da",
    "masterId": "23403ca8-a7eb-4b98-a5ef-0492ac2529c5",
    "product": "셀틴연질캡슐",
@@ -6478,6 +7261,24 @@
    "bytes": 1227
   },
   {
+   "koId": "6d99bb09-3df8-4386-9826-b94c9786b963",
+   "masterId": "23803852-cc98-4b1c-ba5c-dc8b304016d6",
+   "product": "리나치올캡슐375밀리그램(카르보시스테인)(수출명:HyundiolCapsule375Mg)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ad3d3cd8-5e63-26fa-d4f3-62beaeef0c18",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难及慢性鼻窦炎的排脓。",
+   "bytes": 1630
+  },
+  {
+   "koId": "9aaa9d1f-c7fa-4ac4-9db0-1a6125b6114b",
+   "masterId": "23896acd-2d41-4681-91c2-b6863767e965",
+   "product": "아셈지크림(수출명:라밴덤크림비겐덤크림)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "0eb52f8a-fd63-0ad6-19e9-a10645b35f17",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2083
+  },
+  {
    "koId": "c77df6c8-76a9-42db-8944-dfdd5aab0667",
    "masterId": "238b952f-6d9e-4651-9dd6-4a5b8f1ea385",
    "product": "신신파스아렉스마일드카타플라스마",
@@ -6494,6 +7295,15 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "5c584e24-a7df-4d82-bb0b-5bbc1c25347a",
+   "masterId": "23a62c23-6d02-4f6a-b5b5-a2ecd87ada6a",
+   "product": "새로딘시럽(로라타딘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "279ff2cb-d74b-95e8-6364-bc47a4180fd9",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1293
   },
   {
    "koId": "8b756488-d6ce-40e7-bd21-c49ca046855b",
@@ -6548,6 +7358,15 @@
    "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
    "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
    "bytes": 1284
+  },
+  {
+   "koId": "23930180-2141-447a-8ae9-da783d3cd513",
+   "masterId": "23f728d3-f166-47c4-b8c9-f7713b6c9e40",
+   "product": "폴엔정(폴산)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dae59a27-f0f1-c250-97aa-bc2aaae8cdaa",
+   "summary": "本药用于有妊娠计划的女性为一级预防胎儿神经管缺陷而补充叶酸，以及膳食中叶酸摄入不足时的叶酸补充。",
+   "bytes": 1380
   },
   {
    "koId": "de519bf4-a48c-4294-aef2-bffcd09b5fc5",
@@ -6640,6 +7459,24 @@
    "bytes": 718
   },
   {
+   "koId": "ce78e92a-c02b-4e0f-87a4-dc3ffd1a25ee",
+   "masterId": "2472a126-f4d5-45bc-91e3-da233b19e705",
+   "product": "바른솔크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a3548e04-f2fc-3bfb-b50a-1cf9746249a0",
+   "summary": "本药用于有感染风险的创口（抓伤、割伤、撕裂伤、烧伤、皮炎），下肢溃疡，褥疮，继发感染的湿疹，慢性单纯性苔藓（神经性皮炎）等皮肤感染症，哺乳期的乳头皲裂（开裂），小手术（皮肤损伤、手术创口）。",
+   "bytes": 1558
+  },
+  {
+   "koId": "b52d2365-708f-41bd-986d-614ddfd132a7",
+   "masterId": "247ce9d1-a57c-4911-b606-8a0ca8396fec",
+   "product": "후라신연고(푸시딘산나트륨)(수출명:라푸신연고(푸시딘산나트륨))(수출용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1d16571b-6715-2f1b-dbb3-97403ef0f7dd",
+   "summary": "本药用于由葡萄球菌、链球菌、棒状杆菌、梭菌引起的脓疱疮，感染性湿疹样皮炎，寻常痤疮（普通痤疮），毛囊炎，疖及疖病，化脓性汗腺炎，脓疱疮性湿疹，以及烧伤·外伤·缝合伤口·植皮创面的继发感染。",
+   "bytes": 1663
+  },
+  {
    "koId": "404d7747-1fc3-434f-a7f9-949f278056fa",
    "masterId": "2480f556-7975-40da-9233-2aa193cd7daf",
    "product": "이스탄캡슐(에르도스테인)",
@@ -6685,6 +7522,15 @@
    "bytes": 970
   },
   {
+   "koId": "b61bf4c9-3b21-421e-a7fb-0e240b1de939",
+   "masterId": "24a86f94-201f-4aa4-b8ce-3e723aa64113",
+   "product": "헤모콤플러스연질캡슐(수출명:COMHEMO)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8e41a5dd-8b75-6a00-4f4a-3bed23ec813a",
+   "summary": "本药用于缺铁性贫血。",
+   "bytes": 1758
+  },
+  {
    "koId": "0444a56b-9bb1-4785-871f-78c1e44668b8",
    "masterId": "24b10c12-7939-4263-b643-c2ef41375c37",
    "product": "뮤코스텐캡슐200밀리그램(아세틸시스테인)",
@@ -6701,6 +7547,15 @@
    "sourceRefId": "11c0a41b-8676-ef20-d037-d1e034d94398",
    "summary": "本药用于降低男性生殖器触觉的敏感性。",
    "bytes": 1236
+  },
+  {
+   "koId": "92bb65b9-3220-49ae-bf7e-88d4ed40b4e1",
+   "masterId": "24d76446-4240-495f-998f-033283cf2c8a",
+   "product": "파라멜산(L-아스파르트산-L-오르니틴수화물)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ffeac47c-4243-46b9-8c4e-317e8224c35a",
+   "summary": "本药用于肝硬化等重度肝脏疾病解毒的辅助治疗。",
+   "bytes": 1232
   },
   {
    "koId": "da383f43-d861-4817-a9dd-7d8be168e8ba",
@@ -6739,6 +7594,15 @@
    "bytes": 740
   },
   {
+   "koId": "76cbe4ad-e295-4867-8436-d5f29198fc6d",
+   "masterId": "24ffa7ea-0829-414e-b3e4-9914b082f2a4",
+   "product": "아셈지크림(수출명:라밴덤크림비겐덤크림)(수출용1)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "0eb52f8a-fd63-0ad6-19e9-a10645b35f17",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2083
+  },
+  {
    "koId": "642e70b8-77e9-4701-807c-ec3c32442ffb",
    "masterId": "2500bd3b-3bde-4557-a89c-59c29102d62e",
    "product": "지엘세티리진염산염정",
@@ -6746,6 +7610,15 @@
    "sourceRefId": "8d1e6c75-a225-7af0-1b1b-1f9057b2932e",
    "summary": "本药用于季节性及常年性变应性鼻炎，变应性结膜炎，慢性特发性荨麻疹，皮肤瘙痒症，以及与氢化可的松外用制剂合用治疗的湿疹、皮炎。",
    "bytes": 1462
+  },
+  {
+   "koId": "cd9e4a00-1179-49c4-8b48-d24050c263c6",
+   "masterId": "2502ddf6-8a93-4c96-b9dd-a7e1f482560e",
+   "product": "광동파워센액(시트룰린말산염)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b334e320-8f22-072b-68c1-5cc36b4b4a68",
+   "summary": "本药用于功能无力症的辅助治疗。",
+   "bytes": 1247
   },
   {
    "koId": "01db9093-2b14-4e3b-9aed-5f76f7e7b174",
@@ -6791,6 +7664,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "dfa5c832-5707-49b1-8086-119ee3eea7b8",
+   "masterId": "25409b2d-1f38-4091-9471-63c478000598",
+   "product": "제놀골드플라스타(케토프로펜)(수출군납명:케넨서플라스타)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c19f7860-cfec-60c6-fdab-e6e1f2ef9e22",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎（肌腱炎）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1819
   },
   {
    "koId": "30642e82-e533-43ee-a443-13088bedbae0",
@@ -6883,6 +7765,15 @@
    "bytes": 1227
   },
   {
+   "koId": "270c8d54-9d3d-4d00-8f71-0d7a00744261",
+   "masterId": "25f71045-189a-4da8-a2ed-e44f071fa51e",
+   "product": "아이클리어점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1de2470e-3d33-e993-da54-c62438746c36",
+   "summary": "本药用于眼疲劳，结膜充血，游泳后眼部不适感或灰尘、汗液进入眼中时，紫外线及其他光线所致眼部炎症，眼睑糜烂，佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1430
+  },
+  {
    "koId": "a57c2f94-778a-499e-bb07-f9dd4f355617",
    "masterId": "26036052-27b0-4dad-aa30-b3da5011381b",
    "product": "비타메가프리미엄정",
@@ -6901,6 +7792,15 @@
    "bytes": 1449
   },
   {
+   "koId": "92d9f2c6-c7d3-42bc-b5b6-69ac73f77c20",
+   "masterId": "2605c8e9-c3d6-4f6a-baf3-ce788552084e",
+   "product": "삼성브로멜라인장용정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "21e3e19a-c4d1-a264-7584-abd8723bc704",
+   "summary": "本药用于缓解伴有水肿的炎症症状，以及外伤或手术后的水肿。",
+   "bytes": 1311
+  },
+  {
    "koId": "b53a5ef6-072a-459d-8afd-5c0cfd8de76d",
    "masterId": "263b68f1-49f3-45dd-a2ea-2c871fb40667",
    "product": "큐라스텐액(시트룰린말산염)",
@@ -6917,6 +7817,15 @@
    "sourceRefId": "0b98e6f8-d22e-adc7-5c36-22c03d30fb4d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1227
+  },
+  {
+   "koId": "67030b78-f08e-4826-b5b8-82033e73778e",
+   "masterId": "264381fa-1462-4087-b489-b283d4f08141",
+   "product": "아셈지크림(수출명:라밴덤크림비겐덤크림)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "0eb52f8a-fd63-0ad6-19e9-a10645b35f17",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2083
   },
   {
    "koId": "f23d7a12-8e67-4d6a-87f3-8a18c57f18a6",
@@ -6991,6 +7900,15 @@
    "bytes": 760
   },
   {
+   "koId": "f0b08c30-a986-4d04-bb19-c879feb0b75e",
+   "masterId": "26ca1060-6dc6-4604-8cc7-147c866c6487",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "24dca746-6c19-4d4a-8e66-781288ab17bd",
    "masterId": "26d3885f-e186-490b-a4aa-1e642d5e93a5",
    "product": "로얄비콤연질캡슐",
@@ -7025,6 +7943,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "78bfce80-4d81-4a81-bf30-cc6703900717",
+   "masterId": "270aaa5f-7d1e-46ac-8b69-09247f3350df",
+   "product": "광동에너릭정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "f50898c8-f77e-cb96-aeb7-54c479cf6efc",
+   "summary": "本药用于困倦、恢复疲劳。",
+   "bytes": 1308
   },
   {
    "koId": "45d450ca-afed-4a20-83d4-2ce48208d0cf",
@@ -7072,6 +7999,15 @@
    "bytes": 1437
   },
   {
+   "koId": "7deb0098-320d-4308-8a15-ee9ccb0bbe37",
+   "masterId": "2742eeab-a10a-496b-9e52-1e4f3ec8db3c",
+   "product": "위푸린산",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "db8e8196-a02f-a946-8f66-b5396e295437",
+   "summary": "本药用于饮酒过量、烧心、胃部嗳气、过食、胃痛、胃部不适感、消化不良、促进消化、食欲不振、胃弱、胃酸过多、胃·腹部（上腹部·肚子部位）胀满感、恶心（胃部反胃、宿醉、饮酒后的恶心、反胃（恶心））、呕吐、胸口灼痛、嗳气、胃部沉重感。",
+   "bytes": 1493
+  },
+  {
    "koId": "6dd13627-6df3-4727-9cb2-44c99212e378",
    "masterId": "27495489-0338-4fad-bd1f-db187a45caa9",
    "product": "오스칼500디정",
@@ -7081,6 +8017,15 @@
    "bytes": 672
   },
   {
+   "koId": "39d044e9-ad65-4bbc-81ee-31ab4d4f5c24",
+   "masterId": "2753c630-9742-4df8-932d-14b52f5f2ace",
+   "product": "하이아이프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "6e265a23-cdd4-4ac6-8098-a19c21d5ac07",
    "masterId": "2760f445-a070-460d-a51f-f5ea5a20ff80",
    "product": "칼테오-80정(Calteo-40Tablets)",
@@ -7088,6 +8033,24 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "fa689ea7-f63c-4e67-a1d1-ea91e1848a6b",
+   "masterId": "2762e42d-0060-4e80-98a7-e9ebebdbbcdf",
+   "product": "클로안에프점안액(수출명:참술점안액)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "dc9cbeee-53ef-93fc-966d-d9af1359b264",
+   "summary": "本药用于结膜炎（流行性眼炎）、麦粒肿、睑缘炎（眼睑糜烂）、眼部瘙痒。",
+   "bytes": 1351
+  },
+  {
+   "koId": "7d55b00a-3d7b-4e01-8f94-09fc5da470a0",
+   "masterId": "276f965a-0850-4833-91c4-79d4abbccea4",
+   "product": "메가콘사민-에프연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ca3f1beb-49b2-4bf6-a48f-50f2afc8b65c",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 E、B1、B2、B6 的补充，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉），神经痛、肌肉痛、关节痛（腰（腰部）痛、肩部僵硬等）症状的缓解，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解，脚气病，眼疲劳。",
+   "bytes": 1772
   },
   {
    "koId": "9a45ce0b-0548-4313-ad2c-55f41987f5ae",
@@ -7124,6 +8087,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "05cbf58c-659a-495b-bbb1-693b688a31d9",
+   "masterId": "278c8851-24ab-419a-a50d-a577552fa769",
+   "product": "소아용뮤코론시럽(카르보시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "21da4694-6679-62ba-460b-f85b5a3afa54",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难，以及慢性鼻窦炎的排脓、渗出性中耳（中耳）炎的引流。",
+   "bytes": 1482
   },
   {
    "koId": "8c8aff16-9908-4e70-bcfb-6ff43e68beec",
@@ -7180,6 +8152,15 @@
    "bytes": 1236
   },
   {
+   "koId": "8bf09a7c-7280-48b2-b0f3-2cfa1a1c4d4b",
+   "masterId": "27c2ead6-a56c-4d7c-8dfe-adc32721e8de",
+   "product": "티나케어점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "046cf46a-d354-8928-8ceb-0fd55673c43b",
+   "summary": "本药用于结膜炎（流行性眼炎）、麦粒肿、睑缘炎（眼睑糜烂）、眼部瘙痒。",
+   "bytes": 1221
+  },
+  {
    "koId": "d5c3579d-4380-4a85-b49a-8cdbf8d7119a",
    "masterId": "27d3c4b7-f444-4b38-a19f-7ad4d1ef762a",
    "product": "하이비타골드정",
@@ -7187,6 +8168,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "1ed9b219-47a6-4353-8b4e-1e61d322a49f",
+   "masterId": "27eaf619-0b0b-4d51-bdd1-ce8676d655da",
+   "product": "바로콜-에프캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8573805b-9dce-472c-5911-000df324d17a",
+   "summary": "本药用于缓解感冒的多种症状（流涕、鼻塞、打喷嚏、咽喉痛、咳嗽、咳痰、寒战、发热、头痛、关节痛、肌肉痛）。",
+   "bytes": 1945
   },
   {
    "koId": "b1efd9ce-9a79-4f5e-8a6a-f3ee31a3e087",
@@ -7243,6 +8233,15 @@
    "bytes": 760
   },
   {
+   "koId": "df5a1015-e993-4617-81f4-e5ced478322f",
+   "masterId": "2843f659-23b8-47b1-84f5-81fa28017a93",
+   "product": "파프케이플러스카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "7b5ef23c-fcd4-4087-b4da-230385a66035",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱·腱鞘炎（腱滑膜炎）、腱周炎、肱骨上髁炎（网球肘等）、肌肉痛、外伤后浮肿·疼痛的镇痛·消炎。",
+   "bytes": 1362
+  },
+  {
    "koId": "ac30027c-f864-488a-b401-99a75794e257",
    "masterId": "284e5faf-c62f-4e50-a0d0-d71ea51aa5e4",
    "product": "한풍제통고온혈플라스타",
@@ -7261,6 +8260,15 @@
    "bytes": 660
   },
   {
+   "koId": "84fa6659-84a8-432d-8437-8d73ec86bd9b",
+   "masterId": "2876ee14-3948-4fe7-aa62-35df0d9c4351",
+   "product": "리나치올캡슐375밀리그램(카르보시스테인)(수출명:HyundiolCapsule375Mg)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ad3d3cd8-5e63-26fa-d4f3-62beaeef0c18",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难及慢性鼻窦炎的排脓。",
+   "bytes": 1630
+  },
+  {
    "koId": "50b77038-291b-4ec2-9293-ae773a4d468f",
    "masterId": "287d9ccd-7bda-4d56-a679-d707887a63d3",
    "product": "판토가캅셀",
@@ -7277,6 +8285,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "46aa5e65-743f-40db-af7c-86ac867cebe3",
+   "masterId": "289dab53-0b38-42bb-99a5-bebde9ef48d8",
+   "product": "에페린플러스정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8e3dfa2b-b9e1-33e8-4b31-28e3609c9da4",
+   "summary": "本药用于缓解感冒的多种症状（咽喉（喉咙）痛、咳嗽、咳痰、寒战（发冷发抖的症状）、发热、头痛、关节痛、肌肉痛）。",
+   "bytes": 1942
   },
   {
    "koId": "d5bdac06-dfc9-47ed-82aa-14472c01a994",
@@ -7360,6 +8377,15 @@
    "bytes": 740
   },
   {
+   "koId": "98677f4b-36e2-436b-923c-13a43d8abcff",
+   "masterId": "291b7966-8a30-48f5-90af-46318a375570",
+   "product": "세브론시럽(아세틸시스테인)(수출명:뮤시스틴시럽스파탐시럽)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "03635f28-20ff-8a39-d072-ec0231b2490c",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
+   "bytes": 1702
+  },
+  {
    "koId": "d52143d2-8d59-42ab-9615-40a176f23e75",
    "masterId": "292844f6-453a-4e43-9785-bd06aa0027b7",
    "product": "바이코비정",
@@ -7396,6 +8422,15 @@
    "bytes": 1599
   },
   {
+   "koId": "6d199f29-3403-4fce-86a5-c77544c69a49",
+   "masterId": "293d4663-4cbb-4b16-8b18-8a75a2ac5dd7",
+   "product": "티어클린점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7deae8ce-4da2-94ca-e1f7-ab060d9e04b8",
+   "summary": "本药用于佩戴软性隐形眼镜或硬性隐形眼镜时的不适感，泪液补充（眼干燥），眼疲劳，眼睛模糊（眼屎较多时）。",
+   "bytes": 1448
+  },
+  {
    "koId": "30124664-17c9-4dea-95ce-ace6164a5759",
    "masterId": "2949e706-732f-4e15-afee-54518db9f031",
    "product": "카디톤액(L-카르니틴)",
@@ -7405,6 +8440,15 @@
    "bytes": 1210
   },
   {
+   "koId": "28a88ccc-6c60-49a9-a094-92b9a8f109f4",
+   "masterId": "295233f0-c670-4935-bcc0-0c867160dede",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "1fc96c40-82bd-4366-9b41-ca3e0d97841b",
    "masterId": "295a4c65-6736-4592-a922-71834e0ba4fc",
    "product": "세스틴크림",
@@ -7412,6 +8456,33 @@
    "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
    "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
    "bytes": 1681
+  },
+  {
+   "koId": "c37ac142-5f9d-4940-b8f6-b08fe4e5f082",
+   "masterId": "295f3a46-4e45-4a8d-9281-83e1e498462b",
+   "product": "엑스펙토시럽2%(카르보시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6f28c1da-e4f2-e575-93d9-720e0d4d270f",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难，以及慢性鼻窦炎的排脓、渗出性中耳（中耳）炎的引流。",
+   "bytes": 1345
+  },
+  {
+   "koId": "4292806a-3381-4826-aa75-48d7d004deb8",
+   "masterId": "2962a4aa-f8d8-4442-8f60-db130a3b7833",
+   "product": "엘시콤정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "cc67f473-691b-2f01-0257-ca58ef3828d5",
+   "summary": "本药用于易断裂的毛发、指（趾）甲的生长及营养障碍，以及角膜创伤治疗的辅助。",
+   "bytes": 1228
+  },
+  {
+   "koId": "4f807cb5-f7e5-4eb7-a094-ad519e5ab638",
+   "masterId": "2968f1c7-5ec5-4718-acb1-b1158eb8e52a",
+   "product": "한국웨일즈푸시딘산나트륨연고",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9a193c1f-73c0-d60f-7e2f-22043b35ed7b",
+   "summary": "本药用于由葡萄球菌、链球菌、棒状杆菌、梭菌引起的脓疱疮，感染性湿疹样皮炎，寻常痤疮（普通痤疮），毛囊炎，疖及疖病，化脓性汗腺炎，脓疱疮性湿疹，以及烧伤·外伤·缝合伤口·植皮创面的继发感染。",
+   "bytes": 1441
   },
   {
    "koId": "7555fde3-23e5-4c86-acd4-8a1b2f82c572",
@@ -7457,6 +8528,24 @@
    "sourceRefId": "9ae98e61-1036-b7fa-3c85-24ec9cfdc7df",
    "summary": "本药用于季节性及常年性变应性鼻炎，变应性结膜炎，慢性特发性荨麻疹，皮肤瘙痒症，以及与氢化可的松外用制剂合用治疗的湿疹、皮炎。",
    "bytes": 1460
+  },
+  {
+   "koId": "f809a652-dabf-4b62-bda4-e5b6a6a64e03",
+   "masterId": "29ddf899-1dd7-4384-9036-7ea755ff81e9",
+   "product": "뮤코론캡슐375밀리그램(카르보시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "41568982-2898-91f3-c4f7-8094c36370a4",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难及慢性鼻窦炎的排脓。",
+   "bytes": 1269
+  },
+  {
+   "koId": "bc49bb6f-e1dd-481d-aad4-fc6788e826d7",
+   "masterId": "29df0123-c0df-4309-b3e2-fb90285e5542",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "93e1ed5b-de1d-4ca8-9a60-65f5c73279c5",
@@ -7522,6 +8611,15 @@
    "bytes": 1030
   },
   {
+   "koId": "daaa07b7-b183-403c-92c7-b551ca8627f2",
+   "masterId": "2a558270-466a-4093-b170-0ab8723c0a7d",
+   "product": "록센플라스타(록소프로펜나트륨수화물)(수출명:LoxenPlaster)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2f052ee2-8c9e-3c1d-036a-0fc690a0c991",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肌肉痛、外伤后肿胀、疼痛的镇痛·消炎。",
+   "bytes": 1525
+  },
+  {
    "koId": "c8121a29-3baf-4119-994d-0c7ea3fc88d2",
    "masterId": "2a68a4e5-dd6e-4423-ad47-5a237e3a3d3c",
    "product": "아이톡점안액(트레할로스수화물)(1회용)",
@@ -7556,6 +8654,15 @@
    "sourceRefId": "5408235f-c032-cb91-9a9c-b88991ba431a",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "4e978b31-0c86-42eb-8c1e-926551d1e940",
+   "masterId": "2ad2516b-339d-4261-9193-6d9e5df953ad",
+   "product": "제이카인프리미움겔(리도카인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e68db88c-6a6d-1ea5-c736-050317a5debd",
+   "summary": "本药用于降低男性生殖器触觉的敏感性。",
+   "bytes": 1311
   },
   {
    "koId": "8f353650-a21e-4be9-98ca-c7026a44f16d",
@@ -7648,6 +8755,15 @@
    "bytes": 1071
   },
   {
+   "koId": "2d4ecdc9-15a6-452e-af48-0e9120c4b09c",
+   "masterId": "2b22fd18-532e-45e6-8ef8-8dd589769551",
+   "product": "바실리포미스산(바실루스리케니포르미스균)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "4f4a32ae-eb2e-070e-a0da-8331378e7f75",
+   "summary": "本药用于急性、慢性肠炎，急性、慢性腹泻，急性痢疾，各种原因引起的肠内异常发酵。",
+   "bytes": 1282
+  },
+  {
    "koId": "13c8aa5b-24a2-4e88-833b-a0282c63ec2a",
    "masterId": "2b34316b-e32c-48ec-8737-2e7baceb875f",
    "product": "이텍스암브록솔정",
@@ -7657,6 +8773,24 @@
    "bytes": 1286
   },
   {
+   "koId": "e832dc37-1fe2-42e9-813c-13f87a4b77ec",
+   "masterId": "2b3c1f26-1096-4d9a-8bcb-c35f3a01a9aa",
+   "product": "핑크프로캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a4b4678e-6fe6-1d60-05d3-91afc52a5bd7",
+   "summary": "本药用于前列腺肥大所致的排尿困难、残尿及残尿感、尿频。",
+   "bytes": 1111
+  },
+  {
+   "koId": "fe011e8b-5e2c-4cd0-9420-f41decd8c08a",
+   "masterId": "2b496063-686d-4789-b079-df4b31c20c96",
+   "product": "바이오아지니나액(L-아르기닌)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "de8556b2-7371-2ed8-ce74-d80b0ba4b8d7",
+   "summary": "本药用于肝功能障碍所致消化不良的辅助治疗。",
+   "bytes": 1216
+  },
+  {
    "koId": "ef9f87d8-bef2-47a2-bb16-df540142dd5e",
    "masterId": "2b66a48c-ad52-46eb-aea2-685aac782f28",
    "product": "중외비콤푸렉스에스정",
@@ -7664,6 +8798,15 @@
    "sourceRefId": "db7c085e-d233-499c-bb99-56f2e9efcd58",
    "summary": "用于体力疲劳·体力下降时的维生素 B1·B2·B6·C 补充，神经痛·肌肉痛·关节痛，口角炎·唇炎·口腔炎·舌炎，脚气病·眼疲劳，色素沉着的缓解，牙龈·鼻出血的预防。",
    "bytes": 678
+  },
+  {
+   "koId": "d8ccbc4a-a899-485e-b0e1-f8b8caa720e3",
+   "masterId": "2b6f9396-3509-40a8-be56-89effdd355f2",
+   "product": "루페인플라스타(플루르비프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "eb6cb7d0-c5fa-4729-a6f2-155fb1ba8a9f",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1154
   },
   {
    "koId": "2f054965-bd0d-4b4d-9af7-adce8906e731",
@@ -7747,6 +8890,15 @@
    "bytes": 740
   },
   {
+   "koId": "373f6109-4a74-40e2-9293-d7e6418e86c5",
+   "masterId": "2c1df281-1105-4e8e-9a3a-fedb2b1c09fd",
+   "product": "아이미루40이엑스점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "49e34b4c-0e86-64f6-c0df-f4b2078fbe25",
+   "summary": "本药用于眼疲劳，结膜充血，眼病预防（游泳后眼部不适感或灰尘、汗液进入眼中时），紫外线及其他光线所致眼部炎症，眼睑糜烂，佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1452
+  },
+  {
    "koId": "2edafc88-3a5d-4cd4-9bc8-141f0257d5a7",
    "masterId": "2c20b258-a07b-4e22-88af-cc22cddb1534",
    "product": "셀카로틴연질캡슐",
@@ -7754,6 +8906,15 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "7ec5b015-c164-41ac-acc8-967fdafb5c59",
+   "masterId": "2c20f005-72fb-46da-a8a5-7426fb0cac38",
+   "product": "세리펙에스정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "c7fd76d7-5ebe-a130-fc3a-6dd43c407a65",
+   "summary": "本药用于缓解鼻感冒（急性鼻炎）、变应性鼻炎或鼻窦炎所致的鼻塞、流涕、打喷嚏、流泪、咽喉痛、头部沉重感。",
+   "bytes": 1584
   },
   {
    "koId": "3735b4b0-34d3-4212-bcd3-4498bf9d25ed",
@@ -7799,6 +8960,33 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "b2863c06-d869-4640-9dbf-fefe7cd97623",
+   "masterId": "2cce2453-5ff5-42e6-ad8e-384056183379",
+   "product": "아이봉씨세안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2dcc9fd9-322f-16a3-4c25-9a02cb794c7a",
+   "summary": "本药用于眼部清洗，游泳后眼部不适感，或灰尘、汗液进入眼中时。",
+   "bytes": 1224
+  },
+  {
+   "koId": "04dbe608-c8cf-4a51-8455-7f8c9cbc8f41",
+   "masterId": "2cd06f51-1451-47a8-8eac-d45a5c970ca5",
+   "product": "가스앤드액(시메티콘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "db0f9710-9f97-49c7-f3e7-7ff716b04941",
+   "summary": "本药用于胃镜检查时消除肠内气泡，腹部 X 线摄影时消除肠内气体，以及改善胃肠道内气体所致的腹胀感、吞气症等腹部症状。",
+   "bytes": 1473
+  },
+  {
+   "koId": "61a190f1-8470-4c28-b53b-dab0cd13a976",
+   "masterId": "2ce203b4-4b8d-4b70-bfb2-c97377ea8c22",
+   "product": "케펜텍플라스타(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "405f59d1-3e7a-444d-85fb-362133eeb7c8",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、肌腱（腱）·腱鞘炎（腱滑膜炎）、腱（腱）周炎、肱骨（上臂骨）上髁炎（网球肘等）、肌肉痛、外伤（创伤）后肿胀（浮肿）·疼痛的镇痛·消炎（抗炎）。",
+   "bytes": 1301
   },
   {
    "koId": "90e0c9b0-423d-4f77-9c11-c063b143c1dd",
@@ -7889,6 +9077,15 @@
    "sourceRefId": "1874d7f6-4005-d7c1-9f48-8b1766f99bc3",
    "summary": "本药用于肥胖症、糖尿病性·原发性高胆固醇血症所致脂质代谢的改善。",
    "bytes": 1290
+  },
+  {
+   "koId": "1aa7c070-f254-40b3-a803-789485b2431e",
+   "masterId": "2d628e2f-caf1-4f7e-b044-4a71328e61fb",
+   "product": "티어클린점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7deae8ce-4da2-94ca-e1f7-ab060d9e04b8",
+   "summary": "本药用于佩戴软性隐形眼镜或硬性隐形眼镜时的不适感，泪液补充（眼干燥），眼疲劳，眼睛模糊（眼屎较多时）。",
+   "bytes": 1448
   },
   {
    "koId": "6bf60718-4c2d-4034-b5cd-83e20343bc95",
@@ -8026,6 +9223,15 @@
    "bytes": 760
   },
   {
+   "koId": "01e0b44c-e7ce-4b39-a01d-b6a19e8aa81b",
+   "masterId": "2e0b4520-3564-4fda-b5ee-5bd5da822171",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "6ffffa21-d88c-47f1-ac02-502652167525",
    "masterId": "2e0b5be0-fcfa-4cb0-9040-523d2b0ce7fa",
    "product": "엘리도스캡슐(에르도스테인)",
@@ -8042,6 +9248,15 @@
    "sourceRefId": "7a3a689b-f5ce-930e-2934-c431adb6db39",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1214
+  },
+  {
+   "koId": "d1943f7a-c2ec-4ea6-99b9-4fa9e523f998",
+   "masterId": "2e1f8f26-8693-46eb-9ff6-c9a9bd0a12ec",
+   "product": "헥시탄0.5%액(클로르헥시딘글루콘산염액)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7df51beb-8d81-dd71-243c-1cbc1c980ad9",
+   "summary": "本药用于手及皮肤的消毒（不包括保健卫生工作者及手术时术者的手消毒、手术部位皮肤的消毒），医疗器械的消毒，家具、器具等的消毒，皮肤创口部位的消毒。",
+   "bytes": 1629
   },
   {
    "koId": "69f51c94-69d8-4cd7-a649-b668d994df4e",
@@ -8098,6 +9313,15 @@
    "bytes": 1227
   },
   {
+   "koId": "814d8d01-92a6-4286-8f34-a1ec73f87af0",
+   "masterId": "2e7b5014-dca0-475d-924a-5d4768cd1281",
+   "product": "쎄레스톤지크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a535b814-5662-f9e2-1b07-5427b568626d",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1704
+  },
+  {
    "koId": "51846598-5241-4f9f-814f-22ed81e8633b",
    "masterId": "2e7eec13-6090-4546-b4e2-618e162c0351",
    "product": "시트말린액(시트룰린말산염)",
@@ -8132,6 +9356,15 @@
    "sourceRefId": "b96f3977-94ff-4deb-bc0a-10f2945cc92c",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 D·E·C 补充，末梢血液循环障碍·手足冰冷的缓解，黄褐斑·雀斑等色素沉着的缓解，牙龈出血·鼻出血的预防。",
    "bytes": 679
+  },
+  {
+   "koId": "8f6cd501-683c-44d4-aefb-a351c028dc69",
+   "masterId": "2ead9fa5-fd67-4f2f-be8e-a2fbe2e87dbe",
+   "product": "조인트빅300연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ca3f1beb-49b2-4bf6-a48f-50f2afc8b65c",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 E、B1、B2、B6 的补充，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉），神经痛、肌肉痛、关节痛（腰（腰部）痛、肩部僵硬等）症状的缓解，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解，脚气病，眼疲劳。",
+   "bytes": 1772
   },
   {
    "koId": "6591b1cc-929e-4ad1-a8cb-4fa43eef42d6",
@@ -8170,6 +9403,15 @@
    "bytes": 1095
   },
   {
+   "koId": "b2214e3c-81fb-4dec-b03d-ecc5027b8eeb",
+   "masterId": "2ee5b1f7-3563-486e-8224-5cd5fcb3d34d",
+   "product": "디판셉틱크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a3548e04-f2fc-3bfb-b50a-1cf9746249a0",
+   "summary": "本药用于有感染风险的创口（抓伤、割伤、撕裂伤、烧伤、皮炎），下肢溃疡，褥疮，继发感染的湿疹，慢性单纯性苔藓（神经性皮炎）等皮肤感染症，哺乳期的乳头皲裂（开裂），小手术（皮肤损伤、手术创口）。",
+   "bytes": 1558
+  },
+  {
    "koId": "2f18000a-38c4-47dd-b160-bfe2c8390a2b",
    "masterId": "2eea0c11-6407-45ec-a7a0-3a5889ad7e55",
    "product": "한방동의고카타플라스마",
@@ -8204,6 +9446,42 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "b650c969-517d-41ec-8f18-8960d08e8c43",
+   "masterId": "2ef80f61-648a-4253-bfe1-612800936e8e",
+   "product": "비알에스락산(바실루스리케니포르미스균)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9beac274-716f-a16f-a4fe-fbd2343b8a1b",
+   "summary": "本药用于急性、慢性肠炎，急性、慢性腹泻，急性痢疾，各种原因引起的肠内异常发酵。",
+   "bytes": 1282
+  },
+  {
+   "koId": "a5a7cca9-b482-4ead-aa16-5ab760ee0d8f",
+   "masterId": "2ef97751-8856-4de4-914d-a8325c3a4579",
+   "product": "소아용뮤코론시럽(카르보시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "21da4694-6679-62ba-460b-f85b5a3afa54",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难，以及慢性鼻窦炎的排脓、渗出性中耳（中耳）炎的引流。",
+   "bytes": 1482
+  },
+  {
+   "koId": "f4297ad6-4a4c-412a-9eb5-6ece71e93763",
+   "masterId": "2efef159-5551-4233-9edf-8b51cf90b49b",
+   "product": "오늘비타더블골드정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e79ddd4d-4455-25ee-b21b-514b17a9ffb2",
+   "summary": "本药用于体力疲劳，妊娠∙哺乳期，病中∙病后（患病期间或恢复后）体力下降时的维生素 B1、B2、B6、E、C 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等）症状的缓解，脚气病，眼疲劳。",
+   "bytes": 1407
+  },
+  {
+   "koId": "927ab4f3-0314-49cf-82ee-440d79c39e4b",
+   "masterId": "2f03f144-6d5f-494b-a387-6741c462b58c",
+   "product": "아르기닌베이론액(L-아르기닌염산염)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "14bbf81d-6b18-6251-57a6-f33e4845f1b6",
+   "summary": "本药用于肝功能障碍所致消化不良的辅助治疗。",
+   "bytes": 1227
   },
   {
    "koId": "a31a6449-606d-4973-b0e2-65d71ea0cbce",
@@ -8314,6 +9592,15 @@
    "bytes": 738
   },
   {
+   "koId": "34b02eeb-612a-489b-aa26-c81b312fa058",
+   "masterId": "2f9cfa73-e1fc-4342-aed7-d97c35e74939",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
+  },
+  {
    "koId": "be5feefa-56c9-4ca2-8f60-b0043099aa53",
    "masterId": "2fa2f22e-5c58-424d-ad72-d280807a094d",
    "product": "제놀더블액션카타플라스마",
@@ -8348,6 +9635,15 @@
    "sourceRefId": "2bb82579-3b25-402f-81b8-1a6c6280bc2c",
    "summary": "用于妊娠·哺乳期·发育期·老年期的维生素 D 补充与钙缺乏及其他钙的补充，骨骼·牙齿发育不良·佝偻病的预防。",
    "bytes": 672
+  },
+  {
+   "koId": "3cc34b4a-3a73-4ad3-8291-e3da8eea0109",
+   "masterId": "2fe32620-a536-4288-a362-2f1b1c7fdfb0",
+   "product": "토뮤즈연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "726bc316-ecdc-e133-763f-5b6231812fee",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时及老年期的维生素 E、C 的补充，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉）的缓解。",
+   "bytes": 1582
   },
   {
    "koId": "c9d2868d-8057-40c7-b293-d55c4635f5de",
@@ -8431,6 +9727,15 @@
    "bytes": 1265
   },
   {
+   "koId": "da677502-7f1b-4da6-9138-fcbaa91a2177",
+   "masterId": "30ca38bf-900f-4991-a343-4ebe146075a1",
+   "product": "락스타더블캡슐(락토바실루스카제이변종람노수스의동결건조배양물)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9defb525-a30a-1ec8-88a9-2d66f30c4d50",
+   "summary": "本药用于通过肠道菌群正常化改善整肠及腹泻症状。",
+   "bytes": 1216
+  },
+  {
    "koId": "ee1efbcc-5891-4593-98fb-ed1d57ed0365",
    "masterId": "30d6f3f5-71cc-428e-a336-cb1a207a34e8",
    "product": "파워겔(리도카인)",
@@ -8449,6 +9754,15 @@
    "bytes": 1258
   },
   {
+   "koId": "64fb6bc5-cc7c-48c0-bc78-696b79cb4981",
+   "masterId": "30ee36a9-f2b1-439e-8030-e26fb6353d04",
+   "product": "아로민필름코팅정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "558d5b7a-e604-792e-e192-c8f8efeade77",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B1、B2、B6 的补充，以及神经痛、肌肉痛、关节痛（腰痛、肩部僵硬等），脚气病，眼疲劳，口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解。",
+   "bytes": 1484
+  },
+  {
    "koId": "833824f1-16cf-461e-8748-3094cbb888c0",
    "masterId": "30f1a029-e8a3-4ef7-a64f-5ee6a2ec1768",
    "product": "엘스타캡슐(에르도스테인)",
@@ -8456,6 +9770,15 @@
    "sourceRefId": "0b98e6f8-d22e-adc7-5c36-22c03d30fb4d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1227
+  },
+  {
+   "koId": "40f1d09c-14b3-486c-a796-e6eda77b5c1b",
+   "masterId": "30f7013e-3aa2-4d69-a4a0-106ffe9e2bcd",
+   "product": "이지롱내복액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "ff32d5bc-9644-2eec-c2cd-d92a0e1f2d9b",
+   "summary": "本药用于晕动病引起的头晕·呕吐·头痛等的预防及缓解。",
+   "bytes": 1456
   },
   {
    "koId": "ae1e0f32-7e76-47fc-b33d-52359639c3be",
@@ -8521,6 +9844,15 @@
    "bytes": 760
   },
   {
+   "koId": "09e2b966-47cd-49da-8b2a-4bad1ae03395",
+   "masterId": "3166a016-05ad-4b30-960b-f0eae5ef671d",
+   "product": "크마론지크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1dfa6f97-6905-c420-95ab-0610a3974ed3",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 1687
+  },
+  {
    "koId": "0080e2d6-f093-4412-a628-724cda46e2f1",
    "masterId": "31690aeb-5e2c-43f2-a492-48bed2618a75",
    "product": "지테인캡슐(에르도스테인)",
@@ -8528,6 +9860,24 @@
    "sourceRefId": "bc7b09b0-74b4-e593-d5fa-4167e5d2751d",
    "summary": "本药用于急性、慢性呼吸道疾病的黏液溶解与祛痰。",
    "bytes": 1255
+  },
+  {
+   "koId": "0fc0124d-0941-40a7-a589-a0fc55d1d9cb",
+   "masterId": "316bf4e8-5ef9-4599-b798-7698e6c9d5f5",
+   "product": "우먼스타이레놀정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "402769c1-353c-4362-5332-1e231a6df91f",
+   "summary": "本药用于缓解经前紧张症、水肿（浮肿）、痉挛、腰痛及头痛。",
+   "bytes": 1634
+  },
+  {
+   "koId": "3a643fe6-a35c-4b16-a4a2-f770155988c7",
+   "masterId": "316f3ab6-5fa3-4fbf-8715-f6ab61f08699",
+   "product": "지엘소브레롤캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "95a269ce-dc16-5cd4-bfea-fa5feaebb13a",
+   "summary": "本药用于急性、慢性支气管炎，伴有呼吸障碍（哮喘、咳嗽）的支气管炎，鼻咽炎，喉气管炎等分泌功能亢进的急性、慢性呼吸系统障碍。",
+   "bytes": 1271
   },
   {
    "koId": "bf0e5065-c005-4331-b73e-f2df5a1a41fd",
@@ -8555,6 +9905,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "47876236-ef24-4c16-9fd5-db5392f6eb7d",
+   "masterId": "3190b335-3257-40fd-911f-169f77ed97fd",
+   "product": "새솔크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a3548e04-f2fc-3bfb-b50a-1cf9746249a0",
+   "summary": "本药用于有感染风险的创口（抓伤、割伤、撕裂伤、烧伤、皮炎），下肢溃疡，褥疮，继发感染的湿疹，慢性单纯性苔藓（神经性皮炎）等皮肤感染症，哺乳期的乳头皲裂（开裂），小手术（皮肤损伤、手术创口）。",
+   "bytes": 1558
   },
   {
    "koId": "e5eaa4e0-2e0f-4bdd-91df-0b7d26b06afc",
@@ -8602,6 +9961,15 @@
    "bytes": 1227
   },
   {
+   "koId": "be775bea-57aa-4e30-a0eb-3844b11a1a35",
+   "masterId": "31bedb72-75b4-460f-b64a-be9bacfc7804",
+   "product": "바스힐캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2edda461-ca89-18c1-0411-22534b9cc27f",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 C、E 的补充，以及阳光·皮肤病等所致色素沉着（黄褐斑、雀斑）的缓解，牙龈出血·鼻出血（流鼻血）的预防，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉）症状的缓解。",
+   "bytes": 1841
+  },
+  {
    "koId": "2d2a5d16-9e08-4ca2-994f-05d23c95c465",
    "masterId": "31c7dc26-7233-4ca0-b0f5-ba211fd9c84c",
    "product": "앤도민-300연질캡슐",
@@ -8629,6 +9997,15 @@
    "bytes": 672
   },
   {
+   "koId": "71e23816-ace5-41b6-8142-a0fd71ecba71",
+   "masterId": "31d598a4-07a6-42c6-99be-32959ce657fb",
+   "product": "한방경보고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "e5658b2c-c1d5-4b49-8ed4-75ec18a13467",
+   "summary": "本药用于扭伤（扭挫伤）、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩痛（肩部疼痛）、冻疮的镇痛 · 消炎。",
+   "bytes": 1044
+  },
+  {
    "koId": "fc540141-6b73-4e6a-96ef-5a67712d64d3",
    "masterId": "31d990ad-4b58-444e-9479-13f5f45aaef6",
    "product": "음양고카타플라스마",
@@ -8636,6 +10013,15 @@
    "sourceRefId": "064b8abb-e276-4424-95c4-0272a918b05c",
    "summary": "本药用于扭伤、挫伤、肌肉痛、骨折痛、关节痛、腰痛、肩部僵硬、冻疮的镇痛 · 消炎。",
    "bytes": 983
+  },
+  {
+   "koId": "705ba8f3-e7c4-4a93-816f-8ac623fb49ca",
+   "masterId": "31dd87a9-1542-4a65-9353-2a873ce0ab84",
+   "product": "제일한방테이핑파프카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "9656c6b8-df87-413c-8f1f-209d3a069ae5",
+   "summary": "本药用于腰痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
   },
   {
    "koId": "570eab6f-9d44-44f9-906c-2321333dcbca",
@@ -8701,6 +10087,15 @@
    "bytes": 738
   },
   {
+   "koId": "bfdbe762-3d1c-44cf-986c-abbb8b80394a",
+   "masterId": "320b4b0a-edb1-4289-8b9e-3e0f642a25f2",
+   "product": "지엘타이밍정(카페인무수물)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b454ef9d-46d4-d5ed-a3b8-a8b9d3fcb85c",
+   "summary": "本药用于困倦。",
+   "bytes": 1150
+  },
+  {
    "koId": "b90db277-fbc5-4953-8f7e-a5f5a313622c",
    "masterId": "321b90df-32cb-455e-97e4-abcfd0fc0395",
    "product": "큐텐그린연질캡슐",
@@ -8744,6 +10139,15 @@
    "sourceRefId": "fdb7bf7a-1810-6bfb-477c-62fb8e577255",
    "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、食欲不振、营养障碍、发热性及消耗性疾病。",
    "bytes": 1284
+  },
+  {
+   "koId": "85bb41d7-c4bb-46bb-88bc-54c6e9ed03ac",
+   "masterId": "3237dcf9-507a-4f3f-8e26-09bf9e7ae218",
+   "product": "새로딘시럽(로라타딘)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "279ff2cb-d74b-95e8-6364-bc47a4180fd9",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1293
   },
   {
    "koId": "8a2b6df4-b111-4ad6-a21d-30978aa4dd9a",
@@ -8809,6 +10213,15 @@
    "bytes": 1166
   },
   {
+   "koId": "e5bd1d44-a88e-4bd9-a824-a286fdfa4ad1",
+   "masterId": "32656562-d840-4476-b9e3-abb36bb85af0",
+   "product": "청나점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "bf281566-175c-0066-e796-b83365bd0d82",
+   "summary": "本药用于眼疲劳，结膜充血，游泳后眼部不适感或灰尘、汗液进入眼中时，紫外线及其他光线所致眼部炎症，眼睑糜烂，佩戴硬性隐形眼镜时的不适感，眼部瘙痒，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1536
+  },
+  {
    "koId": "1a46ec2d-39bb-4aef-ad30-951625725c5e",
    "masterId": "3275b15e-a2f3-4abc-8664-9dbe9a493145",
    "product": "오큐탈이에스정",
@@ -8825,6 +10238,15 @@
    "sourceRefId": "c17d5a2e-828a-4c78-bccd-388f39775135",
    "summary": "本药用于皮肤及结缔组织营养不足，或因营养不足而易发生溃疡的疾病（例：创口、营养供给）。",
    "bytes": 881
+  },
+  {
+   "koId": "fbe8fffb-9e50-4f7e-976d-ba3f714e6cec",
+   "masterId": "328df4ff-5a99-4b48-b44a-6c1d8ea0ddd0",
+   "product": "지엘소브레롤캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "95a269ce-dc16-5cd4-bfea-fa5feaebb13a",
+   "summary": "本药用于急性、慢性支气管炎，伴有呼吸障碍（哮喘、咳嗽）的支气管炎，鼻咽炎，喉气管炎等分泌功能亢进的急性、慢性呼吸系统障碍。",
+   "bytes": 1271
   },
   {
    "koId": "e177c3e4-7001-4158-b816-3ab89d77295f",
@@ -8863,6 +10285,15 @@
    "bytes": 1227
   },
   {
+   "koId": "1f120eea-e212-4b48-ab28-461394fc159d",
+   "masterId": "330c391e-33da-44c9-9346-48b7338491dc",
+   "product": "멘자펜정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "de6487eb-0177-7719-e4d8-7ee3ea7c0dfe",
+   "summary": "本药用于缓解月经时痉挛（剧烈腹痛）、肿胀（水肿）、头痛、腰痛、肌肉痛、疲劳感。",
+   "bytes": 1530
+  },
+  {
    "koId": "e2892f7f-497b-40d5-8ff7-b5e6a67c91c8",
    "masterId": "334ec249-0bf8-4690-b3a6-9a22ea9ddf41",
    "product": "벤포포르테정",
@@ -8890,6 +10321,15 @@
    "bytes": 760
   },
   {
+   "koId": "d0d903d3-e82a-43cc-8809-380813cf3c4f",
+   "masterId": "33892a80-96d3-47a7-b2f3-c182a7adc912",
+   "product": "아이봉씨세안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2dcc9fd9-322f-16a3-4c25-9a02cb794c7a",
+   "summary": "本药用于眼部清洗，游泳后眼部不适感，或灰尘、汗液进入眼中时。",
+   "bytes": 1224
+  },
+  {
    "koId": "b0ad9a77-56d5-4920-897e-a77fd1203a34",
    "masterId": "338fa8eb-75a8-4c1b-bda6-434b1273e6ce",
    "product": "칼스모아정",
@@ -8906,6 +10346,24 @@
    "sourceRefId": "5c9ffa5a-2a7b-ad5c-77bb-5398afb19676",
    "summary": "本药用于单纯疱疹（水疱）病毒感染症（包括初发及复发性生殖器疱疹（水疱）与唇疱疹（水疱））。",
    "bytes": 1423
+  },
+  {
+   "koId": "a837ebe2-fb61-4db8-b983-22b4529737ae",
+   "masterId": "33bca172-1eaa-482a-84fa-d49e479ac0b5",
+   "product": "노루모듀얼액션현탁액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "e1c8aa7e-6718-c98a-f2c3-264e43f5ae4b",
+   "summary": "本药用于改善酸反流、烧心、因胃内容物反流引起的消化不良（例如餐后、妊娠期、伴有反流性食管炎时）。",
+   "bytes": 1376
+  },
+  {
+   "koId": "4341d673-528b-4933-a088-55b869a53ee5",
+   "masterId": "33c2a35e-8eaf-4412-80be-94bc7ef2800a",
+   "product": "옵티어즈점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d94dd4cb-4526-a477-742e-b191eed561f0",
+   "summary": "本药用于眼疲劳，泪液的补充（眼干燥），佩戴硬性隐形眼镜及软性隐形眼镜时的不适感，眼睛模糊（眼屎较多时等）。",
+   "bytes": 1253
   },
   {
    "koId": "65a2d6a2-8c3e-475c-a6fa-5acfd678d1ac",
@@ -8998,6 +10456,15 @@
    "bytes": 679
   },
   {
+   "koId": "1c6cbfa9-3b26-4732-ade3-7c1eda79053b",
+   "masterId": "3413765d-8ba1-4ed4-88e4-116b347903ae",
+   "product": "시리콤푸연질캡슐175밀리그램(밀크시슬열매건조엑스)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "80ca9c60-5944-b061-c35a-a3aec82f7197",
+   "summary": "本药用于中毒性肝脏疾病、慢性肝炎、肝硬化的辅助治疗。",
+   "bytes": 1276
+  },
+  {
    "koId": "90e8804e-2009-4d00-ad99-2c20558e33fd",
    "masterId": "34196986-4b8c-4a09-852f-b99e78eb4d4d",
    "product": "제일쿨파프",
@@ -9023,6 +10490,15 @@
    "sourceRefId": "b10e6bf9-e4d4-a68f-40ee-e0c4a2322d89",
    "summary": "本药用于末梢动脉循环障碍（间歇性跛行）、头晕、血管性及退行性耳鸣（耳鸣），以及伴有耳鸣（耳鸣）、头痛、记忆力减退、注意力障碍、抑郁感、头晕等痴呆性症状的器质性脑功能障碍的治疗。",
    "bytes": 1581
+  },
+  {
+   "koId": "f2e3260e-48c1-43c6-8579-7f52b26f68e2",
+   "masterId": "343bef21-45a6-4e5e-ae3e-e40c986d51dd",
+   "product": "아우스민캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "13bc32e7-62b9-83dd-8a62-7dd44b81e5d2",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病中病后发热性消耗性疾病、妊娠·哺乳期等情况下的营养补充。",
+   "bytes": 1460
   },
   {
    "koId": "82d1bb7f-865b-432d-9dfb-c2b6364248f3",
@@ -9061,6 +10537,33 @@
    "bytes": 1228
   },
   {
+   "koId": "e11ff614-1954-425d-9ac7-3f21bb583436",
+   "masterId": "3470b14f-2966-4af3-95ae-a170acaa2d14",
+   "product": "한방파프탑카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "fa0d3171-258b-4fe4-a6c1-4176b6a10bb2",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎。",
+   "bytes": 997
+  },
+  {
+   "koId": "15b59a30-d05b-4f8d-9fae-c5b9d6feebc0",
+   "masterId": "34764220-d14a-4d81-91a1-f208e18fdb44",
+   "product": "진녹천액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "8d6412bd-0563-f237-ef39-811590a912d8",
+   "summary": "本药用于滋养强壮、体质虚弱、体力疲劳、病后体力下降、营养障碍、发热性·消耗性疾病、产前·产后等情况下的营养补充。",
+   "bytes": 1270
+  },
+  {
+   "koId": "940ec7ea-8aba-48cb-ad5f-1ee49bc2705a",
+   "masterId": "34851b13-fbed-40f1-9cd9-ec457e07762b",
+   "product": "청수고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "f1dba6a3-9550-4af1-8e59-a815211544f7",
+   "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、骨折痛、腰痛、肩部僵硬、冻疮的镇痛 · 消炎。",
+   "bytes": 1055
+  },
+  {
    "koId": "266bd058-9ffc-43bc-a740-746eae6b2b28",
    "masterId": "3488a456-36ee-4a97-940f-7c93d957cec1",
    "product": "헤모프란크림(프라목신염산염)",
@@ -9077,6 +10580,24 @@
    "sourceRefId": "029b8650-257b-47bb-ae3e-a42444c39d93",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳，末梢血液循环·手足冰冷的缓解，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 718
+  },
+  {
+   "koId": "5cb43d72-8524-4c39-9bd1-25f77efd5fba",
+   "masterId": "34a8f203-8c2f-4e3d-b0a2-3ff8e78dda73",
+   "product": "비스타정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "6e00d5c9-ff66-2017-201d-f6a2b427e716",
+   "summary": "本药用于妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时的维生素 B6 的补充，以及口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解。",
+   "bytes": 1352
+  },
+  {
+   "koId": "c7a3d058-af3b-4592-aeec-c441c0d43b92",
+   "masterId": "34abd2af-5723-40ec-a741-dd90c4872420",
+   "product": "네오탄연고",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "de4b8811-b1f3-dffe-0dc9-04cc6949593b",
+   "summary": "本药用于由新霉素敏感菌继发感染的皮质激素反应性皮肤疾病的早期治疗（皮炎、感染的创口）。",
+   "bytes": 1461
   },
   {
    "koId": "a40be606-9d31-4b8d-bb61-26a7ad8e0806",
@@ -9158,6 +10679,15 @@
    "sourceRefId": "49585ccf-b7e3-4579-ba7a-9940b9db4f13",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、腰痛、肩部僵硬、神经痛、风湿性疼痛的镇痛·消炎。",
    "bytes": 1051
+  },
+  {
+   "koId": "56fb12c8-be5e-44d3-98ac-a7e401ab6d53",
+   "masterId": "35520759-a9bb-4ba8-b808-ebfa16690808",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "15866d20-5ba5-4576-b60c-60b72f94fd9f",
@@ -9286,6 +10816,24 @@
    "bytes": 740
   },
   {
+   "koId": "e18dd783-7a2f-455a-ad46-f6a8e7ac93e5",
+   "masterId": "35c3556c-153a-4d42-9d1d-c92e1fca117e",
+   "product": "클레신점안액(크로모글리크산나트륨)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1cc0d4f6-d6b0-7285-2e09-19be5f104041",
+   "summary": "本药用于春季角膜炎或结膜炎、变应性结膜炎。",
+   "bytes": 1170
+  },
+  {
+   "koId": "64e592a8-b7c7-46c6-9fe7-49b402e76076",
+   "masterId": "35c5b615-9ea0-4c00-8ecd-9787ef556ddb",
+   "product": "트리플에이연고",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d524f4b0-6d93-f784-7266-05216f407905",
+   "summary": "本药用于由新霉素敏感菌继发感染的皮质激素反应性皮肤疾病的早期治疗（皮炎、感染的创口）。",
+   "bytes": 1456
+  },
+  {
    "koId": "4fd74487-82db-4d04-8b83-b2273cc3caf9",
    "masterId": "35c990af-b0ac-4fa4-859a-d7f56b185d69",
    "product": "센트본정",
@@ -9322,6 +10870,15 @@
    "bytes": 678
   },
   {
+   "koId": "9ef21946-2a86-4a80-a24d-9f580629840f",
+   "masterId": "35dfab43-9987-4619-b945-74c91a08b8c0",
+   "product": "비테인캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "be933677-23f0-753f-4bea-66361a38060b",
+   "summary": "本药用于食欲减退（食欲不振）、胃部胀满感、消化不良、过食、积食、恶心、呕吐、促进消化、消化不良所致的胃部胀满感。",
+   "bytes": 1290
+  },
+  {
    "koId": "1d821614-b889-41a3-a6ec-ceea8a20baee",
    "masterId": "35e20bc5-81ed-4b6b-90d0-966a532cdc9a",
    "product": "로제비타연질캡슐",
@@ -9338,6 +10895,24 @@
    "sourceRefId": "5408235f-c032-cb91-9a9c-b88991ba431a",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化等疾病中的排痰困难。",
    "bytes": 1437
+  },
+  {
+   "koId": "b9b89d7b-bc0a-4aca-8ca2-9052c79fd29a",
+   "masterId": "3604e9e6-476c-41fb-b2ac-68136dd8648a",
+   "product": "바른솔크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a3548e04-f2fc-3bfb-b50a-1cf9746249a0",
+   "summary": "本药用于有感染风险的创口（抓伤、割伤、撕裂伤、烧伤、皮炎），下肢溃疡，褥疮，继发感染的湿疹，慢性单纯性苔藓（神经性皮炎）等皮肤感染症，哺乳期的乳头皲裂（开裂），小手术（皮肤损伤、手术创口）。",
+   "bytes": 1558
+  },
+  {
+   "koId": "2f6035ab-310b-48f0-8a21-850cfaeccd43",
+   "masterId": "361b315f-a1f6-4b9a-9c83-bb247f0b9503",
+   "product": "디알프레쉬점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "7833e8a5-29f0-c2e3-a744-b7c9f30f4b3b",
+   "summary": "本药用于暂时缓解干眼症或因暴露于风·阳光而产生的灼热症状、刺激感、不适感，以及预防眼部刺激感。",
+   "bytes": 1432
   },
   {
    "koId": "0c209742-fa7a-4121-a389-5e116da2cf78",
@@ -9403,6 +10978,24 @@
    "bytes": 1232
   },
   {
+   "koId": "6130e18f-5a8a-43c1-a469-5c1b90b6e76f",
+   "masterId": "36684294-f816-45cb-aa7d-6914ce9e06cf",
+   "product": "시프겔한방파프카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "53d338f9-9e93-4ddb-96ee-90abfa0b74b5",
+   "summary": "本药用于腰痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
+  },
+  {
+   "koId": "c5407391-4a11-43c4-b52a-2841e770c6d8",
+   "masterId": "366852ac-19b5-49c2-bd71-86bdeb72f63f",
+   "product": "콜그린에이캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "3e26f9d4-9f47-78fa-6a84-9549edee9c5e",
+   "summary": "本药用于缓解感冒的多种症状（流涕、鼻塞、打喷嚏、咽喉（喉咙）痛、咳嗽、咳痰、寒战（发冷发抖的症状）、发热、头痛、关节痛、肌肉痛）。",
+   "bytes": 2053
+  },
+  {
    "koId": "b08d330c-82c9-48f5-b9b3-59557c2a9e06",
    "masterId": "366bd722-9e4b-4b11-82be-db6ff175c9e8",
    "product": "신일아시클로버크림(수출명:PytumeCream)(수출용)",
@@ -9410,6 +11003,33 @@
    "sourceRefId": "ddafec19-2112-0398-5a9f-27d1724a2518",
    "summary": "本药用于单纯疱疹（水疱）病毒感染症（包括初发及复发性生殖器疱疹（水疱）与唇疱疹（水疱））。",
    "bytes": 1729
+  },
+  {
+   "koId": "666f177b-9340-4de8-bea8-82659cef196a",
+   "masterId": "367bcf27-33d3-40dd-889b-3136621c69c1",
+   "product": "알레스탑-에스정",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "46812aa1-ea6d-5438-386e-17860a9813e6",
+   "summary": "本药用于荨麻疹、湿疹、漆疹、瘙痒症。",
+   "bytes": 1357
+  },
+  {
+   "koId": "2f01e07e-77f5-412e-83ca-5af2d3ef7b77",
+   "masterId": "3683e72e-29de-4387-82c1-ff7173e006f8",
+   "product": "아이티어플러스점안액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "f5e8b947-22fa-c430-e377-a55c4fdc5723",
+   "summary": "本药用于佩戴软性隐形眼镜或硬性隐形眼镜时的不适感，泪液补充（眼干燥），眼疲劳，眼睛模糊（眼屎较多时）。",
+   "bytes": 1290
+  },
+  {
+   "koId": "53200da2-f45a-4e12-b0a5-7bca6dfabf08",
+   "masterId": "3684dba1-b2c7-47c1-8356-f6b08ee22731",
+   "product": "터치메드연고",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "1506de71-eba2-6ef0-fe1d-a64c72f4ed18",
+   "summary": "本药用于口腔炎、舌炎。",
+   "bytes": 1131
   },
   {
    "koId": "cba332b6-8a40-4c69-a4d3-acc7cf8bda91",
@@ -9484,6 +11104,15 @@
    "bytes": 1698
   },
   {
+   "koId": "3353453a-1bd8-471b-bf97-72e242a35dc1",
+   "masterId": "36bd0f22-3b1e-47f8-a9ab-588b86692903",
+   "product": "아이파프케어팝카타플라스마(케토프로펜)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "26ba4756-375a-4779-b31d-942eaa14fb88",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肩关节周围炎、腱炎及腱鞘炎、腱周炎、网球肘等肱骨上髁炎、肌肉痛、外伤后肿胀及创伤后浮肿或疼痛的镇痛及消炎。",
+   "bytes": 1474
+  },
+  {
    "koId": "d0fff6b9-d126-43fd-abc3-f91b34ad2ecb",
    "masterId": "36c2623a-6b0f-4c9b-a3b7-1d54769666e9",
    "product": "헤파딘액",
@@ -9529,6 +11158,24 @@
    "bytes": 685
   },
   {
+   "koId": "7edac746-bdc1-4016-9eb9-37617ded309a",
+   "masterId": "370db616-a40e-4b7b-8785-1043cb03ed30",
+   "product": "더마그램피디알엔크림(폴리데옥시리보뉴클레오티드나트륨)",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "0b758a0d-e317-4d5b-b254-9ec05649e138",
+   "summary": "本药用于皮肤及结缔组织营养不足，或因营养不足而易发生溃疡的疾病（创口、营养供给）。",
+   "bytes": 921
+  },
+  {
+   "koId": "e906ee82-3b75-4e88-bb18-89b7451a95d2",
+   "masterId": "3713b1fc-8de8-4d4e-a559-84c400b5e315",
+   "product": "데카키논캡슐(유비데카레논캡슐)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "f2c3965e-7756-3afd-6ff8-3c6fa98a3206",
+   "summary": "本药用于轻度-中度充血性心力衰竭。",
+   "bytes": 1114
+  },
+  {
    "koId": "a282d042-207d-44a4-9fcb-067d2ab10cc0",
    "masterId": "3737307a-525c-41dd-9c1a-3a121d9eafb9",
    "product": "누네탑플러스연질캡슐",
@@ -9536,6 +11183,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "e623c7bc-d979-4805-a529-94a6ecf1d533",
+   "masterId": "3742bfa8-1b14-4e36-a0ab-b6e790321637",
+   "product": "새솔크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "a3548e04-f2fc-3bfb-b50a-1cf9746249a0",
+   "summary": "本药用于有感染风险的创口（抓伤、割伤、撕裂伤、烧伤、皮炎），下肢溃疡，褥疮，继发感染的湿疹，慢性单纯性苔藓（神经性皮炎）等皮肤感染症，哺乳期的乳头皲裂（开裂），小手术（皮肤损伤、手术创口）。",
+   "bytes": 1558
   },
   {
    "koId": "cb39a97f-cc5e-4a8d-87a1-8da2ad558d53",
@@ -9619,6 +11275,15 @@
    "bytes": 738
   },
   {
+   "koId": "0aa8c2ab-428b-4b0b-bb62-5884f2772e81",
+   "masterId": "37b54bb3-e873-4021-a1b8-791c72ae5916",
+   "product": "대우로라타딘정(수출명:로미딘정라틴정필미딘정)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d5d94e6d-5778-5fcc-662b-d281775d430a",
+   "summary": "本药用于变应性鼻炎（打喷嚏、鼻塞、瘙痒、眼部灼烧感），慢性特发性（原因不明的）荨麻疹。",
+   "bytes": 1709
+  },
+  {
    "koId": "300b91e6-3920-49ab-a2d0-70c57ba0f0df",
    "masterId": "37b5cb13-33ef-4f5e-9c82-665d19c54c39",
    "product": "새크라손크림",
@@ -9626,6 +11291,15 @@
    "sourceRefId": "cd0a59f0-32ec-e486-3240-c3f9a0df5ea5",
    "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
    "bytes": 1681
+  },
+  {
+   "koId": "8a1ec31a-2c68-45aa-b028-d3c3d0900c82",
+   "masterId": "37b84660-393d-4eb2-8d6c-b021cc6e089b",
+   "product": "록센플라스타(록소프로펜나트륨수화물)(수출명:LoxenPlaster)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2f052ee2-8c9e-3c1d-036a-0fc690a0c991",
+   "summary": "本药用于退行性关节炎（骨关节炎）、肌肉痛、外伤后肿胀、疼痛的镇痛·消炎。",
+   "bytes": 1525
   },
   {
    "koId": "1b9927f9-6f51-4626-9ae6-497eeee3a04b",
@@ -9653,6 +11327,15 @@
    "sourceRefId": "5662827f-fcd5-4446-92fb-cfb4da217f67",
    "summary": "本药用于扭伤、挫伤、肌肉痛、关节痛、腰（腰部）痛、肩部僵硬、冻疮（冻伤）的镇痛·消炎（抗炎）。",
    "bytes": 1013
+  },
+  {
+   "koId": "59a4864a-2570-4110-bf1e-c0b28edc92d5",
+   "masterId": "37fff9b3-0f28-4deb-b10c-1c0bfc9db7a9",
+   "product": "뮤코론5%시럽(카르보시스테인)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d37bb03f-71cc-b872-3795-87b41fa7eb7f",
+   "summary": "本药用于急性、慢性支气管炎，支气管哮喘，支气管扩张症，咽炎的排痰（痰液）困难，以及慢性鼻窦炎的排脓、渗出性中耳（中耳）炎的引流。",
+   "bytes": 1482
   },
   {
    "koId": "924e575d-7ff3-4330-ad28-425b45c24210",
@@ -9698,6 +11381,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "f8cf6ab1-fff5-44b4-a620-989783e4dce8",
+   "masterId": "38347fb1-d05e-403e-bfea-561dcb8b3cbc",
+   "product": "뱅드롱액",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "2281dc69-a2bf-7912-c4ec-786d0b38eef3",
+   "summary": "本药用于晕动病引起的头晕·呕吐·头痛的预防及缓解。",
+   "bytes": 1262
   },
   {
    "koId": "caea64dc-33b7-4312-8964-3df6ecaf0004",
@@ -9772,6 +11464,15 @@
    "bytes": 740
   },
   {
+   "koId": "c7e9ec29-c8f8-4788-82ad-86e4205af2ba",
+   "masterId": "389dc530-9146-4c3d-8e9c-c78b49858677",
+   "product": "템페라연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "3fb35c9f-cdf8-c3a8-b1ca-94c34612e2d6",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 A、C、B1、E 的补充，以及眼干燥感的缓解，夜盲症（夜间视物不清的症状），阳光·皮肤病等所致色素沉着（黄褐斑、雀斑）的缓解，牙龈出血·鼻出血（流鼻血）的预防，末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉）症状的缓解与锌的补充。",
+   "bytes": 1934
+  },
+  {
    "koId": "3945d3e6-2dd3-4981-9859-0075f8490ef2",
    "masterId": "389e064f-9f63-4bb6-b1dd-c0f9eda1bb69",
    "product": "레디비타정",
@@ -9788,6 +11489,15 @@
    "sourceRefId": "71fb9b6c-5e88-1ddc-356d-e76c5ae83721",
    "summary": "本药用于药物中毒、自体中毒。",
    "bytes": 1043
+  },
+  {
+   "koId": "34d354bf-d36d-445d-80fb-a40400f92cce",
+   "masterId": "38accb2f-9288-4e01-b637-bd381faf600b",
+   "product": "치지래과립",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "aa1fdb9d-26d2-e688-f0c1-99393f81bb9e",
+   "summary": "本药用于痔核、肛裂、痔出血。",
+   "bytes": 1206
   },
   {
    "koId": "21dec7ac-9bfa-49fc-b28b-49cce89edaaa",
@@ -9835,6 +11545,24 @@
    "bytes": 1342
   },
   {
+   "koId": "dfb42b67-9e94-47a1-bb42-e625dbb8a2ed",
+   "masterId": "38ede9d1-b036-4129-9dc1-4660bbf3f66d",
+   "product": "지오연질캅셀",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9667cce2-710d-6356-cb86-c5ad938cecfa",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 E、B2 的补充，以及末梢血液循环障碍，更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉），口角炎、唇炎、口腔炎、舌炎、湿疹、皮炎症状的缓解。",
+   "bytes": 1612
+  },
+  {
+   "koId": "fd8e7dd9-0eb6-4aa7-bfa0-e292448f7e8a",
+   "masterId": "38faf544-670c-4d24-b605-eb788fae6b36",
+   "product": "웰리드연질캡슐",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "b484a957-eb58-62a2-905b-78f05e676146",
+   "summary": "本药用于体力疲劳，妊娠·哺乳期，病中·病后（患病期间或恢复后）体力下降时，老年期的维生素 A、C、E 的补充，以及眼干燥感的缓解，夜盲症（夜间视物不清的症状），阳光·皮肤病等所致色素沉着（黄褐斑、雀斑）的缓解，牙龈出血·鼻出血（流鼻血）的预防，以及末梢血液循环障碍及更年期时肩·颈僵硬，手足麻木·手足冰冷（手脚发凉）症状的缓解与锌的补充。",
+   "bytes": 1896
+  },
+  {
    "koId": "c2b7cc40-69b2-4b27-8ac1-8b7464ea1100",
    "masterId": "3901fc1b-3aa4-496d-b656-27a43b5ba8fd",
    "product": "휴니즈아세틸시스테인캡슐200mg",
@@ -9878,6 +11606,15 @@
    "sourceRefId": "c1b2a853-ad20-20fa-989d-4abe68b86022",
    "summary": "本药用于急性、慢性支气管炎，支气管哮喘，喉炎，鼻窦炎，囊性纤维化中的排痰困难。",
    "bytes": 1428
+  },
+  {
+   "koId": "9ca3c209-ce4b-41cd-b952-24344564e0c6",
+   "masterId": "392c1d78-b927-4184-a80c-e4f1abbd3e3c",
+   "product": "뮤코졸정(브롬헥신염산염)",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "9aafdd36-0f6c-d3b2-4fcf-3d78a85b5d7d",
+   "summary": "本药用于急性、慢性支气管炎的排痰困难。",
+   "bytes": 1336
   },
   {
    "koId": "72a3ec72-744b-4928-ae0e-8681a1c87c62",
@@ -9925,6 +11662,15 @@
    "bytes": 760
   },
   {
+   "koId": "0b57c4fa-dc90-491f-bb20-ee1d4c134a56",
+   "masterId": "396cd336-fe68-40cf-a6a6-c993ef888264",
+   "product": "활명수",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "67f36d3b-318f-49fb-30a8-be601b01c769",
+   "summary": "本药用于食欲减退（食欲不振）、胃部胀满感、消化不良、过食、积食、恶心、呕吐。",
+   "bytes": 1497
+  },
+  {
    "koId": "bf6ae540-471a-4236-804f-909898da66c1",
    "masterId": "3972c078-e585-479f-8392-0a176c107059",
    "product": "벤포로이틴연질캡슐",
@@ -9941,6 +11687,15 @@
    "sourceRefId": "d29b1340-498e-4128-b6e1-b667e0135035",
    "summary": "用于体力疲劳·体力下降·老年期的维生素 E·B1·B2·B6 补充，末梢血液循环障碍·手足冰冷，神经痛·肌肉痛，口角炎·口腔炎的缓解，锌的补充，以及镁缺乏所致的肌肉痉挛。",
    "bytes": 738
+  },
+  {
+   "koId": "4bce3366-b765-4a96-830f-64376440338a",
+   "masterId": "3981627c-c567-4b4d-9057-347af8d31de0",
+   "product": "해동본방황제고카타플라스마",
+   "sourceType": "o4o_drug_otc_topical",
+   "sourceRefId": "b38a8854-6985-4e2e-920d-64019f11c2f2",
+   "summary": "本药用于腰痛、挫伤、扭伤、肩部僵硬、关节痛、肌肉痛、肌肉疲劳、冻疮（冻伤）、骨折痛的镇痛·消炎（抗炎）。",
+   "bytes": 1056
   },
   {
    "koId": "2c1ed2b6-39ed-421a-aa18-8b97c3e0c098",
@@ -9968,6 +11723,15 @@
    "sourceRefId": "26c2af33-f6ba-4a09-a686-da8c98137aff",
    "summary": "用于体力疲劳·妊娠哺乳·病中病后体力下降·发育期·老年期的维生素 B1·B2·B6·C·D·E 补充与佝偻病预防，神经痛·肌肉痛·关节痛，口角炎·口腔炎，脚气病·眼疲劳的缓解，以及锌的补充。",
    "bytes": 760
+  },
+  {
+   "koId": "87499e02-f755-446f-bcec-746676bcbab3",
+   "masterId": "399d5e39-9ec4-429d-8feb-74d773646ab5",
+   "product": "베라스톤크림",
+   "sourceType": "mfds_drug_otc",
+   "sourceRefId": "d114366b-1f3b-e718-bc09-c3701ddd0ba4",
+   "summary": "本药用于继发感染的变应性或炎症性皮肤疾病（湿疹、接触性皮炎、脂溢性皮炎、特应性皮炎、光化性皮炎、慢性单纯性苔藓、间擦疹（皮肤摩擦症）、剥脱性皮炎、瘙痒、银屑病（干癣）），1 度烧伤。",
+   "bytes": 2068
   },
   {
    "koId": "874a6808-4603-4f78-9f01-e7c9fa112b2e",
@@ -10015,7 +11779,17 @@
    "zhId": null
   },
   {
+   "masterId": "005aeac2-e9b3-4b32-9c28-ba82f23b5286",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "007c0b29-cadc-4703-8588-4d9c95fbb8ab",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "007c7892-cc8a-4859-8c96-25974e974398",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10075,6 +11849,11 @@
    "zhId": null
   },
   {
+   "masterId": "0157611a-578f-4340-a050-0de0f3411e30",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "01643f54-99ae-4006-81eb-1addf4bfd63d",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10090,7 +11869,17 @@
    "zhId": null
   },
   {
+   "masterId": "0174ed73-59b2-4d65-b9cf-741db90ea9b9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "017b0f90-f267-488c-a88e-29adbdfe8a3a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "01857732-146d-461a-8f4e-842b7352625a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10110,12 +11899,22 @@
    "zhId": null
   },
   {
+   "masterId": "01c8f942-56b3-4b4d-b30c-f0343f8d1657",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "01c92bba-f52e-45c2-a16d-37c5bfa572a9",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "01d7af7a-ba1e-4e02-a393-a4c7c82602bb",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "01e0b0dd-f807-4460-8fc5-1ae643b7f634",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10136,6 +11935,11 @@
   },
   {
    "masterId": "020ecf92-080c-4bfb-b247-4fcbc615da8d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "022ba77b-40a2-4824-8b89-c546ecca5440",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10220,6 +12024,21 @@
    "zhId": null
   },
   {
+   "masterId": "02eae3f1-4b07-4457-b919-f66c7b0ea140",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "02fc72e0-83ce-41dd-9b07-09ed1869608c",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "03003c0b-555b-4402-a7f4-0c81009f0f59",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "030981de-cce6-41ac-a5f0-c7968972c083",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10255,12 +12074,22 @@
    "zhId": null
   },
   {
+   "masterId": "0370f584-d563-4d75-a560-e66c4e877ce0",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "037415d8-82d6-4452-8649-eecce4ed80ce",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "0387c0ed-2c19-4beb-a618-742d91e60f06",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0397edeb-fcbe-4dfa-96ad-4e24facfb818",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10280,7 +12109,32 @@
    "zhId": null
   },
   {
+   "masterId": "03b61040-7839-49e4-b789-d9b5629a083d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "03b9eb6b-76dd-4e51-87de-97bd095b43ac",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "03bb7633-361d-461c-aa5f-4b126fcb9125",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "03d268ac-2b0b-451c-9d21-079eda0e3bb7",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "03f23a3e-3626-414a-8323-e7bef2a1c835",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "03fae94d-49a1-4761-bb47-1cc82943e2e2",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10390,6 +12244,11 @@
    "zhId": null
   },
   {
+   "masterId": "05089703-9ca0-4f17-aa91-4d2d666930c5",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "051103f4-1144-4152-8465-de19b2c5e827",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10430,6 +12289,11 @@
    "zhId": null
   },
   {
+   "masterId": "05464adc-cc54-48e1-be4f-66123c9f09b7",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0552c20a-86e1-4b53-aeb1-1aaf588b0e57",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10456,6 +12320,11 @@
   },
   {
    "masterId": "057d12fb-bc36-455e-ba84-11270616512e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "05870ec0-c8d1-40ad-9c86-1614bfcd9411",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10520,6 +12389,11 @@
    "zhId": null
   },
   {
+   "masterId": "061b2bf1-2286-4fd0-beb3-28a085fa297f",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "061edd83-f342-420d-b530-3a71bc3c46c9",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10550,6 +12424,11 @@
    "zhId": null
   },
   {
+   "masterId": "0664b268-6f11-4cbe-9389-db5395d2a436",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "066b1e16-b833-4903-b8e5-dd9fec79d7c2",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10571,6 +12450,11 @@
   },
   {
    "masterId": "06c2baed-b533-498c-b8bb-3f858a31e595",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "06c9c5b9-511d-4fef-9033-fd30aa1f9ca4",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10680,6 +12564,16 @@
    "zhId": null
   },
   {
+   "masterId": "0788e727-b255-49be-8edd-e3d8456688e7",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "07896474-6fc5-4fdc-955a-8a92c2e1991d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "078d6197-a8e4-40d7-9b39-cd2b128cae69",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10710,6 +12604,16 @@
    "zhId": null
   },
   {
+   "masterId": "07cb5931-eba5-4a50-ac1e-c7ae9af9811b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "07d1998e-63cc-4c1b-881e-841e6d00acb4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "07d61c71-e925-469f-88d0-97e5c2b57203",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10725,7 +12629,22 @@
    "zhId": null
   },
   {
+   "masterId": "07f2414c-a818-4b29-b769-a9c6107d8575",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0819760f-01fc-4514-aa83-f6400b0e556b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0825f1b9-531c-417a-8506-b73e1f74e00d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "08261761-4db0-420b-892a-5c400ffc38e9",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10775,7 +12694,22 @@
    "zhId": null
   },
   {
+   "masterId": "088a36bf-cee2-4a38-92bf-2575c00a5c8a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "088b6c11-c65f-4350-abd0-0e890f6afeeb",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "08a1eb4a-ecdf-4e16-aebc-2d44360f38c2",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "08a7247b-2e1d-4712-bdbc-7a5768dc8de3",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10791,6 +12725,16 @@
   },
   {
    "masterId": "08d1493f-ffff-43bd-8959-f35f8aa7342b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "08e24900-9357-47ec-9a55-b296a1d6466a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "08f10d1f-e2ff-4eb6-9e33-c729c064a586",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10815,6 +12759,16 @@
    "zhId": null
   },
   {
+   "masterId": "092a8f96-7f17-4f73-acd5-d9326734aa42",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "09394a9d-674f-4264-9bd0-c67fb53b39b9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0943151d-eb44-4daf-8e6a-f0a5e8b3d97f",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10825,12 +12779,27 @@
    "zhId": null
   },
   {
+   "masterId": "094dcce6-0a11-4ff9-a32c-5f04ddfc6f23",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "095851f7-d218-414e-9260-74b2a8cad72a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
+   "masterId": "0978ecfd-f693-4be0-afd9-f7b00cb35787",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "09959479-1e21-40dc-8729-ee785e4412cf",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "099d4a04-a988-44c5-8680-4d8737a66035",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10850,12 +12819,27 @@
    "zhId": null
   },
   {
+   "masterId": "09d5575b-dab0-438b-ab6c-9f2c3dfc5965",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "09eaac0d-ca98-4935-80e0-6585b9044de0",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "09f6e931-4fbb-4d9a-92f5-783f3622599f",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "0a00ac61-cf08-4c73-98ce-9928e3c7bfc0",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0a09da22-724f-4e39-b53c-73b9ac3c7d1a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10905,6 +12889,11 @@
    "zhId": null
   },
   {
+   "masterId": "0aac55ac-02a9-4ab7-a72f-a1b3df6d271e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0aace74f-6375-4736-a308-81d102228822",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -10916,6 +12905,11 @@
   },
   {
    "masterId": "0abf5410-d0a0-49dc-84c6-febe85a5aebd",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0ac4339a-c2ac-4bae-bb52-ab1394700645",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -10951,6 +12945,11 @@
   },
   {
    "masterId": "0ae72113-ab03-446f-9315-329d3d46ceaa",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0af1ac01-ddee-4e9f-a89f-11faeb4ac7e0",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11065,6 +13064,11 @@
    "zhId": null
   },
   {
+   "masterId": "0c3d3ab3-da39-4ae9-9ccd-a39897a60edb",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0c3f9614-a535-45a1-9e84-7d11a23be865",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -11160,6 +13164,11 @@
    "zhId": null
   },
   {
+   "masterId": "0d39f3a6-adf1-4e49-b937-83cca5f8dee7",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0d45724e-9e6c-48bd-acd4-37e5f138e0ab",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -11215,6 +13224,16 @@
    "zhId": null
   },
   {
+   "masterId": "0def6434-9b1e-40ba-8b6e-b547bef93228",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0df00070-8390-4221-bfba-206738737413",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "0e4c03c6-cb3d-448a-937d-85211cef37da",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -11266,6 +13285,11 @@
   },
   {
    "masterId": "0edd7fd1-450e-46cd-abf9-ecb271f67819",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "0ee61a8d-91a2-4d6c-9dcd-8c542db24003",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11480,7 +13504,17 @@
    "zhId": null
   },
   {
+   "masterId": "10d6a1c1-a5d5-47b2-961f-cc909277d471",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "10df1c6f-db32-4784-b103-04a351acdc4b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "10e79a6f-d5f4-4efd-aa9b-e8acb85c307f",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11501,6 +13535,11 @@
   },
   {
    "masterId": "111541f7-6ca5-41a3-b734-cf1017816764",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "111cfcff-1727-445f-a514-66481c4aa63e",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11531,6 +13570,11 @@
   },
   {
    "masterId": "11531c62-28fc-4251-80c5-e6033872333c",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "116295b0-8f72-494b-92e1-b440cfa2e1e0",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11620,6 +13664,11 @@
    "zhId": null
   },
   {
+   "masterId": "12290db1-8d6c-485c-aa5d-6af33251a91f",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "123055d6-1473-469a-b815-6b47d1591172",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -11705,6 +13754,11 @@
    "zhId": null
   },
   {
+   "masterId": "12ffe692-31f4-4b6c-9f75-7398e06d2411",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "130b3ebc-3baf-42c2-bd4f-10efcc770e50",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -11721,6 +13775,11 @@
   },
   {
    "masterId": "13228742-6870-466c-b272-2aba2bf78e1b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1322c30c-03eb-46f0-a438-5a092c59a364",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11746,6 +13805,11 @@
   },
   {
    "masterId": "134b31e4-7fd6-4721-ac57-4847cdb53aaa",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1356cfb3-c388-4d3b-a347-e510d6f205bb",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -11895,6 +13959,11 @@
    "zhId": null
   },
   {
+   "masterId": "14db70c3-963a-479e-9a35-158b2a68f96c",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "14df929e-79e0-4d9c-bd7b-5201403bd2ea",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12000,6 +14069,16 @@
    "zhId": null
   },
   {
+   "masterId": "15a16f34-114a-4f73-b68a-758c58b5baf8",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "15a5a306-455c-4523-aa97-ac5c0097fd3b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "15b82cdf-9790-47e1-b34a-e4dc72a6ef6c",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12065,6 +14144,11 @@
    "zhId": null
   },
   {
+   "masterId": "15ffd570-2e0c-46cc-9f72-4ac2dc95536c",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "16348d5e-540d-45de-9ed5-4ba7f78aa539",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12115,6 +14199,11 @@
    "zhId": null
   },
   {
+   "masterId": "16e2270b-c0ef-46f9-aa86-3db35fbabc86",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "16fd2434-bf1e-471d-a7f6-19d18c01b962",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12151,6 +14240,11 @@
   },
   {
    "masterId": "171920a9-9dd5-481f-9295-046d4bff4fae",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "17228f71-d9d0-48cb-9296-ff01b3db14af",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12200,6 +14294,11 @@
    "zhId": null
   },
   {
+   "masterId": "17c0d733-53bf-434d-b23a-ee1dcb228d3d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "17c3b1f6-47e9-4daf-bd0e-a4d602039b57",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12216,6 +14315,11 @@
   },
   {
    "masterId": "17ec0e43-9876-4046-93a0-fa0022259ca9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "17fa1e67-620c-4f77-8e6e-3c2ee0275d34",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12300,6 +14404,11 @@
    "zhId": null
   },
   {
+   "masterId": "1859ad34-5785-46a9-881f-9d14b7c1b721",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "185b08c5-96e8-472b-ac2a-95924002b654",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12340,12 +14449,22 @@
    "zhId": null
   },
   {
+   "masterId": "18b15420-1a41-4465-9fb5-ad56572df387",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "18b63e46-6a4f-4ca1-972b-f790dfa197d8",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "18b69284-3c15-4c79-881d-fd762f1527ea",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "18c66c4a-44fc-4adc-8081-6c497554cbce",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12381,6 +14500,11 @@
   },
   {
    "masterId": "18f44c45-7cb8-4cd8-8aab-253063d50914",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "190d28d3-136f-4de3-994f-89cf8be8da10",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12615,7 +14739,17 @@
    "zhId": null
   },
   {
+   "masterId": "1b571741-6d51-4d47-aaac-36bbb2791d4f",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1b594fe5-daf4-4243-8902-764cd7a3d4d9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1b610244-a584-4577-a121-6d8c6c2fc694",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12740,6 +14874,11 @@
    "zhId": null
   },
   {
+   "masterId": "1c30f660-5dc9-4ffa-8713-1ef50e2c16d4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1c331b01-3b8f-49ee-91f2-7facbdaa4988",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12785,7 +14924,17 @@
    "zhId": null
   },
   {
+   "masterId": "1ca9ec22-6651-422b-8a12-7d00d1ba0855",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1cabd837-a424-4f16-93a8-fd2e8e4018df",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1cbb6702-8b65-4546-a29c-436d8a4d739a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -12895,6 +15044,11 @@
    "zhId": null
   },
   {
+   "masterId": "1db01a32-5ffc-4914-a535-675e53c3d366",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1dba952b-a247-4219-b3a9-dc726758211b",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -12916,6 +15070,11 @@
   },
   {
    "masterId": "1dd0b53e-7d70-4ba7-b463-a30fe211f5a3",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1dd47e87-c660-42c8-9319-76ac2e78a31d",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13030,6 +15189,11 @@
    "zhId": null
   },
   {
+   "masterId": "1f061ba1-e0ae-4a4f-9172-c5115aad9847",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1f1a0d06-c504-41e1-937b-154743c8171e",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13051,6 +15215,11 @@
   },
   {
    "masterId": "1f6f6b85-e77d-4bab-a512-3c24e69d8e72",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "1f6fd494-5e1c-4d05-9a3a-c3fe2974674c",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13125,6 +15294,11 @@
    "zhId": null
   },
   {
+   "masterId": "1fee734c-84dd-4c60-923b-d7ad601d811b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "1fee7c21-5f68-4937-83c6-cc4152913dbf",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13186,6 +15360,11 @@
   },
   {
    "masterId": "20aebfa9-abd1-44c2-b0fb-0df6341ca91a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "20b3c712-c6ba-40b8-b390-c76f485527ed",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13260,6 +15439,11 @@
    "zhId": null
   },
   {
+   "masterId": "217fe030-6803-41f5-a265-746c2f2e3332",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "218301cb-5938-457d-a089-f63a272d2a58",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13315,6 +15499,11 @@
    "zhId": null
   },
   {
+   "masterId": "21bf01f7-f622-4576-b9b0-593de3cc02d9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "21c56ebc-0cfc-455d-a40b-9b1dc74655fa",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13361,6 +15550,11 @@
   },
   {
    "masterId": "221ee100-e67c-412c-84f8-6bc9f72f8be4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2226cacc-c9e0-489f-948d-efc000cec874",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13490,6 +15684,11 @@
    "zhId": null
   },
   {
+   "masterId": "2339f7ed-b173-4824-9209-e467a2348373",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "23403ca8-a7eb-4b98-a5ef-0492ac2529c5",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13505,12 +15704,27 @@
    "zhId": null
   },
   {
+   "masterId": "23803852-cc98-4b1c-ba5c-dc8b304016d6",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "23896acd-2d41-4681-91c2-b6863767e965",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "238b952f-6d9e-4651-9dd6-4a5b8f1ea385",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "23971aaf-5cc1-40b7-955d-0d949027fd3d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "23a62c23-6d02-4f6a-b5b5-a2ecd87ada6a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13541,6 +15755,11 @@
   },
   {
    "masterId": "23f48cd5-ad41-42b4-a4ba-14e802285734",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "23f728d3-f166-47c4-b8c9-f7713b6c9e40",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13595,6 +15814,16 @@
    "zhId": null
   },
   {
+   "masterId": "2472a126-f4d5-45bc-91e3-da233b19e705",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "247ce9d1-a57c-4911-b606-8a0ca8396fec",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2480f556-7975-40da-9233-2aa193cd7daf",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13620,12 +15849,22 @@
    "zhId": null
   },
   {
+   "masterId": "24a86f94-201f-4aa4-b8ce-3e723aa64113",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "24b10c12-7939-4263-b643-c2ef41375c37",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "24b4ddb5-9819-49fa-8c7d-7aa57234fa44",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "24d76446-4240-495f-998f-033283cf2c8a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13650,7 +15889,17 @@
    "zhId": null
   },
   {
+   "masterId": "24ffa7ea-0829-414e-b3e4-9914b082f2a4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2500bd3b-3bde-4557-a89c-59c29102d62e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2502ddf6-8a93-4c96-b9dd-a7e1f482560e",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13676,6 +15925,11 @@
   },
   {
    "masterId": "2539ba9b-0677-4162-a886-439da443fc38",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "25409b2d-1f38-4091-9471-63c478000598",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13730,6 +15984,11 @@
    "zhId": null
   },
   {
+   "masterId": "25f71045-189a-4da8-a2ed-e44f071fa51e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "26036052-27b0-4dad-aa30-b3da5011381b",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13740,12 +15999,22 @@
    "zhId": null
   },
   {
+   "masterId": "2605c8e9-c3d6-4f6a-baf3-ce788552084e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "263b68f1-49f3-45dd-a2ea-2c871fb40667",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "263be255-0fb6-4845-a9f9-5fd2eceeff85",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "264381fa-1462-4087-b489-b283d4f08141",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13790,6 +16059,11 @@
    "zhId": null
   },
   {
+   "masterId": "26ca1060-6dc6-4604-8cc7-147c866c6487",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "26d3885f-e186-490b-a4aa-1e642d5e93a5",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13806,6 +16080,11 @@
   },
   {
    "masterId": "26f4e399-92dd-4ef0-8306-22c9877a2e66",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "270aaa5f-7d1e-46ac-8b69-09247f3350df",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13835,12 +16114,32 @@
    "zhId": null
   },
   {
+   "masterId": "2742eeab-a10a-496b-9e52-1e4f3ec8db3c",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "27495489-0338-4fad-bd1f-db187a45caa9",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
+   "masterId": "2753c630-9742-4df8-932d-14b52f5f2ace",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2760f445-a070-460d-a51f-f5ea5a20ff80",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2762e42d-0060-4e80-98a7-e9ebebdbbcdf",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "276f965a-0850-4833-91c4-79d4abbccea4",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13861,6 +16160,11 @@
   },
   {
    "masterId": "2789dc52-caeb-4e3b-b6e0-437dc479ec07",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "278c8851-24ab-419a-a50d-a577552fa769",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13895,7 +16199,17 @@
    "zhId": null
   },
   {
+   "masterId": "27c2ead6-a56c-4d7c-8dfe-adc32721e8de",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "27d3c4b7-f444-4b38-a19f-7ad4d1ef762a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "27eaf619-0b0b-4d51-bdd1-ce8676d655da",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13930,6 +16244,11 @@
    "zhId": null
   },
   {
+   "masterId": "2843f659-23b8-47b1-84f5-81fa28017a93",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "284e5faf-c62f-4e50-a0d0-d71ea51aa5e4",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -13940,12 +16259,22 @@
    "zhId": null
   },
   {
+   "masterId": "2876ee14-3948-4fe7-aa62-35df0d9c4351",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "287d9ccd-7bda-4d56-a679-d707887a63d3",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "288f89da-7a16-47c6-ba1e-e8539ca59d7f",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "289dab53-0b38-42bb-99a5-bebde9ef48d8",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -13995,6 +16324,11 @@
    "zhId": null
   },
   {
+   "masterId": "291b7966-8a30-48f5-90af-46318a375570",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "292844f6-453a-4e43-9785-bd06aa0027b7",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14015,12 +16349,37 @@
    "zhId": null
   },
   {
+   "masterId": "293d4663-4cbb-4b16-8b18-8a75a2ac5dd7",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2949e706-732f-4e15-afee-54518db9f031",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
+   "masterId": "295233f0-c670-4935-bcc0-0c867160dede",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "295a4c65-6736-4592-a922-71834e0ba4fc",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "295f3a46-4e45-4a8d-9281-83e1e498462b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2962a4aa-f8d8-4442-8f60-db130a3b7833",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2968f1c7-5ec5-4718-acb1-b1158eb8e52a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14046,6 +16405,16 @@
   },
   {
    "masterId": "29c685b3-ea91-4290-87e4-349648cdd7b8",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "29ddf899-1dd7-4384-9036-7ea755ff81e9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "29df0123-c0df-4309-b3e2-fb90285e5542",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14085,6 +16454,11 @@
    "zhId": null
   },
   {
+   "masterId": "2a558270-466a-4093-b170-0ab8723c0a7d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2a68a4e5-dd6e-4423-ad47-5a237e3a3d3c",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14101,6 +16475,11 @@
   },
   {
    "masterId": "2abd9ba6-f51c-4c2d-9802-e3d76e203277",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2ad2516b-339d-4261-9193-6d9e5df953ad",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14155,12 +16534,32 @@
    "zhId": null
   },
   {
+   "masterId": "2b22fd18-532e-45e6-8ef8-8dd589769551",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2b34316b-e32c-48ec-8737-2e7baceb875f",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
+   "masterId": "2b3c1f26-1096-4d9a-8bcb-c35f3a01a9aa",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2b496063-686d-4789-b079-df4b31c20c96",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2b66a48c-ad52-46eb-aea2-685aac782f28",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2b6f9396-3509-40a8-be56-89effdd355f2",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14210,7 +16609,17 @@
    "zhId": null
   },
   {
+   "masterId": "2c1df281-1105-4e8e-9a3a-fedb2b1c09fd",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2c20b258-a07b-4e22-88af-cc22cddb1534",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2c20f005-72fb-46da-a8a5-7426fb0cac38",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14236,6 +16645,21 @@
   },
   {
    "masterId": "2cc2f783-647d-46fd-b649-9b1a8d43077d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2cce2453-5ff5-42e6-ad8e-384056183379",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2cd06f51-1451-47a8-8eac-d45a5c970ca5",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2ce203b4-4b8d-4b70-bfb2-c97377ea8c22",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14286,6 +16710,11 @@
   },
   {
    "masterId": "2d4a696b-6a5d-446a-9a4c-82a63bbffbd3",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2d628e2f-caf1-4f7e-b044-4a71328e61fb",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14365,12 +16794,22 @@
    "zhId": null
   },
   {
+   "masterId": "2e0b4520-3564-4fda-b5ee-5bd5da822171",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2e0b5be0-fcfa-4cb0-9040-523d2b0ce7fa",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "2e13dde1-401a-4f30-a9ca-656c27d1ef79",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2e1f8f26-8693-46eb-9ff6-c9a9bd0a12ec",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14405,6 +16844,11 @@
    "zhId": null
   },
   {
+   "masterId": "2e7b5014-dca0-475d-924a-5d4768cd1281",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2e7eec13-6090-4546-b4e2-618e162c0351",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14421,6 +16865,11 @@
   },
   {
    "masterId": "2e996bbd-4b52-42a8-b908-6b557962c67d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2ead9fa5-fd67-4f2f-be8e-a2fbe2e87dbe",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14445,6 +16894,11 @@
    "zhId": null
   },
   {
+   "masterId": "2ee5b1f7-3563-486e-8224-5cd5fcb3d34d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2eea0c11-6407-45ec-a7a0-3a5889ad7e55",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14461,6 +16915,26 @@
   },
   {
    "masterId": "2ef29149-5f27-49c6-990c-438c409ab714",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2ef80f61-648a-4253-bfe1-612800936e8e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2ef97751-8856-4de4-914d-a8325c3a4579",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2efef159-5551-4233-9edf-8b51cf90b49b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2f03f144-6d5f-494b-a387-6741c462b58c",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14525,6 +16999,11 @@
    "zhId": null
   },
   {
+   "masterId": "2f9cfa73-e1fc-4342-aed7-d97c35e74939",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "2fa2f22e-5c58-424d-ad72-d280807a094d",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14541,6 +17020,11 @@
   },
   {
    "masterId": "2fc85db9-8af3-4bbb-9d74-4f584fa10799",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "2fe32620-a536-4288-a362-2f1b1c7fdfb0",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14590,6 +17074,11 @@
    "zhId": null
   },
   {
+   "masterId": "30ca38bf-900f-4991-a343-4ebe146075a1",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "30d6f3f5-71cc-428e-a336-cb1a207a34e8",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14600,7 +17089,17 @@
    "zhId": null
   },
   {
+   "masterId": "30ee36a9-f2b1-439e-8030-e26fb6353d04",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "30f1a029-e8a3-4ef7-a64f-5ee6a2ec1768",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "30f7013e-3aa2-4d69-a4a0-106ffe9e2bcd",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14640,7 +17139,22 @@
    "zhId": null
   },
   {
+   "masterId": "3166a016-05ad-4b30-960b-f0eae5ef671d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "31690aeb-5e2c-43f2-a492-48bed2618a75",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "316bf4e8-5ef9-4599-b798-7698e6c9d5f5",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "316f3ab6-5fa3-4fbf-8715-f6ab61f08699",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14656,6 +17170,11 @@
   },
   {
    "masterId": "318ce9ba-7dbf-4db5-abd8-b38493649867",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3190b335-3257-40fd-911f-169f77ed97fd",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14685,6 +17204,11 @@
    "zhId": null
   },
   {
+   "masterId": "31bedb72-75b4-460f-b64a-be9bacfc7804",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "31c7dc26-7233-4ca0-b0f5-ba211fd9c84c",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14700,7 +17224,17 @@
    "zhId": null
   },
   {
+   "masterId": "31d598a4-07a6-42c6-99be-32959ce657fb",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "31d990ad-4b58-444e-9479-13f5f45aaef6",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "31dd87a9-1542-4a65-9353-2a873ce0ab84",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14740,6 +17274,11 @@
    "zhId": null
   },
   {
+   "masterId": "320b4b0a-edb1-4289-8b9e-3e0f642a25f2",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "321b90df-32cb-455e-97e4-abcfd0fc0395",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14761,6 +17300,11 @@
   },
   {
    "masterId": "3234e18b-2948-4de1-96b3-f7aaecea9239",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3237dcf9-507a-4f3f-8e26-09bf9e7ae218",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14800,12 +17344,22 @@
    "zhId": null
   },
   {
+   "masterId": "32656562-d840-4476-b9e3-abb36bb85af0",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "3275b15e-a2f3-4abc-8664-9dbe9a493145",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "328bf879-0ccd-48ca-8296-6e20483d6d29",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "328df4ff-5a99-4b48-b44a-6c1d8ea0ddd0",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14830,6 +17384,11 @@
    "zhId": null
   },
   {
+   "masterId": "330c391e-33da-44c9-9346-48b7338491dc",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "334ec249-0bf8-4690-b3a6-9a22ea9ddf41",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14845,12 +17404,27 @@
    "zhId": null
   },
   {
+   "masterId": "33892a80-96d3-47a7-b2f3-c182a7adc912",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "338fa8eb-75a8-4c1b-bda6-434b1273e6ce",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "33a3801b-639f-48e9-ada8-cc8f744289aa",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "33bca172-1eaa-482a-84fa-d49e479ac0b5",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "33c2a35e-8eaf-4412-80be-94bc7ef2800a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14905,6 +17479,11 @@
    "zhId": null
   },
   {
+   "masterId": "3413765d-8ba1-4ed4-88e4-116b347903ae",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "34196986-4b8c-4a09-852f-b99e78eb4d4d",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -14916,6 +17495,11 @@
   },
   {
    "masterId": "341e6584-cc2b-41c1-ada4-a2de88e242b1",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "343bef21-45a6-4e5e-ae3e-e40c986d51dd",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14940,12 +17524,37 @@
    "zhId": null
   },
   {
+   "masterId": "3470b14f-2966-4af3-95ae-a170acaa2d14",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "34764220-d14a-4d81-91a1-f208e18fdb44",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "34851b13-fbed-40f1-9cd9-ec457e07762b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "3488a456-36ee-4a97-940f-7c93d957cec1",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "3494c878-6311-4f36-879b-f8da13d3fb20",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "34a8f203-8c2f-4e3d-b0a2-3ff8e78dda73",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "34abd2af-5723-40ec-a741-dd90c4872420",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -14991,6 +17600,11 @@
   },
   {
    "masterId": "354d22bb-a659-4de4-905f-9b8271e760e4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "35520759-a9bb-4ba8-b808-ebfa16690808",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15065,6 +17679,16 @@
    "zhId": null
   },
   {
+   "masterId": "35c3556c-153a-4d42-9d1d-c92e1fca117e",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "35c5b615-9ea0-4c00-8ecd-9787ef556ddb",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "35c990af-b0ac-4fa4-859a-d7f56b185d69",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -15085,12 +17709,27 @@
    "zhId": null
   },
   {
+   "masterId": "35dfab43-9987-4619-b945-74c91a08b8c0",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "35e20bc5-81ed-4b6b-90d0-966a532cdc9a",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "35e8efc1-101d-448f-9fd8-63410febe8dd",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3604e9e6-476c-41fb-b2ac-68136dd8648a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "361b315f-a1f6-4b9a-9c83-bb247f0b9503",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15130,7 +17769,32 @@
    "zhId": null
   },
   {
+   "masterId": "36684294-f816-45cb-aa7d-6914ce9e06cf",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "366852ac-19b5-49c2-bd71-86bdeb72f63f",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "366bd722-9e4b-4b11-82be-db6ff175c9e8",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "367bcf27-33d3-40dd-889b-3136621c69c1",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3683e72e-29de-4387-82c1-ff7173e006f8",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3684dba1-b2c7-47c1-8356-f6b08ee22731",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15175,6 +17839,11 @@
    "zhId": null
   },
   {
+   "masterId": "36bd0f22-3b1e-47f8-a9ab-588b86692903",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "36c2623a-6b0f-4c9b-a3b7-1d54769666e9",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -15200,7 +17869,22 @@
    "zhId": null
   },
   {
+   "masterId": "370db616-a40e-4b7b-8785-1043cb03ed30",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3713b1fc-8de8-4d4e-a559-84c400b5e315",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "3737307a-525c-41dd-9c1a-3a121d9eafb9",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3742bfa8-1b14-4e36-a0ab-b6e790321637",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15250,7 +17934,17 @@
    "zhId": null
   },
   {
+   "masterId": "37b54bb3-e873-4021-a1b8-791c72ae5916",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "37b5cb13-33ef-4f5e-9c82-665d19c54c39",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "37b84660-393d-4eb2-8d6c-b021cc6e089b",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15266,6 +17960,11 @@
   },
   {
    "masterId": "37f2c186-293e-4be1-9947-63cb5b436ea4",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "37fff9b3-0f28-4deb-b10c-1c0bfc9db7a9",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15291,6 +17990,11 @@
   },
   {
    "masterId": "382e9c9e-8379-4432-b1ef-e99b2004bc9b",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "38347fb1-d05e-403e-bfea-561dcb8b3cbc",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15335,12 +18039,22 @@
    "zhId": null
   },
   {
+   "masterId": "389dc530-9146-4c3d-8e9c-c78b49858677",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "389e064f-9f63-4bb6-b1dd-c0f9eda1bb69",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "38a50f4a-8b1f-4377-935f-51506f4d4158",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "38accb2f-9288-4e01-b637-bd381faf600b",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15370,6 +18084,16 @@
    "zhId": null
   },
   {
+   "masterId": "38ede9d1-b036-4129-9dc1-4660bbf3f66d",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "38faf544-670c-4d24-b605-eb788fae6b36",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "3901fc1b-3aa4-496d-b656-27a43b5ba8fd",
    "status": "ALREADY_EXISTS",
    "zhId": null
@@ -15391,6 +18115,11 @@
   },
   {
    "masterId": "392b8a8f-4aff-476b-9f8e-43665765e94a",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "392c1d78-b927-4184-a80c-e4f1abbd3e3c",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15420,12 +18149,22 @@
    "zhId": null
   },
   {
+   "masterId": "396cd336-fe68-40cf-a6a6-c993ef888264",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
    "masterId": "3972c078-e585-479f-8392-0a176c107059",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
   {
    "masterId": "39748ac5-aaa3-470a-8901-99b80db9d117",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "3981627c-c567-4b4d-9057-347af8d31de0",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
@@ -15441,6 +18180,11 @@
   },
   {
    "masterId": "398975fa-3f27-4691-96df-58ed196e07ef",
+   "status": "ALREADY_EXISTS",
+   "zhId": null
+  },
+  {
+   "masterId": "399d5e39-9ec4-429d-8feb-74d773646ab5",
    "status": "ALREADY_EXISTS",
    "zhId": null
   },
