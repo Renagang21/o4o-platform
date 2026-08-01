@@ -1,0 +1,20 @@
+{
+  "clause": {
+    "&lt;정제&gt;": "[Tablet]",
+    "&lt;정제2&gt;": "[Tablet 2]",
+    "&lt;액상&gt;": "[Liquid]",
+    "&lt;루테인&gt;": "[Lutein]",
+    "&lt;아스타잔틴&gt;": "[Astaxanthin]",
+    "&lt;비타민A&gt;": "[Vitamin A]",
+    "&lt;비타민D&gt;": "[Vitamin D]",
+    "&lt;비타민E&gt;": "[Vitamin E]",
+    "&lt;아연&gt;": "[Zinc]",
+    "신경과 근육 기능 유지에 필요 &lt;정제2&gt;": "Needed to maintain nerve and muscle function [Tablet 2]",
+    "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 &lt;액상&gt;": "Needed to keep blood homocysteine at a normal level [Liquid]"
+  },
+  "label": {
+    "피크노제놀-프랑스해안송껍질추출물&lt;PYCNOGENOL&gt;(제2006-1호)": "Pycnogenol – French maritime pine bark extract [PYCNOGENOL] (Notification No. 2006-1)",
+    "비타민B1, 비타민B2, 비오틴": "Vitamin B1, Vitamin B2, Biotin",
+    "비타민 B1, B2, 판토텐산, 비오틴": "Vitamin B1, B2, Pantothenic acid, Biotin"
+  }
+}

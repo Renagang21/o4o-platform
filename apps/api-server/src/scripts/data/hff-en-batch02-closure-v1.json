@@ -1,0 +1,20 @@
+{
+ "wo": "WO-O4O-HFF-EN-BATCH-02-REMAINING-915-DIRECT-TRANSLATION-AND-CLOSURE-V1",
+ "closedAt": "2026-08-01T06:45:44.717Z",
+ "batch": 2,
+ "population": 5000,
+ "completed": 4878,
+ "hold": 122,
+ "sumCheck": true,
+ "holdReasons": {
+  "HOLD_KO_SOURCE_DAMAGED": 110,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 12
+ },
+ "forbiddenHoldReasonsPresent": [],
+ "batch01Sweep": {
+  "scanned": 101,
+  "resolved": 0,
+  "applied": 0,
+  "stillHold": 101
+ }
+}

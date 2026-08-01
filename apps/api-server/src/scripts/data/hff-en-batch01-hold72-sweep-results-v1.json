@@ -1,0 +1,1150 @@
+{
+ "builtAt": "2026-08-01T06:45:44.629Z",
+ "scanned": 101,
+ "resolved": [],
+ "stillHold": [
+  {
+   "productMasterId": "0144700f-bf38-4ada-a8c9-f769b50111c2",
+   "productNameKo": "마이핏 V 루테인지아잔틴 아스타잔틴",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:(1) 영·유아, 어린이, 임산부 및 수유부는 섭취를 피할 것",
+    "clause:NUMBER_DRIFT:(2) 흡연자는 섭취 시 전문가와 상담할 것",
+    "clause:NUMBER_DRIFT:(3) 과다 섭취 시 일시적으로 피부가 황색으로 변할 수 있음"
+   ]
+  },
+  {
+   "productMasterId": "01d73e2f-42c5-4bef-b919-714e9b4309af",
+   "productNameKo": "에브리타임 CaloTrim",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "049ac49e-80ee-4982-a975-ca9206d76fa8",
+   "productNameKo": "당쉼 혈당컷 레몬맛",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "0592d06a-61ae-4c61-bdf2-bab2b2a420e8",
+   "productNameKo": "미스터10",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 2정(1.4 g)을 충분한 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:null"
+   ]
+  },
+  {
+   "productMasterId": "08e60914-a7ea-4722-bdd2-72c743f5fd0f",
+   "productNameKo": "홍삼정",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회"
+   ]
+  },
+  {
+   "productMasterId": "0ace5121-42a8-4377-b7a8-b3d3ba8fe40a",
+   "productNameKo": "더행복한 칼슘마그네슘D",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 2정을 충분한 물과 함께 섭취하십시오",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "0f01e794-f0cd-4e3c-b051-a20b24b0fb2c",
+   "productNameKo": "마이핏 ORIGIN 눈건강 루테인 지아잔틴 A",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:(국문) (",
+    "clause:NO_ENTRY:(영문) (",
+    "clause:NUMBER_DRIFT:(1) 고칼슘혈증이 있거나 의약품 복용 시 전문가와 상담할 것"
+   ]
+  },
+  {
+   "productMasterId": "13ff7141-d043-451d-8d2a-229d7937799a",
+   "productNameKo": "큐라에스 더블컷팅",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "15030e32-8318-4b22-b5fc-fd1cc8895063",
+   "productNameKo": "닥터오프리미엄황금",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 2회,1회1포(6.000mg)을 충분한 음용수와 함께 섭취한다.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회"
+   ]
+  },
+  {
+   "productMasterId": "15bf3f4f-4f42-4723-b678-943b548f2079",
+   "productNameKo": "홍삼정",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회"
+   ]
+  },
+  {
+   "productMasterId": "1bb61341-d0b3-4063-8448-025c5a05ce20",
+   "productNameKo": "고려홍삼파워톤",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:식물성 성분에 의한 침전물이 생길 수 있으나 품질에는 이상이 없으니 안심하고 흔들어 드십시오."
+   ]
+  },
+  {
+   "productMasterId": "1c1ab6b9-0b8d-4d4c-bfc7-3610ba4b24f4",
+   "productNameKo": "인트리트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 2회, 1회 2정(1.2g)을 충분한 물과 함께 섭취.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NO_ENTRY:다래추출물(PG102)",
+    "label:NUMBER_DRIFT:1일 2회",
+    "label:NO_ENTRY:다래추출물(PG102)"
+   ]
+  },
+  {
+   "productMasterId": "1c54760d-306f-4bc2-a47e-eb871b257d7f",
+   "productNameKo": "닥터에스 유산균 19(닥터S 유산균 19)",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:임신, 수유부나 의약품을 복용하시는 분, 질환이 있는 분은 섭취 시 전문가와 상담하여 주십시오.",
+    "clause:NO_ENTRY:특이체질, 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 의사와 상담 후 섭취여부를 결"
+   ]
+  },
+  {
+   "productMasterId": "1c846111-2917-4881-aa29-651f8178e824",
+   "productNameKo": "류시니아 컷(Lusinia Cut)",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일1회, 1회 2정 물과 함께 섭취하시기바랍니다.",
+    "badge:NUMBER_DRIFT:1일1회",
+    "label:NUMBER_DRIFT:1일1회",
+    "clause:NO_ENTRY:(녹차추출물)항산화·체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음",
+    "clause:NO_ENTRY:(바나바잎추출물)식후 혈당상승 억제에 도움을 줄 수 있음"
+   ]
+  },
+  {
+   "productMasterId": "1c8f13e2-62ad-4e49-8c2a-b45631075054",
+   "productNameKo": "드시모네 플러스 히알루론산",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:프로바이오틱스(드시모네) :",
+    "clause:NO_ENTRY:유익한 유산균 증식, 유해균억제, 배변활동에 원활",
+    "clause:NUMBER_DRIFT:(1) 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "1ccde338-64e4-4420-a637-be77f04af620",
+   "productNameKo": "홍삼농축액골드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회 , 1회 1g을 생수에 희석하여 섭취",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:기억력 개선에 도움",
+    "clause:NO_ENTRY:어린이는 성인기준 1/2만 섭취"
+   ]
+  },
+  {
+   "productMasterId": "1cd410e2-5180-49ec-b6bf-b70515fc745b",
+   "productNameKo": "이너모아 다운부스트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 1포(2정)를 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NO_ENTRY:핀토텐산",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "1cd7c708-23fb-44e2-b94c-58d8d82bbfbe",
+   "productNameKo": "알로에겔 퓨어",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 40 ml씩 계량컵 또는 컵을 이용하여 식전에 드십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:특정질환, 특이체질이거나 알러지체질, 임산부, 수유부 및 치료를 받고 계신 중증질환자의 경우에는 의사와 상담",
+    "clause:NO_ENTRY:영.유아 및 어린이에게 섭취시키고자 하실 경우에는 보호자의 관찰하에 섭취하도록 하십시오."
+   ]
+  },
+  {
+   "productMasterId": "1cec1e3c-9d6f-405e-b82a-e5756fda253f",
+   "productNameKo": "테아닌",
+   "holdReason": "HOLD_PENDING_DIRECT_TRANSLATION",
+   "why": [
+    "clause:NO_ENTRY:스트레스로 인한 긴장을 완화하는데 도움을 줄 수 있음",
+    "clause:NO_ENTRY:L-테아닌은 카페인과 길항작용이 있으므로 섭취 시 카페인 함유음료(커피, 홍차, 녹차 등)의 섭취를 삼가시기",
+    "clause:NO_ENTRY:임산부, 수유부 및 어린이, 기타 질병을 가지고 있는 사람은 섭취 전 의사와 상담하시기 바랍니다.",
+    "clause:NO_ENTRY:과량 섭취시 위장장애, 어지러움 둥의 증상이 나타날 수 있습니다."
+   ]
+  },
+  {
+   "productMasterId": "1cf926dd-6946-4ae2-92f8-6847c768cd05",
+   "productNameKo": "백년청우 홍삼스틱",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1.1일 1회, 1회 1포(10g)를 직접 또는 데워 섭취 하십시오 2.식전.후 관계없이 드실 수 있으며 기",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "1d144022-6808-40fa-bef4-60e556c3a7b6",
+   "productNameKo": "슈퍼케이 프로바이오틱스 블루베리맛",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 2회, 1회 1정(750mg)씩 씹어서 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하시기 바랍니다.",
+    "clause:NO_ENTRY:정제를 삼킬 경우 목에 걸릴 수 있으므로 천천히 녹이거나 씹어서 드십시오."
+   ]
+  },
+  {
+   "productMasterId": "1d1a1a36-1428-44d1-ae11-42e0a132613c",
+   "productNameKo": "에르고 런",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일1회, 1회 1포(정제:600mg*2개+액상:20g)를 섭취 하십시오",
+    "badge:NUMBER_DRIFT:1일1회",
+    "label:NUMBER_DRIFT:1일1회",
+    "clause:NO_ENTRY:정제 :",
+    "clause:NO_ENTRY:지방, 탄수화물 단백질 대사와 에너지 생성에 필요"
+   ]
+  },
+  {
+   "productMasterId": "1d360c6d-5446-4778-b75b-f3621d91a3c3",
+   "productNameKo": "이뮨 부스터 · 21",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:난소화성말토덱스트린 :",
+    "clause:NUMBER_DRIFT:(1) 반드시 충분한 물과 함께 섭취할 것(액상제외)",
+    "clause:NUMBER_DRIFT:(2) 이상사례 발생 시 섭취를 중단하고 전문가와 상담할 것"
+   ]
+  },
+  {
+   "productMasterId": "1e3654a4-1857-43f8-b957-33afd4116927",
+   "productNameKo": "비아이 맥스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:정상적인 세포분열에 필요 (셀레늄)",
+    "clause:NO_ENTRY:유해산소로부터 세포를 보호하는데 필요 (요오드)",
+    "clause:NO_ENTRY:골다공증발생 위험 감소에 도움을 줌 (비타민B1)"
+   ]
+  },
+  {
+   "productMasterId": "1e3d1500-6813-43f6-8f70-0cf1dc973283",
+   "productNameKo": "하루홍삼고려홍삼정",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:특이체질,알레르기 체질인 경우 성분을 확인 하신후 섭취하십시오",
+    "clause:NO_ENTRY:개봉시 모서리가 날카로워 손을 다치실 수 있으니 주의하십시오",
+    "clause:NO_ENTRY:용기가 변형,팽창되었거나 내용물이 변질되었을 경우 음용하지 마십시오"
+   ]
+  },
+  {
+   "productMasterId": "1e50ca7f-cbdc-4acb-a93e-88af0b566598",
+   "productNameKo": "비겐닥터나토키나제",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:나토균배양분말-혈행 개선에 도움을 줄 수 있음(생리활성기능 2등급)",
+    "clause:NO_ENTRY:바나바잎추출물-식후 혈당상승 억제에 도움을 줄 수 있음",
+    "clause:NO_ENTRY:대두,쇠고기에 알레르기를 나타내는 사람은 섭취에 주의"
+   ]
+  },
+  {
+   "productMasterId": "1e55f73e-06d8-4a65-96ff-bf713bcdad5a",
+   "productNameKo": "지중해 아티초크",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1PTP(800mg*3정, 800mg*1정)를 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:체지방감소에 도움을 줄 수 있음(생리활성기능 2등급)"
+   ]
+  },
+  {
+   "productMasterId": "1eb6e343-2159-4a9f-b0c9-964e34dbb46d",
+   "productNameKo": "닥터클린헬스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 1포(70ml)을 섭취 하십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:간혹 침전물이 생길 수 있으나 원료성분이오니 안심하시고 잘 흔들어 드십시오.",
+    "clause:NO_ENTRY:제품 개봉시 또는 섭취 시 포장재에 의해 상처를 입을 위험이 있고, 개봉시 내용물이 흘러나올 수 있으므로 섭"
+   ]
+  },
+  {
+   "productMasterId": "1eba40d6-833f-4c4e-bca4-adac1d00bc53",
+   "productNameKo": "컴플리트 멀티비타민 우먼",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 철 :",
+    "clause:NO_ENTRY:혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 크롬: 체내 탄수화물, 지방, 단백질 대사에 관여",
+    "clause:NUMBER_DRIFT:(1) 특히 6세 이하는 과량섭취하지 않도록 주의"
+   ]
+  },
+  {
+   "productMasterId": "1ebfd64a-e66c-45e7-9812-523ce1e40779",
+   "productNameKo": "클린24시간 레드박스 ",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1포(100 mL)를 직접 음용하거나 기호에 따라 물에 희석하여 섭취하십시오",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:폴리덱스트로스 - 배변활동 원활에 도움을 줄 수 있음",
+    "clause:NO_ENTRY:자일로올리고당분말 - 장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음(기타기능II)"
+   ]
+  },
+  {
+   "productMasterId": "1ecfdbf0-b21f-4110-9712-23bcad388f0a",
+   "productNameKo": "해피맑음건강",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일2회,1회2정씩을물과함께섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일2회",
+    "label:NO_ENTRY:홍국분말",
+    "label:NUMBER_DRIFT:1일2회"
+   ]
+  },
+  {
+   "productMasterId": "1eda8701-2e84-4b95-b3fc-88aa0a176405",
+   "productNameKo": "원컷 다이어트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 2회",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:체지방 감소에 도움을 줄 수 있음(생리활성기능 2등급) [May help reduce body fat mas"
+   ]
+  },
+  {
+   "productMasterId": "1ef47e17-0de8-4ecc-8593-6287870bec32",
+   "productNameKo": "화이바골드식이섬유",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:병포장 - 1일 2회, 1회 한스푼(12g)씩 물과 함께 섭취 스틱포장 - 1일 2회, 1회 2포씩 물과 함",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NUMBER_DRIFT:콜레스테롤 개선 2.",
+    "clause:NO_ENTRY:섭취시 충분한 양의 물과 함께 섭취"
+   ]
+  },
+  {
+   "productMasterId": "1f08994a-4199-4843-9398-9a1dfbfc42d7",
+   "productNameKo": "멀티비타민 미네랄",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 2) 셀레늄",
+    "clause:NUMBER_DRIFT:유해산소로부터 세포를 보호하는데 필요 3) 비타민 E",
+    "clause:NUMBER_DRIFT:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 4) 나이아신"
+   ]
+  },
+  {
+   "productMasterId": "1f7898f7-cdc4-4720-b247-6dc99ab56b0c",
+   "productNameKo": "홍삼브레인큐",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회당 4정",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:스트레스로 인한 긴장을 완화시키는데 도움을 줄 수 있음"
+   ]
+  },
+  {
+   "productMasterId": "1fa002a1-5186-4dee-a8b4-bd389c46d4d2",
+   "productNameKo": "락피도 프로폴리스 스프레이",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회 0.5ml(3회 분사)를 구강에 분무하여 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:섭취 전 소비기한을 확인하십시오.",
+    "clause:NO_ENTRY:이상증상이 생길 경우 섭취를 중단하시고, 전문의와 상담하시거나 소비자 상담실로 문의하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "1fb92536-b0c0-4558-9d0b-8f33e399a7f9",
+   "productNameKo": "슈퍼멀티비타민",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 2정(1.3 g)을 충분한 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:유해산소로부터 세포를 보호하는데 필요 셀렌 : 유해산소로부터 세포를 보호하는데 필요 비타민E : 유해산소로부",
+    "clause:NO_ENTRY:혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성"
+   ]
+  },
+  {
+   "productMasterId": "1fc805d4-b311-4dfb-9ec3-0439a8dcceee",
+   "productNameKo": "황후의 보이차 다이어트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 2회, 1회 1정(800mg)을 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:유당불내증이 있는 분은 섭취에 주의하십시오.",
+    "clause:NO_ENTRY:유통기한이 경과된 제품은 섭취하지 마시고 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "1fe64e0f-044f-4ff7-8aab-289ebc832e19",
+   "productNameKo": "보령프라징크",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:섭취전 알레르기성분을 확인하시고 섭취 후 이상이 있을시에는 섭취를 중단하시고 고객만족실로 문의 바랍니다.",
+    "clause:NO_ENTRY:제품 개봉 또는 섭취시에 포장재에 의해 상처를 입을 수 있으니 주의하십시오",
+    "clause:NO_ENTRY:간혹 침전물이 생길수 있으나 원료성분이오니 안심하고 흔들어 드십시오"
+   ]
+  },
+  {
+   "productMasterId": "20132cd0-c3fd-43c2-9025-759657d0b380",
+   "productNameKo": "우먼이소플라본",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:["
+   ]
+  },
+  {
+   "productMasterId": "20326b55-bea6-4a7d-99e2-e63b24b114e5",
+   "productNameKo": "클린C",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:폴리덱스트로스 :"
+   ]
+  },
+  {
+   "productMasterId": "20474541-3b71-43a6-ba8f-1fbd67fd1088",
+   "productNameKo": "웰빙프라임옵티MSM",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:제품 개봉 시 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.",
+    "clause:NO_ENTRY:원료에 의한 침전물이 있을 수 있으나 제품에는 이상이 없으니 잘 흔들어 섭취하십시오.",
+    "clause:NO_ENTRY:임산부, 수유부, 영유아, 기타 질병을 가지신분, 수술 전후 환자분 등은 전문가와 상담 후 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "2076276b-924c-43dd-a987-51f4cd46962e",
+   "productNameKo": "뉴트라 비타민C 3000",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:공복에 섭취시 위장장애가 있을 수 있으니 음식물과 함께 또는 식후에 섭취하시기 바랍니다.",
+    "clause:NO_ENTRY:소비기한을 확인하시기 바라며, 변색된 제품은 섭취하지 않기를 권장합니다.",
+    "clause:NO_ENTRY:임산부, 수유부 및 질병치료나 약물투여 중인 분은 섭취 전 전문가와 상담하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "208a9834-247d-4da0-8efb-24f4edb64353",
+   "productNameKo": "락토피 엘",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회 1g 씩 물과함께 섭취하거나, 기호에 따라 요구르트나 우유와 함께 드십시오",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:개봉 후에는 오염의 우려가 있으니 빨리 사용하십시오",
+    "clause:NO_ENTRY:갈색 또는 회색의 입자는 유산균 이므로 안심하고 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "20c8b360-03fb-437c-8907-f060bafea8fe",
+   "productNameKo": "고려홍삼농축액프리미엄",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회 1g씩 물에 희석하여 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:알러지등 특이체질이신 분은 제품성분을 확인하신 후 섭취하시기 바랍니다.",
+    "clause:NO_ENTRY:임산부 및 질병이 있으신 분은 의사와 상담후 드시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "20e3b9b9-add6-4da5-946f-3ffbe3f62863",
+   "productNameKo": "하루한포 혈당케어 혈당관리 바나바 액상스틱",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:스틱파우치면이 날카로우니 조심하시기 바랍니다.",
+    "clause:NO_ENTRY:개봉후에는 가급적 빨리 드십시오"
+   ]
+  },
+  {
+   "productMasterId": "20f8c8b0-890f-45ac-99c5-2c641b52f48b",
+   "productNameKo": "내나다 슬림루틴블렌드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 1포를 100mL 물에 타서 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:나)간･신장･심장질환, 알레르기 및 천식이 있거나 의약품 복용 시 전문가와 상담할 것",
+    "clause:NO_ENTRY:다) 남성의 경우 과다 섭취를 피할 것"
+   ]
+  },
+  {
+   "productMasterId": "211509c0-7508-4e4e-b3d5-30c72df1ddbc",
+   "productNameKo": "허니베리 간편한 다이어트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 탄수화물과 에너지 대사에 필요 (1) 체내 에너지",
+    "clause:NO_ENTRY:․영·유아, 어린이, 임산부 및 수유부는 섭취에 주의 ․특정질환(알레르기 체질 등)이 있는 분은 섭취에 주의"
+   ]
+  },
+  {
+   "productMasterId": "2131f1e3-4c3d-40e6-ba0b-a762a9b8e5e2",
+   "productNameKo": "리얼 멀티비타민",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. 2) 비타민 E",
+    "clause:NUMBER_DRIFT:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 3) 철",
+    "clause:NUMBER_DRIFT:에너지 생성에 필요 4) 나이아신"
+   ]
+  },
+  {
+   "productMasterId": "216a1536-df21-4e46-a79c-19ff25ec0989",
+   "productNameKo": "장 건강엔 신바이오틱스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:어린이에게 섭취시키고자 하실 경우에는 보호자의 관찰 하에 섭취하도록 하십시오."
+   ]
+  },
+  {
+   "productMasterId": "21802d79-da5f-4875-a0c4-b4b1ea25b4ed",
+   "productNameKo": "홍삼정골드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회 1g(스푼)을 냉수나 온수에 타서 섭취",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:알러지가 있으신 분은 성분을 확인하시고 섭취하시기 바랍니다.",
+    "clause:NO_ENTRY:물기가 있는 도구를 사용 시에는 변질의 우려가 있으니 주의 하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "21e12941-b4c9-48f2-a5cb-3f275b3198e6",
+   "productNameKo": "리얼맨(2)",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:호로파종자 등 추출복합물 : 남성의 갱년기 건강에 도움을 줄 수 있음 옥타코사놀 :"
+   ]
+  },
+  {
+   "productMasterId": "21f8a189-29f4-43f9-bbc6-7d6950efee2a",
+   "productNameKo": "아이커",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1포를 우유와 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NO_ENTRY:황기추출물 등 복합물",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:특정원료에 알레르기가 있거나 장기간 또는 의약품 복용시 전문가와 상담 후 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "2257d21c-97cd-46ba-b1fa-9208c791a065",
+   "productNameKo": "나토 레드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:홍국 :"
+   ]
+  },
+  {
+   "productMasterId": "2265b2ab-51f2-40e1-8ac1-228c4c815b78",
+   "productNameKo": "뉴:트립 바이탈샷",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "228d40f9-b300-41fb-837e-af92ad1f1bbf",
+   "productNameKo": "바이오메라 베이비드롭 비타민D",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 2드롭(드롭당 0.026ml)을 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하기시 바랍니다.",
+    "clause:NO_ENTRY:임산부, 수유부, 특이체질 등의 경우 성분 확인 후 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "22ce68d0-9d46-4f7c-bd45-0bc39676be97",
+   "productNameKo": "솔빛M 스피드액",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:원료에 의해 침전물이 생기는 경우가 있으나 품질에는 이상이 없으니 잘 흔들어 드십시오.",
+    "clause:NO_ENTRY:제품에 함유된 마그네슘의 석출현상으로 침전물이 생길 수 있으나 품질에는 이상이 없으니 안심하고 섭취하십시오."
+   ]
+  },
+  {
+   "productMasterId": "22dc6d7b-58ba-4e89-a1c1-56a99b1e5010",
+   "productNameKo": "내몸에 맞는 루테인 C플러스",
+   "holdReason": "HOLD_PENDING_DIRECT_TRANSLATION",
+   "why": [
+    "clause:NO_ENTRY:알레르기 체칠인신 경우 성분을 확인한 후 섭취여부를 결정하여야 함"
+   ]
+  },
+  {
+   "productMasterId": "22e5d0f6-b7df-4b89-b289-93f1de7f7198",
+   "productNameKo": "헬스칼슘",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 2회, 1회 2캅셀씩 섭취",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:내용물의 손상이나 변형 또는 팽창 시에는 섭취하지 마십시요.",
+    "clause:NO_ENTRY:1회에 과잉 섭취 시에는 설사를 할 수가 있습니다."
+   ]
+  },
+  {
+   "productMasterId": "2316b245-e07d-44bc-b2b8-a97eff82ce10",
+   "productNameKo": "종근당건강칼슘마그네슘",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:칼슘 - 뼈와 치아 형성에 필요, 신경과 근육 기능 유지에 필요, 정상적인 혈액응고에 필요, 골다공증발생 위",
+    "clause:NO_ENTRY:망간 - 뼈 형성에 필요, 에너지 이용에 필요, 유해산소로부터 세포를 보호하는데 필요,"
+   ]
+  },
+  {
+   "productMasterId": "232f1f62-8342-402a-a875-fe5b2ab14932",
+   "productNameKo": "리얼다이어트카페가르시니아",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일2회,1회당 1포씩 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일2회",
+    "label:NUMBER_DRIFT:1일2회",
+    "clause:NO_ENTRY:어린이나 임산부,카페인에 민감한 분은 섭취에 주의하시기 바랍니다.",
+    "clause:NO_ENTRY:.개봉시 파우치절단면에 날카로워 손 등을 다칠수 있으니 주의하십시오."
+   ]
+  },
+  {
+   "productMasterId": "233655b5-e49f-4055-b57a-b5acc22cf0f5",
+   "productNameKo": "당프로",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NO_ENTRY:바나바잎추추물",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:이상사례가 있는 경우 섭취를 중단하고, 전문가와 상의하십시오.",
+    "clause:NO_ENTRY:유통기한 및 섭취방법을 준수하십시오."
+   ]
+  },
+  {
+   "productMasterId": "233f3a28-d218-47a8-9e47-c3a9a40bf63c",
+   "productNameKo": "닥터프로그램 마더스케어 올인원 Ⅲ",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:유해산소로부터 세포를 보호하는데 필요 셀렌 : 유해산소로부터 세포를 보호하는데 필요 철 :"
+   ]
+  },
+  {
+   "productMasterId": "2352e80e-e4a6-4d70-9ac6-54c3e9829333",
+   "productNameKo": "저스트핏(Just fit) 슬림플러스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 1포씩 섭취하여 주십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:특이체질이거난 민감하신 분, 알레르기가 있으신 분은 메스꺼움, 설사, 어지러움, 피부두드러기, 답답한 증상 ",
+    "clause:NO_ENTRY:본 제품은 복숭아를 사용한 제품과 같은 시설에서 제조하였습니다."
+   ]
+  },
+  {
+   "productMasterId": "23619b4d-aa58-49b5-b171-bea62f4ac813",
+   "productNameKo": "홍삼농축액분말20",
+   "holdReason": "HOLD_PENDING_DIRECT_TRANSLATION",
+   "why": [
+    "meta:NO_ENTRY:- 건강기능식품 원료로 사용",
+    "clause:NO_ENTRY:원료에 대한 알레르기 체질이나 질병으로 인해 치료 중이신 분은 의사와 상담 후 섭취",
+    "clause:NO_ENTRY:섭취자의 신체상태에 따라 반응에 차이가 있을 수 있으니 소비자 상담실로 문의"
+   ]
+  },
+  {
+   "productMasterId": "2361d32a-7af0-4452-a95e-e6479bddd7b3",
+   "productNameKo": "브이지케이홍삼정",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회 한스푼(1g)씩 물에 녹여 섭취 하십시오.",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:홍삼성문에 특이 반응이 있거나 알레르기 체질의 경우 제품성분을 확인 후 섭취하시기 바랍니다.",
+    "clause:NO_ENTRY:제품의 개봉 또는 섭취시에 포장재로 인한 상처를 입을수 있으니"
+   ]
+  },
+  {
+   "productMasterId": "2385c628-72bc-4e80-8115-a9b57c7fe287",
+   "productNameKo": "내몸다스림메타5",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 2정 또는 1일 1회, 1회 4정을 물과 함께 드십시오",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "23a01d37-e6c1-4860-8254-7dd97bff0e71",
+   "productNameKo": "자벨린츄정플러스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 3회, 1회 4정(1정당 1000mg)을 씹어서 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:개인의 상황에 따라 섭취량 및 섭취방법에 관한 영양상담이 필요할 수 있으므로, 섭취 전 영양사와 상담하시기 ",
+    "clause:NO_ENTRY:섭취기간에는 2∼3L의 충분한 물의 섭취를 권장합니다."
+   ]
+  },
+  {
+   "productMasterId": "23ce8b6b-8afa-43c5-894b-9b772d05ae77",
+   "productNameKo": "프로메가 오메가3",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 2캡슐(0.740 g) 식전, 식후 관계 없이 충분한 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:임산부, 수유부, 만성질환이 있거나 현재 질병치료 중이신 분은 전문의와 상담하십시오."
+   ]
+  },
+  {
+   "productMasterId": "23ceb254-30c3-47ed-8e45-337a00113ca4",
+   "productNameKo": "남유네유산균앤아연",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1포를 그대로 섭취하시거나 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:특정성분에 알레르기가 있는 분은 섭취 전에 반드시 원료(성분)를 확인하시기 바랍니다.",
+    "clause:NO_ENTRY:알레르기 체질 등은 개인에 따라 과민반을이 나타날 수 있습니다."
+   ]
+  },
+  {
+   "productMasterId": "23e8b42c-f647-4d9d-94c9-b8223f47cdef",
+   "productNameKo": "홍박사 플러스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:원료성분에 의해 간혹 침전물이 생길 수 있으나 변질이 아니오니 안심하고 드십시오",
+    "clause:NO_ENTRY:개봉면이 날카로울 수 있으니 주의하여 섭취하십시오",
+    "clause:NO_ENTRY:파우치 포장 그대로 전자렌지에 넣고 가열하지 마십시오"
+   ]
+  },
+  {
+   "productMasterId": "242072d1-622f-4099-9490-4743aeb9bb60",
+   "productNameKo": "프로틴3.0 (Protein 3.0)",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:스틱 - 1일 2회, 오전 1포,점심 1포 섭취바라며, 1회당 1포(40g)을 물, 저지방우유 또는 두유 3",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:임산부 또는 특이체질, 알레르기 체질의 경우에는 원료를 확인 하신 후 섭취 바랍니다. 이상사례 발생 시 섭취",
+    "clause:NO_ENTRY:유통기한 경과나 변질, 부패 또는 파손된 제품은 섭취하지 마십시오."
+   ]
+  },
+  {
+   "productMasterId": "242a33cd-d23c-463b-aa95-c199c55d5a93",
+   "productNameKo": "고려홍삼골드연질캅셀",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 2캅셀(1,600mg)을 물과 함께 섭취하십시요",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:알레르기 체질이신 경우 성분을 확인 한 후 섭취여부를 결정 하십시요.",
+    "clause:NO_ENTRY:제품개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있어 주위가 필요합니다."
+   ]
+  },
+  {
+   "productMasterId": "246715c2-e1e4-4ec8-a340-d0eb49d18e1c",
+   "productNameKo": "은하고려홍삼정캡슐",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일3회, 1회 2캡슐을 물과 함께 섭취한다.",
+    "badge:NUMBER_DRIFT:1일3회",
+    "label:NUMBER_DRIFT:1일3회",
+    "clause:NO_ENTRY:15세 이하의 어린이는 섭취량의 절반을 드십시오",
+    "clause:NO_ENTRY:특정성분 알레르기 체질을 가지신분은 섭취 전 제품의 성분을 확인 후 섭취하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "249f65f0-fea4-4978-9db0-a9cfe92e7745",
+   "productNameKo": "액티브랩 데일리 프로바이오틱스",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:장건강에 도움을 줄 수 있음(고시 제2020-63호/시행일 21.07.11)"
+   ]
+  },
+  {
+   "productMasterId": "24a35346-fa39-4e00-8ee7-c8f779ce16b5",
+   "productNameKo": "멀티비타민 앤 미네랄 포우먼",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:(가) 체내 산소운반과 혈액생성에 필요",
+    "clause:NO_ENTRY:(가) 철의 운반과 이용에 필요",
+    "clause:NO_ENTRY:(나) 유해산소로부터 세포를 보호하는데 필요"
+   ]
+  },
+  {
+   "productMasterId": "24fe34c4-b484-41d7-b43e-33308af797ce",
+   "productNameKo": "연홍이 플러스 다이나믹 부스터 업",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회, 1회 2정을 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:콜레우스포스콜리추출물 :",
+    "clause:NO_ENTRY:혈액의 효모시스테인 수준을 정상으로 유지하는데 필요"
+   ]
+  },
+  {
+   "productMasterId": "251d53ab-388f-4749-a3cc-352519ce7c0d",
+   "productNameKo": "리턴업 스트레스 데이케어",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:홍경천 추출물 : 스트레스로 인한 피로개선에 도움을 줄 수 있음. 비타민B6 :"
+   ]
+  },
+  {
+   "productMasterId": "253ddfde-6979-4ce8-95a2-4587185e6df6",
+   "productNameKo": "중외메가파워프리미엄",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:섭취 전 유통기한을 확인하시기 바랍니다.",
+    "clause:NO_ENTRY:이상 증상이 생길 경우 섭취를 중단하고, 전문의와 상담하십시오.",
+    "clause:NO_ENTRY:제품 개봉 또는 섭취 시 알루미늄 포장재에 의해 상처를 입을 수도 있으니 주의가 필요합니다."
+   ]
+  },
+  {
+   "productMasterId": "253e8fbd-8d05-45d7-b0bc-e6c85274874e",
+   "productNameKo": "내몸애발란스멀티비타민앤미네랄파워업",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1정(800mg)을 충분한 물과 함께 섭취하십시요.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "2593d385-c299-4995-bb6c-2839fc0812f8",
+   "productNameKo": "바디체인지스키니다이어트",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:유익균 증식",
+    "clause:NO_ENTRY:유해균 억제",
+    "clause:NO_ENTRY:칼슘 흡수에 도움"
+   ]
+  },
+  {
+   "productMasterId": "25b08de8-033e-4cfc-ab23-2f023141b6cf",
+   "productNameKo": "메노엘르",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NUMBER_DRIFT:1일 1회 2정을 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:골다공증발생 위험 감소에 도움을 줌 백수오 등 복합추출물 : (국문) 갱년기 여성의 건강에 도움을 줄 수 있"
+   ]
+  },
+  {
+   "productMasterId": "25de9a0b-24ae-42e3-b500-368b336b8222",
+   "productNameKo": "더 빼네 커피믹스맛",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 1포를 물 80~90 ml 또는 기호에 맞춰 넣고 잘 저은 후 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:탄수화물과 에너지 대사에 필요,(주)더베이글/경기도 의정부시 태평로 21 더베이글 빌딩/'",
+    "clause:NO_ENTRY:드물게 간에 해를 끼칠 수 있으며. 섭취기간 중 알코올 섭취를 피할 것"
+   ]
+  },
+  {
+   "productMasterId": "2600690c-316e-4b49-8d7e-ab370e9be624",
+   "productNameKo": "비타드랍 자몽맛&오렌지맛",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 1정을 300~500ml 물에 녹여 드십시오.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:체내 에너지 생성에 필요 판토텐산 : 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 비타민D :",
+    "clause:NO_ENTRY:정상적인 세포분열에 필요 비타민B12 : 정상적인 엽산 대사에 필요 비타민B6 :"
+   ]
+  },
+  {
+   "productMasterId": "261c8725-e026-4d09-8199-60ece9767174",
+   "productNameKo": "홍삼농축액골드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회당 1액상",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:유통과정 중 파손이나, 변질된 제품은 사용을 금지",
+    "clause:NO_ENTRY:포장재 개봉 후 장기간 보관을 하는 경우 변질될 우려가 있음."
+   ]
+  },
+  {
+   "productMasterId": "262e4010-3dba-426d-9b40-04c25bd607e4",
+   "productNameKo": "에이치엠멀티미네랄 마그네슘&망간",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:동봉된 1ml 계량스푼으로 1일2회 1회 1ml를 계량하여 물(약300ml)이나 주스에 희석하여 섭취하십시오",
+    "badge:NUMBER_DRIFT:1일2회",
+    "label:NUMBER_DRIFT:1일2회",
+    "clause:NO_ENTRY:특이체질 및 과다 섭취시 알레르기 및 설사 등의 발생우려가 있으니 성분 및 섭취량을 확인하시고",
+    "clause:NO_ENTRY:원액 그대로 섭취하지 마시고 반드시 희석하여 섭취하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "26783cff-cd59-49b1-9260-04ec7baf2f84",
+   "productNameKo": "건강프로젝트1",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:프락토올리고당 :장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음 프로바이오틱스:유산균 증식 및 유해"
+   ]
+  },
+  {
+   "productMasterId": "26ccb502-6107-476d-ad1c-903dde0ca1be",
+   "productNameKo": "탱글리 글로우샷",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:(1)기능성 내용 : 피부보습･자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음",
+    "clause:NO_ENTRY:(가) 피부보습에 도움을 줄 수 있음 : 히알루론산으로서 120∼240 mg",
+    "clause:NO_ENTRY:(나)자외선에 의한 피부손상으로부터 피부건강 유지에 도움을 줄 수 있음 : 히알루론산으로서 240 mg"
+   ]
+  },
+  {
+   "productMasterId": "26d30501-01ac-448b-9531-52d07c6348b8",
+   "productNameKo": "하이퍼 멀티 비타 올인원 이뮨샷",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:뚜껑을 개봉하여, 정제+연질을 액상과 함께 섭취(1일 1회, 1회 1병)",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NUMBER_DRIFT:1. 비타민 C:",
+    "clause:NUMBER_DRIFT:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 2. 마그네슘 :"
+   ]
+  },
+  {
+   "productMasterId": "26db55a8-0fea-47d9-bf69-c33e7df37052",
+   "productNameKo": "THE 데일리 액상 마그네슘 스피드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:파우치 모서리로 인한 상해가 발생할 수 있으니 섭취시 주의하십시오.",
+    "clause:NO_ENTRY:본 제품은 원료의 특징 상 미네랄 등의 성분이 침전돼 있을 수 있으므로 섭취 전 충분히 흔들어 섭취하십시오",
+    "clause:NO_ENTRY:포장지 채로 전자레인지에 가열하지 마십시오."
+   ]
+  },
+  {
+   "productMasterId": "26ddd00a-e801-4c96-a01f-2c6984e92c8e",
+   "productNameKo": "인삼분말골드",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 2회, 1회 2g을 온수나 냉수 80 ml에 넣어 잘 저은 후 음용함.",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:제품 개봉시 분말이 흐를 수 있으니 주의.",
+    "clause:NO_ENTRY:정해진 섭취방법을 준수하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "27a5e4d1-8116-4845-99cd-3216afc17756",
+   "productNameKo": "액티브라이프 관절건강보",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1포를 충분히 흔들어 직접 섭취한다.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:제품의 특성상 침전물이 발생될 수 있으나 제품 고유의 성분이므로 안심하고 흔들어 드십시오."
+   ]
+  },
+  {
+   "productMasterId": "27b47ef7-cf63-4234-816a-9b8527311537",
+   "productNameKo": "간애(愛)진심",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회, 1회 1병(액상 20ml + 캡슐(경질) 500mg*2캡슐 + 캡슐(연질) 750 mg*1캡슐)",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:비타민 B1 (1) 탄수화물과 에너지 대사에 필요 비타민 B6",
+    "clause:NO_ENTRY:간 건강에 도움을 줄 수 있음 프로바이오틱스 유산균 증식 및 유해균 억제･배변활동 원활･장 건강에 도움을 줄"
+   ]
+  },
+  {
+   "productMasterId": "27fc738b-eecc-4ae7-b728-ca1ad9c1d264",
+   "productNameKo": "천지류",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 3회, 1회당 1 정씩 물과 함께 섭취하십시오.",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "clause:NO_ENTRY:알레르기 등 특이체질의 경우에는 성분을 확인하신 후 섭취"
+   ]
+  },
+  {
+   "productMasterId": "28ccf13c-7523-43d4-b2eb-ef925dfc8981",
+   "productNameKo": "프리미엄 루테인 플러스 12",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "28d3b9ca-4e80-4bf2-ad5b-985940136715",
+   "productNameKo": "웰메가 간건강 밀크씨슬",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회"
+   ]
+  },
+  {
+   "productMasterId": "29d2cbc5-e430-497b-8f95-cc686dd8ef48",
+   "productNameKo": "다이어트 CLA",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:500mg : 1일 3회, 1회 2캅셀을 물과 함께 섭취하십시오. 750mg : 1일 2회, 1회 2캅셀을 ",
+    "badge:NUMBER_DRIFT:1일 3회",
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 3회",
+    "label:NUMBER_DRIFT:1일 2회"
+   ]
+  },
+  {
+   "productMasterId": "29db9eaf-43b7-4825-a922-aee32d6149fc",
+   "productNameKo": "골드 미소원 맵시",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회",
+    "clause:NO_ENTRY:<비타민B1>",
+    "clause:NO_ENTRY:<비타민 C>"
+   ]
+  },
+  {
+   "productMasterId": "29e3b382-0d66-4d5f-93a2-b61af35d04a0",
+   "productNameKo": "간편한 밀크씨슬",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "meta:NO_ENTRY:1일 1회 500mg*2캡슐을 음용수와 섭취하세요.",
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:PTP포장 개봉시 다칠 염려가 있으므로 주의하십시오.",
+    "clause:NO_ENTRY:대두, 소고기 등에 알레르기 반응을 나타내는 사람은 섭취시 주의하십시오."
+   ]
+  },
+  {
+   "productMasterId": "29f36043-0897-4703-a9e1-33cb7d967d61",
+   "productNameKo": "라비센 슬림S(에스)",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 1회",
+    "label:NUMBER_DRIFT:1일 1회",
+    "clause:NO_ENTRY:특이체질, 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으므로 전",
+    "clause:NO_ENTRY:문가와 삼담 후 섭취 여부를 결정하세요.",
+    "clause:NO_ENTRY:이상사례 발생 시 섭취를 중단하고 전문가와 전문가와 상담하시기 바랍니다."
+   ]
+  },
+  {
+   "productMasterId": "29f3b900-9b7c-4e46-be8d-81694b7e37ef",
+   "productNameKo": "쏙빠지는 악마다이어트 화이바 5000 자몽맛",
+   "holdReason": "HOLD_NUMBER_STRUCTURE_AMBIGUOUS",
+   "why": [
+    "badge:NUMBER_DRIFT:1일 2회",
+    "label:NUMBER_DRIFT:1일 2회"
+   ]
+  }
+ ],
+ "applied": 0,
+ "renderAudit": {
+  "checked": 0,
+  "issues": 0,
+  "failures": []
+ },
+ "appliedMode": false
+}

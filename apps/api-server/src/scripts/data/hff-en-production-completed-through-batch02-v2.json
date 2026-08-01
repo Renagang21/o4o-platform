@@ -1,0 +1,13 @@
+{
+ "builtAt": "2026-08-01T06:45:44.717Z",
+ "batch01": {
+  "population": 5000,
+  "completed": 4899
+ },
+ "batch02": {
+  "population": 5000,
+  "completed": 4878
+ },
+ "batch01SweepApplied": 0,
+ "hffEnCanonicalTotalLive": 24451
+}

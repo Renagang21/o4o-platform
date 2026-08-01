@@ -1,0 +1,23 @@
+{
+ "verifiedAt": "2026-08-01T06:46:15.589Z",
+ "readOnly": true,
+ "population": 915,
+ "expectTranslated": 907,
+ "hold": 8,
+ "sumCheck": true,
+ "failures": {
+  "missingEn": 0,
+  "hangulInSlots": 0,
+  "structureDrift": 0,
+  "koHashDrift": 0,
+  "holdHasEnFromThisRound": 0
+ },
+ "detail": {
+  "missingEn": [],
+  "hangulInSlots": [],
+  "structureDrift": [],
+  "koHashDrift": [],
+  "holdHasEnFromThisRound": []
+ },
+ "verdict": "PASS"
+}

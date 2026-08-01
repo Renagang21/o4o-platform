@@ -47,9 +47,17 @@ const B3 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b3-translations-v1.js
 const B4 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b4-translations-v1.json`, 'utf8'));
 const B5 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b5-translations-v1.json`, 'utf8'));
 const B6 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b6-translations-v1.json`, 'utf8'));
+// Batch 02 잔여 915 직접 번역 라운드 (파일이 없으면 빈 객체로 시작한다)
+const R915 = [1,2,3,4,5,6,7,8,9,10,11,12].map((n) => {
+  const f = `${D}/hff-en-b02-r915-t${n}-translations-v1.json`;
+  return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+});
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+  // 사설 영역(PUA) 글리프·제로폭 문자는 레거시 심볼 폰트가 남긴 표기 잔재이며 의미가 없다.
+  // 조회 키에서만 제거한다(원문 HTML 은 그대로 보존된다).
+  .replace(new RegExp('[\\uE000-\\uF8FF\\u200B-\\u200F\\uFEFF]', 'g'), '')
   .replace(/\s+/g, ' ').trim();
 
 // 열거 구분자·마커·종결부호는 의미가 아니라 표기다. 사전 조회 키에서만 통일한다(원문은 보존).
@@ -203,6 +211,10 @@ for (const src of [B5.clause ?? {}, B5.meta ?? {}, B5.label ?? {}])
 // 35) Batch 02 직접 번역 b6
 for (const src of [B6.clause ?? {}, B6.meta ?? {}, B6.label ?? {}])
   for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 36) Batch 02 잔여 915 직접 번역 (t1~)
+for (const T of R915)
+  for (const src of [T.clause ?? {}, T.meta ?? {}, T.label ?? {}, T.intro ?? {}])
+    for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────
 const CNT = { 정: 'tablet', 캡슐: 'capsule', 포: 'stick pack', 스푼: 'spoonful', 알: 'piece', 병: 'bottle', 개: 'piece', 매: 'sheet', 방울: 'drop' };
