@@ -1,0 +1,931 @@
+{
+ "summary": {
+  "mode": "APPLY",
+  "scanned": 281,
+  "planned": 6,
+  "unitsByArea": {
+   "intake": 6
+  },
+  "skipped": 275,
+  "skipByCode": {
+   "NOT_MATCHED": 163,
+   "FAITHFUL_COPY_OFFICIAL_TYPO": 112
+  },
+  "green": 6,
+  "concurrent": 0
+ },
+ "plans": [
+  {
+   "koId": "90bc3ab6-ad56-4c34-8d03-0ee5c078b491",
+   "masterId": "047f13ee-45ca-4604-aeea-fd3fa98ec283",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "51903d77ad1f295f7bc04cb7add39082",
+   "newHash": "9ac7fe6f8bcf2c38a7ce108c84bdd57e",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 411
+    }
+   ]
+  },
+  {
+   "koId": "53bc3984-37d8-4099-bcae-c6990fd2ae0f",
+   "masterId": "b9758bad-b42d-4f1f-a03f-066ec02e2ea9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "8f295a03258d1dfccca699f7c190cefb",
+   "newHash": "f991980d01f4884d1dd9a0486517ea36",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 451
+    }
+   ]
+  },
+  {
+   "koId": "940136d4-690f-4d03-82b9-bcf9df220461",
+   "masterId": "20d03ee7-7a64-4a5d-8940-47e714e1a9c5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "51903d77ad1f295f7bc04cb7add39082",
+   "newHash": "9ac7fe6f8bcf2c38a7ce108c84bdd57e",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 411
+    }
+   ]
+  },
+  {
+   "koId": "36e0ff01-ac5d-4f1e-b85e-3d6558c27010",
+   "masterId": "24f127f9-1b3a-4d63-933a-b937861b5327",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d6c4c70acc6e284b91a1d5bb060551e2",
+   "newHash": "5c6a179063d6e72e82cbb85d32b3d6ad",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 451
+    }
+   ]
+  },
+  {
+   "koId": "565abbfd-0982-44c3-89f6-e762691303b9",
+   "masterId": "a766708c-f81b-4fbf-8876-52ab11c9f5dc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d6c4c70acc6e284b91a1d5bb060551e2",
+   "newHash": "5c6a179063d6e72e82cbb85d32b3d6ad",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 451
+    }
+   ]
+  },
+  {
+   "koId": "66f7abc9-136f-49ec-b7fe-e4afbe6cfd9d",
+   "masterId": "35da9d3c-5cfe-48a0-ab38-e0668d6aa9cf",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "53b88e8d83e41a3e279783f25ff3f2d6",
+   "newHash": "abdde5b1fb3999993033d985d5530ee1",
+   "acts": [
+    {
+     "area": "intake",
+     "beforeLen": 260,
+     "afterLen": 411
+    }
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "9094b071-c55e-4ee1-9fb2-285e025f7b4a",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f64d7ca5-934a-4dd4-ab0d-9a53f588d56f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "ea9ab367-29be-46a6-9a5d-277892bf179a",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "b73d8db7-8c6b-40bb-8373-02537eff1ef8",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "b30fabfc-9238-4d4c-a81c-f61e8b2d56d0",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "94f45558-a5c0-4ce0-9008-72fb4f04d8e2",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "a7bdee22-5e75-4110-91f5-e07d652311e9",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "ac1e6660-bd30-44eb-b6f4-a073dd954eb2",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "592e0b39-7489-42e1-a457-659aa2587191",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "8242ea03-9239-4f53-90d7-14423c82cc15",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3cbf261f-be80-4dfa-8a2d-a223c3831a40",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "0efc2641-2910-4d85-a80c-1e59f9833f3f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "b60387b1-d4ad-43b4-aa4f-0b695fafd32c",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "41adfe62-d20e-4b6c-91c4-8a07be382453",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "1c7c9f50-e295-4e00-b6dc-f8d2ae993c21",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fda9531c-559d-4c5f-90fd-05ce6df4844c",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "be4c7769-34a6-477a-8122-f83254dfac61",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "99be290c-eb67-4ae5-8b53-a2d8cab083b3",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "e1b3790e-9187-490c-8b38-eaefdf752001",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "aa577533-2097-4918-a657-b80936ce20e8",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fe7b3306-4052-4896-9c8b-f7af8e81c0fd",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "049bb468-21ec-4901-aa50-c4d7b1b962c6",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "229ef0b7-7ce1-48e0-b0e5-a7b86fa0e16f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "6da43049-75a4-486a-ac8a-a4a2dbf19e66",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "6e20a8e6-bd92-4d10-887b-a7685c785ccc",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "d22dde72-0603-4843-8867-292a811b8b85",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "cd571ba0-6dd6-4c80-924d-5763b9ef747d",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "302ec58d-4ec9-43c2-a58f-996d3b0003d6",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f01fd8f5-8363-44b8-9385-672a50f60609",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "7edaecbc-b14f-4827-a617-1f5b3a673393",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "62c00347-e323-4e5f-baa7-d305d0291663",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "01f27b0f-93a7-44f6-b7f4-77bfc1f0a799",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "771d4521-d7f5-4abd-ab10-7cfe501973bb",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "76900254-7d4f-476c-94ea-0aeef5e25bcc",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "5af4e314-d575-4af8-abc4-3b8310c1d02f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "62666f70-ab22-4a41-995c-4a57b694fd16",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "c2b66295-cf5c-49ad-b54e-bcaddc0bea36",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "e20337c0-a5a2-4f9a-b04f-c3af5b95f9a0",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3f59ea8f-9114-4228-aa90-92da6a14483b",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "81cca6c1-0110-4bb8-bb40-98f982eaecba",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "5e1fe1f6-241b-4c52-b085-ea25699e1352",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "3c40fbaa-62bd-4a0b-949a-0acfa90d79f5",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "0b14c5c1-b707-4d80-9f8f-354f5a4cff4b",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "aab631cc-4255-4c9a-805e-2fa064287742",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "ca469e0c-55ed-4bbb-b3e6-13e32a98102c",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "8cd0628c-0b0c-4ad9-a7bd-520616b9503c",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "77f42e6b-3d34-4012-9a37-a84e50a38a6c",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "d287b76b-8407-495b-8e10-035742fbc96a",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fc365cc9-a211-42e6-8696-484d8de043de",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "91fb192e-119e-4649-951c-3ba6dccc05e8",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "ce1cb8f7-fad2-465e-83cb-0468ddafdf24",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "9c2ef785-ee58-4cee-9e94-92ec1fc277ea",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "074a2691-bbcb-4e05-8b1c-ae9ae5497f8f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "4a8b73e9-8776-465e-bca7-3d71c452301f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f5b89782-d644-4ac5-a065-09df1769f781",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "cf6aff86-d1cb-46c2-a8be-77803bcc6ba8",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "dc399942-3991-4688-907e-f08500380946",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "ade46c3b-26f3-4149-b938-04664d492808",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "2bfb1321-6dd0-421d-a448-1988b95189dd",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "6d13db72-2c17-4dfd-ad3d-4c75b1efc1e7",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "056066f9-1a85-4b07-9de9-55e122204686",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "b11e8162-11f2-42eb-972c-3782b070c273",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3bcc1638-5fe0-47f4-a5af-6e5514469b5d",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "0a7c6ec0-04c8-4eff-ba53-76c5d845a1c8",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "ae652025-ecc8-4bc8-a901-d00509b21963",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "388d5465-a022-41ac-81aa-0731157d5c04",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "5e2a9ab5-1012-4b57-8b31-94df95f042c7",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "8cd285a8-b1e6-45bc-930c-89e2898376d9",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "f9c5bee5-76b4-44e6-b37e-2b3bc4d03f9b",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "37e93ca5-9e66-47f0-a9b6-6e7566926f3f",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "1e83a488-24be-4e94-8471-1532aa2a33e4",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "8ac1dca5-86df-4a87-81d8-7b6eccda6290",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e2e7509e-df73-4452-add9-88b8d9ef3cd8",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "ab4d1219-723b-42bb-b940-139fb11e5dbe",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "eeec2a8c-c287-4333-b5f7-4e3b9d23d5a3",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "bb4c46e3-b21a-43d8-bb81-f6d8a80e4451",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "2e489ade-6a36-49ff-ab4c-80aca56f35ea",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "20473547-e644-4d34-97fb-ae727bd0869a",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "30bf9896-c42b-4f48-9832-3d44cbebb389",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "b651a780-e5a2-4f34-a2b1-9a21e4293d3e",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "c5592f8e-512c-4b3d-9e75-66a8580d6acb",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "c08a89f6-65ff-454b-9df8-a4b8d2e28919",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "97bdb0ee-1d49-43e8-981e-a33ac60b4211",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "49d1394b-bf09-4123-8835-8d613915aeef",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "00ce29db-390b-4209-a267-b7b61929d0ac",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "2f955b7f-5690-4182-8068-ab4206a5c4cd",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e0164945-8f91-4329-8067-624c2dfc7fa7",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "3b249254-67a7-4a78-a2e1-19310556936b",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "8b4d5dde-74fb-4193-ba5e-8b6c74d2c0ba",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "88a8f5bd-7d65-46f3-8664-8fdbb5e2b4fa",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "9de53398-94c6-4457-ad03-35c1a906ca2f",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "901133a4-a69a-4b05-8c6b-8ef818922066",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "13cbfb8e-7b71-4afe-845d-33739c8edccd",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "dc446b86-5377-498c-922c-88fc3d44dece",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "14a5e542-3eb5-4931-bccf-2a690dd60db2",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "d2e7f0b8-b9ff-4a4b-8eac-8835eb233aa1",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b61dcb93-2019-48e5-b059-d37838ac5fe9",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "d1f98bd7-3ac0-48c1-83d1-b63dcf31a2a3",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e0baf1a9-c9c3-4b50-9cc9-336079f60fa4",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b323ea95-051c-48d0-9a33-c894ab4c3f21",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "04e173a9-24b1-48ee-b380-0acfc085f837",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "c944dc21-56f4-4e32-8441-8139f7f5a583",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "94522a57-ba65-4cc5-8d48-463fbd092e9e",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "8aa06214-485b-41dc-b4ac-d0e68fb51a74",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "2d2511c3-4024-4aa5-b79b-03437075a39c",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e0125aed-2e52-45fa-b2a6-35a48ad41c34",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "705767aa-0300-4af8-97a9-b95784df9ee2",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "4f884df8-08c8-4553-abe2-ee6683fb30a5",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "d57e557d-b920-4546-9684-c46e4e2835ac",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b9de8548-eaf0-4c37-a2bc-14d94ace7ada",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "5fc128df-77f4-406b-91c8-c5f2748802f7",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "22d52d62-0d50-470d-8417-e99fb82a41fd",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "a515a746-9deb-436f-9639-62f6c23014a0",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "6e4f67a7-19f5-4d6c-99ae-359d0bb73260",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "c3436eb8-1235-4a46-966e-1d1d47ad0342",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b3624eb3-d136-4f3e-9597-ec5348770d36",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "dc5760f5-ba68-40c7-a9ef-d44f2f9ab4d7",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "30d4625d-7796-48de-9165-924da6f5ff96",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "62e3580f-ae8b-456a-a158-46312273e02e",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "7a600075-4ca4-4d8c-b242-0b88603d4620",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "67b647fe-5f1b-4f14-a339-88ccb6d9b320",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "ace4f1c9-d5f6-453a-aa70-cdcf1668c0c3",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "17248ad9-98f3-429d-b169-18f1a87df3c6",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "fe17030a-174b-4a0e-93f2-328ece183160",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "5ebf1779-08ba-4557-83e7-2e95f2b308ad",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "efaac8f6-66f7-4f81-bee5-57ebdce8e42f",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "4c7b8106-8c3f-41bc-adc7-e83626ee4bee",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "6b5fd451-f4b5-443a-a357-91f9b1b12ac6",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "5a2dd908-2247-4b86-9d1e-92626c8407b2",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "6b720a26-9c09-436b-92d3-f0e5308eedcd",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "1bca4be6-4f03-4e47-a99d-1ef53d5344b8",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "20b2d860-223c-4169-9395-bfa8e37c8cf2",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "a0c42f97-f4fb-4da3-8bd1-272a63869eb9",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "98220eef-dbde-4f71-8c9d-03a607590714",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "8533c0cf-4624-48d8-9346-912ecdbc2bc3",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "4d8c23b8-1704-40ca-a635-a632bdc327a5",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "eac89c48-b952-426c-84aa-10c2b53c8fe1",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e643775c-3afb-4ddf-abcc-a6e39f5e11da",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "df6ecf03-c216-49d1-b6ed-ade1745e445b",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "c1ba9db3-72bd-4e77-9c5d-a93d015a1475",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "f869d150-ddba-4db7-bce9-5946308880a5",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "0d24fc0e-2354-4f63-8391-2a8129d96af2",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "31d3b755-8608-426c-a748-d2e4238a047a",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "2e0cad4b-ae5e-431a-a9c0-890a26da9b39",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b60f0d2a-ad24-4477-9048-2b0e1ba3b867",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "1228f939-57bd-42a3-884a-f0a49b9e1d45",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "10e63658-cb75-4205-b571-781257324b48",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "7fca42b5-7411-4414-a88d-6e93ddf3011a",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "a43657df-ed7b-4f24-9779-ab7b1ba78d33",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "2cbb85d1-9209-4fbb-ab28-0fbef4c5a849",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "a9ebfa61-4df8-481f-ab71-a632b4056a44",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b17dae8c-ca50-4342-bc9d-992db25a25f6",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fab005bf-334c-4386-bcf2-ae1e453ae750",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "69d2d700-ecac-43c0-8a7e-e41178784ed7",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "336240c5-8dd5-4d2e-b8e3-9462eb54de7b",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3716a3e6-f229-4773-9a6d-5a145a3b2218",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "30882d6b-e047-43c5-862f-f355159505b4",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f780b350-340a-4b21-a3dd-537760a7846a",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f8b870a4-beb6-43bb-ba41-436029803bd4",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fff4035a-0104-4369-b4f3-926c44c654f3",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "c0a83e60-a1b2-491e-a138-b0e86d76cfe4",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "92d83a76-3190-4afc-8698-f04b1975ef46",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "c468a4b9-37d5-4c80-80ee-cb78ce75f02c",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "f9e26f92-07b3-4824-a6bd-b52b90216d4e",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "d10d5ea7-9aa3-4d94-9681-04fe161bc741",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "acbc6ece-48a2-4fe8-9d6c-82748cb594a5",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "73737858-f372-43c0-998e-a8b7d71b9148",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "41b4ca5b-4f2b-4095-91a1-fa589d8e466f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3ec94bfc-304c-421d-9584-a9053f50d96f",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "aef435fc-9f10-42ed-86ea-23a66b07ea2d",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "18cd694f-28e4-43a0-9d5d-b44366832251",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b83adf2d-c88c-4750-9428-09b3fc8656f6",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "b492d021-5ad8-4f8d-a7b9-e89f1ddfcfe6",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e2203f80-c385-41e2-9c29-5f0e206f734c",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "5b2903ab-798d-41f7-ba0c-e85338948d68",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "3ac34a13-be8f-427a-ad04-488029e772f1",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "dbe95151-9083-4037-b240-6835f6a4fe36",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "0b6929d8-a1ef-4e6e-9818-f999f82531c4",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "4d562761-78a3-4cc6-bb87-48de5dc958e2",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "0c6e0898-2a39-481f-ab61-dd1256040bcc",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "31cd9efa-ddd3-4d41-93ef-f9e1bf3ec78e",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "fc1a32b6-9e88-42fd-a4a2-6d0aa07c0ab9",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "6945516b-20fd-4744-9ecd-804f4974a1ac",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "6b39adda-6282-4930-b571-db7665953082",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "d5f51078-a398-43aa-a352-656bb3c97663",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "cd4a6871-f4cc-4146-ba4b-d088dbebe86e",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "715febdb-8e44-4763-9353-6d1749cddf2a",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "9024fd19-52a0-406f-9f06-72728646f8bf",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "97c76228-2f0d-433e-8f06-e3e587756f8e",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "4afc9518-fd10-4c58-badb-bbcbd84ed9e1",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "d8b5653e-b96c-4725-9e45-8fcf2600686c",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "e31ac732-88a3-4c7d-b54a-4a867c605c8d",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "bf6e7317-37d1-4358-8f6d-5d4cd07041fa",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "18ed21a0-8079-4b4c-b9ce-85b2d0af0d42",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "241138c7-101c-43e1-ba81-79795e60be67",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "7ca46306-aec7-4d49-94b0-d5c0b28cc713",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "6276537d-aa07-4608-92de-30712c9db089",
+   "code": "NOT_MATCHED"
+  },
+  {
+   "id": "8d403f34-c36a-40c3-96ea-65e8635fc5a4",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "54d360eb-4312-4565-95ba-ff440beff5b6",
+   "code": "FAITHFUL_COPY_OFFICIAL_TYPO"
+  },
+  {
+   "id": "202371e4-94bd-4ad2-978d-0a5abc5c0ac8",
+   "code": "NOT_MATCHED"
+  }
+ ],
+ "results": [
+  {
+   "koId": "90bc3ab6-ad56-4c34-8d03-0ee5c078b491",
+   "status": "GREEN"
+  },
+  {
+   "koId": "53bc3984-37d8-4099-bcae-c6990fd2ae0f",
+   "status": "GREEN"
+  },
+  {
+   "koId": "940136d4-690f-4d03-82b9-bcf9df220461",
+   "status": "GREEN"
+  },
+  {
+   "koId": "36e0ff01-ac5d-4f1e-b85e-3d6558c27010",
+   "status": "GREEN"
+  },
+  {
+   "koId": "565abbfd-0982-44c3-89f6-e762691303b9",
+   "status": "GREEN"
+  },
+  {
+   "koId": "66f7abc9-136f-49ec-b7fe-e4afbe6cfd9d",
+   "status": "GREEN"
+  }
+ ]
+}
