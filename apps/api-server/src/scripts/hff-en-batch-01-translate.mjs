@@ -57,6 +57,11 @@ const B03 = Array.from({ length: 30 }, (_, i) => i + 1).map((n) => {
   const f = `${D}/hff-en-b03-t${n}-translations-v1.json`;
   return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
 });
+// Batch 04 직접 번역 라운드 (파일이 없으면 빈 객체로 시작한다)
+const B04 = Array.from({ length: 30 }, (_, i) => i + 1).map((n) => {
+  const f = `${D}/hff-en-b04-t${n}-translations-v1.json`;
+  return fs.existsSync(f) ? JSON.parse(fs.readFileSync(f, 'utf8')) : {};
+});
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -222,6 +227,10 @@ for (const T of R915)
     for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 // 37) Batch 03 직접 번역 (t1~)
 for (const T of B03)
+  for (const src of [T.clause ?? {}, T.meta ?? {}, T.label ?? {}, T.intro ?? {}, T.badge ?? {}, T.heading ?? {}])
+    for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 38) Batch 04 직접 번역 (t1~)
+for (const T of B04)
   for (const src of [T.clause ?? {}, T.meta ?? {}, T.label ?? {}, T.intro ?? {}, T.badge ?? {}, T.heading ?? {}])
     for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 

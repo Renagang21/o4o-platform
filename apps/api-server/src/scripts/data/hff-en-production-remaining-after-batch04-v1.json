@@ -1,0 +1,7 @@
+{
+ "builtAt": "2026-08-01T09:22:37.029Z",
+ "koCanonicalTotal": 40918,
+ "enCanonicalTotal": 34098,
+ "remaining": 6820,
+ "note": "remaining 은 KO canonical 대비 EN 미생산 잔여이며 Batch 04 이후 대상이다(문제 큐 포함)."
+}

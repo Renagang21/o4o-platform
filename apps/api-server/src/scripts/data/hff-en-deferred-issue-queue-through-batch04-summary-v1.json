@@ -1,0 +1,22 @@
+{
+ "builtAt": "2026-08-01T09:22:37.006Z",
+ "total": 576,
+ "byBatch": {
+  "1": 101,
+  "2": 122,
+  "3": 194,
+  "4": 159
+ },
+ "byIssueType": {
+  "KO_SOURCE_DAMAGED": 342,
+  "TRANSLATION_AMBIGUOUS": 4,
+  "NUMBER_STRUCTURE_AMBIGUOUS": 230
+ },
+ "duplicates": 0,
+ "reproductionEligible": {
+  "count": 0,
+  "rows": []
+ },
+ "forbiddenIssueTypesPresent": [],
+ "unknownIssueTypes": []
+}
