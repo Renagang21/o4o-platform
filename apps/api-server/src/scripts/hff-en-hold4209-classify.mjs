@@ -23,7 +23,7 @@ const koNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:
 const enNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT}|hundred million|ten thousand|thousand)`, 'g')) ?? [])
   .map((x) => x.replace(/[,\s]/g, '').replace(/hundredmillion/g, 'E8').replace(/tenthousand/g, 'E4').replace(/thousand/g, 'E3'));
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5511', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5547', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 const ko = new Map(), en = new Map();
