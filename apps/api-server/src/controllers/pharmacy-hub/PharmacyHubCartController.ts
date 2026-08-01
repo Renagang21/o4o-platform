@@ -99,13 +99,28 @@ export class PharmacyHubCartController {
       const svc = PharmacyHubCartController.service();
       const scope = { buyerId, serviceKey: SERVICE_KEY };
       const [items, groups] = await Promise.all([svc.list(scope), svc.groupBySupplier(scope)]);
+
+      // WO-PHARMACY-HUB-STORE-OWNER-CHECKOUT-AND-PAYMENT-UI-V1:
+      //   묶음에 공급자명을 붙인다. 없으면 화면이 UUID 를 그대로 보여주게 된다.
+      //   금액은 건드리지 않는다 — 표시 라벨만 추가한다.
+      const supplierNames = await PharmacyHubCartController.loadSupplierNames(
+        groups.map((g) => g.supplierId),
+      );
+
       return res.json({
         success: true,
         data: {
           items,
-          groups,
+          groups: groups.map((g) => ({
+            ...g,
+            supplierName: (g.supplierId && supplierNames.get(g.supplierId)) || '공급자',
+          })),
           totalItems: items.length,
           totalQuantity: items.reduce((sum, it) => sum + it.quantity, 0),
+          // 화면 합계도 서버가 계산한 값만 쓰도록 함께 내려준다(프론트 재계산 금지).
+          displaySubtotal: groups.reduce((sum, g) => sum + g.displaySubtotal, 0),
+          displayShippingFee: groups.reduce((sum, g) => sum + g.shipping.shippingFee, 0),
+          displayTotal: groups.reduce((sum, g) => sum + g.displayTotal, 0),
         },
       });
     } catch (error) {
@@ -188,6 +203,32 @@ export class PharmacyHubCartController {
     } catch (error) {
       return PharmacyHubCartController.fail(res, error, 'remove');
     }
+  }
+
+  /** supplierId → 표시명 batch 조회. 실패해도 화면이 죽지 않도록 빈 맵으로 떨어진다. */
+  private static async loadSupplierNames(
+    supplierIds: Array<string | null>,
+  ): Promise<Map<string, string>> {
+    const ids = [...new Set(supplierIds.filter((s): s is string => !!s && UUID_RE.test(s)))];
+    const map = new Map<string, string>();
+    if (ids.length === 0) return map;
+    try {
+      const rows: Array<{ id: string; name: string | null }> = await AppDataSource.query(
+        // 표시명은 조직명이 유일한 출처다 — neture_suppliers 에 상호 컬럼은 없다
+        // (주문 상세 쿼리와 동일한 조인 축).
+        `SELECT ns.id::text AS id, org.name AS name
+           FROM neture_suppliers ns
+           LEFT JOIN organizations org ON org.id = ns.organization_id
+          WHERE ns.id::text = ANY($1)`,
+        [ids],
+      );
+      for (const r of rows) if (r.name) map.set(r.id, r.name);
+    } catch (error) {
+      logger.warn('[PharmacyHubCart] supplier name lookup failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+    return map;
   }
 
   private static fail(res: Response, error: unknown, op: string) {

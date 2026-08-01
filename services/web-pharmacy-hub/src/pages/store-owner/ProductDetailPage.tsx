@@ -10,6 +10,7 @@
 import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { api } from '../../lib/apiClient';
+import { addCartItem, errorMessage } from '../../lib/api/pharmacyHubOrders';
 import { BRAND } from '../../config/service';
 
 interface Identifier {
@@ -59,6 +60,26 @@ export default function StoreOwnerProductDetailPage() {
   const [data, setData] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // 담기 상태 — 중복 클릭은 adding 으로 잠근다
+  const [quantity, setQuantity] = useState(1);
+  const [adding, setAdding] = useState(false);
+  const [added, setAdded] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+
+  const addToCart = async () => {
+    if (!offerId || adding) return;
+    setAdding(true);
+    setAddError(null);
+    setAdded(false);
+    try {
+      await addCartItem(offerId, quantity);
+      setAdded(true);
+    } catch (err) {
+      setAddError(errorMessage(err, '장바구니에 담지 못했습니다.'));
+    } finally {
+      setAdding(false);
+    }
+  };
 
   useEffect(() => {
     let alive = true;
@@ -171,17 +192,54 @@ export default function StoreOwnerProductDetailPage() {
         </div>
       )}
 
-      {/* 후속 WO 연결용 식별자 — 장바구니·주문은 이번 범위 밖 */}
-      <div className="mt-6 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-3 text-xs text-gray-500">
-        <p>주문 · 장바구니는 후속 단계에서 연결됩니다.</p>
-        <p className="mt-1 break-all">
-          offerId {data.offerId} · masterId {data.masterId} · supplierId {data.supplierId}
+      {/* 담기 — WO-PHARMACY-HUB-STORE-OWNER-CHECKOUT-AND-PAYMENT-UI-V1 */}
+      <div className="mt-6 rounded-lg border border-gray-200 bg-white p-4">
+        <div className="mb-3 flex items-center gap-3">
+          <label htmlFor="qty" className="text-sm text-gray-500">
+            수량
+          </label>
+          <input
+            id="qty"
+            type="number"
+            min={1}
+            max={1000}
+            value={quantity}
+            onChange={(e) => setQuantity(Math.max(1, Math.min(1000, Number(e.target.value) || 1)))}
+            className="w-24 rounded border border-gray-300 px-2 py-1 text-sm"
+          />
+        </div>
+
+        {addError && <p className="mb-2 text-sm text-red-600">{addError}</p>}
+        {added && (
+          <p className="mb-2 text-sm text-emerald-700">
+            장바구니에 담았습니다.{' '}
+            <Link to="/store-owner/cart" className="underline">
+              장바구니로 이동
+            </Link>
+          </p>
+        )}
+
+        <button
+          type="button"
+          onClick={addToCart}
+          disabled={adding}
+          className={`w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white ${
+            adding ? 'cursor-not-allowed bg-gray-400' : 'bg-emerald-600 hover:bg-emerald-700'
+          }`}
+        >
+          {adding ? '담는 중…' : '장바구니에 담기'}
+        </button>
+        <p className="mt-2 text-xs text-gray-500">
+          담아도 주문되지 않습니다. 장바구니에서 주문 후 결제해야 공급자에게 전달됩니다.
         </p>
       </div>
 
-      <p className="mt-6 text-sm">
+      <p className="mt-6 flex gap-4 text-sm">
         <Link to="/store-owner/products" className="text-gray-500 underline">
           상품 목록
+        </Link>
+        <Link to="/store-owner/cart" className="text-gray-500 underline">
+          장바구니
         </Link>
       </p>
     </div>

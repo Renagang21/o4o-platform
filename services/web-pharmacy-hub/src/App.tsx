@@ -36,6 +36,13 @@ import MembershipDetailPage from './pages/operator/MembershipDetailPage';
 import SupplierProductsPage from './pages/supplier/ProductsPage';
 import StoreOwnerProductsPage from './pages/store-owner/ProductsPage';
 import StoreOwnerProductDetailPage from './pages/store-owner/ProductDetailPage';
+// WO-PHARMACY-HUB-STORE-OWNER-CHECKOUT-AND-PAYMENT-UI-V1
+import CartPage from './pages/store-owner/CartPage';
+import OrdersPage from './pages/store-owner/OrdersPage';
+import OrderDetailPage from './pages/store-owner/OrderDetailPage';
+import PaymentPage from './pages/store-owner/PaymentPage';
+import PaymentSuccessPage from './pages/store-owner/PaymentSuccessPage';
+import PaymentFailPage from './pages/store-owner/PaymentFailPage';
 import { ROLES } from './config/service';
 
 export default function App() {
@@ -55,11 +62,14 @@ export default function App() {
                 <RoleEntryPage
                   role={ROLES.storeOwner}
                   plannedFeatures={[
-                    '주문 · 장바구니 (공통 주문 원장 재사용) — 후속',
                     '공급자 제공 콘텐츠 수신 및 매장 실행 자산 제작',
                     '커뮤니티 참여',
                   ]}
-                  links={[{ to: '/store-owner/products', label: '공급 상품 보기' }]}
+                  links={[
+                    { to: '/store-owner/products', label: '공급 상품 보기' },
+                    { to: '/store-owner/cart', label: '장바구니' },
+                    { to: '/store-owner/orders', label: '주문 내역' },
+                  ]}
                 />
               </MembershipGate>
             }
@@ -139,6 +149,60 @@ export default function App() {
             element={
               <MembershipGate>
                 <StoreOwnerProductDetailPage />
+              </MembershipGate>
+            }
+          />
+
+          {/*
+            장바구니 · 주문 · 결제 (WO-PHARMACY-HUB-STORE-OWNER-CHECKOUT-AND-PAYMENT-UI-V1)
+            결제 성공·실패는 PG 리다이렉트 대상이라 MembershipGate 안에 둔다 —
+            비로그인 상태로 떨어지면 게이트가 로그인으로 안내한다.
+          */}
+          <Route
+            path="/store-owner/cart"
+            element={
+              <MembershipGate>
+                <CartPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/store-owner/orders"
+            element={
+              <MembershipGate>
+                <OrdersPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/store-owner/orders/:orderId"
+            element={
+              <MembershipGate>
+                <OrderDetailPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/store-owner/payment"
+            element={
+              <MembershipGate>
+                <PaymentPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/store-owner/payment/success"
+            element={
+              <MembershipGate>
+                <PaymentSuccessPage />
+              </MembershipGate>
+            }
+          />
+          <Route
+            path="/store-owner/payment/fail"
+            element={
+              <MembershipGate>
+                <PaymentFailPage />
               </MembershipGate>
             }
           />
