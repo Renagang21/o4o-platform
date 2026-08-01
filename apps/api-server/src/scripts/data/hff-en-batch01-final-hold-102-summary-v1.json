@@ -1,0 +1,11 @@
+{
+  "total": 101,
+  "byReason": {
+    "HOLD_KO_SOURCE_DAMAGED": 20,
+    "HOLD_TRANSLATION_AMBIGUOUS": 1,
+    "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 8,
+    "HOLD_LOW_EFFICIENCY_UNIQUE_PHRASES": 72
+  },
+  "sweepEligible": 72,
+  "permanentUnlessNewEvidence": 29
+}

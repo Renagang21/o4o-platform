@@ -1,0 +1,75 @@
+{
+ "verifiedAt": "2026-08-01T04:03:48.997Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "batch01Closure": {
+  "total": 5000,
+  "completed": 4899,
+  "hold": 101,
+  "statusSumOk": true,
+  "koDrift": 0,
+  "koMissing": 0
+ },
+ "batch02": {
+  "population": 5000,
+  "populationOk": true,
+  "byStatus": {
+   "HOLD_KO_SOURCE_DAMAGED": 110,
+   "RESOLVED_NO_CHANGE": 3850,
+   "HOLD_PENDING_DIRECT_TRANSLATION": 915,
+   "UPDATED_EXISTING_EN": 12,
+   "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 4,
+   "CREATED_NEW_EN": 109
+  },
+  "completed": 3971,
+  "hold": 1029,
+  "statusSum": 5000,
+  "statusSumOk": true,
+  "failedSystem": 0
+ },
+ "koIntegrity": {
+  "batch02Drift": 0,
+  "batch02Missing": 0,
+  "batch02StateBad": 0
+ },
+ "applyReconciliation": {
+  "expectedUpdate": 12,
+  "actualUpdate": 12,
+  "expectedInsert": 109,
+  "actualInsert": 109,
+  "skipped": 0,
+  "koUnchanged": true,
+  "pmUnchanged": true,
+  "enDelta": 109,
+  "updateOk": true,
+  "insertOk": true
+ },
+ "appliedRows": {
+  "targets": 121,
+  "missing": 0,
+  "fieldBad": 0,
+  "empty": 0,
+  "fnSectionMissing": 0,
+  "hangulInSlots": 0,
+  "contentHashMismatch": 0
+ },
+ "completedRowsAudit": {
+  "completed": 3971,
+  "missing": 0,
+  "fieldBad": 0,
+  "empty": 0,
+  "fnSectionMissing": 0,
+  "hangulInSlots": 0
+ },
+ "canonicalDup": 0,
+ "globals": {
+  "spd_all": 128845,
+  "ko_canon": 40918,
+  "en_canon": 23544,
+  "pm_hff": 40948
+ },
+ "enCanonicalTotal": 23544,
+ "failures": [],
+ "criticalIssues": 0,
+ "verdict": "PASS"
+}

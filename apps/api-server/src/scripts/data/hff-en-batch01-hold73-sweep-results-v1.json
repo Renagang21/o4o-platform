@@ -1,0 +1,16 @@
+{
+ "wo": "WO-O4O-HFF-EN-BATCH-01-CLOSURE-AND-BATCH-02-5000-DIRECT-BULK-PRODUCTION-V1",
+ "sweepEligibleBefore": 73,
+ "sweepEligibleAfter": 72,
+ "resolvedBySweep": 1,
+ "batch01CompletedBefore": 4898,
+ "batch01CompletedAfter": 4899,
+ "batch01HoldAfter": 101,
+ "batch01ByReason": {
+  "HOLD_KO_SOURCE_DAMAGED": 20,
+  "HOLD_TRANSLATION_AMBIGUOUS": 1,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 8,
+  "HOLD_LOW_EFFICIENCY_UNIQUE_PHRASES": 72
+ },
+ "note": "Batch 02 직접 번역으로 확보된 문구가 Batch 01 저효율 HOLD 에도 안전하게 적용되는 경우만 재생산했다. 별도 저효율 연구는 수행하지 않았다(WO §9)."
+}

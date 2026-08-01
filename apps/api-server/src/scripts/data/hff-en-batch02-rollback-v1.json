@@ -1,0 +1,1216 @@
+{
+ "builtAt": "2026-08-01T03:59:06.764Z",
+ "count": 121,
+ "rollback": [
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "c9d7c2e4-f22b-47f1-983e-f5a596deef18",
+   "koCanonicalId": "3c31715b-8aec-421e-b9f8-c4b033b1a614",
+   "productMasterId": "acde8361-d574-4e32-a581-1f4d8ce91c60",
+   "language": "en",
+   "oldContentHash": "505043bb8f5c474d11dcfdf37ea9cf20378da592f6efd1c1685dc3886b1c2817",
+   "newContentHash": "d1fc648450ddeec1c5e1c40e955421f6e87bb1125da78992af60f4884b14c9cb",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "aae7e8a7-543a-472a-bb3b-983178b776c8",
+   "koCanonicalId": "df08bb56-2882-4ddb-9757-0519dd63ba83",
+   "productMasterId": "54d67e0a-9431-461f-a2e0-f99e52689f6d",
+   "language": "en",
+   "oldContentHash": "86b5e45fd7b088f40d79c2868ef0035c20ec2340a9b581718751e36fc5dd5b0e",
+   "newContentHash": "5d4fcacef66cc33cc9a0840e0a208abf16c6b2164d6fef6d888eb8754ee71f0d",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "56f72cb8-fd7d-46bf-a32e-7d10ec95c615",
+   "koCanonicalId": "68ae5f05-c862-47ef-bdb9-7c84d195fdfb",
+   "productMasterId": "6c83ea78-1f6f-4da1-91b8-cca9c3411d60",
+   "language": "en",
+   "oldContentHash": "8c655b791d537b7f967c3ecd4360293df1f7941db31bcb8a06c1595d6f22db4d",
+   "newContentHash": "227d8d9f66feec10034dea8f93b02a183157b20879b53f17fb892f564a4471b8",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "a43c31e1-44f1-49d1-a952-7f792591f138",
+   "koCanonicalId": "11c3b7e4-93ba-4ca5-a482-8f8ee37b783f",
+   "productMasterId": "e7e2af3d-ccc4-4c04-9a2d-d14390c330ec",
+   "language": "en",
+   "oldContentHash": "542b7850b2451b91fdde6b222f8bec363fcc301010edd1d7aad38a858ca6c8f1",
+   "newContentHash": "3c43c9a895f4c3ab965c57c25341ed59c707514208d7a6fe1c142798c2a2ae15",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "d5db139f-fc7b-4173-95b6-0a2546ea9327",
+   "koCanonicalId": "0d227733-5f5e-4371-8221-5b69952e8cae",
+   "productMasterId": "6827ddc9-1491-44ea-83aa-a15272d58aff",
+   "language": "en",
+   "oldContentHash": "98e933a54b87b8d8f57e3b3ae49c09ef0c8b350e398f1e94b1bfb21d57b3d1b8",
+   "newContentHash": "66a429f6dbf00eb09918f60b91c26d5d8f2c39d1431a86aedec6ef7b032fbdfd",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "1535fdf9-5983-4281-9526-b233dd46a403",
+   "koCanonicalId": "a8ac0d2a-9288-488b-ba21-f7b8fbc3a4c1",
+   "productMasterId": "93b6e12e-ac35-4562-bc45-9d418dcf22c5",
+   "language": "en",
+   "oldContentHash": "3f1f5b2ecb4a480930f1742415cd369ce1685b16de8f984656d3e16c867bd9ae",
+   "newContentHash": "518ed42c81183432f700c04d9d7f9df7aa5059d80d72b631ef61dc8da0558e4a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "31180ccc-76cc-4d26-b824-9c2bbb453d35",
+   "productMasterId": "5ce8f722-b39a-4edb-bcc1-2551ed963de9",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f74fcaaad8a6363dd1bbe4499060e5c4e6d48337a199cb513e322f431f95e37f",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "f8622e60-8891-4e50-9eea-5d143ae752bf",
+   "productMasterId": "f5de6a27-9177-4512-b7b1-a254b941a830",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "69c311745bc73d14fbfbcc4eb515401328b2a904d305c9aa195b97e815a47364",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "030d723c-8611-4176-b21e-0048eb9ccb35",
+   "koCanonicalId": "1270c332-6afb-48d4-b4bc-fd02a1f1ad7b",
+   "productMasterId": "f267c368-420f-472d-9b6f-0eb2a50fb095",
+   "language": "en",
+   "oldContentHash": "bcaf0bfb4df9077847af57bdc828b00fc8c930fe8bbd41f377ee4ce9389b5207",
+   "newContentHash": "8c37efe54595c7638079a88f61becfe58076b0f96794772a59721420a0404ed6",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "88dcb90b-6432-441c-8d65-6ee394b1953c",
+   "productMasterId": "c8636fa6-ad9d-487c-967c-2425873bde90",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "5520f0fa13d377d3bb76c79e39b939d76c3be17bca9e4cf84b5d9f037a52d77d",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "cffdd05f-807b-4554-9ee7-6ee8a944b36f",
+   "productMasterId": "af3e399f-f0e7-4834-beee-0a9c4dcc6e90",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e261a81dc6d059c07fc04970749e259502aad824776276aadb6088ea926a11c5",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "fbac2669-9ba5-42a3-960e-43f9ebf64db8",
+   "productMasterId": "4b94a670-3aa0-4c73-98f5-1f80eb54d539",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "6fc50e6f5ee0c7c3b8536bfc10e7aaee6b723379bfaa466f2ffd9cacd583b520",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "45b90720-c64d-4b9f-a9cb-c8bd72aec56d",
+   "productMasterId": "5ec1d648-ecaf-44c7-a0dd-57592ef72a61",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c277a4ad482f9d7363165b43e56f47d18856327e05e131acf02b29c16455a4a8",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "1c112f98-da49-44a7-8abe-7845959b0b33",
+   "productMasterId": "ba589e63-28ba-40cd-a2ae-0eee383e9a8e",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "5ce654d583735042856d2e4fd67baf152eb29cefd71f41dfd314ef794a6fe031",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "65f6c0d9-14c4-408e-9302-2a99cf49bec3",
+   "productMasterId": "baa9d3c7-1b52-4cb4-82a2-80a0188e60df",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "41da8d84ecba878e6b81f34a40211602c703940cfa468fc7af51fd00ec99c766",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e2aae0ce-4f6a-4651-82b6-1b1826bbde2a",
+   "productMasterId": "f2d37e7f-0e43-4fa0-84c5-a84776c80398",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "03ddbbc7fd3dff43311eb17ec1fb8a3554ba76df196cf5543da9b130c28e5ea0",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "724f85cf-29aa-4747-b534-a0192048a397",
+   "productMasterId": "efb7f64c-245c-4c56-91c9-eb97ce5b072b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "d9c22de0f821bb239d5106e8373a367e9d9f75a6a33c2307a0d487aa8d77e743",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "409fe3c5-ec7f-443e-b285-b27283f9bba8",
+   "productMasterId": "f40d88f0-c7e9-4836-8e9d-c0a20bcfa5ad",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e1598ad7a955281555aba970c09fa702b62339901bf7f11826e00c5aa71f8c68",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "6ff256a1-975a-4564-9d4f-c6b22d82d497",
+   "koCanonicalId": "1d77317d-bd50-48e3-bec3-14ad8ee8958a",
+   "productMasterId": "cfe4e46b-5b46-4e1f-b854-875bf25ca55c",
+   "language": "en",
+   "oldContentHash": "d59663b711a8684a4c5a6649f089eb166fa3f74cc9026b14c3ab9b96378d8ecc",
+   "newContentHash": "2cb715b31e86f67cbfcd3ecf6d1d8ac1204bd24119ea1bcb7867624a0800b678",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "c48a2cd6-996f-4ffd-984b-f861f6eda947",
+   "productMasterId": "ca85c7e9-749b-4f7d-aabf-d0c0eb0e043d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "3e69a8de94de3e8547f164e0ab80cc318b2ebe3039c4147c28b929211889f9f6",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "46a6aa25-7ca0-4232-967d-5ecead9274e3",
+   "productMasterId": "4f8d373d-3094-4f85-ba11-d02d802e3bdf",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f2eb6e7d3cf6fe2e4b06b2979d328a2a0d6d374c56d7c23b15fbad5287ad81a4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "b2dc06c6-514f-4e92-803b-40f246a21891",
+   "productMasterId": "56770c0e-3c77-4aef-b85c-55a6541966d8",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "5cc71af92144bab5b9d2f4b35b3fd7e2c9537cb6abd6998d51040f3063d5f94a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "55e25f33-1b6e-4fb8-8a32-035e3419df69",
+   "productMasterId": "55159bfb-0a38-4364-a39b-9abe65f74a50",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "bf6139548d83c56643577ec66a6dc6bef503b52ae9f27c9ca3a27064759d7715",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "4f9be346-8d4d-4a88-9b30-eaf87274179c",
+   "productMasterId": "7547cc78-7ea6-4265-8da2-a8370c89f49b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "95d5afa2f8319a257f390863851c1a79c1c024f3ec1a8887ed15dc2bee0d0e1f",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e7a394f3-921a-4d21-ad73-9a0c4c8a20d5",
+   "productMasterId": "4a1e7748-34f4-4892-beaa-16e205c15ea1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c868ce79baac3a68946f7f7d230146b4b360e6e7f7a8174754965a9e715d98e0",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "8d8089db-a6a6-4141-96d0-25acc5cec298",
+   "productMasterId": "7353b087-059d-4c52-b34b-be5f59dfb6e7",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "42075133fa03dc4f605e57c8b5ba0dbf0f816ef3b74d0239ffc9089dabfa2a22",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "8e63f1b4-5fae-4316-b521-f4094ec5eb68",
+   "productMasterId": "b1a2ee44-788d-41bb-8cd2-340966eef214",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "412fd349e343ad863e44d8a9c51b59af5ab38180bec5c691a4fad7d33780b002",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "d948b0c9-d372-4a55-a1bb-994b45ceaaa0",
+   "productMasterId": "dc65f62b-3aac-4ca3-b1a9-6ed04cf9cce6",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f4353ab83809232810af8282cced159e1d4f7b63a44bbd51bdde452ac16c0322",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "94266853-a991-495c-83a0-9ddbc0d802f0",
+   "productMasterId": "ab1c8e70-e2fe-4d8b-8931-ec3a9ca68969",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f0d6c21d0c31f8cbeb425c8522b6ee85dae43ba6217fde5f9f950773ce5caaca",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "0d95503f-c285-402c-b251-b112c5726711",
+   "productMasterId": "363731c8-a017-4ac4-8d3b-709ccee377ad",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "05f3b8b4e24c089fc45cb9448889e3698e489b9974181ce9519cb5bddd105dd1",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "9d7b7647-b69a-4ffb-bda6-04a0a47a152c",
+   "productMasterId": "97701852-67bf-4e70-8ef7-c4ea18c164d7",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c04f4d7ca26f726b8177d41b63ecfefdd80d247188e8f2eff3eae8460caef392",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "ff530ed6-5325-4d83-bac6-113860262792",
+   "productMasterId": "916f32d9-3923-4fd6-8f14-4bcd4bbd44d3",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "27da7a423774caed67dd99b3318f1e90cee585b80adca153f2f00049dc77836e",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "b798d6c1-cc1b-4a16-b8fa-e29dd0fbb45a",
+   "productMasterId": "b604b30f-6c00-4d6a-a9ce-fccf83c026d1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "aa99080baa93efc36ba31b3f8e7ab7a0b9c76a1b723ed04606cb566fd65fe34e",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "414f9032-031f-4d6d-83a2-5fcaa461fbbd",
+   "productMasterId": "31d85c24-f3c7-4367-a28d-c9d9e937def9",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "29dc30d5c40c3bdf3da6ba75a1d72fc9c229c64b16cb3b5ee6e164c9e50684fe",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "c34c77d9-f841-41f1-a1af-8116deecde0f",
+   "productMasterId": "aa51867e-1b14-4438-82d9-e6ed595af706",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "ccc16659db4302b7a76e297d8aa28ae5ba42d73bb1ad8fa050be8e372e031f4e",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "b2eb2c7c-e11e-4117-88f5-413106e6a954",
+   "productMasterId": "2e4b8f4f-4452-4fa4-9980-785384122ecb",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e7e379aea4b6c88395fff8c7e7a47fa8f032c4230804ce9418dec5a42c55fa1f",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "66d5357f-8110-43e6-9c12-59a080538eed",
+   "productMasterId": "c3ff38a3-1b04-49a1-a992-caf59e0cd7c1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "b989cf2c571feddbf2c8d9e1922b0fde3a0be7ad6b13dab6dc81b70faff15606",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "51da4028-d24a-45ef-9972-dea017a43b21",
+   "productMasterId": "4b26ede7-f05b-458f-a354-d41528808170",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "fe33d6a110fbf53252c55f686d959670508abfc7226de4b92a81a88afedcf98d",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "51665367-dd59-4ade-9142-5be7beea173a",
+   "productMasterId": "5081e5f9-3741-43b0-b25a-5c96497fa89c",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "96f1b4d48997d53a358ceeb325a96c9be0c9f86b41409322b201c31c1d0d1a3a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "2fe679e5-e317-48d1-b00f-deb763611306",
+   "productMasterId": "9b669829-27d9-4ad5-b132-f47630cce7e8",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "44255418a98f7eaa45ef76eb808f8a63ec2d9e1974bc8bac146089fed657bb11",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e15845de-4685-4749-9268-b88527401d26",
+   "productMasterId": "d6d0ba1f-5702-43bf-9c53-6f762386aebe",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "326e5b04b17559218924de7de03c3704294f3fb63777d847528888c806a54ebc",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "cecb24bd-d2f4-45b4-9b3a-6c18f1d942eb",
+   "productMasterId": "ef3b34d5-61f7-411e-a1ca-2bb274b3cd4d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "71f335df43ccc626b630467fa423e209e26ffb2fcd6ffaf933a3a5c0d8dba31a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "99ca22ce-11ca-4652-9e53-301e42441904",
+   "productMasterId": "b485a2a3-2668-4a97-9a72-ce1c5825c237",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "00237074f70c17b1fcb7c5f5d1a58afb9e937378d2cf5f156dc3d6486228aedb",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "342d7b5b-a667-4a33-962a-e528313d192b",
+   "productMasterId": "986cb368-9846-4485-ad4c-3651ba27f8da",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "91d77ffb219b29dce3f88e9c0fd293a80cfdcaf0b9ff6ff14030e98d6d12c61a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "63df26bd-da72-4d73-9374-e9d9700d72a3",
+   "productMasterId": "9588db25-5b3a-46d7-b4e4-ba0b70d2fe83",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "73d6824d87fcbb17f8a818d79daff76bf38ff63176c4a10544bab5233173ca63",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "8f52a568-c4d4-47e4-acfa-e366c2227309",
+   "productMasterId": "c9422d31-0a33-4320-b8c4-ccd67ebc2b3e",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "23788c1de534a1ee59ccad8458ae46256d21a6f8a0b7bed08a141509013e7b91",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "42ff2b6e-a848-45cc-b4c1-88f259f5f683",
+   "productMasterId": "5ce074eb-8262-4615-bc55-f581b73a388a",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "d01b909749bacafea9448f7b9c83e1a436c6f7ba375d5c7faa6bc1b0ffa52f0f",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "b2965b2e-a534-4a36-b024-2407695a43a2",
+   "productMasterId": "4c43182e-fb9b-43c1-86c4-7ee472c99eca",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8e2c9c7190f99b963ef8d1d4ef06d664464a9268debc027c95a6ea986b47bf35",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "9a2b663c-7daa-4e12-9f6a-a4fa21110d8f",
+   "productMasterId": "7c7b44b9-c55c-4f50-adff-2147e3b42588",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8cae78804af0ac22b933b720262a23b605d07bdcf7f65ee4722ffab1a82e41b8",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "538760ab-514a-4ad4-8244-1acdc903eb52",
+   "productMasterId": "55ab85d6-a72a-4262-ba36-425f8b08e65b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "733545f65ca95293f69898fa6924b91d142847f4da9437ae4f523d086526f012",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "4290d4a6-084c-4cb6-ba18-5544ad7ef612",
+   "productMasterId": "b2bc9e76-c1be-4685-8b79-759251087055",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "69799aed8b51204b300a20ce1756cd28b90e1ae27793a544e8b49090610206dd",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "a4524380-7aa7-4ac0-b506-c195a478fcac",
+   "productMasterId": "811ca0e4-62dd-43f3-8aea-12b99e85fe6d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "cf9a47f4847500c05f6e37d18094b5a64e2dac48cae78a754438a79cda7af3d2",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "7b5aebb3-aa4e-4a44-a6a7-e3f2b01e8c9d",
+   "productMasterId": "b9db85d6-5acc-48fd-93ff-2402e715d954",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "844bef3ec6bcd693c9fcbb9f14c80384d0f0d5d171f95ad461666b688215bc0e",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "d795d9b6-b0cf-4d69-941c-b42036f14b4b",
+   "productMasterId": "2ac29ab9-a606-4802-b6ba-0f28b727b832",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "0ab72c070e992ce3637f96d4588f00ecb568aa0743b37bf5e492a4358cd9e7f4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6ac0853f-a035-403a-9c69-eaf74586e3cd",
+   "productMasterId": "76ebe97e-423f-43b4-80e7-b1bd6ac28165",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "b7c8636e65ee9651622b82a6b122c8560f4d92199f15c12324b1de7dc0690ebf",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "294aad8e-0588-45c2-a5e7-b8233e886e4e",
+   "productMasterId": "bbc3279e-08e6-4796-bc1b-e46c7bf17187",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "4cfd02942a8f2e2e164dc465bbfb42dca6ae244bb1cd6b9cc695344e1b3869e3",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "2417bee1-854c-4de5-be4b-1fc8652028f6",
+   "productMasterId": "77014c05-ebaa-4270-a21c-0881693b74d2",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "52eae5a2c423b199ac9015cb5c95177a244545dfd76808d16f3d90f5019ba268",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "3ed4bf07-8b6e-4652-82be-8ebfdbcdc7fd",
+   "productMasterId": "3f528dda-e52d-442e-bbfe-4d736686a826",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "ae7636d56e34778fc3728cd7facce08b15f7c0e8ed7bf4760de7c20f14f796f4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "7f3e1337-dfa3-4b27-9def-501bc09620a4",
+   "productMasterId": "6be876fc-34ab-49fa-9627-55cccfae46c6",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "85fc7be6a98f530f4e928f57dd858f86d1dd28821285497a76578a0858bce115",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "92862961-779d-485e-b0cb-96566b289daf",
+   "productMasterId": "a7d072a2-df8c-4bac-88fc-38ba41230d8b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "117ab54db97c75060de2baa926d3897a6424e5749121c9932347575998181ebc",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "344359ea-7f68-48f0-a819-fc685ef3738d",
+   "productMasterId": "4a529a4e-33e7-4771-a737-716a362e06e5",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8f61b5f05d365bf60f6eaf26d36d0c7af1da48bd60186b5961c89b19f90ec662",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "5843c375-114a-4a78-8e98-3aae76d3f214",
+   "productMasterId": "38877e7d-2900-46ff-9900-07e023692a3b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e039475e91a5851a0ee8d630e172389763f724431b325bd316868313aa0822a2",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "60fc7a41-d654-4bb0-9703-aa29baca33b9",
+   "productMasterId": "e44ec126-cb09-4393-8a4a-23dd860996c6",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "5010a2e1d033411188ebdc054278dc1e40bd2f2d7031a423dca22a261f5ba8e0",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "ac8fb5a1-b781-491c-8dd8-617b0bf4c2f8",
+   "productMasterId": "72970746-cd48-4d24-9b8f-d8b47e1608a1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c69a58ed7b4ffca778e69cd4fec89da374134d48651ad3f5871ef47c582f065f",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "d7383e9c-ede1-40cf-bca6-c6e844ceaa9b",
+   "productMasterId": "de7d3a52-b8f1-496b-bca9-98493db7d34f",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "7b74cabb74ab2ba4cccf26ace45f84ea359e7e840cecb8c943cb09ff2027ca02",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6982e4b8-992e-4641-b4e2-01188ed8e72f",
+   "productMasterId": "308b9ed5-7061-497f-8978-6487e9fbacff",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "159708a7b924b9f37267294e8d5d7c4e2bb1159a433070d82aaa8a65275d0413",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "c51138ad-b44e-44bc-b50c-7edac206b09a",
+   "productMasterId": "c3ff6a2f-7167-4e39-aa13-1667b35b11e4",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "ee8181a185fb2f76d53875cf3e1f2cde17afd7edf0d22361a93b11c5bb383cbe",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "91da52bb-a268-4a31-af42-5d891e9d5161",
+   "productMasterId": "52767630-5176-4b34-9381-ebf21c3f2e5d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "511d4e702c393fa444532a58714885002ae22643b70f444353c50c3338848ef0",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "9bea2dc8-9ce0-4ebe-a9ea-70ed22ba8c32",
+   "productMasterId": "50877d20-22a3-4c59-9d6d-0a0e510b65b9",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "15713aab4c80b1ddcc429bb419e475b4e1c6562af0a11a0325d7710897aa40db",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e3cd7809-98d3-4cc7-99dc-fa4669d31639",
+   "productMasterId": "72d2b392-860a-4869-bdbf-56f48836ce01",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "ef2d086e8bcaca957a62da0f806a82187f9ad082051508d8a043e5843963b3af",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e95aa8e9-6b3b-4da7-b9e8-2122be8b14d1",
+   "productMasterId": "b221793b-9eba-42a1-8ac0-a3de685ea832",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "d6128af288809a33779492cd12949d646b67182dce7b6f768c6890984d9144b4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "a11dc90c-224c-4bb0-8552-904d40b4e99b",
+   "productMasterId": "529f2fc2-0f82-468a-9771-14f2e24b0757",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "43e5b32b42ff87d91176103304c1b853415519a9039cfc4432dabe83936daba6",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "a764c930-c7db-4e7d-b385-2f133199caad",
+   "productMasterId": "a1c400ae-f9ef-4663-b512-412c77a7eb61",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "b861a1b5c9f8a7762499c830f2263335fd488b5cfbfe2aa82731cae1d31dfb98",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "5c9850c6-4236-45b9-b2c3-508140b98369",
+   "productMasterId": "3e53d783-1e9e-4877-b804-255cbb0c3d7d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f87bc3b535b5a3bd336f76cd426fff95d38009dcc4e0185c01f10e1ad6e92a2d",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "12e2cbb1-1652-4886-9b87-7730c6ea914b",
+   "productMasterId": "34f0427d-1f73-434b-9580-e55163c7d2c4",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "19936a07ada3002e37caa692b1949ae736e07055a62ebd4187f4d7115e682e74",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "7548b550-ec59-4e70-a80f-2c01f150442e",
+   "productMasterId": "4eb9a4f9-9c2c-40e6-b40f-b539c2184021",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "44b98c2bb8626641cca0418d24e4f0313a5e769d5d1790c82da48d21c8253920",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "1af8e4f2-16a5-4735-89d5-9fc5e2028457",
+   "productMasterId": "ec32049a-518e-44fc-9042-0bdfb1b0c8e2",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "cf62b3749433b219594a7a6294d476b5cd55d16361430c371e7cc595c9229d84",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "fed108fc-c1eb-4525-a19c-539a0824585e",
+   "productMasterId": "717a0bd0-acb0-453c-a326-7ea4318ff9fd",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "45a7a71e3073270f2f68db35fdad6d8ca9345e8b07a7cc287d82013bb16023a4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "36d53a05-80c3-42ff-aaf1-74399ddb9105",
+   "productMasterId": "366c3626-2d64-47e0-b98b-402fdab1de7e",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "b2c88a9dde2984bd5702a60a2ab2d0cd809cb6c402ba1b62d69a41226d462fcc",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "4833b9db-73d8-4bdb-87d8-cc7c0dcf3ac2",
+   "productMasterId": "e1f8461f-97cf-465c-acdb-90c489a71e5d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "b79685e8242fd875073ec00a5ca2ccd1090d0817306f58b628831a6b7f6b4875",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6f2f6f49-a388-48dd-9a0f-71f18abbd43b",
+   "productMasterId": "d341b326-6822-488a-b05f-0f2d06544249",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "1177b447b5354c1c4174e9b06bc1722898193da123c195e3ab405183336b4142",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e730db9b-a748-4e36-b214-d7820cc3c705",
+   "productMasterId": "fe954cc1-a7a2-47de-8867-d30dd1a20977",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8a5749f3fcf15265521dc5e9517a72861f457852698e865be039b7f402165bac",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "780d39be-4ffe-430b-a7a7-aeae8fc3237b",
+   "productMasterId": "5fbe731d-4079-4b84-8faf-52620875c85c",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "ab3750b1964dba9cdc72e22f0c02da3acad12173ee6ee5c539c187a3978d6165",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "20392848-4149-4029-9faa-519eccde651f",
+   "productMasterId": "9b2b0ff0-5287-4fff-90e1-8061fb4a74e1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "3e2d0481d51ecc311ea714ae832ae7c6f5c279d47ce63824d5737181e5b0f0bf",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "4c46958f-5e30-4aec-91c7-468cecde0dfc",
+   "productMasterId": "8868a49a-3e00-4987-9f94-d7a7f09fe518",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "9bf75abb52daaa3bdc7c105abbb1bc7a6528430171e8ba8572b1ad5cf0e4ebed",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "40c4e701-85c4-4c7d-a486-5fc8cff69c62",
+   "productMasterId": "87fea307-d1c1-4ef2-afe6-031d46b961d2",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e5d8577f83544c4cf60f36b7e15f5057ca8d9ef88b68b6b1d528e338f4915bff",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6f84077d-6fc1-4f4c-b382-5f1fc55e9254",
+   "productMasterId": "b596a7b6-ef4c-4f11-9796-a6261bf05f68",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "605fc8cf6294629604294d6324575abadcb7fdbe45365d43fc44f831fc337213",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "c3af286c-3746-4ec3-8c34-f5a20f9fbcab",
+   "productMasterId": "e685c01f-15fb-49df-ac1a-d519e41a6c2d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "47f7fecc9facc977e9ecc1003f9f81a514ecb5bd2aafd42d52f2609beacfea49",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "f7ee3b70-be7e-4fe9-a1d1-5293071de157",
+   "productMasterId": "8d8b3220-5738-4a42-b2f8-85dcfe8428ad",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "525891c355f1f44d2246a7d7be36e13276ba37a0db747edc4f41d0f2dc055e04",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "50641ad8-0574-4eed-97e1-4a0c766c1fe7",
+   "productMasterId": "478dd58a-f1bb-4b2a-aec1-09fc96e89046",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "927dcb9d5db4162eb9aeb3d3ba3fc11b3990b2cc33866e2a0b59bde36a3d2e4b",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "82550698-f07c-49f6-9c5d-582636c8c27b",
+   "productMasterId": "5c2e4ed7-e402-451e-9e22-80e0cc04f37b",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "97ddd4e74e00dace1430744a4ee5ca755a444e4dbc59d4abbc58e1d527f1f625",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "58facc84-df5d-47cf-a621-cfb4d0e18b6a",
+   "productMasterId": "7a936090-1b29-416a-a061-fc862ff74cb5",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "a66b688ca7862b52ff56bce59f3a0848798948850cc0724fdb8f47e9daab4c08",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "d3398c36-0723-4d19-aaed-4ac7679b10b0",
+   "productMasterId": "3d2190cd-1996-4d92-832c-d7ba35e0b59a",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "287052dd6f4b6fa320b34545cb41b9a2f2699f095a1434afe2e48763a5ca9216",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "cf91250c-36d8-46e1-9471-405835422d84",
+   "productMasterId": "ce06d35b-02f8-43a8-9602-a22f4e076984",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "f84c8cb59afec09b8aad32ce58dcd7ee4a92a555088cf9cfa49cb532fe1a3641",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "355fc126-c1f2-4f3a-8a39-7e93525bf0b7",
+   "productMasterId": "f0c4c5fb-3af1-47ac-ab76-56879545c914",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "bcdf5aa4db41b9871a721740b241a7a76d8fdcac40eb0eed75d2031ce611b7de",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "3fc21608-e8d5-4ca9-bd87-d6c7370551ff",
+   "productMasterId": "f8c1201a-2741-44ae-92ba-72358a3c6e6a",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8b264f0a58b7f357b7910314135de5ab0ffcb39d36e4c06e2f0a3c34597840a3",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "ae55ec38-4728-4340-9714-9608545f8965",
+   "productMasterId": "e66e8b94-8b4b-4fb6-a6eb-ae6efae054f3",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "77dbeb10d1e46bb303a349fb77da0cb77fdd8ba80e94f66e6ecce6b29fa84a0c",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "42484afc-8bad-47b4-b7ef-fcba33682385",
+   "productMasterId": "73410b35-7ac4-4849-b542-e6f2115261b2",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "870218b151a24fb8ca9e72808c6e7653823784a514a8e4f7868076c741f8da47",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "bbfa35bf-04c0-4ced-932c-e173ab1c2b4d",
+   "productMasterId": "d08ac33f-6ba5-4c55-83ad-1d81806d3805",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "df145957b6df4b1580a672339b810a9fa15c4a7c5a584660d0f839b0dfcff418",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "ffd649cb-7fc3-42fd-b965-e18a55f94b2f",
+   "productMasterId": "70695090-4ba4-48c1-86fb-75aa5e053fb9",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "021295ff2bd60fa36c354b0a685156f289e80274c6fc58c9581f3c509d34564c",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "94ca08ca-3064-4584-8d06-2b58a0cce751",
+   "productMasterId": "d878c7f6-709c-4dad-8e84-999adb49fa18",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "8a84c2686957bd2f2f51106ae7a55818a514c402b2e244730b37e42eb2e777fd",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "bdeb03ac-8093-4568-bd22-df01d19e2a20",
+   "productMasterId": "ccf1db4f-82fd-4c05-87f5-f3a3bd38a167",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "56a7d5a69cc88fffb47e2d257b59f05a1a8473479a5828d9e52b9a2b983b7df2",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "764569ff-27c7-455c-8695-947bae17b6f5",
+   "productMasterId": "5cc8195e-a821-4cf1-b6a3-265da78781b7",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c56d0afd1dbf976e8771ced534fff8f7f7a106419db7b7602e60b20e27e62482",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "98776308-3b31-41fb-8949-1a8d6fad0e33",
+   "productMasterId": "8ce41365-9dc8-4176-b9ac-59d7ed5e2b65",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "1a23d308badbc33ceb6567133b11999da366249709332ba588c8c739b622534b",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "20167dd7-789f-46a8-99a2-2f1ed9737232",
+   "productMasterId": "9a8223a8-0ba7-4a47-8a1e-ff62741c6087",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "538e85477396da6bdc9b274c610f4d23cd7b76b354e9a6e0f724d98bfc897326",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "b08e653c-96c9-4420-bc3d-3d0f3a5f8483",
+   "productMasterId": "4acb6ef1-e0c2-41bf-aaca-0461f45693f2",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "df9027a9c29209b39c9ec916a18cdf1c96f6a682fcf784a34fae8880607b0284",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "2303b0af-00c7-488d-8e94-cda1a07fd511",
+   "productMasterId": "9fa47592-1fc1-4e6c-b789-865aa58dc840",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c1e3c2681ab7752ffc0a3e2e940b71f398fe2a43b507b5788a1e40a5feb9f41a",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "3f9d9d06-c561-46e2-9843-fb1431c79c73",
+   "productMasterId": "38866f3f-2cb3-43e1-898e-5a4c251ce1a4",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "900795ce33b272f3c2c64dbc82fb987e50c8cc16951c23d32f1e8a1fdfd43ef6",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "e617daad-569e-4af2-969d-9a7c7c48542c",
+   "productMasterId": "4aac09a6-79c5-4a7f-a0c6-471a018b5b6d",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "d8faf5b6078234b2ba8a61df03bd75e2c23d09a0a22b8b859adad16becf71643",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "bc47db1b-3ec4-42e0-811e-0e1a0c97c81b",
+   "productMasterId": "8cb30101-bc36-4959-8a20-ff6c6194614f",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "c623a9579980845527dfdc5e4ea955f1ba4f158a06275e60c389cbb282834263",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "0d6850b4-6923-4aee-a35e-65887e2abca6",
+   "productMasterId": "8e4f92b9-7609-4fce-a9fa-942544ae2cb1",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "e3f203f5644f261ab6c694994423019610bb14c6bb5393304d9224020576bc7c",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6ea69d1e-f9e2-4bb2-8bdb-802e9704fd79",
+   "productMasterId": "62b37d4c-3fcd-4cbc-89dc-dc33990e0aea",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "49b19367b79cf4e1de33c66253f8555ef81bd4129bfccd05cc1eafbc73063656",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "18004bea-f97e-4a6f-8469-0feb18b2dd92",
+   "productMasterId": "7cb2c671-62da-47d7-baeb-4dc7fb6594a7",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "fb6e968c8d7dcd723efadd5c6a78159f09e2f92dab5c57efe7967735e6b67bec",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "6ae9b120-d9a6-48f1-8cdf-f1c779924ade",
+   "productMasterId": "3d9669ac-a0c9-4beb-9ec6-4406d68bbdff",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "6f4d5882c0186d402988f6f2521cdefd95123dfeb0d38a7475ce72e17540b246",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "c69c3277-fe94-4b33-a7fc-abe540859fab",
+   "productMasterId": "b0c54aee-0326-4566-a711-58d7fb2b81dc",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "a2d9b0024dbda480c11b75eb09549629fd5aad61623985cd09ba1c4439200dc4",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "21be4436-e6f8-4e5c-a1ca-a48b003cca9f",
+   "productMasterId": "eaaafd51-2712-4962-aca9-58ad088ac26c",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "9df7d34c3e9897d19678d4a607294eee4be57d3f698efff578799bb033a82461",
+   "insertedFnSection": false
+  },
+  {
+   "op": "INSERT",
+   "enCanonicalId": null,
+   "koCanonicalId": "2befd537-673b-47cd-a32b-0a3d608518d3",
+   "productMasterId": "49517efb-bb9e-481e-9a54-9aba3b246a71",
+   "language": "en",
+   "oldContentHash": null,
+   "newContentHash": "eb2597d028761d4e5b7e2d63a7fddafe7ca0201be7a9b71cc4230a60fe40e4f3",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "0f62fc74-9104-47a4-8da1-e9eeb5c6674f",
+   "koCanonicalId": "1ea2165f-97a4-4516-a71b-818a9c40e897",
+   "productMasterId": "fc193e94-2250-4eec-bd3c-e8cfe04cdfd5",
+   "language": "en",
+   "oldContentHash": "8263ced51eddb95e6c7e5c4172fa029441e6aefd16f4a86e3ed57bb319fd61fb",
+   "newContentHash": "0caa60a55696d8de2c56bd3cffec27b42e4a3c16180ccfcfc2dd6f54f58bf3b9",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "340c08b8-10d9-41fd-bb4e-90b68d4ede8b",
+   "koCanonicalId": "36e180d3-dad2-40e5-8991-a5f1f39ce832",
+   "productMasterId": "550351a6-0e10-4ba9-bbd8-bc8b3732426f",
+   "language": "en",
+   "oldContentHash": "8e9ec87dd7751888ec3c1c6c9f6cfd89cd5840e7c629b63317bd98fd1fd8fbe0",
+   "newContentHash": "1986fc9b2ae95f3fd252593b3fd3a6d27b8062e15aec7c028dcb65f457e59914",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "c9ceb50f-4ac1-4c38-97d5-b05ba97d5d38",
+   "koCanonicalId": "076a46a3-a892-48e5-9859-0a739ea49a1d",
+   "productMasterId": "347357c8-a75d-459b-b95c-0cc7b6856347",
+   "language": "en",
+   "oldContentHash": "c29595219a3de8f8a5e77ac2b9ceba49cb6c63f8b791da1202723fefbe94bed5",
+   "newContentHash": "a938208504df5cc2b96208500a4d2ebf1ac3a5f3a3b34010fda19ec3dafded97",
+   "insertedFnSection": false
+  },
+  {
+   "op": "UPDATE",
+   "enCanonicalId": "de7fd5a9-c462-4453-9670-7876e8f9000b",
+   "koCanonicalId": "a89d545b-bcbc-43a0-8a1d-0646183378e5",
+   "productMasterId": "9b3f45f8-662a-4b03-80b1-88b6b7cf7a20",
+   "language": "en",
+   "oldContentHash": "000d93dcd87950346dd86e99396de111e75cbfade0f97928237ac66ccfd3bcb2",
+   "newContentHash": "266a0663b3aa295fbae606bf3e73cfc1b7cc2787c29dd9d86b2340b23c0d9d32",
+   "insertedFnSection": false
+  }
+ ]
+}

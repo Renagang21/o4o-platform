@@ -1,0 +1,10 @@
+{
+ "total": 1029,
+ "byReason": {
+  "HOLD_KO_SOURCE_DAMAGED": 110,
+  "HOLD_PENDING_DIRECT_TRANSLATION": 915,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 4
+ },
+ "blockingPhrases": 2223,
+ "note": "HOLD_PENDING_DIRECT_TRANSLATION 은 자산 부족이 아니라 아직 직접 번역이 진행되지 않은 잔여분이다. 다음 라운드 대상."
+}

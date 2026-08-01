@@ -41,6 +41,12 @@ const R21 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r21-translations-v1.js
 const R22 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r22-translations-v1.json`, 'utf8'));
 const R23 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r23-translations-v1.json`, 'utf8'));
 const R24 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r24-translations-v1.json`, 'utf8'));
+const B1 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b1-translations-v1.json`, 'utf8'));
+const B2 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b2-translations-v1.json`, 'utf8'));
+const B3 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b3-translations-v1.json`, 'utf8'));
+const B4 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b4-translations-v1.json`, 'utf8'));
+const B5 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b5-translations-v1.json`, 'utf8'));
+const B6 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch02-b6-translations-v1.json`, 'utf8'));
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -178,6 +184,24 @@ for (const src of [R23.clause ?? {}, R23.meta ?? {}, R23.label ?? {}])
   for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 // 29) round 24 직접 번역
 for (const src of [R24.clause ?? {}, R24.meta ?? {}, R24.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 30) Batch 02 직접 번역 b1
+for (const src of [B1.clause ?? {}, B1.meta ?? {}, B1.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 31) Batch 02 직접 번역 b2
+for (const src of [B2.clause ?? {}, B2.meta ?? {}, B2.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 32) Batch 02 직접 번역 b3
+for (const src of [B3.clause ?? {}, B3.meta ?? {}, B3.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 33) Batch 02 직접 번역 b4 (복합 포장 섭취방법 · NUMBER_DRIFT 명시 지정)
+for (const src of [B4.clause ?? {}, B4.meta ?? {}, B4.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 34) Batch 02 직접 번역 b5
+for (const src of [B5.clause ?? {}, B5.meta ?? {}, B5.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 35) Batch 02 직접 번역 b6
+for (const src of [B6.clause ?? {}, B6.meta ?? {}, B6.label ?? {}])
   for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────

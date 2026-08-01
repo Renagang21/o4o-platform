@@ -1,5 +1,5 @@
 {
- "builtAt": "2026-08-01T02:57:55.920Z",
+ "builtAt": "2026-08-01T03:54:05.119Z",
  "readOnly": true,
  "dbWrites": 0,
  "checks": {
@@ -7,29 +7,29 @@
   "sum4209": true,
   "byStatus": {
    "RESOLVED_NO_CHANGE": 33,
-   "CREATED_NEW_EN": 4074,
-   "HOLD_TRANSLATION": 102
+   "CREATED_NEW_EN": 4075,
+   "HOLD_TRANSLATION": 101
   },
   "byTrack": {
    "EXISTING_EN_HOLD": {
     "RESOLVED_NO_CHANGE": 33
    },
    "NEW_EN": {
-    "CREATED_NEW_EN": 4074,
-    "HOLD_TRANSLATION": 102
+    "CREATED_NEW_EN": 4075,
+    "HOLD_TRANSLATION": 101
    }
   },
-  "safeTargets": 4074,
+  "safeTargets": 4075,
   "updates": 0,
-  "inserts": 4074,
+  "inserts": 4075,
   "masterDup": 0,
   "koDup": 0,
-  "clausesTranslated": 43644,
+  "clausesTranslated": 43686,
   "holdReasons": {
    "HOLD_KO_SOURCE_DAMAGED": 20,
    "TRANSLATION_AMBIGUOUS": 1,
    "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 8,
-   "TRANSLATION_ASSET_MISSING": 73
+   "TRANSLATION_ASSET_MISSING": 72
   }
  },
  "results": [
@@ -28664,14 +28664,8 @@
    "enCanonicalId": null,
    "productNameKo": "마이핏 V 멀티비타민 피로앤 리버샷",
    "koHash": "ad069cdb2828d4a8bcc82ea5ee0a26e1fe73d7b13d72dce7c2ee3a233fc1987a",
-   "status": "HOLD_TRANSLATION",
-   "holdReason": "TRANSLATION_ASSET_MISSING",
-   "why": [
-    "meta:NO_ENTRY:1일 1회, 1회 2정을 액상과 함께 섭취하십시오."
-   ],
-   "unresolvedPhrases": [
-    "1일 1회, 1회 2정을 액상과 함께 섭취하십시오."
-   ]
+   "status": "CREATED_NEW_EN",
+   "clauses": 42
   },
   {
    "track": "NEW_EN",
@@ -30503,13 +30497,11 @@
    "holdReason": "TRANSLATION_ASSET_MISSING",
    "why": [
     "meta:NO_ENTRY:1일 1회, 1회 1PTP(800mg*3정, 800mg*1정)를 물과 함께 섭취하십시오.",
-    "label:NO_ENTRY:아티초크추출물(기능성원료인정 제2010-8호)",
-    "label:NO_ENTRY:돌외잎주정추출분말(기능성원료인정 제2013-8호)"
+    "label:NO_ENTRY:아티초크추출물(기능성원료인정 제2010-8호)"
    ],
    "unresolvedPhrases": [
     "1일 1회, 1회 1PTP(800mg*3정, 800mg*1정)를 물과 함께 섭취하십시오.",
-    "아티초크추출물(기능성원료인정 제2010-8호)",
-    "돌외잎주정추출분말(기능성원료인정 제2013-8호)"
+    "아티초크추출물(기능성원료인정 제2010-8호)"
    ]
   },
   {
@@ -32567,13 +32559,11 @@
    "status": "HOLD_TRANSLATION",
    "holdReason": "TRANSLATION_ASSET_MISSING",
    "why": [
-    "label:NO_ENTRY:엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)",
     "clause:NO_ENTRY:제품 개봉 시 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.",
     "clause:NO_ENTRY:원료에 의한 침전물이 있을 수 있으나 제품에는 이상이 없으니 잘 흔들어 섭취하십시오.",
     "clause:NO_ENTRY:임산부, 수유부, 영유아, 기타 질병을 가지신분, 수술 전후 환자분 등은 전문가와 상담 후 섭취하십시오."
    ],
    "unresolvedPhrases": [
-    "엠에스엠(MSM, Methyl sulfonylmethane, 디메틸설폰)",
     "제품 개봉 시 또는 섭취 시 포장재에 의한 상처를 입을 수 있으니 주의하시기 바랍니다.",
     "원료에 의한 침전물이 있을 수 있으나 제품에는 이상이 없으니 잘 흔들어 섭취하십시오.",
     "임산부, 수유부, 영유아, 기타 질병을 가지신분, 수술 전후 환자분 등은 전문가와 상담 후 섭취하십시오."
@@ -33639,16 +33629,14 @@
    "status": "HOLD_TRANSLATION",
    "holdReason": "TRANSLATION_ASSET_MISSING",
    "why": [
-    "meta:NO_ENTRY:1일 1회, 1회, 1정을 물과 함께 섭취하십시오.",
     "clause:NO_ENTRY:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. 2) 비타민 E",
-    "clause:NO_ENTRY:항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 3) 철",
     "clause:NO_ENTRY:체내 에너지 생성에 필요. 5) 아연",
-    "clause:NO_ENTRY:상피세포의 성장과 발달에 필요. 8) 셀레늄"
+    "clause:NO_ENTRY:상피세포의 성장과 발달에 필요. 8) 셀레늄",
+    "clause:NO_ENTRY:지방, 탄수화물, 단백질 대사와 에너지 생성에 필요. 10) 비타민 D",
+    "clause:NO_ENTRY:골다공증발생 위험 감소에 도움을 줌. 11) 비오틴"
    ],
    "unresolvedPhrases": [
-    "1일 1회, 1회, 1정을 물과 함께 섭취하십시오.",
     "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요. 2) 비타민 E",
-    "항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요 3) 철",
     "체내 에너지 생성에 필요. 5) 아연",
     "상피세포의 성장과 발달에 필요. 8) 셀레늄",
     "지방, 탄수화물, 단백질 대사와 에너지 생성에 필요. 10) 비타민 D",
@@ -37217,16 +37205,11 @@
    "status": "HOLD_TRANSLATION",
    "holdReason": "HOLD_KO_SOURCE_DAMAGED",
    "why": [
-    "clause:KO_DAMAGED:(가) 결합조직 형성과 기능유지에 필요",
-    "clause:KO_DAMAGED:(가) 칼슘과 인이 흡수되고 이용되는데 필요",
-    "clause:KO_DAMAGED:(가) 정상적인 혈액응고에 필요",
     "clause:KO_DAMAGED:(가) 체내 산소운반과 혈액생성에 필요",
-    "clause:KO_DAMAGED:(가) 철의 운반과 이용에 필요"
+    "clause:KO_DAMAGED:(가) 철의 운반과 이용에 필요",
+    "clause:KO_DAMAGED:(나) 유해산소로부터 세포를 보호하는데 필요"
    ],
    "unresolvedPhrases": [
-    "(가) 결합조직 형성과 기능유지에 필요",
-    "(가) 칼슘과 인이 흡수되고 이용되는데 필요",
-    "(가) 정상적인 혈액응고에 필요",
     "(가) 체내 산소운반과 혈액생성에 필요",
     "(가) 철의 운반과 이용에 필요",
     "(나) 유해산소로부터 세포를 보호하는데 필요"
@@ -37938,14 +37921,10 @@
    "status": "HOLD_TRANSLATION",
    "holdReason": "TRANSLATION_ASSET_MISSING",
    "why": [
-    "meta:NO_ENTRY:1일 1회, 1회 1정(800mg)을 충분한 물과 함께 섭취하십시요.",
-    "clause:NO_ENTRY:과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취전",
-    "clause:NO_ENTRY:동봉된 흡습제(실리카겔)은 섭취하지 마십시오."
+    "meta:NO_ENTRY:1일 1회, 1회 1정(800mg)을 충분한 물과 함께 섭취하십시요."
    ],
    "unresolvedPhrases": [
-    "1일 1회, 1회 1정(800mg)을 충분한 물과 함께 섭취하십시요.",
-    "과량 섭취시 부작용이 있을 수 있으며, 특정원료에 알레르기가 있거나, 질병치료나 약물투여 중인 분들은 섭취전 전문가와 상의하십시오.",
-    "동봉된 흡습제(실리카겔)은 섭취하지 마십시오."
+    "1일 1회, 1회 1정(800mg)을 충분한 물과 함께 섭취하십시요."
    ]
   },
   {

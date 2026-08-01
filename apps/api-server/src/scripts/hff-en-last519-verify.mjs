@@ -1,4 +1,19 @@
-/** WO-...-LAST-MISSING-PHRASE-519 / 독립검증 + 최종 HOLD + 연속성 manifest (별도 read-only 세션). */
+/**
+ * @deprecated 2026-08-01 (WO-O4O-HFF-EN-BATCH-01-CLOSURE-AND-BATCH-02-5000-DIRECT-BULK-PRODUCTION-V1 §7)
+ *
+ * 이 검증기는 519 라운드 시점의 **고정 상수**(expectedEnDelta / expectedUnlockFromSelection /
+ * 선정 manifest 기준 koHash)를 내장하고 있다. 이후 라운드에서 사전이 커지면
+ *   - 앞선 라운드에 INSERT 된 EN 은 그 라운드의 사전 기준 결과가 그대로 남고(중복 INSERT 는 skip),
+ *   - 현재 사전으로 재생성한 문자열과 hash 가 달라진다.
+ * 그 결과 손실·오염이 없는데도 `HASH:*` / `koCanonicalDrift` FAIL 이 나온다.
+ *
+ * 실행 경로에서 제거되었다. 현재 스냅샷 기준 검증은 다음을 사용한다.
+ *   - Batch 01 마감: hff-en-batch01-closure.mjs
+ *   - Batch 02:      hff-en-batch02-verify.mjs
+ * 과거 라운드 재현 목적으로만 보존한다.
+ */
+throw new Error('DEPRECATED: use hff-en-batch02-verify.mjs (snapshot-driven). See header.');
+/* eslint-disable */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
 import pg from 'pg';

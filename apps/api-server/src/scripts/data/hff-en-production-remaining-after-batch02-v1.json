@@ -1,0 +1,22 @@
+{
+ "builtAt": "2026-08-01T04:01:31.018Z",
+ "measuredFromDb": {
+  "koCanonical": 40918,
+  "enCanonical": 23544
+ },
+ "koWithoutEn": 17374,
+ "batch02Hold": 1029,
+ "batch02HoldByReason": {
+  "HOLD_KO_SOURCE_DAMAGED": 110,
+  "HOLD_PENDING_DIRECT_TRANSLATION": 915,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 4
+ },
+ "batch01Hold": 101,
+ "batch01HoldByReason": {
+  "HOLD_KO_SOURCE_DAMAGED": 20,
+  "HOLD_TRANSLATION_AMBIGUOUS": 1,
+  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 8,
+  "HOLD_LOW_EFFICIENCY_UNIQUE_PHRASES": 72
+ },
+ "nextTarget": "Batch 02 잔여 HOLD 직접 번역 계속 → Batch 03 신규 5,000 선정"
+}

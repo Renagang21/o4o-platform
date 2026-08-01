@@ -1,26 +1,33 @@
 {
- "builtAt": "2026-07-31T23:42:11.035Z",
- "batch01Total": 5000,
- "priorCompleted": 791,
- "thisRoundCreated": 2144,
- "thisRoundUpdated": 15,
- "thisRoundNoChange": 12,
- "finalHold": 2038,
- "failedSystem": 0,
- "batch01Completed": 2962,
- "batch01StatusSum": 5000,
- "completionRate": "59.24%",
- "holdByReason": {
-  "TRANSLATION_ASSET_MISSING": 1675,
-  "HOLD_KO_SOURCE_DAMAGED": 303,
-  "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 60
- },
- "globals": {
-  "ko_canon": 40918,
-  "en_canon": 17642,
-  "pm": 40948,
-  "en_dup": 0,
-  "ko_no_en": 23276,
-  "en_no_fn": 6
- }
+  "wo": "WO-O4O-HFF-EN-BATCH-01-CLOSURE-AND-BATCH-02-5000-DIRECT-BULK-PRODUCTION-V1",
+  "batch": 1,
+  "baseCommit": "d4f407f04",
+  "total": 5000,
+  "completedPre": 791,
+  "reproductionPopulation": 4209,
+  "byStatus": {
+    "RESOLVED_NO_CHANGE": 33,
+    "CREATED_NEW_EN": 4075,
+    "HOLD_TRANSLATION": 101
+  },
+  "completed": 4899,
+  "holdTotal": 101,
+  "failedSystem": 0,
+  "statusSum": 5000,
+  "statusSumOk": true,
+  "byReason": {
+    "HOLD_KO_SOURCE_DAMAGED": 20,
+    "HOLD_TRANSLATION_AMBIGUOUS": 1,
+    "HOLD_NUMBER_STRUCTURE_AMBIGUOUS": 8,
+    "HOLD_LOW_EFFICIENCY_UNIQUE_PHRASES": 72
+  },
+  "koIntegrity": {
+    "checked": 4209,
+    "missing": 0,
+    "drift": 0,
+    "ok": true
+  },
+  "enPresentForReproductionPopulation": 4108,
+  "completionRate": 97.98,
+  "sweepEligibleHold": 72
 }

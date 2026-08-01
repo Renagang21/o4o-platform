@@ -1,5 +1,5 @@
 {
- "appliedAt": "2026-08-01T03:00:26.810Z",
+ "appliedAt": "2026-08-01T03:56:33.237Z",
  "mode": "APPLY",
  "shardSize": 500,
  "shards": [
@@ -35,14 +35,14 @@
    "from": 2000,
    "size": 500,
    "updated": 0,
-   "inserted": 20,
+   "inserted": 0,
    "rolledBack": false
   },
   {
    "from": 2500,
    "size": 500,
    "updated": 0,
-   "inserted": 17,
+   "inserted": 1,
    "rolledBack": false
   },
   {
@@ -61,7 +61,7 @@
   },
   {
    "from": 4000,
-   "size": 74,
+   "size": 75,
    "updated": 0,
    "inserted": 0,
    "rolledBack": false
@@ -69,8 +69,8 @@
  ],
  "expectedUpdate": 0,
  "actualUpdate": 0,
- "expectedInsert": 4074,
- "actualInsert": 37,
+ "expectedInsert": 4075,
+ "actualInsert": 1,
  "skipped": [
   {
    "id": "0000a97d-f49a-4790-af56-8a5b54060934",
@@ -8425,6 +8425,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "152822e1-592d-41c5-841c-1ccda10d0a7b",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1531a12c-827b-40b2-9df4-801241931409",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -8473,6 +8477,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "15480e24-f26a-4afa-a44a-a2edff643a5b",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "154998e7-9ec7-4f82-826d-eaf68ac16271",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -8506,6 +8514,10 @@
   },
   {
    "id": "1555cdb6-8563-4ac0-97d9-f1d4de590a3c",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "15588967-72c5-4df5-b1f0-593dcd213dbc",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8609,6 +8621,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1592b751-02e7-497b-9a6d-5825b0f8ae6c",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1596f154-4014-4876-9d18-0b3e2c041080",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -8618,6 +8634,10 @@
   },
   {
    "id": "159a3a11-2873-423d-ba87-0e2f6a755210",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "15a352a2-13e8-488a-a836-d7fec9a7662a",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8642,6 +8662,10 @@
   },
   {
    "id": "15ad96af-a247-4e3a-8b12-4ec4a58e7756",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "15b00e92-5728-4f55-9c51-2d5d29ff9882",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8678,6 +8702,10 @@
   },
   {
    "id": "15cd304f-912a-4bb9-94c4-7bf2cdcf39e9",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "15d15e95-e806-49e2-bcf4-828f10dd6563",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8758,6 +8786,10 @@
   },
   {
    "id": "16003716-0f97-475a-8f91-2189e54f80b6",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "16032cb5-3e9d-43e2-a526-82f4f3094617",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8905,6 +8937,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "16659166-5c63-4865-919c-100c8aea27e9",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "16671bf8-16e1-4f14-ae92-6abc4f9d333a",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -8921,6 +8957,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "166dd0e6-6d3b-4796-a1fa-2f65ab811ed7",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "16762514-49e5-4577-972b-4002ecd47bcf",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -8930,6 +8970,10 @@
   },
   {
    "id": "1678e033-d11d-4ba8-be75-63f2d2c0bae7",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "167904b7-4aef-42a7-a143-2e18008ed058",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -8974,6 +9018,10 @@
   },
   {
    "id": "169e0e4d-13b2-4377-ad4d-5ee658ee0fd5",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "16a0206a-e7ac-47a5-8c9c-00a6465838ef",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -9121,6 +9169,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "16fe6e13-5b9d-4a24-9820-f29761225c0f",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1700f833-706a-450d-bcd4-ea875218a153",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -9169,11 +9221,19 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "17352a1d-4103-49d2-bf34-eaa211f67a44",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "173908f0-7ade-4388-b5a0-e9b72498b951",
    "why": "EN_ALREADY_EXISTS"
   },
   {
    "id": "17395bbc-1480-4e06-96a6-8c5112728c48",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "1739dbb6-5343-46f6-bbb0-ad5dc89a0a2b",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -9293,6 +9353,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1791901b-1ffb-473d-9421-c1ebcd755723",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1797c1d2-2aa7-4e30-8a2d-e47cc9f5d6cd",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -9362,6 +9426,10 @@
   },
   {
    "id": "17d72870-3102-4278-af21-f815e716f5ff",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "17d86a0a-6673-4326-a9e9-1eabd431e3fd",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -9457,6 +9525,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "18200f36-49c1-4581-b9a5-c049b5875e0d",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1820daf7-ec68-4035-9376-2f0cdc3d870a",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -9534,6 +9606,10 @@
   },
   {
    "id": "18492cd4-23b6-4c74-80a5-07baad826f7b",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "184d0390-ebc2-4fde-8cf8-3ddfab8b5af8",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -9630,6 +9706,10 @@
   },
   {
    "id": "1885d01f-d5db-42a2-afd1-fe8266e5971e",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "188607d0-095a-4395-8388-2baa6e2234b5",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10105,6 +10185,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "19a72211-ff26-4333-8b1e-8771c2e3a0f6",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "19abe6ae-73ad-4320-a5fc-b20e83f1f320",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10141,6 +10225,14 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "19bf0236-864a-4fa5-ae09-de0e01e51df7",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "19c1a311-a7e0-4b1f-afc4-3b7824d96c1c",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "19c2acdc-3313-4762-bb3f-d1ff6f516924",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10149,11 +10241,19 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "19ca9f2a-dedc-4f21-8e43-44cd2161a03e",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "19cab44d-625f-4e4a-855a-9d7cd87abdde",
    "why": "EN_ALREADY_EXISTS"
   },
   {
    "id": "19cae126-3b84-4c22-b467-a18e89db5b69",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "19cb9e3f-0b57-47c8-9da6-55bb16e99ae3",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10170,6 +10270,10 @@
   },
   {
    "id": "19d62141-72d0-452a-9a68-a248b470c168",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "19d84ff2-8143-4027-adc5-44b32d657e66",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10221,11 +10325,19 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "19f06bb7-107a-44da-aca0-6309af6e4d1e",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "19f1d383-e8fd-4fc0-929a-11873fa20a66",
    "why": "EN_ALREADY_EXISTS"
   },
   {
    "id": "19f35dc7-48f3-459f-9f0c-54da4cd8fb97",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "19f9731c-1d2b-4d23-9b96-ff372d72ba0a",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10293,6 +10405,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1a2914a5-ad29-43eb-b8ba-94b035bcb726",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1a2b75a9-bc9d-45e9-99f8-c888d36bcd80",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10329,6 +10445,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1a4b72b7-f189-40a0-84fa-43ec77bdd8c1",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1a4c87c1-2c04-4260-85d7-caa07bea8be8",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10341,7 +10461,15 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1a53c166-efd3-4c40-bbe0-b9082e3d1dc6",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1a564cc3-3102-44a5-9758-2a046ded655a",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "1a5972cd-ea9d-4f33-b00a-7b531ba48f2c",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10377,6 +10505,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1a78fc43-281f-4ebe-a6a2-4949d594f26e",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1a802b3d-7925-4784-a440-6ae727782849",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10406,6 +10538,10 @@
   },
   {
    "id": "1a9e649b-3cba-4136-82b8-9a8a029c8003",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "1aa2535c-8314-4e0f-a848-037793dc69bf",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10445,6 +10581,10 @@
    "why": "EN_ALREADY_EXISTS"
   },
   {
+   "id": "1abffc9f-aa66-417e-9829-57c0b2130a22",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
    "id": "1ac0e98d-ef22-4faf-8c98-9208ed7be2d2",
    "why": "EN_ALREADY_EXISTS"
   },
@@ -10474,6 +10614,10 @@
   },
   {
    "id": "1ad1b3f0-9b7c-4386-9df6-4161b652c4cd",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "1ad22451-1f9c-4ba4-91fe-b57515498ae7",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -10630,6 +10774,10 @@
   },
   {
    "id": "1b2ecfb9-7195-4efc-a7e0-a65bc15219a2",
+   "why": "EN_ALREADY_EXISTS"
+  },
+  {
+   "id": "1b331ac6-a536-42d0-804c-d21e9661ee3f",
    "why": "EN_ALREADY_EXISTS"
   },
   {
@@ -16222,18 +16370,18 @@
   }
  ],
  "before": {
-  "spd_all": 124343,
+  "spd_all": 128735,
   "ko_canon": 40918,
-  "en_canon": 19535,
+  "en_canon": 23434,
   "pm_hff": 40948
  },
  "after": {
-  "spd_all": 124380,
+  "spd_all": 128736,
   "ko_canon": 40918,
-  "en_canon": 19572,
+  "en_canon": 23435,
   "pm_hff": 40948
  },
  "koUnchanged": true,
- "enDelta": 37,
+ "enDelta": 1,
  "pmUnchanged": true
 }
