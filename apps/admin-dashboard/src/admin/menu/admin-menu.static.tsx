@@ -394,6 +394,33 @@ export const adminMenuStatic: MenuItem[] = [
     path: '/admin/ops/metrics',
   },
 
+  // WO-O4O-ADMIN-MENU-CONNECT-READY-ONLY-V1:
+  //   메뉴 진입선이 없던 기존 화면 3개를 연결한다(신규 화면·route·API 없음).
+  //   선행 검증: WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1 CHECK — 배포 후 프로덕션 read-only 로
+  //   조회 API 2xx · 실데이터 렌더 · 콘솔 오류 0 확인된 READY 3건.
+  //   Insights 섹션에 배치한 이유: 세 화면 모두 서비스 경계를 가로지르는 **운영 현황**이며
+  //   같은 섹션의 Ops Metrics 와 성격이 같다. Core 는 사람·권한·설정 축이라 맞지 않는다.
+  //   route guard 는 셋 다 requiredRoles={['admin']} 로, 이미 메뉴에 연결된
+  //   Ops Metrics(/admin/ops/metrics) 와 동일하다 → 기존 권한 경계를 그대로 따른다.
+  //   (menuPermissions 별도 항목 없음 = "설정 없음 = 허용" 관례. Ops Metrics 와 동일.)
+  {
+    id: 'platform-hub',
+    label: '플랫폼 HUB',
+    icon: <Layers className="w-5 h-5" />,
+    path: '/admin/platform/hub',
+  },
+  {
+    id: 'store-network',
+    label: '매장 네트워크',
+    icon: <BarChart2 className="w-5 h-5" />,
+    path: '/admin/store-network',
+  },
+  {
+    id: 'physical-stores',
+    label: '오프라인 매장',
+    icon: <Briefcase className="w-5 h-5" />,
+    path: '/admin/physical-stores',
+  },
 
   {
     id: 'service-content-manager',
