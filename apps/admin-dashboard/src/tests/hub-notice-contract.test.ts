@@ -27,6 +27,7 @@ import {
   fetchNotices,
   resolveTotalPages,
   formatDate,
+  createNoticeColumns,
   NoticeContractError,
 } from '../pages/kpa/HubNoticeListPage';
 
@@ -105,6 +106,41 @@ describe('resolveTotalPages', () => {
     expect(resolveTotalPages(undefined)).toBe(1);
     expect(resolveTotalPages({ success: true, data: [] } as never)).toBe(1);
     expect(resolveTotalPages({ ...REAL_RESPONSE, totalPages: 0, total: 0, limit: 0 })).toBe(1);
+  });
+});
+
+describe('컬럼 render — BaseTable 호출 규약 (value, row, index)', () => {
+  const columns = createNoticeColumns({ onEdit: vi.fn(), onArchive: vi.fn() });
+
+  // BaseTable 은 `col.render(value, row, rowIndex)` 로 호출한다
+  // (packages/ui/src/components/table/BaseTable.tsx:623).
+  const callAsBaseTable = (col: (typeof columns)[number], row: Record<string, unknown>) =>
+    col.render!((row as never)[col.key as keyof typeof row], row as never, 0);
+
+  it('모든 컬럼이 실제 호출 규약에서 예외 없이 렌더된다', () => {
+    for (const col of columns) {
+      expect(() => callAsBaseTable(col, NOTICE)).not.toThrow();
+    }
+  });
+
+  it('expiresAt 이 null 이어도 크래시하지 않는다 (2차 크래시 재발 방지)', () => {
+    // 첫 인자를 row 로 잘못 받으면 여기서 `null.expiresAt` 로 터졌다.
+    const col = columns.find((c) => c.key === 'expiresAt')!;
+    expect(() => callAsBaseTable(col, { ...NOTICE, expiresAt: null })).not.toThrow();
+  });
+
+  it('선택 필드가 모두 null 이어도 전 컬럼이 안전하다', () => {
+    const sparse = { ...NOTICE, summary: null, expiresAt: null, publishedAt: null };
+    for (const col of columns) {
+      expect(() => callAsBaseTable(col, sparse)).not.toThrow();
+    }
+  });
+
+  it('컬럼 render 는 셀 값이 아니라 row 를 사용한다', () => {
+    // 잘못된 구현(첫 인자를 row 취급)이면 제목이 비어 렌더된다.
+    const col = columns.find((c) => c.key === 'title')!;
+    const out = JSON.stringify(callAsBaseTable(col, NOTICE));
+    expect(out).toContain(NOTICE.title);
   });
 });
 

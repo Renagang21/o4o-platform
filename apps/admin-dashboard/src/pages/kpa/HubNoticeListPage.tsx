@@ -320,6 +320,99 @@ function NoticeModal({ initial, onClose, onSaved }: NoticeModalProps) {
   );
 }
 
+// ── Columns ──────────────────────────────────────────────────────────────────
+
+/**
+ * BaseTable 의 render 시그니처는 `(value, row, index)` 다
+ * (packages/ui/src/components/table/types.ts:23).
+ *
+ * 기존 코드는 첫 인자를 row 로 잘못 받아 **셀 값**을 row 처럼 다뤘다.
+ *   - title/status : 값이 문자열이라 크래시 없이 잘못된 내용이 렌더됐다(제목이 비어 보임)
+ *   - expiresAt    : 값이 null 이라 `null.expiresAt` 로 **크래시**했다
+ * `value` 가 `any` 로 선언돼 있어 TypeScript 가 이 실수를 잡지 못한다.
+ * 형제 화면(HubContentsPage:154) 과 동일하게 `(_value, row)` 로 맞춘다.
+ *
+ * 회귀 테스트가 실제 호출 규약으로 이 컬럼들을 직접 호출할 수 있도록 factory 로 분리했다.
+ */
+export function createNoticeColumns(handlers: {
+  onEdit: (row: NoticeItem) => void;
+  onArchive: (id: string) => void;
+}): O4OColumn<NoticeItem>[] {
+  return [
+    {
+      key: 'title',
+      header: '제목',
+      render: (_value, row) => (
+        <div className="flex items-start gap-2">
+          {row.isPinned && <Pin size={13} className="mt-0.5 shrink-0 text-amber-500" />}
+          <div>
+            <p className="text-sm font-medium text-gray-900">{row.title}</p>
+            {row.summary && (
+              <p className="mt-0.5 max-w-sm truncate text-xs text-gray-500">{row.summary}</p>
+            )}
+          </div>
+        </div>
+      ),
+    },
+    {
+      key: 'status',
+      header: '상태',
+      width: 100,
+      render: (_value, row) => {
+        const cfg = STATUS_BADGE[row.status] ?? STATUS_BADGE.draft;
+        return (
+          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.cls}`}>
+            {cfg.label}
+          </span>
+        );
+      },
+    },
+    {
+      key: 'expiresAt',
+      header: '종료일',
+      width: 120,
+      render: (_value, row) => (
+        <span className="text-xs text-gray-500">{formatDate(row.expiresAt)}</span>
+      ),
+    },
+    {
+      key: 'createdAt',
+      header: '등록일',
+      width: 110,
+      render: (_value, row) => (
+        <span className="text-xs text-gray-500">{formatDate(row.createdAt)}</span>
+      ),
+    },
+    {
+      key: 'id',
+      header: '관리',
+      width: 130,
+      render: (_value, row) => (
+        <div className="flex gap-1">
+          <button
+            onClick={() => handlers.onEdit(row)}
+            className="flex items-center gap-1 rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
+          >
+            <Edit size={12} /> 수정
+          </button>
+          {row.status !== 'archived' && (
+            <button
+              onClick={() => {
+                if (confirm('이 공지를 비공개 처리하겠습니까?')) {
+                  handlers.onArchive(row.id);
+                }
+              }}
+              className="flex items-center gap-1 rounded border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+            >
+              <Archive size={12} /> 비공개
+            </button>
+          )}
+        </div>
+      ),
+    },
+  ];
+}
+
 // ── Component ────────────────────────────────────────────────────────────────
 
 export default function HubNoticeListPage() {
@@ -351,80 +444,10 @@ export default function HubNoticeListPage() {
     qc.invalidateQueries({ queryKey: ['hub-notices'] });
   };
 
-  const columns: O4OColumn<NoticeItem>[] = [
-    {
-      key: 'title',
-      header: '제목',
-      render: (row) => (
-        <div className="flex items-start gap-2">
-          {row.isPinned && <Pin size={13} className="mt-0.5 shrink-0 text-amber-500" />}
-          <div>
-            <p className="text-sm font-medium text-gray-900">{row.title}</p>
-            {row.summary && (
-              <p className="mt-0.5 max-w-sm truncate text-xs text-gray-500">{row.summary}</p>
-            )}
-          </div>
-        </div>
-      ),
-    },
-    {
-      key: 'status',
-      header: '상태',
-      width: 100,
-      render: (row) => {
-        const cfg = STATUS_BADGE[row.status] ?? STATUS_BADGE.draft;
-        return (
-          <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${cfg.cls}`}>
-            {cfg.label}
-          </span>
-        );
-      },
-    },
-    {
-      key: 'expiresAt',
-      header: '종료일',
-      width: 120,
-      render: (row) => (
-        <span className="text-xs text-gray-500">{formatDate(row.expiresAt)}</span>
-      ),
-    },
-    {
-      key: 'createdAt',
-      header: '등록일',
-      width: 110,
-      render: (row) => (
-        <span className="text-xs text-gray-500">{formatDate(row.createdAt)}</span>
-      ),
-    },
-    {
-      key: 'id',
-      header: '관리',
-      width: 130,
-      render: (row) => (
-        <div className="flex gap-1">
-          <button
-            onClick={() => setModalItem(row)}
-            className="flex items-center gap-1 rounded border border-gray-200 px-2 py-1 text-xs text-gray-600 hover:bg-gray-50"
-          >
-            <Edit size={12} /> 수정
-          </button>
-          {row.status !== 'archived' && (
-            <button
-              onClick={() => {
-                if (confirm('이 공지를 비공개 처리하겠습니까?')) {
-                  archiveMutation.mutate(row.id);
-                }
-              }}
-              className="flex items-center gap-1 rounded border border-red-200 px-2 py-1 text-xs text-red-600 hover:bg-red-50"
-            >
-              <Archive size={12} /> 비공개
-            </button>
-          )}
-        </div>
-      ),
-    },
-  ];
-
+  const columns = createNoticeColumns({
+    onEdit: (row) => setModalItem(row),
+    onArchive: (id) => archiveMutation.mutate(id),
+  });
   return (
     <div className="p-6">
       <PageHeader
