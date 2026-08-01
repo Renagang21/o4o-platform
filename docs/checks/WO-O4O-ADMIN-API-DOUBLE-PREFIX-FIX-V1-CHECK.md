@@ -102,8 +102,26 @@
 
 ---
 
-## 6. 미검증
+## 6. 프로덕션 브라우저 검증 (배포 후, read-only)
 
-- **프로덕션 브라우저 재확인 미완료** — 배포 후 세 화면의 2xx 응답·데이터 표시를 확인해야 최종 복구가 증명된다. 본 CHECK 작성 시점에는 **코드 정합성까지만** 확인했다.
-- **쓰기 경로 미검증** — `physical-stores/sync`, `platform/hub/trigger` 는 경로만 교정했고 실행하지 않았다.
-- 응답 데이터 구조가 화면 기대와 일치하는지는 실제 2xx 응답을 받아봐야 확정된다.
+배포: `Deploy Admin Dashboard (Cloud Run)` **success** (commit `3b2b50c3c`)
+
+| 화면 | 조회 API 응답 | 404 | 이중 프리픽스 | 실패 문구 | 콘솔 오류 |
+|---|---|:--:|:--:|:--:|:--:|
+| 매장 네트워크 | `200` `/api/v1/admin/store-network/{summary,top-stores,insights}` | ✅ 없음 | ✅ 없음 | ✅ 없음 | **0** |
+| 오프라인 매장 | `200` `/api/v1/admin/physical-stores?page=1&limit=20` | ✅ 없음 | ✅ 없음 | ✅ 없음 | **0** |
+| 플랫폼 HUB | `200` `/api/v1/platform/hub/summary` | ✅ 없음 | ✅ 없음 | ✅ 없음 | **0** |
+
+**데이터 표시도 정상**이다.
+
+- 매장 네트워크: `Total Stores 3`, 서비스별 분해(K-Cosmetics 2 stores, Glyco…) 렌더
+- 오프라인 매장: 정상 빈 상태 안내 — `No physical stores linked / Click "Sync Stores" to link stores by business number.`
+- 플랫폼 HUB: `Global Risk Overview`, `승인율 100% / 대기 0건`, `약국 1개 활성` 등 실 지표 렌더
+
+→ **RECOVER 3건 복구 확정.** 선행 IR 의 가설이 실제로 검증됐다.
+
+## 7. 미검증
+
+- **쓰기 경로 미검증** — `physical-stores/sync`, `platform/hub/trigger` 는 경로만 교정했고 **버튼을 누르지 않았다**. 두 API 의 실제 동작은 확인되지 않았다.
+- 오프라인 매장은 연결된 데이터가 0건이라 **목록 렌더링 로직(행 표시·페이지네이션)은 미검증**이다.
+- 상세 드로어(`/:id/summary`, `/:id/insights`)는 클릭할 행이 없어 미검증이다.
