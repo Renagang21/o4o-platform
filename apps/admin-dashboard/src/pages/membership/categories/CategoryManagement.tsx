@@ -141,7 +141,10 @@ const CategoryManagement = () => {
         await authClient.api.post('/membership/categories', payload);
         toast.success('카테고리가 생성되었습니다.');
       } else if (editingId) {
-        await authClient.api.put(`/api/membership/categories/${editingId}`, payload);
+        // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-API-PREFIX-FIX-V1
+        //   authClient.api 의 baseURL 은 이미 `/api/v1` 이다(packages/auth-client/src/client.ts getApiUrl).
+        //   `/api` 를 덧붙이면 `/api/v1/api/membership/...` 로 나가 404 가 된다.
+        await authClient.api.put(`/membership/categories/${editingId}`, payload);
         toast.success('카테고리가 수정되었습니다.');
       }
 
@@ -156,7 +159,8 @@ const CategoryManagement = () => {
 
   const handleToggleActive = async (id: string, currentStatus: boolean) => {
     try {
-      await authClient.api.patch(`/api/membership/categories/${id}`, {
+      // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-API-PREFIX-FIX-V1 — 위와 동일 (이중 `/api` 제거)
+      await authClient.api.patch(`/membership/categories/${id}`, {
         isActive: !currentStatus,
       });
       toast.success(`카테고리가 ${!currentStatus ? '활성화' : '비활성화'}되었습니다.`);
