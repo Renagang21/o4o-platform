@@ -157,6 +157,19 @@ export class NetureOrder {
   @Index()
   orderType!: NetureOrderType;
 
+  /**
+   * WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+   *
+   * 이 fulfillment 주문이 **어느 서비스에서 발생했는가**. `orderType`(거래 모델 축)과 다르다.
+   * 공급자 목록·상세·통계는 이 값으로 스코프해야 서비스 간 혼입이 없다.
+   *
+   * 기본값 `'neture'` — 미표기 주문은 Neture 로 해석한다(레거시 호환 규칙을 구조로 보장).
+   * 값 목록은 `NETURE_FULFILLMENT_SERVICE_KEY` / `service-keys.ts` 참조.
+   */
+  @Column({ name: 'service_key', type: 'varchar', length: 50, default: 'neture' })
+  @Index()
+  serviceKey!: string;
+
   // 직배송 전용 고객 PII (STORE_RESTOCK은 NULL)
   @Column({ name: 'customer_info', type: 'jsonb', nullable: true })
   customerInfo?: NetureCustomerInfo | null;

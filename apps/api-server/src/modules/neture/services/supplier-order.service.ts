@@ -3,6 +3,8 @@
  * Extracted from neture.routes.ts (WO-O4O-SUPPLIER-ORDER-PROCESSING-V1, WO-O4O-SHIPMENT-ENGINE-V1)
  */
 import type { DataSource } from 'typeorm';
+// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 
 /** Allowed supplier status transitions */
 const SUPPLIER_STATUS_TRANSITIONS: Record<string, string[]> = {
@@ -37,8 +39,9 @@ export class SupplierOrderService {
        FROM neture_orders o
        JOIN neture.neture_order_items oi ON oi.order_id = o.id
        JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-       WHERE spo.supplier_id = $1`,
-      [supplierId],
+       WHERE spo.supplier_id = $1
+         AND ${netureOrderServiceScopeSql('o', '$2')}`,
+      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
     );
     return {
       today_orders: Number(result[0]?.today_orders || 0),
@@ -52,12 +55,15 @@ export class SupplierOrderService {
     const { page, limit, status } = params;
     const offset = (page - 1) * limit;
 
-    const baseParams: any[] = [supplierId];
+    // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
+    //   서비스 경계를 $2 로 고정한다(목록·카운트 동일 조건). status 는 $3 으로 밀린다.
+    const baseParams: any[] = [supplierId, NETURE_FULFILLMENT_SERVICE_KEY];
     let statusClause = '';
     if (status) {
-      statusClause = 'AND o.status = $2';
+      statusClause = 'AND o.status = $3';
       baseParams.push(status);
     }
+    const serviceClause = `AND ${netureOrderServiceScopeSql('o', '$2')}`;
 
     const [orders, countResult] = await Promise.all([
       this.dataSource.query(
@@ -71,7 +77,7 @@ export class SupplierOrderService {
          FROM neture_orders o
          JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE spo.supplier_id = $1 ${statusClause}
+         WHERE spo.supplier_id = $1 ${serviceClause} ${statusClause}
          ORDER BY o.created_at DESC, o.id
          LIMIT ${limit} OFFSET ${offset}`,
         baseParams,
@@ -81,7 +87,7 @@ export class SupplierOrderService {
          FROM neture_orders o
          JOIN neture.neture_order_items oi ON oi.order_id = o.id
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
-         WHERE spo.supplier_id = $1 ${statusClause}`,
+         WHERE spo.supplier_id = $1 ${serviceClause} ${statusClause}`,
         baseParams,
       ),
     ]);

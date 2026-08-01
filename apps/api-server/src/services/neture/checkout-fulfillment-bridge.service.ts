@@ -24,6 +24,8 @@ import {
 } from '../../routes/neture/entities/neture-order.entity.js';
 import { NetureOrderItem } from '../../routes/neture/entities/neture-order-item.entity.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+import { NETURE_FULFILLMENT_SERVICE_KEY } from '../../modules/neture/constants/fulfillment-service-scope.js';
 
 const NETURE_B2B_ORDER_SOURCE = 'neture_b2b_checkout';
 
@@ -126,6 +128,10 @@ export class CheckoutFulfillmentBridgeService {
           ordererName: shipping?.recipient_name ?? null,
           ordererPhone: shipping?.phone ?? null,
           orderType: NetureOrderType.STORE_RESTOCK,
+          // WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1:
+          //   bridge 된 주문에 **발생 서비스**를 기입한다. 공급자 조회·통계가 이 값으로 스코프한다.
+          //   checkout_order 의 metadata.serviceKey 를 그대로 승계하고, 미표기면 'neture'(레거시 규칙).
+          serviceKey: (md.serviceKey as string) || NETURE_FULFILLMENT_SERVICE_KEY,
           metadata: {
             // P2c bridge 계약 — fulfillment/settlement guard 가 paid 로 인식
             source: 'checkout_order',

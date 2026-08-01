@@ -10,6 +10,8 @@
  * - 각 원장 per-source CAP 적용(과다 조회 방지). CAP 도달 시 log 로 명시(silent truncation 금지).
  * - checkout_orders 조회 실패 시 neture 단독으로 degrade.
  */
+// WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1
+import { NETURE_FULFILLMENT_SERVICE_KEY, netureOrderServiceScopeSql, checkoutOrderServiceScopeSql } from '../constants/fulfillment-service-scope.js';
 import type { DataSource } from 'typeorm';
 
 const PER_SOURCE_CAP = 300;
@@ -111,9 +113,11 @@ export class SupplierUnifiedOrderService {
          JOIN supplier_product_offers spo ON spo.id = oi.product_id::uuid
          WHERE oi.order_id = o.id AND spo.supplier_id = $1
        )
+         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: 서비스 경계 (미표기 = neture)
+         AND ${netureOrderServiceScopeSql('o', '$2')}
        ORDER BY o.created_at DESC
        LIMIT ${PER_SOURCE_CAP}`,
-      [supplierId],
+      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
     );
     return rows.map((o: any) => ({
       id: o.id,
@@ -165,6 +169,8 @@ export class SupplierUnifiedOrderService {
        LEFT JOIN users u ON u.id = co."buyerId"
        LEFT JOIN organizations org ON org.id = co."sellerOrganizationId"
        WHERE co."supplierId" = $1
+         -- WO-O4O-SUPPLIER-FULFILLMENT-SERVICE-SCOPE-V1: bridge 이전 checkout_order 에도 같은 경계 적용
+         AND ${checkoutOrderServiceScopeSql('co', '$2')}
          -- WO-O4O-KPA-SUPPLIER-UNIFIED-ORDER-CHECKOUT-PAYMENT-VISIBILITY-FIX-V1:
          -- payment-first — 결제 전(paymentStatus != 'paid') checkout_order 는 공급자에게 노출하지 않는다.
          -- 'paid' 주문은 대부분 bridge 되어 neture_orders 로 노출(아래 dedup 제외)되며, 아직 bridge 안 된
@@ -177,7 +183,7 @@ export class SupplierUnifiedOrderService {
          )
        ORDER BY co."createdAt" DESC
        LIMIT ${PER_SOURCE_CAP}`,
-      [supplierId],
+      [supplierId, NETURE_FULFILLMENT_SERVICE_KEY],
     );
     return rows.map((o: any) => ({
       id: o.id,
