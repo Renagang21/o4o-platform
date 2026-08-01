@@ -34,6 +34,9 @@ import { PharmacyHubMembershipConsoleController } from '../../controllers/pharma
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierProductController.js';
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
+// WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
+import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
+import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
 import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
@@ -189,6 +192,27 @@ export function createPharmacyHubRoutes(): Router {
 
   router.get('/store-owner/products', ...storeOwnerGuards, PharmacyHubStoreProductController.list);
   router.get('/store-owner/products/:offerId', ...storeOwnerGuards, PharmacyHubStoreProductController.detail);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)
+  //
+  //   저장은 canonical store_cart_items / checkout_orders 재사용 — 신규 테이블 0.
+  //   경계: buyerId(=인증 사용자) + serviceKey='pharmacy-hub' (서버 고정).
+  //
+  //   공용 /api/v1/store/cart/:serviceKey/* 대신 여기에 두는 이유:
+  //     공용 라우트는 인증만 요구하고 Pharmacy-Hub membership·역할을 확인하지 않는다.
+  //
+  //   ⚠️ Phase 1 — 공급자에게 주문을 노출하지 않는다.
+  //      공급자 주문 목록·상태 변경·shipment·fulfillment bridge 는 결제·수금 정책 확정 후 Phase 2.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/cart', ...storeOwnerGuards, PharmacyHubCartController.list);
+  router.post('/store-owner/cart/items', ...storeOwnerGuards, PharmacyHubCartController.add);
+  router.patch('/store-owner/cart/items/:itemId', ...storeOwnerGuards, PharmacyHubCartController.update);
+  router.delete('/store-owner/cart/items/:itemId', ...storeOwnerGuards, PharmacyHubCartController.remove);
+
+  router.post('/store-owner/orders', ...storeOwnerGuards, PharmacyHubOrderController.create);
+  router.get('/store-owner/orders', ...storeOwnerGuards, PharmacyHubOrderController.list);
+  router.get('/store-owner/orders/:orderId', ...storeOwnerGuards, PharmacyHubOrderController.detail);
 
   return router;
 }
