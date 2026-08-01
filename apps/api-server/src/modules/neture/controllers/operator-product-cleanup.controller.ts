@@ -380,11 +380,13 @@ export function createOperatorProductCleanupController(dataSource: DataSource): 
           SELECT o.id, o.master_id, o.supplier_id, o.approval_status,
                  o.price_general, o.deleted_at, o.deleted_by, o.delete_reason,
                  m.name, m.barcode, m.regulatory_type,
-                 s.company_name AS supplier_name,
+                 -- 공급자 표시명 SSOT = organizations.name (neture_suppliers 에 상호 컬럼 없음)
+                 supplier_org.name AS supplier_name,
                  u.name AS deleted_by_name
           FROM supplier_product_offers o
           JOIN product_masters m ON m.id = o.master_id
           LEFT JOIN neture_suppliers s ON s.id = o.supplier_id
+          LEFT JOIN organizations supplier_org ON supplier_org.id = s.organization_id
           LEFT JOIN users u ON u.id = o.deleted_by
           WHERE o.deleted_at IS NOT NULL
           ORDER BY o.deleted_at DESC

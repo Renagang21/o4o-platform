@@ -324,9 +324,12 @@ export class ProductConsoleController {
                 spo.consumer_reference_price, spo.stock_quantity, spo.reserved_quantity,
                 spo.low_stock_threshold, spo.track_inventory, spo.slug,
                 spo.created_at, spo.updated_at,
-                ns.company_name as supplier_name
+                -- 공급자 표시명 SSOT = organizations.name.
+                -- neture_suppliers 에는 상호 컬럼이 없다(과거 ns.company_name 참조는 42703 오류였다).
+                supplier_org.name as supplier_name
          FROM supplier_product_offers spo
          LEFT JOIN neture_suppliers ns ON spo.supplier_id = ns.id
+         LEFT JOIN organizations supplier_org ON supplier_org.id = ns.organization_id
          WHERE spo.master_id = $1
          ORDER BY spo.created_at DESC`,
         [productId]
