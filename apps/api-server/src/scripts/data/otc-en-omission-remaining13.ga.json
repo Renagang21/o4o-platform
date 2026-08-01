@@ -1,0 +1,211 @@
+{
+ "total": 13,
+ "rows": [
+  {
+   "masterId": "11463d24-3c78-4903-abf0-541951a545e0",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "2220f2ee-f3ea-4a68-9645-0937fcc61092",
+   "enDescriptionId": "7f8ff4ae-3327-43e0-ac31-927c0de5ac65",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "3668bfd5-bf2f-44c5-85fd-54978dbc3477",
+   "productName": "조아파모티딘정10밀리그램",
+   "koDescriptionId": "3a4b8d25-d50d-401b-aff3-8fe43d0645e3",
+   "enDescriptionId": "5d24790b-edc2-49f0-a71c-7fb7e76fb13b",
+   "koHash": "aae16d77f37c55826a27cb48276eb132",
+   "enHash": "592be4a848ecb9bbc329bb6820a59eb4",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈(혈액구토)이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번히 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "47b86fda-ce88-4632-a90b-ceed94c5fc95",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "ffed962d-80e4-445b-aff5-bc2a65f6c0ae",
+   "enDescriptionId": "eaaceecb-f5c3-4561-bc51-023fedef6187",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "49463a47-2a3d-4022-814c-adf8f19a5c34",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "787187ae-cc13-4185-a30a-565417e2e9e8",
+   "enDescriptionId": "d0947423-41e8-4927-bca1-315c68cb779c",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "56aef42c-cedd-49fe-8e04-59c1161f972d",
+   "productName": "메이놀정",
+   "koDescriptionId": "04b9a792-333f-447d-9c7b-bcfbc27e0b26",
+   "enDescriptionId": "43b1f910-97ee-4806-83ad-171895933fb4",
+   "koHash": "108871249f497c8057d72c30313bab15",
+   "enHash": "928ec03610b4a47ae51094d68d8ea20c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "반드시 필요한 경우 이외에는 만 10세 이하의 어린이 분류 일반의약품 · 장용정 작용 이 약은 변비와 변비에 따른 식욕부진(식욕감퇴),복부팽만,장내이상발효,치질의 완화에 사용합니다.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "64fa3041-2811-4da2-b737-3555392ae415",
+   "productName": "조아파모티딘정10밀리그램",
+   "koDescriptionId": "b71eb2f7-1b5b-4db9-ad96-06b93e1812dd",
+   "enDescriptionId": "2e390ba8-9118-4e5b-87ed-b44fcde48ece",
+   "koHash": "aae16d77f37c55826a27cb48276eb132",
+   "enHash": "592be4a848ecb9bbc329bb6820a59eb4",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈(혈액구토)이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번히 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "8225ee69-8088-414a-83a5-bdcd199c7096",
+   "productName": "메이놀정",
+   "koDescriptionId": "091dfb03-2402-4668-8555-f5cb3f4dea13",
+   "enDescriptionId": "5fdf4214-a7dd-4306-97c1-7d50b5fc85d9",
+   "koHash": "108871249f497c8057d72c30313bab15",
+   "enHash": "928ec03610b4a47ae51094d68d8ea20c",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "10세"
+   ],
+   "missingKoSentences": [
+    "반드시 필요한 경우 이외에는 만 10세 이하의 어린이 분류 일반의약품 · 장용정 작용 이 약은 변비와 변비에 따른 식욕부진(식욕감퇴),복부팽만,장내이상발효,치질의 완화에 사용합니다.",
+    "선택 포인트 동일 일반명코드(C96000ATE) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "8b8c5e0a-d9bd-432d-bcaa-b3b6a8b1cec6",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "04298d5c-5653-496b-86bf-7d227f378adc",
+   "enDescriptionId": "299a3394-e83e-4210-88ca-31704d846ca7",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "97e81f3e-5aa2-4763-bea5-558406c2c8af",
+   "productName": "도나펜에프연질캡슐",
+   "koDescriptionId": "2aee59f5-28f1-4262-a3f1-85fa59ea58a9",
+   "enDescriptionId": "8b72b04e-1000-4240-a3c0-db18b6875b56",
+   "koHash": "9da740293d924cf161ef96035a26583e",
+   "enHash": "50c878eccd5e1b2bba509187f7193349",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "lost": [
+    "2,400mg",
+    "2,400mg"
+   ],
+   "missingKoSentences": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허혈성 심장질환,말초동맥질환,뇌혈관질환을 가진 환자는 고용량 이부프로펜(1일 2,400 mg) 복용을 피해야 하며,심혈관계 위험 요소(고혈압,고지혈증,당뇨병,흡연 등)를 가지고 있는 환자는 고용량 이부프로펜(1일 2,400 mg) 복용이 필요한 경우 이 약을 복용하기 전에 의사 또는 분류 일반의약품 · 연질캡슐 작용 이 약은 두통,치통,발치후 동통(통증),인후(목구멍)통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통,오한(춥고 떨리는 증상),발열시의 해열에 사용합니다.",
+    "선택 포인트 동일 일반명코드(D52700ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "c8505a8a-4de5-468f-bbc6-ddd118df53a2",
+   "productName": "파미딘정(파모티딘)",
+   "koDescriptionId": "7b0bc2e7-214f-4467-903c-a2fc93c0eb2a",
+   "enDescriptionId": "9a0d1499-6858-465e-b9e3-b681c968ac30",
+   "koHash": "f710f290506859354ee77561f17b9708",
+   "enHash": "adc89ef1ef5ee808f8ccbb4377c92d08",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "3개월"
+   ],
+   "missingKoSentences": [
+    "이 약을 복용하기 전에 음식을 삼키기 어렵거나 삼킬 때 통증이 있는 경우 및 토혈이나 혈변이 있는 경우,속쓰림 증상이 3개월 이상 지속되는 경우,현기증(어지러움) 또는 졸림,식은땀이 함께 나타나는 경우,짧은 호흡과 함께 가슴 또는 어깨 통증을 동반하는 경우,가슴통증이 빈번 분류 일반의약품 · 정 작용 이 약은 위산과다,속쓰림,신트림에 사용합니다.",
+    "선택 포인트 동일 일반명코드(157301ATB) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "d195e32a-ba8f-4e8b-9619-8fc8227ff7b0",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "279712e2-489b-427f-91a8-952e8d603ae0",
+   "enDescriptionId": "e23e77c1-eb60-422b-a37c-93f6e24cd250",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  },
+  {
+   "masterId": "e271f05c-e3ec-49ed-b7b0-024f51711456",
+   "productName": "도나펜에프연질캡슐",
+   "koDescriptionId": "66441b05-7e53-4882-92e7-831b2113e572",
+   "enDescriptionId": "b0be1a43-c4cd-4706-be05-f7c62f226e54",
+   "koHash": "9da740293d924cf161ef96035a26583e",
+   "enHash": "50c878eccd5e1b2bba509187f7193349",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "lost": [
+    "2,400mg",
+    "2,400mg"
+   ],
+   "missingKoSentences": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허혈성 심장질환,말초동맥질환,뇌혈관질환을 가진 환자는 고용량 이부프로펜(1일 2,400 mg) 복용을 피해야 하며,심혈관계 위험 요소(고혈압,고지혈증,당뇨병,흡연 등)를 가지고 있는 환자는 고용량 이부프로펜(1일 2,400 mg) 복용이 필요한 경우 이 약을 복용하기 전에 의사 또는 분류 일반의약품 · 연질캡슐 작용 이 약은 두통,치통,발치후 동통(통증),인후(목구멍)통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통,오한(춥고 떨리는 증상),발열시의 해열에 사용합니다.",
+    "선택 포인트 동일 일반명코드(D52700ACS) 제품은 성분·함량·제형이 같습니다."
+   ]
+  },
+  {
+   "masterId": "fcb865d8-c91b-41fd-a507-ef2376edf064",
+   "productName": "라미실원스외용액(테르비나핀염산염)",
+   "koDescriptionId": "df78e92d-115e-4764-b6ea-11a5cc80859c",
+   "enDescriptionId": "99c5b095-b128-4221-be6c-957c388da59b",
+   "koHash": "c2b25c8e0b452006cd4dccd76c8c356a",
+   "enHash": "a366d1c6e9c6cf871daf9a3be60a03c9",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "lost": [
+    "15세"
+   ],
+   "missingKoSentences": [
+    "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오."
+   ]
+  }
+ ]
+}
