@@ -19,15 +19,21 @@ export const uid = (kind: string, text: string): string =>
   `${kind}:${crypto.createHash('sha1').update(text).digest('hex').slice(0, 12)}`;
 
 /**
- * KO 원문 절단 감지 — 본문 하드컷 잔재(문장이 종결부호 없이 끊긴 슬롯).
- * 절단된 원문을 번역하면 절단이 그대로 번역문에 전파되므로 번역 대상에서 제외(HOLD)한다.
- * 제목·라벨·코드(h1/h2/tag/th/td/small/meta)는 원래 종결부호가 없으므로 대상이 아니다.
+ * @deprecated **구 절단 판정기 — 신규 사용 금지.**
+ *
+ * 마침표 유무만으로 한국어 완결성을 판정해 실측 732 유닛 중 최소 311(문서 743)을 오탐했다:
+ *   ① badge/tile 의 **명사구 요약 문형**(저작 규약상 종결부호 없음)을 절단으로 판정
+ *   ② `…에 사용합니다` 처럼 **종결어미로 완결된 문장**을 마침표가 없다는 이유로 절단으로 판정
+ *
+ * 현행 SSOT 는 `otc-ko-truncation-policy.ga.ts` 의 `judgeSlot`/`judgeDoc` 이다(슬롯 역할·앞뒤
+ * sibling·태그 구조를 함께 보고 reason code 를 남긴다). 언어별 선정기는 그 모듈만 import 한다.
+ *
+ * 이 함수는 **전수 재판정의 before 축**으로만 남겨둔다. 이름을 `legacy*` 로 바꿨으므로 구
+ * 선정기 코드는 컴파일 단계에서 실패한다 — 그것이 의도된 회귀 가드다.
  */
-const SENTENCE_KINDS = new Set(['intro', 'tile', 'intake', 'warn', 'foot', 'para', 'badge', 'li']);
-export const isTruncatedKo = (kind: string, text: string): boolean =>
-  SENTENCE_KINDS.has(kind) && text.length > 40 && !/[.!?。]$/.test(text);
-/* 닫는 괄호는 종결부호로 인정하지 않는다 — `…베타차단제(아테놀올,메토프로롤,프로프라놀롤)` 처럼
-   열거 괄호에서 잘린 하드컷이 종결로 오인돼 통과하던 사례가 실재한다. */
+const LEGACY_SENTENCE_KINDS = new Set(['intro', 'tile', 'intake', 'warn', 'foot', 'para', 'badge', 'li']);
+export const legacyIsTruncatedKo = (kind: string, text: string): boolean =>
+  LEGACY_SENTENCE_KINDS.has(kind) && text.length > 40 && !/[.!?。]$/.test(text);
 
 type El = { tag: string; cls: string };
 const VOID = /^(br|hr|img|input|meta|link|source|col)$/;

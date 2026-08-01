@@ -12,14 +12,20 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Pool } from 'pg';
-import { slots, uid, isTruncatedKo } from './otc-zh-slots.ga.js';
+import { slots, uid } from './otc-zh-slots.ga.js';
 import { frameLookup } from './otc-zh-frame.ga.js';
+import { judgeDoc } from './otc-ko-truncation-policy.ga.js';
+import { assertSpec } from './otc-ko-truncation-policy.spec.ga.js';
 
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
 const P = (f: string): string => path.join(DATA, f);
 const arg = (n: string): string | undefined => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : undefined; };
 
 async function main(): Promise<void> {
+  /* 절단 판정 회귀시험을 통과하지 못하면 선정 자체를 진행하지 않는다.
+     판정 규칙을 고치면서 시험을 갱신하지 않으면 여기서 멈춘다. */
+  assertSpec();
+
   const man = JSON.parse(fs.readFileSync(P('otc-zh-batch01-manifest.ga.json'), 'utf8')).manifest as any[];
   const mapPath = P('otc-zh-unit-map.ga.json');
   const raw = fs.existsSync(mapPath) ? JSON.parse(fs.readFileSync(mapPath, 'utf8')) : { units: {}, hold: {} };
@@ -39,15 +45,41 @@ async function main(): Promise<void> {
   const docs: Array<{ koId: string; masterId: string; product: string; held: boolean; missing: Array<{ id: string; kind: string; text: string }> }> = [];
   const need = new Map<string, { id: string; kind: string; text: string; docs: number }>();
   const truncated = new Set<string>();
+  const blockReason: Record<string, number> = {};
+  /** 표시용 말줄임 카드 → 같은 문서 완결본에서 번역을 파생한다(KO 무변경·카드 길이 유지). */
+  const derived = new Map<string, { id: string; kind: string; fromKind: string; fromId: string; docs: number }>();
+  /** 표시용 <br> 로만 갈린 한 문장 — 두 슬롯을 한 문장으로 묶어 번역한다(슬롯 수·태그 골격 불변). */
+  const groups = new Map<string, { ids: string[]; joinedKo: string; docs: number }>();
   for (const m of man) {
     const html = ko.get(m.koId); if (!html) continue;
     const missing: Array<{ id: string; kind: string; text: string }> = [];
     let held = false;
-    for (const u of slots(html)) {
+    const sl = slots(html);
+    const verdicts = judgeDoc(html, sl);
+    for (let i = 0; i < sl.length; i++) {
+      const u = sl[i], v = verdicts[i];
       if (frameLookup(u.kind, u.text)) continue;
       const id = uid(u.kind, u.text);
       if (unitMap[id]) continue;
-      if (holdIds.has(id) || isTruncatedKo(u.kind, u.text)) { held = true; truncated.add(id); continue; }
+      if (holdIds.has(id) || v.blocked) {
+        held = true; truncated.add(id);
+        blockReason[holdIds.has(id) ? 'LEDGER_HOLD' : v.reason] = (blockReason[holdIds.has(id) ? 'LEDGER_HOLD' : v.reason] || 0) + 1;
+        continue;
+      }
+      if (v.reason === 'DISPLAY_SUMMARY_ELLIPSIS' && v.deriveFrom) {
+        /* 카드 자체는 번역 유닛이 아니다. 완결본 유닛이 번역되면 자동으로 파생된다. */
+        const fromId = uid(v.deriveFrom.kind, v.deriveFrom.text);
+        const e = derived.get(id) || { id, kind: u.kind, fromKind: v.deriveFrom.kind, fromId, docs: 0 };
+        e.docs++; derived.set(id, e);
+        continue;
+      }
+      if (v.reason === 'STRUCTURAL_SPLIT' && v.groupWithNextIndex != null) {
+        const nx = sl[v.groupWithNextIndex];
+        const nxId = uid(nx.kind, nx.text);
+        const g = groups.get(id) || { ids: [id, nxId], joinedKo: `${u.text} ${nx.text}`, docs: 0 };
+        g.docs++; groups.set(id, g);
+        /* 묶인 두 조각은 각각 슬롯으로 남으므로 번역 대상에는 그대로 들어간다. */
+      }
       if (!missing.some((x) => x.id === id)) missing.push({ id, kind: u.kind, text: u.text });
     }
     docs.push({ koId: m.koId, masterId: m.masterId, product: m.productName, held, missing });
@@ -84,6 +116,10 @@ async function main(): Promise<void> {
     batch: 'zh-batch-01', mappedUnits: Object.keys(unitMap).length, holdUnits: holdIds.size,
     docsTotal: docs.length, docsBlockedByHoldUnit: docs.filter((d) => d.held).length,
     truncatedKoUnits: truncated.size,
+    blockReason,
+    derivedCardUnits: derived.size,
+    derivedCards: [...derived.values()].sort((a, b) => b.docs - a.docs),
+    structuralGroups: [...groups.values()].sort((a, b) => b.docs - a.docs),
     docsAlreadyFull: live.filter((d) => d.missing.length === 0).length,
     missingUnitsTotal: need.size,
     missingByKind: [...need.values()].reduce((a: any, u) => { a[u.kind] = (a[u.kind] || 0) + 1; return a; }, {}),

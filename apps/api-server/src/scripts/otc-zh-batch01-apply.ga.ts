@@ -29,6 +29,9 @@ import { Pool } from 'pg';
 import { LANG } from './otc-zh-batch01-frame-glossary.ga.js';
 import { slots, substitute, uid, T, type Slot } from './otc-zh-slots.ga.js';
 import { frameLookup } from './otc-zh-frame.ga.js';
+import { judgeDoc } from './otc-ko-truncation-policy.ga.js';
+import { assertSpec } from './otc-ko-truncation-policy.spec.ga.js';
+import { deriveCardSummary, verifyDerivedCard } from './otc-card-summary.ga.js';
 
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
 const P = (f: string): string => path.join(DATA, f);
@@ -66,19 +69,56 @@ export function numericCheck(ko: string, zh: string): string | null {
   return null;
 }
 
-function composeZh(html: string): { zh: string; missing: Slot[]; numeric: string[] } {
+/**
+ * 표시용 말줄임 카드(badge/tile)는 **자기 자신을 번역하지 않는다**. KO 카드가 어절 중간에서
+ * 잘려 있어 번역 원문으로 부적합하기 때문이다. 대신 같은 문서 완결본(intro)의 검증된 번역에
+ * 같은 요약 규칙을 다시 적용해 파생한다 — KO 무변경, 카드 길이·역할 유지.
+ * 상세: otc-card-summary.ga.ts
+ */
+function composeZh(html: string): { zh: string; missing: Slot[]; numeric: string[]; derived: number } {
   const numeric: string[] = [];
+  const sl = slots(html);
+  const verdicts = judgeDoc(html, sl);
+  const direct = (s: Slot): string | null => frameLookup(s.kind, s.text) ?? unitMap[uid(s.kind, s.text)]?.zh ?? null;
+
+  /* 1패스: 직접 대응이 있는 슬롯을 먼저 해소한다(파생 카드의 근거가 되는 완결본 포함). */
+  const resolved = sl.map((s) => direct(s));
+  /* 2패스: 파생 카드를 채운다. */
+  let derivedCount = 0;
+  const byIndex = new Map<Slot, number>(sl.map((s, i) => [s, i]));
+  for (let i = 0; i < sl.length; i++) {
+    if (resolved[i] != null) continue;
+    const v = verdicts[i];
+    if (v.reason !== 'DISPLAY_SUMMARY_ELLIPSIS' || !v.deriveFrom) continue;
+    const j = sl.findIndex((s) => s.kind === v.deriveFrom!.kind && s.text === v.deriveFrom!.text);
+    const fullZh = j >= 0 ? resolved[j] : null;
+    if (!fullZh) continue;                                   // 완결본이 아직 번역 전 → 미해소로 남긴다
+    const d = deriveCardSummary(sl[i].text, v.deriveFrom.text, fullZh);
+    if (!d.ok) { numeric.push(`${sl[i].kind}|DERIVE_FAILED:${d.reason}|${sl[i].text.slice(0, 60)}`); continue; }
+    const e = verifyDerivedCard(d.text, fullZh);
+    if (e) { numeric.push(`${sl[i].kind}|${e}|${sl[i].text.slice(0, 60)}`); continue; }
+    resolved[i] = d.text; derivedCount++;
+  }
+
+  const isDerived = new Set<number>();
+  for (let i = 0; i < sl.length; i++)
+    if (resolved[i] != null && verdicts[i].reason === 'DISPLAY_SUMMARY_ELLIPSIS' && direct(sl[i]) == null) isDerived.add(i);
+
   const { out, missing } = substitute(html, (s) => {
-    const z = frameLookup(s.kind, s.text) ?? unitMap[uid(s.kind, s.text)]?.zh ?? null;
-    if (z) { const e = numericCheck(s.text, z); if (e) numeric.push(`${s.kind}|${e}|${s.text.slice(0, 60)}`); }
+    const i = byIndex.get(s) ?? -1;
+    const z = i >= 0 ? resolved[i] : direct(s);
+    /* G3: 파생 카드는 KO 카드와 수치 지문을 맞출 수 없다(자르는 지점이 언어마다 다르다).
+       대신 완결본 번역의 엄격한 접두임을 verifyDerivedCard 로 이미 확인했다. */
+    if (z && !isDerived.has(i)) { const e = numericCheck(s.text, z); if (e) numeric.push(`${s.kind}|${e}|${s.text.slice(0, 60)}`); }
     return z;
   });
-  return { zh: out, missing, numeric };
+  return { zh: out, missing, numeric, derived: derivedCount };
 }
 
 const skeleton = (h: string): string => h.replace(/>[^<]*</g, '><').replace(/^[^<]*/, '').replace(/[^>]*$/, '');
 
 async function main(): Promise<void> {
+  assertSpec();   // 절단 판정 회귀시험이 깨지면 조립·적재를 진행하지 않는다.
   const man = JSON.parse(fs.readFileSync(P('otc-zh-batch01-manifest.ga.json'), 'utf8')).manifest as any[];
   const pool = new Pool({ host: '127.0.0.1', port: parseInt(arg('--port') || '5668', 10), database: 'o4o_platform',
     max: 4, statement_timeout: 900000, user: process.env.DB_USERNAME || 'o4o_api', password: process.env.DB_PASSWORD });

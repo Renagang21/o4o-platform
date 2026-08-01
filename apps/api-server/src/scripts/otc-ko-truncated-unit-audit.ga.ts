@@ -22,7 +22,7 @@ import 'dotenv/config';
 import fs from 'node:fs';
 import path from 'node:path';
 import { Pool } from 'pg';
-import { slots, uid, isTruncatedKo, T } from './otc-zh-slots.ga.js';
+import { slots, uid, legacyIsTruncatedKo as isTruncatedKo, T } from './otc-zh-slots.ga.js';
 import { frameLookup } from './otc-zh-frame.ga.js';
 
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
