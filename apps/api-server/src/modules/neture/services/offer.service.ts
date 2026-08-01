@@ -919,6 +919,61 @@ export class NetureOfferService {
    *
    * masterId 외부 주입 금지 — barcode 기반 resolveOrCreateMaster() 강제 경유
    */
+  /**
+   * WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1
+   *
+   * (supplier, master) 중복 등록을 업무 오류로 변환한다.
+   * soft-delete 된 Offer 도 unique 슬롯을 점유하므로 `withDeleted` 로 함께 조회하고,
+   * 사용자가 취할 조치가 다르므로 두 코드를 구분한다.
+   *   - 살아있는 Offer 존재 → OFFER_ALREADY_EXISTS (이미 등록된 공급 상품)
+   *   - 휴지통 Offer 존재   → OFFER_IN_RECYCLE_BIN (복원하거나 완전 삭제 후 등록)
+   * 중복이 없으면 null.
+   */
+  private async findDuplicateOffer(
+    supplierId: string,
+    masterId: string,
+  ): Promise<{ success: false; error: string; message: string } | null> {
+    const existing = await this.offerRepo.findOne({
+      where: { supplierId, masterId },
+      withDeleted: true,
+      select: { id: true, deletedAt: true },
+    });
+    if (!existing) return null;
+
+    return existing.deletedAt
+      ? {
+          success: false,
+          error: 'OFFER_IN_RECYCLE_BIN',
+          message:
+            '이 상품은 휴지통에 있습니다. 새로 등록하지 말고 휴지통에서 복원하거나 완전 삭제 후 등록해 주세요.',
+        }
+      : {
+          success: false,
+          error: 'OFFER_ALREADY_EXISTS',
+          message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
+        };
+  }
+
+  /**
+   * unique violation(23505) 중 **(supplier, master) 제약** 인 경우에만 업무 오류로 변환한다.
+   * 같은 테이블의 slug UNIQUE 등 다른 제약 위반을 중복 등록으로 오인하지 않는다.
+   */
+  private asOfferDuplicateViolation(
+    err: unknown,
+  ): { success: false; error: string; message: string } | null {
+    const e = err as { code?: string; constraint?: string; driverError?: { code?: string; constraint?: string } };
+    const code = e?.code ?? e?.driverError?.code;
+    const constraint = e?.constraint ?? e?.driverError?.constraint;
+    if (code !== '23505' || constraint !== 'uq_supplier_product_offers_master_supplier') {
+      return null;
+    }
+    return {
+      success: false,
+      error: 'OFFER_ALREADY_EXISTS',
+      message: '이미 등록된 공급 상품입니다. 기존 상품을 수정해 주세요.',
+    };
+  }
+
   async createSupplierOffer(
     supplierId: string,
     data: {
@@ -1008,7 +1063,33 @@ export class NetureOfferService {
         isFeatured: data.isFeatured ?? false,
       });
 
-      const savedOffer = await this.offerRepo.save(offer);
+      // WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1:
+      //   Offer 는 (supplier_id, master_id) 당 1행이다
+      //   (DB 제약 uq_supplier_product_offers_master_supplier — 유지가 정답.
+      //    근거: CHECK-O4O-SUPPLIER-PRODUCT-OFFER-UNIQUE-CONSTRAINT-CONTRACT-AUDIT-V1).
+      //   기존에는 사전 검사 없이 save() 로 직행해 재등록 시 23505 가 그대로 터졌고,
+      //   컨트롤러의 포괄 catch 에 걸려 일반 500 으로 노출됐다(전역 duplicate key → 409
+      //   변환기는 이 경로에 도달하지 않는다).
+      //   soft-delete 행도 슬롯을 계속 점유하므로(휴지통 복원 정책) withDeleted 로 함께 조회해
+      //   "이미 등록됨" 과 "휴지통에 있음" 을 구분한다.
+      const duplicate = await this.findDuplicateOffer(supplierId, masterId);
+      if (duplicate) return duplicate;
+
+      let savedOffer: SupplierProductOffer;
+      try {
+        savedOffer = await this.offerRepo.save(offer);
+      } catch (err: unknown) {
+        // 사전 검사와 INSERT 사이의 경쟁 상태 대비 fallback.
+        // 반드시 해당 제약일 때만 변환한다 — 이 테이블에는 slug UNIQUE 도 있다.
+        const dup = this.asOfferDuplicateViolation(err);
+        if (dup) {
+          logger.warn(
+            `[NetureOfferService] Duplicate offer race for supplier ${supplierId} / master ${masterId}`,
+          );
+          return (await this.findDuplicateOffer(supplierId, masterId)) ?? dup;
+        }
+        throw err;
+      }
       logger.info(`[NetureOfferService] Created offer ${savedOffer.id} by supplier ${supplierId} for master ${masterId} (PENDING approval)`);
 
       // WO-NETURE-REMOVE-NETURE-FROM-SERVICE-SELECTION-AND-APPROVAL-V1:

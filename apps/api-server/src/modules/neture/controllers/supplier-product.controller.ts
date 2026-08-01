@@ -89,8 +89,12 @@ export function createSupplierProductController(dataSource: DataSource): Router 
         isFeatured,
       });
       if (!result.success) {
+        // WO-O4O-SUPPLIER-PRODUCT-OFFER-DUPLICATE-ERROR-CONTRACT-V1:
+        //   OFFER_IN_RECYCLE_BIN 추가 — 동일 상품이 휴지통에 남아 unique 슬롯을 점유하는 경우.
+        //   사용자 조치가 "기존 상품 수정" 이 아니라 "복원 또는 완전 삭제 후 등록" 이라 코드를 분리했다.
         const statusCode = result.error === 'SUPPLIER_NOT_ACTIVE' ? 403
           : result.error === 'OFFER_ALREADY_EXISTS' ? 409
+          : result.error === 'OFFER_IN_RECYCLE_BIN' ? 409
           : 400;
         return res.status(statusCode).json(result);
       }
