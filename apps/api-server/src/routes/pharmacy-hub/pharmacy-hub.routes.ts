@@ -37,6 +37,10 @@ import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hu
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
+// WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1 (Phase 2)
+import { PharmacyHubPaymentController } from '../../controllers/pharmacy-hub/PharmacyHubPaymentController.js';
+import { PharmacyHubSupplierOrderController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierOrderController.js';
+import { PharmacyHubOperatorFulfillmentController } from '../../controllers/pharmacy-hub/PharmacyHubOperatorFulfillmentController.js';
 import { createRequireActiveSupplier } from '../../modules/neture/middleware/neture-identity.middleware.js';
 import { AppDataSource } from '../../database/connection.js';
 import { resolveAccountAccess } from '../../common/auth/account-access.policy.js';
@@ -202,8 +206,7 @@ export function createPharmacyHubRoutes(): Router {
   //   공용 /api/v1/store/cart/:serviceKey/* 대신 여기에 두는 이유:
   //     공용 라우트는 인증만 요구하고 Pharmacy-Hub membership·역할을 확인하지 않는다.
   //
-  //   ⚠️ Phase 1 — 공급자에게 주문을 노출하지 않는다.
-  //      공급자 주문 목록·상태 변경·shipment·fulfillment bridge 는 결제·수금 정책 확정 후 Phase 2.
+  //   Phase 2 에서 결제·공급자 전달이 연결되었다 (아래 결제 블록 참조).
   // ───────────────────────────────────────────────────────────────────────────
   router.get('/store-owner/cart', ...storeOwnerGuards, PharmacyHubCartController.list);
   router.post('/store-owner/cart/items', ...storeOwnerGuards, PharmacyHubCartController.add);
@@ -213,6 +216,54 @@ export function createPharmacyHubRoutes(): Router {
   router.post('/store-owner/orders', ...storeOwnerGuards, PharmacyHubOrderController.create);
   router.get('/store-owner/orders', ...storeOwnerGuards, PharmacyHubOrderController.list);
   router.get('/store-owner/orders/:orderId', ...storeOwnerGuards, PharmacyHubOrderController.detail);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 결제 · 취소 (WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1)
+  //
+  //   공급자가 여럿이어도 구매자는 **1회 결제**한다 (paymentGroupId).
+  //   결제 완료 이벤트만이 주문을 paid 로 전이시키고 공급자에게 전달한다 —
+  //   이 라우트들은 어떤 경우에도 결제 상태를 직접 조작하지 않는다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.post('/store-owner/payments/prepare', ...storeOwnerGuards, PharmacyHubPaymentController.prepare);
+  router.post('/store-owner/payments/confirm', ...storeOwnerGuards, PharmacyHubPaymentController.confirm);
+  // 결제 전 단건 취소
+  router.post(
+    '/store-owner/orders/:orderId/cancel',
+    ...storeOwnerGuards,
+    PharmacyHubPaymentController.cancelBeforePayment,
+  );
+  // 결제 후 전체 취소·환불 (공급자 접수 전 한정)
+  router.post(
+    '/store-owner/payments/:paymentGroupId/cancel',
+    ...storeOwnerGuards,
+    PharmacyHubPaymentController.cancelAfterPayment,
+  );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 공급자 주문 처리 (WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1)
+  //
+  //   자격은 상품 제공 설정과 동일한 3중 guard 를 재사용한다.
+  //   조회·전이 모두 service_key='pharmacy-hub' + 본인 공급자 소유로 스코프된다 —
+  //   Neture 주문은 이 경로에 절대 노출되지 않는다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/supplier/orders', ...supplierProductGuards, PharmacyHubSupplierOrderController.list);
+  router.get('/supplier/orders/:orderId', ...supplierProductGuards, PharmacyHubSupplierOrderController.detail);
+  router.post('/supplier/orders/:orderId/accept', ...supplierProductGuards, PharmacyHubSupplierOrderController.accept);
+  router.post('/supplier/orders/:orderId/ship', ...supplierProductGuards, PharmacyHubSupplierOrderController.ship);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 운영자 fulfillment 복구 (결제됐지만 공급자에게 전달되지 않은 주문의 유일한 공식 복구 경로)
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get(
+    '/operator/fulfillment/stuck',
+    ...operatorGuards,
+    PharmacyHubOperatorFulfillmentController.listStuck,
+  );
+  router.post(
+    '/operator/fulfillment/:orderId/recover',
+    ...operatorGuards,
+    PharmacyHubOperatorFulfillmentController.recover,
+  );
 
   return router;
 }

@@ -28,8 +28,14 @@ const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 const MAX_LIMIT = 100;
 
-/** Phase 1 안내 — 공급자에게 아직 전달되지 않았음을 응답에 명시한다. */
-const PHASE1_NOTICE = '주문이 접수되었습니다. 공급자 전달·처리는 준비 중입니다.';
+/**
+ * 안내 문구 — WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1 에서 갱신.
+ *
+ * Phase 2 부터 **결제 완료 주문만** 공급자에게 전달된다. 미결제 주문을 "접수됨"처럼
+ * 표현하면 구매자가 공급자가 처리 중이라고 오해하므로, 결제 여부로 문구를 분리한다.
+ */
+const AWAITING_PAYMENT_NOTICE = '주문이 생성되었습니다. 결제를 완료해야 공급자에게 전달됩니다.';
+const PAID_NOTICE = '결제가 완료되어 공급자에게 전달되었습니다.';
 
 function getBuyerId(req: Request): string | null {
   const id = (req as any).user?.id;
@@ -55,10 +61,14 @@ export class PharmacyHubOrderController {
       return res.status(result.orders.length > 0 ? 201 : 200).json({
         success: true,
         data: {
+          // 결제는 이 그룹 단위로 1회 수행한다 (POST /store-owner/payments/prepare)
+          paymentGroupId: result.paymentGroupId,
           orders: result.orders,
           failedItems: result.failedItems,
+          // 주문 생성 직후는 미결제 상태다 — 공급자에게 아직 전달되지 않았다.
           supplierNotified: false,
-          notice: PHASE1_NOTICE,
+          requiresPayment: result.orders.length > 0,
+          notice: AWAITING_PAYMENT_NOTICE,
         },
       });
     } catch (error) {
@@ -98,6 +108,8 @@ export class PharmacyHubOrderController {
                 "orderNumber",
                 "supplierId",
                 status,
+                "paymentStatus",
+                metadata->>'paymentGroupId' AS "paymentGroupId",
                 "totalAmount",
                 subtotal,
                 "shippingFee",
@@ -114,10 +126,13 @@ export class PharmacyHubOrderController {
       return res.json({
         success: true,
         data: {
-          items,
+          // 공급자 전달 여부는 주문마다 다르다 — 결제 상태로 판정한다.
+          items: items.map((it: any) => ({
+            ...it,
+            supplierNotified: it.paymentStatus === 'paid',
+            notice: it.paymentStatus === 'paid' ? PAID_NOTICE : AWAITING_PAYMENT_NOTICE,
+          })),
           pagination: { page, limit, total, totalPages: Math.ceil(total / limit) },
-          supplierNotified: false,
-          notice: PHASE1_NOTICE,
         },
       });
     } catch (error) {
@@ -145,12 +160,19 @@ export class PharmacyHubOrderController {
                 co."supplierId",
                 COALESCE(org.name, '공급자') AS "supplierName",
                 co.status,
+                co."paymentStatus",
+                co."paidAt",
+                co.metadata->>'paymentGroupId' AS "paymentGroupId",
                 co.subtotal,
                 co."shippingFee",
                 co."totalAmount",
                 co.items,
                 co.metadata->>'note'        AS "note",
-                co."createdAt"
+                co."createdAt",
+                -- 공급자 전달 실적(bridge 결과)을 원장에서 직접 확인한다 — 추정하지 않는다.
+                (SELECT no2.status FROM neture_orders no2
+                  WHERE no2.metadata->>'checkoutOrderId' = co.id::text
+                  LIMIT 1)                  AS "fulfillmentStatus"
            FROM checkout_orders co
            LEFT JOIN neture_suppliers ns ON ns.id::text = co."supplierId"
            LEFT JOIN organizations org    ON org.id = ns.organization_id
@@ -167,7 +189,12 @@ export class PharmacyHubOrderController {
 
       return res.json({
         success: true,
-        data: { ...row, supplierNotified: false, notice: PHASE1_NOTICE },
+        data: {
+          ...row,
+          // 실제로 공급자 원장에 생성되었을 때만 true — 결제만으로 단정하지 않는다.
+          supplierNotified: row.fulfillmentStatus != null,
+          notice: row.paymentStatus === 'paid' ? PAID_NOTICE : AWAITING_PAYMENT_NOTICE,
+        },
       });
     } catch (error) {
       logger.error('[PharmacyHubOrder] detail error', {

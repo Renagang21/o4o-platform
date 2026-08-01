@@ -661,6 +661,15 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     try {
       app.use('/api/v1/pharmacy-hub', createPharmacyHubRoutes());
       logger.info('✅ Pharmacy-Hub routes registered at /api/v1/pharmacy-hub');
+
+      // WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1:
+      //   결제 완료 → 주문 paid 전이 → 공급자 fulfillment bridge.
+      //   serviceKey='pharmacy-hub' 구독이라 Neture 핸들러와 서로 간섭하지 않는다.
+      const { initializePharmacyHubPaymentHandler } = await import(
+        '../services/pharmacy-hub/PharmacyHubPaymentEventHandler.js'
+      );
+      initializePharmacyHubPaymentHandler(dataSource);
+      logger.info('✅ PharmacyHubPaymentEventHandler initialized');
     } catch (pharmacyHubError) {
       logger.error('Failed to register Pharmacy-Hub routes:', pharmacyHubError);
     }

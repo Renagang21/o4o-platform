@@ -24,15 +24,24 @@
  * `PharmacyHubStoreProductController` 의 EXPOSURE_GATE_SQL 과 같은 조건이다 —
  * **조회에 보이면 담을 수 있고, 담을 수 있으면 주문 시점에 같은 기준으로 재검증**된다.
  *
- * ── Phase 1 범위 밖 (하지 않는 것) ────────────────────────────────────────────
- *   공급자에게 주문 노출 · 공급자 상태 변경 · shipment · fulfillment bridge ·
- *   온라인 결제 · 정산 · 쿠폰 · 반품.
- *   `paymentStatus` 를 임의로 바꾸지 않는다 — `createOrder` 기본값(pending)을 그대로 둔다.
+ * ── Phase 2 (WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1) 에서 추가된 것 ─
+ *   · 공급자 정책 기반 **배송비 snapshot** (Phase 1 의 고정 0 폐기)
+ *   · **paymentGroupId** — 공급자가 여럿이어도 구매자는 1회 결제
+ *   주문 생성 시점의 `paymentStatus` 는 여전히 건드리지 않는다(`createOrder` 기본값 pending).
+ *   paid 전이는 오직 결제 완료 이벤트 핸들러만 수행한다.
+ *
+ * ── 여전히 범위 밖 ────────────────────────────────────────────────────────────
+ *   정산 · 쿠폰 · 반품(부분) · 공급자별 분할 결제.
  */
+import { randomUUID } from 'crypto';
 import { DataSource, Repository, In } from 'typeorm';
 import { StoreCartItem } from '../../entities/cart/StoreCartItem.entity.js';
 import { checkoutService } from '../checkout.service.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import {
+  calculateSupplierShippingFee,
+  type SupplierShippingPolicy,
+} from '../shipping/supplier-shipping.js';
 import logger from '../../utils/logger.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
@@ -70,6 +79,8 @@ interface OfferRow {
   master_status: string | null;
   product_name: string;
   master_id: string;
+  base_shipping_fee: number | null;
+  free_shipping_threshold: number | null;
 }
 
 interface ValidItem {
@@ -104,7 +115,16 @@ export class PharmacyHubCartCheckoutService {
     scope: PharmacyHubCheckoutScope,
     input: PharmacyHubCheckoutInput = {},
   ): Promise<{
-    orders: Array<{ orderId: string; orderNumber: string; supplierId: string; totalAmount: number; itemCount: number }>;
+    paymentGroupId: string;
+    orders: Array<{
+      orderId: string;
+      orderNumber: string;
+      supplierId: string;
+      subtotal: number;
+      shippingFee: number;
+      totalAmount: number;
+      itemCount: number;
+    }>;
     failedItems: FailedItem[];
   }> {
     if (!scope.buyerId) {
@@ -125,6 +145,10 @@ export class PharmacyHubCartCheckoutService {
       throw new PharmacyHubCheckoutError('EMPTY_CART', '주문할 상품이 없습니다.', 400);
     }
 
+    // 이번 체크아웃에서 생성되는 모든 공급자 주문을 하나로 묶는 결제 그룹.
+    // 구매자는 공급자가 여럿이어도 **1회 결제**하고, 주문은 공급자별로 분리 유지된다.
+    const paymentGroupId = randomUUID();
+
     const failedItems: FailedItem[] = [];
     const candidates: StoreCartItem[] = [];
 
@@ -140,7 +164,7 @@ export class PharmacyHubCartCheckoutService {
       candidates.push(it);
     }
     if (candidates.length === 0) {
-      return { orders: [], failedItems };
+      return { paymentGroupId, orders: [], failedItems };
     }
 
     // 2. 서버에서 현재 공급 상태·가격 재조회 (프론트가 보낸 단가는 신뢰하지 않는다)
@@ -156,6 +180,8 @@ export class PharmacyHubCartCheckoutService {
               spo.reserved_quantity,
               spo.master_id::text         AS master_id,
               ns.status                   AS supplier_status,
+              ns.base_shipping_fee,
+              ns.free_shipping_threshold,
               COALESCE(pm.status, 'ACTIVE') AS master_status,
               pm.name                     AS product_name,
               (SELECT osp.unit_price FROM offer_service_prices osp
@@ -228,11 +254,23 @@ export class PharmacyHubCartCheckoutService {
     }
 
     // 5. 공급자별 주문 생성
-    const orders: Array<{ orderId: string; orderNumber: string; supplierId: string; totalAmount: number; itemCount: number }> = [];
+    const orders: Array<{
+      orderId: string;
+      orderNumber: string;
+      supplierId: string;
+      subtotal: number;
+      shippingFee: number;
+      totalAmount: number;
+      itemCount: number;
+    }> = [];
 
     for (const [supplierId, group] of groups.entries()) {
       const lineItems = group.map((v) => ({
-        productId: v.offer.master_id,
+        // ⚠️ productId = **SupplierProductOffer id** (master_id 아님).
+        //   공급자 workspace 는 `supplier_product_offers.id = neture_order_items.product_id` 로
+        //   주문을 스코프한다(Neture B2B 와 동일 축). master_id 를 넣으면 결제까지 성공하고도
+        //   공급자에게 영원히 보이지 않는 조용한 단절이 생긴다. masterId 는 metadata 에 보존한다.
+        productId: v.offer.id,
         productName: v.offer.product_name,
         quantity: v.item.quantity,
         unitPrice: v.unitPrice,
@@ -249,22 +287,39 @@ export class PharmacyHubCartCheckoutService {
 
       const cartIds = group.map((v) => v.item.id);
 
+      // 배송비: 공급자 정책(neture_suppliers)으로 그룹 상품합계 기준 계산해 **주문 시점에 snapshot** 한다.
+      //   Phase 1 의 고정 0 은 더 이상 쓰지 않는다. 결제 금액은 이 snapshot 을 포함한 totalAmount 다.
+      //   정책 미설정 공급자는 calculateSupplierShippingFee 가 0(fallback) 을 돌려준다.
+      const groupSubtotal = group.reduce((sum, v) => sum + v.subtotal, 0);
+      const shippingPolicy: SupplierShippingPolicy = {
+        baseShippingFee:
+          group[0].offer.base_shipping_fee != null ? Number(group[0].offer.base_shipping_fee) : null,
+        freeShippingThreshold:
+          group[0].offer.free_shipping_threshold != null
+            ? Number(group[0].offer.free_shipping_threshold)
+            : null,
+      };
+      const shippingResult = calculateSupplierShippingFee(groupSubtotal, shippingPolicy);
+
       try {
         const savedOrder = await checkoutService.createOrder({
           buyerId: scope.buyerId,
           sellerId: supplierId,
           supplierId,
           items: lineItems,
-          // 배송비는 Phase 1 범위 밖 — 0 으로 고정하고 재결정하지 않는다.
-          shippingFeeSnapshot: 0,
+          shippingPolicy,
+          shippingFeeSnapshot: shippingResult.shippingFee,
           metadata: {
             // 서비스 경계 축 — 기존 3개 서비스와 동일 규약 (OrderType=RETAIL + metadata.serviceKey)
             serviceKey: SERVICE_KEY,
             source: 'pharmacy_hub_cart',
             note: input.note,
             supplierId,
-            // 공급자 노출·fulfillment 는 Phase 2. 결제/수금 상태를 여기서 조작하지 않는다.
-            phase: 'buyer-order-only',
+            // 공급자가 여럿이어도 1회 결제 — 결제 완료 이벤트가 이 그룹의 주문 전부를 전이시킨다.
+            paymentGroupId,
+            paymentGroupSource: 'pharmacy_hub_multi_supplier_cart',
+            shippingFeeSource: shippingResult.policySource,
+            freeShippingApplied: shippingResult.freeShippingApplied,
           },
         });
 
@@ -274,6 +329,8 @@ export class PharmacyHubCartCheckoutService {
           orderId: savedOrder.id,
           orderNumber: savedOrder.orderNumber,
           supplierId,
+          subtotal: Number(savedOrder.subtotal),
+          shippingFee: Number(savedOrder.shippingFee),
           totalAmount: Number(savedOrder.totalAmount),
           itemCount: lineItems.length,
         });
@@ -294,6 +351,6 @@ export class PharmacyHubCartCheckoutService {
       }
     }
 
-    return { orders, failedItems };
+    return { paymentGroupId, orders, failedItems };
   }
 }

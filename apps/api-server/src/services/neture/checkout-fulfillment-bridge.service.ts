@@ -29,6 +29,24 @@ import { NETURE_FULFILLMENT_SERVICE_KEY } from '../../modules/neture/constants/f
 
 const NETURE_B2B_ORDER_SOURCE = 'neture_b2b_checkout';
 
+/**
+ * WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1:
+ *   bridge 대상 checkout_order 의 `metadata.source` 별 기술자(registry).
+ *
+ * Neture 는 기존 값과 **완전히 동일**하다(무회귀 — 등록만 옮겼을 뿐 값·동작 불변).
+ * Pharmacy-Hub 는 자기 항목을 추가해 같은 bridge 를 탄다. 공급자 workspace 는
+ * `neture_orders.service_key` 로 스코프하므로 두 서비스 주문은 섞이지 않는다.
+ */
+interface BridgeSourceDescriptor {
+  /** payment sourceService 라벨 (metadata.sourceService 로 기록) */
+  sourceService: string;
+}
+
+const BRIDGE_SOURCES: Record<string, BridgeSourceDescriptor> = {
+  [NETURE_B2B_ORDER_SOURCE]: { sourceService: 'neture-b2b' },
+  pharmacy_hub_cart: { sourceService: 'pharmacy-hub' },
+};
+
 export interface BridgeResult {
   bridged: boolean;
   netureOrderId?: string;
@@ -81,7 +99,9 @@ export class CheckoutFulfillmentBridgeService {
     if (!co) return { bridged: false, skippedReason: 'NOT_FOUND' };
 
     const md = co.metadata && typeof co.metadata === 'object' ? co.metadata : {};
-    if (md.source !== NETURE_B2B_ORDER_SOURCE) {
+    const descriptor =
+      typeof md.source === 'string' ? BRIDGE_SOURCES[md.source as string] : undefined;
+    if (!descriptor) {
       return { bridged: false, skippedReason: 'UNSUPPORTED_SOURCE' };
     }
 
@@ -138,12 +158,14 @@ export class CheckoutFulfillmentBridgeService {
             sourceOrderType: 'checkout_order',
             checkoutOrderId: co.id,
             checkoutOrderNumber: co.orderNumber,
-            sourceService: 'neture-b2b',
-            originalSource: NETURE_B2B_ORDER_SOURCE,
+            sourceService: descriptor.sourceService,
+            originalSource: md.source as string,
             paymentStatus: 'paid',
             paymentReady: true,
             paidAt: co.paid_at ? new Date(co.paid_at).toISOString() : null,
             supplierId: co.supplier_id ?? null,
+            // 취소·환불 추적축 — 그룹 결제는 PG 취소가 그룹 전체 단위로 일어난다.
+            paymentGroupId: (md.paymentGroupId as string) ?? null,
           },
         });
         const savedOrder = await orderRepo.save(order);
