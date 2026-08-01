@@ -124,15 +124,17 @@ export default function StoreNetworkPage() {
       setLoading(true);
       setError(null);
 
+      // WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1: authClient base = /api/v1 이므로
+      //   선행 '/v1' 제거. 백엔드 mount = /api/v1/admin/store-network (register-routes.ts:306)
       const [summaryRes, topStoresRes, insightsRes] = await Promise.all([
         authClient.api.get<{ success: boolean; data: NetworkSummary }>(
-          '/v1/admin/store-network/summary',
+          '/admin/store-network/summary',
         ),
         authClient.api.get<{ success: boolean; data: TopStore[] }>(
-          '/v1/admin/store-network/top-stores?limit=10',
+          '/admin/store-network/top-stores?limit=10',
         ),
         authClient.api.get<{ success: boolean; data: NetworkInsightsResult }>(
-          '/v1/admin/store-network/insights',
+          '/admin/store-network/insights',
         ),
       ]);
 

@@ -102,7 +102,9 @@ export default function PlatformHubPage() {
       setError(null);
 
       const res = await authClient.api.get<{ success: boolean; data: PlatformSummaryData }>(
-        '/v1/platform/hub/summary',
+        // WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1: authClient base = /api/v1 이므로 선행 '/v1' 제거.
+        //   백엔드 mount = /api/v1/platform/hub (register-routes.ts:1138)
+        '/platform/hub/summary',
       );
 
       if (res.data.success) {
@@ -128,7 +130,7 @@ export default function PlatformHubPage() {
       setTriggerResult(null);
 
       const res = await authClient.api.post<{ success: boolean; message?: string }>(
-        '/v1/platform/hub/trigger',
+        '/platform/hub/trigger',
         { service, actionKey },
       );
 

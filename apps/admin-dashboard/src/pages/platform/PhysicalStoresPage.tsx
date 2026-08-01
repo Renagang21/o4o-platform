@@ -147,8 +147,10 @@ export default function PhysicalStoresPage() {
     try {
       setLoading(true);
       setError(null);
+      // WO-O4O-ADMIN-API-DOUBLE-PREFIX-FIX-V1: authClient base = /api/v1 이므로 선행 '/v1' 제거.
+      //   백엔드 mount = /api/v1/admin/physical-stores (register-routes.ts:310)
       const res = await authClient.api.get<{ success: boolean; data: ListResponse }>(
-        `/v1/admin/physical-stores?page=${p}&limit=${LIMIT}`,
+        `/admin/physical-stores?page=${p}&limit=${LIMIT}`,
       );
       if (res.data.success) {
         setListData(res.data.data);
@@ -170,7 +172,7 @@ export default function PhysicalStoresPage() {
       setSyncing(true);
       setSyncMessage(null);
       const res = await authClient.api.post<{ success: boolean; data: SyncResult }>(
-        '/v1/admin/physical-stores/sync',
+        '/admin/physical-stores/sync',
       );
       if (res.data.success) {
         const d = res.data.data;
@@ -193,10 +195,10 @@ export default function PhysicalStoresPage() {
     try {
       const [summaryRes, insightsRes] = await Promise.all([
         authClient.api.get<{ success: boolean; data: PhysicalStoreSummary }>(
-          `/v1/admin/physical-stores/${id}/summary`,
+          `/admin/physical-stores/${id}/summary`,
         ),
         authClient.api.get<{ success: boolean; data: StoreInsightsResult }>(
-          `/v1/admin/physical-stores/${id}/insights`,
+          `/admin/physical-stores/${id}/insights`,
         ),
       ]);
       if (summaryRes.data.success) {
