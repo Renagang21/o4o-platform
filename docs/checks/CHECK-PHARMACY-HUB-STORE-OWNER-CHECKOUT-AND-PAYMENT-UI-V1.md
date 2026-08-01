@@ -114,6 +114,27 @@ WO 원칙 "중복 클릭·새로고침으로 중복 결제되지 않게" 를 4�
 
 신규 npm 의존성 **0** — Toss SDK 는 Neture 와 동일하게 CDN 주입이라 lockfile 이 변하지 않는다.
 
+### 7-1. 배포 후 라이브 검증 (프로덕션 · 실제 계정)
+
+web `30692750775` · api `30692750776` 둘 다 **success**.
+`renariver21@gmail.com` 으로 로그인해 **실제 API 흐름 전 구간**을 돌렸다 (실결제 승인 제외).
+
+| # | 검증 | 결과 |
+|:-:|---|---|
+| ① | 화면 라우트 3종 | ✅ `/store-owner/{cart,orders,payment}` 200 · 미인증 API 401 |
+| ② | 장바구니 담기 | ✅ 3개 담김 |
+| ③ | **공급자명 표시** | ✅ `(주)쓰라이프존` — UUID 아님 |
+| ④ | **서버 합계 필드** | ✅ `displaySubtotal 29700 / displayShippingFee 0 / displayTotal 29700` |
+| ⑤ | 주문 생성 + `paymentGroupId` | ✅ `f387fc67-…` 발급 · `shippingFee` snapshot 포함 |
+| ⑥ | 미결제 상태 표현 | ✅ `requiresPayment: true` · `supplierNotified: false` · "결제를 완료해야 공급자에게 전달됩니다" |
+| ⑦ | 결제 준비 | ✅ 201 · `amount: 29700` (원장 합계) · `isTestMode: true` |
+| ⑧ | **금액 변조 불가** | ✅ `amount: 100` 을 함께 보내도 서버 결제금액 **29,700 유지** — 요청 금액은 아예 읽지 않는다 |
+| ⑨ | 결제 전 취소 | ✅ 200 · `status: cancelled` |
+| ⑩ | 취소 후 재결제 차단 | ✅ 400 `PAYMENT_GROUP_NOT_PAYABLE` — 취소된 주문이 섞인 그룹은 세션을 만들지 않는다 |
+
+> ⑦ 의 `clientKey` 는 `test_ck_test_key` 로 **PG 테스트 키가 placeholder** 다.
+> 실제 카드 승인은 후속 E2E 에서 키 설정과 함께 진행해야 한다.
+
 ## 8. 잔존 주문 `3b5eedb4…` 처리
 
 | 항목 | 값 |
@@ -122,14 +143,21 @@ WO 원칙 "중복 클릭·새로고침으로 중복 결제되지 않게" 를 4�
 | 상태 | `created` / `pending` — 미결제 |
 | 형상 | `paymentGroupId` 없음 · `productId=master_id` (Phase 1 결함) |
 
-이 주문은 결제 대상이 될 수 없다. **DB 직접 수정 없이** 공식 취소 API 로 처리한다.
+이 주문은 결제 대상이 될 수 없다. **DB 직접 수정 없이** 공식 취소 API 로 처리했다.
 
 ```
 POST /api/v1/pharmacy-hub/store-owner/orders/3b5eedb4-…/cancel
+→ 200 {"orderId":"3b5eedb4-…","status":"cancelled"}     ✅ 처리 완료
 ```
 
-`OrderDetailPage` 는 이 주문에 대해 결제 버튼을 숨기고 "취소 후 다시 주문" 을 안내하므로,
-화면에서도 같은 결론으로 유도된다.
+이어서 **최신 흐름으로 재생성**해 정상 형상을 확인했다 — 새 주문 `ORD-20260801-6136` 은
+`paymentGroupId` 를 받고 배송비 snapshot 을 포함한다(§7-1 ⑤). 검증을 마친 뒤 이 주문도
+결제 전 취소로 정리했다(§7-1 ⑨).
+
+`OrderDetailPage` 는 `paymentGroupId` 없는 주문에 대해 결제 버튼을 숨기고 "취소 후 다시 주문"
+을 안내하므로, 화면에서도 같은 결론으로 유도된다.
+
+DB 직접 UPDATE **0건**.
 
 ## 9. 범위 밖 · 발견 사항
 
