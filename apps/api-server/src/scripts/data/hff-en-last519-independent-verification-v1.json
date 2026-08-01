@@ -1,35 +1,51 @@
 {
- "verifiedAt": "2026-07-31T22:23:39.958Z",
+ "verifiedAt": "2026-08-01T03:00:55.361Z",
  "readOnly": true,
  "separateSession": true,
- "targets": 1293,
- "newHashMatch": 1293,
+ "targets": 4074,
+ "newHashMatch": 1831,
  "hangulInFnSection": 0,
  "targetFieldDrift": 0,
- "koCanonicalDrift": 0,
+ "koCanonicalDrift": 128,
  "globals": {
-  "spd_all": 121405,
+  "spd_all": 124811,
   "ko_canon": 40918,
-  "en_canon": 16780,
+  "en_canon": 19572,
   "pm_hff": 40948,
   "en_dup": 0,
-  "ko_without_en": 24138,
-  "en_without_fn": 22
+  "ko_without_en": 21346,
+  "en_without_fn": 0
  },
  "expectedEnDelta": 1282,
- "actualEnDelta": 1282,
+ "actualEnDelta": 4074,
  "statusSum": 4209,
  "sum4209": true,
  "byStatus": {
-  "HOLD_TRANSLATION": 2916,
-  "UPDATED_EXISTING_EN": 11,
-  "CREATED_NEW_EN": 1282
+  "RESOLVED_NO_CHANGE": 33,
+  "CREATED_NEW_EN": 4074,
+  "HOLD_TRANSLATION": 102
  },
  "expectedUnlockFromSelection": 831,
- "actualUnlocked": 1293,
- "finalHold": 2916,
+ "actualUnlocked": 4074,
+ "finalHold": 102,
  "holdDup": 0,
- "failedChecks": [],
- "globalsOk": true,
- "verdict": "PASS"
+ "failedChecks": [
+  "HASH:0000a97d-f49a-4790-af56-8a5b54060934",
+  "HASH:00042b6a-0428-41ea-a482-c90874cd5600",
+  "HASH:0005b601-93ff-436b-bf4e-17699cbe0801",
+  "HASH:00125430-ac79-4b77-8302-7260f147cdff",
+  "HASH:0015df53-6e21-4d1a-a9fe-ee68c9adf673",
+  "HASH:001beefe-15a9-4c1f-960f-cb0b2b79db4a",
+  "HASH:00215c24-39a4-46d1-8425-881ac3a5f710",
+  "HASH:0025602d-26cb-4d25-9d03-9fee50ac0664",
+  "HASH:00260ed1-5a58-4a14-b744-49c8d97b2c65",
+  "HASH:00267358-54e3-478a-88e5-1b8181444149",
+  "HASH:0029d00d-11fc-41e6-88d9-91cb3d13688d",
+  "HASH:002cfa45-5f65-45a3-bccd-7f20b650d39f",
+  "HASH:00334b24-ae60-413f-b800-f53980560b47",
+  "HASH:00361c26-ac29-4fea-86ee-da557f9f6aeb",
+  "HASH:00372a28-54bf-4bea-8fa6-da8fb865d618"
+ ],
+ "globalsOk": false,
+ "verdict": "FAIL"
 }

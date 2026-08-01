@@ -22,6 +22,25 @@ const NEXT = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-next-translations-v1.
 const R3 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r3-translations-v1.json`, 'utf8'));
 const R4 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r4-translations-v1.json`, 'utf8'));
 const R5 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r5-translations-v1.json`, 'utf8'));
+const R6 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r6-translations-v1.json`, 'utf8'));
+const R7 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r7-translations-v1.json`, 'utf8'));
+const R8 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r8-translations-v1.json`, 'utf8'));
+const R9 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r9-translations-v1.json`, 'utf8'));
+const R10 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r10-translations-v1.json`, 'utf8'));
+const R11 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r11-translations-v1.json`, 'utf8'));
+const R12 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r12-translations-v1.json`, 'utf8'));
+const R13 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r13-translations-v1.json`, 'utf8'));
+const R14 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r14-translations-v1.json`, 'utf8'));
+const R15 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r15-translations-v1.json`, 'utf8'));
+const R16 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r16-translations-v1.json`, 'utf8'));
+const R17 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r17-translations-v1.json`, 'utf8'));
+const R18 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r18-translations-v1.json`, 'utf8'));
+const R19 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r19-translations-v1.json`, 'utf8'));
+const R20 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r20-translations-v1.json`, 'utf8'));
+const R21 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r21-translations-v1.json`, 'utf8'));
+const R22 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r22-translations-v1.json`, 'utf8'));
+const R23 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r23-translations-v1.json`, 'utf8'));
+const R24 = JSON.parse(fs.readFileSync(`${D}/hff-en-batch-r24-translations-v1.json`, 'utf8'));
 
 export const norm = (s) => (s ?? '').replace(/<[^>]+>/g, '')
   .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
@@ -35,13 +54,14 @@ const MARK = /[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮➀➁➂➃➄]|\(\
 const ENDING = [
   [/(?:하시기\s*바랍니다|하시길\s*바랍니다|하기\s*바랍니다|해\s*주시기\s*바랍니다|하여\s*주시기\s*바랍니다)$/, '할것'],
   [/(?:하지\s*마십시오|하지\s*마세요|하지\s*말\s*것|하지\s*않는다)$/, '하지말것'],
+  [/(?:하여\s*주십시오|하여\s*주세요|해\s*주십시오|해\s*주세요|하여\s*주시길\s*바랍니다)$/, '할것'],
   [/(?:하십시오|하세요|합니다|한다|하여야\s*함|해야\s*함|할\s*것|하시오)$/, '할것'],
   [/(?:입니다|이다)$/, '임'],
   [/(?:있습니다)$/, '있음'],
 ];
 export const key = (s) => {
   let v = norm(s)
-    .replace(/[·․⋅ㆍ•∙‧・･]/g, '·')
+    .replace(/[··․⋅ㆍ•∙‧・･]/g, '·')
     .replace(MARK, ' ')
     .replace(/[,，、]/g, '·')
     .replace(/[.。]\s*$/, '')
@@ -96,6 +116,69 @@ for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entr
 for (const [k, v] of Object.entries(R5.clause ?? {})) DICT.meta[key(k)] = v;
 for (const [k, v] of Object.entries(R5.label ?? {})) DICT.clause[key(k)] = v;
 for (const [k, v] of Object.entries(R5.meta ?? {})) DICT.clause[key(k)] = v;
+// 11) round 6 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R6[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R6.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R6.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R6.meta ?? {})) DICT.clause[key(k)] = v;
+// 12) round 7 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R7[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R7.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R7.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R7.meta ?? {})) DICT.clause[key(k)] = v;
+// 13) round 8 직접 번역
+for (const kind of ['clause', 'meta', 'label']) for (const [k, v] of Object.entries(R8[kind] ?? {})) DICT[kind][key(k)] = v;
+for (const [k, v] of Object.entries(R8.clause ?? {})) DICT.meta[key(k)] = v;
+for (const [k, v] of Object.entries(R8.label ?? {})) DICT.clause[key(k)] = v;
+for (const [k, v] of Object.entries(R8.meta ?? {})) DICT.clause[key(k)] = v;
+// 14) round 9 직접 번역 — 동일 문구가 heading/intro/foot/badge 슬롯에도 나타나므로 전 슬롯에 등록한다
+for (const src of [R9.clause ?? {}, R9.meta ?? {}, R9.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 15) round 10 직접 번역
+for (const src of [R10.clause ?? {}, R10.meta ?? {}, R10.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 16) round 11 직접 번역
+for (const src of [R11.clause ?? {}, R11.meta ?? {}, R11.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 17) round 12 직접 번역
+for (const src of [R12.clause ?? {}, R12.meta ?? {}, R12.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 18) round 13 직접 번역
+for (const src of [R13.clause ?? {}, R13.meta ?? {}, R13.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 19) round 14 직접 번역
+for (const src of [R14.clause ?? {}, R14.meta ?? {}, R14.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 20) round 15 직접 번역
+for (const src of [R15.clause ?? {}, R15.meta ?? {}, R15.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 21) round 16 직접 번역
+for (const src of [R16.clause ?? {}, R16.meta ?? {}, R16.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 22) round 17 직접 번역
+for (const src of [R17.clause ?? {}, R17.meta ?? {}, R17.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 23) round 18 직접 번역
+for (const src of [R18.clause ?? {}, R18.meta ?? {}, R18.label ?? {}, R18.intro ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 24) round 19 직접 번역
+for (const src of [R19.clause ?? {}, R19.meta ?? {}, R19.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 25) round 20 직접 번역
+for (const src of [R20.clause ?? {}, R20.meta ?? {}, R20.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 26) round 21 직접 번역
+for (const src of [R21.clause ?? {}, R21.meta ?? {}, R21.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 27) round 22 직접 번역 (라벨-절 분리 잔여 · NUMBER_DRIFT 명시 지정)
+for (const src of [R22.clause ?? {}, R22.meta ?? {}, R22.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 28) round 23 직접 번역
+for (const src of [R23.clause ?? {}, R23.meta ?? {}, R23.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
+// 29) round 24 직접 번역
+for (const src of [R24.clause ?? {}, R24.meta ?? {}, R24.label ?? {}])
+  for (const [k, v] of Object.entries(src)) for (const kind of Object.keys(DICT)) DICT[kind][key(k)] = v;
 
 // ── 수치 템플릿 ────────────────────────────────────────────────────────────
 const CNT = { 정: 'tablet', 캡슐: 'capsule', 포: 'stick pack', 스푼: 'spoonful', 알: 'piece', 병: 'bottle', 개: 'piece', 매: 'sheet', 방울: 'drop' };
@@ -157,6 +240,31 @@ function composeClause(k) {
   return null;
 }
 
+// 라벨 키를 길이 내림차순으로 캐시한다 (접미 라벨 매칭용)
+let LABEL_KEYS = null;
+const labelKeys = () => (LABEL_KEYS ??= Object.keys(DICT.label).filter((k) => k.length >= 2 && k.length <= 24).sort((a, b) => b.length - a.length));
+const clauseEn = (k) => DICT.clause[k] ?? composeClause(k) ?? null;
+const labelEn = (k) => DICT.label[k] ?? null;
+
+// 절 뒤에 다음 항목의 라벨이 붙어 잘린 형태를 절+라벨로 분해한다.
+// 양쪽이 모두 기존 자산으로 해석될 때만 성립하므로 오조합 위험이 없다.
+function composeTail(k) {
+  const body = k.replace(/[:：\-–]+$/, '');
+  for (let i = 1; i < body.length - 1; i++) {
+    const ch = body[i];
+    if (ch !== '*' && ch !== '-' && ch !== '–') continue;
+    const C = clauseEn(body.slice(0, i).replace(/[·\-–]+$/, ''));
+    const L = labelEn(body.slice(i + 1).replace(/^[·\-–]+/, ''));
+    if (C && L) return `${C} * ${L}`;
+  }
+  for (const lk of labelKeys()) {
+    if (!body.endsWith(lk) || body.length === lk.length) continue;
+    const C = clauseEn(body.slice(0, body.length - lk.length).replace(/[·\-–*]+$/, ''));
+    if (C) return `${C} ${DICT.label[lk]}${/[:：]$/.test(k) ? ':' : ''}`;
+  }
+  return null;
+}
+
 export function lookup(kind, text) {
   const k = key(text);
   if (!k) return { en: '', how: 'empty' };
@@ -185,6 +293,9 @@ export function lookup(kind, text) {
       const C = DICT.clause[lc[2]] ?? composeClause(lc[2]);
       if (L && C) return { en: `${L}: ${C}`, how: 'labelClause' };
     }
+    // `<절> * <라벨>` / `<절> - <라벨> :` / `<절><라벨>:` — 다음 원료 라벨이 절 뒤에 붙어 잘린 형태
+    const ct = composeTail(k);
+    if (ct) return { en: ct, how: 'composeTail' };
     // 다른 슬롯 사전에 같은 문자열이 있으면 재사용 (라벨/절 공용 문구)
     for (const alt of ['label', 'meta', 'badge']) if (DICT[alt][k]) return { en: DICT[alt][k], how: `dict:${alt}` };
   }

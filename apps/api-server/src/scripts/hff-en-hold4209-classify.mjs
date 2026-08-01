@@ -17,13 +17,17 @@ const HANGUL = /[가-힣ㄱ-ㅎㅏ-ㅣ]/;
 const DAMAGED = (t) => /[(:：\[]\s*$/.test(t) || /^[*※]\s*\S/.test(t) || /^\(국문\)$|^\(영문\)$/.test(t)
   || /^\s*\(\s*[가나다라마]\s*\)/.test(t) || /[:：]\s*$/.test(t) || t.length < 4
   || /^[A-Za-z][A-Za-z ,.'()\/-]{10,}$/.test(t);
-const UNIT = String.raw`mg|g|㎎|kg|ug|㎍|μg|mcg|IU|kcal|mL|ml|L|CFU|%|억|만|천`;
-const koNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT})`, 'g')) ?? [])
-  .map((x) => x.replace(/[,\s]/g, '').replace(/억/g, 'E8').replace(/만/g, 'E4').replace(/천/g, 'E3'));
-const enNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT}|hundred million|ten thousand|thousand)`, 'g')) ?? [])
-  .map((x) => x.replace(/[,\s]/g, '').replace(/hundredmillion/g, 'E8').replace(/tenthousand/g, 'E4').replace(/thousand/g, 'E3'));
+const UNIT = String.raw`mg|g|㎎|kg|ug|㎍|μg|mcg|IU|kcal|mL|ml|㎖|L|CFU|%|억|만|천`;
+// 단위 표기는 대소문자·전각·이형 표기가 섞인다. 비교 전에 하나로 접는다(수치 자체는 보존).
+const canonUnit = (x) => x.replace(/[,\s]/g, '')
+  .replace(/㎎/g, 'mg').replace(/㎍|μg|mcg/g, 'ug').replace(/㎖/g, 'ml')
+  .replace(/억/g, 'E8').replace(/만/g, 'E4').replace(/천/g, 'E3')
+  .replace(/hundredmillion/gi, 'E8').replace(/tenthousand/gi, 'E4').replace(/thousand/gi, 'E3')
+  .toLowerCase();
+const koNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT})`, 'g')) ?? []).map(canonUnit);
+const enNums = (s) => (norm(s).match(new RegExp(String.raw`\d+(?:[.,]\d+)*\s*(?:${UNIT}|hundred million|ten thousand|thousand)`, 'g')) ?? []).map(canonUnit);
 
-const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5551', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
+const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5555', 10), user: process.env.PGUSER, password: process.env.PGPW, database: 'o4o_platform', ssl: false });
 await c.connect();
 await c.query('SET default_transaction_read_only = on');
 const ko = new Map(), en = new Map();

@@ -1,8 +1,8 @@
 {
- "builtAt": "2026-07-31T22:23:39.957Z",
+ "builtAt": "2026-08-01T03:00:55.360Z",
  "measuredFromDb": true,
- "koWithoutEn": 24138,
- "enWithoutFunctionSection": 22,
- "totalRemaining": 24160,
+ "koWithoutEn": 21346,
+ "enWithoutFunctionSection": 0,
+ "totalRemaining": 21346,
  "nextTarget": "미커버 2개 문서 집합 (documentsWithTwoMissingPhrases)"
 }

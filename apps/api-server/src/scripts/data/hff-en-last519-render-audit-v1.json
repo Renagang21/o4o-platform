@@ -1,18 +1,18 @@
 {
- "renderedAt": "2026-08-01T00:26:21.938Z",
+ "renderedAt": "2026-08-01T02:59:48.768Z",
  "readOnly": true,
  "dbWrites": 0,
- "documentsTotal": 2617,
- "documentsRendered": 540,
- "structureSignatures": 109,
+ "documentsTotal": 4074,
+ "documentsRendered": 848,
+ "structureSignatures": 132,
  "coverage": "signature-exhaustive + high-risk full",
- "documents": 540,
+ "documents": 848,
  "widths": [
   430,
   820,
   1280
  ],
- "renders": 1620,
+ "renders": 2544,
  "wrapperProof": {
   "withoutWrapper": "",
   "withWrapper": "860px",
