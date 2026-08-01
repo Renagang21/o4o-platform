@@ -1,0 +1,281 @@
+{
+ "total": 18,
+ "koRestored": 18,
+ "koStillDamaged": 0,
+ "hasOfficial": 18,
+ "rows": [
+  {
+   "master": "05636642-635f-428d-9054-4270a9f1e650",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "0070ae1d-df51-4c9f-9ef8-ac3c45d745f0",
+   "enId": "e3a84e07-2844-4e03-9721-936da6e8cde6",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "1dcccb5e-bff9-43f1-a862-5aa2f1129ad4",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "3ab82512-d80c-49ca-8705-082fde3c2c96",
+   "enId": "3c4480cb-9615-4e45-9746-d19de9b4ef3f",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "23201fd6-fe6f-42c6-9dd3-d13519c5a6bb",
+   "product": "위엔젤더블액션현탁액",
+   "koId": "3f809103-196b-419c-8cc4-a038729e5a00",
+   "enId": "80ef3b4f-1b1c-4455-abdc-cb1085c87011",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "7일"
+   ]
+  },
+  {
+   "master": "25fafa46-7df6-44d2-9131-64905ecb6cb1",
+   "product": "영진아스피린장용정",
+   "koId": "a90e6abc-2c1c-495f-9070-39973ff2403f",
+   "enId": "e97eeee1-7f74-4789-98d9-89119741fc99",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "15mg"
+   ]
+  },
+  {
+   "master": "2cccb614-4924-452b-af60-0cefd1be10e0",
+   "product": "메코마그빅정",
+   "koId": "06c96d04-686c-4da2-a72f-f1b09c060055",
+   "enId": "282a1b58-51f8-4895-913f-c5beb548378b",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "12개월"
+   ]
+  },
+  {
+   "master": "3d8b0bcb-ef05-4af4-b1e5-1129d067bfe1",
+   "product": "영진아스피린장용정",
+   "koId": "a97ea74f-f58b-40e0-870d-71145be3796a",
+   "enId": "22e38244-f669-46dc-836b-047f0e7d9173",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "15mg"
+   ]
+  },
+  {
+   "master": "627e814c-787b-4c2f-9efe-def23947b439",
+   "product": "메코마그빅정",
+   "koId": "bb8e5b64-6638-443d-b9c9-041039b63227",
+   "enId": "96fb9e9c-6046-47ce-83cf-0fb71b02b73a",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "12개월"
+   ]
+  },
+  {
+   "master": "678c717d-c9c6-401e-9e33-68acdb81ddc6",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "616eff9a-f7fe-4701-a28e-a5e8cbf1f0a2",
+   "enId": "78f6095a-624c-40f0-b5d7-f926cde916a2",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "6e0577db-fa0c-4fc6-9f25-b58f572fdbef",
+   "product": "메가비텐프리미엄정",
+   "koId": "083c9240-384b-4712-a8c5-1bf5468f29b7",
+   "enId": "46d11407-59d3-44ff-8f05-8f1a793debb0",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "12개월"
+   ]
+  },
+  {
+   "master": "6eb708e9-7b1e-4fe4-810a-1e8a08b21529",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "d258fe83-952f-41a3-bc8a-ca5137cbcd72",
+   "enId": "15042bf4-672f-4dc3-8294-867fb199d79b",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "7570253d-11be-43e4-a774-0c8a2e1bd525",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "0de9f972-e44a-4dd4-a1c9-362371099613",
+   "enId": "b9c060ec-afce-481a-a13a-087c92761b98",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "7c9c7c26-304b-4e58-b4e9-da025fd57dec",
+   "product": "쏙코에스연질캡슐",
+   "koId": "95ab9806-0adb-4ceb-9263-61429a2ae181",
+   "enId": "0a3bbc4e-0ee0-4de5-a510-7160692b403d",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "4,000분"
+   ]
+  },
+  {
+   "master": "87702cd6-98db-4059-bf7d-88b1da25c6ad",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "3b2ba73c-56df-41dd-bca7-d91414e187b6",
+   "enId": "94abdc46-8467-4a60-a619-d51e1c027b07",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "8ce2a67c-b6d3-4d77-b3db-487a874b53c1",
+   "product": "쏙코에스연질캡슐",
+   "koId": "6f42a94c-a877-4e66-ab7a-8fb9fadc3ec2",
+   "enId": "f42f086d-9bff-436b-8232-096f25f50351",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "4,000분"
+   ]
+  },
+  {
+   "master": "92ca6c87-52c5-4278-b6bb-0c5232af2861",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "koId": "31ef6d08-9bd3-4985-9cc9-e3906622a70a",
+   "enId": "a02a6477-473a-4d22-8bfd-f70d49a6f2f9",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "1일",
+    "1일",
+    "1회",
+    "1일",
+    "1일",
+    "2분"
+   ]
+  },
+  {
+   "master": "9cbc6201-726f-4c90-ae95-c8c8b4ee54ae",
+   "product": "영진아스피린장용정",
+   "koId": "0c1481a6-d75c-4ef9-93d7-4c17da22ec61",
+   "enId": "125ef10d-9b9f-4946-88e8-a2711b1a7135",
+   "triage": "REAL_DOSE_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "15mg"
+   ]
+  },
+  {
+   "master": "a63c7137-383a-41e3-bde8-870aa019c912",
+   "product": "위엔젤더블액션현탁액",
+   "koId": "604d877c-8b4a-44ba-9dd7-1f65f24d50ae",
+   "enId": "1358316d-230a-4696-be1c-b7a29af7d2ca",
+   "triage": "REAL_OTHER_VALUE_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "1회",
+    "1일",
+    "7일"
+   ]
+  },
+  {
+   "master": "a729c600-cc76-40f3-b99c-1796ade0e915",
+   "product": "메가비텐프리미엄정",
+   "koId": "fd651acb-cc4b-49df-bc6d-f7be2018f6f2",
+   "enId": "cf4ea700-24ce-424f-b277-7462c010b8e7",
+   "triage": "REAL_AGE_CONDITION_MISSING",
+   "koRestored": true,
+   "hasOfficial": true,
+   "lost": [
+    "12개월"
+   ]
+  }
+ ]
+}

@@ -1,0 +1,247 @@
+{
+ "summary": {
+  "mode": "dry-run",
+  "input": 18,
+  "planned": 18,
+  "sentencesInserted": 52,
+  "skipped": 0,
+  "skipByCode": {},
+  "green": 0
+ },
+ "plans": [
+  {
+   "enId": "e3a84e07-2844-4e03-9721-936da6e8cde6",
+   "master": "05636642-635f-428d-9054-4270a9f1e650",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "3c4480cb-9615-4e45-9746-d19de9b4ef3f",
+   "master": "1dcccb5e-bff9-43f1-a862-5aa2f1129ad4",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "80ef3b4f-1b1c-4455-abdc-cb1085c87011",
+   "master": "23201fd6-fe6f-42c6-9dd3-d13519c5a6bb",
+   "product": "위엔젤더블액션현탁액",
+   "oldHash": "f32089c26eecfd2bba839cb173ffd2cd",
+   "newHash": "3cab6947ce99545b28972d1f2e4ca359",
+   "sentences": 2,
+   "keys": [
+    "7일 동안 복용하여도 증상의 개선이 없을 경",
+    "테트라사이클린,디곡신,플루오로퀴놀론,철염"
+   ]
+  },
+  {
+   "enId": "e97eeee1-7f74-4789-98d9-89119741fc99",
+   "master": "25fafa46-7df6-44d2-9131-64905ecb6cb1",
+   "product": "영진아스피린장용정",
+   "oldHash": "3aad875f56fe71adc43e3ef5bcc5ad7c",
+   "newHash": "a5ec23eb4e982dd5cbab0cb3bc7e312f",
+   "sentences": 4,
+   "keys": [
+    "이 약 또는 다른 살리실산제제 과민증,소화성",
+    "임신 1기와 2기에는 반드시 필요한 경우가 ",
+    "이 약을 복용하기 전에 신장애,심혈관 순환기",
+    "다른 비스테로이드성 소염진통제 및 살리실산 "
+   ]
+  },
+  {
+   "enId": "282a1b58-51f8-4895-913f-c5beb548378b",
+   "master": "2cccb614-4924-452b-af60-0cefd1be10e0",
+   "product": "메코마그빅정",
+   "oldHash": "ddb722d82db6019e292d4c046da49d15",
+   "newHash": "a38d6a369873bf0cf34b5eca8ca48a72",
+   "sentences": 1,
+   "keys": [
+    "이 약에 과민증 환자,콩 또는 땅콩에 과민증"
+   ]
+  },
+  {
+   "enId": "22e38244-f669-46dc-836b-047f0e7d9173",
+   "master": "3d8b0bcb-ef05-4af4-b1e5-1129d067bfe1",
+   "product": "영진아스피린장용정",
+   "oldHash": "3aad875f56fe71adc43e3ef5bcc5ad7c",
+   "newHash": "a5ec23eb4e982dd5cbab0cb3bc7e312f",
+   "sentences": 4,
+   "keys": [
+    "이 약 또는 다른 살리실산제제 과민증,소화성",
+    "임신 1기와 2기에는 반드시 필요한 경우가 ",
+    "이 약을 복용하기 전에 신장애,심혈관 순환기",
+    "다른 비스테로이드성 소염진통제 및 살리실산 "
+   ]
+  },
+  {
+   "enId": "96fb9e9c-6046-47ce-83cf-0fb71b02b73a",
+   "master": "627e814c-787b-4c2f-9efe-def23947b439",
+   "product": "메코마그빅정",
+   "oldHash": "ddb722d82db6019e292d4c046da49d15",
+   "newHash": "a38d6a369873bf0cf34b5eca8ca48a72",
+   "sentences": 1,
+   "keys": [
+    "이 약에 과민증 환자,콩 또는 땅콩에 과민증"
+   ]
+  },
+  {
+   "enId": "78f6095a-624c-40f0-b5d7-f926cde916a2",
+   "master": "678c717d-c9c6-401e-9e33-68acdb81ddc6",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "46d11407-59d3-44ff-8f05-8f1a793debb0",
+   "master": "6e0577db-fa0c-4fc6-9f25-b58f572fdbef",
+   "product": "메가비텐프리미엄정",
+   "oldHash": "966f77fecb38b0635d0aef8c85970ce8",
+   "newHash": "f41e3dbbf86ea2c26a45156435c71972",
+   "sentences": 1,
+   "keys": [
+    "이 약에 과민증 환자,고칼슘혈증"
+   ]
+  },
+  {
+   "enId": "15042bf4-672f-4dc3-8294-867fb199d79b",
+   "master": "6eb708e9-7b1e-4fe4-810a-1e8a08b21529",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "b9c060ec-afce-481a-a13a-087c92761b98",
+   "master": "7570253d-11be-43e4-a774-0c8a2e1bd525",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "0a3bbc4e-0ee0-4de5-a510-7160692b403d",
+   "master": "7c9c7c26-304b-4e58-b4e9-da025fd57dec",
+   "product": "쏙코에스연질캡슐",
+   "oldHash": "176e7bf076d7fc1c4af393b0594e4ac8",
+   "newHash": "2d0bd10fad9e3b5dd12672906d07f572",
+   "sentences": 2,
+   "keys": [
+    "아세트아미노펜으로 일일 최대 용량(4,000",
+    "이 약을 복용하기 전에 수두 또는 인플루엔자"
+   ]
+  },
+  {
+   "enId": "94abdc46-8467-4a60-a619-d51e1c027b07",
+   "master": "87702cd6-98db-4059-bf7d-88b1da25c6ad",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "f42f086d-9bff-436b-8232-096f25f50351",
+   "master": "8ce2a67c-b6d3-4d77-b3db-487a874b53c1",
+   "product": "쏙코에스연질캡슐",
+   "oldHash": "176e7bf076d7fc1c4af393b0594e4ac8",
+   "newHash": "2d0bd10fad9e3b5dd12672906d07f572",
+   "sentences": 2,
+   "keys": [
+    "아세트아미노펜으로 일일 최대 용량(4,000",
+    "이 약을 복용하기 전에 수두 또는 인플루엔자"
+   ]
+  },
+  {
+   "enId": "a02a6477-473a-4d22-8bfd-f70d49a6f2f9",
+   "master": "92ca6c87-52c5-4278-b6bb-0c5232af2861",
+   "product": "잼플이부펜시럽(이부프로펜)",
+   "oldHash": "219c3d932b95e2d7980a1a3efbaa0c21",
+   "newHash": "e4928322919b2857fa1ed0cad23be0f4",
+   "sentences": 4,
+   "keys": [
+    "조절되지 않는 고혈압,울혈심부전증,확립된 허",
+    "이 약에 과민증,위장관 궤양,위장관 출혈환자",
+    "이 약을 복용하기 전에 혈액이상 또는 경험자",
+    "의사 또는 약사의 지시 없이 통증에 10일 "
+   ]
+  },
+  {
+   "enId": "125ef10d-9b9f-4946-88e8-a2711b1a7135",
+   "master": "9cbc6201-726f-4c90-ae95-c8c8b4ee54ae",
+   "product": "영진아스피린장용정",
+   "oldHash": "3aad875f56fe71adc43e3ef5bcc5ad7c",
+   "newHash": "a5ec23eb4e982dd5cbab0cb3bc7e312f",
+   "sentences": 4,
+   "keys": [
+    "이 약 또는 다른 살리실산제제 과민증,소화성",
+    "임신 1기와 2기에는 반드시 필요한 경우가 ",
+    "이 약을 복용하기 전에 신장애,심혈관 순환기",
+    "다른 비스테로이드성 소염진통제 및 살리실산 "
+   ]
+  },
+  {
+   "enId": "1358316d-230a-4696-be1c-b7a29af7d2ca",
+   "master": "a63c7137-383a-41e3-bde8-870aa019c912",
+   "product": "위엔젤더블액션현탁액",
+   "oldHash": "f32089c26eecfd2bba839cb173ffd2cd",
+   "newHash": "3cab6947ce99545b28972d1f2e4ca359",
+   "sentences": 2,
+   "keys": [
+    "7일 동안 복용하여도 증상의 개선이 없을 경",
+    "테트라사이클린,디곡신,플루오로퀴놀론,철염"
+   ]
+  },
+  {
+   "enId": "cf4ea700-24ce-424f-b277-7462c010b8e7",
+   "master": "a729c600-cc76-40f3-b99c-1796ade0e915",
+   "product": "메가비텐프리미엄정",
+   "oldHash": "966f77fecb38b0635d0aef8c85970ce8",
+   "newHash": "f41e3dbbf86ea2c26a45156435c71972",
+   "sentences": 1,
+   "keys": [
+    "이 약에 과민증 환자,고칼슘혈증"
+   ]
+  }
+ ],
+ "skips": [],
+ "results": []
+}
