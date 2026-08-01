@@ -1,0 +1,19 @@
+{
+ "checkedDocs": 706,
+ "koDocs": 323,
+ "enDocs": 383,
+ "failures": 0,
+ "byCode": {},
+ "warnItemsPerDoc": {
+  "median": 7,
+  "p90": 11,
+  "max": 15
+ },
+ "warnItemLength": {
+  "median": 97,
+  "p90": 228,
+  "max": 1078
+ },
+ "pass": true,
+ "sampleFailures": []
+}
