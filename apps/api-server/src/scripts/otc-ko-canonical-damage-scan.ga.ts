@@ -96,7 +96,7 @@ async function main(): Promise<void> {
     docsByCode: Object.fromEntries(Object.entries(docsByCode).map(([k, v]) => [k, v.size])),
     samples, crossWithTriage: cross,
   };
-  fs.writeFileSync(path.join(DATA, 'otc-ko-canonical-damage-scan.ga.json'), JSON.stringify({ ...out, detail: detail.slice(0, 500) }, null, 1) + '\n', 'utf8');
+  fs.writeFileSync(path.join(DATA, 'otc-ko-canonical-damage-scan.ga.json'), JSON.stringify({ ...out, detail }, null, 1) + '\n', 'utf8');
   console.log(JSON.stringify(out, null, 1));
 }
 main().catch((e) => { console.error('FATAL', e instanceof Error ? e.message : e); process.exit(1); });

@@ -1,0 +1,5574 @@
+{
+ "summary": {
+  "mode": "dry-run",
+  "scanned": 594,
+  "planned": 317,
+  "restoredUnits": 317,
+  "skipped": 277,
+  "skipByCode": {
+   "NO_PROVEN_DAMAGE": 277
+  },
+  "green": 0,
+  "concurrent": 0
+ },
+ "plans": [
+  {
+   "koId": "3b388da3-b22e-4c29-8e02-9365b49362fd",
+   "masterId": "028a6fbd-bbeb-4e5a-b483-32d95e4fd72a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8cd8516c-cfe2-4d47-9fac-d067b8cc74c9",
+   "masterId": "15f3d447-6a76-4e46-bc54-430aba4a3212",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "256c2fc5-9350-4e7f-8629-cce3f0caeca2",
+   "masterId": "174d046c-8a9f-4a59-a57a-837f35012139",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "90560abb-cc28-40bd-8ace-ae3d1bb50361",
+   "masterId": "3d1fc979-d59b-4357-b6f7-7da143556860",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "b2cb36a7-284c-4ef0-b1eb-34737756860a",
+   "masterId": "43cb072a-a620-4344-bddb-8ad71a8a0056",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3fe6d2d6-bf41-4204-9fc6-38ba617db834",
+   "masterId": "7615e916-78c6-48b6-be46-87fcc5a7fbab",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3cbf261f-be80-4dfa-8a2d-a223c3831a40",
+   "masterId": "285956f8-fb98-42ac-ace6-0bc89c91b990",
+   "sourceType": "o4o_drug_otc_topical",
+   "oldHash": "fe0906bd1fae77edf5bbb355c1b56152",
+   "newHash": "f56c45799693f5227af3ef4e66102f1a",
+   "restored": [
+    {
+     "before": "임신 1기 및 2기, 임신 5개월이 경과한 임부, 수유부, 만 16세 미만의 소아, 이 약에 과민증 환자 또는 경험자, 아스피린 또는 기타 비스",
+     "beforeLen": 560,
+     "afterItems": 8,
+     "afterLen": 733
+    }
+   ]
+  },
+  {
+   "koId": "0efc2641-2910-4d85-a80c-1e59f9833f3f",
+   "masterId": "3c72fb89-ecac-40a9-819f-1300d947cb90",
+   "sourceType": "o4o_drug_otc_topical",
+   "oldHash": "fe0906bd1fae77edf5bbb355c1b56152",
+   "newHash": "f56c45799693f5227af3ef4e66102f1a",
+   "restored": [
+    {
+     "before": "임신 1기 및 2기, 임신 5개월이 경과한 임부, 수유부, 만 16세 미만의 소아, 이 약에 과민증 환자 또는 경험자, 아스피린 또는 기타 비스",
+     "beforeLen": 560,
+     "afterItems": 8,
+     "afterLen": 733
+    }
+   ]
+  },
+  {
+   "koId": "b60387b1-d4ad-43b4-aa4f-0b695fafd32c",
+   "masterId": "103dbc92-d860-4b06-8a6b-63d09f42ad09",
+   "sourceType": "o4o_drug_otc_topical",
+   "oldHash": "fe0906bd1fae77edf5bbb355c1b56152",
+   "newHash": "f56c45799693f5227af3ef4e66102f1a",
+   "restored": [
+    {
+     "before": "임신 1기 및 2기, 임신 5개월이 경과한 임부, 수유부, 만 16세 미만의 소아, 이 약에 과민증 환자 또는 경험자, 아스피린 또는 기타 비스",
+     "beforeLen": 560,
+     "afterItems": 8,
+     "afterLen": 733
+    }
+   ]
+  },
+  {
+   "koId": "7e8ef340-834a-446a-af9f-9d9056e2ad56",
+   "masterId": "1775b1a1-9eef-4b81-9eb9-75bb822ed0f9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "a7b52733-2b56-4913-bc31-6ca12f590a98",
+   "masterId": "3917f818-be61-4091-b8cc-886728e1bf92",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "8d5858dc-dcb5-407d-9603-bc239a21a4d0",
+   "masterId": "4b9f3f33-a0ed-4f62-8e92-53311514d683",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "970469fb-c933-46ad-8e28-dbff3433d656",
+   "masterId": "6382b778-4872-498f-acc8-3d2967cb9452",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "075965fc-c813-4c6d-b5a0-f6d16138bef8",
+   "masterId": "6e6a696c-a593-4d12-8125-56e652ac9feb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "b8094fe0-008d-4758-80a9-dcf92a084d3c",
+   "masterId": "1972e6c9-ea98-4042-ba05-0fb88c2594a7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "bf7a8b56-7c72-4766-887e-5f64f3f06917",
+   "masterId": "00ef4e82-32a2-46d2-9425-407988a9df86",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "d7073468-8429-41db-9632-de460f75c2c9",
+   "masterId": "203b27c6-5e3b-47fb-a274-38148c731bd9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "9d063da3-3fad-40a5-a358-c0bf159f739f",
+   "masterId": "3a274218-bee6-45a3-a025-7d8ba86d250b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "fc6ef6a9-dd94-41de-b547-47d0f66dae79",
+   "masterId": "69ebc400-7924-403b-ac0e-e21913527e0a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "9178ade7-c057-4be1-89c7-a640e514dfb0",
+   "masterId": "64bf28e7-24f0-4768-945f-3479a60744a1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9d6d2e34da2608314231b30cf9ac3a6f",
+   "newHash": "b987166f2a5270ace25638cfb237602a",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "2452cd50-3765-43eb-968b-71777be51482",
+   "masterId": "0042c41f-3c07-49a6-ada7-af6a74177b58",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "162b4ece-2b44-46fa-a337-8b9c41d5da5e",
+   "masterId": "04344a55-7ede-4aae-a8eb-11412318edfb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "9c6acc72-07b8-4b47-873e-104ec34e56d2",
+   "masterId": "0728ee9c-b2e0-493d-9390-b905320bc08d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "18c8cf91-c625-40e9-8d6f-42584a62db04",
+   "masterId": "07adf08b-dc39-45e0-b6b5-27449d156e51",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "a388cff8-5ac3-49b6-9d9d-268a544ed40b",
+   "masterId": "07f26395-9045-4f1f-ad7a-e464bb21b8d9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9d6d2e34da2608314231b30cf9ac3a6f",
+   "newHash": "b987166f2a5270ace25638cfb237602a",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "e712ad66-4504-4c44-be88-404c9d12d4e9",
+   "masterId": "08ac6d6d-2f68-42a9-a200-761941f63d62",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "6d78d115-c69c-4dad-a320-61cf884384f4",
+   "masterId": "0a128a74-5d8e-4fca-8baa-eefc8eba55f6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "6f23f610-e457-4137-8e14-ac23e8718680",
+   "masterId": "0c380954-2ed6-4243-851b-411137e884a0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "5c111d47-a571-40a6-9367-395e8ff0ed8c",
+   "masterId": "0dbf6039-3d9d-49ae-b7f9-61346d66e923",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "4a9d7009-f9d4-49bd-b4fe-01f8d05d2b0e",
+   "masterId": "11d24580-070d-43c1-8077-5064037a4e0b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "a696eaef-f7ee-4533-a84a-4fa169fba1b7",
+   "masterId": "138a2129-89c8-438a-a9fa-f59939730535",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "59b2604e-76c7-41bb-8abe-2ccc5831ad60",
+   "masterId": "15f27d79-4a0d-4c95-9757-ec2b37829d3c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "b63eaed5-33f6-426e-a99f-c20490dd173e",
+   "masterId": "18753d85-72a0-4151-b53f-3dda13230c34",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "5e684daf-0fb2-42a6-88f8-10720618d520",
+   "masterId": "1e89b475-441f-41a0-a225-81385b9a156b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0a6e470a-3bed-4bde-a9f2-cd981e7e34b8",
+   "masterId": "2132698a-68d8-4069-9f7d-108fde374dbb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0db5e30a-268b-45b3-885f-17d4e36557e4",
+   "masterId": "249a0ec1-5e8d-44bd-92ce-9ed1a3eaa1dc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "147826ca-2fda-4952-a2d2-6dff9c113922",
+   "masterId": "266fb49a-f4e0-4f55-81fc-b5fb33252abe",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "623eeb74506877bf9b1d7a944c5451ed",
+   "newHash": "2b78961160a01076df505c65040f2c7c",
+   "restored": [
+    {
+     "before": "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다. 임신 3개월 이내 또는 임신하고 있을 가능성이 있는 여성은 ",
+     "beforeLen": 260,
+     "afterItems": 11,
+     "afterLen": 923
+    }
+   ]
+  },
+  {
+   "koId": "bb2023d3-256f-48f5-8b26-5d63c29e1efc",
+   "masterId": "28be9bbc-d152-4682-9219-47cbd34ed38c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "623eeb74506877bf9b1d7a944c5451ed",
+   "newHash": "2b78961160a01076df505c65040f2c7c",
+   "restored": [
+    {
+     "before": "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다. 임신 3개월 이내 또는 임신하고 있을 가능성이 있는 여성은 ",
+     "beforeLen": 260,
+     "afterItems": 11,
+     "afterLen": 923
+    }
+   ]
+  },
+  {
+   "koId": "30abd2d0-1cdb-4767-bee9-a6677c0b0001",
+   "masterId": "28ceeda2-9b2f-4919-be77-adbb0b0389e3",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0ce57a18-75b4-4cd0-a428-dd1337f9784b",
+   "masterId": "2a1da720-1083-4ff6-8098-f43d6a4fac50",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9d6d2e34da2608314231b30cf9ac3a6f",
+   "newHash": "b987166f2a5270ace25638cfb237602a",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "c7565ef9-2d07-41ca-ac0e-fc01394e1c32",
+   "masterId": "2b2663ac-efb5-4218-b89a-f359804ba0b1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "eba27c20-3497-4f80-891b-d7e2575da709",
+   "masterId": "2b33fa5d-0564-4402-99f1-700afb0badfe",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "c9d4f1db-a0f5-4fb8-8f5a-bb2b2f239cf6",
+   "masterId": "2dd51ae2-aa6d-4c90-b6c1-9e060e06cb40",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "e50017e4-d975-4ab8-91a0-c879696e0049",
+   "masterId": "2f129bfe-fc79-47be-b5aa-bc5f3503dcd7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "1e963b56-d325-4bda-813d-15afbb57c579",
+   "masterId": "2f25b532-52d8-4b87-97b4-2d5cc4aec1d2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "2190847d-3fe9-45b5-8037-8ee38922b8ef",
+   "masterId": "31081a5e-b2b1-4fc5-953d-2b13ba3ed594",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "aec6a711-f765-4d35-badb-5d63e8827dab",
+   "masterId": "31b73aa4-87b8-4cca-8f6c-685b769ad4a6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "ed44e296-7e41-4be4-9492-84cab48be151",
+   "masterId": "3221346f-315d-4a2e-bf30-cd9f1600038e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "5b0465d3-4e4b-4f09-8d06-2f560adc845b",
+   "masterId": "32298b52-08c1-47bb-b8bd-94fb89d0d606",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "2b8cc3d2-1ca1-4cef-a49f-942896cf94cb",
+   "masterId": "333b7224-f2dc-454d-9888-d7582d551999",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "95b5ee35-d3d6-40ce-97bf-80e9e5c2971b",
+   "masterId": "3598d0c1-a306-4e9d-bcaa-9a7580932316",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "fa557036-744e-4b15-a603-65f56be097d2",
+   "masterId": "384d1bf3-2d4f-4cab-a49f-4babbd6401a2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "bd8d548d-5c95-41ac-9ee6-ca3f9eadedc9",
+   "masterId": "38b9a033-96d9-4f23-925b-9ecaa8438554",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "52fd58c4-aca1-4e52-b2a8-138e35e45c88",
+   "masterId": "39e2ba16-3b4e-4771-ac73-183fba9e349b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8ce4b0ad-c384-4ceb-8d95-bcde3e4efde5",
+   "masterId": "3b4a4ead-d67b-48fb-9fa0-79b71c367b2e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "49076792-4e9d-4843-91db-b2c6c9b323f8",
+   "masterId": "3c7ecb84-28ef-4bfe-b6b2-5b7faaef8821",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "67c182cc-61c8-4e4c-9992-cd20ca0feb69",
+   "masterId": "3ed28a76-fde6-4a2a-ab6f-12b81c52dc22",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "7735724b-7d62-4409-9059-5c35f7059d5c",
+   "masterId": "402d2505-4b48-4e12-9475-faae294ebe5d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "f63bcad4-bac8-4dde-ac2d-4dc580c71941",
+   "masterId": "41afcf65-8be9-4e49-b269-b5572c0618e3",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "dd643a3c-d7f9-4bd0-9988-ba04ea01a458",
+   "masterId": "424cdc3a-8b44-4d46-9a0e-635239540a0e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8474a952-9f73-4266-86e3-d6dfff5f7b1a",
+   "masterId": "4567f58d-4886-4611-89eb-db88afda989f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "fa3effa9-464c-4019-a198-98a324cf8f3f",
+   "masterId": "466e4f70-0272-4bfc-84a7-eb05dc84b39a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "891ed13c-4d8f-4cd2-84c7-28a8e0e6935b",
+   "masterId": "4aa1cb7d-dcde-4d37-bf06-a713c8904d2f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "19cb279b-45d3-4215-a726-41377e959cf2",
+   "masterId": "4b299108-d98e-471b-abfa-e295050da831",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "6863b626-e35c-4e58-b3b3-961510a80bfb",
+   "masterId": "4d097e4a-16f4-431b-b2cb-e2b1ab5efdd8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "1c8e3cb9-7170-42b1-91b0-4274c0e40d3a",
+   "masterId": "4d2125e2-63f5-4196-a0a2-d3be113d8f55",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0d4446ae-80ca-4ac0-accc-8f7916abbf8b",
+   "masterId": "4ddb22bf-64ed-47ff-aee7-8ee919f52530",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d40162713033048831880c79fc95295a",
+   "newHash": "2913af12f5b14baf99a3ec12102874d5",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,비타민 B12 결핍으로 인한 악성빈혈 또는 거대적아구성빈혈,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락",
+     "beforeLen": 260,
+     "afterItems": 5,
+     "afterLen": 329
+    }
+   ]
+  },
+  {
+   "koId": "f6a9a454-849b-4865-9e41-e604f947f7b4",
+   "masterId": "5037a24a-2170-470b-9485-c0663c0d6590",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "adf32343-62c6-4c2f-864f-eb9437db2b21",
+   "masterId": "503f6867-06f0-4559-b38f-bc920e815812",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "ac76138e-15ec-4b6f-b02e-9702f34a82b1",
+   "masterId": "5299c37e-7add-4615-a3f1-9bddf905536e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "01dd082e-ef2c-4dce-b8bb-a6b88167892e",
+   "masterId": "53152a74-11f0-4032-b065-3629d04b92a8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8f7e73af-b22b-429f-aa1d-945cfb50d3ca",
+   "masterId": "548c8f8e-65c3-44b8-918f-62b9679baf29",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "dd50e71a-1727-420e-998f-c20b71b9567a",
+   "masterId": "54d7d0ab-8141-47e9-97c7-f8ac4410b916",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "a0bcce40-97d5-419f-b33e-664c08b3ec21",
+   "masterId": "5548e7ea-6c99-451d-84c3-a8693c0bb304",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "824ddb5d-9010-493a-9bee-9e50c5f1405a",
+   "masterId": "5824a1bd-0842-4da8-8700-5d853e9c58f6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "3708b5c8-75e3-4c85-89c0-eb72d20b5cf4",
+   "masterId": "5b523e99-84a1-408a-891c-820ff876d921",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "bb96b326-89e6-413e-a654-0cd8a6f883e9",
+   "masterId": "5c8934d4-f100-4ead-8879-bd3f410e9ec8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "94c720e1-b15a-4e52-a419-8704839431fa",
+   "masterId": "5cff584f-eace-4e31-8a13-7acce852673b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "729bb011-3763-4ca5-b1a1-c055fed3d537",
+   "masterId": "607acfeb-4e98-47e6-ad04-155eba5f25ae",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "bb8e5b64-6638-443d-b9c9-041039b63227",
+   "masterId": "627e814c-787b-4c2f-9efe-def23947b439",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "237d1a0d4f9af83c1f1f6aa650b760ea",
+   "newHash": "190c2c96bb2bdd4731ca07d7a0dfff6a",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,콩 또는 땅콩에 과민증 환자,대두유에 알레르기 반응 경험자,12개월 미만의 젖먹이,심한 증상의 신부전 환자는 이 약을 복용",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 574
+    }
+   ]
+  },
+  {
+   "koId": "616eff9a-f7fe-4701-a28e-a5e8cbf1f0a2",
+   "masterId": "678c717d-c9c6-401e-9e33-68acdb81ddc6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "33947d4b-1c65-46a2-ac01-f993f1d9d911",
+   "masterId": "68c0c020-95e9-4443-8c69-dfa6719ea9e6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "9b696e93-b7b1-4d32-8bec-8349b82483ce",
+   "masterId": "69e21ccc-aff8-445d-b57c-8daffa65197a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "55c1575f-eef6-4e28-8d3f-1d4e3f95093b",
+   "masterId": "6d800d22-c6a3-42ce-9361-b643a40a1ac0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "1cb5b00a-2e40-4513-8caf-54ea24dd59bd",
+   "masterId": "6fa9691c-10e1-49c7-be8d-41370252c958",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "691a6130-ff2d-4122-a3d1-6d2b8b63ba3f",
+   "masterId": "6fd42e89-0b35-46c2-a400-8927281c88cd",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "b367e7b5-d985-43e0-96e1-eefe7b092ab2",
+   "masterId": "712630b5-f6cd-47b1-904c-840d9bf2b3fa",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "c4399033-5d17-4276-998a-041b0180d166",
+   "masterId": "74c3f90c-33be-46be-84d3-e93551ef8f17",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "5fe710b9-0ffa-4636-bca1-80a65f0be741",
+   "masterId": "75070801-95fd-4384-bcbb-b366ac85e2a2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "bf0a6df7-ae62-4f37-9de3-e912903d5724",
+   "masterId": "760a2075-a2f6-4c6b-bb7a-e7eff5fa4b40",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "181826f6-2f1b-4135-91f4-60751368ba06",
+   "masterId": "769f657c-3ef3-4f74-99fe-c859b1920b71",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "dd2307e5-71f4-4942-bafe-96e019ac957e",
+   "masterId": "78c1f77b-daa9-418b-8620-b1e4966459d3",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3783ea75-1f79-4618-ba3a-bdaa0859494a",
+   "masterId": "186efead-b517-4895-8d9d-70eb0b21e61d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "b79702f76b9ed8376327cafb8d0bb940",
+   "newHash": "a52088b2f7c79cf1be9c053644498d03",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,투석 요법을 받고 있는 환자,고마그네슘혈증,고인산혈증,변비,장협착증,급성 충수염,임신초기 3개월 이내의 여성,만 7세 미만",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 452
+    }
+   ]
+  },
+  {
+   "koId": "b08de967-9260-4982-96ca-f7006636c53d",
+   "masterId": "3b2d66ad-223e-4c70-aa75-53e2eb3479e0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "b79702f76b9ed8376327cafb8d0bb940",
+   "newHash": "a52088b2f7c79cf1be9c053644498d03",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,투석 요법을 받고 있는 환자,고마그네슘혈증,고인산혈증,변비,장협착증,급성 충수염,임신초기 3개월 이내의 여성,만 7세 미만",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 452
+    }
+   ]
+  },
+  {
+   "koId": "427da026-b76b-4fcf-9aec-76129bfdf4ce",
+   "masterId": "03a4fc61-bd0e-4a49-859a-6e7ce2d8de34",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "82924a096fbfd987144af759a94d92c6",
+   "newHash": "e08475a2bdde5ee7cae023beeeacd625",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "f14f63e5-b26a-4e41-85de-223997e79ff5",
+   "masterId": "2c94c6b1-2b48-4413-b5b8-f4b72c3d28c5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "82924a096fbfd987144af759a94d92c6",
+   "newHash": "e08475a2bdde5ee7cae023beeeacd625",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "9c173d2c-0d22-4b1b-9315-87c252f9bdc4",
+   "masterId": "3a298a1f-8048-458d-8688-3b886acfd6f2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "82924a096fbfd987144af759a94d92c6",
+   "newHash": "e08475a2bdde5ee7cae023beeeacd625",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "b046dc37-1cf5-40e8-ae20-df040fb82b5a",
+   "masterId": "6f3e7ebe-0c1e-41cd-98b3-8010e04b48f9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c5496ddd84886c6b67054ea1eb6e8e84",
+   "newHash": "5f4c144cdc4a252d21c0cc56be4e3fc0",
+   "restored": [
+    {
+     "before": "이 약에 및 다른 H2 수용체 길항제(억제제)에 과민증 환자,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 680
+    }
+   ]
+  },
+  {
+   "koId": "44d9eb2d-8953-47c0-a7f4-6e1f2e1ded48",
+   "masterId": "2a64df8b-fe96-4c60-86bf-b41ebcff03af",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "2c1f6ed46b6c9f7fd1fe798732c52cf0",
+   "newHash": "10dbbe988295722d68af7c261d374fd4",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "34badcf2-0908-4d83-84d7-f5935928351c",
+   "masterId": "74c856d0-82cd-45f9-b41f-7227da1c5269",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "2c1f6ed46b6c9f7fd1fe798732c52cf0",
+   "newHash": "10dbbe988295722d68af7c261d374fd4",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "cab8c937-cdd5-47f1-a6b6-9d4fba18a70f",
+   "masterId": "11366e05-e8ad-4f16-b92d-e23a439fce29",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "733716d5ce6dff9261af04a7adf22de9",
+   "newHash": "e12383ef7f504a259165ad7e0068f555",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,심한 담도폐쇄,전격성간염,임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부,소아,크론병과 같은 대장 및 소장염,방사선",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 380
+    }
+   ]
+  },
+  {
+   "koId": "a1727117-82df-4c07-9060-4db9a536af8d",
+   "masterId": "4e00a871-eb45-4a97-b8f0-c8034cbe9cc8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "733716d5ce6dff9261af04a7adf22de9",
+   "newHash": "e12383ef7f504a259165ad7e0068f555",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,심한 담도폐쇄,전격성간염,임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부,소아,크론병과 같은 대장 및 소장염,방사선",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 380
+    }
+   ]
+  },
+  {
+   "koId": "0853f2c3-cb89-4782-9f48-e20948c9a4b4",
+   "masterId": "52aec2cd-9c29-48be-b5a9-c7d2d38fb5ae",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "733716d5ce6dff9261af04a7adf22de9",
+   "newHash": "e12383ef7f504a259165ad7e0068f555",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,심한 담도폐쇄,전격성간염,임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부,소아,크론병과 같은 대장 및 소장염,방사선",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 380
+    }
+   ]
+  },
+  {
+   "koId": "6ac987d8-544c-4468-a76d-e88546b19e0c",
+   "masterId": "3dd24ec3-d71e-4ff0-af67-e9f374f45bac",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "1ba3d159f34fd65d526b4f1c3daa368c",
+   "newHash": "96c07b32cf9ae871349a6da902ef81e0",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,MAO 억제제(항우울제,항정신병제,감정조절제,항파킨슨제",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 666
+    }
+   ]
+  },
+  {
+   "koId": "c8beceaa-1b40-472b-9a67-76784cc14d6a",
+   "masterId": "714a1ca7-01c5-4690-92bf-dbbc3297f6b5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "7ff2a0d7b768afbf9d20c29656978044",
+   "newHash": "af041fc4e4d9143ef493af5928fde5ba",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부,소아,심한 담도폐쇄,전격성간염,크론병과 같은 대장 및 소장염,방사선",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 390
+    }
+   ]
+  },
+  {
+   "koId": "d6eea1b5-e8a5-48a6-8704-256b2c077158",
+   "masterId": "7b8d871b-4c36-4cf3-ae5d-b329343bdaa8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "7ff2a0d7b768afbf9d20c29656978044",
+   "newHash": "af041fc4e4d9143ef493af5928fde5ba",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부,소아,심한 담도폐쇄,전격성간염,크론병과 같은 대장 및 소장염,방사선",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 390
+    }
+   ]
+  },
+  {
+   "koId": "dce82aaa-772d-4747-a8f4-44481bf344e3",
+   "masterId": "699b5d9b-bfd3-4647-82a5-b010e9cb1e61",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "5278ea675e7abcc98d94e5de3eb0ee5c",
+   "newHash": "a5d0e64266563de27c2fad2bcd2e8b39",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 만 15세 미만의 소아,이 약에",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 812
+    }
+   ]
+  },
+  {
+   "koId": "9c7677e2-f48c-4c32-a120-3453f6a5d02a",
+   "masterId": "23fe1a08-146d-4670-b417-5f0b31bcf713",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "fa07f7e317b7bd7ddb475ce40824eb41",
+   "newHash": "25020fd054862794bede8d528498bab6",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1299
+    }
+   ]
+  },
+  {
+   "koId": "9ea6e488-5893-44eb-b6e6-7b7f16ef1292",
+   "masterId": "33ce7d43-c93b-4fd9-8b19-081762453961",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d40162713033048831880c79fc95295a",
+   "newHash": "2913af12f5b14baf99a3ec12102874d5",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,비타민 B12 결핍으로 인한 악성빈혈 또는 거대적아구성빈혈,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락",
+     "beforeLen": 260,
+     "afterItems": 5,
+     "afterLen": 329
+    }
+   ]
+  },
+  {
+   "koId": "bf4f0c5e-07b0-4e70-b320-ea7a97b56ec4",
+   "masterId": "37dc7a81-5126-47d9-a5e4-a7ebfd4a9f23",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "7157f47cd09fc2d4e31fffe8717d1d8e",
+   "newHash": "1c9f7073ebc6f97ab62d724dc69e74c1",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1261
+    }
+   ]
+  },
+  {
+   "koId": "c31b70f0-5552-4e88-8642-cfe819d6f5ac",
+   "masterId": "40f9e582-6a77-49a8-94cf-c4d96ec2cec6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "7157f47cd09fc2d4e31fffe8717d1d8e",
+   "newHash": "1c9f7073ebc6f97ab62d724dc69e74c1",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1261
+    }
+   ]
+  },
+  {
+   "koId": "2a08850c-e360-449c-bc29-ac8ea312a20b",
+   "masterId": "2179b081-399b-47c5-b673-5ea5c93ef0a2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "15b5cd69cf67f39303a546bfb67a1e11",
+   "newHash": "9d8b0a2a0827fea227896cd4650b0224",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,갈락토오스 불내성,Lapp 유당분해효소 결",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 769
+    }
+   ]
+  },
+  {
+   "koId": "259f990b-3799-4a92-a6a9-a0f1a5c95920",
+   "masterId": "0d0ea654-6ec4-4015-afd1-65822e1abbd6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "8b579b71-383f-4b47-a3e4-3c9da0e4e71a",
+   "masterId": "199efdb4-5e74-4aff-a3c4-fa979f232a2c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "e4dbace0-8d39-4bdf-9764-9085ca08d04f",
+   "masterId": "23f5eb5d-1624-4bd2-ab1e-d85530f4d963",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "6f2d59be-2670-4342-a820-1cf46970c20d",
+   "masterId": "30ba085e-4361-42aa-bc95-e3804cb33c48",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "d01959fd-6c0e-416a-9ff1-08fc75502cf1",
+   "masterId": "3bbc498d-0c90-4a26-b932-f6a35a942751",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "e779594a-c1f2-4575-94e5-3d05d351ecbd",
+   "masterId": "6af3bda0-0316-4079-bbe5-673f19c32a1a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "82ec49f1-0e1c-485d-8d2b-3c3bcb8b1e3f",
+   "masterId": "7c515891-862e-4682-8569-7b958049984e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "088be82c-efc4-4088-856b-a94cbc57c0a4",
+   "masterId": "0ee7787b-bcac-4434-9631-345c5dc2a97d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "b3726bb1-3e43-4e56-8a79-ba91dddf74bf",
+   "masterId": "1d338f89-93f5-42b3-9e71-3a6e708cba4c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "22b738f3-cf5b-4873-b438-ce90729794cc",
+   "masterId": "223ce265-94a2-4993-bc12-b88fe64bf87e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "41d8b6b9-b960-4695-aa20-705a3760ac1f",
+   "masterId": "28112e3c-96f6-4a1c-8651-b0eef19a1725",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "bf0fe156-b3d2-4db4-98b8-d879c86c7354",
+   "masterId": "3f627dbf-c85d-499a-b3cd-d050605bb64f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "65652c79-0331-4604-85d1-0dcfd55ac336",
+   "masterId": "6645a4a8-ad4a-4a1e-9530-bce3a3703824",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "4425ed14-2153-4a13-81f3-e19e67ed2175",
+   "masterId": "74209283-01a3-4f8d-b56e-3f6ab8ce8dcf",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "92a161e8-08e9-49ac-bc6b-524317338cf1",
+   "masterId": "7734c547-8480-4683-bd36-d90756995929",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "c2ee876e-4a88-46ad-8ef8-91405e2d06bc",
+   "masterId": "02f078dc-27e9-4fe3-b294-aa1ba4466bbd",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "c409b454-27c6-478a-84f9-b9361f94a62e",
+   "masterId": "0151d41f-ac15-4ce4-9da8-2fca78adb98c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "29123797-6148-475e-913e-a82040241679",
+   "masterId": "1e993610-e835-4ebb-9d54-58a00f5dd6ae",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "ab6501c0-b1fc-4808-bc27-7d8456821b6e",
+   "masterId": "201d1dc1-3627-4f83-b707-cada416f1345",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "d4205fc1-cb48-49b4-b3bd-115f43c82a7f",
+   "masterId": "563126f8-d477-4262-8611-04760360c834",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "cc033c60-fbc4-4547-b7dd-b340772152c6",
+   "masterId": "6b8332da-d119-498b-abb3-aadce6b0f420",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "2c39395c-72a3-428c-9dcc-e5734e8b04d7",
+   "masterId": "730d41eb-d705-4d17-934c-ee8afc824268",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "d5513714-3af5-45a9-87b8-9dbf7e50145a",
+   "masterId": "75506299-e02a-4226-acac-765af26f9a52",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "2abcfc03-f368-4fb2-9c7a-7a877bf62bb8",
+   "masterId": "1c6fd481-6319-4455-b51d-043ca4df1928",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "c6d85470-21a0-40d4-863c-8732f00a2016",
+   "masterId": "2231776c-7ad4-451f-b6d0-756117ddccb0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "66d69fcc-27f3-45ab-aa72-711c4ba2e5c8",
+   "masterId": "4c2b3a7c-7d38-4e36-8044-7c90793485f6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "1f028034-c820-4f2f-923d-53d5adac83a7",
+   "masterId": "54ce98c7-51cc-4cf5-941f-004d7dd18ad6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "b530620c-5395-4cc6-a0cb-90970e38cff8",
+   "masterId": "58a0d744-d179-435b-aae7-3f74ab5c2174",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "6a6b4d48-ff71-44c6-ad00-183eb6463d40",
+   "masterId": "5c2fe72d-fe6e-4cc1-8db3-5f674fe58360",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "6aae050b-a0b2-47a0-95c3-a9636e449995",
+   "masterId": "6c48b2b8-af6d-4838-8975-52a1857ac935",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "eec2c50d-48ff-4a74-9886-1bb44c5a4c95",
+   "masterId": "13f0442e-ad0f-4952-8c17-2c3439ef1d9f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "c4b5577a-9c00-4138-bfaf-0537376b8c60",
+   "masterId": "4702cc6c-db9b-4fe1-8403-3ded1813c70d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "b5894066-ddc3-4f77-be65-bdd3725753b3",
+   "masterId": "76686826-c407-40e8-8158-89087f2f4f23",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "0070ae1d-df51-4c9f-9ef8-ac3c45d745f0",
+   "masterId": "05636642-635f-428d-9054-4270a9f1e650",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "3ab82512-d80c-49ca-8705-082fde3c2c96",
+   "masterId": "1dcccb5e-bff9-43f1-a862-5aa2f1129ad4",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "d258fe83-952f-41a3-bc8a-ca5137cbcd72",
+   "masterId": "6eb708e9-7b1e-4fe4-810a-1e8a08b21529",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "0de9f972-e44a-4dd4-a1c9-362371099613",
+   "masterId": "7570253d-11be-43e4-a774-0c8a2e1bd525",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "bd337f42-2d6b-4ea7-ae4d-1118fa0210ea",
+   "masterId": "3740fea4-07dc-470b-b794-c3fa4da464e1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce87f994a484e1cd8ef8dfd36fb9d82a",
+   "newHash": "a931dd0cf3f793cdf8337878efa60aa4",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애,고칼슘혈증,신석회침착증과 재발성 칼슘함유 신결석 환",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 308
+    }
+   ]
+  },
+  {
+   "koId": "850b311d-f179-4c60-8b78-a0bd1de64554",
+   "masterId": "4319edb2-0a03-41b9-a111-3ddcdf80f3c6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce87f994a484e1cd8ef8dfd36fb9d82a",
+   "newHash": "a931dd0cf3f793cdf8337878efa60aa4",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애,고칼슘혈증,신석회침착증과 재발성 칼슘함유 신결석 환",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 308
+    }
+   ]
+  },
+  {
+   "koId": "e79f921b-edad-41c9-a1ac-edf521d14b7f",
+   "masterId": "7c9ed57c-5e89-4064-9534-422fb54dc7ef",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce87f994a484e1cd8ef8dfd36fb9d82a",
+   "newHash": "a931dd0cf3f793cdf8337878efa60aa4",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애,고칼슘혈증,신석회침착증과 재발성 칼슘함유 신결석 환",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 308
+    }
+   ]
+  },
+  {
+   "koId": "9f542059-9d4f-4ff2-912e-ca8d0d274b8d",
+   "masterId": "5056752b-f37a-4462-aba8-710c83d8f487",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "255ddf73dd99dd0eb1f1bd9d4d9f9cbd",
+   "newHash": "77e2c0c1e99b17112f30ed89fdf7c6df",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 645
+    }
+   ]
+  },
+  {
+   "koId": "d180cbcc-e9a2-4be5-9809-ed58c672bf96",
+   "masterId": "5305f8b9-37dd-4407-bd7a-ac153ffc6d68",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "7047cbb095f548d90f5fe1bdae227e42",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1340
+    }
+   ]
+  },
+  {
+   "koId": "3f809103-196b-419c-8cc4-a038729e5a00",
+   "masterId": "23201fd6-fe6f-42c6-9dd3-d13519c5a6bb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "fbe3b42c3b65c3c3568ccbcb035c6a64",
+   "newHash": "a7f41f9ac25921fa9664c76aa915ec69",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "a90e6abc-2c1c-495f-9070-39973ff2403f",
+   "masterId": "25fafa46-7df6-44d2-9131-64905ecb6cb1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce323a318ac62c9af11fc7d4ee1dae9b",
+   "newHash": "8f9ee4eb06137359a6e2ee1884c288cc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제 과민증,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,일주일 동안 ",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 923
+    }
+   ]
+  },
+  {
+   "koId": "a97ea74f-f58b-40e0-870d-71145be3796a",
+   "masterId": "3d8b0bcb-ef05-4af4-b1e5-1129d067bfe1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce323a318ac62c9af11fc7d4ee1dae9b",
+   "newHash": "8f9ee4eb06137359a6e2ee1884c288cc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제 과민증,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,일주일 동안 ",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 923
+    }
+   ]
+  },
+  {
+   "koId": "95ab9806-0adb-4ceb-9263-61429a2ae181",
+   "masterId": "7c9c7c26-304b-4e58-b4e9-da025fd57dec",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "16aa8a615615f4332febcf6e4dea3be4",
+   "newHash": "827351f8ef36582b3c4d19ed6e2b2d8c",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1286
+    }
+   ]
+  },
+  {
+   "koId": "083c9240-384b-4712-a8c5-1bf5468f29b7",
+   "masterId": "6e0577db-fa0c-4fc6-9f25-b58f572fdbef",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "8f06e6d38e3692a76a4838da5843def3",
+   "newHash": "6536196da7a803d188fa80ff3ba7553f",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태)환자,유육종증(원인을 알 수 없는 전신 염증질환),신장질환,신장결석,심",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 777
+    }
+   ]
+  },
+  {
+   "koId": "06c96d04-686c-4da2-a72f-f1b09c060055",
+   "masterId": "2cccb614-4924-452b-af60-0cefd1be10e0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "237d1a0d4f9af83c1f1f6aa650b760ea",
+   "newHash": "190c2c96bb2bdd4731ca07d7a0dfff6a",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,콩 또는 땅콩에 과민증 환자,대두유에 알레르기 반응 경험자,12개월 미만의 젖먹이,심한 증상의 신부전 환자는 이 약을 복용",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 574
+    }
+   ]
+  },
+  {
+   "koId": "ec718e8e-bf14-4361-a3dd-f15abe7cfa44",
+   "masterId": "4f82f782-3147-4187-80de-cb37852b3bbe",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f2d070f2c3e1e11e7ec861f76ab8c3de",
+   "newHash": "f57dd6e5a4edd434ad5fccf7a23cf447",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 692
+    }
+   ]
+  },
+  {
+   "koId": "237026cc-b4e9-4dac-a1bb-5d00ddc27798",
+   "masterId": "26e89548-1bec-4ece-a0d2-8a4b0c89355b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9f78eb6f9e01d04be4d87b2a6cae4524",
+   "newHash": "6663495cee48d36b182743569b67eef1",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,MAO 억제제(항우울제,항정신병제,감정조절제,항파킨슨제",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 725
+    }
+   ]
+  },
+  {
+   "koId": "60ea80f1-059a-4ca3-9a11-a729d073159c",
+   "masterId": "29ee883a-7225-4134-b064-6a24a8092944",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9f78eb6f9e01d04be4d87b2a6cae4524",
+   "newHash": "6663495cee48d36b182743569b67eef1",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,MAO 억제제(항우울제,항정신병제,감정조절제,항파킨슨제",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 725
+    }
+   ]
+  },
+  {
+   "koId": "3f205914-8a2a-47ab-9d34-aa4de9dc1fcf",
+   "masterId": "9a767bd9-73db-45bf-8510-e843222ba0a9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "17cb2354-3bb8-4509-ab7a-23491bd15c1b",
+   "masterId": "b6e48df3-b704-43a9-bc80-1d6031a882a2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "1b3a572c-9788-444b-99fa-a940c23e233d",
+   "masterId": "c226abc9-c806-4af7-8815-b02d8d5d31cb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "35dc9a0a-b134-4d13-88ac-0b041d1ad661",
+   "masterId": "cbe6c5eb-c245-469f-ac2c-820498aa03ef",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "32a8fa5a-31e4-456e-8e26-9baac133f012",
+   "masterId": "d72db201-3616-44be-a494-eac419d98dbf",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "521684a8-bcde-4ef2-8370-23bcb36d6542",
+   "masterId": "e3cd3bda-d937-4825-a0bc-ae941e9db10c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "0079a54b-fd7b-4ef7-a0e4-1d1bbc209b61",
+   "masterId": "fab9a6ed-cfaf-4363-a8da-2e2ec8ebfad6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "2fa573f3-8ac5-4c1f-8c1e-749b47f77ce5",
+   "masterId": "af88e31a-ab5d-4adf-b446-6ff9b80f3213",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "7add5199-17c7-4201-9adb-963a1e7d59c8",
+   "masterId": "8bb6b15a-9d3f-48ec-85b2-0adb4fb9e009",
+   "sourceType": "o4o_drug_otc_topical",
+   "oldHash": "fe0906bd1fae77edf5bbb355c1b56152",
+   "newHash": "f56c45799693f5227af3ef4e66102f1a",
+   "restored": [
+    {
+     "before": "임신 1기 및 2기, 임신 5개월이 경과한 임부, 수유부, 만 16세 미만의 소아, 이 약에 과민증 환자 또는 경험자, 아스피린 또는 기타 비스",
+     "beforeLen": 560,
+     "afterItems": 8,
+     "afterLen": 733
+    }
+   ]
+  },
+  {
+   "koId": "0f3d1153-7b22-464f-aaef-330ac09c974c",
+   "masterId": "81cc8b36-953e-46cf-8f49-ce60939b961f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "0af25de0-a89c-488d-b10d-19fad9a809fe",
+   "masterId": "90cf4514-e52f-4804-9554-59fe3b7078f7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "0dfcdb186b984b960860179bb8f869a0",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "b4cd97ad-1371-425f-bf5e-dfef3c66a848",
+   "masterId": "863f8e91-22e5-41ed-a7ff-f4bab18541d7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "84c82bad-94b4-49ed-9fb9-9265439f4b2f",
+   "masterId": "87bd8821-7509-4100-83c0-ccde5861e2dc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "f3022a72-f3e3-4f0a-9243-0404937670f4",
+   "masterId": "8f5a8636-192a-47e3-82df-be61e04eda4a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "fdcb7e70-2548-469c-bedd-7937d80fb5b3",
+   "masterId": "be909dd5-d872-4c0d-8089-bf1ee1620f83",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "33c4210c-f25f-4e37-94ea-b71a11429545",
+   "masterId": "c15c4e1b-1f09-4d98-a8e5-6c9135cc6791",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "af878a3c-eff3-4e87-bd7c-74cd04ebcaf7",
+   "masterId": "f157a0c2-c752-49ae-9bf8-997774eb9777",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "aa9b0b45e8c567d87bf480f55593739c",
+   "newHash": "3d7c01ab57140f6c944c8a80b0dc0eeb",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 323
+    }
+   ]
+  },
+  {
+   "koId": "342c7e0b-5c5d-45bc-bf38-a6b9d0a543e0",
+   "masterId": "c5716e74-b06c-4e5f-a802-b8821825efa9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "bcbb0213-e399-4cb4-a738-f70576fc0feb",
+   "masterId": "e598e94e-e7d5-41cb-9475-afdb2fa63a21",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "bd2a7cbb-8a22-4164-bb0b-066b90e35de0",
+   "masterId": "e9627c42-5e4b-4355-907d-46680f4c3c78",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "d06c1a21171180e6849c6dffd8a1d79f",
+   "newHash": "26629eabc75f3ff67e5723663821bd24",
+   "restored": [
+    {
+     "before": "15세 미만의 소아는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 다른 항히스타민제,멀미약,감기약,진해거담제에 과민증 환자,임부 또는 임",
+     "beforeLen": 259,
+     "afterItems": 5,
+     "afterLen": 277
+    }
+   ]
+  },
+  {
+   "koId": "e703ef19-f005-4ece-be9f-5c8443a80686",
+   "masterId": "85d01dbf-24b5-415a-837d-f6a154f78a66",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "f7fe5b57-32ae-4b93-8723-25d3d8524738",
+   "masterId": "7d9f98fd-5f8f-4d35-bb87-43443a8a929e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "580753a6-a7df-4a3b-8871-f7859d8c6010",
+   "masterId": "7de6470f-e664-40ff-8167-194b40dde73c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "06dab94a-bb2b-4211-affb-63cbf87837ba",
+   "masterId": "7f851198-1134-4c76-b721-2f00a328d5c5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "71d26f27-c14f-44f5-a48e-b53ca46009cf",
+   "masterId": "86385ec0-70ee-4d5e-a052-56884a18585e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3b2ba73c-56df-41dd-bca7-d91414e187b6",
+   "masterId": "87702cd6-98db-4059-bf7d-88b1da25c6ad",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "2d3f33f2-a43b-4763-b9bf-98358632adae",
+   "masterId": "8a9984c8-dab2-42a2-9ba8-b908b10864f0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "816a6a5a-e7d1-4213-9147-8db18b58cea0",
+   "masterId": "8bf8ecd6-b9bf-4349-9d25-46d4490e129b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "c311b0e3-a167-45e1-b837-d8f4db3c3abb",
+   "masterId": "8c423db0-6f09-4daa-9969-fd33b6ee9a3f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "487889cb9a0e63c1298cb5ac682f249a",
+   "newHash": "6bd62392cfc8379d2d0cd338b64cd791",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,만 12개월 미만의 젖먹이,고칼슘혈증,유육종증,신장(콩팥)질환,신장(콩팥)결석,심한 증상의 신부전 환자,대두유 과민증 또는",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 655
+    }
+   ]
+  },
+  {
+   "koId": "1dffe810-5c07-42bc-a1b3-823b38c3519f",
+   "masterId": "8ecdcb87-179e-4427-b906-3bf013408304",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "f0f70fd6-3893-461b-83f9-54e70092f378",
+   "masterId": "8fa88b56-dd1e-4421-8ccc-ac11fa73c80e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "56586f3a-4bc2-4544-a990-617b7a62c766",
+   "masterId": "9a010063-8c98-4863-9d76-c42bcc11428e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "05e1a009-4fc0-4a53-9ccc-c7e7b9cda30a",
+   "masterId": "9adfe774-f8a7-448f-97d0-e9f2c09cf7e6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "ea11ce91-05cb-4a55-ad9a-c28ba713ed2b",
+   "masterId": "9b20ce36-ccca-4c70-98b9-9068090328bd",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "c88dce72-bb8f-48ef-953e-57b5c7d560cf",
+   "masterId": "9cfada26-aabd-4f91-a84f-99351c4f2d6b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0de5a055-358d-428f-93b9-c79ecdac6afe",
+   "masterId": "9d4e0eeb-4c57-4305-be54-83d29c734b89",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "894cdea8-da13-4b15-8a23-4d0c2eb20552",
+   "masterId": "a04b05c6-acca-486e-a675-853a4433e920",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "d55440f5-648a-42d6-bc88-b25dda72dc97",
+   "masterId": "a1b60854-869b-40aa-af80-7a92f0d6c7bb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "85c9bf9c-c15b-442a-a8e8-9ce4f9e025cd",
+   "masterId": "a28ec75d-84cb-47bd-ac3e-f2ab0639e8d2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "d8ae40a9-a0dc-4501-8c27-f9b0354dbfe3",
+   "masterId": "a3fde5de-b216-4cb1-bf25-fef96cd1581c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "011cdea3-418c-4f8f-927b-29b4c5d4a6ae",
+   "masterId": "a86aed7b-dfb0-4052-a1cd-a3f8c8f6bfa2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "255ddf73dd99dd0eb1f1bd9d4d9f9cbd",
+   "newHash": "77e2c0c1e99b17112f30ed89fdf7c6df",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 645
+    }
+   ]
+  },
+  {
+   "koId": "7d2b3cd5-9af5-43a3-958f-5d734b2cfe7d",
+   "masterId": "a9b37d11-4858-43b8-b2d8-4d4336491bea",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "d4ee53ec-5cb0-46bb-b585-dbb6e4a93aa0",
+   "masterId": "aa23fdb8-4e56-4ef9-b40d-bccde5678544",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "69f7722a-32e2-4b5a-9244-cdccd9fb1d65",
+   "masterId": "aa62744a-ccd9-4f72-919f-625006003347",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "692516c2-0344-4f12-9dd3-73d0990f8465",
+   "masterId": "ae8c5b0d-d8af-47ce-92f3-2eec62524bab",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "b7846371961384df57cec79ae5b6b734",
+   "newHash": "786f95b7b2fef7123c0c74420dae0e66",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태),유육종증(원인을 알 수 없는 전신 염증질환),신장(콩팥)질환,만 3개월",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 485
+    }
+   ]
+  },
+  {
+   "koId": "30ba2db7-915c-4bcb-bf9f-bb34337f3489",
+   "masterId": "b3821f8f-68a8-4183-8ddc-295bb0b7f0df",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "343c19a4-f5cf-4ee7-9b7d-a01a0c3625ba",
+   "masterId": "b4104d1c-cb4e-478a-b25e-51f258ead3dd",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "5fc69d0a-c51b-4182-a592-5cbe30e9391b",
+   "masterId": "b56d8f7f-718f-4b9d-be28-ba7fdfdd0a41",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "646297c9-dbec-486c-be90-b1a7ec3d97fa",
+   "masterId": "b7f8dc99-3353-444a-86e1-824105783ab5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3a794d1b-31cc-497c-9bc0-4ff006acdf15",
+   "masterId": "b8e66706-f72b-4796-ad8f-8740cdcf0e3f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "74a06833-52c5-43fe-a36e-5abf6931117b",
+   "masterId": "b9586016-ddc2-4abc-b4b1-a992b150e5bc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "743c397c-f6ae-46f7-a3b5-8c4231546d34",
+   "masterId": "ba7aa4a3-5ccd-4d8c-a0ae-318c6f33b0ff",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "a4efeb13-73d4-49cb-9a01-9794eaf480b3",
+   "masterId": "bb2bc077-1058-4b8d-beb8-ebbef2c05d92",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "4ade47d9-3e80-460c-904a-3fe6e8bf2891",
+   "masterId": "bcb5b87d-703a-40db-8ad0-7f204d1a8597",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "29308080dd4bdacbb9dc03586086b85f",
+   "newHash": "40a8d569681e5beed426ce1859bad820",
+   "restored": [
+    {
+     "before": "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다. 임신 3개월 이내 또는 임신하고 있을 가능성이 있는 여성은 ",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 846
+    }
+   ]
+  },
+  {
+   "koId": "301909d2-7a54-4c99-8cdb-05e9d8f2e254",
+   "masterId": "be243f43-4be2-4753-bfbb-2614dd55423c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0c82e61c-33f2-48fd-8b79-836f2dab611a",
+   "masterId": "be96dee4-6c13-472b-b201-a15233260a41",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "e3d9e365-00b6-4a34-b229-5182f31d1f71",
+   "masterId": "c15a57c6-f29c-4786-8618-a08fc9644260",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "b9cfb6c0-872b-47b0-a120-bb2d7ef7ca8e",
+   "masterId": "c229f367-f844-4b5d-9f68-81af57c22699",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "25ecb7ba-76d7-423c-9528-3693fc0f7021",
+   "masterId": "c35eb6a0-47ce-46e2-9f11-9b9bebef3e2c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "7d80b005-6ea2-4e8b-906d-3a40023966c0",
+   "masterId": "c4d23c18-aa1c-4f1d-a259-94995e83452a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "9d6d2e34da2608314231b30cf9ac3a6f",
+   "newHash": "b987166f2a5270ace25638cfb237602a",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "7fa8a094-788f-4488-9203-14c4fa584518",
+   "masterId": "c53d3dd4-bbc4-42ba-8517-0c2ccc2bee33",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0253a345-a506-4085-8114-dcb5b8d483e1",
+   "masterId": "c8a19ee3-ff9c-4293-ae4d-ba0313527401",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "d6f1b5e7-a75a-40d5-b3fa-e48ff911c7e3",
+   "masterId": "c97ce1a3-a473-4d53-a1a6-1a195a818e78",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "53f87953-5db8-4ab9-9e42-7456ded1a526",
+   "masterId": "ca55fd9f-a7ea-48d5-8d07-b9ea234f6127",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "c9adbf9c-08f5-441d-b6b6-746dbf76efbc",
+   "masterId": "cb234a08-74b7-4d41-be8d-5474843abad2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "4ed98228-ef26-4e20-8468-1154be40ead4",
+   "masterId": "ccf8b1ac-29d1-4e60-b72c-0712feeb1fab",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "11c6c52c-a2cd-4f32-8e56-68d45307cc3a",
+   "masterId": "d2e92a0e-f5ff-404c-9ab3-4b149a6df188",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "003cde86-5e00-4292-a5b4-d15696d4c0ba",
+   "masterId": "d4a4226a-c955-416a-81e8-09e73b5b3b65",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "46e643d8-ab71-4963-bd9d-c5aa9223b92a",
+   "masterId": "d5c8df91-5825-497d-9e54-66c36dbcc252",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3b2654d7-c6b8-4c86-b59a-aa54d0bd87f3",
+   "masterId": "d6b24e49-06ce-4959-ab09-fc5c603e8df2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "255ddf73dd99dd0eb1f1bd9d4d9f9cbd",
+   "newHash": "77e2c0c1e99b17112f30ed89fdf7c6df",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 645
+    }
+   ]
+  },
+  {
+   "koId": "143f5a78-953c-4f4f-b133-48a467304caa",
+   "masterId": "da19107e-4d60-486b-93e3-452205ff5059",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "0a54ce58-c53c-43af-b5f9-b299fbfead8e",
+   "masterId": "da938ef1-0582-450f-88fc-6a4fcdf2dd3a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "5bc54a0e-da89-4a97-bc48-1c7161197907",
+   "masterId": "df5d01fb-0924-430d-8a9f-2c643685cfb9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "663cd22b-6679-4bac-a5d4-4b8cbb9d130c",
+   "masterId": "e22f8197-84b1-4d25-acb2-adb6c87a6a04",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "29308080dd4bdacbb9dc03586086b85f",
+   "newHash": "40a8d569681e5beed426ce1859bad820",
+   "restored": [
+    {
+     "before": "비타민 A를 1일 5,000 IU 이상 복용 시 선천성 기형을 일으킬 수 있습니다. 임신 3개월 이내 또는 임신하고 있을 가능성이 있는 여성은 ",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 846
+    }
+   ]
+  },
+  {
+   "koId": "3a54b8b5-e7b2-4562-88d0-95c9db49c020",
+   "masterId": "e4418664-b66a-4be9-8e62-f048a39574d8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "b731c37d-5b70-475e-982d-55088a694c49",
+   "masterId": "e7a0d240-5f10-4124-a705-cc221b6299bf",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8c3bc077-b1f1-4b5f-bf5a-0c6761ef112c",
+   "masterId": "e8f55275-d078-441e-81f8-83ead06ea584",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "a7f72d6e-7f33-4038-95f7-55f15e6b70fa",
+   "masterId": "eb3b8ef5-2d3f-419e-af86-993d666a54ec",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "730a491b-63a4-4369-abc0-89a55195832c",
+   "masterId": "eb8fc5e6-2329-4327-ac52-9c653aa536f7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "1e5041cc-e3b3-47b9-9aa2-52d3253e8041",
+   "masterId": "ebfc53ed-6c0d-43a5-9d83-05f1544cd808",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "487889cb9a0e63c1298cb5ac682f249a",
+   "newHash": "6bd62392cfc8379d2d0cd338b64cd791",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,만 12개월 미만의 젖먹이,고칼슘혈증,유육종증,신장(콩팥)질환,신장(콩팥)결석,심한 증상의 신부전 환자,대두유 과민증 또는",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 655
+    }
+   ]
+  },
+  {
+   "koId": "9041ad2e-ee61-4eb0-bf0a-e3c5aa92b31a",
+   "masterId": "ec98351b-a46c-4aca-b32f-847bb7de875f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "8de74d90-5acc-465c-bb94-513ad481b86e",
+   "masterId": "ee9f2c01-d312-43b0-a17d-9d8fa15a80dc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "1641f9dc-cd0f-4a61-8531-b24d8a87263f",
+   "masterId": "f0f20a08-7a54-4a20-99d5-d9d3db93148f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "6a9288b3-35f4-46a0-aa71-167471546c5e",
+   "masterId": "f31edfc0-2435-42bf-aa7b-6488c268213c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "b7846371961384df57cec79ae5b6b734",
+   "newHash": "786f95b7b2fef7123c0c74420dae0e66",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태),유육종증(원인을 알 수 없는 전신 염증질환),신장(콩팥)질환,만 3개월",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 485
+    }
+   ]
+  },
+  {
+   "koId": "9bcaafe2-3e82-435a-929f-c4c71f6316b1",
+   "masterId": "f33b4fca-fc9d-41a2-8cfb-0765e1693426",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "bdca68b0-e046-46db-8f21-a53fe3ed7afe",
+   "masterId": "f3c053c4-d56f-4169-90c2-6ce00c4b3b00",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "509ece0a-e885-431e-9232-c30df95ac7f4",
+   "masterId": "f3f26b71-0605-44c9-91fa-736f8ed9a3ac",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "e770b398-607f-4f02-a3bb-58ba9d008fdf",
+   "masterId": "f6c6b8e3-6066-4b45-9db0-53c0981a3116",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "3cf2e3f0-1d8d-4f23-8bb5-effc32d920de",
+   "masterId": "f8acb041-2acf-4c95-9d33-bda88c98336c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cfc502f1f4da0a028ebd18b127c326e2",
+   "newHash": "b0377ad6ec7a2c3d6e1e90510225130e",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 959
+    }
+   ]
+  },
+  {
+   "koId": "45a9b182-4809-4195-8739-50afe647abd7",
+   "masterId": "fbf4db31-7a07-42e7-9c61-6b3b0de14eee",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "41db028b14a0538ec3166956c07d650e",
+   "newHash": "07208042d50c4b3b658f9f248a3cccf2",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산 제제에 과민증 환자,소화성 궤양,아스피린 천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 980
+    }
+   ]
+  },
+  {
+   "koId": "6b4294f7-d0e1-4cc5-9e1c-0086e16bab63",
+   "masterId": "e67426d9-9523-406f-9ff0-cfda0a6b3442",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "b79702f76b9ed8376327cafb8d0bb940",
+   "newHash": "a52088b2f7c79cf1be9c053644498d03",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,투석 요법을 받고 있는 환자,고마그네슘혈증,고인산혈증,변비,장협착증,급성 충수염,임신초기 3개월 이내의 여성,만 7세 미만",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 452
+    }
+   ]
+  },
+  {
+   "koId": "e6a53192-4cff-433a-b6c1-bd0c7e170a5e",
+   "masterId": "96272eeb-289b-49f0-869b-56ab64b97299",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c5496ddd84886c6b67054ea1eb6e8e84",
+   "newHash": "5f4c144cdc4a252d21c0cc56be4e3fc0",
+   "restored": [
+    {
+     "before": "이 약에 및 다른 H2 수용체 길항제(억제제)에 과민증 환자,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 680
+    }
+   ]
+  },
+  {
+   "koId": "569f900b-edeb-4e6a-8ccf-760ceeae959b",
+   "masterId": "fd2a0551-c8b1-4049-bfd0-25ae605ed2d3",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c5496ddd84886c6b67054ea1eb6e8e84",
+   "newHash": "5f4c144cdc4a252d21c0cc56be4e3fc0",
+   "restored": [
+    {
+     "before": "이 약에 및 다른 H2 수용체 길항제(억제제)에 과민증 환자,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 680
+    }
+   ]
+  },
+  {
+   "koId": "6adfe0f1-e3d2-4056-825d-1e47c095e53d",
+   "masterId": "e446ed6a-152f-4331-8d28-df99a11c4808",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "2c1f6ed46b6c9f7fd1fe798732c52cf0",
+   "newHash": "10dbbe988295722d68af7c261d374fd4",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1316
+    }
+   ]
+  },
+  {
+   "koId": "9a39ff64-aedd-421c-a072-c65ddc137a3e",
+   "masterId": "7e1a8e52-28ae-4a3a-9d6c-13dcafcd95a7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "020f51307a405d36652bf76419269c77",
+   "newHash": "0c27118d81284a49ad34904fbec19a72",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아 및 만 2세 미만의 소아,갈락토오스 불내성",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 724
+    }
+   ]
+  },
+  {
+   "koId": "f0be9103-96f5-4618-bee3-6c911aa2dee1",
+   "masterId": "e98bcbb6-7e8e-4613-8474-c573da016c8c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "020f51307a405d36652bf76419269c77",
+   "newHash": "0c27118d81284a49ad34904fbec19a72",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아 및 만 2세 미만의 소아,갈락토오스 불내성",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 724
+    }
+   ]
+  },
+  {
+   "koId": "95018d99-306b-4751-93b9-757c1b2dda06",
+   "masterId": "ea289352-879b-4924-9924-293c26e339e1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "020f51307a405d36652bf76419269c77",
+   "newHash": "0c27118d81284a49ad34904fbec19a72",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아 및 만 2세 미만의 소아,갈락토오스 불내성",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 724
+    }
+   ]
+  },
+  {
+   "koId": "f09bbdca-8d87-4d28-b9a9-8b47c7445c4a",
+   "masterId": "ffb27a84-abfb-4654-a278-6d0ac82a5865",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "1ba3d159f34fd65d526b4f1c3daa368c",
+   "newHash": "96c07b32cf9ae871349a6da902ef81e0",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,MAO 억제제(항우울제,항정신병제,감정조절제,항파킨슨제",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 666
+    }
+   ]
+  },
+  {
+   "koId": "e4a2c920-655c-4f07-a977-eef77909cd09",
+   "masterId": "e841c3d8-eee9-46fe-849b-38184ee9bc29",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "3fce0c92ef50962e86764aa8cb6bfad5",
+   "newHash": "7c1d5b5558986488b73669a29deae18a",
+   "restored": [
+    {
+     "before": "이 약에 과민증 및 경험자,다른 해열진통제,감기약 복용 시 천식 경험자,만 3개월 미만의 영아,MAO억제제(항우울제,항정신병제,감정조절제,항파킨",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 766
+    }
+   ]
+  },
+  {
+   "koId": "94a2dce4-ecd3-4e71-abf6-485087ec3d86",
+   "masterId": "f6912974-464e-4244-8a46-a004e517e661",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "3fce0c92ef50962e86764aa8cb6bfad5",
+   "newHash": "7c1d5b5558986488b73669a29deae18a",
+   "restored": [
+    {
+     "before": "이 약에 과민증 및 경험자,다른 해열진통제,감기약 복용 시 천식 경험자,만 3개월 미만의 영아,MAO억제제(항우울제,항정신병제,감정조절제,항파킨",
+     "beforeLen": 260,
+     "afterItems": 6,
+     "afterLen": 766
+    }
+   ]
+  },
+  {
+   "koId": "7f9f78b4-6732-43a7-bb9f-9f93058b2183",
+   "masterId": "85fc0aab-b283-4b78-ad45-fc15ed20dc58",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "5278ea675e7abcc98d94e5de3eb0ee5c",
+   "newHash": "a5d0e64266563de27c2fad2bcd2e8b39",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 만 15세 미만의 소아,이 약에",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 812
+    }
+   ]
+  },
+  {
+   "koId": "6f74a2ea-8ae8-4157-ade7-4611accbbd3a",
+   "masterId": "f4fbf1d2-5d53-4e9d-b8e2-4cf6393a86a9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "fa07f7e317b7bd7ddb475ce40824eb41",
+   "newHash": "25020fd054862794bede8d528498bab6",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1299
+    }
+   ]
+  },
+  {
+   "koId": "d8027b0e-5937-4f73-8002-252580ec4adc",
+   "masterId": "d4d7f106-bf0c-44d5-8335-49a88004d61f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "15b5cd69cf67f39303a546bfb67a1e11",
+   "newHash": "9d8b0a2a0827fea227896cd4650b0224",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,갈락토오스 불내성,Lapp 유당분해효소 결",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 769
+    }
+   ]
+  },
+  {
+   "koId": "10520582-af32-4080-a24f-8b6a31916a7d",
+   "masterId": "bb882939-09b7-45c2-bfa3-c462e839f76d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "19b0ed5c-93de-44b7-9c7f-102d72997cc8",
+   "masterId": "c89c4721-551d-4be3-8a84-6eaaa7bb741d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "934585db-ee04-47df-807f-c7b65517aefd",
+   "masterId": "c91d75e7-5733-4c92-8c9d-72a2fa14cbee",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "d70f5761-3f51-40db-aa22-2e24dd1de829",
+   "masterId": "eb81957e-7ddb-4717-afa9-359c412c0d8b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "99c64003-ffab-4e1e-8b27-fcfb76238742",
+   "masterId": "ef4a1ba2-20ec-4912-96bc-c8058e0b3060",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "111321ef-99db-46f1-8634-19bc2a5f7d76",
+   "masterId": "ff096052-4a38-4098-b9b5-bbfbe38534af",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ad4a09a124145551e9bd514a96e41ce9",
+   "newHash": "9ccea8d46880f7fb568a5ac43d3c71fc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제,진통제,소염제,항류마티스제에 대한 과민증 환자,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 965
+    }
+   ]
+  },
+  {
+   "koId": "d9a6889a-a153-4fee-9915-6444f5b3d464",
+   "masterId": "7eb94e9b-79c6-4c47-bd0e-6b20e277c9e5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "00cd0862-8824-41c8-99a5-9df6d07572e3",
+   "masterId": "9634be2c-1c0c-488d-b3f0-c1d04f3e68f2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "df487759-23dd-4544-975f-7ff373da8cdc",
+   "masterId": "990b3bd7-41db-48a6-83e4-3e463cd78b39",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "0f129675-736d-450c-b305-6a6a260accbb",
+   "masterId": "aa4ff9bc-8796-4af2-a69d-066f994b631a",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "bbe8a2b2-e5ea-44c6-ac65-b1cce9b16230",
+   "masterId": "d0f135ba-5c15-49d7-b42b-a7079d83288f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "3cb394a2-8d1c-4a27-b63e-740de4db4063",
+   "masterId": "d9328a25-a633-4d0b-a1c4-a3f39b70a614",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "9a991edc-b3f6-45d2-b8bf-2f0d395b61cf",
+   "masterId": "dcd1f531-2f11-4838-85ed-fba6f087e3fa",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "75ec61b8-c5e7-444e-8a43-0674c0cf4d33",
+   "masterId": "de46d576-2392-4d18-be79-8438ec860192",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "5bcf68d6-bcfa-4cb7-9351-0b170259faa1",
+   "masterId": "f69f7c6d-d196-4481-91f2-c3b92d2cd3e5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c99c51e7d868838879385e43e2ecdde2",
+   "newHash": "325e84b83d2d987a66488ae1e7722635",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘혈",
+     "beforeLen": 260,
+     "afterItems": 3,
+     "afterLen": 292
+    }
+   ]
+  },
+  {
+   "koId": "478f0c09-7ae7-499d-9028-3797ac753004",
+   "masterId": "a54002f2-89ac-4aad-8d1d-638ad2215617",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "f5d3265a-6a94-46dc-888a-566b350d1d9c",
+   "masterId": "b6f4c067-fb49-4e7e-bb7a-a76e28bd43e8",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "54d38ae5-36a8-40c8-9a2f-b733d93820f0",
+   "masterId": "b76694ab-9a2a-4e0c-8986-fec8a1a7fb5f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "4c743aff-1e9a-4496-8dca-7ac73d141eec",
+   "masterId": "c4cf031f-223c-409b-8679-7aa0d56766e6",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "30b788ad-a325-4eab-a60d-b02e2f19b7df",
+   "masterId": "cba13586-202b-4076-807e-80241b4b865c",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "586c156e-31d1-4abe-8528-44f3a3708421",
+   "masterId": "f8c755b0-119a-4428-96b4-d41e844a8e16",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "0046264c-bc10-4965-b71e-13b691202355",
+   "masterId": "f8cafccd-2fa3-41d3-95a7-f8c053cd9456",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "a6c8ed8d-9574-4651-814e-f5c7e6370b52",
+   "masterId": "f989d589-20f0-45b9-a4de-ad0654a5a008",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "c993c1726730e5ac62626592b5518043",
+   "newHash": "46448eb42ccc5ce9045bb2782da1066b",
+   "restored": [
+    {
+     "before": "급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 이 약에 과민증 환자,중증(심한",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 539
+    }
+   ]
+  },
+  {
+   "koId": "3cce42e5-9beb-4b6a-a697-282a7863b7a1",
+   "masterId": "82f385c9-1f9b-4a76-ad70-2269719a384d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "1b01c95b-cd32-4195-b868-7b6236c1169b",
+   "masterId": "af5be085-b59e-4ab7-8cae-bf58ce2206df",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "2d20da55-8a59-428c-aef8-41f95cf375e0",
+   "masterId": "c68e42b2-1267-4b47-a65d-b39d4a447d2f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "f0915c0b-73cc-4054-808e-8b8154e4135e",
+   "masterId": "de62bd3b-7d12-42ab-9aa9-f7dc3ae509c2",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "44f2a668-e89a-4df4-ba7e-8b5e0a4ac7b3",
+   "masterId": "f02eeb08-6b32-4081-bcea-df4f3d7db0be",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "a9334784a71844980894b3674e18e712",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1314
+    }
+   ]
+  },
+  {
+   "koId": "1bcd1424-823a-40f6-98ac-43be6b04c282",
+   "masterId": "98bc88b6-a460-4196-84bc-cd76fa638aa9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "f05189b1-c4fa-4863-aefb-bcbb57b032eb",
+   "masterId": "b4e867e7-d651-41bc-be6a-157258e82360",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "d7d4aba1-aad4-4d12-941c-587eb8a207d0",
+   "masterId": "b6ffaf4f-4699-45c7-a1a4-bfb5902974dc",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "74f41e66-0507-40ac-8566-ad9ea2970b73",
+   "masterId": "bfc78668-9966-4259-821f-ce4b329b83aa",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "5ffc6304-9312-4b06-8d8b-acad947540ed",
+   "masterId": "de0f40bb-6b67-4ce9-81f5-3409f5bd0248",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "31fab50b00efb1140d0abd591d4c0888",
+   "newHash": "181242f4e92d2bd27944e4e42a23b1e7",
+   "restored": [
+    {
+     "before": "이 약은 체내에서 페닐알라닌으로 대사되는 아스파탐이 함유되어 페닐알라닌의 섭취를 규제할 필요가 있는 페닐케톤뇨증 환자는 복용하지 마십시오. 이 ",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 322
+    }
+   ]
+  },
+  {
+   "koId": "31ef6d08-9bd3-4985-9cc9-e3906622a70a",
+   "masterId": "92ca6c87-52c5-4278-b6bb-0c5232af2861",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f64a80977b49416f70766e92484f8019",
+   "newHash": "e253429b506ec155f6d9b30c84b9d8cb",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이 ",
+     "beforeLen": 260,
+     "afterItems": 12,
+     "afterLen": 1201
+    }
+   ]
+  },
+  {
+   "koId": "bf1b14d3-b832-4af0-b95e-79bbbae77b51",
+   "masterId": "b3703e83-1f86-46b7-839a-f09dc248dbf5",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce87f994a484e1cd8ef8dfd36fb9d82a",
+   "newHash": "a931dd0cf3f793cdf8337878efa60aa4",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애,고칼슘혈증,신석회침착증과 재발성 칼슘함유 신결석 환",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 308
+    }
+   ]
+  },
+  {
+   "koId": "2a31f259-df52-473e-b333-48d16610992d",
+   "masterId": "d17263b5-6382-4b18-964d-5f457c9c1eeb",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce87f994a484e1cd8ef8dfd36fb9d82a",
+   "newHash": "a931dd0cf3f793cdf8337878efa60aa4",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애,고칼슘혈증,신석회침착증과 재발성 칼슘함유 신결석 환",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 308
+    }
+   ]
+  },
+  {
+   "koId": "e3f0e08f-5021-439e-aaf5-78d7983dea4a",
+   "masterId": "95d2f4a3-f605-45b0-b249-e1c567f70171",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "7047cbb095f548d90f5fe1bdae227e42",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1340
+    }
+   ]
+  },
+  {
+   "koId": "a7713d68-ef14-4afb-a46e-cef548f6e611",
+   "masterId": "97497226-6dbe-40ba-b05b-0d473c69e2d0",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "99ff2b597a47931a9c1b49c835536890",
+   "newHash": "7047cbb095f548d90f5fe1bdae227e42",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 10,
+     "afterLen": 1340
+    }
+   ]
+  },
+  {
+   "koId": "604d877c-8b4a-44ba-9dd7-1f65f24d50ae",
+   "masterId": "a63c7137-383a-41e3-bde8-870aa019c912",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "fbe3b42c3b65c3c3568ccbcb035c6a64",
+   "newHash": "a7f41f9ac25921fa9664c76aa915ec69",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "827b7424-aeeb-4834-8307-01241e2ad34b",
+   "masterId": "dd09f04b-0b51-46a4-99b1-73875c98fa4d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "fbe3b42c3b65c3c3568ccbcb035c6a64",
+   "newHash": "a7f41f9ac25921fa9664c76aa915ec69",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 울혈심부전,신장애 등과 같이 나트륨을 매우 제한해야 하는 환자,고칼슘",
+     "beforeLen": 260,
+     "afterItems": 4,
+     "afterLen": 331
+    }
+   ]
+  },
+  {
+   "koId": "2fca2212-d943-4580-a874-fe15266849a0",
+   "masterId": "f149a5a3-3cde-49f2-bc28-8b6fd64abc2d",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "15b5cd69cf67f39303a546bfb67a1e11",
+   "newHash": "9d8b0a2a0827fea227896cd4650b0224",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자 또는 경험자,임부 또는 임신하고 있을 가능성이 있는 여성,만 3개월 미만의 영아,갈락토오스 불내성,Lapp 유당분해효소 결",
+     "beforeLen": 259,
+     "afterItems": 9,
+     "afterLen": 769
+    }
+   ]
+  },
+  {
+   "koId": "0c1481a6-d75c-4ef9-93d7-4c17da22ec61",
+   "masterId": "9cbc6201-726f-4c90-ae95-c8c8b4ee54ae",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "ce323a318ac62c9af11fc7d4ee1dae9b",
+   "newHash": "8f9ee4eb06137359a6e2ee1884c288cc",
+   "restored": [
+    {
+     "before": "이 약 또는 다른 살리실산제제 과민증,소화성궤양,아스피린천식 또는 경험자,혈우병,심한 간장애,심한 신장애,심한 심기능부전,출혈경향,일주일 동안 ",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 923
+    }
+   ]
+  },
+  {
+   "koId": "6f42a94c-a877-4e66-ab7a-8fb9fadc3ec2",
+   "masterId": "8ce2a67c-b6d3-4d77-b3db-487a874b53c1",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "16aa8a615615f4332febcf6e4dea3be4",
+   "newHash": "827351f8ef36582b3c4d19ed6e2b2d8c",
+   "restored": [
+    {
+     "before": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 아세트",
+     "beforeLen": 259,
+     "afterItems": 15,
+     "afterLen": 1286
+    }
+   ]
+  },
+  {
+   "koId": "08402cda-c9b7-4add-b15e-54d58e5b69e1",
+   "masterId": "9ea2df7b-1595-4368-8599-ede07d590c94",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "69c9b4969e7f373092e5b326d4ca6948",
+   "newHash": "2f39aad70312479ec6ca823bf311a137",
+   "restored": [
+    {
+     "before": "7세 이하의 영ᆞ유아,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 ",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 419
+    }
+   ]
+  },
+  {
+   "koId": "ee4bac1c-cd25-481b-9e35-49b9b3934f9e",
+   "masterId": "bed9a2b5-c46b-4353-b5c0-916cde8b76b7",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "69c9b4969e7f373092e5b326d4ca6948",
+   "newHash": "2f39aad70312479ec6ca823bf311a137",
+   "restored": [
+    {
+     "before": "7세 이하의 영ᆞ유아,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 ",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 419
+    }
+   ]
+  },
+  {
+   "koId": "661e969b-d493-48b7-b37b-b81fcbf35ff7",
+   "masterId": "a4ef351d-8c47-4e1e-814b-ab4cb30124f9",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "6f50c0ac45a62efaa1cb5b5e96583079",
+   "newHash": "6cfcd2670e605127d3ae2e40dbe08479",
+   "restored": [
+    {
+     "before": "만 3개월 미만의 영아,MAO억제제(항우울제,항정신병제,감정조절제,항파킨슨제 등)를 복용하고 있거나 복용을 중단한 후 2주 이내의 사람은 이 약",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 514
+    }
+   ]
+  },
+  {
+   "koId": "77e018d5-1a60-40f9-b38b-806d4f3bdc97",
+   "masterId": "bbd632be-1e23-4e81-bafc-b7e09e79050f",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "6f50c0ac45a62efaa1cb5b5e96583079",
+   "newHash": "6cfcd2670e605127d3ae2e40dbe08479",
+   "restored": [
+    {
+     "before": "만 3개월 미만의 영아,MAO억제제(항우울제,항정신병제,감정조절제,항파킨슨제 등)를 복용하고 있거나 복용을 중단한 후 2주 이내의 사람은 이 약",
+     "beforeLen": 260,
+     "afterItems": 7,
+     "afterLen": 514
+    }
+   ]
+  },
+  {
+   "koId": "fd651acb-cc4b-49df-bc6d-f7be2018f6f2",
+   "masterId": "a729c600-cc76-40f3-b99c-1796ade0e915",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "8f06e6d38e3692a76a4838da5843def3",
+   "newHash": "6536196da7a803d188fa80ff3ba7553f",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,고칼슘혈증(혈액 중에 칼슘이 과잉으로 존재하는 상태)환자,유육종증(원인을 알 수 없는 전신 염증질환),신장질환,신장결석,심",
+     "beforeLen": 260,
+     "afterItems": 9,
+     "afterLen": 777
+    }
+   ]
+  },
+  {
+   "koId": "034de4f2-a139-48dc-9be7-5e932f762396",
+   "masterId": "a99d827e-1dea-47c1-9496-ad90c13b083b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "f2d070f2c3e1e11e7ec861f76ab8c3de",
+   "newHash": "f57dd6e5a4edd434ad5fccf7a23cf447",
+   "restored": [
+    {
+     "before": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다. 이",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 692
+    }
+   ]
+  },
+  {
+   "koId": "7cf4e1d4-097d-481f-bd76-ab8d7a431d94",
+   "masterId": "881bd792-8e24-4473-bb5a-a37f1e40eb1b",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cd043650c6110cd8b22150b0ca135f6f",
+   "newHash": "ac2b51ef6973bd29f5379ea0a993cd18",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,만 12개월 미만의 젖먹이,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 543
+    }
+   ]
+  },
+  {
+   "koId": "615b6444-cd3d-4088-95de-588b3b53a800",
+   "masterId": "c5f9c674-487e-437d-b341-489803ff9a4e",
+   "sourceType": "mfds_drug_otc",
+   "oldHash": "cd043650c6110cd8b22150b0ca135f6f",
+   "newHash": "ac2b51ef6973bd29f5379ea0a993cd18",
+   "restored": [
+    {
+     "before": "이 약에 과민증 환자,만 12개월 미만의 젖먹이,갈락토오스 불내성,Lapp 유당분해효소 결핍증 또는 포도당,갈락토오스 흡수장애 등의 유전적인 문",
+     "beforeLen": 260,
+     "afterItems": 8,
+     "afterLen": 543
+    }
+   ]
+  }
+ ],
+ "skips": [
+  {
+   "id": "ac1e6660-bd30-44eb-b6f4-a073dd954eb2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "41adfe62-d20e-4b6c-91c4-8a07be382453",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "1c7c9f50-e295-4e00-b6dc-f8d2ae993c21",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "fda9531c-559d-4c5f-90fd-05ce6df4844c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "be4c7769-34a6-477a-8122-f83254dfac61",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "99be290c-eb67-4ae5-8b53-a2d8cab083b3",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e1b3790e-9187-490c-8b38-eaefdf752001",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "fe7b3306-4052-4896-9c8b-f7af8e81c0fd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "049bb468-21ec-4901-aa50-c4d7b1b962c6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "229ef0b7-7ce1-48e0-b0e5-a7b86fa0e16f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6da43049-75a4-486a-ac8a-a4a2dbf19e66",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6e20a8e6-bd92-4d10-887b-a7685c785ccc",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "cd571ba0-6dd6-4c80-924d-5763b9ef747d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "7edaecbc-b14f-4827-a617-1f5b3a673393",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "62c00347-e323-4e5f-baa7-d305d0291663",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "771d4521-d7f5-4abd-ab10-7cfe501973bb",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "5e1fe1f6-241b-4c52-b085-ea25699e1352",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "90bc3ab6-ad56-4c34-8d03-0ee5c078b491",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "0b14c5c1-b707-4d80-9f8f-354f5a4cff4b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "aab631cc-4255-4c9a-805e-2fa064287742",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ca469e0c-55ed-4bbb-b3e6-13e32a98102c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8cd0628c-0b0c-4ad9-a7bd-520616b9503c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "dc399942-3991-4688-907e-f08500380946",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ade46c3b-26f3-4149-b938-04664d492808",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2bfb1321-6dd0-421d-a448-1988b95189dd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6d13db72-2c17-4dfd-ad3d-4c75b1efc1e7",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "056066f9-1a85-4b07-9de9-55e122204686",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b11e8162-11f2-42eb-972c-3782b070c273",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3bcc1638-5fe0-47f4-a5af-6e5514469b5d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8cd285a8-b1e6-45bc-930c-89e2898376d9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f9c5bee5-76b4-44e6-b37e-2b3bc4d03f9b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "37e93ca5-9e66-47f0-a9b6-6e7566926f3f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ab4d1219-723b-42bb-b940-139fb11e5dbe",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "bb4c46e3-b21a-43d8-bb81-f6d8a80e4451",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "20473547-e644-4d34-97fb-ae727bd0869a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "30bf9896-c42b-4f48-9832-3d44cbebb389",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b651a780-e5a2-4f34-a2b1-9a21e4293d3e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c5592f8e-512c-4b3d-9e75-66a8580d6acb",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "49d1394b-bf09-4123-8835-8d613915aeef",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "00ce29db-390b-4209-a267-b7b61929d0ac",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3b249254-67a7-4a78-a2e1-19310556936b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "88a8f5bd-7d65-46f3-8664-8fdbb5e2b4fa",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "9de53398-94c6-4457-ad03-35c1a906ca2f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "901133a4-a69a-4b05-8c6b-8ef818922066",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b61dcb93-2019-48e5-b059-d37838ac5fe9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d1f98bd7-3ac0-48c1-83d1-b63dcf31a2a3",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e0baf1a9-c9c3-4b50-9cc9-336079f60fa4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b323ea95-051c-48d0-9a33-c894ab4c3f21",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "94522a57-ba65-4cc5-8d48-463fbd092e9e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8aa06214-485b-41dc-b4ac-d0e68fb51a74",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2d2511c3-4024-4aa5-b79b-03437075a39c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e0125aed-2e52-45fa-b2a6-35a48ad41c34",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d57e557d-b920-4546-9684-c46e4e2835ac",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6e4f67a7-19f5-4d6c-99ae-359d0bb73260",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c3436eb8-1235-4a46-966e-1d1d47ad0342",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "30d4625d-7796-48de-9165-924da6f5ff96",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "67b647fe-5f1b-4f14-a339-88ccb6d9b320",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "17248ad9-98f3-429d-b169-18f1a87df3c6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "4c7b8106-8c3f-41bc-adc7-e83626ee4bee",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6b5fd451-f4b5-443a-a357-91f9b1b12ac6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "5a2dd908-2247-4b86-9d1e-92626c8407b2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "1bca4be6-4f03-4e47-a99d-1ef53d5344b8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "a0c42f97-f4fb-4da3-8bd1-272a63869eb9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "eac89c48-b952-426c-84aa-10c2b53c8fe1",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e643775c-3afb-4ddf-abcc-a6e39f5e11da",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "df6ecf03-c216-49d1-b6ed-ade1745e445b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c1ba9db3-72bd-4e77-9c5d-a93d015a1475",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f869d150-ddba-4db7-bce9-5946308880a5",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "31d3b755-8608-426c-a748-d2e4238a047a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b60f0d2a-ad24-4477-9048-2b0e1ba3b867",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "10e63658-cb75-4205-b571-781257324b48",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "7fca42b5-7411-4414-a88d-6e93ddf3011a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "a43657df-ed7b-4f24-9779-ab7b1ba78d33",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b17dae8c-ca50-4342-bc9d-992db25a25f6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3716a3e6-f229-4773-9a6d-5a145a3b2218",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "30882d6b-e047-43c5-862f-f355159505b4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "fff4035a-0104-4369-b4f3-926c44c654f3",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c0a83e60-a1b2-491e-a138-b0e86d76cfe4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f9e26f92-07b3-4824-a6bd-b52b90216d4e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d10d5ea7-9aa3-4d94-9681-04fe161bc741",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3ec94bfc-304c-421d-9584-a9053f50d96f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "aef435fc-9f10-42ed-86ea-23a66b07ea2d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "940136d4-690f-4d03-82b9-bcf9df220461",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "18cd694f-28e4-43a0-9d5d-b44366832251",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b83adf2d-c88c-4750-9428-09b3fc8656f6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e2203f80-c385-41e2-9c29-5f0e206f734c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3ac34a13-be8f-427a-ad04-488029e772f1",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "dbe95151-9083-4037-b240-6835f6a4fe36",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "0c6e0898-2a39-481f-ab61-dd1256040bcc",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "31cd9efa-ddd3-4d41-93ef-f9e1bf3ec78e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "fc1a32b6-9e88-42fd-a4a2-6d0aa07c0ab9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6945516b-20fd-4744-9ecd-804f4974a1ac",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "9024fd19-52a0-406f-9f06-72728646f8bf",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d8b5653e-b96c-4725-9e45-8fcf2600686c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e31ac732-88a3-4c7d-b54a-4a867c605c8d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "18ed21a0-8079-4b4c-b9ce-85b2d0af0d42",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8d403f34-c36a-40c3-96ea-65e8635fc5a4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c49ab5ee-6ab9-4475-872d-a6dfb0f266df",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2d57c5fb-579f-4425-8730-055ca25deec9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "06178d2e-ef1d-4bb3-be40-ca32a5380a35",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ed29ef8e-2f0e-4f92-81d6-d7fb73e30ef9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "be87aa9a-b9a5-4b76-8f7d-3a6abed30177",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "36e0ff01-ac5d-4f1e-b85e-3d6558c27010",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c882ccb3-f8c4-452c-bfd4-bb1d2a5669c4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "66f7abc9-136f-49ec-b7fe-e4afbe6cfd9d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f8336ebb-325f-4c83-91fa-e60caa34c8f4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c8562259-43ef-4737-94d2-e8f9abfa966d",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "63214a6f-014b-47ff-b160-4b6703563273",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "00d08f47-dd67-4e3c-8a87-130936808812",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "10a9363e-1dfa-4f8d-b8f6-2abbe81d33a9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b4933968-fda4-4ec3-875d-c5a5747ba5ce",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "0dcca1ea-62cf-4f23-8495-20db62244caa",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6cac8d46-7d32-48a5-967a-c2c549fd632f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8b71fcbc-9eb4-42ee-a16b-d12eecca7e15",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "77e0e465-0af0-41e1-a13a-bb5654a072d2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "01907ee5-6799-4d54-b3bf-952f9ebaa14b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8e34441f-fa54-4be7-8ac7-52a1dbf4e52f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3fbf5de9-9473-45cf-83b1-83dcc0e84b88",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "dfc54a62-1afc-4291-99e9-2b3dc523b3fa",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f4365ad4-6d38-4d9f-a668-8ebcd82e3cc2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "90c13a22-1f91-48da-a1af-694209b18d0e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b6f78679-35f2-4595-8650-d685757fc71e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c3a90763-cc30-403a-b7a7-8893655b7228",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "6678d6eb-5083-44ce-a208-10475ed97fc0",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "71546874-a111-4b59-aba2-6889b576a0dd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "4a4f2e77-8dd1-420d-bb34-a2b509020d0b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "aede9a9f-a407-4b1b-b5c9-9e2761178b86",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "35ce79d0-f619-4f2c-836e-a12ce8ea4646",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3d0e9400-c82f-4afa-afe9-0301fb846b2e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2b71a5b6-1aad-48cf-a252-65e5190bb483",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "1b433077-797a-48f2-8a0b-2c8a5825e660",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f66f7e73-7084-4fe4-9229-7cc7e87c1242",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "7bf853d8-9a3d-4c94-b184-48848e59a164",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e3f649a0-ab9c-4492-b9aa-802496ae9203",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "21597196-61c6-4106-96fe-bcda5d4797e0",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e21c00f3-e69b-4fe3-aa50-ba263c1d67e8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "9ea57f06-7a55-4c3b-9745-33d02f3cfea6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "9094b071-c55e-4ee1-9fb2-285e025f7b4a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f64d7ca5-934a-4dd4-ab0d-9a53f588d56f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ea9ab367-29be-46a6-9a5d-277892bf179a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b73d8db7-8c6b-40bb-8373-02537eff1ef8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b30fabfc-9238-4d4c-a81c-f61e8b2d56d0",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "94f45558-a5c0-4ce0-9008-72fb4f04d8e2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "a7bdee22-5e75-4110-91f5-e07d652311e9",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "592e0b39-7489-42e1-a457-659aa2587191",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8242ea03-9239-4f53-90d7-14423c82cc15",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "aa577533-2097-4918-a657-b80936ce20e8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d22dde72-0603-4843-8867-292a811b8b85",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "302ec58d-4ec9-43c2-a58f-996d3b0003d6",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f01fd8f5-8363-44b8-9385-672a50f60609",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "01f27b0f-93a7-44f6-b7f4-77bfc1f0a799",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "76900254-7d4f-476c-94ea-0aeef5e25bcc",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "5af4e314-d575-4af8-abc4-3b8310c1d02f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "62666f70-ab22-4a41-995c-4a57b694fd16",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c2b66295-cf5c-49ad-b54e-bcaddc0bea36",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e20337c0-a5a2-4f9a-b04f-c3af5b95f9a0",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3f59ea8f-9114-4228-aa90-92da6a14483b",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "81cca6c1-0110-4bb8-bb40-98f982eaecba",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "3c40fbaa-62bd-4a0b-949a-0acfa90d79f5",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "77f42e6b-3d34-4012-9a37-a84e50a38a6c",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "53bc3984-37d8-4099-bcae-c6990fd2ae0f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d287b76b-8407-495b-8e10-035742fbc96a",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "fc365cc9-a211-42e6-8696-484d8de043de",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "91fb192e-119e-4649-951c-3ba6dccc05e8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ce1cb8f7-fad2-465e-83cb-0468ddafdf24",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "9c2ef785-ee58-4cee-9e94-92ec1fc277ea",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "074a2691-bbcb-4e05-8b1c-ae9ae5497f8f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "4a8b73e9-8776-465e-bca7-3d71c452301f",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "f5b89782-d644-4ac5-a065-09df1769f781",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "cf6aff86-d1cb-46c2-a8be-77803bcc6ba8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "0a7c6ec0-04c8-4eff-ba53-76c5d845a1c8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "ae652025-ecc8-4bc8-a901-d00509b21963",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "388d5465-a022-41ac-81aa-0731157d5c04",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "5e2a9ab5-1012-4b57-8b31-94df95f042c7",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "1e83a488-24be-4e94-8471-1532aa2a33e4",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8ac1dca5-86df-4a87-81d8-7b6eccda6290",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e2e7509e-df73-4452-add9-88b8d9ef3cd8",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "eeec2a8c-c287-4333-b5f7-4e3b9d23d5a3",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2e489ade-6a36-49ff-ab4c-80aca56f35ea",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c08a89f6-65ff-454b-9df8-a4b8d2e28919",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "97bdb0ee-1d49-43e8-981e-a33ac60b4211",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "2f955b7f-5690-4182-8068-ab4206a5c4cd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "e0164945-8f91-4329-8067-624c2dfc7fa7",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "8b4d5dde-74fb-4193-ba5e-8b6c74d2c0ba",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "13cbfb8e-7b71-4afe-845d-33739c8edccd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "dc446b86-5377-498c-922c-88fc3d44dece",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "14a5e542-3eb5-4931-bccf-2a690dd60db2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "d2e7f0b8-b9ff-4a4b-8eac-8835eb233aa1",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "04e173a9-24b1-48ee-b380-0acfc085f837",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "c944dc21-56f4-4e32-8441-8139f7f5a583",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "705767aa-0300-4af8-97a9-b95784df9ee2",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "4f884df8-08c8-4553-abe2-ee6683fb30a5",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b9de8548-eaf0-4c37-a2bc-14d94ace7ada",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "5fc128df-77f4-406b-91c8-c5f2748802f7",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "22d52d62-0d50-470d-8417-e99fb82a41fd",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "a515a746-9deb-436f-9639-62f6c23014a0",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "b3624eb3-d136-4f3e-9597-ec5348770d36",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "dc5760f5-ba68-40c7-a9ef-d44f2f9ab4d7",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "62e3580f-ae8b-456a-a158-46312273e02e",
+   "code": "NO_PROVEN_DAMAGE"
+  },
+  {
+   "id": "7a600075-4ca4-4d8c-b242-0b88603d4620",
+   "code": "NO_PROVEN_DAMAGE"
+  }
+ ],
+ "results": []
+}
