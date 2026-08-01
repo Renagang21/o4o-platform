@@ -1,0 +1,3046 @@
+{
+ "note": "R1 자동 복원 후보 — 절단본이 정상 완결본의 엄격한 접두이며 수치 안전지문이 일치하는 건만. 본 원장은 계획서이며 DB 반영은 별도 WO.",
+ "total": 190,
+ "candidates": [
+  {
+   "id": "badge:42a739626a1b",
+   "kind": "badge",
+   "docs": 4,
+   "masters": 4,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개즙) 분비 부전으로 오는 간질환, 담도(쓸개길)(담관(쓸개관), 담낭(쓸개))계 질환의 보조치료로 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 8,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:42a739626a1b",
+   "kind": "tile",
+   "docs": 4,
+   "masters": 4,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 식체(위체), 소화촉진, 소화불량으로 인한 위부팽만감과 담즙(쓸개즙) 분비 부전으로 오는 간질환, 담도(쓸개길)(담관(쓸개관), 담낭(쓸개))계 질환의 보조치료로 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 8,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:a69e56e745a6",
+   "kind": "badge",
+   "docs": 5,
+   "masters": 5,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, B1, B2, B6 의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화와 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화, 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 5,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:a69e56e745a6",
+   "kind": "tile",
+   "docs": 5,
+   "masters": 5,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, B1, B2, B6 의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화와 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화, 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 5,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4764ab42e325",
+   "kind": "badge",
+   "docs": 14,
+   "masters": 14,
+   "before": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕…",
+   "after": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 14,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4764ab42e325",
+   "kind": "tile",
+   "docs": 14,
+   "masters": 14,
+   "before": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕…",
+   "after": "위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역, 구토, 위통, 신트림, 소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 14,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:ea86dc9f0ce2",
+   "kind": "badge",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, E의 보급과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 14,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:ea86dc9f0ce2",
+   "kind": "tile",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, E의 보급과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 14,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:48cad306ac54",
+   "kind": "badge",
+   "docs": 26,
+   "masters": 26,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 A, D, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀 염), 습진, 피부염 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 52,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:48cad306ac54",
+   "kind": "tile",
+   "docs": 26,
+   "masters": 26,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 A, D, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀 염), 습진, 피부염 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 52,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:7560d1e973e2",
+   "kind": "badge",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, …",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, B1의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 12,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:7560d1e973e2",
+   "kind": "tile",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, …",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 D, B1의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 12,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:651df307aba5",
+   "kind": "badge",
+   "docs": 11,
+   "masters": 11,
+   "before": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모질환, 임신수유기 등의 경우의 …",
+   "after": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모질환, 임신수유기 등의 경우의 영양보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 11,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:651df307aba5",
+   "kind": "tile",
+   "docs": 11,
+   "masters": 11,
+   "before": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모질환, 임신수유기 등의 경우의 …",
+   "after": "자양강장, 허약체질, 육체피로, 병중병후, 위장장해, 영양장해, 발열성소모질환, 임신수유기 등의 경우의 영양보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 11,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:e511a8be9a3d",
+   "kind": "badge",
+   "docs": 14,
+   "masters": 14,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈, 비출혈(코피) 예방, 말초혈행장애, 갱년기시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움) 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 28,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:e511a8be9a3d",
+   "kind": "tile",
+   "docs": 14,
+   "masters": 14,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈, 비출혈(코피) 예방, 말초혈행장애, 갱년기시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움) 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 28,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:937babb50d9b",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 …",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:937babb50d9b",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 …",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b01301a5fcf2",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b01301a5fcf2",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f04733092458",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 칼슘 결핍 및 기타 칼슘 보급과 뼈, 이의 발육불량, …",
+   "after": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 칼슘 결핍 및 기타 칼슘 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f04733092458",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 칼슘 결핍 및 기타 칼슘 보급과 뼈, 이의 발육불량, …",
+   "after": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 칼슘 결핍 및 기타 칼슘 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:5e7fadf579bd",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B2, B…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:5e7fadf579bd",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B2, B…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:97388a655192",
+   "kind": "badge",
+   "docs": 9,
+   "masters": 9,
+   "before": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 9,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:97388a655192",
+   "kind": "tile",
+   "docs": 9,
+   "masters": 9,
+   "before": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 9,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:32db59cf9353",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감의 완화, 야맹증, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈 예방, 말초혈행장애 및 갱년기시 어깨ㆍ목결림, 수족(손발)저림ㆍ수족냉증(손발이 차가움) 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:32db59cf9353",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감의 완화, 야맹증, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈 예방, 말초혈행장애 및 갱년기시 어깨ㆍ목결림, 수족(손발)저림ㆍ수족냉증(손발이 차가움) 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:77b812c92240",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "괴혈병의 예방과 치료와 임신, 수유기 및 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시…",
+   "after": "괴혈병의 예방과 치료와 임신, 수유기 및 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 비타민 C의 요구량이 증가하는 소모성 질환과 잇몸출혈, 비출혈(코피), 혈뇨 등의 모세관출혈, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨), 흡수불량 등 비타민 C 결핍으로 추정되는 경우에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:77b812c92240",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "괴혈병의 예방과 치료와 임신, 수유기 및 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시…",
+   "after": "괴혈병의 예방과 치료와 임신, 수유기 및 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 비타민 C의 요구량이 증가하는 소모성 질환과 잇몸출혈, 비출혈(코피), 혈뇨 등의 모세관출혈, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨), 흡수불량 등 비타민 C 결핍으로 추정되는 경우에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d1c00242d395",
+   "kind": "badge",
+   "docs": 6,
+   "masters": 6,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 정장, 변비, 묽…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 정장, 변비, 묽은 변, 복부팽만감, 장내이상발효에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d1c00242d395",
+   "kind": "tile",
+   "docs": 6,
+   "masters": 6,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 정장, 변비, 묽…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 정장, 변비, 묽은 변, 복부팽만감, 장내이상발효에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:493f611bc2d8",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:493f611bc2d8",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d8981b140e6a",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후) 체력 저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후) 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기ㆍ눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d8981b140e6a",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후) 체력 저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후) 체력 저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기ㆍ눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b4ae6441f59a",
+   "kind": "badge",
+   "docs": 5,
+   "masters": 5,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움) 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸 출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 10,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b4ae6441f59a",
+   "kind": "tile",
+   "docs": 5,
+   "masters": 5,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, C, E의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움) 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸 출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 10,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:edddc1129131",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 체함, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:edddc1129131",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 소화촉진, 소화불량으로 인한 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 체함, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:58f1012514ec",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "철 결핍성 빈혈의 예방 및 치료와 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시 …",
+   "after": "철 결핍성 빈혈의 예방 및 치료와 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B6의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:58f1012514ec",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "철 결핍성 빈혈의 예방 및 치료와 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시 …",
+   "after": "철 결핍성 빈혈의 예방 및 치료와 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B6의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f7b58909f998",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6의 보급과 말초혈행장애 및 갱년기의 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 각기, 눈의 피로와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f7b58909f998",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 E, B1, B2, B6의 보급과 말초혈행장애 및 갱년기의 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 각기, 눈의 피로와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f42441d7e7cd",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "칼슘결핍 및 기타 칼슘의 보급과 뼈, 이의 발육불량, 구루병의 예방 및 임신·수유기, 발육기, 노년기의 …",
+   "after": "칼슘결핍 및 기타 칼슘의 보급과 뼈, 이의 발육불량, 구루병의 예방 및 임신·수유기, 발육기, 노년기의 비타민 D의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f42441d7e7cd",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "칼슘결핍 및 기타 칼슘의 보급과 뼈, 이의 발육불량, 구루병의 예방 및 임신·수유기, 발육기, 노년기의 …",
+   "after": "칼슘결핍 및 기타 칼슘의 보급과 뼈, 이의 발육불량, 구루병의 예방 및 임신·수유기, 발육기, 노년기의 비타민 D의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4d9d13aeba6c",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, …",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4d9d13aeba6c",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, …",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:9b88dcf8e2d9",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력저하 시의 비타민 B1 의 보급…",
+   "after": "육체피로, 임신‧수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력저하 시의 비타민 B1 의 보급 및 아연, 셀레늄의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:9b88dcf8e2d9",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력저하 시의 비타민 B1 의 보급…",
+   "after": "육체피로, 임신‧수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력저하 시의 비타민 B1 의 보급 및 아연, 셀레늄의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d2486bad9de7",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 B1,…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 B1, B2, B6, D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 각기, 눈의 피로, 뼈나 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d2486bad9de7",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 B1,…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 발육기, 노년기의 비타민 B1, B2, B6, D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 각기, 눈의 피로, 뼈나 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:8f86f21479f4",
+   "kind": "badge",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6 의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:8f86f21479f4",
+   "kind": "tile",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6 의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:624af8b4bd6e",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기ㆍ눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈, 비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:624af8b4bd6e",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기ㆍ눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈, 비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:04ee09ecc123",
+   "kind": "badge",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년…",
+   "after": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염 증상의 완화와 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:04ee09ecc123",
+   "kind": "tile",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년…",
+   "after": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염 증상의 완화와 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:68fbd2f4672e",
+   "kind": "badge",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 발육기, 노년기의 비타…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급, 뼈, 이의 발육불량, 구루병의 예방, 말초혈행장애 및 갱년기 시 어깨·목 결림, 수족저림, 수족냉증(손발이 차가움)의 완화, 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 7,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:68fbd2f4672e",
+   "kind": "tile",
+   "docs": 7,
+   "masters": 7,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 발육기, 노년기의 비타…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급, 뼈, 이의 발육불량, 구루병의 예방, 말초혈행장애 및 갱년기 시 어깨·목 결림, 수족저림, 수족냉증(손발이 차가움)의 완화, 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 7,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:73d15bea3283",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신,…",
+   "after": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신, 수유기, 병증 및 병후의 체력 저하 시에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:73d15bea3283",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신,…",
+   "after": "햇볕 및 피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈 및 비출혈 예방, 육체피로, 임신, 수유기, 병증 및 병후의 체력 저하 시에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d7842878e49f",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B2, B6, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B2, B6, C의 보급과 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d7842878e49f",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B2, B6, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B2, B6, C의 보급과 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:13afec94b1b4",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 구역, 구토…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 구역, 구토에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:13afec94b1b4",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 구역, 구토…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감, 구역, 구토에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:1d977eeeca1b",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 A, E, B1…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 A, E, B1, B2의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 눈의 건조감의 완화, 야맹증, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:1d977eeeca1b",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 A, E, B1…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 A, E, B1, B2의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 눈의 건조감의 완화, 야맹증, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b7ed9e2ebd10",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, B1의 보급과 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움)의 완화, 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화, 각기, 눈의 피로, 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b7ed9e2ebd10",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 E, B1의 보급과 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림ㆍ수족냉증(손발이 차가움)의 완화, 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화, 각기, 눈의 피로, 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:89271f835f40",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, …",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6 의 보급 또는 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 뼈·이의 발육불량, 구루병의 예방, 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:89271f835f40",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, …",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6 의 보급 또는 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 뼈·이의 발육불량, 구루병의 예방, 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d4ea2e30b583",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d4ea2e30b583",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:96f73a6b0c12",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 뼈, 이의 발육불량, 구루병의 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:96f73a6b0c12",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상), 뼈, 이의 발육불량, 구루병의 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:8fe5f64e163c",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B1, B…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화 및 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:8fe5f64e163c",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B1, B…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시, 노년기의 비타민 E, B1, B2, B6, C의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화 및 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:3ccd4763393f",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하, 발육기, 노년기의 비타민 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하, 발육기, 노년기의 비타민 B1, B2, B6, C, D의 보급, 신경통, 근육통, 관절통(요통,어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 각기, 눈의 피로, 뼈, 이의 발육불량, 구루병의 예방의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:3ccd4763393f",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하, 발육기, 노년기의 비타민 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하, 발육기, 노년기의 비타민 B1, B2, B6, C, D의 보급, 신경통, 근육통, 관절통(요통,어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 각기, 눈의 피로, 뼈, 이의 발육불량, 구루병의 예방의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:506ce57d71fa",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1의 보급과 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:506ce57d71fa",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1의 보급과 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:de1fa579068f",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "습진, 여드름, 두드러기, 피부발진, 기미, 주근깨, 햇볕에 탄 부위 등의 색소침착증, 약물에 의한 피부…",
+   "after": "습진, 여드름, 두드러기, 피부발진, 기미, 주근깨, 햇볕에 탄 부위 등의 색소침착증, 약물에 의한 피부염, 전신권태에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:de1fa579068f",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "습진, 여드름, 두드러기, 피부발진, 기미, 주근깨, 햇볕에 탄 부위 등의 색소침착증, 약물에 의한 피부…",
+   "after": "습진, 여드름, 두드러기, 피부발진, 기미, 주근깨, 햇볕에 탄 부위 등의 색소침착증, 약물에 의한 피부염, 전신권태에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4f2bbfe1a843",
+   "kind": "badge",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민 D, B1의 보급과, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4f2bbfe1a843",
+   "kind": "tile",
+   "docs": 6,
+   "masters": 6,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 발육기, 노년기의 비타민 D, B1의 보급과, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:8a475718c5ea",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "칼슘 결핍 및 기타 칼슘보급과 임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급 및 뼈, 이의 발육불량,…",
+   "after": "칼슘 결핍 및 기타 칼슘보급과 임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급 및 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:8a475718c5ea",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "칼슘 결핍 및 기타 칼슘보급과 임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급 및 뼈, 이의 발육불량,…",
+   "after": "칼슘 결핍 및 기타 칼슘보급과 임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급 및 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:2495dfb54695",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민…",
+   "after": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 A, B1, B2의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화 및 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:2495dfb54695",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민…",
+   "after": "육체피로, 임신 · 수유기, 병중 · 병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 A, B1, B2의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화 및 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4a474e5d65ef",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기…",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4a474e5d65ef",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기…",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f87078496c54",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "식욕감퇴(식욕부진), 위부팽만감, 소화불량, 과식, 체함, 구역, 구토, 소화촉진, 소화불량으로 인한 위…",
+   "after": "식욕감퇴(식욕부진), 위부팽만감, 소화불량, 과식, 체함, 구역, 구토, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f87078496c54",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "식욕감퇴(식욕부진), 위부팽만감, 소화불량, 과식, 체함, 구역, 구토, 소화촉진, 소화불량으로 인한 위…",
+   "after": "식욕감퇴(식욕부진), 위부팽만감, 소화불량, 과식, 체함, 구역, 구토, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d055dbada2c6",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력저하시 비타민 B1, B2, B6 의 보급과 신경통, 근육통, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력저하시 비타민 B1, B2, B6 의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화와 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d055dbada2c6",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력저하시 비타민 B1, B2, B6 의 보급과 신경통, 근육통, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력저하시 비타민 B1, B2, B6 의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화와 각기, 눈의피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:9c2c272a7daa",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "눈의 건조감 증상의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 임신수유기, 병중.병후 체력저하때, …",
+   "after": "눈의 건조감 증상의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 임신수유기, 병중.병후 체력저하때, 발육기, 노년기의 비타민 A, D의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:9c2c272a7daa",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "눈의 건조감 증상의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 임신수유기, 병중.병후 체력저하때, …",
+   "after": "눈의 건조감 증상의 완화, 치골의 발육불량, 야맹증, 구루병 예방과 임신수유기, 병중.병후 체력저하때, 발육기, 노년기의 비타민 A, D의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:1e7d10f412cb",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "발육기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 육체피로, 임신ㆍ수유기, 노년기의 비…",
+   "after": "발육기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 육체피로, 임신ㆍ수유기, 노년기의 비타민 A, B1, B2, B6, C, D, E의 보급과 눈의 건조함의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:1e7d10f412cb",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "발육기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 육체피로, 임신ㆍ수유기, 노년기의 비…",
+   "after": "발육기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 육체피로, 임신ㆍ수유기, 노년기의 비타민 A, B1, B2, B6, C, D, E의 보급과 눈의 건조함의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:7488c052b253",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "위산과다, 속쓰림, 소화불량, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림, 과식, 소화…",
+   "after": "위산과다, 속쓰림, 소화불량, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림, 과식, 소화촉진, 식욕감퇴에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:7488c052b253",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "위산과다, 속쓰림, 소화불량, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림, 과식, 소화…",
+   "after": "위산과다, 속쓰림, 소화불량, 위부불쾌감, 위부팽만감, 체함, 구역, 구토, 위통, 신트림, 과식, 소화촉진, 식욕감퇴에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:c71ef48a7417",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A1, B1, B2, C,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A1, B1, B2, C, D, E의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:c71ef48a7417",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A1, B1, B2, C,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A1, B1, B2, C, D, E의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4d72c160e647",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중(병을 앓는동안)·병후(회복후)의 체력 저하 시 비타민 B1, B2, B6,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중(병을 앓는동안)·병후(회복후)의 체력 저하 시 비타민 B1, B2, B6, C의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4d72c160e647",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중(병을 앓는동안)·병후(회복후)의 체력 저하 시 비타민 B1, B2, B6,…",
+   "after": "육체피로, 임신ㆍ수유기, 병중(병을 앓는동안)·병후(회복후)의 체력 저하 시 비타민 B1, B2, B6, C의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b8a5d67f6124",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "임신 및 수유기, 발육기, 노년기의 비타민 D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 뼈…",
+   "after": "임신 및 수유기, 발육기, 노년기의 비타민 D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 뼈나 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b8a5d67f6124",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "임신 및 수유기, 발육기, 노년기의 비타민 D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 뼈…",
+   "after": "임신 및 수유기, 발육기, 노년기의 비타민 D의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 뼈나 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f9efe44e8992",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 노년기의 비타민 E, B2, B6…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 노년기의 비타민 E, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f9efe44e8992",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 노년기의 비타민 E, B2, B6…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 노년기의 비타민 E, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 말초혈행장애 및 갱년기 시 어깨 및 목결림, 수족저림 및 수족냉증 증상의 완화에 사용합니다. 이 약은 함유된 비타민 등을 통해 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:2b77ddb62173",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 견통(어깨통증) 등), 구각염(입꼬리염), 구순염 (입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:2b77ddb62173",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요(허리)통, 견통(어깨통증) 등), 구각염(입꼬리염), 구순염 (입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로, 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:593b4282571f",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 B1,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화와 각기, 눈의 피로, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:593b4282571f",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 B1,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화와 각기, 눈의 피로, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 3,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:13b1eea26390",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B1, B2,…",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B1, B2, B6의 보급과 신경통, 근육, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화, 각기 및 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:13b1eea26390",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B1, B2,…",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시의 비타민 B1, B2, B6의 보급과 신경통, 근육, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화, 각기 및 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:81729bd16c24",
+   "kind": "badge",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시의 비타민 B1, B2, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시의 비타민 B1, B2, B6의 보급, 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화, 각기 ᠊ 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:81729bd16c24",
+   "kind": "tile",
+   "docs": 3,
+   "masters": 3,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시의 비타민 B1, B2, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력저하시의 비타민 B1, B2, B6의 보급, 신경통, 근육통, 관절통(요통, 어깨결림 등)의 완화, 각기 ᠊ 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 6,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f69679d6f6f7",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민D, B1, B2, B6, …",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민D, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방과 신경통, 근육통, 관절통(요통(허리통), 견통(어깨결림, 어깨통증) 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f69679d6f6f7",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민D, B1, B2, B6, …",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시, 발육기, 노년기의 비타민D, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방과 신경통, 근육통, 관절통(요통(허리통), 견통(어깨결림, 어깨통증) 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f489f847331d",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급, 말초혈행장애 및 갱년기 증상(어깨·목결림, 수족저림·수족냉증(손발이 차가움)…",
+   "after": "노년기의 비타민 E의 보급, 말초혈행장애 및 갱년기 증상(어깨·목결림, 수족저림·수족냉증(손발이 차가움) 등)의 완화 및 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f489f847331d",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급, 말초혈행장애 및 갱년기 증상(어깨·목결림, 수족저림·수족냉증(손발이 차가움)…",
+   "after": "노년기의 비타민 E의 보급, 말초혈행장애 및 갱년기 증상(어깨·목결림, 수족저림·수족냉증(손발이 차가움) 등)의 완화 및 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:202fe57196c7",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:202fe57196c7",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민D의 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:1dd26f3dd0da",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진…",
+   "after": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진, 구역, 구토에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:1dd26f3dd0da",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진…",
+   "after": "위부불쾌감, 위부팽만감, 위통, 위산과다, 속쓰림, 신트림, 과식, 체함, 소화불량, 소화촉진, 식욕부진, 구역, 구토에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:0dffc6f0c05a",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "발육기, 육체피로, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기, 임신·수유기의 비타민…",
+   "after": "발육기, 육체피로, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기, 임신·수유기의 비타민 D, B1, B2, B6, C의 보급 및 뼈, 이의 발육불량·구루병의 예방·각기·눈의 피로, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:0dffc6f0c05a",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "발육기, 육체피로, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기, 임신·수유기의 비타민…",
+   "after": "발육기, 육체피로, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기, 임신·수유기의 비타민 D, B1, B2, B6, C의 보급 및 뼈, 이의 발육불량·구루병의 예방·각기·눈의 피로, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:abba6f3f96ab",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, E, B1, B2, B6, C…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상)과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화와 각기, 눈의 피로와 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(허염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:abba6f3f96ab",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, E, B1, B2, B6, C…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 노년기의 비타민 A, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못 보는 증상)과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화와 각기, 눈의 피로와 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(허염), 습진, 피부염 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:6d1a4e1390ac",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체 피로, 임신·수유기, 병중·병후의 비타민 B1, B2, B6의 보급 및 각기, 눈의 피로 또는 신경…",
+   "after": "육체 피로, 임신·수유기, 병중·병후의 비타민 B1, B2, B6의 보급 및 각기, 눈의 피로 또는 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:6d1a4e1390ac",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체 피로, 임신·수유기, 병중·병후의 비타민 B1, B2, B6의 보급 및 각기, 눈의 피로 또는 신경…",
+   "after": "육체 피로, 임신·수유기, 병중·병후의 비타민 B1, B2, B6의 보급 및 각기, 눈의 피로 또는 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4f701e8c0752",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증의 완화와 마그네슘…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증의 완화와 마그네슘 결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4f701e8c0752",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증의 완화와 마그네슘…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증의 완화와 마그네슘 결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:db4bd8afb5fa",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "소화성 궤양에 따른 다음 증상의 개선: 위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역,…",
+   "after": "소화성 궤양에 따른 다음 증상의 개선: 위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역,구토, 위통, 신트림, 소화불량에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:db4bd8afb5fa",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "소화성 궤양에 따른 다음 증상의 개선: 위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역,…",
+   "after": "소화성 궤양에 따른 다음 증상의 개선: 위산과다, 속쓰림, 위부불쾌감, 위부팽만감, 식체(위체), 구역,구토, 위통, 신트림, 소화불량에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:4aed1759e222",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기…",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:4aed1759e222",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신ㆍ수유기, 발육기, 노년기의 비타민 D 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기…",
+   "after": "임신ㆍ수유기, 발육기, 노년기의 비타민 D 보급과 뼈, 이의 발육불량, 구루병의 예방과 칼슘 결핍 및 기타 칼슘의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:a19b26a44e56",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6, C의…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6, C의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:a19b26a44e56",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6, C의…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6, C의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:559b3f4596f3",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 B1,B2, B6, D의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염 증상의 완화와 뼈, 이의 발육불량, 구루병의 예방, 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:559b3f4596f3",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "육체피로, 임신‧수유기, 병중‧병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 B1,B2, B6, D의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염 증상의 완화와 뼈, 이의 발육불량, 구루병의 예방, 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:47372e8aa33b",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:47372e8aa33b",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1…",
+   "after": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화 및 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:504b0bb28c86",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신 ∙ 수유기, 발육기, 노년기의 비타민 D 보급, 뼈, 이의 발육불량, 구루병의 예방, 칼슘 결핍 및…",
+   "after": "임신 ∙ 수유기, 발육기, 노년기의 비타민 D 보급, 뼈, 이의 발육불량, 구루병의 예방, 칼슘 결핍 및 기타 칼슘 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:504b0bb28c86",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신 ∙ 수유기, 발육기, 노년기의 비타민 D 보급, 뼈, 이의 발육불량, 구루병의 예방, 칼슘 결핍 및…",
+   "after": "임신 ∙ 수유기, 발육기, 노년기의 비타민 D 보급, 뼈, 이의 발육불량, 구루병의 예방, 칼슘 결핍 및 기타 칼슘 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d2ddcc9c8a51",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d2ddcc9c8a51",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:ae2522fe03c1",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "괴혈병의 예방과 치료와 임신·수유기 및 병중 병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 …",
+   "after": "괴혈병의 예방과 치료와 임신·수유기 및 병중 병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 비타민 C의 요구량이 증가하는 소모성 질환과 잇몸출혈, 비출혈(코피), 혈뇨 등의 모세관출혈, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨), 흡수불량 등 비타민 C 결핍으로 추정되는 경우에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:ae2522fe03c1",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "괴혈병의 예방과 치료와 임신·수유기 및 병중 병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 …",
+   "after": "괴혈병의 예방과 치료와 임신·수유기 및 병중 병후(병을 앓는 동안이나 회복 후)의 체력저하, 육체피로시 비타민 C의 요구량이 증가하는 소모성 질환과 잇몸출혈, 비출혈(코피), 혈뇨 등의 모세관출혈, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨), 흡수불량 등 비타민 C 결핍으로 추정되는 경우에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:25d46acab3b9",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 병중ㆍ병후의 체력 저하 시, 임신ㆍ수유기의 비타민 B1, B6, B12의 보급과 눈의 피로, …",
+   "after": "육체피로, 병중ㆍ병후의 체력 저하 시, 임신ㆍ수유기의 비타민 B1, B6, B12의 보급과 눈의 피로, 근육통, 관절통(어깨결림, 요통, 오십견등), 신경통, 손 발의 저림 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:25d46acab3b9",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 병중ㆍ병후의 체력 저하 시, 임신ㆍ수유기의 비타민 B1, B6, B12의 보급과 눈의 피로, …",
+   "after": "육체피로, 병중ㆍ병후의 체력 저하 시, 임신ㆍ수유기의 비타민 B1, B6, B12의 보급과 눈의 피로, 근육통, 관절통(어깨결림, 요통, 오십견등), 신경통, 손 발의 저림 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:a13fa095871d",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신․수유기, 병중·병후의 체력저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 …",
+   "after": "육체피로, 임신․수유기, 병중·병후의 체력저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 보급과 뼈, 이의 발육불량, 구루병의 예방, 각기, 눈의 피로와 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:a13fa095871d",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신․수유기, 병중·병후의 체력저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 …",
+   "after": "육체피로, 임신․수유기, 병중·병후의 체력저하 시, 발육기, 노년기의 비타민 D, B1, B2, B6의 보급과 뼈, 이의 발육불량, 구루병의 예방, 각기, 눈의 피로와 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b552da712250",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화와 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b552da712250",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급과 뼈, 이의 발육불량, 구루병의 예방, 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화와 각기, 눈의 피로, 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:cd18d0fd8557",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:cd18d0fd8557",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방…",
+   "after": "임신·수유기, 발육기, 노년기의 비타민 D의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:cf992a58014f",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B2, B6의 보급과 구각염, 구순염, 구내염…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B2, B6의 보급과 구각염, 구순염, 구내염, 설염, 습진, 피부염, 옻오름, 짓무름, 여드름, 거칠어진 피부 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:cf992a58014f",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B2, B6의 보급과 구각염, 구순염, 구내염…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B2, B6의 보급과 구각염, 구순염, 구내염, 설염, 습진, 피부염, 옻오름, 짓무름, 여드름, 거칠어진 피부 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:8954c27371f8",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:8954c27371f8",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 …",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b08f92b4632c",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방과 철 결핍성 빈혈의 예방 및 치료와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b08f92b4632c",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시, 발육기, 노년기의 비타민 A, D, E, B1, B2, B6, C의 보급과 눈의 건조감의 완화, 야맹증, 뼈, 이의 발육불량, 구루병의 예방과 철 결핍성 빈혈의 예방 및 치료와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:70d3769f0830",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, E, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:70d3769f0830",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, E, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d58c39b32757",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기(간유, 비타민…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기(간유, 비타민 D, E 함유시)의 비타민 B1, B2, B6, E, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d58c39b32757",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기(간유, 비타민…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기(간유, 비타민 D, E 함유시)의 비타민 B1, B2, B6, E, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 4,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:a81d374b140f",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신∙수유기, 병중∙병후의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보…",
+   "after": "육체피로, 임신∙수유기, 병중∙병후의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 말초혈행장애 및 갱년기시 어깨ㆍ목결림, 수족저림, 수족냉증 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:a81d374b140f",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신∙수유기, 병중∙병후의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보…",
+   "after": "육체피로, 임신∙수유기, 병중∙병후의 체력 저하 시, 노년기의 비타민 B1, B2, B6, C, E의 보급과 말초혈행장애 및 갱년기시 어깨ㆍ목결림, 수족저림, 수족냉증 증상의 완화에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:b969c4f9569a",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애, 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애, 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:b969c4f9569a",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "노년기의 비타민 E의 보급과 말초혈행장애, 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상…",
+   "after": "노년기의 비타민 E의 보급과 말초혈행장애, 갱년기시 어깨·목결림, 수족저림·수족냉증(손발이 차가움) 증상의 완화와 마그네슘결핍으로 인한 근육경련에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:d7f66e1efbec",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B1, B2, B…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(허리통증, 어깨결림 등), 각기, 눈의 피로, 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화와 잇몸출혈·비출혈(코피) 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:d7f66e1efbec",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B1, B2, B…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하 시 비타민 B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(허리통증, 어깨결림 등), 각기, 눈의 피로, 입꼬리염, 입술염, 입안염, 혀염, 습진, 피부염, 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화와 잇몸출혈·비출혈(코피) 예방과 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:c600f1292041",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시 비타민 B6, C의 보급과 철 결핍성 빈혈의 예방 및…",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시 비타민 B6, C의 보급과 철 결핍성 빈혈의 예방 및 치료에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:c600f1292041",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시 비타민 B6, C의 보급과 철 결핍성 빈혈의 예방 및…",
+   "after": "육체피로, 임신·수유기, 병중·병후의 체력 저하 시 비타민 B6, C의 보급과 철 결핍성 빈혈의 예방 및 치료에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:dbc989828b93",
+   "kind": "badge",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, E, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림·수족냉증(손발이 차가움), 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:dbc989828b93",
+   "kind": "tile",
+   "docs": 2,
+   "masters": 2,
+   "before": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A,…",
+   "after": "육체피로, 임신·수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민 A, E, C의 보급과 눈의 건조감의 완화, 야맹증(밤에 잘 못보는 증상), 말초혈행장애 및 갱년기 시 어깨ㆍ목결림, 수족저림·수족냉증(손발이 차가움), 햇빛·피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈·비출혈(코피) 예방에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:f0b2480eccfd",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6의 보급…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화 및 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:f0b2480eccfd",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6의 보급…",
+   "after": "육체피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력저하 시 비타민 B1, B2, B6의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통 증상의 완화 및 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:9a7b3fbbd47b",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기의 비타민 A, B…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기의 비타민 A, B1, B2의 보급 또는 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 눈의 건조감의 완화, 야맹증, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:9a7b3fbbd47b",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기의 비타민 A, B…",
+   "after": "육체피로, 임신·수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력저하시, 노년기의 비타민 A, B1, B2의 보급 또는 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 눈의 건조감의 완화, 야맹증, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:09d84d203fd4",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 구…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:09d84d203fd4",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 구…",
+   "after": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 위부팽만감, 위산과다, 속쓰림, 위부불쾌감, 구역, 구토, 위통, 신트림에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:e068945a1e3b",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체 피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 발육기, 노년기의 비타민 D, …",
+   "after": "육체 피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급 및 아연의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화 및 뼈나 이의 발육 불량, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:e068945a1e3b",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체 피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 발육기, 노년기의 비타민 D, …",
+   "after": "육체 피로, 임신 및 수유기, 병을 앓는 동안이나 회복 후의 체력 저하, 발육기, 노년기의 비타민 D, E, B1, B2, B6, C의 보급 및 아연의 보급에 사용합니다. 이 약은 함유된 비타민 등을 통해 신경통, 근육통, 요통이나 어깨결림 등의 관절통, 구각염, 구순염, 구내염, 설염, 습진, 피부염 증상의 완화 및 뼈나 이의 발육 불량, 각기, 눈의 피로에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 1,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:34cd7946e311",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 B1, B2, B6, B12, C, D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방과 철 결핍성 빈혈의 예방 및 치료에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:34cd7946e311",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비…",
+   "after": "임신∙수유기, 육체피로, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 B1, B2, B6, B12, C, D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방과 철 결핍성 빈혈의 예방 및 치료에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "badge:9ff9178adccb",
+   "kind": "badge",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 A, B1, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 A, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 눈의 건조함의 완화, 야맹증(밤에 잘 못 보는 증상) 증상의 완화, 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  },
+  {
+   "id": "tile:9ff9178adccb",
+   "kind": "tile",
+   "docs": 1,
+   "masters": 1,
+   "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 A, B1, B…",
+   "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 A, B1, B2, B6, C의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염, 눈의 건조함의 완화, 야맹증(밤에 잘 못 보는 증상) 증상의 완화, 각기, 눈의 피로와 아연의 보급에 사용하는 일반의약품입니다.",
+   "source": "SAME_DOC_SLOT",
+   "evidence": {
+    "sameDocFullCandidates": 2,
+    "sameDocFullKind": "intro",
+    "safePrefixCandidates": 0,
+    "strictPrefix": true,
+    "digitFingerprintMatch": true
+   }
+  }
+ ]
+}
