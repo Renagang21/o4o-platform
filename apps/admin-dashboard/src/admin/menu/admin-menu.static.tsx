@@ -31,6 +31,7 @@ import {
   Layers,
   Shield,
   Briefcase,
+  Coins,
 } from 'lucide-react';
 
 export interface MenuItem {
@@ -111,6 +112,18 @@ export const adminMenuStatic: MenuItem[] = [
         label: 'Verifications',
         icon: <UserCheck className="w-4 h-4" />,
         path: '/admin/membership/verifications',
+      },
+      // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
+      //   포인트 운영은 금액성 write(지급/차감) 를 가진 화면이라 Admin 영역에 배치한다
+      //   (CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + **금융**).
+      //   이 메뉴에 'Admin' 이라는 별도 그룹은 없고, RBAC·Operators·Membership·Platform Settings 를
+      //   담은 `Core` 그룹이 Admin 거버넌스 그룹에 해당하므로 여기에 넣는다(신규 그룹 생성 없음).
+      //   화면 자체 guard 는 admin·super_admin 이며 변경하지 않는다.
+      {
+        id: 'core-points',
+        label: '포인트 운영',
+        icon: <Coins className="w-4 h-4" />,
+        path: '/operator/points',
       },
       {
         id: 'core-settings',
@@ -319,11 +332,29 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Yaksa (KPA)',
     icon: <Activity className="w-5 h-5" />,
     children: [
+      // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
+      //   기존 항목 `Service Dashboard → /admin/yaksa-hub` 를 **교체**한다(추가 아님).
+      //   그 경로는 `AppRouteGuard appId="yaksa-scheduler"` 로 감싸여 있고 해당 앱이 비활성이라
+      //   실제로는 `/error/app-disabled?app=yaksa-scheduler` 로 귀결되는 죽은 링크였다.
+      //   근거: IR-O4O-ADMIN-MENU-AND-ROUTE-NEXT-BATCH-SELECTION-V1 §5-1 (A안 확정)
+      //   `/admin/yaksa-hub` route 자체와 yaksa-scheduler 앱 상태는 변경하지 않는다.
       {
-        id: 'yaksa-hub',
-        label: 'Service Dashboard',
+        id: 'yaksa-admin-center',
+        label: '지부/분회 관리자 센터',
         icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/admin/yaksa-hub',
+        path: '/admin/yaksa',
+      },
+      {
+        id: 'yaksa-hub-contents',
+        label: 'HUB 콘텐츠',
+        icon: <FileText className="w-4 h-4" />,
+        path: '/operator/hub-contents',
+      },
+      {
+        id: 'yaksa-content-approvals',
+        label: '콘텐츠 승인',
+        icon: <ClipboardList className="w-4 h-4" />,
+        path: '/operator/approvals',
       },
       // WO-O4O-KPA-ADMIN-SNAPSHOT-BROWSE-V1
       {
