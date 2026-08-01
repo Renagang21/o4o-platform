@@ -146,7 +146,28 @@ supplier_product_offers 전체 2건
 | 항목 | 결과 |
 |---|---|
 | `tsc --noEmit -p tsconfig.build.json` | ✅ **0 errors** |
-| 배포 (`deploy-api.yml`) | §7 |
+
+### 5-5. 배포 후 라이브 검증 (프로덕션)
+
+커밋 `cb748a02f`. 이 커밋의 전용 run 은 병행 push 로 **취소(superseded)** 되었고,
+이를 포함한 후속 run `30693851145` (head `8b8d222c0`) 가 **success** 로 배포됐다.
+`git merge-base --is-ancestor cb748a02f 8b8d222c0` → **포함 확인**.
+
+| # | 검증 | 결과 |
+|:-:|---|---|
+| ① | 미인증 offers | ✅ **401** |
+| ② | 미인증 recycle-bin | ✅ **401** |
+| ③ | 관리자 offers (실제 상품) | ✅ **200** |
+| ④ | **공급자명 표시** | ✅ `"supplierName": "(주)쓰라이프존"` — UUID·null 아님 |
+| ⑤ | 응답 필드 계약 | ✅ `id / supplierId / supplierName / distributionType / approvalStatus / isActive / priceGeneral …` 전부 유지 |
+| ⑥ | 관리자 recycle-bin | ✅ **200** · `pagination {page,limit,total,totalPages}` 유지 |
+
+> ④ 의 `supplierName` 은 컨트롤러가 SQL 별칭 `supplier_name` 을 매핑한 응답 필드명이다.
+> SQL 별칭·응답 필드명 모두 이번 변경으로 바뀌지 않았다.
+
+> 비관리자 계정으로는 **401** 이 돌아왔다(403 아님). `authenticate` 미들웨어가 해당 세션을
+> 인증 단계에서 먼저 거르기 때문이며, **이번 변경과 무관한 기존 가드 동작**이다.
+> 권한 가드 코드는 건드리지 않았다(§5-3).
 
 ## 6. 데이터 변경
 
