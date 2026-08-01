@@ -86,6 +86,19 @@ const DOC_CASES: Array<{ name: string; html: string; expect: Array<[number, bool
     expect: [[0, true, 'INCOMPLETE_GRAMMAR'], [1, false, 'TERMINATED']],
   },
   {
+    /* KO 전수감사에서 드러난 오류 유형 — 카드형(sd-*) 이 아닌 **표+섹션 레이아웃**이 실재한다.
+       h1/intro 를 전 모집단에 요구했더니 정상 문서 2,286건이 결함으로 잡혔다.
+       판정기는 레이아웃에 상관없이 각 슬롯을 그 역할대로만 판정해야 한다. */
+    name: '표+섹션 레이아웃 — 라벨(strong)은 판정 대상 아님, 본문은 종결어미로 완결',
+    html: '<h2>비오틴 5mg 정제 — 비오틴 결핍성 손발톱·모발 장애</h2>'
+        + '<table><tbody><tr><th>주요 성분군</th><td>비오틴 5mg</td></tr></tbody></table>'
+        + '<p><strong>효능·효과</strong> 비오틴 결핍으로 인한 손톱·발톱 또는 모발 성장 장애에 사용합니다.</p>'
+        + '<p><strong>주의 대상</strong> 과민증·3개월 미만 영아는 복용하지 않습니다. 임부·수유부는 상담하세요. '
+        + '날계란과 함께 복용하지 않으며, 카르바마제핀·페니토인 등 항경련제 복용자는 약사와 상담하세요</p>',
+    expect: [[0, false, 'NOT_APPLICABLE'], [2, false, 'NOT_APPLICABLE'],
+      [3, false, 'NOT_APPLICABLE'], [6, false, 'KOREAN_TERMINATOR_COMPLETE']],
+  },
+  {
     name: '명사구 형제 항목이 다수인 금기 목록은 정상 열거로 인정',
     html: '<ul class="sd-warn">'
         + '<li>이 약 또는 이 약의 구성 성분에 과민증이 있는 환자 및 그 병력이 있는 환자, 아스피린 천식 환자</li>'
@@ -104,8 +117,31 @@ const STRUCT: Array<{ name: string; html: string; slotCount: number }> = [
   { name: '금기 문장이 목록으로 분리된 사례', html: '<ul class="sd-warn"><li>만 12개월 미만의 영아에게는 투여하지 마십시오. 가나다라마바사아자차카타파하 가나다.</li><li>임부 또는 임신하고 있을 가능성이 있는 여성은 복용하지 마십시오. 가나다라마바사.</li></ul>', slotCount: 2 },
 ];
 
+/* ── KO 복원 안전 규칙 ────────────────────────────────────────────────────────
+   전수감사에서 실제로 걸린 사례를 고정한다. 복원은 문장을 만드는 일이 아니라
+   **다른 문서에 실재하는 완결본을 옮기는 일**이므로, 아래를 어기면 복원하지 않는다. */
+const alnumLen = (s: string): number => s.replace(/[^0-9A-Za-z가-힣]/g, '').length;
+const numsOf = (s: string): string[] => (s.replace(/\s+/g, '').match(/\d+(?:[.,]\d+)*/g) || []);
+const PROHIBIT = /(마십시오|마세요|말고|금지|금기|삼가|피하십시오|투여하지|복용하지)/;
+const CUT = '아세트아미노펜으로 일일 최대 용량 (4,000 mg)을 초과하여 복용하지 마';
+const FULL = '아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오';
+
+const REPAIR: Array<[string, boolean]> = [
+  /* 완결본이 공백을 덜 쓰면 **글자 수는 같거나 줄 수 있다**. 실측에서 260자 → 260자 사례가
+     있었고 raw length 비교로 정상 복원 25건이 오탈락했다. 실질 내용 길이로 판정한다. */
+  ['확장 판정은 실질 내용 길이로 한다', alnumLen(FULL) > alnumLen(CUT)],
+  ['수치가 모두 보존된다', numsOf(CUT).every((v) => numsOf(FULL).includes(v))],
+  ['금기 강도가 유지된다', !PROHIBIT.test(CUT) || PROHIBIT.test(FULL)],
+  ['절단본은 완결본의 엄격한 접두다', FULL.replace(/[^0-9A-Za-z가-힣]/g, '').startsWith(CUT.replace(/[^0-9A-Za-z가-힣]/g, ''))],
+  ['복원 후에는 차단되지 않는다', !judgeSlot('warn', FULL).blocked],
+  ['복원 전에는 차단된다', judgeSlot('warn', CUT).blocked],
+  /* 확장분이 그 자체로 잘려 있으면 복원 후보가 아니다 — 잘린 것을 잘린 것으로 바꾸지 않는다 */
+  ['잘린 후보는 복원 후보가 아니다', judgeSlot('warn', CUT + '십시오. 간손상을 일으킬 수 있습니').blocked],
+];
+
 /* ── 단위 시험 ────────────────────────────────────────────────────────────── */
 const UNIT: Array<[string, boolean]> = [
+  ...REPAIR,
   ['balanced: (요(허리)통)', balancedDelimiters('관절통(요(허리)통, 어깨결림 등)') === true],
   ['balanced: 열린 괄호', balancedDelimiters('신부전 환자(크레아티닌 청소율 < 10 mL/min') === false],
   ['strip: 종결부호 뒤 주석', stripTrailingParenthetical('중단하십시오. (야간용)') === '중단하십시오.'],
