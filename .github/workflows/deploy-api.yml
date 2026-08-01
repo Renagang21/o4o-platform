@@ -37,6 +37,10 @@ env:
   SERVICE_NAME: o4o-core-api
   REPOSITORY_NAME: o4o-api
   IMAGE_NAME: api-server
+  # WO-O4O-CLOUD-RUN-INGRESS-LOAD-BALANCER-ONLY-V1:
+  #   외부 진입점은 공식 LB 도메인 하나다. run.app 직접 URL 은 ingress 로 차단되므로
+  #   외부 HTTP 검증은 반드시 이 주소를 쓴다.
+  PUBLIC_API_URL: https://api.neture.co.kr
 
 jobs:
   build-and-deploy:
@@ -290,6 +294,7 @@ jobs:
           --project=${{ env.PROJECT_ID }} \
           --platform=managed \
           --allow-unauthenticated \
+          --ingress=internal-and-cloud-load-balancing \
           --port=8080 \
           --memory=1Gi \
           --cpu=1 \
@@ -380,17 +385,38 @@ jobs:
       run: |
         echo "🔍 Verifying deployment..."
 
+        # ============================================================
+        # WO-O4O-CLOUD-RUN-INGRESS-LOAD-BALANCER-ONLY-V1
+        #
+        # ingress=internal-and-cloud-load-balancing 적용 후 run.app 직접 URL 은
+        # 외부(GitHub Actions 러너 포함)에서 접근할 수 없다. 그래서 두 축을 분리한다:
+        #   1) revision readiness → control plane (gcloud describe)
+        #   2) 외부 API health    → 공식 LB 도메인 (PUBLIC_API_URL)
+        # 직접 URL 의 HTTP 성공을 readiness 기준으로 삼지 않는다.
+        # ============================================================
+
         SERVICE_URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
           --format="value(status.url)")
 
-        echo "🌐 Service URL: ${SERVICE_URL}"
+        INGRESS=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+          --region=${{ env.REGION }} \
+          --project=${{ env.PROJECT_ID }} \
+          --format="value(metadata.annotations['run.googleapis.com/ingress'])")
 
-        # Health check with retry
+        echo "🌐 Cloud Run URL (LB-only): ${SERVICE_URL}"
+        echo "🚪 Ingress: ${INGRESS}"
+
+        if [ "${INGRESS}" != "internal-and-cloud-load-balancing" ]; then
+          echo "❌ Unexpected ingress: ${INGRESS}"
+          exit 1
+        fi
+
+        # Health check via the official load balancer domain
         for i in {1..5}; do
-          echo "Health check attempt $i..."
-          if curl -sf "${SERVICE_URL}/health" > /dev/null; then
+          echo "Health check attempt $i (${{ env.PUBLIC_API_URL }}/health)..."
+          if curl -sf "${{ env.PUBLIC_API_URL }}/health" > /dev/null; then
             echo "✅ Health check passed!"
             break
           fi
@@ -405,7 +431,8 @@ jobs:
         echo "=========================================="
         echo "✅ API Server Deployed Successfully!"
         echo "=========================================="
-        echo "🌐 URL: ${SERVICE_URL}"
-        echo "🏥 Health: ${SERVICE_URL}/health"
+        echo "🌐 Public URL: ${{ env.PUBLIC_API_URL }}"
+        echo "🏥 Health: ${{ env.PUBLIC_API_URL }}/health"
+        echo "🔒 Cloud Run URL (LB-only): ${SERVICE_URL}"
         echo "📅 Time: $(date)"
         echo "📝 Commit: ${{ github.sha }}"
