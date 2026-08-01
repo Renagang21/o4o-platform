@@ -3,32 +3,1394 @@
  "mappedUnits": 2271,
  "holdUnits": 133,
  "docsTotal": 5000,
- "docsBlockedByHoldUnit": 1397,
- "truncatedKoUnits": 861,
+ "docsBlockedByHoldUnit": 659,
+ "truncatedKoUnits": 353,
+ "blockReason": {
+  "LEDGER_HOLD": 309,
+  "HARD_CUT_RESIDUE": 284,
+  "INCOMPLETE_GRAMMAR": 58,
+  "INCOMPLETE_WORD": 93,
+  "OPEN_DELIMITER": 3
+ },
+ "derivedCardUnits": 190,
+ "derivedCards": [
+  {
+   "id": "badge:48cad306ac54",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:c5accafd3405",
+   "docs": 26
+  },
+  {
+   "id": "tile:48cad306ac54",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:c5accafd3405",
+   "docs": 26
+  },
+  {
+   "id": "badge:4764ab42e325",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:0182f047c1b6",
+   "docs": 14
+  },
+  {
+   "id": "tile:4764ab42e325",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:0182f047c1b6",
+   "docs": 14
+  },
+  {
+   "id": "badge:e511a8be9a3d",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:077a50d84d59",
+   "docs": 14
+  },
+  {
+   "id": "tile:e511a8be9a3d",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:077a50d84d59",
+   "docs": 14
+  },
+  {
+   "id": "badge:651df307aba5",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:ec4be77f9908",
+   "docs": 11
+  },
+  {
+   "id": "tile:651df307aba5",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:ec4be77f9908",
+   "docs": 11
+  },
+  {
+   "id": "badge:97388a655192",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b7da5cc0d194",
+   "docs": 9
+  },
+  {
+   "id": "tile:97388a655192",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b7da5cc0d194",
+   "docs": 9
+  },
+  {
+   "id": "badge:ea86dc9f0ce2",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:23070a36d6e8",
+   "docs": 7
+  },
+  {
+   "id": "tile:ea86dc9f0ce2",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:23070a36d6e8",
+   "docs": 7
+  },
+  {
+   "id": "badge:7560d1e973e2",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:48a0eddd1326",
+   "docs": 7
+  },
+  {
+   "id": "tile:7560d1e973e2",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:48a0eddd1326",
+   "docs": 7
+  },
+  {
+   "id": "badge:68fbd2f4672e",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:22b7e4631913",
+   "docs": 7
+  },
+  {
+   "id": "tile:68fbd2f4672e",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:22b7e4631913",
+   "docs": 7
+  },
+  {
+   "id": "badge:d1c00242d395",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:7281a551777a",
+   "docs": 6
+  },
+  {
+   "id": "tile:d1c00242d395",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:7281a551777a",
+   "docs": 6
+  },
+  {
+   "id": "badge:8f86f21479f4",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:0dd7d9bf1d3e",
+   "docs": 6
+  },
+  {
+   "id": "tile:8f86f21479f4",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:0dd7d9bf1d3e",
+   "docs": 6
+  },
+  {
+   "id": "badge:04ee09ecc123",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d6faa1f71b0a",
+   "docs": 6
+  },
+  {
+   "id": "tile:04ee09ecc123",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d6faa1f71b0a",
+   "docs": 6
+  },
+  {
+   "id": "badge:4f2bbfe1a843",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b21807a0d4d5",
+   "docs": 6
+  },
+  {
+   "id": "tile:4f2bbfe1a843",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b21807a0d4d5",
+   "docs": 6
+  },
+  {
+   "id": "badge:a69e56e745a6",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:7043c35dd869",
+   "docs": 5
+  },
+  {
+   "id": "tile:a69e56e745a6",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:7043c35dd869",
+   "docs": 5
+  },
+  {
+   "id": "badge:b4ae6441f59a",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:afea127992d8",
+   "docs": 5
+  },
+  {
+   "id": "tile:b4ae6441f59a",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:afea127992d8",
+   "docs": 5
+  },
+  {
+   "id": "badge:42a739626a1b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:c97cde7ef86b",
+   "docs": 4
+  },
+  {
+   "id": "tile:42a739626a1b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:c97cde7ef86b",
+   "docs": 4
+  },
+  {
+   "id": "badge:937babb50d9b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:04afcddf8a73",
+   "docs": 3
+  },
+  {
+   "id": "tile:937babb50d9b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:04afcddf8a73",
+   "docs": 3
+  },
+  {
+   "id": "badge:b01301a5fcf2",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:2b742fd3f5c6",
+   "docs": 3
+  },
+  {
+   "id": "tile:b01301a5fcf2",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:2b742fd3f5c6",
+   "docs": 3
+  },
+  {
+   "id": "badge:493f611bc2d8",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:dfd360f718da",
+   "docs": 3
+  },
+  {
+   "id": "tile:493f611bc2d8",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:dfd360f718da",
+   "docs": 3
+  },
+  {
+   "id": "badge:f7b58909f998",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:336b0b1c013e",
+   "docs": 3
+  },
+  {
+   "id": "tile:f7b58909f998",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:336b0b1c013e",
+   "docs": 3
+  },
+  {
+   "id": "badge:d2486bad9de7",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:5f92c29fe243",
+   "docs": 3
+  },
+  {
+   "id": "tile:d2486bad9de7",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:5f92c29fe243",
+   "docs": 3
+  },
+  {
+   "id": "badge:1d977eeeca1b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f5bd4291027d",
+   "docs": 3
+  },
+  {
+   "id": "tile:1d977eeeca1b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f5bd4291027d",
+   "docs": 3
+  },
+  {
+   "id": "badge:89271f835f40",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:90b3e2193bd3",
+   "docs": 3
+  },
+  {
+   "id": "tile:89271f835f40",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:90b3e2193bd3",
+   "docs": 3
+  },
+  {
+   "id": "badge:4a474e5d65ef",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b30608eda3fc",
+   "docs": 3
+  },
+  {
+   "id": "tile:4a474e5d65ef",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b30608eda3fc",
+   "docs": 3
+  },
+  {
+   "id": "badge:593b4282571f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:13eb07773b53",
+   "docs": 3
+  },
+  {
+   "id": "tile:593b4282571f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:13eb07773b53",
+   "docs": 3
+  },
+  {
+   "id": "badge:81729bd16c24",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:9e08d8fadb37",
+   "docs": 3
+  },
+  {
+   "id": "tile:81729bd16c24",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:9e08d8fadb37",
+   "docs": 3
+  },
+  {
+   "id": "badge:77b812c92240",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f60d043bd6a4",
+   "docs": 2
+  },
+  {
+   "id": "tile:77b812c92240",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f60d043bd6a4",
+   "docs": 2
+  },
+  {
+   "id": "badge:edddc1129131",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d805d5e3e577",
+   "docs": 2
+  },
+  {
+   "id": "tile:edddc1129131",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d805d5e3e577",
+   "docs": 2
+  },
+  {
+   "id": "badge:4d9d13aeba6c",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:e4beb635db20",
+   "docs": 2
+  },
+  {
+   "id": "tile:4d9d13aeba6c",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:e4beb635db20",
+   "docs": 2
+  },
+  {
+   "id": "badge:13afec94b1b4",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:35b729dd7f7f",
+   "docs": 2
+  },
+  {
+   "id": "tile:13afec94b1b4",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:35b729dd7f7f",
+   "docs": 2
+  },
+  {
+   "id": "badge:8a475718c5ea",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:0c2c5e57667b",
+   "docs": 2
+  },
+  {
+   "id": "tile:8a475718c5ea",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:0c2c5e57667b",
+   "docs": 2
+  },
+  {
+   "id": "badge:f87078496c54",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d882750aed8a",
+   "docs": 2
+  },
+  {
+   "id": "tile:f87078496c54",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d882750aed8a",
+   "docs": 2
+  },
+  {
+   "id": "badge:b8a5d67f6124",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:7b2972edd53b",
+   "docs": 2
+  },
+  {
+   "id": "tile:b8a5d67f6124",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:7b2972edd53b",
+   "docs": 2
+  },
+  {
+   "id": "badge:1dd26f3dd0da",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:bdfe4a0d2997",
+   "docs": 2
+  },
+  {
+   "id": "tile:1dd26f3dd0da",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:bdfe4a0d2997",
+   "docs": 2
+  },
+  {
+   "id": "badge:47372e8aa33b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:06c8cb205dfe",
+   "docs": 2
+  },
+  {
+   "id": "tile:47372e8aa33b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:06c8cb205dfe",
+   "docs": 2
+  },
+  {
+   "id": "badge:25d46acab3b9",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d3a2deca021f",
+   "docs": 2
+  },
+  {
+   "id": "tile:25d46acab3b9",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d3a2deca021f",
+   "docs": 2
+  },
+  {
+   "id": "badge:d58c39b32757",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:e25805c9c4c7",
+   "docs": 2
+  },
+  {
+   "id": "tile:d58c39b32757",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:e25805c9c4c7",
+   "docs": 2
+  },
+  {
+   "id": "badge:d7f66e1efbec",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:a204ee6d8dc7",
+   "docs": 2
+  },
+  {
+   "id": "tile:d7f66e1efbec",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:a204ee6d8dc7",
+   "docs": 2
+  },
+  {
+   "id": "badge:c600f1292041",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:45a9b130a704",
+   "docs": 2
+  },
+  {
+   "id": "tile:c600f1292041",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:45a9b130a704",
+   "docs": 2
+  },
+  {
+   "id": "badge:dbc989828b93",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:51cee4f96258",
+   "docs": 2
+  },
+  {
+   "id": "tile:dbc989828b93",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:51cee4f96258",
+   "docs": 2
+  },
+  {
+   "id": "badge:f04733092458",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:91b0b8d98b65",
+   "docs": 1
+  },
+  {
+   "id": "tile:f04733092458",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:91b0b8d98b65",
+   "docs": 1
+  },
+  {
+   "id": "badge:5e7fadf579bd",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:5c3506e0371e",
+   "docs": 1
+  },
+  {
+   "id": "tile:5e7fadf579bd",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:5c3506e0371e",
+   "docs": 1
+  },
+  {
+   "id": "badge:32db59cf9353",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f7fb92326055",
+   "docs": 1
+  },
+  {
+   "id": "tile:32db59cf9353",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f7fb92326055",
+   "docs": 1
+  },
+  {
+   "id": "badge:d8981b140e6a",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:290a742eb44a",
+   "docs": 1
+  },
+  {
+   "id": "tile:d8981b140e6a",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:290a742eb44a",
+   "docs": 1
+  },
+  {
+   "id": "badge:58f1012514ec",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:a939e303a216",
+   "docs": 1
+  },
+  {
+   "id": "tile:58f1012514ec",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:a939e303a216",
+   "docs": 1
+  },
+  {
+   "id": "badge:f42441d7e7cd",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b47e524655bb",
+   "docs": 1
+  },
+  {
+   "id": "tile:f42441d7e7cd",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b47e524655bb",
+   "docs": 1
+  },
+  {
+   "id": "badge:9b88dcf8e2d9",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:1fc0b0682a64",
+   "docs": 1
+  },
+  {
+   "id": "tile:9b88dcf8e2d9",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:1fc0b0682a64",
+   "docs": 1
+  },
+  {
+   "id": "badge:624af8b4bd6e",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:e05ec5210891",
+   "docs": 1
+  },
+  {
+   "id": "tile:624af8b4bd6e",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:e05ec5210891",
+   "docs": 1
+  },
+  {
+   "id": "badge:73d15bea3283",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:94fdfff8ada2",
+   "docs": 1
+  },
+  {
+   "id": "tile:73d15bea3283",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:94fdfff8ada2",
+   "docs": 1
+  },
+  {
+   "id": "badge:d7842878e49f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:199c9718fc13",
+   "docs": 1
+  },
+  {
+   "id": "tile:d7842878e49f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:199c9718fc13",
+   "docs": 1
+  },
+  {
+   "id": "badge:b7ed9e2ebd10",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f86c1ecfa725",
+   "docs": 1
+  },
+  {
+   "id": "tile:b7ed9e2ebd10",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f86c1ecfa725",
+   "docs": 1
+  },
+  {
+   "id": "badge:d4ea2e30b583",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:abeb136276a8",
+   "docs": 1
+  },
+  {
+   "id": "tile:d4ea2e30b583",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:abeb136276a8",
+   "docs": 1
+  },
+  {
+   "id": "badge:96f73a6b0c12",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:6179690c2422",
+   "docs": 1
+  },
+  {
+   "id": "tile:96f73a6b0c12",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:6179690c2422",
+   "docs": 1
+  },
+  {
+   "id": "badge:8fe5f64e163c",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:7d275dabe0db",
+   "docs": 1
+  },
+  {
+   "id": "tile:8fe5f64e163c",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:7d275dabe0db",
+   "docs": 1
+  },
+  {
+   "id": "badge:3ccd4763393f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:bfa255e4fcc9",
+   "docs": 1
+  },
+  {
+   "id": "tile:3ccd4763393f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:bfa255e4fcc9",
+   "docs": 1
+  },
+  {
+   "id": "badge:506ce57d71fa",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:0d1c1e1d27e5",
+   "docs": 1
+  },
+  {
+   "id": "tile:506ce57d71fa",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:0d1c1e1d27e5",
+   "docs": 1
+  },
+  {
+   "id": "badge:de1fa579068f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:655fb8318b5a",
+   "docs": 1
+  },
+  {
+   "id": "tile:de1fa579068f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:655fb8318b5a",
+   "docs": 1
+  },
+  {
+   "id": "badge:2495dfb54695",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:78b650dc13fd",
+   "docs": 1
+  },
+  {
+   "id": "tile:2495dfb54695",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:78b650dc13fd",
+   "docs": 1
+  },
+  {
+   "id": "badge:d055dbada2c6",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:4e03618c427f",
+   "docs": 1
+  },
+  {
+   "id": "tile:d055dbada2c6",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:4e03618c427f",
+   "docs": 1
+  },
+  {
+   "id": "badge:9c2c272a7daa",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:97615efec625",
+   "docs": 1
+  },
+  {
+   "id": "tile:9c2c272a7daa",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:97615efec625",
+   "docs": 1
+  },
+  {
+   "id": "badge:1e7d10f412cb",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:12521bd3d925",
+   "docs": 1
+  },
+  {
+   "id": "tile:1e7d10f412cb",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:12521bd3d925",
+   "docs": 1
+  },
+  {
+   "id": "badge:7488c052b253",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:cad43dea572c",
+   "docs": 1
+  },
+  {
+   "id": "tile:7488c052b253",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:cad43dea572c",
+   "docs": 1
+  },
+  {
+   "id": "badge:c71ef48a7417",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:46ea31fbe1f7",
+   "docs": 1
+  },
+  {
+   "id": "tile:c71ef48a7417",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:46ea31fbe1f7",
+   "docs": 1
+  },
+  {
+   "id": "badge:4d72c160e647",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:081c9c97ae89",
+   "docs": 1
+  },
+  {
+   "id": "tile:4d72c160e647",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:081c9c97ae89",
+   "docs": 1
+  },
+  {
+   "id": "badge:f9efe44e8992",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:19d483fc911c",
+   "docs": 1
+  },
+  {
+   "id": "tile:f9efe44e8992",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:19d483fc911c",
+   "docs": 1
+  },
+  {
+   "id": "badge:2b77ddb62173",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f6ebb45126bb",
+   "docs": 1
+  },
+  {
+   "id": "tile:2b77ddb62173",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f6ebb45126bb",
+   "docs": 1
+  },
+  {
+   "id": "badge:13b1eea26390",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:02a2a5b8b4c1",
+   "docs": 1
+  },
+  {
+   "id": "tile:13b1eea26390",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:02a2a5b8b4c1",
+   "docs": 1
+  },
+  {
+   "id": "badge:f69679d6f6f7",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:4f14cb571b08",
+   "docs": 1
+  },
+  {
+   "id": "tile:f69679d6f6f7",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:4f14cb571b08",
+   "docs": 1
+  },
+  {
+   "id": "badge:f489f847331d",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:262ae21f542a",
+   "docs": 1
+  },
+  {
+   "id": "tile:f489f847331d",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:262ae21f542a",
+   "docs": 1
+  },
+  {
+   "id": "badge:202fe57196c7",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:5e009da7373e",
+   "docs": 1
+  },
+  {
+   "id": "tile:202fe57196c7",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:5e009da7373e",
+   "docs": 1
+  },
+  {
+   "id": "badge:0dffc6f0c05a",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b94a937803ac",
+   "docs": 1
+  },
+  {
+   "id": "tile:0dffc6f0c05a",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b94a937803ac",
+   "docs": 1
+  },
+  {
+   "id": "badge:abba6f3f96ab",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:a7967058be56",
+   "docs": 1
+  },
+  {
+   "id": "tile:abba6f3f96ab",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:a7967058be56",
+   "docs": 1
+  },
+  {
+   "id": "badge:6d1a4e1390ac",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:6bdc5bb849c5",
+   "docs": 1
+  },
+  {
+   "id": "tile:6d1a4e1390ac",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:6bdc5bb849c5",
+   "docs": 1
+  },
+  {
+   "id": "badge:4f701e8c0752",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d9ef543164e1",
+   "docs": 1
+  },
+  {
+   "id": "tile:4f701e8c0752",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d9ef543164e1",
+   "docs": 1
+  },
+  {
+   "id": "badge:db4bd8afb5fa",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:725e66352fc2",
+   "docs": 1
+  },
+  {
+   "id": "tile:db4bd8afb5fa",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:725e66352fc2",
+   "docs": 1
+  },
+  {
+   "id": "badge:4aed1759e222",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b17d51b3e5e1",
+   "docs": 1
+  },
+  {
+   "id": "tile:4aed1759e222",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b17d51b3e5e1",
+   "docs": 1
+  },
+  {
+   "id": "badge:a19b26a44e56",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:8e8c702c3dc9",
+   "docs": 1
+  },
+  {
+   "id": "tile:a19b26a44e56",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:8e8c702c3dc9",
+   "docs": 1
+  },
+  {
+   "id": "badge:559b3f4596f3",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:b9064bad2273",
+   "docs": 1
+  },
+  {
+   "id": "tile:559b3f4596f3",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:b9064bad2273",
+   "docs": 1
+  },
+  {
+   "id": "badge:504b0bb28c86",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:4731f442f2d9",
+   "docs": 1
+  },
+  {
+   "id": "tile:504b0bb28c86",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:4731f442f2d9",
+   "docs": 1
+  },
+  {
+   "id": "badge:d2ddcc9c8a51",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:096ec8504b0b",
+   "docs": 1
+  },
+  {
+   "id": "tile:d2ddcc9c8a51",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:096ec8504b0b",
+   "docs": 1
+  },
+  {
+   "id": "badge:ae2522fe03c1",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:e78ce0c607c6",
+   "docs": 1
+  },
+  {
+   "id": "tile:ae2522fe03c1",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:e78ce0c607c6",
+   "docs": 1
+  },
+  {
+   "id": "badge:a13fa095871d",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:a6ee7d78b28e",
+   "docs": 1
+  },
+  {
+   "id": "tile:a13fa095871d",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:a6ee7d78b28e",
+   "docs": 1
+  },
+  {
+   "id": "badge:b552da712250",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:83c0b1c2a59b",
+   "docs": 1
+  },
+  {
+   "id": "tile:b552da712250",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:83c0b1c2a59b",
+   "docs": 1
+  },
+  {
+   "id": "badge:cd18d0fd8557",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f0fa6c9c72f5",
+   "docs": 1
+  },
+  {
+   "id": "tile:cd18d0fd8557",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f0fa6c9c72f5",
+   "docs": 1
+  },
+  {
+   "id": "badge:cf992a58014f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f5d5db15aa4d",
+   "docs": 1
+  },
+  {
+   "id": "tile:cf992a58014f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f5d5db15aa4d",
+   "docs": 1
+  },
+  {
+   "id": "badge:8954c27371f8",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:a3ce802852ce",
+   "docs": 1
+  },
+  {
+   "id": "tile:8954c27371f8",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:a3ce802852ce",
+   "docs": 1
+  },
+  {
+   "id": "badge:b08f92b4632c",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:11ed7019eafa",
+   "docs": 1
+  },
+  {
+   "id": "tile:b08f92b4632c",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:11ed7019eafa",
+   "docs": 1
+  },
+  {
+   "id": "badge:70d3769f0830",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:3d3d3ec0a413",
+   "docs": 1
+  },
+  {
+   "id": "tile:70d3769f0830",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:3d3d3ec0a413",
+   "docs": 1
+  },
+  {
+   "id": "badge:a81d374b140f",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:c6455705a950",
+   "docs": 1
+  },
+  {
+   "id": "tile:a81d374b140f",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:c6455705a950",
+   "docs": 1
+  },
+  {
+   "id": "badge:b969c4f9569a",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:531d0105ae83",
+   "docs": 1
+  },
+  {
+   "id": "tile:b969c4f9569a",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:531d0105ae83",
+   "docs": 1
+  },
+  {
+   "id": "badge:f0b2480eccfd",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:af1bb2acdec8",
+   "docs": 1
+  },
+  {
+   "id": "tile:f0b2480eccfd",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:af1bb2acdec8",
+   "docs": 1
+  },
+  {
+   "id": "badge:9a7b3fbbd47b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:82b927fe68ec",
+   "docs": 1
+  },
+  {
+   "id": "tile:9a7b3fbbd47b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:82b927fe68ec",
+   "docs": 1
+  },
+  {
+   "id": "badge:09d84d203fd4",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d4dfc76a9607",
+   "docs": 1
+  },
+  {
+   "id": "tile:09d84d203fd4",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d4dfc76a9607",
+   "docs": 1
+  },
+  {
+   "id": "badge:e068945a1e3b",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:f8684a3bb2a2",
+   "docs": 1
+  },
+  {
+   "id": "tile:e068945a1e3b",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:f8684a3bb2a2",
+   "docs": 1
+  },
+  {
+   "id": "badge:34cd7946e311",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:fc038480702b",
+   "docs": 1
+  },
+  {
+   "id": "tile:34cd7946e311",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:fc038480702b",
+   "docs": 1
+  },
+  {
+   "id": "badge:9ff9178adccb",
+   "kind": "badge",
+   "fromKind": "intro",
+   "fromId": "intro:d929f4db2fac",
+   "docs": 1
+  },
+  {
+   "id": "tile:9ff9178adccb",
+   "kind": "tile",
+   "fromKind": "intro",
+   "fromId": "intro:d929f4db2fac",
+   "docs": 1
+  }
+ ],
+ "structuralGroups": [
+  {
+   "ids": [
+    "intake:38f75563f1e5",
+    "intake:3adf928d8095"
+   ],
+   "joinedKo": "만 15세 이상은 1회 1병 1일 3회, 만 11세 이상~만 15세 미만은 1회 2/3병 1일 3회, 만 8세 이상~만 11세 미만은 1회 1/2병 1일 3회, 만 5세 이상~만 8세 미만은 1회 1/3병 1일 3회, 만 3세 이상~만 5세 미만은 1회 1/4병 1일 3회 식후 복용하며, 복용간격을 4시간 이상으로 합니다.",
+   "docs": 1
+  }
+ ],
  "docsAlreadyFull": 1289,
- "missingUnitsTotal": 7831,
+ "missingUnitsTotal": 10521,
  "missingByKind": {
-  "badge": 547,
-  "h1": 912,
-  "small": 56,
-  "meta": 96,
-  "intro": 658,
-  "tile": 813,
-  "intake": 1205,
-  "warn": 3539,
-  "foot": 5
+  "badge": 650,
+  "h1": 1247,
+  "small": 85,
+  "meta": 126,
+  "intro": 936,
+  "tile": 1208,
+  "intake": 1564,
+  "warn": 4698,
+  "foot": 7
  },
  "docMissingDistribution": {
   "p10": 0,
-  "median": 8,
-  "p90": 14
+  "median": 10,
+  "p90": 15
  },
  "selection": {
-  "unitBudget": 400,
-  "unitsPicked": 400,
-  "docsCompleted": 1476
+  "unitBudget": 800,
+  "unitsPicked": 800,
+  "docsCompleted": 1626
  },
  "units": [
+  {
+   "id": "foot:91644ca18642",
+   "kind": "foot",
+   "text": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요. 증상이 지속되거나 궁금한 점이 있으면 매장 내 약사 등 전문가와 상담하세요.",
+   "docs": 554
+  },
+  {
+   "id": "warn:c602e7895dff",
+   "kind": "warn",
+   "text": "정해진 용법과 용량을 잘 지키세요.",
+   "docs": 523
+  },
   {
    "id": "warn:b7bb843f4eb5",
    "kind": "warn",
@@ -36,10 +1398,22 @@
    "docs": 86
   },
   {
+   "id": "warn:3c2ac93caade",
+   "kind": "warn",
+   "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 매우 드물게 치명적일 수 있는 급성전신발진고름물집증,스티븐스,존슨증후군,독성표피괴사용해와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 피부발진 또는 다른 과민반응의 징후가 나타나는 경우 즉시 복용을 중단하십시오. 아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오. 간손상을 일으킬 수 있습니다",
+   "docs": 66
+  },
+  {
    "id": "warn:cc051f4f7d3e",
    "kind": "warn",
    "text": "녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하십시오.",
-   "docs": 56
+   "docs": 57
+  },
+  {
+   "id": "tile:16b5b893631a",
+   "kind": "tile",
+   "text": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+   "docs": 44
   },
   {
    "id": "tile:5ee2948eeaf0",
@@ -60,22 +1434,40 @@
    "docs": 39
   },
   {
+   "id": "warn:151f8b364785",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.",
+   "docs": 38
+  },
+  {
+   "id": "intro:6d43aaac8157",
+   "kind": "intro",
+   "text": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감에 사용하는 일반의약품입니다.",
+   "docs": 36
+  },
+  {
+   "id": "badge:16b5b893631a",
+   "kind": "badge",
+   "text": "소화불량, 식욕감퇴(식욕부진), 과식, 체함, 소화촉진, 소화불량으로 인한 위부팽만감",
+   "docs": 35
+  },
+  {
    "id": "h1:6660855bbd09",
    "kind": "h1",
    "text": "Diclofenac Sodium Plaster",
    "docs": 31
   },
   {
-   "id": "warn:151f8b364785",
-   "kind": "warn",
-   "text": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.",
-   "docs": 29
-  },
-  {
    "id": "warn:df82bb8ce4f9",
    "kind": "warn",
    "text": "오염을 방지하기 위해 가능한 공동으로 사용하지 마십시오.",
    "docs": 29
+  },
+  {
+   "id": "intake:be2a13b35869",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 20
   },
   {
    "id": "h1:d1b7b93a9998",
@@ -108,6 +1500,12 @@
    "docs": 16
   },
   {
+   "id": "intake:1b5c2d206198",
+   "kind": "intake",
+   "text": "다만, 초회는 최소량을 복용하고 변의 모양과 상태를 보면서 조금씩 증량 또는 감량합니다.",
+   "docs": 15
+  },
+  {
    "id": "h1:a700224684e7",
    "kind": "h1",
    "text": "플라스타 (179901CPL)",
@@ -132,6 +1530,54 @@
    "docs": 13
   },
   {
+   "id": "warn:13c79a2f8081",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 임부는 의사 또는 약사와 상의하십시오.",
+   "docs": 13
+  },
+  {
+   "id": "intake:eff331a7d815",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2정씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 13
+  },
+  {
+   "id": "warn:cad16fd97b9c",
+   "kind": "warn",
+   "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 매우 드물게 치명적일 수 있는 급성전신발진고름물집증,피부점막안증후군(스티븐스,존슨증후군),독성표피괴사용해(리엘증후군)와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 피부발진 또는 다른 과민반응의 징후가 나타나는 경우 즉시 복용을 중단하십시오. 아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오",
+   "docs": 13
+  },
+  {
+   "id": "h1:e1a1a800e765",
+   "kind": "h1",
+   "text": "정 (D12500ATB)",
+   "docs": 13
+  },
+  {
+   "id": "meta:4d85c093b729",
+   "kind": "meta",
+   "text": "우레아",
+   "docs": 13
+  },
+  {
+   "id": "tile:4d85c093b729",
+   "kind": "tile",
+   "text": "우레아",
+   "docs": 13
+  },
+  {
+   "id": "intro:649b176c7a07",
+   "kind": "intro",
+   "text": "이 약은 근육통, 신경통, 외상후 및 수술후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화에 사용합니다.",
+   "docs": 13
+  },
+  {
+   "id": "warn:b9c59af4d7d8",
+   "kind": "warn",
+   "text": "구역, 구토, 설사, 변비, 복통, 위장출혈, 소화성궤양 및 천공, 드물게 쇼크, 발진, 가려움, 빈혈, AST와 ALT의 상승, 졸음, 두통, 어지러움, 식은땀, 한기, 이상황홀감 등이 나타나면 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 13
+  },
+  {
    "id": "warn:454c1c0dbdab",
    "kind": "warn",
    "text": "이 약을 사용 중이거나 사용 후 2주까지는 날씨에 관계없이, 옥외활동을 피하고, 일상 외출할 때에는 이 약의 도포부위를 옷, 선글라스, 모자, 자외선 차단제 등으로 가려 자외선에 노출되지 않도록 하십시오.",
@@ -150,10 +1596,70 @@
    "docs": 12
   },
   {
+   "id": "h1:169c49d085e2",
+   "kind": "h1",
+   "text": "우레아 크림",
+   "docs": 12
+  },
+  {
    "id": "warn:cdf6872d92c7",
    "kind": "warn",
    "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 때때로 가려움, 홍반, 발적, 피부염(발진, 습진), 접촉피부염, 드물게 자극감 또는 수포 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
    "docs": 11
+  },
+  {
+   "id": "h1:fd6f64b41548",
+   "kind": "h1",
+   "text": "정 (D14700ATB)",
+   "docs": 11
+  },
+  {
+   "id": "badge:6e4c8a410114",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 11
+  },
+  {
+   "id": "intro:6e4c8a410114",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 11
+  },
+  {
+   "id": "tile:6e4c8a410114",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 11
+  },
+  {
+   "id": "intake:0821f8a1346f",
+   "kind": "intake",
+   "text": "성인은 1회 1~2정(125∼250 mg), 1일 3회 복용합니다.",
+   "docs": 11
+  },
+  {
+   "id": "warn:0597141a7fd7",
+   "kind": "warn",
+   "text": "이 약을 복용하는 동안 다른 비스테로이드성 소염진통제, ACE 억제제 또는 안지오텐신Ⅱ 수용체 길항제, 아스피린, 이뇨제, 리튬, 메토트렉세이트, 쿠마린계 항응고제(와파린 등), 시클로스포린 및 타크로리무스, 항혈소판제 및 선택적 세로토닌 재흡수 억제제(SSRI), 코르티코스테로이드를 함께 복용하지 마십시오.이 약을 복용하기 전에 미소프로스톨 등으로 소화성궤양 치료를 병행하고 있는 환자는 의사 또는 약사와 상의하십시오.",
+   "docs": 11
+  },
+  {
+   "id": "intake:296a9ef99eaf",
+   "kind": "intake",
+   "text": "1일 수회 환부(질환 부위)에 적당량을 바릅니다.",
+   "docs": 10
+  },
+  {
+   "id": "intake:88af50eda1e9",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 1정씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 9
+  },
+  {
+   "id": "intake:981d9d4367e6",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,만 8세 이상~만 15세 미만은 1회 1캡슐씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 8
   },
   {
    "id": "h1:c0f48e3b5977",
@@ -177,6 +1683,24 @@
    "id": "intake:0093d07b4a34",
    "kind": "intake",
    "text": "약면의 박리지를 떼어낸 후 1회 1매를 1일 2회 환부에 붙입니다.",
+   "docs": 8
+  },
+  {
+   "id": "badge:305f9b72265d",
+   "kind": "badge",
+   "text": "이 약은 감기로 인한 발열 및 동통(통증),두통,신경통,근육통,월경통,염좌통(삔 통증)과 치통,관절통,류마티양 동통(통증)에 사용합니다.",
+   "docs": 8
+  },
+  {
+   "id": "intro:305f9b72265d",
+   "kind": "intro",
+   "text": "이 약은 감기로 인한 발열 및 동통(통증),두통,신경통,근육통,월경통,염좌통(삔 통증)과 치통,관절통,류마티양 동통(통증)에 사용합니다.",
+   "docs": 8
+  },
+  {
+   "id": "tile:305f9b72265d",
+   "kind": "tile",
+   "text": "이 약은 감기로 인한 발열 및 동통(통증),두통,신경통,근육통,월경통,염좌통(삔 통증)과 치통,관절통,류마티양 동통(통증)에 사용합니다.",
    "docs": 8
   },
   {
@@ -204,6 +1728,24 @@
    "docs": 8
   },
   {
+   "id": "badge:1b5660df8951",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 8
+  },
+  {
+   "id": "intro:1b5660df8951",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 8
+  },
+  {
+   "id": "tile:1b5660df8951",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 8
+  },
+  {
    "id": "intake:dad2d830db58",
    "kind": "intake",
    "text": "필요에 따라 포대, 반창고 등으로 고정합니다.",
@@ -214,6 +1756,18 @@
    "kind": "warn",
    "text": "용기의 끝이 눈꺼풀 및 속눈썹에 닿으면 눈곱이나 곰팡이 등에 의해 약액이 오염 또는 혼탁(흐림)될 수 있으므로, 직접 눈에 닿지 않도록 주의하십시오. 또한, 혼탁(흐림)된 것은 사용하지 마십시오.",
    "docs": 8
+  },
+  {
+   "id": "warn:4fd0c6efaeeb",
+   "kind": "warn",
+   "text": "복부팽만감, 구토, 변비, 두드러기, 발진, 가려움 및 혈관 부종 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 8
+  },
+  {
+   "id": "h1:cbd00ce97a1b",
+   "kind": "h1",
+   "text": "연질캡슐 (A25000ACS)",
+   "docs": 7
   },
   {
    "id": "badge:222575e4eea5",
@@ -237,6 +1791,24 @@
    "id": "warn:81bac76eb88e",
    "kind": "warn",
    "text": "장기간 계속하여 사용하지 마십시오.",
+   "docs": 7
+  },
+  {
+   "id": "badge:cf8732d3351e",
+   "kind": "badge",
+   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
+   "docs": 7
+  },
+  {
+   "id": "intro:cf8732d3351e",
+   "kind": "intro",
+   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
+   "docs": 7
+  },
+  {
+   "id": "tile:cf8732d3351e",
+   "kind": "tile",
+   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
    "docs": 7
   },
   {
@@ -273,6 +1845,12 @@
    "id": "intro:7aa59846d95e",
    "kind": "intro",
    "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건ㆍ건초염, 상완골상과염(테니스 엘보우 등), 근육통, 외상후의 종창ㆍ동통의 진통ㆍ소염에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "h1:f1b53a57ad52",
+   "kind": "h1",
+   "text": "연질캡슐 (D22300ACS)",
    "docs": 6
   },
   {
@@ -333,6 +1911,60 @@
    "id": "tile:475e83a88978",
    "kind": "tile",
    "text": "구아야줄렌",
+   "docs": 6
+  },
+  {
+   "id": "intake:476e4a6e5f45",
+   "kind": "intake",
+   "text": "성인은 1회 1~2정 1일 3회 식후에 복용합니다. 정해진 용법·용량을 지키세요.",
+   "docs": 6
+  },
+  {
+   "id": "intake:e894abce7845",
+   "kind": "intake",
+   "text": "필요시 증상이 있는 눈에 1~2방울씩 넣으십시오.",
+   "docs": 6
+  },
+  {
+   "id": "badge:025648db800e",
+   "kind": "badge",
+   "text": "이 약은 성인의 식도, 위·십이지장과 관련된 통증의 완화, 성인의 급·만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "intro:025648db800e",
+   "kind": "intro",
+   "text": "이 약은 성인의 식도, 위·십이지장과 관련된 통증의 완화, 성인의 급·만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "tile:025648db800e",
+   "kind": "tile",
+   "text": "이 약은 성인의 식도, 위·십이지장과 관련된 통증의 완화, 성인의 급·만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "badge:649b176c7a07",
+   "kind": "badge",
+   "text": "이 약은 근육통, 신경통, 외상후 및 수술후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "h1:0c9f53803ea8",
+   "kind": "h1",
+   "text": "정 (136601ATB)",
+   "docs": 6
+  },
+  {
+   "id": "tile:649b176c7a07",
+   "kind": "tile",
+   "text": "이 약은 근육통, 신경통, 외상후 및 수술후 통증, 두통, 치통, 귀통증의 경증 또는 중등도 통증의 완화에 사용합니다.",
+   "docs": 6
+  },
+  {
+   "id": "warn:e07bf419ca16",
+   "kind": "warn",
+   "text": "복용 시 정제를 씹지 마십시오.",
    "docs": 6
   },
   {
@@ -408,6 +2040,30 @@
    "docs": 5
   },
   {
+   "id": "badge:764338476b94",
+   "kind": "badge",
+   "text": "이 약은 눈물 분비 부족 및 점액 부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 5
+  },
+  {
+   "id": "h1:7d2b0f40794c",
+   "kind": "h1",
+   "text": "점안액 (331800COS)",
+   "docs": 5
+  },
+  {
+   "id": "intro:764338476b94",
+   "kind": "intro",
+   "text": "이 약은 눈물 분비 부족 및 점액 부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 5
+  },
+  {
+   "id": "tile:764338476b94",
+   "kind": "tile",
+   "text": "이 약은 눈물 분비 부족 및 점액 부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 5
+  },
+  {
    "id": "warn:11588a4d619d",
    "kind": "warn",
    "text": "혼탁(흐림)된 것은 사용하지 마십시오.",
@@ -474,6 +2130,42 @@
    "docs": 5
   },
   {
+   "id": "intro:cf724e4f763c",
+   "kind": "intro",
+   "text": "이 약은 피부사상균에 의한 피부진균감염증(족부백선(발백선증,무좀))에 사용합니다.",
+   "docs": 5
+  },
+  {
+   "id": "h1:0b5e7f9f18f8",
+   "kind": "h1",
+   "text": "연질캡슐 (D22400ACS)",
+   "docs": 4
+  },
+  {
+   "id": "h1:3b1a143d7692",
+   "kind": "h1",
+   "text": "연질캡슐 (D22200ACS)",
+   "docs": 4
+  },
+  {
+   "id": "h1:86eeebe82cc7",
+   "kind": "h1",
+   "text": "산 (448301APD)",
+   "docs": 4
+  },
+  {
+   "id": "intake:a6a335939822",
+   "kind": "intake",
+   "text": "성인은 1일 17 g을 약 240 mL의 물, 주스, 소다, 커피, 차 등에 녹여서 가능한 한 아침에 복용합니다.장 운동을 일으키는데 1~4일(24시간에서 96시간)정도 소요됩니다.",
+   "docs": 4
+  },
+  {
+   "id": "warn:c5beeb12cd59",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 염증성 장질환(궤양성 대장염, 크론병 등), 독성거대결장, 장천공 또는 장천공 위험이 있는 환자, 장폐색증이 있거나 장폐색이 의심되는 환자, 장협착, 원인을 알 수 없는 복통 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 어린이 및 청소년, 신질환, 과민대장증후군, 배변습관에 갑작스런 변화가 2주 이상 지속되는 환자, 나트륨 제한 식이를 하는 환자, 저칼륨식이중인 환자는 의사 또는 약사와 상의하십시오.1주 정도 복용하여도 변비의 개선이 없을 경우 복용을 중지하고 의사 또는 약사와 상의하십시오. 다른 약물과 함께 복용 시 2시간 안에 다른 약과 함께 복용하지 마십시오",
+   "docs": 4
+  },
+  {
    "id": "h1:cb074f2eac72",
    "kind": "h1",
    "text": "큐앤큐헥시코올스틱스왑액",
@@ -489,6 +2181,12 @@
    "id": "warn:7217587998e1",
    "kind": "warn",
    "text": "국소 및 전신 알레르기 증상(때때로 발진, 두드러기), 접촉성 습진, 드물게 쇽 증상(구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적), 광감작이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 4
+  },
+  {
+   "id": "h1:924801160460",
+   "kind": "h1",
+   "text": "캡슐 (D94200ACH)",
    "docs": 4
   },
   {
@@ -534,12 +2232,6 @@
    "docs": 4
   },
   {
-   "id": "warn:13c79a2f8081",
-   "kind": "warn",
-   "text": "이 약을 복용하기 전에 임부는 의사 또는 약사와 상의하십시오.",
-   "docs": 4
-  },
-  {
    "id": "intro:57e38b304eb6",
    "kind": "intro",
    "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건ㆍ건초염(힘줄윤활막염), 건주위염, 상완골(위팔뼈)상과염(테니스 엘보우 등), 근육통, 외상후의 종창(부기)ㆍ동통(통증)의 진통ㆍ소염(항염)에 사용합니다.",
@@ -570,6 +2262,60 @@
    "docs": 4
   },
   {
+   "id": "h1:0843c127a5e7",
+   "kind": "h1",
+   "text": "정 (101404ATB)",
+   "docs": 4
+  },
+  {
+   "id": "badge:0f8d44bb9109",
+   "kind": "badge",
+   "text": "이 약은 감기의 제증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "intro:0f8d44bb9109",
+   "kind": "intro",
+   "text": "이 약은 감기의 제증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "tile:0f8d44bb9109",
+   "kind": "tile",
+   "text": "이 약은 감기의 제증상(인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "intake:0d92138e845b",
+   "kind": "intake",
+   "text": "눈의 자극 증상에 따라 1회 1~2방울을 1일 수회(여러 차례) 점안(눈에 넣음)합니다.점안 후 남은 액과 용기는 바로 버립니다.",
+   "docs": 4
+  },
+  {
+   "id": "warn:c0a64a3eb02a",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약은 점안(눈에 넣음)용으로만 사용하십시오.오염을 방지하기 위해 될 수 있는 한 공동으로 사용하지 마십시오.개봉한 후에는 1회만 즉시 사용하고, 남은 액과 용기는 바로 버리십시오.(일회용에 한함)",
+   "docs": 4
+  },
+  {
+   "id": "badge:78e16d73d592",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(기침,가래,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "intro:78e16d73d592",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(기침,가래,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "tile:78e16d73d592",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(기침,가래,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 4
+  },
+  {
    "id": "badge:54a833364ec3",
    "kind": "badge",
    "text": "이 약은 심근경색, 뇌경색, 불안정형 협심증에서 혈전 생성 억제와 관상동맥 우회술(CABG) 또는 경피경관 관상동맥 성형술(PTCA) 후 혈전 생성 억제와 고위험군환자(허혈성 심장질환의 가족력, 고혈압, 고콜레스테롤혈증, 비만, 당뇨 등 복합적 위험인자를 가진 환자)에서 심혈관계 위험성 감소에 사용합니다.",
@@ -588,21 +2334,15 @@
    "docs": 4
   },
   {
-   "id": "badge:cf8732d3351e",
-   "kind": "badge",
-   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
+   "id": "h1:2d64820eb101",
+   "kind": "h1",
+   "text": "정 (101305ATB)",
    "docs": 4
   },
   {
-   "id": "intro:cf8732d3351e",
-   "kind": "intro",
-   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
-   "docs": 4
-  },
-  {
-   "id": "tile:cf8732d3351e",
-   "kind": "tile",
-   "text": "이 약은 소프트콘택트렌즈 또는 하드콘택트렌즈를 착용하고 있을 때의 불쾌감, 눈물 보충(눈의 건조), 눈의 피로, 눈의 흐림(눈곱이 많을 때)에 사용합니다.",
+   "id": "intake:9b470e67ad75",
+   "kind": "intake",
+   "text": "성인은 1회 300~1,000 mg을 1일 3~4회 복용합니다. 1일 최고 8정(4,000 mg)까지 투여할 수 있습니다. 연령,증상에 따라 적절히 증감할 수 있습니다.",
    "docs": 4
   },
   {
@@ -720,15 +2460,45 @@
    "docs": 4
   },
   {
+   "id": "warn:56078714dff0",
+   "kind": "warn",
+   "text": "개봉한 후에는 1회만 즉시 사용하고, 남은 액과 용기는 바로 버리십시오.",
+   "docs": 4
+  },
+  {
    "id": "intake:addc8467daa1",
    "kind": "intake",
    "text": "필요 시 증상이 있는 눈에 1~2방울을 점안하고 점안 후 남은 액과 용기는 버립니다.",
    "docs": 4
   },
   {
+   "id": "intro:6a280f330d49",
+   "kind": "intro",
+   "text": "이 약은 보건위생종사자의 손 소독에 사용합니다.",
+   "docs": 4
+  },
+  {
+   "id": "warn:029b0d475aa4",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 매우 드물게 발진, 가려움, 물집피부염 및 두드러기, 흔하지 않게 피부 건조함, 피부 자극 또는 작열감(화끈감) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 4
+  },
+  {
+   "id": "warn:7827ec18c139",
+   "kind": "warn",
+   "text": "소화성궤양 환자, 약물에 기인하여 위·십이지장에 동요 발현, 이 약에 과민증 환자, 아스피린이나 다른 비스테로이드성 소염진통제(COX-2 억제제 포함)에 천식, 두드러기 또는 알레르기 반응 경험자, 관상동맥 우회로술(CABG) 전후에 발생하는 통증의 치료 환자, 임부 또는 임신하고 있을 가능성이 있는 여성, 심한 간장애, 심한 신장애, 심한 심부전, 크론병 또는 궤양성 대장염과 같은 염증성 장질환 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 소화성궤양의 경험자, 소아 및 고령자, 고혈압, 체액저류 또는 심부전, 기관지천식 환자, 간장애, 신장애 환자 또는 경험자는 의사 또는 약사와 상의하십시오.",
+   "docs": 4
+  },
+  {
    "id": "warn:3dfae47250ee",
    "kind": "warn",
    "text": "【사용상 주의사항】 이 약에 과민증 환자는 이 약을 사용하지 마십시오. 이 약을 사용하기 전에 눈의 통증이 심한 환자, 안약에 의한 알레르기 반응(눈의 충혈, 가려움, 부종(부기), 충혈되어 붉어짐 등) 경험자는 의사 또는 약사와 상의하십시오. 정해진 용법과 용량을 잘 지키십시오. 이 약은 점안용으로만 사용합니다. 소프트콘택트렌즈의 장착액으로 또한 소프트콘택트렌즈를 착용한 채 사용하지 마십시오. 콘택트렌즈는 이 약을 사용하기 전에 제거되어야 하며, 점안 15분 후에 착용하십시오. 다른 점안제와 동시에 사용할 경우, 이 약을 사용하기 전에 최소한 15분의 간격을 두고 점안하십시오. 높은 점도로 인해 이 약 점안 시 일시적으로 눈이 흐릿해질 수 있습니다.",
+   "docs": 3
+  },
+  {
+   "id": "warn:e7446eeada8d",
+   "kind": "warn",
+   "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 급성전신발진고름물집증과 같은 중증 피부 이상반응이 나타나는 경우 복용을 중단하고 의사 또는 약사와 상의하십시오. 매우 드물게 치명적일 수 있는 급성전신발진고름물집증,스티븐스,존슨증후군,독성표피괴사용해와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 피부발진 또는 다른 과민반응의 징후가 나타나는 경우 즉시 복용을 중단하십시오",
    "docs": 3
   },
   {
@@ -822,9 +2592,57 @@
    "docs": 3
   },
   {
+   "id": "intake:29ea8bd090be",
+   "kind": "intake",
+   "text": "성인은 1회 300~1,000 mg을 1일 3~4회 복용합니다. 1일 최고 4,000 mg까지 복용할 수 있습니다. 연령,증상에 따라 적절히 증감할 수 있습니다.",
+   "docs": 3
+  },
+  {
+   "id": "badge:78a908b8eb4d",
+   "kind": "badge",
+   "text": "이 약은 두통,치통,발치후 동통(통증),인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통 및 오한,발열시의 해열에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "h1:0ca70a49fbd9",
+   "kind": "h1",
+   "text": "정 (B02100ATB)",
+   "docs": 3
+  },
+  {
+   "id": "intro:78a908b8eb4d",
+   "kind": "intro",
+   "text": "이 약은 두통,치통,발치후 동통(통증),인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통 및 오한,발열시의 해열에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "tile:78a908b8eb4d",
+   "kind": "tile",
+   "text": "이 약은 두통,치통,발치후 동통(통증),인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통 및 오한,발열시의 해열에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "intake:4c4685591e64",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1일 1정 2회까지로 하고 공복 시를 피하여 복용하십시오. 복용 간격은 6시간 이상으로 하십시오.",
+   "docs": 3
+  },
+  {
    "id": "h1:f87663bebea7",
    "kind": "h1",
    "text": "Ketoprofen Medicated Plaster",
+   "docs": 3
+  },
+  {
+   "id": "intake:24f2ceae2dd2",
+   "kind": "intake",
+   "text": "1회 2~3적, 1일 5~6회 점안합니다.점안 후 남은 액과 용기는 바로 버립니다.(1회용에 한함)",
+   "docs": 3
+  },
+  {
+   "id": "warn:00d27a5ad3de",
+   "kind": "warn",
+   "text": "이 약을 사용하기 전에 약에 알레르기 증상 경험자, 알레르기 체질, 녹내장, 눈의 통증이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.혼탁(흐림)된 것은 사용하지 마십시오.이 약은 점안용으로만 사용하십시오.최초 사용 시 1~2적은 점안하지 않고 버립니다.2주 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.다른 사람과 함께 사용하지 마십시오.일회용 제품인 경우 개봉 후에는 1회만 사용하고 남은 액과 용기는 바로 버립니다.",
    "docs": 3
   },
   {
@@ -936,9 +2754,75 @@
    "docs": 3
   },
   {
+   "id": "h1:201272266d2f",
+   "kind": "h1",
+   "text": "점안액 (D36900COS)",
+   "docs": 3
+  },
+  {
+   "id": "intake:5522618311f1",
+   "kind": "intake",
+   "text": "1회 1~2방울, 1일 4~5회 점안합니다.",
+   "docs": 3
+  },
+  {
+   "id": "warn:61c0e6407b4a",
+   "kind": "warn",
+   "text": "이 약을 사용하기 전에 눈의 통증이 심한 사람, 안약에 의한 알레르기 증상(눈의 충혈, 가려움, 부종(부기), 발진, 충혈되어 붉어짐 등) 경험자, 녹내장 환자는 의사 또는 약사와 상의하십시오.",
+   "docs": 3
+  },
+  {
+   "id": "warn:ac78345fc0cc",
+   "kind": "warn",
+   "text": "이 약 사용에 의해 눈의 침침함이 개선되지 않는 경우, 2주 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 3
+  },
+  {
+   "id": "warn:3eece517613d",
+   "kind": "warn",
+   "text": "용기의 끝이 눈꺼풀 및 속눈썹에 닿으면 눈곱이나 곰팡이 등에 의해 약액이 오염 또는 혼탁(흐림)될 수 있으니 주의하십시오. 혼탁(흐림)된 것은 사용하지 마십시오.",
+   "docs": 3
+  },
+  {
    "id": "warn:2239c78ae1c7",
    "kind": "warn",
    "text": "오염과 눈의 손상을 피하기 위하여 용기의 팁이 외부에 닿지 않도록 하십시오.",
+   "docs": 3
+  },
+  {
+   "id": "badge:dd5ba1c2ff8e",
+   "kind": "badge",
+   "text": "이 약은 간기능 저하로 인한 소화불량의 보조치료에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "h1:6814c2b4125f",
+   "kind": "h1",
+   "text": "연질캡슐 (A02500ACS)",
+   "docs": 3
+  },
+  {
+   "id": "intro:dd5ba1c2ff8e",
+   "kind": "intro",
+   "text": "이 약은 간기능 저하로 인한 소화불량의 보조치료에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "tile:dd5ba1c2ff8e",
+   "kind": "tile",
+   "text": "이 약은 간기능 저하로 인한 소화불량의 보조치료에 사용합니다.",
+   "docs": 3
+  },
+  {
+   "id": "intake:41bc90528111",
+   "kind": "intake",
+   "text": "성인은 1일 1~2캡슐, 식전 또는 소화불량시 복용하며 1일 4캡슐을 초과하지 않습니다.",
+   "docs": 3
+  },
+  {
+   "id": "warn:adbe88e617e0",
+   "kind": "warn",
+   "text": "설사와 복통 등의 증상이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
    "docs": 3
   },
   {
@@ -951,6 +2835,12 @@
    "id": "warn:581a832aa4be",
    "kind": "warn",
    "text": "이 약을 복용하기 전에 카라멜에 과민증 환자, 요저류(소변이 고임) 문제가 있는 사람, 임부 및 임신하고 있을 가능성이 있는 여성, 수유부, 15일 이상 계속 복용하는 사람은 의사 또는 약사와 상의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "intake:bb71e1899df3",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,만 7세 이상~만 15세 미만은 1회 1캡슐씩,1일 3회 식후 30분에 복용합니다.",
    "docs": 2
   },
   {
@@ -993,6 +2883,24 @@
    "id": "h1:62021810bc8d",
    "kind": "h1",
    "text": "카타플라스마 (179901CPO)",
+   "docs": 2
+  },
+  {
+   "id": "h1:278b78fcc600",
+   "kind": "h1",
+   "text": "연질캡슐 (C59600ACS)",
+   "docs": 2
+  },
+  {
+   "id": "h1:932f00b42dc1",
+   "kind": "h1",
+   "text": "캡슐 (A52500ACH)",
+   "docs": 2
+  },
+  {
+   "id": "intake:565a004cb1b4",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,만 8세 이상 만 15세 미만은 1회 1캡슐씩,1일 3회 식후 30분에 복용합니다.",
    "docs": 2
   },
   {
@@ -1158,9 +3066,105 @@
    "docs": 2
   },
   {
+   "id": "h1:cd7d066909bc",
+   "kind": "h1",
+   "text": "정 (D39500ATB)",
+   "docs": 2
+  },
+  {
+   "id": "badge:5f5730cbafd5",
+   "kind": "badge",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:5f5730cbafd5",
+   "kind": "intro",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:5f5730cbafd5",
+   "kind": "tile",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
    "id": "h1:514e3d3a302b",
    "kind": "h1",
    "text": "포비돈브러쉬액(포비돈요오드)",
+   "docs": 2
+  },
+  {
+   "id": "badge:85ee0c3ed4c5",
+   "kind": "badge",
+   "text": "이 약은 콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:85ee0c3ed4c5",
+   "kind": "intro",
+   "text": "이 약은 콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:85ee0c3ed4c5",
+   "kind": "tile",
+   "text": "이 약은 콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "badge:82033743652a",
+   "kind": "badge",
+   "text": "이 약은 두통,치통,발치후 동통,인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통과 오한,발열 시의 해열에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:c35895869d76",
+   "kind": "h1",
+   "text": "정 (378000ATB)",
+   "docs": 2
+  },
+  {
+   "id": "intro:82033743652a",
+   "kind": "intro",
+   "text": "이 약은 두통,치통,발치후 동통,인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통과 오한,발열 시의 해열에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:82033743652a",
+   "kind": "tile",
+   "text": "이 약은 두통,치통,발치후 동통,인후통,귀의 통증,관절통,신경통,요통,근육통,견통(어깨결림),타박통,골절통,염좌통(삠통증),월경통(생리통),외상통의 진통과 오한,발열 시의 해열에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:56ead0d6222a",
+   "kind": "intake",
+   "text": "성인은 1회 1정씩,1일 1회 공복을 피하여 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "badge:af3291703952",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:7c7e83ea340b",
+   "kind": "h1",
+   "text": "연질캡슐 (C95700ACS)",
+   "docs": 2
+  },
+  {
+   "id": "intro:af3291703952",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:af3291703952",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
    "docs": 2
   },
   {
@@ -1218,6 +3222,12 @@
    "docs": 2
   },
   {
+   "id": "intake:647cc4ace1bf",
+   "kind": "intake",
+   "text": "성인은 1회 1회정씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 2
+  },
+  {
    "id": "h1:cd1829ca2fc6",
    "kind": "h1",
    "text": "인도메타신 크림",
@@ -1242,6 +3252,54 @@
    "docs": 2
   },
   {
+   "id": "badge:9aff841d08c8",
+   "kind": "badge",
+   "text": "이 약은 감기의 제증상 (콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,근육통,관절통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:9aff841d08c8",
+   "kind": "intro",
+   "text": "이 약은 감기의 제증상 (콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,근육통,관절통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:9aff841d08c8",
+   "kind": "tile",
+   "text": "이 약은 감기의 제증상 (콧물,코막힘,재채기,인후통,기침,가래,오한,발열,두통,근육통,관절통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:1560a19c9230",
+   "kind": "intake",
+   "text": "성인(만 15세 이상)은 1회 2캡슐씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:c5faeec7563a",
+   "kind": "intake",
+   "text": "성인은 1회 1정씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "badge:7b530c55ed41",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:7b530c55ed41",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:7b530c55ed41",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후통,오한,발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
    "id": "badge:a44fe621cf9c",
    "kind": "badge",
    "text": "이 약은 췌장 외분비 기능장애에 사용합니다.",
@@ -1260,9 +3318,21 @@
    "docs": 2
   },
   {
+   "id": "h1:4ff8d2a40daf",
+   "kind": "h1",
+   "text": "연질캡슐 (D65500ACS)",
+   "docs": 2
+  },
+  {
    "id": "h1:8d7773246e0e",
    "kind": "h1",
    "text": "펠비낙 첩부제",
+   "docs": 2
+  },
+  {
+   "id": "warn:d295b38e5810",
+   "kind": "warn",
+   "text": "발진, 발적(충혈되어 붉어짐), 가려움, 눈의 충혈, 가려움, 부기, 하드콘택트렌즈를 장착한 환자에서 눈곱 등의 분비물이 많고, 렌즈가 흐려지는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
    "docs": 2
   },
   {
@@ -1341,6 +3411,12 @@
    "id": "warn:9e62fc2fe31d",
    "kind": "warn",
    "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 가려움, 홍반, 접촉피부염, 피부발진, 피하출혈, 피부자극, 색소침착, 물집, 종창, 배가 거북함, 상복부 통증, 설사·묽은 변, ALT 상승, AST 상승, -GTP 상승, 부종, 쇽 증상(혈압저하, 두드러기, 후두부종, 호흡곤란) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "h1:7ee85ed7a462",
+   "kind": "h1",
+   "text": "다이제틴정",
    "docs": 2
   },
   {
@@ -1464,9 +3540,273 @@
    "docs": 2
   },
   {
+   "id": "badge:83c19741048a",
+   "kind": "badge",
+   "text": "이 약은 베인상처, 긁힌상처, 쓸린상처에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:1f03552400c3",
+   "kind": "h1",
+   "text": "니라마이드산",
+   "docs": 2
+  },
+  {
+   "id": "intro:83c19741048a",
+   "kind": "intro",
+   "text": "이 약은 베인상처, 긁힌상처, 쓸린상처에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:83c19741048a",
+   "kind": "tile",
+   "text": "이 약은 베인상처, 긁힌상처, 쓸린상처에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:4397b1885e89",
+   "kind": "intake",
+   "text": "1일 수회 적당량을 환부에 산포합니다.",
+   "docs": 2
+  },
+  {
+   "id": "warn:ed3f89f8268f",
+   "kind": "warn",
+   "text": "이 약을 사용하기 전에 약이나 화장품에 등에 의한 알레르기 증상이 나타난 적이 있는 환자, 환부가 광범위한 환자, 상처가 심하거나 화상이 심한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.수일간 투여 후에도 증상의 개선이 없을 경우 투여를 중지하고 의사 또는 약사와 상의하십시오.이 약은 외용으로만 사용하고 사용하지 마십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:0aa2747dc619",
+   "kind": "warn",
+   "text": "이 약의 사용으로 인해 발진·발적, 가려움 등의 증상이 나타나는 경우 사용을 중지하고 약사나 의사와 상의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "badge:6db34429c48b",
+   "kind": "badge",
+   "text": "이 약은 좁은 범위 피부의 창상부위 소독에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:6db34429c48b",
+   "kind": "intro",
+   "text": "이 약은 좁은 범위 피부의 창상부위 소독에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:6db34429c48b",
+   "kind": "tile",
+   "text": "이 약은 좁은 범위 피부의 창상부위 소독에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "badge:caa06ea9a65d",
+   "kind": "badge",
+   "text": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intro:caa06ea9a65d",
+   "kind": "intro",
+   "text": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:caa06ea9a65d",
+   "kind": "tile",
+   "text": "이 약은 습진, 피부염, 땀띠, 옻 등에 의한 피부염, 가려움, 벌레물린데, 두드러기, 동창에 사용합니다.",
+   "docs": 2
+  },
+  {
    "id": "h1:80cc65c89b60",
    "kind": "h1",
    "text": "아이톡씨엠씨점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "docs": 2
+  },
+  {
+   "id": "meta:5af52c06bc6e",
+   "kind": "meta",
+   "text": "D-판테놀",
+   "docs": 2
+  },
+  {
+   "id": "tile:5af52c06bc6e",
+   "kind": "tile",
+   "text": "D-판테놀",
+   "docs": 2
+  },
+  {
+   "id": "h1:34bec2d887cb",
+   "kind": "h1",
+   "text": "구아야줄렌 크림 — 습진·화상·미란 치료",
+   "docs": 2
+  },
+  {
+   "id": "badge:d1ef19491718",
+   "kind": "badge",
+   "text": "이 약은 성인의 식도, 위ㆍ십이지장과 관련된 통증의 완화, 급ㆍ만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:17bfdf9132e9",
+   "kind": "h1",
+   "text": "스타빅현탁액(디옥타헤드랄스멕타이트)",
+   "docs": 2
+  },
+  {
+   "id": "intro:d1ef19491718",
+   "kind": "intro",
+   "text": "이 약은 성인의 식도, 위ㆍ십이지장과 관련된 통증의 완화, 급ㆍ만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:d1ef19491718",
+   "kind": "tile",
+   "text": "이 약은 성인의 식도, 위ㆍ십이지장과 관련된 통증의 완화, 급ㆍ만성 설사, 24개월 이상 소아의 급성 설사에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:7229c20633fe",
+   "kind": "intake",
+   "text": "성인은 1회 1포(3 g)씩, 1일 3회 복용합니다.급성 설사 시 초기 3일은 1일 용량을 2배로 증량할 수 있습니다.식도염에는 식후에, 다른 적응증에는 식간에 복용합니다.24개월 이상 소아는 3일 동안 1일 2~3포(6~9 g)를 3회 분할 복용하고 이후 4일 동안 1일 2포(6 g)를 3회 분할 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "warn:9d56593e1f3f",
+   "kind": "warn",
+   "text": "24개월 미만의 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 심한 만성 변비 환자, 장폐색(창자막힘) 경험자는 의사 또는 약사와 상의하십시오.약은 흡착성이 있어 타 약물과 함께 복용할 경우 흡수율이나 흡수시간에 영향을 미칠 수 있으므로 간격을 두고 복용하는 것이 바람직합니다.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.7일 이상 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.탈수증이 나타나는 경우에는 적절한 수액공급을 하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:78a993abd2f6",
+   "kind": "warn",
+   "text": "항알도스테론제, 트리암테렌과 병용투여시 고칼륨혈증을 일으킬 수 있으므로 주의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "badge:6a280f330d49",
+   "kind": "badge",
+   "text": "이 약은 보건위생종사자의 손 소독에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:6a280f330d49",
+   "kind": "tile",
+   "text": "이 약은 보건위생종사자의 손 소독에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "badge:b4ef7c8a7006",
+   "kind": "badge",
+   "text": "이 약은 코감기(급성비염), 알레르기성 비염 또는 부비강염에 의한 코막힘, 콧물, 재채기, 눈물, 목의 통증, 머리 무거움의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:70c6af968285",
+   "kind": "h1",
+   "text": "코르텍골드구강붕해필름",
+   "docs": 2
+  },
+  {
+   "id": "intro:b4ef7c8a7006",
+   "kind": "intro",
+   "text": "이 약은 코감기(급성비염), 알레르기성 비염 또는 부비강염에 의한 코막힘, 콧물, 재채기, 눈물, 목의 통증, 머리 무거움의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:b4ef7c8a7006",
+   "kind": "tile",
+   "text": "이 약은 코감기(급성비염), 알레르기성 비염 또는 부비강염에 의한 코막힘, 콧물, 재채기, 눈물, 목의 통증, 머리 무거움의 완화에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:af0317497c49",
+   "kind": "intake",
+   "text": "성인 및 15세 이상은 1회 1매, 1일 3회 입 안에서 녹여 복용합니다.복용간격은 4시간 이상이어야 합니다.이 약(필름)은 다음과 같은 순서로 복용합니다.알루미늄 시트를 열고 입에서 천천히 떼어 내고 약(필름)만 꺼냅니다. (알루미늄 시트를 전부 삼키지 않습니다. 식도 점막에 꽂히는 등 뜻밖의 사고로 이어질 수 있습니다.)이 약(필름)을 혀 위에 올려 타액으로 녹이면서 복용합니다.이 약(필름)은 물에 녹기 쉬운 필름이므로 젖은 손으로 취급하지 않습니다.이 약(필름)은 즉시 입 안에서 녹지만 만일 목에 붙어 버린 경우에는 물을 마셔 삼킵니다. 또한 침이 적어서 복용하기 어려운 경우 물을 입에 넣고 녹이면서 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "warn:c93287759a01",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 15세 미만의 소아, MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등)를 복용하고 있거나 복용을 중단한 후 2주 이내의 사람은 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 고령자, 고열, 배뇨곤란, 입 갈증, 녹내장, 당뇨병, 갑상선 기능 장애, 심장 질환, 고혈압, 흡연, 천식, 만성 기관지염, 폐기종, 과도한 가래가 동반되는 기침, 1주 이상 지속 또는 재발되는 기침, 만성 기침, 발열·발진이나 지속적인 두통이 동반되는 기침 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.5~6일 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.복용 후 졸음이 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:c8f042bfb270",
+   "kind": "warn",
+   "text": "발진, 발적, 가려움, 구역질, 구토, 식욕부진, 현기증, 불면증, 신경과민, 두통, 경련, 배뇨곤란, 얼굴 홍조, 눈부심, 재생불량성빈혈 증상(파란 멍, 코피, 잇몸 출혈, 발열, 피부와 점막이 창백해 보임, 피로감, 동계, 호흡 곤란, 어지러워짐, 혈뇨), 무과립구증(고열, 오한, 인후통 등)이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:1e77e29e65a7",
+   "kind": "warn",
+   "text": "MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 비염용 내복약, 항히스타민제를 함유하는 내복약(감기약, 진해 거담제, 멀미약, 알레르기 약 등), 위장 진통 진경제와 함께 복용하지 마십시오.복용 중에는 음주하지 마십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:c1993272b4ab",
+   "kind": "warn",
+   "text": "복용 중에는 알코올성 음료를 피하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "badge:9472a43fa27d",
+   "kind": "badge",
+   "text": "이 약은 신경통, 요통, 어깨결림에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "h1:457b4856917d",
+   "kind": "h1",
+   "text": "스카풀라정",
+   "docs": 2
+  },
+  {
+   "id": "intro:9472a43fa27d",
+   "kind": "intro",
+   "text": "이 약은 신경통, 요통, 어깨결림에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "tile:9472a43fa27d",
+   "kind": "tile",
+   "text": "이 약은 신경통, 요통, 어깨결림에 사용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "intake:dc2d496e4ac8",
+   "kind": "intake",
+   "text": "성인은 1회 1~2정, 1일 2회 동통 또는 발작시에 복용합니다.",
+   "docs": 2
+  },
+  {
+   "id": "warn:428fa77b06b2",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 약에 과민증 환자, 두드러기, 접촉성 피부염, 기관지천식, 알레르기성 비염, 편두통, 음식물 알레르기 등을 일으키기 쉬운 체질을 갖고 있는 사람, 알레르기 증상(예 : 발열, 발진, 관절통, 천식, 가려움증 등) 경험자, 수두 또는 인플루엔자에 감염되어 있거나 또는 의심되는 영·유아 및 어린이 (14세 이하), 간장, 신장, 갑상선질환, 당뇨병, 고혈압, 고열, 몸이 약한 사람, 고령자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:e1eeb5c4fb5e",
+   "kind": "warn",
+   "text": "발진, 발적, 구역, 구토, 변비, 식욕부진, 현기증 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:da34fd12d837",
+   "kind": "warn",
+   "text": "다른 해열진통제, 감기약, 진정약 등과 함께 복용하지 마십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:344d2098ad26",
+   "kind": "warn",
+   "text": "대두유, 콩, 땅콩에 과민증 환자 또는 경험자, 중증의 간세포기능부전이나 담도폐색 환자는 이 약을 복용하지 마십시오.",
+   "docs": 2
+  },
+  {
+   "id": "warn:7a9f2abd723c",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 시스틴뇨증 환자, 고지단백혈증, 당뇨병성고지질혈증 및 췌장염 등 지방대사 이상 환자 또는 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자, 황색4호 및 황색5호에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.",
    "docs": 2
   },
   {
@@ -1491,6 +3831,24 @@
    "id": "h1:3d0c6b366979",
    "kind": "h1",
    "text": "데오클렌액(염화알루미늄)",
+   "docs": 1
+  },
+  {
+   "id": "warn:6b47e8b7db80",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자,심한 신장애,심한 간장애,과당 불내성의 유전적 소인을 가진 환자,만 2세 미만의 소아,임신 초기 3개월 이내는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 신장애,소화성 궤양 환자,임부,수유부,고령자,꼭 필요한 경우의 만 2세 미만 소아,카라멜 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오. 에리트로마이신,세팔렉신,옥시테트라사이클린,아목시실린,세퓨록심,독시사이클린 등의 항생물질과 함께 복용 시 의사 또는 약사와 상의하십시오",
+   "docs": 1
+  },
+  {
+   "id": "intake:0bc3da4bc4f5",
+   "kind": "intake",
+   "text": "만 15세 이상은 1회 15 mL,만 11세 이상~만 15세 미만은 1회 10 mL,만 7세 이상~만 11세 미만은 1회 7.5 mL,만 3세 이상~만 7세 미만은 1회 5 mL,만 2세 이상~만 3세 미만은 1회 3.8 mL씩,1일 3∼4회,매 식후에 복용합니다. 필요한 경우에는 취침 시 복용하며 일반적으로 복용간격은 4시간 이상으로 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:f81689aafd34",
+   "kind": "intake",
+   "text": "성인은 1회 1캡슐씩,1일 3회 식후 30분에 복용합니다.",
    "docs": 1
   },
   {
@@ -1536,6 +3894,18 @@
    "docs": 1
   },
   {
+   "id": "h1:2f84ba837f9b",
+   "kind": "h1",
+   "text": "캡슐 (D82200ACH)",
+   "docs": 1
+  },
+  {
+   "id": "intake:88886c9f6853",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,만 7세 초과~만 15세 미만은 1회 1캡슐씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 1
+  },
+  {
    "id": "intro:270f56e1104c",
    "kind": "intro",
    "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건ㆍ건초염,상완골상과염(테니스 엘보우 등), 근육통, 외상후의 종창ㆍ동통의 진통ㆍ소염에 사용합니다.",
@@ -1551,6 +3921,12 @@
    "id": "warn:9ff411610d00",
    "kind": "warn",
    "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 때때로 발적, 발진, 약진, 가려움 및 작열감, 접촉피부염, 천식발작(건성수포음, 천명, 호흡 곤란 등)이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "intake:e1a4b1748366",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 2캡슐씩,1일 3회 식후 30분 복용합니다.",
    "docs": 1
   },
   {
@@ -1677,6 +4053,30 @@
    "id": "warn:4cb0ee8b33f3",
    "kind": "warn",
    "text": "인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마십시오.에스트로겐을 포함한 경구용 피임제, 항알도스테론제, 트리암테렌과 함께 복용 시 의사 또는 약사와 상의하십시오.녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:ee1120027de3",
+   "kind": "h1",
+   "text": "산 (738400APD)",
+   "docs": 1
+  },
+  {
+   "id": "intake:db6855af1abb",
+   "kind": "intake",
+   "text": "성인 및 15세 이상은 1회 2 g씩, 11세 이상~15세 미만은 1회 1.33 g씩, 8세 이상~11세 미만은 1회 1 g씩, 5세 이상~8세 미만은 1회 0.67 g씩, 3세 이상 - 5세 미만은 1회 0.5 g씩, 1세 이상~3세 미만은 1회 0.4 g씩, 1일 3회 식사 전에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:c8d7b3504392",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 3개월 미만의 젖먹이는 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:82035d1577cc",
+   "kind": "warn",
+   "text": "2주 정도 복용하여도 증상이 좋아지지 않을 경우 이 약의 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오",
    "docs": 1
   },
   {
@@ -1812,6 +4212,36 @@
    "docs": 1
   },
   {
+   "id": "badge:335f1218c2f3",
+   "kind": "badge",
+   "text": "이 약은 변비,식욕부진(식욕감퇴),복부팽만,장내이상발효,치질에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:335f1218c2f3",
+   "kind": "intro",
+   "text": "이 약은 변비,식욕부진(식욕감퇴),복부팽만,장내이상발효,치질에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:335f1218c2f3",
+   "kind": "tile",
+   "text": "이 약은 변비,식욕부진(식욕감퇴),복부팽만,장내이상발효,치질에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:ac7d12a3797f",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 1정씩,1일 3회 식전,식간(식사 때와 식사 때 사이) 또는 식후에 복용합니다. 다만,초회는 최소량을 복용하고 변의 모양과 상태를 보면서 조금씩 증량 또는 감량합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:6030e5de4a68",
+   "kind": "warn",
+   "text": "급성 복부질환(맹장꼬리염,장출혈,궤양성 결장염 등),장폐색(창자막힘) 환자는 이 약을 복용하지 마십시오. 이 약을 복용하기 전에 심한 복통,구역,구토,임부 또는 임신하고 있을 가능성이 있는 여성,신장장애,직장의 출혈 혹은 장부전 경험자는 의사 또는 약사와 상의하십시오. 1주 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오. 정해진 용법과 용량을 잘 지키십시오. 어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오",
+   "docs": 1
+  },
+  {
    "id": "h1:06b1e261a17f",
    "kind": "h1",
    "text": "포텐스틱액(L-아스파르트산-L-아르기닌수화물)",
@@ -1866,6 +4296,192 @@
    "docs": 1
   },
   {
+   "id": "badge:ad1e4d6f6642",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,기침,인후(목구멍)통,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:83160b2774b0",
+   "kind": "h1",
+   "text": "내복액 (C36800ALQ)",
+   "docs": 1
+  },
+  {
+   "id": "intro:ad1e4d6f6642",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,기침,인후(목구멍)통,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:ad1e4d6f6642",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,기침,인후(목구멍)통,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:81b60e5e81ba",
+   "kind": "intake",
+   "text": "성인 1회 1병(30 mL) 1일 3회 식후 30분에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:d6605949a246",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러증상(인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:d6605949a246",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러증상(인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:d6605949a246",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러증상(인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:5ad6468bacc7",
+   "kind": "badge",
+   "text": "이 약은 오심,구토 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:cc548e716a8a",
+   "kind": "h1",
+   "text": "내복액 (148401ALQ)",
+   "docs": 1
+  },
+  {
+   "id": "intro:5ad6468bacc7",
+   "kind": "intro",
+   "text": "이 약은 오심,구토 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:5ad6468bacc7",
+   "kind": "tile",
+   "text": "이 약은 오심,구토 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:121234b6e7be",
+   "kind": "intake",
+   "text": "성인 및 청소년(12세 이상,35 kg 이상)은 1회 10 mg(레보도파 투여시 5 mg)을 1일 3회 식전에 복용합니다. 1일 최대 복용량은 30 mg이며,일반적으로 1주일을 초과하여 사용하지 않도록 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:12af209e6fa0",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자,위운동 촉진이 위험한 환자(위장관출혈,기계적폐쇄증,천공),프로락틴분비종양,강력한 CYP3A4 저해제를 병용투여중인 환자,중등도 및 중증의 간장애,임부 또는 임신하고 있을 가능성이 있는 여성,QTc 간격을 지연시키는 약물을 병용투여중인 환자,전해질 불균형(저칼륨혈증,고칼륨혈증,저마그네슘혈증)을 보이는 환자,심부전과 같은 심장 기저질환 환자,몸무게 35 kg 미만의 소아,(경구용 현탁액의 경우) 소르비톨 불내성 환자는 이 약을 복용하지 마십시오",
+   "docs": 1
+  },
+  {
+   "id": "h1:769e1cabcc73",
+   "kind": "h1",
+   "text": "연질캡슐 (E69900ACS)",
+   "docs": 1
+  },
+  {
+   "id": "intake:88d184dbc1f5",
+   "kind": "intake",
+   "text": "만 8세 이상~만 15세 미만은 1회 1캡슐씩,만 15세 이상 및 성인은 1회 2캡슐씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:2ad0a859ed5d",
+   "kind": "intake",
+   "text": "성인은 1회 1정씩,1일 3회 식후 30분에 복용합니다. 복용간격은 4시간으로 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:7f3278b74262",
+   "kind": "badge",
+   "text": "이 약은 감기의 제증상(여러증상)(인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:04ba32513386",
+   "kind": "h1",
+   "text": "연질캡슐 (E12400ACS)",
+   "docs": 1
+  },
+  {
+   "id": "intro:7f3278b74262",
+   "kind": "intro",
+   "text": "이 약은 감기의 제증상(여러증상)(인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:7f3278b74262",
+   "kind": "tile",
+   "text": "이 약은 감기의 제증상(여러증상)(인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:31c210bdb20b",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:5a73274c17d6",
+   "kind": "h1",
+   "text": "내복액 (D16000ALQ)",
+   "docs": 1
+  },
+  {
+   "id": "intro:31c210bdb20b",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:31c210bdb20b",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러 증상(콧물,코막힘,재채기,인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:df56f04f453c",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1회 1포(1회 용량)을 1일 3회,식후 30분에 복용합니다. 복용간격은 4시간으로 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:7d549ed3abc2",
+   "kind": "h1",
+   "text": "정 (D14400ATB)",
+   "docs": 1
+  },
+  {
+   "id": "intake:9d56da0075fb",
+   "kind": "intake",
+   "text": "1회 1정씩,1일 3회 식후 30분에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:bfe6e93a2976",
+   "kind": "badge",
+   "text": "이 약은 인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:bfe6e93a2976",
+   "kind": "intro",
+   "text": "이 약은 인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:bfe6e93a2976",
+   "kind": "tile",
+   "text": "이 약은 인후(목구멍)통,오한(춥고 떨리는 증상),발열,두통,관절통,근육통 등 감기의 여러 증상의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
    "id": "h1:e2b4fbe0f3e0",
    "kind": "h1",
    "text": "장용캡슐 (111001ACE)",
@@ -1908,6 +4524,84 @@
    "docs": 1
   },
   {
+   "id": "badge:5ff074ac662b",
+   "kind": "badge",
+   "text": "이 약은 감기의 여러증상(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:9fc7d78efc1c",
+   "kind": "h1",
+   "text": "연질캡슐 (E73400ACS)",
+   "docs": 1
+  },
+  {
+   "id": "intro:5ff074ac662b",
+   "kind": "intro",
+   "text": "이 약은 감기의 여러증상(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:5ff074ac662b",
+   "kind": "tile",
+   "text": "이 약은 감기의 여러증상(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:ddee4af42f63",
+   "kind": "intake",
+   "text": "만 15세 이상 및 성인은 1일 3회,1회 1캡슐을 식후 30분에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:6d243cbd3f0b",
+   "kind": "intake",
+   "text": "성인은 1회 300~1,000 mg을 1일 3~4회 복용합니다. 1일 최고 4,000 mg까지 투여할 수 있습니다. 연령,질환,증상에 따라 적절히 증감할 수 있습니다. 자세한 사항은 허가사항을 참고하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:f2c3363b5ebf",
+   "kind": "badge",
+   "text": "이 약은 안자극‧충혈의 일시적 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:18d97d63b495",
+   "kind": "h1",
+   "text": "점안액 (332600COS)",
+   "docs": 1
+  },
+  {
+   "id": "intro:f2c3363b5ebf",
+   "kind": "intro",
+   "text": "이 약은 안자극‧충혈의 일시적 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:f2c3363b5ebf",
+   "kind": "tile",
+   "text": "이 약은 안자극‧충혈의 일시적 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:5cef5e40408b",
+   "kind": "intake",
+   "text": "1회 1~2 방울 1일 4회 점안(눈에 넣음)합니다.점안 후 남은 액과 용기는 바로 버립니다.(1회용에 점안액에 한함)",
+   "docs": 1
+  },
+  {
+   "id": "warn:4cc46c9b07c1",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 폐쇄각 녹내장 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 유아 및 소아, 심부정맥 등 심한 증상의 심혈관 질환, 혈압조절이 잘 되지 않는 고혈압, 당뇨병성 케톤산증이 될 가능성이 있는 당뇨병 환자는 의사 또는 약사와 상의하십시오.이 약은 점안용으로만 사용하십시오.오염을 방지하기 위해 가능한 공동으로 사용하지 마십시오.개봉한 후에는 1회만 즉시 사용하고, 남은 액과 용기는 바로 버리십시오.(일회용 점안액에 한함)3일 이상 사용하여도 증상이 개선되지 않을 경우 사용을 중지하고 의사 또는 약사와 상의하십시오. MAO 억제제를 함께 사용 시 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:7e170144fcc5",
+   "kind": "h1",
+   "text": "연질캡슐 (D62000ACS)",
+   "docs": 1
+  },
+  {
    "id": "h1:5d6be76ef6ef",
    "kind": "h1",
    "text": "그린포비돈세정액(포비돈요오드)",
@@ -1929,6 +4623,42 @@
    "id": "warn:91f771685087",
    "kind": "warn",
    "text": "이 약에 과민증 환자, 소 또는 돼지고기에 과민증 겸험자, 급성췌장염, 만성췌장염의 급성발현 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 낭성섬유증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오. 엽산제제, 아카보즈, 미그리톨과 함께 복용 시 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "intake:cf052eb3b7dc",
+   "kind": "intake",
+   "text": "성인은 1회 1회정씩,1일 3회 식후 30분에 복용합니다. 복용간격은 4시간으로 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:ba93dd314f65",
+   "kind": "badge",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:ba93dd314f65",
+   "kind": "intro",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:ba93dd314f65",
+   "kind": "tile",
+   "text": "이 약은 감기의 제증상(여러증상)(콧물,코막힘,재채기,인후(목구멍)통,기침,가래,오한(춥고 떨리는 증상),발열,두통,관절통,근육통)의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:54a41cac048a",
+   "kind": "h1",
+   "text": "점안액 (D64600COS)",
+   "docs": 1
+  },
+  {
+   "id": "h1:506d3d6f15e9",
+   "kind": "h1",
+   "text": "정 (E27500ATB)",
    "docs": 1
   },
   {
@@ -1971,6 +4701,12 @@
    "id": "warn:670aab2ad624",
    "kind": "warn",
    "text": "【상호작용】 이 약을 다른 점안제와 동시에 사용할 경우에는, 이 약을 사용하기 전에 최소한 15분의 간격을 두고 사용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:f52f7b68a317",
+   "kind": "h1",
+   "text": "아이엔점안액(순)아이엔점안액(쿨)아이엔점안액(쿨하이)",
    "docs": 1
   },
   {
@@ -2428,37 +5164,1063 @@
    "kind": "warn",
    "text": "구강에 구강마비감, 자상감, 작열감 또는 과민증, 트림, 구역, 구토, 수면장애, 시각적 환각(세동, 색체에 대한 환각), 두드러기, 발진, 광과민증이 나타나는 경우 사용(사용)을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
    "docs": 1
+  },
+  {
+   "id": "badge:0561190bd514",
+   "kind": "badge",
+   "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건(힘줄) · 건초염(힘줄윤활막염), 상완골(위팔뼈)상과염(테니스 엘보우 등), 근육통, 외상(상처)후의 종창(부기) · 동통(통증)의 진통 · 소염(항염)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:3ab369cdb7de",
+   "kind": "h1",
+   "text": "카타플라스마 (161902CPO)",
+   "docs": 1
+  },
+  {
+   "id": "intro:0561190bd514",
+   "kind": "intro",
+   "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건(힘줄) · 건초염(힘줄윤활막염), 상완골(위팔뼈)상과염(테니스 엘보우 등), 근육통, 외상(상처)후의 종창(부기) · 동통(통증)의 진통 · 소염(항염)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:0561190bd514",
+   "kind": "tile",
+   "text": "이 약은 퇴행성관절염(골관절염), 어깨관절주위염, 건(힘줄) · 건초염(힘줄윤활막염), 상완골(위팔뼈)상과염(테니스 엘보우 등), 근육통, 외상(상처)후의 종창(부기) · 동통(통증)의 진통 · 소염(항염)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:39483a5944b7",
+   "kind": "intake",
+   "text": "1일 2회 약면의 박리지를 떼어내 환부에 붙입니다.적용부위의 땀을 닦아낸 후 사용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:7ae8b8403fbb",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 아스피린 천식(비스테로이드소염진통제 등에 의한 천식발작의 유발)환자 또는 경험자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 기관지천식 환자, 임부 또는 임신하고 있을 가능성이 있는 여성, 소아, 고령자, 감염을 수반하는 염증, 만성질환에는 의사 또는 약사와 상의하십시오.손상된 피부와 점막, 습진 또는 발진 부위에는 사용하지 마십시오.적용부위의 땀을 닦아낸 후 사용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:2d4bcbe8faf8",
+   "kind": "warn",
+   "text": "때때로 발적(충혈되어 붉어짐), 발진, 약진(약물발진), 가려움 및 작열감(화끈감), 접촉피부염, 천식발작(건성수포음(거품소리), 천명(숨을 쌕쌕거림), 호흡 곤란 등) 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "intro:2ad3da5dde97",
+   "kind": "intro",
+   "text": "이 약은 진행성 지장각피증(주부습진의 건조형), 손ㆍ발바닥 각피증, 어린선, 노인성 건피증(피부건조증), 모공성 태선, 아토피피부에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:f7ce80cf82c4",
+   "kind": "intake",
+   "text": "질환 부위를 씻은 다음 1일 1~여러 차례 이 약을 바른 후 충분히 문지릅니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:0b1423b767d9",
+   "kind": "warn",
+   "text": "안점막 등의 점막, 이 약에 과민증 환자, 급성 습진 또는 염증성 피부질환, 신부전 환자는 이 약을 사용하지 마십시오. 이 약을 사용하기 전에 염증, 균열(갈라짐), 피부자극에 대한 감수성이 높아진 환자, 프로필렌글리콜 과민증 환자 또는 알레르기 반응 경험자, 아황산감수성이 높은 천식환자는 의사 또는 약사와 상의하십시오. 이 약은 외용으로만 사용하십시오. 궤양, 미란(짓무름), 상처 부위에는 직접 사용하지 마십시오. 눈, 코, 입 및 다른 점막에 닿지 않도록 주의하고, 만일 눈에 들어간 경우 충분한 양의 물로 완전히 씻어내십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:bde88392f2c3",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 통증, 열감, 때때로 홍조, 가려움 등이 나타날 수 있습니다. 과민증상, 때때로 습진화, 피부의 균열(갈라짐), 구진, 따끔따끔한 느낌, 작열감, 인설(비늘, 껍질), 드물게 부종, 건조화 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:5441806e59eb",
+   "kind": "h1",
+   "text": "그린클로르헥시딘크림(클로르헥시딘글루콘산염액)",
+   "docs": 1
+  },
+  {
+   "id": "warn:7518b5d41e66",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 질, 방광, 구강 등의 점막면, 눈에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 알레르기 체질인 환자는 의사 또는 약사와 상의하십시오.외용으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만약 들어갔을 경우에는 즉시 깨끗한 물로 잘 씻어내십시오.광범위한 창상, 화상에는 사용하지 마십시오.비누류는 이 약의 살균작용을 약화시키므로 충분히 씻어 제거한 후 사용하십시오.산부인과용(질, 외음부의 소독 등), 비뇨기과용(외성기, 점막면의 소독 등)으로 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:d8a09c3432db",
+   "kind": "warn",
+   "text": "드물게 구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적, 때때로 발진, 두드러기 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.광감작이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:3cd3bcb56e84",
+   "kind": "badge",
+   "text": "이 약은 안구건조증이나 바람이나 태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감의 일시적인 완화 및 자극감의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:3cd3bcb56e84",
+   "kind": "intro",
+   "text": "이 약은 안구건조증이나 바람이나 태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감의 일시적인 완화 및 자극감의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:3cd3bcb56e84",
+   "kind": "tile",
+   "text": "이 약은 안구건조증이나 바람이나 태양에 노출되어 생기는 화끈거리는 증상, 자극감, 불쾌감의 일시적인 완화 및 자극감의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:e14902c03016",
+   "kind": "intake",
+   "text": "이 약의 개봉은 용기의 끝부분을 앞뒤로 완전히 구부린 다음 당겨서 하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:1816c726287e",
+   "kind": "warn",
+   "text": "【사용상 주의사항】 증상이 악화되거나 72시간 이상 지속되는 경우 이 약의 사용을 즉각 중지하고 의사와 상의하십시오. 실수로 이 약을 먹었을 경우에는 즉시 의사 등 전문가의 도움을 받으십시오. 오염을 피하기 위해 용기의 팁이 외부에 닿지 않도록 하십시오. 아울러 색이 변했거나 혼탁된 것은 사용하지 마십시오. 1회 사용 후 재사용하지 마십시오. 눈에 넣은 후 남은 액과 용기는 버리십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:0379cb862ff1",
+   "kind": "warn",
+   "text": "【이상반응】 통증, 시야변화, 지속적인 충혈이나 자극감을 경험하는 경우 이 약의 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:c28f2b5f66ab",
+   "kind": "h1",
+   "text": "아이엔점안액(쿨)",
+   "docs": 1
+  },
+  {
+   "id": "badge:46abd984de07",
+   "kind": "badge",
+   "text": "이 약은 습진, 피부염, 가려움, 두드러기, 땀띠, 벌레물린데에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:14782ee85a15",
+   "kind": "h1",
+   "text": "메디퀵스프레이",
+   "docs": 1
+  },
+  {
+   "id": "intro:46abd984de07",
+   "kind": "intro",
+   "text": "이 약은 습진, 피부염, 가려움, 두드러기, 땀띠, 벌레물린데에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:46abd984de07",
+   "kind": "tile",
+   "text": "이 약은 습진, 피부염, 가려움, 두드러기, 땀띠, 벌레물린데에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:9ed98fda9d3f",
+   "kind": "intake",
+   "text": "1일 수회(여러 차례) 환부(질환 부위)에 적당량을 분무합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:a8696483615f",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 피부감염증(피부결핵, 매독, 칸디다증, 백선, 대상포진, 단순포진, 수두, 종두증, 옴, 사면발이), 고막 천공이 있는 습진성 외이도염, 궤양(베체트병 제외), 제2도 심재성 이상의 화상 및 동상, 입주위피부염, 보통여드름, 주사 환자는 이 약을 사용하지 마십시오.눈 또는 눈 주위, 점막, 피부 감염을 수반하는 습진, 상처부위, 민감한 피부, 화농이 있는 환부(질환 부위)에는 사용하지 마십시오.이 약을 사용하기 전에 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 고령자, 알레르기 체질, 습윤이나 짓무름, 심한 염증, 질환 부위가 광범위한 환자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하고 사용하지 마십시오.이 약이 눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우에는 즉시 물로 씻어내십시오.의사의 감독 없이 밀봉붕대법을 사용하지 마십시오.화장이나 면도 후 등 치료 이외의 목적으로 사용하지 마십시오.이 약은 사용전에 잘 흔들어 사용하십시오.이 약을 염색한 머리에 사용하면 탈색될 수 있으니 주의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:7cb54b28ab4c",
+   "kind": "warn",
+   "text": "피부의 세균성(전염성농가진, 모낭염 등) 및 진균성(칸다다증, 백선 등), 바이러스성 감염증, 부스럼, 피부자극, 자통, 발열, 작열감, 발진, 발적, 홍조, 가려움, 피부건조, 농포성피부염, 알레르기성 접촉피부염, 땀띠, 한진, 상처악화, 욕창, 농포증, 안검피부에 사용시 안압 상승, 녹내장 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:9cb11d990e6e",
+   "kind": "h1",
+   "text": "버물리알파액",
+   "docs": 1
+  },
+  {
+   "id": "warn:09fb715ca3c1",
+   "kind": "warn",
+   "text": "30개월 이하의 유아는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 알레르기 증상(발진, 발적, 가려움, 옻 등에 의한 피부염 등) 경험자, 알레르기 체질, 습윤이나 짓무름, 염증이 심한 환자, 소아는 의사 또는 약사와 상의하십시오.눈 또는 눈 주위, 점막 등, 습진, 상처부위, 민감한 피부, 특히, 벗겨진 피부 표면 또는 물집이 있는 부위에 사용하지 마십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.이 약은 외용으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.사용 전에 잘 흔들어 사용하십시오.5~6일간 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:ab16ed7b2ad4",
+   "kind": "warn",
+   "text": "발진, 발적, 가려움, 부종 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:ed7233df6da3",
+   "kind": "badge",
+   "text": "이 약은 여드름에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:599da43376c0",
+   "kind": "h1",
+   "text": "디에클렌스프레이",
+   "docs": 1
+  },
+  {
+   "id": "intro:ed7233df6da3",
+   "kind": "intro",
+   "text": "이 약은 여드름에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:ed7233df6da3",
+   "kind": "tile",
+   "text": "이 약은 여드름에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:782c3d1e749b",
+   "kind": "intake",
+   "text": "1일 2회(아침, 저녁), 적량을 환부에 분사하여 바릅니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:9b070b61485e",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 당뇨병, 혈액순환장애, 눈 주위 및 점막, 감염, 염증, 발적 또는 자극이 있는 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 약 또는 화장품에 과민증 환자, 신부전, 습윤, 심한 짓무름, 깊은 상처, 심한 화상, 단단한 덩어리가 있는 중증 환자, 화농성 피부염, 환부가 광범위한 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 의사 또는 약사와 상의하십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.정해진 용법과 용량을 잘 지키십시오.2주 정도 사용해도 증상이 개선되지 않거나 증상이 악화된 경우 사용을 중지하고 의사 또는 약사와 상의하십시오.이 약은 외용으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 만일 눈에 들어간 경우 즉시 물 또는 미지근한 물로 씻어내십시오.적용부위 이외의 피부에 닿지 않도록 주의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:b3d9b62871c9",
+   "kind": "warn",
+   "text": "피부에 발진, 발적, 가려움, 정상 피부에 닿았을 경우 국소 자극 반응, 얼얼함, 건조감 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:c7f3b6148b98",
+   "kind": "badge",
+   "text": "이 약은 만성 간질환, 독성 간질환의 보조치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:39ab8a028e0d",
+   "kind": "h1",
+   "text": "연질캡슐 (306700ACS)",
+   "docs": 1
+  },
+  {
+   "id": "intro:c7f3b6148b98",
+   "kind": "intro",
+   "text": "이 약은 만성 간질환, 독성 간질환의 보조치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:c7f3b6148b98",
+   "kind": "tile",
+   "text": "이 약은 만성 간질환, 독성 간질환의 보조치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:996c55b1cfb5",
+   "kind": "intake",
+   "text": "성인은 1회 1캡슐, 1일 3회 복용합니다.치료 후 복용량을 1일 1~2캡슐로 줄입니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:8d5c91390ef3",
+   "kind": "warn",
+   "text": "대두유, 콩, 땅콩에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 임부, 고지단백혈증, 당뇨병성 고지질혈증 및 췌장염 등 지방대사 이상 환자 또는 지질성 유제를 신중히 투여해야 하는 환자, 지방과부하로 특별한 위험이 예상되는 환자, 황색5호에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:11c2a5da995a",
+   "kind": "warn",
+   "text": "설사 등이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:0df39a75ee39",
+   "kind": "badge",
+   "text": "이 약은 임신∙수유기, 발육기, 노년기의 비타민 D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:84d707e3492b",
+   "kind": "h1",
+   "text": "연질캡슐 (D17100ACS)",
+   "docs": 1
+  },
+  {
+   "id": "intro:0df39a75ee39",
+   "kind": "intro",
+   "text": "이 약은 임신∙수유기, 발육기, 노년기의 비타민 D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:0df39a75ee39",
+   "kind": "tile",
+   "text": "이 약은 임신∙수유기, 발육기, 노년기의 비타민 D, E의 보급과 뼈, 이의 발육불량, 구루병의 예방에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:af652c52ae29",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 만 3개월 미만의 젖먹이, 고칼슘혈증(혈액중에 칼슘이 과잉으로 존재하는 상태), 유육종증(원인을 알 수 없는 전신 염증질환), 신장질환, 신장결석 환자는 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:0d17b108ca26",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 만 1세 미만의 젖먹이, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 미숙아, 유아, 햇빛을 많이 보고 정상적인 식사를 하는 어린이, 신장결석 경험자, 혈전(혈관 막힘)성 소인이 있는 환자는 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:33deb38ca2c6",
+   "kind": "warn",
+   "text": "1개월 정도 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오 에스트로겐을 포함한 경구용 피임제와 함께 복용 시 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:be6d2a7065b5",
+   "kind": "warn",
+   "text": "중증의 간세포기능부전이나 담도폐색 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 시스틴뇨증 환자, 황색5호에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.정해진 용법과 용량을 잘 지키십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:3c77de6dd572",
+   "kind": "h1",
+   "text": "리포유정",
+   "docs": 1
+  },
+  {
+   "id": "badge:17395f7b1713",
+   "kind": "badge",
+   "text": "이 약은 미란(짓무름) 또는 궤양을 수반하는 난치성 구내염(입안염) 및 설염(혀염)에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:4af069a8177a",
+   "kind": "h1",
+   "text": "아프타치정(트리암시놀론아세토니드)",
+   "docs": 1
+  },
+  {
+   "id": "intro:17395f7b1713",
+   "kind": "intro",
+   "text": "이 약은 미란(짓무름) 또는 궤양을 수반하는 난치성 구내염(입안염) 및 설염(혀염)에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:17395f7b1713",
+   "kind": "tile",
+   "text": "이 약은 미란(짓무름) 또는 궤양을 수반하는 난치성 구내염(입안염) 및 설염(혀염)에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:9b234baf9413",
+   "kind": "intake",
+   "text": "1회 1정(0.025 mg), 1일 1~2회 백색면을 환부(질환 부위)점막에 부착합니다.연령(나이), 증상에 따라 적절히 증감할 수 있습니다.이 약은 다음과 같은 순서대로 사용합니다.손끝에 타액(침)을 약간 묻혀 정제의 착색면에 손끝을 대어 손끝에 정제를 부착시킨 후, 환부(질환 부위) 점막에 흰색면을 접촉시키고 2~3초 가볍게 손끝으로 누른 후 손을 뗍니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:1d0d5f0c8ff3",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 갈락토오스 불내성, Lapp 유당분해효소 결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 황색5호에 과민증 환자 또는 경험자, 구강(입안)내의 감염 환자, 수두 또는 홍역 경험자, 고령자는 의사 또는 약사와 상의하십시오.이 약은 구강(입안)점막 부착제이므로 삼키지 마십시오.흰색면이 타액(침)에 젖게 되면 점막에의 부착성이 나빠지므로 주의하십시오.환부(질환 부위) 점막이 타액(침) 등으로 심하게 젖어 있는 경우 부착하지 않을 수도 있으므로 미리 거즈 등으로 가볍게 닦은 후 부착시키십시오.유·소아에 사용할 경우에는 첩부 후 손가락으로 떼어낼 수 있으므로 주의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:65026c386d26",
+   "kind": "warn",
+   "text": "때때로 칸디다증이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:e25da0803eac",
+   "kind": "h1",
+   "text": "덱스판테놀 크림",
+   "docs": 1
+  },
+  {
+   "id": "intro:a1d6b4e8b3b0",
+   "kind": "intro",
+   "text": "이 약은 상처, 화상, 찢긴 상처(수유기 중의 유두균열 등), 욕창, 급ㆍ만성 피부염, 습진, 피부 궤양, 기저귀 발진, 햇볕에 탄 곳에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:f38faf6c7bce",
+   "kind": "intake",
+   "text": "상처를 청결히 한 후 환부에 1일 1~수회 바릅니다. 수유기 중의 유두균열에는 매 수유 직후 유두에 바릅니다. 기저귀 발진에는 기저귀 교체 후 바릅니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:d09de8c77820",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 감염성 또는 삼출성 피부병 환자는 이 약을 사용하지 마십시오. 눈과의 접촉을 피하십시오. 수유 중에 균열된 유두를 치료하기 위해 이 약을 도포했을 경우, 모유 수유 전에 닦아내십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:6bb08788ad52",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 매우 드물게 접촉피부염, 알레르기성 피부염, 가려움증, 홍반, 습진, 발진, 두드러기, 피부 자극, 수포 등의 알레르기성 피부 반응이 나타날 경우 의사 또는 약사와 상의하십시오. 피부, 눈, 점막에 경미한 자극이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:e6c3127cbb3b",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 열감, 소양감, 따끔따끔한 감 등의 피부의 자극증상이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:2003e6d47ee7",
+   "kind": "h1",
+   "text": "정 (E77300ATB)",
+   "docs": 1
+  },
+  {
+   "id": "intake:2fc6ae70d707",
+   "kind": "intake",
+   "text": "만 8세 이상 어린이 및 성인은 1일 1회 1정 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:fe18e0f58936",
+   "kind": "warn",
+   "text": "철 함유제제는 만 6세 이하의 어린이가 사고로 과량 복용하였을 경우 중독성 사망을 일으킬 수 있으므로 어린이의 손에 닿지 않는곳에 보관하십시오. 이 약에 과민증, 만 12개월 미만의 젖먹이, 혈색소증(철대사 이상으로 철이 간장, 췌장(이자)에 침착하는 질환), 헤모시데린침착증, 비철결핍성 빈혈, 갈락토오스 불내성, Lapp 유당분해효소결핍증 또는 포도당-갈락토오스 흡수장애 등의 유전적인 문제가 있는 환자는 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:eda6923975ba",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 만 1세 미만의 젖먹이, 의사의 치료를 받고 있는 환자, 소화성궤양, 만성궤양성대장염, 국한성대장염 등의 위장질환, 심장순환기계기능 장애, 신장장애, 저단백혈증 환자는 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:9931f5b757f6",
+   "kind": "warn",
+   "text": "어린이에게 사용할 경우에는 보호자의 지도 감독하에 사용하십시오. 인산염, 칼슘염, 경구용 테트라사이클린계 제제, 제산제와 함께 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:4ddc44bfe72b",
+   "kind": "badge",
+   "text": "이 약은 산 역류, 속쓰림, 위 내용물의 역류로 인한 소화불량(예를 들어, 위수술후, 열공헤르니아의 결과로서, 임신 중 또는 역류성 식도염과 동반하는 경우)에 대한 위식도 역류의 증상 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:ee60ffdf993b",
+   "kind": "h1",
+   "text": "내복액 (A13100ALQ)",
+   "docs": 1
+  },
+  {
+   "id": "intro:4ddc44bfe72b",
+   "kind": "intro",
+   "text": "이 약은 산 역류, 속쓰림, 위 내용물의 역류로 인한 소화불량(예를 들어, 위수술후, 열공헤르니아의 결과로서, 임신 중 또는 역류성 식도염과 동반하는 경우)에 대한 위식도 역류의 증상 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:4ddc44bfe72b",
+   "kind": "tile",
+   "text": "이 약은 산 역류, 속쓰림, 위 내용물의 역류로 인한 소화불량(예를 들어, 위수술후, 열공헤르니아의 결과로서, 임신 중 또는 역류성 식도염과 동반하는 경우)에 대한 위식도 역류의 증상 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:682d4bf65c57",
+   "kind": "intake",
+   "text": "성인 및 12세 이상의 어린이는 1일 4회(식후 및 취침전)에 각각 1포~2포(15~30 mL)씩 복용합니다.12세 미만의 어린이는 의사의 지시에 따라 적절한 양을 복용하도록 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:ac424e32a53d",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 나트륨 제한 식이를 하는 환자, 저위산증 환자, 12세 미만의 어린이는 의사 또는 약사와 상의하십시오.증상이 7일 후에도 개선되지 않을 경우 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:b89041948bf3",
+   "kind": "warn",
+   "text": "소양증이나 기관지 수축, 아나필락시스 반응과 같은 알러지 반응이 나타나는 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오.설사, 변비 등이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:9f4cb6db37e6",
+   "kind": "badge",
+   "text": "이 약은 비듬 및 두피의 지루피부염에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:83484d3940cd",
+   "kind": "h1",
+   "text": "아치온현탁액(피리티온아연)",
+   "docs": 1
+  },
+  {
+   "id": "intro:9f4cb6db37e6",
+   "kind": "intro",
+   "text": "이 약은 비듬 및 두피의 지루피부염에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:9f4cb6db37e6",
+   "kind": "tile",
+   "text": "이 약은 비듬 및 두피의 지루피부염에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:acc09115867f",
+   "kind": "intake",
+   "text": "액 적당량을 취해 젖은 두피 위에 바르고 거품이 나도록 마사지한 후 물로 충분히 헹굽니다.처음 2주간은 최소한 일주일에 2번 사용하고, 그 후에는 정기적으로 의사 또는 약사의 지시에 따라 사용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:edb91b9a7c91",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 증상의 부위가 넓은 환자는 의사 또는 약사와 상의하십시오.이 약은 외용으로만 사용하십시오.눈에 들어가지 않도록 주의하고, 눈에 들어갔을 경우 즉시 깨끗한 물로 씻어내십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:169f4eb9309a",
+   "kind": "warn",
+   "text": "자극이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:3f12e513b283",
+   "kind": "h1",
+   "text": "아이투오미니점안액(카르복시메틸셀룰로오스나트륨)(1회용)",
+   "docs": 1
+  },
+  {
+   "id": "badge:047d4bf88bc2",
+   "kind": "badge",
+   "text": "이 약은 경증의 구내염(입안염) 및 잇몸염에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:f7ad31cb86b1",
+   "kind": "h1",
+   "text": "카미스타드-엔겔",
+   "docs": 1
+  },
+  {
+   "id": "intro:047d4bf88bc2",
+   "kind": "intro",
+   "text": "이 약은 경증의 구내염(입안염) 및 잇몸염에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:047d4bf88bc2",
+   "kind": "tile",
+   "text": "이 약은 경증의 구내염(입안염) 및 잇몸염에 의한 염증의 완화에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:29d9a2ea7e03",
+   "kind": "intake",
+   "text": "12세 이상 청소년 및 성인은 1회 약 0.5 cm를 1일 3회 염증이 있는 부위에 바르고 부드럽게 문지릅니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:57f2d19d91c8",
+   "kind": "warn",
+   "text": "이 약 또는 아미드계 국소마취제에 과민증 환자, 12세 미만의 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부은 이 약을 사용하지 마십시오.이 약을 눈이나 상처 있는 부위에 접촉하지 않도록 주의하여 적용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:8c6059a781e5",
+   "kind": "warn",
+   "text": "때때로 일시적인 가벼운 통증, 피부 또는 점막의 과민반응 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:3abebfb4536b",
+   "kind": "h1",
+   "text": "Loxoprofen Sodium Cataplasm (Pap)",
+   "docs": 1
+  },
+  {
+   "id": "meta:64b75aae93a9",
+   "kind": "meta",
+   "text": "록소프로펜나트륨",
+   "docs": 1
+  },
+  {
+   "id": "intro:07fb96909417",
+   "kind": "intro",
+   "text": "이 약은 퇴행성관절염(뼈관절염), 근육통, 외상 후의 종창, 통증의 진통ㆍ소염에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:64b75aae93a9",
+   "kind": "tile",
+   "text": "록소프로펜나트륨",
+   "docs": 1
+  },
+  {
+   "id": "warn:92908b05aa0b",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 아스피린 천식(비스테로이드소염진통제 등에 의한 천식발작의 유발) 또는 경험자는 이 약을 사용하지 마십시오. 눈 및 점막, 손상된 피부 및 점막, 습진 또는 발진 부위, 무좀, 백선 등에 사용하지 마십시오. 이 약을 사용하기 전에 기관지 천식 환자, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 미숙아, 신생아, 영아(젖먹이, 갓난아기), 유아, 소아, 고령자는 의사 또는 약사와 상의하십시오. 정해진 용법과 용량을 잘 지키십시오. 밀봉붕대법을 사용하지 마십시오. 1주일 정도 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:976aed3fcc34",
+   "kind": "h1",
+   "text": "퓨시드산 크림",
+   "docs": 1
+  },
+  {
+   "id": "meta:36654d4d1950",
+   "kind": "meta",
+   "text": "퓨시드산수화물",
+   "docs": 1
+  },
+  {
+   "id": "intro:c14daea67a43",
+   "kind": "intro",
+   "text": "이 약은 포도구균, 연쇄구균, 코리네박테륨, 클로스트리듐에 의한 농피증(농가진, 감염성습진양피부염, 심상성여드름(보통여드름), 모낭염, 종기 및 종기증, 화농성한선염, 농가진성습진), 화상ㆍ외상ㆍ봉합창ㆍ식피창에 의한 2차 감염에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:36654d4d1950",
+   "kind": "tile",
+   "text": "퓨시드산수화물",
+   "docs": 1
+  },
+  {
+   "id": "intake:f41b7ed94659",
+   "kind": "intake",
+   "text": "1일 3~4회 적당량을 환부에 부드럽게 바릅니다. 드레싱을 할 경우에는 1일 1~2회 정도로 횟수를 줄이는 것이 바람직합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:bddc2ff590c8",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 비감수성균(특히 녹농균)에 의한 감염 환자, 항생물질 성분 또는 첨가제 알레르기 환자는 이 약을 사용하지 마십시오. 이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부, 미숙아, 신생아는 의사 또는 약사와 상의하십시오. 최소기간만 투여하십시오. 광범위한 표면에 투여하지 마십시오. 눈 또는 눈꺼풀과 같은 얼굴 안쪽에 사용하지 마십시오. 안과용으로 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:e1fa7a5d00cc",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 일시적인 작열감, 때때로 발진, 약한 동통 및 자극 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오. 중증의 다리궤양 환자에 적용시 통증이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:054eb694f8a8",
+   "kind": "h1",
+   "text": "마이크로실드2액(클로르헥시딘글루콘산염)",
+   "docs": 1
+  },
+  {
+   "id": "intake:110366991342",
+   "kind": "intake",
+   "text": "이 약 5 mL을 젖은 손에 덜어 30초간 씻은 후 물로 깨끗이 세척하고 완전히 말립니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:7ff8de051cdf",
+   "kind": "warn",
+   "text": "이 약에 과민증 경험자는 이 약을 사용하지 마십시오.이 약을 사용하지 전에 다른 약물에 과민증, 천식 등 알레르기 질환 및 그 경험 또는 가족력이 있는 환자, 임부 또는 임신하고 있을 가능성이 있는 부인 및 수유부는 의사 또는 약사와 상의하십시오.외용으로만 사용하고, 경구투여 및 주사하지 마십시오.눈에 접촉시 각막손상을 일으킬 수 있으므로 눈, 귀에 들어가지 않도록 주의하고 만약 들어갔을 경우에는 즉시 깨끗한 물로 잘 씻어내십시오.다른 화학물질이나 세정제를 혼합하지 마십시오.비누류는 이 약의 살균작용을 약화시키므로 충분히 씻어 제거한 후 사용하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:bacf1cf204ea",
+   "kind": "warn",
+   "text": "드물게 쇽(예: 구역, 불쾌감, 식은땀, 어지러움, 답답함, 호흡곤란, 발적), 때때로 발진, 두드러기 등의 과민증상 등이 나타나면 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.광감작이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:3763bf7c3001",
+   "kind": "h1",
+   "text": "현탁액 (146431ASS)",
+   "docs": 1
+  },
+  {
+   "id": "intake:d2dba8e906c1",
+   "kind": "intake",
+   "text": "성인은 1회 1포(3 g)씩, 1일 3회 복용합니다.급성설사시의 초기 3일은 1일 용량을 2배로 증량할 수 있습니다.식도염에는 식후에, 다른 적응증에는 식간에 복용합니다.24개월 이상의 소아는 3일 동안 1일 2~3포(6~9 g)를 3회 분할 복용하고 이후 4일 동안 1일 2포(6 g)를 3회 분할 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:5b64c41a85cf",
+   "kind": "warn",
+   "text": "24개월 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 복용하지 마십시오.이 약을 복용하기 전에 심한 만성 변비 환자, 장폐색(창자막힘) 경험자는 의사 또는 약사와 상의하십시오.약은 흡착성이 있어 타 약물과 함께 복용할 경우 흡수율이나 흡수시간에 영향을 미칠 수 있으므로 간격을 두고 복용하는 것이 바람직합니다.정해진 용법과 용량을 잘 지키십시오.어린이에게 투여할 경우 보호자의 지도 감독하에 투여하십시오.탈수증이 나타나는 경우에는 적절한 수액공급을 하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:b49378d1fe5d",
+   "kind": "h1",
+   "text": "염산테르비나핀 외용액",
+   "docs": 1
+  },
+  {
+   "id": "intake:64367b061e8f",
+   "kind": "intake",
+   "text": "사용 전에 환부(질환 부위)를 깨끗이 씻고, 완전히 건조시킨후 환부(질환 부위)와 그 주위가 충분히 적셔지도록 충분한 양을 단 1회 적용합니다. 병소(아픈부위)가 나타나지 않은 쪽 발이라 할지라도, 양쪽 발에 발가락 사이 모두 얇게 펴 바르고 발바닥 전체와 발바닥으로부터 약 1.5 cm 높이까지 이 약을 적용하고, 필름이 될 때까지 1~2분간 건조시킵니다. 이 약 적용 시에는 문질러 바르지 않습니다. 이 약의 효과를 높이려면 적용 후 24시간 동안 씻지 않고 그대로 두어야 하기 때문에 샤워 또는 목욕 후에 바르기를 권장하고 그 다음날의 같은 시간 까지 기다린 후 발을 다시 씻으십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:fc6031b7ad01",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 만 15세 미만 소아, 임부 또는 임신하고 있을 가능성이 있는 여성 및 수유부는 이 약을 사용하지 마십시오. 이 약을 사용하기 전에 알코올이 자극할 수 있는 병변(병에 의한 몸의 변화)이 있는 환자는 의사 또는 약사와 상의하십시오. 의사의 지시가 없는 한 밀봉붕대법 또는 포장법을 사용하지 마십시오. 이 약은 외용으로만 적용하십시오. 안과용으로 각막, 결막에 사용하지 않고, 만일 눈에 들어갔을 경우 충분한 양의 물로 완전히 씻어 내십시오. 얼굴, 손톱, 두피, 입주위 및 질부위, 균열(갈라짐), 미란(짓무름) 부위에 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:7a91ff0a81d9",
+   "kind": "badge",
+   "text": "이 약은 눈물 분비 부족 및 점액부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:96788ca42a46",
+   "kind": "h1",
+   "text": "유니티어즈점안액(1회용)",
+   "docs": 1
+  },
+  {
+   "id": "intro:7a91ff0a81d9",
+   "kind": "intro",
+   "text": "이 약은 눈물 분비 부족 및 점액부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:7a91ff0a81d9",
+   "kind": "tile",
+   "text": "이 약은 눈물 분비 부족 및 점액부족에 의한 눈의 건조에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:93bc6f1247d8",
+   "kind": "intake",
+   "text": "눈의 자극 증상에 따라 1회 1~2방울을 1일 수회 점안합니다.점안 후 남은 액과 용기는 바로 버립니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:7df5686256fc",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자는 이 약을 사용하지 마십시오.이 약은 점안용으로만 사용하십시오.직접 눈에 닿지 않도록 주의하십시오.오염을 방지하기 위해 가능한 공동으로 사용하지 마십시오.개봉한 후에는 1회만 즉시 사용하고, 남은 액과 용기는 바로 버리십시오.3일이상 사용하여도 증상의 개선이 없을 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:1bcfc44de30f",
+   "kind": "warn",
+   "text": "통증, 시야변화, 자극감, 충혈이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "intro:5ba6645253a0",
+   "kind": "intro",
+   "text": "이 약은 습진, 열상 및 화상, 그 외의 질환에 따른 미란 (짓무름) 및 궤양에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:7b9eb782977a",
+   "kind": "intake",
+   "text": "1일 여러 차례 질환 부위에 바르십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:96f0a109f928",
+   "kind": "warn",
+   "text": "이 약의 성분에 과민증 환자 또는 경험자는 이 약을 사용하지 마십시오. 이 약을 사용하기 전에 프로필렌글리콜 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오. 안과용으로는 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:1753eec96c6b",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 열감, 가려움, 따끔따끔 감 등의 피부 자극증상 등이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "badge:8718f0235fb1",
+   "kind": "badge",
+   "text": "이 약은 1도, 2도 화상 및 기타 비감염성 피부상처, 방사선 치료에 의한 2차적 홍반(붉은 반점)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:4c3cd3741594",
+   "kind": "h1",
+   "text": "비아핀에멀젼(트롤아민)",
+   "docs": 1
+  },
+  {
+   "id": "intro:8718f0235fb1",
+   "kind": "intro",
+   "text": "이 약은 1도, 2도 화상 및 기타 비감염성 피부상처, 방사선 치료에 의한 2차적 홍반(붉은 반점)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:8718f0235fb1",
+   "kind": "tile",
+   "text": "이 약은 1도, 2도 화상 및 기타 비감염성 피부상처, 방사선 치료에 의한 2차적 홍반(붉은 반점)에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:37540f72f6d6",
+   "kind": "intake",
+   "text": "1도 화상인 경우 1일 2~4회 약물이 더 이상 흡수되지 않을 때까지 두껍게 바른 후 부드럽게 마사지합니다.2도 화상 및 기타 비감염성 피부상처인 경우 상처부위와 그 주위에 약물을 두껍게 바르고 항상 상처부위에 약물이 과량 존재하도록 반복해서 바르며 드레싱이 필요한 경우에는 이 약을 두껍게 바른 후(약 0.5 cm 두께로) 축축한 무균패드로 덮고 드레싱 합니다.방사선 치료에 의한 2차적 홍반(붉은 반점)인 경우 일정한 간격을 두고 1일 2~3회 방사선을 조사할 부위와 주위에 약물을 두껍게 바르고 부드럽게 마사지합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:1d573e0bb79d",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자 또는 경험자, 약물이나 음식 알레르기에 의한 피부염, 출혈성 및 감염성 피부상처 부위, 감염 부위, 이식을 행하기 전의 피부이식 부위에는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 프리필렌글리콜에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.이 약은 살균제를 함유하지 않으므로 상처부위를 청결하게 유지하십시오.정해진 용법과 용량을 잘 지키십시오.안과용으로 사용하지 않고, 만일 눈에 들어간 경우 물로 씻어내십시오.이 약은 일광(햇볕)차단제를 함유하지 않으므로 일광(햇볕)화상 방지용으로 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:d71cb3764154",
+   "kind": "warn",
+   "text": "중등도의 일시적인 따끔따끔한 느낌, 드물게 접촉성알레르기가 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:6261c3765aad",
+   "kind": "intake",
+   "text": "눈의 자극 증상에 따라 1회 1~2방울을 1일 수회 점안합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:0ac746c51c7c",
+   "kind": "warn",
+   "text": "【사용상 주의사항】 이 약에 과민증 환자는 이 약을 사용하지 마십시오.콘택트렌즈 착용자는 이 약 투여시 렌즈를 제거하고 적어도 30분 후에 다시 착용하십시오.개봉 후 1개월 이내에 사용하십시오.이 약은 점안용으로만 사용하십시오.용기의 끝이 눈꺼풀, 속눈썹에 닿지 않게 하고, 혼탁한 것은 사용하지 마십시오.다른 사람과 함께 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:2713c7c38391",
+   "kind": "warn",
+   "text": "【이상반응】 통증, 시야변화, 자극감, 충혈이 나타나는 경우 및 건조증상이 72시간 이상 지속 또는 악화될 경우에는 투여를 중지하고 의사 또는 약사와 상의하십시오.눈곱, 눈물 또는 충혈이 눈의 상태를 악화시켜서 이 약에 대한 과민증이 나타날 수 있습니다.",
+   "docs": 1
+  },
+  {
+   "id": "intro:eab766cd189c",
+   "kind": "intro",
+   "text": "이 약은 진행성 지장각피증(주부습진의 건조형), 손·발바닥 각피증, 어린선, 노인성 건피증(피부건조증), 모공성 태선, 아토피 피부에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:ea48bf2af493",
+   "kind": "intake",
+   "text": "1일 1회 이상 질환 부위를 씻은 다음 이 약을 바른 후 충분히 문지르십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:e25c15f8854d",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 급성 습진 또는 염증성 피부질환 환자, 안점막 등의 점막에는 투여하지 마십시오. 신부전 환자에 광범위하게 적용하는 경우에도 투여하지 마십시오. 염증, 균열(갈라짐)을 수반한 환자, 피부자극에 대한 감수성이 높아진 환자, 프로필렌글리콜 과민증 환자 또는 알레르기 반응 경험자에는 신중히 투여하십시오. 이 약은 외용으로만 사용하십시오. 궤양, 미란(짓무름), 상처 부위에는 직접 적용하지 마십시오. 눈, 코, 입 및 다른 점막에 닿지 않도록 주의하여 적용하고, 실수로 눈에 들어갔을 경우에는 충분한 양의 물로 완전히 씻어내십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:36ba4d61792d",
+   "kind": "warn",
+   "text": "이상반응이 나타나면 사용을 중지하고 의사 또는 약사와 상의하세요: 자극증상(통증, 열감, 홍조, 가려움), 과민증, 피부증상(습진화, 피부의 균열(갈라짐), 구진, 따끔따끔한 느낌, 작열감(화끈감), 인설(비늘, 껍질), 부종(부기), 건조화) 등의 증상이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:ef2bdf26a51d",
+   "kind": "badge",
+   "text": "이 약은 급ㆍ만성 간질환, 경증(가벼운증상)의 간부전(간기능상실)증, 간경변의 보조 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:089071c6e463",
+   "kind": "h1",
+   "text": "시럽 (A32900ASY)",
+   "docs": 1
+  },
+  {
+   "id": "intro:ef2bdf26a51d",
+   "kind": "intro",
+   "text": "이 약은 급ㆍ만성 간질환, 경증(가벼운증상)의 간부전(간기능상실)증, 간경변의 보조 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:ef2bdf26a51d",
+   "kind": "tile",
+   "text": "이 약은 급ㆍ만성 간질환, 경증(가벼운증상)의 간부전(간기능상실)증, 간경변의 보조 치료에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:58f5a5f9e6b1",
+   "kind": "intake",
+   "text": "1일 2~3회 1회 1병씩 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:f7cf5a9d5e53",
+   "kind": "intake",
+   "text": "상부캡 돌출 부위를 끝까지 꾹 누르고 산제와 액제가 잘 섞이도록 충분히 흔들어준 후 상부캡을 좌측으로 돌려 개봉하여 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:df19c0165322",
+   "kind": "warn",
+   "text": "이 약에 과민증 환자, 심한 신기능 장애, 간성혼수, 아미노산 대사장애 환자(특히 선천성 효소 결핍 환자), 심근경색 환자 또는 경험자는 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "badge:cf901216de67",
+   "kind": "badge",
+   "text": "이 약은 치질, 경증(가벼운 증상)의 화상, 외상(상처), 자상(찔린상처)의 통증의 일시적 경감에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "h1:7db1d1480bd4",
+   "kind": "h1",
+   "text": "리도킨연고5%(리도카인)",
+   "docs": 1
+  },
+  {
+   "id": "intro:cf901216de67",
+   "kind": "intro",
+   "text": "이 약은 치질, 경증(가벼운 증상)의 화상, 외상(상처), 자상(찔린상처)의 통증의 일시적 경감에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "tile:cf901216de67",
+   "kind": "tile",
+   "text": "이 약은 치질, 경증(가벼운 증상)의 화상, 외상(상처), 자상(찔린상처)의 통증의 일시적 경감에 사용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:9efdfe36cf9d",
+   "kind": "intake",
+   "text": "증상에 따라 적당량을 도포합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:7babba79dc71",
+   "kind": "warn",
+   "text": "이 약에 과민증, 병소(아픈 부위)에 2차 감염 환자는 이 약을 사용하지 마십시오.이 약을 사용하기 전에 임부 또는 임신하고 있을 가능성이 있는 여성, 적용 부위의 점막 외상, 패혈증, 간질, 심장 전도 이상, 서맥, 간기능 손상, 중증의 쇽 환자, 프로필렌글리콜에 과민증 환자 또는 경험자는 의사 또는 약사와 상의하십시오.가벼운 증상의 아픈 부위에만 사용하십시오.안과용으로 사용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:4966af6069ea",
+   "kind": "warn",
+   "text": "쇽 증상(혈압저하, 안면창백, 맥박의 이상, 호흡억제), 진전, 경련, 졸음, 어지러움, 신경과민, 의식소실, 심장 억제 작용(저혈압, 심근억제, 서맥, 심정지), 자극감 등이 나타나는 경우 사용을 즉각 중지하고 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:c0d3aa98452c",
+   "kind": "warn",
+   "text": "부정맥용제(토카이니드 등)와 함께 사용 시 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:d8534d467198",
+   "kind": "h1",
+   "text": "장용정 (D48400ATE)",
+   "docs": 1
+  },
+  {
+   "id": "intake:0fc8f9fc14b5",
+   "kind": "intake",
+   "text": "만 15세 이상은 1회 1~3정씩, 만 11세 이상 ~ 만 15세 미만은 1회 1~2정씩, 1일 1회 취침 시에 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:8fb2448a1e98",
+   "kind": "warn",
+   "text": "급성 복부질환(충수염, 장출혈, 궤양성 결장염 등) 환자, 장폐색(창자막힘) 환자, 만 7세 이하의 어린이는 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:512f48cbfec3",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 심한 복통(배 아픔) 또는 구역, 구토 환자, 임부 또는 임신하고 있을 가능성이 있는 여성, 나트륨 제한 식이를 하는 사람, 직장의 출혈 혹은 장부전의 경험이 있는 사람, 황색4호 또는 황색5호에 과민증 환자, 만 10세 이하의 어린이는 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:3a78a321167d",
+   "kind": "warn",
+   "text": "1주 정도 투여하여도 변비의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오. 제산제 또는 우유 섭취 후 1시간 이내에 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:c22fcfbeefe0",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 다른 약물을 복용하는 경우 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "h1:99cdd49e975d",
+   "kind": "h1",
+   "text": "내복액 (A80000ALQ)",
+   "docs": 1
+  },
+  {
+   "id": "intake:89e99562dde1",
+   "kind": "intake",
+   "text": "멀미의 예방에는 승차 30분 전에 1회 복용량을 복용합니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:638685c03721",
+   "kind": "intake",
+   "text": "연령구분에 따른 1회 복용량은 만 15세 이상은 1병(30 mL), 만 11세 이상~만 15세 미만은 2/3병(20 mL), 만 7세 이상~만 11세 미만은 1/2병(15 mL), 만 3세 이상~만 7세 미만은 1/3병(10 mL)입니다.",
+   "docs": 1
+  },
+  {
+   "id": "intake:3b974d5ae0c9",
+   "kind": "intake",
+   "text": "필요시 추가 복용할 경우에는 1회 복용량을 4시간 이상의 간격을 두고 복용하며 1일 복용횟수는 2회를 한도로 합니다.",
+   "docs": 1
+  },
+  {
+   "id": "warn:e1c0ac0620e6",
+   "kind": "warn",
+   "text": "수유부, 만 3세 미만의 영 · 유아는 이 약을 복용하지 마십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:fa83d7bc1e47",
+   "kind": "warn",
+   "text": "이 약을 복용하기 전에 알레르기 증상(발진, 충혈되어 붉어짐, 가려움 등) 경험자, 임부 또는 임신하고 있을 가능성이 있는 여성, 수유부, 녹내장(눈의 통증, 눈의 침침함 등), 배뇨(소변을 눔)장애, 심장장애, 허약자, 노인, 폐기종 혹은 만성 기관지염과 같은 호흡기질환 환자, 황색5호 성분에 과민증 환자는 의사 또는 약사와 상의하십시오.",
+   "docs": 1
+  },
+  {
+   "id": "warn:d9bdc93170da",
+   "kind": "warn",
+   "text": "이 약 복용 후 졸음이 나타날 수 있으므로 운전 및 기계조작 시 주의하십시오. 다른 진토제, 감기약, 해열진통제, 항히스타민제, 진정제, 진해거담제, 위장진통·진경제와 함께 복용하지 마십시오.",
+   "docs": 1
   }
  ],
  "topUnresolved": [
   {
-   "id": "foot:157c0a507c85",
-   "kind": "foot",
-   "docs": 485,
-   "text": "의약품은 원료·제조·품질관리 전 과정이 GMP 기준으로 관리됩니다. 같은 성분·함량·제형의 제품은 동일한 기준으로 품질과 효능·효과가 관리됩니다"
-  },
-  {
-   "id": "warn:984b81e3a0ff",
-   "kind": "warn",
-   "docs": 164,
-   "text": "복용 중에는 음주하지 마십시오."
-  },
-  {
    "id": "foot:91644ca18642",
    "kind": "foot",
-   "docs": 163,
+   "docs": 554,
    "text": "제품에 따라 성분 구성과 함량이 다를 수 있으니, 지병이나 복용 중인 약이 있으면 매장의 약사에게 확인하세요. 증상이 지속되거나 궁금한 점이 있"
   },
   {
    "id": "warn:c602e7895dff",
    "kind": "warn",
-   "docs": 133,
+   "docs": 523,
    "text": "정해진 용법과 용량을 잘 지키세요."
+  },
+  {
+   "id": "foot:157c0a507c85",
+   "kind": "foot",
+   "docs": 486,
+   "text": "의약품은 원료·제조·품질관리 전 과정이 GMP 기준으로 관리됩니다. 같은 성분·함량·제형의 제품은 동일한 기준으로 품질과 효능·효과가 관리됩니다"
+  },
+  {
+   "id": "warn:d068a2fa3007",
+   "kind": "warn",
+   "docs": 247,
+   "text": "이 설명서는 제품 선택을 돕기 위한 안내이며, 정확한 복용법과 주의사항은 매장 내 약사 등 전문가와 상의하십시오."
+  },
+  {
+   "id": "warn:984b81e3a0ff",
+   "kind": "warn",
+   "docs": 167,
+   "text": "복용 중에는 음주하지 마십시오."
+  },
+  {
+   "id": "warn:e07cf856972b",
+   "kind": "warn",
+   "docs": 146,
+   "text": "어린이에게 투여할 경우 보호자의 지도 감독하에 투여하세요."
   },
   {
    "id": "warn:24e42adcda69",
    "kind": "warn",
-   "docs": 132,
+   "docs": 135,
    "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다."
   },
   {
@@ -2470,7 +6232,7 @@
   {
    "id": "warn:313776109066",
    "kind": "warn",
-   "docs": 88,
+   "docs": 91,
    "text": "아세트아미노펜으로 일일 최대 용량(4,000 mg)을 초과하여 복용하지 마십시오. 간손상을 일으킬 수 있습니다. 아세트아미노펜을 포함하는 다른 "
   },
   {
@@ -2486,16 +6248,58 @@
    "text": "밀봉붕대법을 사용하지 마십시오."
   },
   {
+   "id": "tile:e14805b3abb4",
+   "kind": "tile",
+   "docs": 74,
+   "text": "위장관 궤양·출혈 병력자, 심혈관질환 위험요인 보유자, 매일 세 잔 이상 정기적 음주자, 임신 6개월 이상 임부"
+  },
+  {
    "id": "warn:c4874c0a2e29",
    "kind": "warn",
    "docs": 70,
    "text": "5~6회 복용하여도 증상의 개선이 없을 경우 복용을 즉각 중지하고 의사 또는 약사와 상의하십시오."
   },
   {
+   "id": "warn:3c2ac93caade",
+   "kind": "warn",
+   "docs": 66,
+   "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 간손상을 일으킬 수 있습니다. 매우 "
+  },
+  {
+   "id": "badge:7065152bc548",
+   "kind": "badge",
+   "docs": 61,
+   "text": "비스테로이드성 소염진통제(NSAID)로 염증·통증·발열을 완화합니다."
+  },
+  {
+   "id": "tile:7065152bc548",
+   "kind": "tile",
+   "docs": 61,
+   "text": "비스테로이드성 소염진통제(NSAID)로 염증·통증·발열을 완화합니다."
+  },
+  {
+   "id": "warn:62fc15f10ccb",
+   "kind": "warn",
+   "docs": 60,
+   "text": "매일 세잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다."
+  },
+  {
+   "id": "warn:67a64f8bcdbf",
+   "kind": "warn",
+   "docs": 60,
+   "text": "각종 요검사 시에 혈당의 검출을 방해할 수 있으며, 요를 황색으로 변하게 하여 임상검사치에 영향을 줄 수 있습니다."
+  },
+  {
    "id": "warn:cc051f4f7d3e",
    "kind": "warn",
-   "docs": 56,
+   "docs": 57,
    "text": "녹차, 홍차 등 탄닌을 함유하는 차는 복용 중, 복용 전후에는 피하십시오."
+  },
+  {
+   "id": "warn:6ec9b6782edc",
+   "kind": "warn",
+   "docs": 53,
+   "text": "매일 세 잔 이상 정기적 음주자가 이 약 또는 다른 해열진통제를 복용할 때는 의사 또는 약사와 상의하십시오. 위장출혈을 일으킬 수 있습니다."
   },
   {
    "id": "badge:e7c1587ec5c5",
@@ -2616,60 +6420,6 @@
    "kind": "badge",
    "docs": 46,
    "text": "정맥 순환 개선"
-  },
-  {
-   "id": "tile:79b6a00807a8",
-   "kind": "tile",
-   "docs": 46,
-   "text": "정맥 순환 개선"
-  },
-  {
-   "id": "foot:58b63e273b96",
-   "kind": "foot",
-   "docs": 44,
-   "text": "---"
-  },
-  {
-   "id": "warn:00f83135d993",
-   "kind": "warn",
-   "docs": 44,
-   "text": "매우 드물게 치명적일 수 있는 급성전신발진고름물집증, 스티븐스-존슨증후군, 독성표피괴사용해와 같은 중대한 피부반응이 보고되었고 이 약 복용 후 "
-  },
-  {
-   "id": "badge:b21410539b70",
-   "kind": "badge",
-   "docs": 43,
-   "text": "항히스타민(알레르기 증상 완화)"
-  },
-  {
-   "id": "tile:b21410539b70",
-   "kind": "tile",
-   "docs": 43,
-   "text": "항히스타민(알레르기 증상 완화)"
-  },
-  {
-   "id": "badge:d8d3f6292c97",
-   "kind": "badge",
-   "docs": 42,
-   "text": "치주치료 후 치은염, 경·중등도 치주염의 보조치료"
-  },
-  {
-   "id": "intro:0e5bff6b7831",
-   "kind": "intro",
-   "docs": 42,
-   "text": "치주치료 후 치은염, 경·중등도 치주염의 보조치료에 사용하는 일반의약품입니다."
-  },
-  {
-   "id": "tile:d8d3f6292c97",
-   "kind": "tile",
-   "docs": 42,
-   "text": "치주치료 후 치은염, 경·중등도 치주염의 보조치료"
-  },
-  {
-   "id": "tile:658541c53b8d",
-   "kind": "tile",
-   "docs": 42,
-   "text": "치주치료 후 치은염, 경, 중등도 치주염의 보조치료"
   }
  ]
 }
