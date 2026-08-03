@@ -22,8 +22,8 @@
     "type-check": "npx tsc --noEmit"
   },
   "dependencies": {
-    "@o4o/auth-client": "file:../auth-client",
-    "@o4o/types": "file:../types",
+    "@o4o/auth-client": "workspace:*",
+    "@o4o/types": "workspace:*",
     "react": "^19.2.0",
     "socket.io-client": "^4.7.4"
   },
