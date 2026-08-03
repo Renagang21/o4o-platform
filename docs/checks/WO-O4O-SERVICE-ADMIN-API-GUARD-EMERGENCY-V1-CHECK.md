@@ -147,6 +147,32 @@ probe 제거 후 **47/47 재통과**. 회귀 가드가 실제로 동작함을 �
 
 ---
 
+## 5-A. 배포 및 프로덕션 실측
+
+| 항목 | 값 |
+|---|---|
+| commit | `db1a649f7` (push `f8b046cb5..db1a649f7`) |
+| workflow | Deploy API Server (Cloud Run) — **success** |
+| revision | `o4o-core-api-03125-72b` |
+| 배포 범위 | **API Server 만** (web 서비스 배포 0) |
+
+비로그인 GET — **상태 코드만** 확인, 응답 본문 미출력:
+
+| Endpoint | 수정 전 | 수정 후 |
+|---|:---:|:---:|
+| `GET /summary?tenantId=x` | 200 | **401** |
+| `GET /apps` | 200 | **401** |
+| `GET /theme?tenantId=x` | 200 | **401** |
+| `GET /init-preview/kpa-society` | 200 | **401** |
+| `GET /templates` | 200 | **401** |
+| `GET /stats` | 200 | **401** |
+
+**비로그인 PUT `/theme` · POST `/theme/reset` 은 프로덕션에서 재현하지 않았다** (WO 지시). 두 endpoint 가 동일 router guard 아래에 있다는 것은 §5 ⑧⑨ 의 소스 계약 테스트로 고정돼 있다.
+
+정상 관리자 read-only 조회는 **수행하지 않았다** — 안전한 platform 관리자 테스트 계정이 준비되지 않았다(후속 8단계). 허용 역할의 handler 도달은 테스트 레벨에서만 검증됨(§5 ⑥).
+
+---
+
 ## 6. 심각도 보정 — 사실만 기록
 
 - 확정된 사실: **인증되지 않은 요청이 관리자 handler 까지 도달했다** (프로덕션 GET 200 실측).
