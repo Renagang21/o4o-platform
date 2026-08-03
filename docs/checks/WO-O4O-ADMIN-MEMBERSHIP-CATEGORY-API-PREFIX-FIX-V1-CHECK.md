@@ -165,9 +165,9 @@ TypeScript 는 경로가 문자열이라 이 오류를 잡지 못한다.
 | 항목 | 명령 | 결과 |
 |---|---|---|
 | typecheck | `npx tsc --noEmit -p tsconfig.json` | **0 error** |
-| 신규 테스트 | `npx vitest run src/tests/membership-category-api-paths.test.tsx` | **7 pass / 0 fail** |
+| 신규 테스트 | `npx vitest run src/tests/membership-category-api-paths.test.tsx` | **9 pass / 0 fail** (재실행 시 2건 추가) |
 | **전체 스위트** | `npx vitest run` | **161 pass / 0 fail** (9 파일) |
-| build | `npm run build` | **성공** (58s) |
+| build | `npm run build` | **성공** (1m 34s) |
 | 전체 monorepo build | — | 미실행 |
 
 ### 테스트가 고정하는 계약
@@ -184,6 +184,8 @@ TypeScript 는 경로가 문자열이라 이 오류를 잡지 못한다.
 | 6 | 저장 성공 후 **목록 재조회 발생** (GET 2회) |
 | 7 | **PUT 실패 시 재조회하지 않음** (오류 처리) |
 | 8 | 소스 가드 — 이 파일의 authClient 호출에 `/api` 접두 재도입 차단 |
+| 9 | **baseURL(`…/api/v1`) 과 합성해도 `/api/api` 가 생기지 않음** — 네 경로 전부 |
+| 10 | 데이터 0건이면 empty state 를 렌더하고 GET 은 **정확히 1회** |
 
 컴포넌트를 실제 렌더링해 **수정 버튼 → 저장** 흐름으로 요청 URL 을 검증한다.
 따라서 예전 경로로 되돌리면 **테스트가 실패한다.**
@@ -236,7 +238,35 @@ dist/assets/CategoryManagement-DbRfVfjy.js
 | 테스트가 잘못된 접두 재도입 차단 | ✅ (§10-8) |
 
 > 배포 서버의 청크를 브라우저 내 `fetch` 로 직접 읽는 방식은 응답이 지연돼 중단했고,
-> **동일 commit 의 로컬 빌드 산출물**로 대체 검증했다(§17 미검증 참조).
+> **동일 commit 의 로컬 빌드 산출물**로 대체 검증했다.
+> → **이 미검증 항목은 §12-1 에서 해소됐다.**
+
+### 12-1. 배포 서버 청크 원문 직접 검증 (2026-08-03 재실행 · READ-ONLY)
+
+브라우저 대신 `curl` 로 **프로덕션이 실제로 서빙 중인 청크**를 받아 원문을 확인했다.
+
+```
+service   o4o-admin-dashboard  https://o4o-admin-dashboard-3e3aws7zqa-du.a.run.app
+version   2026.08.01-1150  (buildDate 2026-08-01T11:50:05Z — 수정 커밋 1741aa56d 이후)
+entry     assets/index-Biq8jr7-.js
+chunk     assets/CategoryManagement-Dfvf4Age.js   (10,014 bytes)
+```
+
+| 검사 | 결과 |
+|---|---:|
+| `/api/membership/categories` 출현 | **0** |
+| `"/api/…"` 형태의 어떤 접두 문자열 | **0** |
+| `.get("/membership/categories` | 존재 ✅ |
+| `.post("/membership/categories` | 존재 ✅ |
+| ``.put(`/membership/categories/${i}`` | 존재 ✅ |
+| `patch` 문자열 출현 | **0** |
+
+> **`patch` 가 0건인 것이 §9 의 dead code 판정을 독립적으로 확증한다.**
+> `handleToggleActive` 는 호출부가 없어 **minifier 가 통째로 제거**했다.
+> 즉 프로덕션 번들에는 활성 토글 PATCH 경로 자체가 존재하지 않는다 —
+> 이번 소스 교정은 **나중에 UI 에 연결될 때를 위한 선제 조치**이며, 현재 사용자 영향은 PUT 경로에만 있다.
+
+이 검증은 **GET 조회조차 발생시키지 않는 정적 파일 다운로드**이므로 운영 데이터 접촉이 0 이다.
 
 ---
 
@@ -297,9 +327,14 @@ dist/assets/CategoryManagement-DbRfVfjy.js
 
 - **실제 수정·토글 저장 동작** — 운영 데이터 0건 + 쓰기 금지 지시로 **의도적 미실행**.
   요청 URL·method·payload 는 §10·§12 로 고정했으나 **서버 200 응답은 미확인**이다.
-- **PATCH 경로의 실사용** — 현재 UI 에 연결되어 있지 않아 실행 경로 자체가 없다(§9).
-- **배포 서버 청크 원문 grep** — 브라우저 내 fetch 가 지연돼 중단, 동일 commit 로컬 빌드로 대체.
+- **PATCH 경로의 실사용** — 현재 UI 에 연결되어 있지 않아 실행 경로 자체가 없다(§9·§12-1 로 확증).
+- ~~배포 서버 청크 원문 grep~~ — **해소됨**(§12-1, 2026-08-03).
 - 회귀 화면의 **403 원인** — 이번 범위 밖.
+- **`/api/v1/membership` mount 에 인증 미들웨어가 없다** — `register-routes.ts:364` 는
+  `app.use('/api/v1/membership', createMembershipRoutes(dataSource))` 로 guard 없이 mount 되어 있고,
+  `categoryRoutes.ts` 의 6개 handler 에도 `authenticate`·scope guard 가 없다.
+  **이번 WO 는 프런트 경로 2줄만 다루므로 백엔드를 변경하지 않았고**, 관측 사실로만 기록한다.
+  후속 판단 필요(§18 의 sweep WO 와는 별개 사안).
 
 ---
 
@@ -363,3 +398,22 @@ HEAD...origin/main = 0 0
 | 운영 쓰기·데이터 변경 | ✅ **0** |
 | 메뉴 미연결 유지 | ✅ |
 | 재도입 차단 테스트 | ✅ |
+| 배포본 청크 원문 이중접두 0 | ✅ (§12-1) |
+
+---
+
+## 22. 재실행 기록 (2026-08-03)
+
+WO 가 동일 문안으로 재전달되어 **전 항목을 다시 검증**했다. 코드 재수정은 없다.
+
+| 항목 | 결과 |
+|---|---|
+| 시작 상태 | `main` · HEAD `68c131365` · worktree clean · `origin/main` 과 0/0 |
+| 수정 상태 | 이미 반영됨 (`1741aa56d` 수정 + `47423386c` CHECK) — **중복 수정 안 함** |
+| `authClient` baseURL 재확인 | `getApiUrl()` 항상 `/api/v1` 종료 (client.ts:333-359) |
+| 백엔드 route 재대조 | `register-routes.ts:364` → `routes/index.ts:55` → `categoryRoutes.ts` 6 handler — §4 그대로 |
+| 테스트 | **9 pass / 0 fail** (계약 #9·#10 추가) |
+| typecheck | `tsc --noEmit` **exit 0** |
+| build | `pnpm run build` **성공** |
+| 배포 | **재배포 안 함** — 소스 변경분이 **테스트 파일뿐**이라 번들 무변경. 프로덕션은 이미 수정본 서빙 중(§12-1) |
+| 운영 쓰기 | **0** (정적 청크 다운로드만 수행) |

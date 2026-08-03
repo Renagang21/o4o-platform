@@ -150,6 +150,42 @@ describe('생성 (POST) — 무변경 확인', () => {
   });
 });
 
+describe('목록 상태 — 로딩 / 빈 목록', () => {
+  it('빈 목록이면 안내 문구를 보여주고 GET 은 한 번만 나간다', async () => {
+    mockGet.mockResolvedValue(okList([]));
+    render(<CategoryManagement />);
+    await waitFor(() => expect(screen.getByText(/카테고리가 없습니다/)).toBeTruthy());
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(mockGet.mock.calls[0][0]).toBe('/membership/categories');
+  });
+});
+
+describe('baseURL 합성 — /api/v1 + 경로', () => {
+  /** authClient.api 의 baseURL 은 `…/api/v1` 이다. 호출 경로와 합쳐도 `/api/api` 가 생기면 안 된다. */
+  const BASE = 'https://api.neture.co.kr/api/v1';
+
+  it('네 호출 경로 모두 baseURL 과 합성해도 이중 접두가 없다', async () => {
+    render(<CategoryManagement />);
+    await waitFor(() => expect(screen.getByTitle('수정')).toBeTruthy());
+    fireEvent.click(screen.getByTitle('수정'));
+    await waitFor(() => expect(screen.getAllByText('저장').length).toBeGreaterThan(0));
+    fireEvent.click(screen.getAllByText('저장')[0]);
+    await waitFor(() => expect(mockPut).toHaveBeenCalled());
+
+    const paths = [
+      mockGet.mock.calls[0][0] as string,
+      mockPut.mock.calls[0][0] as string,
+      '/membership/categories',                        // POST
+      `/membership/categories/${CATEGORY.id}`,         // PATCH (핸들러 경로)
+    ];
+    for (const p of paths) {
+      const full = `${BASE}${p}`;
+      expect(full).not.toContain('/api/api');
+      expect(full).toBe(`https://api.neture.co.kr/api/v1${p}`);
+    }
+  });
+});
+
 describe('소스 계약 — 이중 접두 재도입 차단', () => {
   const SRC = readFileSync(
     join(__dirname, '../pages/membership/categories/CategoryManagement.tsx'),
