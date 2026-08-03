@@ -35,7 +35,7 @@
 | 9 | QR 모바일 화면 parity | **PASS** | `/qr/e2e-2` 상품·순서·QR 동일 |
 | 10 | 노출 게이트 제외 수 안내 | **PASS** | `offer_id IS NULL` 상품 추가 시 "선택한 상품 중 1개는 …" 배너, 해제 시 소멸 |
 | 11 | archive → 410 | **PASS** | 코너 연결 해제 후 보관 → `GET /api/v1/kpa/qr/public/e2e-2` = **410 `SCREEN_SET_INACTIVE`** (직전 200) |
-| 12 | restore → 동일 slug | **FAIL → 수정 후 PASS** | §3-B 참조 |
+| 12 | restore → 동일 slug | **FAIL → 수정 후 PASS** | §3-B · **배포 후 재검증 §4-A** |
 
 ## 3. 발견·수정한 결함
 
@@ -52,7 +52,7 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 - 컬럼·테이블 추가 없음(기존 NOT NULL 컬럼 사용), 반환 shape 불변.
 - **라이브 확인**: `GET /store/product-pool` 응답의 `offer_id: null` 항목들이 실제 `product_name` 반환.
 
-### B. 보관한 콘텐츠를 복원할 수 없음 (커밋 `4673d2fa6`) — 이번 스모크에서 확정
+### B. 보관한 콘텐츠를 복원할 수 없음 (커밋 `4673d2fa6` + `e9cd1691f`) — 이번 스모크에서 확정
 
 보관(`DELETE /screen-sets/:id`)은 `deleted_at = NOW()` **와** `status='archived'` 를 함께 남긴다. 그런데
 
@@ -69,6 +69,7 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 |------|------|
 | `GET /screen-sets` | `deleted_at` 필터를 `includeArchived` 스위치와 같은 축으로 연결. 미지정 시 기존과 동일(`status <> 'archived' AND deleted_at IS NULL`), `true` 면 `(deleted_at IS NULL OR status='archived')`. **이 목록 한 곳만** |
 | `PATCH /screen-sets/:id` | status 를 archived 아닌 값으로 되돌리는 요청에 한해 보관 row 매칭 + `deleted_at = NULL`. slug·row 불변 → 같은 slug 로 QR 재개통 |
+| `PATCH /screen-sets/:id` **소유권 사전 확인** (`e9cd1691f`) | 위 UPDATE 앞의 `SELECT … deleted_at IS NULL` 소유권 조회가 그대로 남아 있어, 복원 요청이 UPDATE 에 닿기 전에 404 로 끊겼다. 같은 `isRestore` 조건을 사전 확인에도 적용(`OR status='archived'`). `isRestore` 판정을 `statusChange` 계산 앞으로 끌어올린 것 외 로직 변경 없음 |
 | `TabletContentLibraryList` | 보관 행에 '보관 해제' 액션 추가(핸들러 미주입 소비처에서는 미노출), 보관 행의 '수정' 액션 숨김 |
 | `TabletScreenSetManager` | `handleRestore` — 확인 후 `updateScreenSet(id, {status:'active'})` + reload |
 
@@ -78,6 +79,26 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 
 - **보관 409 시 사용자 안내 없음** → 안내는 정상 동작. 코너 연결 해제 시 토스트 "✅ 코너에서 연결을 해제했습니다." 렌더 확인. 앞선 관측 실패는 토스트 3초 자동 소멸로 인한 타이밍 문제였다.
 - **비활성 QR 미표시** → 매장 QR UI 에 활성/비활성 토글이 없어(제목·slug·상담 CTA 만) 무단 DB UPDATE 없이 직접 재현 불가. archive 흐름(`setScreenSetQrActive(false)`)으로 대체 검증 — §2-11.
+
+## 4-A. 배포 후 복원 경로 재검증 (2026-08-03, revision `o4o-core-api-03129-87k`)
+
+§2-12 의 최초 PASS 는 `e9cd1691f` 리비전이 **서빙되기 전** 시점에 기록됐다
+(문서 커밋 08:17:48Z vs 리비전 Ready 08:27:25Z). 최종 배포본에 대해 다시 실행한 결과:
+
+| # | 요청 (프로덕션 `api.neture.co.kr`) | 결과 |
+|---|-----------------------------------|------|
+| 1 | `GET /kpa/qr/public/{slug}` (보관 상태) | **410** `SCREEN_SET_INACTIVE` |
+| 2 | `GET /store/screen-sets/:id` (보관 상태) | **404** — 상세는 미변경이 설계대로(§3-B "이 목록 한 곳만") |
+| 3 | `PATCH /store/screen-sets/:id {status:'active'}` | **200** — `status='active'`, `publicQrSlug` **동일**, row id 동일 |
+| 4 | `GET /kpa/qr/public/{slug}` (복원 직후) | **200** — 같은 slug 로 QR 재개통 |
+| 5 | `GET /store/screen-sets` (필터 없음) | 복원 세트 1건 노출 |
+| 6 | `DELETE /store/screen-sets/:id` (원상 복구) | **200** → 공개 QR 다시 **410** |
+
+- 대상: `4ec1c148-…` `[TEST] media-guard smoke` (slug `test-media-guard-smoke`, 코너 미연결).
+  §1 의 `dd81cf73-…`(`e2e-2`) 는 org `9c87f46b` 소속인데 이번 재검증 세션 계정의 매장 스코프가
+  org `c9beb4a2` 로 달라 직접 대상이 되지 못했다. 같은 `PATCH` 코드 경로·같은 archived 전제이므로 대체 검증으로 충분하다.
+  (`e2e-2` 는 별도로 **410** 재확인 — §6 의 보관 상태가 지금도 유지됨.)
+- **검증 전후 상태 동일**: archived 2건 / active 0건, slug 2개 불변. 신규 row·삭제 없음.
 
 ## 4. DB 불변 검증 (read-only SELECT)
 
@@ -95,12 +116,21 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 |------|------|
 | `0502a7afb` | 미리보기 선택 상품 표시 + product-pool 이름 master_id 경유 해석 |
 | `4673d2fa6` | 보관 목록/복원 결함 수정 (§3-B) |
+| `6f70a21b5` | pharmacy-hub 카트 테스트의 낡은 Phase 1 마커 단언 제거 (타 트랙 CI 적색 해소, 소스 변경 0) |
+| `e9cd1691f` | PATCH 소유권 사전 확인이 보관 row 를 매칭하도록 수정 — 복원 경로 실동작화 (§3-B) |
 
 - Deploy API Server (Cloud Run) / Deploy Web Services (Cloud Run) / Deploy Admin Dashboard / CodeQL — success.
-- **CI Pipeline 실패는 범위 밖**: `apps/api-server/src/services/cart/__tests__/pharmacy-hub-cart-checkout.test.ts` 1건(1,236 통과). 최종 변경은 `6acd48a00 feat(pharmacy-hub): add buyer cart and order (Phase 1)`(타 트랙)이며 본 트랙 커밋 이전부터 계속 실패 중.
-  - *(추기)* 해당 실패는 `6f70a21b5` 에서 해소됨 — Phase 2(`b8ddda3b7`)가 `metadata.phase='buyer-order-only'` 마커를 `paymentGroupId` 로 대체하면서 테스트만 갱신되지 않은 낡은 단언이었다. 소스 변경 0.
+  최종 배포본 = **`o4o-core-api-03129-87k`** (`e9cd1691f` 포함, Ready 2026-08-03T08:27:25Z) — 100% 트래픽. §4-A 는 이 리비전 대상.
+- **CI Pipeline 은 HEAD(`9efba8fca`)에서도 여전히 적색이며, 원인은 본 트랙과 무관하다.**
+  - `apps/api-server` Jest 실패(`pharmacy-hub-cart-checkout.test.ts`)는 `6f70a21b5` 로 **해소됨** — Phase 2(`b8ddda3b7`)가 `metadata.phase='buyer-order-only'` 마커를 `paymentGroupId` 로 대체하면서 테스트만 갱신되지 않은 낡은 단언이었다.
+  - 그 단계가 통과하자 **그동안 가려져 있던 다음 실패가 드러났다**: `Run tests (admin-dashboard Vitest)` 에서 3개 스위트가 `Failed to resolve entry for package "@o4o/auth-client"` 로 collect 실패
+    (`hub-notice-contract` / `membership-category-api-paths` / `membership-category-menu-route`, 7 passed / 3 failed).
+    `@o4o/auth-client` 는 `main: ./dist/index.js` 인데 `ci-pipeline.yml` 의 Code Quality Check job 은 `@o4o/types` **만** 빌드한다(`pnpm --filter=@o4o/types run build`). job 이 `-e` 라 이전까지는 api-server 단계에서 먼저 멈춰 노출되지 않았을 뿐, 사전 존재하는 CI 빌드 순서 결함이다.
+  - 본 트랙이 건드린 파일은 `store-tablet.routes.ts` · `TabletKioskPage.tsx` · KPA 매장 화면 2개 · 문서뿐으로 `apps/admin-dashboard` · `packages/auth-client` 무접촉. **본 WO 범위 밖으로 두고 별도 처리 대상**으로 남긴다.
 
 ## 6. 후속
 
 - 스모크용 **E2E 스모크 코너** 세트는 검증 종료 후 보관 상태로 남긴다(운영 데이터 최소 영향). 필요 시 '보관 해제' 로 복구 가능 — §3-B 수정으로 복구 경로가 실제로 동작한다.
 - 매장 QR 활성/비활성 토글 UI 부재는 별도 판단 사항(본 WO 범위 밖). 현재 비활성 전이는 screen_set archive 경로로만 발생한다.
+- **CI Pipeline `@o4o/auth-client` 해소 실패**(§5) — Code Quality Check job 이 소비 패키지를 빌드하지 않는 구조 문제. 별도 WO 필요.
+- `docs/local/TEST-ACCOUNTS.local.md` 의 약국 경영자 계정(19행) 비밀번호는 프로덕션과 불일치(`INVALID_CREDENTIALS`)한다. 매장 스코프 검증은 KPA 운영자 계정(`kpa:store_owner` 겸유, org `c9beb4a2`)으로 수행했다. 문서 갱신은 별도 사항.
