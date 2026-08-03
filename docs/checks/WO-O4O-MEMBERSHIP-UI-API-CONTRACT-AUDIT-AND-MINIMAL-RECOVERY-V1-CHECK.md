@@ -4,7 +4,7 @@
 > **일자**: 2026-08-03 · branch `main` · 시작 HEAD `e250eb0bb`
 
 **최종 판정: `PASS_WITH_FOLLOWUP`**
-A(감사 로그) 최소 조치 완료 · B(소속 관리)는 **정책 선택 필요로 보류**(중지 조건 해당).
+A(감사 로그) 최소 조치 완료 · **B(소속 관리) 화면 제거 완료** (§12 — 사용자 결정 후 실행).
 
 ---
 
@@ -217,5 +217,112 @@ HEAD...origin/main = 0 0
 | 보안 경계 완화 | ✅ **0** |
 | 운영 DB write | ✅ **0** |
 
-`PASS` 가 아닌 이유: B 의 이중 접두·부재 endpoint 가 남아 있고,
-그 처리는 "신규 API 추가 vs 완성 화면 폐기"라는 **정책 선택**이라 추정 실행하지 않았다.
+`PASS` 가 아닌 이유: 감사 로그 **기능 자체가 미배포**로 남아 있기 때문이다(§9-1·2).
+B 는 §12 에서 사용자 결정에 따라 종료됐다.
+
+---
+
+## 12. 후속 처리 — 배포 및 B 결정 실행 (2026-08-03)
+
+사용자 결정: **① 신규 GET 개발하지 않음 ② `AffiliationManagement` dead code 제거 ③ 감사 로그 기능은 보류.**
+
+### 12-1. 배포 (A 변경)
+
+`ca73ef1b6` 은 **양쪽 모두 자동 배포 완료**되어 있었다(수동 트리거 불필요).
+
+| workflow | commit | 결과 |
+|---|---|:--:|
+| `Deploy Admin Dashboard (Cloud Run)` | `ca73ef1b6` | **success** |
+| `Deploy Main Site (Cloud Run)` | `ca73ef1b6` | **success** |
+
+### 12-2. 배포 후 검증 — 감사 로그 요청 중단
+
+| 화면 | 감사 로그 요청 | 크래시 | 렌더 |
+|---|:--:|:--:|:--:|
+| 회원 목록 `/admin/membership/members` | **없음** | 없음 | 정상 |
+| 회원 분류 `/admin/membership/categories` | **없음** | 없음 | 정상 (빈 상태) |
+
+`MemberDetail`·`MemberProfilePage` 에서 나가던 `/membership/audit-logs/member/:id` 요청이
+**완전히 사라졌다.** 화면 탭·빈 상태·UX 는 그대로다.
+
+### 12-3. `AffiliationManagement` 소비처 최종 확인
+
+| 소비처 | 성격 |
+|---|---|
+| `routes/yaksa.routes.tsx:13,95` | 실 route (**메뉴·대시보드 링크 없음** — 직접 URL 전용) |
+| `pages/membership/MembershipRouter.tsx:20,41` | **이 router 자체가 어디에도 mount 되지 않은 legacy** |
+| 테스트·스토리·공용 컴포넌트 | **0건** |
+
+→ 실사용 소비처 **0**. 제거 요건 충족.
+
+### 12-4. 제거 내용
+
+| 파일 | 처리 |
+|---|---|
+| `pages/membership/affiliations/AffiliationManagement.tsx` | **삭제** (241줄) |
+| `routes/yaksa.routes.tsx` | lazy import + Route 블록 제거 (사유 주석 대체) |
+| `pages/membership/MembershipRouter.tsx` | 해당 참조 2줄만 제거 |
+
+- 공용 컴포넌트·다른 정상 소비처 **미제거**
+- `MembershipRouter` 는 mount 되지 않은 legacy 라 **파일 자체는 남겼다**(별도 정리 대상 — §13)
+- 코드 상 `AffiliationManagement` 참조 **0건** (남은 1건은 사유 주석)
+
+### 12-5. 검증
+
+| 항목 | 결과 |
+|---|---|
+| typecheck | **0 error** |
+| 테스트 | **182 pass / 0 fail** (10 파일) |
+| build | **성공** |
+| 배포 | `597a29983` → `Deploy Admin Dashboard` **success** |
+
+**제거 후 프로덕션 실측**
+
+| route | 결과 |
+|---|---|
+| `/admin/membership/affiliations` | `/admin` 으로 폴백 · **크래시 없음 · 콘솔 0** (죽은 화면 사라짐) |
+| `/admin/membership/members` · `/categories` · `/verifications` · `/dashboard` | **전부 정상 렌더 · 크래시 0** |
+
+인접 Membership 화면 회귀 **없음**. (콘솔 오류는 검증 계정 권한에 따른 기존 403.)
+
+---
+
+## 13. 이번 턴에 새로 확인된 항목 (범위 밖 — 미조치)
+
+### `AuditLogManagement` 화면도 이중 `/api` 접두로 호출 중
+
+| 항목 | 값 |
+|---|---|
+| 화면 | `pages/membership/audit-logs/AuditLogManagement.tsx:52` |
+| route | `/admin/membership/audit-logs` |
+| 진입 | **`MembershipDashboard.tsx:490` 에서 링크됨** (메뉴에는 없음) |
+| 실측 요청 | `GET /api/v1/`**`api/`**`membership/audit-logs?page=1&limit=50` → **이중 접두** |
+
+이번 WO 의 A 범위는 `MemberDetail`·`MemberProfilePage` 2건으로 명시돼 있어 **손대지 않았다.**
+다만 감사 로그 **기능 자체가 미배포**이므로, 접두를 고쳐도 테이블이 없어 동작하지 않는다.
+→ **`MEMBERSHIP-AUDIT-LOG-FEATURE-DEPLOY` 시점에 이 화면까지 함께 처리**하는 것이 옳다.
+그때까지는 대시보드에서 링크되는 비동작 화면이 하나 남는다.
+
+### `MembershipRouter.tsx` 자체가 미mount legacy
+
+7개 화면을 라우팅하는 완전한 router 이지만 **어디에서도 mount 되지 않는다.**
+실 route 는 `routes/yaksa.routes.tsx` 가 담당한다. 파일 통째 제거는 이번 범위 밖이라 남겼다.
+
+---
+
+## 14. 최종 상태
+
+```
+ca73ef1b6  감사 로그 죽은 호출 제거      → Admin·Main Site 배포 success
+7567807d2  CHECK
+597a29983  AffiliationManagement 제거   → Admin 배포 success
+HEAD...origin/main = 0 0
+```
+
+| 항목 | 값 |
+|---|---:|
+| 운영 DB write | **0** |
+| schema·migration | **0** |
+| 보안 경계 변경 | **0** |
+| 타 세션 작업물 접촉 | **0** |
+| `pnpm-lock.yaml` | 미변경·미포함 |
