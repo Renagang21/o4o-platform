@@ -1,0 +1,34 @@
+{
+ "wo": "WO-O4O-HFF-EN-INTEGRATED-ISSUE-QUEUE-663-FULL-CLEANUP-V1",
+ "verifiedAt": "2026-08-03T00:45:19.147Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "queueTotal": 663,
+ "finalClassified": 663,
+ "dedupOk": true,
+ "issues": {
+  "koHashDrift": 0,
+  "enStructureDrift": 0,
+  "canonicalDup": 0,
+  "enMissing": 0,
+  "contentMismatch": 0,
+  "hangulSlot": 0
+ },
+ "outsideScopeWrites": 0,
+ "koRowsTouched": 0,
+ "globals": {
+  "ko_canon": 40918,
+  "en_canon": 40902,
+  "pm_hff": 40948
+ },
+ "koUnchangedVsBaseline": true,
+ "enExpected": 40902,
+ "enActual": 40902,
+ "tally": {
+  "RESOLVED_UPDATED": 647,
+  "FINAL_HOLD_TRANSLATION_AMBIGUOUS": 2,
+  "FINAL_HOLD_KO_SOURCE_DAMAGED": 14
+ },
+ "verdict": "PASS",
+ "detail": []
+}

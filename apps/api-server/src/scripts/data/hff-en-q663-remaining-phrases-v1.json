@@ -1,0 +1,196 @@
+{
+ "builtAt": "2026-08-03T00:35:15.673Z",
+ "authoredRounds": [
+  "t1",
+  "t2",
+  "t3"
+ ],
+ "missTotal": 1292,
+ "missSolved": 1278,
+ "missRemaining": 14,
+ "solvedByHow": {
+  "dict": 55,
+  "englishIdentity": 14,
+  "authored": 587,
+  "parenLabelTail": 6,
+  "parenLabelHead": 1,
+  "affix": 324,
+  "officialTag": 11,
+  "dashLabelClause": 40,
+  "clauseColonSpec": 38,
+  "enumNum": 8,
+  "enumOne": 95,
+  "labelChain": 33,
+  "labelColon": 11,
+  "empty": 2,
+  "enumKo": 8,
+  "langTag": 13,
+  "officialEnglishFace": 12,
+  "usageParser": 10,
+  "splitDash": 1,
+  "tpl:directions": 6,
+  "composeTail": 3
+ },
+ "rowState": {
+  "NOW_PRODUCIBLE": 19,
+  "HANGUL_REMAINS": 2,
+  "NOW_RESOLVABLE": 629,
+  "STILL_BLOCKED": 13
+ },
+ "distinctRemaining": 10,
+ "remainingByWhy": {
+  "KO_DAMAGED": 9,
+  "NO_ENTRY": 1
+ },
+ "remainingByKind": {
+  "meta": 1,
+  "clause": 8,
+  "label": 1
+ },
+ "remainingByDamageKind": {
+  "TOO_SHORT": 4,
+  "LANG_MARKER_PREFIX": 2,
+  "TRAILING_LABEL_SEPARATOR": 2,
+  "LEADING_MARKER": 1
+ },
+ "phrases": [
+  {
+   "kind": "meta",
+   "text": "원료성",
+   "rows": 5,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TOO_SHORT"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "(국문) (",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "LANG_MARKER_PREFIX"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "(영문) (",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "LANG_MARKER_PREFIX"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "[",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TRAILING_LABEL_SEPARATOR"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "`",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TOO_SHORT"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "null알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+   "rows": 1,
+   "why": [
+    "NO_ENTRY"
+   ],
+   "damageKind": [],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "(시행일:",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TRAILING_LABEL_SEPARATOR"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "label",
+   "text": "원료성",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TOO_SHORT"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "\"",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "TOO_SHORT"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  },
+  {
+   "kind": "clause",
+   "text": "* 홈삼",
+   "rows": 1,
+   "why": [
+    "KO_DAMAGED"
+   ],
+   "damageKind": [
+    "LEADING_MARKER"
+   ],
+   "lost": [],
+   "tryEn": null,
+   "tryHow": null
+  }
+ ]
+}

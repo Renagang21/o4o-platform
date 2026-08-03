@@ -1,0 +1,340 @@
+{
+ "wo": "WO-O4O-HFF-EN-INTEGRATED-ISSUE-QUEUE-663-FULL-CLEANUP-V1",
+ "count": 16,
+ "rows": [
+  {
+   "batch": 1,
+   "issueType": "TRANSLATION_AMBIGUOUS",
+   "productMasterId": "01d73e2f-42c5-4bef-b919-714e9b4309af",
+   "productName": "에브리타임 CaloTrim",
+   "queuedKoCanonicalId": "0276c7b2-aa45-4744-89f4-9ceda4cba75f",
+   "koCanonicalId": "0276c7b2-aa45-4744-89f4-9ceda4cba75f",
+   "koHash": "2aac2b528b8e862d7d68adfa138dda4c2ee8869c0eee1d1c8b31d120b5637e1c",
+   "enCanonicalId": null,
+   "officialStatementNo": "20150002152115",
+   "state": "HANGUL_REMAINS",
+   "observedIssueType": "TRANSLATION_AMBIGUOUS",
+   "misses": [],
+   "finalWhy": "HANGUL_REMAINS"
+  },
+  {
+   "batch": 1,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "0f01e794-f0cd-4e3c-b051-a20b24b0fb2c",
+   "productName": "마이핏 ORIGIN 눈건강 루테인 지아잔틴 A",
+   "queuedKoCanonicalId": "8654606a-990d-4d75-83d5-8933b5e31d7d",
+   "koCanonicalId": "8654606a-990d-4d75-83d5-8933b5e31d7d",
+   "koHash": "01d822c0833e25f78ca8e4a71b969343e133d1956b1b3ca22a85757b0f5fc5f8",
+   "enCanonicalId": null,
+   "officialStatementNo": "200400170061915",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "(국문) (",
+     "why": "UNRESOLVED"
+    },
+    {
+     "kind": "clause",
+     "text": "(영문) (",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 1,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "20132cd0-c3fd-43c2-9025-759657d0b380",
+   "productName": "우먼이소플라본",
+   "queuedKoCanonicalId": "79dcb158-2cab-4b26-baec-ed96cc39cf8e",
+   "koCanonicalId": "79dcb158-2cab-4b26-baec-ed96cc39cf8e",
+   "koHash": "8e2e9eced4265ee0ba6ac94181edfc8d3c62fd1b1ccec3aae2ed68c2d0559abe",
+   "enCanonicalId": null,
+   "officialStatementNo": "2004002000191",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "[",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 1,
+   "issueType": "NUMBER_STRUCTURE_AMBIGUOUS",
+   "productMasterId": "29db9eaf-43b7-4825-a922-aee32d6149fc",
+   "productName": "골드 미소원 맵시",
+   "queuedKoCanonicalId": "e41d4528-4bf3-414b-90ba-1dafd10e87c7",
+   "koCanonicalId": "e41d4528-4bf3-414b-90ba-1dafd10e87c7",
+   "koHash": "570bcfb8d8d397d0d518fe234c301a5b4de607fc4b0a6d8041f7c2226f33ca69",
+   "enCanonicalId": null,
+   "officialStatementNo": "2004001701386",
+   "state": "BLOCKED",
+   "observedIssueType": "PENDING_DIRECT_TRANSLATION",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "<비타민B1>",
+     "why": "UNRESOLVED"
+    },
+    {
+     "kind": "clause",
+     "text": "<비타민 C>",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 2,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "6f9ea8eb-3af3-48a0-9936-ae3166652d82",
+   "productName": "레드메리 골드",
+   "queuedKoCanonicalId": null,
+   "koCanonicalId": "d1de573a-3769-45e6-a6d4-ca2e2ae46386",
+   "koHash": "22426af12c34d8abe10741941e499506f3762c9e9235bc471f9e3d5e30ff24ea",
+   "enCanonicalId": null,
+   "officialStatementNo": "20160012278181",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "`",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 3,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "a96438be-dae5-4a7c-a94b-2824225736bf",
+   "productName": "철분엽산플러스",
+   "queuedKoCanonicalId": "d2246406-b5ac-4b0c-b28e-2a94b594b6e3",
+   "koCanonicalId": "d2246406-b5ac-4b0c-b28e-2a94b594b6e3",
+   "koHash": "33176e7676d3aa58aa0655f950308df1d3e15118876b96e9dc2d4b78f9605faf",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040020001267",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "null알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 3,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "8d2b1b78-bb80-43d1-b228-08aeede5bf7f",
+   "productName": "공스킨 스트레스 완화 L-테아닌",
+   "queuedKoCanonicalId": "5eef76b0-583c-4483-afa3-41dbd3dbe6fe",
+   "koCanonicalId": "5eef76b0-583c-4483-afa3-41dbd3dbe6fe",
+   "koHash": "8164145d9703cd24a967159cde8f0c2b5dd001d012897103307bda949ca323c0",
+   "enCanonicalId": null,
+   "officialStatementNo": "200400150832338",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "(시행일:",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 3,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "c0d863db-d768-4127-9293-1bc686a7b0e4",
+   "productName": "인삼농축액 7",
+   "queuedKoCanonicalId": "61256e5f-fd5a-47ff-9ca3-c4e2971a8768",
+   "koCanonicalId": "61256e5f-fd5a-47ff-9ca3-c4e2971a8768",
+   "koHash": "40ef4593a81b1ceba4023c08f8f690aeca7f769c1af55fa981794b3f792249b1",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040020039130",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "label",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 4,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "97a052de-79d9-44ee-a3ca-313ffa548fc3",
+   "productName": "뒤끝있는 홍삼정",
+   "queuedKoCanonicalId": "2d2c059e-d160-4629-b05e-84facedde7d4",
+   "koCanonicalId": "2d2c059e-d160-4629-b05e-84facedde7d4",
+   "koHash": "e7a8fc5f0c9e398e2a7b117926f2d1d4b71b5426ede58afef868d8e0ed3490de",
+   "enCanonicalId": null,
+   "officialStatementNo": "202100136824",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "\"",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "e923fe02-ff3a-420a-9d75-7ca56d7f1b1f",
+   "productName": "홍삼정스틱 프리미엄",
+   "queuedKoCanonicalId": "45c89368-eb25-4ff4-8805-6350d2e1f06e",
+   "koCanonicalId": "45c89368-eb25-4ff4-8805-6350d2e1f06e",
+   "koHash": "9c9c3e48737431458b359dc58e3f9e8e721731c1db11e3e92ccca08c6cde77bb",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040020020921",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "clause",
+     "text": "* 홈삼",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "b410fc27-e9af-44d3-a922-5d2328f86188",
+   "productName": "연어이리추출물(DOT™연어핵산)",
+   "queuedKoCanonicalId": "226f5ff4-4810-48aa-af73-cdbf7819e749",
+   "koCanonicalId": "226f5ff4-4810-48aa-af73-cdbf7819e749",
+   "koHash": "2f7f1f4fd1fc7ddc6d5f19f47f4cf8ac907ba0aa58090962a9b0358b76b39447",
+   "enCanonicalId": null,
+   "officialStatementNo": "201800027751",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "meta",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "TRANSLATION_AMBIGUOUS",
+   "productMasterId": "fa2a1038-1457-46fa-8c6d-eb71eb06ff3e",
+   "productName": "에브리타임 PowerForm",
+   "queuedKoCanonicalId": "6d6f0dba-8c0e-4ed2-a358-f1fb367f0889",
+   "koCanonicalId": "6d6f0dba-8c0e-4ed2-a358-f1fb367f0889",
+   "koHash": "b7f6e735c7d615ac62d4380b961cddf414d8c732c51eeebfae6202d82ea76789",
+   "enCanonicalId": null,
+   "officialStatementNo": "20150002152116",
+   "state": "HANGUL_REMAINS",
+   "observedIssueType": "TRANSLATION_AMBIGUOUS",
+   "misses": [],
+   "finalWhy": "HANGUL_REMAINS"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "51d0e76b-1c2f-4e00-b9f9-db576ed78e8a",
+   "productName": "홍삼분말13.0mg",
+   "queuedKoCanonicalId": "c60ad35a-7899-4ebb-a86d-674696ce5fdb",
+   "koCanonicalId": "c60ad35a-7899-4ebb-a86d-674696ce5fdb",
+   "koHash": "b63dea5bf25a822e984eab540a102f83a8446d0d83d9ce1ab72b09ba8c934562",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040017055114",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "meta",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "644a1479-1d63-434f-aae5-e319afcee839",
+   "productName": "인삼분말10.0mg",
+   "queuedKoCanonicalId": "04276051-2a88-4608-9de0-e8eaccc433cd",
+   "koCanonicalId": "04276051-2a88-4608-9de0-e8eaccc433cd",
+   "koHash": "9d98ec45b403defe70630bc4900b7fa1dbf51976378d3618f6d016bf78ec1416",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040017055110",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "meta",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "bd7d9259-16cd-43ea-9962-11ed2ecfd67c",
+   "productName": "인삼분말 6.0mg",
+   "queuedKoCanonicalId": "6e1e6fe3-36d6-4b91-821c-2d44683e2d43",
+   "koCanonicalId": "6e1e6fe3-36d6-4b91-821c-2d44683e2d43",
+   "koHash": "eddc60510856a41dd80d33c964164151e336b8c85db1ca23c66d748b0a6a6f28",
+   "enCanonicalId": null,
+   "officialStatementNo": "20040017055111",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "meta",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  },
+  {
+   "batch": 5,
+   "issueType": "KO_SOURCE_DAMAGED",
+   "productMasterId": "c626fa91-fc44-4ec1-9d55-aa6fe4dfe0f8",
+   "productName": "홍삼분말",
+   "queuedKoCanonicalId": "ec3254bd-2d9e-4650-8793-b1fea91fb43c",
+   "koCanonicalId": "ec3254bd-2d9e-4650-8793-b1fea91fb43c",
+   "koHash": "a0612ea797346aac5d71fc2a7fceb295e35e8d5b2e3598a640197c06efd3520d",
+   "enCanonicalId": null,
+   "officialStatementNo": "2004001705579",
+   "state": "BLOCKED",
+   "observedIssueType": "KO_SOURCE_DAMAGED",
+   "misses": [
+    {
+     "kind": "meta",
+     "text": "원료성",
+     "why": "UNRESOLVED"
+    }
+   ],
+   "finalWhy": "UNRESOLVED"
+  }
+ ]
+}

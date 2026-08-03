@@ -1,0 +1,181 @@
+{
+ "wo": "WO-O4O-HFF-EN-INTEGRATED-ISSUE-QUEUE-663-FULL-CLEANUP-V1",
+ "generatedAt": "2026-08-03T00:45:19.147Z",
+ "count": 16,
+ "rows": [
+  {
+   "productMasterId": "01d73e2f-42c5-4bef-b919-714e9b4309af",
+   "productName": "에브리타임 CaloTrim",
+   "issueType": "TRANSLATION_AMBIGUOUS",
+   "finalState": "FINAL_HOLD_TRANSLATION_AMBIGUOUS",
+   "reason": "번역 슬롯에 한국어 잔존 — 공식 영문 근거 부족",
+   "blockingPhrases": [],
+   "retryCondition": "공식 영문 기능성 문구 또는 승인된 EN 번역 자산이 확보되면 재시도"
+  },
+  {
+   "productMasterId": "0f01e794-f0cd-4e3c-b051-a20b24b0fb2c",
+   "productName": "마이핏 ORIGIN 눈건강 루테인 지아잔틴 A",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "(국문) (",
+    "(영문) ("
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "20132cd0-c3fd-43c2-9025-759657d0b380",
+   "productName": "우먼이소플라본",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "["
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "29db9eaf-43b7-4825-a922-aee32d6149fc",
+   "productName": "골드 미소원 맵시",
+   "issueType": "NUMBER_STRUCTURE_AMBIGUOUS",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "<비타민B1>",
+    "<비타민 C>"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "6f9ea8eb-3af3-48a0-9936-ae3166652d82",
+   "productName": "레드메리 골드",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "`"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "a96438be-dae5-4a7c-a94b-2824225736bf",
+   "productName": "철분엽산플러스",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "null알레르기 체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다."
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "8d2b1b78-bb80-43d1-b228-08aeede5bf7f",
+   "productName": "공스킨 스트레스 완화 L-테아닌",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "(시행일:"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "c0d863db-d768-4127-9293-1bc686a7b0e4",
+   "productName": "인삼농축액 7",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "97a052de-79d9-44ee-a3ca-313ffa548fc3",
+   "productName": "뒤끝있는 홍삼정",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "\""
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "e923fe02-ff3a-420a-9d75-7ca56d7f1b1f",
+   "productName": "홍삼정스틱 프리미엄",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "* 홈삼"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "b410fc27-e9af-44d3-a922-5d2328f86188",
+   "productName": "연어이리추출물(DOT™연어핵산)",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "fa2a1038-1457-46fa-8c6d-eb71eb06ff3e",
+   "productName": "에브리타임 PowerForm",
+   "issueType": "TRANSLATION_AMBIGUOUS",
+   "finalState": "FINAL_HOLD_TRANSLATION_AMBIGUOUS",
+   "reason": "번역 슬롯에 한국어 잔존 — 공식 영문 근거 부족",
+   "blockingPhrases": [],
+   "retryCondition": "공식 영문 기능성 문구 또는 승인된 EN 번역 자산이 확보되면 재시도"
+  },
+  {
+   "productMasterId": "51d0e76b-1c2f-4e00-b9f9-db576ed78e8a",
+   "productName": "홍삼분말13.0mg",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "644a1479-1d63-434f-aae5-e319afcee839",
+   "productName": "인삼분말10.0mg",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "bd7d9259-16cd-43ea-9962-11ed2ecfd67c",
+   "productName": "인삼분말 6.0mg",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  },
+  {
+   "productMasterId": "c626fa91-fc44-4ec1-9d55-aa6fe4dfe0f8",
+   "productName": "홍삼분말",
+   "issueType": "KO_SOURCE_DAMAGED",
+   "finalState": "FINAL_HOLD_KO_SOURCE_DAMAGED",
+   "reason": "KO 원문 손상(잘린 라벨·마커 잔재 등) — 사람 판단 없이 내용 보정 불가",
+   "blockingPhrases": [
+    "원료성"
+   ],
+   "retryCondition": "KO 원문(MFDS 원천) 재수집으로 손상 슬롯이 복구되면 재시도"
+  }
+ ]
+}
