@@ -207,7 +207,16 @@ async function main(): Promise<void> {
       masterId: id, name: row.name, fp, gencode, suffix,
       ingredientStrengthCode: gencode.slice(0, 6), form: ORAL_SUFFIX[suffix], route: 'oral',
       safetyFingerprint: axes,
-      official: { indication: indP.slice(0, 260), dosage: dosP.slice(0, 260), caution: cauP.slice(0, 260) },
+      /**
+       * 공식 원문은 **자르지 않고 그대로 저장한다.**
+       *
+       * 여기서 `.slice(0, 260)` 으로 저장한 값이 하류 저작 러너의 원문 입력이 되어,
+       * LIVE KO canonical 에 260자 하드컷이 그대로 굳었다(실측: 절단 유닛 1,523 중
+       * FIXED_LENGTH_TRUNCATION 이 압도적, 복구 대상 925 문서).
+       * 원문 보존은 이 SSOT 의 책임이고, 표시 길이 제한은 표시 계층의 책임이다.
+       * 저장 단계에서 자르면 되돌릴 근거가 사라진다.
+       */
+      official: { indication: indP, dosage: dosP, caution: cauP },
     });
   }
   masters.sort((a, b) => (a.masterId < b.masterId ? -1 : 1));

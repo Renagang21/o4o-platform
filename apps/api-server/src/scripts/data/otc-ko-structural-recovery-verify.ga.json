@@ -1,0 +1,184 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "independence": "이 검증기는 otc-zh-slots / otc-ko-truncation-policy 를 import 하지 않는다",
+ "appliedDocs": 925,
+ "planTargets": 943,
+ "exceptions": 18,
+ "checked": 925,
+ "residualCutDocs": 24,
+ "residualNote": "이번에 복구한 슬롯이 아니라 같은 문서의 다른 슬롯에 남은 절단이다. 계획 단계의 partialTargets(공식 원문에서 완결본을 증명하지 못한 슬롯을 가진 문서)와 독립 판정기의 더 엄격한 기준이 합쳐진 수다.",
+ "ageLostDocs": 0,
+ "labelBleedDocs": 0,
+ "canonicalFlipped": 0,
+ "failures": [
+  {
+   "id": "822d43ce-30a9-4d06-b762-4b5c51caf987",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "8980461c-180a-45b5-8b94-bcb9f06ba280",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "423383d1-c6df-4379-a24c-14c295d4514e",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "6536f743-73ca-4eef-8391-0b30552f232c",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "67b77152-3a0e-4dc7-82aa-b6e471e716dc",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "cdaf1f00-f194-47f0-b0c7-1deb0b69b8c5",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "f7327304-11f0-4348-a93f-3ba91a5d87fe",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "128c7643-5791-4d47-895f-870ea62a8960",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "c98b3261-346b-4978-97d8-b5a7731fe16e",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "79484cf2-306b-4555-821f-0018cd6b0d43",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "cfac5f11-f393-4338-9008-249c60265bd4",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "cbd7bda1-6522-457d-a43e-331781074c96",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "0ca9f06e-40f7-4151-abd3-eacfd8bd7ff2",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "e032adb3-deee-4d02-9318-802917835fbb",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "3d62b221-2867-4b8d-a7da-6babccfedc09",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "c2f03f02-296d-4a8b-9607-9b9742f3b44f",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "f943d0b7-9ab8-4cc4-85f9-79eac457b687",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "e2fb1765-ac5c-454e-b0d6-ee3e8b3524cd",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "51976d42-3fd6-411b-a3f5-f5366ad5cca3",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "id": "c0c8fd51-1701-443d-8a1f-5e838c99552d",
+   "code": "RESIDUAL_CUT",
+   "kinds": [
+    "SENTENCE_MIDCUT"
+   ]
+  }
+ ],
+ "englishPopulation": {
+  "engReady": 16950,
+  "stillTruncated": 1929,
+  "contentBlocked": 3106,
+  "ncBlocked": 333,
+  "total": 22318,
+  "identity": "22318 = 16950 + 1929 + 3106 + 333",
+  "balanced": true
+ },
+ "en240": {
+  "total": 240,
+  "withMasterId": 240,
+  "koCanonicalLinked": 240,
+  "koCanonicalMissing": 0,
+  "affectedByThisRecovery": 0,
+  "sourceRefDrift": 0,
+  "readyForReclassification": true,
+  "note": "EN 은 이번 WO 에서 수정하지 않았다. 다음 EN 재분류 착수 가능 여부만 보고한다."
+ },
+ "checks": {
+  "적용 건수 = 원장 건수": true,
+  "after content hash 전건 일치": true,
+  "canonical/language/type 불변": true,
+  "적용분 잔존 절단 = 설계상 남는 부분복구분 이하": true,
+  "연령 지문 손실 0": true,
+  "섹션 라벨 침범 0": true,
+  "성공 + 예외 = 계획 대상": true
+ },
+ "verdict": "VERIFIED"
+}

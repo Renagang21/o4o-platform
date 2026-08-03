@@ -1,0 +1,7580 @@
+{
+ "summary": {
+  "mode": "READ-ONLY / DB write 0",
+  "startHead": null,
+  "koCanonicalDocs": 22408,
+  "structureReadyDocs": 21376,
+  "classification": {
+   "KO_CONTENT_HOLD": 2362,
+   "KO_CONTENT_VALID_AND_STRUCTURE_READY": 18556,
+   "KO_CONTENT_INVALID": 834,
+   "KO_CONTENT_VALID_BUT_TRUNCATED": 656
+  },
+  "classificationTotal": 22408,
+  "balanced": true,
+  "recoveryTargets": 18,
+  "recoveryTargetMasters": 18,
+  "recoveryFixes": 18,
+  "partialTargets": 0,
+  "blockedDocs": 638,
+  "blockReason": {
+   "NOT_FOUND_IN_OFFICIAL": 629,
+   "STRUCTURE_MARKER_NOT_UNIQUE": 7,
+   "NUMERIC_CONFLICT": 2
+  },
+  "cutTypes": {
+   "PARENTHESIS_MIDCUT": 18,
+   "FIXED_LENGTH_TRUNCATION": 640,
+   "ENUMERATION_MIDCUT": 11,
+   "SENTENCE_MIDCUT": 73,
+   "STRUCTURE_EXTRACTION_TRUNCATION": 7
+  }
+ },
+ "targets": [
+  {
+   "koId": "ac1e6660-bd30-44eb-b6f4-a073dd954eb2",
+   "mid": "58727146-37c5-4f5d-9e49-a5d3ff58eaa2",
+   "name": "이노엔비타메진캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "6b771426-7f65-94c5-7894-f521288e2f62",
+   "officialId": "08af02ed-c76b-4575-8e5e-80203d1591c6",
+   "officialSourceHash": "3dee4d5d8d41ae6c1af2754372703fdb48b834fd53d9c2f995d9b29aa50e1e67",
+   "beforeContentHash": "f6abe0039240b83d5b874ccca2b393465a767fbf26eacd2712f2db92873af991",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:637600eb1cab",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "592e0b39-7489-42e1-a457-659aa2587191",
+   "mid": "d9b9078b-b724-4f74-a949-2e856f34bdb5",
+   "name": "이노엔비타메진캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "6b771426-7f65-94c5-7894-f521288e2f62",
+   "officialId": "60d8e871-b107-4e78-a505-45b205f59dfd",
+   "officialSourceHash": "3dee4d5d8d41ae6c1af2754372703fdb48b834fd53d9c2f995d9b29aa50e1e67",
+   "beforeContentHash": "f6abe0039240b83d5b874ccca2b393465a767fbf26eacd2712f2db92873af991",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:637600eb1cab",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "8242ea03-9239-4f53-90d7-14423c82cc15",
+   "mid": "fc73c63a-4497-4595-8a3a-a0256ff59266",
+   "name": "씨제이비타메진캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "6b771426-7f65-94c5-7894-f521288e2f62",
+   "officialId": "d27a68ab-6f81-4e65-886b-b98dfa5147d0",
+   "officialSourceHash": "3dee4d5d8d41ae6c1af2754372703fdb48b834fd53d9c2f995d9b29aa50e1e67",
+   "beforeContentHash": "f6abe0039240b83d5b874ccca2b393465a767fbf26eacd2712f2db92873af991",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:637600eb1cab",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "229ef0b7-7ce1-48e0-b0e5-a7b86fa0e16f",
+   "mid": "451ca932-450e-4550-b823-cb2674eac022",
+   "name": "유한비타민씨디정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "4b3fe5a6-73bf-a475-b34d-5ab9c37027d6",
+   "officialId": "8ccd1a13-ae22-4f76-9581-a6911773c50a",
+   "officialSourceHash": "7036d09c27d2d833a3f708a78b6e34e73944c6ca1af78cb1c378c72d75f3ee61",
+   "beforeContentHash": "c01fedf899d4674b12cbfb68950df1cb856cb424530ec1ec6d17c5b377d86629",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:446c9d5056ca",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 C, D의 보급과 햇빛ㆍ피부병 등에 의한 색소침착(기미",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 발육기, 노년기의 비타민 C, D의 보급과 햇빛ㆍ피부병 등에 의한 색소침착(기미, 주근깨)의 완화, 잇몸출혈ㆍ비출혈(코피) 예방 및 뼈, 이의 발육불량, 구루병의 예방에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "6da43049-75a4-486a-ac8a-a4a2dbf19e66",
+   "mid": "5960a039-6769-4fcd-aeea-97b7bcb238a1",
+   "name": "비바원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "304cf910-b28c-8f1b-4e2a-5670658df71e",
+   "officialId": "d11443ea-801c-40ee-a819-eb622e6fdb63",
+   "officialSourceHash": "13f2b4bcb896b02deec67a2d69b9db34ba6d8e23c3493bccc5907200d67ac981",
+   "beforeContentHash": "21c8687655f8545eaba5d3eda0e0503980c0548477726dbc983acbc61eeae946",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:20e5eb0c66ba",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "6e20a8e6-bd92-4d10-887b-a7685c785ccc",
+   "mid": "5ec1ebf7-afaf-4a0f-91bc-1ea9ffa45c3a",
+   "name": "비바원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "304cf910-b28c-8f1b-4e2a-5670658df71e",
+   "officialId": "c153f186-33db-49c5-9d96-ab868f019a77",
+   "officialSourceHash": "13f2b4bcb896b02deec67a2d69b9db34ba6d8e23c3493bccc5907200d67ac981",
+   "beforeContentHash": "21c8687655f8545eaba5d3eda0e0503980c0548477726dbc983acbc61eeae946",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:20e5eb0c66ba",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "d22dde72-0603-4843-8867-292a811b8b85",
+   "mid": "be17961f-15ff-42d7-9502-41931dac0da5",
+   "name": "비바원정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "304cf910-b28c-8f1b-4e2a-5670658df71e",
+   "officialId": "a4e5f883-6608-47b9-a42d-61e55cbac7bf",
+   "officialSourceHash": "13f2b4bcb896b02deec67a2d69b9db34ba6d8e23c3493bccc5907200d67ac981",
+   "beforeContentHash": "21c8687655f8545eaba5d3eda0e0503980c0548477726dbc983acbc61eeae946",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:20e5eb0c66ba",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등) 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "e20337c0-a5a2-4f9a-b04f-c3af5b95f9a0",
+   "mid": "d2472a6d-12d9-439a-b113-c49c26190b92",
+   "name": "바이타비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "7ddc89ee-4a6d-9cb2-7d81-d69718005bfa",
+   "officialId": "e6552b19-92be-4251-998f-cd0693e64c31",
+   "officialSourceHash": "1f16be7afec848f940963accaf350230835e6b763f89e7b84c61cd8ba4b80130",
+   "beforeContentHash": "2d9ef8522c35606ef6b0a1a91ac9f0aaf66e2c9a4e82df6a103183d7778f1955",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:8eb183303ed4",
+     "before": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "3f59ea8f-9114-4228-aa90-92da6a14483b",
+   "mid": "e8909373-ce30-4f4e-ab40-b0b5ac91e6ec",
+   "name": "바이타비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "7ddc89ee-4a6d-9cb2-7d81-d69718005bfa",
+   "officialId": "2094dee2-071a-4c0f-af34-471e0ad62e63",
+   "officialSourceHash": "1f16be7afec848f940963accaf350230835e6b763f89e7b84c61cd8ba4b80130",
+   "beforeContentHash": "2d9ef8522c35606ef6b0a1a91ac9f0aaf66e2c9a4e82df6a103183d7778f1955",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:8eb183303ed4",
+     "before": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "81cca6c1-0110-4bb8-bb40-98f982eaecba",
+   "mid": "f0dcde5e-ab05-4d39-a80d-9622d68c1c76",
+   "name": "바이타비플러스정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "7ddc89ee-4a6d-9cb2-7d81-d69718005bfa",
+   "officialId": "6f043470-f5d2-4f34-a38b-3510720eea7e",
+   "officialSourceHash": "1f16be7afec848f940963accaf350230835e6b763f89e7b84c61cd8ba4b80130",
+   "beforeContentHash": "2d9ef8522c35606ef6b0a1a91ac9f0aaf66e2c9a4e82df6a103183d7778f1955",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:8eb183303ed4",
+     "before": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통",
+     "after": "육체피로, 임신∙수유기, 병중∙병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요통, 어깨결림 등), 각기, 눈의 피로, 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "3b249254-67a7-4a78-a2e1-19310556936b",
+   "mid": "4bd3c6db-b02b-40b2-852c-fc32dfc67c81",
+   "name": "마그킹코발정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "69caacda-81f3-790d-0c3f-de6686f10cb0",
+   "officialId": "b6fc1a75-59d2-42a3-85d0-856902f0f25b",
+   "officialSourceHash": "e141a9b4ede737e6c0e3d7b7d1ac5909e34fbc5eeaae5573d834fe569841e6c5",
+   "beforeContentHash": "79c6b892878d58c2c64c2fd38aff05b59199b655080c86a78e6068cdded05a17",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:2ca48646f3fd",
+     "before": "육체피로, 임신, 수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E",
+     "after": "육체피로, 임신, 수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E, B2, B6)의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화 및 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "8b4d5dde-74fb-4193-ba5e-8b6c74d2c0ba",
+   "mid": "c7f06871-551c-4280-b122-a720b6e4e56c",
+   "name": "마그킹코발정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "69caacda-81f3-790d-0c3f-de6686f10cb0",
+   "officialId": "d1dae621-a969-4428-ba9d-a82d2dfae3f7",
+   "officialSourceHash": "e141a9b4ede737e6c0e3d7b7d1ac5909e34fbc5eeaae5573d834fe569841e6c5",
+   "beforeContentHash": "79c6b892878d58c2c64c2fd38aff05b59199b655080c86a78e6068cdded05a17",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:2ca48646f3fd",
+     "before": "육체피로, 임신, 수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E",
+     "after": "육체피로, 임신, 수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E, B2, B6)의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화 및 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "0c6e0898-2a39-481f-ab61-dd1256040bcc",
+   "mid": "4f0cd7b8-5387-4990-8a22-e4ff95fd0e34",
+   "name": "마그빅코발정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "69caacda-81f3-790d-0c3f-de6686f10cb0",
+   "officialId": "f488871c-68e6-451c-a93d-516976579092",
+   "officialSourceHash": "e141a9b4ede737e6c0e3d7b7d1ac5909e34fbc5eeaae5573d834fe569841e6c5",
+   "beforeContentHash": "79c6b892878d58c2c64c2fd38aff05b59199b655080c86a78e6068cdded05a17",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:2ca48646f3fd",
+     "before": "육체피로, 임신, 수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E",
+     "after": "육체피로, 임신, 수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E, B2, B6)의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화 및 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "31cd9efa-ddd3-4d41-93ef-f9e1bf3ec78e",
+   "mid": "4fc18662-1ded-474f-a9bc-9f00a1720e44",
+   "name": "마그킹코발정",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "69caacda-81f3-790d-0c3f-de6686f10cb0",
+   "officialId": "2afda0f5-7f9c-4e84-9ae4-df5da37362ef",
+   "officialSourceHash": "e141a9b4ede737e6c0e3d7b7d1ac5909e34fbc5eeaae5573d834fe569841e6c5",
+   "beforeContentHash": "79c6b892878d58c2c64c2fd38aff05b59199b655080c86a78e6068cdded05a17",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:2ca48646f3fd",
+     "before": "육체피로, 임신, 수유기, 병중, 병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E",
+     "after": "육체피로, 임신, 수유기, 병중·병후(병을 앓는 동안이나 회복 후)의 체력 저하 시, 노년기의 비타민(E, B2, B6)의 보급과 말초혈행장애 및 갱년기 시 어깨·목결림, 수족저림·수족냉증(손발이 차가움)의 완화 및 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염의 완화에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "18ed21a0-8079-4b4c-b9ce-85b2d0af0d42",
+   "mid": "2d56e2c0-e458-4e50-825b-a3fc19424101",
+   "name": "활비에이캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "aaebde5b-b9b9-2a52-379d-2cf6ba27aa72",
+   "officialId": "2a8bfca9-2e04-4035-bea0-a1806a30629b",
+   "officialSourceHash": "fb31e4f0c0d6d5a3199fd9a57ca0525ddcf720395f39c25bc26cdcd1cbeb3092",
+   "beforeContentHash": "8bc5c423ca878e36b336e3aa583252d67572ffbb608ac186b0860a95213b83b9",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:5ef320fcbc8a",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "241138c7-101c-43e1-ba81-79795e60be67",
+   "mid": "88ba20a5-96ac-4ce7-a2fe-142cc13c5516",
+   "name": "활비에이캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "aaebde5b-b9b9-2a52-379d-2cf6ba27aa72",
+   "officialId": "a0582b1a-3da2-446e-92d6-1931ae3e8871",
+   "officialSourceHash": "fb31e4f0c0d6d5a3199fd9a57ca0525ddcf720395f39c25bc26cdcd1cbeb3092",
+   "beforeContentHash": "8bc5c423ca878e36b336e3aa583252d67572ffbb608ac186b0860a95213b83b9",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:5ef320fcbc8a",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "7ca46306-aec7-4d49-94b0-d5c0b28cc713",
+   "mid": "b6a62cc9-fdb8-40ee-97eb-8f63280c5b5b",
+   "name": "활비에이캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "aaebde5b-b9b9-2a52-379d-2cf6ba27aa72",
+   "officialId": "bf315393-8c10-44e1-a875-ffd00306448a",
+   "officialSourceHash": "fb31e4f0c0d6d5a3199fd9a57ca0525ddcf720395f39c25bc26cdcd1cbeb3092",
+   "beforeContentHash": "8bc5c423ca878e36b336e3aa583252d67572ffbb608ac186b0860a95213b83b9",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:5ef320fcbc8a",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  },
+  {
+   "koId": "6276537d-aa07-4608-92de-30712c9db089",
+   "mid": "e65f2399-ae82-48af-9505-c1ad91fd8f96",
+   "name": "활비에이캡슐",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "sourceRef": "aaebde5b-b9b9-2a52-379d-2cf6ba27aa72",
+   "officialId": "b7250fe4-b075-4596-946e-9d68be8ad618",
+   "officialSourceHash": "fb31e4f0c0d6d5a3199fd9a57ca0525ddcf720395f39c25bc26cdcd1cbeb3092",
+   "beforeContentHash": "8bc5c423ca878e36b336e3aa583252d67572ffbb608ac186b0860a95213b83b9",
+   "contentValidity": "KO_DIRECT_VALID",
+   "lineage": "DIRECT_RAW_ON_MASTER",
+   "fixes": [
+    {
+     "slot": 10,
+     "kind": "tile",
+     "cutType": "PARENTHESIS_MIDCUT",
+     "unitId": "tile:5ef320fcbc8a",
+     "before": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통",
+     "after": "육체피로, 임신ㆍ수유기, 병중ㆍ병후(병을 앓는 동안이나 회복 후)의 체력 저하 시 비타민 B1, B6의 보급과 신경통, 근육통, 관절통(요(허리)통, 어깨결림 등), 구각염(입꼬리염), 구순염(입술염), 구내염(입안염), 설염(혀염), 습진, 피부염 증상의 완화, 각기, 눈의 피로에 사용합니다."
+    }
+   ],
+   "partial": false,
+   "unresolved": []
+  }
+ ],
+ "blocked": [
+  {
+   "koId": "fae602eb-a48e-4289-a0c9-c6da85d4ef3a",
+   "mid": "7494b76f-3180-498f-ad1e-0316772a882b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "41e5d3ee-f99f-4857-9bfa-a02ce7c67613",
+   "mid": "77d68017-00f3-4f23-84c7-bc6b2fd66035",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8c54d16b-7787-4307-80df-bdd0cad78138",
+   "mid": "02119826-036d-4165-84b5-76fdbbd5bee7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5a4c54d9-a7d5-43c6-9591-9931a69e5f6e",
+   "mid": "13f70dbb-0913-42de-bafb-dc1049a7e300",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "66c17ccb-459f-4e8c-a844-a235a1fe0e8a",
+   "mid": "25b49eff-3a55-44cd-9dcd-6d7507c97edc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9c288e6e-39d2-45e6-9a0c-9c6e50885308",
+   "mid": "2798c43f-4ca0-43c5-a09f-0f5f5e33d02e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "364f5ea9-2ebc-487e-9f37-9c75dcf10fbc",
+   "mid": "30ea8cb9-a3fb-4e1c-9808-c77223f8a79a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8cff6cee-4ea4-4c59-876f-ce2c0584f90b",
+   "mid": "35871dc7-827e-4989-802c-c4af171b696a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "15b1b8a9-96e0-45e5-a0c6-2bfd16cc74a3",
+   "mid": "37fff588-cb6d-4bcc-8456-f131c139b66c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "61655e55-031c-4024-8537-47ac0770b8e3",
+   "mid": "3b05249a-5b82-4d1e-85ba-e232ddbb253c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7c688df4-25db-4f9c-b7a1-57047e92fd6b",
+   "mid": "41280fd9-ca72-42f4-bfb7-d95ba065fa52",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "60bbfee3-8f15-45cd-b61b-fc05cbf9d4b0",
+   "mid": "4abc6b9b-eaa9-4e38-ad72-aa8324d4fe9f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0dce8977-77b8-4102-a047-3e8fbf1c5ff9",
+   "mid": "4f6bd1df-e386-472a-b472-c4a2be37163e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d166eb58-74ac-4c90-a94a-147456d53bde",
+   "mid": "69702196-e4da-47fb-bf4e-57c451e698d2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cf8b7bfe-5a6e-4906-a052-848a150c280d",
+   "mid": "6a5f02d1-6f4e-444a-b125-b42bb20c23e0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "84bb30b5-aada-456d-ac3a-2843347a2ea2",
+   "mid": "6a9d787b-9ee7-4f84-955b-f08f309aef0b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bea6d349-36c8-4d8b-8dd3-59ef922390d9",
+   "mid": "6dec5010-c400-4856-9853-756dfca397e4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "879c2462-7e7b-4c4a-b693-4ae45d6604ad",
+   "mid": "75401661-10b7-4fac-bcb8-fc9d3c2596e4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6cab8ec1-af1c-4bab-bbf5-4d80a2e7b0c6",
+   "mid": "7ca80573-ef7b-4335-a7bc-b8f71fa27b1d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "50ea46bb-05d3-431b-ac18-b534ab0d73ef",
+   "mid": "7d8a3119-ebd2-43a6-871d-f44eafc9c8a6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c41e1272-1a7d-42d9-907f-ce18c695459e",
+   "mid": "7da19dff-d36f-4976-b9db-0a122bee11ad",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "699001ed-53e4-46a7-a8c9-78d2d9f50a49",
+   "mid": "7f337b83-5bce-4d48-9112-84a634e60ffb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "77897922-a07b-4186-8637-0e95facce009",
+   "mid": "80c55239-a99a-43cb-ad97-7d07154cb312",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dde48c93-49a6-4d51-8313-04b751936b85",
+   "mid": "89106a5a-bdfe-420b-bc20-04bb574f874f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b1604096-c193-49e5-b9d3-3cd867def130",
+   "mid": "8c6f486c-1623-471f-9ed5-83cb89d4d118",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e13f16ac-e5be-4afc-bda2-7c049898f11f",
+   "mid": "8eafd326-506f-4aa5-93ae-4ed892b7efb0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e30df910-0842-4943-a61a-1432985d2122",
+   "mid": "9085d309-e5d4-44c0-8b0a-a13bc4637f33",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4dc23efb-7f52-4f6a-9541-7a1d4c8b0ab1",
+   "mid": "94efa3d6-503d-4f00-8a6e-4551f86ef51a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e4add262-f539-41ee-906f-423cf4346f58",
+   "mid": "99d2baa8-daea-4fce-8420-5946474ea330",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "02822d83-7943-40ec-a880-f400428f8565",
+   "mid": "b53eb586-cdeb-44c3-b952-3aaeba55036c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dbce2bd1-b29a-410c-91e5-02859fd0c9c8",
+   "mid": "c501ea27-7391-4b00-b4ff-43a49c75485a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9bd2a8da-97a1-49e7-a7d7-c05a98976b81",
+   "mid": "d01b4d54-c93d-4304-84ba-c5584a91f9f0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c288f80a-363a-4f63-a88e-1807a337b01c",
+   "mid": "d0289139-96d5-47b7-a314-119c001f2e9d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "016d4a8b-357a-446c-be87-7c7d21b6f96f",
+   "mid": "dd4631e6-8274-4a0d-b06d-5dfb26906ee7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a5075d81-6064-4973-9f90-e2d5f36d4b3a",
+   "mid": "e1051d8d-e310-4bff-b609-9e8dce48bed8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "07f79b49-698e-481a-8e58-b26245dad6a6",
+   "mid": "e3cf40af-d075-4f58-af11-f827a135a3af",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fa994974-fc2b-4f86-8ad5-b86669ce9270",
+   "mid": "f2679087-81b8-41e5-bf60-15b581f035eb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8ebd60fc-834d-4580-a1be-1717f5f911e8",
+   "mid": "f828548d-6f7d-4630-96e0-99178d41daec",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1eaa9660-2e16-45b9-b109-46900b90a7c5",
+   "mid": "fafec012-3a82-4053-94c0-69dca98022e4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "46ccf01f-ba7f-4a51-8732-e0ac5cf7ca60",
+   "mid": "0ff9abaa-421b-428e-b7a9-e2dd87cc608a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d087a753-3329-43fa-b8dd-c838a7636fe6",
+   "mid": "134e0fec-cd7b-43bc-a877-95b445c9daea",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "256a9909-1df9-40e3-a158-5f2a12aef8c1",
+   "mid": "45f6ae42-aebb-4f90-93d4-eeeb388b7b2a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5b3e57c1-b6c2-4ed3-81b0-834295e184b6",
+   "mid": "4c216467-b947-4d91-b9a7-1b437f002ac0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "47596a43-d5be-46db-9a91-c416338ec291",
+   "mid": "51fc9b3a-157d-4761-9a05-91faa67153c3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "44d49f24-7bf2-4d08-a7cb-0f410cdd4b49",
+   "mid": "5aed238d-1d87-489c-b6ec-46251ab8bb8c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a52362df-b147-4990-b507-1c70c7125ab6",
+   "mid": "7f925e2d-f9a0-4c67-a9f4-81567f04abbc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "db537b8d-8533-4f21-9bdb-8e7d0de49d09",
+   "mid": "9d15323c-5eb0-4c66-9f16-c82dcd28f7c3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8732125f-39b6-47ed-9c1e-ef933b474745",
+   "mid": "a078471a-301d-4c22-a8e9-d4f3340f8d81",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "930ed854-ac5a-4d91-83a5-28ae0b23a905",
+   "mid": "a2dbd207-9e3f-427a-9f60-fc515ab397b7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "44e5a561-b500-4924-9c28-fcf1d23ebd34",
+   "mid": "ab1533ce-7cf4-4b51-8633-5b8ac3d3c221",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4c203f23-4b7f-4123-a724-87c5a4d26378",
+   "mid": "cebd562e-328a-4120-9938-0fa1f77cc376",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "825aafa0-be71-481c-8ccf-04ac7d9f663a",
+   "mid": "d790ce96-fbfb-44a4-8b63-b47e8ea439a4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6dd5ee34-8e3d-47db-a274-ab78f210ba49",
+   "mid": "dd2e59f4-36a9-4d87-93cf-25baaf0ba41a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1fd7e456-fac9-45d5-b8a7-069690c0e9cd",
+   "mid": "e06a1891-b5dc-4c4c-adf3-e5f998b18ea4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4e979f3a-43e4-4998-81c3-44c16b5b9c8b",
+   "mid": "e36e4ae9-fb32-4f76-89a2-d669dfdf63f4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "95b60fe3-c3a5-4aea-8da0-219a27e71612",
+   "mid": "e910e38f-279d-4fda-bdd7-784c5c46688d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "60edeb7f-cd83-4069-9a3a-373948309bdd",
+   "mid": "f746ac81-afed-4f7c-a8a6-e34efd04a51c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e5068b7b-24f3-4bcf-bbc9-c7ec983fb342",
+   "mid": "fb5f6b1d-4c8b-4bd7-b0df-171398558a0d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "90a3623a-bd53-4c77-949a-19d40bdc9d3c",
+   "mid": "03c4bd66-578d-42e4-9c65-1d9c21b17051",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f9f0d664-6d73-499d-977e-ab25d2c07d48",
+   "mid": "1ede5e18-32a2-4694-b8fb-90a95cfe2382",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c3b3e7a9-6a75-4577-983f-157284a86d73",
+   "mid": "2a2bd0ba-e624-41ae-95d8-b2d91a705d9d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "489bfcd4-3aa6-477c-8b59-1299f4a7a689",
+   "mid": "34e72901-6001-4695-aa4e-64b5992dae9c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a8df2e56-ff35-4b13-8cd1-79d37af2f588",
+   "mid": "49d6052a-4617-4623-b0f0-9ec063a6561f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6f7f5950-219f-46de-88e9-a14bfb2eb652",
+   "mid": "67a99ccb-833e-4460-95d8-d23921b7ba1c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9bbd63ca-bd37-4a30-8747-c127ce0e98cc",
+   "mid": "83c67786-b179-4247-86c8-6a2e6f95e0dd",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e8f12794-af78-45b3-8c78-d2e783a88bbd",
+   "mid": "8405ee80-3411-4013-8926-a4f7f65825e6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d42cb028-9850-4003-a456-b6f9d52363de",
+   "mid": "23760a6c-7af7-492b-816b-137b4c05c509",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "11352e32-fb39-4342-834f-d5bb06cc63e4",
+   "mid": "fb7e1f0a-6f3b-4500-997d-96b81bcf1e87",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "93c8eb1d-9b4a-4222-816a-31198b226b18",
+   "mid": "4956bd20-a8b4-4988-a0a8-c92792b6002c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4b978f5d-1b8e-42fa-97ab-c80fbb9c05c3",
+   "mid": "66d31372-9876-4278-bead-1d4060c86cf8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "57dab703-a646-44d5-9660-fdfe3df74aac",
+   "mid": "74fe4a68-20c7-4ba0-9410-808bbe0b3dae",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3922144e-fbc7-4a8e-9f42-51d4a60b614e",
+   "mid": "3135c0ab-fa55-4aa8-8877-b354cd035306",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "91043a27-9a1e-4f08-a2ad-f2485bd4a02e",
+   "mid": "3df456bf-6007-4fd0-8d6e-88024559b053",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "14bd4cda-8af8-40cf-9735-03522f643ee3",
+   "mid": "5673fd56-901a-4726-8b1c-dbd25e68f13c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6b1ebcab-7406-4a5f-83d0-d20fad97dced",
+   "mid": "5cc2ab97-f81c-461c-b8f6-c6528fdd7ffe",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "50840432-5b7f-46c6-b35a-02c66f2170f6",
+   "mid": "9b3e0300-7211-4b2b-8c9f-8204d7a14df8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cac1d22b-054a-4177-a93a-22e19899d190",
+   "mid": "bfa4b34a-7f2a-4121-b1ed-1e62f9a5210a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4e132f2f-9a6c-4212-b25b-31227abd3bb1",
+   "mid": "d8893693-2452-4eb4-8570-b879b0fd41fa",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5c1b6cfc-fb3a-4199-b712-2684f6fec7fa",
+   "mid": "f167b1d5-b70f-41fd-92be-15584da03f4e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "596bdafe-1cf1-438f-a476-434d7a8023b0",
+   "mid": "f43b8abf-e076-488a-ab3f-5e5ad3313716",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2e3556e6-14b8-4b38-887c-be7cc2dc5116",
+   "mid": "f7de77da-a0d0-4153-8662-c8a1808b4c43",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7edaecbc-b14f-4827-a617-1f5b3a673393",
+   "mid": "1ed788b3-1e3c-4c38-8261-fc3acef18560",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "62c00347-e323-4e5f-baa7-d305d0291663",
+   "mid": "69cdabc0-8cb5-440d-9e41-1152cd077106",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "01f27b0f-93a7-44f6-b7f4-77bfc1f0a799",
+   "mid": "b7762b95-5328-4d2d-a0a1-f9069a649487",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "85bbd0bf-0e63-49b2-a47d-a12b47ffd16f",
+   "mid": "9ce4cdab-769d-4342-ad7f-e81e6fe5e697",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a62ccba5-884d-4f63-8fa1-262b4eae8497",
+   "mid": "36178480-6779-4bee-b16e-97e075407126",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "043e8e47-bffa-45d4-82e2-c13cbac99395",
+   "mid": "3c56a3ec-2aed-47bd-aeff-0edec00ce744",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0568b0b1-c362-4b65-911c-1938a63aaae9",
+   "mid": "42223b21-b5dd-465d-a19a-7e449bc3c71c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2a425346-1dcd-4675-a3dc-125d7eb821ff",
+   "mid": "652a45b1-3e81-4ae1-8670-a78c083afe7f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e9d75baf-0321-4896-9b97-af507648da30",
+   "mid": "9ee50dae-16d2-4dff-a1c2-1fc2140e90a5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fe110a18-a12b-4264-b9d5-f28249b112ee",
+   "mid": "a5824d6d-2657-4b82-910b-b2596a99c5a1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ba85744b-1c68-4133-bf88-2fc3f5c56488",
+   "mid": "b8fd3924-6ec5-463d-840e-30127334d3c6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "39fd01c6-27b4-435c-850b-26fad888672f",
+   "mid": "3aade5aa-7435-4c27-a0f8-e6369ecc9c76",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "10dc179f-1af2-4ba8-9180-a165fec877cc",
+   "mid": "64aa609a-1f31-4a6c-8bef-8d2a61b723cd",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a7fb8ae4-8fab-4967-964b-fa290aed5a07",
+   "mid": "7edb22ba-242c-4b09-9991-2e8ee3dcb560",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8ed252ae-906b-498a-8764-7357f157135d",
+   "mid": "844c8ffa-4741-4d97-a03f-4b94d72420ca",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7a96b919-9701-4813-8265-4cbe1912e3f5",
+   "mid": "9280f593-0356-4856-bcc4-10cf0365980b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cdc77ef9-be54-46c9-a486-e2138502bcb4",
+   "mid": "d672276d-b318-45c7-b72c-6362f8bfeda0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "748369ff-ddf0-4b3f-b1a0-1a0d42c40d76",
+   "mid": "fc5a49bb-eb6f-4075-92ba-4b255724d46c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8a5234b3-b8b7-4a09-b4f6-762caf0e6e8f",
+   "mid": "13123f60-e11b-4993-b1c5-8bd4a45c9386",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e7218eaf-5eae-4404-9a09-95f4fe36feb0",
+   "mid": "63e16e74-8853-4dda-b5e0-0024d39cd586",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "33db182c-a8ca-41c4-baf3-ac94b5ee03a1",
+   "mid": "91c0240d-5b15-44d7-9d4e-dab060beb9e5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "08d64a5b-14a6-4281-9f1b-b2a3f5aa75d8",
+   "mid": "9bcb6ba8-3a5b-4b1d-93db-448a719b336f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9de7e485-114c-4941-bf61-c36d6b261948",
+   "mid": "a4612196-2127-4d9d-9b1a-178c2d4738e7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "90bb4bdc-e338-4305-9f70-99aa0cf282dc",
+   "mid": "00c585d6-eea5-4a73-b03e-78e6c48b80ae",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cac138aa-996e-4621-9492-319c7153fd76",
+   "mid": "2f25b1ae-b5ff-41a9-8a5f-b4d0fa2d98b6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6909e834-7636-4804-8e96-718bd6341298",
+   "mid": "5c3bd320-75b1-4c4a-96eb-33de339493c0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "619d6585-8093-427d-99e0-e065225aaf00",
+   "mid": "b21acddd-e205-49fc-9727-33e2b846207b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "37036788-0cc3-4243-8476-024c7a1b9c52",
+   "mid": "263f9b12-f5a3-4b59-b0e2-24a28df3286e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "217e9918-f4a7-437e-8963-3b74a14d7151",
+   "mid": "c1d50af7-3d93-4f8d-ad80-a1992b7b13d8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "72be8c17-2922-411e-b938-5120c0b88065",
+   "mid": "a35586d6-19a2-4546-b5c2-a34eb479936c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1d054768-9e1e-40a5-8815-7fd0dc1d28dd",
+   "mid": "b4a865ae-ffea-480f-abfc-29406107bf40",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "34eda8e4-b4f2-4ef2-b13a-21512120999f",
+   "mid": "0255448a-b333-4ea4-95fb-f013812c991d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "236c0a81-b179-4d97-94bd-6cb228365b27",
+   "mid": "1916087d-15ee-4336-aefb-b05c05d059e4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3faa2d05-6c0b-4088-871d-29270bcb703f",
+   "mid": "24dd2453-b0aa-4478-aa33-f7b708ec0075",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "598f7b2e-8564-46a5-add4-c3d12214b422",
+   "mid": "9807bf59-7bb3-4ac1-9de5-835fc52c109c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0c64acf0-e5e3-43f7-80ce-9da56336e3ee",
+   "mid": "c5f84bb8-39a8-4585-9eb3-3737ac8f99cc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6cc67e8e-c6d7-4a1f-a32e-051d4dc78662",
+   "mid": "04f53143-ecc4-4db0-b960-a1409ab84623",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f2331aa3-74f1-4582-89b0-879feedda0cb",
+   "mid": "f9f9396d-9caa-4b5e-b6ae-1eaf661830f0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3ac8c0df-e5b6-41b0-847b-49058bc78eb3",
+   "mid": "170e4fa5-680d-49d5-aa27-629214665386",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c180e75a-e848-42b9-8d76-c1ab724880d5",
+   "mid": "53b0f4bc-ca1e-4cc8-b1a4-3394be03256d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "27ad24ff-0ead-4294-b487-46549792bc49",
+   "mid": "e38a66e3-89e6-4ef8-8457-808f84cba163",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4216423f-b32d-4758-885a-1ca862f1e281",
+   "mid": "f0123c2a-fb6d-4877-9b30-d0729df8b8dc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8e2892d7-d6f3-4669-9668-292a19a50f01",
+   "mid": "15d4a94f-0399-4535-8449-42fd1a9d552e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a16ec10b-8407-459d-97a0-e5614fb1115a",
+   "mid": "5a0826a7-6a44-449f-a258-850d189ee735",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cd429502-b675-4a76-9e3d-de3ea948ae28",
+   "mid": "85799d6e-8c19-426d-b8f7-95126f793474",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "85527c88-77c0-4881-ae5c-99a0a65d0478",
+   "mid": "a8128d1b-b20e-42c9-ba6a-05c5a3b0c378",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f9396968-163b-47ab-8fa1-53a69e3133c5",
+   "mid": "fd08212e-3257-4c65-9081-46125cc9981a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5e1fe1f6-241b-4c52-b085-ea25699e1352",
+   "mid": "3760a9b3-5b9c-46e5-929c-147be407ac81",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "3c40fbaa-62bd-4a0b-949a-0acfa90d79f5",
+   "mid": "8a103510-8d7a-41e8-87de-97c145b6bb0d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "29938e89-16fd-4b42-8fb0-826888effdac",
+   "mid": "17b93e6f-fea2-4694-88ec-da9ee8475439",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "65e52379-bfb9-40fc-ad5a-44296b712a41",
+   "mid": "1bfdc2f0-1ea6-4767-a39d-fc3d5763870f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "713cf549-d321-421b-817b-f3896dcd9a9b",
+   "mid": "27c76c4c-66e0-4039-b8e5-5ca609468724",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "822d43ce-30a9-4d06-b762-4b5c51caf987",
+   "mid": "3e252344-c726-444d-91f6-eece9deab297",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8980461c-180a-45b5-8b94-bcb9f06ba280",
+   "mid": "50e5f7e8-4464-4b28-90f1-f4547828a95a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "423383d1-c6df-4379-a24c-14c295d4514e",
+   "mid": "6684d97d-5def-49ec-b5cc-8d1c65b724c2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6536f743-73ca-4eef-8391-0b30552f232c",
+   "mid": "96cce83b-6014-432a-aa6e-d0548cf0317a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "67b77152-3a0e-4dc7-82aa-b6e471e716dc",
+   "mid": "1e3f2093-3a95-4ac5-9dec-e4556a3ac869",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cdaf1f00-f194-47f0-b0c7-1deb0b69b8c5",
+   "mid": "8a613d07-c0ed-4887-aa9f-c936f03ff7b9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f7327304-11f0-4348-a93f-3ba91a5d87fe",
+   "mid": "b3fc95ce-e6d1-4116-bd1e-f2ad55a6ef2b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "128c7643-5791-4d47-895f-870ea62a8960",
+   "mid": "ddbe3d7d-9359-4f29-9a1d-5fe1b18ec01d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c98b3261-346b-4978-97d8-b5a7731fe16e",
+   "mid": "f374e8d1-9a4f-4cd7-b2de-c825194efcd2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "79484cf2-306b-4555-821f-0018cd6b0d43",
+   "mid": "f7a9f725-8d0a-4e0b-891e-357b6090a415",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2a0f6784-b41a-4caf-be3f-a5a5d289ac44",
+   "mid": "7343a73d-05a8-4915-bfc2-f1e5aa5657e1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cfac5f11-f393-4338-9008-249c60265bd4",
+   "mid": "02935d3f-9a87-451f-a7d6-d57a8ee33b29",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cbd7bda1-6522-457d-a43e-331781074c96",
+   "mid": "0833a076-e3f3-4d1e-b835-761137ac2ac6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0ca9f06e-40f7-4151-abd3-eacfd8bd7ff2",
+   "mid": "9aa440d5-1d21-490c-bc82-7e1d1229e3a0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c2f03f02-296d-4a8b-9607-9b9742f3b44f",
+   "mid": "ace4e759-327e-4219-8c24-f0a4219a8c4c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3dc41c5e-e204-4812-8b9b-7d78f2832b8c",
+   "mid": "748ad0d4-3ee4-4696-bb96-2a95d92c9872",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "49d9c7a8-ab16-410f-862c-01fe08916d7c",
+   "mid": "f4378604-327b-46f0-b567-d75d9c4b9dc4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "afa8a8c8-4ecf-4a5d-a888-971190dfd777",
+   "mid": "fc78de36-c11c-4e8a-af61-de11976c25ea",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "56ad7031-c328-4029-845a-34290d40970a",
+   "mid": "29d5a57f-b777-44cd-9c6c-07ad167f4a5f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a69dac16-5124-4ebb-a077-850ebc5dbceb",
+   "mid": "41e96393-f45d-4cec-9b08-df47ebc701ae",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "95bcf734-3e44-4532-ae32-0eeb5b63c666",
+   "mid": "098843fc-452e-46c5-831e-4b5fd47c159f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "2ec19e40-aab4-4c46-9887-48082c0eed5c",
+   "mid": "484e8e81-cae4-46ce-88b7-29526d5ef6e0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "97431503-6c27-48f0-9a51-6ba4b2519a2b",
+   "mid": "669520e7-89ea-46f0-b220-d7f61d2f8674",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "7d04441e-ce2e-47d9-acae-19c8226cbb64",
+   "mid": "8ddb29f3-0f71-488e-aceb-a41e8c2dacc0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "c1845e6e-c64b-4b97-a8f6-b30c45f445c3",
+   "mid": "b74684f5-547b-46b7-9531-5501999f2fc0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e914907d-d012-4722-a9bd-74220198a1a9",
+   "mid": "c0e82bd2-7b5b-4ad4-b7ad-39cb963e6286",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "c03da544-e182-4f1c-8ca7-661f33d3b976",
+   "mid": "5ffaddfe-acd5-4494-9379-ee395851e6a6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dc7abf4e-bbe3-4828-a959-39ce39465803",
+   "mid": "610ac214-26a9-4dc9-8927-cd5abfb2e3fa",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2f543467-d289-4a77-a03f-8a664eef7963",
+   "mid": "89708d3f-2771-4abe-a1a9-c5be5ff32441",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1310896d-35a2-48a8-a64c-f345a8472566",
+   "mid": "915a8846-a540-4b1c-b93f-63b40234a443",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ac6e1b84-8fad-434b-9fca-feb8e8901492",
+   "mid": "3db4a60b-51ba-4cb9-8770-34882b344353",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e9739f35-7cfc-471c-b48f-e06e95a8a395",
+   "mid": "720f14ad-df33-43a5-a283-8d3265a48a8a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c28d8ccb-08f2-491a-af0c-2cdf0568b2b5",
+   "mid": "ad6e8f30-cbfd-4095-baa6-952b1d6b3ad5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a6f391bc-69c7-4cc1-a95c-abedcc4687d3",
+   "mid": "c4ca715d-44bc-4f30-93cd-7e21858a1449",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "521ce6fe-563d-4a0f-b38e-09a3f8b680b5",
+   "mid": "62075261-63ac-4e61-8057-9845c4987bf3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "65f984af-67dc-47a7-b083-cf1e02419160",
+   "mid": "6fa0f21c-9d29-4e59-a486-e9fe0aa49375",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "395ad9ad-6867-4c7f-8a12-43ff1585c233",
+   "mid": "80534de2-d3fa-4d1b-862e-0cb5b5959757",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "b32ab738-6bc5-4ee2-abc0-eb13ba1638d8",
+   "mid": "93807d9c-f42a-4b04-a88e-294cc660a376",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "c8c91b05-2e02-49ce-b6d7-92ed3ac4a728",
+   "mid": "9fe6b6f8-2103-4936-b3c4-b1aea119c15a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "089bfbac-57df-4d9c-bdc9-46328f4f24e4",
+   "mid": "a36aa3d5-881c-4019-8c8d-d30b5e510e09",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "c57dc4e6-74b5-4f97-87d6-2e866efb0dca",
+   "mid": "147bc028-ad70-4571-80e1-e61bdbbb26f2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "de95bd1d-d7e5-4e9d-815e-6446556cc3aa",
+   "mid": "8c4c4b42-3ef0-44d0-947c-90e1e534256d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "db4cde73-d677-4ffc-8d6d-3f40da5609c0",
+   "mid": "929440a3-0fcc-4431-a067-a92d0c69466c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e276a8dd-29f7-4595-8637-121f10d911f7",
+   "mid": "eab9890c-a0aa-4cd1-85f0-4c51cf5081c5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "bb103e9b-ef84-4e3a-9689-a0d6ba5281d9",
+   "mid": "b6cc5004-62b1-48a8-9967-a069a74db65d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c71ca206-7611-40e1-b650-6959d80304e2",
+   "mid": "6f856ffb-3da8-4258-a62d-9d67e4ed7eeb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "22bdae31-fda3-4b4f-88a8-416a2c5af8a9",
+   "mid": "995622ca-2a2a-44ec-b376-e10a719c5b23",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "ef789aa3-e9b5-4d33-8df4-a1c8716182ad",
+   "mid": "cbc1a1ff-7aa4-4927-98db-1bc9e06e45a6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "cabc185d-6cab-4adc-be6a-667133069680",
+   "mid": "f0b3e4e1-5246-4d30-b619-251f2c579df2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "898918cc-6460-4efb-9ff1-09f3bd2a3eac",
+   "mid": "08a96621-047c-47e9-9527-2b0fccfb70cc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "966473fa-eaa5-451c-8641-7a7b857fabe8",
+   "mid": "9fbe3894-66e1-4d80-b2f0-ecce77cd8c98",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "736ad27f-6db7-439e-91c3-eea083025172",
+   "mid": "b6be14e9-ae7d-4b44-b0cb-81209e4d3779",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "84ef571d-b3f2-4d18-af58-6edc988f3f13",
+   "mid": "e2ee5850-a418-4432-8f58-e25e09f92a0f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "52d4a9f7-06a1-450c-ba5b-3974266245ab",
+   "mid": "2508af59-a945-43c7-85b0-a513f62b0f08",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "2214e89a-fcf2-4fd7-8719-192ce188b7bf",
+   "mid": "40c403a1-f6da-4e98-bb49-33cbc020c90c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "83a39a76-6136-481b-ab3e-c5988d766ab8",
+   "mid": "615b5898-6651-43e1-b2ae-26e6071b6e5f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "1a6b2a16-4f24-47b9-b4bb-b47548749a6f",
+   "mid": "947ed451-df49-49e2-a1aa-e732fa69dad3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "2ea99e92-9991-4295-bfac-fa684737025d",
+   "mid": "f83db6e2-a279-4f59-a2b6-b8d25ef30790",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7b222377-425b-43bf-9f58-5f410f0d0c6e",
+   "mid": "fe623bd5-2c87-4b10-8388-50aec381938e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "90bc3ab6-ad56-4c34-8d03-0ee5c078b491",
+   "mid": "047f13ee-45ca-4604-aeea-fd3fa98ec283",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b3f76aa8-c5fd-410a-a633-0bb396e32afb",
+   "mid": "1722d2e7-5844-49eb-bdb2-249d31842784",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0dd2ee10-1294-40c4-82d4-84f16f719845",
+   "mid": "3b9297da-aedf-4e74-b643-1dd944afa638",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a0d6a11b-d221-4c6a-b2ee-7bf4ed95ab95",
+   "mid": "4619c70d-7b9f-4a9b-a515-0a2bdadd91d3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "889f825b-03dd-440a-a6b8-55198eb6bcab",
+   "mid": "53f033df-16e1-4cfd-8ffd-ffeea7839dce",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0b3b08c6-2a31-4b17-bce6-282002e48413",
+   "mid": "5eef82dc-bf07-40f7-956a-2da7690e58ad",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dc518726-1328-49f2-a797-795a53f1abc6",
+   "mid": "8b5a4179-fed7-4ab8-b1f5-3ce201beae17",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0ad09fa5-812a-4cef-bc45-88f88fabb367",
+   "mid": "aea56967-a028-47c4-ae9d-bfcdd8c391d7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d4164b10-a2a4-4437-ac7b-004763a867a1",
+   "mid": "c1a41f58-d20e-4d3d-b39f-a634386c2381",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "549eb57a-cdc7-4a5e-829b-ae6d24a1078c",
+   "mid": "c63b64cb-0c23-440f-9ed9-208adc09021d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "be0464e3-f323-4089-ae8a-1623fa922669",
+   "mid": "da0ff81f-757e-4380-93d0-983dcac57469",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "452fdd3e-6ba8-4f48-bd03-d6c62990ee90",
+   "mid": "dd93ac7d-a1e5-4b6b-bbdf-6f64e3b58ef7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "42cc9482-f21f-42d7-9685-d57d81ef932e",
+   "mid": "e40b8d1d-7c03-4ddb-80bc-e033bf4a6025",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b47eac9f-97e9-407f-815e-32027b50d4a3",
+   "mid": "0ce5794e-6dd8-4c68-91c9-9e7e9df87b9e",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "96f68b2a-975c-4954-937f-7ab4178bb36f",
+   "mid": "0fc21a63-1cc1-42d1-a4a7-b57a8b5c6d0e",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cab7aec9-abb8-4abe-8287-33d7446e89ca",
+   "mid": "370436f6-d28a-4726-a06d-1cc3ca879a0f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a5dbca02-80fb-4c8d-88dd-c7b3c2f79dd0",
+   "mid": "38648cee-6d60-4a02-aaee-201ceb11b6aa",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b57b8968-e4d0-4249-867f-7eb30b7149ed",
+   "mid": "8a6d6b8d-0472-486b-a3c5-5c0c9a165610",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d5cdf53b-a660-4d77-9923-47f7a86520c8",
+   "mid": "8de00719-8c1f-4d16-8e15-e39f0245a01e",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b6b04a39-27e9-4ff0-96bd-1c5e26d89420",
+   "mid": "97913005-15b5-4713-8cd1-3b515841706d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "97961638-3290-4678-b765-167766b50f7b",
+   "mid": "da363a2f-9553-426a-a0de-a01778ced878",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "98f6fe64-b83c-4549-9107-2102d55f71f4",
+   "mid": "141d49ef-e964-474b-a3f0-437abb6666a9",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "929171f5-d4f1-49b8-afbb-4a776facef0f",
+   "mid": "16e235cf-c71b-48df-b9bb-2dc5db609531",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c3388dca-1bf7-4213-9a80-f3499ecf0cce",
+   "mid": "430e2520-f5c2-4b22-ae71-89f740640335",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5e1668d8-ec22-4a5b-92b1-11e8848f817a",
+   "mid": "529bde04-be42-4c26-9f28-97b5f350bcea",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0bb45e5e-5e09-451d-a5f7-7ff3478eb3e5",
+   "mid": "7bb3ec85-766b-4f41-b71f-b5c22f4d4030",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6c001c57-2a50-42e1-8b54-47f6a18cd51b",
+   "mid": "836e43d6-ad34-4fca-9bf6-1cbe548a454f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2fd03f8d-0b52-46dd-9534-ddbc21ebe560",
+   "mid": "afeed81b-ed98-437f-99e9-faab957779cb",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b84dbea5-e782-4c99-9a79-44c895cd0c13",
+   "mid": "fde88b7b-0046-4786-8091-1327bf24ca8d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5393fe30-328e-4ebf-9bb7-03d61235cf8c",
+   "mid": "0a72e4e3-02e7-4daf-a171-99c27e80ad6e",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0ee3cd7e-ec3f-4cc7-83f5-cb5a0c030f94",
+   "mid": "1a05316d-f454-4eee-a2d7-05a5d74f6ea0",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7db7857f-b499-4cda-becf-4909c4852dae",
+   "mid": "4fe5582a-3886-404e-9504-327c2b6c6410",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0a695c73-9e21-42e7-a794-c82faabb909b",
+   "mid": "651781e4-1dc1-4a7b-91ea-66fd60b6bc34",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a7b70365-2644-4367-8841-4b058eb369bb",
+   "mid": "84943a11-b7a8-4ee8-ab26-533509ee0a2f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "abe6fa8c-4ef6-4714-81f0-c094a6886472",
+   "mid": "ad85e862-2898-4f89-ad22-f5089ccc16dc",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "355f8ee9-b176-43ba-92dd-ca137fe9e6cc",
+   "mid": "d12258fc-e957-49e1-8673-c919c73f6ffc",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b6afbb63-2fa6-40ed-b236-40bd6590327e",
+   "mid": "dfd26566-0664-487d-b18d-de8cc8826e8a",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a90051fc-30f8-4558-ba1a-cfbe2a47e74c",
+   "mid": "07a5b57e-f90e-4813-891e-38db95e0a395",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "29da960c-1032-42a1-a87e-31659fa6757a",
+   "mid": "6940e2b0-3cbe-4f8f-9dd9-224f9964ebbe",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4e2e6596-382b-4ed7-8c9f-961787158688",
+   "mid": "83e4c06d-4f71-4143-a65e-6d791390bed5",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1ecef019-42ac-492b-ba69-cf2e010345f8",
+   "mid": "90dc719d-02b6-45c2-aaa5-581450c9cd1b",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "723b2a6f-db70-475c-9a54-e629b51af4c8",
+   "mid": "9ac19287-fa8e-465e-9d8d-d1a05191a3cb",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "95e49824-ae13-4b85-8532-add2d0b1e8ab",
+   "mid": "bfe2a363-64fe-4e97-843b-c299678aa359",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6e1b2195-5539-4eca-b7c5-fda91a12a710",
+   "mid": "f02f5f58-5a4c-4970-bdc2-21e9a78b4f9c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "aecb9cc8-3dba-4ae8-b479-ba038c020f8f",
+   "mid": "ff1449c6-1a0e-47e6-ad2f-3d5fda377a2a",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3cf5ef00-19e3-4ec9-acc2-4355ed658b76",
+   "mid": "11191a31-3bfd-4f89-b3a8-160f2f03e159",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "39a5745b-a065-46ed-a9c2-4c74851e7631",
+   "mid": "1fc66e8e-d0a4-4285-ab76-3ddf0276a050",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "66c4c756-9de4-49fd-8d93-1da77e80a808",
+   "mid": "233791f9-93fa-4bdb-85fc-19b4bff3327c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "51b65c8a-d770-4b49-9f44-3dc0c4dfb935",
+   "mid": "382f31d1-a15a-4dc8-b12d-b78366122413",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "62e06f2b-064b-4084-8a95-6082ce2ccae3",
+   "mid": "5f7053d7-6d5a-4e28-8bd7-4ac63185d861",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "15bbe356-3b84-4303-b5af-07ff96ff575d",
+   "mid": "b7f3cc96-2058-495d-a13a-5f5c8a2b5db6",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ee4217ec-3e28-4a53-9899-d32480684ef2",
+   "mid": "e97e2bc8-7d94-49d6-8c46-ef1f4903728b",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "48d4d801-3ae8-48f9-af99-a72306a4ac57",
+   "mid": "f0216445-7272-4f06-8c97-35344ccb1650",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "89166e42-2a87-477d-851f-1404450dd168",
+   "mid": "fba481c5-05dd-433e-96ac-45f738d912ad",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f27d9954-a579-48e1-a3a9-60c35628a051",
+   "mid": "3acecba0-a924-4b87-82a7-def7acfee466",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "efa35215-7b2c-43f1-8934-bc4492e7e3b3",
+   "mid": "3b5f0e52-3afe-4227-894d-d8145eb19bcd",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "676b5041-3158-4abd-ac82-c7d6ee90b375",
+   "mid": "57bb20df-7f69-401b-82fd-93efac8999fb",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9840b38f-e4f8-4931-b7a3-b81820faa3de",
+   "mid": "8fcbb556-89ac-46b4-97ad-d809dee2fcfa",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d50d8cc5-f179-461a-9f07-2657f616df52",
+   "mid": "a02e417a-8dfc-4b7c-b061-f37831a1bb9f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "196ed648-a66a-41f9-8827-dbdde61cc62f",
+   "mid": "a8994295-ab1c-4fee-8230-d0f397a31c2b",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "08d02e5d-38d3-4d37-a50f-e7ba184004f5",
+   "mid": "e00744bc-d9da-4a14-9920-a287003ca7ab",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "STRUCTURE_MARKER_NOT_UNIQUE"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c3ce892f-4589-4a33-8d7b-1be50039e9ef",
+   "mid": "1903233e-681b-4d14-a9b5-1beff9a2a20a",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b87ab1b4-7774-49d2-8823-6e089b1776b9",
+   "mid": "36cba770-44ae-4939-afdc-1f48e4805e46",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9b719369-6e1c-4908-bdbb-f126bbdb5266",
+   "mid": "6b019d64-d539-4e5c-a894-a8aa3509bdbc",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b70b2b71-9e2a-416b-91d4-52ff9ebdacbc",
+   "mid": "a8921d14-8a98-458f-9eeb-adce0169d40f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0f51bba4-ef8e-43c7-8aa1-9662884f1440",
+   "mid": "abf10c6d-cbc2-4b38-acd6-267ceb4edf8c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7806dd70-407c-448e-960a-0a4208a85c7c",
+   "mid": "c6ae714e-f6fe-4e57-bb9b-aab252099627",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6d4c98f2-f6fb-4335-96a8-d45055845c8d",
+   "mid": "d33e1dc1-e9af-4849-b7b3-15dda23653bb",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5f0d93ea-7ba2-4b88-89a1-8ac3d5296cf4",
+   "mid": "35a47829-cf86-4d04-b499-e6688d80598c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fa5ee36b-4bd0-4c1e-907e-9646a94779c8",
+   "mid": "3cb5e6b8-979d-4166-8616-99c33c7505ac",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5e056e29-a2fa-4250-b0f4-00d09fd7de58",
+   "mid": "8ae5870f-df1f-4a21-9f4b-9dcf487f2bfc",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4e964e47-46c3-4468-a2f5-185413064bfc",
+   "mid": "91eb89cd-8596-492a-a1b3-b69efdc82afe",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8905484a-04a3-4d3a-b7f7-11766981cc01",
+   "mid": "cd19522e-9d31-42bc-a5ca-2b974b74c886",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "29352585-d0b6-4b80-add3-2d9edcd62533",
+   "mid": "dca8d88a-192c-4913-a114-4ce41852ad62",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7844e31a-8d61-4501-b3b5-cc064b572316",
+   "mid": "fb197be0-497d-4925-b225-c00201b151b0",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a197a1f7-0076-4408-b700-3a8e44ea397b",
+   "mid": "10c40aab-05f0-4b73-97af-e61dcdd29f2c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ced805f9-a147-4944-8b9e-459bd286ba90",
+   "mid": "1b014b2e-97f8-4dc2-adfc-a661f78eee29",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0fa799c6-befc-4c9a-9db4-d20cf00a2592",
+   "mid": "1f14e180-1f51-4ba3-ac9f-74f919c7a270",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "99b89aab-07fb-48d2-adae-c821e1c008a2",
+   "mid": "4ba61dfd-534f-448e-9b8b-3cc19961c214",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "be520558-2c02-440b-83f2-462febad1ea7",
+   "mid": "8a19faae-35c5-4f66-8099-24db38d12a29",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8e9cd475-6703-4deb-81ae-da87af80d081",
+   "mid": "93f23c11-c863-4f37-87b6-fa415d81e919",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "47cec74a-b217-4b0b-b052-1adbca85a143",
+   "mid": "e3f15242-a829-4fbe-927b-8685366a05ab",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "98a7abd3-b0a7-4790-a60f-e403f57f5dad",
+   "mid": "05453c10-f497-48f2-95f1-7cdad1b5441f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "67256e19-5a09-4d01-871b-d59f083342e7",
+   "mid": "31940dfb-3b7d-4293-93a6-e8f26c7ea224",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "31b708e5-f6cd-4f0a-8a65-3c8580fbe23b",
+   "mid": "397a08a2-7b4c-4412-b4f2-994fb920c985",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "35c774c3-fa6f-4265-b554-9f47dd7c00df",
+   "mid": "75bbf7b1-1a45-403c-80ae-feb1ad70f447",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b69932f7-8a5d-4ae7-bd7e-985e5a5f9e77",
+   "mid": "7cb29cb8-4f31-4267-b09e-2399efd20880",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5e63dcbd-bd1c-4c2e-8e77-c6078680c515",
+   "mid": "86f7ebde-d28a-43d7-9297-fd485e6032b5",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dbd28944-991d-4ab7-ba7b-f222a76737be",
+   "mid": "f08def9a-f86c-4d6c-8cd9-cff2f356878c",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c187c679-7266-48b3-823e-f9a94cdce1c8",
+   "mid": "122a04d2-c9f1-4d08-b558-68feab6294b3",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "48b90420-c656-41cd-b85e-f52e7b14f76e",
+   "mid": "1881a321-6c7a-4a68-bee6-16b1fc83eae7",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9c00faed-566b-4d04-970e-430a863ea8ff",
+   "mid": "1a3783ba-4536-468f-8d33-9821871003ef",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bb3f7a45-ee75-4faf-9287-7e149bb9afd4",
+   "mid": "3464e746-b823-4fa8-aee6-7999181e98fb",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ff3def21-5b80-4621-84c6-15c20d590aea",
+   "mid": "4617ecf0-9ec3-4930-83f7-9bc208ce400d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "70916460-5177-4d43-b26e-bcccbba7eae9",
+   "mid": "ca3ce1b1-f2cb-4155-8a58-283050a93f13",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "64bfd72a-8535-4a25-8145-7e6a3a1b17c0",
+   "mid": "f9eb94c1-826f-4d70-8444-7c78bf67741a",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "eed4e502-1a29-4b00-9d36-d177c9ce52ff",
+   "mid": "1f84ca9a-6f73-4601-93a0-b57a4d0a5a50",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "92cb6596-3328-4608-8301-9478dac8ec89",
+   "mid": "ba01d119-ec0f-43ad-b695-acde2dd49c2b",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ddb782d6-2605-497f-81db-d340c91a9cd2",
+   "mid": "c6a180cc-ae4f-4d92-97b7-ebd5dd746a4f",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1af79dc8-4081-4717-ac61-3f35150110a4",
+   "mid": "e528067f-7035-4f02-92cb-5c7cb67b2af3",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f62bac20-790f-4f8c-9ee7-0819fc9c7e79",
+   "mid": "e5c05243-ba83-44bc-8cda-e42e67b003d3",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9ec58b0c-c333-4b77-a668-3b86df4215ee",
+   "mid": "edc63a68-a1b3-4d97-994a-8c9b51a72425",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7e0e8284-914c-4328-9ad3-10d430084689",
+   "mid": "5ea82d1e-16a4-4dce-aa13-5b697271da6d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fd13abd9-7b6f-4fc5-8e2e-67b976807aa4",
+   "mid": "8b93679e-f610-4478-8a81-3c28f87b9c2d",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "91b7d5b9-4cef-4db3-bd28-fe08e71211ba",
+   "mid": "dcc571c8-94f9-47e4-a25a-9ef70a725a73",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "62ead622-e4b8-43f1-a7f6-9015ab6b88b5",
+   "mid": "eb9d6576-30a1-4bda-ad5c-70021aaf9c19",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b929525d-c592-44c3-ba29-5b4f25549142",
+   "mid": "f23acb48-69fa-4b6b-8ba8-618fab8c4471",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e1a8c467-abca-4e18-95da-c766d7862223",
+   "mid": "f9142e73-f11c-4acc-ba0e-12465b54e966",
+   "sourceType": "mfds_drug_otc_nutrition_combo",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION",
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "99d94f4d-b287-42f6-9ca4-dd24fae9dd56",
+   "mid": "23b37987-3e90-42a0-8932-fea65c3d2654",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "8b4ccd63-f8a9-4889-b1c4-147f145dcd05",
+   "mid": "346717b2-7e4c-4366-a9cb-8180260b260a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e2322814-a2bc-45b9-a14c-d186e62e98e6",
+   "mid": "b8d4ec14-7b27-410c-a3c8-dfe9c5e211ce",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "86c0daed-f302-4172-b331-11e178561c13",
+   "mid": "ecf40e66-780e-4f19-a73b-2ec0ef71a5b0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "26286486-7b7d-4c20-925e-bf3b9a902a76",
+   "mid": "27bd98d5-5314-4b8f-8726-dd2269000470",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bf1b1cf2-78c6-4361-9150-a3578763d494",
+   "mid": "47e88aa3-b537-4a91-a7fa-47aabcc60fc6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dd6fc24d-6f64-4d54-a677-9ef3bca7c5ea",
+   "mid": "530bbb7c-4c83-43dc-a866-bb09d2fef464",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f365b894-1925-46ff-b657-c5cfd0f704ab",
+   "mid": "c12c1108-f54b-4c00-8344-a3955d5ab0b7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f489e72f-5573-42ef-9d38-a1954500fbcc",
+   "mid": "33f07d67-36aa-49b0-9835-b5d0fdca0f4b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7711876c-7e5a-4903-960f-2801f78cedd3",
+   "mid": "0420f964-edbf-4ce7-a815-cc197292bb13",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "0732dded-514c-495f-9028-a5a482d10854",
+   "mid": "21f8ae4c-92ba-4f0e-86e8-830bddc137b8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "5900e053-005d-456d-a0b2-a1982da3094c",
+   "mid": "a98f0971-4772-4965-a149-9bf72cf3830f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "14b732f5-c0a5-4c90-8ea6-ff8433f3ffc0",
+   "mid": "5309c607-760e-4eb7-8bc8-2c06b809e131",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "3dfbf1cb-ae6b-4c4b-9947-561cca128e7a",
+   "mid": "56d11e93-0aef-44f2-a72f-00c66945eb9b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "29a4761d-7349-4815-9ad7-b95b9b5330ad",
+   "mid": "b5d62c42-bd64-4069-a440-3f3ba7c5d96d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "18a80c71-2fb6-4d9e-b9b0-fd906ada9dc2",
+   "mid": "df96ca78-5724-4505-96ca-ce324efb5288",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d46713d6-d6a5-471d-a78e-6f09f643fd31",
+   "mid": "0119f5ef-4bed-4787-affc-8dec3d89bc72",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "a973898c-e084-4f6e-a160-179c9dfe1f38",
+   "mid": "382e1ea1-bb86-4b5e-be06-42260dafd06b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "7e9bc692-0a48-4ac1-beeb-817a04a36f86",
+   "mid": "653e616a-320e-41b2-902a-5c2e82c69a4f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "acf8138f-a8fb-40c2-8083-80ed0ca63535",
+   "mid": "87f30dca-7598-4d34-bb88-cd470256fd78",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "47d64c79-3ad3-48ea-bbc1-c8289ac29b5e",
+   "mid": "5ec61733-d9b9-4508-9c08-5357fb7e3ced",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "679ac97f-99af-4556-9856-3858139a6744",
+   "mid": "a5a1a6ab-4577-4334-bef4-f51c979f7386",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6f7389b8-2344-4447-827d-788282d7ba0f",
+   "mid": "fdf4c50a-c9f7-42b0-8893-1432a76bda7d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "906e3185-4d69-4040-8ecb-44910711fd3f",
+   "mid": "0304ac7e-16ee-4c98-8fc4-d86fe94ed370",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "35f4b15f-9512-4728-a477-c1de8766b317",
+   "mid": "0fda6bda-f895-44c3-9507-6c1a5912b4a0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "7363481a-4e46-44c3-be97-25effda2a13d",
+   "mid": "1bf13b65-3ef7-4361-84e0-a3ea968ece86",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "25f9dbc6-40f5-453a-b17c-c54fbd7076d5",
+   "mid": "7db70b08-3384-41f9-95e2-ea9b3e6e217c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "25175255-f07d-4da4-88e3-1cf0d32c5cb5",
+   "mid": "a4bab2f6-828e-4ee8-9939-aea1096a01ea",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "14f7de03-acb0-4858-8c7c-42339e02a2a4",
+   "mid": "1cf404cb-697e-460b-9471-92c1efd43d3c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e225a3ac-9ecc-4b90-b02c-b09f3ce481c3",
+   "mid": "7019489e-5fb8-4429-84c9-1b91bf2254c3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e5760525-f8e8-4f3e-bd04-5be61ae18d28",
+   "mid": "74c7cb4a-aa36-46fc-9972-fdba12287efe",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "ab539895-f99b-4cdf-bdd5-767e529c50fd",
+   "mid": "deb86a7c-c60b-4265-a765-c1e3e98f879a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e65f85a7-94fd-48d6-8b70-ecf063c5cb03",
+   "mid": "fd78c4bc-9815-4d71-a8e4-49d65576c43a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d6d34af4-7070-49f5-bdfa-517cabd54629",
+   "mid": "c78b76d2-5782-4c16-923b-5f85b16483d2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "25744dba-c445-40c2-91d6-cd490ed1fd4a",
+   "mid": "4138bcb8-f763-4cc1-a509-74223d4b1417",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "667505af-ebd2-4c4d-a617-fa376ed30a25",
+   "mid": "c1d9131e-11c2-4526-a42e-435ec11e2238",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7bae2134-3a12-4b5e-8491-044f5a272714",
+   "mid": "f137edf9-561a-44c0-9036-edadfb9837df",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9b6f1e44-6fc9-49e3-a64b-efe8a357aa4b",
+   "mid": "45f56ab0-e424-4de7-b8a5-54c46009d3a8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "af941c7d-6655-4fa4-8130-4a200c175e59",
+   "mid": "891c7e05-d2a9-4eab-8459-b2fd67ec9f5d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d9302464-ec8b-4a9b-b1cd-dae6e3001d69",
+   "mid": "b48f02e7-3cbf-4f5a-a723-a9d49f87dac1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "805ae753-b20a-4294-9fe2-989d3a7f6310",
+   "mid": "0a851a8e-3e7a-4bbf-9c29-22463183f620",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8a5ba03d-4481-489e-ac20-156ae20fad82",
+   "mid": "5ce81031-8832-4abb-9b51-da9cfdeae153",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "30beb2c8-785b-4d2c-a3fd-b23a423ca455",
+   "mid": "88954ba6-390b-4a47-b090-8d75c5cc82a1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ff40e77a-2b63-4e14-aefd-120652f4a6aa",
+   "mid": "10cd53c7-427f-495a-b113-03a26e792e41",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "5520d8e8-7cc3-48a5-a3a9-a96e89e8e64d",
+   "mid": "3ee792ce-45b2-4043-9b10-0ba7aa5236f2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "35b1f780-a242-4a28-a6fd-c5e6c2563015",
+   "mid": "3fd2cb12-c7de-479a-bf16-16b0cee70604",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "d00f0b5c-989b-49b2-94a8-f57908bfa530",
+   "mid": "4a816615-e28f-417c-9bad-921585177260",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "d44683f3-93d0-4b3e-ad60-164b26fb441f",
+   "mid": "4ec3b4d8-671a-4c3a-90ea-f4f1c137276b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "ffc0798f-303c-45c6-84a4-4cb2838acd44",
+   "mid": "54ea2cd4-f19a-4ff7-b61a-1abf4196a9c5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "46ee2be4-adf6-430a-8551-7588c4fc637a",
+   "mid": "7e14e999-a25e-480f-a3e7-eab8f8ea8645",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "35f0113d-6e9b-4d59-902a-1783b02348d3",
+   "mid": "5907b07c-2bd8-42e0-99a2-af1411a7cc79",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "ca39dda6-4652-49b2-bd5e-abbe29692b2d",
+   "mid": "72e357eb-dce8-4ec3-9692-55eb04110e51",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "91b49de5-fb59-43c0-8ee9-8e4fa107fece",
+   "mid": "8420ea2c-e5fc-43c9-aae5-6d4f07c8f1ec",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "750ab39c-f5d4-4043-aade-7a7aa572464d",
+   "mid": "d6d5dbe8-08b5-4000-90e9-767e3c1c613a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "0eb17e9f-ff57-4521-9fc3-61f1a23d0cd9",
+   "mid": "e6a9dac7-a6a6-4b5f-9725-10a39f72bb52",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "b1505151-6110-4922-9850-95c2a60a1339",
+   "mid": "f0c45653-2908-464c-9a9a-e6f0489847c4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "a9ebfa61-4df8-481f-ab71-a632b4056a44",
+   "mid": "8b5780c7-b9e9-4d0c-963c-cb282ef762fc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "6aa1ec33-d7ce-4b87-8712-4d46af353da8",
+   "mid": "096f3c4b-5272-4182-b291-330302bcac5a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7de738e5-c80e-4012-b6df-6fedf43eab50",
+   "mid": "c4b57886-47df-4c0f-8a57-19cf28d4668d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "940136d4-690f-4d03-82b9-bcf9df220461",
+   "mid": "20d03ee7-7a64-4a5d-8940-47e714e1a9c5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5863a750-6a5c-4e37-b324-15d923352222",
+   "mid": "1109440b-1813-489a-aa98-a104f8fee45c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0b609eec-8b94-410e-a5ab-1ba9a6e6ae05",
+   "mid": "d09c77cb-d5d2-4746-a274-b56acb2eb3a9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "99d678fb-fadc-417d-b74c-13f05efd030d",
+   "mid": "1373d36b-0b33-4eaf-ae36-6ae32658561d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f09d5639-d412-420f-ba14-785cdae5dfb2",
+   "mid": "453ae200-3d0e-46a7-976e-3c23bcd64aed",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ac141069-713a-4a4c-8f02-df716f128e80",
+   "mid": "1a02fba5-2986-4b65-8f64-c6f0e959634c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "515ba194-cde0-4080-941a-a3d8fff8808d",
+   "mid": "26025f55-8d9b-46c6-9b9b-8efe090553b5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "3bee5919-3ac3-43b1-a513-a2613cbd635f",
+   "mid": "5312415e-b304-4afa-a7c3-cf6756e28c64",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "ebf0ba02-e8fe-44c7-9735-a472da590ef8",
+   "mid": "65461a50-d837-4014-b51b-28046f45640d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "472adb15-1d2f-4859-9b39-741257248972",
+   "mid": "943373ba-28fd-4be9-b258-163ea0ca5fe3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "e31cc550-5030-4f35-bc69-24be8bb694c4",
+   "mid": "f7b53b9d-d323-4201-81d1-de19445d70a5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "fea1cb6c-428b-45be-8f10-dc41842c5c0d",
+   "mid": "6f0d18fc-e556-459b-ad5f-420e1e4ebbcd",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "846b0284-afe9-4bd6-bbc0-54acbf22e36e",
+   "mid": "88b1a623-9e1a-4c43-be4f-b42d8d3298fc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "c4e14410-0a99-44e1-a24f-8b704653a9a2",
+   "mid": "f68daf9e-1ee2-45d2-a606-71447381a46d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "5af87445-dca5-4a50-92f7-8d6d4071995a",
+   "mid": "68b37ef4-ab48-4e28-83fb-0e22e7e4b5b4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "d4f60d65-5dc0-4f79-9377-9a28ed1bbddc",
+   "mid": "d95512d0-0677-41fc-8492-a4531f684733",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "74c25a93-c297-44d3-96c7-103198d9ee72",
+   "mid": "404084bb-5ff1-432a-b72f-d853c0a72ed5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "59b1d8e9-5086-42ce-83e6-8c238e6b5fc5",
+   "mid": "6e68dd7d-822d-4640-8af8-778315b5678d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "1742ff03-78ff-49a6-b465-d16149db5ac5",
+   "mid": "a0b0c46b-f4d0-42a0-aaa7-6f120b5d92b0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "acc42f3b-fe12-492b-85c7-4f39a08eace4",
+   "mid": "9fe2428f-84fd-4ee6-aef7-17d9d7281fc4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cadb53cf-56b9-448b-bc8b-b0fff658d987",
+   "mid": "1835074a-2200-4235-a182-c35bf46b35e1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b08d7716-101d-403b-bbf3-701c277311d5",
+   "mid": "fbabe3eb-3b1b-4409-864d-04059a8ecb81",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "23dcdd88-2b39-4430-83b6-aa843e153701",
+   "mid": "7c745fa6-f2ee-473c-bd41-9dd32c54497d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "89677bba-3686-468d-bd1c-7a80bc78a060",
+   "mid": "c8d9677f-56c2-45fc-9227-9d95c54fea04",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e9d94cb4-dc8e-47ba-9725-e7f346d1f93f",
+   "mid": "701ebca2-527a-4c4b-9dda-5bd266c1a43a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bafc51b6-3e54-4bd4-b54c-31e8ddeabc1c",
+   "mid": "bafd5ed3-31b2-4fc7-8f9a-e150d98030e5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e8defd5b-f4db-451d-a67a-6cb30aec139d",
+   "mid": "1885fd71-8d93-4bd4-a8c7-b480eb2118ac",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "207fc9ad-cef6-497f-a7e1-452758249b39",
+   "mid": "78918542-f110-4411-8318-3d89683bb7f2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0777b38f-fa5c-46eb-9ef9-fb4297dc4c52",
+   "mid": "13885469-8200-41eb-82fd-363d061790fc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c83e4efb-19bb-4f01-ad2b-b767af36face",
+   "mid": "8abae628-b23a-43a9-828a-65c96838c7ee",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d33fdb74-8aa0-4036-b5e7-9a7c3ddc247d",
+   "mid": "5e264129-22d6-4b85-8ada-2b3a80186290",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b62659d1-3c20-465f-a946-b67b46c38c8f",
+   "mid": "63b7f575-14b6-47b7-9206-15aaeebf7790",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f79cd4f2-963f-43e4-a279-b703d2077628",
+   "mid": "2364fd52-fdf0-4407-a6c3-0c15045a6ac8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3c83b6be-d43e-4da2-81d5-aa70d2b649c5",
+   "mid": "8c298844-7c96-4db6-b293-92e274b430c6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1eb40eff-659f-4e75-8cda-71b617a81367",
+   "mid": "53544e10-ed42-4beb-acda-8d34048725c0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dbe2a8c8-4e10-43b5-9830-b833881e023c",
+   "mid": "cd90ee49-187e-4ee2-9dea-bebd300fe220",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "57e791c6-b5f9-415a-886b-44f51c8bf58b",
+   "mid": "366d1311-27a9-4eb6-9378-ed43d474d111",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c0868416-8184-400c-94b4-525238510a23",
+   "mid": "91dfbb55-2771-4134-8323-f3d537d1ea9e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "44aaca0d-06db-4e80-9810-99bdf64c37ba",
+   "mid": "5c190d75-4797-4b06-8d3f-77e535a83a49",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "236ab1c4-6210-49de-9303-6a5e39409d9b",
+   "mid": "ef661c2c-f042-4a65-8af3-4496d650305f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c9100351-4c65-4fcd-827c-ffd6124c17ee",
+   "mid": "3663ce96-b196-4650-8a3e-1463dfe99f5a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "079184b9-ca48-41b3-8596-3da8994f76ba",
+   "mid": "42df4502-01b5-4795-a9aa-8380183792b8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9c9d65bb-6aaa-4201-b1f2-6c1e2bdd5500",
+   "mid": "d248bbb6-0244-4894-a924-23637eeac31f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e1b3dd69-d657-44f0-9336-51755a6d9af7",
+   "mid": "850dcf16-9042-45cb-8caa-ae427a5732e7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0e535e8e-0584-4fba-8529-9e40e29d61ec",
+   "mid": "9c865100-1b2f-45c7-8138-4b5238178d21",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "STRUCTURE_EXTRACTION_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c49ab5ee-6ab9-4475-872d-a6dfb0f266df",
+   "mid": "7b999112-5540-4a65-b204-ff15b902c460",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "51407cd8-c445-4557-8fd8-1da917f66d5e",
+   "mid": "17433904-994b-4072-82ec-88e3bbee7291",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d4b3d7a6-cc1d-4c19-9998-ee84bfe28364",
+   "mid": "3729918d-eee5-4843-9a2f-f430bf5d8145",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c1532fe6-de3a-4e61-97f8-1c448f7a8737",
+   "mid": "39b13fc7-c4fb-4d8f-820c-b7a5f3de6313",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "70de1fa3-99a2-472c-aebf-7b11d9d82e2e",
+   "mid": "451f49d9-81e3-4762-b510-976618e40572",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ad40b375-877e-4d8b-9bf0-89d115f3fbc8",
+   "mid": "51e7573f-7fbe-4435-ab04-b350453bfaa5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2e75095d-4fe2-460e-93b1-b8684de82e99",
+   "mid": "5f097632-e817-4050-98cf-cefc25098fb7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b804da07-4210-4479-800f-a8558341081b",
+   "mid": "61fc7977-f6b5-4c46-8f59-1ff13a47d90a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "de550ea1-25a8-476f-aaa5-5e926ba99bf4",
+   "mid": "692467a2-4628-4d5d-9aaa-58367c9fcc4a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "94f0b5df-eee5-4e84-9243-bc9a41a36bdc",
+   "mid": "88bcf16f-c02e-401b-8578-21f90dd67264",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9a78e0b4-e321-4f16-959f-8056a2361e0a",
+   "mid": "89a6e452-a9be-40a2-b1ee-ad5e598360a6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a637005f-d1d7-4d31-9240-fd008dd058bf",
+   "mid": "8a2a1a0c-37ad-4843-b686-9f6c8a6ed392",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d78eddeb-07a1-4161-a665-04c38fe6116a",
+   "mid": "904e6374-21e5-4447-a4fd-86f8fe647e58",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "38b96442-cfe0-4e7a-8f53-b000021f5b19",
+   "mid": "a13304c0-0a6b-4d7d-8ff9-79b4e3162eb2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ecd65967-1900-4db2-8c99-7cec3344d631",
+   "mid": "ba9637ee-84e8-456e-ac30-bcb0cc433e58",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "68590a80-4660-4c1d-b142-3d75ce835a24",
+   "mid": "dc29673f-898c-4bf8-b015-2a84cb03c784",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f8c4d882-9715-494f-b680-4003439103bf",
+   "mid": "e0164e7a-a61f-4c1e-9d7c-068b62dbc640",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c281282d-075f-4993-bc73-9eeb3e989457",
+   "mid": "fc8ed4d6-974d-479b-b0f6-7391d198ea35",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a4e69c2c-658c-4c86-a4b7-f027710650b4",
+   "mid": "01c8d453-3a4c-4b63-a28d-330c146f0646",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2277586b-3bca-4884-a73d-992f264b8347",
+   "mid": "3ecb07d7-210f-4fb4-a6bb-25ea72e4674d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8adbc1ae-b1b8-495c-a971-dd0cd1d3b6de",
+   "mid": "6108e223-671a-49c3-896a-67fa7e9ad0b7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "21331340-ac60-4228-8ede-f17e2e122f4f",
+   "mid": "81bf7882-0f4f-40e1-b3f0-0d258038d84d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "699cb9ba-319e-43fb-b707-c2afd758d943",
+   "mid": "91aed9d9-692d-48d1-9a90-c8d1b94c0326",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "84c9348b-8372-4dae-b26f-61dd09f7bba8",
+   "mid": "ada6c29f-2bb2-447a-9984-b1ed8195e761",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4e2c9541-e25b-4356-82d8-ef2c23fdfc6e",
+   "mid": "b4ef528e-3582-438d-b8ae-e92aeb09bd92",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "020b8bc5-e09d-4b20-a85e-9c7dcaa47eca",
+   "mid": "bb8edef7-24cc-40d2-bce4-45f9e1498bda",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3e6f6b4a-c046-4e34-9e8d-d2657425f3bc",
+   "mid": "ca29762c-845a-4b5d-b55b-065962bfc073",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9905485f-86c0-4ed2-bde7-996a9d152f32",
+   "mid": "d1e7bffe-7209-4d55-8a71-7d7453c3df80",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "342da084-8319-418f-960e-a30a1095f50e",
+   "mid": "da6c856d-2277-4e8c-9caa-bc428ea5cdac",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "47b6af19-8e4b-499a-bcfb-58d3f5621d3f",
+   "mid": "e1031273-d654-4026-b609-bc86c04c4994",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5e89eabf-39d8-42cc-b408-073c5282b1a2",
+   "mid": "088c7fc8-e635-4877-8655-3b4507bb6de6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "68a721e6-8949-4156-96cc-1ec6a27754ba",
+   "mid": "3e0dc6ae-e96d-4aa3-8c96-2ee8eedaa9a8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5dcd1e3e-c746-46a1-b70d-ae335755ac75",
+   "mid": "d057d835-660e-4ff7-a1bc-942f88bfe9ed",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bc03d414-3ace-4e50-b399-d6b0d2d96219",
+   "mid": "d6651e85-19eb-4b6c-87f6-716c2c18e0d3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3610dd98-52a0-45c4-ac7a-fa0d832d774c",
+   "mid": "e555dafd-7174-4a34-a4b2-8d9a3e92da05",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f5a8ec95-4a3a-41ef-ad42-260e2fd2a1f0",
+   "mid": "fabfb76b-9baa-42c2-96cd-9f0f9f4ba4ec",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "51976d42-3fd6-411b-a3f5-f5366ad5cca3",
+   "mid": "58b20537-9034-467d-8534-bff42f3d79a1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c0c8fd51-1701-443d-8a1f-5e838c99552d",
+   "mid": "93559512-9287-4ee8-890b-ecd700b2fef5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6fd6221d-7185-4725-b50d-2cb634be260f",
+   "mid": "f83cd5f8-37c5-44a7-b2bc-1db4a63b7331",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "aa4fc370-ac8b-40b0-85dc-c5fe95dfb60c",
+   "mid": "0e2fd1dd-e293-4782-9c7c-ca31b7164d45",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8ec46828-ab89-4ff5-8851-29ef195bf662",
+   "mid": "653cf7f5-52a2-49c8-b11e-06be6a53a583",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "22d7414d-0618-4252-9159-c8da0b877ba0",
+   "mid": "816a8675-6e87-4e27-b327-1f15775bec88",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5a0409bb-f4c6-4c21-b583-78ae75a42c9d",
+   "mid": "97f32b0f-3951-424e-8166-8546d461e066",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "212e95ac-154d-4bfe-94cf-3b68fe0c0497",
+   "mid": "9d7bbc7c-2413-4f70-be91-081b7f022e2c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0b0f84bf-52f9-4012-907f-05a9753b1731",
+   "mid": "9ecd21f6-f6ab-4e62-9733-416abc858f38",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "080baa35-86e0-4cec-997f-1f08caf05e35",
+   "mid": "d3b4edeb-4fd9-410f-9075-ea1c9292647b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3a9ece5c-49dc-4f10-86d8-85b4a6b75bed",
+   "mid": "ea4454ef-27cd-46bd-8922-6ebb2e0869b7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "bac77562-4857-40d4-b61a-ffe61c351f0b",
+   "mid": "f3d1cd40-95ff-4a39-91ff-5aa48b7cf486",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c79e675b-91ae-4fe6-afb0-f6fa9fc6e170",
+   "mid": "24740ee6-80d8-408f-bd42-894473fc5a3e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2ed1f2cc-1f8e-4df9-8bac-9d19a13ad85a",
+   "mid": "3abb039c-1079-4399-b51f-ed4051fa93b9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "06745f1e-8f4a-4a08-9294-a18fcd6f9d4b",
+   "mid": "3dee621f-8c60-4046-9823-984324603852",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9a13dc91-4313-4205-94ee-4abcab5cc221",
+   "mid": "6aad978d-9c5b-4b55-b8cd-6d980b82a88a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fafc7c92-1e0a-429f-9a00-7398d00f8007",
+   "mid": "6da4ab5e-591c-440d-8851-36c0e39e0f85",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8bd80196-b426-4585-a981-9f0ad7efaa85",
+   "mid": "8f163622-c96c-4a8f-b8c6-adf4b90c47f2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "818f0df4-ebeb-4885-81bb-38ecf1d92aeb",
+   "mid": "a9411e75-983c-4305-946c-d043bacdc1dd",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e6f39b05-305d-41db-b0d6-3f2b76ba22b6",
+   "mid": "c8ec4a77-4b19-4333-81cf-eb399769a01e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c908fbc7-3114-4d43-8509-efdd1ab64d0f",
+   "mid": "fcfe70f2-e387-467e-9458-9ae52641bfdc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d1b8d5e3-cdd6-4320-8d43-47fe152135f1",
+   "mid": "09e5c88f-8b63-4a4a-ab65-512b7e2daf7f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "578fba51-023f-43af-9495-88964305978b",
+   "mid": "2bcd2de9-1a59-4630-ab0d-00f2be5d5a7f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d6111dbd-74cb-45ab-8059-aad78b7d0abe",
+   "mid": "3b15aed6-be59-4e33-8635-fdb75e8da24c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f12ecb56-ce93-449f-821b-dc0d0b8f4ba8",
+   "mid": "7c7e47a0-fbae-4770-95eb-029d2fb9c024",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f69c3185-bfdf-49e4-9d50-6929c72678a6",
+   "mid": "d2dddef5-1970-46cc-8ab9-e8bfd28a1dea",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b280a2fb-4ac8-4df5-95bd-7de14154f8ab",
+   "mid": "de120565-b6be-4a22-879c-831a59b2184a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "27bf0a97-4e6c-40f0-a7b1-ca32ba408943",
+   "mid": "eadcecdd-7ca2-4104-a94d-582495fd6f30",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ace8ab46-c35c-48ab-bb58-f3298594bf2d",
+   "mid": "0891269c-1fc6-4d59-af8c-8730081f8df7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "12edd078-860d-41d2-94cd-5fda74e30c73",
+   "mid": "22595c07-ece1-422d-8eeb-101954c0b89b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "77ef5a25-91b8-4bd9-b126-f09f819e1916",
+   "mid": "47f4aa82-33f4-4da7-bf52-8c3a24fcdace",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "54699eca-ec12-47dc-9197-81ed606e3acb",
+   "mid": "58f93653-4131-48af-bd67-9f8e879d690a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "aacd8918-633c-464d-a66c-7e0262862b83",
+   "mid": "8af02677-0e54-42bb-8c58-006527e17dde",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "289746d4-9086-463c-9c63-45beac074111",
+   "mid": "eb3311e7-5152-4eac-b0d7-fa41d36527c7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e7c0aa84-2571-4596-9b37-48c737302f4f",
+   "mid": "f11858c3-7618-4272-b7e1-23bacf87d173",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b050de9c-67fa-4090-8a27-6bec67759933",
+   "mid": "1e38b69f-1f20-40dd-910e-c75142b7e566",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2c268483-3573-4c88-9313-ecc7a1d0a46c",
+   "mid": "368259e9-b998-4e1b-aa00-c2265c18975d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "59a83356-81ec-45e9-98a7-b76deb280550",
+   "mid": "4dfecaa3-6fb2-4a7c-bee1-6ff67b068003",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0f42692f-27f2-43d4-82ad-07fc14960eba",
+   "mid": "7339cceb-6eb6-425b-8768-8adeb1939ff2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ab8ab6ff-2543-41be-9a0f-8145aeb4ec5a",
+   "mid": "c4a29562-6fdb-4f85-b63f-f88a4549ed10",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "01ec11a9-bb40-44bd-8d51-065f45230e14",
+   "mid": "e7e1c83e-d43a-4b81-811a-0023d7fb91f1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ee6edcdc-4ead-4d81-aa51-88fc8a74ae18",
+   "mid": "e87a1734-a7dc-4c57-9379-014e76482b5d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "545bbd71-2e05-4057-9f1d-4074e9ed5646",
+   "mid": "1f775ad4-a38b-4eee-abf4-b3e19aac18ff",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "63ca1611-f2b8-4d1c-9cc5-5ff5d7a39bce",
+   "mid": "31354187-46c9-446d-9a80-c1897bcc1c87",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b3e85d60-8400-4c35-9dc0-9a1bf960ce8c",
+   "mid": "64a4e61b-de73-401a-bc6e-019cb106f609",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9131416f-db33-4f97-9807-78acde77ab01",
+   "mid": "8b9ace31-b2ae-4c4d-8321-f3feadfb853f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1314efde-4b33-4f9f-8183-63013948a76c",
+   "mid": "bebfe5e5-63ad-4e89-8f47-196a9124a7aa",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9aaecd61-3cfb-4f92-9f29-873e9dd55ba2",
+   "mid": "f65db598-c415-4f07-b296-cfe7ee35c901",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0befbf3a-d7cf-4856-864f-fd954e24dbde",
+   "mid": "528689c4-7f0b-463e-b8ee-29aeff92f4ac",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "70d36a30-b311-4e6f-9d1a-930972f0b7ae",
+   "mid": "55b6c7ca-babb-4897-ba36-426deca8a791",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0f70674a-38da-437c-92c6-90d6bbed9485",
+   "mid": "56ef11b1-8d65-41b8-8d2d-64c13dbc4470",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c8dba00c-77e7-4620-adca-81a4da325522",
+   "mid": "dd48744e-ff56-447a-8c38-9ccb74ce337c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9c349d0e-58b2-489f-9603-82155b13c14c",
+   "mid": "f0945a5e-0af8-4a80-acae-a6d66eee1c55",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e14b86c3-c78d-4a89-a557-615cea257b7b",
+   "mid": "f59c1e94-a35b-40a1-ba35-62627d028c3d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9a5f7da0-822a-474b-8556-3adce50c4d8b",
+   "mid": "36547fa7-39d0-45a2-b8c0-f1e63e0e8327",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8f79650d-3126-41ff-a77d-bda0c7d4309c",
+   "mid": "3f814f5f-f199-4a52-ac37-933cd8959a06",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "246586e5-b908-41b9-993e-50025b822410",
+   "mid": "9c3903f7-76d0-4d7e-be99-aba78236e6b4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "392dfe85-2b42-4268-a7dc-d7abe7c452fa",
+   "mid": "b21efd7e-6a40-4e7d-a3c5-84c60ed4a336",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fe6b49c6-a14b-4fec-9a87-0b518f9c0abe",
+   "mid": "d359a360-346a-44cd-87f9-e8626dde121b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "74f8068c-9526-45c5-8664-205bb0df3f29",
+   "mid": "ec26007e-f05d-4a91-9937-6acfff6365e0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a24525e1-76b8-4c97-9a27-e30bb20b3c5d",
+   "mid": "049fbd15-0a44-467a-a15f-3963437c7b7a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f2e69975-32f8-4ed3-a617-f42c393492ba",
+   "mid": "71b5b934-311d-4da6-93fc-388f8a93fe2b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6f6cb879-c655-4d87-975c-5ae221acf0ca",
+   "mid": "8e4150df-a4f2-4e08-aeed-a817db882859",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0c22385a-bfdf-476a-9a0a-11ab26a9a7be",
+   "mid": "8ed45e1d-00ad-4c2a-9f4a-92e5f203e429",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0b0bd721-5728-4c91-ae97-2a43106b1085",
+   "mid": "f8d3584f-209e-4d5f-81df-8aee67e57623",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "750aea76-ab20-4817-8c14-29e4b819f9de",
+   "mid": "306b53c0-df02-4f3d-a70e-4c17261bb7ee",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1e4c6b2f-f71f-4026-937c-a6d9e836ebaf",
+   "mid": "b09cb954-4d87-4fa2-b07f-fcc9f59fdf12",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "27bcaf7c-178c-476b-8751-9c7670d500ff",
+   "mid": "3ea0b5e4-564b-4e26-ae89-729750285433",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "513f3ce1-ab1e-4f3a-bffe-16450645f130",
+   "mid": "5816712e-c964-4a93-b83a-dc1b0628611e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5ce8fe16-f20c-4ad1-b246-04740d60daff",
+   "mid": "6c5e2642-91a2-484e-aef7-f3d759be9082",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2ee57272-2cc2-4711-a4e3-2caab3f64024",
+   "mid": "9dd539f4-825d-4518-96bb-5c945dec5f21",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8abd69df-725f-480a-ace8-0a06d7928594",
+   "mid": "a4163e6e-139c-4900-9530-1d22bb869285",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f6027227-676c-4f32-99bb-f4f5f5e3dd79",
+   "mid": "06228d6b-43b0-48bc-ac68-dd9114ffd211",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7cb8e915-fb81-4334-be57-7cb21c45ec39",
+   "mid": "5df63997-6442-4e4f-828a-6e8be3dfbea2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3cedac51-03a1-4b83-b5d8-f8eedf808aa9",
+   "mid": "ac7ae302-bdac-4d1d-a605-b27f143fa60f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "632aeab0-9934-412a-adf0-68cb458b1b5c",
+   "mid": "cd171947-b4b0-41e9-8663-aceb09592b86",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "adbaf8d6-fc96-4360-b5b0-1b5e55380900",
+   "mid": "d82c3db4-1146-4f97-ac3c-a528db335364",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "444281ad-bda4-42a3-ad29-4bccc95fd396",
+   "mid": "1c619343-09aa-4279-8f5c-66cc26da4ed6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "63712fa0-f094-479c-ae1e-2dcca2b4b7e5",
+   "mid": "47235cb1-aa58-49fd-99c5-f6b48bf81627",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b69a5187-3d3d-4002-8c8c-7bda7544f27b",
+   "mid": "86cf7b76-9ff9-4315-be88-beb3493f1464",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c116bc76-0172-4ad9-8e43-546cced99163",
+   "mid": "df278444-a8a3-4273-9ab4-eaae79782d6b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0c2785c8-7e12-47ee-8b5d-970809f18dfe",
+   "mid": "2b789539-2852-489a-9a8c-f6f413bf25ce",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8854b8d2-eeb9-4752-a318-f1fe18cf08bd",
+   "mid": "4c9d28ab-1e5f-4c90-ac81-f9d42f78794c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c0c169b6-2bda-49d7-ba96-aee73045c28c",
+   "mid": "8b7aa413-e94d-478d-aaa5-10d89a6aba67",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "65d14d3d-dc39-457e-97db-d2e7bff4358b",
+   "mid": "c4e01180-d2d2-415e-a12d-e1fbbe4a8053",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2d292c62-cfe1-4608-abe3-c162bdae4575",
+   "mid": "07c6f137-9d2a-4708-9e37-f02d3629827e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5f534c3a-4d10-499e-9d5d-88a79cdf1b86",
+   "mid": "0b111d87-24d6-4479-8b13-e611f48c60b9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1bf49f70-249a-48c6-b03b-443f61c42569",
+   "mid": "56339d3a-f5f8-44f3-9c28-cc3acf57a524",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c0582c0c-3649-49af-b28c-ed20a1022534",
+   "mid": "7f3493dc-e9b3-496b-8f42-9239afdfd010",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "99548a74-659f-4fca-b775-aed8ccee87d9",
+   "mid": "12b3eee2-010e-44d9-bf76-9ef1d53ab11f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ab111efc-98f5-4c25-b19d-eeedabd481f2",
+   "mid": "afde8b4d-ab48-45f9-9b23-457064b1d792",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a3a706f8-6985-4443-afad-61eb1debdf19",
+   "mid": "d0af3125-291f-4615-b594-94351d6f8688",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "35c57d32-d9ea-46c9-9510-38187ae51a09",
+   "mid": "f12beca5-e292-4d3d-b2c8-871045698b9d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "74d37875-3b35-4bc8-8aaf-c87a047f1938",
+   "mid": "44e02458-7430-44f9-a696-1518a156109d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "34c1c88a-74b6-4e94-883c-a575c83e9432",
+   "mid": "c29a39d6-aa17-4985-8666-cd1ae704d8de",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "11d3c4ec-514b-4dd5-b40b-81f4b9f4a072",
+   "mid": "db6d5b17-7182-499c-9202-709565b666db",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "803a2b1e-1476-408c-b151-4a33a51fd734",
+   "mid": "2ff7a1ee-bb33-41fa-a018-82fd808f3757",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "287ec80b-db21-4319-8fcc-35a3638c80a7",
+   "mid": "a4bee5d4-7c6f-4ce2-879d-501fea2d87ee",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ec1c946c-5e98-4c78-8ace-5d720e279244",
+   "mid": "a9050c35-baff-4853-8007-13713645162a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9b6a8861-f6cb-4390-bf59-265a895fbfea",
+   "mid": "ac14fabb-586c-47cd-9a56-95b965e76ba7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f3ea5545-2a89-4659-af13-e033d83e8941",
+   "mid": "05878ec8-2142-4453-98fa-20975aa2040f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "01f213c0-faef-4585-9d36-ece528701472",
+   "mid": "a8e55750-6ee2-4d05-9153-72b66919ad1f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dd64a7bd-f768-43eb-854b-d32cf719587f",
+   "mid": "b6ddd6cf-eb9b-457f-8461-4669f8d80e69",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "18afeca7-1ec8-482e-aeb2-fd1c12c631a8",
+   "mid": "cd4648c6-feba-4765-85ff-aa1185e20b1b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1f987ea4-5ab4-4066-a2c4-26831256ca9f",
+   "mid": "d320542a-1c65-495e-ae75-06df37e6c049",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8eb0ebc7-8ba6-4f3a-afd5-62c485471d7f",
+   "mid": "b420bd1f-77a0-4c44-aa3e-0630f0c8b4db",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1f02a5a0-125a-4d35-8863-c0b21b373a31",
+   "mid": "8d824a74-ae83-4e1f-9bec-fd0ceeed6937",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3d220bab-791a-451b-b93a-3f20373d23b7",
+   "mid": "da50bb3b-8da8-472e-bd80-31409dc34741",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b12cbda3-2a81-4e5d-8a75-5f181d93bda0",
+   "mid": "de0e684c-f324-4b35-a985-46dc0291d6be",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4f02c4c2-1d7a-4c86-a26d-eb3e2d4813ac",
+   "mid": "e5f09de6-b49e-4238-9cd9-db207f2e1e95",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2bd33b1d-3943-4bd2-b05f-fdec79cb2079",
+   "mid": "faee7b26-44b2-407c-ad9e-cb85c417e1ad",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8b7aa5a9-ae57-4bc1-bf2a-f57b5d8bf3a1",
+   "mid": "5a9699f1-e089-4458-b20a-75df5e98a14e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "89885216-f179-437a-9b00-b77d8c3d43e4",
+   "mid": "c007809f-4641-4543-84cc-0baa1e24bf2a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "13397696-1853-4031-a86b-d5bbd426558a",
+   "mid": "f8ab10d2-1b6d-4a86-8680-9d77037ad7c3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4b27c556-b417-4d53-a7e9-20c500c98c4a",
+   "mid": "80625849-147b-49ab-b530-1d6b6572bd0a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5cd2bc58-ac74-41ea-843f-4e514ab5edfc",
+   "mid": "ae2b700f-86af-4ae0-b031-8529c96ea9c7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2109dfa3-2173-4ded-91e2-bcad631c5c77",
+   "mid": "be080301-aadc-4b2b-9c83-f8483d03af71",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0ed2497f-0ba1-4441-b8db-cd3ac6477215",
+   "mid": "431b9f9f-78be-452b-b1a1-eaf08d9f42fc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1ae157de-3288-4cde-b728-768d1f156690",
+   "mid": "4607ce75-b986-414f-ad84-2b5f2887c4f0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "82f874c5-d755-423e-9a26-9227825aee91",
+   "mid": "bc735567-6c8d-4121-a954-01433805f301",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dbc720f8-add7-4af7-a115-8d01ac3e979b",
+   "mid": "64b239b6-e8c7-42da-a1d4-99ad6ff56053",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a036f2bc-e34b-4b3f-bdb7-503701a04fff",
+   "mid": "6d5005a4-1a5b-413b-a61e-ea85330bdd3e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "05b8c072-9d4e-4255-a406-5f16bf86413a",
+   "mid": "e05ea613-a7e6-44ca-92b0-2e0b20f0d4ae",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "831730bd-98fa-4732-892a-42bad8d43b82",
+   "mid": "9f8ca4d5-36e2-4841-a617-ff37c3a70e79",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "debd0e91-bdd0-49ea-8342-3fe7f494e727",
+   "mid": "acc1b2be-6f3a-489c-9b6e-ffea0986dce7",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2a7e912d-6b86-43b3-8411-1bd752ee92ae",
+   "mid": "cc072d57-960b-4d2e-abc5-03ae5c4d780f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c2be916d-000d-43bf-bbb7-e6e3270b82f9",
+   "mid": "04f17bd7-0c02-4c15-adaf-415823145432",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9d508050-48da-40c8-9b5e-7d76c7b6f4ae",
+   "mid": "1526ebd0-e001-4300-8d1a-7770cc1cfc47",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9cf764bc-f383-47ef-b7b0-1e1be381541e",
+   "mid": "200571ca-bf12-4206-bbfa-cec244e53dc2",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3ea0dcc4-cd64-4ff0-b4d0-4d0b6e7e6245",
+   "mid": "a311d157-d3a8-4297-b7e6-aeed6b1f66cd",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f9d7d096-b7a7-4bc3-b3c9-42fe8cb58e5b",
+   "mid": "a5a1ace1-ef2e-434a-9e08-62c22548f845",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5a9169d3-3a69-425e-9199-126f6708de21",
+   "mid": "ad908765-db5e-43f6-918b-f4cf853aa48d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "094a31f0-7c0c-40d8-a6f6-6cb006eb8f93",
+   "mid": "e5fc63d8-46f8-4a8d-acd9-e5a370093b5c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d2c4574e-8bf7-4e01-bedf-8fa6bbf89b5d",
+   "mid": "a1688db2-065e-4971-820c-b04f1bb45e21",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "83d33bf5-9899-4859-bef9-157657ef51b3",
+   "mid": "9f7be634-f8b5-474d-a70f-55b3165fe6b1",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6cb8dbf2-7d58-4173-b402-171d1f6e8463",
+   "mid": "e3ccdb7b-1d48-4ddd-b760-fa851c97196e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "9996a8c9-c654-4b3d-aea8-793bbceed167",
+   "mid": "fd6103b5-6256-4a8e-81fb-02c956a1d5ae",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0e70951e-bbf2-4b3d-ad36-f1f894b6dfee",
+   "mid": "0be90b7f-ed9c-43c1-9570-fbfd103ebcf6",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b4e5e588-ba57-47c0-9c97-731f4f663faf",
+   "mid": "c6e80ea1-685e-4fc5-a321-007da6b10828",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0a4f9c7c-fa26-4eee-9001-610109e11ff9",
+   "mid": "81b56344-2092-48d8-b40b-be35a3a439cc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f75c7762-1cfe-4f97-a966-0826e5b84fa3",
+   "mid": "ca2e0193-57bc-4583-bbe9-023d8f6a725f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "758734e2-ebd4-464c-8e1e-1ada884f282d",
+   "mid": "48162c48-7301-4efd-88b6-6f69908f28c4",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "e9c47a7e-a99d-41a6-ab67-525945935fa5",
+   "mid": "49c4bd4a-51eb-4f9b-b5dc-63b270ec5b89",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "144d5c3a-02ab-4878-810d-0ef7c06f2006",
+   "mid": "b41edf63-738a-4622-b477-7e506e5795b8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0a92fc20-3d29-47ee-9aba-fc8403f40c2f",
+   "mid": "2e02d3c4-fb1c-43d0-a2ae-5f8d8284bc75",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "08cfff6b-7af6-49af-bc48-a4faed5046aa",
+   "mid": "9a1b4e9f-0cb2-4518-8e94-71f3df72924c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c05d9e4b-280c-4b95-8cb4-fc89fd4cc3fa",
+   "mid": "60f7ceff-cac5-42a4-a0ff-d2ef9ae07197",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "8e96b0bf-688d-46f6-9ab6-9c658918c49d",
+   "mid": "b533f1ff-f4ae-42cb-bbec-e529af5de8df",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "fffce6d4-ac66-4204-9be3-3bca4abb484d",
+   "mid": "f397bc52-4c1f-42eb-9ca6-f10046fe20c3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "cb55fba6-9191-4eee-903d-60ca22f76c41",
+   "mid": "01acaf74-d852-4c1d-b2d3-765d0eb05589",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "eccd41ee-c775-4989-8f5e-7aa715c179b0",
+   "mid": "2c739b9a-d782-4bed-af0e-41b7647a10d9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0d1e5309-c0f5-4dac-8414-efa4fcb0d099",
+   "mid": "8399cc4c-36ba-4cf9-b8d3-98fe3702bf69",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0774ff90-ada0-44a5-a3b9-6ec7a3447988",
+   "mid": "f8aa4bc6-cfe4-4f64-a16a-1c2b1dca923c",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "d6bf72ad-226b-4445-878d-b2fc895b0a32",
+   "mid": "5c909012-7aa2-4b1d-9eda-d967ac7e470a",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "ad3d8205-f40c-43d8-b077-921bded68472",
+   "mid": "401a482d-eed1-4b23-bbf7-487202584fc9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4b8d0e42-eb20-485b-b5a7-6628e6345a13",
+   "mid": "4046ddee-4308-427b-80d8-17265599663d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "031c44ee-3d2a-4a79-8cf9-9c6b0e73912a",
+   "mid": "616f425c-4a76-4f93-a38d-12963f62aece",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "1fc33d62-6f0e-4a0e-b3dc-4851e3d87e56",
+   "mid": "08ecff41-6bb6-4761-903c-bffc575cbadc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b53a45de-2397-487a-b2d6-e40d8817e235",
+   "mid": "4f3a6f86-286d-4c93-9f87-7d74f008b637",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f7abfac6-cf5a-4ff7-8fd9-4c54f369fd17",
+   "mid": "a271ad1d-14ae-4731-b134-a8bf73facc7d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "672b5259-6fb6-4633-84f4-843d1d0b0b81",
+   "mid": "60b22f6d-8103-4b2e-99ce-729a7ed2d8f9",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c9736c54-dab6-4ef4-9655-0a0c55a51027",
+   "mid": "d5237e3b-ad49-4d02-a475-b5f6c975da65",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "6e2f6aec-3136-42f3-bad6-e6aeb1c70b0c",
+   "mid": "17584743-cfb6-4927-938c-eb05d844d962",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "f9350b35-cb01-4ba9-a07a-60d03b11c7bc",
+   "mid": "187a6f09-7fc5-4838-9adf-28fc919d0ea8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2f16f27b-b090-48b8-94d4-16b39796b71b",
+   "mid": "d3430a3e-c130-4076-bb95-4fb7183c9c26",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NUMERIC_CONFLICT"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "2809fa3a-c1bb-46e7-bf0e-3723589e6a90",
+   "mid": "de65f988-1520-4420-8d67-0717674445e8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NUMERIC_CONFLICT"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a027d4fc-5de8-430a-8d98-412c892db29a",
+   "mid": "a42e9bbb-023f-4a12-8fa4-2ace9156151b",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7281c084-a944-4a35-8c34-5713fbaabf67",
+   "mid": "83fed456-3b50-4aeb-b874-17db8607d0cb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "11b465e1-b24a-4c90-93b2-739bc206e89f",
+   "mid": "058692d7-1d86-401e-9b82-6b233276ddac",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c617e23a-fe15-4ef7-ae1f-671e3a517c95",
+   "mid": "deae6a29-a0f7-4a79-a133-9445f21560e5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "0456b792-d67f-400b-b5de-0c49b68fb00c",
+   "mid": "1086c4b7-79f4-4e1e-a50b-b463d84fcdbe",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "16e41d11-0c21-4f59-885b-b4256038fdd3",
+   "mid": "4d6db88a-174c-42b6-9410-ffe8caa52147",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "24630cdc-0652-49f0-907f-d7d64290ae3c",
+   "mid": "7186456e-0936-44ef-9c71-c21ca387472e",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "dc280bd2-3603-438a-a895-137a59f4a4cb",
+   "mid": "e708cb79-d2a1-4db7-ae53-d330c7b98442",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c3a90763-cc30-403a-b7a7-8893655b7228",
+   "mid": "4cd2645e-056b-4a04-b2b8-c41b222a3106",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "56436c02-732f-49db-a03a-ff1686e7c893",
+   "mid": "a6adcd05-80f5-4afa-8889-c12b8b461803",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "85e024f6-b858-4744-b126-3594f920c643",
+   "mid": "a8b12f5a-3926-4d73-bdfa-0aab76ab7e84",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "1734bf1d-0641-4c0a-af87-aaa1a9838064",
+   "mid": "f0a574b3-7ad4-4ff5-b319-d217cde37e4d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "ENUMERATION_MIDCUT"
+   ]
+  },
+  {
+   "koId": "53f5af95-a366-481b-b26f-de9ea61bd116",
+   "mid": "171812b7-cef2-489b-a6f8-74000c5ca0e3",
+   "sourceType": "mfds_easy_drug",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "92d05ff7-bb7a-438b-a2af-9707e4cea5f0",
+   "mid": "06712efc-26fd-43fa-b97e-3e5a3eafaaa1",
+   "sourceType": "mfds_easy_drug",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "cc0fbe90-ea89-4118-a3e6-b569d94e21d8",
+   "mid": "8fb8e44a-6ea2-4935-9ddc-d3e7e13df2e7",
+   "sourceType": "mfds_easy_drug",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "SENTENCE_MIDCUT"
+   ]
+  },
+  {
+   "koId": "14ff93f0-7466-49d1-84b9-fbd495f78022",
+   "mid": "0d3824e9-4631-4366-a838-d4f48f95cffc",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3857d4a8-6254-4e41-b110-539980ef56a2",
+   "mid": "241bc9a5-1517-40ae-8238-dad3abc60efb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7081def9-7ded-4d72-ba4e-e4053e69b6a6",
+   "mid": "3a117d29-0519-4840-afe8-9f9f8d990d90",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "5f658d23-8343-44ee-aa50-1e89810a722b",
+   "mid": "3f116251-c1c1-4c8d-99b0-f1e14a8bc1e3",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "3dd1ac90-c36c-4e4c-a8f3-6fd27599846d",
+   "mid": "6666eb30-021c-4272-9300-c28ea29daf8f",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "c0b71ce7-9bdc-4c5e-be3d-67676704b446",
+   "mid": "6c22384c-93fa-4bf4-876c-706c0be827f5",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b7b29e9b-9fe8-4a4e-8ca5-2ffc305892f7",
+   "mid": "7f7384d8-cc67-489d-bb22-a040175cc887",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "47dcaabc-c52d-4b45-ae68-c1982b05ff9a",
+   "mid": "81be8696-75b8-405b-91d8-16b2e12a0181",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "a71261f5-8d8f-4eaf-99df-1d735a7d443a",
+   "mid": "946c373d-7123-4b09-908f-9074a742b9ce",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "742b9450-2fc9-45c1-9b40-2a27d60a6a2f",
+   "mid": "9b252852-e114-42a2-a6f6-63bfdd77709d",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b0803bee-231c-40aa-83f9-4966cf0c1be9",
+   "mid": "9dd02374-5797-499a-b0e5-218658f091be",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "7f272bdd-f9d0-465a-a73b-dacecd23dbcc",
+   "mid": "a9adcbc2-056d-4474-9f0d-258d3a6415cb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "46f3e4bc-e909-4c0e-b711-9ecf414cbc48",
+   "mid": "aaba5ca8-d0d7-43f8-9b92-c629d1be7a44",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "4ce9771f-1aed-4f0d-8032-a59109cb7d92",
+   "mid": "ac6f7e75-d68c-489c-94c7-e3fd3ba441eb",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "b3237e31-2e3f-4302-8d5d-40676e61731d",
+   "mid": "e6675def-63f4-40ca-8cde-aad092eb9ac0",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "59fe373e-c020-43da-8575-2e22a5651565",
+   "mid": "f6657182-21a0-4428-bdcc-2c30a34202c8",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  },
+  {
+   "koId": "84d6f456-46ad-4b3f-a94a-3d5d7f2bba71",
+   "mid": "fb34e400-9137-49ba-a6fe-e5e08b5ac6ac",
+   "sourceType": "mfds_drug_otc",
+   "blockReason": [
+    "NOT_FOUND_IN_OFFICIAL"
+   ],
+   "cutTypes": [
+    "FIXED_LENGTH_TRUNCATION"
+   ]
+  }
+ ]
+}
