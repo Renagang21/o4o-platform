@@ -81,6 +81,8 @@ import { createRoleApplicationController } from '../routes/v2/role-application.c
 import organizationRoutes from '../routes/organization.routes.js';
 import linkedAccountsRoutes from '../routes/linked-accounts.js';
 import { createMembershipRoutes } from '@o4o/membership-yaksa';
+// WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2: 관리자용 Membership API 보호
+import { registerMembershipAdminGuards } from './membership-admin-guard.js';
 import marketTrialRoutes from '../routes/market-trial.routes.js';
 import aiQueryRoutes from '../routes/ai-query.routes.js';
 import aiProxyRoutes from '../routes/ai-proxy.routes.js';
@@ -361,6 +363,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // DOMAIN ROUTES PARTIALLY RESTORED
     // ========================================================================
     // 14. Membership routes (/api/v1/membership) - @o4o/membership-yaksa - RE-ENABLED
+    // WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2:
+    //   관리자 전용 subtree 는 mount 직전에 authenticate + requireRole 로 보호한다.
+    //   mount 전체에 걸지 않는 이유는 `/members/me`, `/members/me/summary` 가
+    //   같은 router 에 섞여 있기 때문이다. 상세는 membership-admin-guard.ts 주석 참조.
+    registerMembershipAdminGuards(app);
     app.use('/api/v1/membership', createMembershipRoutes(dataSource));
     logger.info('✅ Membership routes registered at /api/v1/membership');
 
