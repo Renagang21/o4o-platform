@@ -1067,9 +1067,11 @@ export function TabletKioskPage({
       {!hideProductsBody && (
       // WO-O4O-KPA-TABLET-TEMPLATE-DESIGN-REFINE-V1: 제품 템플릿은 제품(order 4)이 콘텐츠(order 6)보다 먼저.
       <div style={{ ...styles.body, order: isProductLayout ? 4 : 5 }}>
-        {previewLayoutOnly ? (
+        {previewLayoutOnly && !selectedSectionProducts ? (
           // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 실제 상품 대신 중립 골격.
           //   템플릿별 배치(grid/gridFocus)는 유지 → 5 템플릿 배치 차이는 그대로 확인 가능.
+          // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 단, **명시 선택**이 있으면 골격이 아니라
+          //   실제 선택 상품·상품 QR 을 그린다(로드 분기와 동일 조건 — 골격이 선택을 가리던 결함 수정).
           <div style={isProductFocus ? styles.gridFocus : styles.grid} aria-hidden>
             {/* WO-O4O-TABLET-PRODUCT-TEXT-BUTTON-NO-IMAGE-V1: 이미지형 골격 제거 →
                 실제 공개 화면과 동일한 텍스트 버튼형(상품명 · 규격 · 선택 표시) 골격. */}

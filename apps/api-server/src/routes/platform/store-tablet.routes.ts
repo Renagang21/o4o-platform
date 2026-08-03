@@ -954,7 +954,7 @@ export function createStoreTabletRoutes(
                   opl.is_active, opl.created_at, opl.service_key
            FROM organization_product_listings opl
            LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-           LEFT JOIN product_masters pm ON pm.id = spo.master_id
+           LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
            WHERE opl.organization_id = $1 AND opl.is_active = true
            ORDER BY opl.created_at ASC, pm.name ASC`,
           [organizationId],
@@ -996,6 +996,11 @@ export function createStoreTabletRoutes(
    *   (태블릿이 0대인 매장도 콘텐츠를 만든다). 기존 /tablets/:id/product-pool 은 tabletId 를
    *   소유 확인에만 쓰고 실제 조회는 organization 기준이므로, **동일 SQL** 을 태블릿 없이 노출한다.
    *   신규 테이블·컬럼 없음. 반환 형태도 기존과 동일( { supplierProducts, localProducts } ).
+   *
+   * WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1:
+   *   상품 이름을 offer 경유로만 찾아서 `offer_id IS NULL` 인 진열(취급 등록만 된 상품)이
+   *   전부 "(이름 없음)" 으로 보이던 결함 → listing 의 canonical `master_id` 로 fallback.
+   *   컬럼·테이블 추가 없음(기존 NOT NULL 컬럼 사용), 반환 shape 불변.
    */
   router.get('/product-pool', withStoreAuth(async (_req, res, organizationId) => {
     try {
@@ -1005,7 +1010,7 @@ export function createStoreTabletRoutes(
                   opl.is_active, opl.created_at, opl.service_key
            FROM organization_product_listings opl
            LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-           LEFT JOIN product_masters pm ON pm.id = spo.master_id
+           LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
            WHERE opl.organization_id = $1 AND opl.is_active = true
            ORDER BY opl.created_at ASC, pm.name ASC`,
           [organizationId],
