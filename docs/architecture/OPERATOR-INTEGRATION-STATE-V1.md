@@ -9,6 +9,14 @@
 >
 > 본 문서는 KPA-Society / GlycoPharm / K-Cosmetics 3 서비스의 Operator 영역 현재 상태를 **분류·정책·우선순위로 고정**한다. 이후 모든 Operator 공통화 작업(`@o4o/operator-core-ui` 패키지 설계, 모듈별 추출 WO, DataTable 통합 등)의 판정 기준이다.
 
+> **스코프 note (2026-08-03 추가):**
+>
+> 본 문서의 조사 대상은 **작성 시점(2026-05-03) 기준 3서비스**(KPA / GlycoPharm / K-Cosmetics)다. 현재 공식 대상 서비스는 **KPA Society · K-Cosmetics · Neture · PharmacyHub** 이며 GlycoPharm 은 `historical out-of-scope` 다 ([`O4O-COMMONIZATION-STANDARD` §3](O4O-COMMONIZATION-STANDARD.md)).
+>
+> - §1.1 **"Operator 는 Capability 집합이다"** 와 §1.2 **3-카테고리 분류 정책**(🟢 Core / 🟡 Core UI + Service Logic / 🔴 Extension)은 **현재도 유효**하다. Neture 가 LMS·CMS·자료실·포럼 일부를 채택하지 않은 채 정상 동작하는 것이 이 정책의 실증이다.
+> - 다만 **서비스별 현황 표·우선순위는 3서비스 기준이므로 그대로 사용하지 않는다.** Neture / PharmacyHub 를 포함한 실측 구성은 [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` §7](../investigations/IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md) 을 참조한다.
+> - §1.3 의 목표 Core Layer 구조에는 **선택형 모듈 구조를 지탱하는 계약이 아직 명시되지 않았다.** 실측으로 확인된 공백 6종 — 운영자 module registry / 선택형 feature registration / 서비스별 capability composition 계약 / 공통 operator runtime·context / 메뉴↔module 연결 계약 / 서비스 extension 등록 계약 — 은 위 IR §5.2 에 기록돼 있다. 현재 모듈 선택은 **선언이 아니라 import 유무**로 표현되며, capability 는 사이드바 노출만 제어하고 route 는 무조건 등록된다(IR §9.2).
+
 ---
 
 ## 1. 개요 — Operator 는 Capability 집합이다

@@ -2,7 +2,7 @@
 
 > **상위 문서**: `CLAUDE.md`
 > **관련**: `docs/o4o-common-structure.md`, `docs/platform/hub/O4O-HUB-TEMPLATE-STANDARD-V1.md`, `docs/architecture/STORE-LAYER-ARCHITECTURE.md`, `docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md`
-> **버전**: V2
+> **버전**: V2.1
 > **작성일**: 2026-05-02 · **개정**: 2026-08-03 (V2 — 공식 대상 서비스 재정렬)
 > **상태**: Active Standard
 >
@@ -244,7 +244,7 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 | **의도적 제외 ≠ gap** | 서비스 경계상 해당 없는 축은 `제외` 로 표기하며 미달 집계에 포함하지 않는다 |
 | **historical 보존** | 대상에서 빠진 서비스의 과거 검증 기록은 삭제하지 않고 `(historical)` 로 남긴다 |
 
-> dependency 만 있고 import 가 0 인 실제 사례가 존재한다(`@o4o/operator-core` 는 저장소 전체 소비 0인데 3개 서비스가 dependency 선언 유지). 반대로 import 0 이 정상인 사례도 있다(`@o4o/screen-content-core` — 간접/빌드 의존). 그래서 실측이 필요하다.
+> dependency 만 있고 import 가 0 인 실제 사례가 존재한다(`@o4o/operator-core` 는 저장소 전체 소비 0인데 **4개 서비스**가 dependency 선언을 유지하고, 그 외에 Dockerfile COPY·tailwind content glob 참조까지 남아 있다 — 2026-08-03 실측). 반대로 import 0 이 정상인 사례도 있다(`@o4o/screen-content-core` — 간접/빌드 의존). 그래서 실측이 필요하다.
 
 ### 9.1 Hub Template
 
@@ -299,9 +299,22 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 |:--:|------|------|
 | **A** | **기준 문서 재정렬** — 공식 대상 서비스 집합 갱신, GlycoPharm historical 분리 | **본 V2 개정으로 완료** |
 | **B** | **PharmacyHub adoption** — 화면군 단위 판정 → 우선순위 → 리팩터링 순서 → 회귀 검증 | 후속 IR |
-| **C** | **legacy · seam 정비** — `@o4o/operator-core` · `@o4o/auth-context` · 서비스별 `AuthContext` · `forum-core`↔`shared-space-ui` 경계 · GP 페어링 추출물 잔존 소비처 · dormant LMS export | 후속 WO/IR |
+| **C** | **legacy · seam 정비** — `@o4o/operator-core` · `@o4o/auth-context` · 서비스별 `AuthContext` · `forum-core`↔`shared-space-ui` 경계 · GP 페어링 추출물 잔존 소비처 · dormant LMS export | 후속 WO/IR (operator-core 는 **조사 완료**, 아래 참조) |
 
 **축 B 와 축 C 를 같은 작업에서 처리하지 않는다**(§0.4).
+
+#### 10.1 `@o4o/operator-core` 상태 (2026-08-03 조사 반영)
+
+축 C 의 `@o4o/operator-core` 는 **"legacy 라서 제거 대상"이 아니다.** 조사 판정은 **`superseded`(계획적 세대 교체로 대체 완료)** 다.
+
+| 항목 | 사실 |
+|------|------|
+| 코드 소비 | 0 (repo 전역 import·dynamic import 모두 0) |
+| **빌드 경로 참조** | **4서비스 × 4곳 = 16곳** — `package.json` · `Dockerfile` COPY 2줄 · `tailwind.config.js` content glob. **dependency 한 줄만 지우면 끝나지 않는다** |
+| 책임 승계 | layout → `operator-ux-core` 5-Block · signal/AI → backend `CopilotEngineService` · 매장 축 → `@o4o/store-ui-core` |
+| 근거 기록 | 5-Block 전환 5 commit + [`KPA-UX-BASELINE-V1`](../baseline/KPA-UX-BASELINE-V1.md) before/after 기재 |
+
+또한 **은퇴 판단과 "운영자 플랫폼 core 재정의" 판단은 별개다.** 운영자 축에는 module registry · runtime context · extension 등록 계약 등 실재하는 구조 공백이 있으나, 그 책임은 `operator-core` 의 잔여 코드와 아무 연속성이 없다. 상세: [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1`](../investigations/IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md).
 
 ---
 
@@ -329,3 +342,4 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 |------|------|------|
 | 2026-05-02 | V1 | 초안 작성 — 공통화 정의, 6개 Hub 채택 매트릭스 코드 검증, Neture 부분 채택 명시, 판정 체크리스트, 금지/dead code 정리 기준 |
 | 2026-08-03 | V2 | **공식 대상 서비스 재정렬** — §0 스코프 선언 신설(Cycle 1 CLOSED 계승 · frozen baseline 불변 · legacy↔adoption 분리) · §3.0 공식 4서비스(KPA/K-Cos/Neture/PharmacyHub) + 역할·성숙도 · §3.0.1 KPA reference 3분류 · §3.3 PharmacyHub 취급 원칙(3구분, 의무 적용 아님) · §3.4 GlycoPharm historical out-of-scope(삭제 아닌 표시) · §9.0 매트릭스 갱신 원칙(dependency≠adoption) · §9.1~9.3 매트릭스 열 재정렬 · §10 현재 트랙 3축(기존 §10 참조 문서 → §11). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·금지사항은 변경 없음** |
+| 2026-08-03 | V2.1 | **축 C `operator-core` 상태 정정** — §10.1 신설(`legacy 제거 대상` 이 아니라 `superseded` 판정 · 빌드 경로 참조 16곳 · 은퇴 판단과 core 재정의 판단 분리) · §9.0 각주 실측 정정(3서비스 → 4서비스 + Dockerfile/tailwind 참조). 근거: `IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` |

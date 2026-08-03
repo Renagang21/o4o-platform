@@ -9,6 +9,20 @@
 >
 > 본 문서는 신규 패키지 `@o4o/operator-core-ui` 의 구조·설계 원칙·인터페이스·마이그레이션 전략을 고정한다. 이후 모든 Operator 공통화 작업(Stores 모듈 추출, Users 모듈, Forum Analytics 모듈)은 본 문서를 기준으로 검토한다. 본 문서는 IR-O4O-OPERATOR-CORE-DESIGN-V1 의 결과를 **그대로** 문서화한 것이며, 설계 변경 없이 정전(stationary)되어 있다.
 
+> **패키지 이름 구분 note (2026-08-03 추가):**
+>
+> 본 문서의 대상은 **`@o4o/operator-core-ui`** 이며, 이름이 유사한 **`@o4o/operator-core`(`-ui` 없음)** 는 **다른 패키지**다. 두 패키지는 세대 관계다.
+>
+> | 세대 | 패키지 | 책임 | 현재 |
+> |:---:|--------|------|------|
+> | 1세대 | `@o4o/operator-core` | Hero + Signal 엔진 + AI Action (클라이언트 계산형 대시보드 셸) | **superseded** — 코드 소비 0 |
+> | 2세대 | `@o4o/operator-ux-core` | 5-Block · List/Form 원시 · Sidebar · Shell | 현역 |
+> | 3세대 | `@o4o/operator-core-ui` | **선택형 페이지 모듈 컬렉션 (본 문서 대상)** | 현역 |
+>
+> 1세대의 책임은 소멸한 것이 아니라 분산 승계됐다 — layout → `operator-ux-core` 5-Block, signal/AI → backend `CopilotEngineService`(CLAUDE.md §11-3: frontend client-side 생성 금지), 매장 축 → `@o4o/store-ui-core`. 따라서 `operator-core` 는 **방치된 dead package 가 아니라 계획적 세대 교체로 대체 완료된 superseded package** 다. 상세·판정 근거: [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1`](../investigations/IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md).
+>
+> 또한 §2.3 의 `package.json` 기재는 **설계 시점 원문**이며 현재 구현과 다르다 (실제: `version 0.1.0` · `main: ./src/index.ts` · `operator-ux-core` 가 `dependencies` · **14개 모듈 subpath `exports` 존재**). subpath exports 는 서비스가 모듈을 **선택 소비**하는 실제 수단이므로, 모듈 채택 여부를 판단할 때는 설계 원문이 아니라 실제 `exports` 맵을 확인한다.
+
 > **Canonical 정렬 (2026-05-23):**
 > 본 문서는 Operator UI 모듈의 **기술 설계** 이다. Operator 의 **사업적 정의** 는 [`O4O-BUSINESS-PHILOSOPHY-V1 §3.2`](../baseline/O4O-BUSINESS-PHILOSOPHY-V1.md) — **"서비스 운영 사업자"** 이다. 본 패키지가 다루는 Stores / Users / Products / Orders / AI Report / Applications 모듈은 PHILOSOPHY §3.2 의 7가지 책임(공급자 자료 수신·구성·AI 활용·매장 실행 자산 제작·큐레이션·매장 지원·운영 수익 모델)을 지원하는 UI 구성 요소다.
 
