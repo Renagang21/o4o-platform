@@ -3,7 +3,9 @@
 > **WO**: `WO-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1`
 > **유형**: Phase 0 read-only 조사 — 코드/DB/package/lock/route **무변경**. 문서 1개만 생성.
 > **목적**: 공통화·`core + extension` 정비를 시작하기 **전에**, 저장소에 이미 존재하는 공통화 자산(문서·패키지·적용 결과)의 현재 상태를 확정한다.
-> **결론(요약)**: **공통화는 신규 과제가 아니라 이미 1차 종료(Cycle 1 CLOSED, 2026-06-15)된 영역이다.** 공식 대상 4개 서비스 중 **KPA / K-Cosmetics / Neture 3개는 성숙한 공통 core 소비자**이며, **PharmacyHub 1개만 공통 auth 외 미채택(bespoke 100%)** 이다. 따라서 이번 정비의 실제 과제는 "공통화 설계"가 아니라 **① PharmacyHub adoption ② GlycoPharm 제외에 따른 기준 문서·페어링 재정렬 ③ 잔존 legacy 패키지 정리** 3가지다.
+> **결론(요약)**: **공통화는 신규 과제가 아니라 이미 1차 종료(Cycle 1 CLOSED, 2026-06-15)된 영역이다.** 공식 대상 4개 서비스 중 **KPA / K-Cosmetics / Neture 3개는 성숙한 공통 core 소비자**이며, **PharmacyHub 는 공통 인증을 제외한 UI·페이지 모듈 adoption 이 아직 초기 단계**다. 따라서 이번 정비의 실제 과제는 "공통화 설계"가 아니라 **① PharmacyHub adoption ② GlycoPharm 제외에 따른 기준 문서·페어링 재정렬 ③ 잔존 legacy 패키지 정리** 3가지다.
+>
+> **용어 주의**: 본 문서에서 PharmacyHub 화면을 "자체 구현"으로 기술한 것은 **현재 공통 패키지를 경유하지 않는다는 사실 기술**이며, 구현이 잘못되었다는 판정이 아니다. PharmacyHub 자체 구현에는 ① 공통 기반으로 대체할 부분 ② 서비스 고유 extension 으로 유지할 부분 ③ 현재 형태를 그대로 유지할 부분이 섞여 있다. 이 구분은 후속 IR(§19-2) 범위이며, 본 IR 은 "제거 대상"을 지정하지 않는다.
 > **작성일**: 2026-08-03 · HEAD `3a9dde01653d1a0da2fc0c4ced77b1f0224d6110` (main, working tree clean)
 
 ---
@@ -278,7 +280,7 @@ Extension:       서비스별 `src/lib/apiClient.ts` (20~27L) 에서 인스턴�
 | 서비스별 operatorConfig | **확립** — KPA/KCos/Neture 모두 `src/config/{dashboard,navigation,operatorCapabilities,operatorMenuGroups}.ts` 동일 세트 |
 | 서비스별 local fork | 잔존 없음(선행 audit A.CLOSED). 서비스 페이지는 thin wrapper |
 | adoption 완료 서비스 | KPA / KCos / Neture 3개 |
-| adoption 미착수 | **PharmacyHub** — `src/pages/operator/` 2개 파일(`MembershipsPage.tsx` 268L, `MembershipDetailPage.tsx` 196L) 전부 bespoke |
+| adoption 미착수 | **PharmacyHub** — `src/pages/operator/` 2개 파일(`MembershipsPage.tsx` 268L, `MembershipDetailPage.tsx` 196L) 이 공통 패키지를 경유하지 않는 자체 구현. 대체 가능 여부는 화면 단위 판정 필요 |
 | 문서↔코드 일치 | 일치. 단 `@o4o/operator-core`(legacy) deprecation 경로가 2026-06-15 audit 에서 B 항목으로 지적되었으나 **2026-08-03 현재 미해결**(dependency 3건 잔존, 소비 0) |
 | 진행 중 리팩터링과 충돌 | 없음(working tree clean) |
 
@@ -333,9 +335,21 @@ Extension:       서비스별 `src/lib/apiClient.ts` (20~27L) 에서 인스턴�
 | **KPA Society** | `MATURE_REFERENCE` | 21개 공통 패키지 소비, 최다 import(ui 87 / error-handling 86 / shared-space-ui 85 / operator-ux-core 84). Hub Template 6종 전부 채택. store-ui-core·tablet 계열 canonical 구현 보유 |
 | **K-Cosmetics** | `MATURE_SHARED_CORE_CONSUMER` (겸 `APP_FRAME_CANDIDATE`) | 18개 소비. operator-core-ui 모듈 30건을 **거의 전부 thin wrapper 로 소비**(주석에 원본 라인수 대비 축소 명기: members 768L→wrapper 등). KPA 와 동일한 config 4파일 세트 보유 |
 | **Neture** | `INDEPENDENT_APP_WITH_SHARED_CORES` | 17개 소비. shared-space-ui 90 / operator-ux-core 53 로 공통 core 를 넓게 소비하되 **LMS·store 실행 축은 정확히 제외**(store-ui-core 1건=MediaPicker). 공급자/B2B extension 이 서비스 고유 |
-| **PharmacyHub** | `NEW_SERVICE_EARLY_ADOPTION` | src 전체 **25파일 / 약 3,700L**, 공통 패키지 **2개(auth 전용)** 만 채택. `@o4o/ui`·`shared-space-ui`·`operator-ux-core`·`operator-core-ui`·`store-ui-core`·`account-ui`·`types`·`error-handling` **전부 미채택**. operator/store-owner/supplier 3역할 화면이 전부 bespoke |
+| **PharmacyHub** | `NEW_SERVICE_EARLY_ADOPTION` | src 전체 **25파일 / 약 3,700L**, 공통 패키지 **2개(auth 전용)** 만 채택. `@o4o/ui`·`shared-space-ui`·`operator-ux-core`·`operator-core-ui`·`store-ui-core`·`account-ui`·`types`·`error-handling` **미채택**. operator/store-owner/supplier 3역할 화면이 공통 패키지를 경유하지 않는 자체 구현 — **단 이 중 B2B 주문·결제·거래조건·PharmacyHub 전용 membership 은 서비스 고유 업무이므로 adoption 대상이 아니다**(§17) |
 
 > 초기 가설과의 차이: 가설은 "KCos = KPA 유사 프레임 후보"였는데, 실측상 **KCos 는 이미 operator 축에서 가장 순수한 thin-wrapper 소비자**다(KPA 보다 fork 가 적음 — KPA 는 reference 로서 advanced 기능을 자체 보유). 즉 **KPA=reference(두꺼움), KCos=frame 검증체(얇음)** 로 역할이 갈린다.
+
+### 12.1 KPA 코드 해석 규칙 (후속 조사 공통 전제)
+
+KPA 가 reference 라는 사실이 "KPA 코드 전체 = 공통 프레임"을 뜻하지 않는다. KPA 코드를 조사할 때는 항상 다음 3종을 구분한다.
+
+| 구분 | 처리 |
+|------|------|
+| 다른 서비스에도 적용해야 하는 **canonical core** | 기준 구현. 공통 패키지에 이미 존재하거나 존재해야 함 |
+| KPA 에서 먼저 구현되었으나 아직 core 로 추출되지 않은 **공통 후보** | 추출 여부는 실제 소비 축이 2개 이상일 때만 판단(Cycle 1 §6 원칙 — 투기적 추상화 금지) |
+| 약국·약사·의약품 업무 전용 **KPA extension** | 서비스 고유. 공통화 대상 아님(§17) |
+
+> **KPA 가 가장 두꺼운 서비스라는 이유로 KPA 전체를 공통 프레임으로 삼으면 안 된다.** KPA↔KCos 비교의 목적은 두 앱을 합치는 것이 아니라, 두꺼운 기준 구현과 얇은 adoption 구현을 대조해 **core / service config / extension / KPA local 잔여** 4가지를 분리해 내는 것이다.
 
 ---
 
@@ -461,9 +475,9 @@ Extension:       서비스별 `src/lib/apiClient.ts` (20~27L) 에서 인스턴�
 | 순위 | 제안 문서 | 성격 | 목적 |
 |:---:|-----------|------|------|
 | 1 | `WO-O4O-COMMONIZATION-STANDARD-SCOPE-REALIGNMENT-V1` | docs-only | R1 — 기준 문서의 대상 서비스 집합을 KPA/KCos/Neture/PharmacyHub 로 갱신, GP 를 이력 처리. **이후 모든 판정의 전제** |
-| 2 | `IR-O4O-PHARMACY-HUB-COMMON-CORE-ADOPTION-SCOPE-V1` | read-only | §14 gap 을 화면 단위로 분해 — auth 다음 채택 순서(types → ui/error-handling → shared-space-ui → operator 축 → store 축) 결정 |
-| 3 | `WO-O4O-OPERATOR-CORE-LEGACY-RETIREMENT-V1` | 소규모 코드 | R3 — dead 패키지 + 3개 dependency 정리(소비 0 확인 완료) |
-| 4 | `IR-O4O-GP-PAIRED-EXTRACTION-RESIDUAL-CONSUMER-AUDIT-V1` | read-only | R2 — GP 제거 시 단독 소비로 축소되는 공통 컴포넌트 식별 |
+| 2 | `IR-O4O-PHARMACY-HUB-COMMON-CORE-ADOPTION-SCOPE-V1` | read-only | §14 gap 을 **패키지 목록이 아니라 화면군 단위**로 분해. 화면군 = Public / Auth·Join / Role Entry / Operator / Store Owner / Supplier / Product / Order·Payment / Account·Notification / Common Error·Loading. 화면군마다 판정값 부여: `KEEP_BESPOKE` · `ADOPT_PRIMITIVE` · `ADOPT_TEMPLATE` · `ADOPT_PAGE_MODULE` · `ADOPT_LAYOUT_ONLY` · `ADOPT_ERROR_CONTRACT` · `ADOPT_TYPES_ONLY` · `SERVICE_EXTENSION_REQUIRED` · `NOT_APPLICABLE`. 채택 순서 가설(types → ui/error-handling → shared-space-ui → operator 축 → store 축)은 이 판정 결과로 검증 |
+| 3 | `WO-O4O-OPERATOR-CORE-LEGACY-RETIREMENT-V1` | 소규모 코드 | R3 — dead 패키지 + 3개 dependency 정리. **제거 전 재검증 필수**: dynamic import · build script · Dockerfile COPY · tsconfig reference · package build order · docs link · test fixture (본 IR 의 소비 0 확인은 정적 `from` import 기준) |
+| 4 | `IR-O4O-GP-PAIRED-EXTRACTION-RESIDUAL-CONSUMER-AUDIT-V1` | read-only | R2 — GP 제거 시 단독 소비로 축소되는 공통 컴포넌트 식별. **목적은 GlycoPharm 제거가 아니라, GlycoPharm 존폐 여부가 공통 core 유지 판단에 영향을 주지 않는 상태를 만드는 것.** GP 제거 미확정이므로 코드 제거 금지 |
 | 5 | `IR-O4O-AUTH-CONTEXT-CANONICAL-POSITION-V1` | read-only | R4·R5 — auth-context 포지션 + 서비스별 AuthContext 4중 병존 공통화 여지 |
 | 6 | `IR-O4O-FORUM-CORE-VS-SHARED-SPACE-UI-SEAM-V1` | read-only | R7 — forum 축 두 패키지 책임 경계 |
 
