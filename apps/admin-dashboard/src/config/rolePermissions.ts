@@ -38,6 +38,21 @@ export const menuPermissions: MenuPermission[] = [
     roles: ['super_admin', 'platform:super_admin']
   },
 
+  // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1
+  //   회원 분류 관리 메뉴는 platform 관리자 전용이다.
+  //   backend guard(WO-…-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2)가
+  //   /api/v1/membership/categories 를 platform:admin / platform:super_admin 으로 제한하므로,
+  //   kpa:admin·일반 사용자에게는 도달할 수 없는 메뉴를 노출하지 않는다.
+  //   (메뉴 노출은 인가 경계가 아니며 실제 차단은 backend guard 가 담당한다.)
+  //   core-users 와 동일하게 suffix 형식과 prefix 형식을 모두 나열한다
+  //   (useAdminMenu 가 role.name 을 raw string 으로 비교).
+  //   이번 WO 에서 기존 Membership 메뉴 3건(core-membership / -members / -verifications)의
+  //   노출 정책은 변경하지 않는다(회원 관리 전체 메뉴 개편은 범위 제외).
+  {
+    menuId: 'core-membership-categories',
+    roles: ['admin', 'super_admin', 'platform:admin', 'platform:super_admin']
+  },
+
   // Seller Management - No restriction (allow all)
   // These menus are visible to all authenticated users
 

@@ -452,9 +452,28 @@ const CategoryManagement = () => {
                   </div>
                 ))}
 
+                {/*
+                  WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1
+                    분류 0건은 오류가 아니라 정상 상태다. 안내 문구만 있던 기존 빈 상태에
+                    기존 생성 흐름(handleStartCreate)으로 들어가는 진입 버튼을 추가한다.
+                    새 폼/모달을 만들지 않고 헤더의 '분류 추가' 와 동일한 핸들러를 재사용하며,
+                    저장은 사용자가 명시적으로 실행할 때만 일어난다(열기만으로 write 없음).
+                */}
                 {categories.length === 0 && !isCreating && (
-                  <div className="text-center py-12 text-gray-500">
-                    카테고리가 없습니다. 새로운 분류를 추가하세요.
+                  <div className="text-center py-12">
+                    <Users className="w-10 h-10 mx-auto text-gray-300" />
+                    <p className="mt-4 text-gray-600">등록된 회원 분류가 없습니다.</p>
+                    <p className="mt-1 text-sm text-gray-500">
+                      첫 번째 회원 분류를 만들어 회원을 구분해 관리할 수 있습니다.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleStartCreate}
+                      className="mt-6 inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                      <Plus className="w-5 h-5 mr-2" />
+                      분류 만들기
+                    </button>
                   </div>
                 )}
               </div>

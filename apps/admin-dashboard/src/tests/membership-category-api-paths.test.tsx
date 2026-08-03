@@ -154,7 +154,10 @@ describe('목록 상태 — 로딩 / 빈 목록', () => {
   it('빈 목록이면 안내 문구를 보여주고 GET 은 한 번만 나간다', async () => {
     mockGet.mockResolvedValue(okList([]));
     render(<CategoryManagement />);
-    await waitFor(() => expect(screen.getByText(/카테고리가 없습니다/)).toBeTruthy());
+    // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1:
+    //   빈 상태 문구가 '카테고리가 없습니다' → '등록된 회원 분류가 없습니다.' 로 바뀌고
+    //   '분류 만들기' 진입 버튼이 추가됐다. 이 테스트의 관심사(GET 1회·경로)는 그대로다.
+    await waitFor(() => expect(screen.getByText(/등록된 회원 분류가 없습니다/)).toBeTruthy());
     expect(mockGet).toHaveBeenCalledTimes(1);
     expect(mockGet.mock.calls[0][0]).toBe('/membership/categories');
   });

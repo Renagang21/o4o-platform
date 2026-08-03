@@ -113,6 +113,18 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <UserCheck className="w-4 h-4" />,
         path: '/admin/membership/verifications',
       },
+      // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1
+      //   회원 분류 관리 화면(CategoryManagement)은 route 는 이미 존재했으나
+      //   (yaksa.routes.tsx — /admin/membership/categories) 메뉴 진입점이 없어
+      //   어디에서도 들어갈 수 없는 상태였다. 기존 route 를 그대로 재사용하고
+      //   Membership 3개 항목 바로 뒤(회원 관리 묶음 안)에 메뉴만 연결한다.
+      //   노출 범위는 rolePermissions.ts 의 menuPermissions 로 platform 관리자 역할에 한정한다.
+      {
+        id: 'core-membership-categories',
+        label: 'Member Categories',
+        icon: <Layers className="w-4 h-4" />,
+        path: '/admin/membership/categories',
+      },
       // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
       //   포인트 운영은 금액성 write(지급/차감) 를 가진 화면이라 Admin 영역에 배치한다
       //   (CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + **금융**).
