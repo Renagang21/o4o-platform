@@ -1,0 +1,21 @@
+{
+  "verifiedRecords": 672,
+  "buckets": {
+    "PASS": 647,
+    "REVIEW": 18,
+    "HOLD_SOURCE": 7,
+    "HOLD_MAPPING": 0,
+    "INVALID_TRANSFORM": 0,
+    "FAILED_SYSTEM": 0
+  },
+  "checkFailures": {
+    "SOURCE_MISSING_OPTIONAL": 18,
+    "SOURCE_MISSING_REQUIRED": 7
+  },
+  "coverage": {
+    "producibleMasters": 672,
+    "recordsExpected": 672,
+    "recordsMissing": 0,
+    "recordsUnexpected": 0
+  }
+}

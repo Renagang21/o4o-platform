@@ -1,0 +1,31 @@
+{
+  "verifiedRecords": 672,
+  "buckets": {
+    "PASS": 640,
+    "REVIEW": 18,
+    "HOLD_SOURCE": 7,
+    "HOLD_MAPPING": 2,
+    "INVALID_TRANSFORM": 5,
+    "FAILED_SYSTEM": 0
+  },
+  "checkFailures": {
+    "TEXT_NOT_PRESERVED": 2,
+    "TOKEN_NUM": 1,
+    "TOKEN_UNIT": 2,
+    "HTML_BLOCK_SHAPE": 2,
+    "SECTION_SET_OR_ORDER": 1,
+    "ATTR_BARCODE_MISMATCH": 1,
+    "ATTR_STATUS_NOT_NEEDS_REVIEW": 1,
+    "ATTR_STATUS_CANONICAL_FORBIDDEN": 1,
+    "HTML_UNEXPECTED_TAG": 1,
+    "HTML_FORBIDDEN_TAG": 1,
+    "SOURCE_MISSING_OPTIONAL": 18,
+    "SOURCE_MISSING_REQUIRED": 7
+  },
+  "coverage": {
+    "producibleMasters": 672,
+    "recordsExpected": 672,
+    "recordsMissing": 0,
+    "recordsUnexpected": 0
+  }
+}

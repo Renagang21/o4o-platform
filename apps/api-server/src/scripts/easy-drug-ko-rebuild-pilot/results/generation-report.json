@@ -1,0 +1,41 @@
+{
+  "ruleVersion": "EASY_DRUG_KO_REBUILD_V1",
+  "sourceType": "mfds_easy_drug",
+  "status": "needs_review",
+  "descriptionType": "STORE",
+  "language": "ko",
+  "permits": 100,
+  "permitsByGroup": {
+    "BOUNDARY": 15,
+    "NORMAL": 80,
+    "MISSING": 5
+  },
+  "permitsByBucket": {
+    "KO_COMPLETE_SOURCE_READY": 95,
+    "KO_PARTIAL_SOURCE_REVIEW": 2,
+    "KO_HOLD_SOURCE_INCOMPLETE": 2,
+    "EXCLUDED": 1
+  },
+  "mastersConsidered": 680,
+  "mastersGenerated": 672,
+  "mastersSkippedEmptyContent": 0,
+  "mastersSkippedNotProducible": 8,
+  "permitsEmptyContent": 0,
+  "expectedInsertCurrentDedup": 0,
+  "expectedInsertIfRebuild": 672,
+  "blockedByExistingEasyDrugRow": 672,
+  "sectionHistogram": {
+    "효능·효과": 98,
+    "용법·용량": 98,
+    "사용상 주의사항": 99,
+    "저장방법": 99,
+    "상호작용": 66,
+    "이상반응": 94,
+    "경고": 25
+  },
+  "contentLen": {
+    "min": 251,
+    "max": 3202,
+    "avg": 947
+  }
+}
