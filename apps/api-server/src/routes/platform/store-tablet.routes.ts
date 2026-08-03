@@ -70,21 +70,59 @@ const TABLET_QR_SERVICE_KEY = 'kpa';
 //   (운영자 공용 idle 등 일부 경로가 쓰는 'kpa-society' 와 다른 값이므로 혼용 금지.)
 const OPERATOR_TEMPLATE_SERVICE_KEY = 'kpa';
 
-// 저장 응답에 QR 링크 정보를 additive 로 병합. ensure 실패는 저장을 무효화하지 않고 플래그로 표기(§3 복구 가능).
+/**
+ * WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1
+ *
+ * QR 생성은 **저장(write) 경로에서만** 수행한다(공개 조회는 read-only). 그리고 저장 성공을 응답하기 전에
+ * QR 준비 결과를 확인한다 — 실패를 '부분 성공'으로 안내하지 않는다.
+ *  - 호출자는 **저장 트랜잭션의 EntityManager** 를 넘긴다 → QR 실패 시 저장까지 함께 롤백된다.
+ *  - 게이트 미해당(운영자·공급자 원본 등 QR 대상 아님)은 실패가 아니다: publicQrUrl=null 로 정상 응답.
+ */
+class ScreenSetQrFailure extends Error {
+  code = 'SCREEN_SET_QR_FAILED';
+}
+
 async function withQrLink(
-  dataSource: DataSource,
+  executor: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
   organizationId: string,
   screenSetId: string,
   base: Record<string, unknown>,
 ): Promise<Record<string, unknown>> {
   try {
-    const qr = await ensureScreenSetQr(dataSource, { organizationId, screenSetId, serviceKey: TABLET_QR_SERVICE_KEY });
+    const qr = await ensureScreenSetQr(executor, { organizationId, screenSetId, serviceKey: TABLET_QR_SERVICE_KEY });
     if (qr) return { ...base, publicQrSlug: qr.slug, publicQrUrl: qr.url };
+    // QR 대상이 아닌 세트(보관/미소유/운영자·공급자 원본) — 정상.
     return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
   } catch (err) {
-    console.error('[StoreTablet] ensureScreenSetQr failed (non-fatal, recoverable):', (err as any)?.message);
-    return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null, qrLink: 'failed' };
+    console.error('[StoreTablet] ensureScreenSetQr failed — save rolled back:', (err as any)?.message);
+    throw new ScreenSetQrFailure((err as any)?.message || 'screen set QR preparation failed');
   }
+}
+
+/**
+ * 관리자 보정(backfill) 전용 — 소유자 인증 하 상세 조회 시 과거 누락 QR 을 보정한다.
+ * 저장 경로가 아니므로 실패해도 조회 자체를 막지 않는다(다음 저장에서 확실히 실패로 드러난다).
+ */
+async function withQrLinkBestEffort(
+  executor: { query: (sql: string, params?: unknown[]) => Promise<unknown> },
+  organizationId: string,
+  screenSetId: string,
+  base: Record<string, unknown>,
+): Promise<Record<string, unknown>> {
+  try {
+    return await withQrLink(executor, organizationId, screenSetId, base);
+  } catch {
+    return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
+  }
+}
+
+/** QR 실패 응답(모든 저장 경로 공통). 저장은 롤백되었으므로 '부분 성공' 문구를 쓰지 않는다. */
+function respondQrFailure(res: import('express').Response): void {
+  res.status(503).json({
+    success: false,
+    error: 'Screen set QR could not be prepared, so the save was cancelled. Please try again.',
+    code: 'SCREEN_SET_QR_FAILED',
+  });
 }
 
 // ─────────────────────────────────────────────────────
@@ -1323,7 +1361,7 @@ export function createStoreTabletRoutes(
       );
       // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §4: 관리 상세 진입 시 owner 인증 하 lazy ensure
       //   (과거 저장/연결 누락 콘텐츠 복구). 공개 runtime 은 read-only 유지(여기 아님).
-      res.json({ success: true, data: await withQrLink(dataSource, organizationId, req.params.id, { ...rows[0], blocks }) });
+      res.json({ success: true, data: await withQrLinkBestEffort(dataSource, organizationId, req.params.id, { ...rows[0], blocks }) });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });
@@ -1350,17 +1388,23 @@ export function createStoreTabletRoutes(
         const t = await dataSource.query(`SELECT id FROM store_tablets WHERE id = $1 AND organization_id = $2 LIMIT 1`, [tabletId, organizationId]);
         if (!t?.[0]) { res.status(400).json({ success: false, error: 'Tablet not found in this store', code: 'INVALID_TABLET' }); return; }
       }
-      const ins = await dataSource.query(
-        // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 생성 계약 명시 — origin='store'·supplier_id=NULL.
-        //   (organization_id=현재 매장, status=draft|active[UI 기본 active], supplier_id 는 매장 원본에 항상 NULL.)
-        `INSERT INTO store_tablet_screen_sets (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
-         VALUES ($1, NULL, NULL, $2, $3, 'store', $4, $5, $6)
-         RETURNING ${setCols('')}`,
-        [organizationId, tabletId, name, status, templateKey, userId],
-      );
       // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §3: Screen Set ID 생성 후 screen_set QR 자동 확보.
-      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, ins[0].id, ins[0]) });
+      // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 생성 + QR 확보를 한 트랜잭션으로 — QR 실패 시 세트도 남기지 않는다.
+      let data: Record<string, unknown> | null = null;
+      await dataSource.transaction(async (m) => {
+        const ins = await m.query(
+          // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 생성 계약 명시 — origin='store'·supplier_id=NULL.
+          //   (organization_id=현재 매장, status=draft|active[UI 기본 active], supplier_id 는 매장 원본에 항상 NULL.)
+          `INSERT INTO store_tablet_screen_sets (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
+           VALUES ($1, NULL, NULL, $2, $3, 'store', $4, $5, $6)
+           RETURNING ${setCols('')}`,
+          [organizationId, tabletId, name, status, templateKey, userId],
+        );
+        data = await withQrLink(m, organizationId, ins[0].id, ins[0]);
+      });
+      res.status(201).json({ success: true, data });
     } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       console.error('[StoreTablet] POST /screen-sets error:', error);
       res.status(500).json({ success: false, error: 'Failed to create screen set', code: 'INTERNAL_ERROR' });
     }
@@ -1413,6 +1457,7 @@ export function createStoreTabletRoutes(
       // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: status 전이(archive/restore)와 종속 QR is_active 를 원자적으로.
       const statusChange: string | null = req.body?.status !== undefined ? String(req.body.status) : null;
       let updated: any = null;
+      let data: Record<string, unknown> | null = null;
       await dataSource.transaction(async (m) => {
         const upd = await m.query(
           `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
@@ -1436,10 +1481,13 @@ export function createStoreTabletRoutes(
         if (statusChange !== null) {
           await setScreenSetQrActive(m, organizationId, id, statusChange !== 'archived');
         }
+        // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 같은 트랜잭션에서 QR 확보(보관 상태는 대상 아님 → null 정상).
+        data = await withQrLink(m, organizationId, id, updated);
       });
       if (!updated) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
-      res.json({ success: true, data: await withQrLink(dataSource, organizationId, id, updated) });
+      res.json({ success: true, data });
     } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       console.error('[StoreTablet] PATCH /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to update screen set', code: 'INTERNAL_ERROR' });
     }
@@ -1516,6 +1564,10 @@ export function createStoreTabletRoutes(
           if (!parsed.ok && 'error' in parsed) { res.status(400).json({ success: false, error: `blocks[${i}].config: ${parsed.error}`, code: 'INVALID_BLOCK_CONFIG' }); return; }
         }
       }
+      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §3: 블록 저장과 함께 screen_set QR 확보.
+      // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: QR 확보를 같은 트랜잭션 안에서 수행 —
+      //   실패하면 블록 저장까지 롤백되고 오류로 응답한다(부분 성공 없음. 편집 내용은 클라이언트에 그대로 남는다).
+      let qrLink: Record<string, unknown> = {};
       await dataSource.transaction(async (manager) => {
         await manager.query(`DELETE FROM store_tablet_screen_blocks WHERE screen_set_id = $1`, [id]);
         for (let i = 0; i < blocks.length; i++) {
@@ -1527,12 +1579,13 @@ export function createStoreTabletRoutes(
           );
         }
         await manager.query(`UPDATE store_tablet_screen_sets SET updated_at = NOW() WHERE id = $1`, [id]);
+        qrLink = await withQrLink(manager, organizationId, id, {});
       });
       const updated = await dataSource.query(`SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`, [id]);
-      // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §3: 블록 저장(커밋) 후 screen_set QR 확보.
       //   data(blocks 배열)는 그대로 두고 publicQrSlug/publicQrUrl 를 top-level additive 로 병합(프론트 호환).
-      res.json({ success: true, data: updated, ...(await withQrLink(dataSource, organizationId, id, {})) });
+      res.json({ success: true, data: updated, ...qrLink });
     } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       console.error('[StoreTablet] PUT /screen-sets/:id/blocks error:', error);
       res.status(500).json({ success: false, error: 'Failed to save blocks', code: 'INTERNAL_ERROR' });
     }
@@ -1692,6 +1745,7 @@ export function createStoreTabletRoutes(
       if (!src) { res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' }); return; }
 
       let created: any = null;
+      let importedData: Record<string, unknown> | null = null;
       await dataSource.transaction(async (m) => {
         // 재검증(동시 보관·삭제 방어)
         const reSrc = await m.query(
@@ -1721,6 +1775,9 @@ export function createStoreTabletRoutes(
             WHERE screen_set_id = $2`,
           [created.id, s.id],
         );
+
+        // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 사본 생성과 같은 트랜잭션에서 QR 확보(실패 시 사본도 롤백).
+        importedData = await withQrLink(m, organizationId, created.id, created);
       });
 
       // 4) provenance 기록(best-effort, 기존 store_asset_derivations 재사용 — 신규 컬럼·테이블 0, FK 없음)
@@ -1739,9 +1796,10 @@ export function createStoreTabletRoutes(
         console.warn('[StoreTablet] screen-set import provenance skipped:', provErr?.message);
       }
 
-      // 5) 매장 사본 반환. QR 은 기존 매장 Screen Set 규칙(withQrLink lazy ensure)으로 관리.
-      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, created.id, created) });
+      // 5) 매장 사본 반환. QR 은 위 트랜잭션에서 이미 확보됨(실패 시 여기 도달하지 않음).
+      res.status(201).json({ success: true, data: importedData });
     } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       if (error?.code === 'OPERATOR_TEMPLATE_NOT_FOUND') {
         res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' });
         return;
@@ -1877,6 +1935,7 @@ export function createStoreTabletRoutes(
       if (!medicationStoreAccessAllowed(med, storeType)) { res.status(403).json({ success: false, error: '이 화면은 약국 매장에만 제공됩니다(의약품 포함).', code: 'MEDICATION_PHARMACY_ONLY' }); return; }
 
       let created: any = null;
+      let importedData: Record<string, unknown> | null = null;
       await dataSource.transaction(async (m) => {
         const reSrc = await m.query(
           `SELECT id, name, template_key AS "templateKey", hub_target_store_type AS "hubTargetStoreType"
@@ -1899,6 +1958,8 @@ export function createStoreTabletRoutes(
            SELECT $1, block_type, sort_order, is_visible, config FROM store_tablet_screen_blocks WHERE screen_set_id = $2`,
           [created.id, s.id],
         );
+        // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 사본 QR 을 같은 트랜잭션에서 확보(실패 시 가져오기 롤백).
+        importedData = await withQrLink(m, organizationId, created.id, created);
       });
 
       // provenance(best-effort) — source_kind='supplier_screen_set'.
@@ -1917,8 +1978,9 @@ export function createStoreTabletRoutes(
         console.warn('[StoreTablet] supplier screen-set import provenance skipped:', provErr?.message);
       }
 
-      res.status(201).json({ success: true, data: await withQrLink(dataSource, organizationId, created.id, created) });
+      res.status(201).json({ success: true, data: importedData });
     } catch (error: any) {
+      if (error?.code === 'SCREEN_SET_QR_FAILED') { respondQrFailure(res); return; }
       if (error?.code === 'SUPPLIER_TEMPLATE_NOT_FOUND') { res.status(404).json({ success: false, error: 'Supplier template not found', code: 'SUPPLIER_TEMPLATE_NOT_FOUND' }); return; }
       console.error('[StoreTablet] POST /screen-set-hub/supplier-templates/:id/import error:', error);
       res.status(500).json({ success: false, error: 'Failed to import supplier template', code: 'INTERNAL_ERROR' });

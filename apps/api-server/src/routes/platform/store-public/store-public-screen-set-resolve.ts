@@ -24,11 +24,10 @@ import { resolveContentListItems } from './store-public-tablet-content-resolve.j
 // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회는 주입된 adapter 로 위임.
 import type { ContentSourceAdapter } from './store-public-tablet-content-source.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
-// WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: slug 미발급 세트는 resolve 시점에 QR 을 자동 보장(멱등).
-import { buildScreenSetQrUrl, ensureScreenSetQr } from '../store-screen-set-qr.service.js';
-
-/** Screen Set QR 의 서비스 키(도메인 도출용) — store-tablet.routes 의 TABLET_QR_SERVICE_KEY 와 동일. */
-const SCREEN_SET_QR_SERVICE_KEY = 'kpa';
+// WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1:
+//   이 resolver 는 **공개 read-only 경로**다. QR 생성(ensureScreenSetQr)은 저장(write) 경로에서만 수행하며
+//   여기서는 이미 발급된 public_qr_slug 를 읽어 URL 로 변환만 한다(DB write 0).
+import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
 
 export interface ScreenSection {
   blockType: string;
@@ -203,24 +202,10 @@ export async function resolveScreenSetSections(
   const set = setRows?.[0];
   if (!set) return null;
 
-  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
-  //   slug 가 아직 없는 세트(구형 저장분 등)는 여기서 **멱등 보장**한다. ensureScreenSetQr 는 기존 행이 있으면
-  //   재사용하고 public_qr_slug 만 동기화하므로 신규 테이블·slug 재발급이 일어나지 않는다.
-  //   실패는 화면 렌더를 막지 않고 qrStatus='unavailable' 로만 표기한다(§원칙: 실패를 성공으로 숨기지 않음).
-  let qrSlug: string | null = set.publicQrSlug ?? null;
-  if (!qrSlug) {
-    try {
-      const ensured = await ensureScreenSetQr(dataSource, {
-        organizationId: input.organizationId,
-        screenSetId: input.screenSetId,
-        serviceKey: SCREEN_SET_QR_SERVICE_KEY,
-      });
-      qrSlug = ensured?.slug ?? null;
-    } catch (qrErr) {
-      console.error('[ScreenSetResolve] ensureScreenSetQr failed (non-fatal):', (qrErr as any)?.message);
-      qrSlug = null;
-    }
-  }
+  // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1:
+  //   공개 조회는 **읽기 전용**이다. slug 가 없으면 생성하지 않고 qrStatus='unavailable' 로만 표기한다.
+  //   QR 은 저장(create/update/blocks/copy/import) 경로에서 응답 전에 보장된다 → 소비자 접근이 write 를 유발하지 않는다.
+  const qrSlug: string | null = set.publicQrSlug ?? null;
   const qrUrl = qrSlug ? buildScreenSetQrUrl(input.serviceKey, qrSlug) : null;
 
   const blocks = await dataSource.query(

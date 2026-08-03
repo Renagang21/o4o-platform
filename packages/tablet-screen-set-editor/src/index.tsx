@@ -45,13 +45,12 @@ export interface ScreenSet {
   updatedAt: string;
   blockCount?: number;
   isApplied?: boolean;
-  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑤:
+  // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1:
   //   매장 저장 응답이 additive 로 병합하는 QR 링크 정보(withQrLink).
-  //   qrLink==='failed' = QR 자동 생성 실패 → 저장 성공으로 숨기지 않고 사용자에게 표시한다.
-  //   운영자·공급자 원본은 QR 대상이 아니어서 publicQrUrl=null 이지만 qrLink 는 붙지 않는다(비노출 유지).
+  //   저장 성공 응답에는 QR 이 이미 준비되어 있다 — QR 실패는 저장 자체가 실패(SCREEN_SET_QR_FAILED)한다.
+  //   운영자·공급자 원본은 QR 대상이 아니어서 publicQrUrl=null(정상, 오류 아님).
   publicQrSlug?: string | null;
   publicQrUrl?: string | null;
-  qrLink?: 'failed';
 }
 export interface ScreenSetDetail extends ScreenSet {
   blocks: ScreenBlock[];
@@ -949,33 +948,30 @@ export function TabletContentStepBuilder({
     setSaving(true);
     try {
       let id = initialDetail?.id;
-      // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑤: QR 자동 생성 실패를 저장 성공으로 숨기지 않는다.
-      let qrFailed = false;
       if (isEdit && id) {
         // WO-O4O-KPA-TABLET-BUILDER-REMOVE-STATUS-SELECT-V1: 상태는 사용자가 선택하지 않는다.
         //   '저장 = 사용할 수 있는 화면 세트'. 코너 적용 게이트(POST current-screen-set)가 active 를 요구하므로
         //   draft 는 active 로 승격(선택 UI 제거 후 draft 를 적용 가능하게 만들 다른 경로가 없음).
         //   active/archived/operator_template 등은 그대로 유지(보관·특수 상태는 별도 흐름에서 관리).
         const nextStatus: ScreenSetStatus = initialDetail!.status === 'draft' ? 'active' : initialDetail!.status;
-        const updated = await api.update(id, { name: name.trim(), status: nextStatus, templateKey });
-        qrFailed = updated?.qrLink === 'failed';
+        await api.update(id, { name: name.trim(), status: nextStatus, templateKey });
       } else {
         // library 재사용 세트(tabletId=null). 신규 저장은 기본 active(코너별 운영에서 바로 적용 가능). draft 는 UI 에서 만들지 않는다.
         //   운영자 API 는 status/tabletId 를 무시하고 operator_template 로 강제한다(계약 고정).
         const created = await api.create({ name: name.trim(), status: 'active', templateKey });
         id = created.id;
-        qrFailed = created?.qrLink === 'failed';
       }
       await api.saveBlocks(id!, blocks);
-      if (qrFailed) {
-        // 저장 자체는 성공(복구 가능) — QR 은 다시 저장하거나 QR 관리에서 재시도하면 확보된다.
-        onToast({ type: 'error', message: '저장은 되었지만 QR 생성에 실패했습니다. 잠시 후 다시 저장하거나 매장 QR 관리에서 확인해 주세요.' });
-      } else {
-        onToast({ type: 'success', message: isEdit ? '태블렛 콘텐츠가 저장되었습니다.' : `태블렛 콘텐츠 "${name.trim()}" 생성됨` });
-      }
+      // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 여기까지 왔으면 QR 까지 준비된 것이다
+      //   (QR 확보 실패는 저장 트랜잭션과 함께 롤백되어 위에서 예외로 떨어진다).
+      onToast({ type: 'success', message: isEdit ? '태블렛 콘텐츠가 저장되었습니다.' : `태블렛 콘텐츠 "${name.trim()}" 생성됨` });
       onSaved();
     } catch (e: any) {
-      onToast({ type: 'error', message: e?.message || '저장에 실패했습니다.' });
+      // QR 준비 실패 = 저장 실패(부분 성공 아님). 사용자에게 재시도를 명확히 안내한다.
+      const message = e?.code === 'SCREEN_SET_QR_FAILED'
+        ? 'QR 준비에 실패해 저장이 취소되었습니다. 잠시 후 다시 저장해 주세요.'
+        : (e?.message || '저장에 실패했습니다.');
+      onToast({ type: 'error', message });
     } finally { setSaving(false); }
   };
 

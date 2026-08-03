@@ -12,7 +12,6 @@
  * - QR 이미지는 저장하지 않고 동적 생성 유지(slug 만 관리).
  */
 
-import type { DataSource } from 'typeorm';
 import { getService } from '../../config/service-catalog.js';
 
 // store owner/플랫폼 service key → service-catalog key. (store-qr-landing.controller 의 매핑과 동일 의미)
@@ -78,11 +77,16 @@ export async function setScreenSetQrActive(
  * @returns 확보된 QR(slug/url/reused). 게이트 미충족(미소유/삭제/보관) 시 null.
  */
 export async function ensureScreenSetQr(
-  dataSource: DataSource,
+  executor: QueryExecutor,
   opts: { organizationId: string; screenSetId: string; serviceKey?: string },
 ): Promise<EnsureScreenSetQrResult | null> {
   const { organizationId, screenSetId } = opts;
   const serviceKey = opts.serviceKey ?? 'kpa';
+
+  // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1:
+  //   저장 트랜잭션(EntityManager) 안에서 호출할 수 있도록 executor 를 받는다.
+  //   → Screen Set 저장과 QR 확보가 같은 트랜잭션에서 성패를 함께 한다(부분 성공 없음).
+  const dataSource = { query: (sql: string, params?: unknown[]) => executor.query(sql, params) as Promise<any> };
 
   // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: QR 발급/조회 대상은 매장 소유(origin='store') 원본만.
   //   운영자·공급자 원본에는 Screen Set QR 을 발급하지 않는다(set 미존재 → null → 호출부가 QR 미부여).

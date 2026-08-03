@@ -229,12 +229,11 @@ export interface ScreenSet {
   updatedAt: string;
   blockCount?: number;
   isApplied?: boolean;
-  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
+  // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1:
   //   목록 GET 및 저장 응답(withQrLink)이 내려주는 Screen Set 자동 QR 정보(additive).
-  //   qrLink==='failed' = QR 확보 실패(저장 자체는 성공) → 제작기가 사용자에게 명시적으로 알린다.
+  //   저장이 성공했다면 QR 도 준비된 상태다 — QR 확보 실패는 저장이 롤백되고 SCREEN_SET_QR_FAILED 로 응답된다.
   publicQrSlug?: string | null;
   publicQrUrl?: string | null;
-  qrLink?: 'failed';
 }
 
 export interface ScreenBlock {
