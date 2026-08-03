@@ -154,18 +154,23 @@ export function MemberProfilePage() {
     }
   }, [isAuthenticated, user]);
 
+  /**
+   * WO-O4O-MEMBERSHIP-UI-API-CONTRACT-AUDIT-AND-MINIMAL-RECOVERY-V1
+   *
+   * 회원 변경 이력(감사 로그) 기능은 **프로덕션 미배포** 상태다
+   *   - `yaksa_member_audit_logs` 를 만드는 migration 이 없고 프로덕션에 테이블이 없다(read-only 실측).
+   * 기존 호출 경로 `/membership/audit-logs/member/:id` 도 **존재하지 않는 route** 였다.
+   *
+   * 게다가 정상 route(`/membership/members/:memberId/logs`)는 현재
+   * 플랫폼 관리자 전용 guard 아래에 있어 **회원 본인은 접근할 수 없다**.
+   * 회원 본인에게 자기 이력을 열어주려면 별도 권한 설계가 필요하므로 여기서 결정하지 않는다.
+   *
+   * 없는 endpoint 호출만 제거하고 아래 UI 는 기존 빈 상태를 그대로 렌더한다.
+   * 기능 배포와 본인 열람 권한은 별도 후속 WO 로 분리한다.
+   */
   const loadAuditLogs = useCallback(async () => {
     if (!profile?.id) return;
-    try {
-      const response = await authClient.api.get(`/membership/audit-logs/member/${profile.id}`, {
-        params: { limit: 10 },
-      });
-      if (response.data.success) {
-        setAuditLogs(response.data.data || []);
-      }
-    } catch {
-      // Silently fail - audit logs are optional
-    }
+    setAuditLogs([]);
   }, [profile?.id]);
 
   useEffect(() => {

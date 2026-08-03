@@ -210,18 +210,25 @@ const MemberDetail = () => {
     }
   }, [id]);
 
+  /**
+   * WO-O4O-MEMBERSHIP-UI-API-CONTRACT-AUDIT-AND-MINIMAL-RECOVERY-V1
+   *
+   * 회원 변경 이력(감사 로그) 기능은 **프로덕션 미배포** 상태다.
+   *   - 엔티티 `@Entity('yaksa_member_audit_logs')` 는 존재하고 DataSource 에 등록돼 있으나
+   *   - 이 테이블을 만드는 **migration 이 없고**, 프로덕션에도 테이블이 **존재하지 않는다**(read-only 실측).
+   *
+   * 또한 기존 호출 경로 `/membership/audit-logs/member/:id` 는 **존재하지 않는 route** 였다
+   * (정상 route 는 `/membership/members/:memberId/logs`).
+   *
+   * 정상 route 로 연결해도 테이블이 없어 500 이 되므로 **연결하지 않는다.**
+   * 없는 endpoint 를 호출해 401/404 를 만들지 않도록 요청만 제거하고,
+   * 아래 UI 는 기존 빈 상태를 그대로 렌더한다(화면 구조 무변경).
+   *
+   * 기능 배포(테이블 생성 + 기록 적재)는 별도 후속 WO 로 분리한다.
+   */
   const fetchAuditLogs = useCallback(async () => {
     if (!id) return;
-    try {
-      const response = await authClient.api.get(`/membership/audit-logs/member/${id}`, {
-        params: { limit: 20 },
-      });
-      if (response.data.success) {
-        setAuditLogs(response.data.data || []);
-      }
-    } catch {
-      // Silently fail
-    }
+    setAuditLogs([]);
   }, [id]);
 
   useEffect(() => {
