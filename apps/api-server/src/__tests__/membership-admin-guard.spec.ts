@@ -212,14 +212,15 @@ describe('회원 본인용 경로 — 회귀 없음', () => {
 // 9. 이번 범위 밖 경로는 건드리지 않았음을 고정
 // ─────────────────────────────────────────────────────
 describe('범위 경계', () => {
-  it('/membership/audit-logs, /affiliations, /license-verification 은 이번 WO 범위가 아니다', async () => {
+  // WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1 로 이 3개 + /organizations 가 보호 대상이 됐다.
+  // (원래 이 테스트는 "guard 미적용 = 범위 밖" 을 고정하고 있었다.)
+  it('audit-logs / affiliations / license-verification 은 이제 보호된다', async () => {
     for (const url of [
       '/api/v1/membership/audit-logs',
       '/api/v1/membership/affiliations',
       '/api/v1/membership/license-verification',
     ]) {
-      const res = await request(app).get(url);
-      expect(res.status).toBe(200); // guard 미적용 = 이번 변경이 손대지 않음
+      expect((await request(app).get(url)).status).toBe(401);
     }
   });
 
@@ -264,13 +265,9 @@ describe('소스 계약', () => {
     const guardedPrefixes = MEMBERSHIP_ADMIN_SUBTREES.map((s) => s.replace('/api/v1/membership', '')).concat('/members');
     const unguarded = mounted.filter((m) => !guardedPrefixes.some((g) => m === g || m.startsWith(`${g}/`)));
 
-    // 이번 WO 보호 대상이 아닌 나머지 — 별도 작업으로 다룬다 (CHECK 문서에 기록)
-    expect(unguarded).toEqual([
-      '/audit-logs',
-      '/affiliations',
-      '/organizations/:organizationId/members',
-      '/license-verification',
-    ]);
+    // WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1 로 잔여 4종까지 보호되어 **전수 보호**가 됐다.
+    // 새 mount 가 guard 없이 추가되면 이 단언이 실패한다.
+    expect(unguarded).toEqual([]);
   });
 
   it('보호 대상 subtree 목록이 예상과 일치한다', () => {
@@ -279,6 +276,11 @@ describe('소스 계약', () => {
       '/api/v1/membership/export',
       '/api/v1/membership/stats',
       '/api/v1/membership/verifications',
+      // WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1
+      '/api/v1/membership/audit-logs',
+      '/api/v1/membership/affiliations',
+      '/api/v1/membership/organizations',
+      '/api/v1/membership/license-verification',
     ]);
     expect(MEMBER_SELF_PATHS).toEqual(['/me', '/me/summary']);
   });

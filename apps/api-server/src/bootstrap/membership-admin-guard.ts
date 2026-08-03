@@ -33,12 +33,68 @@ import logger from '../utils/logger.js';
  */
 export const MEMBERSHIP_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
 
+/**
+ * WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1 — `organizationId` scope 에 대한 판단 근거
+ *
+ * `/organizations/:organizationId/members` 는 요청자가 URL 로 조직을 지정한다.
+ * "URL 의 organizationId 를 신뢰하지 않는다" 는 요구를 **접근 주체를 좁히는 방식**으로 만족시킨다.
+ *
+ *   - 비로그인 → 401
+ *   - 일반 사용자 / 서비스 역할(kpa:admin 등) → 403  → **어떤 조직도 조회할 수 없다**
+ *   - platform:admin · platform:super_admin → 통과 (플랫폼 전역 관리자이므로 cross-org 가 정상)
+ *
+ * 즉 "임의 organizationId 로 남의 조직 회원을 조회" 할 수 있는 주체가 **존재하지 않는다**.
+ * 통과 가능한 유일한 주체가 이미 전 조직에 대한 권한을 가진 플랫폼 관리자이기 때문에,
+ * 여기에 추가로 조직 소유권 필터를 걸면 **정상 권한을 축소**할 뿐 보안 이득이 없다.
+ *
+ * 조직 관리자(organization_members 의 owner/admin/manager, 또는
+ * role_assignments 의 scopeType='organization')에게 자기 조직 회원 조회를 **위임**하는 것은
+ * 현재 없는 권한을 새로 **부여**하는 정책 확대이므로 이 WO(보호 강화) 범위 밖이다.
+ * 필요하면 별도 WO 에서 설계한다.
+ */
+export const MEMBERSHIP_ORG_SCOPE_POLICY = 'platform-admin-only' as const;
+
 /** mount 전체가 관리자 전용인 subtree. */
 export const MEMBERSHIP_ADMIN_SUBTREES = [
   '/api/v1/membership/categories',
   '/api/v1/membership/export',
   '/api/v1/membership/stats',
   '/api/v1/membership/verifications',
+
+  // ── WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1 ──────────────────────────
+  // 상위 경계 밖에 남아 있던 잔여 subtree 4종.
+  // 전수 조사 결과 **네 subtree 안에 공개(비로그인) 계약 endpoint 는 없다.**
+  // 회원 본인용 endpoint 는 모두 `/members/:memberId/...` 아래에 따로 mount 돼 있어
+  // 이미 `membersSelective` guard 로 보호된다(§아래 표).
+  //
+  //   subtree                    | endpoint | 성격
+  //   ---------------------------|----------|-------------------------------------
+  //   /audit-logs                | GET 4    | 회원 변경 감사 기록 조회 (관리자)
+  //   /affiliations              | PUT/DEL  | 소속 정보 수정·삭제 (관리자 write)
+  //   /organizations/:id/members | GET 2    | 조직 회원 목록·이력 (관리자)
+  //   /license-verification      | 8        | 면허 검증 요청·승인·실패처리 (관리자)
+  //
+  // 회원 본인용(이미 보호됨, 여기서 변경하지 않음):
+  //   /members/:memberId/affiliations · /members/:memberId/logs
+  //   /members/:memberId/license-verification
+  //
+  // `/organizations` 는 하위에 `:organizationId/members` 만 존재하므로
+  // path parameter 없이 subtree 째로 건다(guard 가 파라미터 해석에 의존하지 않게 한다).
+  '/api/v1/membership/audit-logs',
+  '/api/v1/membership/affiliations',
+  '/api/v1/membership/organizations',
+  '/api/v1/membership/license-verification',
+];
+
+/**
+ * 이번 WO 로 새로 보호된 subtree (회귀 추적용).
+ * `MEMBERSHIP_ADMIN_SUBTREES` 의 부분집합이다.
+ */
+export const MEMBERSHIP_RESIDUAL_SUBTREES = [
+  '/api/v1/membership/audit-logs',
+  '/api/v1/membership/affiliations',
+  '/api/v1/membership/organizations',
+  '/api/v1/membership/license-verification',
 ];
 
 /** `/members` router 안에서 회원 본인이 사용하는 경로 (guard 제외). */
