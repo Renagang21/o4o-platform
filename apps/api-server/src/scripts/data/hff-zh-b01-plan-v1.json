@@ -1,0 +1,58 @@
+{
+ "wo": "WO-O4O-HFF-ZH-BATCH-01-10000-DIRECT-BULK-PRODUCTION-V1",
+ "plannedAt": "2026-08-03T01:08:23.497Z",
+ "poolDocuments": 40918,
+ "targetDocuments": 10000,
+ "phrasesNeeded": 2421,
+ "kindTally": {
+  "heading": 14,
+  "intro": 53,
+  "meta": 588,
+  "badge": 46,
+  "label": 214,
+  "foot": 26,
+  "clause": 1480
+ },
+ "curve": [
+  {
+   "docs": 1000,
+   "phrases": 157
+  },
+  {
+   "docs": 2000,
+   "phrases": 291
+  },
+  {
+   "docs": 3000,
+   "phrases": 405
+  },
+  {
+   "docs": 4000,
+   "phrases": 516
+  },
+  {
+   "docs": 5000,
+   "phrases": 674
+  },
+  {
+   "docs": 6000,
+   "phrases": 922
+  },
+  {
+   "docs": 7000,
+   "phrases": 1208
+  },
+  {
+   "docs": 8000,
+   "phrases": 1521
+  },
+  {
+   "docs": 9000,
+   "phrases": 1923
+  },
+  {
+   "docs": 10000,
+   "phrases": 2421
+  }
+ ]
+}
