@@ -13,9 +13,15 @@ export function createCategoryRoutes(dataSource: DataSource): Router {
   const categoryService = new MemberCategoryService(dataSource);
 
   // GET /api/v1/membership/categories
+  //
+  // WO-O4O-ADMIN-MEMBERSHIP-INACTIVE-CATEGORY-LIST-FIX-V1
+  //   이 경로는 WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2 로
+  //   platform:admin / platform:super_admin 전용이다(mount 지점 guard).
+  //   관리자는 비활성 분류를 다시 활성화할 수 있어야 하므로 활성·비활성을 모두 반환한다.
+  //   응답 구조({ success, data })와 정렬은 변경하지 않는다.
   router.get('/', async (req: Request, res: Response) => {
     try {
-      const categories = await categoryService.list();
+      const categories = await categoryService.list({ includeInactive: true });
       res.json({ success: true, data: categories });
     } catch (error: any) {
       console.error('Failed to list categories:', error);

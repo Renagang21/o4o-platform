@@ -58,9 +58,21 @@ export class MemberCategoryService {
     return await this.repo.findOne({ where: { id } });
   }
 
-  async list(): Promise<MemberCategory[]> {
+  /**
+   * 회원 분류 목록 조회.
+   *
+   * WO-O4O-ADMIN-MEMBERSHIP-INACTIVE-CATEGORY-LIST-FIX-V1
+   *   기본값은 기존과 동일하게 **활성 분류만** 반환한다.
+   *   일반 회원용 선택 목록 등 향후 소비처가 비활성 분류를 보게 되면 안 되므로
+   *   전체 조회는 명시적 opt-in(`includeInactive: true`)으로만 허용한다.
+   *   관리자 목록(GET /api/v1/membership/categories)은 비활성 분류를 다시
+   *   활성화할 수 있어야 하므로 opt-in 하여 활성·비활성을 모두 반환한다.
+   *
+   * 정렬(sortOrder ASC, name ASC)과 응답 구조는 변경하지 않는다.
+   */
+  async list(options?: { includeInactive?: boolean }): Promise<MemberCategory[]> {
     return await this.repo.find({
-      where: { isActive: true },
+      ...(options?.includeInactive ? {} : { where: { isActive: true } }),
       order: { sortOrder: 'ASC', name: 'ASC' },
     });
   }
