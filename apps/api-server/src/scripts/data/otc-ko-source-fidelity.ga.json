@@ -1,0 +1,66 @@
+{
+ "summary": {
+  "mode": "READ-ONLY / DB write 0",
+  "scope": "현재 KO STORE canonical 전량 — 구조 READY 여부와 무관하게 내용 정합성만 판정",
+  "total": 22408,
+  "verdicts": {
+   "KO_SOURCE_MATCH": 17584,
+   "KO_SOURCE_UNRESOLVED": 2933,
+   "KO_MISSING_CONTENT": 406,
+   "KO_CONTRADICTED": 441,
+   "KO_WRONG_ATTRIBUTION": 90,
+   "KO_STRUCTURE_REMAINING": 944,
+   "KO_EXTRA_CONTENT": 10
+  },
+  "balanced": true,
+  "axisFail": {
+   "NO_OFFICIAL_SOURCE_ON_MASTER": 2933,
+   "MISS_CONSULT": 288,
+   "MISS_AGE": 222,
+   "FREQ": 87,
+   "EXTRA_FREQ": 93,
+   "AGE_LO": 227,
+   "AGE_HI": 136,
+   "OBS_EXTRA_EFFICACY_VOCAB": 30,
+   "DOSE": 114,
+   "EXTRA_DOSE": 114,
+   "MISS_EFFICACY": 132,
+   "MISS_INTERVAL": 283,
+   "MISS_FREQ": 29,
+   "OFF_TARGET": 90,
+   "MISS_PROHIBITION": 261,
+   "EXTRA_AGE": 10
+  },
+  "translatable": 17584,
+  "bySourceType": {
+   "mfds_drug_otc_nutrition_combo": {
+    "KO_SOURCE_MATCH": 1522,
+    "KO_SOURCE_UNRESOLVED": 1661,
+    "KO_MISSING_CONTENT": 80,
+    "KO_CONTRADICTED": 168,
+    "KO_STRUCTURE_REMAINING": 114
+   },
+   "o4o_drug_otc_topical": {
+    "KO_MISSING_CONTENT": 55,
+    "KO_SOURCE_MATCH": 2477,
+    "KO_WRONG_ATTRIBUTION": 26
+   },
+   "mfds_drug_otc": {
+    "KO_SOURCE_MATCH": 13255,
+    "KO_MISSING_CONTENT": 271,
+    "KO_SOURCE_UNRESOLVED": 1272,
+    "KO_STRUCTURE_REMAINING": 827,
+    "KO_CONTRADICTED": 273,
+    "KO_EXTRA_CONTENT": 10
+   },
+   "mfds_easy_drug": {
+    "KO_SOURCE_MATCH": 330,
+    "KO_WRONG_ATTRIBUTION": 20,
+    "KO_STRUCTURE_REMAINING": 3
+   },
+   "manual": {
+    "KO_WRONG_ATTRIBUTION": 44
+   }
+  }
+ }
+}

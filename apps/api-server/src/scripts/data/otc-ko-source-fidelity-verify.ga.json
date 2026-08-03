@@ -1,0 +1,35 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "independence": "판정 스크립트와 otc-zh-slots / otc-ko-truncation-policy 를 import 하지 않는다",
+ "dbTotal": 22408,
+ "ledgerTotal": 22408,
+ "counts": {
+  "KO_SOURCE_MATCH": 17584,
+  "KO_SOURCE_UNRESOLVED": 2933,
+  "KO_MISSING_CONTENT": 406,
+  "KO_CONTRADICTED": 441,
+  "KO_WRONG_ATTRIBUTION": 90,
+  "KO_STRUCTURE_REMAINING": 944,
+  "KO_EXTRA_CONTENT": 10
+ },
+ "translatable": 17584,
+ "contradictedReproof": {
+  "total": 441,
+  "confirmed": 441,
+  "notReproduced": 0,
+  "samples": []
+ },
+ "wrongAttributionReproof": {
+  "total": 90,
+  "confirmed": 90
+ },
+ "checks": {
+  "DB 모집단 = 원장 건수": true,
+  "판정 합계 = 전체 (상호배타)": true,
+  "문서 중복 0": true,
+  "CONTRADICTED 전건 독립 재증명": true,
+  "WRONG_ATTRIBUTION 전건 규제속성으로 확인": true,
+  "번역 가능 = MATCH + DISPLAY_ONLY": true
+ },
+ "verdict": "VERIFIED"
+}
