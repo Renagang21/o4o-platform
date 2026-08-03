@@ -11,7 +11,7 @@ import { SLOT_RE, norm, zh, lostNums, KEEP_PROPER } from './hff-zh-b01-translate
 
 /* HFF ZH 전용 슬롯 확장 — 기준·규격 항목과 매장 문의 안내는 EN 트랙 슬롯 집합에 없다.
    중국어 설명서에서 이 두 영역이 한국어로 남으면 §7 대응 요건을 만족하지 못한다. */
-const ZH_SLOTS = [
+export const ZH_SLOTS = [
   ...SLOT_RE,
   /* `<b>망간</b> 표시량(...)의 80~150%` — 항목명이 `<b>` 로 감싸인 형태가 섞여 있다.
      인라인 태그를 포함해 슬롯을 잡고, 조각 단위 치환은 build 가 처리한다. */

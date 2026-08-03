@@ -1,0 +1,55 @@
+{
+ "wo": "WO-O4O-HFF-ZH-BATCH-02-10000-DIRECT-BULK-PRODUCTION-V1",
+ "plannedAt": "2026-08-03T13:30:33.858Z",
+ "poolDocuments": 30551,
+ "damaged": 0,
+ "alreadyProducible": 10026,
+ "hangulOnly": 25,
+ "targetDocuments": 10000,
+ "docsAvailable": 30526,
+ "newPhrasesNeeded": 0,
+ "kindTally": {},
+ "whyTally": {},
+ "curve": [
+  {
+   "docs": 1000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 2000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 3000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 4000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 5000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 6000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 7000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 8000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 9000,
+   "newPhrases": 0
+  },
+  {
+   "docs": 10000,
+   "newPhrases": 0
+  }
+ ]
+}

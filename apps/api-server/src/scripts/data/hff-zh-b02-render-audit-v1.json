@@ -1,0 +1,57 @@
+{
+ "wo": "WO-O4O-HFF-ZH-BATCH-02-10000-DIRECT-BULK-PRODUCTION-V1",
+ "renderedAt": "2026-08-03T13:47:37.081Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "globalsBefore": {
+  "ko": "40918",
+  "en": "40902",
+  "zh": "10000"
+ },
+ "poolWithoutZh": 30551,
+ "excludedFromPool": 367,
+ "priorQueueCarried": 379,
+ "targets": 10000,
+ "canonicalDup": 0,
+ "producedCandidates": 10014,
+ "notProducedInBatch": 20537,
+ "notProducedByWhy": {
+  "UNRESOLVED": 20497,
+  "UNDEFINED_CLASS": 12,
+  "HANGUL_REMAINS": 25,
+  "NUMBER_DRIFT": 3
+ },
+ "documentsRendered": 5182,
+ "structureSignatures": 485,
+ "coverage": "signature-exhaustive + high-risk full",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "renders": 15546,
+ "counters": {
+  "structureParity": 0,
+  "pageOverflow": 0,
+  "elementOverflow": 0,
+  "clipped": 0,
+  "emptyH2": 0,
+  "emptyUl": 0,
+  "emptyLi": 0,
+  "undefinedClass": 0,
+  "rawHtml": 0,
+  "hangulVisible": 0,
+  "markerVisible": 0,
+  "labelLost": 0,
+  "licenseNoLost": 0
+ },
+ "totalIssues": 0,
+ "verdict": "PASS",
+ "failures": [],
+ "issueQueue": 42,
+ "issueByType": {
+  "RENDER_FAILURE": 12,
+  "TRANSLATION_AMBIGUOUS": 25,
+  "NUMBER_STRUCTURE_AMBIGUOUS": 5
+ }
+}

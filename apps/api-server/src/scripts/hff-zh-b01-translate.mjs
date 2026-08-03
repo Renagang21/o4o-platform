@@ -107,11 +107,15 @@ const COLOR = {};
 /** 해석 실패 조각 수집기(저작 라운드 입력). */
 export const FAILED = new Map();
 const AUTH = { clause: {}, label: {}, meta: {}, heading: {}, badge: {}, intro: {}, foot: {}, spec: {} };
-for (let n = 1; n <= 60; n++) {
-  const f = `${D}/hff-zh-b01-z${n}-translations-v1.json`;
+/* Batch 01 라운드(b01-z*) 다음에 Batch 02 라운드(b02-z*)를 얹는다.
+   같은 문구가 양쪽에 있으면 나중 라운드가 이긴다(사전은 누적·상위 덮어쓰기). */
+const ROUND_FILES = [];
+for (let n = 1; n <= 60; n++) ROUND_FILES.push([`z${n}`, `${D}/hff-zh-b01-z${n}-translations-v1.json`]);
+for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b02z${n}`, `${D}/hff-zh-b02-z${n}-translations-v1.json`]);
+for (const [tag, f] of ROUND_FILES) {
   if (!fs.existsSync(f)) continue;
   const T = JSON.parse(fs.readFileSync(f, 'utf8'));
-  authoredRounds.push(`z${n}`);
+  authoredRounds.push(tag);
   for (const kind of Object.keys(AUTH)) for (const [k, v] of Object.entries(T[kind] ?? {})) AUTH[kind][key(k)] = v;
   /* any = 슬롯 종류와 무관하게 같은 의미로 쓰이는 문구 */
   for (const [k, v] of Object.entries(T.any ?? {})) for (const kind of Object.keys(AUTH)) AUTH[kind][key(k)] = v;
@@ -166,16 +170,16 @@ const freqTokens = (t, zhSide) => {
     /* 제품명은 한국어를 그대로 유지하므로(`딥트3일 스트롱플러스`) 중국어 본문 안에도 한국어 표기가 남는다.
        같은 글자를 한쪽에서만 세면 없어지지 않은 수치가 유실로 잡힌다. */
     for (const m of t.matchAll(/(\d+)\s*일(?![가-힣])/g)) out.push(`PERDAY${m[1]}`);
-    for (const m of t.matchAll(/(\d+)\s*회(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
+    for (const m of t.matchAll(/(\d+)\s*회(?:당|에|시|씩)?(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
   } else {
     for (const m of t.matchAll(/(\d+)\s*일(?![가-힣])/g)) out.push(`PERDAY${m[1]}`);
-    for (const m of t.matchAll(/(\d+)\s*회(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
+    for (const m of t.matchAll(/(\d+)\s*회(?:당|에|시|씩)?(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
   }
   return out;
 };
 const stripFreq = (t, zhSide) => (zhSide
-  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*[일회](?![가-힣])/g, ' ')
-  : t.replace(/(\d+)\s*[일회](?![가-힣])/g, ' '));
+  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ')
+  : t.replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' '));
 /* `每2000mg100亿 CFU` 처럼 단위 바로 뒤에 다음 수치가 붙는 표기가 있다. 이때 `100` 앞 글자가
    라틴 문자(`g`)여서 성분 코드 판정에 걸려 수치가 통째로 안 읽힌다. 이미 단위로 닫힌 자리 뒤에는
    경계를 넣어 다음 수치를 살리고, `비타민B12` 같은 성분 코드는 그대로 막는다. */

@@ -1,0 +1,19 @@
+{
+ "wo": "WO-O4O-HFF-ZH-BATCH-02-10000-DIRECT-BULK-PRODUCTION-V1",
+ "builtAt": "2026-08-03T11:28:29.834Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "globalsBefore": {
+  "ko": "40918",
+  "en": "40902",
+  "zh": "10000"
+ },
+ "koCanonicalWithoutZh": 30918,
+ "excludedZhIssueQueue": 367,
+ "excludedKoPermanentHold": 0,
+ "candidatePool": 30551,
+ "masterDup": 0,
+ "koCanonicalDup": 0,
+ "target": 10000,
+ "poolCoversTarget": true
+}
