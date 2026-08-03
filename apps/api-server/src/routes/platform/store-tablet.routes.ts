@@ -947,6 +947,46 @@ export function createStoreTabletRoutes(
     }
   }));
 
+  /**
+   * GET /product-pool
+   * 매장(조직) 기준 상품 풀 — 물리 태블릿과 무관.
+   *
+   * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+   *   Screen Set(태블렛 콘텐츠)은 코너·태블릿과 독립된 라이브러리 원본이라 tabletId 가 없다
+   *   (태블릿이 0대인 매장도 콘텐츠를 만든다). 기존 /tablets/:id/product-pool 은 tabletId 를
+   *   소유 확인에만 쓰고 실제 조회는 organization 기준이므로, **동일 SQL** 을 태블릿 없이 노출한다.
+   *   신규 테이블·컬럼 없음. 반환 형태도 기존과 동일( { supplierProducts, localProducts } ).
+   */
+  router.get('/product-pool', withStoreAuth(async (_req, res, organizationId) => {
+    try {
+      const [supplierProducts, localProducts] = await Promise.all([
+        dataSource.query(
+          `SELECT opl.id, opl.offer_id, pm.name AS product_name, spo.price_general AS retail_price,
+                  opl.is_active, opl.created_at, opl.service_key
+           FROM organization_product_listings opl
+           LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
+           LEFT JOIN product_masters pm ON pm.id = spo.master_id
+           WHERE opl.organization_id = $1 AND opl.is_active = true
+           ORDER BY opl.created_at ASC, pm.name ASC`,
+          [organizationId],
+        ),
+        dataSource.query(
+          `SELECT id, name, description, summary, thumbnail_url, images, gallery_images,
+                  category, price_display, badge_type, highlight_flag,
+                  is_active, sort_order
+           FROM store_local_products
+           WHERE organization_id = $1 AND is_active = true
+           ORDER BY sort_order ASC, name ASC`,
+          [organizationId],
+        ),
+      ]);
+      res.json({ success: true, data: { supplierProducts, localProducts } });
+    } catch (error: any) {
+      console.error('[StoreTablet] GET /product-pool error:', error);
+      res.status(500).json({ success: false, error: 'Failed to fetch product pool', code: 'INTERNAL_ERROR' });
+    }
+  }));
+
   // ─── Barcode Product Registration (WO-O4O-TABLET-MODULE-V1) ──
 
   /**

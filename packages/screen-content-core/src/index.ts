@@ -39,6 +39,16 @@ export type ContentListItem =
   | { sourceType: 'o4o_product_description'; masterId: string; language: string; displayTitle: string | null; displaySummary: string | null; visible: boolean; sortOrder: number }
   | { sourceType: 'store_content'; contentId: string; displayTitle: string | null; displaySummary: string | null; visible: boolean; sortOrder: number };
 
+/**
+ * product_list 상품 참조(저장 config) — WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1
+ *
+ * 식별자 계약은 **기존 매장 진열(store_tablet_displays)과 동일**하다:
+ *   supplier → organization_product_listings.id   (매장 취급 상품 = 상품 풀의 supplierProducts[].id)
+ *   local    → store_local_products.id            (매장 자체 상품)
+ * 새 식별 체계를 만들지 않는다(신규 테이블/컬럼 없음 — Screen Set block config 안에만 저장).
+ */
+export type SelectedProductRef = { productType: 'supplier' | 'local'; productId: string };
+
 /** 편집 Draft — 저장 전 화면 세트 편집 모델(블록 목록). */
 export interface ScreenSetDraft {
   blocks: ScreenBlock[];
@@ -134,6 +144,59 @@ export function addContentItems(items: ContentListItem[], added: ContentListItem
   const seen = new Set(items.map(contentItemKey));
   const fresh = added.filter((it) => !seen.has(contentItemKey(it)));
   return reindexContentItems([...items, ...fresh]);
+}
+
+// ── product_list(상품 목록) 순수 연산 ──
+//   기존 계약 `{ source: 'legacy_tablet_displays' }`(매장 진열 순서 그대로)를 깨지 않는다.
+//   명시 선택은 `{ source: 'selected_products', products: [...] }` 로 **추가**한다.
+//   선택이 비면 legacy 형태로 되돌려 저장한다 → 과거 소비처/공개 렌더 동작 불변.
+export function productRefKey(ref: SelectedProductRef): string {
+  return `${ref.productType}:${ref.productId}`;
+}
+
+/** config → 명시 선택 목록. legacy/미지정/깨진 값은 모두 빈 배열(= 매장 진열 그대로). */
+export function selectedProductsOf(config: Record<string, unknown> | undefined | null): SelectedProductRef[] {
+  const c = config ?? {};
+  if (c.source !== 'selected_products') return [];
+  const raw = Array.isArray(c.products) ? c.products : [];
+  const seen = new Set<string>();
+  const out: SelectedProductRef[] = [];
+  for (const it of raw) {
+    if (!it || typeof it !== 'object') continue;
+    const { productType, productId } = it as Partial<SelectedProductRef>;
+    if (productType !== 'supplier' && productType !== 'local') continue;
+    if (typeof productId !== 'string' || productId.trim() === '') continue;
+    const ref: SelectedProductRef = { productType, productId };
+    const key = productRefKey(ref);
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(ref);
+  }
+  return out;
+}
+
+/** 명시 선택 여부(= 매장 진열 그대로가 아닌 상태). */
+export function hasSelectedProducts(config: Record<string, unknown> | undefined | null): boolean {
+  return selectedProductsOf(config).length > 0;
+}
+
+/** 선택 목록을 config 로 반영. 빈 목록이면 legacy 계약으로 복귀. */
+export function withSelectedProducts(
+  config: Record<string, unknown> | undefined | null,
+  products: SelectedProductRef[],
+): Record<string, unknown> {
+  const rest = { ...(config ?? {}) };
+  delete rest.source;
+  delete rest.products;
+  if (products.length === 0) return { ...rest, source: 'legacy_tablet_displays' };
+  const seen = new Set<string>();
+  const uniq = products.filter((p) => {
+    const key = productRefKey(p);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  return { ...rest, source: 'selected_products', products: uniq.map((p) => ({ productType: p.productType, productId: p.productId })) };
 }
 
 // ── 저장 전 validation ──

@@ -118,6 +118,57 @@ async function resolveScreenSetLocalProducts(
 }
 
 /**
+ * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+ *   product_list config 의 **명시 선택** 파싱.
+ *   - `{ source: 'legacy_tablet_displays' }`(또는 미지정/깨진 값) → null = 기존 동작(매장 진열 기준) 그대로.
+ *   - `{ source: 'selected_products', products: [{ productType, productId }] }` → 선택 목록.
+ *   프론트 계약(@o4o/screen-content-core selectedProductsOf)과 동일 규칙을 서버에서 재확인한다
+ *   (api-server 는 프론트 패키지에 의존하지 않는다 — parseContentListConfig 과 동일 방침).
+ */
+function parseSelectedProducts(config: unknown): Array<{ productType: 'supplier' | 'local'; productId: string }> | null {
+  if (!config || typeof config !== 'object' || Array.isArray(config)) return null;
+  const cfg = config as Record<string, unknown>;
+  if (cfg.source !== 'selected_products') return null;
+  const raw = Array.isArray(cfg.products) ? cfg.products : [];
+  const seen = new Set<string>();
+  const out: Array<{ productType: 'supplier' | 'local'; productId: string }> = [];
+  for (const it of raw) {
+    if (!it || typeof it !== 'object') continue;
+    const pt = (it as Record<string, unknown>).productType;
+    const pid = (it as Record<string, unknown>).productId;
+    if (pt !== 'supplier' && pt !== 'local') continue;
+    if (typeof pid !== 'string' || pid.trim() === '') continue;
+    const key = `${pt}:${pid}`;
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push({ productType: pt, productId: pid });
+  }
+  return out.length > 0 ? out : null;
+}
+
+/** 명시 선택된 매장 자체 상품(store_local_products) resolve — 선택 순서는 호출부에서 적용. */
+async function resolveSelectedLocalProducts(
+  dataSource: DataSource,
+  organizationId: string,
+  ids: string[],
+): Promise<Array<{ id: string; type: 'local'; name: string; price: number | null; imageUrl: string | null }>> {
+  if (ids.length === 0) return [];
+  const rows = await dataSource.query(
+    `SELECT id, name, price_display AS "priceDisplay", thumbnail_url AS "thumbnailUrl"
+       FROM store_local_products
+      WHERE organization_id = $1 AND is_active = true AND id = ANY($2::uuid[])`,
+    [organizationId, ids],
+  );
+  return rows.map((r: any) => ({
+    id: r.id,
+    type: 'local' as const,
+    name: r.name,
+    price: r.priceDisplay != null ? Number(r.priceDisplay) : null,
+    imageUrl: r.thumbnailUrl ?? null,
+  }));
+}
+
+/**
  * 저장된 Screen Set 을 sections 로 resolve. 경계/삭제/보관 게이트 미충족 시 null.
  */
 export async function resolveScreenSetSections(
@@ -166,6 +217,46 @@ export async function resolveScreenSetSections(
         }
       } else if (b.blockType === 'product_list') {
         if (productMode === 'skip') continue;
+        // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+        //   명시 선택이 있으면 그 목록·순서를 그대로 쓴다(코너 진열 구성에 의존하지 않는다).
+        //   선택이 없으면(= legacy config) 아래 기존 경로가 그대로 동작한다(회귀 0).
+        const selected = parseSelectedProducts(b.config);
+        if (selected) {
+          const selectedListingIds = selected.filter((s) => s.productType === 'supplier').map((s) => s.productId);
+          const selectedLocalIds = selected.filter((s) => s.productType === 'local').map((s) => s.productId);
+          // supplier: 공개 가시성 게이트(TABLET 채널 승인·공급자 ACTIVE 등)는 그대로 통과시킨 뒤 선택으로 교집합.
+          //   선택은 "무엇을 보여줄지"만 정하고 "보여도 되는지"는 기존 게이트가 정한다(권한 완화 없음).
+          let selectedSuppliers: any[] = [];
+          if (selectedListingIds.length > 0) {
+            const r: any = await queryTabletVisibleProducts(dataSource, input.storeId, resolveServiceKeys(input.serviceKey), {
+              page: 1, limit: 200, sort: 'sort_order', order: 'asc',
+              // 코너 진열(configured) 로 집합을 좁히지 않는다 — 선택이 이미 집합을 정한다.
+              firstTabletId: tabletContext?.tabletId ?? null,
+              configured: false,
+            });
+            const byListing = new Map<string, any>();
+            for (const p of (r?.data ?? [])) if (p?.listingId) byListing.set(String(p.listingId), p);
+            selectedSuppliers = selectedListingIds.map((id) => byListing.get(id)).filter(Boolean);
+          }
+          const selectedLocals = await resolveSelectedLocalProducts(dataSource, input.organizationId, selectedLocalIds);
+          const localById = new Map(selectedLocals.map((p) => [p.id, p]));
+          const supplierByListing = new Map(selectedSuppliers.map((p: any) => [String(p.listingId), p]));
+          // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
+          const ordered = selected
+            .map((s) => (s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId)))
+            .filter(Boolean);
+          sections.push({
+            blockType: 'product_list',
+            sortOrder: b.sortOrder,
+            data: {
+              products: ordered,
+              // kiosk 가 자체 조회 대신 이 목록을 쓰도록 알리는 표식(미인식 소비처는 무시 → 기존 동작).
+              selectionMode: 'selected',
+              localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
+            },
+          });
+          continue;
+        }
         // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR/모바일도 태블릿과 상품 parity.
         //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)하는데,
         //   QR(tabletContext 없음)은 그동안 configured=false → org 전체 supplier 라 상품이 더 많았다.

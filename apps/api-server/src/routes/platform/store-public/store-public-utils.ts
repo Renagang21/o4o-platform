@@ -484,6 +484,10 @@ export async function queryTabletVisibleProducts(
          COALESCE(spd.content, sp.description, spo.consumer_detail_description, '') AS description,
          COALESCE(spd.summary, spo.consumer_short_description, '') AS short_description,
          ${contentSelect},
+         -- WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+         -- Screen Set product_list 의 명시 선택(config.products[].productId = organization_product_listings.id)과
+         -- 대조하기 위한 listing id. additive select — 기존 소비처는 이 필드를 읽지 않으므로 영향 없음.
+         opl.id AS "listingId",
          opl.created_at AS sort_order,
          spo.created_at, spo.updated_at,
          opl.organization_id AS pharmacy_id

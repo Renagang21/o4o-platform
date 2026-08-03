@@ -18,6 +18,11 @@ import { DataTable, Pagination } from '@o4o/operator-ux-core';
 import type { ListColumnDef } from '@o4o/operator-ux-core';
 import type { ScreenSet, ScreenSetDetail } from '../../../api/tabletDisplays';
 import { fetchOperatorScreenSets, fetchOperatorScreenSet, removeOperatorScreenSet, operatorScreenSetBuilderApi } from '../../../api/operatorTabletScreenSets';
+// WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1: 코너 내용 편집기 이미지 업로드/라이브러리.
+//   운영자 원본은 매장 상품 문맥이 없으므로 fetchProductPool 은 주입하지 않는다(상품 영역 비노출 = 기존 동작).
+import { mediaApi } from '../../../api/media';
+import MediaPickerModal from '../../../components/common/MediaPickerModal';
+import type { MediaInsert } from '@o4o/content-editor';
 
 type Toast = { type: 'success' | 'error'; message: string };
 const PAGE_LIMIT = 20;
@@ -49,6 +54,14 @@ export default function OperatorTabletScreenSetsPage() {
   const [builder, setBuilder] = useState<{
     detail: ScreenSetDetail | null;
   } | null>(null);
+
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
+  const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'tablet-screen-set');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  }, []);
 
   const previewApi = useMemo(() => operatorPreviewApi, []);
 
@@ -186,6 +199,18 @@ export default function OperatorTabletScreenSetsPage() {
           storeSlug={OPERATOR_PREVIEW_SLUG}
           api={operatorScreenSetBuilderApi}
           contentSources={['spd']}
+          onImageUpload={handleImageUpload}
+          onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
+        />
+        <MediaPickerModal
+          open={!!mediaPickerTarget}
+          onClose={() => setMediaPickerTarget(null)}
+          onSelect={(asset) => {
+            mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
+            setMediaPickerTarget(null);
+          }}
+          title="코너 내용 이미지"
+          defaultFolder="tablet-screen-set"
         />
         {toast && <ToastView toast={toast} />}
       </div>

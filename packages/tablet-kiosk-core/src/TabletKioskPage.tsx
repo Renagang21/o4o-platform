@@ -301,6 +301,26 @@ function mapLocalProduct(p: any): DisplayProduct {
   };
 }
 
+/**
+ * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+ *   /tablet/screen 의 product_list section 이 내려주는 상품 record → DisplayProduct.
+ *   supplier 는 /tablet/products 와 동일 shape(TabletProduct), local 은 서버가 이미 평탄화한
+ *   `{ id, type:'local', name, price, imageUrl }` shape 이다.
+ */
+function mapSectionProduct(p: any): DisplayProduct {
+  if (p?.type === 'local') {
+    return {
+      id: String(p.id),
+      type: 'local',
+      name: p.name,
+      price: typeof p.price === 'number' ? p.price : undefined,
+      priceDisplay: typeof p.priceDisplay === 'string' ? p.priceDisplay : undefined,
+      imageUrl: p.imageUrl ?? undefined,
+    };
+  }
+  return mapSupplierProduct(p as TabletProduct);
+}
+
 // ── Component ──
 
 export interface TabletKioskPageProps {
@@ -453,25 +473,11 @@ export function TabletKioskPage({
     cardRefs.current[browseIndex]?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [browseIndex, mode, autoSlideSeconds, products.length]);
 
-  // Load products (supplier + local merged)
-  useEffect(() => {
-    if (!slug) return;
-    // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
-    //   아직 적용 코너가 없어 진열 상품 문맥이 없다 → 실제 매장 상품을 조회하지 않는다(골격만 표시).
-    if (previewLayoutOnly) { dispatch({ type: 'LOAD_SUCCESS', products: [] }); return; }
-    dispatch({ type: 'LOAD_START' });
-    api.fetchProducts(slug, { limit: 50 })
-      .then((res) => {
-        const suppliers = res.data.map(mapSupplierProduct);
-        const locals = ((res.localProducts as any[] | undefined) || []).map(mapLocalProduct);
-        dispatch({ type: 'LOAD_SUCCESS', products: [...suppliers, ...locals] });
-      })
-      .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
-  }, [slug, api, previewLayoutOnly]);
-
   // WO-O4O-KPA-TABLET-KIOSK-CORE-SCREEN-CONSUMER-V1:
   //   적용된 Screen Set 을 opt-in 으로 읽는다. api.fetchScreen 미주입이거나 응답 mode='legacy'
   //   → screen=null → 기존 /products+/idle 동작 그대로. 미주입 서비스(K-Cosmetics 등) 무영향.
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+  //   상품 로드 effect 가 screen(명시 선택 여부)을 참조해야 하므로 선언 순서를 상품 로드보다 앞으로 옮겼다(로직 불변).
   const [fetchedScreen, setFetchedScreen] = useState<TabletScreenResponse | null>(null);
   useEffect(() => {
     // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: previewScreen 주입 시 fetch 생략(draft sections 사용).
@@ -486,6 +492,34 @@ export function TabletKioskPage({
   }, [slug, api, previewScreen, viewerLang]);
   // 주입 우선(previewScreen) → 없으면 fetch 결과. mode='screen_set' 인 것만 유효.
   const screen = (previewScreen && previewScreen.mode === 'screen_set') ? previewScreen : fetchedScreen;
+
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+  //   product_list 에 **명시 선택**이 저장되면 서버가 selectionMode='selected' + 선택 순서의 products 를 내려준다.
+  //   그때만 kiosk 는 자체 조회(/tablet/products) 대신 이 목록을 쓴다. 표식이 없으면(legacy) 기존 조회 그대로(회귀 0).
+  const selectedSectionProducts = (() => {
+    const d = (screen?.sections ?? []).find((x) => x.blockType === 'product_list')?.data as any;
+    if (!d || d.selectionMode !== 'selected') return null;
+    return Array.isArray(d.products) ? (d.products as any[]).map(mapSectionProduct) : [];
+  })();
+
+  // Load products (supplier + local merged)
+  useEffect(() => {
+    if (!slug) return;
+    // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
+    //   아직 적용 코너가 없어 진열 상품 문맥이 없다 → 실제 매장 상품을 조회하지 않는다(골격만 표시).
+    if (previewLayoutOnly) { dispatch({ type: 'LOAD_SUCCESS', products: [] }); return; }
+    if (selectedSectionProducts) { dispatch({ type: 'LOAD_SUCCESS', products: selectedSectionProducts }); return; }
+    dispatch({ type: 'LOAD_START' });
+    api.fetchProducts(slug, { limit: 50 })
+      .then((res) => {
+        const suppliers = res.data.map(mapSupplierProduct);
+        const locals = ((res.localProducts as any[] | undefined) || []).map(mapLocalProduct);
+        dispatch({ type: 'LOAD_SUCCESS', products: [...suppliers, ...locals] });
+      })
+      .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
+    // selectedSectionProducts 는 매 렌더 새 배열 → 내용 기준 key 로 의존(불필요 재조회 방지).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug, api, previewLayoutOnly, selectedSectionProducts ? selectedSectionProducts.map((p) => `${p.type}:${p.id}`).join(',') : null]);
 
   // Screen Set sections → 화면 요소(코너 설명 / QR 안내 / 대기 미디어). screen=null 이면 전부 미적용(legacy).
   const screenSections = screen?.sections ?? [];

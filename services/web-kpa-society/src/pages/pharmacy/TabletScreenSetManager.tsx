@@ -15,8 +15,13 @@ import {
   searchTabletStoreContents, searchTabletO4oDescriptions,
   // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 draft → sections resolve(read-only)
   previewScreenSet,
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1: 상품 선택용 매장 상품 풀.
+  fetchStoreProductPool,
   type ScreenSet, type ScreenSetDetail,
 } from '../../api/tabletDisplays';
+import { mediaApi } from '../../api/media';
+import MediaPickerModal from '../../components/common/MediaPickerModal';
+import type { MediaInsert } from '@o4o/content-editor';
 // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비.
 import TabletContentLibraryList from './TabletContentLibraryList';
 import type { TabletKioskApi } from '@o4o/tablet-kiosk-core';
@@ -67,6 +72,17 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
 
   // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 인라인 생성/편집 UI → 단계형 제작 셸.
   const [builder, setBuilder] = useState<{ detail: ScreenSetDetail | null } | null>(null);
+
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
+  //   코너 내용 편집기(RichTextEditor)에 이미지 업로드 / 공용 미디어 라이브러리를 연결한다.
+  //   업로드 경로·sanitize 기준은 기존 상품 설명 편집기와 동일(신규 저장소 없음).
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<((media: MediaInsert) => void) | null>(null);
+
+  const handleImageUpload = useCallback(async (file: File): Promise<string> => {
+    const res = await mediaApi.upload(file, true, 'kpa-society', 'tablet-screen-set');
+    if (res.success && res.data) return res.data.url;
+    throw new Error(res.error || '이미지 업로드에 실패했습니다.');
+  }, []);
 
   const reload = useCallback(async () => {
     setLoading(true);
@@ -123,15 +139,31 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
   //   공유 편집기에 **매장 API(defaultStoreBuilderApi)** 를 명시 주입(회귀 0).
   if (builder) {
     return (
-      <TabletContentStepBuilder
-        initialDetail={builder.detail}
-        onCancel={() => setBuilder(null)}
-        onSaved={() => { setBuilder(null); reload(); }}
-        onToast={onToast}
-        previewApi={previewApi}
-        storeSlug={storeSlug ?? null}
-        api={defaultStoreBuilderApi}
-      />
+      <>
+        <TabletContentStepBuilder
+          initialDetail={builder.detail}
+          onCancel={() => setBuilder(null)}
+          onSaved={() => { setBuilder(null); reload(); }}
+          onToast={onToast}
+          previewApi={previewApi}
+          storeSlug={storeSlug ?? null}
+          api={defaultStoreBuilderApi}
+          // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1
+          fetchProductPool={fetchStoreProductPool}
+          onImageUpload={handleImageUpload}
+          onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
+        />
+        <MediaPickerModal
+          open={!!mediaPickerTarget}
+          onClose={() => setMediaPickerTarget(null)}
+          onSelect={(asset) => {
+            mediaPickerTarget?.({ type: 'image', url: asset.url, title: asset.originalName });
+            setMediaPickerTarget(null);
+          }}
+          title="코너 내용 이미지"
+          defaultFolder="tablet-screen-set"
+        />
+      </>
     );
   }
 
