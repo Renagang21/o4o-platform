@@ -124,7 +124,26 @@ describe('정상 주문', () => {
     await service.confirm({ buyerId: 'buyer-1' });
     expect(createOrderCalls[0].metadata.paymentStatus).toBeUndefined();
     expect(createOrderCalls[0].metadata.collectionStatus).toBeUndefined();
-    expect(createOrderCalls[0].metadata.phase).toBe('buyer-order-only');
+    // paid 전이는 오직 결제 완료 이벤트 핸들러만 수행한다 — 주문 생성은 관여하지 않는다.
+  });
+
+  it('공급자가 여럿이어도 1회 결제로 묶는다 (paymentGroupId)', async () => {
+    // Phase 2(WO-PHARMACY-HUB-PAYMENT-AND-SUPPLIER-FULFILLMENT-V1) 에서
+    // Phase 1 의 `metadata.phase='buyer-order-only'` 마커가 paymentGroupId 로 대체됐다.
+    // 공급자 노출·fulfillment 가 실제로 생겼으므로 'buyer-order-only' 는 더 이상 사실이 아니다.
+    const { service } = makeService(
+      [cart({ id: 'cart-1', supplierId: 'sup-1', supplierProductOfferId: 'offer-1' }),
+       cart({ id: 'cart-2', supplierId: 'sup-2', supplierProductOfferId: 'offer-2' })],
+      [offer({ id: 'offer-1', supplier_id: 'sup-1' }),
+       offer({ id: 'offer-2', supplier_id: 'sup-2' })],
+    );
+    const out = await service.confirm({ buyerId: 'buyer-1' });
+
+    expect(out.paymentGroupId).toEqual(expect.any(String));
+    expect(createOrderCalls).toHaveLength(2);          // 주문은 공급자별로 분리 유지
+    expect(createOrderCalls[0].metadata.paymentGroupId).toBe(out.paymentGroupId);
+    expect(createOrderCalls[1].metadata.paymentGroupId).toBe(out.paymentGroupId);
+    expect(createOrderCalls[0].metadata.phase).toBeUndefined();
   });
 
   it('주문 성공한 항목은 장바구니에서 제거한다', async () => {
