@@ -1,0 +1,34 @@
+{
+ "mode": "READ-ONLY / DB write 0",
+ "dbPopulation": 3545,
+ "ledgerDocs": 3545,
+ "stateCount": {
+  "DIRECT": 1720,
+  "HOLD_LINEAGE": 51,
+  "INVALID_AGE_CONFLICT": 98,
+  "INVALID_FREQUENCY_CONFLICT": 66,
+  "PRODUCT_SOURCE_REQUIRED": 1610
+ },
+ "invalidReproof": {
+  "total": 164,
+  "confirmed": 164,
+  "notReproduced": 0,
+  "samples": []
+ },
+ "previousSafe944": {
+  "total": 944,
+  "movedTo": {
+   "PRODUCT_SOURCE_REQUIRED": 333
+  },
+  "notInNutritionCombo": 611
+ },
+ "checks": {
+  "DB 모집단 = 원장 건수": true,
+  "상태 합계 = 전체": true,
+  "문서 중복 0": true,
+  "INVALID 전건 원문 재증명": true,
+  "기존 SAFE 944 전건 추적": true,
+  "SAFE_EXPANDED 는 근거 재현된 것만": true
+ },
+ "verdict": "VERIFIED"
+}
