@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check } from 'lucide-react';
+import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check, QrCode, Download } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import {
@@ -27,6 +27,14 @@ import {
 } from '@o4o/operator-ux-core';
 import { TabletKioskPage, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
 import { archiveScreenSet, fetchScreenSet, previewScreenSet, type ScreenSet, type ScreenSetStatus } from '../../api/tabletDisplays';
+// WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 기존 매장 QR 출력/다운로드 기능 재사용(신규 엔드포인트 없음).
+import {
+  getStoreQrCodes,
+  fetchQrExportBlob,
+  downloadQrExport,
+  QR_EXPORT_PRESETS,
+  type StoreQrCode,
+} from '../../api/storeQr';
 
 // ─── 상수 ────────────────────────────────────────────────────────────────────
 
@@ -65,6 +73,9 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
     { key: 'preview', label: '미리보기' },
     // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 → 대상 태블렛에 바로 적용(보관 제외).
     { key: 'apply', label: '태블렛에 적용', visible: (s) => s.status !== 'archived' },
+    // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 자동 생성된 코너 QR 보기·출력 진입.
+    //   slug 가 없는 콘텐츠(아직 QR 미확보)는 노출하지 않는다 — 없는 QR 을 있는 것처럼 보이지 않게.
+    { key: 'qr', label: 'QR 보기·출력', visible: (s) => !!s.publicQrSlug && s.status !== 'archived' },
     { key: 'edit', label: '수정' },
     // 보관(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지). 내부 status 는 archived 그대로.
     { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
@@ -75,6 +86,7 @@ const ACTION_ICONS: Record<string, ReactNode> = {
   apply: <MonitorSmartphone className="w-4 h-4" />,
   edit: <Edit3 className="w-4 h-4" />,
   archive: <Trash2 className="w-4 h-4" />,
+  qr: <QrCode className="w-4 h-4" />,
 };
 
 /** 적용 대상 태블렛(최소 형태 — StoreTabletDisplaysPage 의 TabletType 하위집합). */
@@ -210,6 +222,55 @@ export default function TabletContentLibraryList({
       toast.error(e?.message || '미리보기를 불러오지 못했습니다.');
     } finally { setPreviewBusy(null); }
   }, [canPreview, previewBusy]);
+
+  // ── 코너 QR 보기·출력 (WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦) ──
+  //   자동 생성된 screen_set QR 을 '매장 QR 관리'로 이동하지 않고 콘텐츠 목록에서 바로 확인·출력한다.
+  //   미리보기 이미지·다운로드는 기존 QR export 엔드포인트(GET /pharmacy/qr/:id/export)를 그대로 사용한다.
+  const [qrFor, setQrFor] = useState<{ set: ScreenSet; qr: StoreQrCode | null; imageUrl: string | null } | null>(null);
+  const [qrBusy, setQrBusy] = useState<string | null>(null);
+  const [qrDownloading, setQrDownloading] = useState<string | null>(null);
+  const qrImageUrlRef = useRef<string | null>(null);
+
+  const closeQr = useCallback(() => {
+    if (qrImageUrlRef.current) { URL.revokeObjectURL(qrImageUrlRef.current); qrImageUrlRef.current = null; }
+    setQrFor(null);
+  }, []);
+  useEffect(() => () => { if (qrImageUrlRef.current) URL.revokeObjectURL(qrImageUrlRef.current); }, []);
+
+  const openQr = useCallback(async (s: ScreenSet) => {
+    if (qrBusy) return;
+    if (!s.publicQrSlug) { toast.error('이 콘텐츠에는 아직 QR이 없습니다. 콘텐츠를 다시 저장하면 자동으로 만들어집니다.'); return; }
+    setQrBusy(s.id);
+    try {
+      // screen_set QR 은 저장 시 자동 생성된다 — 목록에서 이 콘텐츠의 QR 레코드를 찾는다(신규 API 없음).
+      const res = await getStoreQrCodes({ limit: 200 });
+      const qr = (res?.data?.items ?? []).find(
+        (q) => q.landingType === 'screen_set' && q.landingTargetId === s.id,
+      ) ?? null;
+      let imageUrl: string | null = null;
+      if (qr) {
+        try {
+          const { blob } = await fetchQrExportBlob(qr.id, 'png', 'medium');
+          if (qrImageUrlRef.current) URL.revokeObjectURL(qrImageUrlRef.current);
+          imageUrl = URL.createObjectURL(blob);
+          qrImageUrlRef.current = imageUrl;
+        } catch { /* 이미지 실패는 모달을 막지 않는다(주소·안내는 계속 표시) */ }
+      }
+      setQrFor({ set: s, qr, imageUrl });
+    } catch (e: any) {
+      toast.error(e?.message || 'QR 정보를 불러오지 못했습니다.');
+    } finally { setQrBusy(null); }
+  }, [qrBusy]);
+
+  const handleQrDownload = useCallback(async (format: 'png' | 'svg' | 'pdf', preset: string, key: string) => {
+    if (!qrFor?.qr || qrDownloading) return;
+    setQrDownloading(key);
+    try {
+      await downloadQrExport(qrFor.qr.id, format, preset as any);
+    } catch (e: any) {
+      toast.error(e?.message || 'QR 파일을 내려받지 못했습니다.');
+    } finally { setQrDownloading(null); }
+  }, [qrFor, qrDownloading]);
 
   // ── 필터 옵션(현재 목록에서 도출) ──
   const templateOptions = useMemo(() => {
@@ -374,17 +435,22 @@ export default function TabletContentLibraryList({
           actions={buildRowActions(contentActionPolicy, s, {
             preview: () => handlePreview(s),
             apply: () => openApply(s),
+            qr: () => openQr(s),
             edit: () => onEdit(s.id),
             archive: () => onArchive(s),
           }, {
             icons: ACTION_ICONS,
-            loading: previewBusy === s.id ? { preview: true } : (busy ? { archive: true } : undefined),
+            loading: previewBusy === s.id
+              ? { preview: true }
+              : qrBusy === s.id
+                ? { qr: true }
+                : (busy ? { archive: true } : undefined),
           })}
           inlineMax={contentActionPolicy.inlineMax}
         />
       ),
     },
-  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy, activeHighlight, openApply]);
+  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy, activeHighlight, openApply, openQr, qrBusy]);
 
   const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
@@ -541,6 +607,78 @@ export default function TabletContentLibraryList({
         <div className="fixed inset-0 z-[100000] bg-slate-900/40 flex items-center justify-center" role="presentation">
           <div className="bg-white rounded-xl px-4 py-3 text-sm text-slate-600 inline-flex items-center gap-2 shadow-lg">
             <Loader2 className="w-4 h-4 animate-spin" /> 미리보기 준비 중…
+          </div>
+        </div>
+      )}
+
+      {/* ── 코너 QR 보기·출력 모달 (WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦) ──
+          태블렛 화면(대기·메인)에 상시 표시되는 것과 같은 QR. 파일 출력은 기존 QR export 재사용. */}
+      {qrFor && (
+        <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={closeQr}>
+          <div className="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
+            <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <h3 className="text-base font-bold text-slate-800">코너 QR</h3>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">“{qrFor.set.name}” 의 휴대전화 보기 QR입니다.</p>
+              </div>
+              <button onClick={closeQr} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
+                <X className="w-4 h-4 text-slate-500" />
+              </button>
+            </div>
+            <div className="px-5 py-4 overflow-y-auto">
+              <div className="flex flex-col items-center gap-2">
+                {qrFor.imageUrl ? (
+                  <img src={qrFor.imageUrl} alt={`${qrFor.set.name} QR`} className="w-40 h-40 object-contain rounded-lg border border-slate-200 bg-white" />
+                ) : (
+                  <div className="w-40 h-40 rounded-lg border border-dashed border-slate-200 flex items-center justify-center text-center text-[11px] text-slate-400 px-3">
+                    QR 이미지를 불러오지 못했습니다.<br />주소는 아래에서 확인할 수 있습니다.
+                  </div>
+                )}
+                <a
+                  href={`/qr/${qrFor.set.publicQrSlug}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-indigo-600 hover:underline break-all text-center"
+                >
+                  {`${window.location.origin}/qr/${qrFor.set.publicQrSlug}`}
+                </a>
+              </div>
+
+              {qrFor.qr ? (
+                <div className="mt-4">
+                  <div className="text-xs font-semibold text-slate-600 mb-2">출력·다운로드</div>
+                  <div className="grid grid-cols-1 gap-1.5">
+                    {QR_EXPORT_PRESETS.map((p) => {
+                      const key = `${p.format}:${p.preset}`;
+                      return (
+                        <button
+                          key={key}
+                          onClick={() => handleQrDownload(p.format, p.preset, key)}
+                          disabled={!!qrDownloading}
+                          className="w-full flex items-center gap-2 px-3 py-2 rounded-lg border border-slate-200 text-left text-sm hover:border-indigo-300 hover:bg-indigo-50/40 disabled:opacity-50"
+                        >
+                          {qrDownloading === key
+                            ? <Loader2 className="w-4 h-4 animate-spin text-indigo-600 shrink-0" />
+                            : <Download className="w-4 h-4 text-slate-400 shrink-0" />}
+                          <span className="min-w-0 flex-1">
+                            <span className="block font-medium text-slate-800">{p.label}</span>
+                            <span className="block text-[11px] text-slate-400">{p.hint}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-4 text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2 leading-relaxed">
+                  QR 파일 출력 정보를 찾지 못했습니다. ‘매장 QR 관리’에서 확인해 주세요.
+                </p>
+              )}
+              <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
+                이 QR은 콘텐츠를 저장할 때 자동으로 만들어지며, 이름을 바꾸어도 주소는 그대로 유지됩니다.
+                태블렛 대기 화면과 메인 화면에도 같은 QR이 표시됩니다.
+              </p>
+            </div>
           </div>
         </div>
       )}

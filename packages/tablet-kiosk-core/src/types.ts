@@ -164,6 +164,14 @@ export interface TabletScreenResponse {
   screenSet?: { id: string; name: string };
   sections?: TabletScreenSection[];
   tabletId?: string | null;
+  /**
+   * WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
+   *   코너 화면(대기·메인)에 상시 표시할 Screen Set QR. qr_guide block 유무와 무관하게 서버가 내려준다.
+   *   qrStatus='unavailable' = QR 보장 실패 → 화면에서 실패를 숨기지 않고 안내 문구로 표시.
+   */
+  publicQrSlug?: string | null;
+  qrUrl?: string | null;
+  qrStatus?: 'ready' | 'unavailable';
 }
 
 /**

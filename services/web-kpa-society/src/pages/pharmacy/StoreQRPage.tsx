@@ -53,6 +53,15 @@ const LANDING_TYPE_OPTIONS: { value: string; label: string }[] = [
   { value: 'link', label: '외부 링크' },
 ];
 
+// WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑥:
+//   표시 전용 유형 라벨. LANDING_TYPE_OPTIONS 는 "직접 만들 수 있는 유형"(생성 폼 select)이므로
+//   자동 생성 전용인 screen_set 은 여기서만 문구를 갖는다(수동 생성 경로 신설 금지).
+const LANDING_TYPE_LABELS: Record<string, string> = {
+  ...Object.fromEntries(LANDING_TYPE_OPTIONS.map((o) => [o.value, o.label])),
+  screen_set: '태블릿 코너',
+  video: '동영상',
+};
+
 function toSlug(text: string): string {
   return text
     .toLowerCase()
@@ -1040,7 +1049,7 @@ export function StoreQRPage() {
                   align: 'center',
                   render: (_v, item) => (
                     <span style={{ display: 'inline-flex', padding: '2px 8px', borderRadius: '999px', fontSize: '11px', backgroundColor: colors.neutral100, color: colors.neutral600 }}>
-                      {LANDING_TYPE_OPTIONS.find((o) => o.value === item.landingType)?.label || item.landingType}
+                      {LANDING_TYPE_LABELS[item.landingType] || item.landingType}
                     </span>
                   ),
                 },

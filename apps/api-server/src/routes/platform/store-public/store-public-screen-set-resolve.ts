@@ -24,7 +24,11 @@ import { resolveContentListItems } from './store-public-tablet-content-resolve.j
 // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회는 주입된 adapter 로 위임.
 import type { ContentSourceAdapter } from './store-public-tablet-content-source.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: qr_guide URL 을 Screen Set QR(public_qr_slug)로 서버 도출.
-import { buildScreenSetQrUrl } from '../store-screen-set-qr.service.js';
+// WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: slug 미발급 세트는 resolve 시점에 QR 을 자동 보장(멱등).
+import { buildScreenSetQrUrl, ensureScreenSetQr } from '../store-screen-set-qr.service.js';
+
+/** Screen Set QR 의 서비스 키(도메인 도출용) — store-tablet.routes 의 TABLET_QR_SERVICE_KEY 와 동일. */
+const SCREEN_SET_QR_SERVICE_KEY = 'kpa';
 
 export interface ScreenSection {
   blockType: string;
@@ -67,7 +71,17 @@ export interface ResolveScreenSetInput {
 }
 
 export interface ResolvedScreenSet {
-  set: { id: string; name: string; templateKey: string };
+  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 코너 화면(대기/메인)에서 QR 을 상시 표시하기 위해
+  //   qr_guide block 존재 여부와 무관하게 Screen Set QR 을 top-level 로 내려준다.
+  //   qrStatus='unavailable' 은 QR 보장 실패(사용자에게 명확히 표시) — 화면 자체는 정상 렌더한다.
+  set: {
+    id: string;
+    name: string;
+    templateKey: string;
+    publicQrSlug: string | null;
+    publicQrUrl: string | null;
+    qrStatus: 'ready' | 'unavailable';
+  };
   sections: ScreenSection[];
 }
 
@@ -188,6 +202,26 @@ export async function resolveScreenSetSections(
   );
   const set = setRows?.[0];
   if (!set) return null;
+
+  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
+  //   slug 가 아직 없는 세트(구형 저장분 등)는 여기서 **멱등 보장**한다. ensureScreenSetQr 는 기존 행이 있으면
+  //   재사용하고 public_qr_slug 만 동기화하므로 신규 테이블·slug 재발급이 일어나지 않는다.
+  //   실패는 화면 렌더를 막지 않고 qrStatus='unavailable' 로만 표기한다(§원칙: 실패를 성공으로 숨기지 않음).
+  let qrSlug: string | null = set.publicQrSlug ?? null;
+  if (!qrSlug) {
+    try {
+      const ensured = await ensureScreenSetQr(dataSource, {
+        organizationId: input.organizationId,
+        screenSetId: input.screenSetId,
+        serviceKey: SCREEN_SET_QR_SERVICE_KEY,
+      });
+      qrSlug = ensured?.slug ?? null;
+    } catch (qrErr) {
+      console.error('[ScreenSetResolve] ensureScreenSetQr failed (non-fatal):', (qrErr as any)?.message);
+      qrSlug = null;
+    }
+  }
+  const qrUrl = qrSlug ? buildScreenSetQrUrl(input.serviceKey, qrSlug) : null;
 
   const blocks = await dataSource.query(
     `SELECT block_type AS "blockType", sort_order AS "sortOrder", config
@@ -313,7 +347,7 @@ export async function resolveScreenSetSections(
         //   블록이 존재하면 노출(라벨 없어도 자동 URL 있으면 렌더). label·url 둘 다 없으면 생략.
         const cfg = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? (b.config as Record<string, unknown>) : {};
         const label = typeof cfg.label === 'string' ? cfg.label : '';
-        const url = set.publicQrSlug ? buildScreenSetQrUrl(input.serviceKey, set.publicQrSlug) : '';
+        const url = qrUrl ?? '';
         if (label || url) sections.push({ blockType: 'qr_guide', sortOrder: b.sortOrder, data: { label, url } });
       } else {
         const data = shapeStaticBlock(b.blockType, b.config);
@@ -325,5 +359,15 @@ export async function resolveScreenSetSections(
     }
   }
 
-  return { set: { id: set.id, name: set.name, templateKey }, sections };
+  return {
+    set: {
+      id: set.id,
+      name: set.name,
+      templateKey,
+      publicQrSlug: qrSlug,
+      publicQrUrl: qrUrl,
+      qrStatus: qrUrl ? 'ready' : 'unavailable',
+    },
+    sections,
+  };
 }

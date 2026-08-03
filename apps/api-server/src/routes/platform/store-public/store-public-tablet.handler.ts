@@ -537,6 +537,11 @@ export function createStorePublicTabletRoutes(deps: {
           mode: 'screen_set',
           templateKey: resolvedSet.set.templateKey,
           screenSet: { id: resolvedSet.set.id, name: resolvedSet.set.name },
+          // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 코너 화면(대기/메인)의 상시 QR 표시용.
+          //   qr_guide block 유무와 무관하게 내려간다. qrStatus='unavailable' 이면 화면에서 실패를 명시한다.
+          publicQrSlug: resolvedSet.set.publicQrSlug,
+          qrUrl: resolvedSet.set.publicQrUrl,
+          qrStatus: resolvedSet.set.qrStatus,
           sections: resolvedSet.sections,
           tabletId,
           tabletSource: displaySource.source,

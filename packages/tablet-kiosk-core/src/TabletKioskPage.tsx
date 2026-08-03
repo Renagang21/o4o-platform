@@ -561,8 +561,16 @@ export function TabletKioskPage({
   //   screen-set 소비자(KPA, qrGuide.url 있음)는 코너명 전용 헤더 밴드를 제거하고(제목은 코너 설명 섹션이 담당),
   //   우상단 작은 '휴대전화로 보기' 버튼 → QR 모달로 단순화. legacy(GP/KCos, qrGuide 없음)는 기존 헤더 유지(무영향).
   //   idle_touch 는 상단 hero 에 QR chip 이 이미 있어 별도 버튼 없이 헤더만 숨긴다.
-  const hideHeaderBand = !!qrGuide?.url;
-  const showFloatingQr = !!qrGuide?.url && !isIdleTouch && displaySettings?.showQr !== false;
+  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
+  //   코너 QR 은 qr_guide block 이 있어야만 보이던 제약을 없앤다. 서버가 top-level 로 내려주는 Screen Set QR
+  //   (screen.qrUrl)을 1순위로 쓰고, 구버전 응답 호환을 위해 qr_guide.url 을 fallback 으로 둔다.
+  //   → 대기 화면·메인 화면 모두에서 **모달을 열지 않고** QR 이 상시 보이며, 모든 템플릿에 적용된다.
+  const cornerQrUrl = (screen?.mode === 'screen_set' ? (screen.qrUrl ?? null) : null) || qrGuide?.url || null;
+  const cornerQrLabel = qrGuide?.label || '휴대전화로 보기';
+  // QR 생성 실패를 성공으로 숨기지 않는다 — screen_set 인데 URL 이 없으면 화면에 그대로 표시.
+  const cornerQrUnavailable = screen?.mode === 'screen_set' && !cornerQrUrl;
+  const hideHeaderBand = !!cornerQrUrl;
+  const showFloatingQr = !!cornerQrUrl && !isIdleTouch && displaySettings?.showQr !== false;
   // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 언어 선택은 실제 태블렛 런타임(비-미리보기)에서
   //   적용된 Screen Set(콘텐츠 존재)일 때만 노출. legacy/미리보기/임베드는 미노출.
   const showLangSelector = !previewScreen && !previewLayoutOnly && !!slug && !!api.fetchScreen && screen?.mode === 'screen_set';
@@ -899,6 +907,10 @@ export function TabletKioskPage({
         items={screenIdleItems ?? idlePlaylist ?? []}
         onUserInteraction={() => dispatch({ type: 'IDLE_EXIT' })}
         defaultDurationMs={displaySettings?.idleSlideSeconds ? displaySettings.idleSlideSeconds * 1000 : undefined}
+        // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 터치 전(대기 상태)에도 QR 을 스캔할 수 있어야 한다.
+        qrUrl={displaySettings?.showQr !== false ? cornerQrUrl : null}
+        qrLabel={cornerQrLabel}
+        qrUnavailable={displaySettings?.showQr !== false && cornerQrUnavailable}
       />
     );
   }
@@ -912,8 +924,10 @@ export function TabletKioskPage({
       {isIdleTouch && (
         <IdleTouchHero
           items={screenIdleItems}
-          qrUrl={qrGuide?.url}
+          // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: qr_guide 없이도 Screen Set QR 로 chip 표시.
+          qrUrl={displaySettings?.showQr !== false ? (cornerQrUrl ?? undefined) : undefined}
           qrLabel={qrGuide?.label}
+          qrUnavailable={displaySettings?.showQr !== false && cornerQrUnavailable}
         />
       )}
 
@@ -947,10 +961,17 @@ export function TabletKioskPage({
 
       {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 우상단 작은 '휴대전화로 보기' 버튼(QR 상시 노출 대신).
           클릭 시 QR 모달. url 은 서버가 Screen Set public_qr_slug 로 도출(공개 /qr/{slug} — 비로그인 접근). */}
-      {showFloatingQr && (
-        <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrBtn} aria-label="휴대전화로 보기">
-          <span style={styles.floatingQrIcon} aria-hidden>▣</span> 휴대전화로 보기
+      {/* WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 버튼(모달 필요) → **QR 자체를 상시 노출**.
+          손님이 모달을 열지 않고 바로 스캔할 수 있어야 한다. 카드를 누르면 크게 보기(기존 모달 재사용). */}
+      {showFloatingQr && cornerQrUrl && (
+        <button type="button" onClick={() => setQrModalOpen(true)} style={styles.floatingQrCard} aria-label="휴대전화로 보기 — QR 크게 보기">
+          <QrImage url={cornerQrUrl} size={92} />
+          <span style={styles.floatingQrCardText}>{cornerQrLabel}</span>
         </button>
+      )}
+      {/* QR 보장 실패는 숨기지 않는다(성공처럼 보이게 하지 않음). */}
+      {cornerQrUnavailable && displaySettings?.showQr !== false && !isIdleTouch && (
+        <div style={styles.floatingQrFailed}>QR을 준비하지 못했습니다<br />매장 관리자에게 문의해 주세요</div>
       )}
 
       {/* WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 우상단 QR 버튼과 대칭인 좌상단 표시 언어 선택.
@@ -1115,12 +1136,12 @@ export function TabletKioskPage({
           detail.html 은 ContentRenderer(DOMPurify)로만 렌더 — raw innerHTML 금지. */}
       {/* WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: QR 모달 — QR 이미지는 여기서만 표시.
           url = 서버 도출 공개 /qr/{slug}(비로그인 소비자 화면). */}
-      {qrModalOpen && qrGuide?.url && (
+      {qrModalOpen && cornerQrUrl && (
         <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setQrModalOpen(false)} role="presentation">
           <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
             <div style={styles.qrModalTitle}>휴대전화로 이어서 보기</div>
             <div style={styles.qrModalDesc}>QR을 스캔하면 이 코너 안내를 휴대전화에서 확인할 수 있습니다.</div>
-            <div style={{ margin: '18px 0' }}><QrImage url={qrGuide.url} size={200} /></div>
+            <div style={{ margin: '18px 0' }}><QrImage url={cornerQrUrl} size={200} /></div>
             <button type="button" onClick={() => setQrModalOpen(false)} style={styles.qrModalClose}>닫기</button>
           </div>
         </div>
@@ -1196,7 +1217,7 @@ function TouchHintIcon() {
   );
 }
 
-function IdleTouchHero({ items, qrUrl, qrLabel }: { items: IdlePlaylistItem[] | null; qrUrl?: string; qrLabel?: string }) {
+function IdleTouchHero({ items, qrUrl, qrLabel, qrUnavailable }: { items: IdlePlaylistItem[] | null; qrUrl?: string; qrLabel?: string; qrUnavailable?: boolean }) {
   const first = items && items.length > 0 ? items[0] : null;
   const embedUrl =
     first && (first.type === 'youtube' || first.type === 'vimeo') ? toIdleEmbedUrl(first.url) : null;
@@ -1237,6 +1258,12 @@ function IdleTouchHero({ items, qrUrl, qrLabel }: { items: IdlePlaylistItem[] | 
           <span style={styles.heroQrText}>{qrLabel || 'QR로 같은 화면 보기'}</span>
         </div>
       )}
+      {/* WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: QR 보장 실패를 숨기지 않는다. */}
+      {!qrUrl && qrUnavailable && (
+        <div style={styles.heroQr}>
+          <span style={styles.heroQrText}>QR을 준비하지 못했습니다</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -1246,9 +1273,17 @@ interface IdleOverlayProps {
   onUserInteraction: () => void;
   /** 항목별 durationMs 미지정 시 적용할 매장 전시 설정 기본 전환 시간(ms). 미지정 시 5s. */
   defaultDurationMs?: number;
+  /**
+   * WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1:
+   *   대기 화면에서도(= 손님이 화면을 터치하기 전에도) 스캔할 수 있는 코너 QR.
+   *   미지정이면 렌더하지 않는다(기존 소비처·legacy 무영향).
+   */
+  qrUrl?: string | null;
+  qrLabel?: string;
+  qrUnavailable?: boolean;
 }
 
-function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverlayProps) {
+function IdleOverlay({ items, onUserInteraction, defaultDurationMs, qrUrl, qrLabel, qrUnavailable }: IdleOverlayProps) {
   const [index, setIndex] = useState(0);
   const safeIndex = items.length > 0 ? index % items.length : 0;
   const current = items.length > 0 ? items[safeIndex] : null;
@@ -1342,6 +1377,19 @@ function IdleOverlay({ items, onUserInteraction, defaultDurationMs }: IdleOverla
           <TouchHintIcon />
           <span style={styles.heroHintKo}>화면을 터치하여 자세히 보세요</span>
           <span style={styles.heroHintEn}>Touch to explore</span>
+        </div>
+      )}
+      {/* WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 대기 화면 우상단 상시 QR.
+          터치 이벤트를 막지 않으므로(부모로 버블링) QR 영역을 만져도 평소처럼 코너 화면으로 진입한다. */}
+      {qrUrl && (
+        <div style={styles.idleQr}>
+          <QrImage url={qrUrl} size={88} />
+          <span style={styles.idleQrText}>{qrLabel || '휴대전화로 보기'}</span>
+        </div>
+      )}
+      {!qrUrl && qrUnavailable && (
+        <div style={styles.idleQr}>
+          <span style={styles.idleQrText}>QR을 준비하지 못했습니다</span>
         </div>
       )}
     </div>
@@ -1470,26 +1518,50 @@ const styles: Record<string, React.CSSProperties> = {
     flexShrink: 0,
   },
   // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: 우상단 작은 '휴대전화로 보기' 버튼 + QR 모달.
-  floatingQrBtn: {
+  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 우상단 상시 QR 카드(기존 '휴대전화로 보기' 버튼 대체).
+  //   버튼→모달 단계를 없애 손님이 바로 스캔할 수 있게 한다. 누르면 기존 QR 모달(크게 보기)로 연결.
+  floatingQrCard: {
     position: 'absolute',
     top: '12px',
     right: '12px',
     zIndex: 30,
-    display: 'inline-flex',
+    display: 'flex',
+    flexDirection: 'column',
     alignItems: 'center',
     gap: '6px',
-    padding: '8px 12px',
-    fontSize: '13px',
+    padding: '10px',
+    backgroundColor: 'rgba(255,255,255,0.96)',
+    border: '1px solid #e2e8f0',
+    borderRadius: '14px',
+    boxShadow: '0 4px 14px rgba(15,23,42,0.16)',
+    cursor: 'pointer',
+  },
+  floatingQrCardText: {
+    fontSize: '12px',
     fontWeight: 700,
     color: '#0f172a',
-    backgroundColor: 'rgba(255,255,255,0.92)',
-    border: '1px solid #e2e8f0',
-    borderRadius: '999px',
-    boxShadow: '0 2px 8px rgba(15,23,42,0.12)',
-    cursor: 'pointer',
-    whiteSpace: 'nowrap',
+    maxWidth: '112px',
+    textAlign: 'center',
+    lineHeight: 1.3,
+    wordBreak: 'keep-all',
   },
-  floatingQrIcon: { fontSize: '14px', lineHeight: 1, color: '#4f46e5' },
+  floatingQrFailed: {
+    position: 'absolute',
+    top: '12px',
+    right: '12px',
+    zIndex: 30,
+    padding: '10px 12px',
+    maxWidth: '160px',
+    fontSize: '12px',
+    fontWeight: 600,
+    lineHeight: 1.4,
+    color: '#b45309',
+    backgroundColor: 'rgba(255,251,235,0.96)',
+    border: '1px solid #fcd34d',
+    borderRadius: '12px',
+    textAlign: 'center',
+    wordBreak: 'keep-all',
+  },
   // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 좌상단 표시 언어 선택(터치 44px).
   langSelector: {
     position: 'absolute',
@@ -2185,6 +2257,30 @@ const styles: Record<string, React.CSSProperties> = {
     overflowY: 'auto',
   },
   // Idle overlay (WO-O4O-TABLET-IDLE-LAYER-V1)
+  // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1: 대기 화면 우상단 상시 QR(터치 전에도 스캔 가능).
+  idleQr: {
+    position: 'absolute',
+    top: 'clamp(12px, 2vw, 24px)',
+    right: 'clamp(12px, 2vw, 24px)',
+    zIndex: 1000,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '6px',
+    padding: '10px',
+    backgroundColor: 'rgba(255,255,255,0.94)',
+    borderRadius: '12px',
+    boxShadow: '0 4px 14px rgba(0,0,0,0.35)',
+  },
+  idleQrText: {
+    fontSize: '11px',
+    fontWeight: 700,
+    color: '#1e293b',
+    maxWidth: '108px',
+    textAlign: 'center',
+    lineHeight: 1.3,
+    wordBreak: 'keep-all',
+  },
   idleOverlay: {
     position: 'fixed',
     inset: 0,
