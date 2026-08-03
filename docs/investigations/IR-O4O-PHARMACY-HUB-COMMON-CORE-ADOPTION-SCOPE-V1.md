@@ -2,7 +2,7 @@
 
 > **WO**: `WO-O4O-PHARMACY-HUB-COMMON-CORE-ADOPTION-SCOPE-V1`
 > **성격**: read-only 조사 — 코드/package/route/DB/배포 **무변경**. 문서만 생성.
-> **기준 commit**: `9efba8fcaacc061c178641710fffc02d5b62c57c` (main)
+> **기준 commit**: `9efba8fcaacc061c178641710fffc02d5b62c57c` (main, 조사 시작) — 조사 중 병렬 세션이 `dd792c64e` 로 전진했으나 조사 범위 무관 (§1.1)
 > **작성일**: 2026-08-03
 > **선행 문서**: [`O4O-COMMONIZATION-STANDARD` V2.1 §3.3](../architecture/O4O-COMMONIZATION-STANDARD.md) · [`IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1` §14·§19-2](IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md) · [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` §8·§15-1](IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md)
 >
@@ -18,15 +18,26 @@
 |------|-----|
 | repo | `https://github.com/Renagang21/o4o-platform` |
 | branch | `main` |
-| HEAD (조사 시작·종료 동일) | `9efba8fcaacc061c178641710fffc02d5b62c57c` |
-| working tree | **clean 아님** — `apps/api-server/src/scripts/data/otc-zh-batch01-verify.ga.json` 1건 modified |
-| 해당 변경 처리 | **무접촉** — 병렬 세션 WIP 로 간주. 수정·삭제·stash·revert·stage 하지 않음 |
-| `git pull --ff-only origin main` | **미실행** — 작업 트리가 clean 이 아니므로 WO §5 에 따라 생략. 기준 commit 은 로컬 HEAD 로 고정 |
+| **조사 기준 HEAD (조사 시작)** | `9efba8fcaacc061c178641710fffc02d5b62c57c` |
+| **커밋 시점 HEAD (조사 종료)** | `dd792c64ea2cb553f0a28b8cbcf8b169e6128241` |
+| working tree | **clean 아님** — 조사 시작 시 `otc-zh-batch01-verify.ga.json` 1건 modified. 종료 시 병렬 세션 WIP 4건 추가(`hff-zh-b01-build.mjs` M · `hff-zh-b02-*` untracked 3) |
+| 해당 변경 처리 | **전부 무접촉** — 병렬 세션 소유. 수정·삭제·stash·revert·stage 하지 않음. 본 IR 은 path-specific commit 으로만 기록 |
+| `git pull --ff-only origin main` | **미실행** — 작업 트리가 clean 이 아니므로 WO §5 에 따라 생략 |
 | 경로 충돌 | 없음 — 본 IR 문서 경로(`docs/investigations/IR-O4O-PHARMACY-HUB-...`)는 WIP 파일과 무관 |
 | `pnpm install` / 전체 build | **미실행** (WO §5) |
-| 조사 중 기준 commit 변경 | 없음 |
 
-**사용 명령**: `git status/branch/rev-parse/remote`, 파일 열거·읽기, ripgrep 검색, `wc -l`, `node -e`(package.json 파싱)만.
+### 1.1 조사 중 기준 commit 이동 (사실 기록)
+
+조사 진행 중 병렬 세션이 `main` 을 `9efba8fca → dd792c64e` 로 2 commit 전진시켰다.
+
+| commit | 내용 | 본 조사 범위 침범 |
+|--------|------|:---:|
+| `9e7cfb710` | `docs(check)` — Screen Set corner content E2E smoke 기록 | **없음** (docs) |
+| `dd792c64e` | `fix(membership)` — `apps/api-server/src/bootstrap/membership-admin-guard.ts` + 테스트 2 | **없음** — `packages/operator-core-ui/**` · `services/web-pharmacy-hub/**` · `apps/api-server/src/**/pharmacy-hub/**` 무관 |
+
+> **판정**: 본 IR 의 모든 실측(파일 수·LOC·import 수·계약 gap·endpoint 대조)은 **`9efba8fca` 기준으로 수행**되었고, 두 commit 중 어느 것도 조사 대상 경로를 건드리지 않았으므로 **`dd792c64e` 에서도 그대로 유효하다.** 재실측 불필요.
+
+**사용 명령**: `git status/branch/rev-parse/remote/log/show`, 파일 열거·읽기, ripgrep 검색, `wc -l`, `node -e`(package.json 파싱)만.
 
 ---
 
@@ -825,7 +836,7 @@ B3(공유 계약 변경)를 **가장 나중에** 두는 이유는, 그 전까지
 
 | 조건 | 발생 여부 |
 |------|:---:|
-| 다른 세션 WIP 와 충돌 | ✗ — WIP 1건 무접촉, 경로 무관 |
+| 다른 세션 WIP 와 충돌 | ✗ — WIP 5건 무접촉, 경로 무관. 조사 중 base commit 2 전진했으나 조사 범위 무침범 (§1.1) |
 | route ↔ 화면 연결 확인 불가 | ✗ — `App.tsx` 21 route 전수 확인 |
 | backend endpoint ↔ frontend 소비 관계 불명확 | ✗ — 전수 대조 완료. **소비 0 endpoint 7건도 식별**(§4.3) |
 | 회원관리 데이터 모델 확인 불가 | ✗ — SQL 전문 확인(§11 H1) |
@@ -883,4 +894,4 @@ B3(공유 계약 변경)를 **가장 나중에** 두는 이유는, 그 전까지
 
 ---
 
-*Date: 2026-08-03 · read-only adoption scope audit · HEAD `9efba8fca` · frontend 26파일 3,745L + backend 17파일 3,293L 전수 · 화면 21건 × 화면군 10 × 판정값 14 · 공통 패키지 14종 대응 매트릭스 · 코드/package/route/DB/배포 변경 0 · GlycoPharm 무접촉 · 병렬 세션 WIP 무접촉.*
+*Date: 2026-08-03 · read-only adoption scope audit · 조사 기준 HEAD `9efba8fca` (커밋 시점 `dd792c64e`, 범위 무침범) · frontend 26파일 3,745L + backend 17파일 3,293L 전수 · 화면 21건 × 화면군 10 × 판정값 14 · 공통 패키지 14종 대응 매트릭스 · 코드/package/route/DB/배포 변경 0 · GlycoPharm 무접촉 · 병렬 세션 WIP 무접촉.*
