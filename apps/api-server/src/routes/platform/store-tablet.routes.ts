@@ -52,6 +52,8 @@ import { resolveContentListItems } from './store-public/store-public-tablet-cont
 // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: draft preview content_list 원본 조회 기본 Store Adapter 명시 주입.
 import { createStoreContentSourceAdapter } from './store-public/store-public-tablet-content-source.js';
 import { shapeStaticBlock, resolveTemplateKey } from './store-public/store-public-tablet-screen.js';
+// WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 미리보기도 실제 태블릿과 **같은** 선택 상품 resolver 를 재사용(복제 금지).
+import { resolveSelectedProductListSection } from './store-public/store-public-screen-set-resolve.js';
 // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1: 저장 시 screen_set QR 멱등 확보 + URL 도출.
 import { ensureScreenSetQr, buildScreenSetQrUrl, setScreenSetQrActive } from './store-screen-set-qr.service.js';
 // WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1: 가져오기 provenance(추적 전용, FK 없음).
@@ -1595,7 +1597,10 @@ export function createStoreTabletRoutes(
   //   공개 /:slug/tablet/screen 핸들러와 동일한 resolve 로직을 body.blocks 로 복제(저장/DB write 없음).
   //   - content_list: resolveContentListItems(org 스코프) — 공개와 동일 게이트.
   //   - idle_media: custom_media 는 config 자체 items 로 완전 resolve. draft 는 tablet 미지정 → legacy/operator 소스 빈 배열.
-  //   - product_list: 뷰어가 /tablet/products 로 별도 표시하므로 sections 에서 생략(상품은 fetchProducts 로 노출).
+  //   - product_list(WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1):
+  //       · 명시 선택(`source:'selected_products'`) → 공개 resolver 와 **동일 함수**(resolveSelectedProductListSection)로
+  //         선택 상품·순서·상품별 QR 을 그대로 내려준다 → 미리보기와 실제 태블릿/모바일 표시 일치.
+  //       · legacy(`legacy_tablet_displays`) → 기존대로 생략(뷰어가 fetchProducts 로 매장 진열 상품 표시).
   //   - 정적 텍스트(corner_description/health_info/staff_inquiry/qr_guide): shapeStaticBlock.
   //   개별 block 실패는 해당 섹션만 생략(안전 fallback). screen_set 소유 검증 불필요(저장 안 함, org 스코프만).
   router.post('/screen-sets/preview', withStoreAuth(async (req, res, organizationId) => {
@@ -1617,6 +1622,25 @@ export function createStoreTabletRoutes(
       let order = 0;
       // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회 기본 Store Adapter 명시 주입.
       const contentSource = createStoreContentSourceAdapter(dataSource);
+      // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1:
+      //   선택 상품 resolve 는 공개 경로와 동일한 store 스코프(serviceKey/slug)를 써야 결과가 일치한다.
+      //   공개 경로는 platform_store_slugs 의 service_key 를 사용 → 미리보기도 같은 행에서 도출(없으면 기본 kpa).
+      let previewServiceKey = TABLET_QR_SERVICE_KEY;
+      let previewStoreSlug: string | null = null;
+      if (visible.some(({ b }: any) => b.blockType === 'product_list')) {
+        try {
+          const slugRows = await dataSource.query(
+            `SELECT slug, service_key AS "serviceKey" FROM platform_store_slugs
+              WHERE store_id = $1 AND is_active = true
+              ORDER BY updated_at DESC NULLS LAST LIMIT 1`,
+            [organizationId],
+          );
+          if (slugRows?.[0]?.serviceKey) previewServiceKey = String(slugRows[0].serviceKey);
+          if (slugRows?.[0]?.slug) previewStoreSlug = String(slugRows[0].slug);
+        } catch (slugErr) {
+          console.warn('[StoreTablet] preview store slug resolve skipped:', (slugErr as any)?.message);
+        }
+      }
       for (const { b } of visible) {
         const bt = b.blockType as string;
         const config = (b.config && typeof b.config === 'object' && !Array.isArray(b.config)) ? b.config : {};
@@ -1635,8 +1659,20 @@ export function createStoreTabletRoutes(
           } else if (bt === 'product_content') {
             sections.push({ blockType: bt, sortOrder: order++, data: { productRef: config.productRef ?? null, contentId: config.contentId ?? null } });
           } else if (bt === 'product_list') {
-            // 뷰어가 fetchProducts 로 상품을 별도 표시 → preview sections 에서 생략.
-            continue;
+            // 실제 태블릿/모바일과 동일한 resolver 재사용(선택 상품·순서·활성 QR). read-only.
+            const selectedData = await resolveSelectedProductListSection(
+              dataSource,
+              {
+                organizationId,
+                storeId: organizationId, // KPA: store id = organization id (공개 경로와 동일)
+                serviceKey: previewServiceKey,
+                storeSlug: previewStoreSlug,
+                tabletId: null, // draft 는 적용 코너가 없다 — 선택 모드는 진열로 집합을 좁히지 않는다.
+              },
+              config,
+            );
+            // 명시 선택이 없으면(legacy) 기존대로 생략 → 뷰어가 fetchProducts 로 표시(회귀 0).
+            if (selectedData) sections.push({ blockType: bt, sortOrder: order++, data: selectedData });
           } else {
             const data = shapeStaticBlock(bt, config);
             if (data) sections.push({ blockType: bt, sortOrder: order++, data });

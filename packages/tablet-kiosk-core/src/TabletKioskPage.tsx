@@ -514,8 +514,11 @@ export function TabletKioskPage({
     if (!slug) return;
     // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기는
     //   아직 적용 코너가 없어 진열 상품 문맥이 없다 → 실제 매장 상품을 조회하지 않는다(골격만 표시).
-    if (previewLayoutOnly) { dispatch({ type: 'LOAD_SUCCESS', products: [] }); return; }
+    // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 명시 선택은 코너 진열 문맥이 필요 없다(제작자가 직접 고른 목록).
+    //   → previewLayoutOnly(레이아웃 전용)여도 선택 상품·상품 QR 은 실제 화면과 동일하게 보여준다.
+    //   선택이 없는 legacy 문맥에서만 기존대로 골격(상품 0)을 유지한다.
     if (selectedSectionProducts) { dispatch({ type: 'LOAD_SUCCESS', products: selectedSectionProducts }); return; }
+    if (previewLayoutOnly) { dispatch({ type: 'LOAD_SUCCESS', products: [] }); return; }
     dispatch({ type: 'LOAD_START' });
     api.fetchProducts(slug, { limit: 50 })
       .then((res) => {
@@ -525,8 +528,9 @@ export function TabletKioskPage({
       })
       .catch((e) => dispatch({ type: 'LOAD_ERROR', message: e.message }));
     // selectedSectionProducts 는 매 렌더 새 배열 → 내용 기준 key 로 의존(불필요 재조회 방지).
+    //   WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: QR 만 바꾼 경우도 미리보기에 즉시 반영되도록 qrUrl 을 key 에 포함.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slug, api, previewLayoutOnly, selectedSectionProducts ? selectedSectionProducts.map((p) => `${p.type}:${p.id}`).join(',') : null]);
+  }, [slug, api, previewLayoutOnly, selectedSectionProducts ? selectedSectionProducts.map((p) => `${p.type}:${p.id}:${p.qrUrl ?? ''}`).join(',') : null]);
 
   // Screen Set sections → 화면 요소(코너 설명 / QR 안내 / 대기 미디어). screen=null 이면 전부 미적용(legacy).
   const screenSections = screen?.sections ?? [];

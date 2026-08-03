@@ -1035,6 +1035,18 @@ export function TabletContentStepBuilder({
   }, [liveKey, canPreview]);
   // §4.6: QR 모바일 미리보기는 대기 영상을 제외(공개 QR 정합). identity 안정화 위해 memo.
   const liveScreenMobile = useMemo(() => stripIdleForMobilePreview(liveScreen), [liveScreen]);
+  // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1:
+  //   명시 선택 상품은 미리보기에도 실제 화면과 동일하게 표시된다. 다만 공개 노출 게이트(승인·활성 등)에서
+  //   제외된 상품은 실제 화면에도 나오지 않으므로, 그 수를 제작자에게 알려 준다(원인 진단 가능하게).
+  const productPreviewInfo = useMemo(() => {
+    const d = (liveScreen?.sections ?? []).find((x: any) => x.blockType === 'product_list')?.data as any;
+    if (!d || d.selectionMode !== 'selected') return null;
+    const excludedRaw = Number(d.excludedCount ?? 0);
+    return {
+      shownCount: Array.isArray(d.products) ? d.products.length : 0,
+      excludedCount: Number.isFinite(excludedRaw) && excludedRaw > 0 ? excludedRaw : 0,
+    };
+  }, [liveScreen]);
 
   // ── dirty guard (baseline = 초기값) ──
   const baseline = useRef({
@@ -1453,8 +1465,18 @@ export function TabletContentStepBuilder({
               Screen Set 은 코너와 독립된 원본(§3.1) — 빌더 미리보기는 코너 문맥이 없어 배치 골격만 보여준다.
               실제 상품은 이 콘텐츠를 코너에 적용했을 때 그 코너의 진열 상품으로 공개 화면에 표시된다. */}
           <div className="px-3 py-1.5 border-t bg-white text-[10px] text-slate-400 leading-relaxed">
-            템플릿의 화면 배치를 미리 보여드립니다. 상품은 이 콘텐츠를 적용한 코너의 진열 상품으로 표시됩니다. 저장 전 미리보기이며, 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            {/* WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 상품을 직접 선택한 경우 미리보기 = 실제 화면. */}
+            {productPreviewInfo
+              ? `직접 선택한 상품 ${productPreviewInfo.shownCount}개를 실제 화면과 같은 순서·QR 로 표시합니다.`
+              : '템플릿의 화면 배치를 미리 보여드립니다. 상품은 이 콘텐츠를 적용한 코너의 진열 상품으로 표시됩니다.'}
+            {' '}저장 전 미리보기이며, 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
+          {productPreviewInfo && productPreviewInfo.excludedCount > 0 && (
+            <div className="px-3 py-1.5 border-t bg-amber-50 text-[10px] text-amber-800 leading-relaxed">
+              선택한 상품 중 {productPreviewInfo.excludedCount}개는 현재 매장 노출 조건(판매 승인·활성 여부 등)을 만족하지 않아
+              미리보기와 실제 화면 모두에서 표시되지 않습니다.
+            </div>
+          )}
         </div>
       </aside>
       </div>{/* /2단 그리드 */}

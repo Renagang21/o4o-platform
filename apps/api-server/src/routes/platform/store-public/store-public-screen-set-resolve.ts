@@ -198,6 +198,90 @@ async function resolveSelectedQrUrls(
   return map;
 }
 
+/**
+ * WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1
+ *   product_list **명시 선택** 상품 resolve 의 단일 소스.
+ *   저장된 Screen Set(공개 태블릿·QR 모바일)과 미저장 draft preview(POST /screen-sets/preview)가
+ *   이 함수 하나를 공유한다 — 미리보기 전용 상품 판정 로직을 복제하지 않는다.
+ *   read-only(SELECT 전용) — 공개 경로 DB write 0 계약 유지.
+ */
+export interface SelectedProductListContext {
+  /** Set 소유 org(경계). 로컬 상품·QR 해석 기준. */
+  organizationId: string;
+  /** 상품 가시성 게이트 store id(KPA=organizationId 와 동일). */
+  storeId: string;
+  serviceKey: string;
+  /** localProductsEndpoint 용 store slug(없으면 null). */
+  storeSlug: string | null;
+  /** 코너 태블릿 문맥(없으면 null). 선택 모드에서는 집합을 좁히지 않고 gate 문맥으로만 쓴다. */
+  tabletId?: string | null;
+}
+
+export interface SelectedProductListSectionData extends Record<string, unknown> {
+  products: any[];
+  selectionMode: 'selected';
+  localProductsEndpoint: string | null;
+  /** 저장된 선택 상품 수. */
+  selectedCount: number;
+  /** 노출 게이트(승인·활성 등)에서 제외되어 화면에 나오지 않는 상품 수. */
+  excludedCount: number;
+}
+
+/** 명시 선택이 없으면(legacy config) null — 호출부가 기존 경로를 그대로 수행한다. */
+export async function resolveSelectedProductListSection(
+  dataSource: DataSource,
+  ctx: SelectedProductListContext,
+  config: unknown,
+): Promise<SelectedProductListSectionData | null> {
+  const selected = parseSelectedProducts(config);
+  if (!selected) return null;
+
+  const selectedListingIds = selected.filter((s) => s.productType === 'supplier').map((s) => s.productId);
+  const selectedLocalIds = selected.filter((s) => s.productType === 'local').map((s) => s.productId);
+  // supplier: 공개 가시성 게이트(TABLET 채널 승인·공급자 ACTIVE 등)는 그대로 통과시킨 뒤 선택으로 교집합.
+  //   선택은 "무엇을 보여줄지"만 정하고 "보여도 되는지"는 기존 게이트가 정한다(권한 완화 없음).
+  let selectedSuppliers: any[] = [];
+  if (selectedListingIds.length > 0) {
+    const r: any = await queryTabletVisibleProducts(dataSource, ctx.storeId, resolveServiceKeys(ctx.serviceKey), {
+      page: 1, limit: 200, sort: 'sort_order', order: 'asc',
+      // 코너 진열(configured) 로 집합을 좁히지 않는다 — 선택이 이미 집합을 정한다.
+      firstTabletId: ctx.tabletId ?? null,
+      configured: false,
+    });
+    const byListing = new Map<string, any>();
+    for (const p of (r?.data ?? [])) if (p?.listingId) byListing.set(String(p.listingId), p);
+    selectedSuppliers = selectedListingIds.map((id) => byListing.get(id)).filter(Boolean);
+  }
+  const selectedLocals = await resolveSelectedLocalProducts(dataSource, ctx.organizationId, selectedLocalIds);
+  const localById = new Map(selectedLocals.map((p) => [p.id, p]));
+  const supplierByListing = new Map(selectedSuppliers.map((p: any) => [String(p.listingId), p]));
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 선택된 기존 QR → 공개 URL(매장 소유 + 활성만).
+  const qrUrlById = await resolveSelectedQrUrls(
+    dataSource,
+    ctx.organizationId,
+    ctx.serviceKey,
+    selected.map((s) => s.qrCodeId).filter((v): v is string => !!v),
+  );
+  // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
+  const ordered = selected
+    .map((s) => {
+      const base = s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId);
+      if (!base) return null;
+      // 상품 데이터에 qrUrl 을 additive 로 부여. 미선택·비활성·삭제 QR 은 null(소비처는 표시하지 않는다).
+      return { ...base, qrUrl: (s.qrCodeId && qrUrlById.get(s.qrCodeId)) || null };
+    })
+    .filter(Boolean);
+
+  return {
+    products: ordered,
+    // kiosk 가 자체 조회 대신 이 목록을 쓰도록 알리는 표식(미인식 소비처는 무시 → 기존 동작).
+    selectionMode: 'selected',
+    localProductsEndpoint: ctx.storeSlug ? `/${ctx.storeSlug}/tablet/products` : null,
+    selectedCount: selected.length,
+    excludedCount: Math.max(0, selected.length - ordered.length),
+  };
+}
+
 /** 명시 선택된 매장 자체 상품(store_local_products) resolve — 선택 순서는 호출부에서 적용. */
 async function resolveSelectedLocalProducts(
   dataSource: DataSource,
@@ -278,53 +362,20 @@ export async function resolveScreenSetSections(
         // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
         //   명시 선택이 있으면 그 목록·순서를 그대로 쓴다(코너 진열 구성에 의존하지 않는다).
         //   선택이 없으면(= legacy config) 아래 기존 경로가 그대로 동작한다(회귀 0).
-        const selected = parseSelectedProducts(b.config);
-        if (selected) {
-          const selectedListingIds = selected.filter((s) => s.productType === 'supplier').map((s) => s.productId);
-          const selectedLocalIds = selected.filter((s) => s.productType === 'local').map((s) => s.productId);
-          // supplier: 공개 가시성 게이트(TABLET 채널 승인·공급자 ACTIVE 등)는 그대로 통과시킨 뒤 선택으로 교집합.
-          //   선택은 "무엇을 보여줄지"만 정하고 "보여도 되는지"는 기존 게이트가 정한다(권한 완화 없음).
-          let selectedSuppliers: any[] = [];
-          if (selectedListingIds.length > 0) {
-            const r: any = await queryTabletVisibleProducts(dataSource, input.storeId, resolveServiceKeys(input.serviceKey), {
-              page: 1, limit: 200, sort: 'sort_order', order: 'asc',
-              // 코너 진열(configured) 로 집합을 좁히지 않는다 — 선택이 이미 집합을 정한다.
-              firstTabletId: tabletContext?.tabletId ?? null,
-              configured: false,
-            });
-            const byListing = new Map<string, any>();
-            for (const p of (r?.data ?? [])) if (p?.listingId) byListing.set(String(p.listingId), p);
-            selectedSuppliers = selectedListingIds.map((id) => byListing.get(id)).filter(Boolean);
-          }
-          const selectedLocals = await resolveSelectedLocalProducts(dataSource, input.organizationId, selectedLocalIds);
-          const localById = new Map(selectedLocals.map((p) => [p.id, p]));
-          const supplierByListing = new Map(selectedSuppliers.map((p: any) => [String(p.listingId), p]));
-          // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 선택된 기존 QR → 공개 URL(매장 소유 + 활성만).
-          const qrUrlById = await resolveSelectedQrUrls(
-            dataSource,
-            input.organizationId,
-            input.serviceKey,
-            selected.map((s) => s.qrCodeId).filter((v): v is string => !!v),
-          );
-          // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
-          const ordered = selected
-            .map((s) => {
-              const base = s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId);
-              if (!base) return null;
-              // 상품 데이터에 qrUrl 을 additive 로 부여. 미선택·비활성·삭제 QR 은 null(소비처는 표시하지 않는다).
-              return { ...base, qrUrl: (s.qrCodeId && qrUrlById.get(s.qrCodeId)) || null };
-            })
-            .filter(Boolean);
-          sections.push({
-            blockType: 'product_list',
-            sortOrder: b.sortOrder,
-            data: {
-              products: ordered,
-              // kiosk 가 자체 조회 대신 이 목록을 쓰도록 알리는 표식(미인식 소비처는 무시 → 기존 동작).
-              selectionMode: 'selected',
-              localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
-            },
-          });
+        // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 선택 상품 판정은 공용 함수 하나로(미리보기와 동일 결과).
+        const selectedData = await resolveSelectedProductListSection(
+          dataSource,
+          {
+            organizationId: input.organizationId,
+            storeId: input.storeId,
+            serviceKey: input.serviceKey,
+            storeSlug: input.storeSlug,
+            tabletId: tabletContext?.tabletId ?? null,
+          },
+          b.config,
+        );
+        if (selectedData) {
+          sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: selectedData });
           continue;
         }
         // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR/모바일도 태블릿과 상품 parity.
