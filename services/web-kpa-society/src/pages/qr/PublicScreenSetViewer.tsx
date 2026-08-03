@@ -23,6 +23,8 @@ import { useState } from 'react';
 import { QrCode } from 'lucide-react';
 import { colors } from '../../styles/theme';
 import { ContentRenderer } from '@o4o/content-editor';
+// WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 태블릿과 동일한 QR 렌더를 재사용(qrcode.react 재도입 없음).
+import { QrImage } from '@o4o/tablet-kiosk-core';
 import type { QrScreenSet, QrScreenSetSection } from '../../api/storeQr';
 
 interface ContentCard {
@@ -48,6 +50,9 @@ interface ProductCard {
   specification?: string | null;
   description?: string | null;
   short_description?: string | null;
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 기존 QR 의 공개 URL.
+  //   태블릿과 **같은 resolver 결과**를 쓰므로 두 화면의 QR 표시가 항상 일치한다. 미선택·비활성이면 없음.
+  qrUrl?: string | null;
 }
 
 
@@ -61,6 +66,8 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
   const [openCard, setOpenCard] = useState<ContentCard | null>(null);
   // WO-O4O-TABLET-QR-PRODUCT-TEXT-BUTTON-ALIGN-AND-SPECIFICATION-SMOKE-V1: 상품 상세(이미지 없음) 진입.
   const [openProduct, setOpenProduct] = useState<ProductCard | null>(null);
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기(태블릿과 같은 동작).
+  const [openQr, setOpenQr] = useState<{ url: string; name: string } | null>(null);
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR 모바일은 '태블릿 대기화면'을 첫 콘텐츠로 보여주지 않는다.
   //   대기화면은 무조작 태블릿 전용 개념 — 휴대전화로 열면 코너 안내·상품·추가 콘텐츠를 바로 본다.
@@ -92,6 +99,7 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
             section={section}
             onOpenCard={setOpenCard}
             onOpenProduct={setOpenProduct}
+            onOpenQr={setOpenQr}
           />
         ))}
 
@@ -144,6 +152,19 @@ export default function PublicScreenSetViewer({ screenSet }: { screenSet: QrScre
           </div>
         </div>
       )}
+
+      {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기.
+          어떤 용도의 QR 인지는 매장이 정한다(O4O 가 규정하지 않음) → 안내 문구는 용도 중립. */}
+      {openQr && (
+        <div style={styles.modalOverlay} onClick={() => setOpenQr(null)} role="presentation">
+          <div style={{ ...styles.modal, textAlign: 'center', padding: '24px' }} onClick={(e) => e.stopPropagation()}>
+            <h2 style={{ ...styles.modalTitle, marginBottom: '6px' }}>{openQr.name}</h2>
+            <p style={{ margin: '0 0 16px', fontSize: '13px', color: colors.neutral500 }}>QR을 스캔하면 이어서 확인할 수 있습니다.</p>
+            <div style={{ display: 'flex', justifyContent: 'center' }}><QrImage url={openQr.url} size={200} /></div>
+            <button onClick={() => setOpenQr(null)} style={styles.qrModalClose}>닫기</button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -152,10 +173,13 @@ function SectionBlock({
   section,
   onOpenCard,
   onOpenProduct,
+  onOpenQr,
 }: {
   section: QrScreenSetSection;
   onOpenCard: (c: ContentCard) => void;
   onOpenProduct: (p: ProductCard) => void;
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+  onOpenQr: (q: { url: string; name: string }) => void;
 }) {
   // corner_description 은 header 에서 이미 렌더 → 본문 반복 안 함.
   if (section.blockType === 'corner_description') return null;
@@ -243,6 +267,19 @@ function SectionBlock({
                     <span style={styles.productMore}>자세히 보기 ›</span>
                   </div>
                 </div>
+                {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 고른 QR(있을 때만).
+                    터치하면 확대 보기 — 상품 상세 진입과 분리. */}
+                {p.qrUrl && (
+                  <div
+                    style={styles.productQrBox}
+                    onClick={(e) => { e.stopPropagation(); onOpenQr({ url: p.qrUrl!, name: p.name || '상품' }); }}
+                    role="button"
+                    aria-label={`${p.name || '상품'} QR 크게 보기`}
+                  >
+                    <QrImage url={p.qrUrl} size={64} />
+                    <span style={styles.productQrHint}>QR 크게 보기</span>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -395,6 +432,29 @@ const styles: Record<string, React.CSSProperties> = {
   productMore: { fontSize: '12px', fontWeight: 600, color: colors.primary, whiteSpace: 'nowrap' },
   productDetailSpec: { fontSize: '14px', color: colors.neutral600, margin: '6px 0 0', lineHeight: 1.5, wordBreak: 'keep-all' },
   productDetailPrice: { fontSize: '16px', fontWeight: 800, color: colors.primary, margin: '8px 0 0' },
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 카드 하단 QR(매장이 고른 QR 이 있을 때만).
+  productQrBox: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '4px',
+    padding: '8px 10px 10px',
+    borderTop: `1px solid ${colors.neutral200}`,
+    cursor: 'pointer',
+  },
+  productQrHint: { fontSize: '11px', fontWeight: 600, color: colors.neutral500, whiteSpace: 'nowrap' },
+  qrModalClose: {
+    marginTop: '18px',
+    minHeight: '44px',
+    padding: '10px 20px',
+    borderRadius: '10px',
+    border: 'none',
+    backgroundColor: colors.primary,
+    color: '#fff',
+    fontSize: '14px',
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
   footer: {
     display: 'flex',
     alignItems: 'center',

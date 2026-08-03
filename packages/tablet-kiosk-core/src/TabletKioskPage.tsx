@@ -133,6 +133,8 @@ interface DisplayProduct {
   selectedContentHtml?: string | null;
   // WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1: 게시 가능 번역(locale → {title?, html}).
   selectedContentTranslations?: Record<string, TabletContentTranslation> | null;
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 기존 QR 의 공개 URL(미선택/비활성이면 없음).
+  qrUrl?: string | null;
 }
 
 // ── Reducer (internal) ──
@@ -308,6 +310,8 @@ function mapLocalProduct(p: any): DisplayProduct {
  *   `{ id, type:'local', name, price, imageUrl }` shape 이다.
  */
 function mapSectionProduct(p: any): DisplayProduct {
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: resolver 가 상품별로 실어 준 QR 공개 URL 을 그대로 전달.
+  const qrUrl: string | null = typeof p?.qrUrl === 'string' && p.qrUrl ? p.qrUrl : null;
   if (p?.type === 'local') {
     return {
       id: String(p.id),
@@ -316,9 +320,10 @@ function mapSectionProduct(p: any): DisplayProduct {
       price: typeof p.price === 'number' ? p.price : undefined,
       priceDisplay: typeof p.priceDisplay === 'string' ? p.priceDisplay : undefined,
       imageUrl: p.imageUrl ?? undefined,
+      qrUrl,
     };
   }
-  return mapSupplierProduct(p as TabletProduct);
+  return { ...mapSupplierProduct(p as TabletProduct), qrUrl };
 }
 
 // ── Component ──
@@ -452,6 +457,8 @@ export function TabletKioskPage({
   const [openContentCard, setOpenContentCard] = useState<TabletContentCard | null>(null);
   // WO-O4O-KPA-TABLET-PUBLIC-QR-AND-DEMO-IMAGE-FIX-V1: QR 은 상시 노출이 아니라 작은 버튼 → 모달에서만.
   const [qrModalOpen, setQrModalOpen] = useState(false);
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 카드 QR 확대 보기 — 코너 QR 모달과 **동일 오버레이**를 재사용한다.
+  const [productQrZoom, setProductQrZoom] = useState<{ url: string; name: string } | null>(null);
   const autoSlideSeconds = displaySettings?.autoSlideSeconds ?? 0;
 
   useEffect(() => {
@@ -1117,6 +1124,19 @@ export function TabletKioskPage({
                     <span style={styles.productMore}>자세히 보기 ›</span>
                   </div>
                 </div>
+                {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장이 이 상품에 직접 고른 QR(있을 때만).
+                    터치하면 코너 QR 과 동일한 확대 보기 모달을 재사용한다(카드 선택과 분리). */}
+                {p.qrUrl && (
+                  <div
+                    style={styles.productQrBox}
+                    onClick={(e) => { e.stopPropagation(); setProductQrZoom({ url: p.qrUrl!, name: p.name }); }}
+                    role="button"
+                    aria-label={`${p.name} QR 크게 보기`}
+                  >
+                    <QrImage url={p.qrUrl} size={64} />
+                    <span style={styles.productQrHint}>QR 크게 보기</span>
+                  </div>
+                )}
                 {/* WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: '자체'(local) 출처 배지 공개 미노출. p.type 데이터는 보존. */}
               </div>
               );
@@ -1143,6 +1163,19 @@ export function TabletKioskPage({
             <div style={styles.qrModalDesc}>QR을 스캔하면 이 코너 안내를 휴대전화에서 확인할 수 있습니다.</div>
             <div style={{ margin: '18px 0' }}><QrImage url={cornerQrUrl} size={200} /></div>
             <button type="button" onClick={() => setQrModalOpen(false)} style={styles.qrModalClose}>닫기</button>
+          </div>
+        </div>
+      )}
+
+      {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 QR 확대 보기 — 위 코너 QR 모달과 동일 스타일 재사용.
+          어떤 용도의 QR 인지는 매장이 정한다(O4O 가 규정하지 않음) → 안내 문구를 용도 중립으로 둔다. */}
+      {productQrZoom && (
+        <div style={embedded ? { ...styles.contentModalOverlay, position: 'absolute' as const } : styles.contentModalOverlay} onClick={() => setProductQrZoom(null)} role="presentation">
+          <div style={styles.qrModal} onClick={(e) => e.stopPropagation()}>
+            <div style={styles.qrModalTitle}>{productQrZoom.name}</div>
+            <div style={styles.qrModalDesc}>QR을 스캔하면 휴대전화에서 이어서 확인할 수 있습니다.</div>
+            <div style={{ margin: '18px 0' }}><QrImage url={productQrZoom.url} size={200} /></div>
+            <button type="button" onClick={() => setProductQrZoom(null)} style={styles.qrModalClose}>닫기</button>
           </div>
         </div>
       )}
@@ -1192,7 +1225,9 @@ export function TabletKioskPage({
 // WO-O4O-KPA-TABLET-TEMPLATE-THREE-PATTERNS-V1:
 //   화면 QR = 그 화면(코너 안내)을 여는 스캔 가능한 QR. qr_guide.url(운영자 설정)을 client-side SVG 로 렌더.
 //   백엔드/entity/저장 모델 무추가 — 이미 존재하는 qr_guide.url 만 소비. url 없으면 렌더 안 함(호출부 fallback).
-function QrImage({ url, size = 72 }: { url: string; size?: number }) {
+// WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 모바일 코너 화면(PublicScreenSetViewer)이 **같은 QR 렌더**를
+//   쓰도록 export 한다(qrcode.react 를 소비처에 재도입하지 않는다 — 태블릿·모바일 표시 동일 보장).
+export function QrImage({ url, size = 72 }: { url: string; size?: number }) {
   if (!url) return null;
   return (
     <div style={styles.qrImageBox}>
@@ -1683,6 +1718,22 @@ const styles: Record<string, React.CSSProperties> = {
     fontSize: '15px',
     fontWeight: 700,
     color: '#2563eb',
+  },
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품 카드 하단 QR(매장이 고른 QR 이 있을 때만).
+  productQrBox: {
+    display: 'flex',
+    flexDirection: 'column' as const,
+    alignItems: 'center',
+    gap: '4px',
+    padding: '8px 10px 10px',
+    borderTop: '1px solid #f1f5f9',
+    cursor: 'pointer',
+  },
+  productQrHint: {
+    fontSize: '11px',
+    fontWeight: 600,
+    color: '#64748b',
+    whiteSpace: 'nowrap' as const,
   },
   // WO-O4O-TABLET-QR-PUBLIC-SOURCE-BADGE-REMOVE-V1: localBadge('자체') 공개 미노출로 스타일 제거.
   // WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1: 레이아웃 전용 미리보기 골격(중립 회색 블록).

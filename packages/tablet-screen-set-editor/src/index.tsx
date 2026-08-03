@@ -18,11 +18,11 @@
  *   (소비처 tabletDisplays 와 구조적 동일 — 계약 변경 0).
  */
 import { useState, useEffect, useCallback, useRef, useMemo, type ReactNode } from 'react';
-import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, Search } from 'lucide-react';
+import { Loader2, Plus, ChevronUp, ChevronDown, X, Save, Layers, Search, QrCode } from 'lucide-react';
 import {
   normalizeCornerBody, normalizeBlocks, ensureAutoBlocks, seedInitialBlocks,
   contentItemKey, moveContentItem, removeContentItem, addContentItems, updateContentItem, isValidScreenSetName,
-  selectedProductsOf, withSelectedProducts,
+  selectedProductsOf, withSelectedProducts, withProductQr,
   type ScreenBlock, type ScreenBlockType, type ContentListItem, type SelectedProductRef,
 } from '@o4o/screen-content-core';
 import { TabletKioskPage, detectIdleMediaType, type TabletKioskApi, type TabletScreenResponse } from '@o4o/tablet-kiosk-core';
@@ -624,10 +624,40 @@ function poolEntries(pool: ScreenSetProductPool | null): PoolEntry[] {
   ];
 }
 
-function ProductSelectEditor({ selected, onChange, fetchProductPool, onToast }: {
+/**
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+ * 상품 카드에 붙일 **기존** QR 후보. 매장 소유 + 활성 QR 만 소비처가 주입한다(신규 생성 없음).
+ * 필드는 store_qr_codes 계약 그대로 — 이 패키지는 QR 의 용도를 규정하지 않고 제목·유형·연결 대상만 보여준다.
+ */
+export interface ScreenSetQrOption {
+  id: string;
+  title: string;
+  type?: string | null;
+  landingType?: string | null;
+  landingTargetId?: string | null;
+  slug?: string | null;
+}
+
+/** QR 유형 라벨(표시 전용). 알 수 없는 값은 원문 그대로 — O4O 가 용도를 규정하지 않는다. */
+const QR_TYPE_LABEL: Record<string, string> = {
+  product: '상품',
+  page: '페이지',
+  link: '링크',
+  video: '동영상',
+  content: '콘텐츠',
+  screen_set: '코너',
+};
+function qrTypeLabel(v?: string | null): string {
+  if (!v) return 'QR';
+  return QR_TYPE_LABEL[v] ?? v;
+}
+
+function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQrCodes, onToast }: {
   selected: SelectedProductRef[];
   onChange: (next: SelectedProductRef[]) => void;
   fetchProductPool: () => Promise<ScreenSetProductPool>;
+  /** 미주입이면 QR 선택 UI 를 노출하지 않는다(기존 동작 그대로). */
+  fetchStoreQrCodes?: () => Promise<ScreenSetQrOption[]>;
   onToast: (t: Toast) => void;
 }) {
   const [pool, setPool] = useState<ScreenSetProductPool | null>(null);
@@ -635,6 +665,11 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, onToast }: 
   const [picking, setPicking] = useState(false);
   const [q, setQ] = useState('');
   const [tab, setTab] = useState<'supplier' | 'local'>('supplier');
+  // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장 활성 QR 목록(모달을 처음 열 때 1회 로드).
+  const [qrOptions, setQrOptions] = useState<ScreenSetQrOption[] | null>(null);
+  const [qrLoading, setQrLoading] = useState(false);
+  const [qrTargetIndex, setQrTargetIndex] = useState<number | null>(null);
+  const [qrQuery, setQrQuery] = useState('');
 
   useEffect(() => {
     let cancelled = false;
@@ -665,6 +700,35 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, onToast }: 
     if (selectedKeys.has(key)) onChange(selected.filter((s) => `${s.productType}:${s.productId}` !== key));
     else onChange([...selected, { productType: e.productType, productId: e.productId }]);
   };
+
+  // ── WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품별 QR 선택 ──
+  //   기존 QR 만 고른다(자동 생성·대표 QR 자동 판정 없음). 해제하면 그 상품은 QR 을 표시하지 않는다.
+  const qrById = useMemo(() => new Map((qrOptions ?? []).map((o) => [o.id, o])), [qrOptions]);
+  const openQrPicker = (i: number) => {
+    if (!fetchStoreQrCodes) return;
+    setQrTargetIndex(i);
+    setQrQuery('');
+    if (qrOptions || qrLoading) return;
+    setQrLoading(true);
+    fetchStoreQrCodes()
+      .then((list) => setQrOptions(Array.isArray(list) ? list : []))
+      .catch((e: any) => {
+        setQrOptions(null);
+        onToast({ type: 'error', message: e?.message || 'QR 목록을 불러오지 못했습니다.' });
+      })
+      .finally(() => setQrLoading(false));
+  };
+  const applyQr = (i: number, qrCodeId: string | null) => {
+    const target = selected[i];
+    if (!target) return;
+    onChange(withProductQr(selected, target, qrCodeId));
+    setQrTargetIndex(null);
+  };
+  const qrRows = (qrOptions ?? []).filter((o) => {
+    const t = qrQuery.trim().toLowerCase();
+    if (!t) return true;
+    return (o.title || '').toLowerCase().includes(t) || (o.slug || '').toLowerCase().includes(t);
+  });
 
   const btn = 'min-h-[44px] px-3 py-2 text-sm font-medium rounded-xl inline-flex items-center justify-center gap-1';
   const rows = entries.filter((e) => e.productType === tab).filter((e) => !q.trim() || e.name.toLowerCase().includes(q.trim().toLowerCase()));
@@ -704,16 +768,87 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, onToast }: 
                       </span>
                       {e?.price && <span className="text-[11px] text-slate-500">{e.price}</span>}
                     </div>
+                    {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 현재 선택된 QR 표시(미선택이면 안내만). */}
+                    {fetchStoreQrCodes && (
+                      <div className="mt-1 text-[11px] text-slate-500 truncate">
+                        {s.qrCodeId
+                          ? <>QR: <b className="text-slate-700">{qrById.get(s.qrCodeId)?.title ?? (qrLoading ? '불러오는 중…' : '선택된 QR')}</b></>
+                          : 'QR 미선택 — 이 상품에는 QR이 표시되지 않습니다.'}
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 flex-wrap">
                   <button onClick={() => move(i, 'up')} disabled={i === 0} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronUp className="w-4 h-4" /> 위로</button>
                   <button onClick={() => move(i, 'down')} disabled={i === selected.length - 1} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-30`}><ChevronDown className="w-4 h-4" /> 아래로</button>
+                  {fetchStoreQrCodes && (
+                    <button onClick={() => openQrPicker(i)} className={`${btn} ${s.qrCodeId ? 'text-indigo-700 bg-indigo-50 border border-indigo-200 hover:bg-indigo-100' : 'text-slate-600 bg-white border border-slate-200 hover:bg-slate-50'}`}>
+                      <QrCode className="w-4 h-4" /> {s.qrCodeId ? 'QR 변경' : 'QR 선택'}
+                    </button>
+                  )}
+                  {fetchStoreQrCodes && s.qrCodeId && (
+                    <button onClick={() => applyQr(i, null)} className={`${btn} text-slate-600 bg-white border border-slate-200 hover:bg-slate-50`}><X className="w-4 h-4" /> QR 해제</button>
+                  )}
                   <button onClick={() => remove(i)} className={`${btn} text-red-600 bg-white border border-red-200 hover:bg-red-50`}><X className="w-4 h-4" /> 제외</button>
                 </div>
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 매장에 이미 있는 QR 중에서 고른다(생성 기능 없음). */}
+      {qrTargetIndex !== null && (
+        <div className="fixed inset-0 z-[960] bg-slate-900/50 flex items-stretch sm:items-center justify-center p-0 sm:p-4" onClick={() => setQrTargetIndex(null)} role="presentation">
+          <div className="bg-white w-full h-full sm:h-auto sm:max-w-lg sm:max-h-[86vh] rounded-none sm:rounded-2xl flex flex-col overflow-hidden" onClick={(ev) => ev.stopPropagation()}>
+            <div className="px-4 py-3 border-b flex items-center justify-between flex-shrink-0">
+              <div className="min-w-0">
+                <h4 className="text-base font-bold text-slate-700">QR 선택</h4>
+                <p className="text-[11px] text-slate-500 truncate">
+                  {byKey.get(`${selected[qrTargetIndex]?.productType}:${selected[qrTargetIndex]?.productId}`)?.name ?? '선택한 상품'}
+                </p>
+              </div>
+              <button onClick={() => setQrTargetIndex(null)} className="min-h-[40px] min-w-[40px] flex items-center justify-center text-slate-400 hover:text-slate-600" aria-label="닫기"><X className="w-5 h-5" /></button>
+            </div>
+            <div className="px-4 py-2 flex-shrink-0">
+              <div className="relative">
+                <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <input value={qrQuery} onChange={(ev) => setQrQuery(ev.target.value)} placeholder="QR 제목으로 찾기"
+                  className="w-full min-h-[44px] pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-sm" autoFocus />
+              </div>
+              <p className="text-[11px] text-slate-400 mt-1.5 leading-relaxed">
+                매장에 이미 만들어 둔 QR 중에서 고릅니다. 어떤 용도의 QR을 붙일지는 직접 정하시면 됩니다. 여기서 QR을 새로 만들지는 않습니다.
+              </p>
+            </div>
+            <div className="flex-1 overflow-y-auto px-4 pb-2 space-y-2">
+              {qrLoading ? (
+                <div className="flex items-center gap-2 text-sm text-slate-400 py-6"><Loader2 className="w-4 h-4 animate-spin" /> 불러오는 중…</div>
+              ) : qrRows.length === 0 ? (
+                <div className="text-sm text-slate-400 py-6 text-center">사용할 수 있는 QR이 없습니다.<br />매장 QR 관리에서 QR을 먼저 만들어 주세요.</div>
+              ) : qrRows.map((o) => {
+                const sel = selected[qrTargetIndex!]?.qrCodeId === o.id;
+                return (
+                  <button key={o.id} onClick={() => applyQr(qrTargetIndex!, o.id)}
+                    className={`w-full text-left rounded-xl border p-3 transition ${sel ? 'border-indigo-400 bg-indigo-50' : 'border-slate-200 bg-white hover:border-indigo-200'}`}>
+                    <div className="flex items-start gap-2">
+                      <QrCode className={`w-4 h-4 mt-0.5 flex-shrink-0 ${sel ? 'text-indigo-600' : 'text-slate-400'}`} />
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-medium text-slate-800 truncate">{o.title || '(제목 없음)'}</div>
+                        <div className="text-[11px] text-slate-400 truncate">
+                          {qrTypeLabel(o.type ?? o.landingType)}{o.slug ? ` · /qr/${o.slug}` : ''}
+                        </div>
+                      </div>
+                      {sel && <span className="text-[11px] font-semibold text-indigo-600 flex-shrink-0">현재 선택</span>}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="px-4 py-3 border-t flex items-center justify-between gap-2 flex-shrink-0">
+              <button onClick={() => applyQr(qrTargetIndex!, null)} className="min-h-[44px] px-3 py-2 text-sm font-medium text-slate-600 rounded-xl border border-slate-200 hover:bg-slate-50">QR 표시 안 함</button>
+              <button onClick={() => setQrTargetIndex(null)} className="min-h-[44px] px-4 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700">닫기</button>
+            </div>
+          </div>
         </div>
       )}
 
@@ -812,7 +947,7 @@ function EditorSection({ title, note, children }: { title: string; note?: string
 //   api/contentSources 미주입 시 매장 기본값(회귀 0). 운영자는 operator API + spd 출처만 주입.
 export function TabletContentStepBuilder({
   initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug, api,
-  contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, onImageUpload, onMediaLibraryPick,
+  contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, fetchStoreQrCodes, onImageUpload, onMediaLibraryPick,
 }: {
   initialDetail: ScreenSetDetail | null;
   onCancel: () => void;
@@ -828,6 +963,12 @@ export function TabletContentStepBuilder({
    *   (운영자·공급자 제작기처럼 매장 상품 문맥이 없는 소비처 — 기존 동작 그대로).
    */
   fetchProductPool?: () => Promise<ScreenSetProductPool>;
+  /**
+   * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1:
+   *   상품 카드에 붙일 수 있는 **매장 소유 활성 QR** 목록. 미주입이면 QR 선택 UI 를 노출하지 않는다
+   *   (운영자·공급자 제작기 — 매장 QR 문맥 없음. 기존 동작 그대로).
+   */
+  fetchStoreQrCodes?: () => Promise<ScreenSetQrOption[]>;
   /** §4.3: 코너 설명 편집기 이미지 업로드(표준 편집기 props 를 그대로 전달). 미주입이면 업로드 버튼 미노출. */
   onImageUpload?: (file: File) => Promise<string>;
   /** §4.3: 코너 설명 편집기 미디어 라이브러리 선택(표준 편집기 props 를 그대로 전달). */
@@ -1093,6 +1234,7 @@ export function TabletContentStepBuilder({
       selected={selectedProducts}
       onChange={(next) => replaceConfigOf('product_list', withSelectedProducts(configOf('product_list'), next))}
       fetchProductPool={fetchProductPool!}
+      fetchStoreQrCodes={fetchStoreQrCodes}
       onToast={onToast}
     />
   );

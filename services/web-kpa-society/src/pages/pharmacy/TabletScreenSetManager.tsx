@@ -19,6 +19,8 @@ import {
   fetchStoreProductPool,
   type ScreenSet, type ScreenSetDetail,
 } from '../../api/tabletDisplays';
+// WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 상품별 QR 선택 후보 = 매장 소유 활성 QR 목록.
+import { getStoreQrCodes } from '../../api/storeQr';
 import { mediaApi } from '../../api/media';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
 import type { MediaInsert } from '@o4o/content-editor';
@@ -40,6 +42,24 @@ const defaultStoreBuilderApi: ScreenSetBuilderApi = {
   preview: previewScreenSet,
   searchO4oDescriptions: searchTabletO4oDescriptions,
   searchStoreContents: searchTabletStoreContents,
+};
+
+/**
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+ * 상품 카드에 붙일 수 있는 QR 후보 조회. 서버(GET /pharmacy/qr)가 이미
+ * `organization_id = 내 매장 AND is_active = true` 로 제한한다(매장 소유 + 활성 경계).
+ * 여기서 QR 을 새로 만들지 않는다 — 이미 있는 QR 만 고른다.
+ */
+const fetchStoreQrOptions = async () => {
+  const res = await getStoreQrCodes({ page: 1, limit: 200 });
+  return (res?.data?.items ?? []).map((q) => ({
+    id: q.id,
+    title: q.title,
+    type: q.type,
+    landingType: q.landingType,
+    landingTargetId: q.landingTargetId,
+    slug: q.slug,
+  }));
 };
 
 // '사용 중인 코너' 계산용 최소 태블렛 정보(페이지의 TabletType 하위집합).
@@ -150,6 +170,8 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           api={defaultStoreBuilderApi}
           // WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1
           fetchProductPool={fetchStoreProductPool}
+          // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+          fetchStoreQrCodes={fetchStoreQrOptions}
           onImageUpload={handleImageUpload}
           onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
         />

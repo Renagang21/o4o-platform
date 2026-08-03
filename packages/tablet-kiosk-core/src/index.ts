@@ -7,6 +7,9 @@
 export { TabletKioskPage } from './TabletKioskPage';
 export type { TabletKioskPageProps, TabletKioskDisplaySettings } from './TabletKioskPage';
 
+// WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 공개 모바일 코너 화면이 태블릿과 동일한 QR 렌더를 재사용.
+export { QrImage } from './TabletKioskPage';
+
 // WO-O4O-TABLET-IDLE-PLAYLIST-EDITOR-V1
 export { IdlePlaylistEditor } from './IdlePlaylistEditor';
 export type { IdlePlaylistEditorProps } from './IdlePlaylistEditor';

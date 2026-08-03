@@ -46,8 +46,18 @@ export type ContentListItem =
  *   supplier → organization_product_listings.id   (매장 취급 상품 = 상품 풀의 supplierProducts[].id)
  *   local    → store_local_products.id            (매장 자체 상품)
  * 새 식별 체계를 만들지 않는다(신규 테이블/컬럼 없음 — Screen Set block config 안에만 저장).
+ *
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: `qrCodeId` 를 **additive** 로 추가한다.
+ *   - 값 = 매장 소유 기존 QR(`store_qr_codes.id`). 신규 QR 을 만들지 않고 **사용자가 고른 기존 QR** 만 참조한다.
+ *   - 미선택/해제 = 필드 없음(또는 null) → QR 미표시. 대표 QR 자동 판정 없음.
+ *   - 과거 저장값(필드 없음)과 완전 호환.
  */
-export type SelectedProductRef = { productType: 'supplier' | 'local'; productId: string };
+export type SelectedProductRef = {
+  productType: 'supplier' | 'local';
+  productId: string;
+  /** 이 상품 카드에 표시할 기존 QR(store_qr_codes.id). 미선택이면 undefined. */
+  qrCodeId?: string;
+};
 
 /** 편집 Draft — 저장 전 화면 세트 편집 모델(블록 목록). */
 export interface ScreenSetDraft {
@@ -167,6 +177,9 @@ export function selectedProductsOf(config: Record<string, unknown> | undefined |
     if (productType !== 'supplier' && productType !== 'local') continue;
     if (typeof productId !== 'string' || productId.trim() === '') continue;
     const ref: SelectedProductRef = { productType, productId };
+    // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 선택된 기존 QR id 를 보존(빈 문자열/비문자열은 미선택 취급).
+    const { qrCodeId } = it as Partial<SelectedProductRef>;
+    if (typeof qrCodeId === 'string' && qrCodeId.trim() !== '') ref.qrCodeId = qrCodeId.trim();
     const key = productRefKey(ref);
     if (seen.has(key)) continue;
     seen.add(key);
@@ -196,7 +209,37 @@ export function withSelectedProducts(
     seen.add(key);
     return true;
   });
-  return { ...rest, source: 'selected_products', products: uniq.map((p) => ({ productType: p.productType, productId: p.productId })) };
+  return {
+    ...rest,
+    source: 'selected_products',
+    // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: qrCodeId 는 선택된 경우에만 additive 로 직렬화(미선택은 키 자체 없음).
+    products: uniq.map((p) =>
+      p.qrCodeId && p.qrCodeId.trim() !== ''
+        ? { productType: p.productType, productId: p.productId, qrCodeId: p.qrCodeId.trim() }
+        : { productType: p.productType, productId: p.productId },
+    ),
+  };
+}
+
+/**
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+ * 특정 상품의 QR 선택을 지정/해제한다(순수 함수). `qrCodeId=null` 이면 해제.
+ * 같은 QR 을 여러 상품에 지정할 수 있고, 다른 상품의 선택에는 영향이 없다.
+ */
+export function withProductQr(
+  products: SelectedProductRef[],
+  target: SelectedProductRef,
+  qrCodeId: string | null,
+): SelectedProductRef[] {
+  const key = productRefKey(target);
+  return products.map((p) => {
+    if (productRefKey(p) !== key) return p;
+    if (!qrCodeId || qrCodeId.trim() === '') {
+      const { qrCodeId: _drop, ...rest } = p;
+      return rest;
+    }
+    return { ...p, qrCodeId: qrCodeId.trim() };
+  });
 }
 
 // ── 저장 전 validation ──

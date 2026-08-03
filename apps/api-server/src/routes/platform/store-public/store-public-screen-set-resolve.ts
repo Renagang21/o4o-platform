@@ -137,26 +137,65 @@ async function resolveScreenSetLocalProducts(
  *   - `{ source: 'selected_products', products: [{ productType, productId }] }` → 선택 목록.
  *   프론트 계약(@o4o/screen-content-core selectedProductsOf)과 동일 규칙을 서버에서 재확인한다
  *   (api-server 는 프론트 패키지에 의존하지 않는다 — parseContentListConfig 과 동일 방침).
+ *
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1:
+ *   상품별 `qrCodeId`(매장이 직접 고른 **기존** QR) 를 additive 로 함께 파싱한다. 값이 없으면 QR 미표시
+ *   (대표 QR 자동 판정·자동 생성 없음). 과거 저장값과 완전 호환.
  */
-function parseSelectedProducts(config: unknown): Array<{ productType: 'supplier' | 'local'; productId: string }> | null {
+type SelectedProduct = { productType: 'supplier' | 'local'; productId: string; qrCodeId: string | null };
+
+function parseSelectedProducts(config: unknown): SelectedProduct[] | null {
   if (!config || typeof config !== 'object' || Array.isArray(config)) return null;
   const cfg = config as Record<string, unknown>;
   if (cfg.source !== 'selected_products') return null;
   const raw = Array.isArray(cfg.products) ? cfg.products : [];
   const seen = new Set<string>();
-  const out: Array<{ productType: 'supplier' | 'local'; productId: string }> = [];
+  const out: SelectedProduct[] = [];
   for (const it of raw) {
     if (!it || typeof it !== 'object') continue;
     const pt = (it as Record<string, unknown>).productType;
     const pid = (it as Record<string, unknown>).productId;
+    const qid = (it as Record<string, unknown>).qrCodeId;
     if (pt !== 'supplier' && pt !== 'local') continue;
     if (typeof pid !== 'string' || pid.trim() === '') continue;
     const key = `${pt}:${pid}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    out.push({ productType: pt, productId: pid });
+    out.push({
+      productType: pt,
+      productId: pid,
+      qrCodeId: typeof qid === 'string' && qid.trim() !== '' ? qid.trim() : null,
+    });
   }
   return out.length > 0 ? out : null;
+}
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/**
+ * WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1
+ * 선택된 QR id → 공개 URL 맵. **매장 소유 + 활성(is_active)** QR 만 해석한다.
+ *   - 삭제되었거나 비활성인 QR, 다른 매장 QR, uuid 가 아닌 값 → 맵에 없음 → 해당 상품은 QR 미표시(안전 제외).
+ *   - 읽기 전용(SELECT). QR 을 만들지 않는다.
+ */
+async function resolveSelectedQrUrls(
+  dataSource: DataSource,
+  organizationId: string,
+  serviceKey: string,
+  qrCodeIds: string[],
+): Promise<Map<string, string>> {
+  const ids = Array.from(new Set(qrCodeIds.filter((id) => UUID_RE.test(id))));
+  const map = new Map<string, string>();
+  if (ids.length === 0) return map;
+  const rows = await dataSource.query(
+    `SELECT id, slug FROM store_qr_codes
+      WHERE organization_id = $1 AND is_active = true AND id = ANY($2::uuid[])`,
+    [organizationId, ids],
+  );
+  for (const r of rows ?? []) {
+    if (r?.id && r?.slug) map.set(String(r.id), buildScreenSetQrUrl(serviceKey, String(r.slug)));
+  }
+  return map;
 }
 
 /** 명시 선택된 매장 자체 상품(store_local_products) resolve — 선택 순서는 호출부에서 적용. */
@@ -260,9 +299,21 @@ export async function resolveScreenSetSections(
           const selectedLocals = await resolveSelectedLocalProducts(dataSource, input.organizationId, selectedLocalIds);
           const localById = new Map(selectedLocals.map((p) => [p.id, p]));
           const supplierByListing = new Map(selectedSuppliers.map((p: any) => [String(p.listingId), p]));
+          // WO-O4O-SCREEN-SET-PRODUCT-QR-SELECTION-V1: 선택된 기존 QR → 공개 URL(매장 소유 + 활성만).
+          const qrUrlById = await resolveSelectedQrUrls(
+            dataSource,
+            input.organizationId,
+            input.serviceKey,
+            selected.map((s) => s.qrCodeId).filter((v): v is string => !!v),
+          );
           // 저장된 선택 순서 그대로 출력(supplier/local 혼합 순서 보존).
           const ordered = selected
-            .map((s) => (s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId)))
+            .map((s) => {
+              const base = s.productType === 'supplier' ? supplierByListing.get(s.productId) : localById.get(s.productId);
+              if (!base) return null;
+              // 상품 데이터에 qrUrl 을 additive 로 부여. 미선택·비활성·삭제 QR 은 null(소비처는 표시하지 않는다).
+              return { ...base, qrUrl: (s.qrCodeId && qrUrlById.get(s.qrCodeId)) || null };
+            })
             .filter(Boolean);
           sections.push({
             blockType: 'product_list',
