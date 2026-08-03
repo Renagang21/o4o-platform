@@ -1,0 +1,110 @@
+{
+ "summary": {
+  "mode": "dry-run (DB write 0)",
+  "planTargets": 18,
+  "ready": 0,
+  "exceptions": 18,
+  "exByCode": {
+   "REVERSE_PATCH_MISMATCH": 18
+  },
+  "fixes": 0,
+  "planDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "updated": 0,
+  "rolledBack": 0,
+  "guardMiss": 0
+ },
+ "applied": [],
+ "plan": [],
+ "exceptions": [
+  {
+   "koId": "ac1e6660-bd30-44eb-b6f4-a073dd954eb2",
+   "mid": "58727146-37c5-4f5d-9e49-a5d3ff58eaa2",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "592e0b39-7489-42e1-a457-659aa2587191",
+   "mid": "d9b9078b-b724-4f74-a949-2e856f34bdb5",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "8242ea03-9239-4f53-90d7-14423c82cc15",
+   "mid": "fc73c63a-4497-4595-8a3a-a0256ff59266",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "229ef0b7-7ce1-48e0-b0e5-a7b86fa0e16f",
+   "mid": "451ca932-450e-4550-b823-cb2674eac022",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "6da43049-75a4-486a-ac8a-a4a2dbf19e66",
+   "mid": "5960a039-6769-4fcd-aeea-97b7bcb238a1",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "6e20a8e6-bd92-4d10-887b-a7685c785ccc",
+   "mid": "5ec1ebf7-afaf-4a0f-91bc-1ea9ffa45c3a",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "d22dde72-0603-4843-8867-292a811b8b85",
+   "mid": "be17961f-15ff-42d7-9502-41931dac0da5",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "e20337c0-a5a2-4f9a-b04f-c3af5b95f9a0",
+   "mid": "d2472a6d-12d9-439a-b113-c49c26190b92",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "3f59ea8f-9114-4228-aa90-92da6a14483b",
+   "mid": "e8909373-ce30-4f4e-ab40-b0b5ac91e6ec",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "81cca6c1-0110-4bb8-bb40-98f982eaecba",
+   "mid": "f0dcde5e-ab05-4d39-a80d-9622d68c1c76",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "3b249254-67a7-4a78-a2e1-19310556936b",
+   "mid": "4bd3c6db-b02b-40b2-852c-fc32dfc67c81",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "8b4d5dde-74fb-4193-ba5e-8b6c74d2c0ba",
+   "mid": "c7f06871-551c-4280-b122-a720b6e4e56c",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "0c6e0898-2a39-481f-ab61-dd1256040bcc",
+   "mid": "4f0cd7b8-5387-4990-8a22-e4ff95fd0e34",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "31cd9efa-ddd3-4d41-93ef-f9e1bf3ec78e",
+   "mid": "4fc18662-1ded-474f-a9bc-9f00a1720e44",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "18ed21a0-8079-4b4c-b9ce-85b2d0af0d42",
+   "mid": "2d56e2c0-e458-4e50-825b-a3fc19424101",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "241138c7-101c-43e1-ba81-79795e60be67",
+   "mid": "88ba20a5-96ac-4ce7-a2fe-142cc13c5516",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "7ca46306-aec7-4d49-94b0-d5c0b28cc713",
+   "mid": "b6a62cc9-fdb8-40ee-97eb-8f63280c5b5b",
+   "code": "REVERSE_PATCH_MISMATCH"
+  },
+  {
+   "koId": "6276537d-aa07-4608-92de-30712c9db089",
+   "mid": "e65f2399-ae82-48af-9505-c1ad91fd8f96",
+   "code": "REVERSE_PATCH_MISMATCH"
+  }
+ ]
+}
