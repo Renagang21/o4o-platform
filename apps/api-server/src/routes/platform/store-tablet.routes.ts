@@ -1428,7 +1428,17 @@ export function createStoreTabletRoutes(
   router.patch('/screen-sets/:id', withStoreAuth(async (req, res, organizationId) => {
     try {
       const id = req.params.id;
-      const owned = await dataSource.query(`SELECT id FROM store_tablet_screen_sets WHERE id = $1 AND organization_id = $2 AND origin = 'store' AND deleted_at IS NULL LIMIT 1`, [id, organizationId]);
+      // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1 (결함 수정):
+      //   복원 요청(status 를 archived 아닌 값으로) 은 보관 row 를 대상으로 하므로
+      //   이 소유권 사전 확인도 보관 row 를 허용해야 한다(아니면 아래 UPDATE 전에 404).
+      const isRestore = req.body?.status !== undefined && String(req.body.status) !== 'archived';
+      const owned = await dataSource.query(
+        `SELECT id FROM store_tablet_screen_sets
+          WHERE id = $1 AND organization_id = $2 AND origin = 'store'
+            AND (deleted_at IS NULL${isRestore ? " OR status = 'archived'" : ''})
+          LIMIT 1`,
+        [id, organizationId],
+      );
       if (!owned?.[0]) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       const sets: string[] = [];
       const params: any[] = [];
@@ -1473,7 +1483,6 @@ export function createStoreTabletRoutes(
       //   **복원(restore) 이 구조적으로 불가능**했다(아래 setScreenSetQrActive(…, true) 재활성 분기는 도달 불가 = dead).
       //   status 를 archived 아닌 값으로 되돌리는 요청에 한해 보관 row 도 매칭하고 archive 마커를 해제한다.
       //   slug·row 는 그대로이므로 복원 후 같은 slug 로 다시 200 이 된다.
-      const isRestore = statusChange !== null && statusChange !== 'archived';
       if (isRestore) sets.push('deleted_at = NULL');
       sets.push(`updated_at = NOW()`);
       params.push(id); params.push(organizationId);
