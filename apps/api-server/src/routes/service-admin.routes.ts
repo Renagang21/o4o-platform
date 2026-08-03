@@ -6,6 +6,7 @@
  */
 
 import { Router, Request, Response } from 'express';
+import { authenticate, requireAdmin } from '../middleware/auth.middleware.js';
 import logger from '../utils/logger.js';
 import { templateRegistry } from '../service-templates/template-registry.js';
 import { initPackRegistry } from '../service-templates/init-pack-registry.js';
@@ -47,6 +48,36 @@ function getInstalledAppsInfo() {
 }
 
 const router: Router = Router();
+
+// ─────────────────────────────────────────────────────────────────────────────
+// WO-O4O-SERVICE-ADMIN-API-GUARD-EMERGENCY-V1
+//
+// 이 라우터는 `app.use('/api/v1/service-admin', serviceAdminRoutes)` 로 mount 되는데
+// mount 지점에도, 라우터 안에도 인증 미들웨어가 없었다. `/api/v1` 에는 전역 인증이
+// 없으므로(main.ts 에는 globalErrorHandler 뿐) 8개 endpoint 전부가 비로그인에 공개돼
+// 있었다 — 프로덕션 GET 200 실측. 상세: docs/audits/O4O-ADMIN-AUTHORIZATION-ROLE-
+// ROUTE-API-CONSISTENCY-AUDIT-V1.md (P0-1).
+//
+// 허용 역할을 platform 관리자로 한정하는 근거
+//   - 이 라우터가 반환하는 것은 특정 서비스의 데이터가 아니라 **플랫폼 전역 레지스트리**
+//     다: moduleLoader(설치 모듈), templateRegistry(서비스 템플릿), initPackRegistry,
+//     themePresetService 의 기본 프리셋. 서비스 경계로 나눌 대상이 아니다.
+//   - `tenantId` / `serviceGroup` 은 **요청자가 query·body 로 지정**하며 소유권 검사가
+//     없다. tenant-context.middleware 는 어디에도 등록돼 있지 않아 `req.tenantId` 는
+//     항상 undefined 다. 따라서 서비스 관리자에게 열면 임의 tenantId 를 지정해 다른
+//     테넌트의 테마를 조회·변경할 수 있다(scope 로 좁힐 축이 없다).
+//   - 저장소 전수 검색 결과 이 API 의 **소비처가 0건**이다(정의부 외 참조 없음).
+//     정상 사용 중인 서비스 관리자 흐름이 존재하지 않으므로 최소 권한 적용의
+//     기능 회귀 위험이 없다.
+// 따라서 기존 canonical guard 를 그대로 재사용한다 — 신규 역할·permission 체계 없음.
+// (`requireAdmin` = platform:admin / platform:super_admin, WO-O4O-REQUIREADMIN-
+//  PREFIXED-ONLY-V1)
+//
+// 개별 endpoint 가 아니라 **router 수준**에 건다. 이후 추가되는 endpoint 도 자동으로
+// 이 경계 아래에 놓인다(회귀 테스트가 이 순서를 고정한다).
+// ─────────────────────────────────────────────────────────────────────────────
+router.use(authenticate);
+router.use(requireAdmin);
 
 /**
  * GET /api/v1/service-admin/summary
