@@ -17,7 +17,8 @@ const MemberDetail = lazy(() => import('./members/MemberDetail'));
 const VerificationManagement = lazy(() => import('./verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('./categories/CategoryManagement'));
 const AuditLogManagement = lazy(() => import('./audit-logs/AuditLogManagement'));
-const AffiliationManagement = lazy(() => import('./affiliations/AffiliationManagement'));
+// WO-O4O-MEMBERSHIP-UI-API-CONTRACT-AUDIT-AND-MINIMAL-RECOVERY-V1: AffiliationManagement 제거
+// (이 router 자체는 현재 어디에도 mount 되지 않은 legacy 다 — 별도 정리 대상)
 
 const PageLoader = () => (
   <div className="p-6 space-y-4">
@@ -38,7 +39,6 @@ export default function MembershipRouter() {
           <Route path="verifications" element={<VerificationManagement />} />
           <Route path="categories" element={<CategoryManagement />} />
           <Route path="audit-logs" element={<AuditLogManagement />} />
-          <Route path="affiliations" element={<AffiliationManagement />} />
         </Routes>
       </Suspense>
     </AppGuard>

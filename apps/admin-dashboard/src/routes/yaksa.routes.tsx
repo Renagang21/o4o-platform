@@ -10,7 +10,11 @@ const MemberDetail = lazy(() => import('@/pages/membership/members/MemberDetail'
 const VerificationManagement = lazy(() => import('@/pages/membership/verifications/VerificationManagement'));
 const CategoryManagement = lazy(() => import('@/pages/membership/categories/CategoryManagement'));
 const AuditLogManagement = lazy(() => import('@/pages/membership/audit-logs/AuditLogManagement'));
-const AffiliationManagement = lazy(() => import('@/pages/membership/affiliations/AffiliationManagement'));
+// WO-O4O-MEMBERSHIP-UI-API-CONTRACT-AUDIT-AND-MINIMAL-RECOVERY-V1
+//   AffiliationManagement 제거 — 메뉴·대시보드 어디에서도 링크되지 않고,
+//   화면이 요구하는 전역 목록 GET endpoint 가 백엔드에 존재한 적이 없다
+//   (AffiliationService 는 회원별·조직별 조회만 제공). 소속 관리 기능이 실제로
+//   필요해지면 권한·범위·필터 계약을 새로 설계한다.
 
 // Reporting-Yaksa: Annual Report Management
 const ReportingDashboard = lazy(() => import('@/pages/reporting/dashboard/ReportingDashboard'));
@@ -89,14 +93,6 @@ export function YaksaRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/admin/membership/affiliations" path="/admin/membership/affiliations" element={
-      <AdminProtectedRoute requiredPermissions={['membership:manage']}>
-        <Suspense fallback={<PageLoader />}>
-          <AffiliationManagement />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
     // Reporting-Yaksa: 신상신고 관리
     <Route key="/admin/reporting" path="/admin/reporting" element={
       <AdminProtectedRoute requiredPermissions={['reporting:view']}>
