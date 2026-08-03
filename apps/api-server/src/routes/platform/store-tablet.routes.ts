@@ -1331,12 +1331,19 @@ export function createStoreTabletRoutes(
   router.get('/screen-sets', withStoreAuth(async (req, res, organizationId) => {
     try {
       // WO-O4O-STORE-SCREEN-SET-ORIGIN-ISOLATION-HARDENING-V1: 매장 목록은 매장 소유(origin='store') 원본만.
-      const where: string[] = ['s.organization_id = $1', "s.origin = 'store'", 's.deleted_at IS NULL'];
+      const where: string[] = ['s.organization_id = $1', "s.origin = 'store'"];
       const params: any[] = [organizationId];
       const { tabletId, status, includeArchived } = req.query;
       if (tabletId && typeof tabletId === 'string') { params.push(tabletId); where.push(`s.tablet_id = $${params.length}`); }
       if (status && typeof status === 'string') { params.push(status); where.push(`s.status = $${params.length}`); }
-      if (includeArchived !== 'true') { where.push(`s.status <> 'archived'`); }
+      // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1 (결함 수정):
+      //   보관(DELETE /screen-sets/:id)은 `deleted_at = NOW() + status='archived'` 를 함께 쓰는데, 목록은
+      //   `deleted_at IS NULL` 을 무조건 걸어 **includeArchived=true 여도 보관 항목이 한 건도 반환되지 않았다**.
+      //   그 결과 UI '보관' 필터는 항상 0건이고, 보관 확인 문구("‘보관’ 필터에서 다시 확인할 수 있습니다")가
+      //   사실과 달랐다. 이 경로에서 deleted_at 은 archive 마커이므로 includeArchived 스위치와 같이 동작시킨다.
+      //   (공개/타 경로의 deleted_at 필터는 그대로 — 이 목록 한 곳만 변경.)
+      if (includeArchived !== 'true') { where.push(`s.status <> 'archived'`); where.push('s.deleted_at IS NULL'); }
+      else { where.push(`(s.deleted_at IS NULL OR s.status = 'archived')`); }
       const rows = await dataSource.query(
         `SELECT ${setCols('s.')},
                 (SELECT count(*)::int FROM store_tablet_screen_blocks b WHERE b.screen_set_id = s.id) AS "blockCount",
@@ -1459,16 +1466,24 @@ export function createStoreTabletRoutes(
         params.push(tk); sets.push(`template_key = $${params.length}`);
       }
       if (sets.length === 0) { res.status(400).json({ success: false, error: 'no fields to update', code: 'VALIDATION_ERROR' }); return; }
-      sets.push(`updated_at = NOW()`);
-      params.push(id); params.push(organizationId);
       // WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1: status 전이(archive/restore)와 종속 QR is_active 를 원자적으로.
       const statusChange: string | null = req.body?.status !== undefined ? String(req.body.status) : null;
+      // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1 (결함 수정):
+      //   보관은 `deleted_at = NOW()` 를 함께 남기는데 이 UPDATE 는 `deleted_at IS NULL` 만 매칭해
+      //   **복원(restore) 이 구조적으로 불가능**했다(아래 setScreenSetQrActive(…, true) 재활성 분기는 도달 불가 = dead).
+      //   status 를 archived 아닌 값으로 되돌리는 요청에 한해 보관 row 도 매칭하고 archive 마커를 해제한다.
+      //   slug·row 는 그대로이므로 복원 후 같은 slug 로 다시 200 이 된다.
+      const isRestore = statusChange !== null && statusChange !== 'archived';
+      if (isRestore) sets.push('deleted_at = NULL');
+      sets.push(`updated_at = NOW()`);
+      params.push(id); params.push(organizationId);
       let updated: any = null;
       let data: Record<string, unknown> | null = null;
       await dataSource.transaction(async (m) => {
         const upd = await m.query(
           `UPDATE store_tablet_screen_sets SET ${sets.join(', ')}
-           WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND origin = 'store' AND deleted_at IS NULL
+           WHERE id = $${params.length - 1} AND organization_id = $${params.length} AND origin = 'store'
+             AND (deleted_at IS NULL${isRestore ? " OR status = 'archived'" : ''})
            RETURNING ${setCols('')}`,
           params,
         );

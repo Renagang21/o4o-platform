@@ -155,6 +155,21 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
     } finally { setBusy(false); }
   };
 
+  // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 해제(복원).
+  //   보관해도 slug 는 그대로 남으므로 복원하면 기존 코너 QR 이 같은 주소로 다시 살아난다.
+  const handleRestore = async (set: ScreenSet) => {
+    if (busy) return;
+    if (!window.confirm(`“${set.name}” 의 보관을 해제하시겠습니까?\n목록에 다시 나타나고, 이 콘텐츠의 코너 QR 주소도 다시 열립니다.`)) return;
+    setBusy(true);
+    try {
+      await updateScreenSet(set.id, { status: 'active' });
+      onToast({ type: 'success', message: '보관을 해제했습니다.' });
+      await reload();
+    } catch (e: any) {
+      onToast({ type: 'error', message: e?.message || '보관을 해제하지 못했습니다.' });
+    } finally { setBusy(false); }
+  };
+
   // WO-O4O-KPA-TABLET-CONTENT-STEP-BUILDER-SHELL-V1: 제작/수정은 단계형 제작 셸이 화면을 전환(takeover).
   //   공유 편집기에 **매장 API(defaultStoreBuilderApi)** 를 명시 주입(회귀 0).
   if (builder) {
@@ -214,6 +229,7 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           onCreate={openCreate}
           onEdit={openEdit}
           onArchive={handleArchive}
+          onRestore={handleRestore}
           onRefresh={reload}
           previewApi={previewApi}
           storeSlug={storeSlug ?? null}

@@ -14,7 +14,7 @@
  */
 
 import { useMemo, useState, useEffect, useCallback, useRef, type ReactNode } from 'react';
-import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check, QrCode, Download } from 'lucide-react';
+import { Edit3, Trash2, Plus, Layers, Eye, X, Loader2, MonitorSmartphone, Check, QrCode, Download, RotateCcw } from 'lucide-react';
 import { toast } from '@o4o/error-handling';
 import { ActionBar, BulkResultModal, RowActionMenu } from '@o4o/ui';
 import {
@@ -76,9 +76,13 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
     // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 자동 생성된 코너 QR 보기·출력 진입.
     //   slug 가 없는 콘텐츠(아직 QR 미확보)는 노출하지 않는다 — 없는 QR 을 있는 것처럼 보이지 않게.
     { key: 'qr', label: 'QR 보기·출력', visible: (s) => !!s.publicQrSlug && s.status !== 'archived' },
-    { key: 'edit', label: '수정' },
+    // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 항목은 편집 대상이 아니다(복원 후 수정).
+    { key: 'edit', label: '수정', visible: (s) => s.status !== 'archived' },
     // 보관(= soft delete/archived). 확인은 상위 handleArchive 에서 수행(중복 방지). 내부 status 는 archived 그대로.
     { key: 'archive', label: '보관', variant: 'warning', visible: (s) => s.status !== 'archived' },
+    // WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 확인 문구가 약속한 '다시 확인/되돌리기' 의 실행 지점.
+    //   복원해도 slug 는 그대로라 기존 QR 이 다시 살아난다.
+    { key: 'restore', label: '보관 해제', visible: (s) => s.status === 'archived' },
   ],
 });
 const ACTION_ICONS: Record<string, ReactNode> = {
@@ -86,6 +90,7 @@ const ACTION_ICONS: Record<string, ReactNode> = {
   apply: <MonitorSmartphone className="w-4 h-4" />,
   edit: <Edit3 className="w-4 h-4" />,
   archive: <Trash2 className="w-4 h-4" />,
+  restore: <RotateCcw className="w-4 h-4" />,
   qr: <QrCode className="w-4 h-4" />,
 };
 
@@ -117,6 +122,11 @@ interface Props {
   onEdit: (id: string) => void;
   /** 개별 리스트에서 제거(부모 handleArchive — 확인 + 적용중 가드 + reload 포함). */
   onArchive: (set: ScreenSet) => void;
+  /**
+   * WO-O4O-SCREEN-SET-CORNER-CONTENT-E2E-SMOKE-V1: 보관 해제(복원). 부모에서 확인 + reload 처리.
+   * 미주입 시 '보관 해제' 항목은 노출되지 않는다.
+   */
+  onRestore?: (set: ScreenSet) => void;
   /** 일괄 작업 후 목록 갱신. */
   onRefresh: () => void;
   /** 행 미리보기(kiosk-core 재사용) — 미주입 시 미리보기 비활성. */
@@ -142,6 +152,7 @@ export default function TabletContentLibraryList({
   onCreate,
   onEdit,
   onArchive,
+  onRestore,
   onRefresh,
   previewApi,
   storeSlug,
@@ -438,19 +449,21 @@ export default function TabletContentLibraryList({
             qr: () => openQr(s),
             edit: () => onEdit(s.id),
             archive: () => onArchive(s),
+            restore: () => onRestore?.(s),
           }, {
             icons: ACTION_ICONS,
             loading: previewBusy === s.id
               ? { preview: true }
               : qrBusy === s.id
                 ? { qr: true }
-                : (busy ? { archive: true } : undefined),
-          })}
+                : (busy ? { archive: true, restore: true } : undefined),
+            // 핸들러 미주입 소비처에서는 '보관 해제' 를 아예 노출하지 않는다(빈 동작 방지).
+          }).filter((a) => a.key !== 'restore' || !!onRestore)}
           inlineMax={contentActionPolicy.inlineMax}
         />
       ),
     },
-  ], [templateLabel, usageBySet, onEdit, onArchive, busy, handlePreview, previewBusy, activeHighlight, openApply, openQr, qrBusy]);
+  ], [templateLabel, usageBySet, onEdit, onArchive, onRestore, busy, handlePreview, previewBusy, activeHighlight, openApply, openQr, qrBusy]);
 
   const selectCls = 'px-2.5 py-2 rounded-lg border border-slate-200 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-indigo-400';
 
