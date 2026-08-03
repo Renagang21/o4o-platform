@@ -27,6 +27,8 @@ import { AppDataSource } from '../../database/connection.js';
 import { MembershipApprovalService } from '../../services/approval/MembershipApprovalService.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import { ActionLogService } from '@o4o/action-log-core';
+// WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 승인 후 매장 주체(organization/owner/slug) 보장
+import { PharmacyHubStoreProvisioningService } from '../../services/pharmacy-hub/PharmacyHubStoreProvisioningService.js';
 import logger from '../../utils/logger.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
@@ -235,6 +237,38 @@ export class PharmacyHubMembershipConsoleController {
         })
         .catch(() => {});
 
+      // WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1
+      //   승인이 커밋된 뒤 매장 주체를 보장한다 (store_owner 만 대상, 멱등).
+      //   실패 격리: 프로비저닝 실패가 회원 승인을 되돌리지 않는다 — KPA member.controller.ts
+      //   pharmacy_owner auto-activation 과 동일 정책. 보류/실패는 응답 storeSubject 로 보고되고
+      //   backfill 스크립트로 복구 가능하다.
+      let storeSubject: Record<string, unknown> | undefined;
+      try {
+        const provisioning = new PharmacyHubStoreProvisioningService(AppDataSource);
+        const result = await provisioning.provisionStoreSubject(membership.user_id, approvedBy);
+        storeSubject = {
+          outcome: result.outcome,
+          organizationId: result.organizationId,
+          slug: result.slug,
+          ...(result.holdReason ? { holdReason: result.holdReason, detail: result.detail } : {}),
+        };
+        if (result.outcome === 'held') {
+          logger.warn('[PharmacyHubMembershipConsole] store subject held', {
+            membershipId,
+            userId: membership.user_id,
+            holdReason: result.holdReason,
+            detail: result.detail,
+          });
+        }
+      } catch (provisionError) {
+        logger.error('[PharmacyHubMembershipConsole] store subject provisioning failed', {
+          membershipId,
+          userId: membership.user_id,
+          error: provisionError instanceof Error ? provisionError.message : String(provisionError),
+        });
+        storeSubject = { outcome: 'failed' };
+      }
+
       return res.json({
         success: true,
         data: {
@@ -243,6 +277,7 @@ export class PharmacyHubMembershipConsoleController {
           status: membership.status,
           role: membership.role,
           roleType: toRoleType(membership.role),
+          storeSubject,
         },
       });
     } catch (error) {
