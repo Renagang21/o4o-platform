@@ -245,7 +245,10 @@ const MemberDetail = () => {
     if (!member) return;
     try {
       setSaving(true);
-      const response = await authClient.api.patch(`/membership/members/${member.id}`, editData);
+      // WO-O4O-ADMIN-INDIVIDUAL-API-ACCESS-BOUNDARY-CORRECTION-V1
+      // 백엔드 계약은 PUT `/members/:id` 다 (memberRoutes.ts:115). PATCH `/members/:id` 는 없어
+      // 이 화면의 저장·검증·활성 토글 3개 동작이 모두 404 였다(권한 문제가 아니다).
+      const response = await authClient.api.put(`/membership/members/${member.id}`, editData);
       if (response.data.success) {
         toast.success('저장되었습니다.');
         setIsEditing(false);
@@ -272,7 +275,8 @@ const MemberDetail = () => {
     if (!confirm(`이 회원을 ${action}하시겠습니까?`)) return;
 
     try {
-      const response = await authClient.api.patch(`/membership/members/${member.id}`, {
+      // PATCH `/members/:id/verify` 는 setVerified(true) 고정이라 해제를 표현할 수 없다 → PUT 사용.
+      const response = await authClient.api.put(`/membership/members/${member.id}`, {
         isVerified: !member.isVerified,
       });
       if (response.data.success) {
@@ -290,7 +294,7 @@ const MemberDetail = () => {
     if (!confirm(`이 회원을 ${action}하시겠습니까?`)) return;
 
     try {
-      const response = await authClient.api.patch(`/membership/members/${member.id}`, {
+      const response = await authClient.api.put(`/membership/members/${member.id}`, {
         isActive: !member.isActive,
       });
       if (response.data.success) {

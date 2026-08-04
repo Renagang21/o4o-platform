@@ -116,7 +116,11 @@ const VerificationManagement = () => {
     if (!confirm('이 검증을 승인하시겠습니까?')) return;
 
     try {
-      await authClient.api.post(`/api/membership/verifications/${id}/approve`);
+      // WO-O4O-ADMIN-INDIVIDUAL-API-ACCESS-BOUNDARY-CORRECTION-V1
+      // 백엔드 계약은 PATCH `/verifications/:id/approve` 다 (verificationRoutes.ts:24).
+      // 기존 호출은 method(POST)와 경로(`/api/` 중복 접두) 가 모두 달라 404 였다.
+      // authClient baseURL 이 이미 `.../api/v1` 이므로 경로에 `/api` 를 다시 붙이면 안 된다.
+      await authClient.api.patch(`/membership/verifications/${id}/approve`);
       toast.success('승인되었습니다.');
       fetchVerifications();
       setSelectedVerification(null);
@@ -136,7 +140,8 @@ const VerificationManagement = () => {
     if (!reason) return;
 
     try {
-      await authClient.api.post(`/api/membership/verifications/${id}/reject`, {
+      // 백엔드 계약: PATCH `/verifications/:id/reject` (verificationRoutes.ts:27)
+      await authClient.api.patch(`/membership/verifications/${id}/reject`, {
         reason,
       });
       toast.success('거부되었습니다.');

@@ -184,7 +184,12 @@ const MemberManagement = () => {
     if (!confirm(`이 회원을 ${action}하시겠습니까?`)) return;
 
     try {
-      await authClient.api.patch(`/api/membership/members/${id}`, {
+      // WO-O4O-ADMIN-INDIVIDUAL-API-ACCESS-BOUNDARY-CORRECTION-V1
+      // 백엔드 계약은 PUT `/members/:id` 다 (memberRoutes.ts:115). PATCH `/members/:id` 는 없다
+      // (PATCH 는 `/members/:id/verify` 뿐이며 검증 해제가 불가능해 토글에 쓸 수 없다).
+      // 기존 호출은 method 와 경로 접두가 모두 달라 404 였다.
+      // MemberService.update 는 Object.assign 기반 부분 병합이므로 변경 필드만 보내도 안전하다.
+      await authClient.api.put(`/membership/members/${id}`, {
         isActive: !currentStatus,
       });
       toast.success(`${action}되었습니다.`);

@@ -82,7 +82,13 @@ router.delete('/:id', requireRole(ADMIN_ROLES), adminUserController.deleteUser);
 
 // WO-O4O-ADMIN-OPERATOR-ROLE-REVOKE-AND-SUPERADMIN-GUARD-V1
 // 단일 역할 해제 — 계정 삭제/비활성화 없이 role_assignments만 비활성화
-// requireRole(ADMIN_ROLES): legacy super_admin / admin + platform:super_admin / platform:admin 모두 허용
+//
+// WO-O4O-ADMIN-INDIVIDUAL-API-ACCESS-BOUNDARY-CORRECTION-V1 — 주석 정정 (동작 변경 없음)
+//   기존 주석은 "legacy super_admin / admin 도 모두 허용" 이라고 적혀 있었으나 사실과 다르다.
+//   ADMIN_ROLES 는 위 :32 에서 platform: 접두 2종만으로 좁혀졌다
+//   (WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1, legacy 데이터는
+//    migration 20261027000000-MigrateLegacyRolesToPlatformPrefixed 로 platform: 접두로 이전됨).
+//   즉 legacy 표기 역할은 이 라우트 전체에서 403 이다.
 router.delete('/:userId/role-assignments/:role', requireRole(ADMIN_ROLES), adminUserController.revokeRoleAssignment);
 
 export default router;

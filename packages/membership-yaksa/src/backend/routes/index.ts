@@ -3,6 +3,16 @@
  *
  * Router factories that create routes with DataSource
  *
+ * WO-O4O-ADMIN-INDIVIDUAL-API-ACCESS-BOUNDARY-CORRECTION-V1 — 경로 접두 주석 정정
+ *   이 패키지 전체의 JSDoc 주석은 `/api/membership/...` 로 적혀 있으나 사실과 다르다.
+ *   실제 마운트는 `app.use('/api/v1/membership', createMembershipRoutes(dataSource))`
+ *   (apps/api-server/src/bootstrap/register-routes.ts) 이므로 canonical 접두는
+ *   **`/api/v1/membership`** 이다.
+ *   프런트(authClient)의 baseURL 은 이미 `.../api/v1` 로 끝나므로 호출 경로는
+ *   `/membership/...` 로 시작해야 한다. `/api/membership/...` 로 호출하면
+ *   `/api/v1/api/membership/...` 이 되어 403 이 아니라 404 가 난다.
+ *   (아래 개별 파일 주석의 `/api/membership/...` 표기는 모두 이 규칙으로 읽을 것.)
+ *
  * Phase 2: 확장 라우트 추가
  * - auditLogRoutes: 변경 이력 관리
  * - affiliationRoutes: 조직 소속 관리
