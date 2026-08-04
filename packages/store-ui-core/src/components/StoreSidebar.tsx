@@ -92,6 +92,11 @@ const SECTION_ICONS: Record<string, typeof LayoutDashboard> = {
   // WO-O4O-TABLET-MENU-STRUCTURE-ALIGN-V1: dead 'tablet-channels' 매핑 제거
   // (어떤 menu config에서도 미사용, 'channel' 어휘는 Tablet device에 부적절)
   'tablet-displays': MonitorSmartphone,
+  // WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1: Pharmacy-Hub B2B 거래 축.
+  //   'orders'(ShoppingCart)는 기존 3서비스가 쓰는 키라 아이콘을 바꾸지 않고,
+  //   Pharmacy-Hub 는 장바구니/주문 내역을 구분하도록 별도 키를 사용한다(additive).
+  cart: ShoppingCart,
+  'purchase-orders': Receipt,
   'store-settings': Settings,
   'layout-builder': PanelLeft,
   template: Palette,

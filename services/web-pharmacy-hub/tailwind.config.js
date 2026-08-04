@@ -3,7 +3,15 @@
 // Foundation 최소 설정. Design Core v1.0 토큰(--color-* / --space-*) 참조 방식은
 // 기존 서비스와 동일하게 유지하고, 실제 화면 구축 WO 에서 확장한다.
 export default {
-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
+  // WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1:
+  //   공통 매장 셸(@o4o/store-ui-core)·공통 UI(@o4o/ui)는 source-mode 로 소비하므로
+  //   해당 소스를 content 에 포함해야 클래스가 생성된다 (K-Cosmetics 와 동일 패턴).
+  content: [
+    './index.html',
+    './src/**/*.{js,ts,jsx,tsx}',
+    '../../packages/store-ui-core/src/**/*.{ts,tsx}',
+    '../../packages/ui/src/**/*.{ts,tsx}',
+  ],
   theme: {
     extend: {
       colors: {

@@ -160,6 +160,43 @@ export const COSMETICS_STORE_CONFIG: StoreDashboardConfig = {
 };
 
 /**
+ * Pharmacy-Hub Store Config
+ * WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1 (2026-08-04)
+ *
+ * Pharmacy-Hub 는 신규 서비스라 매장 기능이 B2B 거래(공급 상품 · 장바구니 · 주문)만 구현돼 있다.
+ * canonical tree(O4O-STORE-MENU-CANONICAL-TREE-V1) 의 "약국 상품·거래" 축만 채우고,
+ * 미구현 영역(활성화 · 자료함 · 사이니지 · 채널 · 분석 · 설정)은 **메뉴를 만들지 않는다** —
+ * 데드링크 0 / "준비 중" 메뉴 0 원칙 (KPA/GP/KCos 와 동일).
+ *
+ * basePath 가 `/store-owner` 인 유일한 config 다. 기존 3서비스의 `/store` 로 강제 이동시키지 않는다:
+ *   - 결제 callback(`/store-owner/payment/success|fail`) 이 PG 등록 URL 이라 변경 시 계약 파손.
+ *   - 기존 링크·redirect 를 그대로 유지하고 셸만 씌우는 것이 본 WO 의 범위.
+ * StoreSidebar / StoreTopBar 는 basePath 를 그대로 이어붙이므로 값 제약이 없다.
+ *
+ * 용어: "공급 상품" = 공급자가 Pharmacy-Hub 에 제공한 거래·주문 대상
+ * (기존 화면 라벨 및 WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1 과 동일 어휘).
+ *
+ * 결제(`/payment`, `/payment/success`, `/payment/fail`)는 장바구니·주문에서 진입하는 deep route 라
+ * 독립 메뉴로 노출하지 않는다.
+ */
+export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
+  serviceKey: 'pharmacy-hub',
+  serviceName: '약국 경영자',
+  basePath: '/store-owner',
+  enabledMenus: ['dashboard'],   // section 모드에서는 미사용, 하위 호환용으로 유지
+  menuSections: [
+    { label: '', items: [
+      { key: 'home', label: '홈', subPath: '' },
+    ]},
+    { label: '약국 상품·거래', items: [
+      { key: 'products',         label: '공급 상품', subPath: '/products' },
+      { key: 'cart',             label: '장바구니',  subPath: '/cart' },
+      { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
+    ]},
+  ],
+};
+
+/**
  * GlycoPharm Store Config
  * WO-O4O-GLYCOPHARM-NAVIGATION-AND-STORE-STRUCTURE-REFINE-V1: flat → 섹션형
  * WO-O4O-MY-STORE-PRODUCT-CENTERED-ACTIVATION-V1: 운영/활성화 축 1차 정렬

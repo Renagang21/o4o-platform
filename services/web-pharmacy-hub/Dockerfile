@@ -29,6 +29,12 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
+# WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1: 공통 매장 셸 의존 체인
+#   store-ui-core → { error-handling, operator-ux-core, ui } → types
+COPY packages/store-ui-core/package.json ./packages/store-ui-core/
+COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
+COPY packages/error-handling/package.json ./packages/error-handling/
+COPY packages/ui/package.json ./packages/ui/
 
 # Copy service package.json
 COPY services/web-pharmacy-hub/package.json ./services/web-pharmacy-hub/
@@ -40,6 +46,10 @@ RUN pnpm install --filter pharmacy-hub-web... --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/store-ui-core/ ./packages/store-ui-core/
+COPY packages/operator-ux-core/ ./packages/operator-ux-core/
+COPY packages/error-handling/ ./packages/error-handling/
+COPY packages/ui/ ./packages/ui/
 
 # Copy service source
 COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/
@@ -48,6 +58,9 @@ COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/
 RUN pnpm --filter @o4o/types build
 RUN pnpm --filter @o4o/auth-utils build
 RUN pnpm --filter @o4o/auth-client build
+# @o4o/ui 는 dist-mode (main: ./dist/index.js) — 빌드 필요.
+# store-ui-core / operator-ux-core / error-handling 은 source-mode 로 빌드 불필요.
+RUN pnpm --filter @o4o/ui build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr
