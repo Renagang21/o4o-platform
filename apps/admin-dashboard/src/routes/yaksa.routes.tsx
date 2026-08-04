@@ -151,8 +151,17 @@ export function YaksaRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
+    // WO-O4O-ADMIN-DASHBOARD-OPERATION-SECURITY-BOUNDARY-ROLE-ACCESS-V1
+    //   이 화면(MemberApprovalPage)이 다루는 데이터는 `/api/v1/membership/*` 관리자 subtree —
+    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 로 보호되는
+    //   **플랫폼 전역** 회원 데이터다(서비스 경계 없음). 그런데 route 선언은
+    //   `requiredPermissions` 뿐이었고, 백엔드가 `user.permissions` 를 공급하지 않으므로
+    //   실효 경계는 "관리자급이면 통과"(서비스 접두 `kpa:admin` 포함) 였다.
+    //   canonical 회원 콘솔(`/admin/membership/members`)과 같은 경계로 좁힌다.
+    //   `requiredPermissions` 는 그대로 둔다 — permission 이 공급되면 AND 조건이 된다.
+    //   화면 자체의 운영 주체(canonical 콘솔과의 중복 여부)는 POLICY_REQUIRED 로 남긴다.
     <Route key="/admin/yaksa/members" path="/admin/yaksa/members" element={
-      <AdminProtectedRoute requiredPermissions={['yaksa-admin.members.approve']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['yaksa-admin.members.approve']}>
         <Suspense fallback={<PageLoader />}>
           <MemberApprovalPage />
         </Suspense>

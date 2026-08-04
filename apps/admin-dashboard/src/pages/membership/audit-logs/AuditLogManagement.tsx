@@ -49,7 +49,11 @@ export default function AuditLogManagement() {
       if (filters.startDate) params.append('startDate', filters.startDate);
       if (filters.endDate) params.append('endDate', filters.endDate);
 
-      const response = await authClient.api.get(`/api/membership/audit-logs?${params}`);
+      // WO-O4O-ADMIN-DASHBOARD-OPERATION-SECURITY-BOUNDARY-ROLE-ACCESS-V1 — 접두 중복 교정
+      //   authClient 의 baseURL 은 이미 `.../api/v1` 로 끝난다. `/api/membership/...` 로 호출하면
+      //   `/api/v1/api/membership/...` 이 되어 404 였다. canonical 마운트는 `/api/v1/membership`
+      //   (apps/api-server/src/bootstrap/register-routes.ts) 이므로 `/membership/...` 로 호출한다.
+      const response = await authClient.api.get(`/membership/audit-logs?${params}`);
       if (response.data?.success) {
         setLogs(response.data.data.items || response.data.data);
         if (response.data.data.total) {
