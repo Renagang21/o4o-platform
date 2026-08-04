@@ -51,6 +51,9 @@ const POP_SERVICE_TO_CATALOG_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
+  // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1: role prefix 와 catalog key 동일.
+  // 본 controller 는 서비스별 명시 serviceKey 로만 mount 되며 pharmacy-hub mount 는 아직 없다.
+  'pharmacy-hub': 'pharmacy-hub',
 };
 
 function storePublicOrigin(serviceKey?: StoreOwnerServiceKey): string {

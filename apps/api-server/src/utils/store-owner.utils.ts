@@ -32,11 +32,19 @@ import type { AuthContext } from '../auth/auth-context.js';
  *                pharmacy_owner 승인 시 store_owner + pharmacist 둘 다 부여되므로
  *                경영자 판단은 store_owner role 단독 기준 — glycopharm-member.service.ts 참조.
  * - cosmetics  : `cosmetics:store_owner`
+ * - pharmacy-hub : `pharmacy-hub:store_owner` (약국 경영자)
+ *                WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
+ *                W1(프로비저닝)이 organizations / organization_members(owner) /
+ *                organization_service_enrollments / platform_store_slugs 를 생성해도
+ *                이 registry 에 없으면 isStoreOwner() 가 role 게이트에서 종료되어
+ *                organizationId 를 반환하지 못했다 (CHECK-PHARMACY-HUB-STORE-SUBJECT-
+ *                PROVISIONING-V1 §8-5). 등록으로 공통 매장 API 진입을 복구한다.
  */
 const STORE_OWNER_ROLES_BY_SERVICE = {
   kpa: ['kpa:store_owner'],
   glycopharm: ['glycopharm:store_owner'],
   cosmetics: ['cosmetics:store_owner'],
+  'pharmacy-hub': ['pharmacy-hub:store_owner'],
 } as const;
 
 export type StoreOwnerServiceKey = keyof typeof STORE_OWNER_ROLES_BY_SERVICE;
@@ -47,22 +55,25 @@ export type StoreOwnerServiceKey = keyof typeof STORE_OWNER_ROLES_BY_SERVICE;
  *   common/middleware/membership-guard.middleware.ts 의 SCOPE_TO_MEMBERSHIP_KEY,
  *   utils/serviceScope.ts 의 ROLE_PREFIX_TO_SERVICE_KEY 와 동일 의미 (follow-up
  *   으로 단일 상수 통합 권장).
+ *
+ * `pharmacy-hub` 는 role prefix 와 service_memberships.service_key 가 동일하다
+ * (middleware/pharmacy-hub-scope.middleware.ts `PHARMACY_HUB_SCOPE_CONFIG.serviceKey`).
+ * kpa 만 prefix('kpa') ≠ membership key('kpa-society') 인 예외다.
  */
 const STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY: Record<StoreOwnerServiceKey, string> = {
   kpa: 'kpa-society',
   glycopharm: 'glycopharm',
   cosmetics: 'k-cosmetics',
+  'pharmacy-hub': 'pharmacy-hub',
 };
 
 /**
  * 모든 서비스의 store_owner role 합집합 (back-compat 경로용).
  * 신규 호출은 가급적 serviceKey 를 지정하여 cross-service 침투를 차단한다.
  */
-const ALL_STORE_OWNER_ROLES: readonly string[] = [
-  ...STORE_OWNER_ROLES_BY_SERVICE.kpa,
-  ...STORE_OWNER_ROLES_BY_SERVICE.glycopharm,
-  ...STORE_OWNER_ROLES_BY_SERVICE.cosmetics,
-];
+const ALL_STORE_OWNER_ROLES: readonly string[] = Object.values(
+  STORE_OWNER_ROLES_BY_SERVICE,
+).flat();
 
 /**
  * Service-aware store_owner 체크.
@@ -153,7 +164,14 @@ export function createRequireStoreOwner(
       user.id,
       serviceKey,
     );
-    if (!isOwner) {
+    // WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1:
+    //   organizationId 미해석(= 매장 조직 미연결) 사용자를 통과시키지 않는다.
+    //   기존에는 role 만 있으면 통과 후 req.organizationId = null 이 되어 하위 핸들러가
+    //   organization_id IS NULL 로 조회(0건)하거나 NOT NULL 위반으로 500 을 냈다.
+    //   auth-context.middleware 의 requireStoreAuth 는 이미 동일 정책(`!isOwner || !organizationId`)이며
+    //   이쪽만 어긋나 있었다. 프로덕션 실측상 kpa/glycopharm/cosmetics 의 active store_owner 는
+    //   전원 조직을 보유하므로(각 5/1/2, 미보유 0) 기존 서비스 동작 변화 0.
+    if (!isOwner || !organizationId) {
       res.status(403).json({
         success: false,
         error: 'Store owner access required',

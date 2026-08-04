@@ -10,8 +10,13 @@
 
 > **2026-08-04 갱신** — `WO-PHARMACY-HUB-STORE-SLUG-SERVICE-KEY-TYPE-COMPLETION-AND-W1-RESUME-V1`
 > 로 §6 중지 조건이 해소되어 **apply·post-verify·멱등성 재실행을 완료**했다.
-> §1~§7 은 2026-08-03 시점 기록이며 **§8 이 현재 상태**다.
-> **W1 은 아직 완료로 닫지 않았다** — `resolveStoreAccess()` 실증이 실패했다 (§8-5).
+> §1~§7 은 2026-08-03 시점 기록이며 **§8·§9 가 현재 상태**다.
+>
+> **2026-08-04 (2차) — W1 최종 종료.** §8-5 차단 결함이
+> `WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1` (W2) 로 해소되어
+> `resolveStoreAccess()` 가 기대 organizationId 를 반환하고 공통 매장 API 5개 endpoint
+> smoke 가 PASS 했다. **§9 참조** ·
+> [CHECK-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1](CHECK-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1.md)
 
 아래 표는 2026-08-03 시점 기록이다.
 
@@ -506,4 +511,63 @@ docs/checks/CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1.md   (§0 노트 + 
 
 ---
 
-*§1~§7: 2026-08-03 read-only 검증 + 코드 구현 · §8: 2026-08-04 apply·검증 재개*
+## 9. W1 최종 종료 (2026-08-04, 2차)
+
+§8-5 의 차단 결함을 `WO-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1` (W2) 가
+해소했다. 상세 근거는
+[CHECK-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1](CHECK-O4O-STORE-OWNER-GUARD-PHARMACY-HUB-REGISTRATION-V1.md)
+에 있고 여기에는 W1 완료 판정만 기록한다.
+
+### 9-1. §8-5 해소 확인
+
+`store-owner.utils.ts` 의 `STORE_OWNER_ROLES_BY_SERVICE` /
+`STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 에 `pharmacy-hub` 를 등록한 뒤 재측정.
+
+| 항목 | §8-5 (변경 전) | W2 이후 |
+|---|---|---|
+| `isStoreOwner(ds, user)` | `{isOwner:false, organizationId:null}` | `{isOwner:true, organizationId:'c5e3a37a-…', memberRole:'owner'}` |
+| `resolveStoreAccess(ds, user, [])` | `null` | `c5e3a37a-4aac-4b89-ab51-1a88b960ed50` |
+| `resolveStoreAccess(…, 'pharmacy-hub')` | (registry 부재로 타입 불가) | `c5e3a37a-4aac-4b89-ab51-1a88b960ed50` |
+
+### 9-2. 공통 매장 API 실제 진입
+
+실제 `AppDataSource`(entity 274) + 실제 `requireAuth`(JWT) + 실제 라우터로 GET 호출.
+
+```
+200 /api/v1/store/local-products     200 /api/v1/store/handled-products
+200 /api/v1/store/tablets            200 /api/v1/store/product-pool
+200 /api/v1/store/library
+```
+
+W1 apply 로 만든 매장 주체(조직 `c5e3a37a-…` / owner membership / enrollment / slug)가
+**실제로 사용되는 상태**가 되었다 — W1 의 목적이 충족됐다.
+
+### 9-3. W1 미완료 항목 최종 처리
+
+| §8-7 항목 | 처리 |
+|---|---|
+| 1. digital-signage ESM 순환 참조 | 완료 (`4c5f08aee`) |
+| 2. backfill apply + post-verify | 완료 (§8-3, §8-4) |
+| 3. renagang21 (대상 #2) | **HOLD 유지** — 운영자 조직 지정 대기. W1 종료와 무관한 정책 대기 |
+| 4. store-owner.utils pharmacy-hub 반영 | **완료 — W2** (§9-1) |
+| 5. 신규 승인 E2E 안전 실행 | **별도 작업으로 이관** (아래) |
+| 6. `resolveStoreAccess()` `LIMIT 1` 비결정성 | **별도 작업으로 이관** |
+| 7. `generateSlugFromName` 의 `'_'` 처리 불일치 | **별도 작업으로 이관** |
+
+### 9-4. 판정
+
+**W1 종료 = CLOSED.** 프로비저닝 코드·데이터·가드 진입이 모두 실증됐다.
+3·5·6·7 은 W1 의 완료 조건이 아니라 후속 트랙 항목으로 이관한다.
+
+| W1 완료 조건 | 결과 |
+|---|---|
+| 매장 조직 / owner membership / enrollment / slug 생성 | PASS (§8-3) |
+| post-verify · 멱등 재실행 | PASS (§8-4) |
+| 기존 role 재사용 · renagang21 HOLD | PASS (§8-3, §9-3) |
+| `resolveStoreAccess()` organizationId 반환 | **PASS** (§9-1) |
+| 공통 매장 API 실제 진입 | **PASS** (§9-2) |
+| typecheck · CHECK · commit · push | PASS |
+
+---
+
+*§1~§7: 2026-08-03 read-only 검증 + 코드 구현 · §8: 2026-08-04 apply·검증 재개 · §9: 2026-08-04 W1 최종 종료*
