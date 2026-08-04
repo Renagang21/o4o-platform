@@ -9,9 +9,11 @@
 >
 > 본 문서는 KPA-Society / GlycoPharm / K-Cosmetics 3 서비스의 Operator 영역 현재 상태를 **분류·정책·우선순위로 고정**한다. 이후 모든 Operator 공통화 작업(`@o4o/operator-core-ui` 패키지 설계, 모듈별 추출 WO, DataTable 통합 등)의 판정 기준이다.
 
-> **스코프 note (2026-08-03 추가):**
+> **스코프 note (2026-08-03 추가 · 2026-08-04 정정):**
 >
-> 본 문서의 조사 대상은 **작성 시점(2026-05-03) 기준 3서비스**(KPA / GlycoPharm / K-Cosmetics)다. 현재 공식 대상 서비스는 **KPA Society · K-Cosmetics · Neture · PharmacyHub** 이며 GlycoPharm 은 `historical out-of-scope` 다 ([`O4O-COMMONIZATION-STANDARD` §3](O4O-COMMONIZATION-STANDARD.md)).
+> 본 문서의 조사 대상은 **작성 시점(2026-05-03) 기준 3서비스**(KPA / GlycoPharm / K-Cosmetics)다. 현재 공통화 대상 서비스는 **KPA Society · K-Cosmetics · GlycoPharm · Neture · PharmacyHub** 이다 ([`O4O-COMMONIZATION-STANDARD` §3](O4O-COMMONIZATION-STANDARD.md) V3).
+>
+> **정정(2026-08-04)**: 2026-08-03 자 note 의 "GlycoPharm 은 `historical out-of-scope`" 표현은 폐기한다. GlycoPharm 삭제 검토는 보류되었고 GlycoPharm 은 **현재 공통화 대상 서비스**다(`O4O-COMMONIZATION-STANDARD` §3.4 V3). 따라서 본 문서의 GlycoPharm 기재는 이력이 아니라 **현재 대상 서비스의 (2026-05-03 시점) 조사 기록**으로 읽는다 — 다만 아래 항목대로 서비스별 현황 표·우선순위는 그대로 사용하지 않는다.
 >
 > - §1.1 **"Operator 는 Capability 집합이다"** 와 §1.2 **3-카테고리 분류 정책**(🟢 Core / 🟡 Core UI + Service Logic / 🔴 Extension)은 **현재도 유효**하다. Neture 가 LMS·CMS·자료실·포럼 일부를 채택하지 않은 채 정상 동작하는 것이 이 정책의 실증이다.
 > - 다만 **서비스별 현황 표·우선순위는 3서비스 기준이므로 그대로 사용하지 않는다.** Neture / PharmacyHub 를 포함한 실측 구성은 [`IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` §7](../investigations/IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1.md) 을 참조한다.
