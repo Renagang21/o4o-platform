@@ -216,6 +216,38 @@ D2·D3 는 WO 본문에 없던 항목이나, D1 을 고치는 순간 표면화�
 
 ---
 
+## 6-A. 후속 — CI 전용으로만 재현되던 잠복 실패 2건 (commit 2)
+
+첫 커밋(`16b15d502`) push 후 CI Pipeline 이 RED 로 떨어졌다. 로컬은 `type-check:frontend` EXIT 0 이었다.
+**로컬 `node_modules`/`dist` 에 남아 있던 과거 산출물이 실패를 가리고 있었기 때문**이며,
+CI 의 fresh checkout + `pnpm install` 에서만 재현되는 유형이다. 두 건 모두 §3.1 D1 로 **원래부터 삼켜지던** 오류다.
+
+| # | 대상 | 오류 | 근본 원인 |
+|---|------|------|-----------|
+| E1 | `packages/dropshipping-cosmetics` | `TS2307: Cannot find module '@o4o/dropshipping-core'` ×8 | `@o4o/dropshipping-core` 를 **package.json 에 아예 선언하지 않음**. 로컬은 hoist 된 잔여물로 해석되던 undeclared dependency |
+| E2 | `apps/admin-dashboard` | `TS2307: Cannot find module '@o4o/cgm-pharmacist-app'` ×4 | 의존성 선언은 정상(`workspace:*`)이나, 해당 패키지의 `types` 가 `dist/index.d.ts` 인데 **`build:packages` 체인에 빌드가 없어 CI 에 dist 가 존재하지 않음** (`dropshipping-core` 도 동일) |
+
+### 수정
+
+| 파일 | 변경 |
+|------|------|
+| `packages/dropshipping-cosmetics/package.json` | `"@o4o/dropshipping-core": "workspace:*"` 선언 추가 (미선언 의존성 정정 — 본 WO 의 "내부 패키지 의존성 `workspace:*` 수렴" 범위) |
+| `package.json` | `build:app-store-packages` 에 `@o4o/dropshipping-core` 추가 · `build:cgm-pharmacist-app` 신설 후 `build:packages` 체인에 편입 |
+| `.github/workflows/ci-pipeline.yml` | dist 검증 루프에 `dropshipping-core` · `cgm-pharmacist-app` 추가 ("must stay in sync" 주석 준수) |
+
+### 검증
+
+- `pnpm --filter @o4o/dropshipping-core run build` · `pnpm --filter @o4o/cgm-pharmacist-app run build` → **각 EXIT 0**, `dist/index.d.ts` 생성 확인
+- `pnpm install` 후 `node scripts/dev.mjs type-check:frontend` → **EXIT 0**
+
+### 실측 함정 기록
+
+`packages/dropshipping-core` 는 `composite: true` 라서, `dist` 만 지우고 재빌드하면
+`tsconfig.tsbuildinfo` 가 "최신" 으로 판단해 **아무것도 emit 하지 않는다** (build EXIT 0 인데 dist 없음).
+로컬에서 CI 조건을 재현할 때는 `tsbuildinfo` 도 함께 제거해야 한다. CI 는 fresh checkout 이라 해당 없음.
+
+---
+
 ## 7. 지키지 않은 것 / 하지 않은 것
 
 - 패키지 **버전 변경 0**

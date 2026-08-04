@@ -27,6 +27,7 @@
     "test": "jest --config jest.config.cjs"
   },
   "dependencies": {
+    "@o4o/dropshipping-core": "workspace:*",
     "@o4o/types": "workspace:*"
   },
   "devDependencies": {
