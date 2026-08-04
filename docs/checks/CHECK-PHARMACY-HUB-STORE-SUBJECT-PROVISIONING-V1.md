@@ -8,6 +8,13 @@
 
 ## 0. 결과 요약
 
+> **2026-08-04 갱신** — `WO-PHARMACY-HUB-STORE-SLUG-SERVICE-KEY-TYPE-COMPLETION-AND-W1-RESUME-V1`
+> 로 §6 중지 조건이 해소되어 **apply·post-verify·멱등성 재실행을 완료**했다.
+> §1~§7 은 2026-08-03 시점 기록이며 **§8 이 현재 상태**다.
+> **W1 은 아직 완료로 닫지 않았다** — `resolveStoreAccess()` 실증이 실패했다 (§8-5).
+
+아래 표는 2026-08-03 시점 기록이다.
+
 | 항목 | 결과 |
 |---|---|
 | 신규 승인 프로비저닝 구현 | **완료** (승인 컨트롤러 연결) |
@@ -325,4 +332,178 @@ migration 0 · 신규 테이블 0 · DB write 0 · 배포 0
 
 ---
 
-*read-only 검증 + 코드 구현 · apply 는 §6 사유로 미실행*
+## 8. W1 재개 (2026-08-04)
+
+> WO: `WO-PHARMACY-HUB-STORE-SLUG-SERVICE-KEY-TYPE-COMPLETION-AND-W1-RESUME-V1`
+> 선행 해소: `CHECK-O4O-DIGITAL-SIGNAGE-ENTITY-CIRCULAR-IMPORT-REMOVAL-V1` (commit `4c5f08aee`)
+> → §6-2 의 `ReferenceError: Cannot access 'MediaList' before initialization` 해소, §6-5 의 1번 완료.
+
+### 8-0. 재개 결과 요약
+
+| 항목 | 결과 |
+|---|---|
+| 범위 A — 타입 계약 정합 | **이미 정합 · 소스 변경 0** (§8-1) |
+| backfill dry-run 재실행 | **PASS** — 2026-08-03 판정과 동일 (§8-2) |
+| backfill **apply** (E2E 계정 1건) | **완료** (§8-3) |
+| post-verify | **PASS** (§8-4) |
+| 멱등성 (동일 apply 재실행) | **PASS — 추가 생성 0** (§8-4) |
+| `resolveStoreAccess()` organizationId 실증 | **FAIL — 차단 결함** (§8-5) |
+| 신규 승인 프로비저닝 E2E | **미실행** (§8-6) |
+| renagang21 | **무변경** — `AMBIGUOUS_ORGANIZATION` HOLD 유지 |
+| schema / migration / 신규 테이블 | **0 / 0 / 0** |
+| **W1 완료 여부** | **미완료** — WO 완료 기준 5 불충족 (§8-5) |
+
+### 8-1. 범위 A — 타입 계약 (소스 변경 0)
+
+WO 가 전제한 `StoreSlugServiceKey` 의 `pharmacy-hub` 누락은 **소스에는 존재하지 않았다.**
+두 union 은 Foundation 커밋 시점(§4)부터 이미 `'pharmacy-hub'` 를 포함한다.
+
+| union | 위치 | 현재 값 |
+|---|---|---|
+| `StoreSlugServiceKey` | `platform-store-slug.entity.ts:31-36` | `glycopharm \| cosmetics \| kpa \| neture \| pharmacy-hub` |
+| `StorePolicyServiceKey` | `platform-store-policy.entity.ts:31-36` | 동일 집합 |
+
+- 보고된 TS2322 은 **`packages/platform-core/dist` 의 stale 산출물**이 원인이었다.
+  재빌드 후 `npx tsc --noEmit -p tsconfig.build.json` **EXIT 0**.
+- DB 컬럼은 양쪽 모두 `varchar(50)` — **enum 아님 → migration 불필요**.
+- exhaustive switch 소비처 없음 (union 은 값 비교·전달에만 사용).
+- KPA·GlycoPharm·K-Cosmetics 는 additive union 이므로 **동작 불변**.
+
+> **미정합 잔존 1건 (본 WO 범위 밖, 미수정):** `src/scripts/audit-roles.ts:66,80` 의
+> `Record<ServiceKey|'none', number>` 에 `'pharmacy-hub'` 누락 (§5 에 기록된 기존 결함).
+> 운영 경로가 아닌 감사 스크립트이며 W1 판정에 영향 없다.
+
+### 8-2. dry-run 재실행 (프로덕션)
+
+실행 경로: `PharmacyHubStoreProvisioningService.provisionStoreSubject(userId, …, dryRun=true)`
+— dry-run·apply·post-verify가 **동일 판정 로직**을 사용한다 (SQL 직접 실행 0).
+
+```
+모집단: active + pharmacy-hub:store_owner = 2명
+  5ee37566…  → created   (E2E 테스트 계정, 후보 조직 0 → 신규 생성 대상)
+  6967ebe0…  → held      HOLD:AMBIGUOUS_ORGANIZATION
+                          후보 3: KCOSA3DDC841B946 / neture-supplier-6967ebe0 / kpa-pharm-1088602873
+```
+
+2026-08-03 dry-run 판정(§2-2)과 **완전히 일치**한다.
+
+### 8-3. apply — E2E 계정 1건 (사용자 승인 후 실행)
+
+```
+5ee37566…  created
+  org  = c5e3a37a-4aac-4b89-ab51-1a88b960ed50   code = ph-pharm-5ee375662a51
+  slug = e2e-test-pharmacy-hub-검증약국-a
+```
+
+| 테이블 | 생성 | 검증 |
+|---|:--:|---|
+| `organizations` | 1 | `type=pharmacy`, `isActive=true` |
+| `organization_members` | 1 | `role=owner`, `is_primary=true`, `left_at IS NULL` |
+| `organization_service_enrollments` | 1 | `service_code=pharmacy-hub`, `status=active` |
+| `role_assignments` | 0 | 기존 활성 행 재사용 (멱등 3단계, §1-1) |
+| `platform_store_slugs` | 1 | `is_active=true` |
+
+당일 전체 write 총량 = **1 / 1 / 1 / 1 / 0** (위 5테이블 외 write 0).
+renagang21 의 organization_members 3건은 `joined_at` 2026-05·06 그대로 **무변경**.
+
+### 8-4. post-verify · 멱등성
+
+| 검사 | 결과 |
+|---|---|
+| 모집단 정합 | 1 / 2 — 불일치 1은 renagang21 (설계된 HOLD) |
+| 조직 중복 | 0 |
+| owner membership 중복 | 0 |
+| enrollment 중복 | 0 |
+| slug 중복 | 0 |
+| `ph-pharm-*` 조직 / enrollment / slug | 1 / 1 / 1 |
+| **동일 apply 재실행** | **`noop` — 생성 카운터 전부 0** |
+
+### 8-5. **차단 결함 — `resolveStoreAccess()` 가 organizationId 를 반환하지 못한다**
+
+apply 로 DB 상태는 정상인데도 프로덕션 실행 결과가 `null` 이다.
+
+```
+role_assignments      : [{"role":"pharmacy-hub:store_owner","is_active":true}]
+organization_members  : [{"organization_id":"c5e3a37a-…","role":"owner","left_at":null}]
+
+isStoreOwner(serviceKey 없음)       = {"isOwner":false,"organizationId":null,"memberRole":""}
+resolveStoreAccess(serviceKey 없음) = null
+resolveStoreAccess('kpa')           = null
+resolveStoreAccess('glycopharm')    = null
+resolveStoreAccess('cosmetics')     = null
+```
+
+**원인** — `apps/api-server/src/utils/store-owner.utils.ts:36-40`:
+
+```ts
+const STORE_OWNER_ROLES_BY_SERVICE = {
+  kpa:        ['kpa:store_owner'],
+  glycopharm: ['glycopharm:store_owner'],
+  cosmetics:  ['cosmetics:store_owner'],
+} as const;                       // ← 'pharmacy-hub' 항목이 없다
+```
+
+`isStoreOwner()` 는 **먼저** `role_assignments` 가 `allowedRoles` 에 속하는지 확인하고,
+통과한 뒤에야 `organization_members` 를 조회한다. `pharmacy-hub:store_owner` 가
+`ALL_STORE_OWNER_ROLES` 에 없으므로 **조직 조회 이전에 false 로 종료**된다.
+`STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 도 동일하게 `pharmacy-hub` 가 없다.
+
+→ WO 완료 기준 5 (`resolveStoreAccess()` organizationId 실증) **불충족**.
+→ WO 중요 판정 *"단일 organization_members 대상에서도 잘못된 organizationId 반환 … 이면
+   W1 완료로 닫지 않는다"* 에 해당 → **W1 미완료로 유지**한다.
+
+**이번 WO 에서 고치지 않은 이유:** 이 registry 는 공통 권한 맵이며,
+back-compat(serviceKey 미지정) 경로를 통해 아래 공통 매장 라우트의 접근 범위를 동시에 넓힌다.
+CLAUDE.md *Shared Module / Core+Extension Change Rule* 상 단독 판단으로 확장할 수 없다.
+
+```
+routes/platform/store-local-product.routes.ts:125,219,278
+routes/platform/store-handled-products.routes.ts
+routes/platform/store-tablet.routes.ts:215
+modules/store/store-library.routes.ts:32
+modules/store-ai/controllers/*
+modules/store-entitlement/store-entitlement.routes.ts:147,184
+middleware/auth/auth-context.middleware.ts:38,77
+```
+
+> **Pharmacy-Hub B2B 기능에는 영향이 없다.** `routes/pharmacy-hub/pharmacy-hub.routes.ts`
+> 의 상품·장바구니·주문·결제(`/store-owner/*`)는 `requirePharmacyHubScope('pharmacy-hub:store_owner')`
+> 로 보호되며 `resolveStoreAccess()` 를 쓰지 않는다. 이번 갭은 **공통 매장 기능
+> (자료함·태블릿·로컬상품·AI) 진입 시점**에 드러난다.
+
+**후속 판단 필요 (별도 WO):** `STORE_OWNER_ROLES_BY_SERVICE` /
+`STORE_OWNER_SCOPE_TO_MEMBERSHIP_KEY` 에 `pharmacy-hub` 를 추가할지, 소비처 전수 영향
+검토와 함께 결정한다.
+
+### 8-6. 미실행 항목
+
+| 항목 | 사유 |
+|---|---|
+| 신규 승인 프로비저닝 E2E | 프로덕션에 신규 테스트 사용자 생성이 필요하다. WO 는 *"운영 데이터에 영향을 줄 수 있으면 픽스처·트랜잭션 롤백"* 을 요구하나, `provisionStoreSubject` 가 **자체 queryRunner 를 열어** 외부 트랜잭션 롤백 픽스처로는 커밋 전 행을 관측할 수 없다. 별도 안전 설계 필요. |
+| 공통 매장 기능 회귀 | §8-5 미해결 상태에서는 Pharmacy-Hub 매장주가 애초에 진입 불가 — 회귀 대상이 아직 없다. |
+| B2B 회귀 (상품·장바구니·주문·결제) | **코드 변경 0** — 해당 라우트·컨트롤러 무수정, 가드 경로 분리 확인(§8-5 인용). |
+| KPA·GlycoPharm·K-Cosmetics slug 회귀 | **코드 변경 0** — union·guard·SSOT 무수정. |
+
+### 8-7. 남은 작업 (§6-5 갱신)
+
+```
+1. [완료] digital-signage-core ESM 순환 참조 정합            → 4c5f08aee
+2. [완료] backfill apply + post-verify (대상 #1)             → §8-3, §8-4
+3. [대기] 대상 #2(renagang21) 는 운영자가 매장 조직 지정 후 재실행
+4. [신규·차단] store-owner.utils.ts 권한 맵에 pharmacy-hub 반영 판단  → §8-5
+5. [대기] 신규 승인 E2E 안전 실행 설계                        → §8-6
+6. [별도] resolveStoreAccess() LIMIT 1 비결정성 정책 판단 (renagang21 같은 다중 조직 사용자)
+7. [별도] generateSlugFromName 의 '_' 처리 불일치
+```
+
+### 8-8. 변경 파일 (본 재개분)
+
+```
+docs/checks/CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1.md   (§0 노트 + §8 추가)
+```
+
+소스 변경 0 · migration 0 · 신규 테이블 0 · 배포 0 · DB write = §8-3 의 4행뿐
+
+---
+
+*§1~§7: 2026-08-03 read-only 검증 + 코드 구현 · §8: 2026-08-04 apply·검증 재개*
