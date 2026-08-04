@@ -245,21 +245,130 @@ partnerops ──▶ partner-core            (dropshipping 무관 — 범위 밖
 
 ---
 
-## 7. 중지 조건 대조
+## 7. 최종 판정
 
-| 조건 | 결과 |
-|------|------|
-| 현재 운영 주문·정산이 해당 엔티티에 실제 의존 | **미해당** — 주문=`checkout_orders`, 정산=`neture_settlements`/`partner_settlements` 로 완전 분리. dropshipping 엔티티 등록 0 |
-| 삭제 대상 DB 에 보존이 필요한 운영 데이터 존재 | **미해당** — 대상 테이블 0개, row 0 |
-| 현재 정본으로 대체되지 않은 필수 기능 발견 | **미해당** — §3 대조 완료 |
+### 7-1. 항목별 판정표
+
+| # | 대상 | 판정 | 근거 (runtime / DB / 소비처) |
+|:--:|------|:---:|------|
+| 1 | `apps/api-server/src/routes/dropshipping-admin/**` (14) + `register-routes.ts:114,868-874` mount | **DELETE** | mount 는 LIVE 이나 조회 대상 3개 테이블 전부 프로덕션 부재 → 현재도 실패 경로 |
+| 2 | `packages/dropshipping-core` (50) | **DELETE** | api-server import 0 · entity 등록 0 · manifest 0 · 테이블 0. 소비처는 §7-2 dead chain 뿐 |
+| 3 | `packages/dropshipping-cosmetics` (85) | **DELETE** | 소비처 0. schema 무지정 엔티티 → 등록 시 `cosmetics` 정본 대신 `public` 오염 위험 |
+| 4 | `packages/sellerops` (41) | **DELETE** | 소비처 0. admin 동명 페이지는 이 패키지를 import 하지 않음 |
+| 5 | `packages/supplierops` (29) | **DELETE** | 동일 |
+| 6 | `packages/pharmacyops` (54) | **DELETE** | 소비처 0. dead chain 최상단 |
+| 7 | `packages/pharmaceutical-core` (31) | **DELETE** | `dropshipping-core` 를 실제 import 하는 유일 패키지이나, 자체 소비처는 `pharmacyops` 뿐 → 함께 소멸 |
+| 8 | `apps/api-server/packages/{dropshipping-core,dropshipping-cosmetics}` 스텁 | **DELETE** | 스텁 |
+| 9 | admin-dashboard dropshipping 자산 56 files + 라우트 4 + alias | **DELETE** | 백엔드 경로 부재(shortcode 계열 404) 또는 테이블 부재 |
+| 10 | `appsCatalog.ts` dropshipping/sellerops/supplierops 항목 | **DELETE** | `manifestRegistry={}` 로 설치 불가 — 열람만 되는 유령 카탈로그 |
+| 11 | `database/entities.ts:64-76`, `:547` 주석 블록 | **DELETE** | 주석 |
+| 12 | `packages/health-extension` (tracked 0) | **DELETE** | 소스 부재, `package.json` 조차 없음 |
+| 13 | `packages/diabetes-core`, `packages/diabetes-pharmacy` (tracked 0) | **DELETE** | 소스 부재. root `package.json:33` 만 빌드 시도 중 |
+| 14 | root `build:diabetes-packages` / `build:app-store-packages` 의 dropshipping 항목 / CI dist 루프 항목 | **DELETE** | 위 삭제와 lockstep |
+| 15 | `packages/cgm-pharmacist-app` (38) + `apps/api-server/packages/cgm-pharmacist-app` | **MIGRATE_THEN_DELETE** | admin 라우트 5개가 실제 lazy import 중 → 라우트 해제 선행. 백엔드는 mock 이라 데이터 이관 없음 |
+| 16 | `glucoseview` service key (공유 enum·셀렉터 다수) | **MIGRATE_THEN_DELETE** | `service_memberships` 0 row 이나 enum·CHECK 제약이 4서비스 공유 → 코드 제거와 DB enum 정리 분리 필수 |
+| 17 | `GlucosecareParticipationNotice.tsx`, `BloodCareBusinessStatusPage.tsx` | **MIGRATE_THEN_DELETE** | 참조 라우트 확인 후 제거 |
+| 18 | glucoseview·care·health 마이그레이션 23건 | **RETAIN** | 이미 실행 완료. `typeorm_migrations` 이력과의 대조 근거 |
+| 19 | `health-functional-food-*` 18 files | **RETAIN** | 활성 HFF 생산 트랙. 이름만 `health` |
+| 20 | `routes/health.ts`, `forum-api/health.routes.ts` | **RETAIN** | 인프라 헬스체크 |
+| 21 | `packages/partnerops`, `packages/partner-core` | **RETAIN** | `partner-core` 의존. `app_registry` active. dropshipping 체인 밖 |
+| 22 | `packages/pharmacy-ai-insight` (23) | **RETAIN (조건부)** | admin `/pharmacy-ai-insight` LIVE. 혈당 유틸(`glucoseUtils.ts`) 보유 → 별도 판단 |
+| 23 | admin 로컬 `pages/{sellerops,supplierops,partnerops}` | **RETAIN** | 동명이나 패키지와 무관한 별개 자산 |
+| — | **`DATA_ARCHIVE_THEN_DELETE`** | **0건** | 대상 테이블 0개 / row 0 |
+
+### 7-2. 판정 요지
+
+- **dead chain 전체가 하나의 덩어리**다: `pharmacyops → pharmaceutical-core → dropshipping-core`, `sellerops/supplierops/dropshipping-cosmetics → dropshipping-core`. 진입점(`pharmacyops`, `sellerops`, `supplierops`)의 소비처가 0 이므로 **부분 삭제가 아니라 체인 통삭제**가 맞다.
+- `pharmaceutical-core` 가 `dropshipping-core` 를 실제 import 한다는 사실은 **유지 근거가 되지 않는다** (WO 원칙: 단순 타입/참조 때문에 전체 패키지를 유지하지 않는다).
+- **삭제하지 않는 쪽이 더 위험한 항목이 2개** 있다: ① `/api/v1/dropshipping` (존재하지 않는 테이블을 raw query 하는 LIVE 라우터), ② `dropshipping-cosmetics` (schema 무지정 엔티티).
 
 ---
 
-## 8. 완료 조건 대조
+## 8. 후속 제거 WO 초안
+
+### 8-1. `WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1` (R1~R4 통합)
+
+> **목표** — 소비처 0 인 dropshipping 계열 코드·패키지·카탈로그·빌드 설정을 제거한다. DB 변경 없음.
+>
+> **전제** — 본 CHECK §2 (대상 테이블 0 / row 0), §3 (정본 대체 완료), §7-1 항목 1~14.
+>
+> **범위**
+> 1. `register-routes.ts` 의 dropshipping import(`:114`) · mount(`:868-874`) 제거 → `apps/api-server/src/routes/dropshipping-admin/**` 14 files 삭제
+> 2. admin-dashboard 56 files 삭제 + `routes/commerce.routes.tsx` dropshipping 라우트 4개 + `ViewComponentRegistry.ts:256,266,276` + `vite.config.ts:45,105`
+> 3. 패키지 6종 + api-server 스텁 2종 삭제 (`dropshipping-core`, `dropshipping-cosmetics`, `sellerops`, `supplierops`, `pharmacyops`, `pharmaceutical-core`)
+> 4. `appsCatalog.ts` 5 항목 · `database/entities.ts:64-76,:547` 주석 정리
+> 5. 유령 디렉터리 3개 정리 + root `package.json` `build:diabetes-packages`(:33) 제거 + `build:app-store-packages` 의 `dropshipping-core` 제거 + `.github/workflows/ci-pipeline.yml:119` dist 루프 동기화
+>
+> **원칙** — DB write 0 / 마이그레이션 파일 미삭제 / `partnerops`·`pharmacy-ai-insight` 계열 미접촉 / admin 로컬 `pages/{sellerops,supplierops}` 미접촉
+>
+> **중지 조건** — 삭제 중 예상 밖 소비처 발견 / `pnpm install` lockfile 충돌이 병렬 세션 작업물과 겹침
+>
+> **검증** — `pnpm install` → `build:packages` EXIT 0 → api-server typecheck·test → admin-dashboard typecheck·vitest·build → CI dist 루프 대조 → 배포 후 `/api/v1/dropshipping/admin/*` 404 확인
+>
+> **CHECK** — `docs/checks/CHECK-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1.md`
+
+### 8-2. `WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1` (R5)
+
+> **목표** — 혈당측정 legacy `cgm-pharmacist-app` 을 admin 라우트 해제 후 삭제한다.
+>
+> **범위** — `routes/apps.routes.tsx:34-56,191-227` 의 lazy import 4 + `AppRouteGuard appId="cgm-pharmacist-app"` 5 제거 → `apps/admin-dashboard/package.json:49` dep · `vite.config.ts:49,107` · root `build:cgm-pharmacist-app`(:36) · `build:packages` 말단 · CI dist 루프 항목 제거 → `packages/cgm-pharmacist-app` 38 files + api-server 스텁 삭제
+>
+> **주의** — `cgm-pharmacist-app/src/manifest.ts:24` 가 `pharmacy-ai-insight` 를 optional 의존한다. **역방향 아님** — `pharmacy-ai-insight` 는 영향 없음
+>
+> **데이터** — 백엔드가 `src/backend/mock/mockPatients.ts` 기반이고 `cgm_*` 테이블은 이미 DROP 됨 → **이관·아카이브 0**
+>
+> **검증** — admin typecheck·build, `/apps` 화면 스모크(잔여 앱 카드 정상)
+>
+> **CHECK** — `docs/checks/CHECK-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1.md`
+
+### 8-3. `WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1` (R6)
+
+> **목표** — `glucoseview` service key 를 코드에서 제거한다. **DB enum·CHECK 제약 변경은 본 WO 에 포함하지 않는다** (별도 마이그레이션 WO).
+>
+> **위험** — 최고. `service-catalog.ts` 5키 중 하나이며 `service-scopes.ts`, `rbac-catalog.ts`, `ServiceMembership`, `register.dto.ts`, `approval-service-keys.ts`, CMS 채널/슬롯/콘텐츠 셀렉터, `PartnerApplication/Content/Event/Target`, `OperatorNotificationSettings`, `store-policy.routes.ts` 등에 분포. **CLAUDE.md Shared Module Change Rule 적용 대상** — 4서비스(KPA / K-Cosmetics / Neture / Pharmacy-Hub) 전 소비처 선식별 필수
+>
+> **안전 근거** — `service_memberships` 에 `glucoseview` **0 row**
+>
+> **검증** — 4서비스 typecheck + 회원가입 · CMS 채널/슬롯 셀렉터 · 파트너 대상 선택 스모크
+>
+> **CHECK** — `docs/checks/CHECK-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1.md`
+
+### 8-4. 권고
+
+`8-1` → `8-2` → `8-3` 순서. `8-1` 과 `8-2` 는 서로 독립이라 순서를 바꿔도 무방하나, `8-3` 은 반드시 마지막에 둔다(공유 enum 영향이 가장 넓다).
+
+---
+
+## 9. 중지 조건 대조
+
+| 조건 | 결과 |
+|------|------|
+| 현재 운영 주문·정산이 해당 엔티티나 서비스에 실제 의존 | **미해당** — 주문=`checkout_orders`(+`neture_orders`), 정산=`neture_settlements`/`partner_settlements` 로 완전 분리. dropshipping 엔티티 등록 0 |
+| 삭제 대상 DB 에 보존이 필요한 운영 데이터 존재 | **미해당** — 대상 테이블 0개, row 0 |
+| 현재 정본으로 대체되지 않은 필수 기능 발견 | **미해당** — §3 대조 완료 |
+| 모집단이 예상보다 크게 확장되어 독립 감사로 분리해야 하는 경우 | **부분 해당 → 분리 처리** — `glucoseview` **service key** 만 공유 enum 전반으로 확장된다. 이를 §8-3 독립 WO 로 분리했고, 나머지 모집단(패키지 6 + 라우트 14 + 프론트 56)은 예상 범위 내 |
+
+---
+
+## 10. 완료 조건 대조
 
 | WO 기준 | 결과 |
 |---------|------|
-| 코드 변경 0 | ✅ (본 CHECK 문서 1건 신규 외 없음) |
-| DB write 0 | ✅ (SELECT / information_schema 조회만) |
-| dropshipping·health 삭제 가능 범위 확정 | ✅ §5 |
-| 최소 제거 WO 작성용 파일 목록·순서 제출 | ✅ §5·§6 |
+| READ-ONLY / 코드 변경 0 | ✅ (본 CHECK 문서 1건 신규 외 없음) |
+| DB write 0 | ✅ (SELECT / `information_schema` 조회만) |
+| 병렬 세션 WIP 미접촉 | ✅ (`AuditLogManagement.tsx` · `yaksa.routes.tsx` · `admin-operation-boundary.test.ts` 미접촉, 커밋은 pathspec 지정) |
+| 삭제 가능 범위 확정 | ✅ §5 · §7 |
+| 유지 항목 최소화 + 근거 | ✅ §7-1 (RETAIN 6항목, 각 근거 명시) |
+| 즉시 사용 가능한 파일 목록·순서 | ✅ §5 · §6 |
+| 후속 제거 WO 초안 | ✅ §8 (3건) |
+| CHECK 문서 작성 | ✅ 본 문서 |
+| commit · push | ✅ §11 |
+
+---
+
+## 11. 이력
+
+| 커밋 | 내용 |
+|------|------|
+| `a1ef18265` | 초판 (보고 1~6 + 중지/완료 조건) |
+| 본 커밋 | WO 재발행 반영 — §7 최종 판정 · §8 후속 제거 WO 초안 3건 · §9 중지 조건 4항 · §10 완료 조건 확장 |
