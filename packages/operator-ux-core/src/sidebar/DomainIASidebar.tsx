@@ -17,7 +17,7 @@
  * domain IA 메타데이터는 ./operatorDomainIA 에서 import.
  */
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, type ComponentType } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   ChevronDown,
@@ -29,7 +29,6 @@ import {
   Settings,
   Package,
   CreditCard,
-  type LucideIcon,
 } from 'lucide-react';
 import {
   STANDARD_GROUPS,
@@ -46,7 +45,13 @@ import {
 // WO-O4O-DOMAIN-IA-SIDEBAR-HEADING-ICON-ALIGNMENT-V1 (IR Option A):
 // config 데이터(DOMAIN_LABELS / NETURE_DOMAIN_LABELS)의 emoji 는 그대로 두고,
 // 렌더 시점에 domain key → lucide 로 치환한다. 미매핑 key 는 emoji fallback.
-const DOMAIN_HEADING_ICONS: Record<string, LucideIcon> = {
+// WO-O4O-WORKSPACE-DEPENDENCY-AND-CI-EXIT-CODE-HARDENING-V1:
+// 소비처(apps/admin-dashboard)의 `declare module 'lucide-react';` shorthand ambient
+// 선언이 lucide-react 실제 타입을 가려 `LucideIcon` 이 TS2709 로 잡힌다. 런타임과
+// 무관한 타입 표기이므로 shim 유무와 무관하게 성립하는 컴포넌트 타입으로 표기한다.
+type IconComponent = ComponentType<Record<string, unknown>>;
+
+const DOMAIN_HEADING_ICONS: Record<string, IconComponent> = {
   community: MessagesSquare,
   community_content: MessagesSquare,
   store_hub: Store,

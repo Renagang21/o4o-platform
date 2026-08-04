@@ -12,8 +12,8 @@
     "test": "bash -c 'npx vitest run --passWithNoTests'"
   },
   "dependencies": {
-    "@o4o/types": "file:../../packages/types",
-    "@o4o/utils": "file:../../packages/utils",
+    "@o4o/types": "workspace:*",
+    "@o4o/utils": "workspace:*",
     "axios": "^1.10.0",
     "compression": "^1.7.6",
     "cookie-parser": "^1.4.6",

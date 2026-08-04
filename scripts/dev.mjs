@@ -8,7 +8,7 @@
  */
 
 import { execSync, spawn } from 'child_process';
-import { existsSync, readdirSync } from 'fs';
+import { existsSync, readdirSync, readFileSync } from 'fs';
 import { join, resolve } from 'path';
 import { platform } from 'os';
 
@@ -41,8 +41,38 @@ function exec(cmd, cwd = ROOT_DIR) {
     });
     return true;
   } catch (error) {
+    // 실패는 여기서 삼키지 않는다. 호출자가 반환값을 누적해 최종 종료코드로 전파한다.
+    log.error(`  ✗ FAILED (${cwd}): ${cmd}`);
     return false;
   }
+}
+
+/**
+ * 실패 누적기 — 모든 단계를 끝까지 실행하되(전체 오류 목록 확보),
+ * 하나라도 실패하면 non-zero 로 종료시키기 위해 실패 항목을 모은다.
+ */
+function createFailureTracker() {
+  const failures = [];
+  return {
+    /** exec 결과를 누적하고 그대로 반환한다 */
+    track(label, ok) {
+      if (!ok) failures.push(label);
+      return ok;
+    },
+    get failures() {
+      return failures;
+    },
+    /** 실패가 없으면 true */
+    report(taskName) {
+      if (failures.length === 0) {
+        log.info(`${taskName}: OK`);
+        return true;
+      }
+      log.error(`${taskName}: ${failures.length} step(s) FAILED`);
+      for (const f of failures) log.error(`  - ${f}`);
+      return false;
+    }
+  };
 }
 
 /**
@@ -58,6 +88,18 @@ function getDirs(basePath) {
 }
 
 /**
+ * 해당 디렉터리가 자체 tsconfig.json 을 가지고 있는지 확인한다.
+ *
+ * `npx tsc --noEmit` 은 cwd 에 tsconfig.json 이 없으면 상위로 올라가 루트
+ * tsconfig.json 을 집어든다. 그러면 "packages/forum-app 타입체크" 라는 이름으로
+ * 실제로는 모노레포 전체(api-server 포함)를 검사하게 되고, composite 출력이 없는
+ * api-server 때문에 TS6305 가 대량 발생한다. 대상 아닌 검사이므로 건너뛴다.
+ */
+function hasOwnTsconfig(relPath) {
+  return existsSync(join(ROOT_DIR, relPath, 'tsconfig.json'));
+}
+
+/**
  * Check if package has a specific script
  */
 function hasScript(pkgPath, scriptName) {
@@ -65,8 +107,10 @@ function hasScript(pkgPath, scriptName) {
   if (!existsSync(pkgJsonPath)) return false;
 
   try {
-    const pkg = JSON.parse(require('fs').readFileSync(pkgJsonPath, 'utf8'));
-    return pkg.scripts && pkg.scripts[scriptName];
+    // ESM 모듈이므로 require 를 쓸 수 없다. 과거 `require('fs')` 는 ReferenceError 를
+    // 내고 catch 에서 false 로 삼켜져 test/build 가 아무것도 실행하지 않았다.
+    const pkg = JSON.parse(readFileSync(pkgJsonPath, 'utf8'));
+    return Boolean(pkg.scripts && pkg.scripts[scriptName]);
   } catch {
     return false;
   }
@@ -85,6 +129,7 @@ function runLint() {
 
 function runTypeCheck() {
   log.info('Running TypeScript checks...');
+  const t = createFailureTracker();
 
   // Build packages first
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes', 'block-core'];
@@ -94,7 +139,7 @@ function runTypeCheck() {
     const pkgPath = join('packages', pkg);
     if (existsSync(join(ROOT_DIR, pkgPath))) {
       console.log(`  - Building @o4o/${pkg}`);
-      exec('npx tsc', join(ROOT_DIR, pkgPath));
+      t.track(`build packages/${pkg}`, exec('npx tsc', join(ROOT_DIR, pkgPath)));
     }
   }
 
@@ -104,10 +149,13 @@ function runTypeCheck() {
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);
-    if (existsSync(join(ROOT_DIR, pkgPath))) {
-      console.log(`  - Checking @o4o/${pkg}`);
-      exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath));
+    if (!existsSync(join(ROOT_DIR, pkgPath))) continue;
+    if (!hasOwnTsconfig(pkgPath)) {
+      log.warn(`  - Skipping @o4o/${pkg} (no tsconfig.json)`);
+      continue;
     }
+    console.log(`  - Checking @o4o/${pkg}`);
+    t.track(`type-check packages/${pkg}`, exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath)));
   }
 
   // Type check apps
@@ -116,17 +164,21 @@ function runTypeCheck() {
 
   for (const app of apps) {
     const appPath = join('apps', app);
-    if (existsSync(join(ROOT_DIR, appPath))) {
-      console.log(`  - Checking ${app}`);
-      exec('npx tsc --noEmit', join(ROOT_DIR, appPath));
+    if (!existsSync(join(ROOT_DIR, appPath))) continue;
+    if (!hasOwnTsconfig(appPath)) {
+      log.warn(`  - Skipping ${app} (no tsconfig.json)`);
+      continue;
     }
+    console.log(`  - Checking ${app}`);
+    t.track(`type-check apps/${app}`, exec('npx tsc --noEmit', join(ROOT_DIR, appPath)));
   }
 
-  return true;
+  return t.report('type-check');
 }
 
 function runTypeCheckFrontend() {
   log.info('Running TypeScript checks (Frontend only)...');
+  const t = createFailureTracker();
 
   // Build packages first
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes'];
@@ -136,7 +188,7 @@ function runTypeCheckFrontend() {
     const pkgPath = join('packages', pkg);
     if (existsSync(join(ROOT_DIR, pkgPath))) {
       console.log(`  - Building @o4o/${pkg}`);
-      exec('npx tsc', join(ROOT_DIR, pkgPath));
+      t.track(`build packages/${pkg}`, exec('npx tsc', join(ROOT_DIR, pkgPath)));
     }
   }
 
@@ -146,10 +198,13 @@ function runTypeCheckFrontend() {
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);
-    if (existsSync(join(ROOT_DIR, pkgPath))) {
-      console.log(`  - Checking @o4o/${pkg}`);
-      exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath));
+    if (!existsSync(join(ROOT_DIR, pkgPath))) continue;
+    if (!hasOwnTsconfig(pkgPath)) {
+      log.warn(`  - Skipping @o4o/${pkg} (no tsconfig.json)`);
+      continue;
     }
+    console.log(`  - Checking @o4o/${pkg}`);
+    t.track(`type-check packages/${pkg}`, exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath)));
   }
 
   // Type check frontend apps only (skip api-server)
@@ -158,10 +213,13 @@ function runTypeCheckFrontend() {
 
   for (const app of apps) {
     const appPath = join('apps', app);
-    if (existsSync(join(ROOT_DIR, appPath))) {
-      console.log(`  - Checking ${app}`);
-      exec('npx tsc --noEmit', join(ROOT_DIR, appPath));
+    if (!existsSync(join(ROOT_DIR, appPath))) continue;
+    if (!hasOwnTsconfig(appPath)) {
+      log.warn(`  - Skipping ${app} (no tsconfig.json)`);
+      continue;
     }
+    console.log(`  - Checking ${app}`);
+    t.track(`type-check apps/${app}`, exec('npx tsc --noEmit', join(ROOT_DIR, appPath)));
   }
 
   // Type check web services (KPA, etc.)
@@ -170,25 +228,29 @@ function runTypeCheckFrontend() {
 
   for (const svc of webServices) {
     const svcPath = join('services', svc);
-    if (existsSync(join(ROOT_DIR, svcPath))) {
-      console.log(`  - Checking ${svc}`);
-      exec('npx tsc --noEmit', join(ROOT_DIR, svcPath));
+    if (!existsSync(join(ROOT_DIR, svcPath))) continue;
+    if (!hasOwnTsconfig(svcPath)) {
+      log.warn(`  - Skipping ${svc} (no tsconfig.json)`);
+      continue;
     }
+    console.log(`  - Checking ${svc}`);
+    t.track(`type-check services/${svc}`, exec('npx tsc --noEmit', join(ROOT_DIR, svcPath)));
   }
 
   log.warn('Skipping api-server type check (handled separately on server)');
-  return true;
+  return t.report('type-check:frontend');
 }
 
 function runTests() {
   log.info('Running tests...');
+  const t = createFailureTracker();
 
   // Run tests for apps
   for (const app of getDirs('apps')) {
     const appPath = join('apps', app);
     if (hasScript(appPath, 'test')) {
       console.log(`Testing ${app}...`);
-      exec('pnpm test', join(ROOT_DIR, appPath));
+      t.track(`test apps/${app}`, exec('pnpm test', join(ROOT_DIR, appPath)));
     }
   }
 
@@ -197,15 +259,16 @@ function runTests() {
     const pkgPath = join('packages', pkg);
     if (hasScript(pkgPath, 'test')) {
       console.log(`Testing ${pkg}...`);
-      exec('pnpm test', join(ROOT_DIR, pkgPath));
+      t.track(`test packages/${pkg}`, exec('pnpm test', join(ROOT_DIR, pkgPath)));
     }
   }
 
-  return true;
+  return t.report('test');
 }
 
-function buildPackages() {
+function buildPackages(tracker) {
   log.info('Building packages...');
+  const t = tracker || createFailureTracker();
 
   const packages = [
     'types', 'utils', 'ui', 'auth-client', 'auth-context',
@@ -216,18 +279,19 @@ function buildPackages() {
     const pkgPath = join(ROOT_DIR, 'packages', pkg);
     if (existsSync(pkgPath) && hasScript(`packages/${pkg}`, 'build')) {
       console.log(`  - Building @o4o/${pkg}`);
-      exec('pnpm run build', pkgPath);
+      t.track(`build packages/${pkg}`, exec('pnpm run build', pkgPath));
     }
   }
 
-  return true;
+  return tracker ? t.failures.length === 0 : t.report('build:packages');
 }
 
 function runBuild() {
   log.info('Building project...');
+  const t = createFailureTracker();
 
   // Build packages first
-  buildPackages();
+  buildPackages(t);
 
   // Build apps
   log.info('Building apps...');
@@ -237,15 +301,16 @@ function runBuild() {
     const appPath = join(ROOT_DIR, 'apps', app);
     if (existsSync(appPath) && hasScript(`apps/${app}`, 'build')) {
       console.log(`  - Building ${app}`);
-      exec('pnpm run build', appPath);
+      t.track(`build apps/${app}`, exec('pnpm run build', appPath));
     }
   }
 
-  return true;
+  return t.report('build');
 }
 
 function cleanProject() {
   log.info('Cleaning project...');
+  const t = createFailureTracker();
 
   // Remove dist directories
   const dirsToClean = [
@@ -257,16 +322,15 @@ function cleanProject() {
     const fullPath = join(ROOT_DIR, dir);
     if (existsSync(fullPath)) {
       console.log(`  - Removing ${dir}`);
-      if (isWindows) {
-        exec(`rmdir /s /q "${fullPath}"`, ROOT_DIR);
-      } else {
-        exec(`rm -rf "${fullPath}"`, ROOT_DIR);
-      }
+      const ok = isWindows
+        ? exec(`rmdir /s /q "${fullPath}"`, ROOT_DIR)
+        : exec(`rm -rf "${fullPath}"`, ROOT_DIR);
+      t.track(`clean ${dir}`, ok);
     }
   }
 
   log.info('Clean complete!');
-  return true;
+  return t.report('clean');
 }
 
 function showUsage() {
@@ -296,30 +360,39 @@ Examples:
 
 const command = process.argv[2];
 
+/**
+ * 명령 결과를 그대로 프로세스 종료코드로 전파한다.
+ * 과거에는 모든 러너가 무조건 true 를 반환하고 결과를 버려서,
+ * tsc/build/test 실패가 CI 에서 GREEN 으로 통과했다.
+ */
+function finish(ok) {
+  process.exit(ok ? 0 : 1);
+}
+
 switch (command) {
   case 'lint':
-    runLint();
+    finish(runLint());
     break;
   case 'lint:fix':
-    runLint();
+    finish(runLint());
     break;
   case 'type-check':
-    runTypeCheck();
+    finish(runTypeCheck());
     break;
   case 'type-check:frontend':
-    runTypeCheckFrontend();
+    finish(runTypeCheckFrontend());
     break;
   case 'test':
-    runTests();
+    finish(runTests());
     break;
   case 'build':
-    runBuild();
+    finish(runBuild());
     break;
   case 'build:packages':
-    buildPackages();
+    finish(buildPackages());
     break;
   case 'clean':
-    cleanProject();
+    finish(cleanProject());
     break;
   default:
     showUsage();
