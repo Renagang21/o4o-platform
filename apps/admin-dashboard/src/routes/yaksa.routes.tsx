@@ -2,6 +2,7 @@ import { Route, Navigate } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
 import { AppRouteGuard } from '@/components/AppRouteGuard';
+import { PLATFORM_ADMIN_ROLES } from '@/config/rolePermissions';
 
 // Membership-Yaksa: Membership Management
 const MembershipDashboard = lazy(() => import('@/pages/membership/dashboard/MembershipDashboard'));
@@ -51,43 +52,51 @@ const PageLoader = () => (
 export function YaksaRoutes() {
   return [
     // Membership-Yaksa: 회원 관리
+    //
+    // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
+    //   이 6개 화면이 소비하는 `/api/v1/membership/*` 관리자 subtree 는
+    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 로 보호된다.
+    //   기존에는 route 가 `requiredPermissions` 만 선언했는데, permission 은 백엔드가 공급하지 않아
+    //   사실상 "관리자급이면 통과" 로 동작했다. 그래서 메뉴를 숨겨도 URL 직접 접근이면 화면이 렌더됐다.
+    //   메뉴에서 숨긴 대상은 route 에서도 막혀야 하므로 실제 경계를 `requiredRoles` 로 선언한다.
+    //   `requiredPermissions` 는 그대로 둔다 — 나중에 permission 이 공급되면 자동으로 AND 조건이 된다.
     <Route key="/admin/membership/dashboard" path="/admin/membership/dashboard" element={
-      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:view']}>
         <Suspense fallback={<PageLoader />}>
           <MembershipDashboard />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/admin/membership/members" path="/admin/membership/members" element={
-      <AdminProtectedRoute requiredPermissions={['membership:view', 'membership:manage']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:view', 'membership:manage']}>
         <Suspense fallback={<PageLoader />}>
           <MemberManagement />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/admin/membership/members/:id" path="/admin/membership/members/:id" element={
-      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:view']}>
         <Suspense fallback={<PageLoader />}>
           <MemberDetail />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/admin/membership/verifications" path="/admin/membership/verifications" element={
-      <AdminProtectedRoute requiredPermissions={['membership:verify']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:verify']}>
         <Suspense fallback={<PageLoader />}>
           <VerificationManagement />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/admin/membership/categories" path="/admin/membership/categories" element={
-      <AdminProtectedRoute requiredPermissions={['membership:manage']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:manage']}>
         <Suspense fallback={<PageLoader />}>
           <CategoryManagement />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/admin/membership/audit-logs" path="/admin/membership/audit-logs" element={
-      <AdminProtectedRoute requiredPermissions={['membership:view']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['membership:view']}>
         <Suspense fallback={<PageLoader />}>
           <AuditLogManagement />
         </Suspense>

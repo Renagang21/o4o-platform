@@ -10,6 +10,24 @@ export interface MenuPermission {
   requireAll?: boolean; // Requires all permissions if true
 }
 
+/**
+ * 플랫폼 전역 관리 데이터(회원·사용자)의 **백엔드 접근 경계**.
+ *
+ * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1**
+ *
+ * 이 배열은 정책을 새로 정하는 것이 아니라, 이미 배포된 백엔드 guard 상수를 프런트에 **복제**한 것이다.
+ *
+ * | 백엔드 | 상수 |
+ * |---|---|
+ * | `/api/v1/admin/users` | `ADMIN_ROLES` — `routes/admin/users.routes.ts:32` |
+ * | `/api/v1/membership/*` 관리자 subtree | `MEMBERSHIP_ADMIN_ROLES` — `bootstrap/membership-admin-guard.ts:34` |
+ *
+ * 메뉴(어떤 항목이 보이는가)와 프런트 route(직접 URL 접근 시 누가 통과하는가)가
+ * 이 값을 함께 참조해야 세 계층이 갈라지지 않는다. 백엔드 상수가 바뀌면 여기도 함께 바꾼다
+ * (`admin-menu-route-backend-alignment.test.ts` 가 백엔드 소스와 대조해 고정한다).
+ */
+export const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'] as const;
+
 // Menu permission configuration without hardcoded roles
 // Roles should be fetched from database and checked dynamically
 export const menuPermissions: MenuPermission[] = [
@@ -32,26 +50,34 @@ export const menuPermissions: MenuPermission[] = [
 
   // WO-O4O-ADMIN-USERS-RBAC-CONSOLE-REPOSITIONING-V1:
   // /users 는 platform super_admin 전용 RBAC 권한 할당 콘솔로 재정렬됨.
-  // role suffix 'super_admin' 과 prefix 형식 'platform:super_admin' 둘 다 허용 (useAdminMenu 가 role.name 을 raw string 으로 비교).
+  //
+  // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — 백엔드 경계로 재정렬:
+  //   화면이 실제 호출하는 API 는 `/api/v1/admin/users` 이고(UsersListClean.tsx:72),
+  //   그 guard 는 `ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다
+  //   (routes/admin/users.routes.ts:32).
+  //   기존 선언은 `platform:admin` 을 빠뜨려 **백엔드가 허용하는 사용자에게 메뉴를 숨기고**,
+  //   `super_admin` 을 포함해 **백엔드가 거부하는 사용자에게 메뉴를 보여주었다** — 양방향 불일치.
   {
     menuId: 'core-users',
-    roles: ['super_admin', 'platform:super_admin']
+    roles: [...PLATFORM_ADMIN_ROLES]
   },
 
-  // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1
-  //   회원 분류 관리 메뉴는 platform 관리자 전용이다.
-  //   backend guard(WO-…-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2)가
-  //   /api/v1/membership/categories 를 platform:admin / platform:super_admin 으로 제한하므로,
-  //   kpa:admin·일반 사용자에게는 도달할 수 없는 메뉴를 노출하지 않는다.
-  //   (메뉴 노출은 인가 경계가 아니며 실제 차단은 backend guard 가 담당한다.)
-  //   core-users 와 동일하게 suffix 형식과 prefix 형식을 모두 나열한다
-  //   (useAdminMenu 가 role.name 을 raw string 으로 비교).
-  //   이번 WO 에서 기존 Membership 메뉴 3건(core-membership / -members / -verifications)의
-  //   노출 정책은 변경하지 않는다(회원 관리 전체 메뉴 개편은 범위 제외).
-  {
-    menuId: 'core-membership-categories',
-    roles: ['admin', 'super_admin', 'platform:admin', 'platform:super_admin']
-  },
+  // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
+  //   회원 관리 메뉴 4건은 모두 `/api/v1/membership/*` 관리자 subtree 를 소비한다.
+  //   그 경계는 `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다
+  //   (bootstrap/membership-admin-guard.ts:34, 대상 subtree 는 같은 파일 :58-87).
+  //
+  //   선행 WO 는 분류 메뉴에만 게이트를 걸면서 legacy `admin`·`super_admin` 을 함께 나열했고
+  //   ("backend 판정에 따름" 으로 유보), 나머지 3건은 게이트 없이 두었다.
+  //   그 결과 `admin`·`super_admin` 에게 메뉴 4건이 모두 보이지만 API 는 403 이다.
+  //   메뉴는 보안 경계가 아니라 **실제 접근권을 반영하는 탐색 장치**이므로 백엔드 경계에 맞춘다.
+  //
+  //   ⚠️ 백엔드 상수가 RBAC 카탈로그의 canonical `admin`·`super_admin` 을 제외한 것이
+  //   타당한지는 별도 사안이다. 이 WO 는 계층 간 불일치만 제거하고 경계 자체는 옮기지 않는다.
+  { menuId: 'core-membership', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'core-membership-members', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'core-membership-verifications', roles: [...PLATFORM_ADMIN_ROLES] },
+  { menuId: 'core-membership-categories', roles: [...PLATFORM_ADMIN_ROLES] },
 
   // Seller Management - No restriction (allow all)
   // These menus are visible to all authenticated users

@@ -48,7 +48,7 @@ export function TestRoutes() {
 
     // UI Showcase
     <Route key="/ui-showcase" path="/ui-showcase" element={
-      <AdminProtectedRoute requiredPermissions={['admin']}>
+      <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <UIShowcase />
         </Suspense>

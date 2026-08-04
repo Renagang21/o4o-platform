@@ -7,7 +7,7 @@
  * 컴포넌트를 렌더링하지 않고 단위 테스트로 고정할 수 있어야 한다.
  */
 
-/** 서비스 접두 역할(`kpa:admin`, `neture:operator` 등)을 받아줄 수 있는 관리자급 요구 역할. */
+/** 관리자급으로 취급하는 역할 전체. */
 export const ADMIN_LEVEL_ROLES: readonly string[] = [
   'admin',
   'administrator',
@@ -15,6 +15,26 @@ export const ADMIN_LEVEL_ROLES: readonly string[] = [
   'operator',
   'platform:admin',
   'platform:super_admin',
+];
+
+/**
+ * 서비스 접두 역할(`kpa:admin`, `neture:operator` 등)을 받아줄 수 있는 요구 역할.
+ *
+ * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1**
+ *
+ * `ADMIN_LEVEL_ROLES` 에서 `platform:*` 을 뺀 집합이다.
+ * `platform:admin`·`platform:super_admin` 은 **플랫폼 전역 관리자로 좁히려는** 선언이므로,
+ * 여기에 서비스 단위 관리자(`kpa:admin`)를 끼워 넣으면 선언의 의미가 사라진다.
+ * 실제로 백엔드도 이 화면들에서 서비스 역할을 403 으로 거부한다
+ * (`bootstrap/membership-admin-guard.ts:30-34` — 플랫폼 전역 데이터라 서비스 경계가 없다).
+ *
+ * `admin` 을 포함하는 기존 선언은 여전히 서비스 접두 역할을 받아주므로 잠기는 사용자는 없다.
+ */
+const SERVICE_PREFIX_ACCEPTING_ROLES: readonly string[] = [
+  'admin',
+  'administrator',
+  'super_admin',
+  'operator',
 ];
 
 /** `kpa:admin`, `neture:operator` 같은 서비스 접두 관리자급 역할인가. */
@@ -25,6 +45,18 @@ export const isServicePrefixedAdminRole = (role: string): boolean =>
  * 요구 역할 집합을 실제 판정 집합으로 확장한다.
  *
  * `admin` 은 `super_admin`·`operator`·`platform:*` 을 함께 허용한다(기존 계층 규칙 유지).
+ *
+ * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — `platform:admin` 확장 트리거 제거**
+ *
+ * 이전에는 `platform:admin` 이 들어 있기만 해도 legacy `super_admin`·`operator` 까지 함께 열렸다.
+ * 방향이 거꾸로다. `platform:admin` 은 플랫폼 전역 관리자로 **좁히려는** 선언인데
+ * 확장이 더 넓은 legacy 역할을 도로 끌어들여, "platform 한정" 을 선언할 방법 자체가 없었다.
+ *
+ * 그래서 백엔드가 `['platform:admin','platform:super_admin']` 로 제한한 화면(회원·사용자 관리)의
+ * 프런트 경계를 백엔드와 일치시킬 수 없었다.
+ *
+ * 안전성: `platform:admin` 을 포함하면서 `admin` 을 포함하지 않는 선언은 **저장소 전역 0건**이므로
+ * (전수 확인) 기존 선언의 판정 결과는 하나도 바뀌지 않는다. `admin` 쪽 트리거는 그대로 둔다.
  */
 export const expandRequiredRoles = (requiredRoles: string[]): string[] => {
   const expanded = [...requiredRoles];
@@ -32,7 +64,7 @@ export const expandRequiredRoles = (requiredRoles: string[]): string[] => {
     if (!expanded.includes(role)) expanded.push(role);
   };
 
-  if (requiredRoles.includes('admin') || requiredRoles.includes('platform:admin')) {
+  if (requiredRoles.includes('admin')) {
     ['super_admin', 'operator', 'platform:admin', 'platform:super_admin'].forEach(push);
   }
   if (requiredRoles.includes('super_admin')) push('platform:super_admin');
@@ -54,7 +86,9 @@ export const matchesRequiredRole = (role: string, requiredRoles: string[]): bool
   const expanded = expandRequiredRoles(requiredRoles);
   if (expanded.includes(role)) return true;
 
-  const allowsServicePrefixed = expanded.some((required) => ADMIN_LEVEL_ROLES.includes(required));
+  const allowsServicePrefixed = expanded.some((required) =>
+    SERVICE_PREFIX_ACCEPTING_ROLES.includes(required),
+  );
   return allowsServicePrefixed && isServicePrefixedAdminRole(role);
 };
 

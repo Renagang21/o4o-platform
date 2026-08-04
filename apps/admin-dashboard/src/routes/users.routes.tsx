@@ -1,6 +1,7 @@
 import { Route } from 'react-router-dom';
 import { AdminProtectedRoute } from '@o4o/auth-context';
 import { Suspense, lazy } from 'react';
+import { PLATFORM_ADMIN_ROLES } from '@/config/rolePermissions';
 
 const UsersPage = lazy(() => import('@/pages/users'));
 const UserForm = lazy(() => import('@/pages/users/UserForm'));
@@ -46,36 +47,42 @@ export function UserRoutes() {
     } />,
 
     // 사용자 관리
+    //
+    // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
+    //   이 화면들은 `/api/v1/admin/users` 를 소비하며(UsersListClean.tsx:72),
+    //   그 guard 는 `ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다.
+    //   메뉴(core-users)·route·백엔드가 같은 경계를 쓰도록 실제 역할을 선언한다.
+    //   `requiredPermissions` 는 유지한다 — permission 공급 시 자동으로 AND 조건이 된다.
     <Route key="/users" path="/users" element={
-      <AdminProtectedRoute requiredPermissions={['users:read']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:read']}>
         <Suspense fallback={<PageLoader />}>
           <UsersPage />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/add" path="/users/add" element={
-      <AdminProtectedRoute requiredPermissions={['users:create']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:create']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/new" path="/users/new" element={
-      <AdminProtectedRoute requiredPermissions={['users:create']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:create']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/:id" path="/users/:id" element={
-      <AdminProtectedRoute requiredPermissions={['users:read']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:read']}>
         <Suspense fallback={<PageLoader />}>
           <UserDetail />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/users/:id/edit" path="/users/:id/edit" element={
-      <AdminProtectedRoute requiredPermissions={['users:update']}>
+      <AdminProtectedRoute requiredRoles={[...PLATFORM_ADMIN_ROLES]} requiredPermissions={['users:update']}>
         <Suspense fallback={<PageLoader />}>
           <UserForm />
         </Suspense>

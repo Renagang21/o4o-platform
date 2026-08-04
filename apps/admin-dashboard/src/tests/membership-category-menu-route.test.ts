@@ -70,25 +70,26 @@ describe('route 재사용', () => {
     expect(hits).toHaveLength(1);
   });
 
-  it('route guard 를 변경하지 않았다', () => {
+  it('permission 선언은 유지하고 실제 역할 경계를 함께 선언한다', () => {
     const idx = ROUTES.indexOf(`path="${CATEGORY_PATH}"`);
     const block = ROUTES.slice(idx, idx + 400);
+    // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 로 requiredRoles 가 추가됐다.
+    // permission 선언 자체는 그대로 둔다(permission 공급 시 AND 조건으로 승격).
     expect(block).toContain("requiredPermissions={['membership:manage']}");
+    expect(block).toContain('requiredRoles={[...PLATFORM_ADMIN_ROLES]}');
     expect(block).toContain('<CategoryManagement />');
   });
 });
 
 describe('역할별 메뉴 노출 정책', () => {
-  it.each([
-    ['platform:admin'],
-    ['platform:super_admin'],
-    ['admin'],
-    ['super_admin'],
-  ])('%s 는 메뉴를 본다', (role) => {
+  it.each([['platform:admin'], ['platform:super_admin']])('%s 는 메뉴를 본다', (role) => {
     expect(hasMenuPermission([role], [], MENU_ID)).toBe(true);
   });
 
-  it.each([['kpa:admin'], ['kpa:operator'], ['user'], ['customer']])(
+  // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1:
+  //   legacy `admin`·`super_admin` 은 backend guard 가 403 으로 거부한다.
+  //   보이지만 쓸 수 없는 메뉴를 없애기 위해 노출 대상에서 제외했다.
+  it.each([['admin'], ['super_admin'], ['kpa:admin'], ['kpa:operator'], ['user'], ['customer']])(
     '%s 는 메뉴를 보지 못한다',
     (role) => {
       expect(hasMenuPermission([role], [], MENU_ID)).toBe(false);
@@ -99,22 +100,9 @@ describe('역할별 메뉴 노출 정책', () => {
     expect(hasMenuPermission([], [], MENU_ID)).toBe(false);
   });
 
-  it('메뉴 게이트 설정이 1건만 추가되었고 기존 설정은 유지된다', () => {
+  it('메뉴 게이트가 중복 없이 1건이고 dashboard 는 무게이트로 남는다', () => {
     expect(menuPermissions.filter((m) => m.menuId === MENU_ID)).toHaveLength(1);
-    // 기존 2건(dashboard / core-users)의 정책은 이번 WO 에서 변경하지 않는다.
-    expect(menuPermissions.find((m) => m.menuId === 'core-users')?.roles).toEqual([
-      'super_admin',
-      'platform:super_admin',
-    ]);
     expect(menuPermissions.find((m) => m.menuId === 'dashboard')?.roles).toBeUndefined();
-    // 회원 관리 전체 메뉴 개편은 범위 제외 — 기존 Membership 메뉴는 게이트를 추가하지 않는다.
-    for (const id of [
-      'core-membership',
-      'core-membership-members',
-      'core-membership-verifications',
-    ]) {
-      expect(menuPermissions.some((m) => m.menuId === id)).toBe(false);
-    }
   });
 });
 

@@ -88,21 +88,21 @@ export function PlatformRoutes() {
 
     // System Monitoring
     <Route key="/monitoring" path="/monitoring" element={
-      <AdminProtectedRoute requiredPermissions={['admin']}>
+      <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <IntegratedMonitoring />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/monitoring/performance" path="/monitoring/performance" element={
-      <AdminProtectedRoute requiredPermissions={['admin']}>
+      <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <PerformanceDashboard />
         </Suspense>
       </AdminProtectedRoute>
     } />,
     <Route key="/monitoring/security" path="/monitoring/security" element={
-      <AdminProtectedRoute requiredPermissions={['admin']}>
+      <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <IntegratedMonitoring />
         </Suspense>
@@ -111,7 +111,7 @@ export function PlatformRoutes() {
 
     // Phase 2.4 - Operations Dashboard
     <Route key="/admin/dashboard/operations" path="/admin/dashboard/operations" element={
-      <AdminProtectedRoute requiredPermissions={['admin']}>
+      <AdminProtectedRoute requiredRoles={['admin']}>
         <Suspense fallback={<PageLoader />}>
           <OperationsDashboard />
         </Suspense>
