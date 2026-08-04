@@ -36,6 +36,8 @@
 | 10 | 노출 게이트 제외 수 안내 | **PASS** | `offer_id IS NULL` 상품 추가 시 "선택한 상품 중 1개는 …" 배너, 해제 시 소멸 |
 | 11 | archive → 410 | **PASS** | 코너 연결 해제 후 보관 → `GET /api/v1/kpa/qr/public/e2e-2` = **410 `SCREEN_SET_INACTIVE`** (직전 200) |
 | 12 | restore → 동일 slug | **FAIL → 수정 후 PASS** | §3-B · **배포 후 재검증 §4-A** |
+| 13 | 복원 후 모바일 parity 재확인 | **PASS** | 재개통된 `/qr/e2e-2` 상품 3건 순서(p1→p2→p3)·p1·p2 QR·HTML/이미지 모두 보관 전과 동일 |
+| 14 | 재보관 → 다시 410 | **PASS** | 검증 종료 후 다시 보관 → 410 `SCREEN_SET_INACTIVE`. 전체 사이클 **410 → 200 → 410** |
 
 ## 3. 발견·수정한 결함
 
@@ -100,6 +102,28 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
   (`e2e-2` 는 별도로 **410** 재확인 — §6 의 보관 상태가 지금도 유지됨.)
 - **검증 전후 상태 동일**: archived 2건 / active 0건, slug 2개 불변. 신규 row·삭제 없음.
 
+## 4-B. §1 정본 대상(`e2e-2`) 실브라우저 복원 재검증 (2026-08-04)
+
+§4-A 는 계정 스코프 문제로 대체 세트를 썼다. 원 스코프(테스트 약국 매장, org `9c87f46b`)로 로그인돼 있던
+브라우저 세션을 그대로 이어받아 **§1 의 정본 대상 `dd81cf73-…` / slug `e2e-2`** 를 UI 만으로 처음부터 끝까지 재실행했다.
+(§6 마지막 항목의 자격증명 불일치는 이 세션에서 재확인하지 않았다 — 기존 세션 재사용이라 로그인 자체를 거치지 않았다.)
+
+| 단계 | 조작 (실브라우저) | 결과 |
+|---|---|---|
+| 1 | '보관' 필터 | **17건** 표시 (수정 전에는 0건) — E2E 스모크 코너 포함 |
+| 2 | 보관 행 더보기 | **미리보기 / 보관 해제** 2개만 노출 (수정·태블렛 적용·QR 은 숨김) |
+| 3 | 사전 baseline `GET /kpa/qr/public/e2e-2` | **410** `SCREEN_SET_INACTIVE` |
+| 4 | '보관 해제' → 확인 | 성공. 목록 '사용 가능' 13건으로 복귀, 상태 `사용 가능` |
+| 5 | `GET /kpa/qr/public/e2e-2` | **200** — slug `e2e-2`, QR row `3b94e67f-…` **동일**, `isActive: true` |
+| 6 | `/qr/e2e-2` 모바일 화면 | 상품 3건 순서 p1→p2→p3, p1·p2 QR, p3 QR 없음, HTML·이미지 — **보관 전과 동일** |
+| 7 | 복원된 행 더보기 | 미리보기 / 태블렛에 적용 / QR 보기·출력 / 수정 / 보관 — 정상 5종 복귀('보관 해제' 숨김) |
+| 8 | 다시 '보관' (원상 복구) | **410** 재확인 — 전체 사이클 **410 → 200 → 410** |
+
+- **DB (read-only SELECT, 사이클 종료 후)**: `store_qr_codes` **61 불변** / `e2e-2` `is_active=false` (row·slug 보존)
+  / 세트 `status='archived'`, `deleted_at IS NOT NULL`, `public_qr_slug='e2e-2'`.
+  복원 중간 시점에도 count **61**, `is_active=true`, `deleted_at IS NULL` 로 확인 — **신규 row 생성·삭제 0**.
+- 테스트 세트는 §6 대로 다시 **보관 상태**로 남겨 두었다.
+
 ## 4. DB 불변 검증 (read-only SELECT)
 
 | 항목 | 결과 |
@@ -132,5 +156,6 @@ LEFT JOIN product_masters pm ON pm.id = COALESCE(spo.master_id, opl.master_id)
 
 - 스모크용 **E2E 스모크 코너** 세트는 검증 종료 후 보관 상태로 남긴다(운영 데이터 최소 영향). 필요 시 '보관 해제' 로 복구 가능 — §3-B 수정으로 복구 경로가 실제로 동작한다.
 - 매장 QR 활성/비활성 토글 UI 부재는 별도 판단 사항(본 WO 범위 밖). 현재 비활성 전이는 screen_set archive 경로로만 발생한다.
+- **문구 불일치(경미, 미수정)**: 보관 확인 대화상자는 "‘리스트에서 제거됨’ 필터에서 다시 확인할 수 있습니다" 라고 안내하지만 실제 필터 라벨은 **'보관'** 이다. 기능 결함은 아니고(§3-B 수정으로 목록은 실제로 채워진다) 문구만 어긋난다. 카피 정리는 별도 사항으로 남긴다.
 - **CI Pipeline `@o4o/auth-client` 해소 실패**(§5) — Code Quality Check job 이 소비 패키지를 빌드하지 않는 구조 문제. 별도 WO 필요.
 - `docs/local/TEST-ACCOUNTS.local.md` 의 약국 경영자 계정(19행) 비밀번호는 프로덕션과 불일치(`INVALID_CREDENTIALS`)한다. 매장 스코프 검증은 KPA 운영자 계정(`kpa:store_owner` 겸유, org `c9beb4a2`)으로 수행했다. 문서 갱신은 별도 사항.
