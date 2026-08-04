@@ -180,7 +180,6 @@ import {
   ZoomOut,
   Command,
   Option,
-  Shift,
   Delete,
   Terminal,
   Code2,

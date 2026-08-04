@@ -356,7 +356,7 @@ export default function CMSSlotList() {
                             {isLocked && (
                               <Lock
                                 className="w-4 h-4 text-amber-600 flex-shrink-0"
-                                title={lockedReason || 'Locked slot'}
+                                aria-label={lockedReason || 'Locked slot'}
                               />
                             )}
                             <span className="text-sm font-medium text-gray-900 truncate">

@@ -121,9 +121,9 @@ const ConditionalBlock: React.FC<ConditionalBlockProps> = ({
           <GitBranch size={16} />
           <span>{indicatorText}</span>
           {showWhenMet ? (
-            <Eye size={16} title="Show when conditions met" />
+            <Eye size={16} aria-label="Show when conditions met" />
           ) : (
-            <EyeOff size={16} title="Hide when conditions met" />
+            <EyeOff size={16} aria-label="Hide when conditions met" />
           )}
         </div>
       )}

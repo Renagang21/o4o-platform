@@ -28,6 +28,7 @@ import {
   Calendar as CalendarIcon,
   BarChart2 as BarChart2Icon,
 } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
 import { adminMenuStatic, MenuItem } from '@/admin/menu/admin-menu.static';
 import { useDynamicCPTMenu, injectCPTMenuItems } from './useDynamicCPTMenu';
 import { useAuth } from '@o4o/auth-context';
@@ -248,7 +249,7 @@ function transformApiMenuItems(items: any[]): MenuItem[] {
  */
 function getIconComponent(iconName?: string): React.ReactElement {
   // Icon map using React.createElement (no JSX in .ts file)
-  const iconMap: Record<string, React.ComponentType> = {
+  const iconMap: Record<string, LucideIcon> = {
     'layout': LayoutDashboardIcon,
     'dashboard': LayoutDashboardIcon,
     'database': DatabaseIcon,

@@ -18,7 +18,6 @@ import {
   X,
   Palette,
   Sliders,
-  AspectRatio,
   Focus
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
