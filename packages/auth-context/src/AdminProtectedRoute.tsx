@@ -1,10 +1,19 @@
 import { FC, ReactNode, useEffect  } from 'react';
 import { useAuth } from './AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { hasRequiredPermissions, hasRequiredRoles } from './adminRouteAccess';
 
 interface AdminProtectedRouteProps {
   children: ReactNode;
   requiredRoles?: string[];
+  /**
+   * 선언된 permission 키.
+   *
+   * **주의: 이것은 permission 검사가 아니다.** 백엔드 인증 응답이 `user.permissions` 를 채우지
+   * 않으므로(2026-08-04 확인) 현재는 "관리자 대시보드 역할 게이트"로만 동작한다.
+   * `user.permissions` 가 실제로 채워지면 그때부터 자동으로 실검사로 승격된다 —
+   * `hasRequiredPermissions()` 참조.
+   */
   requiredPermissions?: string[];
   showContactAdmin?: boolean;
 }
@@ -124,82 +133,16 @@ export const AdminProtectedRoute: FC<AdminProtectedRouteProps> = ({
   }
 
   // 역할 기반 접근 제어
+  // 역할 출처는 user.role / user.activeRole.name / user.roles[] 세 곳 모두를 본다(하위 호환).
   if (requiredRoles.length > 0) {
-    // Check both user.role (single) and user.roles (array) for backward compatibility
-    // Support both string roles and object roles with name field
-    const userRole = user.role;
-    const userActiveRole = (user as any).activeRole?.name;
-    const userRoles = (user as any).roles || []; // roles array from User entity
-
-    // Role hierarchy: super_admin > admin > operator
-    // super_admin has all admin privileges
-    // Phase3-E: Support both unprefixed and domain-prefixed role names
-    // WO-OPERATOR-FIX-V1: Include operator and service-prefixed roles
-    const expandedRequiredRoles = [...requiredRoles];
-    if (requiredRoles.includes('admin') || requiredRoles.includes('platform:admin')) {
-      // admin also accepts super_admin, operator, and all platform/service prefixed variants
-      const extras = ['super_admin', 'operator',
-        'platform:admin', 'platform:super_admin'];
-      extras.forEach(r => { if (!expandedRequiredRoles.includes(r)) expandedRequiredRoles.push(r); });
-    }
-    if (requiredRoles.includes('super_admin') && !expandedRequiredRoles.includes('platform:super_admin')) {
-      expandedRequiredRoles.push('platform:super_admin');
-    }
-
-    // Check if a role string matches the expanded required roles
-    // Supports exact match + service-prefixed admin/operator (e.g., kpa:admin, neture:operator)
-    const matchesRole = (role: string): boolean => {
-      if (expandedRequiredRoles.includes(role)) return true;
-      if (role.includes(':') && (role.endsWith(':admin') || role.endsWith(':operator'))) return true;
-      return false;
-    };
-
-    const hasRequiredRole =
-      // Check user.role (string)
-      (userRole && matchesRole(userRole)) ||
-      // Check user.activeRole.name (object)
-      (userActiveRole && matchesRole(userActiveRole)) ||
-      // Check user.roles array (can be strings or objects)
-      (Array.isArray(userRoles) && userRoles.some((r: any) =>
-        typeof r === 'string'
-          ? matchesRole(r)
-          : r?.name && matchesRole(r.name)
-      ));
-
-    if (!hasRequiredRole) {
+    if (!hasRequiredRoles(user, requiredRoles)) {
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
 
-  // 권한 기반 접근 제어는 현재 User 타입에 없으므로 기본적으로 통과
+  // 권한 기반 접근 제어 — 판정 의미는 hasRequiredPermissions() 주석 참조.
   if (requiredPermissions.length > 0) {
-    // 향후 확장을 위한 구조 유지
-    // 현재는 admin/operator 역할이면 모든 권한을 가진 것으로 간주
-    // WO-OPERATOR-FIX-V1: Include operator and service-prefixed roles
-    const isDashboardRole = (role: string): boolean => {
-      const exactRoles = ['admin', 'administrator', 'super_admin', 'operator',
-        'platform:admin', 'platform:super_admin'];
-      if (exactRoles.includes(role)) return true;
-      if (role.includes(':') && (role.endsWith(':admin') || role.endsWith(':operator'))) return true;
-      return false;
-    };
-    const userRole = user.role;
-    const userActiveRole = (user as any).activeRole?.name;
-    const userRoles = (user as any).roles || [];
-
-    const isAdminOrOperator =
-      // Check user.role (string)
-      (userRole && isDashboardRole(userRole)) ||
-      // Check user.activeRole.name (object)
-      (userActiveRole && isDashboardRole(userActiveRole)) ||
-      // Check user.roles array (can be strings or objects)
-      (Array.isArray(userRoles) && userRoles.some((r: any) =>
-        typeof r === 'string'
-          ? isDashboardRole(r)
-          : r?.name && isDashboardRole(r.name)
-      ));
-
-    if (!isAdminOrOperator) {
+    if (!hasRequiredPermissions(user, requiredPermissions)) {
       return <AccessDeniedComponent showContactAdmin={showContactAdmin} />;
     }
   }
