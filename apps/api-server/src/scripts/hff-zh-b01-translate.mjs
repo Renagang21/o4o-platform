@@ -113,6 +113,7 @@ const ROUND_FILES = [];
 for (let n = 1; n <= 60; n++) ROUND_FILES.push([`z${n}`, `${D}/hff-zh-b01-z${n}-translations-v1.json`]);
 for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b02z${n}`, `${D}/hff-zh-b02-z${n}-translations-v1.json`]);
 for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b03z${n}`, `${D}/hff-zh-b03-z${n}-translations-v1.json`]);
+for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b04z${n}`, `${D}/hff-zh-b04-z${n}-translations-v1.json`]);
 for (const [tag, f] of ROUND_FILES) {
   if (!fs.existsSync(f)) continue;
   const T = JSON.parse(fs.readFileSync(f, 'utf8'));
