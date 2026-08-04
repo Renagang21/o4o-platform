@@ -1,0 +1,14 @@
+{
+ "wo": "WO-O4O-HFF-ZH-BATCH-03-10000-DIRECT-BULK-PRODUCTION-V1",
+ "generatedAt": "2026-08-04T02:29:43.092Z",
+ "total": 517,
+ "carriedForward": 410,
+ "resolvedFromPriorQueue": 11,
+ "addedByBatch03": 107,
+ "byType": {
+  "NUMBER_STRUCTURE_AMBIGUOUS": 356,
+  "TRANSLATION_AMBIGUOUS": 160,
+  "RENDER_FAILURE": 1
+ },
+ "uniqueProductMasters": 517
+}

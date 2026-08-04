@@ -112,6 +112,7 @@ const AUTH = { clause: {}, label: {}, meta: {}, heading: {}, badge: {}, intro: {
 const ROUND_FILES = [];
 for (let n = 1; n <= 60; n++) ROUND_FILES.push([`z${n}`, `${D}/hff-zh-b01-z${n}-translations-v1.json`]);
 for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b02z${n}`, `${D}/hff-zh-b02-z${n}-translations-v1.json`]);
+for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b03z${n}`, `${D}/hff-zh-b03-z${n}-translations-v1.json`]);
 for (const [tag, f] of ROUND_FILES) {
   if (!fs.existsSync(f)) continue;
   const T = JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -207,11 +208,34 @@ const keyVariants = (k) => [...new Set([
    승인된 EN 자산이 `Made by 코스맥스바이오(주)` 로 법인명을 그대로 둔 것과 같은 계약이다. */
 export const KEEP_PROPER = /[^·<>]{0,40}(?:制造|\(주\)|㈜|주식회사|유한회사)[^·<>]{0,40}/g;
 
+/* 괄호·구분점·콜론 표기만 다른 같은 문구를 흡수한다. 뜻이 갈릴 수 있으므로
+   납작한 키가 유일할 때만 쓰고, 일반 조회가 모두 실패한 뒤에만 본다. */
+const flat = (k) => k.replace(/[·()（）\[\]:：;；\-–—]/g, '');
+const FLAT = {};
+let FLAT_READY = false;
+function buildFlat() {
+  for (const kd of KINDS) {
+    const seen = new Map();
+    for (const [k, v] of Object.entries(AUTH[kd])) {
+      const f = flat(k);
+      if (!f) continue;
+      if (seen.has(f) && seen.get(f) !== v) seen.set(f, null);
+      else if (!seen.has(f)) seen.set(f, v);
+    }
+    FLAT[kd] = seen;
+  }
+  FLAT_READY = true;
+}
+
 /** 사전 조회. kind 를 주면 해당 슬롯을 먼저 본다. */
 function lookup(kind, t) {
-  const ks = keyVariants(key(t));
+  const k0 = key(t);
+  const ks = keyVariants(k0);
   const order = kind ? [kind, ...KINDS.filter((x) => x !== kind)] : KINDS;
   for (const k2 of ks) for (const kd of order) if (AUTH[kd][k2]) return { zh: AUTH[kd][k2], how: `dict(${kd})` };
+  if (!FLAT_READY) buildFlat();
+  const f = flat(k0);
+  if (f) for (const kd of order) { const v = FLAT[kd].get(f); if (v) return { zh: v, how: `dict-flat(${kd})` }; }
   return null;
 }
 const MARK_HEAD = /^(\s*(?:[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⒜⒝⒞㉮㉯㉰㉱㈎㈏㈐㈑○●◦▶ⓛ]|\(\s*\d+\s*\)|\d+(?:-\d+)+\s*[).]|\d+\s*[).>]|\(\s*[가나다라마바사]\s*\)|[가나다라마바사]\s*[.)])\s*)/;
@@ -307,24 +331,64 @@ const MANNER = {
   '직접 또는 물과 함께': '直接或与水一起', '그대로 혹은 물과 함께': '直接或与水一起',
   '직접 섭취하거나 물과 함께': '直接摄取或与水一起', '물에 타서': '用水冲调后',
   '물이나 음료에 타서': '用水或饮料冲调后', '그대로': '直接', '직접': '直接',
+  '삼켜서': '吞服', '물과 함께 삼켜서': '与水一起吞服', '음용수와 함께': '与饮用水一起',
+  '음용수와': '与饮用水一起', '음용수': '与饮用水一起', '따뜻한 물에 타서': '用温水冲调后',
+  '찬물에 타서': '用冷水冲调后', '한번에': '一次性', '녹여': '溶解后', '녹여서': '溶解后',
+  '흔들어서': '摇匀后', '흔들어': '摇匀后', '씹거나 삼키지 말고 입안에서 천천히 녹여': '不咀嚼、不吞咽，在口中缓慢溶解后',
+  '씹어서': '咀嚼后', '충분한 물과 함께 삼켜서': '与充足的水一起吞服', '우유와 함께': '与牛奶一起',
+  '음료와 함께': '与饮料一起', '음료에 타서': '用饮料冲调后', '주스에 타서': '用果汁冲调后',
+  '충분히 씹어서': '充分咀嚼后', '충분히 씹어': '充分咀嚼后', '씹거나 녹여서': '咀嚼或溶解后',
+  '씹거나 녹여': '咀嚼或溶解后', '씹거나 물과 함께': '咀嚼或与水一起', '잘 저어': '搅拌均匀后',
+  '저어': '搅拌后', '데워': '加热后', '직접 또는 데워': '直接或加热后', '온수 또는 냉수에 타서': '用温水或冷水冲调后',
+  '냉수나 온수에 타서': '用冷水或温水冲调后', '따뜻한 물이나 찬물에 타서': '用温水或冷水冲调后',
+};
+/* 문장 앞에 오는 섭취 시점 표현. 섭취 표기 앞에서 떼어낸다. */
+const PRE_MANNER = {
+  '식사와 관계없이': '不受用餐影响', '식사와 관계 없이': '不受用餐影响', '식사에 관계없이': '不受用餐影响',
+  '식사 여부와 관계없이': '不受用餐影响', '식전, 식후 관계없이': '不受餐前餐后影响',
+  '식전, 식후 관계 없이': '不受餐前餐后影响', '식사 전, 후 관계없이': '不受餐前餐后影响',
+  '식사 전, 후 관계 없이': '不受餐前餐后影响', '식전·식후 관계없이': '不受餐前餐后影响',
+  '식전 또는 식후에': '餐前或餐后', '식후에': '餐后', '식전에': '餐前', '공복에': '空腹时',
 };
 /* 긴 표현이 짧은 표현을 포함하므로 항상 긴 쪽을 먼저 맞춘다. */
 const MANNER_KEYS = Object.keys(MANNER).sort((a, b) => b.length - a.length);
 
 /** `1일 1회, 1회 1캡슐을 물과 함께 섭취하십시오.` — 섭취 표기와 방식을 분리해 옮긴다. */
 function intake(t) {
-  const m = /^(.+?)\s*(?:섭취|복용)(?:하십시오|하세요|합니다|하시기\s*바랍니다|해\s*주십시오|하여\s*주십시오|할\s*것|하여야\s*함|한다)?\s*([.]?)$/.exec(t);
+  const VERB = '(?:(?:섭취|복용|음용|투여)\\s*(?:하십시오|하십시요|하십오|하세요|하시오|합니다|하시기\\s*바랍니다|하여\\s*주시기\\s*바랍니다|해\\s*주십시오|하여\\s*주십시오|할\\s*것|하도록\\s*하십시오|하여야\\s*함|한다)?|드십시오|드십시요|드시기\\s*바랍니다|드세요|드시오|먹습니다)';
+  /* 띄어쓰기·오타 변형은 표기만 다르고 뜻이 같다. 수치·단위는 건드리지 않는다. */
+  const t1 = t.replace(/합께/g, '함께').replace(/물과함께/g, '물과 함께').replace(/1회시/g, '1회').replace(/\s+/g, ' ');
+  const m = new RegExp(`^(.+?)\\s*${VERB}\\s*([.]?)$`).exec(t1);
   if (!m) return null;
   let body = m[1].trim();
-  let manner = '';
-  for (const k of MANNER_KEYS) {
-    if (body.endsWith(k)) { manner = MANNER[k]; body = body.slice(0, -k.length).trim(); break; }
+  /* `100~200ml 물에 타서` `물 150~200ml에 녹여` — 물 양이 들어간 섭취 방식. 수치는 원문 그대로 둔다. */
+  const waterManner = [];
+  let wm;
+  if ((wm = /\s*([\d][\d~\-–.,\s]*(?:ml|mL|㎖|L|리터))\s*(?:의\s*)?(?:물|온수|냉수)에\s*(타서|녹여|녹여서|풀어서|풀어)$/.exec(body))
+    || (wm = /\s*(?:물|온수|냉수)\s*([\d][\d~\-–.,\s]*(?:ml|mL|㎖|L|리터))\s*에\s*(타서|녹여|녹여서|풀어서|풀어)$/.exec(body))) {
+    const amt = wm[1].replace(/\s+/g, '');
+    waterManner.push(/타서|풀어/.test(wm[2]) ? `用${amt}水冲调后` : `在${amt}水中溶解后`);
+    body = body.slice(0, wm.index).replace(/(?:을|를|씩|씩을)$/, '').trim();
   }
-  body = body.replace(/(?:을|를|씩)$/, '').trim();
+  /* 섭취 방식이 여러 개 겹친다(`씹어서 충분한 물과 함께`). 뒤에서부터 차례로 떼어낸다. */
+  const manners = [...waterManner];
+  for (let i = 0; i < 3; i++) {
+    const k = MANNER_KEYS.find((x) => body.endsWith(x));
+    if (!k) break;
+    manners.unshift(MANNER[k]);
+    body = body.slice(0, -k.length).replace(/(?:을|를|씩|씩을)$/, '').trim();
+  }
+  let pre = '';
+  /* 시점 표현은 문장 앞뒤 어느 쪽에도 온다(`식사와 관계없이 1일 …` / `… 2캡슐 식전, 식후 관계 없이`). */
+  for (const k of Object.keys(PRE_MANNER).sort((a, b) => b.length - a.length)) {
+    if (body.startsWith(k)) { pre = PRE_MANNER[k]; body = body.slice(k.length).trim(); break; }
+    if (body.endsWith(k)) { pre = PRE_MANNER[k]; body = body.slice(0, -k.length).replace(/(?:을|를|씩|씩을)$/, '').trim(); break; }
+  }
+  body = body.replace(/(?:을|를|씩|씩을)$/, '').trim();
   if (!body) return null;
   const dose = doseChain(body) ?? dosage(body) ?? resolveAtom(body, 3);
   if (!dose) return null;
-  return `${dose}${manner ? `，${manner}` : ''}摄取${m[2] ? '。' : ''}`;
+  return `${pre ? `${pre}，` : ''}${dose}${manners.length ? `，${manners.join('')}` : ''}摄取${m[2] ? '。' : ''}`;
 }
 
 const SPACED = /\s+[·・*•․∙]\s+/;
@@ -425,20 +489,43 @@ function fragmentCompose(t, depth) {
 
 /* `성상` 서술 — 관능 표현·색·제형은 표기 변형이 많다. 표기를 정규화한 뒤 고정 대응으로 옮긴다. */
 const sensoryNorm = (t) => t.replace(/\s+/g, ' ')
-  .replace(/이미\s*[,，、·･]?\s*이취/g, '이미·이취')
-  .replace(/([있없]고)\s*,/g, '$1')
+  /* `이미, 이취` `이미∙이취` `이미.이취` `이미와 이취` 등 구분 표기가 제각각이다. */
+  .replace(/이미\s*(?:[,，、·･∙⸱‧․・ㆍ･･.]|와|과)?\s*이취/g, '이미·이취')
+  .replace(/이취\s+([가없])/g, '이취$1')
+  .replace(/고유의향미/g, '고유의 향미')
+  .replace(/([가-힣])이미·이취/g, '$1 이미·이취')
+  .replace(/이취가없/g, '이취가 없')
+  .replace(/이미·이취\s*[,，、·･∙⸱]\s*이물/g, '이미·이취·이물')
+  .replace(/(있고|없고|있으며|없으며)\s*,/g, '$1')
+  .replace(/색택\s*[,，]\s*향미/g, '색택과 향미')
+  .replace(/없어야\s*(한다|함|합니다)/g, '없어야 $1')
   .trim();
 /* [정규화된 패턴, 중국어, 뒤에 제형이 이어지지 않는 종결형인지] */
 const SENSORY = [
-  [/^고유의 (?:향미가 (?:있고|있으며)|향미를 (?:지니고|가지고|가지며|지니며|가지고 있고)) 이미·이취가 없는 ?(.*)$/, '具有固有风味且无异味、无异臭的'],
+  [/^고유의 (?:향미가 (?:있고|있으며)|향미를 (?:지니고|가지고|가지며|지니며|가지고 있고|가지고 있으며|가지고 있는|가진)) 이미·이취가 (?:없는|없으며|없고) ?(.*)$/, '具有固有风味且无异味、无异臭的'],
+  [/^고유의 색택과 향미를 (?:가지고 있으며|가지고 있는|가지고 있고|가진) 이미·이취가 (?:없는|없으며|없고) ?(.*)$/, '具有固有色泽与风味且无异味、无异臭的'],
+  [/^고유의 색택과 향미를 (?:가진|가지는|가지고 있는)\s*(.+)$/, '具有固有色泽与风味的'],
+  [/^고유의 색택과 향미가 (?:있고|있으며) 이미·이취가 (?:없는|없으며|없고) ?(.*)$/, '具有固有色泽与风味且无异味、无异臭的'],
+  [/^이미·이취·이물이 (?:없어야 (?:한다|함|합니다)|없다|없음)[.]? ?(.*)$/, '应无异味、无异臭、无异物。'],
+  [/^이미·이취·이물이 (?:없는|없고|없으며) ?(.+)$/, '无异味、无异臭、无异物的'],
+  [/^이취가 (?:없는|없고|없으며) ?(.+)$/, '无异臭的'],
+  [/^고유의 향미가 (?:있고|있으며|있다|있음)[.]?()$/, '具有固有风味。'],
   [/^이미·이취가 (?:없고|없으며),? ?고유의 (?:향미가 있는|향미를 (?:가진|지닌|가지고 있는|지니고 있는)) ?(.*)$/, '无异味、无异臭并具有固有风味的'],
   [/^고유의 향미를 (?:가지며|지니며) 이미·이취가 없는 ?(.*)$/, '具有固有风味且无异味、无异臭的'],
   [/^고유의 색택과 향미를 (?:가지며|가지고|지니며|지니고) 이미·이취가 (?:없어야 (?:한다|함|합니다)|없다|없음)[.]? ?(.*)$/, '应具有固有的色泽与风味，且无异味、无异臭。'],
   [/^고유의 색택과 향미를 (?:가지며|가지고) 이미·이취가 없는 ?(.*)$/, '具有固有色泽与风味且无异味、无异臭的'],
   [/^이미·이취가 (?:없어야 (?:한다|함|합니다)|없다|없음)[.]? ?(.*)$/, '应无异味、无异臭。'],
+  /* 향미 언급이 없는 짧은 어순(`이미·이취가 없는 흑갈색의 액상`)은 마지막에 본다. */
+  [/^이미·이취가 (?:없는|없으며|없고) ?(.+)$/, '无异味、无异臭的'],
 ];
 function appearance(t0, depth) {
   const t = sensoryNorm(t0);
+  /* `1) 성상 :` `① 성상 :` `(1) 성상:` 같은 항목 라벨. 라벨만 떼어 옮기고 본문은 규칙에 다시 태운다. */
+  let lm = /^(?:\(?\s*(?:\d+|[①-⑳⑴-⑽])\s*\)?\s*[.．)]?\s*)?성상\s*(?:정제\s*\d+\s*)?[:：;]\s*(.+)$/.exec(t);
+  if (lm) {
+    const a = resolveAtom(lm[1].trim(), depth + 1);
+    if (a) return `性状：${a}`;
+  }
   for (const [re, head] of SENSORY) {
     const m = re.exec(t);
     if (!m) continue;
@@ -447,8 +534,41 @@ function appearance(t0, depth) {
     const a = resolveAtom(rest, depth + 1);
     if (a) return head.endsWith('。') ? head + a : head + a;
   }
-  /* `갈색의 분말로 이미·이취가 없음` — 성상이 뒤에 붙는 어순. */
   let sm;
+  /* `암갈색의 액상으로 고유의 색택과 향미를 가지며 이미·이취가 없어야 한다` — 제형이 앞에 오는 어순. */
+  if ((sm = /^(.+?)\s*으?로 고유의 색택과 향미를 (?:가지며|가지고|지니며|지니고),? 이미·이취가 (?:없어야 (?:한다|함|합니다)|없다|없음)[.]?$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    if (a) return `${a}，应具有固有的色泽与风味，且无异味、无异臭。`;
+  }
+  /* `점박이가 있는` `점성을 가진` `분말이 현탁된` 같은 성상 수식. */
+  if ((sm = /^(?:불규칙한\s*)?(?:점박이|반점)(?:가|를|이)\s*(?:있는|있으며|포함한|함유한|포함된)\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    if (a) return `带有斑点的${a}`;
+  }
+  if ((sm = /^(?:점성|점조성|점도)를?을?\s*(?:가진|가지는|갖는|있는)\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    if (a) return `具有黏性的${a}`;
+  }
+  if ((sm = /^점도가\s*묽은\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    if (a) return `黏度稀薄的${a}`;
+  }
+  if ((sm = /^분말이\s*현탁된\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    if (a) return `悬浮有粉末的${a}`;
+  }
+  if ((sm = /^([A-Za-z]+)\s*모양의\s*(.+)$/.exec(t))) {
+    const shape = { oval: '椭圆形', round: '圆形', capsule: '胶囊形' }[sm[1].toLowerCase()];
+    const a = resolveAtom(sm[2].trim(), depth + 1);
+    if (shape && a) return `${shape}${a}`;
+  }
+  /* `A 또는 B` — 두 성상 표기의 병기. 순서를 유지한다. */
+  if ((sm = /^(.+?)\s*(?:또는|혹은)\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1);
+    const b = resolveAtom(sm[2].trim(), depth + 1);
+    if (a && b) return `${a}或${b}`;
+  }
+  /* `갈색의 분말로 이미·이취가 없음` — 성상이 뒤에 붙는 어순. */
   if ((sm = /^(.+?)\s*으?로 이미·이취가 (?:없음|없다|없어야 한다|없어야 함)[.]?$/.exec(t))) {
     const a = resolveAtom(sm[1].trim(), depth + 1);
     if (a) return `${a}，无异味、无异臭。`;
@@ -460,17 +580,73 @@ function appearance(t0, depth) {
     const pre = sm[1].trim() ? resolveAtom(sm[1].trim(), depth + 1) : '';
     if (tone && rest && pre !== null) return `${pre}带${tone}色调的${rest}`;
   }
-  /* `연한노랑색의 분말` / `내용물을 함유한 빨간색의 타원형 연질캡슐` — 앞부분·색·제형. */
-  const c = /^(.*?)\s*([가-힣 ]+?)색의?\s*(.+)$/.exec(t);
-  if (c) {
-    const col = colorCompose(c[2]);
-    const form = resolveAtom(c[3].trim(), depth + 1);
-    const pre = c[1].trim() ? resolveAtom(c[1].trim(), depth + 1) : '';
+  /* `X을 함유한 Y` — 내용물·분말·알갱이 등 내포 서술. 앞 수식(색·성상)과 뒤 제형을 따로 옮긴다. */
+  if ((sm = /^(.*?)\s*(내용물|분말|과립|알갱이|입자|액상|알맹이|결정|고체상|점박이|반점|광택|오일|유상액)(?:을|를|이|가)?\s*(?:내용물로\s*)?(?:함유한|함유하는|함유하고 있는|함유하고있는|포함한|포함하는|가진|든|들어있는|들어 있는|포함된|함유된|현탁된|보이는|느껴지는|있는)\s+(.+)$/.exec(t))) {
+    const NOUN = { 내용물: '内容物', 분말: '粉末', 과립: '颗粒', 알갱이: '颗粒', 입자: '颗粒', 액상: '液状内容物', 알맹이: '颗粒', 결정: '结晶', 고체상: '固体状', 점박이: '斑点', 반점: '斑点', 광택: '光泽', 오일: '油', 유상액: '油状液' };
+    const pre = sm[1].trim() ? resolveAtom(sm[1].trim(), depth + 1) : '';
+    const tail = resolveAtom(sm[3].trim(), depth + 1);
+    if (pre !== null && tail) return `含有${pre}${NOUN[sm[2]]}的${tail}`;
+  }
+  /* `연한노랑색의 분말` / `내용물을 함유한 빨간색의 타원형 연질캡슐` — 앞부분·색·제형.
+     `색`이 여러 번 나오므로 가능한 분해 지점을 모두 시도한다(한 번만 시도하면 앞쪽 오검출로 실패한다). */
+  for (let idx = t.indexOf('색'); idx >= 0; idx = t.indexOf('색', idx + 1)) {
+    const head = t.slice(0, idx);
+    const tail = t.slice(idx + 1).replace(/^의/, '').trim();
+    if (!tail || !head) continue;
+    for (let j = 0; j < head.length; j++) {
+      const colSeg = head.slice(j).trim();
+      if (!colSeg || !/[가-힣]/.test(colSeg[0] ?? '')) continue;
+      const col = colorCompose(colSeg);
+      if (!col) continue;
+      const preSeg = head.slice(0, j).trim();
+      const pre = preSeg ? resolveAtom(preSeg, depth + 1) : '';
+      const form = resolveAtom(tail, depth + 1);
+      if (pre !== null && form) return `${pre}${col}色${form}`;
+      break;
+    }
+  }
+  /* `붉은 주황의 내용물` — `색` 없이 색 표기만 오는 어순. */
+  if ((sm = /^(.*?)\s*([가-힣 ]+)의\s+(.+)$/.exec(t))) {
+    const col = colorCompose(sm[2]);
+    const form = col ? resolveAtom(sm[3].trim(), depth + 1) : null;
+    const pre = sm[1].trim() ? resolveAtom(sm[1].trim(), depth + 1) : '';
     if (col && form && pre !== null) return `${pre}${col}色${form}`;
   }
   /* 색 표기만 있는 조각(`흑갈색`). */
-  if ((sm = /^([가-힣 ]+?)색$/.exec(t))) { const col = colorCompose(sm[1]); if (col) return `${col}色`; }
-  return formCompose(t);
+  if ((sm = /^([가-힣 ()（）]+?)색$/.exec(t))) { const col = colorCompose(sm[1]); if (col) return `${col}色`; }
+  /* `흰노랑` 처럼 `색` 없이 색 표기만 오는 조각. 색 어근으로 끝날 때만 색으로 본다. */
+  if (/(노랑|노란|황|백|하양|흰|갈|흑|검정|적|빨강|빨간|붉은|녹|초록|연두|청|파랑|자|보라|회|분홍|주황|투명)$/.test(t)) {
+    const col = colorCompose(t);
+    if (col) return `${col}色`;
+  }
+  /* `상부 초록색, 하부 갈색의 이중제피정제` — 부위별 색 표기. */
+  if ((sm = /^상부\s*(.+?)\s*[,，]\s*하부\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1), b = resolveAtom(sm[2].trim(), depth + 1);
+    if (a && b) return `上部${a}、下部${b}`;
+  }
+  /* `흑갈색에 점도가 있는 액상` — 색 뒤에 성상이 이어지는 어순. */
+  if ((sm = /^(.+?)에\s*(?:점도|점성|점조성)가?이?\s*있는\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1), b = resolveAtom(sm[2].trim(), depth + 1);
+    if (a && b) return `${a}且具有黏性的${b}`;
+  }
+  /* `흰노랑색 바탕에 점박이가 있는 …` — 바탕색 서술. */
+  if ((sm = /^(.+?)\s*바탕에\s*(.+)$/.exec(t))) {
+    const a = resolveAtom(sm[1].trim(), depth + 1), b = resolveAtom(sm[2].trim(), depth + 1);
+    if (a && b) return `以${a}为底色的${b}`;
+  }
+  /* 끝에 붙은 군더더기 기호(`… 원형 정제 -`)는 의미가 없다. */
+  if (/[\s\-–—]$/.test(t)) {
+    const a = resolveAtom(t.replace(/[\s\-–—]+$/, ''), depth + 1);
+    if (a) return a;
+  }
+  const fc = formCompose(t);
+  if (fc) return fc;
+  /* 마침표로 끝나는 성상 조각(`… 코팅정제.`). */
+  if (/[.]$/.test(t)) {
+    const a = resolveAtom(t.replace(/[.]+$/, ''), depth + 1);
+    if (a) return `${a}。`;
+  }
+  return null;
 }
 
 /* 색 표기는 수식어 + 색 어근의 조합이다. 사전 나열 대신 형태소 단위로 옮긴다. */
@@ -482,11 +658,23 @@ const CTOK_RAW = {
   갈: '褐', 갈색: '褐', 밤: '棕', 흑: '黑', 검은: '黑', 검정: '黑', 회: '灰', 재: '灰',
   녹: '绿', 초록: '绿', 연두: '黄绿', 보라: '紫', 자: '紫', 주황: '橙', 오렌지: '橙',
   청: '青', 파란: '蓝', 파랑: '蓝', 크림: '奶油', 베이지: '米', 상아: '象牙', 우유: '乳',
+  선명한: '鲜', 짙: '深', 무: '无', 초콜렛: '巧克力', 초콜릿: '巧克力', 카라멜: '焦糖',
+  자줏빛: '紫', 분홍빛: '粉红', 노랑빛: '黄', 미황: '微黄', 담황: '淡黄', 유황: '乳黄',
+  살구: '杏', 커피: '咖啡', 겨자: '芥末', 미색: '米',
+  투명: '透明', 반투: '半透明', 불투명: '不透明', 진: '深', 연: '浅', 흙: '土',
+  초코렛: '巧克力', 초코릿: '巧克力', 명: '亮', 은: '银', 남: '蓝', 탁: '浑浊', 록: '绿', 청록: '青绿',
 };
 const CTOK_KEYS = Object.keys(CTOK_RAW).sort((a, b) => b.length - a.length);
 function colorCompose(t) {
   const s = String(t ?? '').replace(/\s+/g, '');
   if (!s || !/[가-힣]/.test(s)) return null;
+  /* `암(흑)갈` 처럼 괄호로 대체 표기를 병기한다. 괄호 안팎을 따로 옮기고 병기를 유지한다. */
+  const pm = /^([가-힣]*)[(（]([가-힣]+)[)）]([가-힣]*)$/.exec(s);
+  if (pm) {
+    const [a, b, c] = [pm[1] ? colorCompose(pm[1]) : '', colorCompose(pm[2]), pm[3] ? colorCompose(pm[3]) : ''];
+    if (a !== null && b && c !== null) return `${a}（${b}）${c}`;
+    return null;
+  }
   let i = 0, out = '';
   outer: while (i < s.length) {
     for (const k of CTOK_KEYS) if (s.startsWith(k, i)) { out += CTOK_RAW[k]; i += k.length; continue outer; }
@@ -510,6 +698,22 @@ const FORM_RAW = {
   입자성이있는: '有颗粒感的', 점조성이있는: '黏稠的', 점조성: '黏稠', 유동성: '流动性',
   내용물을포함한: '含内容物的', 분말을포함한: '含粉末的', 액상제품: '液状产品', 제품: '产品',
   불투명한: '不透明', 반투명한: '半透明', 이중정제: '双层片剂', 츄어블정제: '咀嚼片剂',
+  연질캡슐제: '软胶囊剂', 경질캡슐제: '硬胶囊剂', 연질캅셀제: '软胶囊剂', 경질캅셀제: '硬胶囊剂',
+  경질캡: '硬胶囊', 연질캡: '软胶囊', 하드캡슐: '硬胶囊', 소프트캡슐: '软胶囊',
+  장용성: '肠溶', 장용: '肠溶', 원형정제: '圆形片剂', 장방형정제: '长方形片剂', 타원형정제: '椭圆形片剂',
+  직사각형: '长方形', 물고기모양: '鱼形', 하트모양: '心形', 별모양: '星形', 튜브형: '管形',
+  농축액: '浓缩液', 농축액상: '浓缩液状', 과립상: '颗粒状', 분말상: '粉末状', 유상: '油状',
+  묽은: '稀薄的', 걸쭉한: '黏稠的', 현탁액: '悬浊液', 페이스트: '膏状', 겔상: '凝胶状', 겔: '凝胶',
+  분말이든: '含粉末的', 과립이든: '含颗粒的', 액상이든: '含液状内容物的', 내용물을담은: '含内容物的',
+  구미: '软糖', 구미젤리: '软糖', 츄어블연질캡슐: '咀嚼软胶囊', 스틱: '棒包', 포: '包',
+  과립제: '颗粒剂', 산제: '散剂', 정제제: '片剂', 식물성: '植物性', 입자성의: '有颗粒感的',
+  이중코팅정제: '双层包衣片剂', 투명제피정제: '透明包衣片剂', 제피과립: '包衣颗粒',
+  코팅된: '包衣的', 장용성코팅된: '肠溶包衣的', 코팅정제: '包衣片剂', 반구형: '半球形', 정방형: '正方形',
+  투명제피: '透明包衣', 츄어블정: '咀嚼片剂', 정제제품: '片剂产品', 액상제: '液剂',
+  장원형: '长椭圆形', 고체상: '固体状', 무광택의: '无光泽的', 무광택: '无光泽', 여러가지: '各种',
+  다양한형태의: '各种形态的', 동물모양: '动物形', 이중제피정제: '双层包衣片剂', 제품임: '产品', 농축액제품: '浓缩液产品',
+  /* `타원형의 연질캡슐` 처럼 조사가 끼는 표기. 의미가 없으므로 자리만 흡수한다. */
+  의: '', 인: '', 임: '', 으로된: '', 로된: '',
 };
 const FORM = {};
 for (const [k, v] of Object.entries(FORM_RAW)) FORM[k] = v;
@@ -580,6 +784,19 @@ function resolveAtomRaw(t0, depth) {
   const dc = doseChain(t0); if (dc) return dc;
   const ik = intake(t0); if (ik) return ik;
   const hc = headingCompose(t0, depth); if (hc) return hc;
+  /* `… 보관하십시오. 2) 어린이의 손이 …` — 한 슬롯에 여러 문장이 들어온다.
+     문장 단위로 나눠 옮기고 항목 번호 표기는 원문 그대로 둔다(소수점은 자르지 않는다). */
+  if (/[.]\s+\S/.test(t0)) {
+    const parts = t0.split(/(?<=[^0-9][.])\s+/).map((s) => s.trim()).filter(Boolean);
+    if (parts.length > 1 && parts.length <= 8) {
+      const zs = parts.map((pp) => {
+        const mm = /^(\(\d+\)|\d+\)|[①-⑳⑴-⑽]|\d+[.])\s*(.+)$/.exec(pp);
+        const r = resolveAtom(mm ? mm[2].trim() : pp, depth + 1);
+        return r === null ? null : (mm ? `${mm[1]} ${r}` : r);
+      });
+      if (zs.every(Boolean)) return zs.join(' ');
+    }
+  }
   /* 푸터·각주는 ` · ` / ` * ` (공백 포함) 로 조각이 이어진다.
      조각 안의 `예방·치료` 같이 붙어 있는 가운뎃점과 구분한다. */
   if (SPACED.test(t0)) {

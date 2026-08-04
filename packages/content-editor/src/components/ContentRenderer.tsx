@@ -209,9 +209,13 @@ const storeDescriptionCss = `
 .store-desc-content .sd-intro b{color:var(--sd-blue);font-weight:700}
 .store-desc-content .sd-body h2{font-size:18px;letter-spacing:-.005em;color:var(--sd-navy);font-weight:800;text-align:center;margin:34px 0 16px}
 .store-desc-content .sd-body h2::after{content:"";display:block;width:26px;height:3px;border-radius:3px;background:var(--sd-blue);margin:10px auto 0}
-.store-desc-content .sd-why,.store-desc-content .sd-who{list-style:none;margin:0;padding:0}
-.store-desc-content .sd-why li,.store-desc-content .sd-who li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-line);line-height:1.5}
-.store-desc-content .sd-why li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-blue)}
+/* sd-fn — h2 아래 공식 인정 기능성을 원료 그룹 없이 평면으로 나열하는 목록(ko 268 · en 271 사용 중).
+   sd-why 와 마크업·역할이 같은데 정의만 없어 브라우저 기본 disc 불릿으로 렌더됐다.
+   새 디자인을 만들지 않고 기존 sd-why family 에 편입만 한다(다른 family 동작 불변). */
+.store-desc-content .sd-why,.store-desc-content .sd-who,.store-desc-content .sd-fn{list-style:none;margin:0;padding:0}
+.store-desc-content .sd-why li,.store-desc-content .sd-who li,.store-desc-content .sd-fn li{position:relative;padding:11px 0 11px 22px;font-size:15.5px;color:var(--sd-ink);border-bottom:1px solid var(--sd-line);line-height:1.5}
+.store-desc-content .sd-why li::before,.store-desc-content .sd-fn li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-blue)}
+.store-desc-content .sd-fn li:last-child{border-bottom:0}
 .store-desc-content .sd-who li::before{content:"";position:absolute;left:2px;top:18px;width:7px;height:7px;border-radius:50%;background:var(--sd-gold)}
 /* sd-func — 원료별 공식 인정 기능성 목록의 **상위 컨테이너**(원료 그룹 단위).
    저장 콘텐츠 17,432건(ko 8,716 + en 8,716)이 이미 사용 중인 class 로, 구조는 전량
@@ -258,8 +262,8 @@ const storeDescriptionCss = `
   .store-desc-content .sd-intro{font-size:17px;line-height:1.8;max-width:68ch;margin-left:auto;margin-right:auto;text-align:center}
   .store-desc-content .sd-body h2{font-size:21px;margin:44px 0 20px}
   .store-desc-content .sd-core{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-  .store-desc-content .sd-why,.store-desc-content .sd-who{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
-  .store-desc-content .sd-why li,.store-desc-content .sd-who li{font-size:16.5px}
+  .store-desc-content .sd-why,.store-desc-content .sd-who,.store-desc-content .sd-fn{display:grid;grid-template-columns:1fr 1fr;column-gap:28px}
+  .store-desc-content .sd-why li,.store-desc-content .sd-who li,.store-desc-content .sd-fn li{font-size:16.5px}
   /* sd-warn 은 다단으로 쪼개지 않는다 — 금기가 두 열로 나뉘면 오독 위험. 행 길이만 제한. */
   .store-desc-content .sd-warn{padding:16px 20px;max-width:74ch;margin-left:auto;margin-right:auto}
   .store-desc-content .sd-warn li{font-size:16.5px}
