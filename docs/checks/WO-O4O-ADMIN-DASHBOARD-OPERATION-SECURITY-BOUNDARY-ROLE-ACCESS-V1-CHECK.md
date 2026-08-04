@@ -333,7 +333,16 @@ read-only 로 다음을 센다.
 
 ## 18. 커밋 · push
 
-§19 참조(문서 하단, 실제 커밋 후 기재).
+- 커밋 `13d30fef3` — `audit(admin): 관리자 대시보드 운영 주체·보안 경계 확정 (…-V1)`
+- 포함 파일 4개 (정확한 pathspec 지정 커밋, `git add .` 미사용):
+  `apps/admin-dashboard/src/pages/membership/audit-logs/AuditLogManagement.tsx` ·
+  `apps/admin-dashboard/src/routes/yaksa.routes.tsx` ·
+  `apps/admin-dashboard/src/tests/admin-operation-boundary.test.ts` ·
+  `docs/checks/WO-O4O-ADMIN-DASHBOARD-OPERATION-SECURITY-BOUNDARY-ROLE-ACCESS-V1-CHECK.md`
+- push 완료 `c9150cb59..13d30fef3 main -> main`. push 후 **ahead 0 / behind 0**, 작업 트리 clean.
+- 선행 커밋 `26f04de6e`(5번) · `456242de7`(6번) 이 HEAD 조상에 포함됨을 확인.
+- 타 세션이 같은 기간에 `7ecc1e1a8`(easy-drug) 등을 main 에 올렸으나, 본 세션은 해당 파일을 열람·수정·stage·commit 하지 않았다.
+- 이 §18 항목만 커밋 후 후속 커밋으로 기재했다(공유 main 의 push 된 커밋은 amend 하지 않는다).
 
 ---
 
