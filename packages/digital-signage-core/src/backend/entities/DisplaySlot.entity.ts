@@ -8,7 +8,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Display } from './Display.entity.js';
+import type { Display } from './Display.entity.js';
 
 /**
  * DisplaySlot Entity
@@ -55,7 +55,7 @@ export class DisplaySlot {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => Display, (display) => display.slots)
+  @ManyToOne('Display', 'slots')
   @JoinColumn({ name: 'displayId' })
   display!: Display;
 }

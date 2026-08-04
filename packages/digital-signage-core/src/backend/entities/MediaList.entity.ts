@@ -7,7 +7,7 @@ import {
   Index,
   OneToMany,
 } from 'typeorm';
-import { MediaListItem } from './MediaListItem.entity.js';
+import type { MediaListItem } from './MediaListItem.entity.js';
 
 /**
  * MediaList Entity
@@ -48,6 +48,6 @@ export class MediaList {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @OneToMany(() => MediaListItem, (item) => item.mediaList)
+  @OneToMany('MediaListItem', 'mediaList')
   items!: MediaListItem[];
 }

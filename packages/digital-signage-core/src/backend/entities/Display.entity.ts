@@ -7,7 +7,7 @@ import {
   Index,
   OneToMany,
 } from 'typeorm';
-import { DisplaySlot } from './DisplaySlot.entity.js';
+import type { DisplaySlot } from './DisplaySlot.entity.js';
 
 /**
  * Display Entity
@@ -57,6 +57,6 @@ export class Display {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @OneToMany(() => DisplaySlot, (slot) => slot.display)
+  @OneToMany('DisplaySlot', 'display')
   slots!: DisplaySlot[];
 }

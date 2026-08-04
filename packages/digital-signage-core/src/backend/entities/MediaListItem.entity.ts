@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { MediaList } from './MediaList.entity.js';
-import { MediaSource } from './MediaSource.entity.js';
+import type { MediaList } from './MediaList.entity.js';
+import type { MediaSource } from './MediaSource.entity.js';
 
 /**
  * MediaListItem Entity
@@ -48,11 +48,11 @@ export class MediaListItem {
   @UpdateDateColumn()
   updatedAt!: Date;
 
-  @ManyToOne(() => MediaList, (list) => list.items)
+  @ManyToOne('MediaList', 'items')
   @JoinColumn({ name: 'mediaListId' })
   mediaList!: MediaList;
 
-  @ManyToOne(() => MediaSource)
+  @ManyToOne('MediaSource')
   @JoinColumn({ name: 'mediaSourceId' })
   mediaSource!: MediaSource;
 }
