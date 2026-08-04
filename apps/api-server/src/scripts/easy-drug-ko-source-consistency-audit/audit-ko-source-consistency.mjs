@@ -370,9 +370,13 @@ function auditRecord(rec, attributionVerdict) {
   // 경로는 **용법 문맥에서만** 판정한다. 주의사항까지 포함하면 관장약·외용제의
   // "복용하지 마십시오" 같은 경고 문장이 oral 로 잡혀 전량 오탐이 된다.
   const offRoutes = routeSet(offSectionText.usage || offAllText);
+  // 창 종료 토큰에 안전 절 제목을 전부 넣는다. `사용상 주의사항` 절이 없는 제품에서는
+  // 창이 닫히지 않아 이상반응 문장("…항문주위 통증")이 경로 판정에 섞여 들어간다
+  // (WO-...-KO-CRITICAL-CONTENT-CORRECTION-V1 게이트에서 itemSeq 202501826 로 실측).
   const canUsageText =
-    (plain.match(/(?:복용|사용|투여|점안|점적)\s*안내([\s\S]*?)(?=주의\s*대상|주의사항|안전정보|$)/) ||
-      [])[1] || plain;
+    (plain.match(
+      /(?:복용|사용|투여|점안|점적)\s*안내([\s\S]*?)(?=주의\s*대상|주의사항|안전정보|경고|이상반응|상호작용|$)/,
+    ) || [])[1] || plain;
   const canRoutes = routeSet(canUsageText);
   const routeMissing = offRoutes.filter((r) => !canRoutes.includes(r));
   const routeExtra = canRoutes.filter((r) => !offRoutes.includes(r));

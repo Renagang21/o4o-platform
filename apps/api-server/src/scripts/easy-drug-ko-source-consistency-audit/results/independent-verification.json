@@ -8,15 +8,15 @@
     "masters": 19431
   },
   "confirmedTranslationPopulation": {
-    "units": 1844,
-    "permitsAllApproved": 1478,
-    "permitsAnyApproved": 1581,
-    "masters": 7085
+    "units": 1845,
+    "permitsAllApproved": 1479,
+    "permitsAnyApproved": 1582,
+    "masters": 7088
   },
   "notes": [
-    "V3 승인 1844건 독립 재검 → 위험 결함 0건",
-    "V4 배제 3354건 → 독립 근거 확인 2201 / 부분반영(보수적 배제) 736 / 검증범위 밖 축만 408 / 근거 없음 9",
-    "V5 허가품목 승인: 전 본문 승인 1478 / 일부 본문 승인 1581 (차 103 = 포장군 내 본문 불일치)"
+    "V3 승인 1845건 독립 재검 → 위험 결함 0건",
+    "V4 배제 3353건 → 독립 근거 확인 2201 / 부분반영(보수적 배제) 736 / 검증범위 밖 축만 407 / 근거 없음 9",
+    "V5 허가품목 승인: 전 본문 승인 1479 / 일부 본문 승인 1582 (차 103 = 포장군 내 본문 불일치)"
   ],
   "failures": [],
   "result": "PASS"

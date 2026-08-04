@@ -1,0 +1,64 @@
+{
+  "ruleVersion": "KO_SOURCE_CONSISTENCY_V1",
+  "units": 5203,
+  "permits": 4747,
+  "mastersCovered": 19388,
+  "byVerdict": {
+    "KO_DISPLAY_ONLY_DIFFERENCE": 2040,
+    "KO_MISSING_CONTENT": 2630,
+    "KO_STRUCTURE_REMAINING": 278,
+    "KO_SOURCE_UNRESOLVED": 10,
+    "KO_EXTRA_CONTENT": 245
+  },
+  "permitByVerdict": {
+    "KO_DISPLAY_ONLY_DIFFERENCE": 1648,
+    "KO_MISSING_CONTENT": 2585,
+    "KO_STRUCTURE_REMAINING": 270,
+    "KO_SOURCE_UNRESOLVED": 10,
+    "KO_EXTRA_CONTENT": 234
+  },
+  "masterByVerdict": {
+    "KO_DISPLAY_ONLY_DIFFERENCE": 7846,
+    "KO_MISSING_CONTENT": 9760,
+    "KO_STRUCTURE_REMAINING": 909,
+    "KO_SOURCE_UNRESOLVED": 32,
+    "KO_EXTRA_CONTENT": 841
+  },
+  "bySourceVerdict": {
+    "mfds_drug_otc::KO_DISPLAY_ONLY_DIFFERENCE": 1498,
+    "mfds_easy_drug::KO_DISPLAY_ONLY_DIFFERENCE": 52,
+    "mfds_drug_otc::KO_MISSING_CONTENT": 2145,
+    "mfds_drug_otc_nutrition_combo::KO_MISSING_CONTENT": 423,
+    "mfds_drug_otc::KO_STRUCTURE_REMAINING": 278,
+    "o4o_drug_otc_topical::KO_DISPLAY_ONLY_DIFFERENCE": 487,
+    "mfds_drug_otc::KO_SOURCE_UNRESOLVED": 1,
+    "mfds_drug_otc::KO_EXTRA_CONTENT": 245,
+    "o4o_drug_otc_topical::KO_MISSING_CONTENT": 62,
+    "mfds_easy_drug::KO_SOURCE_UNRESOLVED": 9,
+    "mfds_drug_otc_nutrition_combo::KO_DISPLAY_ONLY_DIFFERENCE": 3
+  },
+  "axisFindingCount": {
+    "sideEffect::MISSING": 2379,
+    "caution::MISSING": 1317,
+    "interaction::MISSING": 1317,
+    "efficacy::MISSING": 516,
+    "extraIndication::EXTRA": 406,
+    "age::MISSING": 398,
+    "interval::MISSING": 385,
+    "warning::MISSING": 299,
+    "prohibition::WEAKENED": 291,
+    "prohibition::MISSING": 253,
+    "usage::MISSING": 183,
+    "perDose::MISSING": 47,
+    "perDay::MISSING": 16,
+    "consult::MISSING": 12,
+    "route::MISSING": 9,
+    "route::CONTRADICT": 1
+  },
+  "confirmedTranslationPopulation": {
+    "units": 2040,
+    "masters": 7846,
+    "permits": 1648
+  },
+  "storageOnlyInOfficial": 5107
+}

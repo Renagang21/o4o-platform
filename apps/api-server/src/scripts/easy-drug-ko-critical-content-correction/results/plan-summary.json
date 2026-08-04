@@ -1,0 +1,43 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-CRITICAL-CONTENT-CORRECTION-V1",
+  "auditWo": "WO-O4O-EASY-DRUG-KO-SOURCE-CONSISTENCY-AUDIT-V1",
+  "auditCommit": "2deeb8e73",
+  "mode": "READ-ONLY plan",
+  "liveDbWrite": 0,
+  "ledger": {
+    "units": 192,
+    "mastersExpected": 808
+  },
+  "live": {
+    "unitsStillCanonical": 192,
+    "staleUnits": 0,
+    "staleDetail": [],
+    "masters": 808
+  },
+  "plan": {
+    "total": 808,
+    "replace": 765,
+    "hold": 43
+  },
+  "byVerdict": {
+    "KO_CONTRADICTED": {
+      "replace": 562,
+      "hold": 43
+    },
+    "KO_WRONG_ATTRIBUTION": {
+      "replace": 203,
+      "hold": 0
+    }
+  },
+  "byHoldCode": {
+    "ROUTE_CONFLICT": 24,
+    "PROFESSIONAL_USE": 14,
+    "ROUTE_UNRESOLVED": 5
+  },
+  "byRouteReplace": {
+    "oral": 541,
+    "topical": 224
+  },
+  "distinctNewBodies": 197,
+  "systemStop": []
+}

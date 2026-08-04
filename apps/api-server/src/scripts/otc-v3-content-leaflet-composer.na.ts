@@ -23,6 +23,8 @@ import {
   missingNumerics,
   missingNumericsEn,
   ROUTE_PROFILE,
+  rewriteKoByRoute,
+  stripOralProhibitionSentences,
   type RouteProfile,
 } from './otc-v2-store-leaflet-runner.shared.js';
 
@@ -101,7 +103,8 @@ export function composeKoV3(
   if (!prof) {
     return { source: { summaryTable: {}, efficacy: '', usage: '', usageLabel: '', warning: '', precaution: '', adverse: '', interaction: '' }, anomalies: [`미지원 route(${route})`] };
   }
-  const rewrite = (s: string): string => { let t = s; for (const [re, to] of prof.koVerbRewrite) t = t.replace(re, to); return t; };
+  // 경구 금지 문장(외용 대조)은 재표현하지 않는다 — 상세는 rewriteKoByRoute 주석
+  const rewrite = (s: string): string => rewriteKoByRoute(s, prof.koVerbRewrite);
 
   const efficacy = toPlain(sec['효능·효과'] || '');
   const usage = rewrite(toPlain(sec['용법·용량'] || ''));
@@ -124,7 +127,9 @@ export function composeKoV3(
   for (const re of prof.koForbidden) {
     for (const [label, txt] of [['용법', usage], ['경고', warning], ['주의', precaution], ['이상반응', adverse], ['상호작용', interaction]] as const) {
       re.lastIndex = 0;
-      if (txt && re.test(txt)) anomalies.push(`비경구(${route}) ${label}에 경구 동사 잔존: ${re.source}`);
+      // 경구 금지 문장은 원문 보존이 정답이므로 잔존 판정에서 뺀다
+      const gated = txt ? stripOralProhibitionSentences(txt) : '';
+      if (gated && re.test(gated)) anomalies.push(`비경구(${route}) ${label}에 경구 동사 잔존: ${re.source}`);
     }
   }
 

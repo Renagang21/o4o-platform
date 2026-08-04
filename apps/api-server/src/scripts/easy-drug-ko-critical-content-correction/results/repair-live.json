@@ -1,0 +1,178 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-CRITICAL-CONTENT-CORRECTION-V1",
+  "phase": "repair-oral-prohibition",
+  "mode": "LIVE APPLY",
+  "scope": {
+    "replaceRows": 765,
+    "liveMastersMatched": 765
+  },
+  "needRepair": 23,
+  "unchanged": 742,
+  "byOutcome": {
+    "REPAIRED": 23
+  },
+  "failed": [],
+  "results": [
+    {
+      "masterId": "103dbc92-d860-4b06-8a6b-63d09f42ad09",
+      "itemSeq": "200600735",
+      "outcome": "REPAIRED",
+      "oldDescId": "f1231159-2b12-4796-8a43-2f807ac8cefe",
+      "newDescId": "c83e61dc-33f7-4e45-b607-8bd4916fb733"
+    },
+    {
+      "masterId": "19fc2ace-c69c-45ba-bfd8-0601e49da968",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "62747dd3-47ed-49fc-b149-5507479e901e",
+      "newDescId": "252f0c4f-efc2-4f10-b9e4-c1346b81e5cf"
+    },
+    {
+      "masterId": "24a4f772-14da-4f5b-8be9-d93755a41106",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "a8503664-bc74-433c-a35b-29c8aca07557",
+      "newDescId": "0468ea7b-f55b-4483-9265-f3fc4371a2f7"
+    },
+    {
+      "masterId": "280b406a-f817-4b94-acaa-fe65be62e8e3",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "7a9ff608-6eec-47d5-9482-09af10b67834",
+      "newDescId": "374d17b6-fbd5-44e1-ae1b-d129ded4af4d"
+    },
+    {
+      "masterId": "285956f8-fb98-42ac-ace6-0bc89c91b990",
+      "itemSeq": "200600735",
+      "outcome": "REPAIRED",
+      "oldDescId": "7f61692d-8574-4f4a-87c0-6aee3ad05c98",
+      "newDescId": "f116d131-9911-4217-bfa8-9dbbc4358968"
+    },
+    {
+      "masterId": "3c72fb89-ecac-40a9-819f-1300d947cb90",
+      "itemSeq": "200600735",
+      "outcome": "REPAIRED",
+      "oldDescId": "bfd8f50a-e7b5-4670-b600-5e6dd8a3480f",
+      "newDescId": "62c0b4ab-17d6-4881-ac0c-38267d85c5b9"
+    },
+    {
+      "masterId": "3f5d2105-2794-4340-8f49-70418938bbbc",
+      "itemSeq": "202006761",
+      "outcome": "REPAIRED",
+      "oldDescId": "8ce84114-5105-4097-aaad-127bcef0ee7b",
+      "newDescId": "260deb7e-ab29-4adf-826a-34eef8a94ac9"
+    },
+    {
+      "masterId": "44c7f252-c016-4d4d-8be2-35d8f70dcacc",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "f6c0c863-6fa4-42d7-81a4-25a0a2806ce5",
+      "newDescId": "cafbe64f-7e7f-4760-abef-09fa6a6147a4"
+    },
+    {
+      "masterId": "5eada1ab-faf2-4b08-a7c7-55c96db0c0e7",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "87ecd9ad-3a78-44cf-aaea-c7d922e845fc",
+      "newDescId": "5f8f5b90-3849-46cf-b8ce-a0b7946d0c58"
+    },
+    {
+      "masterId": "884bcc35-2050-4847-a0e9-166437c66058",
+      "itemSeq": "202201233",
+      "outcome": "REPAIRED",
+      "oldDescId": "e934fe21-a236-4752-adbb-ecdb6582a7b8",
+      "newDescId": "d8ce829b-3b3f-4828-9305-78584e9c9dea"
+    },
+    {
+      "masterId": "8bb6b15a-9d3f-48ec-85b2-0adb4fb9e009",
+      "itemSeq": "200600735",
+      "outcome": "REPAIRED",
+      "oldDescId": "1b1c8757-324d-4be1-857f-061a835ea27b",
+      "newDescId": "c241bb7a-57f3-476a-a5d2-2f0394fc1be4"
+    },
+    {
+      "masterId": "99580115-3104-4a73-b736-6b99949c064d",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "02729965-45d9-41ff-9978-e610f12b6bf8",
+      "newDescId": "1d74d979-b9cf-425c-9289-683a112a7736"
+    },
+    {
+      "masterId": "9dd28ee5-2984-4606-8639-44e861d2d120",
+      "itemSeq": "202401447",
+      "outcome": "REPAIRED",
+      "oldDescId": "fa0aa710-f9fd-432c-b661-1ae811e7ed16",
+      "newDescId": "c36dd251-7ff7-44de-bbaa-0a2dbe74a10a"
+    },
+    {
+      "masterId": "a7525648-9fcc-4419-bcf5-91562ca3301f",
+      "itemSeq": "202006761",
+      "outcome": "REPAIRED",
+      "oldDescId": "ee12d6e4-67b9-41e9-a6fd-fab3e93aa0bf",
+      "newDescId": "ce6d1c16-08c1-4212-97bc-6ea5a8cca4f0"
+    },
+    {
+      "masterId": "aee56324-8bee-4e5a-8777-178a9fd7212c",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "0e084946-8994-431c-8c31-0d51a0622fe1",
+      "newDescId": "909680cd-60ca-4557-a47d-4746d71e8bd5"
+    },
+    {
+      "masterId": "b40ee679-ff39-4ad5-90b7-4adc91359a2c",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "914d75f7-8181-4644-9811-70c805950637",
+      "newDescId": "f415babb-d3c4-4cc7-b80c-b2d6cd35f4e7"
+    },
+    {
+      "masterId": "ba6ccc92-139f-48f6-9ae5-1c5efd90d583",
+      "itemSeq": "202201233",
+      "outcome": "REPAIRED",
+      "oldDescId": "527f0f97-9e63-4f2a-bde2-29bfc6fd8f15",
+      "newDescId": "5303fb9a-6e78-47ab-88ef-fb0cb9085ceb"
+    },
+    {
+      "masterId": "bb52863f-2fe1-47cf-8718-f212815bde44",
+      "itemSeq": "200202997",
+      "outcome": "REPAIRED",
+      "oldDescId": "cec638d9-b1b3-4c66-a717-41f91ae0c33f",
+      "newDescId": "d548384e-97d2-480a-be94-993cd6039d30"
+    },
+    {
+      "masterId": "d06f4a81-c5e7-4178-8377-a927c569a530",
+      "itemSeq": "202401447",
+      "outcome": "REPAIRED",
+      "oldDescId": "685a6f76-b4bd-45e7-8f57-799e0ef262b8",
+      "newDescId": "844a2b77-e734-4188-a9e4-b4e5af8ab770"
+    },
+    {
+      "masterId": "d20b4b1e-e585-45b2-bcdb-6a0f71ea62f8",
+      "itemSeq": "200302218",
+      "outcome": "REPAIRED",
+      "oldDescId": "fc1a622c-4997-4bd2-9c9c-bf5ccbe01017",
+      "newDescId": "e981762d-9c0b-41ef-99d1-a6b671c7123f"
+    },
+    {
+      "masterId": "d49be57a-13aa-4702-9ed1-ad0b016be29d",
+      "itemSeq": "200202997",
+      "outcome": "REPAIRED",
+      "oldDescId": "df2be78c-b01d-4591-be99-87eaa390d5cd",
+      "newDescId": "1b99db9d-dfda-4c3a-9329-9079416bb7e7"
+    },
+    {
+      "masterId": "d721510d-e864-44f7-92ca-30b077ee6312",
+      "itemSeq": "202006761",
+      "outcome": "REPAIRED",
+      "oldDescId": "2e5ccad1-48ab-430f-a7d7-c2077969310f",
+      "newDescId": "385e88cd-d597-45d5-abdc-58488ade0044"
+    },
+    {
+      "masterId": "eb4d9237-8fa2-4150-b068-3c0729064a12",
+      "itemSeq": "202201233",
+      "outcome": "REPAIRED",
+      "oldDescId": "219cd968-642f-4d47-a874-281b8a90f8f3",
+      "newDescId": "278ece8d-35e9-4b94-938d-9c7da61cf428"
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "verifier": "CORRECTION_INDEPENDENT_V1",
+  "wo": "WO-O4O-EASY-DRUG-KO-CRITICAL-CONTENT-CORRECTION-V1",
+  "appliedAt": "Tue Aug 04 2026 07:13:35 GMT+0900 (대한민국 표준시)",
+  "scope": {
+    "masters": 808,
+    "replace": 765,
+    "hold": 43
+  },
+  "notes": [
+    "C8 수리로 대체된 1차 시정본 23건 — 전부 deprecated 보존",
+    "C1 오류본 808건 전부 deprecated 보존 (물리·soft 삭제 0)",
+    "C2 REPLACE 765/765 — ko canonical 1건 · 계획 md5 일치 · source_type=mfds_drug_otc",
+    "C3 HOLD 43/43 — ko canonical 0건(비노출)",
+    "C4 대상 master 타 언어: en 750건(변경 0) / zh 56건(변경 0)",
+    "C5 대상 밖 update 0 · 신규 INSERT 788 · 감사 로그 831(replaced 788 / withdrawn 43)",
+    "C6 grounding 재검 765/765 — 원문 문장 전량 반영 & 원문 밖 문장 0 (그중 16건은 경로 동사 재표현만 차이)",
+    "C7 신규본 197종 · 2개 이상 허가품목 공유 0건"
+  ],
+  "ungroundedSample": [],
+  "failures": [],
+  "result": "PASS"
+}

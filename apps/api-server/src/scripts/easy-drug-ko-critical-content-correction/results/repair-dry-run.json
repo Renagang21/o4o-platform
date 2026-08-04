@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-CRITICAL-CONTENT-CORRECTION-V1",
+  "phase": "repair-oral-prohibition",
+  "mode": "DRY-RUN",
+  "scope": {
+    "replaceRows": 765,
+    "liveMastersMatched": 742
+  },
+  "needRepair": 0,
+  "unchanged": 742,
+  "byOutcome": {},
+  "failed": [],
+  "results": []
+}

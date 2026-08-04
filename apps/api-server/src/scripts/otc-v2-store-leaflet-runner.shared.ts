@@ -215,6 +215,50 @@ export const NONORAL_REWRITE: Array<[RegExp, string]> = [
   [/내복/g, '사용'],
 ];
 
+/**
+ * 경구 섭취 **금지**를 뜻하는 문장인가.
+ *
+ * 비경구 제품의 안전 문장 중 "이 약은 외용으로만 사용하고 내복하지 마십시오" 처럼
+ * 외용/국소와 내복/복용을 대조하는 문장은, 경로 동사 재표현 대상이 아니다.
+ * 여기에 NONORAL_REWRITE 를 적용하면 "외용으로만 사용하고 **사용**하지 마십시오" 가 되어
+ * 안전 정보가 자기모순이 된다
+ * (WO-O4O-EASY-DRUG-KO-CRITICAL-CONTENT-CORRECTION-V1 독립검증에서 19건 실측).
+ * 같은 이유로 koForbidden(경구 동사 잔존) 게이트에서도 이 문장은 제외한다.
+ */
+/**
+ * 문장 경계. e약은요 원문은 "…상의하십시오.때때로 …" 처럼 마침표 뒤 공백이 없는 경우가 많아
+ * `(?<=[.!?])(?=\s|$)` 로는 거의 분할되지 않는다 → 문장 하나가 걸리면 절 전체가 보존돼
+ * 정당한 재표현까지 되돌아간다. 폭 0 분할이라 join('') 시 원문이 그대로 복원된다.
+ */
+const SENTENCE_SPLIT = /(?<=[.!?])/;
+
+export const isOralProhibitionSentence = (s: string): boolean =>
+  /외용|국소|점안|바르|도포/.test(s)
+  && /내복|복용|먹/.test(s)
+  && /마십시오|마세요|않도록|금지|삼가/.test(s);
+
+/**
+ * 문장 단위 경로 동사 재표현. 경구 금지 문장은 원문 그대로 통과시킨다.
+ * 분할은 zero-width lookaround 라 join('') 시 원문이 문자 단위로 복원된다.
+ */
+export const rewriteKoByRoute = (text: string, rules: Array<[RegExp, string]>): string =>
+  text
+    .split(SENTENCE_SPLIT)
+    .map((s) => {
+      if (isOralProhibitionSentence(s)) return s;
+      let t = s;
+      for (const [re, to] of rules) t = t.replace(re, to);
+      return t;
+    })
+    .join('');
+
+/** koForbidden 게이트용 — 경구 금지 문장을 제거한 텍스트 (오탐 방지) */
+export const stripOralProhibitionSentences = (text: string): string =>
+  text
+    .split(SENTENCE_SPLIT)
+    .filter((s) => !isOralProhibitionSentence(s))
+    .join('');
+
 export const ROUTE_PROFILE: Record<string, RouteProfile> = {
   oral: {
     koUsageLabel: '복용 안내',

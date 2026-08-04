@@ -3383,7 +3383,7 @@
 {"itemSeq":"201803219","contentMd5":"60d0a25a8edf06e77f171429e8203b5d","descriptionId":"f975460b-8078-4af2-a36d-06062933c4d6","nMaster":1,"sourceType":"mfds_drug_otc","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
 {"itemSeq":"201803219","contentMd5":"6ac9b0804920a522beade5a8992c4d6d","descriptionId":"20fc68a9-5826-4663-8fb8-fedb214d3e02","nMaster":1,"sourceType":"mfds_drug_otc","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
 {"itemSeq":"201803233","contentMd5":"459f20efdf5c52b550d2806c5acbe7ac","descriptionId":"4adef014-019d-41c9-b739-326b6d1fe22f","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}
-{"itemSeq":"201803236","contentMd5":"b7cdf5238fe42516031bd842b19ac511","descriptionId":"2bb5047c-0ea8-48b1-bf99-b5486b547401","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_EXTRA_CONTENT"}
+{"itemSeq":"201803236","contentMd5":"b7cdf5238fe42516031bd842b19ac511","descriptionId":"2bb5047c-0ea8-48b1-bf99-b5486b547401","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}
 {"itemSeq":"201803248","contentMd5":"484cba95264a20398d77ba844faeb8f5","descriptionId":"37b01f81-1599-4f67-97c9-f75eb1b13981","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}
 {"itemSeq":"201803263","contentMd5":"7d20283da488604f7e76cad5caf7e54f","descriptionId":"42e1b7f2-3e1b-4d7a-865a-b69b7357dfcf","nMaster":4,"sourceType":"mfds_drug_otc_nutrition_combo","verdict":"KO_WRONG_ATTRIBUTION"}
 {"itemSeq":"201803284","contentMd5":"ebdf0036d2d0483ff2c58c8d71ea5fab","descriptionId":"37e233c4-9254-446a-a0d3-0bb549736bfb","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
@@ -5164,7 +5164,7 @@
 {"itemSeq":"202501781","contentMd5":"4fe946581623250f53f5d293c9110ed8","descriptionId":"a30b8381-6774-44bf-a580-93727554de92","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_STRUCTURE_REMAINING"}
 {"itemSeq":"202501797","contentMd5":"a260bbfc643f77274ffdada5d0f4eaf4","descriptionId":"a0a4f247-9cb1-473a-a47e-1b0c36c5fb12","nMaster":2,"sourceType":"o4o_drug_otc_topical","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
 {"itemSeq":"202501821","contentMd5":"3e071c0379d57261d61087e2e061d1a1","descriptionId":"4b1268e6-278f-4af0-8e00-e7a62f5f5f56","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
-{"itemSeq":"202501826","contentMd5":"d785051f4bf6cd8752d18c6fbe6d98d9","descriptionId":"29192be0-b118-4060-bdb1-c0805a6c5b35","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_CONTRADICTED"}
+{"itemSeq":"202501826","contentMd5":"d785051f4bf6cd8752d18c6fbe6d98d9","descriptionId":"29192be0-b118-4060-bdb1-c0805a6c5b35","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_DISPLAY_ONLY_DIFFERENCE"}
 {"itemSeq":"202501843","contentMd5":"9eef1fcd7efe52b7dbfb6281362c3ce6","descriptionId":"4993413b-1bdd-4f69-b1f8-dc296bca5471","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}
 {"itemSeq":"202501849","contentMd5":"09d0aa4edc7a134b2f864cd63f72bf91","descriptionId":"35dfab0a-e4f4-4d65-8926-d93a5ee557df","nMaster":2,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}
 {"itemSeq":"202501887","contentMd5":"c4eb2aace1a3eb4d4d8a689132c0a279","descriptionId":"2973ec79-a9d1-4084-9992-6c682b30dced","nMaster":3,"sourceType":"mfds_drug_otc","verdict":"KO_MISSING_CONTENT"}

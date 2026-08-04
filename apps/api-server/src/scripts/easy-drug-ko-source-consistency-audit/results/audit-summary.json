@@ -4,42 +4,42 @@
   "permits": 4757,
   "mastersCovered": 19431,
   "byVerdict": {
-    "KO_DISPLAY_ONLY_DIFFERENCE": 1844,
-    "KO_MISSING_CONTENT": 2627,
+    "KO_DISPLAY_ONLY_DIFFERENCE": 1845,
+    "KO_MISSING_CONTENT": 2628,
     "KO_STRUCTURE_REMAINING": 278,
     "KO_SOURCE_UNRESOLVED": 10,
-    "KO_CONTRADICTED": 161,
-    "KO_EXTRA_CONTENT": 246,
+    "KO_CONTRADICTED": 160,
+    "KO_EXTRA_CONTENT": 245,
     "KO_WRONG_ATTRIBUTION": 32
   },
   "permitByVerdict": {
-    "KO_DISPLAY_ONLY_DIFFERENCE": 1478,
-    "KO_MISSING_CONTENT": 2581,
+    "KO_DISPLAY_ONLY_DIFFERENCE": 1479,
+    "KO_MISSING_CONTENT": 2582,
     "KO_STRUCTURE_REMAINING": 270,
     "KO_SOURCE_UNRESOLVED": 10,
-    "KO_CONTRADICTED": 151,
-    "KO_EXTRA_CONTENT": 235,
+    "KO_CONTRADICTED": 150,
+    "KO_EXTRA_CONTENT": 234,
     "KO_WRONG_ATTRIBUTION": 32
   },
   "masterByVerdict": {
-    "KO_DISPLAY_ONLY_DIFFERENCE": 7085,
-    "KO_MISSING_CONTENT": 9751,
+    "KO_DISPLAY_ONLY_DIFFERENCE": 7088,
+    "KO_MISSING_CONTENT": 9753,
     "KO_STRUCTURE_REMAINING": 909,
     "KO_SOURCE_UNRESOLVED": 32,
-    "KO_CONTRADICTED": 608,
-    "KO_EXTRA_CONTENT": 843,
+    "KO_CONTRADICTED": 605,
+    "KO_EXTRA_CONTENT": 841,
     "KO_WRONG_ATTRIBUTION": 203
   },
   "bySourceVerdict": {
-    "mfds_drug_otc::KO_DISPLAY_ONLY_DIFFERENCE": 1302,
+    "mfds_drug_otc::KO_DISPLAY_ONLY_DIFFERENCE": 1303,
     "mfds_easy_drug::KO_DISPLAY_ONLY_DIFFERENCE": 52,
-    "mfds_drug_otc::KO_MISSING_CONTENT": 2142,
+    "mfds_drug_otc::KO_MISSING_CONTENT": 2143,
     "mfds_drug_otc_nutrition_combo::KO_MISSING_CONTENT": 423,
     "mfds_drug_otc::KO_STRUCTURE_REMAINING": 278,
     "o4o_drug_otc_topical::KO_DISPLAY_ONLY_DIFFERENCE": 487,
     "mfds_drug_otc::KO_SOURCE_UNRESOLVED": 1,
-    "mfds_drug_otc::KO_CONTRADICTED": 107,
-    "mfds_drug_otc::KO_EXTRA_CONTENT": 246,
+    "mfds_drug_otc::KO_CONTRADICTED": 106,
+    "mfds_drug_otc::KO_EXTRA_CONTENT": 245,
     "o4o_drug_otc_topical::KO_MISSING_CONTENT": 62,
     "mfds_easy_drug::KO_CONTRADICTED": 10,
     "o4o_drug_otc_topical::KO_CONTRADICTED": 42,
@@ -63,17 +63,17 @@
     "age::CONTRADICT": 97,
     "perDose::MISSING": 80,
     "interval::CONTRADICT": 69,
-    "route::CONTRADICT": 54,
+    "route::CONTRADICT": 53,
     "consult::MISSING": 49,
     "perDay::MISSING": 30,
     "perDose::CONTRADICT": 29,
     "perDay::CONTRADICT": 14,
-    "route::MISSING": 9
+    "route::MISSING": 10
   },
   "confirmedTranslationPopulation": {
-    "units": 1844,
-    "masters": 7085,
-    "permits": 1478
+    "units": 1845,
+    "masters": 7088,
+    "permits": 1479
   },
   "storageOnlyInOfficial": 5092
 }
