@@ -155,7 +155,35 @@ KPA·K-Cosmetics 대시보드 복사 **없음**.
 
 ## 7. 프로덕션 브라우저 smoke
 
-*(배포 후 기록)*
+배포: commit `ef61e34d5`
+· Deploy API Server run `30966228928` **success** (revision `o4o-core-api-03155-wcp`)
+· Deploy Web Services run `30966228918` **success** (`deploy-pharmacy-hub` 만 빌드, 타 4서비스 skipped)
+
+브라우저: Playwright(실브라우저) · https://pharmacyhub.co.kr · 계정 `renagang21@gmail.com`
+(테스트 계정 SSOT `docs/local/TEST-ACCOUNTS.local.md`)
+
+| # | 항목 | 결과 |
+|:-:|------|:---:|
+| 1 | 미인증 `GET /api/v1/pharmacy-hub/store-owner/dashboard` → `401 AUTH_REQUIRED` (기존 store-owner 라우트와 동일) | PASS |
+| 2 | 로그인 → `/store-owner` 진입, W3 셸(상단바·사이드바·아코디언) 그대로 렌더 | PASS |
+| 3 | 상단 카드 = **"매장 정보 미연결"** + 안내 문구 (renagang21 은 타 서비스 조직 3개 보유 — 이름 유출 0) | PASS |
+| 4 | 이용 상태 배지 `이용 중` · 역할 `약국 경영자` · 승인 일시 `2026. 7. 30.` | PASS |
+| 5 | 요약 카드 4 = 장바구니 0종 / 전체 주문 0건 / 결제 대기 0건 / 공급자 처리·배송 0건 — §4 DB 실측과 일치 | PASS |
+| 6 | 최근 주문 = "아직 주문 내역이 없습니다" + 상품 둘러보기 CTA (정상 빈 상태) | PASS |
+| 7 | `awaitingPayment=0` 이므로 처리 필요 안내 **미노출** (조건부 렌더 정상) | PASS |
+| 8 | 바로가기 3 (`/store-owner/products` · `/cart` · `/orders`) 이동 정상 | PASS |
+| 9 | API 응답 원문 대조 — `store.status='not_connected'`, `candidateCount=0`, `organizationId/name=null`, membership/cart/orders 값이 DB 와 일치 | PASS |
+| 10 | 회귀 — 주문 내역 화면 정상(빈 상태), 장바구니 정상(빈 상태), 공급 상품 목록 정상(E2E 상품 1건 노출) | PASS |
+| 11 | 결제 실거래 · DB write · 비밀번호 기록 | **없음** |
+
+**단일 조직 계정(정확히 1개 enrollment)의 조직명 격리**는 브라우저로 재현하지 못했다 —
+해당 계정(`5ee37566…` / `[E2E_TEST] Pharmacy-Hub 검증약국 A`)의 비밀번호가 테스트 계정 SSOT 에 없다.
+대신 §4 에서 컨트롤러와 **동일한 SQL 을 프로덕션에서 직접 실행**해 그 계정만 1개 조직을 반환하고
+나머지 계정은 0개를 반환함을 서버 측에서 실증했다. (W3 CHECK 와 동일한 기록 방식)
+
+주문 상태 배지 경로(결제 대기/완료/취소 문구)는 이 계정에 주문이 없어 화면으로 재현하지 못했다.
+해당 로직은 `OrdersPage` 에 있던 함수를 **문구·톤·분기 그대로** `lib/orderStatus.ts` 로 옮긴 것이며
+(로직 변경 0), 홈과 목록이 같은 함수를 쓴다.
 
 ---
 
