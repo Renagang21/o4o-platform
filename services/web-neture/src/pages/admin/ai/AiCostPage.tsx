@@ -67,7 +67,6 @@ const mockCostData: CostDashboardData = {
       avgCost: 1.3,
       packageCompliance: 70,
     },
-    // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview entry 제거
     {
       serviceId: 'kpa-society',
       serviceName: 'KPA 약사회',

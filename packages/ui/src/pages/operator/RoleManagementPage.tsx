@@ -62,7 +62,6 @@ export interface RoleManagementPageProps {
 
 // ─── Constants ───────────────────────────────────────────────
 
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview option 제거
 const SERVICE_OPTIONS = [
   { value: '', label: '전체' },
   { value: 'platform', label: 'Platform' },

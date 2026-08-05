@@ -479,7 +479,7 @@ export class NetureOfferService {
         const eligibleKeys = filterApprovalEligibleServiceKeys(ownedRow.service_keys || []);
 
         if (eligibleKeys.length === 0) {
-          // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture/glucoseview only)
+          // offer의 service_keys가 비어 있거나, 모두 정책상 승인 대상 아님 (예: neture only)
           result.skipped.push({ id: offerId, reason: 'NO_ELIGIBLE_SERVICE_KEYS' });
           continue;
         }
@@ -1026,11 +1026,10 @@ export class NetureOfferService {
 
       // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
       //
-      // WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: 'glucoseview' 항목은 **의도적으로 유지**한다.
-      //   이 필터는 카탈로그가 아니라 입력 방어선이다. 항목을 빼면 API 로 직접 전달된
-      //   'glucoseview' 가 service_keys 에 그대로 저장되고 deriveDistributionType 이
-      //   해당 offer 를 SERVICE 유통으로 뒤집는다 — 제거가 오히려 허용 범위를 넓힌다.
-      //   (승인 대상은 filterApprovalEligibleServiceKeys 로 별도 통제되므로 승인 범위와는 무관)
+      // serviceKeys 는 등록 서비스 목록(allowlist)으로 검증되지 않으므로, 유통 축을 뒤집는
+      // 값은 여기서 입력 단계에 걸러낸다. 'neture' 는 PUBLIC 축이고 'glucoseview' 는 폐지된
+      // 서비스 키다 — 둘 중 하나라도 통과하면 deriveDistributionType 이 offer 를
+      // SERVICE 유통으로 잘못 판정한다.
       const filteredServiceKeys = (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
 
       // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
@@ -1308,11 +1307,11 @@ export class NetureOfferService {
     const currentKeys: string[] = offer.service_keys || [];
     // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1:
     //   이 경로는 **승인 대상 키(SSOT) 3개만 책임진다**. 그 밖의 키
-    //   (pharmacy-hub / neture / glucoseview 등)는 다른 경로가 소유하므로 그대로 보존한다.
+    //   (pharmacy-hub / neture 등)는 다른 경로가 소유하므로 그대로 보존한다.
     //
     //   이전 구현은 nextKeys = filterApprovalEligibleServiceKeys(input.serviceKeys) 였다.
     //   승인 대상이 아닌 키는 입력에 담겨 있든 없든 전부 탈락 → 공급자가 유통 화면을
-    //   한 번 저장하면 pharmacy-hub / neture / glucoseview 가 조용히 삭제되었다.
+    //   한 번 저장하면 pharmacy-hub / neture 가 조용히 삭제되었다.
     //
     //   approval 생성·취소 diff 는 여전히 승인 대상 키에서만 계산하므로
     //   기존 3개 서비스의 승인·listing 거동은 변하지 않는다.

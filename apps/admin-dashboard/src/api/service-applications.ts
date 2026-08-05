@@ -6,9 +6,6 @@
  * API 경로:
  * - Glycopharm: /api/v1/glycopharm/applications/*
  *
- * WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1:
- *   GlucoseView 폐지 — ServiceType union / case 분기 / SERVICE_LABELS / SERVICE_TYPE_LABELS 에서 제거.
- *   백엔드 /api/v1/glucoseview/applications 라우트는 이미 부재 — 호출 시 404 발생을 사전 차단.
  */
 
 import { authClient } from '@o4o/auth-client';

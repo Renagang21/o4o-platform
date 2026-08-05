@@ -45,7 +45,7 @@ export class CmsContent {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   @Index()
-  serviceKey!: string | null; // 'glycopharm', 'kpa', 'glucoseview', null = global
+  serviceKey!: string | null; // 'glycopharm', 'kpa', null = global
 
   // === Type (what kind of content?) ===
   @Column({ type: 'varchar', length: 50 })

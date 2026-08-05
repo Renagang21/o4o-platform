@@ -214,7 +214,6 @@ volta list
 | Admin Dashboard | https://o4o-admin-dashboard-117791934476.asia-northeast3.run.app |
 | Neture Web | https://neture-web-117791934476.asia-northeast3.run.app |
 | Glycopharm Web | https://glycopharm-web-117791934476.asia-northeast3.run.app |
-| Glucoseview Web | https://glucoseview-web-117791934476.asia-northeast3.run.app |
 
 ---
 

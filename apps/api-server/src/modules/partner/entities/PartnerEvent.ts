@@ -27,7 +27,7 @@ export class PartnerEvent {
   partnerId!: string;
 
   @Column({ type: 'varchar', length: 50, name: 'service_id' })
-  serviceId!: string; // 'glycopharm', 'k-cosmetics', 'glucoseview'
+  serviceId!: string; // 'glycopharm', 'k-cosmetics'
 
   @Column({ type: 'varchar', length: 200 })
   name!: string;

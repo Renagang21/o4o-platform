@@ -52,14 +52,6 @@ const staticNowRunning: NowRunningItem[] = [
     link: '/pharmacy/market-trial',
   },
   {
-    id: '2',
-    type: 'event',
-    title: '혈당관리 앱 연동 이벤트',
-    supplier: 'GlucoseView',
-    deadline: '2026.02.15',
-    link: '/pharmacy/market-trial',
-  },
-  {
     id: '3',
     type: 'campaign',
     title: '당뇨인의 날 캠페인',

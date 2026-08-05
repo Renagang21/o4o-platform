@@ -31,7 +31,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
   const router = Router();
 
   // GET / — 약국 목록
-  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers JOIN(환자수) 제거
   router.get('/', async (_req, res) => {
     try {
       const rows = await dataSource.query(`
@@ -282,10 +281,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
     }
   });
 
-  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1
-  // GET /care-data 제거 — 100% glucoseview_customers 진단용 endpoint.
-  // glucoseview_customers 테이블 삭제(20260600000000)로 더 이상 동작하지 않음.
-
   // GET /appointment-trace?patient=전화수&pharmacy=테스트약국
   // IR-O4O-GLYCOPHARM-APPOINTMENT-REQUEST-MISSING-IN-PHARMACY-V1
   router.get('/appointment-trace', async (req, res) => {
@@ -372,7 +367,6 @@ export function createPharmacyDebugRouter(dataSource: DataSource): Router {
         }
       }
 
-      // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview_customers 진단 항목 제거
 
       if (Array.isArray(result.appointments)) {
         if (result.appointments.length === 0) {

@@ -30,7 +30,6 @@ import PageHeader from '../../../components/common/PageHeader';
 // 따라서 여기서는 `/api/v1` 접두어를 붙이지 않는다.
 const API_BASE = '/kpa/supplier/signage/campaign-requests';
 
-// WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1: GlucoseView 폐지 — 캠페인 요청 대상 옵션 제거
 const KPA_SERVICES = [
   { value: 'kpa-society', label: 'KPA Society' },
   { value: 'neture', label: 'Neture' },

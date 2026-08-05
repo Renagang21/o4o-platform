@@ -23,7 +23,6 @@ import {
 /**
  * Service keys for policy ownership (same as slug)
  */
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: 'glucoseview' 제거
 // WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 'pharmacy-hub' 추가.
 //   위 주석대로 이 union 은 StoreSlugServiceKey 와 **동일 집합을 유지해야 한다** —
 //   store-policy.routes.ts 가 slugRecord.serviceKey 를 그대로 getActivePolicy 에 넘긴다.

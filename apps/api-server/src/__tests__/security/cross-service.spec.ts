@@ -15,11 +15,6 @@
  *   glycopharm:admin → neture guard = 403
  *   cosmetics:admin → all 3 guards = 403
  *   nonexistent-service:admin → all 3 guards = 403
- *
- * WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1:
- *   음성 대조군이던 'glucoseview:admin' 을 명시적 미등록 키
- *   'nonexistent-service:admin' 으로 치환. 폐지 service key 이름에 의존하지 않으면서
- *   "미등록 service scope 도 거부된다" 는 검출력은 그대로 유지한다.
  */
 
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';

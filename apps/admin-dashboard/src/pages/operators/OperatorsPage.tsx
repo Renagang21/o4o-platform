@@ -63,9 +63,7 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
   ],
-  // WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
-  //   glucoseview 는 정책상 폐지된 서비스로 신규 role 할당 옵션에서 제외.
-  //   platform 은 super_admin role 할당을 위해 잔존.
+  // platform 은 super_admin role 할당을 위해 잔존.
 };
 
 interface Facets {

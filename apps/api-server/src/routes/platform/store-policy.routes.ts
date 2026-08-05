@@ -40,7 +40,6 @@ async function isStoreOwner(
   serviceKey: string,
   userId: string,
 ): Promise<boolean> {
-  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview ownership 항목 제거 (테이블 삭제)
   const ownershipQueries: Record<string, string> = {
     glycopharm: `SELECT 1 FROM organizations WHERE id = $1 AND created_by_user_id = $2 LIMIT 1`,
     cosmetics: `SELECT 1 FROM cosmetics.cosmetics_stores WHERE id = $1 AND created_by_user_id = $2 LIMIT 1`,
@@ -547,7 +546,6 @@ export function createStorePolicyRoutes(dataSource: DataSource): Router {
       });
 
       // Also update the slug in the service-specific store table
-      // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1: glucoseview slug update 항목 제거
       const updateQueries: Record<string, string> = {
         // glycopharm: slug stored in platform_store_slugs only (no slug column on organizations)
         cosmetics: `UPDATE cosmetics.cosmetics_stores SET slug = $1 WHERE id = $2`,

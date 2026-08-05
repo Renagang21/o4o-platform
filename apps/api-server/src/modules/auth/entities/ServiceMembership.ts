@@ -43,7 +43,7 @@ export class ServiceMembership {
   userId!: string;
 
   @Column({ type: 'varchar', length: 100, name: 'service_key' })
-  serviceKey!: string; // 'neture' | 'glycopharm' | 'kpa-society' | 'glucoseview' | 'k-cosmetics' | 'platform'
+  serviceKey!: string; // 'neture' | 'glycopharm' | 'kpa-society' | 'k-cosmetics' | 'platform'
 
   @Column({ type: 'varchar', length: 50, default: 'pending' })
   status!: ServiceMembershipStatus;

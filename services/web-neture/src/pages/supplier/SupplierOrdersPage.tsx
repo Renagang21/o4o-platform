@@ -32,7 +32,6 @@ const ORDER_STATUS_LABEL: Record<string, string> = {
   cancelled: '취소', refunded: '환불',
 };
 
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview icon 제거
 const SERVICE_ICONS: Record<string, string> = {
   glycopharm: '🏥',
   'k-cosmetics': '💄',

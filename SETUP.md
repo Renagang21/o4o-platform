@@ -159,7 +159,6 @@ pnpm run dev:web
 | Main Site | https://o4o-main-site-117791934476.asia-northeast3.run.app |
 | Neture Web | https://neture-web-117791934476.asia-northeast3.run.app |
 | Glycopharm Web | https://glycopharm-web-117791934476.asia-northeast3.run.app |
-| Glucoseview Web | https://glucoseview-web-117791934476.asia-northeast3.run.app |
 | K-Cosmetics Web | https://k-cosmetics-web-117791934476.asia-northeast3.run.app |
 | KPA Society Web | https://kpa-society-web-117791934476.asia-northeast3.run.app |
 

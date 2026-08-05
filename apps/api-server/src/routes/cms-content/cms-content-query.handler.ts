@@ -31,7 +31,7 @@ export function createCmsContentQueryRoutes(deps: {
    * Get content statistics for dashboards
    *
    * Query params:
-   * - serviceKey: Filter by service (glycopharm, kpa, glucoseview, etc.)
+   * - serviceKey: Filter by service (glycopharm, kpa, etc.)
    * - organizationId: Filter by organization
    */
   router.get('/stats', optionalAuth, async (req: Request, res: Response): Promise<void> => {

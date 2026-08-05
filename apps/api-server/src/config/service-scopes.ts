@@ -35,7 +35,7 @@ export interface ServiceScopes {
  * 전체 서비스 스코프 레지스트리
  *
  * Hard Cleanup v1: Service Registry에 등록된 서비스만 포함
- * - glycopharm, glucoseview, neture, kpa-society, cosmetics
+ * - glycopharm, neture, kpa-society, cosmetics
  *
  * 제거됨:
  * - k-cosmetics (API 없음)

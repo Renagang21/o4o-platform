@@ -4,7 +4,6 @@ import { IsEmail, IsString, MinLength, IsOptional, IsBoolean, IsIn, IsInt, Min, 
  * Register Request DTO
  *
  * WO-NETURE-REGISTER-IDENTITY-STABILIZATION-V1
- * WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: GlucoseView 제거 (4개 서비스).
  * 4개 서비스(KPA, GlycoPharm, Neture, K-Cosmetics) 공유 DTO.
  * 서비스별 필드 차이를 수용하기 위해 이름/동의 필드는 optional.
  * Controller에서 서비스별 정규화 수행.
@@ -266,10 +265,8 @@ export class RegisterRequestDto {
   address2?: string;
 
   // --- 약국 정보 필드 ---
-  // WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEANUP-V1:
-  //   displayName 필드 제거 (register flow 사용처 0 — GlucoseView 전용 dead code 였음).
-  //   pharmacyName 필드는 KPA register flow 의 약사 활동 (pharmacist) 시 약국명으로
-  //   active 사용 중 (auth-register.controller.ts:458/671/691/721) — 유지하되 주석 정정.
+  //   pharmacyName 은 KPA register flow 의 약사 활동 (pharmacist) 시 약국명으로 사용된다
+  //   (auth-register.controller.ts:458/671/691/721).
 
   /** KPA pharmacist 활동: 약국명 (businessName fallback 으로도 사용) */
   @IsOptional()

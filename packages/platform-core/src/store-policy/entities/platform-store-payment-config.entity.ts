@@ -34,7 +34,6 @@ export type PaymentMode = 'test' | 'live';
 /**
  * Service keys (same as slug/policy)
  */
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: 'glucoseview' 제거
 export type PaymentConfigServiceKey =
   | 'glycopharm'
   | 'cosmetics'

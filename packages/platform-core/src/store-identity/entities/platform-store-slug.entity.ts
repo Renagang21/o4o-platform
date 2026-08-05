@@ -23,7 +23,6 @@ import {
 /**
  * Service keys for slug ownership
  */
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: 'glucoseview' 제거
 // WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1: 'pharmacy-hub' 추가 (additive union 확장).
 //   DB 컬럼은 varchar(50) 이라 스키마 변경·migration 이 없다. 기존 4 키의 의미·동작 불변이며
 //   소비처(store-hub.controller / foreign-visitor-partner-qr-code.routes)는 전부 pass-through

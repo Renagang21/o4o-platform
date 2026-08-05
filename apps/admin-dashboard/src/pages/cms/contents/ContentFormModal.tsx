@@ -26,7 +26,6 @@ interface ContentFormModalProps {
 }
 
 // Available services
-// WO-O4O-GLUCOSEVIEW-RESIDUAL-CLEANUP-PHASE1-V1: GlucoseView 폐지 — 신규 콘텐츠 할당 옵션 제거
 const SERVICES = [
   { value: '', label: 'Global (No Service)' },
   { value: 'glycopharm', label: 'Glycopharm' },

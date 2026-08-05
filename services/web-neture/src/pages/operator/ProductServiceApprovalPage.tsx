@@ -33,7 +33,6 @@ const STATUS_TABS = [
   { key: 'rejected', label: '거절됨' },
 ] as const;
 
-// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const SERVICE_OPTIONS = [
   { key: '', label: '전체 서비스' },
   { key: 'glycopharm', label: 'GlycoPharm' },

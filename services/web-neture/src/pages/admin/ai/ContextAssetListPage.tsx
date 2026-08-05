@@ -152,7 +152,6 @@ const mockContextAssets: ContextAsset[] = [
     updatedAt: '2026-01-12T15:00:00Z',
     createdBy: 'admin',
   },
-  // WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: ca-7 글루코스뷰 카드 mock entry 제거
 ];
 
 // ===== 유틸 함수 =====

@@ -18,9 +18,6 @@ import {
   Index,
 } from 'typeorm';
 
-// WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1:
-//   'GlucoseView' 제거 (폐지 서비스). partner_applications 테이블은 운영 DB에
-//   존재하지 않아 보존해야 할 기존 값이 없다.
 export type ServiceInterest = 'GlycoPharm' | 'K-Cosmetics';
 
 @Entity('partner_applications')

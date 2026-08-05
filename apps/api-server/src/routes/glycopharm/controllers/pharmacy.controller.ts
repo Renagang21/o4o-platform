@@ -191,12 +191,6 @@ export function createPharmacyController(
     }
   );
 
-  // WO-O4O-GLUCOSEVIEW-POST-DROP-CLEANUP-V1
-  // GET /pharmacy/customers, GET /pharmacy/customers/:id, POST /pharmacy/customers 제거.
-  // 세 엔드포인트 모두 glucoseview_customers 테이블에 100% 의존했고, 해당 테이블은
-  // DropGlucoseviewAndCgmTables 마이그레이션(20260600000000)으로 삭제됨.
-  // 환자/당뇨인 관리 기능은 향후 Care Core 기반으로 재설계 예정.
-
   return router;
 }
 

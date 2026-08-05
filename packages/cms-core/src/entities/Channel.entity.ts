@@ -53,7 +53,7 @@ export class Channel {
   @Index()
   serviceKey!: string | null;
   // null = cross-service channel
-  // 'glycopharm', 'kpa', 'glucoseview', 'neture', 'k-cosmetics'
+  // 'glycopharm', 'kpa', 'neture', 'k-cosmetics'
 
   // ═══════════════════════════════════════════════════════════════
   // IDENTITY (What is this channel?)

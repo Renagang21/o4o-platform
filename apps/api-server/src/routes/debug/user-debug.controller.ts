@@ -332,7 +332,6 @@ export function createUserDebugRouter(dataSource: DataSource): Router {
       );
 
       // 3. 누락된 서비스 멤버십 생성 (neture 등)
-      // WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: 'glucoseview' 제거
       //   (폐지 서비스 — 남겨두면 진단 도구가 dead service_key 멤버십을 새로 만든다)
       const allServices = ['neture', 'glycopharm', 'kpa-society', 'k-cosmetics'];
       const existingMemberships = await dataSource.query(

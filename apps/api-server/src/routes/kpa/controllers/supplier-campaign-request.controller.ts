@@ -29,7 +29,6 @@ type AuthMiddleware = import('express').RequestHandler;
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-// WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: 'glucoseview' 제거 (폐지 서비스)
 const ALLOWED_SERVICES = [
   'kpa-society',
   'neture',

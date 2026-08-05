@@ -20,7 +20,6 @@ import { Compass, Info, ExternalLink, Users, Megaphone, ArrowRight, AlertCircle,
 import { AiSummaryButton } from '../../components/ai';
 import { dashboardApi, partnerDashboardApi, type PartnerDashboardSummary, type PartnerDashboardItem, type BrowsableContent, type LinkedContent } from '../../lib/api';
 
-// WO-O4O-SHARED-PACKAGES-GLUCOSEVIEW-RESIDUE-CLEANUP-V1: glucoseview URL/icon/label entries 제거
 // 서비스 URL 설정
 const SERVICE_URLS: Record<string, string> = {
   glycopharm: 'https://glycopharm.co.kr/partner',

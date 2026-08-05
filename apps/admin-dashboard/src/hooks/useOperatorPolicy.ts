@@ -94,10 +94,6 @@ export interface OperatorPolicyHookResult {
 /**
  * 스코프 문자열에서 운영자 스코프 키 추출
  * 예: 'kpa:membership:manage' → 'kpa_society'
- *
- * WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1:
- *   'glucoseview:' → 'glycocare' 매핑 제거. 해당 role 4행은 운영 DB에서 삭제되었고
- *   보유자(role_assignments)는 0 이었다.
  */
 function extractOperatorScopeFromScope(scope: string): OperatorScopeKey | null {
   if (scope.startsWith('kpa:')) {

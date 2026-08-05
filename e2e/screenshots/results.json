@@ -33,17 +33,6 @@
     "accessNote": "Skipped — login failed"
   },
   {
-    "service": "GlucoseView",
-    "registerSuccess": true,
-    "registerNote": "Registration submitted successfully",
-    "approvalSuccess": false,
-    "approvalNote": "Approve button not found or user not in pending list",
-    "loginSuccess": false,
-    "loginNote": "Login may have failed — still on login page: https://glucoseview.co.kr/login",
-    "accessSuccess": false,
-    "accessNote": "Skipped — login failed"
-  },
-  {
     "service": "K-Cosmetics",
     "registerSuccess": true,
     "registerNote": "Registration submitted successfully",

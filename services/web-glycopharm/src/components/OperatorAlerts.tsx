@@ -1,7 +1,7 @@
 /**
  * OperatorAlerts — Operator 플랫폼 운영 알림 표시
  *
- * WO-GLYCOPHARM-GLUCOSEVIEW-OPERATOR-ALERT-SYSTEM-V1
+ * WO-GLYCOPHARM-OPERATOR-ALERT-SYSTEM-V1
  *
  * Rule-based alerts computed by backend.
  * Renders above OperatorDashboardLayout (frozen F1).

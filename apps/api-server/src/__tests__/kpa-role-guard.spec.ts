@@ -79,7 +79,7 @@ describe('requireKpaScope role matrix (KPA-a)', () => {
       'neture:admin',
       'glycopharm:admin',
       'cosmetics:admin',
-      'nonexistent-service:admin', // WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: 폐지 key 대신 미등록 key
+      'nonexistent-service:admin', // 미등록 service key — 음성 대조군
       'admin',                 // legacy
       'super_admin',           // legacy
       'operator',              // legacy

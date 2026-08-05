@@ -70,7 +70,6 @@ export function deriveDistributionType(isPublic: boolean, serviceKeys: string[])
 
 // ─── Constants ───
 
-// WO-NETURE-EXCLUDE-GLUCOSEVIEW-FROM-PRODUCT-SERVICE-SELECTION-V1: glucoseview 제외 (소비자 대상 서비스)
 const AVAILABLE_SERVICES = [
   { key: 'glycopharm', name: 'GlycoPharm' },
   { key: 'kpa-society', name: 'KPA Society' },

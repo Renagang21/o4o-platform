@@ -33,11 +33,6 @@ const YaksaCommunityFeed = lazy(() =>
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
-// WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1:
-//   CGM Pharmacist App(@o4o/cgm-pharmacist-app) lazy import 4건 제거.
-//   백엔드가 mock 데이터 기반이었고 `cgm_*` 테이블은 이미 DROP 되었다
-//   (`20260600000000-DropGlucoseviewAndCgmTables`).
-
 // SellerOps Pages
 const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
 

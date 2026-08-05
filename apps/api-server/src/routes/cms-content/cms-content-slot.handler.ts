@@ -39,8 +39,6 @@ const SCOPE_TO_CMS_KEYS: Record<string, string[]> = {
   cosmetics: ['k-cosmetics', 'cosmetics'],
   neture: ['neture'],
   glycopharm: ['glycopharm'],
-  // WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: glucoseview 매핑 제거
-  //   (해당 role 4행 삭제 완료, cms_content_slots 에 glucoseview serviceKey row 0)
 };
 
 const KNOWN_PREFIXES = Object.keys(SCOPE_TO_CMS_KEYS);

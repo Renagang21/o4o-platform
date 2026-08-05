@@ -22,8 +22,6 @@ export class PasswordController extends BaseController {
    *   Main service canonical origins are sourced from service-catalog SSOT.
    *   Non-catalog origins (admin sub-domain / localhost dev) are declared
    *   explicitly to preserve previous behavior.
-   * WO-O4O-API-SERVER-AUTH-GLUCOSEVIEW-RESIDUE-CLEANUP-V1:
-   *   'https://glucoseview.co.kr' allowed origin 제거 (GlucoseView 서비스 폐기).
    */
   private static readonly ALLOWED_ORIGINS = [
     ...getServiceOrigins(),

@@ -4,7 +4,7 @@
  * WO-NETURE-APPROVAL-REQUEST-TRUTH-ALIGNMENT-V1
  *
  * 배경:
- * - offer.service_keys에는 'neture', 'glucoseview'를 포함한 모든 대상 서비스가 저장될 수 있음
+ * - offer.service_keys에는 'neture' 를 포함한 모든 대상 서비스가 저장될 수 있음
  * - 하지만 **승인 요청 대상**은 운영 정책상 glycopharm / kpa-society / k-cosmetics 만
  * - 이 정책을 여러 곳에서 필터링하면 누락/불일치 위험이 있으므로 한 곳에서만 정의
  *
@@ -13,7 +13,7 @@
 
 /**
  * 승인 요청 가능(= offer_service_approvals 레코드 생성 대상) 서비스 키.
- * neture / glucoseview 등은 정책상 승인 대상이 아니다.
+ * neture 등은 정책상 승인 대상이 아니다.
  */
 export const APPROVAL_ELIGIBLE_SERVICE_KEYS = [
   'glycopharm',
