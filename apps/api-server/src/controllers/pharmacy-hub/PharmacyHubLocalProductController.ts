@@ -96,6 +96,22 @@ function rejectsOrganizationId(req: Request, res: Response): boolean {
   return false;
 }
 
+/**
+ * uuid 형식 가드 — Pharmacy-Hub 라우트에만 둔다.
+ *
+ * `store_local_products.id` 는 uuid 컬럼이므로 비-uuid 를 그대로 넘기면 Postgres 캐스팅
+ * 오류(500)가 난다. 공통 service 는 원본 라우트의 동작(가드는 GET 상세에만)을 그대로
+ * 보존해야 하므로(WO 동작 불변), 이 가드는 서비스 계층이 아니라 여기에서 건다.
+ * 다른 서비스(KPA·GlycoPharm·K-Cosmetics)의 동작에는 영향이 없다.
+ */
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+function rejectsMalformedId(req: Request, res: Response): boolean {
+  if (UUID_RE.test(String(req.params.id ?? ''))) return false;
+  res.status(404).json({ success: false, error: 'Product not found', code: 'NOT_FOUND' });
+  return true;
+}
+
 /** 공통 500 처리 — 원인 메시지는 로그에만 남긴다. */
 function fail(res: Response, userId: string, op: string, error: unknown, message: string, code: string) {
   logger.error(`[PharmacyHubLocalProduct] ${op} failed`, {
@@ -139,6 +155,7 @@ export class PharmacyHubLocalProductController {
   static async detail(req: Request, res: Response): Promise<any> {
     const userId = getUserId(req, res);
     if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
 
     try {
       const resolution = await resolvePharmacyHubStoreOrganization(userId);
@@ -175,6 +192,7 @@ export class PharmacyHubLocalProductController {
     const userId = getUserId(req, res);
     if (!userId) return;
     if (rejectsOrganizationId(req, res)) return;
+    if (rejectsMalformedId(req, res)) return;
 
     try {
       const resolution = await resolvePharmacyHubStoreOrganization(userId);
@@ -197,6 +215,7 @@ export class PharmacyHubLocalProductController {
   static async deactivate(req: Request, res: Response): Promise<any> {
     const userId = getUserId(req, res);
     if (!userId) return;
+    if (rejectsMalformedId(req, res)) return;
 
     try {
       const resolution = await resolvePharmacyHubStoreOrganization(userId);
