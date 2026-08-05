@@ -158,6 +158,6 @@ INSERT/UPDATE/DELETE 0. `shared_product_descriptions` 무변경 → EN 19,081 ·
 
 ## 15. commit / push
 
-- commit: `<이 CHECK 를 포함한 커밋 해시>`
+- commit: `4713b37fb` → push `d76cbefe7..4713b37fb main`
 - pathspec: `apps/api-server/src/scripts/easy-drug-ko-full-rebuild-pilot/**` + 본 문서
 - 타 세션 WIP(admin-dashboard·membership 등) 미접촉. `git add .` 미사용.
