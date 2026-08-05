@@ -47,12 +47,17 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps (cosmetics-specific + global)
-            expect(appIds).toContain('dropshipping-cosmetics');
-            expect(appIds).toContain('sellerops');
-            expect(appIds).toContain('supplierops');
+            expect(appIds).toContain('cosmetics-seller-extension');
+            expect(appIds).toContain('cosmetics-supplier-extension');
             // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1:
             //   레거시 'cosmetics-partner' 카탈로그 항목이 제거되어 더 이상 노출되지 않는다.
             expect(appIds).not.toContain('cosmetics-partner');
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   dropshipping 레거시 체인 카탈로그 항목이 제거되어 더 이상 노출되지 않는다.
+            expect(appIds).not.toContain('dropshipping-cosmetics');
+            expect(appIds).not.toContain('dropshipping-core');
+            expect(appIds).not.toContain('sellerops');
+            expect(appIds).not.toContain('supplierops');
 
             // Global apps available to all
             expect(appIds).toContain('organization-forum');
@@ -76,8 +81,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(appIds).toContain('membership-yaksa');
             expect(appIds).toContain('forum-yaksa');
             expect(appIds).toContain('reporting-yaksa');
-            expect(appIds).toContain('pharmaceutical-core');
             expect(appIds).toContain('lms-yaksa');
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   'pharmaceutical-core' 카탈로그 항목·패키지가 제거되었다.
+            expect(appIds).not.toContain('pharmaceutical-core');
 
             // Global apps available to all
             expect(appIds).toContain('organization-forum');
@@ -113,8 +120,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps
-            expect(appIds).toContain('sellerops');
             expect(appIds).toContain('cosmetics-seller-extension');
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   serviceGroup 'sellerops' 는 유지되지만 동명 앱 카탈로그 항목은 제거되었다.
+            expect(appIds).not.toContain('sellerops');
 
             // NOT expected (yaksa-specific)
             expect(appIds).not.toContain('membership-yaksa');
@@ -130,8 +139,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps
-            expect(appIds).toContain('supplierops');
             expect(appIds).toContain('cosmetics-supplier-extension');
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   serviceGroup 'supplierops' 는 유지되지만 동명 앱 카탈로그 항목은 제거되었다.
+            expect(appIds).not.toContain('supplierops');
 
             // NOT expected (yaksa-specific)
             expect(appIds).not.toContain('membership-yaksa');
@@ -211,8 +222,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             )).toBe(true);
 
             // Should include cosmetics-specific app
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   'dropshipping-cosmetics' 제거 → 잔존 cosmetics 전용 앱으로 대표 검증한다.
             const appIds = recommended.map(app => app.appId);
-            expect(appIds).toContain('dropshipping-cosmetics');
+            expect(appIds).toContain('cosmetics-sample-display-extension');
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
         });
@@ -249,9 +262,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const cosmeticsIds = cosmeticsRec.map(app => app.appId);
             const yaksaIds = yaksaRec.map(app => app.appId);
 
-            // Cosmetics should have dropshipping-cosmetics, yaksa should not
-            expect(cosmeticsIds).toContain('dropshipping-cosmetics');
-            expect(yaksaIds).not.toContain('dropshipping-cosmetics');
+            // Cosmetics should have its own extension, yaksa should not
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'dropshipping-cosmetics' 제거에 따른 대체 검증
+            expect(cosmeticsIds).toContain('cosmetics-sample-display-extension');
+            expect(yaksaIds).not.toContain('cosmetics-sample-display-extension');
 
             // Yaksa should have membership-yaksa, cosmetics should not
             expect(yaksaIds).toContain('membership-yaksa');
@@ -308,8 +322,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
         test('Installing compatible app succeeds', async () => {
             const { cosmetics } = representatives;
 
-            // Install dropshipping-cosmetics - should succeed
-            const result = canInstallApp('dropshipping-cosmetics', 'cosmetics');
+            // Install a cosmetics-scoped app - should succeed
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'dropshipping-cosmetics' 제거에 따른 대체 검증
+            const result = canInstallApp('cosmetics-sample-display-extension', 'cosmetics');
             expect(result.canInstall).toBe(true);
 
             // Install global app - should succeed
@@ -323,13 +338,14 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const { yaksa, tourist, sellerops } = representatives;
 
             // Yaksa cannot install cosmetics app
-            expect(canInstallApp('dropshipping-cosmetics', 'yaksa').canInstall).toBe(false);
+            expect(canInstallApp('cosmetics-sample-display-extension', 'yaksa').canInstall).toBe(false);
 
             // Tourist cannot install yaksa app
             expect(canInstallApp('membership-yaksa', 'tourist').canInstall).toBe(false);
 
-            // Sellerops can install sellerops app
-            expect(canInstallApp('sellerops', 'sellerops').canInstall).toBe(true);
+            // Sellerops can install a sellerops-scoped app
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'sellerops' 앱 항목 제거에 따른 대체 검증
+            expect(canInstallApp('cosmetics-seller-extension', 'sellerops').canInstall).toBe(true);
         });
     });
 
@@ -388,10 +404,12 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const cosmeticsIds = cosmeticsAppsWithDeps.map(app => app.appId);
             const yaksaIds = yaksaAppsWithDeps.map(app => app.appId);
 
-            // dropshipping-cosmetics depends on dropshipping-core
-            // Both should be in cosmetics catalog (via dependency resolution)
-            expect(cosmeticsIds).toContain('dropshipping-cosmetics');
-            expect(cosmeticsIds).toContain('dropshipping-core');
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   dropshipping-cosmetics → dropshipping-core 의존 체인이 통째로 제거되었다.
+            //   cosmetics 카탈로그에는 두 항목이 의존 해석 결과로도 나타나지 않아야 한다.
+            expect(cosmeticsIds).toContain('cosmetics-seller-extension');
+            expect(cosmeticsIds).not.toContain('dropshipping-cosmetics');
+            expect(cosmeticsIds).not.toContain('dropshipping-core');
 
             // membership-yaksa depends on organization-core
             // Both should be in yaksa catalog (via dependency resolution)
@@ -402,13 +420,16 @@ describe('Multi-Tenant AppStore Filtering', () => {
         });
 
         test('Extension with multi-group dependency resolves correctly', async () => {
-            // sellerops app depends on dropshipping-core
+            // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+            //   'sellerops' 앱과 그 의존 'dropshipping-core' 가 모두 제거되었다.
+            //   serviceGroup 'sellerops' 는 유지되므로, 잔존 앱이 정상 해석되고
+            //   삭제된 의존이 dangling 으로 남지 않는지 검증한다.
             const selleropsApps = getAppsForServiceGroupWithDependencies('sellerops');
             const appIds = selleropsApps.map(app => app.appId);
 
-            // Should include both sellerops and its dependency
-            expect(appIds).toContain('sellerops');
-            expect(appIds).toContain('dropshipping-core');
+            expect(appIds).toContain('cosmetics-seller-extension');
+            expect(appIds).not.toContain('sellerops');
+            expect(appIds).not.toContain('dropshipping-core');
         });
 
         test('Chained dependencies are resolved', async () => {

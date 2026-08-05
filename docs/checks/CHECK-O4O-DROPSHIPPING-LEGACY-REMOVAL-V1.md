@@ -145,7 +145,9 @@
 | `apps/api-server/src/init/cpt.init.ts` → `ds_product` · `ds_supplier` · `ds_partner` · `ds_commission_policy` 스키마 등록 | **LIVE** (main.ts 부트스트랩) | `schemas/ds_*.schema.ts`, `services/cpt/dropshipping-cpts.ts`, `services/acf/dropshipping-fields.ts`, `types/dropshipping.ts`, `templates/system/archive-ds-products.json`. 제거 전 `custom_posts` 의 `ds_*` row 조사 필요 |
 | `packages/shortcodes/src/dropshipping/**`, `apps/main-site/src/shortcodes/_functions/dropshipping/**`, `apps/main-site/src/components/ui/dropshipping/**`, `apps/admin-dashboard/public/shortcode-config.js` | dead | 삭제 패키지 import 0, 백엔드 대응 경로 없음 |
 | `services/signage-player-web/.../CornerDisplayBlock.tsx:70` `DEFAULT_LISTINGS_API = '/api/v1/dropshipping/core'` | **본 WO 이전부터 404** | 삭제된 라우터가 제공한 경로는 `/api/v1/dropshipping/admin/*` 뿐이었으므로 `/core` 는 원래부터 존재하지 않았다. 본 WO 로 인한 회귀 아님 |
-| `apps/api-server/tests/multi-tenant/**`, `scripts/{bootstrap-install-apps,test-e2e-workflow,test-settlement-workflow-simple}.ts` | 미실행 스크립트/스펙 | jest 기본 실행 대상 아님 (73 suites 전부 PASS) |
+| `apps/api-server/tests/multi-tenant/**` | **CI 전용 스텝** — 사후 정정 완료 | jest 대상이 아니라 CI 의 별도 스텝(`Run tests (multi-tenant Vitest)`)으로만 실행되어 로컬 검증에서 누락되었다. §9-1 참조 |
+| `apps/api-server/tests/multi-tenant/tenant-factory.ts` 의 `dropshipping-cosmetics` · `sellerops` · `supplierops` appId 문자열 | 테스트 픽스처 | 삭제 코드 import 아닌 가상 테넌트 시뮬레이션 문자열. navigation / view-system 스펙의 유효성을 유지하기 위해 보존 |
+| `scripts/{bootstrap-install-apps,test-e2e-workflow,test-settlement-workflow-simple}.ts` | 미실행 스크립트 | jest·CI 실행 대상 아님 |
 | `docs/architecture/BUSINESS-SERVICE-RULES.md` 의 `dropshipping-api`/`dropshipping-web` **Planned** 행 | 계획 문서 | 삭제 코드 참조 아님 |
 
 ---
@@ -165,6 +167,15 @@
 | admin-dashboard `vite build` | **EXIT 0** |
 | main-site `vite build` | **EXIT 0** |
 | api-server `npm run build` | **EXIT 0** |
+| multi-tenant `vitest` (§9-1 정정 후) | **EXIT 0** — 4 files / 75 tests PASS |
+
+### 9-1. CI 1차 실패와 정정
+
+1차 CI(`30964857643`, 커밋 `223832247`)에서 `Code Quality Check` 의 **`Run tests (multi-tenant Vitest)` 스텝 1건만 실패**했다. 나머지 15개 스텝(typecheck · ESLint · api-server Jest · admin Vitest · api-gateway Vitest 포함)은 전부 success.
+
+- **원인** — `apps/api-server/tests/multi-tenant/appstore.spec.ts` 가 삭제된 카탈로그 항목(`dropshipping-core` · `dropshipping-cosmetics` · `sellerops` · `supplierops` · `pharmaceutical-core`)의 **존재를 단정**하고 있었다. 이 스펙은 jest 대상이 아니라 `.github/workflows/ci-pipeline.yml:92` 의 별도 스텝에서만 실행되어 로컬 검증에서 누락되었다.
+- **정정** — 같은 파일의 선례(`WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1`, 51-55행)와 동일하게 처리했다. 삭제 항목 단정은 **`not.toContain` 부재 검증으로 전환**하고, 대표 검증이 필요한 자리는 잔존 앱(`cosmetics-seller-extension` · `cosmetics-supplier-extension` · `cosmetics-sample-display-extension`)으로 교체했다. 테스트 개수(24)는 유지했고 삭제하거나 skip 한 케이스는 없다.
+- **소스 코드 변경 없음** — 정정 범위는 테스트 스펙 1파일이며, `appsCatalog.ts` 등 제품 코드는 재수정하지 않았다.
 
 ---
 
