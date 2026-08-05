@@ -393,10 +393,11 @@ LMS Job 이 대상으로 하는 `lms_yaksa_course_assignments`(약사회가 회�
 
 | 항목 | 값 |
 |------|------|
-| commit | (commit 직후 기재) |
-| 포함 파일 | (동상) |
-| push | (동상) |
-| ahead / behind | (동상) |
+| commit | `54c9db66d` — `docs(check): yaksa-scheduler 잔여 Job 8건 사업 필요성·대체 구조 감사 (…-V1)` |
+| 포함 파일 | **1개** (405 insertions / 0 deletions) — 본 CHECK 신규 1건뿐 |
+| 타 세션 파일 포함 | **0** — 커밋 시점에 타 세션 staged 파일 23건이 index 에 있었으나 `git commit -- <본 CHECK 경로>` pathspec 격리로 제외. `git show --name-only --format= HEAD` 로 1개 파일만 확인. 타 세션 staged 항목은 unstage·수정하지 않았다 |
+| push | `origin/main` `a01280895..54c9db66d` (fast-forward) |
+| ahead / behind | **0 / 0** |
 
 ---
 
