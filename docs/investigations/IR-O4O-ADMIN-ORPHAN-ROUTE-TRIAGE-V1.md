@@ -91,7 +91,7 @@ triage 를 선행시킨 판단이 실제로 유효했다.
 |---|---:|---|
 | **READY** | **9** | `/operator/hub-contents` `/operator/points` `/admin/yaksa` `/admin/yaksa/accounting` `/admin/services/overview` `/store/pop` `/admin/membership/categories` `/active-users` `/tools` |
 | **READY_AFTER_FIX** | 8 | `/admin/orders`(콘솔오류 4) `/admin/services`(5) `/operator/approvals`(1) `/admin/yaksa/members`(2) `/admin/yaksa/fees`(2) `/store/qr`(1) `/store/tablet/settings`(2) `/store-content`(2) |
-| **SERVICE_ONLY** | 7 | `/kpa/content-workspace` `/kpa/my-store-contents` `/cgm-pharmacist/*` `/pharmacy-ai-insight/summary` — 특정 서비스·앱 전용 |
+| **SERVICE_ONLY** | 7 | `/kpa/content-workspace` `/kpa/my-store-contents` ~~`/cgm-pharmacist/*`~~(삭제 — `WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1`) `/pharmacy-ai-insight/summary` — 특정 서비스·앱 전용 |
 | **ROLE_POLICY_REQUIRED** | 5 | `/admin/operator/my-policy` `/admin/role-applications` `/admin/enrollments` `/enrollments` `/operator/analytics/auth` |
 | **HOLD / 미검증** | 36 | 브라우저 미확인(`CODE_ONLY`) — 대부분 marketing·cpt-engine·appearance·yaksa 하위 |
 
@@ -123,8 +123,8 @@ triage 를 선행시킨 판단이 실제로 유효했다.
 | `/admin/o4o-product-db/candidates/:id` | DETAIL | 공공데이터 후보 목록(메뉴 있음) | **FIX** — 유일하게 메뉴 있는 업무의 상세 단절 | **P1** |
 | `/yaksa/communities/:id` | DETAIL | `/yaksa/communities` | CONNECT | P2 |
 | `/yaksa/communities/:id/feed` | DETAIL | 〃 | CONNECT | P2 |
-| `/cgm-pharmacist/patients/:patientId` | DETAIL | `/cgm-pharmacist/patients` | HOLD(앱 게이팅) | P2 |
-| `/cgm-pharmacist/patients/:patientId/coaching` | DETAIL | 〃 | HOLD | P2 |
+| ~~`/cgm-pharmacist/patients/:patientId`~~ | DETAIL | ~~`/cgm-pharmacist/patients`~~ | **해소(라우트 삭제)** — `WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1` | — |
+| ~~`/cgm-pharmacist/patients/:patientId/coaching`~~ | DETAIL | 〃 | **해소(라우트 삭제)** — 〃 | — |
 | `/editor/templates/:id` | DETAIL | 편집기 서브앱 | REVIEW | P3 |
 | `/editor/patterns/:id` | DETAIL | 〃 | REVIEW | P3 |
 

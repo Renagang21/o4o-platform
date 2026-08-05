@@ -46,7 +46,6 @@
     "@o4o/shortcodes": "workspace:*",
     "@o4o/slide-app": "workspace:*",
     "@o4o/pharmacy-ai-insight": "workspace:*",
-    "@o4o/cgm-pharmacist-app": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
     "@o4o/ui": "workspace:*",

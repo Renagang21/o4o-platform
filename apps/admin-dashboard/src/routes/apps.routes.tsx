@@ -33,27 +33,10 @@ const YaksaCommunityFeed = lazy(() =>
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
 
-// CGM Pharmacist App (Phase 1 - Development)
-const CGMPatientListPage = lazy(() =>
-  import('@o4o/cgm-pharmacist-app')
-    .then((m: any) => ({ default: m.PatientListPage }))
-    .catch(() => ({ default: () => <div className="p-6">CGM Patient List - Coming Soon</div> }))
-);
-const CGMPatientDetailPage = lazy(() =>
-  import('@o4o/cgm-pharmacist-app')
-    .then((m: any) => ({ default: m.PatientDetailPage }))
-    .catch(() => ({ default: () => <div className="p-6">CGM Patient Detail - Coming Soon</div> }))
-);
-const CGMCoachingPage = lazy(() =>
-  import('@o4o/cgm-pharmacist-app')
-    .then((m: any) => ({ default: m.CoachingPage }))
-    .catch(() => ({ default: () => <div className="p-6">CGM Coaching - Coming Soon</div> }))
-);
-const CGMAlertsPage = lazy(() =>
-  import('@o4o/cgm-pharmacist-app')
-    .then((m: any) => ({ default: m.AlertsPage }))
-    .catch(() => ({ default: () => <div className="p-6">CGM Alerts - Coming Soon</div> }))
-);
+// WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1:
+//   CGM Pharmacist App(@o4o/cgm-pharmacist-app) lazy import 4건 제거.
+//   백엔드가 mock 데이터 기반이었고 `cgm_*` 테이블은 이미 DROP 되었다
+//   (`20260600000000-DropGlucoseviewAndCgmTables`).
 
 // SellerOps Pages
 const SellerOpsRouter = lazy(() => import('@/pages/sellerops/SellerOpsRouter'));
@@ -72,7 +55,7 @@ const PageLoader = () => (
 );
 
 /**
- * App routes — forum, pharmacy AI, CGM, sellerops, supplierops, partnerops
+ * App routes — forum, pharmacy AI, sellerops, supplierops, partnerops
  */
 export function AppRoutes() {
   return [
@@ -185,52 +168,10 @@ export function AppRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // CGM Pharmacist App - 약사용 CGM 환자 관리 (Phase 1 - Development)
-    <Route key="/cgm-pharmacist" path="/cgm-pharmacist" element={
-      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
-        <AppRouteGuard appId="cgm-pharmacist-app">
-          <Suspense fallback={<PageLoader />}>
-            <CGMPatientListPage />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cgm-pharmacist/patients" path="/cgm-pharmacist/patients" element={
-      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
-        <AppRouteGuard appId="cgm-pharmacist-app">
-          <Suspense fallback={<PageLoader />}>
-            <CGMPatientListPage />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cgm-pharmacist/patients/:patientId" path="/cgm-pharmacist/patients/:patientId" element={
-      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.patients.read']}>
-        <AppRouteGuard appId="cgm-pharmacist-app">
-          <Suspense fallback={<PageLoader />}>
-            <CGMPatientDetailPage />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cgm-pharmacist/patients/:patientId/coaching" path="/cgm-pharmacist/patients/:patientId/coaching" element={
-      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.coaching.write']}>
-        <AppRouteGuard appId="cgm-pharmacist-app">
-          <Suspense fallback={<PageLoader />}>
-            <CGMCoachingPage />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/cgm-pharmacist/alerts" path="/cgm-pharmacist/alerts" element={
-      <AdminProtectedRoute requiredPermissions={['cgm-pharmacist.alerts.read']}>
-        <AppRouteGuard appId="cgm-pharmacist-app">
-          <Suspense fallback={<PageLoader />}>
-            <CGMAlertsPage />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1:
+    //   /cgm-pharmacist 계열 5개 라우트 제거.
+    //   `cgm-pharmacist-app` 은 app_registry 에 등록된 적이 없어 AppRouteGuard 가
+    //   항상 /error/app-disabled 로 리다이렉트하던 도달 불가 라우트였다.
 
     // SellerOps - Seller Operations App
     <Route key="/sellerops/*" path="/sellerops/*" element={

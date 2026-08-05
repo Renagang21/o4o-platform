@@ -296,9 +296,6 @@ importers:
       '@o4o/block-renderer':
         specifier: workspace:*
         version: link:../../packages/block-renderer
-      '@o4o/cgm-pharmacist-app':
-        specifier: workspace:*
-        version: link:../../packages/cgm-pharmacist-app
       '@o4o/content-editor':
         specifier: workspace:*
         version: link:../../packages/content-editor
@@ -1754,43 +1751,6 @@ importers:
         version: 5.4.5
 
   packages/capabilities: {}
-
-  packages/cgm-pharmacist-app:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      '@o4o/utils':
-        specifier: workspace:*
-        version: link:../utils
-      express:
-        specifier: ^4.0.0
-        version: 4.21.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      tsup:
-        specifier: ^8.0.0
-        version: 8.5.1(@swc/core@1.13.5(@swc/helpers@0.5.17))(jiti@1.21.7)(postcss@8.5.6)(tsx@4.21.0)(typescript@5.9.3)(yaml@2.8.2)
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
 
   packages/cms-core:
     dependencies:
@@ -18533,7 +18493,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.2)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
+      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.2)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
