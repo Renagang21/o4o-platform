@@ -187,11 +187,14 @@ commit 은 본 WO 대상 파일만 정확한 경로 목록으로 지정했다.
 
 ## 12. commit · push · ahead/behind
 
-> 본 절은 commit 직후 값으로 채운다.
+| 항목 | 값 |
+|------|-----|
+| commit | `69d853f0b` — `chore(yaksa): legacy /api/v1/yaksa/* API 와 실행 불가능한 관리자 UI 제거` |
+| 포함 파일 | **24개** (본 WO 대상 전량, 타 세션 WIP 0) — 236 insertions / 2,494 deletions |
+| push | `origin/main` `e1b18e264..69d853f0b` (fast-forward) |
+| ahead/behind | **0 / 0** |
 
-- commit: `(아래 커밋 로그 참조)`
-- push: `origin/main`
-- ahead/behind: `0 / 0`
+commit 은 정확한 경로 목록을 pathspec 으로 지정해 수행했고, `git show --name-only` 로 24개 파일만 포함됨을 확인했다.
 
 ---
 
