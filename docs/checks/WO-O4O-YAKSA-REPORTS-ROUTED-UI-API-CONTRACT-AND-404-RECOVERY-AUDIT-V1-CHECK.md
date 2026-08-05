@@ -285,7 +285,13 @@ yaksa_membership_years, yaksa_post_logs, yaksa_posts
 
 ## 18. commit · push · ahead/behind
 
-> commit 직후 값으로 채운다.
+| 항목 | 값 |
+|---|---|
+| commit | `e7beff9bd` — `docs(check): /admin/yaksa/reports 도달성·4개 API 계약·404 원인 감사 (…-V1)` |
+| 포함 파일 | **1개** — 본 CHECK 문서만 (294 insertions / 0 deletions) |
+| push | `origin/main` `77f920303..e7beff9bd` (fast-forward) |
+| ahead/behind | **0 / 0** |
+| 후속 | 본 §18 backfill 커밋 1건 (CHECK 문서 단일 경로) |
 
 ---
 
