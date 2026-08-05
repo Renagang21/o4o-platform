@@ -1,0 +1,28 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1",
+  "step": "browser-smoke",
+  "origin": "https://neture.co.kr",
+  "loginLanded": "https://neture.co.kr/admin",
+  "anonAccessGate": {
+    "state": "AUTH_REQUIRED",
+    "h1": "로그인 후 제품 설명을 볼 수 있어요",
+    "textLength": 131,
+    "bodyLeaked": false
+  },
+  "targets": 60,
+  "viewports": [
+    "desktop 1440x900",
+    "mobile 390x844",
+    "tablet 1024x768"
+  ],
+  "pageLoads": 180,
+  "byVerdict": {
+    "RESPONSIVE_DEFECT": 18
+  },
+  "productsWithFindings": 14,
+  "productsAllPass": 46,
+  "maxPageHeight": 6222,
+  "anyDocOverflow": 7,
+  "dbWrites": 0,
+  "result": "REVIEW"
+}

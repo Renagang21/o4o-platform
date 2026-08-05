@@ -180,7 +180,7 @@ export default function ProductLandingPage() {
             <Lock size={30} className="text-primary-600" />
           </div>
           {data.product?.name && (
-            <p className="text-base font-semibold text-gray-900 break-keep mb-1">{data.product.name}</p>
+            <p className="text-base font-semibold text-gray-900 break-keep [overflow-wrap:anywhere] mb-1">{data.product.name}</p>
           )}
           <h1 className="text-lg font-bold text-gray-900 mb-2">로그인 후 제품 설명을 볼 수 있어요</h1>
           <p className="text-sm text-gray-600 mb-6 break-keep">
@@ -229,7 +229,9 @@ export default function ProductLandingPage() {
               <Package size={24} className="text-primary-600" />
             </div>
             <div className="min-w-0">
-              <h1 className="text-xl font-bold text-gray-900 break-keep">{p?.name || '제품'}</h1>
+              {/* 의약품명은 공백 없는 장문이 흔하다("…(수출명:HEATWAVEARTHRO…)").
+                  break-keep 만으로는 끊을 자리가 없어 카드를 뚫고 나간다 — 넘칠 때만 강제로 끊는다. */}
+              <h1 className="text-xl font-bold text-gray-900 break-keep [overflow-wrap:anywhere]">{p?.name || '제품'}</h1>
               {p?.manufacturerName && <p className="text-sm text-gray-500 mt-0.5">{p.manufacturerName}</p>}
             </div>
           </div>

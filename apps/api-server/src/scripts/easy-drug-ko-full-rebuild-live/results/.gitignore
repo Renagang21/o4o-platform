@@ -14,3 +14,5 @@ hide-plan.jsonl
 hide-plan-run1.jsonl
 hide-plan-run2.jsonl
 hide-plan-rerun.jsonl
+# 대용량 스크린샷 원본. 대표 증거만 ../evidence/ 로 추려 커밋한다.
+screenshots/
