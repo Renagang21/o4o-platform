@@ -23,7 +23,9 @@
  *     ├ /cart                    장바구니
  *     ├ /orders                  주문 내역
  *     ├ /orders/:orderId         주문 상세
- *     ├ /info                    매장 정보 (조직 · WO-...-STORE-INFO-AND-ACCOUNT-V1)
+ *     ├ /handled-products        매장 경영활용 제품 (WO-...-STORE-HANDLED-PRODUCTS-V1)
+ *     ├ /local-products          매장 자체 상품 (동일 WO)
+ *     ├ /info                  매장 정보 (조직 · WO-...-STORE-INFO-AND-ACCOUNT-V1)
  *     └ /account                 내 계정 (사용자 · 동일 WO)
  *   /store-owner/payment         결제 (셸 동일 · 사이드바 메뉴 미노출 deep route)
  *     ├ /success                 PG 성공 callback
@@ -61,6 +63,9 @@ import OrderDetailPage from './pages/store-owner/OrderDetailPage';
 import PaymentPage from './pages/store-owner/PaymentPage';
 import PaymentSuccessPage from './pages/store-owner/PaymentSuccessPage';
 import PaymentFailPage from './pages/store-owner/PaymentFailPage';
+// WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1
+import HandledProductsPage from './pages/store-owner/HandledProductsPage';
+import LocalProductsPage from './pages/store-owner/LocalProductsPage';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
@@ -150,6 +155,9 @@ export default function App() {
             <Route path="cart" element={<CartPage />} />
             <Route path="orders" element={<OrdersPage />} />
             <Route path="orders/:orderId" element={<OrderDetailPage />} />
+            {/* WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1 — 매장 제품 (공급 상품과 다른 축) */}
+            <Route path="handled-products" element={<HandledProductsPage />} />
+            <Route path="local-products" element={<LocalProductsPage />} />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}
             <Route path="info" element={<StoreInfoPage />} />
             <Route path="account" element={<AccountPage />} />

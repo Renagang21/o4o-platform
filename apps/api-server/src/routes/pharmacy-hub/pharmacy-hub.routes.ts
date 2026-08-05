@@ -17,6 +17,8 @@
  *   PATCH /api/v1/pharmacy-hub/store-owner/info                          (store_owner) 매장 정보 수정
  *   GET   /api/v1/pharmacy-hub/store-owner/account/profile               (store_owner) 내 계정 조회
  *   PATCH /api/v1/pharmacy-hub/store-owner/account/profile               (store_owner) 내 계정 수정
+ *   *     /api/v1/pharmacy-hub/store-owner/handled-products*             (store_owner) 매장 경영활용 제품
+ *   *     /api/v1/pharmacy-hub/store-owner/local-products*               (store_owner) 매장 자체 상품
  *
  * 포함하지 않는 것 (후속 WO):
  *   상품 카탈로그/장바구니/주문, 콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
@@ -42,6 +44,9 @@ import { PharmacyHubStoreDashboardController } from '../../controllers/pharmacy-
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import { PharmacyHubStoreInfoController } from '../../controllers/pharmacy-hub/PharmacyHubStoreInfoController.js';
 import { PharmacyHubAccountController } from '../../controllers/pharmacy-hub/PharmacyHubAccountController.js';
+// WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1
+import { PharmacyHubHandledProductController } from '../../controllers/pharmacy-hub/PharmacyHubHandledProductController.js';
+import { PharmacyHubLocalProductController } from '../../controllers/pharmacy-hub/PharmacyHubLocalProductController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -238,6 +243,45 @@ export function createPharmacyHubRoutes(): Router {
   // ───────────────────────────────────────────────────────────────────────────
   router.get('/store-owner/account/profile', ...storeOwnerGuards, PharmacyHubAccountController.getProfile);
   router.patch('/store-owner/account/profile', ...storeOwnerGuards, PharmacyHubAccountController.updateProfile);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 경영활용 제품 · 매장 자체 상품 (WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1)
+  //
+  //   `/store-owner/products`(위)는 **B2B 구매 대상 공급 상품**이고, 아래 두 축은
+  //   **매장이 실제로 취급하는 제품**이다 — 합치거나 서로 대체하지 않는다.
+  //     handled-products : O4O 상품 DB 제품을 매장이 취급 (organization_product_listings)
+  //     local-products   : O4O 와 무관하게 매장이 직접 등록 (store_local_products)
+  //   주문 완료 상품이 자동으로 취급 등록되지 않는다 (등록은 명시적 액션뿐).
+  //
+  //   저장 SSOT·검증 로직은 공통 services/store/* 를 그대로 호출한다 (복제 0).
+  //   공통 `/api/v1/store/*` 대신 여기 두는 이유: 공통 라우트의 조직 해석
+  //   (resolveStoreAccess → organization_members LIMIT 1)이 service enrollment 를
+  //   보지 않아 다중 조직 계정에서 타 서비스 조직을 반환할 수 있기 때문이다.
+  //   여기서는 resolvePharmacyHubStoreOrganization 으로만 조직을 정한다.
+  //   schema 변경·migration 0.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/handled-products', ...storeOwnerGuards, PharmacyHubHandledProductController.list);
+  router.post('/store-owner/handled-products', ...storeOwnerGuards, PharmacyHubHandledProductController.apply);
+  router.patch(
+    '/store-owner/handled-products/active',
+    ...storeOwnerGuards,
+    PharmacyHubHandledProductController.setActive,
+  );
+  router.post(
+    '/store-owner/handled-products/remove',
+    ...storeOwnerGuards,
+    PharmacyHubHandledProductController.remove,
+  );
+
+  router.get('/store-owner/local-products', ...storeOwnerGuards, PharmacyHubLocalProductController.list);
+  router.post('/store-owner/local-products', ...storeOwnerGuards, PharmacyHubLocalProductController.create);
+  router.get('/store-owner/local-products/:id', ...storeOwnerGuards, PharmacyHubLocalProductController.detail);
+  router.put('/store-owner/local-products/:id', ...storeOwnerGuards, PharmacyHubLocalProductController.update);
+  router.delete(
+    '/store-owner/local-products/:id',
+    ...storeOwnerGuards,
+    PharmacyHubLocalProductController.deactivate,
+  );
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)

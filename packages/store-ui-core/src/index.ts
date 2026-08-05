@@ -111,6 +111,8 @@ export { StoreLocalProductsManager } from './components/local-products/StoreLoca
 export type {
   StoreLocalProductsManagerProps,
   StoreLocalProductsManagerLabels,
+  // WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1: 후속 화면 진입 액션 주입(미주입 시 기존 동작 유지)
+  StoreLocalProductsManagerActions,
   StoreLocalProductsApi,
   StoreLocalProduct,
   StoreLocalProductInput,

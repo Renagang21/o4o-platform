@@ -193,6 +193,13 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'cart',             label: '장바구니',  subPath: '/cart' },
       { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
     ]},
+    // WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1 (2026-08-05)
+    //   '공급 상품'(B2B 구매 대상)과 **다른 축**이라 별도 섹션으로 둔다 — 합치지 않는다.
+    //   매장 경영활용 제품 = O4O 제품을 약국이 취급 / 매장 자체 상품 = O4O 무관 직접 등록.
+    { label: '매장 제품', items: [
+      { key: 'handled-products', label: '매장 경영활용 제품', subPath: '/handled-products' },
+      { key: 'local-products',   label: '매장 자체 상품',     subPath: '/local-products' },
+    ]},
     // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)
     //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).
     //   매장 정보 = organizations(조직) / 내 계정 = users(사용자) — 서로 다른 축이라 항목을 분리한다.

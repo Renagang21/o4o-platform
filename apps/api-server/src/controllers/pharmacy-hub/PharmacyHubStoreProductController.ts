@@ -38,20 +38,18 @@
 import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
+import { PHARMACY_HUB_OFFER_EXPOSURE_GATE_SQL } from './offer-exposure.js';
 import logger from '../../utils/logger.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
 const MAX_LIMIT = 100;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
-/** 노출 게이트 SSOT — 목록·카운트·상세가 같은 조건을 쓴다. $1 = 'pharmacy-hub' */
-const EXPOSURE_GATE_SQL = `
-        spo.deleted_at IS NULL
-    AND spo.is_active = true
-    AND spo.distribution_type <> 'PRIVATE'
-    AND $1 = ANY(spo.service_keys)
-    AND ns.status = 'ACTIVE'
-    AND COALESCE(pm.status, 'ACTIVE') = 'ACTIVE'`;
+/**
+ * 노출 게이트 SSOT — 목록·카운트·상세, 그리고 취급 등록(handled-products apply)이 같은 조건을 쓴다.
+ * WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1 에서 offer-exposure.ts 로 추출했다 ($1 = 'pharmacy-hub').
+ */
+const EXPOSURE_GATE_SQL = PHARMACY_HUB_OFFER_EXPOSURE_GATE_SQL;
 
 /** 응답 투영 SSOT — 공급자 내부 정보(원가·재고·정산·연락처)는 담지 않는다. */
 const SELECT_FIELDS = `

@@ -71,20 +71,62 @@ export interface StoreLocalProductsApi {
 export interface StoreLocalProductsManagerLabels {
   /** 카테고리 입력 placeholder (서비스별 예시) */
   categoryPlaceholder?: string;
+  /** 화면 제목 (기본: '매장 취급 상품') */
+  title?: string;
+  /** 제목 아래 설명 문구 */
+  description?: string;
+}
+
+/**
+ * 후속 화면 진입 액션 (WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1).
+ *
+ * 기존 소비처(GlycoPharm·K-Cosmetics)는 이 prop 을 주지 않으므로 종전 `/store/*`
+ * 경로로 그대로 이동한다 — 동작 불변. 그 경로가 없는 서비스(Pharmacy-Hub)는
+ * 각 키를 `null` 로 주어 **dead link 대신 버튼을 숨긴다** ("준비 중 메뉴 0").
+ *
+ *   undefined = 기본 동작 유지 · null = 버튼 숨김 · 함수 = 해당 동작으로 교체
+ */
+export interface StoreLocalProductsManagerActions {
+  onTabletDisplays?: (() => void) | null;
+  onMarketingAssets?: ((product: StoreLocalProduct) => void) | null;
+  onCreatePop?: ((product: StoreLocalProduct) => void) | null;
 }
 
 export interface StoreLocalProductsManagerProps {
   api: StoreLocalProductsApi;
   labels?: StoreLocalProductsManagerLabels;
+  actions?: StoreLocalProductsManagerActions;
 }
 
 const PAGE_SIZE = 20;
 
 // ==================== Component ====================
 
-export function StoreLocalProductsManager({ api, labels }: StoreLocalProductsManagerProps) {
+export function StoreLocalProductsManager({ api, labels, actions }: StoreLocalProductsManagerProps) {
   const navigate = useNavigate();
   const categoryPlaceholder = labels?.categoryPlaceholder ?? '예: 건강기능식품, 의약외품';
+  const title = labels?.title ?? '매장 취급 상품';
+  const description =
+    labels?.description ??
+    'O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.';
+
+  // undefined = 기존 `/store/*` 기본 동작 · null = 숨김 · 함수 = 교체
+  const onTabletDisplays =
+    actions?.onTabletDisplays === undefined
+      ? () => navigate('/store/commerce/tablet-displays')
+      : actions.onTabletDisplays;
+  const onMarketingAssets =
+    actions?.onMarketingAssets === undefined
+      ? (product: StoreLocalProduct) => navigate(`/store/commerce/products/${product.id}/marketing`)
+      : actions.onMarketingAssets;
+  // WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
+  //   legacy `/store/commerce/products/:id/pop` (local UUID 를 ProductMaster 처럼 사용)
+  //   경유를 제거하고 canonical POP 화면으로 직접 진입한다.
+  const onCreatePop =
+    actions?.onCreatePop === undefined
+      ? (product: StoreLocalProduct) =>
+          navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
+      : actions.onCreatePop;
 
   // Data state
   const [products, setProducts] = useState<StoreLocalProduct[]>([]);
@@ -205,20 +247,20 @@ export function StoreLocalProductsManager({ api, labels }: StoreLocalProductsMan
         <div>
           <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
             <ShoppingBag className="w-7 h-7 text-teal-600" />
-            매장 취급 상품
+            {title}
             <span className="text-base font-normal text-slate-400">({total})</span>
           </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            O4O 주문과 무관하게 매장에서 자체적으로 취급·진열하는 상품입니다. 결제/주문 시스템과 연결되지 않습니다.
-          </p>
+          <p className="text-sm text-slate-500 mt-1">{description}</p>
         </div>
-        <button
-          onClick={() => navigate('/store/commerce/tablet-displays')}
-          className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
-        >
-          <Tablet className="w-4 h-4" />
-          태블릿 진열 관리
-        </button>
+        {onTabletDisplays && (
+          <button
+            onClick={onTabletDisplays}
+            className="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-teal-700 bg-teal-50 rounded-xl hover:bg-teal-100 transition-colors"
+          >
+            <Tablet className="w-4 h-4" />
+            태블릿 진열 관리
+          </button>
+        )}
       </div>
 
       {/* Filters */}
@@ -373,25 +415,24 @@ export function StoreLocalProductsManager({ api, labels }: StoreLocalProductsMan
                       >
                         <Edit2 className="w-4 h-4" />
                       </button>
-                      <button
-                        onClick={() => navigate(`/store/commerce/products/${product.id}/marketing`)}
-                        className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
-                        title="마케팅 자산"
-                      >
-                        <BarChart3 className="w-4 h-4" />
-                      </button>
-                      {/* WO-O4O-STORE-LOCAL-PRODUCT-POP-CANONICAL-FLOW-ALIGNMENT-V1:
-                          legacy `/store/commerce/products/:id/pop` (local UUID 를 ProductMaster 처럼 사용)
-                          경유를 제거하고 canonical POP 화면으로 직접 진입한다. */}
-                      <button
-                        onClick={() =>
-                          navigate(CANONICAL_STORE_POP_ROUTE, { state: buildLocalProductPopState(product) })
-                        }
-                        className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
-                        title="POP 만들기"
-                      >
-                        <FileText className="w-4 h-4" />
-                      </button>
+                      {onMarketingAssets && (
+                        <button
+                          onClick={() => onMarketingAssets(product)}
+                          className="p-1.5 rounded-lg hover:bg-blue-50 text-slate-500 hover:text-blue-600"
+                          title="마케팅 자산"
+                        >
+                          <BarChart3 className="w-4 h-4" />
+                        </button>
+                      )}
+                      {onCreatePop && (
+                        <button
+                          onClick={() => onCreatePop(product)}
+                          className="p-1.5 rounded-lg hover:bg-purple-50 text-slate-500 hover:text-purple-600"
+                          title="POP 만들기"
+                        >
+                          <FileText className="w-4 h-4" />
+                        </button>
+                      )}
                       {product.is_active && (
                         <button
                           onClick={() => handleDelete(product)}

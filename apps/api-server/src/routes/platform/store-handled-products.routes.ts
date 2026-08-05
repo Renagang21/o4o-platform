@@ -27,26 +27,17 @@ import { ProductLandingService } from '../../modules/neture/services/product-lan
 // WO-O4O-KPA-STORE-PRODUCT-QR-DOWNLOAD-AND-PRINT-SIZE-V1: PNG/SVG/PDF export (지정 mm 라벨 PDF)
 import { generateQrPng, generateQrSvg, generateProductQrLabelPdf } from '../../services/qr-print.service.js';
 // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류(규제유형+의약품분류 → 표시 분류) SSOT 재사용
-import { deriveProductClassification } from '../../modules/neture/utils/product-type.util.js';
+// WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1:
+//   조회·해제 로직을 services/store/store-handled-products.service.ts 로 추출했다.
+//   이 라우트는 인증·조직 결정(공통 resolveStoreAccess — 무변경)과 응답 매핑만 담당한다.
+//   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다.
+import {
+  listHandledProducts,
+  removeHandledProducts,
+  parseHandledProductRefs,
+} from '../../services/store/store-handled-products.service.js';
 
 type AuthMiddleware = RequestHandler;
-
-interface UnifiedRow {
-  source_type: 'listing' | 'local';
-  source_id: string;
-  name: string | null;
-  image_url: string | null;
-  price: string | number | null;
-  is_active: boolean;
-  listing_status: string | null;
-  start_at: string | null;
-  end_at: string | null;
-  master_id: string | null;
-  updated_at: string;
-  // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류 파생용 (listing 만 존재, local 은 NULL)
-  regulatory_type: string | null;
-  drug_category: string | null;
-}
 
 // WO-O4O-KPA-STORE-NEW-PRODUCT-REQUEST-AND-ADMIN-APPROVAL-V1 (P3 cleanup):
 //   '승인 대기' 표시 제거. organization_product_listings.status 기본값 'pending'(Neture Distribution
@@ -89,98 +80,15 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         return;
       }
 
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
-      const offset = (page - 1) * limit;
-      const search = ((req.query.search as string) || '').trim();
-      const sourceParam = (req.query.source as string) || 'all';
-      const includeListing = sourceParam !== 'local';
-      const includeLocal = sourceParam !== 'listing';
-
-      // ── 공통 파라미터 ($1=org, $2=search) ──
-      const baseParams: any[] = [organizationId];
-      const hasSearch = search.length > 0;
-      if (hasSearch) baseParams.push(`%${search}%`);
-      const searchListing = hasSearch ? ` AND pm.name ILIKE $2` : '';
-      const searchLocal = hasSearch ? ` AND lp.name ILIKE $2` : '';
-
-      const listingSelect = `
-        SELECT 'listing'::text AS source_type, opl.id AS source_id, pm.name AS name,
-               (SELECT pi.image_url FROM product_images pi WHERE pi.master_id = opl.master_id AND pi.deleted_at IS NULL
-                 ORDER BY pi.is_primary DESC, pi.sort_order ASC LIMIT 1) AS image_url,
-               COALESCE(opl.price, spo.price_general) AS price,
-               opl.is_active AS is_active, opl.status AS listing_status,
-               opl.start_at AS start_at, opl.end_at AS end_at, opl.master_id AS master_id,
-               opl.updated_at AS updated_at,
-               pm.regulatory_type AS regulatory_type, pm.drug_category AS drug_category
-        FROM organization_product_listings opl
-        LEFT JOIN product_masters pm ON pm.id = opl.master_id
-        LEFT JOIN supplier_product_offers spo ON spo.id = opl.offer_id
-        WHERE opl.organization_id = $1 AND opl.is_active = true${searchListing}`;
-
-      const localSelect = `
-        SELECT 'local'::text AS source_type, lp.id AS source_id, lp.name AS name,
-               lp.thumbnail_url AS image_url,
-               lp.price_display AS price,
-               lp.is_active AS is_active, NULL::varchar AS listing_status,
-               NULL::timestamp AS start_at, NULL::timestamp AS end_at, NULL::uuid AS master_id,
-               lp.updated_at AS updated_at,
-               NULL::varchar AS regulatory_type, NULL::varchar AS drug_category
-        FROM store_local_products lp
-        WHERE lp.organization_id = $1 AND lp.is_active = true${searchLocal}`;
-
-      const selects: string[] = [];
-      if (includeListing) selects.push(listingSelect);
-      if (includeLocal) selects.push(localSelect);
-      if (selects.length === 0) {
-        res.json({ success: true, data: { items: [], pagination: { page, limit, total: 0 } } });
-        return;
-      }
-      const unionSql = selects.join('\n        UNION ALL\n');
-
-      const dataSql = `WITH unified AS (${unionSql})
-        SELECT * FROM unified ORDER BY updated_at DESC NULLS LAST
-        LIMIT $${baseParams.length + 1} OFFSET $${baseParams.length + 2}`;
-      const countSql = `WITH unified AS (${unionSql}) SELECT count(*)::int AS total FROM unified`;
-
-      const [rows, countRes]: [UnifiedRow[], { total: number }[]] = await Promise.all([
-        dataSource.query(dataSql, [...baseParams, limit, offset]),
-        dataSource.query(countSql, baseParams),
-      ]);
-      const total = countRes[0]?.total ?? 0;
-
-      // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1:
-      //   '연결 콘텐츠' 컬럼·집계(linkedContentCount) 제거 → O4O 표준 분류(classification)로 대체.
-      //   분류는 ProductMaster.regulatory_type(+drug_category)에서 deriveProductClassification 으로 파생.
-
-      // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-DISPLAY-POOL-SIMPLIFY-V1:
-      //   제품 풀(매장 취급제품)은 채널 상태판이 아니다. 화면에서 채널 상태 컬럼(타블렛/온라인몰/상품설명)을
-      //   제거했으므로, 그를 위한 enrich 조인 3종(store_tablet_displays / organization_product_channels /
-      //   shared_product_descriptions)도 함께 제거한다. 채널 노출은 각 채널 메뉴에서 관리한다.
-      const items = rows.map((r) => {
-        const isListing = r.source_type === 'listing';
-        // WO-...-CATEGORY-COLUMN-V1: O4O 표준 분류(코드+라벨). master 없는 local 은 regulatory_type=NULL → '미분류'.
-        const cls = deriveProductClassification({ regulatoryType: r.regulatory_type, drugCategory: r.drug_category });
-        return {
-          sourceType: r.source_type,
-          sourceId: r.source_id,
-          name: r.name || '(이름 없음)',
-          imageUrl: r.image_url || null,
-          originLabel: isListing ? 'O4O 기반 제품' : '매장 경영활용 제품',
-          ownerLabel: isListing ? '공급/플랫폼' : '내 매장',
-          price: r.price != null ? Number(r.price) : null,
-          isActive: r.is_active,
-          // WO-O4O-KPA-STORE-HANDLED-PRODUCT-CATEGORY-COLUMN-V1: O4O 표준 분류 (사용자 표시 라벨).
-          classificationCode: cls.code,
-          classificationLabel: cls.label,
-          updatedAt: r.updated_at,
-          managePath: isListing
-            ? `/store/my-products?highlight=${r.source_id}`
-            : `/store/commerce/local-products?highlight=${r.source_id}`,
-        };
+      // 조회 계약(UNION·검색·분류 파생·기본 managePath)은 공통 service 함수가 SSOT 다.
+      const data = await listHandledProducts(dataSource, organizationId, {
+        page: req.query.page,
+        limit: req.query.limit,
+        search: req.query.search,
+        source: req.query.source,
       });
 
-      res.json({ success: true, data: { items, pagination: { page, limit, total } } });
+      res.json({ success: true, data });
     } catch (error: any) {
       console.error('[StoreHandledProducts] GET /handled-products error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch handled products', code: 'INTERNAL_ERROR' });
@@ -220,49 +128,14 @@ export function createStoreHandledProductsRoutes(dataSource: DataSource): Router
         return;
       }
 
-      const UUID_RE = /^[0-9a-fA-F-]{36}$/;
-      const rawItems = Array.isArray(req.body?.items) ? req.body.items : [];
-      const valid = rawItems.filter(
-        (it: any) =>
-          it &&
-          (it.sourceType === 'listing' || it.sourceType === 'local') &&
-          typeof it.sourceId === 'string' &&
-          UUID_RE.test(it.sourceId),
-      ) as Array<{ sourceType: 'listing' | 'local'; sourceId: string }>;
+      const valid = parseHandledProductRefs(req.body?.items);
       if (valid.length === 0) {
         res.status(400).json({ success: false, error: 'items(sourceType, sourceId) required', code: 'VALIDATION_ERROR' });
         return;
       }
 
-      let removed = 0;
-      const failed: Array<{ sourceType: string; sourceId: string; reason: string }> = [];
-      for (const it of valid) {
-        try {
-          await dataSource.transaction(async (m) => {
-            // 제품↔콘텐츠 연결만 해제(콘텐츠·QR 자체는 보존).
-            await m.query(
-              `DELETE FROM kpa_store_content_product_links
-               WHERE organization_id = $1 AND product_source_type = $2 AND product_source_id = $3`,
-              [organizationId, it.sourceType, it.sourceId],
-            );
-            const table = it.sourceType === 'listing' ? 'organization_product_listings' : 'store_local_products';
-            const del: Array<{ id: string }> = await m.query(
-              `DELETE FROM ${table} WHERE id = $1 AND organization_id = $2 RETURNING id`,
-              [it.sourceId, organizationId],
-            );
-            if (del.length === 0) {
-              const e: any = new Error('NOT_FOUND');
-              e.code = 'NOT_FOUND';
-              throw e;
-            }
-          });
-          removed++;
-        } catch (e: any) {
-          failed.push({ sourceType: it.sourceType, sourceId: it.sourceId, reason: e?.code || e?.message || 'ERROR' });
-        }
-      }
-
-      res.json({ success: true, data: { removed, failed } });
+      const data = await removeHandledProducts(dataSource, organizationId, valid);
+      res.json({ success: true, data });
     } catch (error: any) {
       console.error('[StoreHandledProducts] POST /handled-products/remove error:', error);
       res.status(500).json({ success: false, error: 'Failed to remove handled products', code: 'INTERNAL_ERROR' });
