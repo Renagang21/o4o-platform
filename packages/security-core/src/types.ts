@@ -77,6 +77,8 @@ export interface ServiceScopeGuardConfig {
 /** User object shape expected by security guards */
 export interface SecurityUser {
   id: string;
-  scopes?: string[];
+  // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+  //   scopes 필드 제거 — 인증 미들웨어가 채운 적이 없는 값이다.
+  //   guard 판정은 roles + membership 으로만 이루어진다.
   roles?: string[];
 }

@@ -27,7 +27,7 @@ interface AuthRequest extends Request {
     email?: string;
     name?: string;
     roles?: string[];
-    scopes?: string[];
+    // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1: scopes 제거 (전달되지 않는 값)
   };
 }
 

@@ -7,16 +7,21 @@
 
 import type { Request, Response, NextFunction } from 'express';
 
-/** Create a mock user object matching SecurityUser shape */
+/**
+ * Create a mock user object matching SecurityUser shape
+ *
+ * WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+ *   `scopes` 를 제거했다. 인증 미들웨어가 req.user 에 scopes 를 채운 적이 없어
+ *   guard 가 실제로 보는 값은 roles 뿐이다. mock 이 실제보다 넓으면 죽은 축을
+ *   살아 있는 것처럼 검증하게 되므로 실제 shape 에 맞춘다.
+ */
 export function createMockUser(overrides: {
   id?: string;
   roles?: string[];
-  scopes?: string[];
 } = {}) {
   return {
     id: overrides.id ?? 'test-user-001',
     roles: overrides.roles ?? [],
-    scopes: overrides.scopes ?? [],
   };
 }
 

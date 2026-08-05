@@ -54,21 +54,10 @@ describe('KPA Scope Guard', () => {
     });
   });
 
-  describe('admin scope match', () => {
-    it('kpa:admin scope in JWT scopes → allowed', async () => {
-      const guard = requireKpaScope('kpa:operator');
-      const user = createMockUser({ scopes: ['kpa:admin'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
-    });
-
-    it('exact scope match in JWT scopes → allowed', async () => {
-      const guard = requireKpaScope('kpa:operator');
-      const user = createMockUser({ scopes: ['kpa:operator'] });
-      const result = await executeGuard(guard, user);
-      expect(result.allowed).toBe(true);
-    });
-  });
+  // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+  //   'admin scope match' describe 블록(JWT scopes 배열 기반 허용 2 케이스)을 제거했다.
+  //   guard 의 scope 분기 자체가 제거됐고, 인증 미들웨어가 req.user.scopes 를 채운 적이
+  //   없어 프로덕션에서 성립한 적 없는 경로였다. 역할 기반 허용/거부 케이스는 그대로 유지.
 
   // WO-KPA-SCOPE-HIERARCHY-FIX-V1: kpa:admin ⊃ kpa:operator
   describe('scope hierarchy (admin ⊃ operator)', () => {

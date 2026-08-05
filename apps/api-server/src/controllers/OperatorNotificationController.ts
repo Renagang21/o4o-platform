@@ -24,20 +24,16 @@ export class OperatorNotificationController {
    */
   getSettings = async (req: Request, res: Response) => {
     try {
-      // Determine service code from query or user's scope
+      // Determine service code from query
+      //
+      // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+      //   기존에는 query 가 비었을 때 `req.user.scopes` 에서 `*:operator` 를 찾아
+      //   serviceCode 를 유추했으나, 인증 미들웨어가 scopes 를 req.user 로 전달한 적이
+      //   없어 이 분기는 한 번도 실행되지 않았다. 죽은 분기를 제거하고 기존과 동일하게
+      //   query 미지정 시 'neture' 기본값을 사용한다.
       let serviceCode = req.query.serviceCode as string;
 
-      // If no service code provided, try to get from user's scopes
-      if (!serviceCode && req.user) {
-        const userScopes = (req.user as any).scopes || [];
-        // Find service-specific scope (e.g., 'neture:operator', 'glycopharm:operator')
-        const serviceScope = userScopes.find((s: string) => s.includes(':operator'));
-        if (serviceScope) {
-          serviceCode = serviceScope.split(':')[0];
-        }
-      }
-
-      // Default to 'neture' if still no service code
+      // Default to 'neture' if no service code
       serviceCode = serviceCode || 'neture';
 
       const settings = await this.settingsRepository.findOne({
@@ -118,15 +114,9 @@ export class OperatorNotificationController {
       }
 
       // Determine service code
+      // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+      //   getSettings 와 동일하게 `req.user.scopes` 기반 유추 분기를 제거했다 (실행 이력 0).
       let serviceCode = bodyServiceCode || (req.query.serviceCode as string);
-
-      if (!serviceCode && req.user) {
-        const userScopes = (req.user as any).scopes || [];
-        const serviceScope = userScopes.find((s: string) => s.includes(':operator'));
-        if (serviceScope) {
-          serviceCode = serviceScope.split(':')[0];
-        }
-      }
 
       serviceCode = serviceCode || 'neture';
 

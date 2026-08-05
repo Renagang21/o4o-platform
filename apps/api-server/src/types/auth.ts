@@ -147,8 +147,10 @@ export interface AccessTokenPayload {
   permissions?: string[];
   /** 다중 역할 배열 (WO-O4O-ROLE-MODEL-UNIFICATION-PHASE1-V1) */
   roles?: string[];
-  /** 서비스 스코프 목록 (WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1) */
-  scopes?: string[];
+  // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+  //   scopes claim 제거. 인증 미들웨어가 req.user 로 전달한 적이 없어
+  //   백엔드 권한 판정에 연결된 적 없는 미완성 축이었다.
+  //   프런트 user.scopes 는 GET /auth/me 응답에서 계속 공급된다.
   /** 서비스별 멤버십 상태 (WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1) */
   memberships?: { serviceKey: string; status: string; role?: string }[];
   /**

@@ -156,15 +156,11 @@ export const SERVICE_SCOPES: Record<string, ServiceScopes> = {
   },
 };
 
-/**
- * 서비스의 모든 스코프 조회
- * WO-KPA-OPERATOR-SCOPE-UNIFICATION-V1: operator 레벨 포함
- */
-export function getAllScopes(serviceCode: string): string[] {
-  const scopes = SERVICE_SCOPES[serviceCode];
-  if (!scopes) return [];
-  return [...scopes.public, ...scopes.member, ...scopes.operator, ...scopes.admin];
-}
+// WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+//   소비처가 0 이던 scope 전용 helper 를 제거했다
+//   (getAllScopes · hasScope · extractServiceFromScope · hasAnyScopes).
+//   남은 SERVICE_SCOPES · getScopesByLevel 은 deriveUserScopes() → GET /auth/me 의
+//   `user.scopes` 응답 계산 경로에서만 사용된다.
 
 /**
  * 스코프 레벨별 조회
@@ -173,30 +169,6 @@ export function getScopesByLevel(serviceCode: string, level: ScopeLevel): string
   const scopes = SERVICE_SCOPES[serviceCode];
   if (!scopes) return [];
   return scopes[level] || [];
-}
-
-/**
- * 스코프 존재 여부 확인
- */
-export function hasScope(serviceCode: string, scope: string): boolean {
-  return getAllScopes(serviceCode).includes(scope);
-}
-
-/**
- * 스코프에서 서비스 코드 추출
- * 예: 'glycopharm:products:read' → 'glycopharm'
- */
-export function extractServiceFromScope(scope: string): string | null {
-  const parts = scope.split(':');
-  if (parts.length < 2) return null;
-  return parts[0];
-}
-
-/**
- * 서비스에 스코프가 정의되어 있는지 확인
- */
-export function hasAnyScopes(serviceCode: string): boolean {
-  return getAllScopes(serviceCode).length > 0;
 }
 
 // ============================================================================

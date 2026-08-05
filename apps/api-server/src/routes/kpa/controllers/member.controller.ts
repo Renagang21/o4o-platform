@@ -1498,7 +1498,12 @@ export function createMemberController(
             serviceKeys: ['kpa-society'],
           });
 
-          const operatorRole = (req as any).user?.scopes?.includes('kpa:admin') ? 'kpa:admin' : 'kpa:operator';
+          // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+          //   기존 `user.scopes.includes('kpa:admin')` 분기는 scopes 가 req.user 로
+          //   전달된 적이 없어 항상 false 였고, 이 감사 로그 라벨은 실제로 늘
+          //   'kpa:operator' 로 기록돼 왔다. 죽은 분기만 제거하고 현행 동작을 유지한다.
+          //   (라벨 정확도 개선은 role 축 기반으로 별도 판단한다.)
+          const operatorRole = 'kpa:operator';
           try {
             await auditRepo.save(auditRepo.create({
               operator_id: (req as any).user?.id,
@@ -1535,16 +1540,17 @@ export function createMemberController(
         //   판정을 사용하므로 이 인라인 체크는 그 결과와 일치한다.
         const reqUser = (req as any).user;
         const userRoles: string[] = reqUser?.roles ?? [];
-        const userScopes: string[] = reqUser?.scopes ?? [];
         const memberships: Array<{ serviceKey: string; role?: string }> =
           Array.isArray(reqUser?.memberships) ? reqUser.memberships : [];
         const hasAdminRole = userRoles.includes('kpa:admin');
-        // 방어적: 향후 scopes 에 리터럴 'kpa:admin' 이 들어올 수 있을 경우도 허용
-        const hasAdminScope = userScopes.includes('kpa:admin');
+        // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+        //   방어적으로 남겨 두었던 `userScopes.includes('kpa:admin')` 조건을 제거했다.
+        //   scopes 는 req.user 로 전달되지 않아 항상 false 였으므로 판정은 불변이며,
+        //   canonical 축인 role 과 membership 만 남는다.
         const hasAdminMembership = memberships.some(
           (m) => (m.serviceKey === 'kpa-society' || m.serviceKey === 'kpa') && m.role === 'admin',
         );
-        if (!hasAdminRole && !hasAdminScope && !hasAdminMembership) {
+        if (!hasAdminRole && !hasAdminMembership) {
           res.status(403).json({
             success: false,
             error: 'FORBIDDEN',

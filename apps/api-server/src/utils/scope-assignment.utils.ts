@@ -8,6 +8,11 @@
  * - 역할에서 스코프 자동 도출
  * - 서비스별 스코프 레벨 매핑
  * - prefixed role (예: 'platform:super_admin', 'neture:operator') 및 unprefixed role 모두 지원
+ *
+ * WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+ *   **백엔드 권한 판정에는 사용되지 않는다.** 유일한 소비처는 GET /auth/me 가
+ *   프런트에 내려 주는 `user.scopes` 계산이며, access token claim 생성에서는 제거됐다.
+ *   backend guard 에 scope 축을 다시 도입하지 않는다.
  */
 
 import { SERVICE_SCOPES, getScopesByLevel, type ScopeLevel } from '../config/service-scopes.js';
@@ -86,25 +91,6 @@ function rolesToScopeLevel(role: string, roles?: string[]): ScopeLevel {
 }
 
 // ============================================================================
-// Service Context Detection
-// ============================================================================
-
-/**
- * 역할에서 서비스 컨텍스트 힌트
- */
-function detectServiceFromRole(role: string, roles?: string[]): string[] {
-  const services: string[] = [];
-  const allRoles = new Set([role, ...(roles || [])]);
-
-  // super_admin/admin은 모든 서비스 접근 가능
-  if (hasRole(allRoles, 'super_admin') || hasRole(allRoles, 'admin')) {
-    return Object.keys(SERVICE_SCOPES);
-  }
-
-  return services;
-}
-
-// ============================================================================
 // Main Scope Assignment Functions
 // ============================================================================
 
@@ -165,29 +151,8 @@ export function deriveUserScopes(context: ScopeAssignmentContext): string[] {
   return Array.from(scopes);
 }
 
-/**
- * 간단한 역할 기반 스코프 조회 (서비스 컨텍스트 없이)
- */
-export function getBasicScopesForRole(role: string): string[] {
-  return deriveUserScopes({ role });
-}
-
-/**
- * 특정 서비스의 운영자 스코프 조회
- */
-export function getOperatorScopesForService(serviceCode: string): string[] {
-  return deriveUserScopes({
-    role: 'operator',
-    serviceCode,
-  });
-}
-
-/**
- * KPA Society 운영자 스코프 조회
- */
-export function getKpaSocietyOperatorScopes(): string[] {
-  return deriveUserScopes({
-    role: 'operator',
-    serviceCode: 'kpa-society',
-  });
-}
+// WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+//   소비처가 0 이던 scope 전용 helper 를 제거했다
+//   (getBasicScopesForRole · getOperatorScopesForService · getKpaSocietyOperatorScopes,
+//    그리고 deriveUserScopes 가 호출하지 않던 detectServiceFromRole).
+//   남은 deriveUserScopes 는 GET /auth/me 의 user.scopes 응답 계산에만 쓰인다.

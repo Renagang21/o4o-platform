@@ -4,7 +4,6 @@ import { User } from '../entities/User.js';
 import { AccessTokenPayload, RefreshTokenPayload, AuthTokens, TokenType } from '../types/auth.js';
 import type { ServiceUserData, GuestUserData } from '../types/account-linking.js';
 import logger from './logger.js';
-import { deriveUserScopes } from './scope-assignment.utils.js';
 import { resolveAccountAccess } from '../common/auth/account-access.policy.js';
 
 /**
@@ -80,12 +79,11 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
   const userRoles = roles;
   const primaryRole = userRoles[0] || 'user';
 
-  // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1: 역할 기반 스코프 도출
-  const userScopes = deriveUserScopes({
-    role: primaryRole,
-    roles: userRoles,
-  });
-
+  // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+  //   access token 의 scopes claim 생성을 제거했다. 인증 미들웨어가 payload.scopes 를
+  //   req.user 로 전달한 적이 없어 백엔드 권한 판정에 연결된 적이 없는 축이다.
+  //   프런트가 소비하는 user.scopes 는 GET /auth/me 가 deriveUserScopes() 로 별도
+  //   계산해 응답하므로 그대로 유지된다 (본 변경의 영향 없음).
   const payload: AccessTokenPayload = {
     userId: user.id,
     sub: user.id,
@@ -93,7 +91,6 @@ export function generateAccessToken(user: User, roles: string[], domain: string 
     role: primaryRole,
     roles: userRoles, // Phase3-E: from RoleAssignment
     permissions: user.permissions || [],
-    scopes: userScopes, // WO-KPA-OPERATOR-SCOPE-ASSIGNMENT-OPS-V1
     memberships: memberships || [], // WO-O4O-SERVICE-MEMBERSHIP-GUARD-V1
     // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1:
     //   users.status 에서 파생되는 계정 접근 상태. 프론트 분기용 힌트이며
@@ -139,7 +136,6 @@ export function generateServiceAccessToken(
     name: serviceUser.displayName,
     role: 'service_user', // Not a platform role, just for identification
     permissions: [],       // Service users have no platform permissions
-    scopes: [],            // Service users have no platform scopes
     tokenType: 'service',  // Phase 1: Service User 인증 기반
     serviceId: serviceUser.serviceId,
     storeId: serviceUser.storeId,
@@ -475,7 +471,6 @@ export function generateGuestAccessToken(
     sub: guestData.guestSessionId,
     role: 'guest', // Not a platform role, just for identification
     permissions: [],    // Guest users have no platform permissions
-    scopes: [],         // Guest users have no platform scopes
     tokenType: 'guest', // Phase 3: Guest 인증
     serviceId: guestData.serviceId,
     storeId: guestData.storeId,

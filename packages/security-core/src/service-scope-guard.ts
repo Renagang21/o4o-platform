@@ -56,12 +56,12 @@ export function createServiceScopeGuard(
         return;
       }
 
-      const userScopes: string[] = user.scopes || [];
       const userRoles: string[] = user.roles || [];
 
-      // --- Check JWT scopes ---
-      const adminScope = `${serviceKey}:admin`;
-      const hasScope = userScopes.includes(scope) || userScopes.includes(adminScope);
+      // WO-O4O-LEGACY-BACKEND-JWT-SCOPE-BRANCH-REMOVAL-V1:
+      //   기존의 `user.scopes` 기반 허용 분기를 제거했다. 인증 미들웨어가 JWT 의
+      //   scopes claim 을 req.user 로 전달한 적이 없어 항상 false 로만 평가되던
+      //   미완성 축이다. 판정은 아래 role 기반 경로가 전담한다 (동작 불변).
 
       // --- Priority 1: Check service-prefixed roles ---
       let rolesToCheck: string[];
@@ -81,7 +81,7 @@ export function createServiceScopeGuard(
 
       const hasServiceRole = userRoles.some(r => rolesToCheck.includes(r));
 
-      if (hasScope || hasServiceRole) {
+      if (hasServiceRole) {
         next();
         return;
       }
