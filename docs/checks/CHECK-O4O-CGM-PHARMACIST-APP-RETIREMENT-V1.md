@@ -144,8 +144,16 @@
 
 | 항목 | 값 |
 |------|-----|
-| 커밋 | (본 문서 커밋 시 기재) |
-| CI | (GREEN 확인 후 기재) |
+| 커밋 | `5c34c0aac` — `chore(admin): CGM Pharmacist App 레거시 은퇴 (WO-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1)` (47 files, +174 / −4502) |
+| push | `76b5a2271..5c34c0aac  main -> main` (fast-forward) |
+| CI Pipeline | `30972246646` — **success** |
+| AppStore Guard | `30972246633` — **success** |
+| CodeQL Security Analysis | `30972246634` — **success** |
+| Deploy Admin Dashboard (Cloud Run) | `30972246609` — **success** |
+| Deploy API Server (Cloud Run) | `30972246613` — **success** |
+| Deploy Web Services (Cloud Run) | `30972246622` — **success** |
+
+> 커밋 시 pre-commit 훅이 lockfile 을 재확인했고 "Lockfile is up to date" 로 통과했다(§2-3 에서 이미 재생성 완료).
 
 ---
 
