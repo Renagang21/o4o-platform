@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "step": "8-independent-verification",
+  "importsProducer": false,
+  "pilot": 500,
+  "withHtml": 495,
+  "checks": {
+    "populationMismatch": 0,
+    "attributionWrong": 0,
+    "foreignSource": 0,
+    "requiredSectionMissing": 0,
+    "medicalAddition": 0,
+    "numericChanged": 0,
+    "negationLost": 0,
+    "strengthWeakened": 0,
+    "routeChanged": 0,
+    "truncated": 0,
+    "labelInvasion": 0,
+    "md5Mismatch": 0,
+    "missingHtmlNotHold": 0
+  },
+  "samples": {},
+  "inject": null,
+  "dbWrites": 0,
+  "result": "PASS"
+}

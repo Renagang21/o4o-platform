@@ -1,0 +1,22 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "endpoint": "https://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList",
+  "pageSize": 500,
+  "pages": 10,
+  "apiTotalCount": 4775,
+  "fetchedItems": 4758,
+  "duplicateItemSeqDropped": 17,
+  "withAllRequired": 4748,
+  "missingEfficacy": 9,
+  "missingUsage": 5,
+  "sectionPresence": {
+    "efcyQesitm": 4749,
+    "useMethodQesitm": 4753,
+    "atpnWarnQesitm": 1132,
+    "atpnQesitm": 4747,
+    "intrcQesitm": 3307,
+    "seQesitm": 4525,
+    "depositMethodQesitm": 4746
+  },
+  "distinctSourceHash": 3669
+}

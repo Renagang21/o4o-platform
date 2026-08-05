@@ -1,0 +1,26 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "step": "5-6-7-build-and-preserve",
+  "pilot": 500,
+  "built": 495,
+  "verdicts": {
+    "PILOT_PASS": 495,
+    "SOURCE_INCOMPLETE": 5
+  },
+  "axisHitMasters": {
+    "sourceIncomplete": 5
+  },
+  "distinctNewMd5": 400,
+  "dbWrites": 0,
+  "areaLabels": {
+    "overview": "제품 개요",
+    "efficacy": "효능·효과",
+    "usage": "사용 방법",
+    "prohibition": "사용하면 안 되는 경우",
+    "consult": "사용 전 상담이 필요한 경우",
+    "caution": "사용 중 주의사항",
+    "sideEffect": "이상반응",
+    "interaction": "상호작용",
+    "storage": "보관 방법"
+  }
+}

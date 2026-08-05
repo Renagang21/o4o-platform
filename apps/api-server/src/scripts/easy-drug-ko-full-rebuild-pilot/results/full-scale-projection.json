@@ -1,0 +1,42 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "step": "10-full-scale-projection",
+  "method": "파일럿과 동일한 생산 계약을 전 모집단에 실제 적용한 실측(비율 외삽 아님)",
+  "linkedMasters": 19507,
+  "status": {
+    "PRODUCIBLE": 19363,
+    "HOLD_EXCLUDED": 42,
+    "HOLD_NO_API_SOURCE": 70,
+    "HOLD_SOURCE_INCOMPLETE": 32,
+    "HOLD_STRUCTURE_ANOMALY": 0
+  },
+  "excludedReason": {
+    "PROFESSIONAL_USE": 42
+  },
+  "holdTotal": 144,
+  "producibleRate": 99.26,
+  "holdRate": 0.74,
+  "producibleItemSeq": 4739,
+  "estimatedHtmlBytes": 72124320,
+  "estimatedHtmlMB": 68.8,
+  "pilotReference": {
+    "pilot": 500,
+    "pilotPass": 495,
+    "sourceIncomplete": 5,
+    "systemFailures": 0
+  },
+  "existingKoDefectRate": {
+    "mastersCompared": 473,
+    "missing": 453,
+    "extra": 287,
+    "contradiction": 175,
+    "wrongAttribution": 2,
+    "truncation": 13,
+    "cleanMasters": 20,
+    "sourcePreservation": "76.9% → 100%"
+  },
+  "downstream": {
+    "note": "정상 KO 교체 후 재번역·비노출 판단 대상. 이번 WO 에서는 변경 0."
+  },
+  "dbWrites": 0
+}

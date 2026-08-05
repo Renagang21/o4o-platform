@@ -1,0 +1,60 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "step": "2-population-census",
+  "reference": {
+    "masters": 19431,
+    "permits": 4757,
+    "comparisonUnits": 5198,
+    "note": "참고값 — 목표 아님"
+  },
+  "identifierMastersAll": 194561,
+  "identifierItemSeqAll": 65248,
+  "linkedMasters": 19507,
+  "linkedItemSeq": 4782,
+  "mastersPerItemSeq": {
+    "2-5": 3908,
+    "6-20": 849,
+    "21-100": 24,
+    "100+": 1
+  },
+  "maxMastersPerItemSeq": 114,
+  "apiFetchedItemSeq": 4758,
+  "apiMissingItemSeq": 24,
+  "apiOnlyNotStored": 25,
+  "storedOnlyNotInApi": 24,
+  "apiItemSeqUnlinked": 0,
+  "hashMatch": 4569,
+  "hashDiffer": 164,
+  "hashSectionDiffDistribution": {
+    "atpnQesitm": 116,
+    "seQesitm": 126,
+    "depositMethodQesitm": 71,
+    "useMethodQesitm": 62,
+    "intrcQesitm": 86,
+    "efcyQesitm": 5,
+    "atpnWarnQesitm": 20
+  },
+  "missingRequiredItemSeq": 10,
+  "missingEfficacy": 9,
+  "missingUsage": 5,
+  "excludedMasters": 42,
+  "excludedBreakdown": {
+    "PROFESSIONAL_USE": 42
+  },
+  "itemSeqWithSplitKo": 385,
+  "itemSeqWithNoKo": 65,
+  "comparisonUnits": 5171,
+  "koCanonicalMasters": 19138,
+  "enCanonicalMasters": 19081,
+  "zhCanonicalMasters": 912,
+  "jaCanonicalMasters": 0,
+  "storedOctKeys": [
+    "caution",
+    "efficacy",
+    "interaction",
+    "sideEffect",
+    "storage",
+    "usage",
+    "warning"
+  ]
+}

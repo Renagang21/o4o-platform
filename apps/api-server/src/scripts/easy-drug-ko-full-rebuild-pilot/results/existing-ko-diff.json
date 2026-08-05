@@ -1,0 +1,32 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-PIPELINE-PILOT-VALIDATION-V1",
+  "step": "9-existing-ko-diff",
+  "note": "기존 KO 는 생성 입력이 아니며 결과 비교에만 사용했다. DB write 0.",
+  "pilot": 500,
+  "withExistingKo": 473,
+  "noExistingKo": 27,
+  "sourceItemsTotal": 6319,
+  "preservedTotal": 4859,
+  "missingTotal": 1458,
+  "mastersWithMissing": 453,
+  "mastersWithExtra": 287,
+  "mastersWithContradiction": 175,
+  "mastersWithWrongAttribution": 2,
+  "mastersWithTruncation": 13,
+  "mastersClean": 20,
+  "extraSentencesTotal": 752,
+  "truncationsTotal": 28,
+  "newLeafletPreservedTotal": 6248,
+  "newLeafletMissingTotal": 0,
+  "existingKoPreservationRate": 76.9,
+  "newKoPreservationRate": 100,
+  "resolvedByRebuild": {
+    "missingItems": 1458,
+    "mastersWithMissing": 453,
+    "mastersWithExtra": 287,
+    "mastersWithContradiction": 175,
+    "mastersWithWrongAttribution": 2,
+    "mastersWithTruncation": 13
+  },
+  "dbWrites": 0
+}
