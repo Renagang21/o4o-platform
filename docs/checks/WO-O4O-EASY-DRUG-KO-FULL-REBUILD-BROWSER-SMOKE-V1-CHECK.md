@@ -149,7 +149,20 @@ WO 규정대로 제품별 진행을 멈추고 최소 수정했다 — [`ProductL
 
 ---
 
-## 7. 후속 (이번 범위 밖)
+## 7. commit · push · 배포 결과
+
+| 커밋 | 내용 | 배포 |
+|---|---|---|
+| `873ac46e6` | [`ProductLandingPage.tsx`](../../services/web-neture/src/pages/ProductLandingPage.tsx) 제목 가로 넘침 수정 + run1 결함 증거 | web 배포 run `30977947529` **success** |
+| `dc97a5d0c` | 본 CHECK · 검증 스크립트 6종 · 결과 산출물 · 대표 증거 3장 (24 파일) | docs·scripts 전용 → 배포 불필요 |
+
+- 두 커밋 모두 `git commit -- <파일 목록>` path-specific 으로만 스테이징했고, 타 세션 WIP 는 미접촉이다.
+- 배포 반영 확인: 이후 타 세션 배포(`bfa0a3d7f`, `4274982e5`)까지 success 이며, 현재 서빙 중인 번들 `assets/index-Fo046BVn.css` 에 `overflow-wrap:anywhere` 가 그대로 남아 있다(§3 C층).
+- **정정 기록** — `dc97a5d0c` 커밋 시도 중 `-F -` 를 `--` 뒤에 두어 git 이 옵션을 pathspec 으로 해석해 커밋이 실패했는데, 같은 명령줄에 이어 붙인 `git push` 는 그대로 실행되어 **타 세션이 로컬에 만들어 둔 커밋 `1fbe5ad01` 이 함께 push** 되었다. 해당 커밋 내용은 건드리지 않았고 이력 재작성도 하지 않는다.
+
+---
+
+## 8. 후속 (이번 범위 밖)
 
 - HOLD KO 130건 `MANUAL_REVIEW` 유지
 - 전문의약품 42건 별도 후속 감사
