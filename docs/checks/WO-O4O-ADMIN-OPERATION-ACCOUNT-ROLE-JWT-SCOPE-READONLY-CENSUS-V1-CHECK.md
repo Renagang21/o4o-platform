@@ -464,8 +464,16 @@ WO 지시대로 위 경로를 **하나도 호출하지 않았다.**
 ## 20. 커밋 · push · ahead/behind
 
 - 커밋 대상: 본 CHECK 문서 1개 (`docs/checks/WO-O4O-ADMIN-OPERATION-ACCOUNT-ROLE-JWT-SCOPE-READONLY-CENSUS-V1-CHECK.md`)
-- 정확한 파일 경로 pathspec 으로만 add·commit 하였다.
-- 커밋·push 결과는 커밋 직후 §20 에 보정 커밋으로 기재한다 (push 된 커밋 amend 금지).
+- 정확한 파일 경로 pathspec 으로만 add·commit 하였다. 인덱스에 타 세션의 staged delete 가 있었으므로 `git commit -- <파일>` 형태로 **본 파일만** 커밋했다.
+
+| 항목 | 값 |
+|---|---|
+| 커밋 | `94a407e8a` |
+| 포함 파일 | `docs/checks/WO-O4O-ADMIN-OPERATION-ACCOUNT-ROLE-JWT-SCOPE-READONLY-CENSUS-V1-CHECK.md` 1개 |
+| push | `ed066f840..94a407e8a  main -> main` 성공 |
+| ahead / behind | 0 / 0 |
+
+(push 된 커밋은 amend 하지 않고 본 보정을 후속 커밋으로 남긴다.)
 
 ---
 
