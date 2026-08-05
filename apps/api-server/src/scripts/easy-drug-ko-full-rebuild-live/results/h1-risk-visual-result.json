@@ -1,0 +1,18 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1",
+  "step": "h1-risk-visual",
+  "targets": 84,
+  "loads": 252,
+  "byVerdict": {
+    "CHAR_BREAK": 1
+  },
+  "productsWithFindings": 1,
+  "priorDefect14Reproduced": 1,
+  "maxLines": {
+    "desktop": 4,
+    "mobile": 10,
+    "tablet": 4
+  },
+  "dbWrites": 0,
+  "result": "REVIEW"
+}

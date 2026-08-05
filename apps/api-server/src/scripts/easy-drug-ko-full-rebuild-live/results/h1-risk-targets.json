@@ -1,0 +1,1857 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1",
+  "step": "select-h1-risk",
+  "total": 84,
+  "byGroup": {
+    "G1_prior_defect": 14,
+    "G2_name_length": 30,
+    "G3_longest_token": 30,
+    "G4_export_name": 20,
+    "G7_max_lines": 20,
+    "G5_mixed_script": 20,
+    "G6_min_slack": 20
+  },
+  "nameLength": {
+    "max": 134,
+    "min": 8
+  },
+  "mobileLines": {
+    "max": 10
+  },
+  "targets": [
+    {
+      "publicKey": "dnuvvvmymip6",
+      "masterId": "374575df-d6d4-4c2e-951c-a1b3f8002d01",
+      "productName": "신신물파스에스(수출명:HEATWAVEARTHROHONLINIMENTPANOPASY&JWATER)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 53,
+        "spaceCount": 0,
+        "longestToken": 53,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 3,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.02,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "as9pxve3hsuc",
+      "masterId": "5db215b2-b2eb-49dd-9714-451e6b1252a3",
+      "productName": "이지드롭점안액(수출명:아티피셜티어즈점안액제티어점안액게리케어아티피셜티어즈점안액)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 43,
+        "spaceCount": 0,
+        "longestToken": 43,
+        "hasExportName": true,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 10,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "jnie6vnq9dah",
+      "masterId": "3fa88beb-dd17-4c90-a2f9-2600b031e247",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 22,
+        "spaceCount": 0,
+        "longestToken": 22,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 10,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "kw6dyk5g2y7y",
+      "masterId": "b22b8c69-ad5a-42bb-a3ac-cdd5562fff22",
+      "productName": "화이투벤나잘스프레이0.1%(자일로메타졸린염산염)/화이투벤멘톨나잘스프레이0.1%(자일로메타졸린염산염)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 55,
+        "spaceCount": 0,
+        "longestToken": 55,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 9,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.22,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "7yiv9hssk4z5",
+      "masterId": "68c12d33-bfd5-46e0-a701-ed31b9700fcf",
+      "productName": "피지오머비강세척액스프레이노즐(멸균등장해수)/피지오머비강세척액젯노즐(멸균등장해수)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 44,
+        "spaceCount": 0,
+        "longestToken": 44,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 10,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "77mxde4mfh64",
+      "masterId": "78074156-0777-48a1-bed7-46e68e0b7e37",
+      "productName": "아이엠씨점안액1%(카르복시메틸셀룰로오스나트륨)(1회용)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 30,
+        "spaceCount": 0,
+        "longestToken": 30,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.61,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "fdzmrf72s8us",
+      "masterId": "5fcc1926-ae21-480c-acc6-394e61c6c8fc",
+      "productName": "라이트프레쉬점안액0.5%(카르복시메틸셀룰로오스나트륨)(1회용)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 34,
+        "spaceCount": 0,
+        "longestToken": 34,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 6,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.61,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "xdifmqhq9e9y",
+      "masterId": "ce82d940-72a0-4571-86bd-7029520e3381",
+      "productName": "메클린구강용해필름25밀리그램(메클리진염산염수화물)(오렌지향)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 33,
+        "spaceCount": 0,
+        "longestToken": 33,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 6.98,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "b4776n8keca7",
+      "masterId": "bc5cab7a-7e92-41cf-8d70-2ba2f5e43a7e",
+      "productName": "퍼스크린액0.12%(클로르헥시딘글루콘산염액)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 24,
+        "spaceCount": 0,
+        "longestToken": 24,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.61,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "nsqf4xf8pkp4",
+      "masterId": "da50fcd5-f96b-43d8-a8b7-4acd8244eb74",
+      "productName": "한국웨일즈이부프로펜정400밀리그람",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 18,
+        "spaceCount": 0,
+        "longestToken": 18,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 0,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 6.98,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "emwzxzam6zva",
+      "masterId": "4668ae31-6cc7-4d0a-85c2-17ebb2338895",
+      "productName": "시프겔한방파프카타플라스마",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 13,
+        "spaceCount": 0,
+        "longestToken": 13,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 0,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 10,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "myznbp9jpte4",
+      "masterId": "91cbe819-d38b-4219-9425-89b92ea56db7",
+      "productName": "한미유리아크림200밀리그램(우레아)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 19,
+        "spaceCount": 0,
+        "longestToken": 19,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 15.48,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "m6nuk3g5efns",
+      "masterId": "21f34f2a-770b-438f-85cd-3af380f51464",
+      "productName": "알파키연질캡슐1마이크로그램(알파칼시돌)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 21,
+        "spaceCount": 0,
+        "longestToken": 21,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 18.48,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "kyrctc5qfdwm",
+      "masterId": "6c059fc7-2d4a-44a3-ad93-03c71b67730d",
+      "productName": "알파키연질캡슐0.5마이크로그램(알파칼시돌)",
+      "groups": [
+        "G1_prior_defect"
+      ],
+      "risk": {
+        "len": 23,
+        "spaceCount": 0,
+        "longestToken": 23,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 3,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 1.56,
+      "mobileLines": 2,
+      "mobileHeightPx": 56
+    },
+    {
+      "publicKey": "eg4h8irrv2db",
+      "masterId": "64e0a0f8-6195-48d2-b187-55042ef5ee67",
+      "productName": "케논에스플라스타(케토프로펜)수출명:케논에스플라스타(Kenon-SPlaster)케토플라스트패취(KetoplastPatch)케토밴드(Ketoband)케토티디디에스플라스타(Keto-TDDSPlaster)케토덤플라스타(KetodermPlaster)",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 134,
+        "spaceCount": 0,
+        "longestToken": 134,
+        "hasExportName": true,
+        "latinRun": 15,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 7.39,
+      "mobileLines": 10,
+      "mobileHeightPx": 280
+    },
+    {
+      "publicKey": "zrrn3xxbcyvx",
+      "masterId": "75eb88da-5ebe-4757-be1d-d8f33387d424",
+      "productName": "케논에스플라스타(케토프로펜)수출명:케논에스플라스타(Kenon-SPlaster)케토플라스트패취(KetoplastPatch)케토밴드(Ketoband)케토티디디에스플라스타(Keto-TDDSPlaster)케토덤플라스타(KetodermPlaster)",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 134,
+        "spaceCount": 0,
+        "longestToken": 134,
+        "hasExportName": true,
+        "latinRun": 15,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 7.39,
+      "mobileLines": 10,
+      "mobileHeightPx": 280
+    },
+    {
+      "publicKey": "tp5yayhwiejp",
+      "masterId": "acc75137-1dc1-4bd9-8c93-78baef827a36",
+      "productName": "케논에스플라스타(케토프로펜)수출명:케논에스플라스타(Kenon-SPlaster)케토플라스트패취(KetoplastPatch)케토밴드(Ketoband)케토티디디에스플라스타(Keto-TDDSPlaster)케토덤플라스타(KetodermPlaster)",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 134,
+        "spaceCount": 0,
+        "longestToken": 134,
+        "hasExportName": true,
+        "latinRun": 15,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 7.39,
+      "mobileLines": 10,
+      "mobileHeightPx": 280
+    },
+    {
+      "publicKey": "zy3tycg9qmti",
+      "masterId": "b46fc848-17fa-47f3-a8d8-51f15079ae92",
+      "productName": "케논에스플라스타(케토프로펜)수출명:케논에스플라스타(Kenon-SPlaster)케토플라스트패취(KetoplastPatch)케토밴드(Ketoband)케토티디디에스플라스타(Keto-TDDSPlaster)케토덤플라스타(KetodermPlaster)",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 134,
+        "spaceCount": 0,
+        "longestToken": 134,
+        "hasExportName": true,
+        "latinRun": 15,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 7.39,
+      "mobileLines": 10,
+      "mobileHeightPx": 280
+    },
+    {
+      "publicKey": "4sb5eprtpt9n",
+      "masterId": "e52a7753-89b8-4821-a5c0-4c8113e6298c",
+      "productName": "케논에스플라스타(케토프로펜)수출명:케논에스플라스타(Kenon-SPlaster)케토플라스트패취(KetoplastPatch)케토밴드(Ketoband)케토티디디에스플라스타(Keto-TDDSPlaster)케토덤플라스타(KetodermPlaster)",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 134,
+        "spaceCount": 0,
+        "longestToken": 134,
+        "hasExportName": true,
+        "latinRun": 15,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 7.39,
+      "mobileLines": 10,
+      "mobileHeightPx": 280
+    },
+    {
+      "publicKey": "d89a52vaxmdz",
+      "masterId": "08a1eb4a-ecdf-4e16-aebc-2d44360f38c2",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "8gahrt7aenmn",
+      "masterId": "18c66c4a-44fc-4adc-8081-6c497554cbce",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "99d9xx2jer2v",
+      "masterId": "3cd8759f-6484-485a-849c-eca9f345ef98",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "4nij8b5h2e93",
+      "masterId": "3f3ea654-60a1-4599-99a7-2f0fe1448d4e",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "2jepa7x3amhd",
+      "masterId": "46e9c2ac-36f6-491d-80d6-06250126f0bd",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "y3m5vukdf5ic",
+      "masterId": "4c45bb90-c414-4272-9c4f-f6f967b75983",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "4a522hsbvs29",
+      "masterId": "69665b0d-f2d2-4207-9c8d-ea70926efc94",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "9y8m3tuzqihv",
+      "masterId": "8adea964-5cd3-4f12-9b47-8e941e0c459d",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "z7vinjxjnes7",
+      "masterId": "95058867-4705-4365-969f-12f91424e3d4",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "cvdpgpg6u3yb",
+      "masterId": "ad6d6526-c08d-4c8f-8cea-8b397334af3a",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "zvy6c9fuxnbn",
+      "masterId": "b37a986a-6a34-4911-96f9-d790888cf75f",
+      "productName": "케논엘플라스타(케토프로펜)[수출명:케논-엘(Kenon-L)케토덤-엘(Ketoderm-L)케노덤(Kenoderm)페노덤(Fenoderm)케이트란스(Ketrans)케토플라스트-엘(Ketoplast-L)]",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 111,
+        "spaceCount": 0,
+        "longestToken": 111,
+        "hasExportName": true,
+        "latinRun": 9,
+        "mixedScript": true,
+        "symbolCount": 20,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 14.34,
+      "mobileLines": 8,
+      "mobileHeightPx": 224
+    },
+    {
+      "publicKey": "y3depm6g8vda",
+      "masterId": "87fa0084-c01d-4d0b-bae0-d41d2c02fcc1",
+      "productName": "펠스타플라스타(펠비낙)(수출명:펠스타(Felster)펠비나(Felbina)펠비덤(Felbiderm)모빌렉스(Mobilex)헥토플라스트(Hectoplast)페낙스(Fenacs))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name"
+      ],
+      "risk": {
+        "len": 98,
+        "spaceCount": 0,
+        "longestToken": 98,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 16,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 35.23,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "5ihhyzqufr9i",
+      "masterId": "acbf0bc6-1a4f-4c31-99c6-dc1b121e7e19",
+      "productName": "펠스타플라스타(펠비낙)(수출명:펠스타(Felster)펠비나(Felbina)펠비덤(Felbiderm)모빌렉스(Mobilex)헥토플라스트(Hectoplast)페낙스(Fenacs))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name"
+      ],
+      "risk": {
+        "len": 98,
+        "spaceCount": 0,
+        "longestToken": 98,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 16,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 35.23,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "u8epps3way8n",
+      "masterId": "cde0fc02-9e43-4bfe-9510-8a4b15aa553b",
+      "productName": "펠스타플라스타(펠비낙)(수출명:펠스타(Felster)펠비나(Felbina)펠비덤(Felbiderm)모빌렉스(Mobilex)헥토플라스트(Hectoplast)페낙스(Fenacs))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name"
+      ],
+      "risk": {
+        "len": 98,
+        "spaceCount": 0,
+        "longestToken": 98,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 16,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 35.23,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "z7676ahd6eu3",
+      "masterId": "dd3e4fce-9ebc-4da9-a1b7-dd8c3446e189",
+      "productName": "펠스타플라스타(펠비낙)(수출명:펠스타(Felster)펠비나(Felbina)펠비덤(Felbiderm)모빌렉스(Mobilex)헥토플라스트(Hectoplast)페낙스(Fenacs))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G4_export_name"
+      ],
+      "risk": {
+        "len": 98,
+        "spaceCount": 0,
+        "longestToken": 98,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 16,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 35.23,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "4d9zd9tf45ym",
+      "masterId": "227151a1-a706-4fc2-808f-fc976286caed",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "urka6uxnb8nd",
+      "masterId": "3139c029-e0e6-4136-9fcd-945d11019686",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "99x75icp9c6e",
+      "masterId": "50140229-4dd0-42e6-975f-4b7b28c02acc",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "tb3y5bdb4a2r",
+      "masterId": "658d659e-23e3-4a28-9be3-d76bb9f23a00",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token",
+        "G7_max_lines"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "j7zqxzx8vqrn",
+      "masterId": "c0a144d1-c813-4340-af31-712aac89638e",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "n59d8t35pegg",
+      "masterId": "c3dd242e-0ad2-41be-b02d-da667bab299d",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "bk7vzsm2ncqn",
+      "masterId": "ccaf4a7c-396a-43cf-a50a-e5613c52dd1c",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "t283rhqe7bb3",
+      "masterId": "ee8c44fa-2285-4ed1-beba-b9645417614b",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "kj676nvr7wka",
+      "masterId": "f0933403-65f1-49a1-8ef4-c905d18b2329",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "eyjhg5rnvgqm",
+      "masterId": "ffa33144-dab9-4d4b-9f8b-b7cdf0257e71",
+      "productName": "플럭스플라스타(플루르비프로펜수출명:플럭스(Flux)플루펜(Flufen)더마펜(Dermafen)플루르비덤(Flurbiderm)렉스펜(Rexfen)아티펜(Artifen))",
+      "groups": [
+        "G2_name_length",
+        "G3_longest_token"
+      ],
+      "risk": {
+        "len": 93,
+        "spaceCount": 0,
+        "longestToken": 93,
+        "hasExportName": true,
+        "latinRun": 10,
+        "mixedScript": true,
+        "symbolCount": 14,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.47,
+      "mobileLines": 7,
+      "mobileHeightPx": 196
+    },
+    {
+      "publicKey": "m58keja3cawb",
+      "masterId": "070833ab-afb8-465f-89d2-365940886ba2",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "4eba3f7t7tg7",
+      "masterId": "2c3b9221-0ec0-4fb3-bc17-d68ffabdbd95",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "tqmmu2tc6nci",
+      "masterId": "2dc98bb9-fc6f-424a-83a9-39cd85efc5b5",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "hubnbrfevehg",
+      "masterId": "77717a8e-b0a5-4dca-95dc-66ea62ed06b5",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "gb4pzsthpan9",
+      "masterId": "972d4111-6e82-4a57-b83e-c32fee6477a3",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "gbaa47k87gds",
+      "masterId": "df7463f1-7915-46d8-abcb-56c50f5c0a37",
+      "productName": "세라진정(세티리진염산염)[수출명:CeratabletAllergentabletUnizeftabletHighceratablet]",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 69,
+        "spaceCount": 0,
+        "longestToken": 69,
+        "hasExportName": true,
+        "latinRun": 50,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 0.5,
+      "mobileLines": 4,
+      "mobileHeightPx": 112
+    },
+    {
+      "publicKey": "xy3g4e9czncp",
+      "masterId": "52847605-3594-4aae-ac4f-a08cecb42a16",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)(수출용)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 77,
+        "spaceCount": 0,
+        "longestToken": 77,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 7,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "yhiet9mwdrw2",
+      "masterId": "a21b9cb9-a5e5-4b82-a6e3-3e3173c4929b",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)(수출용)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 77,
+        "spaceCount": 0,
+        "longestToken": 77,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 7,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "gpfju67re2ew",
+      "masterId": "0fecc7ed-d15f-4287-bb08-ecb5228b15cb",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 72,
+        "spaceCount": 0,
+        "longestToken": 72,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "emz6bsm8hgcp",
+      "masterId": "3fbfcc28-1969-4f5a-95dd-0f5f63d08f79",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 72,
+        "spaceCount": 0,
+        "longestToken": 72,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "89ypbur4vfqk",
+      "masterId": "a553c395-c19d-418f-ada9-4dea3c0fc707",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 72,
+        "spaceCount": 0,
+        "longestToken": 72,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "x93k3mzid246",
+      "masterId": "da2c45a1-4df9-49d8-9294-62144a895d92",
+      "productName": "하이로손크림(히드로코르티손)(수출명:Hydrocortisone1%CreamMaxStrengthHydrocortisoneCream)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 72,
+        "spaceCount": 0,
+        "longestToken": 72,
+        "hasExportName": true,
+        "latinRun": 35,
+        "mixedScript": true,
+        "symbolCount": 5,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 2.19,
+      "mobileLines": 5,
+      "mobileHeightPx": 140
+    },
+    {
+      "publicKey": "sbjyyyhjki7i",
+      "masterId": "3151e1e7-a319-4299-8e0d-dad374618302",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "ftxfztgrj4vv",
+      "masterId": "329e66c2-ce3c-4db9-877f-3767a72e60d8",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "apujrrsd67cy",
+      "masterId": "3513d46f-f9b2-4d70-9349-2c6985786eed",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "4irjmqngnmwr",
+      "masterId": "5b38a75f-7d56-4352-bc4b-ab29e8e3aaac",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "f4t6ugcf3whj",
+      "masterId": "6f64e3e2-e6e5-4e1b-b8ed-44daa59bc527",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "gczqp2ymperb",
+      "masterId": "75d965ce-a44a-408e-8049-51c21cb7271a",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "a8dijfxhcnwh",
+      "masterId": "83200660-7027-4bfb-8213-aeee6eccd73a",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "f4se5tzwgtak",
+      "masterId": "867481e0-e512-410c-aee3-6561e32659ea",
+      "productName": "케바논첩부제(케토프로펜)(수출명:PlasterJointPolyArtritoPlastKEPAX)",
+      "groups": [
+        "G5_mixed_script"
+      ],
+      "risk": {
+        "len": 52,
+        "spaceCount": 0,
+        "longestToken": 52,
+        "hasExportName": true,
+        "latinRun": 33,
+        "mixedScript": true,
+        "symbolCount": 4,
+        "hasFullWidth": false
+      },
+      "mobileSlack": 4.09,
+      "mobileLines": 3,
+      "mobileHeightPx": 84
+    },
+    {
+      "publicKey": "sm3hs29atz6w",
+      "masterId": "0a351655-5068-4252-9758-3a700bd87dda",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "jqz3g47gw395",
+      "masterId": "18a1ecdc-b8ef-4c15-817a-31d7b3e8b90f",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "vtb5e2c87c4r",
+      "masterId": "26844de0-cd50-4e58-82f0-a8980a88266b",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "a2b4ky7s4f43",
+      "masterId": "34add51f-93bf-4ea8-9c69-557dcb76cbac",
+      "productName": "벨라제정45mg(브로멜라인)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 15,
+        "spaceCount": 0,
+        "longestToken": 15,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "c48xefhc8tw6",
+      "masterId": "397f775f-5ed1-4f9d-8739-68e1adfa8992",
+      "productName": "벨라제정45mg(브로멜라인)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 15,
+        "spaceCount": 0,
+        "longestToken": 15,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "rg7ut9rrftpe",
+      "masterId": "3b106636-d156-4ac5-8599-80c5efa2f691",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "4t3jvukeqwy7",
+      "masterId": "49e15c4b-3019-4484-899e-3ed9c7af5966",
+      "productName": "아모틴정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "gbfrvjj4hzg5",
+      "masterId": "74c83e0d-11e4-4e55-bd60-9ca55f64b30e",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "eh9zq6jizasn",
+      "masterId": "a65ea3ad-196b-4903-b21e-fd661bc7584f",
+      "productName": "아모틴정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "9p5i6vnfx8ch",
+      "masterId": "b4e02199-963c-4a68-8903-64c751f81d01",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "pvyvfhmm2zce",
+      "masterId": "e2ab8e2b-3c53-414d-be0a-3b69aeb4aa9a",
+      "productName": "벨라제정45mg(브로멜라인)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 15,
+        "spaceCount": 0,
+        "longestToken": 15,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "j7sudrcm5wd5",
+      "masterId": "f9e98ecc-a4d8-4c14-b1d6-8e51e82d8e16",
+      "productName": "티파딘정10mg(파모티딘)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 14,
+        "spaceCount": 0,
+        "longestToken": 14,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.48,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "sgpmg9tv6j2e",
+      "masterId": "6485a448-bef4-4f61-919f-6cbad872eb2d",
+      "productName": "CBI젠트락스정(수출용)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 13,
+        "spaceCount": 0,
+        "longestToken": 13,
+        "hasExportName": true,
+        "latinRun": 0,
+        "mixedScript": true,
+        "symbolCount": 2,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.41,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "axsw77hmq34v",
+      "masterId": "836cfa44-7ce6-46fe-b865-38ade6e08ce0",
+      "productName": "디카듀오정100/1000",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 13,
+        "spaceCount": 0,
+        "longestToken": 13,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.41,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "xwprmbte3evn",
+      "masterId": "bf0d4bdc-763e-4c3b-81e4-33da79d61127",
+      "productName": "디카듀오정100/1000",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 13,
+        "spaceCount": 0,
+        "longestToken": 13,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.41,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "t37kdaqerzm2",
+      "masterId": "f8e48117-6577-4fb3-b9a9-0f7f6a3f1c4b",
+      "productName": "디카듀오정100/1000",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 13,
+        "spaceCount": 0,
+        "longestToken": 13,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.41,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "8s7hxsb4g5aj",
+      "masterId": "08ffaab2-3f82-4e7a-8bf0-0bc936a33932",
+      "productName": "뷰티스홈15%겔",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 8,
+        "spaceCount": 0,
+        "longestToken": 8,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.36,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "p2mk646p3gu5",
+      "masterId": "0fbb078e-45a1-4c8f-b689-1fb2a02552a5",
+      "productName": "뷰티스홈15%겔",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 8,
+        "spaceCount": 0,
+        "longestToken": 8,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.36,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "q4sn85m8ia92",
+      "masterId": "37c292d7-ba62-4195-a43b-41e019158088",
+      "productName": "5-엠씨크림(리도카인)",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 12,
+        "spaceCount": 0,
+        "longestToken": 12,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 3,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.36,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    },
+    {
+      "publicKey": "992k7vz5vaw9",
+      "masterId": "397788d1-65cd-4138-b03b-3def57d4656b",
+      "productName": "뷰티스홈15%겔",
+      "groups": [
+        "G6_min_slack"
+      ],
+      "risk": {
+        "len": 8,
+        "spaceCount": 0,
+        "longestToken": 8,
+        "hasExportName": false,
+        "latinRun": 0,
+        "mixedScript": false,
+        "symbolCount": 1,
+        "hasFullWidth": false
+      },
+      "mobileSlack": -0.36,
+      "mobileLines": 1,
+      "mobileHeightPx": 28
+    }
+  ]
+}

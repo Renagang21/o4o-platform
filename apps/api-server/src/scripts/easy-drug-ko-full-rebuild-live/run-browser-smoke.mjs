@@ -181,6 +181,8 @@ function judge(target, vp, m) {
 async function main() {
   fs.mkdirSync(SHOTS, { recursive: true });
   let targets = JSON.parse(fs.readFileSync(path.join(RESULTS, 'browser-smoke-targets.json'), 'utf8'));
+  const only = arg('--only', '');
+  if (only) targets = targets.filter((t) => only.split(',').includes(t.k));
   if (LIMIT) targets = targets.slice(0, LIMIT);
 
   const browser = await chromium.launch({ headless: !HEADED });

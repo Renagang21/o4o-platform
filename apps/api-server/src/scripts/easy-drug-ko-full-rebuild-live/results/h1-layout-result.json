@@ -1,0 +1,47 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1",
+  "step": "h1-audit-layout",
+  "population": 19363,
+  "viewports": [
+    "desktop",
+    "mobile",
+    "tablet"
+  ],
+  "measurements": 116178,
+  "byVerdict": {},
+  "productsWithFindings": 0,
+  "slackStats": {
+    "desktop": {
+      "capPx": 532,
+      "minSlackAtCap": 2.11,
+      "p1SlackAtCap": 10.95,
+      "medianSlackAtCap": 317.23,
+      "negativeSlack": 0,
+      "maxLines": 4,
+      "maxHeightPx": 112,
+      "linesOver3": 16
+    },
+    "mobile": {
+      "capPx": 250,
+      "minSlackAtCap": 0.02,
+      "p1SlackAtCap": 2.61,
+      "medianSlackAtCap": 70,
+      "negativeSlack": 0,
+      "maxLines": 10,
+      "maxHeightPx": 280,
+      "linesOver3": 309
+    },
+    "tablet": {
+      "capPx": 532,
+      "minSlackAtCap": 2.11,
+      "p1SlackAtCap": 10.95,
+      "medianSlackAtCap": 317.23,
+      "negativeSlack": 0,
+      "maxLines": 4,
+      "maxHeightPx": 112,
+      "linesOver3": 16
+    }
+  },
+  "dbWrites": 0,
+  "result": "PASS"
+}

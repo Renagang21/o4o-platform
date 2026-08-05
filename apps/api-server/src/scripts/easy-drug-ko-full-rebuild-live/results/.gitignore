@@ -16,3 +16,10 @@ hide-plan-run2.jsonl
 hide-plan-rerun.jsonl
 # 대용량 스크린샷 원본. 대표 증거만 ../evidence/ 로 추려 커밋한다.
 screenshots/
+
+# 전수 원장 원본(수천만 셀). 위험 하위 구간 worst500 만 커밋한다.
+h1-population.jsonl
+h1-layout-slack-ledger.jsonl
+browser-smoke-result.json
+browser-smoke-findings.jsonl
+browser-smoke-rows.jsonl

@@ -1,0 +1,21 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1",
+  "step": "h1-audit-api",
+  "origin": "https://neture.co.kr",
+  "population": 19363,
+  "anonAccessGate": {
+    "httpStatus": 200,
+    "authRequired": true,
+    "hasCanonical": false,
+    "contentLeaked": false,
+    "languages": []
+  },
+  "byVerdict": {},
+  "productsWithFindings": 0,
+  "contentLength": {
+    "min": 1091,
+    "max": 4331
+  },
+  "dbWrites": 0,
+  "result": "PASS"
+}
