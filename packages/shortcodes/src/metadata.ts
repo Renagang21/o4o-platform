@@ -226,50 +226,6 @@ export const shortcodeMetadata: ShortcodeMetadata[] = [
     version: '1.0.0',
   },
 
-  // Dropshipping Dashboard shortcodes
-  {
-    name: 'customer_dashboard',
-    description: '고객 대시보드를 표시합니다',
-    category: 'dropshipping',
-    parameters: {},
-    examples: ['[customer_dashboard]'],
-    tags: ['고객', 'customer', 'dashboard'],
-    aiPrompts: ['고객 대시보드가 필요할 때', '구매자 관리 화면이 필요할 때'],
-    requiresAuth: true,
-    version: '1.0.0',
-  },
-
-  // Dropshipping Application shortcodes
-  {
-    name: 'supplier_application',
-    description: '공급업체 신청 폼을 표시합니다',
-    category: 'dropshipping',
-    parameters: {},
-    examples: ['[supplier_application]'],
-    tags: ['공급업체', 'supplier', 'application'],
-    aiPrompts: ['공급업체 신청 폼이 필요할 때', '공급자 등록이 필요할 때'],
-    version: '1.0.0',
-  },
-  {
-    name: 'seller_application',
-    description: '판매자 신청 폼을 표시합니다',
-    category: 'dropshipping',
-    parameters: {},
-    examples: ['[seller_application]'],
-    tags: ['판매자', 'seller', 'application'],
-    aiPrompts: ['판매자 신청 폼이 필요할 때', '판매자 등록이 필요할 때'],
-    version: '1.0.0',
-  },
-  {
-    name: 'partner_application',
-    description: '파트너 신청 폼을 표시합니다',
-    category: 'dropshipping',
-    parameters: {},
-    examples: ['[partner_application]'],
-    tags: ['파트너', 'partner', 'application'],
-    aiPrompts: ['파트너 신청 폼이 필요할 때', '파트너 등록이 필요할 때'],
-    version: '1.0.0',
-  },
 ];
 
 /**

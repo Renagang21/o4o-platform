@@ -67,7 +67,6 @@ interface CornerProduct {
 const DEFAULT_REFRESH_INTERVAL = 60000; // 1분
 const DEFAULT_LIMIT = 12;
 const DEFAULT_COLUMNS = 4;
-const DEFAULT_LISTINGS_API = '/api/v1/dropshipping/core';
 
 // ============================================================================
 // Component
@@ -90,7 +89,7 @@ export function CornerDisplayBlock({
     cornerId,
     deviceType,
     refreshIntervalMs = DEFAULT_REFRESH_INTERVAL,
-    listingsApiBaseUrl = DEFAULT_LISTINGS_API,
+    listingsApiBaseUrl,
     limit = DEFAULT_LIMIT,
     columns = DEFAULT_COLUMNS,
     showPrice = true,
@@ -100,8 +99,11 @@ export function CornerDisplayBlock({
 
   // 제품 조회 함수
   const fetchProducts = useCallback(async () => {
+    // WO-O4O-POST-LEGACY-RESIDUE-AND-ENVIRONMENT-CLEANUP-V1:
+    //   기본값이던 '/api/v1/dropshipping/core' 는 폐지된 API 다. 이제 base URL 이
+    //   블록 설정으로 명시되지 않으면 요청을 보내지 않고 빈 목록으로 처리한다.
     const corner = cornerKey || cornerId;
-    if (!corner) {
+    if (!corner || !listingsApiBaseUrl) {
       setProducts([]);
       setIsLoading(false);
       return;

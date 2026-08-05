@@ -8,9 +8,6 @@ export interface UIComponentProps {
   [key: string]: any;
 }
 
-// Dropshipping UI Components
-import { DropshippingDashboard } from '@/components/ui/dropshipping/DropshippingDashboard';
-
 // Commerce UI Components
 import { ProductCard } from '@/components/ui/commerce/ProductCard';
 import { ProductGrid } from '@/components/ui/commerce/ProductGrid';
@@ -121,8 +118,6 @@ export const UIComponentRegistry: Record<string, React.ComponentType<any>> = {
   DashboardView,
   ErrorMessage,
   KPIGrid,
-  // Dropshipping
-  DropshippingDashboard,
   // Commerce
   ProductCard,
   ProductGrid,

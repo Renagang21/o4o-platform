@@ -11,9 +11,7 @@ import logger from '../dist/utils/logger.js';
 const CORE_APPS_INSTALL_ORDER = [
   'organization-core',
   'forum-core',
-  'dropshipping-core',
   'lms-core',
-  'dropshipping-cosmetics',
   'organization-forum',
   'membership-yaksa',
   'forum-cosmetics',

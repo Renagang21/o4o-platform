@@ -253,11 +253,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['platform-core'],
   },
-  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-  //   'dropshipping-core' 카탈로그 항목을 제거했다. 본체 패키지
-  //   @o4o/dropshipping-core 는 삭제되었고, 소비처·entity 등록·운영 테이블이 모두 0 이었다.
-  //   주문·정산은 ecommerce-core(checkout_orders), 상품은 product_masters,
-  //   공급 오퍼는 supplier_product_offers 가 정본이다.
   {
     appId: 'ecommerce-core',
     name: 'E-commerce Core Engine',
@@ -280,9 +275,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     author: 'O4O Platform',
     serviceGroups: ['platform-core', 'partnerops'],
   },
-  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-  //   'pharmaceutical-core' 항목 제거. 본체 패키지는 dropshipping-core 를 실제 import 하던
-  //   유일한 패키지였으나 자체 소비처가 pharmacyops 하나뿐인 dead chain 이었다.
   {
     appId: 'digital-signage-core',
     name: 'Digital Signage Core',
@@ -317,10 +309,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   // Cosmetics Service Apps (cosmetics)
   // Cosmetics eCommerce and beauty marketplace
   // ============================================
-  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-  //   'dropshipping-cosmetics' 항목 제거. 본체 패키지의 엔티티는 schema 무지정이라
-  //   등록될 경우 cosmetics 스키마 정본이 아니라 public 에 동명 테이블을 만들 위험이 있었다.
-  //   화장품 정본은 apps/api-server/src/routes/cosmetics/entities/* (schema: 'cosmetics') 이다.
   // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1:
   //   'cosmetics-partner' (화장품 파트너/인플루언서 관리) 카탈로그 항목을 제거했다.
   //   본체 패키지 @o4o/cosmetics-partner-extension 은 이미 삭제되었고 관리자 화면·백엔드
@@ -336,7 +324,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     tags: ['화장품', 'cosmetics', 'seller', 'display', 'sample', 'inventory', 'kpi'],
     type: 'extension',
     status: 'active', // Phase 1 완료 - 2024-12 Active 전환
-    // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 삭제된 dropshipping-* 의존 참조 제거
     dependencies: {},
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'sellerops'],
@@ -350,7 +337,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     tags: ['화장품', 'cosmetics', 'supplier', 'brand', 'price', 'campaign'],
     type: 'extension',
     // WO-O4O-LEGACY-COSMETICS-PARTNER-REMOVAL-V1: 제거된 'cosmetics-partner' 의존 참조 삭제
-    // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 삭제된 dropshipping-* 의존 참조 제거
     dependencies: {},
     author: 'O4O Platform',
     serviceGroups: ['cosmetics', 'supplierops'],
@@ -363,7 +349,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['화장품', 'cosmetics', 'sample', 'display', 'tester', 'conversion'],
     type: 'extension',
-    // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 삭제된 dropshipping-cosmetics 의존 참조 제거
     dependencies: { 'cosmetics-seller-extension': '>=1.0.0', 'cosmetics-supplier-extension': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['cosmetics'],
@@ -476,12 +461,8 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['signage'],
   },
 
-  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-  //   'sellerops' / 'supplierops' 카탈로그 항목 제거. 본체 패키지 @o4o/sellerops,
-  //   @o4o/supplierops 는 삭제되었고 리포 전역 소비처가 0 이었다.
-  //   admin-dashboard 의 동명 로컬 페이지(src/pages/sellerops, src/pages/supplierops)는
-  //   이 패키지들을 import 하지 않는 별개 자산이므로 그대로 유지한다.
-  //   serviceGroup id 'sellerops' / 'supplierops' 는 화장품 확장이 사용 중이라 유지한다.
+  // serviceGroup id 'sellerops' / 'supplierops' 는 화장품 확장이 사용 중이라 유지한다.
+  // admin-dashboard 의 동명 로컬 페이지(src/pages/{sellerops,supplierops})는 별개 자산이다.
 
   // ============================================
   // Partner Operations Apps (partnerops)
@@ -495,8 +476,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     category: 'commerce',
     tags: ['파트너', 'partner', 'affiliate', 'commission', 'referral'],
     type: 'feature',
-    // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 삭제된 dropshipping-core 의존 참조 제거
-    // (partnerops 본체는 @o4o/partner-core 기반이며 본 WO 범위 밖 — 유지)
+    // partnerops 본체는 @o4o/partner-core 기반이다.
     dependencies: {},
     author: 'O4O Platform',
     serviceGroups: ['partnerops', 'cosmetics'],
@@ -551,12 +531,7 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     serviceGroups: ['cosmetics'],
     // Note: Hidden - Development status
   },
-  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-  //   'health-extension' / 'pharmacyops' 항목 제거.
-  //   - health-extension: packages/health-extension 은 소스가 없는 유령 디렉터리였다
-  //     (git tracked 0, package.json 없음). 현재 건강기능식품 기능은
-  //     apps/api-server/src/modules/neture/drug-import/health-functional-food-* 가 담당한다.
-  //   - pharmacyops: @o4o/pharmaceutical-core → @o4o/dropshipping-core dead chain 최상단.
+  // 건강기능식품 기능은 apps/api-server/src/modules/neture/drug-import/health-functional-food-* 가 담당한다.
 ];
 
 /**

@@ -20,11 +20,6 @@ export type FunctionComponent = (
   context: ViewContext
 ) => FunctionComponentResult;
 
-// Dropshipping Function Components
-import { sellerDashboard } from '@/shortcodes/_functions/dropshipping/sellerDashboard';
-import { supplierDashboard } from '@/shortcodes/_functions/dropshipping/supplierDashboard';
-import { partnerDashboard } from '@/shortcodes/_functions/dropshipping/partnerDashboard';
-
 // Commerce Function Components
 import { productList } from '@/shortcodes/_functions/commerce/productList';
 import { productDetail } from '@/shortcodes/_functions/commerce/productDetail';
@@ -66,10 +61,6 @@ import { signageSchedule } from '@o4o-apps/signage/functions/signageSchedule';
 import { signagePlayback } from '@o4o-apps/signage/functions/signagePlayback';
 
 export const FunctionRegistry: Record<string, FunctionComponent> = {
-  // Dropshipping
-  SellerDashboard: sellerDashboard,
-  SupplierDashboard: supplierDashboard,
-  PartnerDashboard: partnerDashboard,
   // Commerce
   productList,
   productDetail,

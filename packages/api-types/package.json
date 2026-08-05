@@ -17,10 +17,6 @@
     "./yaksa": {
       "import": "./dist/yaksa.js",
       "types": "./dist/yaksa.d.ts"
-    },
-    "./dropshipping": {
-      "import": "./dist/dropshipping.js",
-      "types": "./dist/dropshipping.d.ts"
     }
   },
   "files": [

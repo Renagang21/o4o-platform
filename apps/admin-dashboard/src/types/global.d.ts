@@ -55,7 +55,6 @@ declare global {
       render?: (element: unknown, container: unknown) => void;
       [key: string]: unknown;
     };
-    renderShortcode?: (name: string, attributes: unknown, content: string) => void;
   }
 }
 

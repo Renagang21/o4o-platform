@@ -7,14 +7,10 @@ import { registry } from '@o4o/cpt-registry';
 import logger from '../utils/logger.js';
 
 // Import all schema definitions
-import { dsProductSchema } from '../schemas/ds_product.schema.js';
 import { productsSchema } from '../schemas/products.schema.js';
 import { portfolioSchema } from '../schemas/portfolio.schema.js';
 import { testimonialsSchema } from '../schemas/testimonials.schema.js';
 import { teamSchema } from '../schemas/team.schema.js';
-import { dsSupplierSchema } from '../schemas/ds_supplier.schema.js';
-import { dsPartnerSchema } from '../schemas/ds_partner.schema.js';
-import { dsCommissionPolicySchema } from '../schemas/ds_commission_policy.schema.js';
 
 /**
  * Initialize CPT Registry
@@ -24,16 +20,15 @@ export async function initializeCPT(): Promise<void> {
   logger.info('[CPT Registry] Initializing...');
 
   try {
-    // Register all CPT schemas (Phase P0-A: 8/8 CPTs registered)
+    // Register all CPT schemas
+    // WO-O4O-POST-LEGACY-RESIDUE-AND-ENVIRONMENT-CLEANUP-V1:
+    //   ds_product / ds_supplier / ds_partner / ds_commission_policy 4개 Dropshipping CPT 제거.
+    //   운영 DB 에 custom_posts 테이블 자체가 없고 custom_post_types 는 0 row 이므로 데이터 영향 없음.
     const schemas = [
-      dsProductSchema,
       productsSchema,
       portfolioSchema,
       testimonialsSchema,
       teamSchema,
-      dsSupplierSchema,
-      dsPartnerSchema,
-      dsCommissionPolicySchema,
     ];
 
     for (const schema of schemas) {

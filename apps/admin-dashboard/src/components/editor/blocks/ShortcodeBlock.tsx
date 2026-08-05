@@ -1088,7 +1088,7 @@ const ShortcodeBlock: React.FC<ShortcodeBlockProps> = ({
             </div>
             <div className="space-y-2 text-sm text-blue-700">
               <div>
-                <code className="bg-blue-100 px-1 rounded">[cpt_list type="ds_product" count="6" template="grid"]</code>
+                <code className="bg-blue-100 px-1 rounded">[cpt_list type="products" count="6" template="grid"]</code>
                 <span className="ml-2">- CPT 게시물 목록</span>
               </div>
               <div>

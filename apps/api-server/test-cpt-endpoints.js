@@ -112,8 +112,8 @@ async function testCPTEndpoints() {
           VALUES
             ('category', 'Categories', 'Hierarchical taxonomy for organizing content', 'post,page', true, $1),
             ('post_tag', 'Tags', 'Non-hierarchical taxonomy for tagging content', 'post', false, $1),
-            ('product_cat', 'Product Categories', 'Product categories for e-commerce', 'product,ds_product', true, $1),
-            ('product_tag', 'Product Tags', 'Product tags for e-commerce', 'product,ds_product', false, $1)
+            ('product_cat', 'Product Categories', 'Product categories for e-commerce', 'product', true, $1),
+            ('product_tag', 'Product Tags', 'Product tags for e-commerce', 'product', false, $1)
         `, [userId]);
 
         // Insert default terms

@@ -65,9 +65,6 @@ export {
   presetShortcodeDefinition
 } from './preset/index.js';
 
-// Dropshipping shortcodes
-export { registerDropshippingShortcodes } from './dropshipping/index.js';
-export { SellerDashboard, SupplierDashboard, AffiliateDashboard } from './dropshipping/index.js';
 
 // Auth shortcodes
 export { registerAuthShortcodes } from './auth/index.js';

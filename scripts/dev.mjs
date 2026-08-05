@@ -145,7 +145,7 @@ function runTypeCheck() {
 
   // Type check App Store packages
   log.info('Type checking App Store packages...');
-  const appStorePackages = ['dropshipping-core', 'dropshipping-cosmetics', 'forum-app', 'forum-neture', 'forum-yaksa'];
+  const appStorePackages = ['forum-app', 'forum-neture', 'forum-yaksa'];
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);
@@ -194,7 +194,7 @@ function runTypeCheckFrontend() {
 
   // Type check App Store packages
   log.info('Type checking App Store packages...');
-  const appStorePackages = ['dropshipping-core', 'dropshipping-cosmetics', 'forum-app', 'forum-neture', 'forum-yaksa'];
+  const appStorePackages = ['forum-app', 'forum-neture', 'forum-yaksa'];
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);

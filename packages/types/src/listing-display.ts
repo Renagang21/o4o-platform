@@ -9,7 +9,7 @@
  * - API 필터 파라미터 타입 안전성 확보
  *
  * ## 사용 위치
- * - SellerListing.channelSpecificData (dropshipping-core)
+ * - SellerListing.channelSpecificData
  * - Listings API 필터 파라미터
  * - CmsView.query 필터 규칙
  *
@@ -115,7 +115,7 @@ export interface ChannelSpecificDataWithDisplay {
  *
  * @example
  * ```typescript
- * // GET /api/v1/dropshipping/core/listings?deviceId=kiosk_1&corner=premium_zone
+ * // GET {listingsApiBaseUrl}/listings?deviceId=kiosk_1&corner=premium_zone
  * const filters: ListingDisplayFilters = {
  *   deviceId: 'kiosk_1',
  *   corner: 'premium_zone',

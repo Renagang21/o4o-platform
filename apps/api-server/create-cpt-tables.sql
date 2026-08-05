@@ -144,11 +144,11 @@ BEGIN
     WHERE NOT EXISTS (SELECT 1 FROM "taxonomies" WHERE "name" = 'post_tag');
 
     INSERT INTO "taxonomies" ("name", "label", "description", "objectTypes", "hierarchical", "createdBy")
-    SELECT 'product_cat', 'Product Categories', 'Product categories for e-commerce', 'product,ds_product', true, admin_user_id
+    SELECT 'product_cat', 'Product Categories', 'Product categories for e-commerce', 'product', true, admin_user_id
     WHERE NOT EXISTS (SELECT 1 FROM "taxonomies" WHERE "name" = 'product_cat');
 
     INSERT INTO "taxonomies" ("name", "label", "description", "objectTypes", "hierarchical", "createdBy")
-    SELECT 'product_tag', 'Product Tags', 'Product tags for e-commerce', 'product,ds_product', false, admin_user_id
+    SELECT 'product_tag', 'Product Tags', 'Product tags for e-commerce', 'product', false, admin_user_id
     WHERE NOT EXISTS (SELECT 1 FROM "taxonomies" WHERE "name" = 'product_tag');
 
     -- Insert some default terms

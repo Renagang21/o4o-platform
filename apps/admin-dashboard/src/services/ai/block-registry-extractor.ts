@@ -10,10 +10,6 @@ import { blockRegistry } from '@/blocks/registry/BlockRegistry';
 // Phase P0-C: Import metadata from SSOT
 import { blockMetadata, type BlockMetadata as BlockMetadataSSOT } from '@o4o/block-renderer';
 
-// WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
-//   dropshipping 숏코드 동적 로드 제거 (@/components/shortcodes/dropshipping 삭제됨).
-//   해당 숏코드는 존재하지 않는 `/api/v1/dropshipping/*` 경로를 호출하던 dead asset 이었다.
-
 export interface BlockMetadata {
   name: string;
   title: string;
