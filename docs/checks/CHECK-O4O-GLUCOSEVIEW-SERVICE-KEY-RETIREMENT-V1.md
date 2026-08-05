@@ -4,11 +4,18 @@
 > **목표**: 과거 혈당측정 서비스에서 남은 `glucoseview` service key 를 코드·설정·UI에서 제거
 > **선행**: [`CHECK-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1`](CHECK-O4O-CGM-PHARMACIST-APP-RETIREMENT-V1.md)
 > **일자**: 2026-08-05
-> **판정**: ⛔ **STOPPED — 중지 조건 발동 (운영 DB에 `glucoseview` row 존재). 코드 변경 0건.**
+> **판정**: ✅ **PASS (재개 완료)** — 1차 시도는 ⛔ STOPPED(§0~§7, 코드 변경 0건),
+> [`WO-O4O-GLUCOSEVIEW-OPERATING-DATA-RETIREMENT-V1`](CHECK-O4O-GLUCOSEVIEW-OPERATING-DATA-RETIREMENT-V1.md)
+> 로 운영 row 6건이 제거된 뒤 재개하여 코드 제거를 완료했다. **재개 결과는 §8.**
 
 ---
 
-## 0. 결론 요약
+> ⚠️ **§0~§7 은 1차 시도(STOPPED) 시점의 기록이다.** 당시 서술된 "운영 row 6건 존재",
+> "§4-A 는 BLOCKED" 등은 그 시점 사실이며, 현재 상태는 **§8** 를 본다.
+
+---
+
+## 0. 결론 요약 (1차 시도 — STOPPED 시점 기록)
 
 WO 의 원칙은 "**먼저 운영 DB의 `glucoseview` 사용 row를 read-only로 확인 / 운영 row 0일 때만 코드 제거**"
 이고, 중지 조건 1번은 "**운영 DB에 `glucoseview` row 존재**" 다.
@@ -185,3 +192,127 @@ typecheck·test·build·CI 검증은 변경이 없으므로 수행하지 않았�
 | DB enum 값 제거 migration 필요? | **불필요** — `glucoseview` 라벨을 가진 enum 0건 |
 | CHECK 제약 변경 migration 필요? | **불필요** — 해당 정의 0건 |
 | 그렇다면 무엇이 필요한가? | **데이터 row 정리 migration** — `platform_services` 1 / `roles` 4 / `operator_notification_settings` 1. 전부 `role_assignments` 참조 0 이라 FK 연쇄 없음 |
+
+---
+
+## 8. 재개 실행 기록 (2026-08-05, 판정 ✅ PASS)
+
+### 8-1. 재개 트리거
+
+[`CHECK-O4O-GLUCOSEVIEW-OPERATING-DATA-RETIREMENT-V1`](CHECK-O4O-GLUCOSEVIEW-OPERATING-DATA-RETIREMENT-V1.md)
+(commit `e1b18e264`) 에서 §6-1 의 row 정리가 완료되었다.
+
+| 대상 | 1차 시도 시점 | 재개 시점 |
+|---|---:|---:|
+| `platform_services` code='glucoseview' | 1 | **0** |
+| `roles` service_key='glucoseview' | 4 | **0** |
+| `operator_notification_settings` service_code='glucoseview' | 1 | **0** |
+| `role_assignments` 참조 | 0 | 0 |
+| enum 라벨 / CHECK 제약 | 0 | 0 |
+
+§0 의 STOPPED 근거("표시 계약을 지탱하는 운영 row 존재")가 소멸하여 §4-A 의 BLOCKED 가 해제되었다.
+
+### 8-2. 제거한 참조 (실행 코드)
+
+| 파일 | 제거 내용 |
+|---|---|
+| `apps/admin-dashboard/src/lib/rbac-catalog.ts` | `ServiceKey` union / `SERVICES` 항목 / `EXCLUDED_FROM_FACET` 예외 |
+| `apps/admin-dashboard/src/hooks/useOperatorPolicy.ts` | `'glucoseview:'` → `'glycocare'` 스코프 매핑 분기 |
+| `apps/admin-dashboard/src/pages/operator/PointBudgetPage.tsx` | `SERVICE_LABELS` 의 `'글루코스뷰'` |
+| `apps/api-server/src/routes/cms-content/cms-content-slot.handler.ts` | `SCOPE_TO_CMS_KEYS` 의 `glucoseview` 항목 |
+| `apps/api-server/src/routes/kpa/controllers/supplier-campaign-request.controller.ts` | `ALLOWED_SERVICES` 항목 (5 → 4) |
+| `apps/api-server/src/modules/partner/entities/PartnerApplication.ts` | `ServiceInterest` 의 `'GlucoseView'` |
+| `apps/api-server/src/database/entities.ts` | 내용 없는 `// GLUCOSEVIEW ENTITIES` 배너 주석 |
+| `apps/api-server/src/routes/debug/user-debug.controller.ts` | `allServices` 항목 — **live write 경로**(진단 도구가 dead service_key 멤버십을 신규 생성하던 지점) |
+| `apps/api-server/src/routes/debug/approval-test.controller.ts` | debug HTML 의 glucoseview 네비 버튼 |
+
+### 8-3. 치환한 참조 (테스트 음성 대조)
+
+WO 의 "검출력 유지가 필요하면 다른 미등록 service key 로 치환" 지침에 따라
+**폐지된 key 대신 애초에 등록된 적 없는 key** 로 바꿨다. 폐지 key 는 앞으로 다시
+등록될 여지가 있어 음성 대조값으로 부적합하다.
+
+| 파일 | 치환 |
+|---|---|
+| `apps/api-server/src/__tests__/security/cross-service.spec.ts` (3곳) | `'glucoseview:admin'` → `'nonexistent-service:admin'` |
+| `apps/api-server/src/__tests__/kpa-role-guard.spec.ts:82` | 동일 |
+
+치환 후에도 두 스펙 전부 PASS — 검출력(교차 서비스 스코프 거부) 유지 확인.
+
+### 8-4. 정책 판단 — `offer.service.ts` 방어 필터는 **의도적 유지**
+
+WO 의 중지 조건 "`offer.service.ts` 필터 제거가 실제 승인 범위를 넓히는 경우" 를 검증했다.
+
+- 이 필터는 **카탈로그가 아니라 입력 방어선**이다. 항목을 빼면 API 로 직접 전달된
+  `'glucoseview'` 가 `service_keys` 에 그대로 저장되고,
+  `deriveDistributionType(isPublic, serviceKeys)` (`offer.service.ts:30-32`) 이
+  `serviceKeys.length > 0` 만 보므로 해당 offer 를 **SERVICE 유통으로 뒤집는다**.
+- 즉 **제거가 오히려 허용 범위를 넓힌다** → 중지 조건 발동 → 항목 유지 + 근거 주석 추가.
+- 승인 대상은 `APPROVAL_ELIGIBLE_SERVICE_KEYS` / `filterApprovalEligibleServiceKeys()`
+  로 별도 통제되므로 이 판단은 승인 범위와 무관하다.
+
+### 8-5. 중지 조건 대조
+
+| 중지 조건 | 결과 | 근거 |
+|---|---|---|
+| `offer.service.ts` 필터 제거가 승인 범위를 넓힘 | **발동** | §8-4 — 해당 항목만 유지, 나머지 진행 |
+| `PartnerApplication` 기존 데이터에 `GlucoseView` 존재 | **미해당** | `partner_applications` 테이블이 운영 DB 에 **미존재**(`partner_commissions`/`referrals`/`settlement_items`/`settlements` 만 존재) → 보존할 값 0 |
+| 예상 외 런타임 소비처 발견 | **미해당** | `supplier_product_offers.service_keys` 에 glucoseview 0건(전체 2 offer, `pharmacy-hub` 만 사용). `useOperatorPolicy` 경로는 백엔드가 `user.scopes` 를 채우지 않아 이미 inert |
+| 병렬 세션 WIP 충돌 | **미해당** | `hff-zh-*` 미접촉, pathspec 커밋 |
+
+### 8-6. 잔존 occurrence 분류 (제거 후 전역 재검색)
+
+| 유형 | 위치 | 유지 사유 |
+|---|---|---|
+| 방어 필터 | `offer.service.ts` | §8-4 — 의도적 유지 |
+| 문서 주석(유효값 나열) | `OperatorNotificationSettings.ts:23`, `ServiceMembership.ts:46`, `PartnerContent.ts:32`, `PartnerEvent.ts:30`, `PartnerTarget.ts:30`, `operator-alert.utils.ts:21`, `packages/cms-core/src/entities/CmsContent.entity.ts:48` | 실행 코드 아님. 다만 stale — 후속 `WO-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1` 대상 |
+| mock 공급자명 `supplier: 'GlucoseView'` | `routes/glycopharm/controllers/public.controller.ts:58`, `services/web-glycopharm/src/api/public.ts:76` | 본 WO 범위 밖(문자열 일치일 뿐 service key 아님). 실제 의미 재확인은 후속 WO 지시사항 |
+| migration 이력 / 과거 CHECK·감사 문서 | 다수 | WO 명시 제외 |
+| `packages/ai-common-core/dist/prompts/glucoseview/` | 빌드 산출물 | git 미추적(`dist/`), src 는 이미 제거됨 |
+
+**실행 코드의 service key 참조: 방어 필터 1건(의도적 유지)을 제외하고 0.**
+
+### 8-7. 검증 (로컬에서 CI 파이프라인 전 단계 재현)
+
+| 항목 | 결과 |
+|---|---|
+| `pnpm run type-check:frontend` | `type-check:frontend: OK` |
+| api-server `tsc --noEmit -p tsconfig.build.json` | clean (빌드가 실제 사용하는 config) |
+| api-server Jest | **73 suites / 1306 tests PASS** |
+| admin-dashboard Vitest | **14 files / 237 tests PASS** |
+| api-gateway Vitest | 1 file / 1 test PASS |
+| multi-tenant Vitest (`apps/api-server/tests/multi-tenant`) | **4 files / 75 tests PASS** |
+| `pnpm run lint` | passed |
+| CI console.log grep | `OK: no console.log` |
+| admin-dashboard `vite build` | ✓ built (exit 0) |
+| api-server build | exit 0 |
+
+참고: `tsconfig.json`(scripts 포함) 기준으로는 `src/scripts/*` 에 기존 오류 ~14건이 있으나
+병렬 HFF/OTC 작업물이며 `tsconfig.build.json` 에서 제외되어 CI·빌드와 무관하다(본 WO 범위 밖).
+
+### 8-8. 원칙 준수
+
+| 원칙 | 결과 |
+|---|---|
+| DB write 0 | ✅ 본 WO 구간 write 0건 |
+| 신규 service key 생성 금지 | ✅ (`nonexistent-service` 는 테스트 리터럴, 등록 아님) |
+| 다른 서비스 enum·권한·필터 변경 금지 | ✅ |
+| 단순 문자열 일치가 아닌 실제 service key 의미만 제거 | ✅ §8-6 |
+| 병렬 세션 WIP 미접촉 | ✅ pathspec 커밋 |
+
+### 8-9. commit
+
+| 항목 | 값 |
+|---|---|
+| 코드 12파일 | `e51bcbb6b` |
+| 본 CHECK 문서 | 후속 커밋 |
+| 브랜치 | `main` (직접 작업) |
+
+### 8-10. 후속
+
+- [`WO-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1`](CHECK-O4O-GLUCOSEVIEW-FULL-LEGACY-REMOVAL-V1.md) —
+  §8-6 의 stale 주석·mock 문자열, `CGM_PROVIDER` 환경변수 잔재,
+  `scripts/care-*` 미실행 스크립트, debug controller 잔여 등 전수 정리.
+- 부산물 발견: 백엔드가 `user.scopes` 를 채우지 않아
+  `useOperatorPolicy` 의 operator-scope 경로(`glycocare`/`kpa_society`) 전체가 이미 inert.
+  본 WO 의 매핑 제거는 행위 중립이며, 경로 자체의 처리는 후속 판단 대상이다.
