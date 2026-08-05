@@ -163,10 +163,6 @@ import {
   GlycopharmContent, // WO-O4O-GLYCOPHARM-RESOURCES-BACKEND-V1
 } from '../routes/glycopharm/entities/index.js';
 
-// ============================================================================
-// GLUCOSEVIEW ENTITIES (Phase C-1, C-2, C-3)
-// ============================================================================
-
 // STORE AI ENTITIES (WO-O4O-STORE-HUB-AI-SUMMARY-V1)
 import { StoreAiSnapshot } from '../modules/store-ai/entities/store-ai-snapshot.entity.js';
 import { StoreAiInsight } from '../modules/store-ai/entities/store-ai-insight.entity.js';

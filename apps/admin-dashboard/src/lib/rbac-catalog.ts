@@ -14,7 +14,6 @@ export const SERVICE_KEYS = [
   'neture',
   'glycopharm',
   'cosmetics',
-  'glucoseview',
 ] as const;
 
 export type ServiceKey = (typeof SERVICE_KEYS)[number];
@@ -31,7 +30,6 @@ export const SERVICES: Record<ServiceKey, ServiceMeta> = {
   neture: { key: 'neture', label: 'Neture', badgeClass: 'text-orange-700 bg-orange-50' },
   glycopharm: { key: 'glycopharm', label: 'GlycoPharm', badgeClass: 'text-green-700 bg-green-50' },
   cosmetics: { key: 'cosmetics', label: 'K-Cosmetics', badgeClass: 'text-pink-700 bg-pink-50' },
-  glucoseview: { key: 'glucoseview', label: 'GlucoseView', badgeClass: 'text-purple-700 bg-purple-50' },
 };
 
 export interface RoleMeta {
@@ -130,12 +128,15 @@ export function isOperatorRole(raw: string): boolean {
  *
  * WO-O4O-ADMIN-OPERATORS-LEGACY-SERVICE-TABS-CLEANUP-V1:
  *   - Platform 은 super_admin role 의 namespace 로만 의미가 있어 운영자 필터 옵션에서 제외.
- *   - GlucoseView 는 정책상 폐지된 서비스로 옵션에서 제외.
- *   - SERVICES/SERVICE_KEYS/parseRole 등 catalog 본체는 그대로 유지 — 과거 할당된
- *     platform:* / glucoseview:* role 의 표시·badge 색상은 정상 유지.
  *   - canonical 운영 서비스: KPA / Neture / GlycoPharm / K-Cosmetics
+ *
+ * WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1:
+ *   GlucoseView 는 SERVICE_KEYS / SERVICES 에서 완전히 제거되어 facet 제외 목록에서도 빠졌다.
+ *   표시 계약을 유지하던 근거였던 `roles` 4행·`platform_services` 1행은
+ *   WO-O4O-GLUCOSEVIEW-OPERATING-DATA-RETIREMENT-V1 로 삭제되었고
+ *   해당 role 을 보유한 사용자(role_assignments)는 애초에 0 이었다.
  */
-const EXCLUDED_FROM_FACET: ReadonlySet<ServiceKey> = new Set(['platform', 'glucoseview']);
+const EXCLUDED_FROM_FACET: ReadonlySet<ServiceKey> = new Set(['platform']);
 export function getServiceOptions(): { value: string; label: string }[] {
   return SERVICE_KEYS
     .filter((k) => !EXCLUDED_FROM_FACET.has(k))

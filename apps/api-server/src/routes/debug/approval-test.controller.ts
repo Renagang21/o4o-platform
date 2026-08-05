@@ -87,7 +87,6 @@ export function createApprovalTestRouter(dataSource: DataSource): Router {
   <a class="btn${serviceKey === 'neture' ? ' btn-danger' : ''}" href="?serviceKey=neture">neture</a>
   <a class="btn${serviceKey === 'kpa-society' ? ' btn-danger' : ''}" href="?serviceKey=kpa-society">kpa-society</a>
   <a class="btn${serviceKey === 'k-cosmetics' ? ' btn-danger' : ''}" href="?serviceKey=k-cosmetics">k-cosmetics</a>
-  <a class="btn${serviceKey === 'glucoseview' ? ' btn-danger' : ''}" href="?serviceKey=glucoseview">glucoseview</a>
 </div>`;
 
       // 유저 검색 폼

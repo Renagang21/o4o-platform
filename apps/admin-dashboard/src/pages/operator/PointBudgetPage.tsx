@@ -64,7 +64,6 @@ const SERVICE_LABELS: Record<string, string> = {
   'glycopharm': '글라이코팜',
   'neture': '네처',
   'k-cosmetics': 'K-화장품',
-  'glucoseview': '글루코스뷰',
 };
 
 function serviceLabel(key: string): string {

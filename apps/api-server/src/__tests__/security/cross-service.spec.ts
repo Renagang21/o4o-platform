@@ -14,7 +14,12 @@
  *   glycopharm:admin → kpa guard = 403
  *   glycopharm:admin → neture guard = 403
  *   cosmetics:admin → all 3 guards = 403
- *   glucoseview:admin → all 3 guards = 403
+ *   nonexistent-service:admin → all 3 guards = 403
+ *
+ * WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1:
+ *   음성 대조군이던 'glucoseview:admin' 을 명시적 미등록 키
+ *   'nonexistent-service:admin' 으로 치환. 폐지 service key 이름에 의존하지 않으면서
+ *   "미등록 service scope 도 거부된다" 는 검출력은 그대로 유지한다.
  */
 
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';
@@ -38,7 +43,7 @@ describe('Cross-Service Access Blocking', () => {
       'glycopharm:admin',
       'glycopharm:operator',
       'cosmetics:admin',
-      'glucoseview:admin',
+      'nonexistent-service:admin',
       // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
       //   'platform:admin' 은 제거된 legacy 역할이다. 문자열이 다시 유입되더라도
       //   거부돼야 하므로 거부 회귀 케이스로 의도적으로 보존한다.
@@ -64,7 +69,7 @@ describe('Cross-Service Access Blocking', () => {
       'glycopharm:admin',
       'glycopharm:operator',
       'cosmetics:admin',
-      'glucoseview:admin',
+      'nonexistent-service:admin',
     ];
 
     it.each(blockedRoles)('%s → Neture guard = 403', async (role) => {
@@ -84,7 +89,7 @@ describe('Cross-Service Access Blocking', () => {
       'neture:admin',
       'neture:operator',
       'cosmetics:admin',
-      'glucoseview:admin',
+      'nonexistent-service:admin',
     ];
 
     it.each(blockedRoles)('%s → GlycoPharm guard = 403', async (role) => {

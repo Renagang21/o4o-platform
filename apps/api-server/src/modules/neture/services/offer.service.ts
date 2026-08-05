@@ -1025,6 +1025,12 @@ export class NetureOfferService {
       const resolvedStockQty = manualData.stockQty != null ? Number(manualData.stockQty) : 0;
 
       // WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1: 두 축 분리
+      //
+      // WO-O4O-GLUCOSEVIEW-SERVICE-KEY-RETIREMENT-V1: 'glucoseview' 항목은 **의도적으로 유지**한다.
+      //   이 필터는 카탈로그가 아니라 입력 방어선이다. 항목을 빼면 API 로 직접 전달된
+      //   'glucoseview' 가 service_keys 에 그대로 저장되고 deriveDistributionType 이
+      //   해당 offer 를 SERVICE 유통으로 뒤집는다 — 제거가 오히려 허용 범위를 넓힌다.
+      //   (승인 대상은 filterApprovalEligibleServiceKeys 로 별도 통제되므로 승인 범위와는 무관)
       const filteredServiceKeys = (data.serviceKeys || []).filter((k) => k !== 'neture' && k !== 'glucoseview');
 
       // WO-O4O-REGULATED-PRODUCT-GATE-CONSOLIDATION-V1 / WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1:
