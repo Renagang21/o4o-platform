@@ -1,0 +1,28 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-DERIVED-TRANSLATION-UNPUBLISH-V1",
+  "step": "hide-derived-translations",
+  "mode": "live",
+  "tag": null,
+  "batchSize": 200,
+  "ledgerRows": 19993,
+  "planned": 19993,
+  "skippedAtPlan": 0,
+  "skipReasons": {},
+  "byLang": {
+    "en": 19081,
+    "zh": 912
+  },
+  "byClass": {
+    "RETRANSLATE_REQUIRED": 19888,
+    "WITHDRAW_TRANSLATION": 105
+  },
+  "planDigest": "bb33f8374cb668420c50ff325f37af46930d546570162688475943252040a8ca",
+  "batches": 100,
+  "statusUpdated": 19993,
+  "rolledBackUpdates": 0,
+  "problems": [],
+  "problemCount": 0,
+  "contentWrites": 0,
+  "sourceRefWrites": 0,
+  "koWrites": 0
+}

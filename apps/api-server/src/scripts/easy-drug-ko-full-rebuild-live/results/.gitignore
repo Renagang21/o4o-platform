@@ -9,3 +9,8 @@ plan-run2.jsonl
 plan-run3.jsonl
 apply-eligible.jsonl
 apply-result-rollback.jsonl
+# 비노출 계획 원장. 추적 중인 translation-status-ledger.jsonl + planDigest 로 재생성된다.
+hide-plan.jsonl
+hide-plan-run1.jsonl
+hide-plan-run2.jsonl
+hide-plan-rerun.jsonl

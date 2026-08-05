@@ -1,0 +1,20 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-DERIVED-TRANSLATION-UNPUBLISH-V1",
+  "step": "post-verify-hide",
+  "targetRows": 19993,
+  "hiddenConfirmed": 19993,
+  "notHiddenCount": 0,
+  "notHiddenSample": [],
+  "missingCount": 0,
+  "contentChangedCount": 0,
+  "sourceRefChangedCount": 0,
+  "publicCanonicalByLangInPopulation": {
+    "ko": 19493
+  },
+  "publicEnExposed": 0,
+  "publicZhExposed": 0,
+  "koCanonicalOnAppliedMasters": 19363,
+  "appliedMasters": 19363,
+  "dbWrites": 0,
+  "result": "PASS"
+}

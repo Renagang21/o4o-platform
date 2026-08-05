@@ -24,8 +24,25 @@ node snapshot-db-state.mjs --label after-rollback                  #    residue 
 node apply-live.mjs --live --concurrency 6                         # §9  LIVE 적용
 node post-verify-live.mjs     # §12 DB 재조회 독립검증
 node plan-apply.mjs --tag run3  # §13 멱등 재실행 (기대: ALREADY_CURRENT 전건)
-node translations-status.mjs    # §10 파생 EN·ZH 원장 (write 하려면 --live)
+node translations-status.mjs    # §10 파생 EN·ZH 원장 (census, read-only)
 node legacy-ko-census.mjs       # §14 기존 오류본 전수 조사 (read-only)
+```
+
+## 파생 번역 비노출 (후속 WO)
+
+`WO-O4O-EASY-DRUG-KO-DERIVED-TRANSLATION-UNPUBLISH-V1`.
+교체 전 KO 에서 파생된 EN·ZH 를 `status='canonical' → 'hidden'` 으로만 바꾼다.
+본문·`source_ref_id` 는 건드리지 않는다 — 재번역 시 대조 원본으로 남겨야 한다.
+
+```bash
+node hide-derived-translations.mjs --dry-run --tag run1
+node hide-derived-translations.mjs --dry-run --tag run2   # planDigest 동일 확인
+node snapshot-db-state.mjs --label before-hide-rollback
+node hide-derived-translations.mjs --rollback             # 같은 write 함수, COMMIT 만 안 함
+node snapshot-db-state.mjs --label after-hide-rollback    # residue 0 대조
+node hide-derived-translations.mjs --live
+node post-verify-hide.mjs                                 # DB 재조회 독립 검증
+node hide-derived-translations.mjs --live --tag rerun      # 멱등: planned 0 / write 0
 ```
 
 `MFDS_API_KEY` 는 `apps/api-server/.env` 에서 실행 시점에만 읽는다.
