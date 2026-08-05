@@ -214,38 +214,10 @@ viewComponentRegistry.register(
 );
 
 // ============================================================================
-// REGISTER MEMBERSHIP COMPONENTS
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+//   'membership-yaksa.*' 등록 5건 제거. 약사회 전용 관리자 화면과
+//   @o4o/membership-yaksa 패키지를 함께 제거해 resolve 대상이 없다.
 // ============================================================================
-
-viewComponentRegistry.register(
-  'membership-yaksa.dashboard',
-  lazy(() => import('@/pages/membership/dashboard/MembershipDashboard')),
-  { appId: 'membership-yaksa', description: 'Membership Dashboard' }
-);
-
-viewComponentRegistry.register(
-  'membership-yaksa.members-list',
-  lazy(() => import('@/pages/membership/members/MemberManagement')),
-  { appId: 'membership-yaksa', description: 'Member Management' }
-);
-
-viewComponentRegistry.register(
-  'membership-yaksa.member-detail',
-  lazy(() => import('@/pages/membership/members/MemberDetail')),
-  { appId: 'membership-yaksa', description: 'Member Detail' }
-);
-
-viewComponentRegistry.register(
-  'membership-yaksa.verifications',
-  lazy(() => import('@/pages/membership/verifications/VerificationManagement')),
-  { appId: 'membership-yaksa', description: 'Verifications' }
-);
-
-viewComponentRegistry.register(
-  'membership-yaksa.categories',
-  lazy(() => import('@/pages/membership/categories/CategoryManagement')),
-  { appId: 'membership-yaksa', description: 'Categories' }
-);
 
 // ============================================================================
 // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
@@ -275,14 +247,10 @@ viewComponentRegistry.register(
 );
 
 // ============================================================================
-// REGISTER LMS-YAKSA COMPONENTS
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+//   'lms-yaksa.router' 등록 제거. 약사회 전용 LMS 화면과 @o4o/lms-yaksa 패키지를
+//   함께 제거했다. 공용 LMS core 및 lms-instructor 화면은 보존한다.
 // ============================================================================
-
-viewComponentRegistry.register(
-  'lms-yaksa.router',
-  lazy(() => import('@/pages/lms-yaksa/LmsYaksaRouter')),
-  { appId: 'lms-yaksa', description: 'LMS Yaksa Router' }
-);
 
 // ============================================================================
 // FALLBACK COMPONENTS

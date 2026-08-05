@@ -510,29 +510,17 @@ import {
 } from '@o4o/education-extension/entities';
 
 // ============================================================================
-// MEMBERSHIP-YAKSA ENTITIES (Re-enabled for /api/v1/membership routes)
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+//   @o4o/membership-yaksa entity 9건 등록 제거. 패키지 자체를 삭제했다.
+//   운영 DB table 은 이번 작업에서 DROP 하지 않는다(별도 WO 판단 대상).
 // ============================================================================
-import {
-  MemberCategory,
-  Member,
-  Affiliation,
-  MembershipRoleAssignment,
-  MembershipYear,
-  Verification,
-  AffiliationChangeLog,
-  MemberAuditLog,
-  LicenseVerificationRequest,
-} from '@o4o/membership-yaksa/entities';
 
 // ============================================================================
 // DOMAIN ENTITIES REMOVED (Phase R1: Execution Boundary Cleanup)
 // ============================================================================
 // The following domain package entities remain removed:
-// - @o4o/membership-yaksa (MemberCategory, Member, Affiliation, etc.)
 // - @o4o/dropshipping-cosmetics (CosmeticsFilter) — WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1 에서 패키지 자체 삭제됨
-// - @o4o/reporting-yaksa (AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment)
-// - @o4o/lms-yaksa (YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment)
-// - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)
+// - 약사회 전용 도메인 패키지 4종(membership/reporting/lms/annualfee-yaksa) — WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 패키지 자체 삭제됨
 // - @o4o/cosmetics-partner-extension
 // - @o4o/cosmetics-sample-display-extension
 // - @o4o/lms-marketing (ProductContent, QuizCampaign, SurveyCampaign)
@@ -908,15 +896,6 @@ export const entities = [
   // ============================================================================
   // MEMBERSHIP-YAKSA ENTITIES (Re-enabled for /api/v1/membership routes)
   // ============================================================================
-  MemberCategory,
-  Member,
-  Affiliation,
-  MembershipRoleAssignment,
-  MembershipYear,
-  Verification,
-  AffiliationChangeLog,
-  MemberAuditLog,
-  LicenseVerificationRequest,
   // ============================================================================
   // PLATFORM PHYSICAL STORE ENTITIES (WO-O4O-CROSS-SERVICE-STORE-LINKING-V1)
   // ============================================================================

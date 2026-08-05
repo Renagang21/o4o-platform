@@ -51,12 +51,12 @@ const AUTHZ = /\brequire(?!Auth\b)[A-Z][A-Za-z]*\b|\b(adminOnly|checkPermission)
 
 /**
  * mount 지점에서 이미 보호되어 라우터 소스에 guard 가 없는 것이 정상인 경로.
- * `registerMembershipAdminGuards(app)` 가 mount 앞에 등록되는 membership 패턴이 여기 해당한다.
+ * (mount 앞 guard 등록 패턴 — 예: `register…AdminGuards(app)`)
  * 새 항목을 넣으려면 왜 mount 지점 보호가 맞는지 근거를 함께 적는다.
  */
 const MOUNT_LEVEL_GUARDED: ReadonlyArray<{ path: string; reason: string }> = [
-  // 현재는 없음. membership 은 `/api/v1/membership` 이라 ADMIN_PATH 에 잡히지 않으며
-  // 별도 spec(`membership-admin-guard.spec.ts` · `membership-residual-subtree-guard.spec.ts`)이 덮는다.
+  // 현재는 없음. (membership 항목은 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+  //  에서 @o4o/membership-yaksa mount·guard·spec 과 함께 제거되었다.)
 ];
 
 /**

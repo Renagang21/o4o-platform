@@ -29,10 +29,6 @@
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@o4o/membership-yaksa/*": ["../../packages/membership-yaksa/dist/*"],
-      "@o4o/reporting-yaksa/*": ["../../packages/reporting-yaksa/dist/*"],
-      "@o4o/annualfee-yaksa": ["../../packages/annualfee-yaksa/dist"],
-      "@o4o/annualfee-yaksa/*": ["../../packages/annualfee-yaksa/dist/*"],
       "@o4o/cosmetics-seller-extension/backend": ["../../packages/cosmetics-seller-extension/dist/backend"],
       "@o4o/cosmetics-seller-extension/manifest": ["../../packages/cosmetics-seller-extension/dist/manifest"],
       "@o4o/ai-prompts/care": ["../../packages/ai-prompts/dist/care"],

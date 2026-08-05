@@ -13,7 +13,6 @@ const CORE_APPS_INSTALL_ORDER = [
   'forum-core',
   'lms-core',
   'organization-forum',
-  'membership-yaksa',
   'forum-cosmetics',
   'forum-yaksa',
   'sellerops',

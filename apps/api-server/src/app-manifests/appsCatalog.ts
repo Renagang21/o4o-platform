@@ -356,20 +356,10 @@ export const APPS_CATALOG: AppCatalogItem[] = [
 
   // ============================================
   // Yaksa Organization Apps (yaksa)
-  // Pharmacist organization management
+  // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+  //   membership-yaksa · reporting-yaksa · lms-yaksa · yaksa-scheduler · annualfee-yaksa
+  //   카탈로그 등록 제거 (패키지 삭제). forum-yaksa 는 공용 소비 여부 미확정으로 HOLD.
   // ============================================
-  {
-    appId: 'membership-yaksa',
-    name: 'Membership Extension – Yaksa Organization',
-    version: '1.0.0',
-    description: '약사회 회원 관리 시스템 - 회원정보, 자격검증, 소속관리, 연회비',
-    category: 'organization',
-    tags: ['회원', 'membership', 'yaksa', 'verification', 'license'],
-    type: 'extension',
-    dependencies: { 'organization-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
   {
     appId: 'forum-yaksa',
     name: 'Forum Extension – Yaksa Organization',
@@ -379,54 +369,6 @@ export const APPS_CATALOG: AppCatalogItem[] = [
     tags: ['약사', 'yaksa', 'forum', 'pharmacy', 'medication'],
     type: 'extension',
     dependencies: { 'forum-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
-  {
-    appId: 'reporting-yaksa',
-    name: 'Annual Reporting Extension – Yaksa Organization',
-    version: '1.0.0',
-    description: '약사회 신상신고 시스템 - 연간 신고서, 승인 워크플로우, 자동 동기화',
-    category: 'organization',
-    tags: ['신상신고', 'reporting', 'yaksa', 'annual', 'membership'],
-    type: 'extension',
-    dependencies: { 'organization-core': '>=1.0.0', 'membership-yaksa': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
-  {
-    appId: 'lms-yaksa',
-    name: 'LMS Extension – Yaksa Organization',
-    version: '1.0.0',
-    description: '약사 면허 교육 학습 관리 시스템 - 필수교육, 학점관리, 수료증, 면허갱신',
-    category: 'education',
-    tags: ['LMS', '학습', 'yaksa', 'education', 'credit', 'license', 'certification'],
-    type: 'extension',
-    dependencies: { 'lms-core': '>=0.1.0', 'organization-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
-  {
-    appId: 'yaksa-scheduler',
-    name: 'Yaksa Scheduler',
-    version: '0.1.0',
-    description: '약사회 서비스 자동화 스케줄러 - Job 관리, 실패 큐, 알림 시스템',
-    category: 'infrastructure',
-    tags: ['scheduler', 'automation', 'yaksa', 'cron', 'job', 'notification'],
-    type: 'extension',
-    dependencies: { 'organization-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
-  {
-    appId: 'annualfee-yaksa',
-    name: '약사회 연회비 시스템',
-    version: '1.0.0',
-    description: '약사회 연회비/회비 관리 시스템 - 정책, 청구, 납부, 감면, 정산 관리',
-    category: 'organization',
-    tags: ['연회비', 'annualfee', 'yaksa', 'membership', 'payment', 'invoice'],
-    type: 'extension',
-    dependencies: { 'organization-core': '>=1.0.0', 'membership-yaksa': '>=1.0.0' },
     author: 'O4O Platform',
     serviceGroups: ['yaksa'],
   },

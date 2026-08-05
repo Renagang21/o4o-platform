@@ -294,7 +294,7 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     apps: {
       requiredCoreApps: ['cms-core', 'organization-core', 'dropshipping-cosmetics'],
       recommendedExtensions: ['review-core', 'analytics-core'],
-      incompatibleApps: ['forum-yaksa', 'membership-yaksa', 'lms-yaksa'],
+      incompatibleApps: ['forum-yaksa'],
     },
     initPack: {
       initPackIdPattern: 'cosmetics-*-init',
@@ -317,7 +317,7 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     extensionRules: {
       required: [],
       recommended: ['review-core'],
-      incompatible: ['forum-yaksa', 'membership-yaksa'],
+      incompatible: ['forum-yaksa'],
     },
     isActive: true,
   },
@@ -356,8 +356,8 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
       },
     },
     apps: {
-      requiredCoreApps: ['cms-core', 'organization-core', 'forum-yaksa', 'membership-yaksa'],
-      recommendedExtensions: ['reporting-yaksa', 'lms-yaksa'],
+      requiredCoreApps: ['cms-core', 'organization-core', 'forum-yaksa'],
+      recommendedExtensions: [],
       incompatibleApps: ['dropshipping-cosmetics', 'cosmetics-core'],
     },
     initPack: {
@@ -380,7 +380,7 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     },
     extensionRules: {
       required: [],
-      recommended: ['reporting-yaksa', 'lms-yaksa'],
+      recommended: [],
       incompatible: ['dropshipping-cosmetics'],
     },
     isActive: true,

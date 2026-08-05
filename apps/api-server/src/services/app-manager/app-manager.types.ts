@@ -25,7 +25,6 @@ export const PACKAGE_MAP: Record<string, string> = {
   'dropshipping': 'dropshipping-core',
   'dropshipping-core': 'dropshipping-core',
   'dropshipping-cosmetics': 'dropshipping-cosmetics',
-  'membership-yaksa': 'membership-yaksa',
   'sellerops': 'sellerops',
   'supplierops': 'supplierops',
   'cms-core': 'cms-core',

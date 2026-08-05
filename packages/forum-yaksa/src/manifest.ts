@@ -22,7 +22,7 @@ export const forumYaksaManifest = {
   // ===== 의존성 =====
   dependencies: {
     core: ['forum-core'],
-    apps: ['organization-core', 'membership-yaksa'],
+    apps: ['organization-core'],
   },
 
   // ===== 소유 테이블 =====

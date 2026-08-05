@@ -57,7 +57,6 @@ import { ContentRoutes } from '@/routes/content.routes';
 import { AppearanceRoutes } from '@/routes/appearance.routes';
 import { CommerceRoutes } from '@/routes/commerce.routes';
 import { ServiceRoutes } from '@/routes/services.routes';
-import { YaksaRoutes } from '@/routes/yaksa.routes';
 import { AppRoutes } from '@/routes/apps.routes';
 import { LmsMarketingRoutes } from '@/routes/lms-marketing.routes';
 import { PlatformRoutes } from '@/routes/platform.routes';
@@ -195,7 +194,6 @@ function App() {
                     {AppearanceRoutes()}
                     {CommerceRoutes()}
                     {ServiceRoutes()}
-                    {YaksaRoutes()}
                     {AppRoutes()}
                     {LmsMarketingRoutes()}
                     {PlatformRoutes()}

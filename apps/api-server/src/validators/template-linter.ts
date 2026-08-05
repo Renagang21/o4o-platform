@@ -50,7 +50,7 @@ export interface TemplateLintResult {
 
 const REQUIRED_CORE_APPS: Record<string, string[]> = {
   cosmetics: ['cms-core', 'organization-core', 'cosmetics-core'],
-  yaksa: ['cms-core', 'organization-core', 'membership-yaksa', 'forum-yaksa'],
+  yaksa: ['cms-core', 'organization-core', 'forum-yaksa'],
   tourist: ['cms-core', 'organization-core'],
   default: ['cms-core', 'organization-core'],
 };
@@ -61,7 +61,7 @@ const REQUIRED_CORE_APPS: Record<string, string[]> = {
 
 const RECOMMENDED_EXTENSIONS: Record<string, string[]> = {
   cosmetics: ['review-core', 'cosmetics-seller-extension'],
-  yaksa: ['reporting-yaksa', 'lms-yaksa'],
+  yaksa: [],
   tourist: ['booking-core', 'reviews-core'],
   default: [],
 };
@@ -71,7 +71,7 @@ const RECOMMENDED_EXTENSIONS: Record<string, string[]> = {
 // =============================================================================
 
 const INCOMPATIBLE_EXTENSIONS: Record<string, string[]> = {
-  cosmetics: ['yaksa-member', 'yaksa-extension', 'forum-yaksa', 'membership-yaksa', 'reporting-yaksa', 'lms-yaksa'],
+  cosmetics: ['yaksa-member', 'yaksa-extension', 'forum-yaksa'],
   yaksa: ['cosmetics-core', 'cosmetics-seller', 'cosmetics-extension'],
   tourist: ['yaksa-member', 'cosmetics-core'],
   default: [],

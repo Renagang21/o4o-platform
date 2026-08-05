@@ -20,7 +20,6 @@ export interface MenuPermission {
  * | 백엔드 | 상수 |
  * |---|---|
  * | `/api/v1/admin/users` | `ADMIN_ROLES` — `routes/admin/users.routes.ts:32` |
- * | `/api/v1/membership/*` 관리자 subtree | `MEMBERSHIP_ADMIN_ROLES` — `bootstrap/membership-admin-guard.ts:34` |
  *
  * 메뉴(어떤 항목이 보이는가)와 프런트 route(직접 URL 접근 시 누가 통과하는가)가
  * 이 값을 함께 참조해야 세 계층이 갈라지지 않는다. 백엔드 상수가 바뀌면 여기도 함께 바꾼다
@@ -62,22 +61,9 @@ export const menuPermissions: MenuPermission[] = [
     roles: [...PLATFORM_ADMIN_ROLES]
   },
 
-  // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
-  //   회원 관리 메뉴 4건은 모두 `/api/v1/membership/*` 관리자 subtree 를 소비한다.
-  //   그 경계는 `MEMBERSHIP_ADMIN_ROLES = ['platform:super_admin']` 이다
-  //   (bootstrap/membership-admin-guard.ts:34, 대상 subtree 는 같은 파일 :58-87).
-  //
-  //   선행 WO 는 분류 메뉴에만 게이트를 걸면서 legacy `admin`·`super_admin` 을 함께 나열했고
-  //   ("backend 판정에 따름" 으로 유보), 나머지 3건은 게이트 없이 두었다.
-  //   그 결과 `admin`·`super_admin` 에게 메뉴 4건이 모두 보이지만 API 는 403 이다.
-  //   메뉴는 보안 경계가 아니라 **실제 접근권을 반영하는 탐색 장치**이므로 백엔드 경계에 맞춘다.
-  //
-  //   ⚠️ 백엔드 상수가 RBAC 카탈로그의 canonical `admin`·`super_admin` 을 제외한 것이
-  //   타당한지는 별도 사안이다. 이 WO 는 계층 간 불일치만 제거하고 경계 자체는 옮기지 않는다.
-  { menuId: 'core-membership', roles: [...PLATFORM_ADMIN_ROLES] },
-  { menuId: 'core-membership-members', roles: [...PLATFORM_ADMIN_ROLES] },
-  { menuId: 'core-membership-verifications', roles: [...PLATFORM_ADMIN_ROLES] },
-  { menuId: 'core-membership-categories', roles: [...PLATFORM_ADMIN_ROLES] },
+  // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+  //   회원 관리(core-membership*) 메뉴 4건의 권한 설정은 메뉴·화면·`/api/v1/membership/*`
+  //   백엔드 subtree 가 함께 제거되면서 평가 대상이 사라져 삭제했다.
 
   // Seller Management - No restriction (allow all)
   // These menus are visible to all authenticated users

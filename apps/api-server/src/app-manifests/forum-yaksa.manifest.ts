@@ -14,7 +14,7 @@ export const forumYaksaManifest = {
 
   dependencies: {
     core: ['forum-core'],
-    optional: ['organization-core', 'membership-yaksa'],
+    optional: ['organization-core'],
   },
 
   ownsTables: [

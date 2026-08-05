@@ -703,9 +703,6 @@ importers:
       '@o4o/ai-prompts':
         specifier: workspace:*
         version: link:../../packages/ai-prompts
-      '@o4o/annualfee-yaksa':
-        specifier: workspace:*
-        version: link:../../packages/annualfee-yaksa
       '@o4o/asset-copy-core':
         specifier: workspace:*
         version: link:../../packages/asset-copy-core
@@ -739,18 +736,12 @@ importers:
       '@o4o/lms-core':
         specifier: workspace:*
         version: link:../../packages/lms-core
-      '@o4o/lms-yaksa':
-        specifier: workspace:*
-        version: link:../../packages/lms-yaksa
       '@o4o/mail-core':
         specifier: workspace:*
         version: link:../../packages/mail-core
       '@o4o/market-trial':
         specifier: workspace:*
         version: link:../../packages/market-trial
-      '@o4o/membership-yaksa':
-        specifier: workspace:*
-        version: link:../../packages/membership-yaksa
       '@o4o/organization-core':
         specifier: workspace:*
         version: link:../../packages/organization-core
@@ -775,9 +766,6 @@ importers:
       '@o4o/utils':
         specifier: workspace:*
         version: link:../../packages/utils
-      '@o4o/yaksa-scheduler':
-        specifier: workspace:*
-        version: link:../../packages/yaksa-scheduler
       '@opentelemetry/api':
         specifier: ^1.9.0
         version: 1.9.0
@@ -1509,37 +1497,6 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
-  packages/annualfee-yaksa:
-    dependencies:
-      '@o4o/membership-yaksa':
-        specifier: workspace:*
-        version: link:../membership-yaksa
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
-      '@o4o/yaksa-scheduler':
-        specifier: workspace:*
-        version: link:../yaksa-scheduler
-      express:
-        specifier: ^4.18.2
-        version: 4.21.2
-      typeorm:
-        specifier: ^0.3.17
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-    devDependencies:
-      '@types/express':
-        specifier: 4.17.23
-        version: 4.17.23
-      '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.25
-      rimraf:
-        specifier: ^5.0.5
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.2
-        version: 5.9.3
-
   packages/api-types:
     devDependencies:
       openapi-typescript:
@@ -2231,34 +2188,6 @@ importers:
         specifier: 5.4.5
         version: 5.4.5
 
-  packages/lms-yaksa:
-    dependencies:
-      '@o4o/lms-core':
-        specifier: workspace:*
-        version: link:../lms-core
-      '@o4o/membership-yaksa':
-        specifier: workspace:*
-        version: link:../membership-yaksa
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      express:
-        specifier: ^4.18.0
-        version: 4.21.2
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@24.10.1)(typescript@5.9.3))
-    devDependencies:
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
   packages/mail-core:
     dependencies:
       nodemailer:
@@ -2299,49 +2228,6 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.25
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
-  packages/membership-yaksa:
-    dependencies:
-      '@o4o/organization-core':
-        specifier: workspace:*
-        version: link:../organization-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      '@o4o/yaksa-scheduler':
-        specifier: workspace:*
-        version: link:../yaksa-scheduler
-      class-transformer:
-        specifier: ^0.5.0
-        version: 0.5.1
-      class-validator:
-        specifier: ^0.14.0
-        version: 0.14.2
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-router-dom:
-        specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      typeorm:
-        specifier: ^0.3.0
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-      xlsx:
-        specifier: 0.18.5
-        version: 0.18.5
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10
@@ -2932,40 +2818,6 @@ importers:
       typescript:
         specifier: 5.4.5
         version: 5.4.5
-
-  packages/yaksa-scheduler:
-    dependencies:
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      express:
-        specifier: ^4.18.0
-        version: 4.21.2
-      node-cron:
-        specifier: ^3.0.3
-        version: 3.0.3
-      typeorm:
-        specifier: ^0.3.17
-        version: 0.3.27(babel-plugin-macros@3.1.0)(better-sqlite3@12.5.0)(ioredis@5.8.2)(pg@8.16.3)(redis@5.10.0)(reflect-metadata@0.2.2)(sqlite3@5.1.7)(ts-node@10.9.2(@swc/core@1.13.5(@swc/helpers@0.5.17))(@types/node@20.19.25)(typescript@5.9.3))
-      uuid:
-        specifier: ^9.0.0
-        version: 9.0.1
-    devDependencies:
-      '@types/node':
-        specifier: ^20.10.0
-        version: 20.19.25
-      '@types/node-cron':
-        specifier: ^3.0.11
-        version: 3.0.11
-      '@types/uuid':
-        specifier: ^9.0.7
-        version: 9.0.8
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
 
   services/signage-player-web:
     dependencies:
@@ -10849,10 +10701,6 @@ packages:
     resolution: {integrity: sha512-t1QzWwnk4sjLWaQAS8CHgOJ+RAfmHpxFWmc36IWTiWHQfs0w5JDMBS1b1ZxQteo0vVVuWJvIUKHDkkeK7vIGCg==}
     engines: {node: '>= 8.0.0'}
 
-  node-cron@3.0.3:
-    resolution: {integrity: sha512-dOal67//nohNgYWb+nWmg5dkFdIwDm8EpeGYMekPMrngV3637lqnX0lbUcCtgibHTz6SEz7DAIjKvKDFYCnO1A==}
-    engines: {node: '>=6.0.0'}
-
   node-cron@4.2.1:
     resolution: {integrity: sha512-lgimEHPE/QDgFlywTd8yTR61ptugX3Qer29efeyWw2rv259HtGBNn1vZVmp8lB9uo9wC0t/AT4iGqXxia+CJFg==}
     engines: {node: '>=6.0.0'}
@@ -18493,7 +18341,7 @@ snapshots:
       sirv: 3.0.2
       tinyglobby: 0.2.15
       tinyrainbow: 2.0.0
-      vitest: 3.2.4(@types/node@22.17.2)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.2)(msw@2.12.3(@types/node@22.17.2)(typescript@5.4.5))(terser@5.44.1)
+      vitest: 3.2.4(@types/node@24.10.1)(@vitest/ui@3.2.4)(jsdom@26.1.0)(lightningcss@1.30.2)(msw@2.12.3(@types/node@24.10.1)(typescript@5.4.5))(terser@5.43.1)
 
   '@vitest/utils@3.2.4':
     dependencies:
@@ -22515,10 +22363,6 @@ snapshots:
   node-cache@5.1.2:
     dependencies:
       clone: 2.1.2
-
-  node-cron@3.0.3:
-    dependencies:
-      uuid: 8.3.2
 
   node-cron@4.2.1: {}
 

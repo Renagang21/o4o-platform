@@ -9,14 +9,13 @@ import { AppManifest } from '@o4o/types';
 // Removed manifests:
 // - Forum: forum, forum-core, forum-yaksa
 // - Display: signage, digitalsignage
-// - LMS: lms-core, lms-yaksa (lms-marketing R7에서 삭제됨)
-// - Organization: organization-core, organization-forum, membership-yaksa
+// - LMS: lms-core (lms-marketing R7에서 삭제됨)
+// - Organization: organization-core, organization-forum
 // - Dropshipping: dropshipping, dropshipping-core, dropshipping-cosmetics
 // - Cosmetics: cosmetics-seller-extension, cosmetics-partner-extension, cosmetics-supplier-extension
 // - Operations: sellerops, supplierops, partnerops
 // - CMS: cms-core
 // - E-commerce: ecommerce-core
-// - Yaksa: annualfee-yaksa, yaksa-scheduler
 // - Platform: platform-core, auth-core, health-extension
 //
 // These will be handled in Phase R2 (domain service separation).

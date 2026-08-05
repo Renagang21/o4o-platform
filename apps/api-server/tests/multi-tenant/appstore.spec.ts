@@ -78,10 +78,13 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = catalog.map(app => app.appId);
 
             // Expected apps (yaksa-specific + global)
-            expect(appIds).toContain('membership-yaksa');
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+            //   membership-yaksa · reporting-yaksa · lms-yaksa · yaksa-scheduler · annualfee-yaksa
+            //   카탈로그 항목이 제거되었다. forum-yaksa 만 yaksa 전용 항목으로 남는다.
             expect(appIds).toContain('forum-yaksa');
-            expect(appIds).toContain('reporting-yaksa');
-            expect(appIds).toContain('lms-yaksa');
+            expect(appIds).not.toContain('membership-yaksa');
+            expect(appIds).not.toContain('reporting-yaksa');
+            expect(appIds).not.toContain('lms-yaksa');
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
             //   'pharmaceutical-core' 카탈로그 항목·패키지가 제거되었다.
             expect(appIds).not.toContain('pharmaceutical-core');
@@ -245,9 +248,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Should include yaksa-specific apps
             const appIds = recommended.map(app => app.appId);
-            expect(appIds).toContain('membership-yaksa');
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1: 잔존 yaksa 전용 항목은 forum-yaksa 뿐이다.
             expect(appIds).toContain('forum-yaksa');
-            expect(appIds).toContain('lms-yaksa');
+            expect(appIds).not.toContain('membership-yaksa');
+            expect(appIds).not.toContain('lms-yaksa');
 
             expect(yaksa.serviceGroup).toBe('yaksa');
         });
@@ -267,9 +271,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(cosmeticsIds).toContain('cosmetics-sample-display-extension');
             expect(yaksaIds).not.toContain('cosmetics-sample-display-extension');
 
-            // Yaksa should have membership-yaksa, cosmetics should not
-            expect(yaksaIds).toContain('membership-yaksa');
-            expect(cosmeticsIds).not.toContain('membership-yaksa');
+            // Yaksa should have forum-yaksa, cosmetics should not
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1: membership-yaksa 제거에 따른 대체 검증
+            expect(yaksaIds).toContain('forum-yaksa');
+            expect(cosmeticsIds).not.toContain('forum-yaksa');
 
             expect(cosmetics.serviceGroup).not.toBe(yaksa.serviceGroup);
         });
@@ -306,14 +311,16 @@ describe('Multi-Tenant AppStore Filtering', () => {
         test('Installing incompatible app is blocked', async () => {
             const { cosmetics } = representatives;
 
-            // Attempt to install membership-yaksa in cosmetics tenant
-            const result = canInstallApp('membership-yaksa', 'cosmetics');
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+            //   membership-yaksa 는 카탈로그에서 제거되어 'App not found' 로 귀결된다.
+            //   incompatible 판정은 잔존 yaksa 전용 항목(forum-yaksa) 으로 검증한다.
+            const result = canInstallApp('forum-yaksa', 'cosmetics');
 
             expect(result.canInstall).toBe(false);
             expect(result.reason).toContain('incompatible');
 
-            // Attempt to install forum-yaksa in cosmetics tenant
-            const result2 = canInstallApp('forum-yaksa', 'cosmetics');
+            // 제거된 앱은 설치 후보로도 남지 않는다
+            const result2 = canInstallApp('membership-yaksa', 'cosmetics');
             expect(result2.canInstall).toBe(false);
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
@@ -341,7 +348,7 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(canInstallApp('cosmetics-sample-display-extension', 'yaksa').canInstall).toBe(false);
 
             // Tourist cannot install yaksa app
-            expect(canInstallApp('membership-yaksa', 'tourist').canInstall).toBe(false);
+            expect(canInstallApp('forum-yaksa', 'tourist').canInstall).toBe(false);
 
             // Sellerops can install a sellerops-scoped app
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'sellerops' 앱 항목 제거에 따른 대체 검증
@@ -411,10 +418,11 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(cosmeticsIds).not.toContain('dropshipping-cosmetics');
             expect(cosmeticsIds).not.toContain('dropshipping-core');
 
-            // membership-yaksa depends on organization-core
-            // Both should be in yaksa catalog (via dependency resolution)
-            expect(yaksaIds).toContain('membership-yaksa');
-            expect(yaksaIds).toContain('organization-core');
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+            //   forum-yaksa → forum-core 의존 체인으로 대체 검증한다.
+            expect(yaksaIds).toContain('forum-yaksa');
+            expect(yaksaIds).toContain('forum-core');
+            expect(yaksaIds).not.toContain('membership-yaksa');
 
             expect(cosmetics.serviceGroup).not.toBe(yaksa.serviceGroup);
         });
@@ -433,14 +441,15 @@ describe('Multi-Tenant AppStore Filtering', () => {
         });
 
         test('Chained dependencies are resolved', async () => {
-            // reporting-yaksa depends on membership-yaksa which depends on organization-core
+            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+            //   reporting-yaksa → membership-yaksa → organization-core 체인이 통째로 제거되었다.
+            //   삭제된 의존이 dangling 으로 되살아나지 않는지 검증한다.
             const yaksaApps = getAppsForServiceGroupWithDependencies('yaksa');
             const appIds = yaksaApps.map(app => app.appId);
 
-            // All three should be present
-            expect(appIds).toContain('reporting-yaksa');
-            expect(appIds).toContain('membership-yaksa');
-            expect(appIds).toContain('organization-core');
+            expect(appIds).not.toContain('reporting-yaksa');
+            expect(appIds).not.toContain('membership-yaksa');
+            expect(appIds).toContain('forum-yaksa');
         });
 
         test('Dependencies not available for incompatible service groups', async () => {

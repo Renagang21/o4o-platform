@@ -37,33 +37,12 @@ const QuizCampaignViewerPage = lazy(() =>
 );
 
 // Member Portal
-const MemberHome = lazy(() =>
-  import('@/pages/member/MemberHome').then((m) => ({ default: m.MemberHome }))
-);
-const MemberNotifications = lazy(() =>
-  import('@/pages/member/MemberNotifications').then((m) => ({ default: m.MemberNotifications }))
-);
-
-// LMS Member (Yaksa) pages
-const LmsMemberDashboard = lazy(() =>
-  import('@/pages/member/lms/LmsMemberDashboard').then((m) => ({ default: m.LmsMemberDashboard }))
-);
-const LmsMemberRequiredCourses = lazy(() =>
-  import('@/pages/member/lms/LmsMemberRequiredCourses').then((m) => ({
-    default: m.LmsMemberRequiredCourses,
-  }))
-);
-const LmsMemberCredits = lazy(() =>
-  import('@/pages/member/lms/LmsMemberCredits').then((m) => ({ default: m.LmsMemberCredits }))
-);
-const LmsMemberLicense = lazy(() =>
-  import('@/pages/member/lms/LmsMemberLicense').then((m) => ({ default: m.LmsMemberLicense }))
-);
-const LmsMemberAssignments = lazy(() =>
-  import('@/pages/member/lms/LmsMemberAssignments').then((m) => ({
-    default: m.LmsMemberAssignments,
-  }))
-);
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+//   `/member` 회원 포털(내 자격·회비·교육 4탭) · `/member/lms/*` · `/member/notifications`
+//   화면은 모두 membership-yaksa · annualfee-yaksa · lms-yaksa 전용 도메인 화면이라 제거했다.
+//   알림 화면은 6개 알림 타입(면허·회비·교육)이 전부 제거된 scheduler Job 산출물이었고,
+//   유일한 진입점(MemberHome) 과 복귀 링크(`/member`) 가 함께 사라져 도달 불가 화면이 된다.
+//   공용 알림 백엔드(`/api/v2/notifications`) 자체는 변경하지 않는다.
 
 // Seller pages
 const SellerDashboardPage = lazy(() =>
@@ -142,75 +121,6 @@ export function AppRouter() {
 
                   {/* Marketing - Quiz Campaign Viewer */}
                   <Route path="/marketing/quiz/:id" element={<QuizCampaignViewerPage />} />
-
-                  {/* 회원 포털 (Member Portal) */}
-                  <Route
-                    path="/member"
-                    element={
-                      <RequireAuth>
-                        <MemberHome />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/member/notifications"
-                    element={
-                      <RequireAuth>
-                        <MemberNotifications />
-                      </RequireAuth>
-                    }
-                  />
-
-                  {/* 회원 LMS (약사 교육) */}
-                  <Route
-                    path="/member/lms/dashboard"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberDashboard />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/member/lms/required-courses"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberRequiredCourses />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/member/lms/credits"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberCredits />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/member/lms/license"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberLicense />
-                      </RequireAuth>
-                    }
-                  />
-                  <Route
-                    path="/member/lms/assignments"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberAssignments />
-                      </RequireAuth>
-                    }
-                  />
-                  {/* /member/lms → dashboard 리다이렉트 */}
-                  <Route
-                    path="/member/lms"
-                    element={
-                      <RequireAuth>
-                        <LmsMemberDashboard />
-                      </RequireAuth>
-                    }
-                  />
 
                   {/* Seller Dashboard (관리자/판매원 접근 가능) */}
                   <Route

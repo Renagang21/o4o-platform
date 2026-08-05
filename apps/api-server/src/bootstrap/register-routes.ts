@@ -80,9 +80,9 @@ import userRoleRoutes from '../routes/user-role.routes.js';
 import { createRoleApplicationController } from '../routes/v2/role-application.controller.js';
 import organizationRoutes from '../routes/organization.routes.js';
 import linkedAccountsRoutes from '../routes/linked-accounts.js';
-import { createMembershipRoutes } from '@o4o/membership-yaksa';
-// WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2: 관리자용 Membership API 보호
-import { registerMembershipAdminGuards } from './membership-admin-guard.js';
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
+//   `/api/v1/membership` (@o4o/membership-yaksa) mount 와 그 관리자 guard 제거.
+//   약사회 전용 회원 자격 도메인이며 다른 운영 서비스 소비처가 없다.
 import marketTrialRoutes from '../routes/market-trial.routes.js';
 import aiQueryRoutes from '../routes/ai-query.routes.js';
 import aiProxyRoutes from '../routes/ai-proxy.routes.js';
@@ -104,7 +104,7 @@ import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.rout
 import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
 // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
 //   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
-//   현행 Yaksa 실서비스(`/api/v1/membership`, `@o4o/lms-yaksa`, `/api/v1/forum`)와 무관하다.
+//   (`/api/v1/membership`·`@o4o/lms-yaksa` 도 이후 WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1 에서 제거됨)
 import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
@@ -363,18 +363,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // ========================================================================
     // DOMAIN ROUTES PARTIALLY RESTORED
     // ========================================================================
-    // 14. Membership routes (/api/v1/membership) - @o4o/membership-yaksa - RE-ENABLED
-    // WO-O4O-ADMIN-MEMBERSHIP-API-AUTHORIZATION-GUARD-V2:
-    //   관리자 전용 subtree 는 mount 직전에 authenticate + requireRole 로 보호한다.
-    //   mount 전체에 걸지 않는 이유는 `/members/me`, `/members/me/summary` 가
-    //   같은 router 에 섞여 있기 때문이다. 상세는 membership-admin-guard.ts 주석 참조.
-    registerMembershipAdminGuards(app);
-    app.use('/api/v1/membership', createMembershipRoutes(dataSource));
-    logger.info('✅ Membership routes registered at /api/v1/membership');
+    // 14. Membership routes — WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+    //     에서 @o4o/membership-yaksa 와 함께 제거됨 (약사회 전용, 다른 소비처 0).
 
     // Still disabled (Phase R2):
-    // 15. Reporting routes (/api/reporting) - @o4o/reporting-yaksa
-    // 16. AnnualFee routes (/api/annualfee) - @o4o/annualfee-yaksa
     // 17. Cosmetics Seller routes (/api/v1/cosmetics-seller) - @o4o/cosmetics-seller-extension
     // 18. Cosmetics Sample Display routes - @o4o/cosmetics-sample-display-extension
     // 19. Cosmetics Supplier routes - @o4o/cosmetics-supplier-extension

@@ -25,7 +25,6 @@ import { DisabledAppEntry } from '@o4o/types';
 export const disabledAppsRegistry: DisabledAppEntry[] = [
   // === BROKEN: Build/Runtime Errors ===
   // WO-MENU-BROKEN-FIX (2024-12-20): All broken apps have been fixed
-  // - yaksa-scheduler: TypeScript errors fixed
   // - cosmetics-partner-extension: ESM imports fixed, design system dependency removed
   // - cosmetics-supplier-extension: ESM imports fixed
   // - cosmetics-sample-display-extension: Dependencies now working

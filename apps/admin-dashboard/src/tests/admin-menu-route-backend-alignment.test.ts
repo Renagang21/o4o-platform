@@ -28,9 +28,10 @@ const stripComments = (s: string) => s.replace(/^\s*\/\/.*$/gm, '');
 
 const API = '../../../../apps/api-server/src';
 const USERS_GUARD = read(`${API}/routes/admin/users.routes.ts`);
-const MEMBERSHIP_GUARD = read(`${API}/bootstrap/membership-admin-guard.ts`);
 
-const YAKSA_ROUTES = stripComments(read('../routes/yaksa.routes.tsx'));
+// WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+//   membership-admin-guard.ts · routes/yaksa.routes.tsx 는 약사회 전용 기능 제거와 함께
+//   삭제되어 대조 대상이 없다. 남은 platform 경계 화면은 core-users 뿐이다.
 const USERS_ROUTES = stripComments(read('../routes/users.routes.tsx'));
 
 /** 백엔드 소스에서 역할 배열 상수를 읽는다. 표기를 못 읽으면 **실패**한다(통과로 넘기지 않는다). */
@@ -46,21 +47,11 @@ const readBackendRoles = (source: string, constName: string): string[] => {
 /** 플랫폼 전역 경계를 쓰는 화면: 메뉴 id ↔ route 경로 ↔ route 소스. */
 const PLATFORM_SCOPED_SCREENS = [
   { menuId: 'core-users', path: '/users', source: USERS_ROUTES },
-  { menuId: 'core-membership', path: '/admin/membership/dashboard', source: YAKSA_ROUTES },
-  { menuId: 'core-membership-members', path: '/admin/membership/members', source: YAKSA_ROUTES },
-  { menuId: 'core-membership-verifications', path: '/admin/membership/verifications', source: YAKSA_ROUTES },
-  { menuId: 'core-membership-categories', path: '/admin/membership/categories', source: YAKSA_ROUTES },
 ];
 
 describe('계층 3 — 백엔드 경계가 프런트 상수와 일치한다', () => {
   it('/api/v1/admin/users 의 ADMIN_ROLES 와 PLATFORM_ADMIN_ROLES 가 같다', () => {
     expect(readBackendRoles(USERS_GUARD, 'ADMIN_ROLES')).toEqual([...PLATFORM_ADMIN_ROLES]);
-  });
-
-  it('/api/v1/membership/* 의 MEMBERSHIP_ADMIN_ROLES 와 PLATFORM_ADMIN_ROLES 가 같다', () => {
-    expect(readBackendRoles(MEMBERSHIP_GUARD, 'MEMBERSHIP_ADMIN_ROLES')).toEqual([
-      ...PLATFORM_ADMIN_ROLES,
-    ]);
   });
 });
 
@@ -84,7 +75,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
   const boundary = [...PLATFORM_ADMIN_ROLES];
 
   it.each([['platform:super_admin']])('%s 는 메뉴도 보이고 route 도 통과한다', (role) => {
-    expect(hasMenuPermission([role], [], 'core-membership-categories')).toBe(true);
+    expect(hasMenuPermission([role], [], 'core-users')).toBe(true);
     expect(hasRequiredRoles({ roles: [role] }, boundary)).toBe(true);
   });
 
@@ -92,7 +83,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
   it.each([['admin'], ['super_admin'], ['operator'], ['kpa:admin'], ['neture:operator'], ['user']])(
     '%s 는 메뉴도 안 보이고 route 도 통과하지 못한다',
     (role) => {
-      expect(hasMenuPermission([role], [], 'core-membership-categories')).toBe(false);
+      expect(hasMenuPermission([role], [], 'core-users')).toBe(false);
       expect(hasRequiredRoles({ roles: [role] }, boundary)).toBe(false);
     },
   );
@@ -116,7 +107,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
 describe('선언 위생 — 역할 문자열과 permission 문자열을 섞지 않는다', () => {
   const ROUTE_FILES = [
     'appearance', 'apps', 'commerce', 'content', 'dashboard', 'lms-marketing',
-    'platform', 'public', 'test', 'users', 'yaksa',
+    'platform', 'public', 'test', 'users',
   ];
   const ALL_ROUTES = ROUTE_FILES.map((f) => {
     try {

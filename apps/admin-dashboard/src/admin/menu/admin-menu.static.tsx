@@ -19,7 +19,6 @@ import {
   Settings,
   Users,
   FileText,
-  UserCheck,
   BarChart2,
   ClipboardList,
   Activity,
@@ -95,36 +94,10 @@ export const adminMenuStatic: MenuItem[] = [
         icon: <Shield className="w-4 h-4" />,
         path: '/operators',
       },
-      {
-        id: 'core-membership',
-        label: 'Membership',
-        icon: <UserCheck className="w-4 h-4" />,
-        path: '/admin/membership/dashboard',
-      },
-      {
-        id: 'core-membership-members',
-        label: 'Members',
-        icon: <Users className="w-4 h-4" />,
-        path: '/admin/membership/members',
-      },
-      {
-        id: 'core-membership-verifications',
-        label: 'Verifications',
-        icon: <UserCheck className="w-4 h-4" />,
-        path: '/admin/membership/verifications',
-      },
-      // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1
-      //   회원 분류 관리 화면(CategoryManagement)은 route 는 이미 존재했으나
-      //   (yaksa.routes.tsx — /admin/membership/categories) 메뉴 진입점이 없어
-      //   어디에서도 들어갈 수 없는 상태였다. 기존 route 를 그대로 재사용하고
-      //   Membership 3개 항목 바로 뒤(회원 관리 묶음 안)에 메뉴만 연결한다.
-      //   노출 범위는 rolePermissions.ts 의 menuPermissions 로 platform 관리자 역할에 한정한다.
-      {
-        id: 'core-membership-categories',
-        label: 'Member Categories',
-        icon: <Layers className="w-4 h-4" />,
-        path: '/admin/membership/categories',
-      },
+      // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+      //   약사회 전용 Membership 4개 메뉴(dashboard/members/verifications/categories)는
+      //   @o4o/membership-yaksa 패키지 제거와 함께 삭제되었다. 향후 약사회 기능은
+      //   중앙 O4O 관리자가 아닌 별도 서비스에서 새로 설계한다.
       // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
       //   포인트 운영은 금액성 write(지급/차감) 를 가진 화면이라 Admin 영역에 배치한다
       //   (CLAUDE.md §11 — Admin = 구조 + 정책 + 거버넌스 + **금융**).
@@ -344,18 +317,9 @@ export const adminMenuStatic: MenuItem[] = [
     label: 'Yaksa (KPA)',
     icon: <Activity className="w-5 h-5" />,
     children: [
-      // WO-O4O-ADMIN-MENU-CONNECT-BATCH-2-V1
-      //   기존 항목 `Service Dashboard → /admin/yaksa-hub` 를 **교체**한다(추가 아님).
-      //   그 경로는 `AppRouteGuard appId="yaksa-scheduler"` 로 감싸여 있고 해당 앱이 비활성이라
-      //   실제로는 `/error/app-disabled?app=yaksa-scheduler` 로 귀결되는 죽은 링크였다.
-      //   근거: IR-O4O-ADMIN-MENU-AND-ROUTE-NEXT-BATCH-SELECTION-V1 §5-1 (A안 확정)
-      //   `/admin/yaksa-hub` route 자체와 yaksa-scheduler 앱 상태는 변경하지 않는다.
-      {
-        id: 'yaksa-admin-center',
-        label: '지부/분회 관리자 센터',
-        icon: <LayoutDashboard className="w-4 h-4" />,
-        path: '/admin/yaksa',
-      },
+      // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1
+      //   `지부/분회 관리자 센터 → /admin/yaksa` 는 약사회 전용 관리자 화면이라 제거했다.
+      //   아래 4개 항목은 현재 운영 중인 KPA Society operator 화면이므로 보존한다.
       {
         id: 'yaksa-hub-contents',
         label: 'HUB 콘텐츠',

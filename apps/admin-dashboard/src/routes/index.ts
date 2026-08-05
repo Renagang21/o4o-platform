@@ -9,7 +9,6 @@ export { ContentRoutes } from './content.routes';
 export { AppearanceRoutes } from './appearance.routes';
 export { CommerceRoutes } from './commerce.routes';
 export { ServiceRoutes } from './services.routes';
-export { YaksaRoutes } from './yaksa.routes';
 export { AppRoutes } from './apps.routes';
 export { LmsMarketingRoutes } from './lms-marketing.routes';
 export { PlatformRoutes } from './platform.routes';
