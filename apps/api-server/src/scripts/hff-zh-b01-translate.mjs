@@ -113,7 +113,7 @@ const ROUND_FILES = [];
 for (let n = 1; n <= 60; n++) ROUND_FILES.push([`z${n}`, `${D}/hff-zh-b01-z${n}-translations-v1.json`]);
 for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b02z${n}`, `${D}/hff-zh-b02-z${n}-translations-v1.json`]);
 for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b03z${n}`, `${D}/hff-zh-b03-z${n}-translations-v1.json`]);
-for (let n = 1; n <= 80; n++) ROUND_FILES.push([`b04z${n}`, `${D}/hff-zh-b04-z${n}-translations-v1.json`]);
+for (let n = 1; n <= 120; n++) ROUND_FILES.push([`b04z${n}`, `${D}/hff-zh-b04-z${n}-translations-v1.json`]);
 for (const [tag, f] of ROUND_FILES) {
   if (!fs.existsSync(f)) continue;
   const T = JSON.parse(fs.readFileSync(f, 'utf8'));
@@ -179,9 +179,14 @@ const freqTokens = (t, zhSide) => {
   }
   return out;
 };
+/* `1일섭취량기준` `1회섭취기준` 처럼 띄어쓰기가 빠져 뒤 한글에 붙은 `1일`·`1회` 는 빈도 토큰으로도,
+   수량으로도 읽히지 않아야 한다. 빈도 토큰은 이미 `(?![가-힣])` 로 제외돼 있는데 수량 축(NUM_RE)에는
+   `1일` 이 그대로 남아, 중국어에 대응 표기가 없는(일/회는 canonUnit 대상이 아님) 유실로 오판된다.
+   섭취 빈도는 PERDAY/TIMES 축에서 이미 대조하므로 여기서 빼도 검사 강도는 줄지 않는다. */
+const FREQ_COMPOUND_KO = /(\d+)\s*(?:일|회)(?=[가-힣])/g;
 const stripFreq = (t, zhSide) => (zhSide
-  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ')
-  : t.replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' '));
+  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ').replace(FREQ_COMPOUND_KO, ' ')
+  : t.replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ').replace(FREQ_COMPOUND_KO, ' '));
 /* `每2000mg100亿 CFU` 처럼 단위 바로 뒤에 다음 수치가 붙는 표기가 있다. 이때 `100` 앞 글자가
    라틴 문자(`g`)여서 성분 코드 판정에 걸려 수치가 통째로 안 읽힌다. 이미 단위로 닫힌 자리 뒤에는
    경계를 넣어 다음 수치를 살리고, `비타민B12` 같은 성분 코드는 그대로 막는다. */
@@ -228,15 +233,30 @@ function buildFlat() {
   FLAT_READY = true;
 }
 
+/* `key()` 는 열거 기호(①·(1)·3)·4.)를 지운다 — 기호가 다른 두 원문이 같은 키가 된다.
+   기호를 달고 저작된 값이 기호 없는 문서로 새지 않도록, 조회 결과의 앞뒤 기호를 원문에 맞춘다. */
+const MARK_LEAD = /^\s*(?:[①-⑮➀-➄]|\(\s*\d+\s*\)|\d+\s*[).](?!\d))\s*/;
+const MARK_TAIL = /\s*(?:[①-⑮➀-➄]|\d+\s*[).])\s*$/;
+const circled = (s) => s.replace(/[①-⑮]/g, (c) => `(${c.charCodeAt(0) - 0x245f})`).replace(/[➀-➄]/g, (c) => `(${c.charCodeAt(0) - 0x277f})`);
+function alignMarks(src, kind, v) {
+  if (typeof v !== 'string' || !v) return v;
+  let out = v;
+  const sl = MARK_LEAD.exec(src), vl = MARK_LEAD.exec(out);
+  if (vl && (!sl || sl[0].trim() !== vl[0].trim())) out = out.slice(vl[0].length);
+  if (sl && !MARK_LEAD.test(out)) out = `${sl[0].trim()} ${out}`;
+  if (MARK_TAIL.test(out) && !MARK_TAIL.test(src)) out = out.replace(MARK_TAIL, '');
+  return out;
+}
+
 /** 사전 조회. kind 를 주면 해당 슬롯을 먼저 본다. */
 function lookup(kind, t) {
   const k0 = key(t);
   const ks = keyVariants(k0);
   const order = kind ? [kind, ...KINDS.filter((x) => x !== kind)] : KINDS;
-  for (const k2 of ks) for (const kd of order) if (AUTH[kd][k2]) return { zh: AUTH[kd][k2], how: `dict(${kd})` };
+  for (const k2 of ks) for (const kd of order) if (AUTH[kd][k2]) return { zh: alignMarks(t, kind,AUTH[kd][k2]), how: `dict(${kd})` };
   if (!FLAT_READY) buildFlat();
   const f = flat(k0);
-  if (f) for (const kd of order) { const v = FLAT[kd].get(f); if (v) return { zh: v, how: `dict-flat(${kd})` }; }
+  if (f) for (const kd of order) { const v = FLAT[kd].get(f); if (v) return { zh: alignMarks(t, kind,v), how: `dict-flat(${kd})` }; }
   return null;
 }
 const MARK_HEAD = /^(\s*(?:[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⒜⒝⒞㉮㉯㉰㉱㈎㈏㈐㈑○●◦▶ⓛ]|\(\s*\d+\s*\)|\d+(?:-\d+)+\s*[).]|\d+\s*[).>]|\(\s*[가나다라마바사]\s*\)|[가나다라마바사]\s*[.)])\s*)/;
@@ -312,6 +332,24 @@ function labelColon(t) {
   const a = resolveAtom(m[1].trim()), b = resolveAtom(m[2].trim());
   if (!a || !b) return null;
   return `${a}：${b}`;
+}
+
+/* `정상적인 세포분열에 필요 망간 :` `유해산소로부터 세포를 보호하는데 필요 *아연`
+   — 기능성 문구 뒤에 그 기능성이 귀속되는 영양성분명이 붙는 라벨 형태.
+   앞부분이 기능성 문구로 확정될 때만 적용해 임의 2분할로 어순이 뒤집히는 것을 막는다.
+   귀속(어느 성분의 기능성인가)과 표기 순서를 원문 그대로 보존한다(§4). */
+const FUNC_TAIL = /(?:필요|필요\.|도움을 줌|도움이 됨|도움을 줄 수 있음|도움을 줄 수 있음\.|관여|기여)$/;
+function functionNutrient(t, depth) {
+  const m = /^(.{4,}?)\s+([*·◦●○☆★]?)\s*([가-힣A-Za-z][가-힣A-Za-z0-9]{0,11})\s*([:：\-–—])?\s*$/.exec(t);
+  if (!m) return null;
+  const head = m[1].trim();
+  if (!FUNC_TAIL.test(head)) return null;
+  const a = resolveAtom(head, depth + 1);
+  if (!a) return null;
+  const b = ING[key(m[3])] ?? lookup(null, m[3])?.zh;
+  if (!b) return null;
+  const tail = m[4] ? (/[:：]/.test(m[4]) ? '：' : m[4]) : '';
+  return `${a} ${m[2]}${b}${tail}`;
 }
 
 /** `1일 1회, 1회 1캡슐` 처럼 이어진 섭취 표기. 조각이 모두 섭취 표기여야 한다. */
@@ -784,6 +822,7 @@ function resolveAtomRaw(t0, depth) {
   const lc = labelColon(t0); if (lc) return lc;
   const dc = doseChain(t0); if (dc) return dc;
   const ik = intake(t0); if (ik) return ik;
+  const fn = functionNutrient(t0, depth); if (fn) return fn;
   const hc = headingCompose(t0, depth); if (hc) return hc;
   /* `… 보관하십시오. 2) 어린이의 손이 …` — 한 슬롯에 여러 문장이 들어온다.
      문장 단위로 나눠 옮기고 항목 번호 표기는 원문 그대로 둔다(소수점은 자르지 않는다). */
@@ -1095,6 +1134,8 @@ export function zh(kind, text) {
   const mk = `${kind} ${t}`;
   if (ZH_MEMO.has(mk)) return ZH_MEMO.get(mk);
   const res = zhCompute(kind, t);
+  /* 기준·규격(spec) 밖에서는 동그라미 숫자를 `(n)` 으로 옮긴다 — 목록 슬롯의 기존 저작 자산(②→(2))과 같은 표기다. */
+  if (res && kind !== 'spec' && typeof res.zh === 'string') res.zh = circled(res.zh);
   ZH_MEMO.set(mk, res);
   return res;
 }
@@ -1109,7 +1150,9 @@ function zhCompute(kind, t) {
     const rest = t.slice(mm[0].length);
     const r = zh(kind, rest);
     /* 가·나·다 마커는 한글 자체가 순서 기호다. 순서를 유지한 채 천간(甲乙丙…)으로 옮긴다. */
-    if (r) return { zh: mm[0].replace(/\s+$/, ' ').replace(/[가나다라마바사]/g, (c) => ({ 가: '甲', 나: '乙', 다: '丙', 라: '丁', 마: '戊', 바: '己', 사: '庚' }[c])) + r.zh, how: `marker+${r.how}` };
+    /* 기준·규격(spec) 은 기존 배치와 같이 동그라미 숫자를 그대로 둔다.
+       목록(li) 안에서는 앞선 저작 자산(②→(2))과 같게 `(n)` 으로 옮긴다. */
+    if (r) return { zh: (kind === 'spec' ? mm[0].replace(/\s+$/, ' ') : circled(mm[0].replace(/\s+$/, ' '))).replace(/[가나다라마바사]/g, (c) => ({ 가: '甲', 나: '乙', 다: '丙', 라: '丁', 마: '戊', 바: '己', 사: '庚' }[c])) + r.zh, how: `marker+${r.how}` };
   }
   const a = resolveAtom(t);
   if (a) return { zh: a, how: 'compose' };

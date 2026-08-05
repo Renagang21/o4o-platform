@@ -1,0 +1,763 @@
+{
+ "wo": "WO-O4O-HFF-ZH-ALL-REMAINING-10414-DIRECT-BULK-PRODUCTION-AND-TRACK-CLOSURE-V1",
+ "generatedAt": "2026-08-05T09:53:15.794Z",
+ "count": 84,
+ "targets": [
+  {
+   "op": "INSERT",
+   "productMasterId": "00194041-dccf-4c90-b5d0-4db91d607e12",
+   "productNameKo": "레드마임",
+   "koCanonicalId": "a092d070-b8b9-4c34-8565-c20af88d0ada",
+   "koHash": "9f9b7c14ebd4bd68f854413f87bf3ca54104d09c34e8c491250e94a495d6039c",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>레드마임</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>正常叶酸代谢所必需</li><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次20g摄取。</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的红色液状</div><div class=\"sd-item\">2)维生素B12：标示量(3ug/20g)的80~180%</div><div class=\"sd-item\">3)叶酸：标示量(200ug/20g)的80~150%</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5)细菌数：100以下（每ml）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f622ccad61feb4b3200a455bf028ca9eb325af58e2917133a2e6bea7ab7f9165"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "00ad6a51-a60b-41da-a404-306d1a3d1d3e",
+   "productNameKo": "엠에스엠100파우더",
+   "koCanonicalId": "974b23bb-bdef-423d-b9f4-b9ff77409697",
+   "koHash": "2eacef90c35431f071cc8735b53a28ac319c2edc76d82405d3e4bb2c92d0dfd1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1996mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>엠에스엠100파우더<small>MSM</small></h1><p class=\"sd-meta\">주식회사 아리너스 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品在每日 摄取量（1次 · 1勺）中含有MSM <b>1996mg</b>的标示量含有（标示基准每2000mg）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入MSM <b>1996mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味且无异味、无异臭的白色粉末 · 주식회사 아리너스 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1996mg/2000mg)的80~120%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起2年</div><div class=\"sd-item\"><b>保存</b> 开封后请盖紧盖子，存放于湿气少且不受阳光直射的阴凉处。置于高温潮湿处可能吸湿变形，请密封保存。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 出现不良反应时停止摄取并咨询专业人员 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "06da63b40cbd4e4a3ddc11a776f388dd60742779780c13a208948c87d3e57c61"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "010484c9-f2df-44aa-84bd-afc605c6a010",
+   "productNameKo": "식이섬유 화이버크린캡",
+   "koCanonicalId": "5c29bcf6-fe0e-4360-9a26-c762f268da1b",
+   "koHash": "ad4bec929a74ae3af7d56c4ba1932f983849dcf45f9397a22b460723adf5e290",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>식이섬유 화이버크린캡</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">车前子壳产品</span><ul><li>排便顺畅</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次6粒胶囊，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">车前子壳产品</span><ul><li>务必与充足的水一起摄取（液体剂型除外）</li><li>过敏体质者请确认成分后再摄取。</li><li>请用充足的水使内容物完全膨胀后再摄取</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：微黄色硬胶囊</div><div class=\"sd-item\">膳食纤维：标示量(2500mg/3g)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解度：20分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "5eb65de82a8ff4e83d12baaab6bbc74669681ce5a8fb4a041bf885a7f4c12ab0"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "04859fe1-87cf-4487-8948-ec1698156674",
+   "productNameKo": "엠브이케이 옵티엠에스엠(MVK OptiMSM)",
+   "koCanonicalId": "5b590f5a-edbf-45a2-ac1c-f5900b0f0cda",
+   "koHash": "8d9f09381d469f3ba728e364428ee4e86b8ba2d0f7d5cd93c5dadbe0a85b688a",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1.96g</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>엠브이케이 옵티엠에스엠(MVK OptiMSM)<small>MSM</small></h1><p class=\"sd-meta\">(주)세종바이오팜 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品在每日 摄取量（1次 · 1勺）中含有MSM <b>1.96g</b>的标示量含有（标示基准每2g）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入MSM <b>1.96g</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的白色粉末 · (주)세종바이오팜 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1.96g/2g)的80~120%</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 请在湿气少且不受阳光直射的阴凉处保存。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 摄取前确认产品标示事项 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "4a1a1ab568dbbec43b481c52d46c2b3d0188b8986a78de2f0468f4711e621567"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "0823015b-c621-4d2b-b5fc-32a54c8b4999",
+   "productNameKo": "라이프토콜 간 건강 밀크씨슬",
+   "koCanonicalId": "c2c23b1e-e91b-4208-868a-fb9488bec3b5",
+   "koHash": "17528eda1397369ba8b29dfb41039ff9d90e8ac244b80e57586fed127f957272",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">水飞蓟 130mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>라이프토콜 간 건강 밀크씨슬<small>水飞蓟</small></h1><p class=\"sd-meta\">주식회사 피플리브 制造 · 每日1次，每次1粒胶囊</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品在每日摄取量（1次 · 1粒胶囊）中含有水飞蓟 <b>130mg</b>的标示量含有（标示基准每450mg）。 水飞蓟的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1粒胶囊）摄取可摄入水飞蓟 <b>130mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>1) 性状：具有固有风味且无异味、无异臭亮黄橙色含有内容物的白色硬胶囊 · 주식회사 피플리브 制造</li></ul>\n  <h2>水飞蓟功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于肝脏健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1粒胶囊</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>水飞蓟</b> 标示量(130mg/450mg)的80~120%</div><div class=\"sd-item\"><b>性状</b> 1) 性状：具有固有风味、无异味异臭、装有浅黄橙色内容物的白色硬胶囊</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射，保存于阴凉处。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 孕妇·哺乳期妇女应在摄取前咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 出现不良反应时停止摄取并咨询专业人员 · 保存于儿童接触不到的地方 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "3c90456bb6a255fea25cb22ff7cd1a0c497d71a9f6891880d488e5d05c74d0a6"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "08ba1c35-7998-4503-bf46-4ded86a44a27",
+   "productNameKo": "홍삼활력보",
+   "koCanonicalId": "c8603b8c-6384-4b4e-b0f6-c71f0ce6c13a",
+   "koHash": "3f31e94bf9fd24138d49603de1727a57fa4a1b4e5994547c0aa162697095c731",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼활력보</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>增进免疫力</li><li>改善疲劳</li><li>通过抑制血小板凝集改善血流</li><li>改善记忆力</li><li>有助于抗氧化，有助于增强免疫力、恢复疲劳、通过抑制血小板凝集改善血液流动</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次 10g（1勺）摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1) 性状：具有固有风味且无异味、无异臭的黑褐色流动性液状</div><div class=\"sd-item\">(2) 人参皂苷Rg1与Rb1及Rg3之和：标示量(3.4mg/10g)的80%以上</div><div class=\"sd-item\">(3) 细菌数：每1mL3,000以下</div><div class=\"sd-item\">(4) 大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "7026e9921df664ef0094c7f905a6079de3ec00649c2b803cc2b68a89bb60fc39"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "08eb7038-d8d7-4c85-baae-5bc8bd1fad66",
+   "productNameKo": "홍삼타임 25 장원",
+   "koCanonicalId": "5b93cbef-e760-45b2-8664-ee964dd9d64c",
+   "koHash": "47528af7b975307f03f80d846d581cceef26aae8c207c50b8ea5614165e81f40",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼타임 25 장원</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力·改善疲劳</li><li>有助于通过抑制血小板凝集改善血流･改善记忆力･抗氧化</li><li>有助于更年期女性健康</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有香味，无异味·异嗅的褐色液体</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和：标示量(25mg/10g)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：每1ml100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "83e31f3afdec1cd6b6ce0e627bbf53072cdb6e707a7c0ca8757f9b3b9f66b5bb"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "0e453216-19a6-4ca3-926b-eb32716f1ebc",
+   "productNameKo": "미타민2",
+   "koCanonicalId": "e6fbc51e-3af5-4d86-8913-36ea193ec120",
+   "koHash": "c3ffb3ab86ba4a12d527d6f853a9ab8be993da2e175e9e79216143414c1dc984",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>미타민2</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>暗处视觉适应所必需</li><li>形成皮肤和黏膜并维持其功能所必需</li><li>上皮细胞生长与发育所必需</li><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li><li>保护细胞免受有害氧侵害所必需</li><li>正常血液凝固所必需</li><li>骨骼构成所必需</li><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>体内能量生成所必需</li><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>正常叶酸代谢所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次2g，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>摄取时可能卡喉，务必与水一起摄取</li><li>摄取时如出现消化不良、胃肠障碍症状请停止摄取。</li><li>摄取前如产品有异常，请勿摄取</li><li>根据个人身体状态如发生异常请停止摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的微褐色包衣片剂</div><div class=\"sd-item\">2) 维生素A：标示量(800ug/4g)的80~150%</div><div class=\"sd-item\">3) 维生素C：标示量(800mg/4g)的80~150%</div><div class=\"sd-item\">4) 维生素D：标示量(8ug/4g)的80~180%</div><div class=\"sd-item\">5) 维生素E：标示量(320mg/4g)的80~180%</div><div class=\"sd-item\">6) 维生素K：标示量(800ug/4g)的80~180%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "7589ad5dc53d2ecd5df6368be2e2cfb07506e5ec60d3395951a0c95540933809"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "17d86a0a-6673-4326-a9e9-1eabd431e3fd",
+   "productNameKo": "모닝파트너 (Morning Partner)",
+   "koCanonicalId": "a12983d8-04ac-4e47-b4fb-94280594866f",
+   "koHash": "04ba92854e3fbafcaaa674dbbe5ab19a062c361760063c6e1099792bf1b9b180",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>모닝파트너 (Morning Partner)</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>水飞蓟素</li><li>甲) 有助于肝脏健康</li><li>维生素B6</li><li>甲) 蛋白质及氨基酸利用所必需</li><li>乙) 维持血液中同型半胱氨酸水平正常所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（14g），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>出现过敏反应时停止摄取</li><li>出现腹泻、胃痛、腹胀等胃肠道不适时摄取需注意</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味且无异味、无异臭的黄灰色粉末产品</div><div class=\"sd-item\">2) 功能性原料</div><div class=\"sd-item\">水飞蓟素</div><div class=\"sd-item\">含量：130 mg/14g（标示量的80~120%）</div><div class=\"sd-item\">维生素B6</div><div class=\"sd-item\">含量：2 mg/14g（标示量的80~150%）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f0003a4de7bfbcd7a013df3f2acd766f819bacbdb41871512f88e66d9e5fe959"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "1b05f7bf-5195-4856-a0ff-95baf55ac9e2",
+   "productNameKo": "면역홍삼",
+   "koCanonicalId": "25f5fd0a-c10c-489b-a6d3-9d40af546194",
+   "koHash": "ba5dee720b4f0e292e7ed8c28291b9e38bf1da3fa35584d375972feafcc82105",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>면역홍삼</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味、无异味异臭的褐色液体</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(3mg/10g)的80%以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)细菌数：每g100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "6eb4f7b567c5d00255076b37b56d760b6291c7af3f9bf409ea2b89ab0e0cfb69"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "1b52d7ca-a5a3-4511-be1c-ccde1c443bdd",
+   "productNameKo": "바이탈파워",
+   "koCanonicalId": "503dea51-3174-4361-8d2f-fcef74dfa22a",
+   "koHash": "ca17aae363b18f90a9ed8cd04562d96a22cf23d8a26303b7148d7b372e6f1c97",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>바이탈파워</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次10g摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的红褐色液状</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(5mg/10g)的80%以上</div><div class=\"sd-item\">3)锌：标示量(6mg/10g)的80~150%</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5)细菌数：每g100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "d9b57ae0ee03ed1791788c0c2ade4a30e567dba3f8ef31eb8cf36e8b4748810f"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "20ea2fb1-8b73-439f-b887-8f707bcee289",
+   "productNameKo": "면역앤혈당케어포뮬러",
+   "koCanonicalId": "c3d0245b-6711-4f4d-92aa-90935fa5089d",
+   "koHash": "ec078424f11b2186d3416387a78991635e1348d44e9f83afc0dce59e0fb40521",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>면역앤혈당케어포뮬러</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于抑制餐后血糖升高</li><li>有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>儿童、孕妇及哺乳期妇女应避免摄取</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味、无异味异臭的褐色液体</div><div class=\"sd-item\">2) 人参皂苷 Rg1，Rb1，Rg3之和：标示量(3mg/10g)的80%以上</div><div class=\"sd-item\">3) 科罗索酸：标示量(1mg/10g)的80-120%</div><div class=\"sd-item\">4) 细菌数：100cfu/ml以下</div><div class=\"sd-item\">5) 大肠菌群阴性</div><div class=\"sd-item\">6) 重金属(mg/kg)：铅 1.0以下，镉 0.5以下，汞 0.5以下，砷 1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "adc8a0037ae04dfe45b1cf968fe6161c79373208e1a96687b3c0e4eca39e3808"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "232f1f62-8342-402a-a875-fe5b2ab14932",
+   "productNameKo": "리얼다이어트카페가르시니아",
+   "koCanonicalId": "bad36dc4-ecdd-4ce1-bdc9-18089cf8310f",
+   "koHash": "5bbb10f3d25ef8903a6dc784a33359fa14b4e7803d5f33fa823143751af232a8",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>리얼다이어트카페가르시니아</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">藤黄果提取物</span><ul><li>有助于通过抑制碳水化合物合成为脂肪来减少体脂肪</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1袋摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童或孕妇,对咖啡因敏感者摄取时请注意。</li><li>.开封时软包切口锋利，可能伤及手部等，请注意。</li><li>。特异体质、过敏体质者偶尔因人而异可能出现过敏反应，请确认原料后再摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)。性状：黑褐色液状产品，无异味、无异臭。</div><div class=\"sd-item\">2)。总(-)-Hydroxycitric acid（羟基柠檬酸）：标示量(380mg/190ml)的80~120%</div><div class=\"sd-item\">3)。铅(mg/kg)：1.0以下</div><div class=\"sd-item\">4)。镉(mg/kg)：0.5以下</div><div class=\"sd-item\">5)。总汞(mg/kg)：0.4以下</div><div class=\"sd-item\">6)。总砷(mg/kg)：1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "60698a62a21206c2670770982c428b7162434a7e9c7f51f6aff257729db029f9"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "2359628d-37f6-4b7f-abda-3f2e2a8b8a56",
+   "productNameKo": "원향엠에스엠",
+   "koCanonicalId": "e533c3db-578d-4a17-a758-0d1b23bd39c3",
+   "koHash": "4aed257b7c2f48ba5834f4130f86154ffa83139226078fc4834a1d59a07ade26",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1700mg</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>원향엠에스엠<small>MSM</small></h1><p class=\"sd-meta\">한국네츄럴팜 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1700mg</b>的标示量含有（标示基准每2000mg）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>1700mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>白色粉末，无异味、无异臭。 한국네츄럴팜 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1700mg/2000mg)的80~120%</div><div class=\"sd-item\"><b>性状</b> 白色粉末，无异味、无异臭。</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 2年</div><div class=\"sd-item\"><b>保存</b> 请在湿气少且不受阳光直射的阴凉处保存。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 出现不良反应时停止摄取并咨询专业人员 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "8f32639348bc381f80b8b6faa54b43c44d6b5c6bb672057a03e04c0fc996ef2d"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "2489cc50-ab48-4789-993e-c1cb7668876d",
+   "productNameKo": "옥타코사놀가족사랑진",
+   "koCanonicalId": "7d6bf639-6ef1-4665-b56d-dde45ad1c2eb",
+   "koHash": "814b8c6fd55a69bf980aea364f74754d6d0a31109b90b46447f1e341549834e6",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>옥타코사놀가족사랑진</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>增强耐力</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次3片，与饮用水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>过敏体质者请确认成分后再摄取</li><li>开封产品时可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1.性状：暗褐色圆形片剂</div><div class=\"sd-item\">二十八烷醇：10mg/1500mg的80~120%</div><div class=\"sd-item\">3. 大肠菌群阴性</div><div class=\"sd-item\">崩解：60分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "2365474bfe0a263d245a88210ea6a97e6fcbc9182a053e0ced29398f79a50016"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "272a231c-0545-4e05-9485-2f41b59022b3",
+   "productNameKo": "장쿨",
+   "koCanonicalId": "498f41ad-048c-48e1-8abc-b6889e6a8743",
+   "koHash": "908246b7cbb34743dc648fc7b498dc1490aa6ffdabf512eb16f3f94f22e55fc2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>장쿨</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于乳酸菌增殖及抑制有害菌</li><li>有助于排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的暗绿色包衣片剂</div><div class=\"sd-item\">2)益生菌数：1×10^8c.f.u/1300mg以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)崩解试验：60分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "4d7375e98f1d023ff5e56a30f3508595ca1497751a9f509812fa853e7e9c09ee"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "27fc738b-eecc-4ae7-b728-ca1ad9c1d264",
+   "productNameKo": "천지류",
+   "koCanonicalId": "5409535f-f9d4-4bd5-ba6d-091657f8c7cc",
+   "koHash": "4d290368dc6747e8c306e1eea2561fdf317cc73fbba5b8c5807aba0ba0e7cf90",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日3次</span></div>\n  <h1>천지류</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>增进免疫力</li><li>改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>改善记忆力</li><li>有助于抗氧化。</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日3次</span></span><p class=\"sd-meta\">每每日3次，1次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>过敏等特异体质者请确认成分后再摄取。</li><li>开封产品或摄取时可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：微褐色片剂</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和：标示量(1.0mg/0.6g)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解度：30分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "9289aa0d0122b19268f24f1ed0effb6728e178d641ff1dfe0834fd690671501d"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "28154194-d073-4aba-a0c2-781434c8c8c4",
+   "productNameKo": "어쎔코드 F",
+   "koCanonicalId": "974c6531-d912-46a2-bd20-ca9fd8e55bbf",
+   "koHash": "96ecd8698a39d6c86af1943b858f1359ce4cce1530de42ab590ece79706f42d3",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span></div>\n  <h1>어쎔코드 F</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">绿茶提取物</span><ul><li>有助于抗氧化·减少体脂肪·改善血中胆固醇</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">参见产品标示事项</span></span><p class=\"sd-meta\">每日1次，每次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>患有肝脏疾病或正在服用药品时应咨询专业人员</li><li>因含有咖啡因，可能出现焦躁、失眠等</li><li>应在餐后摄取</li><li>应注意含咖啡因食品的摄取</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有风味且无异味、无异臭的浑浊橙色椭圆形包衣片剂</div><div class=\"sd-item\">崩解：以水为试验液60分钟以内符合</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">儿茶素：标示量 300mg/800 mg的80~120 %</div><div class=\"sd-item\">表没食子儿茶素没食子酸酯(EGCG)：每日摄取量中300以下</div><div class=\"sd-item\">咖啡因(mg/kg)：50,000以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "730699713487c691b13adfe3d5b83c07cf2143627ee075eeb4e10ffef9ccca11"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "2bc3feb0-9f99-4d9c-83f4-08cc43b505f5",
+   "productNameKo": "바이탈업",
+   "koCanonicalId": "c9373aa1-8241-4f5c-b036-b0c12d4c4b70",
+   "koHash": "e5b0694abf306d806fbc18d7f3c9818b9ca697841b7f7dfc7e91daf1081ff05a",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>바이탈업</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">含二十八烷醇的油脂产品</span><ul><li>有助于增强耐力</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次30g摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味异臭的黄褐色液体</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(4mg/60 g)的80%以上</div><div class=\"sd-item\">3)二十八烷醇：标示量(7mg/60g)的80~120%</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5)细菌数：100c.f.u/ml以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "e824e4e114372857409cbf0314b063903a17c52ac511d15191b688697d14141e"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "2dbfb3eb-e85c-4faf-8406-05ad3ae1b042",
+   "productNameKo": "예비채진스트15홍삼정스틱",
+   "koCanonicalId": "05f8d277-bdcc-4b1f-aba3-102c146b1cba",
+   "koHash": "8661d6f9da6098262710e4154face15f5ef4d73cc0e50737331141f2c2258dda",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>예비채진스트15홍삼정스틱</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10 ml），直接摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：褐色液状，无异味、无异臭。</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和</div><div class=\"sd-item\">* 最终产品：标示量 12mg/10 ml以上的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：100以下（每1ml）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "bb0394bff429dca32a42455cfe64efac8ccc101ac74416a2a1a9280ef44548da"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "3175fb7f-9cbf-4910-9fb0-1a06cc0215bf",
+   "productNameKo": "홍삼정 프리미엄 루틴10",
+   "koCanonicalId": "70474e73-bd04-4957-8062-1dc92cd40f08",
+   "koHash": "f5f8a2d4de45e60f817328e285ec516c8be3afea7ff6b309a4b2a911cd8af729",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼정 프리미엄 루틴10</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力·改善疲劳</li><li>有助于通过抑制血小板凝集改善血流･改善记忆力･抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有香味，无异味异嗅的褐色液体</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和：标示量(10mg/10g)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：每1ml100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "9d89d19c990659b9ced8784c9a6ac15027ced1f046d6b89247944e7cfc5943f4"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "320fcf7c-e4b0-409e-9b2b-0483aa7a1e5f",
+   "productNameKo": "6년근고려흑삼365스틱",
+   "koCanonicalId": "c0b9270d-d5b0-40c0-bac2-cd918f03e739",
+   "koHash": "27023dc1e35d76e32ced4535c2ad7731eedb2dd1306c697a0487a2c57fd506d2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>6년근고려흑삼365스틱</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10 ml），直接摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：黑褐色液状，无异味、无异臭。</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和</div><div class=\"sd-item\">* 最终产品：标示量 7mg/10 ml以上的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：100以下（每1ml）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "071c7ec1ef68616dfc8f6ec5fd7e62332c27339b2aaf82ef0f5eb259bda64f84"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "349fd267-9b67-4225-bfbd-5fa11e4214da",
+   "productNameKo": "레드마임H",
+   "koCanonicalId": "94f2dade-2e23-485f-bbfd-85478dc78c00",
+   "koHash": "105459097894f4170fac67488d693f4570dcc0e6ce959899141bc9fdff78c9a0",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>레드마임H</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>碳水化合物与能量代谢所必需</li><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>正常叶酸代谢所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（20g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>开封或摄取产品时可能被包装材料划伤，需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的红色液状</div><div class=\"sd-item\">2)维生素B1：标示量(35mg/20g)的80~180%</div><div class=\"sd-item\">3)维生素B6：标示量(60mg/20g)的80~150%</div><div class=\"sd-item\">4)维生素B12：标示量(1000ug/20g)的80~180%</div><div class=\"sd-item\">5) 大肠菌群阴性</div><div class=\"sd-item\">6)细菌数：每g100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "5a79ce4e88e013eb511e6dcb318ae95a56da91c01301e20affa22688ffb64f84"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "37fa8e85-0576-4f73-98d7-7ddf535a0c14",
+   "productNameKo": "하루엔진",
+   "koCanonicalId": "26e3e0c5-a97f-49b1-ac66-106cc4be3564",
+   "koHash": "35557ca148baed391a20fe80262ded3fe5680eac67795918b549a4d23ed80a50",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>하루엔진</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于乳酸菌增殖及抑制有害菌 · 促进排便顺畅 · 肠道健康</li><li>含EPA及DHA的油脂 有助于改善血中中性脂肪·改善血液循环·改善干眼从而有助于眼睛健康</li><li>体内能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所需。</li><li>蛋白质及氨基酸利用所需，维持血液中同型半胱氨酸水平正常所需，</li><li>正常叶酸代谢所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>正常免疫功能所必需，正常细胞分裂所必需</li><li>ㆍ细胞与血液生成所必需ㆍ胎儿神经管正常发育所必需ㆍ维持血液中同型半胱氨酸水平正常所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，1次每次分量（片剂1，硬胶囊 1，软胶囊 1），与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>服用药品（抗凝血药、抗血小板药、降压药等）时应咨询专业人员</li><li>因人而异可能出现皮肤相关不良反应</li><li>出现手脚刺痛、灼热感或麻木等不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">硬胶囊</div><div class=\"sd-item\">性状：具有固有风味且无异味、无异臭的白色含有内容物的黄黄绿色硬胶囊</div><div class=\"sd-item\">益生菌数：标示量（1,000,000,000(10亿) CFU/ 2,350 mg）以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解试验：20分钟以内</div><div class=\"sd-item\">软胶囊</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "cac73d43eb7599d0616ded943e833842b0e7d218c8d720c3392f71b8f479622d"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "38c4de2f-a1bc-4438-a938-9018467b0e1f",
+   "productNameKo": "어쎔코드 I",
+   "koCanonicalId": "99768cca-7a39-4b81-9d93-6dcc058b017d",
+   "koHash": "b359b55356b1bf186c1159f6a8f33d466eca5642e35eec3107ca645d493a458a",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span></div>\n  <h1>어쎔코드 I</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">大花紫薇叶提取物</span><ul><li>有助于抑制餐后血糖升高</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">参见产品标示事项</span></span><p class=\"sd-meta\">每日1次，每次1片，与水一起摄取。</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有风味且无异味、无异臭的黄褐色长方形包衣片剂</div><div class=\"sd-item\">崩解：以水为试验液60分钟以内符合</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">科罗索酸：标示量 1mg/500 mg的80~120 %</div><div class=\"sd-item\">铅(mg/kg)：1.0以下</div><div class=\"sd-item\">镉(mg/kg)：0.5以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "ba8f587d2b22f87a53b1446807f31cc06ee2b4748936d276f0d944cf82d28ea9"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "3a7f3b58-f71c-4900-b904-599522642732",
+   "productNameKo": "어쎔코드 A",
+   "koCanonicalId": "a0d1a52e-377d-4159-9996-8a5864229661",
+   "koHash": "6a75f4c94b9b4170d9b40237d2e5f6b9eeab654bc38d3fa6ecbabecd2e3eeb53",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span></div>\n  <h1>어쎔코드 A</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">红景天提取物</span><ul><li>有助于改善因压力引起的疲劳</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">益生菌</span><ul><li>有助于乳酸菌增殖及抑制有害菌 · 促进排便顺畅 · 肠道健康</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">锌</span><ul><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">参见产品标示事项</span></span><p class=\"sd-meta\">每日1次，每次1粒胶囊与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：以具有固有香味且无异味 异嗅的黄褐色的粉末为内容物的微黄色的硬胶囊</div><div class=\"sd-item\">崩解：以水为试验液20分钟以内符合</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">益生菌数：标示量 1,000,000,000(10亿) CFU/400 mg以上</div><div class=\"sd-item\">锌：标示量 2.55mg/400 mg的80~150 %</div><div class=\"sd-item\">罗沙维（Rosavin）：标示量 4mg/400 mg的80~120 %</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f1b83a2a539b0ad2930e302d6272e75a6ec5b4e6c476c68f45fad7befa13c9fe"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "3f657f98-bb6f-4eb5-839e-712f9a8013c0",
+   "productNameKo": "홍삼정스틱프리미엄퀸",
+   "koCanonicalId": "5670f463-2a4e-4d46-9637-55f959041202",
+   "koHash": "1b8366c17a71d2ae6d54fbb3d75d45e4b7e5ce8267e18c367066e4a513249ab5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼정스틱프리미엄퀸</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li><li>有助于更年期女性健康</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10 ml），直接摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：褐色液状，无异味、无异臭。</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和</div><div class=\"sd-item\">* 最终产品：标示量 25mg/10 ml以上的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：100以下（每1ml）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "2d1319f0dab481d98564f483dc1c850cff862a6c8232d4fcd398b5505f53a88a"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "4235d530-b34a-417e-96f3-e3693b1a5f37",
+   "productNameKo": "영웅제약 장건강 철벽방어",
+   "koCanonicalId": "7d44822d-8f27-4d38-9375-1cd84b2f4259",
+   "koHash": "692be17f1d7b3ee5265b1529dc183a4fac714872d2f8e79f8ae52b4577fe85a2",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>영웅제약 장건강 철벽방어</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于肠内有益菌增殖及排便顺畅</li><li>有助于乳酸菌增殖及抑制有害菌 · 促进排便顺畅 · 肠道健康</li><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次1袋，直接或与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-core\"><div class=\"sd-item\"><ul><li>过敏体质者请确认成分后再摄取</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">低聚果糖</span><ul><li>摄取时可能出现胀气、打嗝、腹痛、腹胀感等</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">益生菌</span><ul><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">泛酸</span><ul><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1) 性状：无异味、无异臭并具有固有风味的白色粉末</div><div class=\"sd-item\">(2) 低聚果糖：标示量(3 g/5 g)的80%以上 120%以下</div><div class=\"sd-item\">(3) 益生菌数：标示量(1.0*10^8 CFU/5 g)以上</div><div class=\"sd-item\">(4) 泛酸：标示量(5mg/5 g)的80%以上 180%以下</div><div class=\"sd-item\">(5) 锌：标示量(8.5mg/5 g)的80%以上 150%以下</div><div class=\"sd-item\">(6) 铅(mg/kg)：1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "873bd17162422d5ba4402149a4f83a569af4696487dcdf7148030ecad74a06e8"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "443bc34e-db21-4745-968b-b2441054b4e3",
+   "productNameKo": "홍기천 스틱",
+   "koCanonicalId": "81eb5aab-36d5-42d5-8f6e-09aa1f6ed091",
+   "koHash": "3662db388e66de5873b83784c9c5357119e440fd20335d3ea602b00b53ed6a6f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍기천 스틱</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>(1)功能性内容：有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li><li>(甲)有助于增进免疫力·改善疲劳：以人参皂苷 Rg1, Rb1及Rg3之和计3~80 mg</li><li>(乙)有助于通过抑制血小板凝集改善血流･改善记忆力･抗氧化：以人参皂苷 Rg1, Rb1及Rg3之和计2.4~80 mg</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次1袋(10g)摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>(3) 摄取时注意事项</li><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有色泽与风味且无异味、无异臭的褐色液状</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和</div><div class=\"sd-item\">最终产品：标示量（3mg/每日摄取量 10g）的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：每1 mL100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "9371d6948b290c8f6773ac115994d8f57308985fc011e23ccc13dc0b5e7af60e"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "48bdeeb0-18e8-49d7-9b3b-8be057870c71",
+   "productNameKo": "홍삼비옥고",
+   "koCanonicalId": "98275afd-bf87-4832-98dd-48814f867927",
+   "koHash": "c90aee76a6270ec7f966d17643432a6e463f2e101f14c5290bffd582829cf353",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼비옥고</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次 10g（1勺）摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1) 性状：具有固有风味且无异味、无异臭的黑褐色流动性液状</div><div class=\"sd-item\">(2) 人参皂苷Rg1与Rb1及Rg3之和：标示量(3.7mg/10g)的80%以上</div><div class=\"sd-item\">(3) 细菌数：每1mL3,000以下</div><div class=\"sd-item\">(4) 大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "bb771943a6eedbae426009299a9dfa90532656d3e1c2b1e4e6aa2b7e5bef6c51"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "48de25b2-2646-4722-8bee-cbe3e787c437",
+   "productNameKo": "뉴식이섬유 화이버크린캡",
+   "koCanonicalId": "fc6411c5-0905-405e-a0ba-c068514fc0cd",
+   "koHash": "56c4b945d892db3dea4e6a91f55946a8f82c39ebfd0b7597a76a74d53cfef863",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>뉴식이섬유 화이버크린캡</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日2次，每次6粒胶囊，与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>与充足的水一起摄取</li><li>过敏体质者请确认成分后再摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：无异味、无异臭并具有固有风味的微黄色硬胶囊</div><div class=\"sd-item\">膳食纤维：标示量(5000mg/6g)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解度：20分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "8321fbb6a7a72c72ecc37a3c80d505d9d78b06b72594b47e6041ece2cd638280"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "497ece43-e293-4d44-8646-76a5161eb70f",
+   "productNameKo": "발효흑삼정",
+   "koCanonicalId": "302e44c6-e49a-411c-8d60-de2168a0041b",
+   "koHash": "a9a261612fc1016dcebcb636cc9fce0fce71905553212968bcc2ff2ca589b8c9",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日3次</span></div>\n  <h1>발효흑삼정</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日3次</span></span><p class=\"sd-meta\">每每日3次，1次5g摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：深暗褐色黏稠液体，无异味、无异臭。</div><div class=\"sd-item\">2)人参皂苷Rg1与Rb1及Rg3之和：标示量(8mg/15g)的80%以上</div><div class=\"sd-item\">3)细菌数：每1ml3,000以下</div><div class=\"sd-item\">4) 大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "4679fcb76a3262901562648eb8f89f29ae275decf501293e3f4a179a1a649622"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "50213c8c-193f-4579-805a-1ccd3ce8f484",
+   "productNameKo": "파워MSM",
+   "koCanonicalId": "1e940847-0954-4c97-bc00-500705703a05",
+   "koHash": "a1387cbdb53d677915214d9208a5a453931ff968e1b4b9780ec0a85379dc2cc5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1960mg</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>파워MSM<small>MSM</small></h1><p class=\"sd-meta\">대원헬스케어 주식회사 2공장 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1960mg</b>的标示量含有（标示基准每2000mg）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>1960mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味且无异味、无异臭的白色粉末 · 대원헬스케어 주식회사 2공장 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1960mg/2000mg)的80~120%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 请在请避开阳光直射，常温保存，请在婴幼儿及儿童接触不到的地方保存。。 开封后请尽量隔绝空气保存。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 出现不良反应时停止摄取并咨询专业人员 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "5ad5ad76da3702911ce6fab1f9a65174e4a84bdd2c904b5a78509e09b1413591"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "52c5f810-8f02-4483-9437-de458ba942f8",
+   "productNameKo": "홍치",
+   "koCanonicalId": "17462035-89b9-462d-b102-548dd4b72632",
+   "koHash": "65fcb8124a78c0b5c6a5e41d2c3d7bb12df202868caa7b6396e6b0bf2883fc89",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>홍치</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>增进免疫力</li><li>改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>改善记忆力</li><li>有助于抗氧化。</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">益生菌产品</span><ul><li>有益乳酸菌增殖</li><li>抑制有害菌或促进排便顺畅</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次2粒胶囊，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>摄取时请与水一同摄取。</li><li>已过流通期限的产品请勿摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：白色硬胶囊</div><div class=\"sd-item\">益生菌：标示量(1,000,000,000cfu/900mg)以上</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和：标示量(1.5mg/900mg)的80%以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解度：20分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "09fb4a5a838115c81240f101f42b4cda381427c993da7d976db428f563d4aa30"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "563e8f97-af84-4862-9af5-aa785f3488b3",
+   "productNameKo": "케이 시크릿 키즈",
+   "koCanonicalId": "b0237901-0f0a-4b4c-8439-7da3e66dcdc7",
+   "koHash": "fea58b59df254be318411360f424145c6b327ef9a817f141ec7c87c93206bfd7",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>케이 시크릿 키즈</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">钙</span><ul><li>骨骼与牙齿形成所必需</li><li>维持神经与肌肉功能所必需</li><li>正常血液凝固所必需</li><li>有助于降低骨质疏松症发生风险</li><li>骨骼与牙齿形成所必需</li><li>维持神经与肌肉功能所必需</li><li>正常血液凝固所必需</li><li>有助于降低骨质疏松症发生风险</li><li>改善记忆力</li><li>有助于抗氧化</li><li>有助于通过抑制血小板凝集改善血流</li><li>骨骼与牙齿形成所必需</li><li>维持神经与肌肉功能所必需</li><li>正常血液凝固所必需</li><li>有助于降低骨质疏松症发生风险</li><li>改善记忆力</li><li>有助于抗氧化</li><li>有助于通过抑制血小板凝集改善血流</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">红参产品</span><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li><li>可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有色泽与风味，应无异味异臭。</div><div class=\"sd-item\">钙：标示量(110mg/700mg )的80~150%</div><div class=\"sd-item\">人参皂苷Rg1、Rb1及Rg3之和：标示量(1.2mg/700mg )的80%以上</div><div class=\"sd-item\">崩解试验：符合</div><div class=\"sd-item\">大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "a8868bf20ccc1c6c7701e197e0536beb2b2fcd50b39d756e5c590483b77bdc13"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "5af03634-2d60-4050-b37c-8a388e8bc85d",
+   "productNameKo": "화이바6",
+   "koCanonicalId": "e43d1243-cf8e-465f-9e02-4af8589f0e5f",
+   "koHash": "c68c32e69f43a1fcfd1d84b5b73915ac1e554c01869cf451020ec9683b6ac2e3",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>화이바6</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日2次，每次6粒胶囊，与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>务必与充足的水一起摄取（液体剂型除外）</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：无异味、无异臭并具有固有风味的黄褐色含有内容物的黄白色硬胶囊</div><div class=\"sd-item\">膳食纤维：标示量的80%以上（标示量：4800mg/6000mg）</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解：20分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "cf4fcd643a88967101a7af1936f0135734dd7e1a9780f94374bced92847a21f0"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "5c4af66f-201a-4bc2-ba4e-f27ce779428a",
+   "productNameKo": "비피스",
+   "koCanonicalId": "89a60c53-fef5-4370-8247-c3a229cdbafb",
+   "koHash": "e7fbe0ae3476401aa691ea5c8ae89a31fc930adc9abf282ed4faeae9312e3504",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>비피스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于乳酸菌增殖及抑制有害菌</li><li>有助于排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次2片</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味、无异臭的暗绿色包衣片剂</div><div class=\"sd-item\">2) 益生菌数：6×10^8c.f.u/1300mg以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4) 崩解试验：60分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "36874230fdc05a1820d388b6fdb663d46cbae5f598eb22a2b6d5d5298fb8f8c9"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "5e679478-7291-4e20-80fe-40cf270bde38",
+   "productNameKo": "파비스애니원슬림",
+   "koCanonicalId": "b730e3ca-2aa1-42c7-b5c1-adea8a4a0a28",
+   "koHash": "f4c9ad1f6da5e9588d0a71dac6354df7c518abc49c0e8385d0fa4b9bcab2a137",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日3次</span></div>\n  <h1>파비스애니원슬림</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于通过抑制碳水化合物合成为脂肪来减少体脂肪</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日3次</span></span><p class=\"sd-meta\">每日3次，每次请将1袋(5g)用温水(200ml)冲调后摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>孕妇与哺乳期女性最好避免摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1)性状：为褐色粉末，应无异味异嗅异物。</div><div class=\"sd-item\">(2)HCA含量：标示量 5.4g/100g(270mg/5000mg：每次摄取量的80-120%</div><div class=\"sd-item\">(3) 重金属</div><div class=\"sd-item\">铅(mg/kg)：1.0以下</div><div class=\"sd-item\">镉(mg/kg)：0.5以下</div><div class=\"sd-item\">总砷(mg/kg) 1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "31a708dd13e3b8121c1a26f28ed30ab10fd0c1f7b48ed4ad4c3663feb233996a"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "60497ba3-3bdc-40b1-8a18-dad90b0ac067",
+   "productNameKo": "내일을 위한 오늘 홍삼",
+   "koCanonicalId": "07c7c47e-c314-41ef-acd9-20ee75967954",
+   "koHash": "6daa272ca9efe7feab8b11468cb4ab0cd731091906b0cd7e64523861f5d7279f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>내일을 위한 오늘 홍삼</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力·改善疲劳</li><li>有助于通过抑制血小板凝集改善血流･改善记忆力･抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用糖尿病治疗药及抗凝血药时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有香味，无异味·异嗅的褐色液体</div><div class=\"sd-item\">人参皂苷 Rg1,Rb1 及Rg3之和 标示量(3.5mg/10g)的80% 以上</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：每1ml100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "fe6916ba15ad35fd77bfc4b612c9d10975c319eed0b87c7d7616889b8a3aab55"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "635d5905-11a9-4408-a0d1-44c4f13de981",
+   "productNameKo": "강젠고려인삼(Kangzen Korean Ginseng)",
+   "koCanonicalId": "e509a65d-b309-4f65-9694-74b464144574",
+   "koHash": "eb120dec95ef65004faa191868845d03dbb6c1e2f02ae827f30db5cfe99c0029",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>강젠고려인삼(Kangzen Korean Ginseng)</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">人参产品</span><ul><li>增进免疫力</li><li>恢复疲劳</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次5粒胶囊，与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>注意产品开封或摄取时被包装材料划伤</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">⑴ 性状：含有褐色黏稠内容物的暗褐色软胶囊</div><div class=\"sd-item\">⑵ 人参皂苷Rg1与Rb1之和：标示量(5.76 ㎎/3200 mg)的80 %以上</div><div class=\"sd-item\">⑶ 大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "0c9f15dd64246cea84b1a2948eb251c087bf2c11a3f34be2969014cadf6560be"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "67d219a4-1967-40ac-8dd4-49528abc14a2",
+   "productNameKo": "보윤수홍삼하루애키즈",
+   "koCanonicalId": "5debb110-dc17-47f8-80d4-876d44267777",
+   "koHash": "4b90203e5138f547bd3280edfcf44c8b93d4af7a959cb0c7e3466da446908295",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>보윤수홍삼하루애키즈</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的黑褐色液状</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(4mg/10g)的80%以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)细菌数：100以下（每ml）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "6b408277ae12ec9b354198206f5e84150afe3307894a0557f6525ca7801880b6"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "6f8c9484-cc68-4767-b3ba-253ab58827b3",
+   "productNameKo": "에너진",
+   "koCanonicalId": "c393ac90-60b4-4e92-b480-5c442d5f62b7",
+   "koHash": "a72437c15002be40daf641bdf06e9c1a9a55c375c8ddcb893e191db03693a4cf",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">烟酸 34mg</span><span class=\"sd-badge is-solid\">维生素B2 1.4mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>에너진<small>烟酸 · 维生素B2</small></h1><p class=\"sd-meta\">(주)세움바이오텍 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以烟酸 <b>34mg</b>维生素B2 <b>1.4mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入烟酸 <b>34mg</b>维生素B2 <b>1.4mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味且无异味、无异臭的白粉红色粉末 · (주)세움바이오텍 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>烟酸</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>维生素B2</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>烟酸</b> 标示量(34mg/1200mg)的80~150%</div><div class=\"sd-item\"><b>维生素B2</b> 标示量(1.4mg/1200mg)的80~180%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的白粉红色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射，请在阴凉处保存。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 出现不良反应时停止摄取并咨询专业人员 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "bd856c369ef1f3e241a41ef5e42ca1c466e9b70c2c8f5f94d47b415abb290573"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "6fabbe4e-869d-4853-abaf-50b862d72278",
+   "productNameKo": "씨에스엠파우더",
+   "koCanonicalId": "1c98e073-3d34-424b-86a4-0b8f0eefe493",
+   "koHash": "07af2c0ba6c58ec578907fe80b6b6a56b09ab45e392530a053f83a0c51786756",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 2000mg</span><span class=\"sd-badge is-solid\">维生素C 61.6mg</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>씨에스엠파우더<small>MSM · 维生素C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>2000mg</b>维生素C <b>61.6mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>2000mg</b>维生素C <b>61.6mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的紫色粉末 · (주)유유헬스케어 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>MSM</b><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(2000mg/2100mg)的80~120%</div><div class=\"sd-item\"><b>维生素C</b> 标示量(61.6mg/2100mg)的80~150%</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的紫色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射及高温、潮湿处，存放于阴凉处。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 孕妇·哺乳期妇女应在摄取前咨询专业人员 · 有疾病或正在服用药品时咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 保存于儿童接触不到的地方 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "08d07752ba07d37d6e303abb0028604015c80b2b15221060555c1118b638a2e8"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "7293f4df-09cd-4ea6-9d7a-34c5405cf072",
+   "productNameKo": "비에날 퀸",
+   "koCanonicalId": "f4a09ba4-2b68-4e2a-8306-27e10a03eabd",
+   "koHash": "497b10810b9de84f1c3d5f2507d57e967c6021c179fa04ddcb29de9f828a6606",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>비에날 퀸</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>Lactobacillus gasseri BNR17：（韩文）有助于减少体脂肪（生理活性功能），有助于乳酸菌增殖及抑制有害菌，有助于排便顺畅，有助于肠道健康（英文）May help to reduce body fat. 槐树果实提取物：有助于更年期女性健康 硒：保护细胞免受有害氧侵害所必需 维生素D：</li><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险 锌</li><li>正常免疫功能所必需</li><li>正常细胞分裂所需 维生素A：</li><li>暗处视觉适应所必需</li><li>形成皮肤和黏膜并维持其功能所必需</li><li>上皮细胞生长与发育所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日1次，每次请将2粒胶囊(或每日2次, 每次1粒胶囊)与水一同摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>(1) 宜避免与酸度低的饮料或热水一起服用</li><li>(2) 有疾病或正在服用药品时应咨询专业人员</li><li>(3) 过敏体质等因人而异可能出现过敏反应</li><li>(4) 请指导儿童不要随意摄取，并遵守每日摄取量</li><li>(5) 出现不良反应时应停止摄取并咨询专业人员</li><li>(6) 儿童、孕妇、哺乳期妇女摄取需注意</li><li>(7) 对雌激素敏感者摄取需注意</li><li>(8) 有高钙血症或正在服用药品时应咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">① 性状：具有固有风味且无异味、无异臭的浑浊黄褐色含有粉末的透明硬胶囊</div><div class=\"sd-item\">② 益生菌数：标示量（10,000,000,000(100亿) CFU/0.8g）以上</div><div class=\"sd-item\">③ 槐属苷（Sophoricoside）：标示量(35 mg/0.8g)的80%~120%</div><div class=\"sd-item\">④ 硒：标示量(16.5 ug/0.8g)的80%~150%</div><div class=\"sd-item\">⑤ 维生素D：标示量(10 ug/0.8g)的80%~180%</div><div class=\"sd-item\">⑥ 锌：标示量(2.55 mg/0.8g)的80%~150%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "d157af76953fb98cfc7097c2a27ecf9b75cd1ff9edf521e799389ec7e15f8854"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "7824a401-fd85-4070-9466-af30bb48ca07",
+   "productNameKo": "골드-엘엠에스엠",
+   "koCanonicalId": "75d92398-588c-4113-9065-3621e4107212",
+   "koHash": "4451ca2372fd2ab433427b1ac0799cba60f9b5a0a98638b3e857fdfbc5d81ff3",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1.98g</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>골드-엘엠에스엠<small>MSM</small></h1><p class=\"sd-meta\">(주)바이오 로제트 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1.98g</b>的标示量含有（标示基准每2g）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>1.98g</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的白色粉末 · (주)바이오 로제트 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1.98g/2g)的80~120%</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 1) 请避开阳光直射与高温潮湿处，请在常温保存。。 2) 产品开封后可能变质，请立即食用。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "8ed1538f676e02731ea9be2bcf9ceca16a6fbd2a5ace012684cd023be1223b81"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "79230abc-0d5a-48a5-a5ed-6180867477ab",
+   "productNameKo": "대한민국 진호간 골드ND-1",
+   "koCanonicalId": "9243ff6f-4147-48fa-b156-94ad1d7310a8",
+   "koHash": "773c14941144aaad909f1326dbae4853e02d6c52ba07dd2e167ae7089a8f16aa",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>대한민국 진호간 골드ND-1</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">枳椇果梗提取粉末</span><ul><li>有助于保护肝脏免受酒精性损伤（生理活性功能2级）</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次10g摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">枳椇果梗提取粉末</span><ul><li>孕妇及哺乳期妇女请谨慎摄取</li><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>根据个人身体状态如发生异常请停止摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的深褐色液状</div><div class=\"sd-item\">2)槲皮素(Quercetin)：标示量(18.20ug/10g)的80~120%</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)普通细菌：100以下</div><div class=\"sd-item\">5)铅(mg/kg)：0.1以下</div><div class=\"sd-item\">6) 总砷(mg/kg) 1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "686d09696aee93753e18cddaac474859cd82343b482f44ce8d337915b9735887"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "7d921a21-1cec-4c13-b46d-dbeaa2816d9b",
+   "productNameKo": "이오니스칼슘",
+   "koCanonicalId": "cf327c24-6f44-49bb-9dd2-479f8a0ca4e4",
+   "koHash": "5332a3563e4176dcea48a3da13db53ec429bf9cdde274e019b3d3095d57b0408",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>이오니스칼슘</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">钙</span><ul><li>骨骼与牙齿形成所必需</li><li>维持神经与肌肉功能所必需</li><li>正常血液凝固所必需</li><li>在青年期之前保持适当运动与健康饮食习惯并摄取充足的钙，可降低今后骨质疏松症发生的风险</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1粒胶囊，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>摄取时请与水一同摄取。</li><li>已过流通期限的产品请勿摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：白色含有粉末的微黄色硬胶囊</div><div class=\"sd-item\">钙：标示量(340mg/g)的80~150%</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">崩解度：20分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "a43db3f10e416e278aa3411222309e84012e7339a31137eaec08c878e5355dc6"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "83e85cc8-e322-49f2-b19a-7f9d7113f21c",
+   "productNameKo": "미솔로뮨",
+   "koCanonicalId": "fa1bfb81-a06b-444c-b77e-de0d4d18c3d0",
+   "koHash": "89b510fb7749d8e38049acc4cb0fed64f39d59c932a780baec0c6103db5ebbeb",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>미솔로뮨</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增进免疫力‧改善疲劳‧通过抑制血小板凝集改善血流‧改善记忆力‧抗氧化</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，每次1袋，直接摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li><li>过敏体质等因人而异可能出现过敏反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1) 性状：具有固有风味、无异味异臭的褐色液体</div><div class=\"sd-item\">(2) 人参皂苷Rg1、Rb1及Rg3之和：标示量(3.5mg/40g)的80%以上</div><div class=\"sd-item\">(3) 大肠菌群阴性</div><div class=\"sd-item\">(4)每1mL细菌数：100以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "91ea88ae8b94b3b78fcb41189fd3c966e6b4126da0c1d6f69207d868d3d65233"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "84f457a2-26d5-4de8-884e-1b510525a4b6",
+   "productNameKo": "아이엠브이 플러스",
+   "koCanonicalId": "3b37e0de-c8b5-4a2c-b761-592e208e266e",
+   "koHash": "996babae4cc43261f6ccb85243c52d191d981f977e5fb540a20df3cd5c4ec412",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1999mg</span><span class=\"sd-badge is-solid\">维生素C 42mg</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>아이엠브이 플러스<small>MSM · 维生素C</small></h1><p class=\"sd-meta\">(주)유유헬스케어 制造 · 每日2次，每次2片</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1999mg</b>维生素C <b>42mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（2片）摄取可摄入MSM <b>1999mg</b>维生素C <b>42mg</b></li><li>无异味、无异臭并具有固有风味的紫色长方形包衣片剂。 (주)유유헬스케어 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>MSM</b><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次2片</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1999mg/2400mg)的80~120%</div><div class=\"sd-item\"><b>维生素C</b> 标示量(42mg/2400mg)的80~150%</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的紫色长方形包衣片剂。</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射及高温潮湿处，存放于阴凉处。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "55f338f62c36e74e80af04aa3b130d210acb9ff71b2e526eaf748b960f8933dd"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "854deb34-378f-4e10-bffc-42748fb39f29",
+   "productNameKo": "해피 관절 솔루션",
+   "koCanonicalId": "7bd57da6-5335-4b0a-abfb-0be16d1e9474",
+   "koHash": "683bd3dbf91fdbf71986fe511711fb4eedb58bdd961c3e6620dd1e97c2acc5b5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>해피 관절 솔루션</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于关节健康</li><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li><li>保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日1次，每次2片或每日2次，每次1片，与饮用水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">姜黄提取物</span><ul><li>婴幼儿、孕妇、哺乳期妇女请谨慎摄取 － 对姜黄过敏或患有特定疾病（胆囊疾病等）者请谨慎摄取 － 摄取超过建议摄取量可能出现消化不良、胃肠不适、恶心、胃酸反流等</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">①性状：无异味、无异臭并具有固有风味的褐色长方形包衣片剂</div><div class=\"sd-item\">② 大肠菌群阴性</div><div class=\"sd-item\">③对香豆酸：0.5mg/1,500mg的80%~120%</div><div class=\"sd-item\">④维生素D：10ug/1,500mg的80%~180%</div><div class=\"sd-item\">⑤硒：55ug/1,500mg的80%~150%</div><div class=\"sd-item\">⑥ 铅：1.0 mg/kg以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "75d4d2b44eaca04e85f52cbb042697eb80ab13bb6a101b809bcb2639d858744c"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "85ee0109-fc19-4921-8310-17f51d4fb38f",
+   "productNameKo": "헤모마임",
+   "koCanonicalId": "4250b391-79e4-4492-b218-f216e6e1eb1f",
+   "koHash": "aefecadf4b1fab09c4a128c01be9050f7203e88391b97e6013a292067a352168",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>헤모마임</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>正常叶酸代谢所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次50g摄取。</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的黑褐色液状</div><div class=\"sd-item\">2)维生素B12：标示量(5ug/50g)的80~150%</div><div class=\"sd-item\">3)叶酸：标示量(400ug/50g)的80~180%</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5)细菌数：100c.f.u/ml以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "ab9cc24dd6bb3e3ab102c4fbff05b8e30160eff9580e385ade8b4ff1019f5961"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "88746dd1-1ee0-498e-a874-71ba182c91a6",
+   "productNameKo": "미타민1",
+   "koCanonicalId": "bbd3e380-fbcc-4266-b9cc-d43d054c647c",
+   "koHash": "02e8388984c1f36107712f76b02cb389a50c282b9244aca012aa0e73d17929fd",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>미타민1</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>暗处视觉适应所必需</li><li>形成皮肤和黏膜并维持其功能所必需</li><li>上皮细胞生长与发育所必需</li><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li><li>保护细胞免受有害氧侵害所必需</li><li>正常血液凝固所必需</li><li>骨骼构成所必需</li><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>体内能量生成所必需</li><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>正常叶酸代谢所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次2g，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>摄取时可能卡喉，务必与水一起摄取</li><li>摄取时如出现消化不良、胃肠障碍症状请停止摄取。</li><li>摄取前如产品有异常，请勿摄取</li><li>根据个人身体状态如发生异常请停止摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味异臭的微黄色包衣片</div><div class=\"sd-item\">2) 维生素A：标示量(1000ug/4g)的80~150%</div><div class=\"sd-item\">3) 维生素C：标示量(1000mg/4g)的80~150%</div><div class=\"sd-item\">4) 维生素D：标示量(10ug/4g)的80~180%</div><div class=\"sd-item\">5) 维生素E：标示量(400mg/4g)的80~180%</div><div class=\"sd-item\">6) 维生素K：标示量(1000ug/4g)的80~180%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "cc91dc943804bab577ea8b12f34f06134b21168e92378763c7e61da5dcb190c5"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "8ecb2ad7-b522-4978-8319-47fef895a04c",
+   "productNameKo": "싸이지놀 파워 맥스",
+   "koCanonicalId": "456ac842-43e9-4107-9035-feb3c007fed4",
+   "koHash": "448e893898ed5ad268e2702287b7b0c892305bf0dbc39c87f9e71fd8393f46ef",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>싸이지놀 파워 맥스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">镁</span><ul><li>能量利用所必需</li><li>维持神经与肌肉功能所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">烟酸</span><ul><li>体内能量生成所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素B1</span><ul><li>碳水化合物与能量代谢所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素B6</span><ul><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（20g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>(1) 出现不良反应时应停止摄取并咨询专业人员</li><li>(2) 出现手脚刺痛、灼热感或麻木等不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">(1) 性状：具有固有风味、无异味异臭的褐色液体</div><div class=\"sd-item\">(2) 大肠菌群阴性</div><div class=\"sd-item\">(3) 细菌数：每1 mL100以下</div><div class=\"sd-item\">(4) 镁：标示量(100mg/20g)的80 ~ 150%</div><div class=\"sd-item\">(5) 烟酸：标示量(17mg NE/20g)的80 ~ 150%</div><div class=\"sd-item\">(6) 维生素B1：标示量(1.2mg/20g)的80 ~ 180%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f148a3d88b9e3bee8e21054044c11a6a413b06cd508b9bf14e7fb61ba94b6c06"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "935cfdb1-1049-4f16-a4e3-e5135a912c2c",
+   "productNameKo": "락토스온",
+   "koCanonicalId": "18cdb5d8-9eb4-486d-b380-9f2af5359318",
+   "koHash": "09f14704f22fae000e66bc32a9ffac142e1fdd2c5561656e2c349692f3e78910",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>락토스온</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有益乳酸菌增殖，抑制有害菌或排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次2片</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的微褐色包衣片剂</div><div class=\"sd-item\">2)益生菌数：6×10^8c.f.u/1300mg以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)崩解试验：阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "6bbe413850ea3765133fbb2ed873104f10f44737f34e7a8b76704e1715eecb1a"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "97329572-91d9-48ab-843f-edc5983e531f",
+   "productNameKo": "메타큐플러스 (Meta Q Plus)",
+   "koCanonicalId": "3eb6acf2-8af8-4fae-99c9-749b8e6e7eed",
+   "koHash": "bd755c79e61e8a409441d3786a2724faf1f474d001b9001e33b0691e629f65c4",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>메타큐플러스 (Meta Q Plus)</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于肝脏健康</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（13g），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>出现过敏反应时停止摄取</li><li>出现腹泻、胃痛、腹胀等胃肠道不适时摄取需注意</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味且无异味、无异臭的黄灰色粉末产品</div><div class=\"sd-item\">2) 功能性原料</div><div class=\"sd-item\">水飞蓟素</div><div class=\"sd-item\">含量：130 mg/13g（标示量的80~120%）</div><div class=\"sd-item\">3) 残留溶剂（仅限使用该溶剂的情况）</div><div class=\"sd-item\">(甲) 己烷(mg/kg)：5.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "0818a23ea1cd4f640d6309e033adb80137b32ff669708a36a1e614dd781260a7"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "a2fb2947-972a-4405-b873-ccb172f2aaac",
+   "productNameKo": "징코피노",
+   "koCanonicalId": "139df5c3-2820-4d18-8d63-36b7f776216a",
+   "koHash": "aebde5cc39c67e8d866ec431bfe5ce5dfbd9cf502b168cac4a4fd69e538779c1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>징코피노</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于改善记忆力</li><li>有助于改善血行</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1袋摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>孕妇、哺乳期妇女、儿童及手术前后患者摄取需注意</li><li>服用药品（抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有色泽与风味，应无异味异臭。</div><div class=\"sd-item\">黄酮醇苷：18mg/15g的80~120%</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">细菌数：每1ml100以下</div><div class=\"sd-item\">银杏酸(mg/kg)：5.0以下</div><div class=\"sd-item\">铅(mg/kg)：1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "6575b9f4f866ab2a3f7f78ef4fa76d30c843f24407d54eeb54691e2d63909602"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "a4970507-93cb-4d63-b71e-48981e530008",
+   "productNameKo": "어쎔코드 G",
+   "koCanonicalId": "102922e4-f81a-409e-afa5-ac5780444614",
+   "koHash": "5a3a4df23c8acec334d96fd038ed68b9bc3cc5649d45a9a4ca16ffb5d2d2e6a1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span></div>\n  <h1>어쎔코드 G</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">柘树叶提取物（第2021-16号）</span><ul><li>有助于改善胃部不适感</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">参见产品标示事项</span></span><p class=\"sd-meta\">每日1次，每次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>婴幼儿、儿童、孕妇及哺乳期妇女摄取需注意</li><li>患有特定疾病（过敏体质等）者摄取需注意</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有风味且无异味、无异臭的亮灰青色长方形包衣片剂</div><div class=\"sd-item\">崩解：以水为试验液60分钟以内符合</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">芦丁(Rutin)：标示量 0.23mg/500 mg的80~120 %</div><div class=\"sd-item\">总黄曲霉毒素(ug/kg)：B1, B2, G1及G2之和：15.0以下（B110.0以下）</div><div class=\"sd-item\">铅(mg/kg)：0.5以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "bacabc98cfc98e03702f2e757a0d704ec5cca8ed01b7e625d5dc032927bd18e1"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "a722c5a5-b755-4312-a8f4-5251e476fb47",
+   "productNameKo": "대한민국진호간골드스틱ND-1",
+   "koCanonicalId": "a5a30a88-71b7-4d1a-be2b-ef48d7c45b02",
+   "koHash": "52958d6ad167b4dc1417d96c79fcca37ef9406d80f8da656db4f454288d3b7fb",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>대한민국진호간골드스틱ND-1</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-item\"><span class=\"sd-tag\">枳椇果梗提取粉末</span><ul><li>有助于保护肝脏免受酒精性损伤（生理活性功能2级）</li></ul></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次10g摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">枳椇果梗提取粉末</span><ul><li>孕妇及哺乳期妇女请谨慎摄取</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的深褐色液状</div><div class=\"sd-item\">2)槲皮素(Quercetin)：标示量(18.20ug/10g)的80~120%</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)普通细菌：100以下</div><div class=\"sd-item\">5)铅(mg/kg)：0.1以下</div><div class=\"sd-item\">6) 总砷(mg/kg) 1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "ae8a587c0ab3cdd956e0889569f4b9f2a1b170a0ca101b19206a6087f4052f63"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "a8f1d53f-c504-447a-a9ac-561b7058ca65",
+   "productNameKo": "어쎔코드 C",
+   "koCanonicalId": "b153498b-b96d-41fa-aec4-23b0dc670fa2",
+   "koHash": "ef2e38ffeff78b495377136aa77c6bbaa71440a3c35a354a9f2c79497aab4735",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span></div>\n  <h1>어쎔코드 C</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">槐树果实提取物</span><ul><li>有助于更年期女性健康</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">大豆异黄酮</span><ul><li>有助于骨骼健康</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素C</span><ul><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">参见产品标示事项</span></span><p class=\"sd-meta\">每日1次，每次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇、哺乳期妇女摄取需注意</li><li>对雌激素敏感者摄取需注意</li><li>婴幼儿、儿童、孕妇与哺乳期妇女食用时注意</li><li>对大豆过敏者摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：具有固有风味、无异味异臭的浅黄褐色长方形包衣片</div><div class=\"sd-item\">崩解：以水为试验液60分钟以内符合</div><div class=\"sd-item\">大肠菌群阴性</div><div class=\"sd-item\">槐属苷（Sophoricoside）：标示量 40mg/1,000 mg的80~120 %</div><div class=\"sd-item\">大豆异黄酮（以苷元计）：标示量 24mg/1,000 mg的80~120 %</div><div class=\"sd-item\">维生素C：标示量 100mg/1,000 mg的80~150 %</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "165528b1dd068236c34729c17d93d55ff60854cd3f5a5defc963cffdad992763"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "aa522384-f709-4f39-8223-ecc45d15c960",
+   "productNameKo": "으뜸면역젤리",
+   "koCanonicalId": "5a78c5a8-8df8-44d8-a1a9-9e8fb536e24d",
+   "koHash": "69ddf3fc3fbf7c84dbd1f17bf4b3414df57086d030add16e7d8692c7e31ff18f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>으뜸면역젤리</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于皮肤健康ㆍ肠道健康ㆍ增强免疫力</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋摄取</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：无异味、无异臭并具有固有风味的黄色凝胶软糖</div><div class=\"sd-item\">总多糖：标示量（100mg/20g）的80%以上（其他来源多糖 141.7952mg/20g）</div><div class=\"sd-item\">蒽醌类化合物（以无水芦荟苷计）(%)：0.033以下</div><div class=\"sd-item\">大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "09824848bb0377c7f464c94f5fe6df1da8ffb1ffae9209b3c695fa1d26b2a91b"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "ac984f22-adf4-4213-a675-15c72130d84a",
+   "productNameKo": "나눔비타민사랑주는어른용",
+   "koCanonicalId": "98aef7fb-af2f-4cca-8760-c5e3bd323639",
+   "koHash": "6cb24f228e5b5e821688b1e8fd8bd3e431df49c90bfa16977549540c5a8bc9e5",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>나눔비타민사랑주는어른용</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>体内能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>正常叶酸代谢所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>能量利用所必需</li><li>维持神经与肌肉功能所必需</li><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li><li>铁的运输与利用所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>骨骼形成所必需</li><li>能量利用所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>摄取时可能卡喉，务必与水一起摄取</li><li>摄取时如出现消化不良、胃肠障碍症状请停止摄取。</li><li>摄取前如产品有异常，请勿摄取</li><li>根据个人身体状态如发生异常请停止摄取。</li><li>出现手脚刺痛、灼热感或麻木等不良反应时应停止摄取并咨询专业人员</li><li>应注意不要过量摄取</li><li>患有肾脏疾病时应在摄取前咨询专业人员</li><li>出现不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：具有固有风味且无异味、无异臭的浅黄色包衣片剂</div><div class=\"sd-item\">2)维生素B1：标示量(13mg / 1,000mg)的80~180%</div><div class=\"sd-item\">3)维生素B2：标示量(15 mg / 1,000mg)的80~180%</div><div class=\"sd-item\">4)维生素B6：标示量(16mg / 1,000mg)的80~150%</div><div class=\"sd-item\">5) 维生素B12：标示量(50㎍ / 1,000mg)的80~180%</div><div class=\"sd-item\">6)维生素C：标示量(110mg / 1,000mg)的80~150%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "409e9b4e36755d31aa78029392222082df2aa8971b080a1391d5de8af7d18089"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "af88c653-7de3-42ae-b7c0-7ee6dcea91c1",
+   "productNameKo": "헤모마임플러스",
+   "koCanonicalId": "262cba97-2dfc-43fa-849c-82d6ad7240c1",
+   "koHash": "3bb04d02e66b6fb31271e2b4484e1b0d4ccfcd93a3b57b7ee629ed4ae0a6e494",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>헤모마임플러스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">叶酸</span><ul><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">锌</span><ul><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次50g摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>根据个人身体状况出现异常症状时应停止摄取</li><li>特异体质等过敏体质者偶尔因人而异可能出现过敏反应，请确认原料后再摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的黑褐色液状</div><div class=\"sd-item\">2)锌：标示量(12mg/50g)的80~150%</div><div class=\"sd-item\">3)叶酸：标示量(400ug/50g)的80~150%</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5)细菌数：100c.f.u/ml以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "209282420a3dc069ea93e78e7ae517b000d26e01907a86067c16df26f6bbebe9"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "b1ffc65b-cc72-4834-affa-586f378010cf",
+   "productNameKo": "닥터린 비타민C",
+   "koCanonicalId": "c4357ff2-4c9a-4c1e-b736-c19483b93f23",
+   "koHash": "1132e19f1a40a2bf74d3e3e869600cc5b1fe9664d3807f6f5f1dfdb8287125cd",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">维生素C</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>닥터린 비타민C<small>维生素C</small></h1><p class=\"sd-meta\">주식회사 네추럴웨이 制造 · 每日1次，每次1片</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以 <b>维生素C</b>为主原料的健康功能食品。 官方食用方法为 <b>每日1次，每次1片</b>。官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>主原料 <b>维生素C</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的黄褐色长方形片剂 · 주식회사 네추럴웨이 制造</li></ul>\n  <h2>官方认定功能性</h2><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1片</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的黄褐色长方形片剂</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 摄取前确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "b6f7b1bd9bbb9e0a9e9a15913faaeb44ff5efe2e1d279d38372fc7fb5cdfb02f"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "b3359161-7d3e-4e4d-ba1a-eb26e657c179",
+   "productNameKo": "순백 MSM관절100",
+   "koCanonicalId": "730d4856-900a-4245-9cb9-2fa52c55b59e",
+   "koHash": "98791c7ee8a27ad87a7023c0b03d29c6d48fb0d9649815bc82c4b55a4217fdd0",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1960mg</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>순백 MSM관절100<small>MSM</small></h1><p class=\"sd-meta\">주식회사한미양행 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1960mg</b>的标示量含有（标示基准每2000mg）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>1960mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的白色粉末 · 주식회사한미양행 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1960mg/2000mg)的80%以上</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 请避开高温潮湿处或阳光直射，保存于阴凉处。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 过敏体质等因人而异可能出现过敏反应 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "6686c6bacac919c547497028b4eaba5ed1c4b2d9157b52930d37ab1209e37e9d"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "ba957082-8846-4f9d-b776-ca891874276a",
+   "productNameKo": "퍼틸케어",
+   "koCanonicalId": "60870bef-a30c-4263-b370-bb2409e795a1",
+   "koHash": "d51036ab4040bc8a4dfbaf3007bd1a8bcda0aa2e3f3e8adb666fd5415e76f9d8",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">欧米伽3</span><span class=\"sd-badge is-solid\">维生素C</span><span class=\"sd-badge is-solid\">辅酶Q10</span><span class=\"sd-badge is-solid\">锰</span><span class=\"sd-badge is-solid\">铁</span><span class=\"sd-badge is-solid\">硒</span><span class=\"sd-badge is-solid\">碘</span><span class=\"sd-badge is-solid\">维生素B12</span><span class=\"sd-badge is-solid\">烟酸</span><span class=\"sd-badge is-solid\">锌</span><span class=\"sd-badge is-solid\">维生素E</span><span class=\"sd-badge is-solid\">维生素B6</span><span class=\"sd-badge is-solid\">维生素B1</span><span class=\"sd-badge is-solid\">泛酸</span><span class=\"sd-badge is-solid\">铜</span><span class=\"sd-badge is-solid\">维生素B2</span><span class=\"sd-badge is-solid\">维生素D</span><span class=\"sd-badge is-solid\">叶酸</span><span class=\"sd-badge is-solid\">生物素</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>퍼틸케어<small>欧米伽3 · 维生素C · 辅酶Q10 · 锰 · 铁 · 硒 · 碘 · 维生素B12 · 烟酸 · 锌 · 维生素E · 维生素B6 · 维生素B1 · 泛酸 · 铜 · 维生素B2 · 维生素D · 叶酸 · 生物素</small></h1><p class=\"sd-meta\">(주)알피바이오 制造 · 每日1次，每次1袋</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以 <b>欧米伽3</b>, <b>维生素C</b>, <b>辅酶Q10</b>, <b>锰</b>, <b>铁</b>, <b>硒</b>, <b>碘</b>, <b>维生素B12</b>, <b>烟酸</b>, <b>锌</b>, <b>维生素E</b>, <b>维生素B6</b>, <b>维生素B1</b>, <b>泛酸</b>, <b>铜</b>, <b>维生素B2</b>, <b>维生素D</b>, <b>叶酸</b>, <b>生物素</b>是以其为主原料的19种原料复合保健功能食品。。 官方食用方法为 <b>每日1次，每次1袋</b>，各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>主原料 <b>欧米伽3</b>, <b>维生素C</b>, <b>辅酶Q10</b>, <b>锰</b>, <b>铁</b>, <b>硒</b>, <b>碘</b>, <b>维生素B12</b>, <b>烟酸</b>, <b>锌</b>, <b>维生素E</b>, <b>维生素B6</b>, <b>维生素B1</b>, <b>泛酸</b>, <b>铜</b>, <b>维生素B2</b>, <b>维生素D</b>, <b>叶酸</b>, <b>生物素</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>- 无异味、无异臭并具有固有风味微黄色含内容物的透明软胶囊 - 无异味、无异臭并具有固有风味橙色含内容物的红褐色软胶囊 - 无异味、无异臭并具有固有风味浅黄色包衣片剂 · (주)알피바이오 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>欧米伽3</b><ul class=\"sd-why\"><li>有助于改善血中中性脂肪·改善血液循环·改善干眼从而有助于眼睛健康</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul></li><li><b>辅酶Q10</b><ul class=\"sd-why\"><li>有助于抗氧化·降低偏高的血压</li></ul></li><li><b>锰</b><ul class=\"sd-why\"><li>骨骼形成所必需</li><li>能量利用所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul></li><li><b>铁</b><ul class=\"sd-why\"><li>体内氧气运输与血液生成所必需</li><li>能量生成所必需</li></ul></li><li><b>硒</b><ul class=\"sd-why\"><li>保护细胞免受有害氧侵害所必需</li></ul></li><li><b>碘</b><ul class=\"sd-why\"><li>甲状腺激素合成所必需</li><li>能量生成所必需</li><li>神经发育所必需</li></ul></li><li><b>维生素B12</b><ul class=\"sd-why\"><li>正常叶酸代谢所必需</li></ul></li><li><b>烟酸</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>锌</b><ul class=\"sd-why\"><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul></li><li><b>维生素E</b><ul class=\"sd-why\"><li>保护细胞免受有害氧侵害所必需</li></ul></li><li><b>维生素B6</b><ul class=\"sd-why\"><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li></ul></li><li><b>维生素B1</b><ul class=\"sd-why\"><li>碳水化合物与能量代谢所必需</li></ul></li><li><b>泛酸</b><ul class=\"sd-why\"><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul></li><li><b>铜</b><ul class=\"sd-why\"><li>铁的运输与利用所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul></li><li><b>维生素B2</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>维生素D</b><ul class=\"sd-why\"><li>钙和磷的吸收与利用所必需</li><li>骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li></ul></li><li><b>叶酸</b><ul class=\"sd-why\"><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li></ul></li><li><b>生物素</b><ul class=\"sd-why\"><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1袋</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>性状</b> - 无异味、无异臭并具有固有风味微黄色含内容物的透明软胶囊 - 无异味、无异臭并具有固有风味橙色含内容物的红褐色软胶囊 - 无异味、无异臭并具有固有风味浅黄色包衣片剂</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月</div><div class=\"sd-item\"><b>保存</b> 请避开高温潮湿处与阳光直射，请在湿气少而干燥的地方保存。。 请在儿童接触不到的地方保存。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 出现不良反应时停止摄取并咨询专业人员 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "ebc09e22ce2609bdf565f1f77abf26644f2d03067e5dcb0fbfce2bc5e1657c1f"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "bc02ae57-bef3-44bc-916d-6cf9731c257b",
+   "productNameKo": "프로엘엠에스엠",
+   "koCanonicalId": "79e552d0-2b14-42d0-9abe-c0310aa1e40b",
+   "koHash": "f3c17adbd76b1d11b7099b85eab128cb86c7f481d29540ccb0d02df56c81c15f",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 1.98g</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>프로엘엠에스엠<small>MSM</small></h1><p class=\"sd-meta\">(주)바이오 로제트 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>1.98g</b>的标示量含有（标示基准每2g）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>1.98g</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>无异味、无异臭并具有固有风味的白色粉末 · (주)바이오 로제트 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(1.98g/2g)的80~120%</div><div class=\"sd-item\"><b>性状</b> 无异味、无异臭并具有固有风味的白色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月为止</div><div class=\"sd-item\"><b>保存</b> 1) 请避开阳光直射与高温潮湿处，请在常温保存。。 2) 产品开封后可能变质，请立即食用。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 摄取前确认产品标示事项 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "9298a9335cbfe47ffd20a90026a643ae5ef3c1c932e45d41b1ec3d8f12e033cc"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "be9d4831-6637-4459-9e38-8ffe0d6d996c",
+   "productNameKo": "혈행개선에 도움을 주는 수협 혈행플러스",
+   "koCanonicalId": "3b8b3680-4b80-4c10-9b38-df6b56502a41",
+   "koHash": "5e995e9e5acef5d508d4c1105a1e77f258a41f4e7247b2f1797d2b793f8f3bac",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>혈행개선에 도움을 주는 수협 혈행플러스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">银杏叶提取物</span><ul><li>有助于改善成人记忆力 (其他功能II) 有助于改善血液循环 (其他功能II)</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">锌</span><ul><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次2粒胶囊，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">银杏叶提取物</span><ul><li>儿童、孕妇与哺乳期妇女摄取时请注意。</li><li>手术前后摄取需注意</li><li>服用抗凝血剂时请注意摄取。</li><li>患病者摄取前请咨询医生。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1.性状：白黄色含内容物的中褐色硬胶囊</div><div class=\"sd-item\">2.黄酮醇苷(mg/g)：26mg/1800mg的80~120%</div><div class=\"sd-item\">3.银杏酸(mg/kg)：5.0以下</div><div class=\"sd-item\">4. 铅(mg/kg)：1.0以下</div><div class=\"sd-item\">5. 总砷(mg/kg) 1.0以下</div><div class=\"sd-item\">6.镉(mg/kg)：1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "eb5c4185df04e53cb985abbbd5cd4d9f852ad1c66a7b4549a3196b9a703a67f6"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "c2685544-2015-4f04-88fe-4f8935a3be12",
+   "productNameKo": "보윤수 홍삼 하루애",
+   "koCanonicalId": "12d60ab1-8c88-4249-abbd-3b356607dd35",
+   "koHash": "d496f4d525224621a7a8f7cc18045406aa70fe91079aef6a4bbc4b8ea5354eef",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>보윤수 홍삼 하루애</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味异臭的褐色液体</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(10mg/10g)的80%以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)细菌数：100c.f.u/ml以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "33af74bea5754e235ce0c02b2e4452b1ae7a2adf6d30c84710cdaa7745cc771b"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "cd222e33-4341-420f-b115-3962970c5210",
+   "productNameKo": "아리멀티비타민",
+   "koCanonicalId": "15d7d225-7ecc-4204-9f7c-377cbc9378bc",
+   "koHash": "1c54d3187284d17ddd4344a00cfbd2fb77f99ca003dd16a7b53e9a0b956eff77",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>아리멀티비타민</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>蛋白质及氨基酸利用所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>体内能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>细胞与血液生成所必需</li><li>胎儿神经管正常发育所必需</li><li>维持血液中同型半胱氨酸水平正常所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次2粒胶囊，与水一起摄取。</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味、无异臭的含有绿色粉末的绿色硬胶囊</div><div class=\"sd-item\">2) 维生素B1：标示量(5mg/2g)的80 ~ 180 %</div><div class=\"sd-item\">3) 维生素B2：标示量(5mg/2g)的80 ~ 180 %</div><div class=\"sd-item\">4) 维生素B6：标示量(5mg/2g)的80 ~ 150 %</div><div class=\"sd-item\">5) 烟酸：标示量(5mg/2g)的80 ~ 150 %</div><div class=\"sd-item\">6) 泛酸：标示量(5mg/2g)的80 ~ 180 %</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "2870ea926c18e83c99fdc91d1edf29fa34f6043e6c0e1fa3572831c536e9c968"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "d1dae285-eb3a-4f98-a80c-25738c85f8ce",
+   "productNameKo": "드시모네 장면역 다이어트",
+   "koCanonicalId": "5e364bbc-7305-4cdf-bdbe-30bb73b9a477",
+   "koHash": "34f2fffc3410568efea1adef43360365d799491a98227447563fc1f64f554e8a",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>드시모네 장면역 다이어트</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">益生菌（De Simone）（功能性原料认定 第2009-28号）</span><ul><li>有益乳酸菌增殖，抑制有害菌，排便顺畅，调节肠道免疫，有助于肠道健康</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">绿茶提取物</span><ul><li>有助于抗氧化·减少体脂肪·改善血中胆固醇</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素B1</span><ul><li>碳水化合物与能量代谢所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素B2</span><ul><li>体内能量生成所必需</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">维生素B6</span><ul><li>蛋白质及氨基酸利用所需，维持血液中同型半胱氨酸水平正常所需，</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，1次每次分量（片剂 600mg，硬胶囊 650mg），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>内容物中偶尔可见有色碎片，这是原料的一部分，可放心摄取。</li><li>开封或摄取时可能被包装材料划伤，请注意</li><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>患有肝脏疾病或正在服用药品时应咨询专业人员</li><li>因含有咖啡因，可能出现焦躁、失眠等</li><li>应在餐后摄取</li><li>应注意含咖啡因食品的摄取</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味且无异味、无异臭的深绿色长方形包衣片剂</div><div class=\"sd-item\">2) 大肠菌群阴性</div><div class=\"sd-item\">3) 崩解度：60分钟以内</div><div class=\"sd-item\">4) 维生素B1：标示量(1.2mg/1250mg)的80~180%</div><div class=\"sd-item\">5) 维生素B2：标示量(1.4mg/1250mg)的80~180%</div><div class=\"sd-item\">6) 维生素B6：标示量(1.5mg/1250mg)的80~150%</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "02cf630cc32c984c8a872af4a2eac0b60499cf56876fc1ecbd516d162af10c8a"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "d515bcc3-f0e3-4cc7-af0b-466755480f3a",
+   "productNameKo": "토라토라액",
+   "koCanonicalId": "9a780feb-b691-459b-958f-716b2dcd4009",
+   "koHash": "3f8f704df4f50ad45200a6741ba889874a2a7539f0a94f769e80e12bd49a8eb1",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>토라토라액</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1袋摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味异臭的褐色液体</div><div class=\"sd-item\">2)维生素B1：标示量(26㎎/60g)的80 ~ 180%</div><div class=\"sd-item\">3)维生素B2：标示量(22㎎/60g)的80 ~ 180%</div><div class=\"sd-item\">4)维生素C：标示量(100㎎/60g)的80 ~ 150%</div><div class=\"sd-item\">5)细菌数：100cfu/mL以下</div><div class=\"sd-item\">6) 大肠菌群阴性</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "b373d68ae8586377e3bab7d6eb783ff05c5a6a551ba6469accc19e5761547e20"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "d6399e6b-2fc9-4415-99ad-a1e6d9b74d27",
+   "productNameKo": "장온",
+   "koCanonicalId": "fcad912f-39fa-4c49-917d-77843c4e5014",
+   "koHash": "bd79de5076e6c3cd73ba6418b2719134d3b2a43be43fed0722403a0355188b42",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>장온</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有益乳酸菌增殖，抑制有害菌或排便顺畅</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次1片，与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质等过敏体质者请确认成分后再摄取。</li><li>可能被包装材料划伤，请注意。</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的微褐色包衣片剂</div><div class=\"sd-item\">2)益生菌数：1×10^8c.f.u/1300mg以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)崩解试验：60分钟以内</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f3f8ac44f97280e53b387a13d90a710dde05728026c568debce2fe9a2069026d"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "e18b2673-13df-42f6-b294-8afa10179f9b",
+   "productNameKo": "체지방다이어트 포스트바이오틱스",
+   "koCanonicalId": "bad80493-d5d9-4867-9a05-6a8cf716d239",
+   "koHash": "e6b39e9b53addf145af791c32566ec63e20f72d38fdbac9d651eece10ee8e09c",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>체지방다이어트 포스트바이오틱스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于通过抑制碳水化合物合成为脂肪来减少体脂肪</li><li>有助于乳酸菌增殖及抑制有害菌 · 促进排便顺畅 · 肠道健康</li><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日2次，每次1袋，直接或与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>患有肝·肾·心脏疾病、过敏及哮喘或正在服用药品时应咨询专业人员</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味且无异味、无异臭的浅黄白色粉末</div><div class=\"sd-item\">2) 益生菌：标示量(100,000,000 CFU/5g)以上</div><div class=\"sd-item\">3) 总(-)-Hydroxycitric acid（羟基柠檬酸）：标示量(750mg/5g)的80~120%</div><div class=\"sd-item\">4) 锌：标示量(8.5mg/5g)的80～150%</div><div class=\"sd-item\">5) 铅：1.0 mg/kg以下</div><div class=\"sd-item\">6) 镉：0.5 mg/kg以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "b5ff24fe476d09318c394a52d9604fbc6cf336a2c4f1625202c1dbec8f34aec8"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "e4c7e697-f80a-40bf-9ec6-576189e5892e",
+   "productNameKo": "메타칸골드(Metakhan Gold)",
+   "koCanonicalId": "4e02c1bf-c491-40cb-ad08-009c55383322",
+   "koHash": "8ea6e57e0946ba6fb5210ad1cdab2ac0f8eb9228864ae9b4dd8c2a98f26ea778",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">烟酸 23mg</span><span class=\"sd-badge is-solid\">维生素C 110mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>메타칸골드(Metakhan Gold)<small>烟酸 · 维生素C</small></h1><p class=\"sd-meta\">원바이오 주식회사 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以烟酸 <b>23mg</b>维生素C <b>110mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入烟酸 <b>23mg</b>维生素C <b>110mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味且无异味、无异臭的浅黄粉红色或亮灰粉红色粉末 · 원바이오 주식회사 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>烟酸</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>烟酸</b> 标示量(23mg/1g)的80~150%</div><div class=\"sd-item\"><b>维生素C</b> 标示量(110mg/1g)的80~150%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的浅黄粉红色或亮灰粉红色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 24个月</div><div class=\"sd-item\"><b>保存</b> 请避开高温潮湿，阳光直射，请在常温保存及流通。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 孕妇·哺乳期妇女应在摄取前咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 出现不良反应时停止摄取并咨询专业人员 · 保存于儿童接触不到的地方 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "136aa24085c7bc17546c890a4e5c5caacd94a07ec7915ffc778400e1dbceb1cf"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "eaa0346e-0ed8-486f-ab9d-98be08ade4da",
+   "productNameKo": "트루엔 오엠비",
+   "koCanonicalId": "97e9fd55-2e85-4241-99b3-1e1066ddb0b3",
+   "koHash": "e89e95aedf5717c3a3db2bf4988fc818fb77463a0f2af253a15eea7c4dd54c90",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>트루엔 오엠비</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>含EPA及DHA的油脂：有助于改善血中中性脂肪 · 改善血液循环 · 改善记忆力 · 改善干眼从而有助于眼睛健康</li><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>蛋白质及氨基酸利用所需，维持血液中同型半胱氨酸水平正常所需，</li><li>正常叶酸代谢所必需</li><li>结缔组织形成与功能维持所需 (2) 铁吸收所需 (3) 通过抗氧化作用保护细胞免受有害氧损伤所需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li><li>体内能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>ㆍ细胞与血液生成所必需ㆍ胎儿神经管正常发育所必需ㆍ维持血液中同型半胱氨酸水平正常所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>能量利用所必需 (2)维持神经与肌肉功能所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，1次每次分量（片剂 2片，软胶囊 1粒胶囊），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质、过敏体质者偶尔因人而异可能出现过敏反应，请确认原料后再摄取</li><li>服用药品（抗凝血药、抗血小板药、降压药等）时应咨询专业人员</li><li>因人而异可能出现皮肤相关不良反应</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>应注意不要过量摄取</li><li>患有肾脏疾病时应在摄取前咨询专业人员</li><li>出现手脚刺痛、灼热感或麻木等不良反应时应停止摄取并咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">[镁片剂]</div><div class=\"sd-item\">1) 性状：具固有香味、无异味•异臭的白色长方形包衣片剂</div><div class=\"sd-item\">2) 镁：标示量(200 mg/3,640 mg)的80~150%</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4) 崩解试验：60分钟以内</div><div class=\"sd-item\">维生素片剂</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "8c6ca730a197a63b760b164918bc2c91e44d2a00b9b4da2678d1bde565ffbd9e"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "eace059e-2ab6-47cd-bdcd-daf33e2cc01d",
+   "productNameKo": "듀썸헬씨 유코드 항균 프로폴리스",
+   "koCanonicalId": "bb17ae1f-3ba2-448b-a6e9-9c1737bd125f",
+   "koHash": "090b58c341cab197600ef12efe51b1f03beaf1f0ee3554b7453d8aaada6079c8",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>듀썸헬씨 유코드 항균 프로폴리스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于口腔内的抗菌作用</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每日2次，每次0.6ml（喷4次）喷入口腔摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>对蜂胶过敏者摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">性状：无异味、无异臭并具有固有风味的红褐色液状</div><div class=\"sd-item\">总黄酮：标示量[1mg/1.2ml]的80~120%</div><div class=\"sd-item\">对(ρ)-香豆酸：确认</div><div class=\"sd-item\">肉桂酸：确认</div><div class=\"sd-item\">铅(mg/kg)5.0以下</div><div class=\"sd-item\">二甘醇：未检出</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "6ec0f0142ead0e1b9bf7ccb6c31432d5728a189f94ecbd3ad39f57dac9037964"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "ece2a181-25d2-40b6-94fe-776de2bad9a4",
+   "productNameKo": "식물성 엠에스엠",
+   "koCanonicalId": "30c24d86-d261-427b-a2de-39d3631908d4",
+   "koHash": "a432456df9d73b39e2f75a736d55d5f471ccbb099bf68f9e70663b057ae71d94",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">MSM 2g</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>식물성 엠에스엠<small>MSM</small></h1><p class=\"sd-meta\">(주)유유헬스케어 制造 · 每日2次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以MSM <b>2g</b>的标示量含有（标示基准每2g）。 MSM的功能性如下方官方认定范围所示。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日2次（1勺）摄取可摄入MSM <b>2g</b></li><li>具有固有风味且无异味、无异臭的白色粉末 · (주)유유헬스케어 制造</li></ul>\n  <h2>MSM功能性（官方认定）</h2><ul class=\"sd-why\"><li>有助于关节及软骨健康</li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>MSM</b> 标示量(2g/2g)的80~120%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的白色粉末</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起24个月</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射及高温潮湿处，存放于阴凉处。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 有疾病或正在服用药品时咨询专业人员 · 出现不良反应时停止摄取并咨询专业人员 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "c61e07b31ad306fdca8b87db45d85c5e9c83e853298fe0ea7f220b265c36e903"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "ef28c6ba-8b67-499f-82c1-a6b155f68986",
+   "productNameKo": "모닝솔루션(Morning Solution)",
+   "koCanonicalId": "72eface7-1487-41d8-82ae-f59b4d55165e",
+   "koHash": "e8804b031fd4b7a7f5e850dbee80d5f655b50d2dd6cc86f79efac2f62a55cad7",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>모닝솔루션(Morning Solution)</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>* 水飞蓟素</li><li>甲) 有助于肝脏健康</li><li>* 维生素C</li><li>甲) 结缔组织形成与功能维持所必需</li><li>乙) 铁的吸收所必需</li><li>丙) 通过抗氧化作用保护细胞免受有害氧侵害所必需</li><li>* 维生素D</li><li>甲 钙与磷的吸收与利用所必需</li><li>或骨骼形成与维持所必需</li><li>有助于降低骨质疏松症发生风险</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（16g），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>儿童、孕妇及哺乳期妇女应避免摄取</li><li>出现过敏反应时停止摄取</li><li>出现腹泻、胃痛、腹胀等胃肠道不适时摄取需注意</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>有高钙血症或正在服用药品时应咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：具有固有风味且无异味、无异臭的黄灰色粉末产品</div><div class=\"sd-item\">2) 功能性原料</div><div class=\"sd-item\">水飞蓟素</div><div class=\"sd-item\">含量：130 mg/16g（标示量的80~120%）</div><div class=\"sd-item\">维生素C</div><div class=\"sd-item\">含量：500 mg/16g（标示量的80~150%）</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "5062025374101501571609f2fae83ec3bb0ed1404e93f00e6b4d9558cbf7c975"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f1d17037-8e92-41d1-a82b-facf84473371",
+   "productNameKo": "프로신프로폴리스",
+   "koCanonicalId": "a981ca3f-cc87-42f9-9e2c-58504609f364",
+   "koHash": "ebbc8848a5bf8b3fe698376e2bc666d46b77199015191c2eef7ea52547f45a30",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日3次</span></div>\n  <h1>프로신프로폴리스</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><div class=\"sd-core\"><div class=\"sd-item\"><span class=\"sd-tag\">蜂胶提取物产品</span><ul><li>有助于抗氧化作用</li></ul></div><div class=\"sd-item\"><span class=\"sd-tag\">锌</span><ul><li>正常免疫功能所必需</li><li>正常细胞分裂所必需</li></ul></div></div>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日3次</span></span><p class=\"sd-meta\">每每日3次，1次2粒胶囊，与水一起摄取</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><span class=\"sd-tag\">蜂胶提取物产品</span><ul><li>对蜂胶过敏者摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">① 性状：无异味、无异臭的黄褐色含有粉末的淡褐色硬胶囊剂</div><div class=\"sd-item\">② 总黄酮：标示量(16.8mg/2,700mg)的80 ~ 120%</div><div class=\"sd-item\">③ 锌：标示量(11.5mg/2,700mg)的80 ~ 150%</div><div class=\"sd-item\">④ 肉桂酸：确认</div><div class=\"sd-item\">⑤ 铅(mg/kg)5.0以下</div><div class=\"sd-item\">⑥ 二甘醇：未检出</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "db43b534e34d72510b15201f0eb9c53283557c5cc12741ad36f52e476db63cf1"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f252373f-a6a8-4dd5-a56f-1a20f2f016bd",
+   "productNameKo": "디제로킹 지티GT 스텝2",
+   "koCanonicalId": "dc6572af-decf-4682-87f6-c6f1a38d7a62",
+   "koHash": "afe3b5a56bc0830843d7dcda3bbcfbd4682529bf410edc8132c98940f7107298",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>디제로킹 지티GT 스텝2</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于乳酸菌增殖及抑制有害菌 · 促进排便顺畅 · 肠道健康</li><li>ㆍ暗处视觉适应所必需 ㆍ形成皮肤与黏膜并维持其功能所必需 ㆍ上皮细胞的生长与发育所必需</li><li>碳水化合物与能量代谢所必需</li><li>体内能量生成所必需</li><li>蛋白质及氨基酸利用所需，维持血液中同型半胱氨酸水平正常所需，</li><li>正常叶酸代谢所必需</li><li>结缔组织形成与功能维持所需 (2) 铁吸收所需 (3) 通过抗氧化作用保护细胞免受有害氧损伤所需</li><li>钙与磷的吸收利用所需 (2) 骨骼形成与维持所需 (3) 有助于降低骨质疏松症发生风险</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li><li>体内能量生成所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>ㆍ细胞与血液生成所必需ㆍ胎儿神经管正常发育所必需ㆍ维持血液中同型半胱氨酸水平正常所必需</li><li>脂肪、碳水化合物、蛋白质代谢与能量生成所必需</li><li>正常免疫功能所必需，正常细胞分裂所必需</li><li>保护细胞免受有害氧侵害所必需</li><li>骨骼形成所必需 (2)能量利用所必需 (3)保护细胞免受有害氧侵害所必需</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每日1次，1次每次分量（片剂 1片，硬胶囊 1粒胶囊），与水一起摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>特异体质、过敏体质者因人而异可能出现过敏反应，请确认原料后再摄取</li><li>有疾病或正在服用药品时应咨询专业人员</li><li>过敏体质等因人而异可能出现过敏反应</li><li>请指导儿童不要随意摄取，并遵守每日摄取量</li><li>出现不良反应时应停止摄取并咨询专业人员</li><li>有高钙血症或正在服用药品时应咨询专业人员</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">硬胶囊</div><div class=\"sd-item\">1) 性状：具有固有风味、无异味异臭、含黄白色粉末的白色硬胶囊</div><div class=\"sd-item\">2) 益生菌数：标示量（1,000,000,000(10亿) CFU/1,200 mg）以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4) 崩解试验：20分钟以内</div><div class=\"sd-item\">片剂</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "5a714dc9dc0bf146247bf68eda42b36da16b686085484f01293346caf162e6e9"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f3279b5b-dabc-4efd-87f6-6585ea8d625d",
+   "productNameKo": "메타D'테일 B 1 (Meta D'tail B 1)",
+   "koCanonicalId": "54ac1dcf-1ad5-4562-b461-0d829bdb42d0",
+   "koHash": "1b47b98146fced0b8c4a9d3a863e02f290aed145a0774490a299b16453dda033",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">烟酸 23mg</span><span class=\"sd-badge is-solid\">维生素C 110mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>메타D'테일 B 1 (Meta D'tail B 1)<small>烟酸 · 维生素C</small></h1><p class=\"sd-meta\">원바이오 주식회사 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以烟酸 <b>23mg</b>维生素C <b>110mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入烟酸 <b>23mg</b>维生素C <b>110mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味且无异味、无异臭的灰黄色或黄灰色粉末 · 원바이오 주식회사 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>烟酸</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>烟酸</b> 标示量(23mg/1g)的80~150%</div><div class=\"sd-item\"><b>维生素C</b> 标示量(110mg/1g)的80~150%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味且无异味、无异臭的灰黄色或黄灰色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 24个月</div><div class=\"sd-item\"><b>保存</b> 请避开高温潮湿，阳光直射，请在常温保存及流通。。</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 孕妇·哺乳期妇女应在摄取前咨询专业人员 · 过敏体质等因人而异可能出现过敏反应 · 出现不良反应时停止摄取并咨询专业人员 · 保存于儿童接触不到的地方 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "024099bf5dad4a978204a1f49035a4e9d428bb7b096f319760a15b9717056ccd"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f36a7e1b-33fb-4ef9-94e2-837ea4e662b3",
+   "productNameKo": "웰니스 알파",
+   "koCanonicalId": "7366c6fb-272f-4c47-980e-4b42ce7702b7",
+   "koHash": "5ccacedc589d967568d68fdfe98b3e505434e69fe404068fbc6bebf4ff2a1b57",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge is-solid\">烟酸 30mg</span><span class=\"sd-badge is-solid\">维生素C 100mg</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>웰니스 알파<small>烟酸 · 维生素C</small></h1><p class=\"sd-meta\">(주)엘에이치뉴트리 制造 · 每日1次，每次1勺</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是以烟酸 <b>30mg</b>维生素C <b>100mg</b>的标示量含有的2原料复合健康功能食品。各原料的官方认定功能性如下。</p>\n  <h2>为什么选择本产品</h2><ul class=\"sd-why\"><li>每日1次（1勺）摄取可摄入烟酸 <b>30mg</b>维生素C <b>100mg</b></li><li>大肠菌群阴性 — 符合食品医药品安全处申报基准</li><li>具有固有风味、无异臭的淡粉色粉末 · (주)엘에이치뉴트리 制造</li></ul>\n  <h2>各原料的官方认定功能性</h2><ul class=\"sd-func\"><li><b>烟酸</b><ul class=\"sd-why\"><li>体内能量生成所必需</li></ul></li><li><b>维生素C</b><ul class=\"sd-why\"><li>结缔组织形成与功能维持所必需</li><li>铁的吸收所必需</li><li>通过抗氧化作用保护细胞免受有害氧侵害所必需</li></ul></li></ul>\n  <h2>摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span><span class=\"sd-tag\">每次1勺</span><span class=\"sd-tag\">与水一起服用</span></span></div>\n  <h2>标示基准</h2><div class=\"sd-spec\"><div class=\"sd-item\"><b>烟酸</b> 标示量(30mg/1g)的80~150%</div><div class=\"sd-item\"><b>维生素C</b> 标示量(100mg/1g)的80~150%</div><div class=\"sd-item\"><b>性状</b> 具有固有风味、无异臭的淡粉色粉末</div><div class=\"sd-item\"><b>大肠菌群</b> 阴性</div><div class=\"sd-item\"><b>保质期</b> 自生产之日起2年</div><div class=\"sd-item\"><b>保存</b> 请避开阳光直射及高温潮湿处，存放于干燥阴凉处，保质期为2年</div></div>\n  </div><div class=\"sd-foot\"><b>摄取时注意事项</b> 摄取前确认产品标示事项 · 详细注意事项请确认产品标示事项 · 健康功能食品并非用于疾病预防·治疗的药品，如有疑问请咨询门店内药师等专业人员</div></div>",
+   "newContentHash": "0d44ebba6ec6e52d974705304f017eda712de8acb51087bd7342a39805f0227a"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f5d88106-046c-4b5d-942e-f4d3b0cf2bb9",
+   "productNameKo": "홍삼애골드스틱",
+   "koCanonicalId": "5844776f-240f-4cd0-81a8-e47f3feda80b",
+   "koHash": "55c4920d48142ecda7db66de19acd23fcd23df469d28067450fa31da1f75d5e0",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日1次</span></div>\n  <h1>홍삼애골드스틱</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于增强免疫力</li><li>有助于改善疲劳</li><li>有助于通过抑制血小板凝集改善血流</li><li>有助于改善记忆力</li><li>有助于抗氧化。</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日1次</span></span><p class=\"sd-meta\">每每日1次，1次1袋（10g）摄取。</p></div>\n  <h2>摄取时参考事项</h2><div class=\"sd-item\"><ul><li>服用药品（糖尿病治疗药、抗凝血药）时摄取需注意</li></ul></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1) 性状：无异味异臭的褐色液体</div><div class=\"sd-item\">2)人参皂苷Rg1、Rb1及Rg3之和：标示量(10mg/10g)的80%以上</div><div class=\"sd-item\">3) 大肠菌群阴性</div><div class=\"sd-item\">4)细菌数：100c.f.u/ml以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "f2c24109714357b0cc69288b3149ac8ba1d5178675cad1b1498e0c4d09d9044b"
+  },
+  {
+   "op": "INSERT",
+   "productMasterId": "f9bfec75-ec79-402a-bd26-0bf44c434c2c",
+   "productNameKo": "슬림투미",
+   "koCanonicalId": "7889abcd-8bf4-4de4-bcce-6cf36501e02b",
+   "koHash": "505488cb8f1ef2d6bb9ccbaffad6fd83aeaf0f596b0abe13764bf2e3df3b1ce9",
+   "newContent": "<div class=\"sd-card sd-theme-green\"><div class=\"sd-hero\">\n  <div class=\"sd-badges\"><span class=\"sd-badge\">健康功能食品</span><span class=\"sd-badge\">每日2次</span></div>\n  <h1>슬림투미</h1><p class=\"sd-meta\">健康功能食品 · 基于官方认定功能性的门店说明书</p></div>\n  <div class=\"sd-body\"><p class=\"sd-intro\">本产品是已向食品医药品安全处申报的健康功能食品。官方认定的功能性如下。</p>\n  <h2>主要功能性</h2><ul class=\"sd-why\"><li>有助于通过抑制碳水化合物合成为脂肪来减少体脂肪</li></ul>\n  <h2>摄取量及摄取方法（照官方标示）</h2><div class=\"sd-intake\"><span class=\"sd-chips\"><span class=\"sd-tag\">每日2次</span></span><p class=\"sd-meta\">每每日2次，1次3片，与水一起摄取。</p></div>\n  <h2>可确认的基准·规格信息</h2><div class=\"sd-spec\"><div class=\"sd-item\">1)性状：无异味、无异臭的微褐色包衣片剂</div><div class=\"sd-item\">2)总(-)-Hydroxycitric acid（羟基柠檬酸）：标示量(810mg/3000mg)的80%~120%</div><div class=\"sd-item\">3)崩解试验：符合（在水中60分钟）</div><div class=\"sd-item\">4) 大肠菌群阴性</div><div class=\"sd-item\">5) 重金属</div><div class=\"sd-item\">铅(mg/kg)：1.0以下</div></div>\n  <h2>门店专业人员咨询指南</h2><div class=\"sd-cta\"><p>如对摄取方法或是否适合自身状况有疑问，请咨询门店内药师等专业人员</p></div></div>\n  <div class=\"sd-foot\">请一并确认产品标示事项</div></div>",
+   "newContentHash": "c20792a2b6d9acc2fca6ccf9dc8918e714eebe953945a0e9deee2949f7bbb4fb"
+  }
+ ]
+}

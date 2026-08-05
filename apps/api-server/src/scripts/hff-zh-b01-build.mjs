@@ -25,6 +25,10 @@ export const ZH_SLOTS = [
 export const HANGUL = /[가-힣ㄱ-ㅎㅏ-ㅣ]/;
 /** 원문 표기를 유지하는 제조사 법인명 구간 제거 — 잔존 한글 검사 전용. */
 export const stripKeep = (s) => s.replace(KEEP_PROPER, ' ');
+/* KO 원문이 `1&gt;` 처럼 엔티티로 들고 있는 기호가 번역 슬롯을 거치며 맨 `>` 로 돌아오면
+   HTML 상 표기가 원문과 달라진다(렌더 결과는 같지만 raw HTML 검사에 걸린다).
+   이미 엔티티인 `&xxx;` 는 건드리지 않고, 맨 `&`·`<`·`>` 만 다시 이스케이프한다. */
+const esc = (s) => s.replace(/&(?!#?[a-zA-Z0-9]+;)/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 const cnt = (h, re) => (h.match(re) ?? []).length;
 export const PARITY = [[/<li[ >]/g, 'li'], [/<h2[ >]/g, 'h2'], [/sd-item/g, 'sd-item'], [/sd-tag/g, 'sd-tag'], [/<b>/g, 'b'], [/<ul[ >]/g, 'ul'], [/<p[ >]/g, 'p']];
 export const parityBreak = (ko, out) => { for (const [re, name] of PARITY) if (cnt(ko, re) !== cnt(out, re)) return name; return null; };
@@ -46,7 +50,7 @@ export function build(html) {
           if (!r) { misses.push({ kind, text: norm(core), why: 'UNRESOLVED' }); failed = true; return seg; }
           const lost = lostNums(core, r.zh);
           if (lost.length) { misses.push({ kind, text: norm(core), why: 'NUMBER_DRIFT', lost }); failed = true; return seg; }
-          return lead + r.zh + tail;
+          return lead + esc(r.zh) + tail;
         });
         if (failed) return whole;
         return open + parts.join('') + close;
@@ -55,7 +59,7 @@ export function build(html) {
       if (!r) { misses.push({ kind, text: t, why: 'UNRESOLVED' }); return whole; }
       const lost = lostNums(inner, r.zh);
       if (lost.length) { misses.push({ kind, text: t, why: 'NUMBER_DRIFT', lost }); return whole; }
-      return open + r.zh + close;
+      return open + esc(r.zh) + close;
     });
   }
   let hangul = 0;

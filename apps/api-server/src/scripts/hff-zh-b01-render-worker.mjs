@@ -46,7 +46,11 @@ for (const t of tasks) {
       if (!txt) { counters.emptyLi++; failures.push({ p: t.p, w, why: 'EMPTY_LI' }); continue; }
       if (HANGUL.test(stripKeep(txt))) { counters.hangulVisible++; failures.push({ p: t.p, w, why: 'HANGUL', txt: txt.slice(0, 40) }); }
       if (/[①②③④⑤⑥⑦⑧⑨⑩]/.test(txt)) { counters.markerVisible++; failures.push({ p: t.p, w, why: 'MARKER' }); }
-      if (/&lt;|&gt;|<[a-z]/i.test(li.innerHTML.replace(/<\/?(b|span|em|strong)>/g, ''))) counters.rawHtml++;
+      /* KO 원문이 `2&gt;글루코사민` 처럼 항목 기호로 쓰는 맨 `>` 는 정상 텍스트다 — ZH 도 같은 표기를 승계한다.
+         raw HTML 로 볼 것은 **태그가 텍스트로 샌 경우**뿐이므로, 태그 모양(`&lt;b`, `&gt;&lt;`, `<b`)만 잡는다. */
+      if (/&lt;\s*\/?[a-z]|&gt;\s*&lt;|<[a-z]/i.test(li.innerHTML.replace(/<\/?(b|span|em|strong)>/g, ''))) {
+        counters.rawHtml++; failures.push({ p: t.p, w, why: 'RAW_HTML', txt: li.innerHTML.slice(0, 120) });
+      }
     }
     for (const el of doc.querySelectorAll('.store-desc-content *')) {
       for (const cls of el.classList ?? []) if (cls.startsWith('sd-') && !DEFINED.has(cls)) { counters.undefinedClass++; failures.push({ p: t.p, w, why: `UNDEFINED_CLASS:${cls}` }); }
