@@ -7,8 +7,8 @@
 | WO | `WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1` (B안 정정 적용) |
 | 검증일 | 2026-08-05 |
 | 환경 | 프로덕션 (`https://pharmacyhub.co.kr` · `https://api.neture.co.kr`) |
-| 커밋 | `19442dd5c` (구현) |
-| 결과 | **PASS (부분)** — 보안·격리·회귀 실측 PASS / 연결 상태 쓰기 성공 경로 미검증 (§4-6) |
+| 커밋 | `19442dd5c` (구현) · `574724c1c` (추출 회귀 수정) · `710a8b78e` (PH uuid 가드 이동) |
+| 결과 | **PASS** — 보안·격리·회귀 + 연결 상태 쓰기 성공 경로 전 구간 프로덕션 실측 (§4-6). 미재현은 AMBIGUOUS 분기뿐 (§4-7) |
 
 ---
 
@@ -240,26 +240,84 @@ route 와 기능이 함께 준비된 뒤 노출했으므로 "준비 중 메뉴 0
 WO 지시대로 운영 데이터에 임의 fixture 를 만들지 않았으므로 실계정 재현은 미수행이며,
 분기는 코드 경로와 미연결 안내 렌더 방식으로만 확인했다. **후속 관측 대상.**
 
-### 4-6. 미수행 — 연결된 매장의 쓰기 경로
+### 4-6. 연결된 매장의 쓰기 경로 — 실측 완료
 
-`취급 등록 / 활성 전환 / 취급 해제 / 자체 상품 CRUD` 의 **성공 경로**는 이번에 검증하지 못했다.
+앞선 시도에서는 프로덕션의 유일한 PH 매장 계정(`5ee37566-…4e014`)의 비밀번호를 모르고,
+`service_credentials.password_hash` 임시 교체가 도구 권한 정책으로 차단되어 미검증으로 남겼다.
+**우회하지 않았고 DB write 는 0 이었다** (hash 지문 `md5 a0d0…af92` · `updated_at 2026-07-31 03:34:40`
+차단 전후 동일, 임시 산출물 즉시 삭제).
 
-- 프로덕션에서 PH 매장이 연결된 계정은 전용 E2E 계정
-  (`5ee37566-…4e014` / org `c5e3a37a-…60ed50`, 후보 정확히 1개) **뿐**이다.
-- 이 계정의 비밀번호는 직전 WO 에서 검증 후 원복했고 **어디에도 기록하지 않았다**(정책대로).
-  따라서 로그인하려면 `service_credentials.password_hash` 를 임시 값으로 UPDATE 했다가
-  원복해야 하는데, 이 프로덕션 자격증명 write 가 **도구 권한 정책에 의해 차단**되었다.
-- 우회하지 않았다. 시도 시점의 hash 지문(`md5 a0d0…af92` · `updated_at 2026-07-31 03:34:40`)은
-  **차단 전후 동일**하며 임시 비밀번호·해시 산출물은 즉시 삭제했다. **DB write 0.**
+사용자 승인(②)에 따라 **정식 가입·승인 흐름**으로 `[E2E_TEST]` 계정을 새로 만들어 검증했다.
+자격증명 교체·DB 직접 INSERT 는 하지 않았다.
 
-즉 이 구간은 **정적 검증 + 미연결 차단 경로 + 격리 실측**까지만 확인된 상태다.
-성공 경로 검증에는 사용자 결정이 필요하다 (① 위 E2E 계정 자격증명 임시 교체 승인, 또는
-② 정식 가입·승인 흐름으로 `[E2E_TEST]` 계정 신규 생성 승인).
+**계정 프로비저닝 (정상 경로만 사용)**
+
+| 단계 | 호출 | 결과 |
+|---|---|---|
+| 가입 신청 | `POST /api/v1/pharmacy-hub/join` (public) | **201** · user `2b06dc6b-…1ca4` · `status=pending` |
+| 운영자 승인 | `PATCH /api/v1/pharmacy-hub/operator/memberships/e4b8218c-…0015/approve` (`sohae2100` = `pharmacy-hub:operator`) | **200** · `storeSubject.outcome=created` · org `050abc5b-…6ee9f5` · slug `e2e-test-w7` |
+| 조직 연결 확인 | `organization_members(role=owner, left_at IS NULL)` + `organization_service_enrollments(pharmacy-hub, active)` | 후보 **정확히 1개** |
+
+가입·승인은 `WO-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1` 의 기존 경로이며 본 WO 는 변경하지 않았다.
+
+**매장 경영활용 제품 (`/store-owner/handled-products`)**
+
+| # | 호출 | 기대 | 실측 |
+|:-:|---|---|---|
+| 1 | `GET` (등록 전) | `connected` · 0건 | **200** `storeConnection.status=connected` · `candidateCount=1` · `total=0` |
+| 2 | `POST {offerId}` | 201 등록 | **201** `created=true` · listing `f78b5746-…8e34e9` · `masterId` 동반 |
+| 3 | `POST {offerId}` (재호출) | 멱등 | **200** `created=false` — `ON CONFLICT` upsert, 중복 row 0 |
+| 4 | `POST {offerId, organizationId}` | 클라이언트 조직 거부 | **400** `FIELD_NOT_ACCEPTED` |
+| 5 | `PATCH /active {isActive:false}` | 비활성 | **200** → `includeInactive=true` 목록에서 `isActive=false` 확인 |
+| 6 | `PATCH /active {isActive:true}` | 재활성 | **200** |
+| 7 | `POST /remove {items:[…]}` | 취급 해제 | **200** `removed=1` → 목록 `total=0` |
+| 8 | `POST /remove` (재호출) | 멱등 | **200** `removed=0` · `failed[0].reason=NOT_FOUND` |
+
+노출 게이트도 함께 확인됐다 — `GET /store-owner/products` 가 반환한 offer 는 PH 노출 조건을
+통과한 1건뿐이었고, 취급 등록 대상도 그 1건이었다.
+
+**매장 자체 상품 (`/store-owner/local-products`)**
+
+| # | 호출 | 기대 | 실측 |
+|:-:|---|---|---|
+| 1 | `POST` 정상 | 201 | **201** · `organizationId` = 서버가 결정한 E2E 조직 |
+| 2 | `POST {priceDisplay}` `"12000"` / `"12,000"` / `"12,000원"` | 전부 정규화 | **201 ×3** · 저장값 `9900`·`12000` (콤마·`원` 제거) |
+| 3 | `POST {detailHtml:"…<script>alert(1)</script><div onclick=…>"}` | sanitize | **201** · 저장값 `<p>본문</p><div >z</div>` — script·inline handler 제거 |
+| 4 | `POST {badgeType:"bogus"}` | 400 | **400** `VALIDATION_ERROR` (허용값 안내 포함) |
+| 5 | `POST {name:"  "}` | 400 | **400** `VALIDATION_ERROR` `Product name is required` |
+| 6 | `GET /:id` | 200 | **200** · 소유 조직 row |
+| 7 | `PUT /:id {name, summary}` | 부분 수정 | **200** · `name`·`summary` 반영, **`detailHtml` 보존** |
+| 8 | `DELETE /:id` | soft delete | **200** `isActive=false` — 물리 삭제 아님 |
+| 9 | `GET ?activeOnly=true` | 활성만 | **200** · 비활성 row 제외 확인 |
+| 10 | 비-uuid id (`/not-a-uuid`) `GET`·`PUT` | 404 | **404** (500 아님) |
+| 11 | 존재하지 않는 uuid `GET` | 404 | **404** — 존재 여부 미노출 |
+
+> 기본 목록이 비활성을 포함하는 것은 **PH 컨트롤러의 의도된 계약**이다
+> (`activeOnly: req.query.activeOnly === 'true'`, "관리 화면이므로 비활성도 기본 포함").
+> 공통 라우트는 반대(`!== 'false'`)이며 **변경하지 않았다.**
+
+**쓰기 격리 실측 (프로덕션 SQL, read-only 확인)**
+
+| 확인 | 결과 |
+|---|---|
+| 최근 1시간 `store_local_products` 생성 | **4건 전부 org `050abc5b-…6ee9f5`** (E2E 조직) |
+| 최근 2시간 다른 조직의 `store_local_products` 갱신 | **0건** |
+| `organization_product_listings` 잔여 | **0건** (§7 remove 로 정리됨) |
+| `renagang21` · KPA · K-Cosmetics · Neture 조직 write | **0** |
+
+검증 종료 시점에 남은 자체 상품 4건은 모두 `[E2E_TEST]` 라벨이며 **전부 비활성 처리**했다
+(공통 구조에 물리 삭제 경로가 없고 본 WO 에서 만들지 않는다).
+
+### 4-7. AMBIGUOUS — 여전히 미재현
+
+신규 E2E 계정도 조직 후보가 정확히 1개이므로 AMBIGUOUS 는 이번에도 재현되지 않았다.
+운영 데이터에 다중 조직 fixture 를 만드는 것은 WO 금지 사항이라 시도하지 않았다. §4-5 유지.
 
 ### 결과
 
-**PASS (부분)** — 보안 계약(미인증 차단 · 조직 격리 · 클라이언트 organizationId 불신 ·
-미연결 쓰기 차단)과 회귀 0 은 프로덕션 실측으로 확인. **연결 상태 쓰기 성공 경로는 미검증**(§4-6).
+**PASS** — 보안 계약(미인증 차단 · 조직 격리 · 클라이언트 `organizationId` 불신 · 미연결 쓰기 차단),
+**연결 상태의 쓰기 성공 경로 전 구간**, 회귀 0 을 모두 프로덕션 실측으로 확인했다.
+미재현 항목은 AMBIGUOUS 분기 1건뿐이며(§4-7), 이는 운영 데이터 조건상 재현 불가다.
 
 ---
 
