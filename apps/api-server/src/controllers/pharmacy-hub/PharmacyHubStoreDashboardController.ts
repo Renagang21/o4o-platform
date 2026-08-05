@@ -38,6 +38,11 @@
  *     영향을 주는 별도 작업이므로 **본 WO 는 공통 해석기를 변경하지 않고**
  *     Pharmacy-Hub 전용 읽기 경로에서만 enrollment 스코프를 적용한다.
  *
+ *   WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05):
+ *     위 규칙을 store-organization.resolver.ts 로 옮겨 매장 정보 조회·수정과 **동일한
+ *     해석기**를 쓰게 했다. 규칙·SQL·반환 의미는 그대로이며(홈 요약 동작 불변),
+ *     "보이는 매장"과 "저장되는 매장"이 갈라질 여지를 구조적으로 없앤 것이다.
+ *
  * ─────────────────────────────────────────────────────────────────────────────
  * 장바구니·주문 경계는 기존 저장 계약 그대로 (조직 기준으로 바꾸지 않는다)
  *
@@ -51,11 +56,9 @@ import type { Request, Response } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { SERVICE_KEYS } from '../../constants/service-keys.js';
 import logger from '../../utils/logger.js';
+import { resolvePharmacyHubStoreOrganization } from './store-organization.resolver.js';
 
 const SERVICE_KEY = SERVICE_KEYS.PHARMACY_HUB;
-
-/** organization_members 중 매장 접근으로 인정되는 role (provisioning·공통 정의와 동일 집합) */
-const STORE_MEMBER_ROLES = ['owner', 'admin', 'manager'];
 
 /** 홈에 노출하는 최근 주문 개수 */
 const RECENT_ORDER_LIMIT = 5;
@@ -106,28 +109,9 @@ export class PharmacyHubStoreDashboardController {
    * 어떤 경우에도 후보를 임의로 고르지 않는다.
    */
   private static async resolveStore(userId: string): Promise<StoreBlock> {
-    const rows = await AppDataSource.query(
-      `SELECT o.id::text AS id,
-              o.name,
-              o.code,
-              (SELECT s.slug FROM platform_store_slugs s
-                WHERE s.store_id = o.id AND s.service_key = $3
-                LIMIT 1) AS slug
-         FROM organization_members om
-         JOIN organizations o
-           ON o.id = om.organization_id
-         JOIN organization_service_enrollments e
-           ON e.organization_id = o.id
-          AND e.service_code = $3
-          AND e.status = 'active'
-        WHERE om.user_id = $1::uuid
-          AND om.role = ANY($2::text[])
-          AND om.left_at IS NULL
-        ORDER BY o.id`,
-      [userId, STORE_MEMBER_ROLES, SERVICE_KEY],
-    );
+    const resolution = await resolvePharmacyHubStoreOrganization(userId);
 
-    if (rows.length === 0) {
+    if (resolution.status === 'not_connected') {
       return {
         status: 'not_connected',
         organizationId: null,
@@ -137,7 +121,7 @@ export class PharmacyHubStoreDashboardController {
         candidateCount: 0,
       };
     }
-    if (rows.length > 1) {
+    if (resolution.status === 'ambiguous') {
       // 2개 이상은 사람이 판단할 대상이다. 이름을 하나 골라 보여주지 않는다.
       return {
         status: 'ambiguous',
@@ -145,18 +129,18 @@ export class PharmacyHubStoreDashboardController {
         name: null,
         code: null,
         slug: null,
-        candidateCount: rows.length,
-        errorCode: 'AMBIGUOUS_STORE_CONNECTION',
+        candidateCount: resolution.candidateCount,
+        errorCode: resolution.errorCode,
       };
     }
 
-    const org = rows[0];
+    const org = resolution.org;
     return {
       status: 'connected',
       organizationId: org.id,
-      name: org.name ?? null,
-      code: org.code ?? null,
-      slug: org.slug ?? null,
+      name: org.name,
+      code: org.code,
+      slug: org.slug,
       candidateCount: 1,
     };
   }

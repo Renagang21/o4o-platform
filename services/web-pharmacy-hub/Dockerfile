@@ -35,6 +35,8 @@ COPY packages/store-ui-core/package.json ./packages/store-ui-core/
 COPY packages/operator-ux-core/package.json ./packages/operator-ux-core/
 COPY packages/error-handling/package.json ./packages/error-handling/
 COPY packages/ui/package.json ./packages/ui/
+# WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1: 공통 계정 UI (프로필·비밀번호·알림)
+COPY packages/account-ui/package.json ./packages/account-ui/
 
 # Copy service package.json
 COPY services/web-pharmacy-hub/package.json ./services/web-pharmacy-hub/
@@ -50,6 +52,7 @@ COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/ui/ ./packages/ui/
+COPY packages/account-ui/ ./packages/account-ui/
 
 # Copy service source
 COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/
@@ -61,6 +64,8 @@ RUN pnpm --filter @o4o/auth-client build
 # @o4o/ui 는 dist-mode (main: ./dist/index.js) — 빌드 필요.
 # store-ui-core / operator-ux-core / error-handling 은 source-mode 로 빌드 불필요.
 RUN pnpm --filter @o4o/ui build
+# @o4o/account-ui 도 dist-mode (main: ./dist/index.js) — 빌드 필요.
+RUN pnpm --filter @o4o/account-ui build
 
 # Build-time environment variables for Vite
 ARG VITE_API_BASE_URL=https://api.neture.co.kr

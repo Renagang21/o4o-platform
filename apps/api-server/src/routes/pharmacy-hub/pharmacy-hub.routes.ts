@@ -13,6 +13,8 @@
  *   PATCH /api/v1/pharmacy-hub/operator/memberships/:id/approve          (operator scope)
  *   PATCH /api/v1/pharmacy-hub/operator/memberships/:id/reject           (operator scope)
  *   GET   /api/v1/pharmacy-hub/{operator|store-owner|supplier}/ping      (각 scope)
+ *   GET   /api/v1/pharmacy-hub/store-owner/info                          (store_owner) 매장 정보
+ *   PATCH /api/v1/pharmacy-hub/store-owner/info                          (store_owner) 매장 정보 수정
  *
  * 포함하지 않는 것 (후속 WO):
  *   상품 카탈로그/장바구니/주문, 콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
@@ -35,6 +37,8 @@ import { PharmacyHubMembershipConsoleController } from '../../controllers/pharma
 import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierProductController.js';
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
 import { PharmacyHubStoreDashboardController } from '../../controllers/pharmacy-hub/PharmacyHubStoreDashboardController.js';
+// WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
+import { PharmacyHubStoreInfoController } from '../../controllers/pharmacy-hub/PharmacyHubStoreInfoController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -207,6 +211,18 @@ export function createPharmacyHubRoutes(): Router {
   //   그대로 사용한다. 상세 근거는 컨트롤러 상단 주석 참조.
   // ───────────────────────────────────────────────────────────────────────────
   router.get('/store-owner/dashboard', ...storeOwnerGuards, PharmacyHubStoreDashboardController.summary);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 정보 조회·수정 (WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1)
+  //
+  //   SSOT = organizations (+ enrollment / platform_store_slugs 표시).
+  //   대상 조직은 **서버가** 인증 사용자 + pharmacy-hub active enrollment 로 결정한다 —
+  //   클라이언트가 보낸 organizationId 는 신뢰하지 않으며 body 에 있으면 400 으로 거부한다.
+  //   수정은 allowlist(name/phone/address/addressDetail/description) 만 반영한다.
+  //   schema 변경·migration 0.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/info', ...storeOwnerGuards, PharmacyHubStoreInfoController.get);
+  router.patch('/store-owner/info', ...storeOwnerGuards, PharmacyHubStoreInfoController.update);
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)

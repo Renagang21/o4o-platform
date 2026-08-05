@@ -193,6 +193,14 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'cart',             label: '장바구니',  subPath: '/cart' },
       { key: 'purchase-orders',  label: '주문 내역', subPath: '/orders' },
     ]},
+    // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)
+    //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).
+    //   매장 정보 = organizations(조직) / 내 계정 = users(사용자) — 서로 다른 축이라 항목을 분리한다.
+    //   KPA 전용 계정·자격·면허·분회 메뉴는 가져오지 않는다.
+    { label: '설정', items: [
+      { key: 'store-info', label: '매장 정보', subPath: '/info' },
+      { key: 'account',    label: '내 계정',   subPath: '/account' },
+    ]},
   ],
 };
 
