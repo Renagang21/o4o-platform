@@ -233,6 +233,16 @@ C:\Users\home\coding\o4o-platform\bin\cloud-sql-proxy.exe --address 127.0.0.1 --
 
 → 본 WO 범위 밖이며 소유 세션에 귀속된다. 수정하지 않았다.
 
+### 8-2. commit · push · CI
+
+- commit: `196b84a58` (45 files, +288 / −5694)
+- push: `origin/main` fast-forward 완료
+- 직후 병렬 세션이 `574724c1c fix(store): local product 추출본의 자체 유입 UUID 가드 제거` 를 push 하여
+  `196b84a58` 의 CI Pipeline 은 **concurrency 로 cancelled**(실패 아님).
+- 본 커밋을 포함하는 `574724c1c` 기준 **CI Pipeline `success` / CodeQL `success`**,
+  `196b84a58` 기준 **AppStore Guard · Deploy Main Site · Deploy Admin Dashboard · Deploy Web Services 모두 `success`**.
+- §8-1 의 선행 결함은 소유 세션이 `574724c1c` 로 직접 해소했다.
+
 ---
 
 ## 9. 승인 필요 — 미조치 항목
