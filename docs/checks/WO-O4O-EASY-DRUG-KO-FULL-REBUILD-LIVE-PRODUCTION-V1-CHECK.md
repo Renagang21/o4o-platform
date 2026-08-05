@@ -277,7 +277,7 @@ HOLD 144 는 번역 모집단에서 제외한다.
 
 ## 23. commit / push
 
-- 커밋: (아래 push 결과 참조)
+- 커밋: `ace09847c` → push `898862460..ace09847c main` (35 files, 66,328 insertions)
 - pathspec: `apps/api-server/src/scripts/easy-drug-ko-full-rebuild-live/` + 본 CHECK 만 사용.
   다른 세션 WIP(`hff-zh-*`, `scripts/data/hff-zh-b04-*`)는 stage·수정·삭제하지 않았다.
 - 본문 68.8MB 는 Git 에 넣지 않았다(`results/.gitignore`). hash·원장·요약·재현 스크립트·CHECK 만 포함.
