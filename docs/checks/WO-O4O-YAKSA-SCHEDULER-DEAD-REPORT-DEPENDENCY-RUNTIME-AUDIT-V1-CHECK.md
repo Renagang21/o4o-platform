@@ -321,10 +321,11 @@ DB 자격증명은 Cloud Run env 에서 읽어 환경변수로만 전달했고 �
 
 | 항목 | 값 |
 |------|------|
-| commit | (commit 직후 기재) |
-| 포함 파일 | (동상) |
-| push | (동상) |
-| ahead / behind | (동상) |
+| commit | `36903e6e4` — `docs(check): yaksa-scheduler YaksaReport 의존성 런타임 감사 (…-V1)` |
+| 포함 파일 | **1개** (333 insertions / 0 deletions) — 본 CHECK 신규 1건뿐 |
+| 타 세션 파일 포함 | **0** — `git commit -- <본 CHECK 경로>` pathspec 격리, `git show --name-only` 로 확인 |
+| push | `origin/main` `4274982e5..36903e6e4` (fast-forward) |
+| ahead / behind | **0 / 0** |
 
 ---
 
