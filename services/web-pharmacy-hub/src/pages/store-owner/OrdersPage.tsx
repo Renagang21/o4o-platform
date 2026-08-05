@@ -15,21 +15,8 @@ import {
   type OrderListItem,
 } from '../../lib/api/pharmacyHubOrders';
 import { BRAND } from '../../config/service';
-
-const won = (v: number) => `${Number(v).toLocaleString('ko-KR')}원`;
-
-/** 주문 원장 상태 → 사용자 문구. 결제 여부를 우선해서 읽는다. */
-function statusLabel(order: OrderListItem): { text: string; tone: string } {
-  if (order.status === 'cancelled') return { text: '취소됨', tone: 'bg-gray-100 text-gray-600' };
-  if (order.paymentStatus === 'refunded') return { text: '환불됨', tone: 'bg-gray-100 text-gray-600' };
-  if (order.paymentStatus === 'paid') {
-    return order.supplierNotified
-      ? { text: '공급자 전달 완료', tone: 'bg-emerald-50 text-emerald-700' }
-      : { text: '결제 완료', tone: 'bg-emerald-50 text-emerald-700' };
-  }
-  if (order.paymentStatus === 'failed') return { text: '결제 실패', tone: 'bg-red-50 text-red-700' };
-  return { text: '결제 대기', tone: 'bg-amber-50 text-amber-700' };
-}
+// 상태 문구·금액 표기는 홈 대시보드와 동일 정의를 쓴다(사본 금지).
+import { orderStatusBadge as statusLabel, won } from '../../lib/orderStatus';
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState<OrderListItem[]>([]);

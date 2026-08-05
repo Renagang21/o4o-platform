@@ -34,6 +34,7 @@ import { PharmacyHubMembershipConsoleController } from '../../controllers/pharma
 // WO-PHARMACY-HUB-SUPPLIER-PRODUCT-OFFER-DELIVERY-V1
 import { PharmacyHubSupplierProductController } from '../../controllers/pharmacy-hub/PharmacyHubSupplierProductController.js';
 import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hub/PharmacyHubStoreProductController.js';
+import { PharmacyHubStoreDashboardController } from '../../controllers/pharmacy-hub/PharmacyHubStoreDashboardController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -196,6 +197,16 @@ export function createPharmacyHubRoutes(): Router {
 
   router.get('/store-owner/products', ...storeOwnerGuards, PharmacyHubStoreProductController.list);
   router.get('/store-owner/products/:offerId', ...storeOwnerGuards, PharmacyHubStoreProductController.detail);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 약국 경영자 홈 요약 (WO-PHARMACY-HUB-STORE-HOME-DASHBOARD-V1)
+  //
+  //   읽기 전용 SELECT 만 수행한다 — 신규 테이블·집계 저장소·migration 0.
+  //   매장명은 organization_service_enrollments(service_code='pharmacy-hub',
+  //   status='active') 스코프로만 해석하고, 장바구니·주문은 기존 buyerId 경계를
+  //   그대로 사용한다. 상세 근거는 컨트롤러 상단 주석 참조.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/dashboard', ...storeOwnerGuards, PharmacyHubStoreDashboardController.summary);
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)

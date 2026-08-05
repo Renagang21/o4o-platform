@@ -22,6 +22,63 @@ function unwrap<T>(body: any, fallbackMessage: string): T {
   return body.data as T;
 }
 
+// ── 매장 홈 요약 (WO-PHARMACY-HUB-STORE-HOME-DASHBOARD-V1) ──────────────────
+
+/**
+ * 매장 조직 해석 결과.
+ *   connected     : Pharmacy-Hub active enrollment 조직이 정확히 1개
+ *   not_connected : 0개 — "매장 정보 미연결" 정상 빈 상태 (다른 서비스 조직으로 대체하지 않는다)
+ *   ambiguous     : 2개 이상 — 임의 선택 없이 안내만 한다
+ */
+export interface DashboardStore {
+  status: 'connected' | 'not_connected' | 'ambiguous';
+  organizationId: string | null;
+  name: string | null;
+  code: string | null;
+  slug: string | null;
+  candidateCount: number;
+  errorCode?: 'AMBIGUOUS_STORE_CONNECTION';
+}
+
+export interface DashboardMembership {
+  status: string;
+  role: string | null;
+  roleType: string | null;
+  approvedAt: string | null;
+  appliedAt: string | null;
+}
+
+export interface DashboardRecentOrder {
+  orderId: string;
+  orderNumber: string;
+  status: string;
+  paymentStatus: string;
+  totalAmount: number;
+  itemCount: number;
+  createdAt: string;
+  /** 판정 근거는 주문 목록(GET /orders)과 동일하다 — 홈과 목록의 배지가 갈리지 않게 한다. */
+  supplierNotified: boolean;
+}
+
+export interface StoreDashboard {
+  store: DashboardStore;
+  membership: DashboardMembership;
+  cart: { itemCount: number; totalQuantity: number };
+  orders: {
+    total: number;
+    awaitingPayment: number;
+    inFulfillment: number;
+    cancelled: number;
+    recent: DashboardRecentOrder[];
+    recentLimit: number;
+  };
+}
+
+export async function fetchStoreDashboard(): Promise<StoreDashboard> {
+  const res = await api.get(`${BASE}/dashboard`);
+  return unwrap<StoreDashboard>(res.data, '매장 요약 정보를 불러오지 못했습니다.');
+}
+
 // ── 장바구니 ────────────────────────────────────────────────────────────────
 
 export interface CartItem {
