@@ -1,0 +1,64 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "3-population",
+  "frozenSnapshotDigest": "2695464920e0ba3d7bceea6760f9df7cdd0a61e415414bfbddc0c9e823d87ba9",
+  "method": "동결 snapshot + 최신 LIVE 재계산. 파일럿 19,363 을 목표로 사용하지 않았다.",
+  "identifierMastersAll": 194561,
+  "linkedMasters": 19507,
+  "linkedItemSeq": 4782,
+  "mastersPerItemSeq": {
+    "6-20": 849,
+    "2-5": 3908,
+    "21-100": 24,
+    "100+": 1
+  },
+  "maxMastersPerItemSeq": 114,
+  "states": {
+    "PRODUCTION_READY": 19363,
+    "HOLD_ITEMSEQ_MAPPING": 0,
+    "HOLD_EXCLUDED": 42,
+    "HOLD_NO_API_SOURCE": 70,
+    "HOLD_SOURCE_DRIFT_DURING_RUN": 0,
+    "HOLD_SOURCE_INCOMPLETE": 32,
+    "HOLD_STRUCTURE_ANOMALY": 0
+  },
+  "holdTotal": 144,
+  "productionReadyRate": 99.26,
+  "readyItemSeq": 4739,
+  "holdReasons": {
+    "HOLD_NO_API_SOURCE:동결 snapshot 에 itemSeq 없음": 70,
+    "HOLD_SOURCE_INCOMPLETE:efcyQesitm,useMethodQesitm": 12,
+    "HOLD_EXCLUDED:PROFESSIONAL_USE": 42,
+    "HOLD_SOURCE_INCOMPLETE:efcyQesitm": 17,
+    "HOLD_SOURCE_INCOMPLETE:useMethodQesitm": 3
+  },
+  "integrity": {
+    "stateSumEqualsLinked": true,
+    "unclassified": 0,
+    "duplicateMasters": 0,
+    "frozenItemSeq": 4758,
+    "frozenItemSeqUnlinked": 0,
+    "candidateItemSeqMultipleRows": 0,
+    "readyWithoutSourceCandidate": 76,
+    "readyWithoutSourceHash": 0,
+    "koCanonicalDuplicatePerMaster": 0
+  },
+  "existingCanonical": {
+    "readyWithExistingKo": 19008,
+    "readyWithoutExistingKo": 355,
+    "holdWithExistingKo": 130,
+    "koSourceTypeDistribution": {
+      "mfds_drug_otc": 14993,
+      "mfds_easy_drug": 295,
+      "o4o_drug_otc_topical": 2188,
+      "mfds_drug_otc_nutrition_combo": 1662
+    }
+  },
+  "derivedTranslations": {
+    "readyWithEn": 18980,
+    "readyWithZh": 908,
+    "readyWithJa": 0,
+    "note": "이번 WO 에서 본문 write 0. 단계 10 에서 상태만 분류한다."
+  },
+  "dbWrites": 0
+}

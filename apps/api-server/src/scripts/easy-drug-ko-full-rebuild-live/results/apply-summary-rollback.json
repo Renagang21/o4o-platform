@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "11-rollback-test",
+  "mode": "rollback",
+  "concurrency": 6,
+  "startedAt": "2026-08-05T03:22:37.744Z",
+  "finishedAt": "2026-08-05T03:25:05.356Z",
+  "targets": 19363,
+  "statuses": {
+    "ROLLED_BACK": 19363
+  },
+  "problemQueue": [],
+  "systemFailures": 0
+}

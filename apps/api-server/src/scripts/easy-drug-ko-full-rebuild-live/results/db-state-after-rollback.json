@@ -1,0 +1,128 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "label": "after-rollback",
+  "takenAt": "2026-08-05T03:25:24.448Z",
+  "scopedByLangStatus": [
+    {
+      "lang": "en",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc",
+      "n": 14636
+    },
+    {
+      "lang": "en",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "n": 1884
+    },
+    {
+      "lang": "en",
+      "status": "canonical",
+      "sourceType": "o4o_drug_otc_topical",
+      "n": 2558
+    },
+    {
+      "lang": "en",
+      "status": "deprecated",
+      "sourceType": "mfds_drug_otc",
+      "n": 3
+    },
+    {
+      "lang": "ko",
+      "status": "candidate",
+      "sourceType": "mfds_easy_drug",
+      "n": 254
+    },
+    {
+      "lang": "ko",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc",
+      "n": 14990
+    },
+    {
+      "lang": "ko",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "n": 1662
+    },
+    {
+      "lang": "ko",
+      "status": "canonical",
+      "sourceType": "mfds_easy_drug",
+      "n": 295
+    },
+    {
+      "lang": "ko",
+      "status": "canonical",
+      "sourceType": "o4o_drug_otc_topical",
+      "n": 2188
+    },
+    {
+      "lang": "ko",
+      "status": "deprecated",
+      "sourceType": "mfds_drug_otc",
+      "n": 1139
+    },
+    {
+      "lang": "ko",
+      "status": "deprecated",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "n": 222
+    },
+    {
+      "lang": "ko",
+      "status": "deprecated",
+      "sourceType": "mfds_easy_drug",
+      "n": 18882
+    },
+    {
+      "lang": "ko",
+      "status": "deprecated",
+      "sourceType": "o4o_drug_otc_topical",
+      "n": 370
+    },
+    {
+      "lang": "zh",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc",
+      "n": 720
+    },
+    {
+      "lang": "zh",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc_nutrition_combo",
+      "n": 54
+    },
+    {
+      "lang": "zh",
+      "status": "canonical",
+      "sourceType": "o4o_drug_otc_topical",
+      "n": 138
+    }
+  ],
+  "global": {
+    "total": 178328,
+    "alive": 178306,
+    "canonical": 157332,
+    "easydrug": 19431,
+    "maxCreatedAt": "2026-08-05 00:45:50.095912",
+    "maxUpdatedAt": "2026-08-05 00:45:50.095912"
+  },
+  "otherLanguage": [
+    {
+      "lang": "en",
+      "n": 62962,
+      "contentDigest": "645cc34f491447c0304b04efbd1af4d1"
+    },
+    {
+      "lang": "zh",
+      "n": 31331,
+      "contentDigest": "a4e8266ecaf7a94a4866f1cf0f439435"
+    }
+  ],
+  "masterCounts": {
+    "productMasters": 239361,
+    "productIdentifiers": 621280
+  },
+  "dbWrites": 0
+}

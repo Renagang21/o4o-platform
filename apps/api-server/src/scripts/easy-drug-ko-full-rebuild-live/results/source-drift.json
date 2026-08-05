@@ -1,0 +1,40 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "2-freeze-source",
+  "endpoint": "https://apis.data.go.kr/1471000/DrbEasyDrugInfoService/getDrbEasyDrugList",
+  "pageSize": 500,
+  "pages": 10,
+  "runStartedAt": "2026-08-05T03:08:01.186Z",
+  "runFinishedAt": "2026-08-05T03:08:12.221Z",
+  "apiTotalCount": 4775,
+  "fetchedItems": 4758,
+  "duplicateItemSeqDropped": 17,
+  "failedPages": [],
+  "partialFailure": false,
+  "fallbackToPreviousSnapshot": false,
+  "withAllRequired": 4748,
+  "missingEfficacy": 9,
+  "missingUsage": 5,
+  "sectionPresence": {
+    "efcyQesitm": 4749,
+    "useMethodQesitm": 4753,
+    "atpnWarnQesitm": 1132,
+    "atpnQesitm": 4747,
+    "intrcQesitm": 3307,
+    "seQesitm": 4525,
+    "depositMethodQesitm": 4746
+  },
+  "distinctSourceHash": 3669,
+  "frozenSnapshotDigest": "2695464920e0ba3d7bceea6760f9df7cdd0a61e415414bfbddc0c9e823d87ba9",
+  "driftVsPilotSnapshot": {
+    "comparable": true,
+    "previousItemSeq": 4758,
+    "currentItemSeq": 4758,
+    "changedSourceHash": 0,
+    "addedItemSeq": 0,
+    "removedItemSeq": 0,
+    "changedSample": [],
+    "addedSample": [],
+    "removedSample": []
+  }
+}

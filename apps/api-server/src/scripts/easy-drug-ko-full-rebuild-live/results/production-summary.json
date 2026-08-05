@@ -1,0 +1,22 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "4-5-production",
+  "frozenSnapshotDigest": "2695464920e0ba3d7bceea6760f9df7cdd0a61e415414bfbddc0c9e823d87ba9",
+  "targets": 19363,
+  "built": 19363,
+  "problemQueue": 0,
+  "verdicts": {
+    "PRODUCTION_PASS": 19363
+  },
+  "axisHitMasters": {},
+  "distinctContentHash": 5318,
+  "distinctItemSeq": 4739,
+  "sameSourceSameOutput": {
+    "distinctSourceHash": 3654,
+    "sourceHashWithMultipleOutputs": 635
+  },
+  "htmlBytes": 72124320,
+  "htmlMB": 68.8,
+  "existingKoReadAsInput": false,
+  "dbWrites": 0
+}

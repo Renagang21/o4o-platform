@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "10-derived-translation-status",
+  "mode": "census",
+  "exposureContract": {
+    "publicPathsAcceptOnly": "status=canonical",
+    "hiddenIsNonExposed": true,
+    "residualRisk": "kpa_store_contents 로 이미 복사된 사본은 원본 status 를 재확인하지 않는다"
+  },
+  "scopedMasters": 19507,
+  "activeTranslationRows": 19993,
+  "classes": {
+    "RETRANSLATE_REQUIRED": 19888,
+    "WITHDRAW_TRANSLATION": 105,
+    "NO_TRANSLATION": 426
+  },
+  "byLangClass": {
+    "en:RETRANSLATE_REQUIRED": 18980,
+    "zh:RETRANSLATE_REQUIRED": 908,
+    "en:WITHDRAW_TRANSLATION": 101,
+    "zh:WITHDRAW_TRANSLATION": 4
+  },
+  "bodyWrites": 0,
+  "statusWrites": 0,
+  "hideBatchErrors": 0,
+  "hideTargets": 19993
+}

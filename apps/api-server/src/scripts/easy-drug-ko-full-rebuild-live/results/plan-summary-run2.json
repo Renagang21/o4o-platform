@@ -1,0 +1,27 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "7-8-plan-dry-run",
+  "tag": "run2",
+  "frozenSnapshotDigest": "2695464920e0ba3d7bceea6760f9df7cdd0a61e415414bfbddc0c9e823d87ba9",
+  "population": 19507,
+  "eligible": 19363,
+  "actions": {
+    "REPLACE_EXISTING_KO": 19008,
+    "CREATE_NEW_KO": 355,
+    "HOLD_NO_REPLACEMENT": 144
+  },
+  "expectedWrites": {
+    "insertCanonical": 19363,
+    "demoteExisting": 19008,
+    "withdrawInvalid": 0,
+    "noWrite": 144,
+    "otherLanguageWrites": 0,
+    "productMasterWrites": 0,
+    "productIdentifierWrites": 0
+  },
+  "guardMiss": 0,
+  "holdNoReplacementWithExistingKo": 130,
+  "planDigest": "ac7ed9249064c6488eaf4010acac6f276929f49bff06d9e5ac59dc865de9f87d",
+  "populationDigest": "e4fbc0c870339d151852a1c31a2d93d05b19c719fe47f48bdaf904a27468d6d9",
+  "dbWrites": 0
+}

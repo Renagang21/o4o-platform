@@ -1,0 +1,52 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "14-legacy-census",
+  "scopedMasters": 19507,
+  "koRowsAlive": 59368,
+  "activeKoRows": 19493,
+  "mastersWithDuplicateActiveKo": 0,
+  "mastersWithoutActiveKo": 14,
+  "activeKoOnHoldMasters": 130,
+  "classes": {
+    "TRANSLATION_DEPENDENCY": 20806,
+    "ARCHIVE_KEEP_FOR_AUDIT": 19008,
+    "ACTIVE_CURRENT_KO": 19363,
+    "MANUAL_REVIEW": 130,
+    "SAFE_TO_DELETE": 61
+  },
+  "samples": {
+    "TRANSLATION_DEPENDENCY": {
+      "masterId": "0042c41f-3c07-49a6-ada7-af6a74177b58",
+      "descId": "a2ce886d-c23b-4acc-bc81-4efddb88d2b4",
+      "status": "deprecated",
+      "sourceType": "mfds_easy_drug"
+    },
+    "ARCHIVE_KEEP_FOR_AUDIT": {
+      "masterId": "028a6fbd-bbeb-4e5a-b483-32d95e4fd72a",
+      "descId": "3b388da3-b22e-4c29-8e02-9365b49362fd",
+      "status": "deprecated",
+      "sourceType": "mfds_drug_otc"
+    },
+    "ACTIVE_CURRENT_KO": {
+      "masterId": "043f73e8-ae63-44f8-9e51-f7072691e934",
+      "descId": "d7d6bd1f-cf88-41e8-a4de-842752bf1f94",
+      "status": "canonical",
+      "sourceType": "mfds_easy_drug"
+    },
+    "MANUAL_REVIEW": {
+      "masterId": "02b12fb2-85aa-4817-b379-22acdf38a457",
+      "descId": "1f9e5edb-7cde-49e6-b950-5c8371febdfb",
+      "status": "canonical",
+      "sourceType": "mfds_drug_otc"
+    },
+    "SAFE_TO_DELETE": {
+      "masterId": "06712efc-26fd-43fa-b97e-3e5a3eafaaa1",
+      "descId": "98935004-87d6-4cf5-96de-039ad98e0285",
+      "status": "deprecated",
+      "sourceType": "mfds_drug_otc"
+    }
+  },
+  "referencedByStoreCopies": 0,
+  "physicalDeletePerformed": false,
+  "dbWrites": 0
+}

@@ -1,0 +1,33 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "12-post-verify-live",
+  "verifiedFromDb": true,
+  "appliedTargets": 19363,
+  "presentInDb": 19363,
+  "missingInDb": 0,
+  "generatedHashMismatch": 0,
+  "sourceTypeMismatch": 0,
+  "canonicalDuplicatePerMaster": 0,
+  "staleErrorCanonicalActive": 0,
+  "holdNewlyPublished": 0,
+  "holdWithPreexistingEasyDrugKo": 29,
+  "axisViolationMasters": {},
+  "axisFailedTotal": 0,
+  "otherLanguageUnchanged": true,
+  "otherLanguageNow": [
+    {
+      "lang": "en",
+      "n": 62962,
+      "contentDigest": "645cc34f491447c0304b04efbd1af4d1"
+    },
+    {
+      "lang": "zh",
+      "n": 31331,
+      "contentDigest": "a4e8266ecaf7a94a4866f1cf0f439435"
+    }
+  ],
+  "masterCountsUnchanged": true,
+  "samples": [],
+  "dbWrites": 0,
+  "result": "PASS"
+}

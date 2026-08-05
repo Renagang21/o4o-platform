@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "9-live-apply",
+  "mode": "live",
+  "concurrency": 6,
+  "startedAt": "2026-08-05T03:29:46.822Z",
+  "finishedAt": "2026-08-05T03:32:01.805Z",
+  "targets": 19363,
+  "statuses": {
+    "APPLIED": 19363
+  },
+  "problemQueue": [],
+  "systemFailures": 0
+}

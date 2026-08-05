@@ -1,0 +1,21 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-FULL-REBUILD-LIVE-PRODUCTION-V1",
+  "step": "6-independent-verification",
+  "importsProducer": false,
+  "productionReady": 19363,
+  "verified": 19363,
+  "passed": 19363,
+  "failed": 0,
+  "axisFailMasters": {},
+  "globalChecks": {
+    "holdProduced": 0,
+    "professionalProduced": 0,
+    "orphanLeaflet": 0,
+    "readyWithoutLeaflet": 0
+  },
+  "samples": [],
+  "inject": null,
+  "injectedMaster": null,
+  "dbWrites": 0,
+  "result": "PASS"
+}
