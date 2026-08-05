@@ -118,9 +118,11 @@ describe('배치 2 — 기존 메뉴 보존 및 무결성', () => {
     }
   });
 
-  it('leaf 총계가 기존 44 + 배치2 신규 3 + 회원 분류 1 = 48 이다', () => {
+  it('leaf 총계가 기존 44 + 배치2 신규 3 + 회원 분류 1 − Reports 3 = 45 이다', () => {
     // WO-O4O-ADMIN-MEMBERSHIP-CATEGORY-MENU-ROUTE-AND-EMPTY-STATE-V1 에서
     // Core 그룹에 'Member Categories' 1건이 추가되어 47 → 48 이 되었다.
-    expect(leaves).toHaveLength(48);
+    // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1 에서
+    // 'Reports'(신상신고) 그룹의 leaf 3건이 제거되어 48 → 45 가 되었다.
+    expect(leaves).toHaveLength(45);
   });
 });

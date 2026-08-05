@@ -107,12 +107,8 @@ export const OperatorCard: React.FC<UnifiedCardProps> = ({ config }) => {
           회원 관리
           <ArrowRight className="w-4 h-4" />
         </Link>
-        <Link
-          to="/admin/reporting/dashboard"
-          className="flex-1 flex items-center justify-center gap-1 px-3 py-2 text-sm text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
-        >
-          보고서
-        </Link>
+        {/* WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+            '보고서'(/admin/reporting/dashboard) 링크 제거 — 대상 화면과 백엔드가 제거됐다. */}
       </div>
     </div>
   );

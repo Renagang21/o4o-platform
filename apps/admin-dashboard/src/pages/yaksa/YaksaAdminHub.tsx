@@ -4,13 +4,12 @@
  * Phase 19-D: 통합 행정 대시보드 UI
  * 운영자가 매일 첫 화면으로 여는 "한 장의 화면"
  *
- * 6 Widgets:
+ * 5 Widgets:
  * 1. 미납/연체 청구서 (annualfee)
  * 2. 면허 만료/갱신 임박 (membership)
  * 3. 교육 미이수/기한 임박 (lms)
- * 4. 승인 대기 신고서 (reporting)
- * 5. 자동화 실패 큐 (scheduler failure queue)
- * 6. Scheduler 상태/헬스 (jobs/last run/next run)
+ * 4. 자동화 실패 큐 (scheduler failure queue)
+ * 5. Scheduler 상태/헬스 (jobs/last run/next run)
  *
  * Important: NO action buttons - Human-in-the-Loop maintained
  */
@@ -25,7 +24,6 @@ import {
   CreditCard,
   Shield,
   BookOpen,
-  FileText,
   AlertTriangle,
   Activity,
   RefreshCw,
@@ -44,14 +42,18 @@ import {
   OverdueInvoiceWidget,
   ExpiringVerificationWidget,
   PendingAssignmentWidget,
-  PendingReportWidget,
   FailureQueueWidget,
   SchedulerHealthWidget,
   AdminAlert,
 } from '@/lib/api/yaksaScheduler';
 
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   본 화면이 소비하는 위젯 집합에서 `pendingReports`(신상신고) 를 제외한다.
+//   `IntegratedDashboardData`(yaksa-scheduler 계약)는 변경하지 않는다.
+type HubDashboardData = Omit<IntegratedDashboardData, 'pendingReports'>;
+
 // Mock data for development/fallback
-const MOCK_DATA: IntegratedDashboardData = {
+const MOCK_DATA: HubDashboardData = {
   overdueInvoices: {
     totalCount: 5,
     totalAmount: 250000,
@@ -78,15 +80,6 @@ const MOCK_DATA: IntegratedDashboardData = {
       { id: '2', memberName: '윤약사', courseName: '신규 의약품 교육', assignedAt: new Date('2024-11-01'), dueDate: new Date('2024-12-20'), daysRemaining: 7 },
     ],
   },
-  pendingReports: {
-    draftCount: 3,
-    reviewedCount: 5,
-    failedSubmissionCount: 1,
-    items: [
-      { id: '1', reportType: '연간 업무 보고서', reportYear: 2024, submitterName: '관리자', status: 'draft', submittedAt: undefined },
-      { id: '2', reportType: '분기별 현황 보고', reportYear: 2024, submitterName: '담당자', status: 'reviewed', submittedAt: new Date('2024-12-10') },
-    ],
-  },
   failureQueue: {
     pendingCount: 2,
     exhaustedCount: 0,
@@ -109,7 +102,7 @@ const MOCK_DATA: IntegratedDashboardData = {
 
 export default function YaksaAdminHub() {
   const { user } = useAuth();
-  const [dashboardData, setDashboardData] = useState<IntegratedDashboardData | null>(null);
+  const [dashboardData, setDashboardData] = useState<HubDashboardData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -281,7 +274,7 @@ export default function YaksaAdminHub() {
         </div>
       )}
 
-      {/* 6 Widget Grid - 2 rows x 3 columns */}
+      {/* 5 Widget Grid */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Widget 1: 미납/연체 청구서 */}
         <OverdueInvoicesCard data={dashboardData.overdueInvoices} />
@@ -292,8 +285,8 @@ export default function YaksaAdminHub() {
         {/* Widget 3: 교육 미이수/기한 임박 */}
         <PendingAssignmentsCard data={dashboardData.pendingAssignments} />
 
-        {/* Widget 4: 승인 대기 신고서 */}
-        <PendingReportsCard data={dashboardData.pendingReports} />
+        {/* Widget 4 (승인 대기 신고서) 는
+            WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1 로 제거됐다. */}
 
         {/* Widget 5: 자동화 실패 큐 */}
         <FailureQueueCard data={dashboardData.failureQueue} />
@@ -484,65 +477,10 @@ function PendingAssignmentsCard({ data }: PendingAssignmentsCardProps) {
   );
 }
 
-interface PendingReportsCardProps {
-  data: PendingReportWidget;
-}
-
-function PendingReportsCard({ data }: PendingReportsCardProps) {
-  const totalPending = data.draftCount + data.reviewedCount;
-  const urgencyClass = data.failedSubmissionCount > 0 ? 'border-red-500' : totalPending > 5 ? 'border-yellow-500' : 'border-green-500';
-
-  return (
-    <Card className={`border-l-4 ${urgencyClass}`}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <div>
-          <CardTitle className="text-base font-medium flex items-center gap-2">
-            <FileText className="h-5 w-5 text-purple-500" />
-            승인 대기 신고서
-          </CardTitle>
-          <CardDescription>reporting-yaksa</CardDescription>
-        </div>
-        <Link
-          to="/admin/reporting/submissions"
-          className="text-sm text-primary hover:underline flex items-center"
-        >
-          상세보기 <ChevronRight className="h-4 w-4" />
-        </Link>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
-          <div className="grid grid-cols-3 gap-2">
-            <div className="text-center p-2 bg-gray-50 rounded-lg">
-              <div className="text-xl font-bold text-gray-600">{data.draftCount}</div>
-              <div className="text-xs text-muted-foreground">초안</div>
-            </div>
-            <div className="text-center p-2 bg-blue-50 rounded-lg">
-              <div className="text-xl font-bold text-blue-600">{data.reviewedCount}</div>
-              <div className="text-xs text-muted-foreground">검토됨</div>
-            </div>
-            <div className="text-center p-2 bg-red-50 rounded-lg">
-              <div className="text-xl font-bold text-red-600">{data.failedSubmissionCount}</div>
-              <div className="text-xs text-muted-foreground">실패</div>
-            </div>
-          </div>
-          {data.items.length > 0 && (
-            <div className="space-y-2 pt-2 border-t">
-              <div className="text-xs font-medium text-muted-foreground">최근 대기</div>
-              {data.items.slice(0, 2).map((item) => (
-                <div key={item.id} className="flex items-center justify-between text-sm">
-                  <span className="truncate max-w-[140px]">{item.reportType}</span>
-                  <Badge variant="outline" className="text-xs">
-                    {item.status === 'draft' ? '초안' : item.status === 'reviewed' ? '검토됨' : item.status}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </CardContent>
-    </Card>
-  );
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   PendingReportsCard(승인 대기 신고서 widget) 제거 —
+//   '상세보기' 는 존재한 적 없는 `/admin/reporting/submissions` 로 향했고,
+//   reporting-yaksa 백엔드가 없어 값은 항상 mock fallback 이었다.
 
 interface FailureQueueCardProps {
   data: FailureQueueWidget;

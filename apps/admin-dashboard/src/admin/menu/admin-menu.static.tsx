@@ -472,29 +472,8 @@ export const adminMenuStatic: MenuItem[] = [
     path: '/admin/service-content-manager',
   },
 
-  {
-    id: 'reporting',
-    label: 'Reports',
-    icon: <ClipboardList className="w-5 h-5" />,
-    children: [
-      {
-        id: 'reporting-overview',
-        label: 'Overview',
-        icon: <BarChart2 className="w-4 h-4" />,
-        path: '/admin/reporting/dashboard',
-      },
-      {
-        id: 'reporting-submissions',
-        label: 'Submissions',
-        icon: <FileText className="w-4 h-4" />,
-        path: '/admin/reporting/reports',
-      },
-      {
-        id: 'reporting-templates',
-        label: 'Templates',
-        icon: <ClipboardList className="w-4 h-4" />,
-        path: '/admin/reporting/templates',
-      },
-    ],
-  },
+  // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+  //   'Reports'(신상신고) 메뉴 그룹 3개 leaf 제거 —
+  //   Overview / Submissions / Templates 화면이 호출하는 `/reporting/*` API 는
+  //   백엔드에 mount 된 적이 없어 전부 404 였다(죽은 링크).
 ];

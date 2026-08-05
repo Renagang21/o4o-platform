@@ -10,7 +10,6 @@
 import { Link } from 'react-router-dom';
 import {
   UserCheck,
-  FileText,
   Users,
   GraduationCap,
   CreditCard,
@@ -38,15 +37,9 @@ const MENU_CARDS: MenuCard[] = [
     badge: 'Approval',
     badgeColor: 'bg-blue-100 text-blue-700',
   },
-  {
-    id: 'reports',
-    title: '신상신고 승인',
-    description: '제출된 신상신고서 검토 및 승인',
-    icon: <FileText className="h-8 w-8" />,
-    path: '/admin/yaksa/reports',
-    badge: 'Approval',
-    badgeColor: 'bg-blue-100 text-blue-700',
-  },
+  // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+  //   '신상신고 승인' 카드 제거 — 연결 대상 `/admin/yaksa/reports` 화면과
+  //   그 백엔드 도메인이 존재하지 않는다(항상 404).
   {
     id: 'officers',
     title: '임원 관리',

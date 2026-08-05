@@ -33,7 +33,6 @@ interface MemberNotification {
     daysUntilDeadline?: number;
     year?: number;
     amount?: number;
-    reportId?: string;
     courseId?: string;
     courseName?: string;
     rejectReason?: string;
@@ -50,7 +49,7 @@ const NOTIFICATION_DEEP_LINKS: Record<string, string> = {
   'member.verification_expired': '/member/profile',
   'member.fee_overdue_warning': '/member/fees',
   'member.fee_overdue': '/member/fees',
-  'member.report_rejected': '/member/reports', // Will append :id if available
+  // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1: 'member.report_rejected' 제거 (`/member/reports` route 부재)
   'member.education_deadline': '/member/lms/required-courses',
 };
 
@@ -61,7 +60,6 @@ const NOTIFICATION_META: Record<string, { icon: string; label: string; color: st
   'member.verification_expired': { icon: '🔒', label: '자격 검증 만료', color: 'red' },
   'member.fee_overdue_warning': { icon: '💳', label: '회비 납부 예정', color: 'yellow' },
   'member.fee_overdue': { icon: '🚨', label: '회비 연체', color: 'red' },
-  'member.report_rejected': { icon: '📋', label: '신고서 반려', color: 'red' },
   'member.education_deadline': { icon: '📚', label: '교육 마감 임박', color: 'yellow' },
 };
 
@@ -151,11 +149,6 @@ export function MemberNotifications() {
 
     // Get deep link
     let targetPath = NOTIFICATION_DEEP_LINKS[notification.type] || '/member';
-
-    // Special handling for report_rejected with reportId
-    if (notification.type === 'member.report_rejected' && notification.metadata?.reportId) {
-      targetPath = `/member/reports/${notification.metadata.reportId}`;
-    }
 
     // Special handling for education_deadline with courseId
     if (notification.type === 'member.education_deadline' && notification.metadata?.courseId) {

@@ -7,7 +7,6 @@
  *
  * 4개 탭:
  * - 내 자격 (membership-yaksa)
- * - 내 신고 (reporting-yaksa)
  * - 내 회비 (annualfee-yaksa)
  * - 내 교육 (lms-yaksa)
  */
@@ -48,18 +47,7 @@ interface MemberSummary {
   lastVerifiedAt?: string;
 }
 
-interface ReportSummary {
-  currentYear: number;
-  latestReport?: {
-    id: string;
-    year: number;
-    status: 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'SUBMITTED' | 'REJECTED';
-    submittedAt?: string;
-    updatedAt: string;
-  };
-  pendingCount: number;
-  totalCount: number;
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1: ReportSummary 타입 제거 (`/reporting/my-report` 부재)
 
 interface FeeSummary {
   currentYear: number;
@@ -81,16 +69,14 @@ interface EducationSummary {
 
 interface DashboardData {
   member: MemberSummary | null;
-  report: ReportSummary | null;
   fee: FeeSummary | null;
   education: EducationSummary | null;
 }
 
-type TabId = 'qualification' | 'reports' | 'fees' | 'education';
+type TabId = 'qualification' | 'fees' | 'education';
 
 const TABS: { id: TabId; label: string; icon: string }[] = [
   { id: 'qualification', label: '내 자격', icon: '🪪' },
-  { id: 'reports', label: '내 신고', icon: '📋' },
   { id: 'fees', label: '내 회비', icon: '💳' },
   { id: 'education', label: '내 교육', icon: '📚' },
 ];
@@ -100,7 +86,6 @@ export function MemberHome() {
   const [activeTab, setActiveTab] = useState<TabId>('qualification');
   const [data, setData] = useState<DashboardData>({
     member: null,
-    report: null,
     fee: null,
     education: null,
   });
@@ -174,16 +159,14 @@ export function MemberHome() {
 
     try {
       // 병렬로 각 앱의 summary API 호출
-      const [memberRes, reportRes, feeRes, educationRes] = await Promise.allSettled([
+      const [memberRes, feeRes, educationRes] = await Promise.allSettled([
         authClient.api.get('/membership/members/me/summary'),
-        authClient.api.get('/reporting/my-report'),
         authClient.api.get('/annualfee/members/me/summary'),
         authClient.api.get('/lms/yaksa/member/dashboard'),
       ]);
 
       setData({
         member: memberRes.status === 'fulfilled' ? memberRes.value.data?.data : null,
-        report: reportRes.status === 'fulfilled' ? transformReportData(reportRes.value.data) : null,
         fee: feeRes.status === 'fulfilled' ? feeRes.value.data?.data : null,
         education: educationRes.status === 'fulfilled' ? transformEducationData(educationRes.value.data) : null,
       });
@@ -311,7 +294,6 @@ export function MemberHome() {
         )}
 
         {activeTab === 'qualification' && <QualificationTab data={data.member} />}
-        {activeTab === 'reports' && <ReportsTab data={data.report} />}
         {activeTab === 'fees' && <FeesTab data={data.fee} />}
         {activeTab === 'education' && <EducationTab data={data.education} />}
       </div>
@@ -446,9 +428,6 @@ function StatusDot({ tab, data }: { tab: TabId; data: DashboardData }) {
     case 'qualification':
       hasIssue = data.member?.memberStatus !== 'active' || data.member?.licenseStatus !== 'valid';
       break;
-    case 'reports':
-      hasIssue = (data.report?.pendingCount || 0) > 0;
-      break;
     case 'fees':
       hasIssue = data.fee?.status === 'unpaid' || data.fee?.status === 'overdue';
       break;
@@ -536,102 +515,8 @@ function QualificationTab({ data }: { data: MemberSummary | null }) {
   );
 }
 
-// ===== Reports Tab =====
-function ReportsTab({ data }: { data: ReportSummary | null }) {
-  if (!data) {
-    return (
-      <EmptyCard
-        icon="📋"
-        title="신고서 정보를 불러올 수 없습니다"
-        description="아직 신고서가 없거나 일시적인 오류일 수 있습니다."
-      />
-    );
-  }
-
-  const { latestReport } = data;
-
-  return (
-    <div className="space-y-6">
-      {/* 상태 요약 */}
-      <div className="bg-white rounded-lg border border-gray-200 p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-gray-900">
-            {data.currentYear}년 신상신고서
-          </h3>
-          {latestReport && (
-            <Badge variant={getReportStatusVariant(latestReport.status)}>
-              {getReportStatusLabel(latestReport.status)}
-            </Badge>
-          )}
-        </div>
-
-        {latestReport ? (
-          <div className="space-y-3">
-            <InfoRow
-              label="상태"
-              value={getReportStatusLabel(latestReport.status)}
-            />
-            {latestReport.submittedAt && (
-              <InfoRow
-                label="제출일"
-                value={formatDate(latestReport.submittedAt)}
-              />
-            )}
-            <InfoRow
-              label="최근 수정"
-              value={formatDate(latestReport.updatedAt)}
-            />
-          </div>
-        ) : (
-          <div className="text-center py-6">
-            <span className="text-4xl block mb-2">📝</span>
-            <p className="text-gray-600 mb-4">아직 신고서가 작성되지 않았습니다.</p>
-            <Link
-              to="/member/reports/new"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              신고서 작성하기
-            </Link>
-          </div>
-        )}
-      </div>
-
-      {/* 통계 */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-          <p className="text-sm text-gray-500 mb-1">총 신고서</p>
-          <p className="text-2xl font-bold text-gray-900">{data.totalCount}</p>
-        </div>
-        <div className="bg-white rounded-lg border border-gray-200 p-4 text-center">
-          <p className="text-sm text-gray-500 mb-1">처리 대기</p>
-          <p className={`text-2xl font-bold ${data.pendingCount > 0 ? 'text-orange-600' : 'text-gray-400'}`}>
-            {data.pendingCount}
-          </p>
-        </div>
-      </div>
-
-      {/* 딥링크 */}
-      <div className="flex gap-3">
-        <Link
-          to="/member/reports"
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
-        >
-          <span>📋</span>
-          <span>신고서 목록</span>
-        </Link>
-        {latestReport && (
-          <Link
-            to={`/member/reports/${latestReport.id}`}
-            className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            <span>📝</span>
-            <span>신고서 상세</span>
-          </Link>
-        )}
-      </div>
-    </div>
-  );
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1: ReportsTab('내 신고') 제거 —
+//   `/reporting/my-report` 는 404 이고 `/member/reports*` route 도 존재한 적이 없다.
 
 // ===== Fees Tab =====
 function FeesTab({ data }: { data: FeeSummary | null }) {
@@ -974,28 +859,6 @@ function getLicenseStatusLabel(status: string): string {
   return labels[status] || status;
 }
 
-function getReportStatusLabel(status: string): string {
-  const labels: Record<string, string> = {
-    DRAFT: '작성 중',
-    REVIEWED: '검토 중',
-    APPROVED: '승인됨',
-    SUBMITTED: '제출됨',
-    REJECTED: '반려됨',
-  };
-  return labels[status] || status;
-}
-
-function getReportStatusVariant(status: string): 'success' | 'warning' | 'error' | 'info' | 'neutral' {
-  const variants: Record<string, 'success' | 'warning' | 'error' | 'info' | 'neutral'> = {
-    DRAFT: 'neutral',
-    REVIEWED: 'info',
-    APPROVED: 'success',
-    SUBMITTED: 'info',
-    REJECTED: 'error',
-  };
-  return variants[status] || 'neutral';
-}
-
 function getFeeStatusLabel(status: string): string {
   const labels: Record<string, string> = {
     paid: '납부 완료',
@@ -1016,29 +879,7 @@ function getFeeStatusVariant(status: string): 'success' | 'warning' | 'error' | 
   return variants[status] || 'neutral';
 }
 
-function transformReportData(response: any): ReportSummary | null {
-  if (!response?.success || !response?.data) {
-    return {
-      currentYear: new Date().getFullYear(),
-      pendingCount: 0,
-      totalCount: 0,
-    };
-  }
-
-  const report = response.data;
-  return {
-    currentYear: new Date().getFullYear(),
-    latestReport: {
-      id: report.id,
-      year: report.year,
-      status: report.status,
-      submittedAt: report.submittedAt,
-      updatedAt: report.updatedAt,
-    },
-    pendingCount: report.status === 'DRAFT' || report.status === 'REJECTED' ? 1 : 0,
-    totalCount: 1, // API에서 상세 조회 시에는 1건만 반환
-  };
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1: transformReportData 제거
 
 function transformEducationData(response: any): EducationSummary | null {
   if (!response) return null;
@@ -1065,7 +906,6 @@ const NOTIFICATION_DEEP_LINKS: Record<string, string> = {
   'member.verification_expired': '/member/profile',
   'member.fee_overdue_warning': '/member/fees',
   'member.fee_overdue': '/member/fees',
-  'member.report_rejected': '/member/reports',
   'member.education_deadline': '/member/lms/required-courses',
 };
 
@@ -1085,11 +925,6 @@ function NotificationPanel({
   const getDeepLink = (notification: MemberNotification): string => {
     let targetPath = NOTIFICATION_DEEP_LINKS[notification.type] || '/member';
 
-    // Special handling for report_rejected with reportId
-    if (notification.type === 'member.report_rejected' && notification.metadata?.reportId) {
-      targetPath = `/member/reports/${notification.metadata.reportId}`;
-    }
-
     // Special handling for education_deadline with courseId
     if (notification.type === 'member.education_deadline' && notification.metadata?.courseId) {
       targetPath = `/member/lms/course/${notification.metadata.courseId}`;
@@ -1105,7 +940,6 @@ function NotificationPanel({
       'member.verification_expired': '🔒',
       'member.fee_overdue_warning': '💳',
       'member.fee_overdue': '🚨',
-      'member.report_rejected': '📋',
       'member.education_deadline': '📚',
     };
     return icons[type] || '🔔';

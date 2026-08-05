@@ -8,7 +8,6 @@
  *
  * [Scope Included]
  * - Membership Approval (membership-yaksa)
- * - Reporting Review (reporting-yaksa)
  * - Officer Assign (organization-core)
  * - Education Overview (lms-yaksa, READ ONLY)
  * - Fee Overview (annualfee-yaksa, READ ONLY)
@@ -54,28 +53,11 @@ export interface MemberListResponse {
   limit: number;
 }
 
-// ============================================
-// Types - Reporting
-// ============================================
-
-export interface YaksaReport {
-  id: string;
-  memberId: string;
-  memberName?: string;
-  status: 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'REJECTED';
-  reportType: 'PROFILE_UPDATE' | 'LICENSE_CHANGE' | 'WORKPLACE_CHANGE' | 'AFFILIATION_CHANGE';
-  confidence?: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface ReportListResponse {
-  success: boolean;
-  data: YaksaReport[];
-  total: number;
-  page: number;
-  limit: number;
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   Reporting 타입(`YaksaReport` · `ReportListResponse`) 제거 —
+//   이 계약을 제공해야 할 `@o4o/reporting-yaksa` 는 저장소에 소스가 없고
+//   `/api/v1/yaksa/reports*` 는 mount 된 적이 없다(항상 404).
+//   근거: docs/checks/WO-O4O-YAKSA-REPORTS-ROUTED-UI-API-CONTRACT-AND-404-RECOVERY-AUDIT-V1-CHECK.md
 
 // ============================================
 // Types - Organization / Officer
@@ -201,46 +183,10 @@ export async function rejectMember(verificationId: string, data: {
   return response.data;
 }
 
-// ============================================
-// API Functions - Reporting Review
-// ============================================
-
-/**
- * 신상신고 목록 조회
- */
-export async function getReports(params: {
-  status?: 'DRAFT' | 'REVIEWED' | 'APPROVED' | 'REJECTED';
-  reportType?: string;
-  page?: number;
-  limit?: number;
-}): Promise<ReportListResponse> {
-  const response = await apiClient.get('/api/v1/yaksa/reports', { params });
-  return response.data;
-}
-
-/**
- * 신상신고 상세 조회
- */
-export async function getReportDetail(reportId: string): Promise<{ success: boolean; data: YaksaReport }> {
-  const response = await apiClient.get(`/api/v1/yaksa/reports/${reportId}`);
-  return response.data;
-}
-
-/**
- * 신상신고 승인
- */
-export async function approveReport(reportId: string): Promise<{ success: boolean }> {
-  const response = await apiClient.post(`/api/v1/yaksa/reports/${reportId}/approve`);
-  return response.data;
-}
-
-/**
- * 신상신고 반려
- */
-export async function rejectReport(reportId: string, reason: string): Promise<{ success: boolean }> {
-  const response = await apiClient.post(`/api/v1/yaksa/reports/${reportId}/reject`, { reason });
-  return response.data;
-}
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   Reporting Review 4 helper(`getReports` · `getReportDetail` ·
+//   `approveReport` · `rejectReport`) 제거 — 대상 endpoint 가 존재하지 않는다.
+//   membership verification 승인 API 로 치환하지 않는다(승인 대상 도메인이 다름).
 
 // ============================================
 // API Functions - Officer Management

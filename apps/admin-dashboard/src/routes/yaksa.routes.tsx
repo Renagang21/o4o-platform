@@ -17,10 +17,12 @@ const AuditLogManagement = lazy(() => import('@/pages/membership/audit-logs/Audi
 //   (AffiliationService 는 회원별·조직별 조회만 제공). 소속 관리 기능이 실제로
 //   필요해지면 권한·범위·필터 계약을 새로 설계한다.
 
-// Reporting-Yaksa: Annual Report Management
-const ReportingDashboard = lazy(() => import('@/pages/reporting/dashboard/ReportingDashboard'));
-const ReportList = lazy(() => import('@/pages/reporting/reports/ReportList'));
-const TemplateList = lazy(() => import('@/pages/reporting/templates/TemplateList'));
+// WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+//   Reporting-Yaksa(신상신고) 화면 4 route 제거 — `/admin/reporting`,
+//   `/admin/reporting/dashboard`, `/admin/reporting/reports`, `/admin/reporting/templates`.
+//   백엔드 `@o4o/reporting-yaksa` 는 저장소에 소스가 없고 router 가 mount 된 적이 없어
+//   화면이 호출하는 모든 endpoint 가 404 였다. 회원 제출 경로도 존재하지 않는다.
+//   근거: docs/checks/WO-O4O-YAKSA-REPORTS-ROUTED-UI-API-CONTRACT-AND-404-RECOVERY-AUDIT-V1-CHECK.md
 
 // Yaksa Admin Hub (Phase 19-D)
 const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
@@ -28,7 +30,6 @@ const YaksaAdminHub = lazy(() => import('@/pages/yaksa/YaksaAdminHub'));
 // Yaksa Admin - Phase 1 Approval & Overview UI
 const YaksaAdminDashboard = lazy(() => import('@/pages/yaksa-admin/YaksaAdminDashboard'));
 const MemberApprovalPage = lazy(() => import('@/pages/yaksa-admin/MemberApprovalPage'));
-const ReportReviewPage = lazy(() => import('@/pages/yaksa-admin/ReportReviewPage'));
 const OfficerManagePage = lazy(() => import('@/pages/yaksa-admin/OfficerManagePage'));
 const EducationOverviewPage = lazy(() => import('@/pages/yaksa-admin/EducationOverviewPage'));
 const FeeOverviewPage = lazy(() => import('@/pages/yaksa-admin/FeeOverviewPage'));
@@ -47,7 +48,7 @@ const PageLoader = () => (
 );
 
 /**
- * Yaksa routes — membership, reporting, yaksa admin, accounting
+ * Yaksa routes — membership, yaksa admin, accounting
  */
 export function YaksaRoutes() {
   return [
@@ -102,36 +103,6 @@ export function YaksaRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    // Reporting-Yaksa: 신상신고 관리
-    <Route key="/admin/reporting" path="/admin/reporting" element={
-      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
-        <Suspense fallback={<PageLoader />}>
-          <ReportingDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/reporting/dashboard" path="/admin/reporting/dashboard" element={
-      <AdminProtectedRoute requiredPermissions={['reporting:view']}>
-        <Suspense fallback={<PageLoader />}>
-          <ReportingDashboard />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/reporting/reports" path="/admin/reporting/reports" element={
-      <AdminProtectedRoute requiredPermissions={['reporting:view', 'reporting:manage']}>
-        <Suspense fallback={<PageLoader />}>
-          <ReportList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/admin/reporting/templates" path="/admin/reporting/templates" element={
-      <AdminProtectedRoute requiredPermissions={['reporting:manage']}>
-        <Suspense fallback={<PageLoader />}>
-          <TemplateList />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
-
     // Yaksa Admin Hub - Integrated Dashboard (Phase 19-D)
     <Route key="/admin/yaksa-hub" path="/admin/yaksa-hub" element={
       <AdminProtectedRoute requiredPermissions={['yaksa-scheduler.job.read']}>
@@ -167,13 +138,9 @@ export function YaksaRoutes() {
         </Suspense>
       </AdminProtectedRoute>
     } />,
-    <Route key="/admin/yaksa/reports" path="/admin/yaksa/reports" element={
-      <AdminProtectedRoute requiredPermissions={['yaksa-admin.reports.review']}>
-        <Suspense fallback={<PageLoader />}>
-          <ReportReviewPage />
-        </Suspense>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-YAKSA-REPORTS-NONFUNCTIONAL-UI-AND-DEAD-CONTRACT-REMOVAL-V1
+    //   `/admin/yaksa/reports`(신상신고 승인) route 제거 — 메뉴에서 도달은 됐지만
+    //   목록·승인·반려 3 API 가 모두 404 였고 승인 대상 신고서를 만들 제출 경로도 없었다.
     <Route key="/admin/yaksa/officers" path="/admin/yaksa/officers" element={
       <AdminProtectedRoute requiredPermissions={['yaksa-admin.officers.assign']}>
         <Suspense fallback={<PageLoader />}>
