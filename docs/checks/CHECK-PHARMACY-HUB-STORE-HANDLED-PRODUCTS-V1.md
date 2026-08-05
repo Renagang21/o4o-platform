@@ -60,6 +60,14 @@ Pharmacy-Hub 전용 service-scoped 라우트 추가
 > 항상 2 이므로, 원본 라우트의 `del.length === 0` NOT_FOUND 판정은 **한 번도 성립하지 않았다.**
 > 추출 함수는 `affectedRows()` 로 rowCount 를 보고 판정한다.
 
+> **추출 시 자체 유입 회귀 1건 — 수정 완료.** 최초 추출본에서 `updateLocalProduct` ·
+> `deactivateLocalProduct` 에 UUID 형식 가드(`UUID_RE`)를 넣었으나, 원본 라우트는 이 가드를
+> `GET /local-products/:id` 에만 두고 PUT·DELETE 에는 두지 않았다. 그 결과 비-uuid id 가
+> `repo.findOne` 에 닿기 전에 404 로 단락되어 `store-local-product-description.spec.ts` 4건이
+> 실패했다. 두 함수에서 가드를 제거해 **동작 불변**을 복원했고(`getLocalProduct` 의 가드는 원본과
+> 동일하므로 유지), `npx jest --maxWorkers=1` 전량 통과를 확인했다 —
+> **73 suites / 1,306 tests PASS**.
+
 ### 1-2. Pharmacy-Hub 전용 라우트
 
 `apps/api-server/src/routes/pharmacy-hub/pharmacy-hub.routes.ts` — 전부 `storeOwnerGuards`

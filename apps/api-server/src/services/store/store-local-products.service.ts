@@ -219,9 +219,8 @@ export async function updateLocalProduct(
   productId: string,
   body: any,
 ): Promise<ServiceResult<StoreLocalProduct>> {
+  // 원본 PUT 라우트는 UUID 형식 가드를 두지 않았다 (repo.findOne 이 처리) — 동작 불변을 위해 유지하지 않는다.
   const repo = dataSource.getRepository(StoreLocalProduct);
-  if (!UUID_RE.test(productId)) return NOT_FOUND;
-
   const existing = await repo.findOne({ where: { id: productId, organizationId } });
   if (!existing) return NOT_FOUND;
 
@@ -273,8 +272,7 @@ export async function deactivateLocalProduct(
   organizationId: string,
   productId: string,
 ): Promise<ServiceResult<{ id: string; isActive: false }>> {
-  if (!UUID_RE.test(productId)) return NOT_FOUND;
-
+  // 원본 DELETE 라우트도 UUID 형식 가드가 없다 — 동작 불변.
   // TypeORM(postgres) 는 UPDATE 결과를 [rows, rowCount] 로 돌려준다 — 원본 라우트와 동일한 판정.
   const raw: any = await dataSource.query(
     `UPDATE store_local_products SET is_active = false, updated_at = now()
