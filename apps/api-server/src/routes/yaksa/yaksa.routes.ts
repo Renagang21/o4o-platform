@@ -27,7 +27,6 @@ function requireYaksaScope(requiredScope: string) {
     if (
       userScopes.includes(requiredScope) ||
       userScopes.includes('yaksa:admin') ||
-      authReq.user?.roles?.includes('platform:admin') ||
       authReq.user?.roles?.includes('platform:super_admin')
     ) {
       return next();

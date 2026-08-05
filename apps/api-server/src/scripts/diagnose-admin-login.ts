@@ -240,9 +240,9 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     );
     logger.info(`   role_assignments: ${raCheck.map(r => r.role).join(', ') || 'none'}`);
 
-    const hasAdminRole = raCheck.some(r =>
-      r.role === UserRole.ADMIN || r.role === UserRole.SUPER_ADMIN
-    );
+    // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+    //   UserRole.ADMIN('platform:admin') 제거 → 플랫폼 전역 관리자는 super_admin 뿐.
+    const hasAdminRole = raCheck.some(r => r.role === UserRole.SUPER_ADMIN);
 
     if (!hasAdminRole) {
       results.push({

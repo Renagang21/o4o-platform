@@ -10,7 +10,7 @@
  * 검증 대상
  *   1. 비로그인 → 401 (GET / PUT / POST 전부)
  *   2. 일반 사용자·비허용 서비스 역할 → 403
- *   3. platform:admin / platform:super_admin → handler 도달
+ *   3. platform:super_admin → handler 도달
  *   4. 인증 실패 시 handler·service 계층이 실행되지 않는다
  *   5. 모든 endpoint 가 guard 아래에 있다 (소스 계약 — 신규 endpoint 를 guard 위에
  *      추가하면 실패한다)
@@ -28,7 +28,7 @@ import request from 'supertest';
 //   한다. 여기서는 같은 계약(401 / 403 / next)의 대역을 주입하고,
 //   실제 미들웨어가 연결돼 있다는 사실은 아래 "소스 계약" 블록에서 확인한다.
 // ─────────────────────────────────────────────────────
-const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
+const PLATFORM_ADMIN_ROLES = ['platform:super_admin'];
 
 jest.mock('../middleware/auth.middleware.js', () => ({
   authenticate: (req: Request, res: Response, next: NextFunction) => {
@@ -118,7 +118,6 @@ beforeEach(() => {
   app = buildApp();
 });
 
-const ADMIN = ['x-test-roles', 'platform:admin'] as const;
 const SUPER_ADMIN = ['x-test-roles', 'platform:super_admin'] as const;
 const PLAIN_USER = ['x-test-roles', 'customer'] as const;
 
@@ -195,14 +194,8 @@ describe('비허용 역할', () => {
 // 3. 허용 역할 → handler 도달
 // ─────────────────────────────────────────────────────
 describe('플랫폼 관리자', () => {
-  it.each(ENDPOINTS)('platform:admin %s %s → guard 통과', async (method, url) => {
-    const res = await (request(app) as any)[method](url)
-      .set(...ADMIN)
-      .send({ tenantId: 'test-tenant' });
-    expect(res.status).not.toBe(401);
-    expect(res.status).not.toBe(403);
-  });
-
+  // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+  //   legacy 'platform:admin' 통과 케이스 제거 (역할 자체가 삭제됨).
   it.each(ENDPOINTS)('platform:super_admin %s %s → guard 통과', async (method, url) => {
     const res = await (request(app) as any)[method](url)
       .set(...SUPER_ADMIN)

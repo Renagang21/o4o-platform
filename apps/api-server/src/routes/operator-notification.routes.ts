@@ -28,7 +28,7 @@ router.use(requireAuth);
 //   ⚠️ 서비스 운영자(kpa:operator / neture:operator 등)에게 알림 설정을 열지 여부는
 //      **정책 결정 사항**이라 본 WO 범위에서 제외했다. 따라서 이 엔드포인트는 여전히
 //      플랫폼 관리자 전용이다. (후속: WO-…-OPERATOR-NOTIFICATION-SERVICE-SCOPE-POLICY-V1)
-const PLATFORM_ADMIN = ['platform:super_admin', 'platform:admin'];
+const PLATFORM_ADMIN = ['platform:super_admin'];
 
 // Get operator notification settings
 router.get('/settings/notifications',

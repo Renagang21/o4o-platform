@@ -21,7 +21,6 @@ export interface PharmacyContextRequest extends Request {
 const ADMIN_ROLES = [
   'glycopharm:admin',
   'glycopharm:operator',
-  'platform:admin',
   'platform:super_admin',
 ] as const;
 

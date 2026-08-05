@@ -13,7 +13,6 @@ export const ADMIN_LEVEL_ROLES: readonly string[] = [
   'administrator',
   'super_admin',
   'operator',
-  'platform:admin',
   'platform:super_admin',
 ];
 
@@ -23,7 +22,7 @@ export const ADMIN_LEVEL_ROLES: readonly string[] = [
  * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1**
  *
  * `ADMIN_LEVEL_ROLES` 에서 `platform:*` 을 뺀 집합이다.
- * `platform:admin`·`platform:super_admin` 은 **플랫폼 전역 관리자로 좁히려는** 선언이므로,
+ * `platform:super_admin` 은 **플랫폼 전역 관리자로 좁히려는** 선언이므로,
  * 여기에 서비스 단위 관리자(`kpa:admin`)를 끼워 넣으면 선언의 의미가 사라진다.
  * 실제로 백엔드도 이 화면들에서 서비스 역할을 403 으로 거부한다
  * (`bootstrap/membership-admin-guard.ts:30-34` — 플랫폼 전역 데이터라 서비스 경계가 없다).
@@ -46,17 +45,17 @@ export const isServicePrefixedAdminRole = (role: string): boolean =>
  *
  * `admin` 은 `super_admin`·`operator`·`platform:*` 을 함께 허용한다(기존 계층 규칙 유지).
  *
- * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — `platform:admin` 확장 트리거 제거**
+ * **WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — platform 역할은 확장 트리거가 아니다**
  *
- * 이전에는 `platform:admin` 이 들어 있기만 해도 legacy `super_admin`·`operator` 까지 함께 열렸다.
- * 방향이 거꾸로다. `platform:admin` 은 플랫폼 전역 관리자로 **좁히려는** 선언인데
- * 확장이 더 넓은 legacy 역할을 도로 끌어들여, "platform 한정" 을 선언할 방법 자체가 없었다.
+ * platform 역할은 플랫폼 전역 관리자로 **좁히려는** 선언이므로, 그것이 들어 있다는 이유로
+ * 더 넓은 legacy 역할(`super_admin`·`operator`)을 도로 열어서는 안 된다. 그래야 백엔드가
+ * `['platform:super_admin']` 로 제한한 화면(회원·사용자 관리)의 프런트 경계를 백엔드와 맞출 수 있다.
+ * 확장 트리거는 legacy `admin`·`super_admin` 쪽에만 둔다.
  *
- * 그래서 백엔드가 `['platform:admin','platform:super_admin']` 로 제한한 화면(회원·사용자 관리)의
- * 프런트 경계를 백엔드와 일치시킬 수 없었다.
+ * **WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1**
  *
- * 안전성: `platform:admin` 을 포함하면서 `admin` 을 포함하지 않는 선언은 **저장소 전역 0건**이므로
- * (전수 확인) 기존 선언의 판정 결과는 하나도 바뀌지 않는다. `admin` 쪽 트리거는 그대로 둔다.
+ * 확장 결과 집합에서 legacy `platform:admin` 을 제거했다(보유자 0 · 독립 권한 0).
+ * 플랫폼 전역 관리자는 `platform:super_admin` 뿐이므로 판정 결과는 바뀌지 않는다.
  */
 export const expandRequiredRoles = (requiredRoles: string[]): string[] => {
   const expanded = [...requiredRoles];
@@ -65,7 +64,7 @@ export const expandRequiredRoles = (requiredRoles: string[]): string[] => {
   };
 
   if (requiredRoles.includes('admin')) {
-    ['super_admin', 'operator', 'platform:admin', 'platform:super_admin'].forEach(push);
+    ['super_admin', 'operator', 'platform:super_admin'].forEach(push);
   }
   if (requiredRoles.includes('super_admin')) push('platform:super_admin');
 

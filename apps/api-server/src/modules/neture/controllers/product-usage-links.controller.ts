@@ -18,7 +18,6 @@ import { ProductUsageLinksService } from '../services/product-usage-links.servic
 import logger from '../../../utils/logger.js';
 
 const ADMIN_ROLES = [
-  'platform:admin',
   'platform:super_admin',
   'neture:admin',
   'neture:operator',

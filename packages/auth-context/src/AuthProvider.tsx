@@ -292,7 +292,7 @@ export const AuthProvider: FC<AuthProviderProps> = ({
   // WO-OPERATOR-FIX-V1: Include operator roles for dashboard access
   const isDashboardRole = (role: string): boolean => {
     const exactRoles = ['admin', 'administrator', 'super_admin', 'operator',
-      'platform:admin', 'platform:super_admin'];
+      'platform:super_admin'];
     if (exactRoles.includes(role)) return true;
     // Service-prefixed admin/operator roles (e.g., kpa:admin, neture:operator)
     if (role.includes(':') && (role.endsWith(':admin') || role.endsWith(':operator'))) return true;

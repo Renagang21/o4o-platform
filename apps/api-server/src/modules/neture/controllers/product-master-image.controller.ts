@@ -33,7 +33,6 @@ import { AuditLog } from '../../../entities/AuditLog.js';
 import logger from '../../../utils/logger.js';
 
 const ADMIN_ROLES = [
-  'platform:admin',
   'platform:super_admin',
   'neture:admin',
   'neture:operator',

@@ -25,9 +25,9 @@ import logger from '../../utils/logger.js';
 const router: Router = Router();
 
 // 접근 권한: platform admin 이상
-const ADMIN_ACCESS_ROLES = ['platform:super_admin', 'platform:admin'];
+const ADMIN_ACCESS_ROLES = ['platform:super_admin'];
 // 목록에 표시할 관리자성 역할
-const ADMIN_ACCOUNT_ROLES = ['platform:super_admin', 'platform:admin', 'neture:admin', 'neture:operator'];
+const ADMIN_ACCOUNT_ROLES = ['platform:super_admin', 'neture:admin', 'neture:operator'];
 const SUPER_ADMIN_ROLE = 'platform:super_admin';
 const MIN_PASSWORD_LENGTH = 8;
 

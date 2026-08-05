@@ -21,7 +21,7 @@ router.use(authenticate);
 // WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1: 'kpa-society:*' → canonical 'kpa:*'
 //   (service_key 를 role prefix 자리에 쓴 오타. cosmetics 는 6b586fb06 에서 선행 정정됨)
 router.use(requireRole([
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',

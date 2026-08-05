@@ -12,7 +12,7 @@
  *   - 제외(절대 미반환): password, refreshTokenFamily, phone, businessInfo, lastLoginIp,
  *     provider/provider_id, kakao URL, avatar, 동의 타임스탬프 등 PII/보안 토큰.
  *   - read-only: mutation(상태변경/삭제/파기/role편집) 없음 — 기존 service admin/operator 경계 유지.
- *   - guard: platform:admin / platform:super_admin.
+ *   - guard: platform:super_admin.
  *
  * 재사용(중복 0): User 엔티티, role_assignments(RBAC SSOT) 배치 조회. AdminUserController 의
  * 목록 쿼리(pagination/search/role·status filter) 패턴 복제하되 투영만 적용.
@@ -26,7 +26,7 @@ import logger from '../../utils/logger.js';
 const router: Router = Router();
 
 // 접근 권한: platform admin 이상 (서비스 admin/operator 비허용)
-const ADMIN_ACCESS_ROLES = ['platform:super_admin', 'platform:admin'];
+const ADMIN_ACCESS_ROLES = ['platform:super_admin'];
 const MAX_LIMIT = 100;
 
 router.use(authenticate);

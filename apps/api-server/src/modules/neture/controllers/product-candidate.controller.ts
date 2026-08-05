@@ -41,7 +41,7 @@ const GROUPED_STATUS_MAP: Record<string, ProductCandidateStatus[]> = {
 };
 
 const OPERATOR_ROLES = [
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',

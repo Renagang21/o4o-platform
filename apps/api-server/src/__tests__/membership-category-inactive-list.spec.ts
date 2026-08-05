@@ -306,7 +306,7 @@ describe('WO-...-GUARD-V2 권한 계약 유지', () => {
     expect(res.status).toBe(403);
   });
 
-  it('platform:admin / platform:super_admin 은 전체 목록을 받는다', async () => {
+  it('platform:super_admin 은 전체 목록을 받는다', async () => {
     for (const role of MEMBERSHIP_ADMIN_ROLES) {
       const res = await request(guardedApp(new FakeRepo(seedRows())))
         .get('/api/v1/membership/categories')
@@ -318,7 +318,7 @@ describe('WO-...-GUARD-V2 권한 계약 유지', () => {
   });
 
   it('guard 설정(역할·subtree)은 이번 WO 에서 변경되지 않았다', () => {
-    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:admin', 'platform:super_admin']);
+    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:super_admin']);
     expect(MEMBERSHIP_ADMIN_SUBTREES).toContain('/api/v1/membership/categories');
 
     const guardSrc = readFileSync(join(__dirname, '../bootstrap/membership-admin-guard.ts'), 'utf8');

@@ -14,7 +14,7 @@
  *   created_by_user_id=<작성자> · status='operator_template'
  *
  * 권한 (operator-blog.controller.ts 와 동일 패턴):
- *   {service}:operator / {service}:admin / platform:admin / platform:super_admin
+ *   {service}:operator / {service}:admin / platform:super_admin
  *   (supplier / store_owner / member 차단)
  *
  * 라우트 (router 내부, 외부 mount: /api/v1/{serviceKey}/operator/screen-sets):
@@ -68,7 +68,7 @@ function firstReturnedRow(result: unknown): any | null {
 }
 
 function buildAllowedRoles(serviceKey: string): PrefixedRole[] {
-  return [`${serviceKey}:admin` as PrefixedRole, `${serviceKey}:operator` as PrefixedRole, 'platform:admin', 'platform:super_admin'];
+  return [`${serviceKey}:admin` as PrefixedRole, `${serviceKey}:operator` as PrefixedRole, 'platform:super_admin'];
 }
 
 export function createOperatorScreenSetController(dataSource: DataSource, requireAuth: RequestHandler, serviceKey: string): Router {

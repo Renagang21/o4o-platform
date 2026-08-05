@@ -9,7 +9,6 @@ import type { User } from '../contexts/AuthContext';
 // WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed role labels
 const ROLE_LABELS: Record<string, string> = {
   'platform:super_admin': '최고 관리자',
-  'platform:admin': '관리자',
   'neture:admin': '관리자',
   'neture:operator': '운영자',
   'neture:supplier': '공급자',

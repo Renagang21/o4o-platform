@@ -1102,7 +1102,7 @@ function App() {
             {/* ================================================================
                 Platform Admin Section (/admin/platform/*)
                 WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1 (Phased B)
-                guard = platform:admin / super_admin (PlatformRoute) — neture:admin 단독 차단.
+                guard = platform:super_admin (PlatformRoute) — neture:admin 단독 차단.
                 Neture 서비스 admin(/admin) sidebar/layout 과 분리된 platform surface.
                 Tier 1(운영자/역할/서비스 대상 정책)은 이동하지 않음(landing 안내만).
             ================================================================ */}

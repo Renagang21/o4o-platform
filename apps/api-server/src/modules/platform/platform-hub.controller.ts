@@ -7,7 +7,7 @@
  * 모든 서비스 데이터를 집계하고, cross-service trigger를 프록시한다.
  *
  * Security:
- * - platform:admin / platform:super_admin 전용
+ * - platform:super_admin 전용
  * - 서비스별 trigger는 화이트리스트 기반
  */
 
@@ -37,7 +37,7 @@ function requirePlatformAdmin(req: Request, res: Response, next: () => void) {
   }
   const roles: string[] = user.roles || [];
   if (!isPlatformAdmin(roles)) {
-    res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'platform:admin required' });
+    res.status(403).json({ success: false, error: 'FORBIDDEN', message: 'platform:super_admin required' });
     return;
   }
   next();

@@ -8,7 +8,7 @@
  * → 프론트는 title / videoUrl / description / slug 만 전송한다.
  *
  * Backend: /api/v1/kpa/operator/video/posts (CRUD + publish + archive)
- * 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+ * 권한: kpa:operator / kpa:admin / platform:super_admin
  *
  * 패턴: operatorPop.ts mirror — store_pops 와 store_videos 가 동일 schema 형태
  *       (content → videoUrl, excerpt → description).

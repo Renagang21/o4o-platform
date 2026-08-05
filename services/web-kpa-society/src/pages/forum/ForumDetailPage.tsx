@@ -196,7 +196,7 @@ export function ForumDetailPage() {
     );
   }
 
-  const isAdmin = hasAnyRole(user?.roles ?? [], [...PLATFORM_ROLES, ROLES.PLATFORM_ADMIN, ROLES.PLATFORM_SUPER_ADMIN]);
+  const isAdmin = hasAnyRole(user?.roles ?? [], [...PLATFORM_ROLES, ROLES.PLATFORM_SUPER_ADMIN]);
   const isAuthor = user?.id === post.authorId || isAdmin;
 
   return (

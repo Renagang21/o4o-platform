@@ -76,7 +76,8 @@ describe('Pharmacy Context Middleware', () => {
     const adminRoles = [
       ['glycopharm:admin'],
       ['glycopharm:operator'],
-      ['platform:admin'],
+      // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+      //   ['platform:admin'] 행 제거 — 해당 역할은 더 이상 존재하지 않는다.
       ['platform:super_admin'],
     ];
 

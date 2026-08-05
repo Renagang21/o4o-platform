@@ -55,7 +55,7 @@ export function YaksaRoutes() {
     //
     // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
     //   이 6개 화면이 소비하는 `/api/v1/membership/*` 관리자 subtree 는
-    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 로 보호된다.
+    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:super_admin']` 로 보호된다.
     //   기존에는 route 가 `requiredPermissions` 만 선언했는데, permission 은 백엔드가 공급하지 않아
     //   사실상 "관리자급이면 통과" 로 동작했다. 그래서 메뉴를 숨겨도 URL 직접 접근이면 화면이 렌더됐다.
     //   메뉴에서 숨긴 대상은 route 에서도 막혀야 하므로 실제 경계를 `requiredRoles` 로 선언한다.
@@ -153,7 +153,7 @@ export function YaksaRoutes() {
     } />,
     // WO-O4O-ADMIN-DASHBOARD-OPERATION-SECURITY-BOUNDARY-ROLE-ACCESS-V1
     //   이 화면(MemberApprovalPage)이 다루는 데이터는 `/api/v1/membership/*` 관리자 subtree —
-    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 로 보호되는
+    //   `MEMBERSHIP_ADMIN_ROLES = ['platform:super_admin']` 로 보호되는
     //   **플랫폼 전역** 회원 데이터다(서비스 경계 없음). 그런데 route 선언은
     //   `requiredPermissions` 뿐이었고, 백엔드가 `user.permissions` 를 공급하지 않으므로
     //   실효 경계는 "관리자급이면 통과"(서비스 접두 `kpa:admin` 포함) 였다.

@@ -20,7 +20,6 @@ import { ProductMasterNoteService } from '../services/product-master-note.servic
 import logger from '../../../utils/logger.js';
 
 const ADMIN_ROLES = [
-  'platform:admin',
   'platform:super_admin',
   'neture:admin',
   'neture:operator',

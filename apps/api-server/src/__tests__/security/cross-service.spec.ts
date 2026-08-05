@@ -39,7 +39,10 @@ describe('Cross-Service Access Blocking', () => {
       'glycopharm:operator',
       'cosmetics:admin',
       'glucoseview:admin',
-      'platform:admin',       // KPA: platformBypass = false
+      // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+      //   'platform:admin' 은 제거된 legacy 역할이다. 문자열이 다시 유입되더라도
+      //   거부돼야 하므로 거부 회귀 케이스로 의도적으로 보존한다.
+      'platform:admin',       // KPA: platformBypass = false (제거된 legacy 역할)
       'platform:super_admin', // KPA: platformBypass = false
     ];
 

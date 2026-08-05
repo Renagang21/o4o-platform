@@ -25,7 +25,6 @@ import { authenticate, requireRole } from '../../../middleware/auth.middleware.j
 import logger from '../../../utils/logger.js';
 
 const ADMIN_ROLES = [
-  'platform:admin',
   'platform:super_admin',
   'neture:admin',
   'neture:operator',

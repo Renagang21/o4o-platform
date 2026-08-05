@@ -3,7 +3,7 @@
  *
  * 검증 대상
  *   1. 관리자 전용 subtree(categories / export / stats / verifications)
- *      - 비로그인 401 / 일반 사용자 403 / platform:admin·platform:super_admin 허용
+ *      - 비로그인 401 / 일반 사용자 403 / platform:super_admin 허용
  *   2. `/members` 선택적 guard
  *      - 관리자 endpoint 는 보호, 회원 본인용(`/me`, `/me/summary`)은 그대로 통과
  *   3. 인증 실패 시 하위 handler(controller/service)가 호출되지 않는다
@@ -69,7 +69,6 @@ beforeEach(() => {
   app = buildApp();
 });
 
-const ADMIN = ['x-test-roles', 'platform:admin'] as const;
 const SUPER_ADMIN = ['x-test-roles', 'platform:super_admin'] as const;
 const PLAIN_USER = ['x-test-roles', 'customer'] as const;
 
@@ -130,14 +129,11 @@ describe('categories — 일반 로그인 사용자', () => {
 });
 
 // ─────────────────────────────────────────────────────
-// 3-4. platform:admin / platform:super_admin — 통과
+// 3-4. platform:super_admin — 통과
+//   WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+//   legacy 'platform:admin' 통과 케이스 제거 (역할 자체가 삭제됨).
 // ─────────────────────────────────────────────────────
 describe('categories — 플랫폼 관리자', () => {
-  it.each(CATEGORY_PATHS)('platform:admin %s %s → 통과', async (method, url) => {
-    const res = await (request(app) as any)[method](url).set(...ADMIN);
-    expect(res.status).toBe(200);
-  });
-
   it.each(CATEGORY_PATHS)('platform:super_admin %s %s → 통과', async (method, url) => {
     const res = await (request(app) as any)[method](url).set(...SUPER_ADMIN);
     expect(res.status).toBe(200);
@@ -151,7 +147,7 @@ describe('export endpoint 보호', () => {
   it.each(EXPORT_PATHS)('%s — 비로그인 401 / 일반 403 / 관리자 통과', async (url) => {
     expect((await request(app).get(url)).status).toBe(401);
     expect((await request(app).get(url).set(...PLAIN_USER)).status).toBe(403);
-    expect((await request(app).get(url).set(...ADMIN)).status).toBe(200);
+    expect((await request(app).get(url).set(...SUPER_ADMIN)).status).toBe(200);
     // 권한 차단 단계에서 파일 생성 경로에 도달하지 않는다
     expect(downstreamCalls).toEqual([url]);
   });
@@ -164,7 +160,7 @@ describe('인접 관리자 API 보호', () => {
   it.each(ADJACENT_ADMIN_PATHS)('%s — 비로그인 401 / 일반 403 / 관리자 통과', async (url) => {
     expect((await request(app).get(url)).status).toBe(401);
     expect((await request(app).get(url).set(...PLAIN_USER)).status).toBe(403);
-    expect((await request(app).get(url).set(...ADMIN)).status).toBe(200);
+    expect((await request(app).get(url).set(...SUPER_ADMIN)).status).toBe(200);
   });
 
   it('members 쓰기 경로도 비로그인에서 차단된다', async () => {
@@ -224,8 +220,9 @@ describe('범위 경계', () => {
     }
   });
 
-  it('허용 역할은 platform 2종뿐이다', () => {
-    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:admin', 'platform:super_admin']);
+  it('허용 역할은 platform:super_admin 뿐이다', () => {
+    // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1: legacy 'platform:admin' 제거
+    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:super_admin']);
     expect(MEMBERSHIP_ADMIN_ROLES).not.toContain('kpa:admin');
   });
 });
@@ -243,7 +240,6 @@ describe('소스 계약', () => {
 
   it('guard 는 기존 authenticate / requireRole 을 사용한다 (신규 권한 체계 없음)', () => {
     expect(guardSrc).toMatch(/import \{ authenticate, requireRole \} from '\.\.\/middleware\/auth\.middleware\.js'/);
-    expect(guardSrc).toContain("'platform:admin'");
     expect(guardSrc).toContain("'platform:super_admin'");
   });
 

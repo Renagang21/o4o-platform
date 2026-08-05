@@ -10,6 +10,11 @@
  * - Unauthenticated requests get 401
  * - Scope-level role mapping (Neture hierarchy)
  * - Platform bypass behavior per config
+ *
+ * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+ *   'platform:admin' 은 제거된 legacy 역할이다. 아래 거부 케이스들은
+ *   해당 문자열이 다시 유입되더라도 bypass 되지 않음을 고정하는 보안 회귀 테스트이므로
+ *   의도적으로 그대로 보존한다 (오직 platform:super_admin 만 bypass).
  */
 
 import { createServiceScopeGuard, KPA_SCOPE_CONFIG, NETURE_SCOPE_CONFIG, GLYCOPHARM_SCOPE_CONFIG } from '@o4o/security-core';

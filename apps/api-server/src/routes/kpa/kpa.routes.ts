@@ -486,7 +486,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/kpa/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   const kpaOperatorBlogController = createOperatorBlogController(
     dataSource,
     coreRequireAuth as any,
@@ -496,7 +496,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB POP write API
   // /api/v1/kpa/operator/pop/posts (운영자가 매장 HUB 에 게시하는 POP)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   const kpaOperatorPopController = createOperatorPopController(
     dataSource,
     coreRequireAuth as any,
@@ -506,7 +506,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-QR-CODE-VIDEO-CONTENT-V1: 운영자 HUB 동영상 write API (QR 전용)
   // /api/v1/kpa/operator/video/posts (운영자가 매장 HUB 에 게시하는 외부 동영상 URL)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   const kpaOperatorVideoController = createOperatorVideoController(
     dataSource,
     coreRequireAuth as any,
@@ -516,7 +516,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1: 운영자 HUB 다국어 상품 콘텐츠 write API
   // /api/v1/kpa/operator/multilingual-product-contents/groups (운영자 원본 — 매장이 가져가면 사본 생성)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   router.use(
     '/operator/multilingual-product-contents',
     createOperatorMultilingualContentController(dataSource, coreRequireAuth as any, 'kpa'),
@@ -524,7 +524,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-OPERATOR-QR-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB QR template write API
   // /api/v1/kpa/operator/qr/templates (운영자가 매장 HUB 에 게시하는 QR 청사진 — 실제 QR 아님)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   // 매장 가져가기 시 기존 store_qr_codes 에 매장 사본 INSERT (Phase 3-B 후속).
   const kpaOperatorQrController = createOperatorQrController(
     dataSource,
@@ -535,7 +535,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-OPERATOR-SCREEN-SET-AUTHORING-FOUNDATION-V1: 운영자 Screen Set 원본 제작 API
   // /api/v1/kpa/operator/screen-sets (운영자가 매장 배포용 화면 세트 원본을 제작 — operator_template)
-  // 권한: kpa:operator / kpa:admin / platform:admin / platform:super_admin
+  // 권한: kpa:operator / kpa:admin / platform:super_admin
   // 매장 API(/store/screen-sets)와 별도 라우터. origin='operator' AND service_key='kpa' 격리.
   // 차단: 매장·코너 적용 / current 지정 / 공개 타블렛 URL / Screen Set QR / 매장 콘텐츠 조회.
   const kpaOperatorScreenSetController = createOperatorScreenSetController(
@@ -912,7 +912,7 @@ export function createKpaRoutes(dataSource: DataSource): Router {
     if (forum.forumType === 'closed') {
       const userId: string | undefined = (req as any).user?.id;
       const userRoles: string[] = (req as any).user?.roles || [];
-      const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
+      const BYPASS_ROLES = ['kpa:admin', 'kpa:operator', 'platform:super_admin'];
       if (!userRoles.some((r) => BYPASS_ROLES.includes(r))) {
         let allowed = false;
         if (userId) {

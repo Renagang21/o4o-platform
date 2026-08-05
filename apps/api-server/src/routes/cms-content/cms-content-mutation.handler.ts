@@ -31,7 +31,7 @@ import { VALID_CONTENT_TYPES } from './cms-content-utils.js';
  * Authorize a CMS mutation request against a target serviceKey.
  *
  * Allowed:
- *   - platform:admin / platform:super_admin (any serviceKey)
+ *   - platform:super_admin (any serviceKey)
  *   - `${serviceKey}:admin` or `${serviceKey}:operator` (only matching serviceKey)
  *
  * Returns { allowed, isPlatformAdmin } so callers can decide author_role / visibility_scope.
@@ -44,7 +44,7 @@ async function authorizeCmsMutation(
   if (!user) return { allowed: false, isPlatformAdmin: false };
 
   const jwtRoles: string[] = user.roles || [];
-  const platformRoleNames = ['platform:admin', 'platform:super_admin'];
+  const platformRoleNames = ['platform:super_admin'];
 
   let isPlatformAdmin = jwtRoles.some((r) => platformRoleNames.includes(r));
   if (!isPlatformAdmin) {

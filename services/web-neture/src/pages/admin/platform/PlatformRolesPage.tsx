@@ -15,7 +15,7 @@ import { useAuth } from '@/contexts/AuthContext';
 
 export default function PlatformRolesPage() {
   const { user } = useAuth();
-  const isAdmin = user?.roles?.some((r: string) => ['platform:admin', 'platform:super_admin'].includes(r)) ?? false;
+  const isAdmin = user?.roles?.some((r: string) => ['platform:super_admin'].includes(r)) ?? false;
 
   return (
     <div>

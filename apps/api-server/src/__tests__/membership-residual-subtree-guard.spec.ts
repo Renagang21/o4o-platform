@@ -7,7 +7,7 @@
  * 고정하는 계약
  *   1. 대상 endpoint **전수**가 비로그인 401 (handler 미도달)
  *   2. 일반 사용자·비허용 서비스 역할은 403
- *   3. platform:admin / platform:super_admin 만 handler 도달
+ *   3. platform:super_admin 만 handler 도달
  *   4. `/organizations/:organizationId/members` 는 **임의 조직 ID** 로도 비관리자 접근 불가
  *   5. 회원 본인용 경로(`/members/me`)는 회귀 없이 그대로 통과
  *   6. 신규 보호 endpoint 가 guard 밖에 추가되면 실패 (소스 전수 대조)
@@ -69,7 +69,6 @@ beforeEach(() => {
   app = buildApp();
 });
 
-const ADMIN = ['x-test-roles', 'platform:admin'] as const;
 const SUPER_ADMIN = ['x-test-roles', 'platform:super_admin'] as const;
 const PLAIN_USER = ['x-test-roles', 'customer'] as const;
 const SERVICE_ROLE = ['x-test-roles', 'kpa:admin'] as const;
@@ -169,11 +168,8 @@ describe('비허용 역할', () => {
 // 3. 정상 역할은 handler 도달 (read / write 모두)
 // ─────────────────────────────────────────────────────
 describe('정상 허용 역할', () => {
-  it.each(TARGET_ENDPOINTS)('platform:admin: %s %s → handler 도달', async (method, url) => {
-    const res = await (request(app) as any)[method](url).set(...ADMIN);
-    expect(res.status).toBe(200);
-  });
-
+  // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+  //   legacy 'platform:admin' 허용 케이스 제거 (역할 자체가 삭제됨).
   it.each(TARGET_ENDPOINTS)('platform:super_admin: %s %s → handler 도달', async (method, url) => {
     const res = await (request(app) as any)[method](url).set(...SUPER_ADMIN);
     expect(res.status).toBe(200);
@@ -210,8 +206,8 @@ describe('organizations/:organizationId/members scope', () => {
   it('통과 가능한 주체는 플랫폼 전역 관리자뿐이다 (cross-org 가 정상 권한)', async () => {
     // 조직 소유권 필터를 추가로 걸지 않는 이유: 여기까지 오는 유일한 주체가
     // 이미 전 조직 권한을 가진 platform 관리자라 축소만 발생한다.
-    expect((await request(app).get(orgUrl(OTHER_ORG)).set(...ADMIN)).status).toBe(200);
-    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:admin', 'platform:super_admin']);
+    expect((await request(app).get(orgUrl(OTHER_ORG)).set(...SUPER_ADMIN)).status).toBe(200);
+    expect(MEMBERSHIP_ADMIN_ROLES).toEqual(['platform:super_admin']);
   });
 });
 
@@ -233,7 +229,7 @@ describe('회원 본인용 경로 회귀', () => {
       `/api/v1/membership/members/${FAKE_ID}/license-verification`,
     ]) {
       expect((await request(app).get(url)).status).toBe(401);
-      expect((await request(app).get(url).set(...ADMIN)).status).toBe(200);
+      expect((await request(app).get(url).set(...SUPER_ADMIN)).status).toBe(200);
     }
   });
 });

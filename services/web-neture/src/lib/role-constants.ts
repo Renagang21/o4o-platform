@@ -39,7 +39,9 @@ export const ADMIN_ROLES: string[] = [NETURE_ROLES.ADMIN, NETURE_ROLES.PLATFORM_
  * WO-O4O-ADMIN-PLATFORM-SECTION-ROUTING-V1: /admin/platform section 전용.
  * neture:admin 단독으로는 platform surface 에 접근하지 못한다(platform guard).
  */
-export const PLATFORM_ROLES: string[] = ['platform:admin', NETURE_ROLES.PLATFORM_SUPER_ADMIN];
+// WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+//   legacy 'platform:admin' 제거 → platform surface 는 platform:super_admin 단독.
+export const PLATFORM_ROLES: string[] = [NETURE_ROLES.PLATFORM_SUPER_ADMIN];
 
 /**
  * platform-admin 진입점 노출 판정 — WO-O4O-PLATFORM-ADMIN-ROLE-BASED-ENTRYPOINT-V1.

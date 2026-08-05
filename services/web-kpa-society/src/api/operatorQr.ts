@@ -11,7 +11,7 @@
  *   /api/v1/kpa/operator/qr/templates (CRUD + publish + archive)
  *
  * 권한 (backend 검증):
- *   kpa:operator / kpa:admin / platform:admin / platform:super_admin
+ *   kpa:operator / kpa:admin / platform:super_admin
  *
  * 주의:
  *   - 운영자 단계에서는 slug / organizationId 없음 (entity 자체 부재)

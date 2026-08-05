@@ -39,7 +39,7 @@ export function UserRoutes() {
 
     // 운영자 관리 (관리자/서비스 운영자)
     <Route key="/operators" path="/operators" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform:super_admin', 'platform:admin']}>
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform:super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <OperatorsPage />
         </Suspense>
@@ -50,7 +50,7 @@ export function UserRoutes() {
     //
     // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
     //   이 화면들은 `/api/v1/admin/users` 를 소비하며(UsersListClean.tsx:72),
-    //   그 guard 는 `ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다.
+    //   그 guard 는 `ADMIN_ROLES = ['platform:super_admin']` 이다.
     //   메뉴(core-users)·route·백엔드가 같은 경계를 쓰도록 실제 역할을 선언한다.
     //   `requiredPermissions` 는 유지한다 — permission 공급 시 자동으로 AND 조건이 된다.
     <Route key="/users" path="/users" element={

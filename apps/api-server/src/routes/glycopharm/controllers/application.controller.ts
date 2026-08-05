@@ -328,7 +328,7 @@ export function createApplicationController(
 
         // Only allow access if owner or admin
         // WO-P4′-MULTI-SERVICE-ROLE-PREFIX-IMPLEMENTATION-V1 (Phase 4.2: GlycoPharm)
-        // Check for glycopharm:admin/operator or platform:admin (legacy roles denied)
+        // Check for glycopharm:admin/operator (unprefixed legacy roles denied)
         const isAdmin = isServiceAdmin(userRoles, 'glycopharm') ||
                         userRoles.includes('glycopharm:operator');
         if (application.userId !== userId && !isAdmin) {

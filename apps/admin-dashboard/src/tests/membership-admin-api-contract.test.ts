@@ -7,7 +7,7 @@
  *
  * 역할 허용·거부 행렬 자체는 백엔드에서 이미 고정돼 있다
  * (apps/api-server/src/__tests__/membership-admin-guard.spec.ts —
- *  비로그인 거부 / kpa:admin 거부 / platform:admin·platform:super_admin 허용).
+ *  비로그인 거부 / kpa:admin 거부 / platform:super_admin 허용).
  * 따라서 이 테스트는 그 guard 아래에서 **요청이 실제 handler 에 도달하는지**,
  * 즉 프런트 (method, path) 가 백엔드 라우트 정의와 일치하는지를 고정한다.
  *

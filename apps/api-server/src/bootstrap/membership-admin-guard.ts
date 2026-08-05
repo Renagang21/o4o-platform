@@ -31,7 +31,7 @@ import logger from '../utils/logger.js';
  * 서비스 단위 역할(kpa:admin 등)로는 관리 범위를 제한할 경계가 없다.
  * routes/admin/users.routes.ts 의 ADMIN_ROLES 와 동일한 목록을 사용한다.
  */
-export const MEMBERSHIP_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
+export const MEMBERSHIP_ADMIN_ROLES = ['platform:super_admin'];
 
 /**
  * WO-O4O-MEMBERSHIP-RESIDUAL-SUBTREE-GUARD-V1 — `organizationId` scope 에 대한 판단 근거
@@ -41,7 +41,7 @@ export const MEMBERSHIP_ADMIN_ROLES = ['platform:admin', 'platform:super_admin']
  *
  *   - 비로그인 → 401
  *   - 일반 사용자 / 서비스 역할(kpa:admin 등) → 403  → **어떤 조직도 조회할 수 없다**
- *   - platform:admin · platform:super_admin → 통과 (플랫폼 전역 관리자이므로 cross-org 가 정상)
+ *   - platform:super_admin → 통과 (플랫폼 전역 관리자이므로 cross-org 가 정상)
  *
  * 즉 "임의 organizationId 로 남의 조직 회원을 조회" 할 수 있는 주체가 **존재하지 않는다**.
  * 통과 가능한 유일한 주체가 이미 전 조직에 대한 권한을 가진 플랫폼 관리자이기 때문에,

@@ -23,7 +23,7 @@ describe('adminRouteAccess — 요구 역할 확장', () => {
   it('admin 은 super_admin·operator·platform:* 을 함께 허용한다 (기존 계층 규칙 유지)', () => {
     const expanded = expandRequiredRoles(['admin']);
     expect(expanded).toEqual(
-      expect.arrayContaining(['admin', 'super_admin', 'operator', 'platform:admin', 'platform:super_admin']),
+      expect.arrayContaining(['admin', 'super_admin', 'operator', 'platform:super_admin']),
     );
   });
 

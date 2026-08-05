@@ -387,7 +387,7 @@ export function createNetureController(dataSource: DataSource): Router {
    * Update partnership request status (admin only)
    *
    * WO-P1-SERVICE-ROLE-PREFIX-ROLLING-IMPLEMENTATION-V1 (Phase 3: Neture)
-   * - Requires neture:admin OR platform:admin/super_admin
+   * - Requires neture:admin OR platform:super_admin
    * - Legacy roles (admin, super_admin) are logged and denied
    */
   router.patch('/partnership/requests/:id', requireAuth, requireNetureScope('neture:admin'), async (req: Request, res: Response) => {

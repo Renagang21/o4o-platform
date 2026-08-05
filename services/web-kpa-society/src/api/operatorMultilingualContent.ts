@@ -9,7 +9,7 @@
  * Backend: WO-O4O-KPA-MULTILINGUAL-PRODUCT-CONTENT-HUB-FLOW-PILOT-V1 (Phase 1)
  *   /api/v1/kpa/operator/multilingual-product-contents/groups (CRUD + publish + archive + pages)
  *
- * 권한 (backend 검증): kpa:operator / kpa:admin / platform:admin / platform:super_admin
+ * 권한 (backend 검증): kpa:operator / kpa:admin / platform:super_admin
  */
 
 import { getAccessToken } from '../contexts/AuthContext';

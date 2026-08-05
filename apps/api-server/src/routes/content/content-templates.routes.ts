@@ -30,7 +30,7 @@ import { ContentTemplate } from '../../entities/ContentTemplate.js';
 import { O4O_SERVICES } from '../../config/service-catalog.js';
 
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
-const PUBLIC_TEMPLATE_ROLES = ['platform:admin', 'platform:super_admin'];
+const PUBLIC_TEMPLATE_ROLES = ['platform:super_admin'];
 const VALID_SERVICE_KEYS = new Set(O4O_SERVICES.map((s) => s.key));
 
 export function createContentTemplateRoutes(dataSource: DataSource): Router {

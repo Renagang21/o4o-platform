@@ -31,7 +31,6 @@ function isOperatorOrAdmin(roles: string[] = []): boolean {
   return hasAnyServiceRole(roles, [
     'glycopharm:admin',
     'glycopharm:operator',
-    'platform:admin',
     'platform:super_admin',
   ]);
 }

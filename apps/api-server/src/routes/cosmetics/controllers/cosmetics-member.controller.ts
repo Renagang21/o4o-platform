@@ -13,7 +13,6 @@
  * 권한 (operator-only PATCH):
  *   - cosmetics:operator
  *   - cosmetics:admin
- *   - platform:admin
  *   - platform:super_admin
  *
  * 패턴: GlycopharmMemberController (apps/api-server/src/routes/glycopharm/controllers/glycopharm-member.controller.ts) mirror.
@@ -43,7 +42,6 @@ function isOperatorOrAdmin(roles: string[] = []): boolean {
   return hasAnyServiceRole(roles, [
     'cosmetics:admin',
     'cosmetics:operator',
-    'platform:admin',
     'platform:super_admin',
   ]);
 }

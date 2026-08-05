@@ -6,7 +6,7 @@
  * 목적:
  *   admin-dashboard 의 메뉴·라우트 게이팅(useAdminMenu / AppRouteGuard / AppGuard)은
  *   "이 앱이 활성인가" 만 알면 된다. 그런데 기존에는 플랫폼 관리자 전용
- *   `GET /api/v1/admin/apps` (requireAdmin = platform:admin | platform:super_admin) 를
+ *   `GET /api/v1/admin/apps` (requireAdmin = platform:super_admin) 를
  *   역할 구분 없이 호출해, 서비스 운영자 계정은 403 을 받고 그 실패가 `apps=[]` 로 해석되어
  *   정상 활성 앱까지 비활성으로 판정되었다.
  *

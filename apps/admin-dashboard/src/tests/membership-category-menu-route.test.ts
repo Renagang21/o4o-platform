@@ -82,7 +82,7 @@ describe('route 재사용', () => {
 });
 
 describe('역할별 메뉴 노출 정책', () => {
-  it.each([['platform:admin'], ['platform:super_admin']])('%s 는 메뉴를 본다', (role) => {
+  it.each([['platform:super_admin']])('%s 는 메뉴를 본다', (role) => {
     expect(hasMenuPermission([role], [], MENU_ID)).toBe(true);
   });
 

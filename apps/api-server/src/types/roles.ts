@@ -24,11 +24,17 @@ export type ServiceKey =
 
 /**
  * Platform-level roles (cross-service access)
+ *
+ * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+ *   `platform:admin` · `platform:operator` 제거.
+ *   두 역할은 접두 없는 legacy `admin`/`operator` 의 과도기 버킷이었고
+ *   (20260205070000-Phase4MultiServiceRolePrefixMigration → 20260228000001-CleanupLegacyRoles),
+ *   활성 보유자 0 · `platform:super_admin` 대비 독립 권한 0 으로 확정되었다.
+ *   플랫폼 전역 관리는 `platform:super_admin`, 서비스 관리·운영은 `{service}:admin` / `{service}:operator` 를 쓴다.
+ *   근거: WO-O4O-LEGACY-ADMIN-ROLE-AND-SCOPE-USAGE-AUDIT-V1 (CHECK 4f63b2844)
  */
 export type PlatformRole =
   | 'platform:super_admin'  // Highest privilege, cross-service access
-  | 'platform:admin'        // Platform administrator
-  | 'platform:operator'     // Platform operator
   | 'platform:manager'      // Platform manager
   | 'platform:vendor'       // Platform vendor
   | 'platform:member'       // Platform member
@@ -165,7 +171,7 @@ export function isPrefixedRoleType(role: string): role is PrefixedRole {
  * @returns true if role is PlatformRole
  *
  * @example
- * isPlatformRoleType('platform:admin') // true
+ * isPlatformRoleType('platform:super_admin') // true
  * isPlatformRoleType('kpa:admin') // false
  */
 export function isPlatformRoleType(role: string): role is PlatformRole {
@@ -180,7 +186,7 @@ export function isPlatformRoleType(role: string): role is PlatformRole {
  *
  * @example
  * isKpaRoleType('kpa:admin') // true
- * isKpaRoleType('platform:admin') // false
+ * isKpaRoleType('platform:super_admin') // false
  */
 export function isKpaRoleType(role: string): role is KpaRole {
   return role.startsWith('kpa:');
@@ -241,22 +247,8 @@ export const ROLE_REGISTRY: Record<PrefixedRole, RoleMetadata> = {
     category: 'platform',
     deprecated: false
   },
-  'platform:admin': {
-    role: 'platform:admin',
-    label: 'Platform Admin',
-    description: 'Platform administrator (deprecated — use service-specific admin)',
-    service: 'platform',
-    category: 'platform',
-    deprecated: true
-  },
-  'platform:operator': {
-    role: 'platform:operator',
-    label: 'Platform Operator',
-    description: 'Platform operator (deprecated — use service-specific operator)',
-    service: 'platform',
-    category: 'platform',
-    deprecated: true
-  },
+  // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+  //   'platform:admin' / 'platform:operator' entries removed (활성 보유자 0, 독립 권한 0).
   'platform:manager': {
     role: 'platform:manager',
     label: 'Platform Manager',

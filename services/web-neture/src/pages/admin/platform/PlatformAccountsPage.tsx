@@ -20,7 +20,6 @@ function fmtDate(iso: string | null | undefined): string {
 
 const ROLE_LABEL: Record<string, string> = {
   'platform:super_admin': '슈퍼관리자',
-  'platform:admin': '플랫폼관리자',
   'neture:admin': 'Neture 관리자',
   'neture:operator': 'Neture 운영자',
 };

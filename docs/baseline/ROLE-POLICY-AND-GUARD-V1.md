@@ -8,7 +8,7 @@
 ## 1. 권한 계층 구조
 
 ```
-Platform Layer       → platform:admin, platform:super_admin
+Platform Layer       → platform:super_admin
   └── Service Layer  → {service}:admin, {service}:operator
         └── Org Layer → {service}:branch_admin, {service}:branch_operator
 ```
@@ -42,8 +42,8 @@ Platform Layer       → platform:admin, platform:super_admin
 
 ## 3. Platform Bypass 정책
 
-| 서비스 | `platform:admin` 접근 | 이유 |
-|--------|----------------------|------|
+| 서비스 | `platform:super_admin` 접근 | 이유 |
+|--------|----------------------------|------|
 | KPA Society | **차단** | 약사회 자치 |
 | Neture | 허용 | 플랫폼 운영 |
 | GlycoPharm | 허용 | 플랫폼 운영 |
@@ -130,7 +130,7 @@ requireScope('{service}:branch_admin') + validateBranchOwnership()
 
 | 서비스 | 역할 |
 |--------|------|
-| platform | `platform:admin`, `platform:super_admin` |
+| platform | `platform:super_admin` |
 | kpa | `kpa:admin`, `kpa:operator`, `kpa:district_admin`, `kpa:branch_admin`, `kpa:branch_operator` |
 | neture | `neture:admin`, `neture:operator`, `neture:supplier`, `neture:partner` |
 | glycopharm | `glycopharm:admin`, `glycopharm:operator` |

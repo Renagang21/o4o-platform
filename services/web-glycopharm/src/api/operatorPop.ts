@@ -11,7 +11,7 @@
  *   /api/v1/glycopharm/operator/pop/posts (CRUD + publish + archive)
  *
  * 권한 (backend 검증):
- *   glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+ *   glycopharm:operator / glycopharm:admin / platform:super_admin
  *
  * 패턴: operatorBlog.ts mirror — store_blog_posts 와 store_pops 가 동일 schema 형태.
  */

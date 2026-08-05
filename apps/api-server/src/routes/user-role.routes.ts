@@ -30,7 +30,6 @@ router.get('/:userId/permissions', authenticate, async (req: Request, res: Respo
     if (actorId !== userId) {
       const { roleAssignmentService } = await import('../modules/auth/services/role-assignment.service.js');
       const isPlatformAdmin = await roleAssignmentService.hasAnyRole(actorId, [
-        'platform:admin',
         'platform:super_admin',
       ]);
       if (!isPlatformAdmin) {

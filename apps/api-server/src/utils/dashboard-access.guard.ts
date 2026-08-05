@@ -19,7 +19,7 @@
  *
  *   1. self         — dashboardId === 인증 사용자 id (표준 경로)
  *   2. organization — dashboardId 가 사용자가 현재 소속된 organization id (organization_members)
- *   3. admin        — platform:admin / platform:super_admin
+ *   3. admin        — platform:super_admin
  *
  * 신규 테이블 0 / migration 0 / 신규 role 0.
  */
@@ -123,7 +123,6 @@ export async function checkDashboardAccess(
   // 3. 플랫폼 관리자 (기존 requireAdmin 과 동일 기준)
   try {
     const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
-      'platform:admin',
       'platform:super_admin',
     ]);
     if (isAdmin) {

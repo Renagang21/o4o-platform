@@ -70,7 +70,6 @@ export function KCosGlobalHeader() {
       (r: string) =>
         r === 'cosmetics:operator' ||
         r === 'cosmetics:admin' ||
-        r === 'platform:admin' ||
         r === 'platform:super_admin',
     )
   );

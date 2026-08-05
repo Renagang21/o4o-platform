@@ -26,7 +26,7 @@ import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIR
 //   role prefix 자리에 잘못 쓴 오타 교정. requireRole 은 정확 문자열 매칭이라
 //   'kpa-society:*' 는 역할 카탈로그에 0건 → 실 역할 kpa:admin / kpa:operator 로 정정.
 const requireOperatorOrAdmin = requireRole([
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'kpa:admin', 'kpa:operator',

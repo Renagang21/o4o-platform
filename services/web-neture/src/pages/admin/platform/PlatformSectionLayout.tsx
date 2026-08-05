@@ -5,7 +5,7 @@
  *
  * platform-admin section 내부 navigation(플랫폼 홈 / 계정 관리 / 서비스 관리)만 제공.
  * 전체 Neture admin sidebar 와 통합하지 않는다(section 내부 한정).
- * guard 는 상위 PlatformRoute(platform:admin/super_admin)가 담당.
+ * guard 는 상위 PlatformRoute(platform:super_admin)가 담당.
  */
 
 import { NavLink, Outlet } from 'react-router-dom';

@@ -83,7 +83,7 @@ describe('계층 1·2 — 메뉴와 route 가 같은 경계를 선언한다', ()
 describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', () => {
   const boundary = [...PLATFORM_ADMIN_ROLES];
 
-  it.each([['platform:admin'], ['platform:super_admin']])('%s 는 메뉴도 보이고 route 도 통과한다', (role) => {
+  it.each([['platform:super_admin']])('%s 는 메뉴도 보이고 route 도 통과한다', (role) => {
     expect(hasMenuPermission([role], [], 'core-membership-categories')).toBe(true);
     expect(hasRequiredRoles({ roles: [role] }, boundary)).toBe(true);
   });
@@ -106,7 +106,7 @@ describe('실제 판정 — 세 계층이 같은 사용자를 통과시킨다', 
 
   it('기존 admin 선언은 계층 확장과 서비스 접두 역할 수용을 그대로 유지한다 (잠김 회귀 방지)', () => {
     expect(expandRequiredRoles(['admin'])).toEqual(
-      expect.arrayContaining(['super_admin', 'operator', 'platform:admin', 'platform:super_admin']),
+      expect.arrayContaining(['super_admin', 'operator', 'platform:super_admin']),
     );
     expect(hasRequiredRoles({ roles: ['kpa:admin'] }, ['admin'])).toBe(true);
     expect(hasRequiredRoles({ roles: ['super_admin'] }, ['admin'])).toBe(true);

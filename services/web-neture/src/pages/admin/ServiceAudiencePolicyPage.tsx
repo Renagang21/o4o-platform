@@ -90,7 +90,7 @@ export default function ServiceAudiencePolicyPage() {
         <Info className="w-4 h-4 flex-shrink-0 mt-0.5" />
         <div>
           이 설정은 Neture 자체 서비스 설정이 아니라, <strong>O4O 내 여러 서비스의 대상 정책</strong>을 관리하는
-          플랫폼 관리 항목입니다. platform 권한(platform:admin / platform:super_admin)으로 관리합니다.
+          플랫폼 관리 항목입니다. platform 권한(platform:super_admin)으로 관리합니다.
         </div>
       </div>
 

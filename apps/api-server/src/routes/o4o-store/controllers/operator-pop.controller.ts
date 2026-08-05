@@ -13,7 +13,6 @@
  * 권한 (3 개 서비스 공통):
  *   - {service}:operator
  *   - {service}:admin
- *   - platform:admin
  *   - platform:super_admin
  *   (supplier / store_owner / member / pharmacist 차단 — 비로그인 차단)
  *
@@ -73,7 +72,6 @@ function buildAllowedRoles(serviceKey: string): PrefixedRole[] {
   return [
     `${serviceKey}:admin` as PrefixedRole,
     `${serviceKey}:operator` as PrefixedRole,
-    'platform:admin',
     'platform:super_admin',
   ];
 }

@@ -27,7 +27,7 @@ import { classificationLabel, type ProductClassification } from '../../../module
 import logger from '../../../utils/logger.js';
 
 const OPERATOR_ROLES = [
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',

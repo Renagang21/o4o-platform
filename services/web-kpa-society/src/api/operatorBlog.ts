@@ -11,7 +11,7 @@
  *   /api/v1/kpa/operator/blog/posts (CRUD + publish + archive)
  *
  * 권한 (backend 검증):
- *   kpa:operator / kpa:admin / platform:admin / platform:super_admin
+ *   kpa:operator / kpa:admin / platform:super_admin
  */
 
 import { getAccessToken } from '../contexts/AuthContext';

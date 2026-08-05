@@ -235,7 +235,7 @@ export class User {
     const roleStr = role as string;
     if (!this.roles || this.roles.length === 0) return false;
     // Direct match, platform-prefixed match, or service-prefixed match
-    // e.g., 'admin' matches 'platform:admin', 'glycopharm:admin', 'kpa:admin'
+    // e.g., 'admin' matches 'glycopharm:admin', 'kpa:admin'; 'super_admin' matches 'platform:super_admin'
     // WO-O4O-MEMBERSHIP-APPROVAL-API-403-FIX-V1
     return this.roles.some(r => r === roleStr || r === `platform:${roleStr}` || r.endsWith(`:${roleStr}`));
   }
@@ -244,8 +244,12 @@ export class User {
     return roles.some((role: any) => this.hasRole(role));
   }
 
+  // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+  //   UserRole.ADMIN('platform:admin') 제거에 따라 SUPER_ADMIN 단독 판정.
+  //   `hasRole` 는 roleStr 전체를 비교하므로 기존에도 'platform:admin' 정확 일치만 통과했고
+  //   해당 역할 보유자는 0 이었다 → 동작 변화 없음.
   isAdmin(): boolean {
-    return this.hasAnyRole([UserRole.SUPER_ADMIN, UserRole.ADMIN]);
+    return this.hasAnyRole([UserRole.SUPER_ADMIN]);
   }
 
   getAllPermissions(): string[] {

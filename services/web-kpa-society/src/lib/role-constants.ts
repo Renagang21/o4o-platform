@@ -23,8 +23,9 @@ export const ROLES = {
   LMS_INSTRUCTOR: 'lms:instructor',
 
   // 플랫폼 Super
-  PLATFORM_ADMIN: 'platform:admin',
-  PLATFORM_OPERATOR: 'platform:operator',
+  // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+  //   PLATFORM_ADMIN('platform:admin') · PLATFORM_OPERATOR('platform:operator') 제거.
+  //   보유자 0 · platform:super_admin 대비 독립 권한 0 인 과도기 역할이었다.
   PLATFORM_SUPER_ADMIN: 'platform:super_admin',
   SUPER_OPERATOR: 'super_operator',
 } as const;
@@ -62,16 +63,12 @@ export const STORE_OWNER_ROLES = [
 
 /** Super Operator 감지용 (Header) */
 export const SUPER_OPERATOR_ROLES = [
-  ROLES.PLATFORM_OPERATOR,
   ROLES.SUPER_OPERATOR,
-  ROLES.PLATFORM_ADMIN,
 ] as const;
 
 /** Dashboard Switcher: 관리자 계열 전체 */
 export const DASHBOARD_ADMIN_ROLES: readonly string[] = [
   ...PLATFORM_ROLES,
-  ROLES.PLATFORM_ADMIN,
-  ROLES.PLATFORM_OPERATOR,
   ROLES.PLATFORM_SUPER_ADMIN,
   ROLES.SUPER_OPERATOR,
 ];

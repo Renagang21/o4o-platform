@@ -3,9 +3,11 @@
 import { Request } from 'express';
 
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 체계로 전환
+// WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+//   ADMIN = 'platform:admin' 제거. 플랫폼 전역 관리자는 SUPER_ADMIN 뿐이고,
+//   서비스 관리자는 '{service}:admin' 으로 표현한다(이 enum 이 아닌 PrefixedRole 축).
 export enum UserRole {
   SUPER_ADMIN = 'platform:super_admin',
-  ADMIN       = 'platform:admin',
   OPERATOR    = 'operator',    // 서비스운영자 (Platform Service Operator)
   MANAGER     = 'manager',
   VENDOR      = 'vendor',

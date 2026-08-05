@@ -184,7 +184,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/cosmetics/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
-  // 권한: cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+  // 권한: cosmetics:operator / cosmetics:admin / platform:super_admin
   router.use(
     '/operator/blog',
     createOperatorBlogController(dataSource, coreRequireAuth as any, 'cosmetics'),
@@ -192,7 +192,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB POP write API
   // /api/v1/cosmetics/operator/pop/posts (운영자가 매장 HUB 에 게시하는 POP)
-  // 권한: cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+  // 권한: cosmetics:operator / cosmetics:admin / platform:super_admin
   router.use(
     '/operator/pop',
     createOperatorPopController(dataSource, coreRequireAuth as any, 'cosmetics'),
@@ -207,7 +207,7 @@ export function createCosmeticsRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KCOSMETICS-OPERATOR-BLOG-POP-QR-BOOTSTRAP-V1: 운영자 HUB QR 템플릿 write API
   // /api/v1/cosmetics/operator/qr/templates (운영자가 매장 HUB 에 게시하는 QR)
-  // 권한: cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+  // 권한: cosmetics:operator / cosmetics:admin / platform:super_admin
   router.use(
     '/operator/qr',
     createOperatorQrController(dataSource, coreRequireAuth as any, 'cosmetics'),

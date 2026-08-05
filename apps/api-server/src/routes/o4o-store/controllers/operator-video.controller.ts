@@ -7,7 +7,7 @@
  * operator-pop.controller.ts 패턴 1:1 mirror — store_videos / store_pops 가 동일 형태이기 때문.
  * 차이: content(본문) → videoUrl(외부 URL), excerpt → description.
  *
- * 권한 (3 개 서비스 공통): {service}:operator / {service}:admin / platform:admin / platform:super_admin
+ * 권한 (3 개 서비스 공통): {service}:operator / {service}:admin / platform:super_admin
  *
  * 서버 강제 저장 (body 무시): author_role='operator', service_key=주입값, store_id=null, status='draft'
  *
@@ -54,7 +54,6 @@ function buildAllowedRoles(serviceKey: string): PrefixedRole[] {
   return [
     `${serviceKey}:admin` as PrefixedRole,
     `${serviceKey}:operator` as PrefixedRole,
-    'platform:admin',
     'platform:super_admin',
   ];
 }

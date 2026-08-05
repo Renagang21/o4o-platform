@@ -159,12 +159,15 @@ export class AuthLoginService {
     // user 조회 자체를 (email + serviceKey) 기반으로 전환할 준비 단계이다.
     //
     // WO-O4O-ADMIN-DASHBOARD-PLATFORM-ADMIN-MEMBERSHIP-BYPASS-FIX-V1 (단기 패치):
-    // platform 관리자 역할(platform:super_admin, platform:admin, super_admin) 보유 계정은
+    // WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+    //   allow-list 에서 legacy 'platform:admin' 제거 (보유자 0 · 독립 권한 0).
+    //   unprefixed legacy 'super_admin' 은 별개 축이라 유지한다.
+    // platform 관리자 역할(platform:super_admin, super_admin) 보유 계정은
     // service_memberships 검증을 우회한다. admin.neture.co.kr 접근 자격은
     // 특정 서비스 가입 여부가 아니라 platform 관리자 역할 보유 여부로 판단한다.
     // 비밀번호 검증은 이후 단계에서 동일하게 수행된다.
     if (serviceKey) {
-      const PLATFORM_ADMIN_ROLES = ['platform:super_admin', 'platform:admin', 'super_admin'];
+      const PLATFORM_ADMIN_ROLES = ['platform:super_admin', 'super_admin'];
       const isPlatformAdmin = await roleAssignmentService.hasAnyRole(user.id, PLATFORM_ADMIN_ROLES);
 
       if (!isPlatformAdmin) {

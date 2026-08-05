@@ -21,7 +21,6 @@ import logger from '../../../utils/logger.js';
 //   이 검색 엔드포인트는 관리자 목록과 공급자/저작 picker 가 공유한다(requireAuth).
 //   비-ACTIVE(SUSPENDED/ARCHIVED) 조회는 관리자 롤에게만 허용하고, 그 외에는 항상 ACTIVE-only 로 강제한다.
 const STATUS_ADMIN_ROLES = [
-  'platform:admin',
   'platform:super_admin',
   'neture:admin',
   'neture:operator',

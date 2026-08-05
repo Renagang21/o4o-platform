@@ -7,7 +7,7 @@
  *   POST /api/v1/admin/security/blocked-ips/unblock   IP 1건 해제 (멱등)
  *
  * 권한: 기존 관리자 allowlist 를 그대로 쓴다 — 신규 권한 구조를 만들지 않는다.
- *   `platform:admin` / `platform:super_admin`
+ *   `platform:super_admin`
  *
  * ⚠️ 알려진 한계 (설계상):
  *   차단 상태는 **in-memory / 현재 Cloud Run 인스턴스 범위**다. 인스턴스 간 공유되지 않고
@@ -24,7 +24,7 @@ import logger from '../../utils/logger.js';
 
 const router: Router = Router();
 
-const ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
+const ADMIN_ROLES = ['platform:super_admin'];
 
 /** IPv4 / IPv6 최소 형식 검증 — 임의 문자열을 해제 키로 받지 않는다. */
 const IPV4_RE = /^\d{1,3}(\.\d{1,3}){3}$/;

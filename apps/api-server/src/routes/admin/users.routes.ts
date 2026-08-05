@@ -29,7 +29,7 @@ const isValidRole = (value: string) => {
 router.use(authenticate);
 
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 필수 (legacy super_admin/admin 제거)
-const ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
+const ADMIN_ROLES = ['platform:super_admin'];
 
 // User management routes (platform admin only)
 router.get('/', requireRole(ADMIN_ROLES), adminUserController.getUsers);

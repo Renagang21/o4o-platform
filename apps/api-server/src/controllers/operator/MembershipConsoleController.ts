@@ -1030,7 +1030,7 @@ export class MembershipConsoleController {
       if (mode === 'hard' && !scope.isPlatformAdmin) {
         const userRoles: string[] = (req as any).user?.roles ?? [];
         const hasAdminRole = userRoles.some(
-          (r) => r === 'platform:admin' || r === 'platform:super_admin' || r.endsWith(':admin'),
+          (r) => r === 'platform:super_admin' || r.endsWith(':admin'),
         );
         if (!hasAdminRole) {
           res.status(403).json({

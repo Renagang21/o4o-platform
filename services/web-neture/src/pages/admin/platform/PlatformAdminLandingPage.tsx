@@ -97,7 +97,7 @@ export default function PlatformAdminLandingPage() {
       {/* 안내 배너 */}
       <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-3 text-xs text-indigo-800 leading-relaxed">
         이 영역은 <strong>Neture 서비스 관리(/admin)와 분리된 플랫폼 관리 surface</strong>입니다.
-        platform 권한(<code>platform:admin</code> / <code>platform:super_admin</code>)으로만 접근할 수 있으며,
+        platform 권한(<code>platform:super_admin</code>)으로만 접근할 수 있으며,
         서비스 단위 운영자(neture:admin)와 권한이 구분됩니다.
       </div>
 

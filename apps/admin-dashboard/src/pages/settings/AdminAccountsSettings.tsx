@@ -33,7 +33,6 @@ const MAX_ROLE_BADGES = 2;
 //   포함 기준이 아니므로 필터에서 제외한다(표시·검색·정렬에는 그대로 남는다).
 const CANONICAL_ADMIN_ROLES = [
   'platform:super_admin',
-  'platform:admin',
   'neture:admin',
   'neture:operator',
 ] as const;

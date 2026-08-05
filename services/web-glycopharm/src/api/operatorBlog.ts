@@ -11,7 +11,7 @@
  *   /api/v1/glycopharm/operator/blog/posts (CRUD + publish + archive)
  *
  * 권한 (backend 검증):
- *   glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+ *   glycopharm:operator / glycopharm:admin / platform:super_admin
  */
 
 import { getAccessToken } from '../contexts/AuthContext';

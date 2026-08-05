@@ -30,7 +30,7 @@ const requireKpaAdmin = createMembershipScopeGuard(KPA_SCOPE_CONFIG)('kpa:admin'
 // This natural separation enforces kpa:operator cannot approve via the global route.
 // Cross-service isolation between non-KPA operators requires Course.serviceKey — WO-O4O-LMS-COURSE-SERVICEKEY-V1.
 const requireLmsOperator = requireRole([
-  'admin', 'super_admin', 'platform:admin', 'platform:super_admin',
+  'admin', 'super_admin', 'platform:super_admin',
   'cosmetics:admin', 'cosmetics:operator',
   'glycopharm:admin', 'glycopharm:operator',
 ]);
@@ -38,7 +38,7 @@ const requireLmsOperator = requireRole([
 // WO-O4O-LMS-COURSE-SERVICEKEY-V1: Service-scope check for operator course actions.
 // Returns true if the operator's service matches the course's serviceKey.
 // Platform admins bypass. Courses with null serviceKey allow all operators (legacy compat).
-const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform:admin', 'platform:super_admin']);
+const PLATFORM_ADMIN_ROLES = new Set(['admin', 'super_admin', 'platform:super_admin']);
 function isCourseAccessibleByOperator(roles: string[], courseServiceKey: string | null | undefined): boolean {
   if (roles.some(r => PLATFORM_ADMIN_ROLES.has(r))) return true;
   if (!courseServiceKey) return true; // legacy/unscoped course: backward compat

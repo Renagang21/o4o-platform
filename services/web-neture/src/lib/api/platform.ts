@@ -6,7 +6,7 @@
  *   PATCH /api/v1/admin/platform-accounts/:id/password   { newPassword }
  *   PATCH /api/v1/admin/platform-accounts/:id/status     { isActive }
  *   GET   /api/v1/admin/platform-services
- * guard(backend): platform:admin / platform:super_admin (+ 서버측 SELF_LOCK / LAST_SUPER_ADMIN / SUPER_ADMIN_ONLY).
+ * guard(backend): platform:super_admin (+ 서버측 SELF_LOCK / LAST_SUPER_ADMIN / SUPER_ADMIN_ONLY).
  */
 
 import { api } from './client.js';

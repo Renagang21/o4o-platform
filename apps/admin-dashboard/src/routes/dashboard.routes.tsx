@@ -69,7 +69,7 @@ export function DashboardRoutes() {
 
     // WO-ADMIN-CONTENT-SLOT-V1: Service Content Manager
     <Route key="/admin/service-content-manager" path="/admin/service-content-manager" element={
-      <AdminProtectedRoute requiredRoles={['admin', 'super_admin', 'platform:admin']}>
+      <AdminProtectedRoute requiredRoles={['admin', 'super_admin']}>
         <Suspense fallback={<PageLoader />}>
           <ServiceContentManagerPage />
         </Suspense>

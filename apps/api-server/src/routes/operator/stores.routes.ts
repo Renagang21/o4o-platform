@@ -22,7 +22,7 @@ const controller = new StoreConsoleController();
 // WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1: 'kpa-society:*' → canonical 'kpa:*'
 router.use(authenticate);
 router.use(requireRole([
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',

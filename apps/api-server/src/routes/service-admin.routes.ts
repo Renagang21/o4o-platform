@@ -70,7 +70,7 @@ const router: Router = Router();
 //     정상 사용 중인 서비스 관리자 흐름이 존재하지 않으므로 최소 권한 적용의
 //     기능 회귀 위험이 없다.
 // 따라서 기존 canonical guard 를 그대로 재사용한다 — 신규 역할·permission 체계 없음.
-// (`requireAdmin` = platform:admin / platform:super_admin, WO-O4O-REQUIREADMIN-
+// (`requireAdmin` = platform:super_admin, WO-O4O-REQUIREADMIN-
 //  PREFIXED-ONLY-V1)
 //
 // 개별 endpoint 가 아니라 **router 수준**에 건다. 이후 추가되는 endpoint 도 자동으로

@@ -7,7 +7,7 @@
  * 사용자 역할 기반 스코프 할당 로직
  * - 역할에서 스코프 자동 도출
  * - 서비스별 스코프 레벨 매핑
- * - prefixed role (예: 'platform:admin', 'neture:operator') 및 unprefixed role 모두 지원
+ * - prefixed role (예: 'platform:super_admin', 'neture:operator') 및 unprefixed role 모두 지원
  */
 
 import { SERVICE_SCOPES, getScopesByLevel, type ScopeLevel } from '../config/service-scopes.js';
@@ -35,7 +35,7 @@ export interface ScopeAssignmentContext {
  * WO-O4O-RBAC-SCOPE-CONSISTENCY-FIX-V1
  *
  * prefixed role과 unprefixed role 모두 매칭.
- * 예: hasRole(roles, 'admin') → 'admin', 'platform:admin', 'neture:admin' 모두 매칭
+ * 예: hasRole(roles, 'admin') → 'admin', 'kpa:admin', 'neture:admin' 모두 매칭
  */
 function hasRole(allRoles: Set<string>, target: string): boolean {
   if (allRoles.has(target)) return true;

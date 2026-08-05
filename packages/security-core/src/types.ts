@@ -25,7 +25,7 @@ export type PrefixedRole = `${ServiceKey}:${string}`;
  *
  * Each service defines:
  * - Which prefixed roles grant access
- * - Whether platform:admin can bypass
+ * - Whether platform:super_admin can bypass
  * - Which legacy roles to detect and deny
  * - Which other service prefixes to block
  */

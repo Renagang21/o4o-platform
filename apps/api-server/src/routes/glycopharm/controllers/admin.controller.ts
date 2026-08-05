@@ -41,13 +41,12 @@ interface AuthRequest extends Request {
  * - **GlycoPharm 서비스는 오직 glycopharm:* role만 신뢰**
  * - Priority 1: GlycoPharm prefixed roles ONLY (glycopharm:admin, glycopharm:operator)
  * - Priority 2: Legacy role detection → Log + DENY
- * - platform:admin 허용 (플랫폼 감독)
+ * - platform:super_admin 허용 (플랫폼 감독)
  */
 function isOperatorOrAdmin(roles: string[] = []): boolean {
   return hasAnyServiceRole(roles, [
     'glycopharm:admin',
     'glycopharm:operator',
-    'platform:admin',
     'platform:super_admin',
   ]);
 }

@@ -18,7 +18,7 @@ const controller = new RoleController();
 router.use(authenticate);
 // WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1: 'kpa-society:*' → canonical 'kpa:*'
 //   guard 통과는 카탈로그 '조회'만 의미한다. 생성/수정/삭제는 RoleController 가
-//   scope.isPlatformAdmin(platform:admin | platform:super_admin) 으로 별도 강제하므로
+//   scope.isPlatformAdmin(platform:super_admin) 으로 별도 강제하므로
 //   kpa:admin / kpa:operator 는 CUD 불가(조회 전용) 상태가 유지된다.
 // WO-O4O-ADMIN-LEGACY-SUPER-ADMIN-NOOP-CLEANUP-V1:
 //   requireRole → hasAnyRole 은 role_assignments 에 대한 In() 정확 문자열 매칭이다.
@@ -26,7 +26,7 @@ router.use(authenticate);
 //   'admin'/'operator'/'manager' 는 본 WO 범위 밖이라 유지한다.
 router.use(requireRole([
   'admin', 'operator', 'manager',
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
   'glycopharm:admin', 'glycopharm:operator',
   'cosmetics:admin', 'cosmetics:operator',

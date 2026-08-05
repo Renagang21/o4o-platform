@@ -33,8 +33,11 @@ declare module 'express' {
  * Check if user has Admin permission for Signage
  *
  * WO-P2-PLATFORM-ROLE-PREFIX-IMPLEMENTATION-V1 - Phase 2
- * - Only platform:admin or platform:super_admin allowed
+ * - Only platform:super_admin allowed
  * - Legacy roles (admin, super_admin) logged and denied
+ *
+ * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+ *   'platform:admin' 분기 제거 (보유자 0 · 독립 권한 0).
  */
 export function hasSignageAdminPermission(user: any): boolean {
   if (!user) return false;
@@ -43,7 +46,7 @@ export function hasSignageAdminPermission(user: any): boolean {
   const userRoles: string[] = user.roles || [];
 
   // Check for platform-level admin roles (Priority 1)
-  if (hasPlatformRole(userRoles, 'super_admin') || hasPlatformRole(userRoles, 'admin')) {
+  if (hasPlatformRole(userRoles, 'super_admin')) {
     return true;
   }
 

@@ -20,7 +20,6 @@ import { requireAuth } from './authentication.middleware.js';
  * This should be chained after requireAuth or used standalone (it calls requireAuth internally).
  *
  * Accepted roles:
- * - platform:admin
  * - platform:super_admin
  *
  * Legacy unprefixed roles (admin, super_admin) are no longer accepted.
@@ -48,7 +47,6 @@ export const requireAdmin = async (
   try {
     // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 필수
     const isAdmin = await roleAssignmentService.hasAnyRole(user.id, [
-      'platform:admin',
       'platform:super_admin',
     ]);
 

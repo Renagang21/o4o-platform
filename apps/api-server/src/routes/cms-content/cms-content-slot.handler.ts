@@ -43,7 +43,7 @@ const SCOPE_TO_CMS_KEYS: Record<string, string[]> = {
 };
 
 const KNOWN_PREFIXES = Object.keys(SCOPE_TO_CMS_KEYS);
-const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'];
+const PLATFORM_ADMIN_ROLES = ['platform:super_admin'];
 const OPERATOR_SUFFIXES = [':admin', ':operator'];
 
 /** Slot access context attached to request by requireSlotAccess middleware */
@@ -87,7 +87,7 @@ function extractAllowedCmsKeys(roles: string[]): string[] {
  *
  * Must be chained after requireAuth.
  *
- * Admin (platform:admin, platform:super_admin):
+ * Admin (platform:super_admin):
  *   → slotAccess = { isAdmin: true, allowedCmsKeys: [] }
  *
  * Operator ({service}:admin, {service}:operator):

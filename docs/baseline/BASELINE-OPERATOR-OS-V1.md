@@ -121,7 +121,7 @@
 ### Display Controller Isolation (GlycoPharm)
 
 - All 14 endpoints enforce `pharmacy_id` isolation
-- Admin bypass: `glycopharm:admin`, `platform:admin`, `platform:super_admin`
+- Admin bypass: `glycopharm:admin`, `platform:super_admin`
 - Server-forced `pharmacy_id` on CREATE
 - Ownership verification on UPDATE/DELETE
 

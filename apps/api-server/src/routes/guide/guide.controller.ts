@@ -33,7 +33,6 @@ function isOperatorOrAbove(roles: string[]): boolean {
   return roles.some(
     (r) =>
       r === 'platform:super_admin' ||
-      r === 'platform:admin' ||
       r.endsWith(':operator') ||
       r.endsWith(':admin') ||
       r === 'admin'

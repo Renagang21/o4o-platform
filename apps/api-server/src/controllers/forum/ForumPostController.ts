@@ -62,7 +62,7 @@ export class ForumPostController extends ForumControllerBase {
         }
       } else {
         // Exclude closed forum posts for non-members
-        const BYPASS = ['kpa:admin', 'kpa:operator', 'platform:admin', 'platform:super_admin'];
+        const BYPASS = ['kpa:admin', 'kpa:operator', 'platform:super_admin'];
         if (!roles.some((r) => BYPASS.includes(r))) {
           if (uid) {
             // WO-O4O-FORUM-FCR-COLUMN-FIX-V1:

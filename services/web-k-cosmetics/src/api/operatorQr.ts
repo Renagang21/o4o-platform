@@ -5,7 +5,7 @@
  *
  * 운영자가 K-Cosmetics 매장 HUB 에 게시할 QR 템플릿을 작성/수정/게시하는 API client.
  * Backend: /api/v1/cosmetics/operator/qr/templates (CRUD + publish + archive)
- * 권한 (backend 검증): cosmetics:operator / cosmetics:admin / platform:admin / platform:super_admin
+ * 권한 (backend 검증): cosmetics:operator / cosmetics:admin / platform:super_admin
  */
 
 import { authClient } from '../lib/apiClient';

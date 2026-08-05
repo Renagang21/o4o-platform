@@ -149,7 +149,7 @@ Template literal 삽입은 SQL Injection 취약점을 생성한다.
 
 #### Rule 3 보강 — Platform Admin Cross-Service 정책 (Amendment, 2026-05-23)
 
-`platform:admin` / `platform:super_admin` 호출자의 cross-service 조회는 **명시 opt-in 만 허용**한다.
+`platform:super_admin` 호출자의 cross-service 조회는 **명시 opt-in 만 허용**한다.
 
 - service operator (e.g., `neture:operator`, `kpa:operator`) → backend `injectServiceScope` 가 자동으로 boundary 필터 적용
 - platform admin + `serviceKey=<key>` query → 해당 단일 service scope 로 조회

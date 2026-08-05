@@ -20,7 +20,7 @@ import logger from '../../utils/logger.js';
  */
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: platform: prefix 필수
 function isAdmin(user: any): boolean {
-  return user && user.roles?.some((r: string) => ['platform:admin', 'platform:super_admin'].includes(r));
+  return user && user.roles?.some((r: string) => ['platform:super_admin'].includes(r));
 }
 
 export class AdminOrderController {

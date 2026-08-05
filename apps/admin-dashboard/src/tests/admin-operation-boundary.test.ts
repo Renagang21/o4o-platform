@@ -6,7 +6,7 @@
  *
  * 1. **플랫폼 전역 회원 데이터 화면의 route 경계**
  *    `/api/v1/membership/*` 관리자 subtree 는 `MEMBERSHIP_ADMIN_ROLES =
- *    ['platform:admin','platform:super_admin']` 로 보호된다(서비스 경계가 없는 플랫폼 전역 데이터).
+ *    ['platform:super_admin']` 로 보호된다(서비스 경계가 없는 플랫폼 전역 데이터).
  *    같은 데이터를 다루는 화면은 route 에서도 같은 경계를 선언해야 한다.
  *    `requiredPermissions` 만 선언하면 백엔드가 `user.permissions` 를 공급하지 않으므로
  *    실효 경계가 "관리자급이면 통과"(서비스 접두 `kpa:admin` 포함) 로 넓어진다
@@ -92,10 +92,10 @@ describe('플랫폼 전역 회원 데이터 화면의 route 경계', () => {
     );
   });
 
-  it('PLATFORM_ADMIN_ROLES 는 platform 접두 2개로 유지된다 (임의 확대 금지)', () => {
+  it('PLATFORM_ADMIN_ROLES 는 platform:super_admin 단독으로 유지된다 (임의 확대 금지)', () => {
     const config = stripComments(read('config/rolePermissions.ts'));
     expect(config).toContain(
-      "export const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'] as const;",
+      "export const PLATFORM_ADMIN_ROLES = ['platform:super_admin'] as const;",
     );
   });
 });

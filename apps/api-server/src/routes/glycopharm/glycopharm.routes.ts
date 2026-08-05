@@ -439,7 +439,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-OPERATOR-BLOG-PUBLISHING-WRITE-API-V1: 운영자 HUB 게시 write API
   // /api/v1/glycopharm/operator/blog/posts (운영자가 매장 HUB 에 게시하는 블로그)
-  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  // 권한: glycopharm:operator / glycopharm:admin / platform:super_admin
   const glycopharmOperatorBlogController = createOperatorBlogController(
     dataSource,
     coreRequireAuth as any,
@@ -449,7 +449,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-KPA-POP-PUBLISHING-PHASE2-BACKEND-V1: 운영자 HUB POP write API
   // /api/v1/glycopharm/operator/pop/posts (운영자가 매장 HUB 에 게시하는 POP)
-  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  // 권한: glycopharm:operator / glycopharm:admin / platform:super_admin
   const glycopharmOperatorPopController = createOperatorPopController(
     dataSource,
     coreRequireAuth as any,
@@ -466,7 +466,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-GLYCOPHARM-STORE-HUB-QR-BACKEND-FOUNDATION-V1: 운영자 HUB QR template write API
   // /api/v1/glycopharm/operator/qr/templates (운영자가 약국 HUB 에 게시하는 QR 템플릿)
-  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  // 권한: glycopharm:operator / glycopharm:admin / platform:super_admin
   const glycopharmOperatorQrController = createOperatorQrController(
     dataSource,
     coreRequireAuth as any,
@@ -494,7 +494,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-GLYCOPHARM-LMS-QUALIFICATION-BACKEND-FOUNDATION-V1
   // /api/v1/glycopharm/qualifications — LMS 강사 자격 신청/승인 (GlycoPharm 분리)
-  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  // 권한: glycopharm:operator / glycopharm:admin / platform:super_admin
   router.use('/qualifications', createQualificationController(
     dataSource,
     coreRequireAuth as any,
@@ -538,7 +538,7 @@ export function createGlycopharmRoutes(dataSource: DataSource): Router {
 
   // WO-O4O-GLYCOPHARM-OPERATOR-EVENT-OFFER-APPROVAL-V1
   // /api/v1/glycopharm/operator/event-offers — 운영자 Event Offer 승인/반려
-  // 권한: glycopharm:operator / glycopharm:admin / platform:admin / platform:super_admin
+  // 권한: glycopharm:operator / glycopharm:admin / platform:super_admin
   router.use('/operator/event-offers', createGlycopharmEventOfferOperatorController(
     dataSource,
     coreRequireAuth as any,

@@ -131,7 +131,7 @@ draft ──→ pending ──→ active ──→ archived
 
 ### Platform Admin 특권
 
-Platform Admin(`platform:admin`, `platform:super_admin`)은 `draft → active` 직접 전환 가능.
+Platform Admin(`platform:super_admin`)은 `draft → active` 직접 전환 가능.
 이는 긴급 배포 시나리오를 위한 것이며, 일반 운영에서는 `draft → pending → active` 경로 권장.
 
 ---

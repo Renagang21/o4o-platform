@@ -24,7 +24,7 @@ import logger from '../../../utils/logger.js';
  */
 const requireOperatorOrAdmin = requireRole([
   'admin', 'super_admin', 'operator',
-  'platform:admin', 'platform:super_admin',
+  'platform:super_admin',
   'neture:admin', 'neture:operator',
 ]);
 

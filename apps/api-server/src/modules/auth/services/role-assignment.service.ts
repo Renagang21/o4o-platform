@@ -90,10 +90,15 @@ export class RoleAssignmentService {
   }
 
   /**
-   * Check if user is admin (super_admin or admin)
+   * Check if user is a platform-wide admin
+   *
+   * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+   *   UserRole.ADMIN('platform:admin') 제거에 따른 allow-list 축소.
+   *   해당 역할 보유자는 0 이었으므로 판정 결과 변화 없음.
+   *   서비스 단위 admin 은 이 helper 가 아니라 `{service}:admin` guard 로 판정한다.
    */
   async isAdmin(userId: string): Promise<boolean> {
-    return this.hasAnyRole(userId, [UserRole.SUPER_ADMIN, UserRole.ADMIN]);
+    return this.hasAnyRole(userId, [UserRole.SUPER_ADMIN]);
   }
 
   /**

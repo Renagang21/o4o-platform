@@ -30,7 +30,7 @@ export function hasServiceRole(userRoles: string[], serviceRole: PrefixedRole): 
  * @returns true if user has at least one of the roles
  *
  * @example
- * hasAnyServiceRole(['kpa:pharmacist'], ['kpa:admin', 'platform:admin']) // false
+ * hasAnyServiceRole(['kpa:pharmacist'], ['kpa:admin', 'platform:super_admin']) // false
  * hasAnyServiceRole(['platform:super_admin'], ['kpa:admin', 'platform:super_admin']) // true
  */
 export function hasAnyServiceRole(userRoles: string[], serviceRoles: PrefixedRole[]): boolean {
@@ -57,7 +57,6 @@ export function hasAllServiceRoles(userRoles: string[], serviceRoles: PrefixedRo
  *
  * Checks for:
  * - Service-specific admin (e.g., "kpa:admin")
- * - Platform-level admin ("platform:admin")
  * - Platform super admin ("platform:super_admin")
  *
  * @param userRoles - Array of user roles
@@ -83,7 +82,6 @@ export function isServiceAdmin(userRoles: string[], serviceKey: ServiceKey): boo
  * Checks for:
  * - Service-specific operator (e.g., "kpa:operator")
  * - Service-specific admin (e.g., "kpa:admin")
- * - Platform-level admin ("platform:admin")
  * - Platform super admin ("platform:super_admin")
  *
  * @param userRoles - Array of user roles
@@ -114,7 +112,6 @@ export function isServiceOperator(userRoles: string[], serviceKey: ServiceKey): 
  *
  * @example
  * isPlatformSuperAdmin(['platform:super_admin']) // true
- * isPlatformSuperAdmin(['platform:admin']) // false
  * isPlatformSuperAdmin(['kpa:admin']) // false
  */
 export function isPlatformSuperAdmin(userRoles: string[]): boolean {
@@ -122,18 +119,23 @@ export function isPlatformSuperAdmin(userRoles: string[]): boolean {
 }
 
 /**
- * Check if user has platform-level admin role (admin or super admin)
+ * Check if user has platform-wide admin authority
+ *
+ * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+ *   allow-list 에서 legacy 'platform:admin' 제거 → `platform:super_admin` 단독.
+ *   해당 역할 보유자는 0 이고 `platform:super_admin` 대비 독립 권한도 0 이었으므로
+ *   판정 결과 변화는 없다. 서비스 단위 관리는 `isServiceAdmin`/`isServiceOperator` 를 쓴다.
+ *   (helper 이름은 `serviceScope.isPlatformAdmin` 계약 필드명과 짝을 이루므로 유지한다.)
  *
  * @param userRoles - Array of user roles
- * @returns true if user is platform admin or super admin
+ * @returns true if user is platform super admin
  *
  * @example
- * isPlatformAdmin(['platform:admin']) // true
  * isPlatformAdmin(['platform:super_admin']) // true
  * isPlatformAdmin(['kpa:admin']) // false
  */
 export function isPlatformAdmin(userRoles: string[]): boolean {
-  return hasAnyServiceRole(userRoles, ['platform:admin', 'platform:super_admin']);
+  return hasServiceRole(userRoles, 'platform:super_admin');
 }
 
 /**
@@ -144,19 +146,21 @@ export function isPlatformAdmin(userRoles: string[]): boolean {
  * Strict platform role checking - only accepts `platform:*` format.
  * Service roles (e.g., `kpa:admin`) and legacy roles (e.g., `admin`) are rejected.
  *
+ * WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1:
+ *   'platform:admin' 제거로 선택지가 'super_admin' 하나만 남았다.
+ *
  * @param userRoles - Array of user roles
- * @param role - Platform role name ('admin' or 'super_admin')
+ * @param role - Platform role name ('super_admin')
  * @returns true if user has the platform role
  *
  * @example
  * hasPlatformRole(['platform:super_admin'], 'super_admin') // true
- * hasPlatformRole(['platform:admin'], 'admin') // true
- * hasPlatformRole(['kpa:admin'], 'admin') // false (service role, not platform)
- * hasPlatformRole(['admin'], 'admin') // false (legacy, not prefixed)
+ * hasPlatformRole(['kpa:admin'], 'super_admin') // false (service role, not platform)
+ * hasPlatformRole(['super_admin'], 'super_admin') // false (legacy, not prefixed)
  */
 export function hasPlatformRole(
   userRoles: string[],
-  role: 'admin' | 'super_admin'
+  role: 'super_admin'
 ): boolean {
   return userRoles.includes(`platform:${role}`);
 }
@@ -203,7 +207,7 @@ export function getServiceRoles(userRoles: string[], serviceKey: ServiceKey): st
  * Check if user has any admin role across all services
  * WO-O4O-AUTH-RBAC-FINAL-CLEANUP-V2
  *
- * Matches: platform:admin, platform:super_admin, kpa:admin, neture:admin, etc.
+ * Matches: platform:super_admin, kpa:admin, neture:admin, etc.
  * Use for cross-service features (CPT, tenant-isolation, entities).
  */
 export function isAnyAdmin(userRoles: string[]): boolean {

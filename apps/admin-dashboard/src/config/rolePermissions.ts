@@ -26,7 +26,7 @@ export interface MenuPermission {
  * 이 값을 함께 참조해야 세 계층이 갈라지지 않는다. 백엔드 상수가 바뀌면 여기도 함께 바꾼다
  * (`admin-menu-route-backend-alignment.test.ts` 가 백엔드 소스와 대조해 고정한다).
  */
-export const PLATFORM_ADMIN_ROLES = ['platform:admin', 'platform:super_admin'] as const;
+export const PLATFORM_ADMIN_ROLES = ['platform:super_admin'] as const;
 
 // Menu permission configuration without hardcoded roles
 // Roles should be fetched from database and checked dynamically
@@ -53,9 +53,9 @@ export const menuPermissions: MenuPermission[] = [
   //
   // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1 — 백엔드 경계로 재정렬:
   //   화면이 실제 호출하는 API 는 `/api/v1/admin/users` 이고(UsersListClean.tsx:72),
-  //   그 guard 는 `ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다
+  //   그 guard 는 `ADMIN_ROLES = ['platform:super_admin']` 이다
   //   (routes/admin/users.routes.ts:32).
-  //   기존 선언은 `platform:admin` 을 빠뜨려 **백엔드가 허용하는 사용자에게 메뉴를 숨기고**,
+  //   기존 선언은 백엔드 allow-list 와 어긋난 역할을 나열해 **백엔드가 허용하는 사용자에게 메뉴를 숨기고**,
   //   `super_admin` 을 포함해 **백엔드가 거부하는 사용자에게 메뉴를 보여주었다** — 양방향 불일치.
   {
     menuId: 'core-users',
@@ -64,7 +64,7 @@ export const menuPermissions: MenuPermission[] = [
 
   // WO-O4O-ADMIN-MENU-ROUTE-BACKEND-ACCESS-ALIGNMENT-V1
   //   회원 관리 메뉴 4건은 모두 `/api/v1/membership/*` 관리자 subtree 를 소비한다.
-  //   그 경계는 `MEMBERSHIP_ADMIN_ROLES = ['platform:admin','platform:super_admin']` 이다
+  //   그 경계는 `MEMBERSHIP_ADMIN_ROLES = ['platform:super_admin']` 이다
   //   (bootstrap/membership-admin-guard.ts:34, 대상 subtree 는 같은 파일 :58-87).
   //
   //   선행 WO 는 분류 메뉴에만 게이트를 걸면서 legacy `admin`·`super_admin` 을 함께 나열했고

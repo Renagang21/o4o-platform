@@ -9,7 +9,7 @@
  *       (테이블 실재 여부 + checkout_orders serviceKey row 분포 = H1/H2 판단)을 닫는다.
  *
  * 제약:
- * - Platform admin 인증 필수 (authenticate + requireAdmin: platform:admin / platform:super_admin)
+ * - Platform admin 인증 필수 (authenticate + requireAdmin: platform:super_admin)
  * - SELECT / information_schema 만 실행 (INSERT/UPDATE/DELETE/ALTER/CREATE/DROP 절대 금지)
  * - PII 미조회: 주문 상세 row(buyerId/recipient/phone/email/items/shippingAddress) 반환 안 함
  * - count / column 메타 / serviceKey·status group 집계만 반환
