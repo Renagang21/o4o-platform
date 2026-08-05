@@ -284,7 +284,14 @@ commit 은 pathspec 을 명시한 `git commit -- <파일 목록>` 으로 수행�
 
 ## 16. commit · push · ahead/behind
 
-(커밋·push 후 기재)
+| 항목 | 값 |
+|------|-----|
+| commit | `5a9826925` — `refactor(rbac): 과도기 역할 platform:admin·platform:operator 코드 제거 (WO-O4O-LEGACY-PLATFORM-ADMIN-AND-OPERATOR-CODE-REMOVAL-V1)` |
+| 포함 파일 | **131** (본 CHECK 포함), `522 insertions(+), 261 deletions(-)` |
+| pathspec | 명시 파일 목록 (`git commit --pathspec-from-file`) |
+| push | `origin/main` `03913b22d..5a9826925` ✅ |
+| ahead / behind | **0 / 0** |
+| 타 세션 WIP | commit 후에도 `apps/api-server/src/scripts/hff-zh-b01-translate.mjs` modified 유지 + untracked 38건 그대로 ✅ |
 
 ---
 
