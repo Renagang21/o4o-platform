@@ -1,0 +1,107 @@
+# WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1
+
+e약은요 기반으로 새로 확정된 KO STORE canonical **19,363건**을 유일한 기준본으로 삼아
+영어 STORE 설명서를 전량 재생산하고, 독립검증 통과 후 canonical 로 공개한다.
+
+- 발행: 2026-08-06
+- 선행 완료: [`WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1`](../checks/WO-O4O-EASY-DRUG-KO-FULL-REBUILD-BROWSER-SMOKE-V1-CHECK.md) — KO 브라우저 검증 PASS (커밋 `873ac46e6` · `dc97a5d0c` · `1d92ca9c7`)
+- 상태: **핸드오프** (본 문서는 요청서이며, 실행은 별도 지시로 착수)
+
+---
+
+## 1. 목표
+
+e약은요 기반으로 새로 확정된 KO STORE canonical 19,363건을 유일한 기준본으로 삼아
+영어 STORE 설명서를 전량 재생산하고, 독립검증 통과 후 canonical 로 공개한다.
+
+## 2. 기준
+
+- 번역 모집단: KO 정상 canonical 19,363
+- HOLD 144 제외
+- 기존 hidden EN 은 번역 입력으로 사용하지 않음
+- 기존 EN 은 용어 참고 · diff · 검증에만 사용
+- 신규 KO `generatedContentHash` 와 `officialSourceHash` 를 기준으로 잠금
+- 제품별 자기 KO 만 번역
+- 다른 제품 · 성분군 · ATC 기반 공유 금지
+
+## 3. 핵심 원칙
+
+1. KO 정보 전부 보존
+2. 효능 · 용법 · 연령 · 1회량 · 횟수 · 간격 · 기간 보존
+3. route 동사 정확히 번역
+4. 금기 · 부정어 · 경고 강도 보존
+5. 이상반응 · 상호작용 · 보관 누락 금지
+6. 의료 정보 추가 금지
+7. 고정 길이 절단 금지
+8. 제품명 · 성분명 · 함량 · 제형 혼입 금지
+9. 문장 단위 TM 재사용은 허용하되 제품 귀속과 수치는 별도 검증
+10. 기존 hidden EN 을 그대로 canonical 복구하지 않음
+
+## 4. 실행
+
+- 최신 KO 19,363 모집단 재확인
+- 번역 단위 추출 및 TM census
+- 신규 · 재사용 · 검토 필요 단위 분류
+- 전량 파일 생산
+- 독립검증
+- dry-run 2회
+- rollback-test
+- master 별 transaction + `FOR UPDATE`
+- 기존 hidden EN 과 별도 신규 정상 EN canonical 생성 또는 안전 교체
+- post-verify
+- 브라우저 대표 스모크
+- 멱등 재실행
+- CHECK · 정확한 pathspec commit · push
+
+## 5. 완료 조건
+
+- KO 19,363 대비 EN 생산 누락 0 또는 명시적 HOLD
+- 수치 · 연령 · 경로 · 부정어 · 경고 강도 손실 0
+- 다른 제품 내용 혼입 0
+- 기존 오류 EN canonical 복구 0
+- 정상 EN 만 공개
+- KO · ZH · JA 본문 변경 0
+- 독립검증 PASS
+- 브라우저 대표 검증 PASS
+- 재실행 write 0
+
+---
+
+## 6. 실행 세션이 알아야 할 전제 (선행 트랙에서 확정된 사실)
+
+### 6-1. 모집단 SSOT
+
+- 19,363 의 단일 출처는 `apps/api-server/src/scripts/easy-drug-ko-full-rebuild-live/results/apply-result-live.jsonl` (전건 `status:'APPLIED'`).
+- `plan-run2.jsonl` 은 **19,507건이며 `HOLD_NO_REPLACEMENT` 144건을 포함**한다. 즉 **§2 의 "HOLD 144 제외" 는 19,363 에 이미 반영된 상태**다 — 여기서 144 를 다시 빼지 말 것.
+- 별도로 존재하는 **`MANUAL_REVIEW` HOLD KO 130건**은 위 144 와 다른 집합이다. 두 숫자를 합산하거나 혼동하지 말 것.
+
+### 6-2. canonical 유일성
+
+- SPD canonical 유일 키는 `(master, resourceType, descriptionType, COALESCE(language,'ko'))` 다. EN 은 언어별로 유일하므로 기존 EN 행이 남아 있으면 **409 계열 충돌**이 난다. "신규 생성" 과 "안전 교체" 중 어느 쪽인지 dry-run 단계에서 먼저 확정할 것.
+
+### 6-3. 공개 노출 계약 lockstep (중요)
+
+- KO 검증 스크립트 [`h1-audit-api.mjs`](../../apps/api-server/src/scripts/easy-drug-ko-full-rebuild-live/h1-audit-api.mjs) 는 공개 랜딩 응답의 `languages` 가 **정확히 `['ko']`** 가 아니면 `LANGUAGE_EXPOSURE_DEFECT` 로 판정한다.
+- EN 을 공개하는 순간 이 단정은 거짓이 된다. **EN 공개와 같은 커밋에서 이 판정식을 `['en','ko']` 기준으로 갱신**하지 않으면 이후 회귀검증이 전건 실패한다.
+
+### 6-4. 재사용 가능한 검증 자산
+
+- 브라우저 대표 스모크: [`select-browser-smoke.mjs`](../../apps/api-server/src/scripts/easy-drug-ko-full-rebuild-live/select-browser-smoke.mjs) · [`run-browser-smoke.mjs`](../../apps/api-server/src/scripts/easy-drug-ko-full-rebuild-live/run-browser-smoke.mjs)
+- 공개 API 전수 감사: `h1-audit-api.mjs` (인증은 **localStorage Bearer `o4o_accessToken`** — 쿠키 `credentials:'include'` 만으로는 401)
+- API 진입점은 `https://api.neture.co.kr` 이고, `neture.co.kr` 은 정적 SPA 호스팅이라 `/api` 를 서빙하지 않는다.
+- 공개 경로: `https://neture.co.kr/p/{public_key}`
+
+### 6-5. 운영 제약
+
+- `product_masters` 의 제품명 컬럼은 **`name`** (`product_name` 아님).
+- 프로덕션 DB 는 read-only 검증만 무확인 진행 가능. **UPDATE/DELETE/INSERT 는 사용자 승인 필요**이며, DB write owner 세션은 하나만 유지한다.
+- 자격증명은 환경변수로만 사용하고 로그 · 산출물 · 커밋에 남기지 않는다.
+- 커밋은 반드시 `git commit -- <정확한 파일 목록>` path-specific. 타 세션 WIP 미접촉, `git add .` 금지, amend · rebase · force-push 금지.
+
+---
+
+## 7. 후속 순서 (본 WO 이후)
+
+1. hidden EN 정리
+2. ZH 재번역
+3. JA 신규 생산
