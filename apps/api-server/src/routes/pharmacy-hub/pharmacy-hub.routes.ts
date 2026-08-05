@@ -15,6 +15,8 @@
  *   GET   /api/v1/pharmacy-hub/{operator|store-owner|supplier}/ping      (각 scope)
  *   GET   /api/v1/pharmacy-hub/store-owner/info                          (store_owner) 매장 정보
  *   PATCH /api/v1/pharmacy-hub/store-owner/info                          (store_owner) 매장 정보 수정
+ *   GET   /api/v1/pharmacy-hub/store-owner/account/profile               (store_owner) 내 계정 조회
+ *   PATCH /api/v1/pharmacy-hub/store-owner/account/profile               (store_owner) 내 계정 수정
  *
  * 포함하지 않는 것 (후속 WO):
  *   상품 카탈로그/장바구니/주문, 콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
@@ -39,6 +41,7 @@ import { PharmacyHubStoreProductController } from '../../controllers/pharmacy-hu
 import { PharmacyHubStoreDashboardController } from '../../controllers/pharmacy-hub/PharmacyHubStoreDashboardController.js';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import { PharmacyHubStoreInfoController } from '../../controllers/pharmacy-hub/PharmacyHubStoreInfoController.js';
+import { PharmacyHubAccountController } from '../../controllers/pharmacy-hub/PharmacyHubAccountController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -223,6 +226,18 @@ export function createPharmacyHubRoutes(): Router {
   // ───────────────────────────────────────────────────────────────────────────
   router.get('/store-owner/info', ...storeOwnerGuards, PharmacyHubStoreInfoController.get);
   router.patch('/store-owner/info', ...storeOwnerGuards, PharmacyHubStoreInfoController.update);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 내 계정(프로필) 조회·수정 (동일 WO — 범위 B)
+  //
+  //   SSOT = users. 대상은 **항상 인증 사용자 자신**이며 body 로 다른 사용자를
+  //   지목할 수 없다 (allowlist = name/nickname/phone).
+  //   공통 /api/v1/users/* 는 `/password` 를 제외하면 requireAdmin 뒤에 있어
+  //   일반 사용자 프로필 계약이 없다 → PH scope 최소 계약으로 둔다.
+  //   비밀번호 변경은 기존 공통 계약(PUT /api/v1/users/password)을 그대로 쓴다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/account/profile', ...storeOwnerGuards, PharmacyHubAccountController.getProfile);
+  router.patch('/store-owner/account/profile', ...storeOwnerGuards, PharmacyHubAccountController.updateProfile);
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)

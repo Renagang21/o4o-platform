@@ -3,10 +3,15 @@
  *
  * WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
  *
- * 기존 플랫폼 계정 계약을 그대로 쓴다 — Pharmacy-Hub 전용 계정 API 를 만들지 않는다.
- *   GET /users/profile   내 프로필
- *   PUT /users/profile   { name, nickname, phone }
- *   PUT /users/password  { currentPassword, newPassword, newPasswordConfirm, serviceKey }
+ *   GET   /pharmacy-hub/store-owner/account/profile   내 프로필
+ *   PATCH /pharmacy-hub/store-owner/account/profile   { name, nickname, phone }
+ *   PUT   /users/password                             { currentPassword, newPassword, newPasswordConfirm, serviceKey }
+ *
+ * 프로필이 PH scope 인 이유: 공통 `/api/v1/users/*` 는 `/password` 를 제외하면
+ * 전부 requireAdmin 뒤에 있어 일반 사용자용 프로필 계약이 없다 (`/users/profile`
+ * 은 admin 전용 `/:id` 에 걸려 403). 공통 가드 정책은 이 WO 의 변경 금지 항목이라
+ * 건드리지 않고, users 자기 행만 다루는 PH 최소 계약을 쓴다.
+ * 비밀번호는 기존 공통 계약을 그대로 재사용한다.
  *
  * serviceKey 를 함께 보내면 service_credentials(V2 경로)만 갱신된다
  * (WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1).
@@ -36,10 +41,11 @@ function unwrap<T>(body: any, fallbackMessage: string): T {
   return body.data as T;
 }
 
+const PROFILE_PATH = '/pharmacy-hub/store-owner/account/profile';
+
 export async function fetchAccountProfile(): Promise<AccountProfile> {
-  const res = await api.get('/users/profile');
-  const data = unwrap<{ user: AccountProfile }>(res.data, '계정 정보를 불러오지 못했습니다.');
-  return data.user;
+  const res = await api.get(PROFILE_PATH);
+  return unwrap<AccountProfile>(res.data, '계정 정보를 불러오지 못했습니다.');
 }
 
 export async function updateAccountProfile(patch: {
@@ -47,9 +53,8 @@ export async function updateAccountProfile(patch: {
   nickname?: string;
   phone?: string;
 }): Promise<AccountProfile> {
-  const res = await api.put('/users/profile', patch);
-  const data = unwrap<{ user: AccountProfile }>(res.data, '계정 정보를 저장하지 못했습니다.');
-  return data.user;
+  const res = await api.patch(PROFILE_PATH, patch);
+  return unwrap<AccountProfile>(res.data, '계정 정보를 저장하지 못했습니다.');
 }
 
 /**
