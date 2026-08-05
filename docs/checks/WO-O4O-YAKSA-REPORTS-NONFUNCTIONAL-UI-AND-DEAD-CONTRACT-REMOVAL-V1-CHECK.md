@@ -254,10 +254,11 @@ type HubDashboardData = Omit<IntegratedDashboardData, 'pendingReports'>;
 
 | 항목 | 값 |
 |------|------|
-| commit | (§12 는 commit 직후 기재) |
-| 포함 파일 | (동상) |
-| push | (동상) |
-| ahead / behind | (동상) |
+| commit | `bfa0a3d7f` — `refactor(yaksa): 작동 불가 신상신고 UI·죽은 프런트엔드 API 계약 제거 (…-V1)` |
+| 포함 파일 | **18개** (334 insertions / 2,264 deletions) — 삭제 6 · 신규 1(본 CHECK) · 수정 11 |
+| 타 세션 파일 포함 | **0** — `git commit -- <자기 파일 목록>` pathspec 으로 격리. 타 세션이 staged 해 둔 `e2e/screenshots/**` · `scripts/care-*` 는 그대로 staged 상태로 보존(unstage 하지 않음) |
+| push | `origin/main` `a5a8402cf..bfa0a3d7f` (fast-forward) |
+| ahead / behind | **0 / 0** |
 
 ---
 
