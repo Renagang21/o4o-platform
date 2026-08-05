@@ -352,7 +352,21 @@ commit 은 자기 파일 275건만 명시 경로로 지정해 수행했다 (§20
 - commit 후 `git show --name-only --format= HEAD` 로 파일 목록 검증
 - push 후 `origin/main` 대비 **ahead 0 / behind 0**
 
-> 상세 commit hash 및 push 결과는 §20 하단에 기재한다.
+### 실제 결과
+
+| 항목 | 값 |
+|---|---|
+| commit | `ab5570573` — `chore(yaksa): 레거시 약사회 전용 관리자·도메인·scheduler 기능 전면 제거 (WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1)` |
+| 변경 규모 | **276 files changed, 471 insertions(+), 56,948 deletions(-)** |
+| `git show --name-only --format= HEAD` 대조 | 의도 목록 276건과 **완전 일치**, `src/scripts/` 오염 **0** |
+| push | `be6a102a5..ab5570573  main -> main` |
+| 최종 ahead/behind | **0 / 0** |
+| commit 후 잔여 워크트리 | 타 세션 WIP(`apps/api-server/src/scripts/**`)만 남음 — 무변경 |
+
+> pre-commit hook 이 `package.json` 변경을 감지해 lockfile 을 재확인·stage 했다
+> (`Lockfile is up to date, resolution step is skipped`). 삭제한 workspace package 반영분 외 변경 없음.
+
+> 본 CHECK 의 §20 결과 기재는 push 된 commit 을 재작성하지 않고 **후속 commit** 으로 반영했다.
 
 ---
 
