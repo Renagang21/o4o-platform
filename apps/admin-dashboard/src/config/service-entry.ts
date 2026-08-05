@@ -81,7 +81,9 @@ export const SERVICE_ENTRY_DEFAULTS: Record<ServiceEntryPoint, ServiceEntryConfi
     displayName: '약사 포럼',
     description: '약사 커뮤니티 포럼',
     isProgram: false,
-    routePatterns: ['/admin/forum', '/admin/yaksa-forum'],
+    // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: '/admin/yaksa-forum' 패턴 제거
+    //   (해당 경로의 화면은 라우팅된 적이 없고 legacy `/api/v1/yaksa/*` 와 함께 제거됨)
+    routePatterns: ['/admin/forum'],
   },
   lms: {
     entry: 'lms',

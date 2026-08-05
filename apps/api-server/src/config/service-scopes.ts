@@ -277,7 +277,9 @@ export function detectServiceEntryFromPath(path: string): ServiceEntryPoint | nu
   if (pathLower.includes('/pharmacy') || pathLower.includes('/yakguk')) {
     return 'pharmacy';
   }
-  if (pathLower.includes('/forum') || pathLower.includes('/yaksa-forum')) {
+  // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: '/yaksa-forum' 경로 분기 제거
+  //   (해당 경로의 화면·라우트가 존재하지 않으며 legacy `/api/v1/yaksa/*` 와 함께 제거됨)
+  if (pathLower.includes('/forum')) {
     return 'forum';
   }
   if (pathLower.includes('/lms') || pathLower.includes('/learning')) {

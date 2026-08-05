@@ -134,13 +134,11 @@ import {
 } from '../routes/cosmetics/entities/index.js';
 
 // ============================================================================
-// YAKSA ENTITIES (Phase A-1)
+// YAKSA ENTITIES (Phase A-1) — REMOVED
+// WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
+//   legacy `/api/v1/yaksa/*` 제거와 함께 YaksaCategory / YaksaPost / YaksaPostLog 등록을 해제했다.
+//   DB 테이블 자체는 보존하며, DROP 여부는 별도 보존·아카이브 판단 감사에서 결정한다.
 // ============================================================================
-import {
-  YaksaCategory,
-  YaksaPost,
-  YaksaPostLog,
-} from '../routes/yaksa/entities/index.js';
 
 // ============================================================================
 // GLYCOPHARM ENTITIES (Phase B-1)
@@ -660,11 +658,8 @@ export const entities = [
   // COSMETICS MEMBER PROFILE (WO-O4O-KCOS-COSMETICS-MEMBER-PROFILE-FOUNDATION-V1)
   CosmeticsMember,
   // ============================================================================
-  // YAKSA ENTITIES (Phase A-1: Yaksa API Implementation)
-  // ============================================================================
-  YaksaCategory,
-  YaksaPost,
-  YaksaPostLog,
+  // YAKSA ENTITIES (Phase A-1) — REMOVED
+  // WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1: legacy route 제거와 함께 등록 해제
   // ============================================================================
   // GLYCOPHARM ENTITIES (Phase B-1)
   // Note: GlycopharmPharmacy REMOVED (WO-O4O-ORG-SERVICE-MODEL-NORMALIZATION-V1 Phase C)

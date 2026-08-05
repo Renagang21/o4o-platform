@@ -81,8 +81,12 @@ export class ForumRecommendationController {
   }
 
   /**
-   * GET /api/v1/yaksa/forum/recommendations
+   * GET /api/v1/forum/recommendations/yaksa
    * Get yaksa-domain specific recommendations
+   *
+   * WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
+   *   기존 주석의 `/api/v1/yaksa/forum/recommendations` 는 실경로와 다른 stale 표기였다.
+   *   실제 mount 는 forum.recommendation.routes.ts 의 `/api/v1/forum/recommendations/yaksa` 다.
    */
   async getYaksaRecommendations(req: Request, res: Response): Promise<void> {
     try {

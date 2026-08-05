@@ -102,7 +102,9 @@ import operatorStoreRoutes from '../routes/operator/stores.routes.js';
 import operatorRoleRoutes from '../routes/operator/roles.routes.js';
 import { createOperatorAnalyticsRoutes } from '../routes/operator/analytics.routes.js';
 import { createCosmeticsRoutes } from '../routes/cosmetics/cosmetics.routes.js';
-import { createYaksaRoutes } from '../routes/yaksa/yaksa.routes.js';
+// WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1:
+//   legacy `/api/v1/yaksa/*` (createYaksaRoutes) 제거. 소비처·운영 데이터 0으로 확정된 dead route 였다.
+//   현행 Yaksa 실서비스(`/api/v1/membership`, `@o4o/lms-yaksa`, `/api/v1/forum`)와 무관하다.
 import { createGlycopharmRoutes } from '../routes/glycopharm/glycopharm.routes.js';
 // WO-PHARMACY-HUB-NEW-SERVICE-FOUNDATION-V1
 import { createPharmacyHubRoutes } from '../routes/pharmacy-hub/pharmacy-hub.routes.js';
@@ -639,14 +641,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to initialize LmsPaymentEventHandler:', lmsPaymentError);
     }
 
-    // 26. Register Yaksa routes (Phase A-1)
-    try {
-      const yaksaRoutes = createYaksaRoutes(dataSource);
-      app.use('/api/v1/yaksa', yaksaRoutes);
-      logger.info('✅ Yaksa routes registered at /api/v1/yaksa');
-    } catch (yaksaError) {
-      logger.error('Failed to register Yaksa routes:', yaksaError);
-    }
+    // 26. (제거됨) Yaksa routes — WO-O4O-LEGACY-YAKSA-API-ROUTE-AND-DEAD-UI-REMOVAL-V1
+    //   legacy `/api/v1/yaksa/*` 12 endpoint 는 production 소비처·내부 호출·운영 데이터가 모두 0으로
+    //   확정되어(WO-O4O-LEGACY-YAKSA-API-ROUTE-USAGE-AND-DISPOSITION-AUDIT-V1) mount 를 제거했다.
+    //   DB 테이블(yaksa_posts / yaksa_categories / yaksa_post_logs)은 보존한다.
 
     // 27. Register Glycopharm routes (Phase B-1)
     try {
