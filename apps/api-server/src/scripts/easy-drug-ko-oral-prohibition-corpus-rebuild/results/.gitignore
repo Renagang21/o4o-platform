@@ -1,0 +1,5 @@
+# 본문(newHtml) 포함 3.9MB — e약은요 원문에서 결정적으로 재생성되므로 추적하지 않는다.
+# 재생성: plan-rebuild.ts (단, 입력은 candidate-measure.before.json 를 candidate-measure.json 으로
+# 되돌린 뒤여야 한다 — candidate-measure.json 은 적용 후 재스캔 결과로 덮여 있다).
+# 추적 원장은 rebuild-plan-ledger.jsonl + plan-summary.json (emit-plan-ledger.mjs 산출).
+rebuild-plan.json

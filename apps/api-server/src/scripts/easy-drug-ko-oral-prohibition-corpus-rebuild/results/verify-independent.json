@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-ORAL-PROHIBITION-CORPUS-REBUILD-V1",
+  "mode": "INDEPENDENT VERIFY (저작기·판정기 미import · SQL 정규식 재작성)",
+  "verdict": "PASS",
+  "checks": {
+    "V1_liveDamagedKoCanonical": 0,
+    "V2_replaceOk": "702/702",
+    "V3_holdWithdrawnOk": "253/253",
+    "V4_auditEvents": {
+      "canonical_replaced": 702,
+      "canonical_withdrawn": 253
+    },
+    "V5_translationBodiesChanged": 0,
+    "V6_delta": {
+      "koCanonical": -253,
+      "koDeprecated": 955,
+      "audit": 955
+    }
+  },
+  "snapshot": {
+    "ko_canonical": 63283,
+    "ko_deprecated": 19689,
+    "ko_damaged": 569,
+    "auditTotal": 19672,
+    "auditThisWo": 0
+  },
+  "current": {
+    "ko_canonical": 63030,
+    "ko_deprecated": 20644,
+    "ko_damaged": 0,
+    "auditTotal": 20627,
+    "auditThisWo": 955
+  },
+  "failures": [],
+  "failureCount": 0
+}

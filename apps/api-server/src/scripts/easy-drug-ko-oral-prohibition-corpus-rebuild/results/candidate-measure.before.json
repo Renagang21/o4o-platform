@@ -1,0 +1,4540 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-ORAL-PROHIBITION-CORPUS-REBUILD-V1",
+  "mode": "READ-ONLY MEASURE",
+  "oralTermRe": "내복|복용|복약|먹|삼키|삼켜|경구",
+  "prohibitRe": "마십시오|마세요|마시오|말 것|말아야|않도록|않습니다|않는다|금지|삼가|안 됩니다|안됩니다|하지 하십시오",
+  "selfContraSqlRe": "(사용|적용|도포|점안|바르)(하고|하며|하거나)[, ]{0,3}\\1(하)?지 *(마|않|하)|내사용|사용용|사용약|경구사용|사용하지 *하십시오",
+  "scannedUnits": 4083,
+  "unitsWithSafetyProhibitionInSource": 1646,
+  "damagedUnits": 207,
+  "damagedMasterSum": 955,
+  "damagedUnitsWithoutOfficialSource": 0,
+  "byDetector": {
+    "SOURCE_DIFF+SELF_CONTRADICTION": 92,
+    "SELF_CONTRADICTION": 54,
+    "SOURCE_DIFF": 61
+  },
+  "benignRewriteOnlyUnits": 69,
+  "lostPatterns": [
+    {
+      "n": 63,
+      "pattern": "이 약은 외용으로만 사용하고 내복하지 마십시오."
+    },
+    {
+      "n": 14,
+      "pattern": "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+    },
+    {
+      "n": 12,
+      "pattern": "외용으로만 사용하고 내복하지 마십시오."
+    },
+    {
+      "n": 9,
+      "pattern": "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+    },
+    {
+      "n": 8,
+      "pattern": "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+    },
+    {
+      "n": 4,
+      "pattern": "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "이 약은 외용으로만 사용하고 삼키지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제,"
+    },
+    {
+      "n": 2,
+      "pattern": "이 약은 외용제제로 피부에만 사용하며, 복용하지 마십시오."
+    },
+    {
+      "n": 2,
+      "pattern": "이 약은 코에만 사용하고 내복하거나 눈 및 귀에 사용하지 않습니다."
+    },
+    {
+      "n": 2,
+      "pattern": "외용으로만 사용하며 경구복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 2,
+      "pattern": "이 약을 사용하는 동안에는 디클로페낙 제제나 비스테로이드 소염제를 국소적으로 적용하거나 복용하지 마십시오."
+    },
+    {
+      "n": 2,
+      "pattern": "이 약은 외용, 즉 질환 부위에 바르는 약으로만 사용하고 내복 또는 흡입하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "관장에만 사용하고 내복하지 않습니다."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 사용하는 동안 경구용 타크로리무스, 시롤리무스를 함께 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 삼키지 않도록 주의하십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고 내복하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고 내복하지 하십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 복용하는 동안 MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해(기침을 그치게 함)거담제"
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하고 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하고 경구복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 사용하는 동안 경구용 타크로리무스를 함께 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하고, 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "디펜히드라민(및 그 염류) 함유하는 제제(피부에 적용하는 제제 포함)는 복용(사용)하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "목(목구멍)의 도포(바르다)용으로 사용하고, 내복하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하며 경구 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제,"
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 주사하거나 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "목구멍의 도포용으로 사용하고 내복하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하며 복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고 경구복용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "다른 진해거담제, 감기약, 항히스타민제를 함유하는 내복약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 복용하지 마십"
+    },
+    {
+      "n": 1,
+      "pattern": "MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해거담제, 감기약, 항히스타민제를 함유하는 내복약(비"
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 사용하는 동안 디클로페낙 제제나 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "경구용 타크로리무스(면역억제제)와 함께 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "국소용, 즉 효능과 사용방법에 따라 질 내에 삽입하는 약이므로 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "복용하거나 눈 및 귀에 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하는 약이므로 복용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+    }
+  ],
+  "contradictionPatterns": [
+    {
+      "n": 64,
+      "pattern": "이 약은 외용으로만 사용하고 사용하지 마십시오."
+    },
+    {
+      "n": 25,
+      "pattern": "안과용 및 내사용으로 사용하지 마십시오."
+    },
+    {
+      "n": 12,
+      "pattern": "외용으로만 사용하고 사용하지 마십시오."
+    },
+    {
+      "n": 11,
+      "pattern": "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+    },
+    {
+      "n": 7,
+      "pattern": "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+    },
+    {
+      "n": 4,
+      "pattern": "이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "내사용으로 사용하지 마십시오."
+    },
+    {
+      "n": 2,
+      "pattern": "이 약은 외용제제로 피부에만 사용하며, 사용하지 마십시오."
+    },
+    {
+      "n": 2,
+      "pattern": "외용으로만 사용하며 경구사용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "관장에만 사용하고 사용하지 않습니다."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 구강 세척용으로만 사용하고 내사용으로 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 직장(곧창자)에만 사용하고 내사용으로는 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 점비용으로만 사용하고 내사용이나 눈이나 귀에 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고 사용하지 하십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약을 사용하는 동안 MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해(기침을 그치게 함)거담제"
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 코의 점막에만 사용하고 내사용이나 눈 또는 귀에 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "외용으로만 사용하고 경구사용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "목(목구멍)의 도포(바르다)용으로 사용하고, 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "목구멍의 도포용으로 사용하고 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 외용으로만 사용하고 경구사용 및 주사하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "다른 진해거담제, 감기약, 항히스타민제를 함유하는 사용약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 사용하지 마십"
+    },
+    {
+      "n": 1,
+      "pattern": "함수용으로만 사용하고 내사용으로 사용하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 항문부위에만 사용하고 내사용 또는 안과용으로 사용하지 말고 흡입하지 마십시오."
+    },
+    {
+      "n": 1,
+      "pattern": "MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해거담제, 감기약, 항히스타민제를 함유하는 사용약(비"
+    },
+    {
+      "n": 1,
+      "pattern": "이 약은 안과용 또는 내사용으는 사용하지 마십시오."
+    }
+  ],
+  "topBenignPatterns": [
+    {
+      "n": 6,
+      "pattern": "우울증, 파킨슨병 치료 등에 사용되는 MAO 억제제를 복용하고 있거나 복용을 중단한 후 #주 이내인 사람은 이 약을 사용하지 "
+    },
+    {
+      "n": 5,
+      "pattern": "COX-# 저해제를 포함하여 다른 비스테로이드성 소염진통제, 아스피린 등 혈소판 응집 억제제, 글루코코르티코이드, 칼륨보전이뇨"
+    },
+    {
+      "n": 4,
+      "pattern": "MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등)를 복용(사용)하고 있거나 복용(사용)을 중단한 후 #주 이내"
+    },
+    {
+      "n": 3,
+      "pattern": "이 약 또는 아스피린, 다른 비스테로이드성 소염진통제에 과민증 환자, 소화성궤양, 출혈, 아스피린 또는 다른 비스테로이드성 소"
+    },
+    {
+      "n": 3,
+      "pattern": "복용 중에는 음주하지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "이 약에 과민증, 만 #세 미만의 소아, 뇌경질막이 노출되는 수술이나 나비뼈통과 뇌하수체절제술을 한 사람, 폐쇄각 녹내장, 건"
+    },
+    {
+      "n": 3,
+      "pattern": "이 약에 과민증 환자는 이 약을 복용하지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "이 약에 과민증 환자, 세균(결핵, 매독 등)ㆍ진균(칸디다증, 백선 등)ㆍ단순포진을 제외한 바이러스(대상포진, 수두, 종두증 "
+    },
+    {
+      "n": 3,
+      "pattern": "혈압강하제, 항우울약과 함께 복용하지 마십시오."
+    },
+    {
+      "n": 3,
+      "pattern": "이 약에 과민증 환자는 이 약은 복용하지 마십시오."
+    }
+  ],
+  "damaged": [
+    {
+      "itemSeq": "197300075",
+      "contentMd5": "cb0af03a3a2755a7219f251845aa0ce3",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "관장에만 사용하고 내복하지 않습니다."
+      ],
+      "contradictionSentences": [
+        "관장에만 사용하고 사용하지 않습니다."
+      ]
+    },
+    {
+      "itemSeq": "197600172",
+      "contentMd5": "66b3ca9f3815c7dfef901d4444472bf6",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198200102",
+      "contentMd5": "e5de577991f2fe89381981e24d6993eb",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198200799",
+      "contentMd5": "e5de577991f2fe89381981e24d6993eb",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198400399",
+      "contentMd5": "74b21305cb77ee3a4ae4fe52aca71c37",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [
+        "이 약을 사용하는 동안 경구용 타크로리무스, 시롤리무스를 함께 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198400401",
+      "contentMd5": "e40223b2dc5fc5f562f78b9194d51130",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 2,
+      "nSafety": 2,
+      "nSafetyLost": 2,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 삼키지 마십시오.",
+        "이 약을 삼키지 않도록 주의하십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "198401161",
+      "contentMd5": "db1c0d379217add44f9141544a0bac5c",
+      "nMaster": 12,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198701196",
+      "contentMd5": "70c0e40af620e7193782a6b7c2189afe",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "198802349",
+      "contentMd5": "034ce6b687d447ef3e525d7d9c03d22b",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 2,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199201236",
+      "contentMd5": "3c6ca1f75dadc7c010a6aeab8173285d",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199301708",
+      "contentMd5": "d4d6fdf4e0827efc86ba017f7520d377",
+      "nMaster": 10,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199500818",
+      "contentMd5": "40a9872c6b4ad7723dac2bbc66cc06ab",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "199501025",
+      "contentMd5": "440a2128d178d9bfbe01333d1f17eb13",
+      "nMaster": 7,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199501960",
+      "contentMd5": "6ec206653ffe564e78f6edfcd93c407b",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199600201",
+      "contentMd5": "70e229474c1956c3536f0409b01937ab",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 2,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199601069",
+      "contentMd5": "6379c0fc78a6c759e964a1886792b813",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199601101",
+      "contentMd5": "0879af0bf1ffb750a1c44b0570141d4d",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199700635",
+      "contentMd5": "cfb27fd7912ed98526d7dfe501b54f15",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199700636",
+      "contentMd5": "a7ffbeed5e0865a52708e4ec810a7f6d",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199702589",
+      "contentMd5": "b5fad18d5473e5ea5e03c54e32c17040",
+      "nMaster": 9,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 구강 세척용으로만 사용하고 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199702966",
+      "contentMd5": "81c5077b0cf9ba5e10f227ddaaa15bca",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "199801231",
+      "contentMd5": "1f958012d69b32a1d71563fc9d5835f4",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199803082",
+      "contentMd5": "aacdaa63959e026cd30adfcf32fda201",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199806423",
+      "contentMd5": "f968e98852fcb1a8deb076441db55b20",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 직장(곧창자)에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199806775",
+      "contentMd5": "0b960fe27502348eb605db6f646caf17",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199900248",
+      "contentMd5": "537fe72dd92932827cf8cc6470ff82ea",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199900422",
+      "contentMd5": "2bd43dce2454cbcada43aadd54f84d9e",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199903457",
+      "contentMd5": "e4037144aba8617839f482a758ec6de2",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199904088",
+      "contentMd5": "d6e7155f0f3698ed008634cb6538ec22",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "199906850",
+      "contentMd5": "91928493b2e071aac9da82a235015fb0",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 삼키지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "200001731",
+      "contentMd5": "1357b64bc4679186063528a357746bbf",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200001760",
+      "contentMd5": "8cae76bc6ea9b9e6b6e1dde2a4bca4cd",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200001761",
+      "contentMd5": "fd9d1d07334b507b5bae2f664265b9cb",
+      "nMaster": 11,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200001775",
+      "contentMd5": "d1ddf1e6bcf60582e017361cf0626126",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200003005",
+      "contentMd5": "0a71689ff2ecc27d9f4bbdb352ddec12",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200003399",
+      "contentMd5": "6dc3adb5f9b81271786ed599c2fa6df5",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 삼키지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "200004836",
+      "contentMd5": "17f20e10e2e4249ca2f50e7073b17287",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200008589",
+      "contentMd5": "491ec0cbf8a84beff7c3708d6dc472f7",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 2,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200008590",
+      "contentMd5": "fcb8eedbcbe7a4672adaab05fd4c65ff",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 2,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200100454",
+      "contentMd5": "15d3bce1cb1adcd640045b8fc749c526",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200100584",
+      "contentMd5": "8b015bdd55779da64be88f18e276b1af",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200100920",
+      "contentMd5": "1e94016294b4e18c1b5b3b39ab5cb6a3",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200108778",
+      "contentMd5": "18df3820f172a51ef321b9ad13629e02",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용제제로 피부에만 사용하며, 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용제제로 피부에만 사용하며, 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200108778",
+      "contentMd5": "dee72972f111ea45fd0e5b9878f910d9",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용제제로 피부에만 사용하며, 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용제제로 피부에만 사용하며, 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200203626",
+      "contentMd5": "c823fe11c0120a4fba2d50cab31ce237",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200210726",
+      "contentMd5": "15b81eff7b4923acbeee937caf99f174",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200210727",
+      "contentMd5": "1322ff808093d60fe3f20c609627ce11",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200300337",
+      "contentMd5": "d64257d3bca889cedf8f2834064794db",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200300338",
+      "contentMd5": "627f789f22dbb77ca5519352623a426c",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200300836",
+      "contentMd5": "3b5321a9dc6a0ab5a62dbeaf8d15a365",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200308600",
+      "contentMd5": "6ec206653ffe564e78f6edfcd93c407b",
+      "nMaster": 7,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200401046",
+      "contentMd5": "d2abc939acee1bfbc835d040ed6176bf",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200401051",
+      "contentMd5": "8b015bdd55779da64be88f18e276b1af",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200402713",
+      "contentMd5": "d1aa178cf94cd0df20a1f8e02ce77633",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200404710",
+      "contentMd5": "6541c67cc71e030836fefd173943f48b",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200500434",
+      "contentMd5": "8b015bdd55779da64be88f18e276b1af",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200501200",
+      "contentMd5": "8096b8e733a9b263e8c937619a2f01b2",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200501323",
+      "contentMd5": "1357b64bc4679186063528a357746bbf",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200511465",
+      "contentMd5": "c93cf7f7e23039e6710ec3aced553f3a",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200600106",
+      "contentMd5": "3cc5550cf413c623b3270220404bebdc",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200607484",
+      "contentMd5": "4d04ed5c99ebcb5039abe54898df5dbb",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200612696",
+      "contentMd5": "a65ec1bb480b6f2720373b28e54fe1bb",
+      "nMaster": 7,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200701274",
+      "contentMd5": "27dce340c3e339fef6c8ab4c23b6656e",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200704064",
+      "contentMd5": "c7e2f28af37caa18b858bf5b1b75d342",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200713754",
+      "contentMd5": "9ac7c4c14dfa423923ff8666b1b60a48",
+      "nMaster": 55,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200713763",
+      "contentMd5": "9748029786382e3639d343ada1c8d427",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200800438",
+      "contentMd5": "862d78a11a27b70efeb337519104f7dd",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 점비용으로만 사용하고 내사용이나 눈이나 귀에 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200802686",
+      "contentMd5": "06621d1f60207969316c59605b5296a3",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200807607",
+      "contentMd5": "0edef5cc70bd7fa2cda050946b586653",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 하십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 하십시오."
+      ]
+    },
+    {
+      "itemSeq": "200811147",
+      "contentMd5": "0879af0bf1ffb750a1c44b0570141d4d",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200901117",
+      "contentMd5": "dba8da43512a1d8ac91a5c80196b5133",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200901276",
+      "contentMd5": "f944e278cc0240d67b2204d27aa3412c",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "200901683",
+      "contentMd5": "318e2821a513cefbc56399bf0d4941c3",
+      "nMaster": 12,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200901684",
+      "contentMd5": "c11550f2277dc66dc995ca6d5ec131f9",
+      "nMaster": 8,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200901703",
+      "contentMd5": "ad88b5012e7ffe1496215ef96a889340",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "200906982",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 17,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201102036",
+      "contentMd5": "1d5d01cdac734a6c077b4e1b7a104d4d",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201103942",
+      "contentMd5": "06621d1f60207969316c59605b5296a3",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201109733",
+      "contentMd5": "aa48dace2c6e2b7551cfdf0a4cc05d4f",
+      "nMaster": 9,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 복용하는 동안 MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해(기침을 그치게 함)거담제(가래약), 감기약, 항히스타민제를 함유하는 내복약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 사용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약을 사용하는 동안 MAO 억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해(기침을 그치게 함)거담제(가래약), 감기약, 항히스타민제를 함유하는 사용약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201112308",
+      "contentMd5": "546544cf3a5aba1f1be7655e3dad07a4",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201112308",
+      "contentMd5": "768de6a64505a27802db204686904bca",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201201278",
+      "contentMd5": "8bdd106d24824f5026054d379475c39d",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 코의 점막에만 사용하고 내사용이나 눈 또는 귀에 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201201484",
+      "contentMd5": "f5c25e2bf64f630771b59355bf311146",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 코에만 사용하고 내복하거나 눈 및 귀에 사용하지 않습니다."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201202800",
+      "contentMd5": "b3fda9b081fb9ecde85b7b2996216bef",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201210143",
+      "contentMd5": "b68dd6180fc40f056bd037097203e281",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201300902",
+      "contentMd5": "5a85d6cd94c70d41aeadd23c93481505",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하며 경구복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하며 경구사용 및 주사하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201307343",
+      "contentMd5": "e77e0471333e974a797939deddc1a473",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201307475",
+      "contentMd5": "3049beec8dec7936d9d9ef370f7430b8",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 경구복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 경구사용 및 주사하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201307879",
+      "contentMd5": "2286e22fccfb4846a80ba2db5c50991f",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201308657",
+      "contentMd5": "17da929d50c263f355d386d0c907966e",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201308657",
+      "contentMd5": "a185d94b1870da503234372ec24da999",
+      "nMaster": 8,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201310681",
+      "contentMd5": "d578b6c36e46a8114bf13bb6c30ec78d",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [
+        "이 약을 사용하는 동안 경구용 타크로리무스를 함께 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201402375",
+      "contentMd5": "743be8d251f8aa26a359aae41544383d",
+      "nMaster": 12,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201403893",
+      "contentMd5": "ddb87910543ced566512c360e01df47f",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201404210",
+      "contentMd5": "336b797319eb40bc054b5ee263c78d2e",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201405694",
+      "contentMd5": "3596f9f3e9241cc8de9dde9ef8b3c18e",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 3,
+      "nSafety": 2,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 1,
+      "nAbsent": 0,
+      "lostSentences": [
+        "디펜히드라민(및 그 염류) 함유하는 제제(피부에 적용하는 제제 포함)는 복용(사용)하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201406047",
+      "contentMd5": "6541c67cc71e030836fefd173943f48b",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201500020",
+      "contentMd5": "356bd6ef6dc7ef1bff5954c34b516e31",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201500199",
+      "contentMd5": "a4780a6ed417ab9f2b508b62022ba242",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "목(목구멍)의 도포(바르다)용으로 사용하고, 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "목(목구멍)의 도포(바르다)용으로 사용하고, 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201501235",
+      "contentMd5": "fe6514637816859aca3fef12e3415e19",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201501621",
+      "contentMd5": "b9944e62171c12b206898678244eee28",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201501792",
+      "contentMd5": "d2abc939acee1bfbc835d040ed6176bf",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201501926",
+      "contentMd5": "11747591b42b649eafb479cac64d2e2a",
+      "nMaster": 20,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하며 경구 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201505097",
+      "contentMd5": "08b591da62ecb9caead5ffb32fe6de59",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하며 경구복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하며 경구사용 및 주사하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201506002",
+      "contentMd5": "7d603b602b162eff0a98e0291a8361f1",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201506622",
+      "contentMd5": "b21312efbfeb0e9288004323532be173",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201507025",
+      "contentMd5": "4b07ef467ff2311df3dee3c4a2b4e5e5",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201507422",
+      "contentMd5": "1f761328f35fdb3cabfe04b516f0d07d",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약을 복용(사용)하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201508135",
+      "contentMd5": "034ce6b687d447ef3e525d7d9c03d22b",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 2,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201508488",
+      "contentMd5": "36c4b7dab7787967d77bf04a96aee069",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201601470",
+      "contentMd5": "eb85f5b8d655ec8ecd5b101bd94a4705",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 코에만 사용하고 내복하거나 눈 및 귀에 사용하지 않습니다."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201602246",
+      "contentMd5": "8b015bdd55779da64be88f18e276b1af",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201604278",
+      "contentMd5": "1515b58f737185cb86da2ea95a29a3c4",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201604489",
+      "contentMd5": "f316546a21fc5ce6f4941b76ec7ce859",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201604986",
+      "contentMd5": "02201fad9a961124fb6f988052f100a4",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201604986",
+      "contentMd5": "42d4e34512988930d2251a63646bc0b3",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201605959",
+      "contentMd5": "3f42a32f22f1229adc0e23e63bb089f3",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201606591",
+      "contentMd5": "e5bb88f7239d31570430d64ae791c447",
+      "nMaster": 27,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201606592",
+      "contentMd5": "075c0d1aa336292c2ffb088f2b27638e",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201606592",
+      "contentMd5": "41a0a7cd564dc329e19cc548cac2ec2c",
+      "nMaster": 81,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201606639",
+      "contentMd5": "d1bf91f279a1ab29777d6201e927a47c",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201606648",
+      "contentMd5": "d716836be94a610b314d27d411669224",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201606714",
+      "contentMd5": "0a553b01eba04de2914257862e64cf54",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201606826",
+      "contentMd5": "a2ac8dee4d5d5d548d3a1621cebad5a5",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약을 복용(사용)하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201607126",
+      "contentMd5": "b18bba05b571d9eda396cacd2a0389c4",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201700107",
+      "contentMd5": "302eed969430212ce4d3960b3a863021",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201700225",
+      "contentMd5": "8405bddee39e4f2a9eeb1b0b0a6f8e6d",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201700798",
+      "contentMd5": "cf8bc6739bd238ac4fbbf97c0e611632",
+      "nMaster": 15,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201701257",
+      "contentMd5": "8590dbf3eea66b131c6f7b676e8ba9a2",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201701906",
+      "contentMd5": "b1561aa62b32d05ab504f8ac50895e95",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 2,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201702594",
+      "contentMd5": "43de5a2cd13d008f7e33db12b4518518",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201702594",
+      "contentMd5": "fb24d3b44aa24aa64e0c89d19d365768",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201705734",
+      "contentMd5": "dd0ac9e115e5b80e3beba0f0dcabb9ce",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약을 사용하지 복용(사용)하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201707150",
+      "contentMd5": "39496dfd1297e8c04a7a8d780544e9b9",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201707533",
+      "contentMd5": "d322962b7252e0e61ac0fe5c6ce62c2b",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201708285",
+      "contentMd5": "bc84ea5db897675c2a01835b149f2943",
+      "nMaster": 8,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201708500",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 26,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201800106",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201800233",
+      "contentMd5": "ac0844f5f63dbb0f18b5e12600002407",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201800352",
+      "contentMd5": "fb6d80fc9ffacadbf2c9c5e96b1c2411",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 dl-메틸에페드린염산염, 스코폴리아 엑스 및 글리시리진산 함유 좌제 또는 연고제, 크림제, 혈압강하제, 항우울약을 복용(사용)하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201800891",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201800949",
+      "contentMd5": "f871b291e03289e063f4a430cddfc1ed",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201801264",
+      "contentMd5": "9fc8db73acc0a3d9e24f84accee68343",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201801352",
+      "contentMd5": "4be343cae8655c06f856b12b43fbb081",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고, 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201801390",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 8,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201801775",
+      "contentMd5": "d2e97193349c2a1f63753085595bed16",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201801775",
+      "contentMd5": "fa8d3cd4b34fb04c795f42df975334c8",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201801854",
+      "contentMd5": "75e69d112e280940cba153c85cd507c4",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 주사하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201801921",
+      "contentMd5": "274ce83230941613a70d3b5da370833f",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201802469",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201802608",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201802940",
+      "contentMd5": "c0f4093d9780cee5c3095529c4dc6350",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 2,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201803016",
+      "contentMd5": "9db530515c9ae188905f451b663b5a6a",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "목구멍의 도포용으로 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "목구멍의 도포용으로 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201803284",
+      "contentMd5": "ebdf0036d2d0483ff2c58c8d71ea5fab",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201803753",
+      "contentMd5": "4a7cff9f1c20d4e27cb382d907403dc7",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201803842",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201804704",
+      "contentMd5": "8941592173a7da5fe400d4313f9a5fdb",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201900904",
+      "contentMd5": "1d6ac8d603fc6a8f4f5168bdfd0287c5",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201900904",
+      "contentMd5": "7e5a4215d6c63989589d3f07f9d58bc3",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201901012",
+      "contentMd5": "904f9de9fa7ac3da973692f97e9d6080",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201902450",
+      "contentMd5": "cb455869eee4fbf3fc0e494c25ca04c8",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하며 복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201902572",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 14,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201903099",
+      "contentMd5": "1e947f7310bdae1dbf4547399477b65f",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201904579",
+      "contentMd5": "51587044888ebb69d6acbfb2e27a4d91",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201904579",
+      "contentMd5": "a6d09933796ffbae55e0eb0e0d1b2845",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201904772",
+      "contentMd5": "259fa7afd49525e7d905f2717e971d3a",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201905649",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201907160",
+      "contentMd5": "a3cc6d7dc48838d96555277c9adf0ebc",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "201908027",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "201908230",
+      "contentMd5": "7d3abf6cca1cfefec9f9660ffdae460b",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 2,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202000733",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202001153",
+      "contentMd5": "77f378d76ddff77c601742269af692f9",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 경구복용 및 주사하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 경구사용 및 주사하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202002110",
+      "contentMd5": "cc2508aed923997b0df9c61416031c7a",
+      "nMaster": 15,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202002390",
+      "contentMd5": "3e925901d4afdae98765e4b4c13800c8",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 5,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "다른 진해거담제, 감기약, 항히스타민제를 함유하는 내복약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "다른 진해거담제, 감기약, 항히스타민제를 함유하는 사용약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202002443",
+      "contentMd5": "6541c67cc71e030836fefd173943f48b",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202002671",
+      "contentMd5": "7ed8871192425ba090fb054e56776899",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202002817",
+      "contentMd5": "4a7aea937e432ebf54d9ffeb418f85aa",
+      "nMaster": 5,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202003209",
+      "contentMd5": "f7e8c6901eda6928fbd01f08f978b456",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고, 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202005237",
+      "contentMd5": "d79a5a2918aec8ccd2f0f781e57022d6",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "함수용으로만 사용하고 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202005650",
+      "contentMd5": "ff703653cf4e69e56a7b374a730c4294",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 항문부위에만 사용하고 내사용 또는 안과용으로 사용하지 말고 흡입하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202006196",
+      "contentMd5": "82365b229aabc3eec75b4ce94c6896c3",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 4,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 2,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202006992",
+      "contentMd5": "06a94d205b73edf01e192b738c18ffda",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해거담제, 감기약, 항히스타민제를 함유하는 내복약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "MAO억제제(항우울제, 항정신병제, 감정조절제, 항파킨슨제 등), 다른 진해거담제, 감기약, 항히스타민제를 함유하는 사용약(비염용 경구제, 멀미약, 알레르기용약), 진정제와 함께 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202101211",
+      "contentMd5": "10f21cfa3130a596a59cf2e52d1d2cd5",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202102183",
+      "contentMd5": "6477cc9e27fa54f8fcac8432c540fb8e",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 2,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 1,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202103144",
+      "contentMd5": "fed09ca66cd9ba78650efe0e50dbc073",
+      "nMaster": 6,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제나 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202106045",
+      "contentMd5": "43135cc49a63ad4be911719602b74f09",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [
+        "경구용 타크로리무스(면역억제제)와 함께 복용하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 질에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202106673",
+      "contentMd5": "c4f939e4c4479bffb6fe684285320b2e",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202107875",
+      "contentMd5": "08bc023db6414ded38e6b031c2727e74",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202107891",
+      "contentMd5": "bc544f974cdec4b2c96e67bb1a915cbb",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 직장에만 사용하고 내사용으로는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202202254",
+      "contentMd5": "cc2508aed923997b0df9c61416031c7a",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202300708",
+      "contentMd5": "023561d6f082aeac6882ce942d89bb41",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202301122",
+      "contentMd5": "e1f594f285a8a03222c9d0d83569e6f4",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "국소용, 즉 효능과 사용방법에 따라 질 내에 삽입하는 약이므로 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202301761",
+      "contentMd5": "cc2508aed923997b0df9c61416031c7a",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안 디클로페낙 제제 혹은 비스테로이드 소염제(항염증제)를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202302242",
+      "contentMd5": "bda4e132a41ef6d13323d3b2eef8550e",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "이 약은 안과용 또는 내사용으는 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202302480",
+      "contentMd5": "c8be69f39ec4afaa390b5459493ccb2d",
+      "nMaster": 9,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안에는 디클로페낙 제제나 비스테로이드 소염제를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202302826",
+      "contentMd5": "5b15aea2f5fa872f3f278b044d6a56ad",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202302836",
+      "contentMd5": "fdcaa867ce860a6e676a8f6e7eb6c4ab",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약을 사용하는 동안에는 디클로페낙 제제나 비스테로이드 소염제를 국소적으로 적용하거나 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202302903",
+      "contentMd5": "cc72b1a15179e32e7ac09bf5a023b1ed",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "복용하거나 눈 및 귀에 사용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202303116",
+      "contentMd5": "6981d576f1bf9128016256e4819c68cf",
+      "nMaster": 4,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 0,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "안과용 및 내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202303158",
+      "contentMd5": "a5d77edcc8416b9f57196eb984d3b29c",
+      "nMaster": 3,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하는 약이므로 복용하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202303278",
+      "contentMd5": "487af0696875949a3b8e2a0936432db8",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202303278",
+      "contentMd5": "772657ac2c9e3e3e2ab8abbd67d3d1a3",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 3,
+      "nSafety": 3,
+      "nSafetyLost": 0,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 1,
+      "lostSentences": [],
+      "contradictionSentences": [
+        "내사용으로 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202400213",
+      "contentMd5": "49a6a9ca7d1cd0f621fde3cb805d6dd1",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF",
+        "SELF_CONTRADICTION"
+      ],
+      "nCandidate": 2,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 1,
+      "nKept": 1,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복하지 마십시오."
+      ],
+      "contradictionSentences": [
+        "이 약은 외용으로만 사용하고 사용하지 마십시오."
+      ]
+    },
+    {
+      "itemSeq": "202400576",
+      "contentMd5": "56411aa48d5cb62683d7f468943f8604",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202401207",
+      "contentMd5": "0a11f968ce9e0f919014abeaff6ec48a",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용, 즉 질환 부위에 바르는 약으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202401207",
+      "contentMd5": "f6369e0a087c01af7d63d2149dcf2fd9",
+      "nMaster": 1,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "이 약은 외용, 즉 질환 부위에 바르는 약으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    },
+    {
+      "itemSeq": "202401301",
+      "contentMd5": "adfc480444f459ddbb0acbb72dace0dd",
+      "nMaster": 2,
+      "hasOfficialSource": true,
+      "detectedBy": [
+        "SOURCE_DIFF"
+      ],
+      "nCandidate": 1,
+      "nSafety": 1,
+      "nSafetyLost": 1,
+      "nSelfContradiction": 0,
+      "nKept": 0,
+      "nAbsent": 0,
+      "lostSentences": [
+        "외용으로만 사용하고 내복 또는 흡입하지 마십시오."
+      ],
+      "contradictionSentences": []
+    }
+  ]
+}

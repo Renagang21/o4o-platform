@@ -1,0 +1,18 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-KO-ORAL-PROHIBITION-CORPUS-REBUILD-V1",
+  "mode": "READ-ONLY PLAN (write 0)",
+  "engine": "composeKoV4 via easy-drug-ko-critical-content-correction/correction-contract",
+  "targetUnits": 207,
+  "plannedMasters": 955,
+  "byAction": {
+    "REPLACE": 702,
+    "HOLD": 253
+  },
+  "byHold": {
+    "ROUTE_UNRESOLVED": 161,
+    "ROUTE_CONFLICT": 92
+  },
+  "distinctNewBodies": 174,
+  "replaceUnchangedMd5": 0,
+  "postRenderDamage": 0
+}

@@ -21,6 +21,8 @@ import {
   normalize,
   missingNumerics,
   missingNumericsEn,
+  rewriteKoByRoute,
+  stripOralProhibitionSentences,
 } from './otc-v2-store-leaflet-runner.shared.js';
 import {
   OPHTHALMIC_PROFILE,
@@ -98,11 +100,10 @@ export function composeKoV3(
   const anomalies: string[] = [];
   if (!prof) return { html: '', source: null, presentSafety: [], anomalies: ['미지원 route(ophthalmic)'] };
 
-  const rewrite = (s: string): string => {
-    let out = s;
-    for (const [re, to] of prof.koVerbRewrite as Array<[RegExp, string]>) out = out.replace(re, to);
-    return out;
-  };
+  // 경구 금지 문장("외용으로만 사용하고 내복하지 마십시오")은 재표현하지 않는다.
+  // 무조건 replace 하면 내복→사용 치환으로 "…사용하고 사용하지 마십시오" 자기모순이 된다
+  // — WO-O4O-EASY-DRUG-KO-ORAL-PROHIBITION-CORPUS-REBUILD-V1 에서 잔존 파손원으로 실측.
+  const rewrite = (s: string): string => rewriteKoByRoute(s, prof.koVerbRewrite as Array<[RegExp, string]>);
 
   const efficacyRaw = sixRaw['효능·효과'] || '';
   const usageRaw = sixRaw['용법·용량'] || '';
@@ -129,11 +130,14 @@ export function composeKoV3(
   if (lostE.length) anomalies.push(`효능 수치 누락 ${lostE.length}: ${lostE.slice(0, 5).join(',')}`);
 
   // 경구 동사 게이트 — 용법·주의 모두
+  // 경구 금지 문장은 원문 보존이 정답이므로 잔존 판정에서 뺀다
+  const gatedUsage = stripOralProhibitionSentences(usage);
+  const gatedCaution = stripOralProhibitionSentences(caution);
   for (const re of prof.koForbidden as RegExp[]) {
     re.lastIndex = 0;
-    if (re.test(usage)) anomalies.push(`점안 용법에 경구 동사 잔존: ${re.source}`);
+    if (gatedUsage && re.test(gatedUsage)) anomalies.push(`점안 용법에 경구 동사 잔존: ${re.source}`);
     re.lastIndex = 0;
-    if (re.test(caution)) anomalies.push(`점안 주의에 경구 동사 잔존: ${re.source}`);
+    if (gatedCaution && re.test(gatedCaution)) anomalies.push(`점안 주의에 경구 동사 잔존: ${re.source}`);
   }
 
   // 6섹션 보존 게이트 — present 안전 섹션 본문이 caution 에 전량 남아야 한다

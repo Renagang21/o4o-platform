@@ -1,0 +1,10 @@
+{
+  "takenFor": "pre-apply",
+  "globals": {
+    "ko_canonical": 63283,
+    "ko_deprecated": 19689,
+    "ko_damaged": 569,
+    "auditTotal": 19672,
+    "auditThisWo": 0
+  }
+}

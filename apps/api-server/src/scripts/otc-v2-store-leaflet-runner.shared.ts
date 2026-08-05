@@ -232,10 +232,43 @@ export const NONORAL_REWRITE: Array<[RegExp, string]> = [
  */
 const SENTENCE_SPLIT = /(?<=[.!?])/;
 
-export const isOralProhibitionSentence = (s: string): boolean =>
-  /외용|국소|점안|바르|도포/.test(s)
-  && /내복|복용|먹/.test(s)
-  && /마십시오|마세요|않도록|금지|삼가/.test(s);
+/** 경구 섭취 어휘. */
+const ORAL_TERM_G = /내복|복용|복약|먹|삼키|삼켜|경구/g;
+/**
+ * 금지 종결형. `하지 하십시오` 는 오타 보정이 아니라 **e약은요 원문 자체의 결손형**이다
+ * (itemSeq 200807607: "이 약은 외용으로만 사용하고 내복하지 하십시오.") — 원문이 결손이어도
+ * 경구 금지 의도는 명확하므로 재표현 대상에서 제외해야 한다.
+ */
+const PROHIBIT_END = /마십시오|마세요|마시오|말 것|말아야|않도록|않습니다|않는다|금지|삼가|안 됩니다|안됩니다|하지 하십시오/g;
+/** 금지 종결 앞 어느 범위까지를 같은 금지 절로 볼 것인가. */
+const ORAL_PROHIBIT_WINDOW = 45;
+
+/**
+ * 경구 섭취 **금지**를 뜻하는 문장인가.
+ *
+ * v1 은 경로 어휘를 `외용|국소|점안|바르|도포` 로만 봤는데, 이 목록에 없는
+ * **안과용 · 질 · 코(점비) · 귀 · 함수용 · 직장** 문장과 `않습니다` · `하지 하십시오` 종결형이
+ * 보호를 못 받아 그대로 파손됐다
+ * (WO-O4O-EASY-DRUG-KO-ORAL-PROHIBITION-CORPUS-REBUILD-V1 재조립 dry-run 에서 240 master 실측:
+ *  "안과용 및 내복용으로 사용하지 마십시오." → "안과용 및 **내사용**으로 사용하지 마십시오.").
+ *
+ * 그래서 경로 대조 조건을 **없앤다**. 판정은 "금지 종결 직전 창 안에 경구 어휘가 있는가" 하나다.
+ * 경로 어휘 화이트리스트는 원문 표현이 늘어날 때마다 새는 구조였고, 원문을 그대로 보존하는 쪽은
+ * 내용상 틀릴 수 없다 — 재표현을 놓치는 비용만 있고 안전정보를 파손하는 비용은 없다.
+ * 이 규칙은 타 약물 병용 금지 문장("…경구용 타크로리무스를 함께 복용하지 마십시오")도 함께 지킨다.
+ *
+ * 같은 이유로 koForbidden(경구 동사 잔존) 게이트에서도 이 문장은 제외한다.
+ */
+export const isOralProhibitionSentence = (s: string): boolean => {
+  PROHIBIT_END.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = PROHIBIT_END.exec(s)) !== null) {
+    const window = s.slice(Math.max(0, m.index - ORAL_PROHIBIT_WINDOW), m.index);
+    ORAL_TERM_G.lastIndex = 0;
+    if (ORAL_TERM_G.test(window)) return true;
+  }
+  return false;
+};
 
 /**
  * 문장 단위 경로 동사 재표현. 경구 금지 문장은 원문 그대로 통과시킨다.
@@ -452,7 +485,10 @@ export function composeKo(
   const efficacy = toPlain(ax.ind);
   let usage = toPlain(ax.dos);
   let caution = toPlain(ax.cau);
-  for (const [re, to] of prof.koVerbRewrite) { usage = usage.replace(re, to); caution = caution.replace(re, to); }
+  // 문장 단위 재표현 — 경구 금지 문장은 원문 그대로 통과 (rewriteKoByRoute 주석 참조).
+  // 무조건 replace 하면 "외용으로만 사용하고 내복하지 마십시오" 가 자기모순으로 파손된다.
+  usage = rewriteKoByRoute(usage, prof.koVerbRewrite);
+  caution = rewriteKoByRoute(caution, prof.koVerbRewrite);
 
   // 수치 보존 검증 — 재표현 후에도 원문 수치가 전량 남아야 한다.
   const lostU = missingNumerics(ax.dos, usage);
