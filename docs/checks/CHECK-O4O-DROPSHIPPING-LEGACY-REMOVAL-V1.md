@@ -200,7 +200,7 @@
 | 관련 package 및 API typecheck | ✅ |
 | admin-dashboard · api-server test | ✅ |
 | 주요 앱 build | ✅ |
-| CI GREEN | §12 참조 |
+| CI GREEN | ✅ (§12) |
 | CHECK 문서 | 본 문서 |
 | commit · push | §12 참조 |
 
@@ -211,3 +211,5 @@
 | 일자 | 내용 |
 |------|------|
 | 2026-08-05 | 제거 실행 + 본 CHECK 문서 작성 — 커밋 `0c857f984` (395 files changed, +282 / -60,893), `origin/main` push 완료 |
+| 2026-08-05 | 1차 CI(`30964857643`) 의 multi-tenant Vitest 스텝 1건 실패 → 스펙 정정 커밋 `cf91949b5` push (§9-1) |
+| 2026-08-05 | **CI Pipeline GREEN 확인** — 실행 `30966777802`. `Code Quality Check` 16 스텝 + `Build Applications` (admin-dashboard / main-site) 전부 success. `0c857f984` 시점의 `Deploy API Server` · `Deploy Web Services` · `Deploy Admin Dashboard` · `AppStore Guard` 도 success. **WO 완료** |
