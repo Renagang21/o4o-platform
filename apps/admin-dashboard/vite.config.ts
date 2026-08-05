@@ -41,8 +41,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       // Forum app packages - map to source directories for lazy loading
       '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core'),
       '@o4o/forum-core-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
-      // Dropshipping core - map to source for subpath imports
-      '@o4o/dropshipping-core': path.resolve(__dirname, '../../packages/dropshipping-core/src'),
       // Pharmacy AI Insight - map to source for lazy loading
       '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/src'),
       // CGM Pharmacist App - map to source for lazy loading
@@ -102,7 +100,6 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/shortcodes', // Workspace package - pre-bundling 방지
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
       '@o4o/slide-app', // Workspace package - pre-bundling 방지
-      '@o4o/dropshipping-core', // Dropshipping core - source imports
       '@o4o/pharmacy-ai-insight', // Pharmacy AI Insight - source imports
       '@o4o/cgm-pharmacist-app', // CGM Pharmacist App - source imports
       '@o4o/forum-core', // Forum app packages - source imports

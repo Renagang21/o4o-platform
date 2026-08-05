@@ -123,7 +123,6 @@ describe('접두 중복(/api/v1/api/...) 무증식', () => {
     'pages/dashboard/unified/cards/OverviewCard.tsx',
     'pages/digital-signage/v2/ChannelEditor.tsx',
     'pages/digital-signage/v2/ChannelList.tsx',
-    'pages/dropshipping/BulkProductImport.tsx',
     'services/api/zoneApi.ts',
   ];
 

@@ -17,7 +17,6 @@ const SeedPresets = lazy(() => import('@/pages/test/SeedPresets'));
 const PresetIntegrationTest = lazy(() => import('@/pages/test/PresetIntegrationTest'));
 const DeleteCustomizerTest = lazy(() => import('@/pages/test/DeleteCustomizerTest'));
 const AuthDebug = lazy(() => import('@/pages/test/AuthDebug'));
-const DropshippingUsersTest = lazy(() => import('@/pages/test/DropshippingUsersTest'));
 const UserEditTest = lazy(() => import('@/pages/test/UserEditTest'));
 const ApiResponseChecker = lazy(() => import('@/pages/test/ApiResponseChecker'));
 const MenuDebug = lazy(() => import('@/pages/test/MenuDebug'));
@@ -101,12 +100,6 @@ export function TestRoutes() {
     <Route key="/admin/test/auth-debug" path="/admin/test/auth-debug" element={
       <Suspense fallback={<PageLoader />}>
         <AuthDebug />
-      </Suspense>
-    } />,
-    // Test - Dropshipping Users
-    <Route key="/admin/test/dropshipping-users" path="/admin/test/dropshipping-users" element={
-      <Suspense fallback={<PageLoader />}>
-        <DropshippingUsersTest />
       </Suspense>
     } />,
     // Test - User Edit

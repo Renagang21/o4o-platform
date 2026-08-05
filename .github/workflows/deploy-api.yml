@@ -91,7 +91,6 @@ jobs:
         pnpm --filter '@o4o/interactive-content-core' run build
         pnpm --filter '@o4o/education-extension' run build
         pnpm --filter '@o4o/lms-core' run build
-        pnpm --filter '@o4o/dropshipping-core' run build
 
         # Extensions & Features (depends on Domain Core)
         echo "📦 Extensions & Features..."

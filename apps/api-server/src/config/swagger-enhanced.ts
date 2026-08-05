@@ -432,11 +432,6 @@ Authorization: Bearer <your-jwt-token>
         'x-displayName': '🛍️ 이커머스'
       },
       {
-        name: 'Dropshipping',
-        description: '드랍쉬핑 관리',
-        'x-displayName': '📦 드랍쉬핑'
-      },
-      {
         name: 'Platform',
         description: '플랫폼 관리',
         'x-displayName': '⚙️ 플랫폼'
@@ -460,7 +455,7 @@ Authorization: Bearer <your-jwt-token>
       },
       {
         name: '비즈니스',
-        tags: ['E-commerce', 'Dropshipping']
+        tags: ['E-commerce']
       },
       {
         name: '시스템',

@@ -10,16 +10,9 @@ import { blockRegistry } from '@/blocks/registry/BlockRegistry';
 // Phase P0-C: Import metadata from SSOT
 import { blockMetadata, type BlockMetadata as BlockMetadataSSOT } from '@o4o/block-renderer';
 
-// Lazy load dropshippingShortcodes to avoid dynamic/static import mixing
-let _dropshippingShortcodesCache: Awaited<typeof import('@/components/shortcodes/dropshipping')>['dropshippingShortcodes'] | null = null;
-
-async function getDropshippingShortcodes() {
-  if (!_dropshippingShortcodesCache) {
-    const module = await import('@/components/shortcodes/dropshipping');
-    _dropshippingShortcodesCache = module.dropshippingShortcodes;
-  }
-  return _dropshippingShortcodesCache;
-}
+// WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+//   dropshipping 숏코드 동적 로드 제거 (@/components/shortcodes/dropshipping 삭제됨).
+//   해당 숏코드는 존재하지 않는 `/api/v1/dropshipping/*` 경로를 호출하던 dead asset 이었다.
 
 export interface BlockMetadata {
   name: string;
@@ -202,36 +195,6 @@ export async function extractShortcodesMetadata(): Promise<ShortcodeMetadata[]> 
   const generalShortcodesMetadata = extractFromRegistry(generalShortcodes);
   shortcodes.push(...generalShortcodesMetadata);
 
-  // 2. Dropshipping 숏코드 (동적 로드하여 추출)
-  const dropshippingShortcodes = await getDropshippingShortcodes();
-  dropshippingShortcodes.forEach((config) => {
-    const attrs = config.attributes || {};
-    const attrNames = Object.keys(attrs);
-    const name = config.name;
-
-    // 예제 생성
-    let example = `[${name}`;
-    if (attrNames.length > 0) {
-      const exampleAttrs = attrNames.slice(0, 2).map(attr => {
-        const attrConfig = attrs[attr];
-        const defaultValue = attrConfig.default ||
-                           (attrConfig.type === 'string' ? 'value' :
-                            attrConfig.type === 'number' ? '1' : 'true');
-        return `${attr}="${defaultValue}"`;
-      }).join(' ');
-      example += ` ${exampleAttrs}`;
-    }
-    example += ']';
-
-    shortcodes.push({
-      name,
-      description: config.description || `${name} 숏코드`,
-      attributes: attrNames,
-      example,
-      category: getShortcodeCategory(name)
-    });
-  });
-
   return shortcodes;
 }
 
@@ -333,7 +296,6 @@ function getShortcodeCategory(name: string): string {
   if (name.includes('form') || name.includes('view')) return 'Forms';
   if (name.includes('video') || name.includes('gallery')) return 'Media';
   if (name.includes('post') || name.includes('author')) return 'Content';
-  if (name.includes('partner') || name.includes('commission') || name.includes('admin')) return 'Dropshipping';
   return 'Other';
 }
 

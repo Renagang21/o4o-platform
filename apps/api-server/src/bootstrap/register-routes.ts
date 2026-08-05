@@ -111,7 +111,6 @@ import { createNetureRoutes } from '../routes/neture/neture.routes.js';
 import createNetureModuleRoutes from '../modules/neture/neture.routes.js';
 import netureLibraryRoutes from '../modules/neture/neture-library.routes.js';
 import { createCatalogImportRoutes } from '../modules/catalog-import/catalog-import.routes.js';
-import { createDropshippingAdminRoutes } from '../routes/dropshipping-admin/dropshipping-admin.routes.js';
 import { createGuideContentsRouter } from '../routes/guide/index.js';
 import { createCmsContentRoutes } from '../routes/cms-content/cms-content.routes.js';
 import { createContentAssetsRoutes } from '../routes/content/content-assets.routes.js';
@@ -865,14 +864,10 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Catalog Import routes:', catalogImportError);
     }
 
-    // 30. Register Dropshipping Admin routes (DS-3)
-    try {
-      const dropshippingAdminRoutes = createDropshippingAdminRoutes(dataSource);
-      app.use('/api/v1/dropshipping', dropshippingAdminRoutes);
-      logger.info('✅ Dropshipping Admin routes registered at /api/v1/dropshipping/admin');
-    } catch (dropshippingError) {
-      logger.error('Failed to register Dropshipping Admin routes:', dropshippingError);
-    }
+    // 30. (removed) Dropshipping Admin routes
+    //     WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: dropshipping 레거시 체인 제거.
+    //     조회 대상 테이블(dropshipping_seller_offers / dropshipping_supplier_catalog_items /
+    //     dropshipping_offer_logs)이 프로덕션에 존재하지 않았고 소비처도 0 이었다.
 
     // 31. Register KPA routes (Pharmacist Association SaaS)
     try {

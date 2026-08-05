@@ -248,24 +248,11 @@ viewComponentRegistry.register(
 );
 
 // ============================================================================
-// REGISTER SELLEROPS COMPONENTS
+// WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+//   'sellerops.router' / 'supplierops.router' 등록 제거.
+//   두 appId 가 appsCatalog 에서 삭제되어 resolve 될 수 없다.
+//   admin 로컬 pages/{sellerops,supplierops} 자산 자체는 감사 §5-4 판정에 따라 보존한다.
 // ============================================================================
-
-viewComponentRegistry.register(
-  'sellerops.router',
-  lazy(() => import('@/pages/sellerops/SellerOpsRouter')),
-  { appId: 'sellerops', description: 'SellerOps Router' }
-);
-
-// ============================================================================
-// REGISTER SUPPLIEROPS COMPONENTS
-// ============================================================================
-
-viewComponentRegistry.register(
-  'supplierops.router',
-  lazy(() => import('@/pages/supplierops/SupplierOpsRouter')),
-  { appId: 'supplierops', description: 'SupplierOps Router' }
-);
 
 // ============================================================================
 // REGISTER PARTNEROPS COMPONENTS

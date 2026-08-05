@@ -12,10 +12,9 @@ export const partneropsManifest: AppManifest = {
   type: 'extension',
   description: '파트너/어필리에이트 운영 앱 - 링크 추적, 전환 분석, 커미션 정산',
 
-  // Dependencies - requires dropshipping-core
-  dependencies: {
-    'dropshipping-core': '>=1.0.0',
-  },
+  // Dependencies
+  // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: dropshipping-core 의존 제거 (패키지 삭제됨)
+  dependencies: {},
 
   // Permissions
   permissions: [

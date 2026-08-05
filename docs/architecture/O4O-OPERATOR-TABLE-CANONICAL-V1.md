@@ -499,10 +499,7 @@ const columns: O4OColumn<T>[] = [
 
 | 파일 | 서비스 | 누락 항목 |
 |------|--------|---------|
-| `apps/admin-dashboard/src/pages/dropshipping/Products.tsx` | Admin | ActionBar + BulkResultModal |
-| `apps/admin-dashboard/src/pages/dropshipping/PartnersList.tsx` | Admin | ActionBar + BulkResultModal |
-| `apps/admin-dashboard/src/pages/dropshipping/SellersList.tsx` | Admin | ActionBar + BulkResultModal |
-| `apps/admin-dashboard/src/pages/dropshipping/SuppliersList.tsx` | Admin | ActionBar + BulkResultModal |
+| ~~`apps/admin-dashboard/src/pages/dropshipping/*` 4건~~ | ~~Admin~~ | **삭제됨** — `WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1` |
 | `apps/admin-dashboard/src/pages/users/UsersListClean.tsx` | Admin | ActionBar + BulkResultModal |
 | `services/web-kpa-society/src/pages/operator/OperatorResourcesPage.tsx` | KPA | BulkResultModal |
 
@@ -625,7 +622,7 @@ const result = await batch.executeBatch(apiFn, [...selectedIds]);
 | P1-B | `ContentApprovalsPage.tsx` | selectable + ActionBar + bulk approve/reject (개별 API Promise.all) |
 | P1-C | `HubContentsPage.tsx` | selectable + ActionBar + bulk (상태 변경 API 확인 필요) |
 | P1-D | `HubNoticeListPage.tsx` | selectable + ActionBar + bulk delete |
-| P1-E | Dropshipping 4개 | confirm() → ActionBar + BulkResultModal 교체 |
+| ~~P1-E~~ | ~~Dropshipping 4개~~ | **불필요** — 대상 화면이 `WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1` 에서 삭제됨 |
 
 ### Phase 2 — Raw HTML → BaseTable 전환 (중간 위험)
 

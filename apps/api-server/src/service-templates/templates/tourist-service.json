@@ -3,9 +3,7 @@
   "label": "Tourist Service",
   "description": "관광객 서비스 - 여행 상품, 리테일 연동, 예약 시스템",
   "serviceGroup": "tourist",
-  "coreApps": [
-    "dropshipping-core"
-  ],
+  "coreApps": [],
   "extensionApps": [
     "signage"
   ],

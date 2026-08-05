@@ -52,12 +52,9 @@ interface CPTType {
   updatedAt?: string;
 }
 
-// Dropshipping CPT definitions (these should exist in the database)
-const DROPSHIPPING_CPTS = [
-  { slug: 'ds_supplier', name: '공급자' },
-  { slug: 'ds_product', name: '드롭쉬핑 상품' },
-  { slug: 'ds_commission_policy', name: '수수료 정책' }
-];
+// WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+//   DROPSHIPPING_CPTS(ds_supplier / ds_product / ds_commission_policy) 하드코딩 제거.
+//   DB 에 없는 CPT 를 목록에 합성해 넣던 코드였다. 이제 CPT 목록은 API 응답만을 따른다.
 
 const CPTDashboardToolset = () => {
   const navigate = useNavigate();
@@ -106,38 +103,9 @@ const CPTDashboardToolset = () => {
     }
   });
 
-  // Ensure dropshipping CPTs are included
   const cptTypes = useMemo(() => {
     const safeCPTs = Array.isArray(allCPTTypes) ? allCPTTypes : [];
-    const validCPTs = safeCPTs.filter(cpt => cpt?.slug);
-    const existingSlugs = new Set(validCPTs.map(cpt => cpt.slug));
-    const combinedCPTs = [...validCPTs];
-    
-    // Add missing dropshipping CPTs
-    DROPSHIPPING_CPTS.forEach(dsCPT => {
-      if (!existingSlugs.has(dsCPT.slug)) {
-        combinedCPTs.push({
-          id: dsCPT.slug,
-          slug: dsCPT.slug,
-          name: dsCPT.name,
-          pluralName: dsCPT.name,
-          singularName: dsCPT.name,
-          description: `Dropshipping ${dsCPT.name}`,
-          isPublic: dsCPT.slug === 'ds_product',
-          public: dsCPT.slug === 'ds_product',
-          hasArchive: dsCPT.slug === 'ds_product',
-          showInMenu: true,
-          active: false, // Mark as inactive if not found
-          isActive: false,
-          supports: ['title', 'editor', 'custom-fields', 'revisions'] as any,
-          taxonomies: dsCPT.slug === 'ds_product' ? ['ds_product_category', 'ds_product_tag'] : [],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        } as any);
-      }
-    });
-    
-    return combinedCPTs;
+    return safeCPTs.filter(cpt => cpt?.slug);
   }, [allCPTTypes]);
 
   // Filter CPTs based on search and filter
@@ -206,14 +174,6 @@ const CPTDashboardToolset = () => {
   // Handle creating archive
   const handleCreateArchive = (cptSlug: string) => {
     navigate(`/cpt-engine/archives/new?postType=${cptSlug}`);
-  };
-
-  // Render CPT type badge
-  const renderTypeBadge = (slug: string) => {
-    if (slug.startsWith('ds_')) {
-      return <span className="cpt-type-badge dropshipping">DS</span>;
-    }
-    return null;
   };
 
   // Render content based on current view
@@ -403,8 +363,6 @@ const CPTDashboardToolset = () => {
               <tbody>
                 {filteredCPTs.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
-                  const isDropshipping = cpt.slug.startsWith('ds_');
-                  
                   return (
                     <tr key={cpt.slug}>
                       <td>
@@ -419,7 +377,6 @@ const CPTDashboardToolset = () => {
                             onClick={() => handleEdit(cpt.slug)}
                           >
                             {cpt.name}
-                            {renderTypeBadge(cpt.slug)}
                           </span>
                           <div className="cpt-slug">{cpt.slug}</div>
                         </div>
@@ -535,8 +492,6 @@ const CPTDashboardToolset = () => {
               <tbody>
                 {filteredCPTs.map((cpt) => {
                   const fieldCount = getFieldCount(cpt.slug);
-                  const isDropshipping = cpt.slug.startsWith('ds_');
-                  
                   return (
                     <tr key={cpt.slug}>
                       <td>
@@ -551,7 +506,6 @@ const CPTDashboardToolset = () => {
                             onClick={() => handleEdit(cpt.slug)}
                           >
                             {cpt.name}
-                            {renderTypeBadge(cpt.slug)}
                           </span>
                           <div className="cpt-slug">{cpt.slug}</div>
                         </div>
@@ -637,41 +591,6 @@ const CPTDashboardToolset = () => {
         </div>
       )}
 
-      {/* Additional Info Section */}
-      <div style={{ marginTop: '30px', padding: '20px', background: 'white', border: '1px solid #ddd', borderRadius: '4px' }}>
-        <h3 style={{ fontSize: '16px', marginBottom: '10px', color: '#23282d' }}>
-          Dropshipping CPTs Status
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '15px' }}>
-          {DROPSHIPPING_CPTS.map(dsCPT => {
-            const exists = Array.isArray(cptTypes) && cptTypes.some(cpt => cpt.slug === dsCPT.slug);
-            const foundCPT = Array.isArray(cptTypes) && cptTypes.find(cpt => cpt.slug === dsCPT.slug);
-            const isActive = foundCPT?.active || foundCPT?.isActive;
-            
-            return (
-              <div key={dsCPT.slug} style={{ padding: '10px', background: '#f9f9f9', borderRadius: '4px' }}>
-                <div style={{ fontWeight: 600, color: '#333', marginBottom: '4px' }}>
-                  {dsCPT.name}
-                </div>
-                <div style={{ fontSize: '12px', color: '#666' }}>
-                  {dsCPT.slug}
-                </div>
-                <div style={{ fontSize: '12px', marginTop: '4px' }}>
-                  {exists ? (
-                    isActive ? (
-                      <span style={{ color: '#46b450' }}>✓ Active</span>
-                    ) : (
-                      <span style={{ color: '#ffa500' }}>⚠ Inactive</span>
-                    )
-                  ) : (
-                    <span style={{ color: '#dc3545' }}>✗ Not Found</span>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
     </div>
   );
 

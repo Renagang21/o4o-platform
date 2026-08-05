@@ -41,53 +41,11 @@ export const useDynamicCPTMenu = () => {
       .sort((a, b) => (a.menuPosition || 50) - (b.menuPosition || 50));
 
     if (menuCPTs.length > 0) {
-      // 드롭쉬핑 CPT와 일반 CPT 분리
-      const dropshippingCPTs = menuCPTs.filter(cpt => cpt.slug.startsWith('ds_'));
-      const regularCPTs = menuCPTs.filter(cpt => !cpt.slug.startsWith('ds_'));
-
-      // 드롭쉬핑 CPT 메뉴 생성
-      if (dropshippingCPTs.length > 0) {
-        const dropshippingChildren: MenuItem[] = dropshippingCPTs.map(cpt => {
-          const IconComponent = getIconForCPT(cpt.icon);
-          const cptName = cpt.name || cpt.labels?.singular || cpt.slug;
-          const singularName = cpt.labels?.singular || cpt.name || cpt.slug;
-
-          const children: MenuItem[] = [
-            {
-              id: `cpt-${cpt.slug}-all`,
-              label: `모든 ${cptName}`,
-              icon: <FileText className="w-4 h-4" />,
-              path: `/cpt-engine/content/${cpt.slug}`
-            },
-            {
-              id: `cpt-${cpt.slug}-new`,
-              label: `새 ${singularName} 추가`,
-              icon: <FileText className="w-4 h-4" />,
-              path: `/cpt-engine/content/${cpt.slug}/new`
-            },
-            {
-              id: `cpt-${cpt.slug}-categories`,
-              label: '카테고리',
-              icon: <FileText className="w-4 h-4" />,
-              path: `/cpt-engine/taxonomies?cpt=${cpt.slug}`
-            }
-          ];
-
-          return {
-            id: `cpt-${cpt.slug}`,
-            label: cptName,
-            icon: <IconComponent className="w-5 h-5" />,
-            children
-          };
-        });
-
-        menuItems.push({
-          id: 'dropshipping-cpt-content',
-          label: 'CPT 콘텐츠 관리',
-          icon: <Database className="w-5 h-5" />,
-          children: dropshippingChildren
-        });
-      }
+      // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+      //   ds_ prefix CPT 를 별도 '드롭쉬핑' 메뉴로 분리하던 분기 제거.
+      //   해당 상위 메뉴(id='dropshipping')가 존재하지 않아 ds_ CPT 는 메뉴에서 누락되고 있었다.
+      //   이제 모든 showInMenu CPT 는 동일한 일반 CPT 경로를 따른다.
+      const regularCPTs = menuCPTs;
 
       // 일반 CPT 메뉴 생성 (드롭쉬핑이 아닌 것들)
       if (regularCPTs.length > 0) {
@@ -168,38 +126,9 @@ export const injectCPTMenuItems = (
 
   const result = [...baseMenuItems];
 
-  // 드롭쉬핑 CPT와 일반 CPT 분리
-  const dropshippingCPTMenu = cptMenuItems.find(item => item.id === 'dropshipping-cpt-content');
-  const regularCPTMenus = cptMenuItems.filter(item => item.id !== 'dropshipping-cpt-content');
+  const regularCPTMenus = cptMenuItems;
 
-  // 1. 드롭쉬핑 CPT는 드롭쉬핑 메뉴 하위에 추가
-  if (dropshippingCPTMenu) {
-    const dropshippingIndex = result.findIndex(item => item.id === 'dropshipping');
-
-    if (dropshippingIndex !== -1) {
-      const dropshippingMenu = result[dropshippingIndex];
-
-      // 드롭쉬핑 메뉴에 children이 없으면 생성
-      if (!dropshippingMenu.children) {
-        dropshippingMenu.children = [];
-      }
-
-      // 이미 추가된 CPT 콘텐츠 관리 메뉴가 있는지 확인
-      const existingCPTMenuIndex = dropshippingMenu.children.findIndex(
-        child => child.id === 'dropshipping-cpt-content'
-      );
-
-      if (existingCPTMenuIndex !== -1) {
-        // 기존 메뉴를 새 메뉴로 교체
-        dropshippingMenu.children[existingCPTMenuIndex] = dropshippingCPTMenu;
-      } else {
-        // 없으면 추가
-        dropshippingMenu.children.push(dropshippingCPTMenu);
-      }
-    }
-  }
-
-  // 2. 일반 CPT는 CPT Engine 다음에 삽입
+  // 일반 CPT는 CPT Engine 다음에 삽입
   if (regularCPTMenus.length > 0) {
     const cptEngineIndex = result.findIndex(item => item.id === 'cpt-engine');
 

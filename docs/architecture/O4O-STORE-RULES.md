@@ -45,15 +45,18 @@ const order = await checkoutService.createOrder({
 const order = tourismOrderRepository.save({ ... }); // ❌
 ```
 
-### 1.4 Dropshipping 연계 규칙
+### 1.4 상품 공급 연계 규칙
 
 Tourism은 **상품을 소유하지 않습니다**.
 
 | 역할 | 책임 |
 |------|------|
 | Tourism | 상품을 설명하는 서비스 (콘텐츠) |
-| Dropshipping | 상품을 공급하는 엔진 |
+| 상품 공급 (ProductMaster / SupplierProductOffer) | 상품을 공급하는 엔진 |
 | E-commerce Core | 주문 원장 |
+
+> `WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1`: 구 Dropshipping 엔진(`@o4o/dropshipping-core` 계열)은 삭제되었다.
+> 상품 공급 정본은 `ProductMaster` · `SupplierProductOffer` 이며, 아래 `dropshippingProductId` 는 미사용 soft FK 컬럼명이다.
 
 ```typescript
 // tourism_package_items

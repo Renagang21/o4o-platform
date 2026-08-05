@@ -62,19 +62,10 @@ import { AppInstance } from '../entities/AppInstance.js';
 import { AppUsageLog } from '../entities/AppUsageLog.js';
 import { AppRegistry } from '../entities/AppRegistry.js';
 // Cart/Order/Settlement entities removed - legacy commerce entities
-// Dropshipping entities - Now imported from @o4o/dropshipping-core package
-// import { Product } from '../entities/Product.js';
-// import { Supplier } from '../entities/Supplier.js';
-// import { Seller } from '../entities/Seller.js';
-// import { Partner } from '../entities/Partner.js';
-// import { SellerProduct } from '../entities/SellerProduct.js';
-// import { PartnerCommission } from '../entities/PartnerCommission.js';
-// import { BusinessInfo } from '../entities/BusinessInfo.js';
-// import { CommissionPolicy } from '../entities/CommissionPolicy.js';
-// import { Commission } from '../entities/Commission.js';
-// import { ConversionEvent } from '../entities/ConversionEvent.js';
-// import { ReferralClick } from '../entities/ReferralClick.js';
-// import { SellerAuthorization } from '../entities/SellerAuthorization.js';
+// WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1:
+//   dropshipping entity 주석 블록 제거. @o4o/dropshipping-core 패키지가 삭제되었고
+//   해당 엔티티는 등록된 적이 없다 (운영 테이블 0). 상품=ProductMaster,
+//   공급 오퍼=SupplierProductOffer, 주문=checkout_orders 가 정본이다.
 // Form entities
 import { Form } from '../entities/Form.js';
 import { FormSubmission } from '../entities/FormSubmission.js';
@@ -544,7 +535,7 @@ import {
 // ============================================================================
 // The following domain package entities remain removed:
 // - @o4o/membership-yaksa (MemberCategory, Member, Affiliation, etc.)
-// - @o4o/dropshipping-cosmetics (CosmeticsFilter)
+// - @o4o/dropshipping-cosmetics (CosmeticsFilter) — WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1 에서 패키지 자체 삭제됨
 // - @o4o/reporting-yaksa (AnnualReport, ReportFieldTemplate, ReportLog, ReportAssignment)
 // - @o4o/lms-yaksa (YaksaLicenseProfile, RequiredCoursePolicy, CreditRecord, YaksaCourseAssignment)
 // - @o4o/annualfee-yaksa (FeePolicy, FeeInvoice, FeePayment, FeeExemption, FeeSettlement, FeeLog)

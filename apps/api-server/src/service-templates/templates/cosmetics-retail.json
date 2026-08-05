@@ -3,12 +3,7 @@
   "label": "Cosmetics Retail Service",
   "description": "화장품 리테일 서비스 - 드랍쉬핑, 셀러 운영, 리뷰 시스템 포함",
   "serviceGroup": "cosmetics",
-  "coreApps": [
-    "dropshipping-core",
-    "dropshipping-cosmetics",
-    "sellerops",
-    "supplierops"
-  ],
+  "coreApps": [],
   "extensionApps": [
     "partnerops",
     "signage"
