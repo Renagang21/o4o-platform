@@ -50,13 +50,8 @@ cp .env.example .env
 # .env 편집하여 설정 입력
 ```
 
-개발 DB는 GCP Cloud SQL을 Cloud SQL Proxy 경유로 사용합니다. 프록시 설치·인증·환경변수 등
-**로컬 개발 환경 구성 절차는 아래 문서를 참조**하세요.
-
-- [QUICK-START.md](QUICK-START.md) — 3단계 로컬 개발 시작
-- [SETUP.md](SETUP.md) — 설치 항목 및 초기 설정
-- [README-LOCAL-DEV.md](README-LOCAL-DEV.md) — 일일 개발 루틴 · 문제 해결
-- [GCP-SETUP-GUIDE.md](GCP-SETUP-GUIDE.md) — Cloud SQL 연결 상세
+개발 DB는 GCP Cloud SQL을 Cloud SQL Proxy 경유로 사용합니다. 프록시 설치·GCP 인증·환경변수 등
+로컬 실행환경 구성 절차의 **단일 기준 문서는 [SETUP.md](SETUP.md)** 입니다.
 
 ## 주요 명령
 
@@ -90,6 +85,7 @@ pnpm run clean
 | 문서 | 내용 |
 |---|---|
 | [CLAUDE.md](CLAUDE.md) | 개발 규칙 · 아키텍처 경계 · 운영 정책 |
+| [SETUP.md](SETUP.md) | 로컬 실행환경 정본 (설치 · 인증 · DB · 검증) |
 | [AGENTS.md](AGENTS.md) | Codex 실행 지침 |
 | [docs/README.md](docs/README.md) | 문서 폴더 구조 및 우선순위 |
 | [docs/baseline/](docs/baseline/) | Frozen 정책 · Baseline 기준선 |

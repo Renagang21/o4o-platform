@@ -12,7 +12,7 @@ echo.
 echo Press any key to continue...
 pause >nul
 
-"C:\Users\sohae\AppData\Local\Google\Cloud SDK\google-cloud-sdk\bin\gcloud.cmd" auth application-default login
+call "%~dp0gcloud.cmd" auth application-default login
 
 echo.
 echo ============================================================
