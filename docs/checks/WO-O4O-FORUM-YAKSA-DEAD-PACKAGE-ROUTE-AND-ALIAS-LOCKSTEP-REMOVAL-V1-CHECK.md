@@ -224,8 +224,13 @@ git 미추적 로컬 산출물. 패키지 `package.json` 이 사라져 모듈 �
 
 ## §9. 커밋 · push 결과
 
-- **커밋**: `chore(forum): remove dead forum-yaksa package and routes` — §9-A 참조
-- **push**: **보류 (미실행)** — §10 참조
+- **커밋 hash**: **`779d26994`** — `chore(forum): remove dead forum-yaksa package and routes`
+- **커밋 규모**: **67 파일 / +385 / −3,716** (변경 21 · 삭제 45 · 신규 CHECK 1)
+- **stage 방식**: `git commit -F - -- <24개 명시 경로 + packages/forum-yaksa>` (pathspec 없는 commit 미사용)
+- **사후 검증**: `git show --name-only --format= HEAD` → 24 비패키지 경로 + `packages/forum-yaksa/**` 43 파일. 상품 데이터 스크립트·JSON **0건**
+- **pre-commit hook 동작 기록**: 훅이 `package.json` 변경을 감지해 `pnpm install --lockfile-only` 를 재실행하고 락파일을 재stage 했다.
+  재실행 후 `pnpm-lock.yaml` 커밋 diff 는 **31줄 삭제 / 0줄 추가** 로 사전 생성분과 **동일** — 보호조건 6 위반 없음.
+- **push**: **보류 (미실행)** — §10-A 참조
 
 ---
 
@@ -249,10 +254,20 @@ git 미추적 로컬 산출물. 패키지 `package.json` 이 사라져 모듈 �
 작업 도중 원격이 전진했다.
 
 ```
-HEAD        9ce1c3491  (타 세션이 커밋한 HFF ZH 작업 — 이번 WO 와 무관, 파일 교집합 0)
-origin/main 3 commits ahead of HEAD
-git rev-list --left-right --count HEAD...origin/main  →  1  3
+커밋 직전   HEAD 9ce1c3491  (타 세션 HFF ZH 커밋 — 이번 WO 와 무관, 파일 교집합 0)
+            git rev-list --left-right --count HEAD...origin/main  →  1  3
+
+커밋 직후   HEAD 779d26994  (이번 WO 커밋)
+            git fetch origin main
+            git rev-list --left-right --count HEAD...origin/main  →  2  3
 ```
+
+원격 3 커밋의 변경 파일은 전부 `apps/api-server/src/scripts/**` · `docs/work-orders/**`
+(HFF ZH TRANSLATION_AMBIGUOUS 319 / easy-drug EN TM 하네스) 로, 이번 WO 67 파일과 **교집합 0** 이다.
+즉 내용 충돌은 없으나, 사용자 중지 조건이 "전진 사실" 자체를 기준으로 하므로 push 하지 않는다.
+
+로컬 미push 커밋이 **2건**(`9ce1c3491` 타 세션 + `779d26994` 이번 WO)이므로,
+push 하면 타 세션 커밋이 함께 원격에 반영된다. 이 또한 단독 판단으로 수행하지 않는다.
 
 사용자 지정 즉시 중지 조건 **"origin/main 이 현재 HEAD 보다 전진함"** 및 보호조건 10
 **"원격 main 이 전진했다면 pull·rebase 하지 말고 중지하여 보고한다"** 에 해당한다.
