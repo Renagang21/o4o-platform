@@ -123,6 +123,48 @@
 - Axis/5-Block/sidebar/notification 회귀 없음
 - console error/pageerror/4xx 없음
 
+### 9-1. 라이브 smoke 결과 (2026-08-06)
+
+> **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-LIVE-SMOKE-AND-ARCHIVE-V1**
+> 배포 리비전: `kpa-society-web-01781-95t` · `glycopharm-web-01213-7vl` · `k-cosmetics-web-00961-c8q` (모두 2026-08-06 03:11 배포)
+> 계정: `sohae2100@gmail.com` (KPA/GlycoPharm/K-Cosmetics operator) · Chrome desktop
+
+| 검증 항목 | KPA | GlycoPharm | K-Cosmetics |
+|---|:---:|:---:|:---:|
+| 안내 카드 렌더 (문구 4종 일치) | ✅ | ✅ | ✅ |
+| 카드가 `/operator` **상단**에 위치 | ❌ **최하단** | ✅ 최상단 | ✅ 최상단 |
+| 가이드 링크 `href` | `/guide/for/operator` | `/guide/usage` | `/guide/usage` |
+| 가이드 route 실제 렌더 (데드링크 없음) | ✅ | ✅ | ✅ |
+| Axis / 5-Block / sidebar / notification 회귀 | 없음 | 없음 | 없음 |
+| console error / pageerror | 0 | 0 | 0 |
+| `/operator` API 4xx·5xx | 0 (7건 모두 200) | 0 (3건 모두 200) | 0 (3건 모두 200) |
+
+**카드 위치 실측** (`getBoundingClientRect().top + scrollY`, px)
+
+| 서비스 | 안내 카드 | Overview | Axis 섹션 | 판정 |
+|---|---:|---:|---:|---|
+| KPA | **1502** | 151 | 1280 | 5-Block·Axis **아래** — §2 배치도와 불일치 |
+| GlycoPharm | **172** | 482 | 카드 아래 | §2 배치도와 일치 |
+| K-Cosmetics | **172** | 482 | 카드 아래 | §2 배치도와 일치 |
+
+**원인 (코드 확인)**
+
+- GlycoPharm·K-Cosmetics: 공통 layout slot `aboveBlocks` 최상단에 `OperatorRoleGuideCard` 배치 → §2 배치도대로 렌더.
+  - `services/web-glycopharm/src/pages/operator/GlycoPharmOperatorDashboard.tsx:131-138`
+  - `services/web-k-cosmetics/src/pages/operator/KCosmeticsOperatorDashboard.tsx:128-135`
+- KPA: `aboveBlocks` 가 아니라 `KpaOperatorDashboardLayout` 의 `auxiliary` slot 에, 그것도 `AxisNavigationSection` **뒤에** 배치되어 페이지 최하단에 렌더된다.
+  - `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx:128-138`
+
+즉 **카드의 존재·문구·링크는 3서비스 동일하나(내용 parity PASS), 배치 위치는 KPA만 다르다(배치 parity FAIL).**
+
+**판정**: 라이브 smoke **부분 PASS**. §9 4개 항목 중 1번(상단 렌더)이 KPA에서 미충족이므로 본 문서는 archive 하지 않고 현재 위치에 유지한다.
+
+**후속 WO 후보** (본 WO 범위 밖 — 코드 수정하지 않음)
+
+- KPA `OperatorRoleGuideCard` 를 `auxiliary` slot 최하단 → 공통 `aboveBlocks` 최상단으로 이동하여 3서비스 배치 parity 를 맞춘다.
+- 또는 §2 배치도를 KPA 레이아웃 구조(`auxiliary` slot 만 제공) 기준으로 정정하고, "상단 배치"를 parity 요건에서 제외한다.
+- 둘 중 어느 쪽이든 `KpaOperatorDashboardLayout` 의 slot 구조 확인이 선행되어야 한다.
+
 ---
 
 ## 10. 남은 차이와 사유
@@ -142,4 +184,6 @@
 - 코드/타입/빌드 단계: **PASS**
 - 범위: 운영 철학 안내 카드 공통화 (합의된 최소 범위)
 - 데드링크 0 / route·menu·capability·API·backend·DB 무변경
-- 배포 후 브라우저 smoke로 최종 고정 권장
+- ~~배포 후 브라우저 smoke로 최종 고정 권장~~ → **2026-08-06 수행 완료 (§9-1)**
+- 라이브 smoke 단계: **부분 PASS** — 카드 내용·링크·회귀·콘솔·API 는 3서비스 전부 PASS, **카드 배치 위치만 KPA 불일치**
+- 따라서 본 문서는 **`docs/investigations/` 에 유지**하며 archive 하지 않는다. 배치 parity 정리는 §9-1 의 후속 WO 후보로 넘긴다.
