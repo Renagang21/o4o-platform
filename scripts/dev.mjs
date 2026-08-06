@@ -100,6 +100,55 @@ function hasOwnTsconfig(relPath) {
 }
 
 /**
+ * 워크스페이스 자동 탐색 (WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1)
+ *
+ * 과거에는 대상 목록이 하드코딩되어 있어 services/ 전체와 대부분의 packages 가
+ * 검증에서 빠졌고, 존재하지 않는 dead entry('apps/ecommerce')가 남아 있었다.
+ * package.json 이 있는 디렉터리만 워크스페이스로 인정한다.
+ */
+function discoverWorkspaces(basePath) {
+  return getDirs(basePath)
+    .filter(name => !name.endsWith('.backup'))
+    .map(name => join(basePath, name).replace(/\\/g, '/'))
+    .filter(rel => existsSync(join(ROOT_DIR, rel, 'package.json')));
+}
+
+/** apps + services + packages 전체 */
+function allWorkspaces() {
+  return [
+    ...discoverWorkspaces('apps'),
+    ...discoverWorkspaces('services'),
+    ...discoverWorkspaces('packages'),
+  ];
+}
+
+/** 워크스페이스가 선언한 type-check 계열 script 이름을 찾는다 */
+function typeCheckScriptName(relPath) {
+  for (const candidate of ['type-check', 'typecheck']) {
+    if (hasScript(relPath, candidate)) return candidate;
+  }
+  return null;
+}
+
+/**
+ * 워크스페이스 1개 타입체크.
+ * 자체 script 가 있으면 그것을 쓰고, 없으면 tsconfig 기준 `npx tsc --noEmit`.
+ */
+function typeCheckWorkspace(tracker, relPath) {
+  const script = typeCheckScriptName(relPath);
+  if (script) {
+    console.log(`  - ${relPath} (pnpm run ${script})`);
+    return tracker.track(`type-check ${relPath}`, exec(`pnpm run ${script}`, join(ROOT_DIR, relPath)));
+  }
+  if (!hasOwnTsconfig(relPath)) {
+    log.warn(`  - Skipping ${relPath} (no type-check script, no tsconfig.json)`);
+    return true;
+  }
+  console.log(`  - ${relPath} (npx tsc --noEmit)`);
+  return tracker.track(`type-check ${relPath}`, exec('npx tsc --noEmit', join(ROOT_DIR, relPath)));
+}
+
+/**
  * Check if package has a specific script
  */
 function hasScript(pkgPath, scriptName) {
@@ -120,11 +169,24 @@ function hasScript(pkgPath, scriptName) {
 // Commands
 // ============================================================================
 
+/**
+ * 실제 ESLint 실행 (WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1)
+ *
+ * 과거 구현은 아무 검사도 하지 않고 "Linting passed (skipped)" 를 반환했다.
+ * 루트 eslint.config.js 로 저장소 전체를 1회 검사한다 (워크스페이스 전부 포함).
+ *
+ * 워크스페이스별 자체 eslint 설정을 따로 실행하지는 않는다. 루트 설정이 모든
+ * 워크스페이스를 동일 기준으로 덮으며, 개별 설정은 해당 워크스페이스의 lint
+ * script 로 여전히 실행할 수 있다.
+ */
 function runLint() {
   log.info('Running ESLint...');
-  // Skip for now - return success
-  log.info('Linting passed (skipped)');
-  return true;
+  const t = createFailureTracker();
+
+  console.log('  - repository (root eslint.config.js)');
+  t.track('lint', exec('npx eslint .', ROOT_DIR));
+
+  return t.report('lint');
 }
 
 function runTypeCheck() {
@@ -159,19 +221,17 @@ function runTypeCheck() {
     t.track(`type-check packages/${pkg}`, exec('npx tsc --noEmit', join(ROOT_DIR, pkgPath)));
   }
 
-  // Type check apps
+  // Type check apps + services
+  // 과거에는 apps 4개(그중 'ecommerce' 는 실재하지 않는 dead entry)만 검사하고
+  // services/ 전체가 빠져 있었다. 이제 자동 탐색한 전 워크스페이스를 검사한다.
   log.info('Type checking apps...');
-  const apps = ['api-server', 'main-site', 'admin-dashboard', 'ecommerce'];
+  for (const rel of discoverWorkspaces('apps')) {
+    typeCheckWorkspace(t, rel);
+  }
 
-  for (const app of apps) {
-    const appPath = join('apps', app);
-    if (!existsSync(join(ROOT_DIR, appPath))) continue;
-    if (!hasOwnTsconfig(appPath)) {
-      log.warn(`  - Skipping ${app} (no tsconfig.json)`);
-      continue;
-    }
-    console.log(`  - Checking ${app}`);
-    t.track(`type-check apps/${app}`, exec('npx tsc --noEmit', join(ROOT_DIR, appPath)));
+  log.info('Type checking services...');
+  for (const rel of discoverWorkspaces('services')) {
+    typeCheckWorkspace(t, rel);
   }
 
   return t.report('type-check');
@@ -210,36 +270,21 @@ function runTypeCheckFrontend() {
   }
 
   // Type check frontend apps only (skip api-server)
+  // 'ecommerce' dead entry 제거, 자동 탐색으로 전환.
   log.info('Type checking frontend apps...');
-  const apps = ['main-site', 'admin-dashboard', 'ecommerce'];
-
-  for (const app of apps) {
-    const appPath = join('apps', app);
-    if (!existsSync(join(ROOT_DIR, appPath))) continue;
-    if (!hasOwnTsconfig(appPath)) {
-      log.warn(`  - Skipping ${app} (no tsconfig.json)`);
-      continue;
-    }
-    console.log(`  - Checking ${app}`);
-    t.track(`type-check apps/${app}`, exec('npx tsc --noEmit', join(ROOT_DIR, appPath)));
+  for (const rel of discoverWorkspaces('apps')) {
+    if (rel === 'apps/api-server') continue;
+    typeCheckWorkspace(t, rel);
   }
 
-  // Type check web services (KPA, etc.)
+  // Type check web services
+  // 과거에는 web-kpa-society 1개만 검사해 나머지 운영 서비스가 전부 빠져 있었다.
   log.info('Type checking web services...');
-  const webServices = ['web-kpa-society'];
-
-  for (const svc of webServices) {
-    const svcPath = join('services', svc);
-    if (!existsSync(join(ROOT_DIR, svcPath))) continue;
-    if (!hasOwnTsconfig(svcPath)) {
-      log.warn(`  - Skipping ${svc} (no tsconfig.json)`);
-      continue;
-    }
-    console.log(`  - Checking ${svc}`);
-    t.track(`type-check services/${svc}`, exec('npx tsc --noEmit', join(ROOT_DIR, svcPath)));
+  for (const rel of discoverWorkspaces('services')) {
+    typeCheckWorkspace(t, rel);
   }
 
-  log.warn('Skipping api-server type check (handled separately on server)');
+  log.warn('Skipping api-server type check (run `pnpm run type-check` for it)');
   return t.report('type-check:frontend');
 }
 
@@ -247,22 +292,18 @@ function runTests() {
   log.info('Running tests...');
   const t = createFailureTracker();
 
-  // Run tests for apps
-  for (const app of getDirs('apps')) {
-    const appPath = join('apps', app);
-    if (hasScript(appPath, 'test')) {
-      console.log(`Testing ${app}...`);
-      t.track(`test apps/${app}`, exec('pnpm test', join(ROOT_DIR, appPath)));
-    }
+  // apps / services / packages 중 test script 를 선언한 워크스페이스만 실행한다.
+  // 과거에는 services/ 가 통째로 빠져 있었다. test script 가 없는 워크스페이스에
+  // 무조건 성공하는 명령을 만들어 넣지는 않는다 (없으면 없는 대로 건너뛴다).
+  const targets = allWorkspaces().filter(rel => hasScript(rel, 'test'));
+
+  if (targets.length === 0) {
+    log.warn('No workspace declares a "test" script.');
   }
 
-  // Run tests for packages
-  for (const pkg of getDirs('packages')) {
-    const pkgPath = join('packages', pkg);
-    if (hasScript(pkgPath, 'test')) {
-      console.log(`Testing ${pkg}...`);
-      t.track(`test packages/${pkg}`, exec('pnpm test', join(ROOT_DIR, pkgPath)));
-    }
+  for (const rel of targets) {
+    console.log(`Testing ${rel}...`);
+    t.track(`test ${rel}`, exec('pnpm test', join(ROOT_DIR, rel)));
   }
 
   return t.report('test');

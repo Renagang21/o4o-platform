@@ -6,9 +6,13 @@ inputs:
     required: false
     default: '22.18.0'
   pnpm-version:
+    # 저장소 기준은 package.json 의 volta.pnpm (10.25.0) 이다.
+    # 과거 기본값 '9' 는 로컬과 메이저가 달라 CI 전용 재현 문제의 원인이 됐다.
+    # pnpm v10 의 build script 차단 정책은 package.json 의
+    # pnpm.onlyBuiltDependencies 로 이미 처리되어 있다.
     description: 'pnpm version'
     required: false
-    default: '9'
+    default: '10.25.0'
   build-packages:
     description: 'Whether to build shared packages'
     required: false

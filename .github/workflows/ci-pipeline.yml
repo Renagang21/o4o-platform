@@ -46,7 +46,19 @@ jobs:
     - name: Run TypeScript check (App Store packages)
       run: pnpm run typecheck:app-store-packages || echo "⚠️ App Store packages have type errors (non-blocking)"
 
+    # WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1
+    # api-server 는 type-check:frontend 대상이 아니라 CI 에서 아예 검증되지 않았다.
+    # 기존 오류 baseline(19건)이 남아 있어 우선 non-blocking 으로 가시화한다.
+    # baseline 이 0 이 되면 continue-on-error 를 제거해 blocking 으로 전환할 것.
+    - name: Run TypeScript check (api-server)
+      continue-on-error: true
+      run: pnpm --filter @o4o/api-server run type-check
+
+    # 이전에는 lint 가 아무 검사도 하지 않고 항상 성공했다(스텁).
+    # 이제 실제 ESLint 를 실행한다. 기존 오류 baseline(282건)이 남아 있어
+    # 우선 non-blocking 으로 가시화하며, baseline 해소 후 blocking 으로 전환할 것.
     - name: Run ESLint
+      continue-on-error: true
       run: pnpm run lint
     
     - name: Check for console.log statements
