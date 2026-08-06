@@ -1,0 +1,49 @@
+{
+ "wo": "WO-O4O-HFF-ZH-TRANSLATION-AMBIGUOUS-319-REPAIR-AND-APPLY-V1",
+ "scope": "z83 round dictionary overlap with already-produced ZH canonical KO sources",
+ "scannedAt": "2026-08-06T01:46:20.098Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "keys": 141,
+ "documentsScanned": 40599,
+ "overlappingKeys": 9,
+ "overlaps": [
+  {
+   "ko": "공식 섭취",
+   "docs": 4238
+  },
+  {
+   "ko": "청년기 이전에 적절한 운동과 건강한 식습관을 유지하면서 충분한 칼슘을 섭취하면 향후",
+   "docs": 92
+  },
+  {
+   "ko": "확인하신 후 취하십시오.",
+   "docs": 30
+  },
+  {
+   "ko": "특이체질 등 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를",
+   "docs": 6
+  },
+  {
+   "ko": "복용하십시오.",
+   "docs": 6
+  },
+  {
+   "ko": "질병으로 치료중이시거나 알레르기, 특이체질이신 분은 본 제품의 원료를 확인하시고 섭취 전 전문가와 상의하시기 바랍니다.",
+   "docs": 2
+  },
+  {
+   "ko": ").성상 : 흑갈색의 액상제품으로 이미,이취가 없어야 함",
+   "docs": 1
+  },
+  {
+   "ko": "이취가 없는 노란색의 겔타입의 액상",
+   "docs": 1
+  },
+  {
+   "ko": "인의 기억력 개선에 도움을 줄 수 있음 (기타기능II)혈행 개선에 도움을 줄 수 있음 (기타기능II)",
+   "docs": 1
+  }
+ ],
+ "verdict": "OVERLAP_FOUND"
+}

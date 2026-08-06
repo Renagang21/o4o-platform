@@ -14,8 +14,10 @@ import pg from 'pg';
 
 const D = 'apps/api-server/src/scripts/data';
 const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
-const RENDER = JSON.parse(fs.readFileSync(`${D}/hff-zh-final-render-audit-v1.json`, 'utf8'));
+/* 산출물 접두는 렌더와 같은 축으로 읽는다 — 대상 목록만 이번 패스 것을 쓰고 감사 결과는
+   직전 WO 것을 읽으면, 통과 근거가 이번 렌더가 아닌 남의 감사가 된다. 기본값 `final` 은 종전과 동일. */
 const OUT_TAG = process.env.ZH_OUT_TAG ?? 'final';
+const RENDER = JSON.parse(fs.readFileSync(`${D}/hff-zh-${OUT_TAG}-render-audit-v1.json`, 'utf8'));
 const TARGETS = JSON.parse(fs.readFileSync(`${D}/hff-zh-${OUT_TAG}-safe-targets-v1.json`, 'utf8')).targets;
 if (RENDER.verdict !== 'PASS') { console.error('RENDER_NOT_PASS'); process.exit(1); }
 if (!TARGETS.length) { console.error('TARGETS_EMPTY'); process.exit(1); }
@@ -36,7 +38,7 @@ const globals = async () => (await c.query(`
 
 const before = await globals();
 
-fs.writeFileSync(`${D}/hff-zh-final-rollback-v1.json`, JSON.stringify({
+fs.writeFileSync(`${D}/hff-zh-${OUT_TAG}-rollback-v1.json`, JSON.stringify({
   wo: RENDER.wo, preparedAt: new Date().toISOString(),
   rollback: "INSERT 전용이므로 되돌리기는 삽입된 ZH canonical 행의 soft delete 이다: UPDATE shared_product_descriptions SET deleted_at=now() WHERE id = ANY(insertedIds) AND language='zh' AND source_type='o4o_hff_generated'.",
   before, targets: TARGETS.map((t) => ({ productMasterId: t.productMasterId, koCanonicalId: t.koCanonicalId, koHash: t.koHash, newContentHash: t.newContentHash })),

@@ -1,0 +1,11 @@
+{
+ "scannedAt": "2026-08-06T01:45:29.615Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documents": 40599,
+ "worse": 0,
+ "better": 1,
+ "same": 40598,
+ "worseSamples": [],
+ "verdict": "PASS"
+}
