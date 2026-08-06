@@ -153,6 +153,8 @@ CREATED 101 / UPDATED 0 / HOLD 0 / FAILED 0.
 | NSA 잔여 | **0** |
 | 통합 문제 큐 | 319 (전량 `TRANSLATION_AMBIGUOUS`) |
 | 프록시 | 종료 (포트 5463) |
+| commit | `07391e6ee` (path-specific, 21 files) |
+| push | `1831969a7..07391e6ee main -> main` 완료 |
 
 ### 산출물
 
