@@ -220,6 +220,25 @@ tsconfig.json
 `packages/forum-yaksa/dist/`, `apps/api-server/packages/forum-yaksa/dist/`, `apps/api-server/tsconfig.tsbuildinfo` —
 git 미추적 로컬 산출물. 패키지 `package.json` 이 사라져 모듈 해석이 불가하므로 무해하며, 다음 clean build 시 소멸한다.
 
+### 8-E. 추적된 stale 빌드 산출물 1건 — **후속 정리 권고** (push 마감 단계에서 추가 발견)
+
+§8-A 의 전수 검색은 `dist*` 디렉터리를 제외했다. push 마감을 위해 만든 clean worktree 에서
+**제외 조건 없이** 재검색한 결과, 아래 **git 추적 중인** 산출물이 alias 문자열을 보유하고 있었다.
+
+| 대상 | 내용 | 판정 |
+|---|---|---|
+| `apps/admin-dashboard/dist-node/apps/admin-dashboard/vite.config.js` (L41, L104) | `'@o4o/forum-core-yaksa': path.resolve(..., 'packages/forum-yaksa')` — 제거 전 `vite.config.ts` 의 **tsc emit 산출물** | **실행·빌드 참조 아님** |
+
+근거:
+
+- `dist-node` 는 `apps/admin-dashboard/tsconfig.node.json` 의 `outDir` 일 뿐이며, 이를 **import·require·참조하는 코드는 0건** 이다 (Vite 는 `vite.config.ts` 를 직접 읽는다).
+- 과거 커밋(`3b7a37239` 이전)에 산출물이 실수로 커밋되어 4파일이 추적 중인 상태이고, `.gitignore` 에 `dist-node` 항목이 없다.
+- 재emit 하면 문자열은 자동 소멸한다.
+
+이번 WO 는 **소스 실행 참조 제거**가 범위이고, 추적된 산출물 4파일의 정리는
+`.gitignore` 정책 판단(추적 해제 여부)을 동반하므로 **별도 정리로 이관**한다.
+따라서 §8-A 의 "실행·빌드·alias·route 참조 0건" 판정은 유지된다 (본 항목은 소스가 아닌 stale emit).
+
 ---
 
 ## §9. 커밋 · push 결과
@@ -286,3 +305,62 @@ push 하면 타 세션 커밋이 함께 원격에 반영된다. 이 또한 단�
 
 1. **`IR-O4O-SERVICE-PHARMACY-PRODUCT-ACCESS-ENFORCEMENT-COVERAGE-AUDIT-V1`** (WO 지정 후속)
 2. **`yaksa_*` 운영 DB 테이블 · `app_registry` stale 행 · `tmp/forum_yaksa_install.sql` 처리** — read-only 감사 선행 후 별도 WO
+3. **`apps/admin-dashboard/dist-node/**` 추적 해제** (§8-E) — 산출물 4파일 git 추적 중 + `.gitignore` 누락. 정책 판단 동반이므로 별도 정리
+
+---
+
+## §12. push 마감 (clean worktree cherry-pick)
+
+현재 작업공간에는 타 세션 상품 데이터 WIP 및 타 세션 커밋 `9ce1c3491` 이 있어
+해당 작업공간에서 `pull`·`rebase`·`merge`·`push` 를 하지 않았다.
+대신 저장소 바깥에 `origin/main` 기준 clean worktree 를 만들고 이번 WO 커밋 2개만 cherry-pick 했다.
+
+| 항목 | 값 |
+|---|---|
+| worktree | `../o4o-forum-yaksa-push` (branch `wo/forum-yaksa-removal-push`, base `origin/main`) |
+| cherry-pick 충돌 | **0건** |
+| `9ce1c3491` (타 세션) | **cherry-pick·push 하지 않음** |
+| 원격 신규 3커밋(38파일) ↔ 이번 WO(67파일) 경로 교집합 | **0건** |
+| 이번 커밋의 HFF·easy-drug·상품데이터 파일 | **0건** |
+
+> 원격 `f22f32bec` 와 로컬 `9ce1c3491` 은 제목이 같은 HFF ZH 작업이다(타 세션이 원격에 별도 반영).
+> 어느 쪽도 이번 WO 가 다루지 않는다.
+
+### 12-A. 커밋 hash 대응
+
+| 원본 로컬 (push 안 함) | cherry-pick 후 (원격 반영) | 내용 |
+|---|---|---|
+| `779d26994` | `1b7177036` | forum-yaksa 제거 본체 (67파일) |
+| `68b9e45bc` | `bb8347928` | CHECK 커밋 hash·push 보류 근거 |
+| — | (본 커밋) | §8-E · §11-3 · §12 push 마감 기록 |
+
+### 12-B. 원격 최신(`f22f32bec`) 기준 결합 상태 재검증
+
+clean worktree 는 dist 가 없어 `pnpm install --frozen-lockfile` + 전체 workspace 패키지 빌드를 선행했다.
+
+| 항목 | 결과 |
+|---|---|
+| `tsc -p apps/api-server/tsconfig.build.json --noEmit` | **0 errors** |
+| admin-dashboard `vite build` | **✓ built in 50.29s** (alias 제거 안전 재확인) |
+| vitest `tests/multi-tenant` | **4 spec / 75 tests PASS** |
+| jest `apps/api-server` | **70 suites / 1,176 tests PASS** |
+| 커밋 내 HFF·easy-drug·상품데이터 파일 | **0건** |
+| cherry-pick 충돌 | **0건** |
+
+> **선행 결함 1건 (이번 WO 무관)**: `packages/financial-core` 의 `tsup` 빌드가
+> `No input files` 로 실패한다(`src` 비어 있음). `--no-bail` 없이 재귀 빌드하면 후속 패키지 dist 가
+> 생성되지 않아 api-server typecheck 에 대량 `TS2307` 오탐이 발생한다.
+> forum-yaksa 참조 0건이며 origin/main 시점부터 존재하던 결함이다.
+
+### 12-C. 원본 작업공간 보호
+
+| 항목 | 결과 |
+|---|---|
+| 원본 작업공간에서 `pull`·`rebase`·`merge`·`stash`·`push` | **전부 미실행** |
+| 타 세션 커밋 `9ce1c3491` | **cherry-pick·push 하지 않음** |
+| 원본 작업공간 `git status --short` | **clean** (이번 작업으로 변경 0) |
+| 강제 push | **미사용** |
+
+> 검증완료 트리(`68b9e45bc`) 대비 결합 트리의 차이는 **11파일뿐**이며
+> 전부 `apps/api-server/src/scripts/**` (10, `tsconfig.build.json` exclude 대상) 과 `docs/**` (1) 이다.
+> 즉 실행 코드 면에서 이전 검증 상태와 동일하다.
