@@ -21,7 +21,7 @@ import { validate } from './en-validator.mjs';
 import { SECTION_TITLE, FIELD_LABEL, BADGE, FOOTER } from './en-frame.mjs';
 import {
   RESULTS, BATCHES, tmKey, loadTM, appendTM, appendJsonl, readJsonl, streamKoUnits,
-  checkSentence, bodySentences, EN_UNITS_PATH, QUEUE_PATH,
+  checkSentence, bodySentences, blockedMasters, EN_UNITS_PATH, QUEUE_PATH,
 } from './tm-lib.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : d; };
@@ -74,6 +74,9 @@ const target = SWEEP ? null : new Set(batch.masters);
 const produced = [], blockedRows = [], pending = [];
 const codeTally = {};
 const alreadyDone = new Set(readJsonl(EN_UNITS_PATH).map((u) => u.masterId));
+/** 이전 회차에 막혔던 master — 이번에 통과하면 큐에 RESOLVED 를 남겨 낙인을 푼다. */
+const wasBlocked = blockedMasters();
+const resolvedRows = [];
 
 for (const ko of streamKoUnits()) {
   if (target && !target.has(ko.masterId)) continue;
@@ -86,6 +89,12 @@ for (const ko of streamKoUnits()) {
       masterId: ko.masterId, itemSeq: ko.itemSeq, batch: BATCH,
       koHash: ko.generatedContentHash, sentences: bodySentences(ko).length, segments: unit.segments,
     });
+    if (wasBlocked.has(ko.masterId)) {
+      resolvedRows.push({
+        kind: 'MASTER', state: 'RESOLVED', batch: BATCH, masterId: ko.masterId, itemSeq: ko.itemSeq,
+        note: '번역 정정 후 독립검증 통과',
+      });
+    }
   } else {
     for (const c of r.codes) codeTally[c] = (codeTally[c] ?? 0) + 1;
     blockedRows.push({
@@ -95,6 +104,7 @@ for (const ko of streamKoUnits()) {
   }
 }
 appendJsonl(EN_UNITS_PATH, produced);
+appendJsonl(QUEUE_PATH, resolvedRows);
 appendJsonl(QUEUE_PATH, blockedRows);
 
 const out = {
@@ -103,7 +113,11 @@ const out = {
   batch: BATCH,
   sentences: { offered: batch.sentences.length, admitted: admitted.length, rejected: rejected.length },
   rejectedCodes: rejected.reduce((a, r) => { for (const c of new Set(r.violations.map((v) => v.code))) a[c] = (a[c] ?? 0) + 1; return a; }, {}),
-  masters: { inBatch: batch.masters.length, produced: produced.length, blocked: blockedRows.length, pending: pending.length },
+  masters: {
+    inBatch: batch.masters.length, produced: produced.length,
+    blocked: blockedRows.length, resolved: resolvedRows.length, pending: pending.length,
+  },
+  blockedTotalAfter: blockedMasters([...readJsonl(QUEUE_PATH)]).size,
   blockedCodes: codeTally,
   tmSize: tm.size,
   totalProduced: alreadyDone.size + produced.length,

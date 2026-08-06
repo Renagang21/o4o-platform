@@ -157,6 +157,19 @@ export function bodySentences(ko) {
   return ko.segments.filter((s) => s.kind === 'BODY' && !FOOTER[s.text]);
 }
 
+/**
+ * 지금 막혀 있는 master 집합.
+ *
+ * 문제 큐는 append-only 이므로 한 master 에 BLOCKED 행이 여러 번 쌓일 수 있고,
+ * 번역을 고쳐 다시 통과시키면 RESOLVED 행이 뒤에 붙는다. **마지막 행만 유효**하다.
+ * 첫 BLOCKED 를 영구 낙인으로 쓰면 고친 master 가 영원히 재시도되지 않는다.
+ */
+export function blockedMasters(rows = readJsonl(QUEUE_PATH)) {
+  const last = new Map();
+  for (const r of rows) if (r.kind === 'MASTER' && r.masterId) last.set(r.masterId, r.state);
+  return new Set([...last].filter(([, s]) => s === 'BLOCKED').map(([m]) => m));
+}
+
 /** 아직 TM 에 없는 문장 (키는 공백 정규화 기준). */
 export function missingHashes(ko, tm) {
   const out = new Map();

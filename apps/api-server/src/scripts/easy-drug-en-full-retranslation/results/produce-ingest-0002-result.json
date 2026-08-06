@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "produce-ingest",
+  "batch": "0002",
+  "sentences": {
+    "offered": 21,
+    "admitted": 21,
+    "rejected": 0
+  },
+  "rejectedCodes": {},
+  "masters": {
+    "inBatch": 261,
+    "produced": 24,
+    "blocked": 0,
+    "resolved": 24,
+    "pending": 0
+  },
+  "blockedTotalAfter": 0,
+  "blockedCodes": {},
+  "tmSize": 166,
+  "totalProduced": 450,
+  "dbWrites": 0
+}

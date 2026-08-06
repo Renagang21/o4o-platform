@@ -16,8 +16,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {
   RESULTS, BATCHES, loadTM, readJsonl, streamKoUnits,
-  bodySentences, missingHashes, numbers, strengths,
-  EN_UNITS_PATH, QUEUE_PATH,
+  bodySentences, missingHashes, numbers, strengths, blockedMasters,
+  EN_UNITS_PATH,
 } from './tm-lib.mjs';
 
 const arg = (n, d) => { const i = process.argv.indexOf(n); return i >= 0 ? process.argv[i + 1] : d; };
@@ -26,7 +26,7 @@ const MAX_MASTERS = parseInt(arg('--max-masters', '400'), 10);
 
 const tm = loadTM();
 const done = new Set(readJsonl(EN_UNITS_PATH).map((u) => u.masterId));
-const blocked = new Set(readJsonl(QUEUE_PATH).filter((q) => q.state === 'BLOCKED').map((q) => q.masterId));
+const blocked = blockedMasters();
 
 /* 1. 전 master 를 훑어 미번역 문장 수를 센다. 본문은 들고 있지 않는다(메모리). */
 const cand = [];
