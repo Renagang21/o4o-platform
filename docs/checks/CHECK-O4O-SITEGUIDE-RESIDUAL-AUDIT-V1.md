@@ -73,7 +73,7 @@ curl -I https://siteguide.co.kr  https://www.glycopharm.co.kr  ...
 - `apps/api-server/src/database/migrations/20261113000000-DropSiteGuideSchema.ts` (DROP 기록)
 - `docs/checks/CHECK-O4O-SITEGUIDE-LEGACY-CODE-REMOVAL-V1.md`, `CHECK-O4O-GLYCOPHARM-DOMAIN-MAPPING-SITEGUIDE-REMOVAL-V1.md`, 본 문서
 - `docs/archive/**` 8건 (historical audits/investigations/reports — 과거 시점 기록)
-- 루트 `IR-O4O-MAIN-TS-BOOTSTRAP-SPLIT-POST-CHECK-V1.md`(L81), `IR-O4O-AUTH-MIDDLEWARE-SPLIT-POST-CHECK-V1.md`(L97) — 과거 post-check 기록(당시 "siteguide 미사용 import/오류 1건" 언급). 역사적 기록이라 보존. (단 루트 위치는 추후 docs 정리 시 이동 후보)
+- `docs/archive/investigations/IR-O4O-MAIN-TS-BOOTSTRAP-SPLIT-POST-CHECK-V1.md`(L81), `docs/archive/investigations/IR-O4O-AUTH-MIDDLEWARE-SPLIT-POST-CHECK-V1.md`(L97) — 과거 post-check 기록(당시 "siteguide 미사용 import/오류 1건" 언급). 역사적 기록이라 보존. (루트에 있던 파일로, WO-O4O-DOCUMENTATION-ENTRY-AND-ROOT-CLEANUP-V1 에서 archive 로 이동함)
 - `apps/api-server/dist/**` 의 `*SiteGuide*.js/.d.ts` — **빌드 산출물(untracked, 재빌드 시 갱신)**. 다음 빌드에서 자동 제거됨. 무시.
 
 ## 5. 최종 판정

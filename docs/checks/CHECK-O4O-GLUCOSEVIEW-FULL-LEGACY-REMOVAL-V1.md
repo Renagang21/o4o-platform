@@ -97,7 +97,7 @@
 - `typeorm_migrations` 9행 및 `apps/api-server/src/database/migrations/**` 의 실행 완료 마이그레이션 파일
 - `docs/**` 의 과거 WO·IR·CHECK·RBAC 감사 문서
 - `services/web-glycopharm/UX-TRUST-RULES-V1.md` (과거 WO 확산 대상 목록)
-- `IR-O4O-OVERSIZED-FILE-AUDIT-PHASE2-NEXT-PICK-V1.md` (과거 감사 스냅샷)
+- `docs/archive/investigations/IR-O4O-OVERSIZED-FILE-AUDIT-PHASE2-NEXT-PICK-V1.md` (과거 감사 스냅샷)
 
 ### 2-4. UNRELATED_RETAIN — 동명이인
 
