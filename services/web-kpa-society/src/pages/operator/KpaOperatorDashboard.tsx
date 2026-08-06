@@ -124,15 +124,18 @@ export default function KpaOperatorDashboard() {
 
   const axes = buildKpaAxesFromConfig(config, storeStats);
 
+  // WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1:
+  //   GlycoPharm·K-Cosmetics 와 동일한 순서 컨벤션([안내 카드] → [Axis] → [5-Block])으로 정렬.
+  //   이전에는 auxiliary(5-Block 아래) 였고, 그 결과 KPA 에서만 카드가 화면 최하단에 렌더됐다.
   return (
     <KpaOperatorDashboardLayout
       config={config}
-      auxiliary={
+      aboveBlocks={
         <>
-          {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
-          {axes.length > 0 && <AxisNavigationSection axes={axes} />}
           {/* WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1: 운영 철학 카드 */}
           <OperatorRoleGuideCard guideHref="/guide/for/operator" />
+          {/* WO-O4O-OPERATOR-DASHBOARD-COMMUNITY-STORE-HUB-SPLIT-V1: 2축 운영 네비게이션 */}
+          {axes.length > 0 && <AxisNavigationSection axes={axes} />}
         </>
       }
     />
