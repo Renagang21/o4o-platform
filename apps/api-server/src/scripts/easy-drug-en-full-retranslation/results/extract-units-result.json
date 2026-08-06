@@ -1,0 +1,32 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "extract-units",
+  "unit": "master (생산·검증 단위). TM 은 비용 절감 수단일 뿐 제품 간 공유 근거가 아니다.",
+  "mastersRequested": 19360,
+  "mastersExtracted": 19360,
+  "anomalies": 0,
+  "anomalySample": [],
+  "bodySegments": {
+    "total": 306609,
+    "perMasterMin": 7,
+    "perMasterMax": 34,
+    "perMasterMedian": 15
+  },
+  "fixedIdentitySegments": 116160,
+  "tm": {
+    "distinctSentences": 17075,
+    "NEW_UNIQUE": 10900,
+    "REUSE_SAFE": 3773,
+    "REVIEW_NUMERIC": 2402,
+    "occurrencesCoveredByReuse": 266410,
+    "reuseRatio": 86.89,
+    "distinctKoDocuments": 5317,
+    "topSentence": {
+      "docN": 5317,
+      "n": 19360,
+      "len": 26,
+      "text": "이 설명서는 매장 상담을 돕기 위한 자료입니다."
+    }
+  },
+  "dbWrites": 0
+}
