@@ -107,16 +107,22 @@ DRAFT → ACTIVE → SUPERSEDED(대체 ADR 명시)
 3. **`CLAUDE.md` 미링크** — `CLAUDE.md` 및 그 링크 체인에서 직접 참조되지 않는다.
 4. **대체 관계 명시** — SUPERSEDED 인 경우 대체 문서를 문서 상단에 기록했다.
 
-### 이동 대상 폴더 대응표
+### 이동 대상 폴더 결정 기준
 
-| 원래 폴더 | archive 대상 |
+**archive 목적지는 현재 저장 위치가 아니라 문서의 실제 종류와 역할을 우선하여 결정한다. 문서 종류가 불명확한 경우에만 원래 폴더와 관련 문맥을 보조 기준으로 사용한다.**
+
+문서가 원래 폴더와 성격이 어긋나 보관되어 있는 경우가 실재하므로(`checks/` 에 `WO-` 52건, `work-orders/` 에 `CHECK-` 다수), 아래 표는 **문서 종류** 기준이며 원래 폴더 기준이 아니다.
+
+| 문서 종류 | archive 대상 |
 |-----------|--------------|
-| `checks/` | `archive/checks/` |
-| `investigations/` · `ir/` | `archive/investigations/` |
-| `work-orders/` | `archive/work-orders/` |
-| `audits/` · `data-audits/` | `archive/audits/` |
+| 검증 회차 기록 (CHECK) | `archive/checks/` |
+| 조사 기록 (IR) | `archive/investigations/` |
+| 작업요청서 (WO) | `archive/work-orders/` |
+| 감사 기록 (AUDIT) | `archive/audits/` |
 | 완료 보고서 (REPORT · COMPLETION · ROLLOUT) | `archive/reports/` |
 | 전제 소멸(OBSOLETE) | `archive/obsolete/` |
+
+> **적용 실적**: `CHECK-O4O-HFF-ZH-*` 7건은 `docs/work-orders/` 에 있었으나 성격이 완료된 검증 기록이므로 `archive/checks/` 로 이동했다 (2026-08-06, `WO-O4O-HFF-ZH-CHECK-DOCUMENTS-ARCHIVE-PILOT-V1`).
 
 ### 이동 단위
 
