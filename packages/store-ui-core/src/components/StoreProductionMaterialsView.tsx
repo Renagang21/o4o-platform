@@ -23,6 +23,13 @@ import {
   type ProductionMaterialItem,
 } from '../utils/productionMaterials';
 
+export interface StoreProductionMaterialsCrossLink {
+  key: string;
+  label: string;
+  icon: typeof Megaphone;
+  to: string;
+}
+
 export interface StoreProductionMaterialsViewProps {
   items: ProductionMaterialItem[];
   loading: boolean;
@@ -30,15 +37,26 @@ export interface StoreProductionMaterialsViewProps {
   onRefresh: () => void;
   /** 원본(derivation) 조회 — 서비스별 API 경로 주입 */
   fetchDerivations: (args: { derivedKind: string; derivedId: string }) => Promise<{ items: any[] }>;
+  /**
+   * 교차 진입 CTA. (WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1)
+   *   undefined = 기존 3서비스 기본값(`/store/*`) · null = 숨김 · 배열 = 서비스별 override
+   * 기본 route 가 없는 서비스에서 데드링크가 생기지 않도록 열어 둔다 (데드링크 0 원칙).
+   * StoreLocalProductsManagerActions 와 같은 컨벤션이다.
+   */
+  crossCreateLinks?: StoreProductionMaterialsCrossLink[] | null;
+  /** 가이드 back link. undefined = 기본 · null = 숨김 (가이드 페이지가 없는 서비스용) */
+  guideLink?: { to: string; label: string } | null;
 }
 
-// 제작 자료 기반 교차 진입(기존 제작 화면 route 재사용 — 신규 API/DB 없음, 3서비스 공통)
-const CROSS_CREATE: { key: string; label: string; icon: typeof Megaphone; to: string }[] = [
+// 제작 자료 기반 교차 진입(기존 제작 화면 route 재사용 — 신규 API/DB 없음, 3서비스 공통 기본값)
+const CROSS_CREATE: StoreProductionMaterialsCrossLink[] = [
   { key: 'pop', label: 'POP 만들기', icon: Megaphone, to: '/store/marketing/pop' },
   { key: 'qr', label: 'QR-code 만들기', icon: QrCode, to: '/store/marketing/qr' },
   { key: 'blog', label: '블로그 글쓰기', icon: PenLine, to: '/store/content/blog' },
   { key: 'signage', label: '사이니지에 추가', icon: MonitorPlay, to: '/store/marketing/signage/playlist' },
 ];
+
+const DEFAULT_GUIDE_LINK = { to: '/guide/features/production-materials', label: '제작 자료 활용 방법' };
 
 export function StoreProductionMaterialsView({
   items,
@@ -46,7 +64,11 @@ export function StoreProductionMaterialsView({
   error,
   onRefresh,
   fetchDerivations,
+  crossCreateLinks,
+  guideLink,
 }: StoreProductionMaterialsViewProps) {
+  const crossLinks = crossCreateLinks === undefined ? CROSS_CREATE : (crossCreateLinks ?? []);
+  const guide = guideLink === undefined ? DEFAULT_GUIDE_LINK : guideLink;
   const navigate = useNavigate();
   const [derivTarget, setDerivTarget] = useState<
     { id: string; title: string; kind: 'pop' | 'blog'; kindLabel: string } | null
@@ -68,9 +90,11 @@ export function StoreProductionMaterialsView({
           <p style={styles.subtitle}>
             POP·QR·블로그·상품 상세설명 등 매장 실행 자산을 관리합니다.
           </p>
-          <div style={{ marginTop: 8 }}>
-            <GuideBackLink to="/guide/features/production-materials" label="제작 자료 활용 방법" />
-          </div>
+          {guide && (
+            <div style={{ marginTop: 8 }}>
+              <GuideBackLink to={guide.to} label={guide.label} />
+            </div>
+          )}
         </div>
         <button onClick={onRefresh} style={styles.refreshBtn} disabled={loading}>
           <RefreshCw size={14} />
@@ -79,14 +103,16 @@ export function StoreProductionMaterialsView({
       </div>
 
       {/* cross-create CTA — 제작 자료에서 POP/QR/블로그/사이니지 제작 화면으로 진입 */}
-      <div style={styles.ctaBar}>
-        {CROSS_CREATE.map(({ key, label, icon: Icon, to }) => (
-          <button key={key} style={styles.ctaBtn} onClick={() => navigate(to)}>
-            <Icon size={14} />
-            {label}
-          </button>
-        ))}
-      </div>
+      {crossLinks.length > 0 && (
+        <div style={styles.ctaBar}>
+          {crossLinks.map(({ key, label, icon: Icon, to }) => (
+            <button key={key} style={styles.ctaBtn} onClick={() => navigate(to)}>
+              <Icon size={14} />
+              {label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {loading ? (
         <div style={styles.empty}>
@@ -106,7 +132,9 @@ export function StoreProductionMaterialsView({
             저장된 제작 자료가 없습니다.
           </p>
           <p style={{ margin: '8px 0 0', color: '#94a3b8', fontSize: 13, lineHeight: 1.6 }}>
-            위 만들기 버튼 또는 내 자료함 → 콘텐츠에서 제작 작업을 시작하세요.
+            {crossLinks.length > 0
+              ? '위 만들기 버튼 또는 내 자료함 → 콘텐츠에서 제작 작업을 시작하세요.'
+              : '내 자료함 → 콘텐츠에서 제작 작업을 시작하세요.'}
           </p>
         </div>
       ) : (

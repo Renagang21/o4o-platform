@@ -55,7 +55,10 @@ export type {
 
 // Production Materials 목록 공통 View (WO-O4O-STORE-PRODUCTION-MATERIALS-PAGE-COMPONENT-EXTRACTION-V1)
 export { StoreProductionMaterialsView } from './components/StoreProductionMaterialsView';
-export type { StoreProductionMaterialsViewProps } from './components/StoreProductionMaterialsView';
+export type {
+  StoreProductionMaterialsViewProps,
+  StoreProductionMaterialsCrossLink,
+} from './components/StoreProductionMaterialsView';
 
 // Production Materials 목록 정규화/병합 (WO-O4O-STORE-PRODUCTION-MATERIAL-LIST-QUERY-CLEANUP-V1)
 export {
