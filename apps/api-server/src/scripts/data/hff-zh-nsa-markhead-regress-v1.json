@@ -1,0 +1,13 @@
+{
+ "wo": "WO-O4O-HFF-ZH-NUMBER-STRUCTURE-AMBIGUOUS-101-REPAIR-AND-APPLY-V1",
+ "scope": "MARK_HEAD decimal-split regression over existing ZH canonical",
+ "scannedAt": "2026-08-06T00:14:23.823Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "zhCanonicalTotal": 40498,
+ "candidateDocuments": 4787,
+ "markerNotDecimalDocuments": 7,
+ "damagedDocuments": 0,
+ "damaged": [],
+ "verdict": "PASS"
+}

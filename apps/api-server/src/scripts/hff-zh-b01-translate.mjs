@@ -259,7 +259,26 @@ function lookup(kind, t) {
   if (f) for (const kd of order) { const v = FLAT[kd].get(f); if (v) return { zh: alignMarks(t, kind,v), how: `dict-flat(${kd})` }; }
   return null;
 }
-const MARK_HEAD = /^(\s*(?:[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⒜⒝⒞㉮㉯㉰㉱㈎㈏㈐㈑○●◦▶ⓛ]|\(\s*\d+\s*\)|\d+(?:-\d+)+\s*[).]|\d+\s*[).>]|\(\s*[가나다라마바사]\s*\)|[가나다라마바사]\s*[.)])\s*)/;
+/* 구분자 뒤에 곧바로 숫자가 오면 열거 기호가 아니라 **소수점**이다 — `0.5g당 10억 CFU 이상` 의 `0.` 를
+   항목 번호로 떼어내면 `0.` + `每5g…` 가 되어 수치가 통째로 손상된다(`MARK_LEAD` 와 같은 가드). */
+const MARK_HEAD = /^(\s*(?:[①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑴⑵⑶⑷⑸⑹⑺⑻⑼⑽⒜⒝⒞㉮㉯㉰㉱㈎㈏㈐㈑○●◦▶ⓛ]|\(\s*\d+\s*\)|\d+(?:-\d+)+\s*[).](?!\d)|\d+\s*[).>](?!\d)|\(\s*[가나다라마바사]\s*\)|[가나다라마바사]\s*[.)])\s*)/;
+/* 다만 `1.1일 3회 … 2. 건강기능식품 원료로 …` 처럼 **뒤에 다음 번호 항목이 이어지면** 그 `1.` 은
+   실제 항목 번호다. 소수와 구별할 수 있는 유일한 근거가 형제 마커의 존재이므로, 숫자가 뒤따르는
+   구분자는 `n+1` 마커가 같은 문장 안에 있을 때만 마커로 인정한다. */
+const SIBLING_MARK = (n) => new RegExp(String.raw`(?:^|[\s(])${n + 1}\s*[).](?!\d)`);
+/* `1.1일 2회` 처럼 뒤가 `N일 M회` 섭취 빈도로 시작하는 경우도 소수가 아니라 항목 번호다.
+   빈도는 두 축(일·회)이 함께 나타나야만 인정해 `1.5일분` 같은 실제 소수를 마커로 오인하지 않는다. */
+const FREQ_HEAD = /^\d+\s*일\s*\d+\s*회/;
+const MARK_HEAD_AMBIG = /^\s*(\d+)\s*[).](?=\d)/;
+function markHead(t) {
+  const mm = MARK_HEAD.exec(t);
+  if (mm) return mm;
+  const am = MARK_HEAD_AMBIG.exec(t);
+  if (!am) return null;
+  const rest = t.slice(am[0].length);
+  if (SIBLING_MARK(Number(am[1])).test(rest) || FREQ_HEAD.test(rest)) return [am[0]];
+  return null;
+}
 /* 구분자 — `2,000` 의 쉼표와 `mg/kg` 의 슬래시는 열거 구분자가 아니다(수치·단위 보존). */
 const SPLIT = /\s*[·､、･•․∙]\s*|\s*(?:(?<!\d)[,，]|[,，](?!\s*\d))\s*|(?<![A-Za-z0-9])\s*\/\s*|\s*\/\s*(?![A-Za-z0-9])/;
 /* 괄호 밖(최상위)에서만 자른다 — `표시량(36 mg/1일 섭취량)의 …` 를 조각내지 않는다. */
@@ -1145,7 +1164,7 @@ function zhCompute(kind, t) {
   const hit = lookup(kind, t);
   if (hit) return hit;
   /* 마커 접두는 표기다. 원문 마커를 그대로 두고 본문만 번역한다. */
-  const mm = MARK_HEAD.exec(t);
+  const mm = markHead(t);
   if (mm) {
     const rest = t.slice(mm[0].length);
     const r = zh(kind, rest);

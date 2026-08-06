@@ -1,0 +1,13 @@
+{
+ "wo": "WO-O4O-HFF-ZH-NUMBER-STRUCTURE-AMBIGUOUS-101-REPAIR-AND-APPLY-V1",
+ "generatedAt": "2026-08-06T00:14:27.013Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documents": 101,
+ "alreadyClean": 101,
+ "blockedDocuments": 0,
+ "atomCount": 0,
+ "byWhy": {},
+ "hangulOnlyDocs": [],
+ "atoms": []
+}

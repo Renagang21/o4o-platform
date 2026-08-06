@@ -1,0 +1,1055 @@
+{
+ "wo": "WO-O4O-HFF-ZH-NUMBER-STRUCTURE-AMBIGUOUS-101-REPAIR-AND-APPLY-V1",
+ "scannedAt": "2026-08-06T00:00:03.864Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "queueTotal": 420,
+ "queueNSA": 101,
+ "populationReproduced": 101,
+ "productMasterDup": 0,
+ "koCanonicalDup": 0,
+ "tally": {
+  "UNRESOLVED": 47,
+  "NOW_CLEAN": 50,
+  "HANGUL_ONLY": 1,
+  "NUMBER_DRIFT": 3
+ },
+ "lostTokenTop": [
+  [
+   "TIMES1",
+   3
+  ]
+ ],
+ "cases": [
+  {
+   "masterId": "00a5ca9e-daa4-4935-b176-bf5fa7693c3a",
+   "koId": "bba10087-47a6-44aa-b223-770da3a7bb95",
+   "productName": "게스프로 장건강(Gespro Enguz)",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "00a865e9-59ec-484a-bd8e-509d61d97840",
+   "koId": "f527908e-7ec4-445d-b6fd-78e8abb4ec71",
+   "productName": "해피데이 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "0108b746-ba10-4034-a5dc-79d6b88fd5d6",
+   "koId": "4b4f2c9e-ce6f-4393-9cfb-7ac708a9b832",
+   "productName": "본질 유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "04067f2d-bbf5-45f7-90ec-4b1a9a85641d",
+   "koId": "90515fd6-66e2-493d-8798-f7f0f89dad90",
+   "productName": "100억 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "051f4610-82ef-4529-9dc4-b2ed5cb4e529",
+   "koId": "dad8efde-30a3-4653-81e0-5835c8625f75",
+   "productName": "락토핏 솔루션1 50캡슐",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "0565db89-a967-4a3c-8535-35a632e32115",
+   "koId": "43c465ee-8915-46bc-9cb9-68571453dd7a",
+   "productName": "슈비체 프로바이오 (SPITZE PROBIO)",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": true
+  },
+  {
+   "masterId": "092ae386-128a-43af-a2a5-bcad0d3a9488",
+   "koId": "a4aff9bc-4cc2-4396-adc2-1c6be6e0d68f",
+   "productName": "장 건강에 도움을 줄 수 있는 프로그램",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "0942ecca-a94f-44cd-92fb-478cb5c5bf3f",
+   "koId": "020698ea-116e-4753-86b4-cd478019e802",
+   "productName": "피토틱스 브라운",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "098efe51-8dfc-4bea-9357-4a2b09389093",
+   "koId": "0ed3c3f5-2af8-4fb3-ab89-2b14ec8d0bb0",
+   "productName": "더 파르마 유산균 II",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "0b60f94a-c1bc-4419-8844-7442032de3c3",
+   "koId": "c86215cf-0f74-4504-b5b3-da6e3f751ccd",
+   "productName": "익스트림 리얼 비피더스 플러스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "0d30ae52-5259-4fa3-a3bc-d2b6a06f2121",
+   "koId": "e552407c-40bb-4af8-81c6-f07e859270e8",
+   "productName": "프로바이오틱스 골드",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "10f696d8-9831-4197-a496-3df5928df1af",
+   "koId": "44db3ec9-3784-4eda-b371-008c3f44f535",
+   "productName": "제왕베베 베이비 유산균 스텝 1",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "13ebe32d-d8bc-4845-95a3-49af2acc7bb4",
+   "koId": "60bec6ce-bd45-4339-ad14-df5cc97031c5",
+   "productName": "락토바이옴 솔루션3",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "159970e9-3455-4f8b-9f57-db833d848184",
+   "koId": "6beb2d9f-3d91-4154-877a-121c0e0c605c",
+   "productName": "유산균 증식 및 유해균 억제배변활동 원활, 장건강에 도움을 줄 수 있는프리미엄케어장",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "19fef438-3122-4f07-a2ea-58ec0fd78594",
+   "koId": "17b6df9d-af41-49ce-a3b0-2b82fdc13026",
+   "productName": "3-스텝 활성 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "213edb16-d933-4f72-b78a-6c08f1d1fb10",
+   "koId": "517b13cf-1996-4b6b-b9ae-3a6511a4fd68",
+   "productName": "마이락토 오가닉 포 키즈(MYLACTO ORGANIC FOR KIDS)",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "24f995eb-2109-402c-a53f-069c2a76356d",
+   "koId": "b1356b99-6f8b-465e-b753-3ce4e6f455d3",
+   "productName": "장건강 유한 생유산균 스틱",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "2549c0c0-ad63-4a38-9e98-55637ee03314",
+   "koId": "331f1a7e-3381-44eb-9eaf-91ed4d6b4117",
+   "productName": "디노보 프로제닉 메트릭스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "26207f11-a631-4731-8b1b-9a8bd1b0ec1b",
+   "koId": "831f2a1a-d759-4649-a47a-946f99f4388a",
+   "productName": "이너바이옴",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "26ec7386-3af2-4cbd-a877-27cd7598b4f0",
+   "koId": "1c59a1dc-7079-48d9-aafe-1e2ca83349be",
+   "productName": "유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "2a27a6f0-93c4-45cc-ba7e-1976fe5b9446",
+   "koId": "54e17d97-d7fe-498a-acc6-92d5efa6e73c",
+   "productName": "어뉴엠 프리미엄 장앤청 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "2aa2c597-7d6f-4c08-9308-7761791d2267",
+   "koId": "8e481227-80bf-4b15-8fa8-66e13df89310",
+   "productName": "코어리셋 옴니바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "2d0348e4-d9eb-4c94-abd1-5f5551080124",
+   "koId": "207b912a-1da2-478f-80fd-dac967047ec9",
+   "productName": "락토핏 솔루션1",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "2d7ede14-5120-451e-848f-e13d93f5824f",
+   "koId": "a72b349e-4465-40b3-a1a2-786f45992568",
+   "productName": "유산균 플러스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "2e4941c7-e8e9-4741-bad1-ed8f415688fa",
+   "koId": "d26cabc8-dfd6-421f-9ed2-3509e04fc1a7",
+   "productName": "미담은 생생 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "2ef59439-a067-466b-948e-256261ea260e",
+   "koId": "162a8f4d-90d5-4ba3-83a3-101b72929e60",
+   "productName": "띠띠뽀 튼튼키즈 삼형제 3단계",
+   "drifts": [
+    {
+     "kind": "meta",
+     "ko": "1일 1회, 1회 1포를 섭취하거나, 물에 희석하여 음용",
+     "zh": null,
+     "lost": [
+      "TIMES1"
+     ]
+    }
+   ],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": true
+  },
+  {
+   "masterId": "30216e44-d51a-445b-9aeb-a2306ea2e9d0",
+   "koId": "edad5ad1-dab4-469b-aa2d-c173f017b0a6",
+   "productName": "마이크로바이옴 1",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "310df37e-a47a-4f07-84c4-ad7b0b83ce30",
+   "koId": "a0295ae4-31b9-402b-98e7-b6e85d12f2c7",
+   "productName": "묵직한 장 유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "31e8fb86-7911-4d54-9fd3-b987c950d10d",
+   "koId": "9d4690e0-a45c-47ea-8664-d34b83e642f2",
+   "productName": "프로바이오틱스 100억 솔루션",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 3,
+   "hangul": true
+  },
+  {
+   "masterId": "331dd735-1c5d-46ab-8ed7-7d89e29efce6",
+   "koId": "dc822e8c-2e15-4463-82fc-14592544f725",
+   "productName": "프로바이오슈퍼K",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "367bdc61-d2ae-45eb-9265-99a54ea46d53",
+   "koId": "f89af6d9-1170-4bce-92b7-937abc1f1fbc",
+   "productName": "생유산균 패밀리 플러스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "391b1682-f54a-4e05-90c4-c840ceda95c2",
+   "koId": "b8d400bf-2ef2-4da2-ae4e-2c0eef027d8b",
+   "productName": "슈퍼프로바이오 펜타5골드",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "3bd1d1e8-fd57-4f84-bd85-1b79f0edb214",
+   "koId": "083ca4b7-0640-43ff-b54e-67c5f4b64013",
+   "productName": "프로바이오틱스 츄어블",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "3cc2aebd-e31e-4be8-9469-c2599ec2fa78",
+   "koId": "fce01c7c-c3f0-4dae-bc64-bfa9db99f78b",
+   "productName": "락토바이옴 이지",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "3fe7cbbf-9057-405e-9004-66d11a1e8520",
+   "koId": "1cc47141-ddb1-46e6-a514-3334587c3529",
+   "productName": "프로바이오틱스 키즈 맥스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "405e4be6-4193-467a-90d0-796adc34187f",
+   "koId": "0cf3da97-b804-49a0-a58e-25e78e2d1e45",
+   "productName": "뉴오리진 프로바이오틱스 (New Origin Probiotics)",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "46570450-dcd6-41d7-b2d6-6a1af6eb7e70",
+   "koId": "e1eaaad0-5bdf-4874-8133-3f7679f15776",
+   "productName": "신터액트 베이비 오일드롭",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 13,
+   "hangul": true
+  },
+  {
+   "masterId": "470b481e-7a14-449e-8081-6ece96b35f1e",
+   "koId": "708ae85a-6275-494e-8b86-cf79409dbbdf",
+   "productName": "락티브 베베 우리아이 유산균 프로바이오틱스 드롭",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 11,
+   "hangul": true
+  },
+  {
+   "masterId": "474ff17e-a3fd-439c-80fc-85ace92b8551",
+   "koId": "218b5ddb-8a71-48d7-a68e-b7fa57b9de4b",
+   "productName": "20억 유산균 분말",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "4897fc08-41ab-4cbe-93c5-7259bac81afc",
+   "koId": "eac3611d-145f-4b3d-8952-b8998f83a1a3",
+   "productName": "파파 파르마 키즈유산균 아이상쾌해",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "4a72c414-7953-48ac-b337-fa03c97934b9",
+   "koId": "b4696493-9c35-4aeb-933a-c7f094601b29",
+   "productName": "마이크로바이옴 2",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "4a80dacd-e3d2-4053-8174-a5a63ea3b021",
+   "koId": "fe985f9c-286e-43c3-8314-47e98cc52f62",
+   "productName": "바이오리브 100억 유산균 프레시",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "4ac2e3f8-1294-4c62-b483-7f0ed81b9226",
+   "koId": "25eb43c4-ec34-45d7-bd93-c698380c4605",
+   "productName": "프로바이오틱스 트리플",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "4db34f86-9a50-4bfa-ad6a-ef0d4ea6d263",
+   "koId": "c0fc6bd3-c4cf-4c29-b63f-d8e26a129c24",
+   "productName": "락토바이옴 솔루션2",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "520452ba-b549-4c19-8051-388c5de2595c",
+   "koId": "90ed8222-955c-4e7c-b4bc-6c4611583cfc",
+   "productName": "THESSEN남자 2000",
+   "drifts": [
+    {
+     "kind": "meta",
+     "ko": "1일 1회, 1회 적색캡슐 1개(1,000 mg)와 녹색캡슐 1개(1,000 mg)를 충분한 물과 함께 섭취하십시오.",
+     "zh": null,
+     "lost": [
+      "TIMES1"
+     ]
+    }
+   ],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": true
+  },
+  {
+   "masterId": "54871009-2f34-4aa8-95e5-5f07c3786ee5",
+   "koId": "ac582616-0977-4d4b-a209-8cf50b7acf22",
+   "productName": "프로바이오틱스 센서티브",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "57ef0728-7fe3-4ca8-94b3-b5ddac646b38",
+   "koId": "ab59155a-4931-4f7f-918f-f383a400bd2e",
+   "productName": "홍이장군 키즈랩 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "5b6c5ef0-627a-4825-a03c-968ba09d36a2",
+   "koId": "056153b9-4bcf-43fd-b71d-2d4a7fe7a88d",
+   "productName": "코오롱 아이사랑 매일 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "6187f5eb-2638-417b-82fd-b654fc0bd73e",
+   "koId": "9a0d184f-daf3-4a5b-a71e-6287b5dafa30",
+   "productName": "장 유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6321ecf3-8bc4-49aa-aa19-796564afa128",
+   "koId": "facdb17c-03e0-4962-99b6-a35d248b84a2",
+   "productName": "100억 유산균 캡슐",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6a45e20e-155a-447e-b707-3bb2890f8f41",
+   "koId": "79a1a2a4-affa-4873-823a-7c710aa44419",
+   "productName": "파파유산균 베이비",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6b669349-5c40-4b2e-b16f-eb658a96de8f",
+   "koId": "937152a2-6695-476c-918a-a1ad1412c282",
+   "productName": "프로비던스 장건강 100억 유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6d4c3367-e5b0-436b-a1ff-d7badb8401c5",
+   "koId": "140613f3-7282-400c-a8ea-64702763f447",
+   "productName": "디노보 프로제닉스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6f02666d-1dd0-4f21-a842-38e4ee276827",
+   "koId": "819ebdff-659c-410d-8411-aa66efb96a84",
+   "productName": "여에스더 유산균 클래식 PRO",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "6f3cb06a-7709-4802-ab6b-dbf6581aa1da",
+   "koId": "3f00d304-09b4-4fa5-889b-43cd27558f8e",
+   "productName": "더팜뉴바이오틱스베이비",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "71b0d886-9bb7-402b-9aee-6b9b66bd4a62",
+   "koId": "a9b5fb8d-efa3-46df-b802-7b5b16410bed",
+   "productName": "땡큐 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "76535c99-62d8-457b-aeb6-298079a113a3",
+   "koId": "0431d445-6693-4cba-8292-fd5f01ddc1c1",
+   "productName": "장밸런스 536 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "7a9538e6-b939-456c-8fdb-65778530fa02",
+   "koId": "eb26c937-aa22-43d5-aa4e-5b46885fef0d",
+   "productName": "올인원 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "84122e0f-0e44-449d-8af7-412722a4c875",
+   "koId": "173bf7d1-8af1-45fd-bb6f-54d6a926c13c",
+   "productName": "락토핏 솔루션2 50캡슐",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "86f4ba75-968a-4f31-9aa5-89c2fe4e3f21",
+   "koId": "337fc549-8a71-43dc-9d2f-d915887cdcd7",
+   "productName": "여에스더 유산균 골드 PRO  ",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "89d36e75-aa83-4672-9065-4a4cadb7fe53",
+   "koId": "8ed5216e-66ad-43ff-8635-7fc63d317b87",
+   "productName": "프로바이오틱스100억",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "8a9596ad-5c44-4006-8993-16a8677008a0",
+   "koId": "114e1051-1a7d-405d-9e31-c25144d9e834",
+   "productName": "해피문데이 랩 장 건강 100억 유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "8aead717-056f-4c7a-bb03-1d2544a3ff5e",
+   "koId": "05fea192-e6bf-44ba-ad14-e0f8a63b9037",
+   "productName": "바이오코어 100억 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "8eea4e59-6a67-4e30-ae65-09682ec970da",
+   "koId": "32196a1e-e777-42bf-b6a2-6c4f4104796a",
+   "productName": "유투바이옴베베 C 것 케어",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "9f36f83b-3784-472e-be3d-1674d8ec3658",
+   "koId": "4a3897c6-3619-4b0a-a614-382de9976aca",
+   "productName": "뉴장안에화제",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "9f908ea1-f6e1-4625-bd90-53c807123c55",
+   "koId": "88804c74-2457-4a08-b967-ce29f642178e",
+   "productName": "바이오 20억 생유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "a1b89f41-dec4-49ad-8d29-9fbce75d7bb7",
+   "koId": "27999d7b-d8e8-45b8-8e3e-5cd52b8ef2fd",
+   "productName": "닥터드랍비",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 12,
+   "hangul": true
+  },
+  {
+   "masterId": "afd2e0b8-5820-4e17-bb77-819a66061856",
+   "koId": "81f9b3d1-1c9e-487e-936b-2919f9f5ed9a",
+   "productName": "락토베베유산균",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "b4d070e3-f55d-4865-82ac-5e6e64ec1f34",
+   "koId": "6de99189-2e10-4ea0-85b7-b5aa19fd592f",
+   "productName": "PROBIOTICS DOUBLE CAPSULE",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "b7a1afb3-3f43-4a88-b0f2-ca07d8864b46",
+   "koId": "da07e1cc-15a5-407a-bad1-933b7376537f",
+   "productName": "셀티아이 베이비(CellTi Baby)",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "b9e9801d-e4e0-456b-b681-bcacaaa0b3e6",
+   "koId": "8fcc314e-2e79-497e-9cce-5a314cbbb282",
+   "productName": "프로바이오틱스 코어 17 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "baf44608-38c5-4a5f-a4a2-c71e63334573",
+   "koId": "bbfdadc7-20b5-472d-b5b8-a9710345d7be",
+   "productName": "베베&키즈 100억 아기유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "bb044e14-4f48-46c7-b1f4-9d7bc82b4a71",
+   "koId": "b1da518e-d9f7-402a-8c5b-1686315ea17f",
+   "productName": "키즈 생 유산균 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "bd665902-0964-4d1b-ac26-78002d8783a3",
+   "koId": "60e4b099-9e24-4f18-823d-26819e9a0325",
+   "productName": "Kids Garden® Babyflora Probiotic drops",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 13,
+   "hangul": true
+  },
+  {
+   "masterId": "bee59b3e-dd82-4bb9-8576-96cac98ab66f",
+   "koId": "470c96ed-1ce0-4fc0-91aa-cf93a8f2b989",
+   "productName": "데일리 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 3,
+   "hangul": true
+  },
+  {
+   "masterId": "bf6d9eea-a10b-4fc6-a660-401daefd9140",
+   "koId": "7c3fa29c-adb4-4978-9791-1121087b5e7e",
+   "productName": "더트리플바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 4,
+   "hangul": true
+  },
+  {
+   "masterId": "c00922bd-6d27-4720-9a42-450a5d76336b",
+   "koId": "d52746e6-bb2d-4dd0-b2c3-9f2d12b8c095",
+   "productName": "마이크로바이옴 6",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "c07fe444-081e-47a7-912f-6428721a1b5c",
+   "koId": "3d5d3bf0-63e3-4ddc-bf24-8ed9c34f8b34",
+   "productName": "더팜 이지바울 베베키즈",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "c220219a-3b35-4808-b3b3-c69dae8ddddb",
+   "koId": "c3326944-967e-49b7-b6d9-6f15411dec4e",
+   "productName": "에이치 005 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "c2ddaf78-efc8-475d-84dc-237f9d5b7534",
+   "koId": "b25b0868-2081-4751-ab41-d4082c97b625",
+   "productName": "띠띠뽀 튼튼키즈 삼형제 2단계",
+   "drifts": [
+    {
+     "kind": "meta",
+     "ko": "1일 1회, 1회 1포를 섭취하거나, 물에 희석하여 음용",
+     "zh": null,
+     "lost": [
+      "TIMES1"
+     ]
+    }
+   ],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": true
+  },
+  {
+   "masterId": "c33888bc-b75b-473e-8a6c-bf6c1458d925",
+   "koId": "ba48ed88-ca3e-43f2-a94b-f2393764178f",
+   "productName": "차일드라이프 베이비 액상 유산균 드롭스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 11,
+   "hangul": true
+  },
+  {
+   "masterId": "c37eecb1-0191-4094-a9a6-298e6fe6f0a5",
+   "koId": "1bcf03e4-63c6-422b-a9ab-67ec9cf27c92",
+   "productName": "마이크로바이옴 3",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "c39d8193-4791-434a-bef7-0d13b5d06715",
+   "koId": "dfcdd25a-4c79-4417-95d5-ba0518d3f8d7",
+   "productName": "마이크로바이옴 4",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "c421a190-4fd9-4a65-9484-72b52e5c05dc",
+   "koId": "27c928ae-11d1-4b99-909c-d503017648a3",
+   "productName": "제왕베베 토들러 유산균 스텝 2",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "c618b6be-8049-4d8c-b7ad-4da1314aea49",
+   "koId": "195b6b0b-77d2-4c62-b433-8e26c767867e",
+   "productName": "더팜 이지바울 골드",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "c7731268-ff60-406b-9224-5196ef37bfe5",
+   "koId": "11fc802a-11c5-430f-97b7-efe202211f14",
+   "productName": "닥터오라클 프리미엄 프로바이오틱스 100억 CFU",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "cc749cb3-c495-4f07-9422-35d53375ce56",
+   "koId": "d4c5e9e3-8072-4896-90e7-14a3904dcbc8",
+   "productName": "이든마이크로바이옴프로젝트970",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "ccb11335-6d7c-4fb7-ad03-672d62d8e8f2",
+   "koId": "7654d7ba-91ed-492e-bc31-89c0e8719a19",
+   "productName": "어뉴엠 장앤청 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "d1810fd3-4b10-4481-a6b7-89b4eaca2886",
+   "koId": "46d29dc5-d544-4287-9173-2bb34c2ace64",
+   "productName": "락토핏 솔루션2",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "d18d005c-998d-47df-b1f4-2389bb3ba693",
+   "koId": "c9f80d6c-498b-4b91-b95b-2728a58289dd",
+   "productName": "식물성 유산균 패밀리",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "d2b2b25c-ca39-45dc-ad2e-b699a7cd99ca",
+   "koId": "1ffa0453-0fac-4d7d-b287-7a94a229b90d",
+   "productName": "락토바이옴 솔루션1",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "d3b9e8bc-ea8a-40c2-b991-42426699e9f6",
+   "koId": "763ecb8b-04f7-40f5-ab13-affe3a5623ba",
+   "productName": "순창 쉴 프로바이오틱스 골드",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "da9c48c3-3928-42c4-8835-c1ec528243a5",
+   "koId": "014ee473-110f-467a-b2a0-25ae368d610a",
+   "productName": "마이크로바이옴 5",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "dd47a928-7466-4b44-ab11-f552bd491655",
+   "koId": "dd013678-e00a-4970-86df-a795c0c70afa",
+   "productName": "더블유 10억 유산균",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 2,
+   "hangul": true
+  },
+  {
+   "masterId": "e3773d11-5831-4beb-9e26-c387fbbb859f",
+   "koId": "21f07a45-c80e-4407-b2f6-51fd7ec39856",
+   "productName": "Core reset Omnibiotics",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "e406eaf7-60ea-42dd-b758-6d8462133c24",
+   "koId": "f4c0e4c3-78a8-4c3f-a81d-b6910799fec2",
+   "productName": "어뉴엠 장앤청 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "eac39de3-71a1-40aa-a199-7f2c8e88820c",
+   "koId": "811511c8-71f5-45f9-b6f4-f753bcea763f",
+   "productName": "뉴오리진 베이비 프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "ec423fea-3ad8-4912-b377-2553e3e33781",
+   "koId": "eca04949-d286-469e-8225-88635a06a8b6",
+   "productName": "수퍼바이오틱스",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "ef6f435e-ab2f-4836-9f57-6d7fcd4ea6e9",
+   "koId": "ab010af7-c3cc-4662-b60a-9373a3cbd6bf",
+   "productName": "프로바이오틱스",
+   "drifts": [],
+   "otherWhy": [
+    "UNRESOLVED"
+   ],
+   "otherCount": 1,
+   "hangul": true
+  },
+  {
+   "masterId": "f8291fdd-ee4b-4434-854a-1ac182f8369c",
+   "koId": "8a9e5292-32c8-485e-9052-480a310ad0b3",
+   "productName": "뉴오리진 프로바이오틱스 MCT (New Origin Probiotics MCT)",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  },
+  {
+   "masterId": "f875b23c-a1c7-47de-9402-794cbd36c5b3",
+   "koId": "fc51fe65-152c-4ae4-ae7e-ff6d049684fd",
+   "productName": "더 프로바이오틱스 키움 243",
+   "drifts": [],
+   "otherWhy": [],
+   "otherCount": 0,
+   "hangul": false
+  }
+ ]
+}

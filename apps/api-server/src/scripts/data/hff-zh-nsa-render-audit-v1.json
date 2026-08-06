@@ -1,0 +1,50 @@
+{
+ "wo": "WO-O4O-HFF-ZH-ALL-REMAINING-10414-DIRECT-BULK-PRODUCTION-AND-TRACK-CLOSURE-V1",
+ "renderedAt": "2026-08-06T00:16:45.253Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "globalsBefore": {
+  "ko": "40918",
+  "en": "40902",
+  "zh": "40498"
+ },
+ "poolWithoutZh": 101,
+ "excludedFromPool": 319,
+ "priorQueueCarried": 420,
+ "targets": 101,
+ "canonicalDup": 0,
+ "producedCandidates": 101,
+ "notProducedInBatch": 0,
+ "notProducedByWhy": {},
+ "documentsRendered": 100,
+ "structureSignatures": 2,
+ "coverage": "signature-exhaustive + high-risk full",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "renders": 300,
+ "counters": {
+  "structureParity": 0,
+  "pageOverflow": 0,
+  "elementOverflow": 0,
+  "clipped": 0,
+  "emptyH2": 0,
+  "emptyUl": 0,
+  "emptyLi": 0,
+  "undefinedClass": 0,
+  "rawHtml": 0,
+  "hangulVisible": 0,
+  "markerVisible": 0,
+  "labelLost": 0,
+  "licenseNoLost": 0
+ },
+ "totalIssues": 0,
+ "verdict": "PASS",
+ "failures": [],
+ "issueQueue": 0,
+ "retryCandidates": 101,
+ "retryResolved": 101,
+ "issueByType": {}
+}

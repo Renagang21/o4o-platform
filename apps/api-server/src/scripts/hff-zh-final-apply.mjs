@@ -15,7 +15,8 @@ import pg from 'pg';
 const D = 'apps/api-server/src/scripts/data';
 const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
 const RENDER = JSON.parse(fs.readFileSync(`${D}/hff-zh-final-render-audit-v1.json`, 'utf8'));
-const TARGETS = JSON.parse(fs.readFileSync(`${D}/hff-zh-final-safe-targets-v1.json`, 'utf8')).targets;
+const OUT_TAG = process.env.ZH_OUT_TAG ?? 'final';
+const TARGETS = JSON.parse(fs.readFileSync(`${D}/hff-zh-${OUT_TAG}-safe-targets-v1.json`, 'utf8')).targets;
 if (RENDER.verdict !== 'PASS') { console.error('RENDER_NOT_PASS'); process.exit(1); }
 if (!TARGETS.length) { console.error('TARGETS_EMPTY'); process.exit(1); }
 
@@ -94,6 +95,6 @@ const out = {
   expectedEqualsActual: inserted.length === TARGETS.length && (after.zh_canon - before.zh_canon) === inserted.length,
   skippedSample: skipped.slice(0, 20), failed,
 };
-fs.writeFileSync(`${D}/hff-zh-final-apply-result-v1.json`, JSON.stringify({ ...out, insertedIds: inserted.map((x) => x.id) }, null, 1));
+fs.writeFileSync(`${D}/hff-zh-${OUT_TAG}-apply-result-v1.json`, JSON.stringify({ ...out, insertedIds: inserted.map((x) => x.id) }, null, 1));
 console.log(JSON.stringify(out, null, 2));
 await c.end();

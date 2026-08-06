@@ -54,7 +54,13 @@ const poolRaw = (await c.query(`
           AND z.source_type='o4o_hff_generated' AND z.description_type='STORE'
           AND z.status='canonical' AND z.language='zh')
    ORDER BY k.master_id`)).rows;
-const pool = poolRaw.filter((r) => !EXCLUDE.has(r.master_id));
+/* WO-…-NUMBER-STRUCTURE-AMBIGUOUS-101-…: 모집단을 승인된 대상 목록으로 정확히 고정한다.
+   지정된 id 는 문제 큐에 있어도 재시도 대상이고, 그 밖의 문서는 이번 패스에서 건드리지 않는다. */
+const LIMIT_IDS = process.env.ZH_LIMIT_IDS
+  ? new Set(JSON.parse(fs.readFileSync(`${D}/${process.env.ZH_LIMIT_IDS}`, 'utf8')))
+  : null;
+if (LIMIT_IDS) for (const m of LIMIT_IDS) { RETRY.add(m); EXCLUDE.delete(m); }
+const pool = poolRaw.filter((r) => (LIMIT_IDS ? LIMIT_IDS.has(r.master_id) : !EXCLUDE.has(r.master_id)));
 const excludedCount = poolRaw.length - pool.length;
 const globalsBefore = (await c.query(`
   SELECT count(*) FILTER (WHERE coalesce(language,'ko')='ko') ko,
@@ -65,6 +71,8 @@ const globalsBefore = (await c.query(`
      AND description_type='STORE' AND status='canonical'`)).rows[0];
 await c.end();
 
+/* 이번 패스 산출물 접두 — 직전 WO 산출물을 덮어쓰지 않는다. */
+const OUT_TAG = process.env.ZH_OUT_TAG ?? 'final';
 const CACHE = process.env.ZH_CACHE ?? 'apps/api-server/src/scripts/.cache';
 fs.writeFileSync(`${CACHE}/hff-zh-final-pool.jsonl`,
   pool.map((r) => JSON.stringify({ m: r.master_id, i: r.id, n: r.product_name, c: r.content })).join('\n') + '\n');
@@ -241,8 +249,8 @@ const audit = {
   issueQueue: issues.length, retryCandidates: RETRY.size, retryResolved: retryResolved.length,
   issueByType: issues.reduce((a, b) => { a[b.issueType] = (a[b.issueType] ?? 0) + 1; return a; }, {}),
 };
-fs.writeFileSync(`${D}/hff-zh-final-safe-targets-v1.json`, JSON.stringify({ wo: WO, generatedAt: audit.renderedAt, count: targets.length, targets }, null, 1));
-fs.writeFileSync(`${D}/hff-zh-final-render-audit-v1.json`, JSON.stringify(audit, null, 1));
+fs.writeFileSync(`${D}/hff-zh-${OUT_TAG}-safe-targets-v1.json`, JSON.stringify({ wo: WO, generatedAt: audit.renderedAt, count: targets.length, targets }, null, 1));
+fs.writeFileSync(`${D}/hff-zh-${OUT_TAG}-render-audit-v1.json`, JSON.stringify(audit, null, 1));
 /* QUEUE_RETRY 패스는 ZH 가 없는 문서 전량(pool)을 다시 판정하므로, 큐의 근거는 이번 패스의 판정 결과다.
    승계 대상은 "이번에 판정하지 않았고 아직 ZH 도 없는" 항목뿐인데, pool = ZH 없는 전량이라 그런 항목은
    존재하지 않는다(ZH 가 생긴 항목은 해결된 것이므로 승계하지 않는다). 부분 패스에서는 종전대로 승계한다. */

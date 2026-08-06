@@ -1,518 +1,620 @@
 {
  "wo": "WO-O4O-HFF-ZH-ALL-REMAINING-10414-DIRECT-BULK-PRODUCTION-AND-TRACK-CLOSURE-V1",
- "preparedAt": "2026-08-05T09:54:03.536Z",
+ "preparedAt": "2026-08-06T00:17:07.366Z",
  "rollback": "INSERT 전용이므로 되돌리기는 삽입된 ZH canonical 행의 soft delete 이다: UPDATE shared_product_descriptions SET deleted_at=now() WHERE id = ANY(insertedIds) AND language='zh' AND source_type='o4o_hff_generated'.",
  "before": {
-  "spd_all": 208083,
+  "spd_all": 208167,
   "ko_canon": 40918,
   "en_canon": 40902,
-  "zh_canon": 40414,
+  "zh_canon": 40498,
   "pm_hff": 40948
  },
  "targets": [
   {
-   "productMasterId": "00194041-dccf-4c90-b5d0-4db91d607e12",
-   "koCanonicalId": "a092d070-b8b9-4c34-8565-c20af88d0ada",
-   "koHash": "9f9b7c14ebd4bd68f854413f87bf3ca54104d09c34e8c491250e94a495d6039c",
-   "newContentHash": "f622ccad61feb4b3200a455bf028ca9eb325af58e2917133a2e6bea7ab7f9165"
+   "productMasterId": "00a5ca9e-daa4-4935-b176-bf5fa7693c3a",
+   "koCanonicalId": "bba10087-47a6-44aa-b223-770da3a7bb95",
+   "koHash": "e0726de08f5af3677f28be122bddd4de28bc8cd674e8a012775030e3bd84da9f",
+   "newContentHash": "f3d31f2c93683a9f2f59c2f7af23584fa10aba9cdaa09f006cef101a2866ad54"
   },
   {
-   "productMasterId": "00ad6a51-a60b-41da-a404-306d1a3d1d3e",
-   "koCanonicalId": "974b23bb-bdef-423d-b9f4-b9ff77409697",
-   "koHash": "2eacef90c35431f071cc8735b53a28ac319c2edc76d82405d3e4bb2c92d0dfd1",
-   "newContentHash": "06da63b40cbd4e4a3ddc11a776f388dd60742779780c13a208948c87d3e57c61"
+   "productMasterId": "00a865e9-59ec-484a-bd8e-509d61d97840",
+   "koCanonicalId": "f527908e-7ec4-445d-b6fd-78e8abb4ec71",
+   "koHash": "fbe1a882d05984f660c64f90aabfcf6b51c38ebfa7b156c8eeb05dde8d0ebde0",
+   "newContentHash": "c3f7788dce5f3dce3172c15062ffca41e422a7af0dadc8d099fe6cd2e35e0d91"
   },
   {
-   "productMasterId": "010484c9-f2df-44aa-84bd-afc605c6a010",
-   "koCanonicalId": "5c29bcf6-fe0e-4360-9a26-c762f268da1b",
-   "koHash": "ad4bec929a74ae3af7d56c4ba1932f983849dcf45f9397a22b460723adf5e290",
-   "newContentHash": "5eb65de82a8ff4e83d12baaab6bbc74669681ce5a8fb4a041bf885a7f4c12ab0"
+   "productMasterId": "0108b746-ba10-4034-a5dc-79d6b88fd5d6",
+   "koCanonicalId": "4b4f2c9e-ce6f-4393-9cfb-7ac708a9b832",
+   "koHash": "8849baf91473581a0896cea5faa429e03b7241acd52b7721614f88ce0bb3ea13",
+   "newContentHash": "0d90fb3da70e60e9504c2a4f3661930d95e3d0fc8d4905c0600bc04982796640"
   },
   {
-   "productMasterId": "04859fe1-87cf-4487-8948-ec1698156674",
-   "koCanonicalId": "5b590f5a-edbf-45a2-ac1c-f5900b0f0cda",
-   "koHash": "8d9f09381d469f3ba728e364428ee4e86b8ba2d0f7d5cd93c5dadbe0a85b688a",
-   "newContentHash": "4a1a1ab568dbbec43b481c52d46c2b3d0188b8986a78de2f0468f4711e621567"
+   "productMasterId": "04067f2d-bbf5-45f7-90ec-4b1a9a85641d",
+   "koCanonicalId": "90515fd6-66e2-493d-8798-f7f0f89dad90",
+   "koHash": "8027d6f6973ecf85d08a4f86f7df9386f9281eeeb1aa3c0cb46f72933acca74c",
+   "newContentHash": "a4e2e4e803f72d7d3df18fd94e5dcc281c3f59b7010ed109abe63ca159cb891d"
   },
   {
-   "productMasterId": "0823015b-c621-4d2b-b5fc-32a54c8b4999",
-   "koCanonicalId": "c2c23b1e-e91b-4208-868a-fb9488bec3b5",
-   "koHash": "17528eda1397369ba8b29dfb41039ff9d90e8ac244b80e57586fed127f957272",
-   "newContentHash": "3c90456bb6a255fea25cb22ff7cd1a0c497d71a9f6891880d488e5d05c74d0a6"
+   "productMasterId": "051f4610-82ef-4529-9dc4-b2ed5cb4e529",
+   "koCanonicalId": "dad8efde-30a3-4653-81e0-5835c8625f75",
+   "koHash": "1062a027726e37960b768ad46bb305a029e5ae599534402ae384f3404153a948",
+   "newContentHash": "10d020df011679799436cfe8816d071121429c6f3f46414b667725b0962dd3ab"
   },
   {
-   "productMasterId": "08ba1c35-7998-4503-bf46-4ded86a44a27",
-   "koCanonicalId": "c8603b8c-6384-4b4e-b0f6-c71f0ce6c13a",
-   "koHash": "3f31e94bf9fd24138d49603de1727a57fa4a1b4e5994547c0aa162697095c731",
-   "newContentHash": "7026e9921df664ef0094c7f905a6079de3ec00649c2b803cc2b68a89bb60fc39"
+   "productMasterId": "0565db89-a967-4a3c-8535-35a632e32115",
+   "koCanonicalId": "43c465ee-8915-46bc-9cb9-68571453dd7a",
+   "koHash": "2997f3a73d71ef03430509fc0545811ae840a6a8bc2058b2d3234cb9df744d96",
+   "newContentHash": "1e6dc36360199482dc9525535948b8bfe9012a9ea5f6ee9a87d4b6d7da44c3a3"
   },
   {
-   "productMasterId": "08eb7038-d8d7-4c85-baae-5bc8bd1fad66",
-   "koCanonicalId": "5b93cbef-e760-45b2-8664-ee964dd9d64c",
-   "koHash": "47528af7b975307f03f80d846d581cceef26aae8c207c50b8ea5614165e81f40",
-   "newContentHash": "83e31f3afdec1cd6b6ce0e627bbf53072cdb6e707a7c0ca8757f9b3b9f66b5bb"
+   "productMasterId": "092ae386-128a-43af-a2a5-bcad0d3a9488",
+   "koCanonicalId": "a4aff9bc-4cc2-4396-adc2-1c6be6e0d68f",
+   "koHash": "948042909c209f42eeee39ec9a4280187391cb548b15827d55b43e23492ef185",
+   "newContentHash": "14b38aec37d7ab1477f68b9b95a905e06e10a3e1e460b1e7fcb329ebb32bfba3"
   },
   {
-   "productMasterId": "0e453216-19a6-4ca3-926b-eb32716f1ebc",
-   "koCanonicalId": "e6fbc51e-3af5-4d86-8913-36ea193ec120",
-   "koHash": "c3ffb3ab86ba4a12d527d6f853a9ab8be993da2e175e9e79216143414c1dc984",
-   "newContentHash": "7589ad5dc53d2ecd5df6368be2e2cfb07506e5ec60d3395951a0c95540933809"
+   "productMasterId": "0942ecca-a94f-44cd-92fb-478cb5c5bf3f",
+   "koCanonicalId": "020698ea-116e-4753-86b4-cd478019e802",
+   "koHash": "0b5905b195ea9da46920f84e949bec3dfc4e454337e05db9e38a410a6670ae97",
+   "newContentHash": "5d4a7dacc589a835922d51bac52531cb634581ba9388f438d59f6c740a6923d7"
   },
   {
-   "productMasterId": "17d86a0a-6673-4326-a9e9-1eabd431e3fd",
-   "koCanonicalId": "a12983d8-04ac-4e47-b4fb-94280594866f",
-   "koHash": "04ba92854e3fbafcaaa674dbbe5ab19a062c361760063c6e1099792bf1b9b180",
-   "newContentHash": "f0003a4de7bfbcd7a013df3f2acd766f819bacbdb41871512f88e66d9e5fe959"
+   "productMasterId": "098efe51-8dfc-4bea-9357-4a2b09389093",
+   "koCanonicalId": "0ed3c3f5-2af8-4fb3-ab89-2b14ec8d0bb0",
+   "koHash": "c3c5e46e5d90b63fcf5644142f9ee2164d86f05732610ee2dfcceb4ed57fb7c5",
+   "newContentHash": "aa920b56b4a6d9363806f475ae230f4cfdd26d2b5fd3da371c2b6103798ac433"
   },
   {
-   "productMasterId": "1b05f7bf-5195-4856-a0ff-95baf55ac9e2",
-   "koCanonicalId": "25f5fd0a-c10c-489b-a6d3-9d40af546194",
-   "koHash": "ba5dee720b4f0e292e7ed8c28291b9e38bf1da3fa35584d375972feafcc82105",
-   "newContentHash": "6eb4f7b567c5d00255076b37b56d760b6291c7af3f9bf409ea2b89ab0e0cfb69"
+   "productMasterId": "0b60f94a-c1bc-4419-8844-7442032de3c3",
+   "koCanonicalId": "c86215cf-0f74-4504-b5b3-da6e3f751ccd",
+   "koHash": "659358d499b65527e0c29ea73c7799db53c6d28b686aabe930e78f3bb84738c2",
+   "newContentHash": "e4357200ff78c84865b31e5ccfc1081d9a812c81bc55f1975220331d413ee854"
   },
   {
-   "productMasterId": "1b52d7ca-a5a3-4511-be1c-ccde1c443bdd",
-   "koCanonicalId": "503dea51-3174-4361-8d2f-fcef74dfa22a",
-   "koHash": "ca17aae363b18f90a9ed8cd04562d96a22cf23d8a26303b7148d7b372e6f1c97",
-   "newContentHash": "d9b57ae0ee03ed1791788c0c2ade4a30e567dba3f8ef31eb8cf36e8b4748810f"
+   "productMasterId": "0d30ae52-5259-4fa3-a3bc-d2b6a06f2121",
+   "koCanonicalId": "e552407c-40bb-4af8-81c6-f07e859270e8",
+   "koHash": "c17668d3db361dd0d4ee9aee819f5c700f7d28e85e0818d4e2304e70f5efe8a2",
+   "newContentHash": "8c0724a8be74f2e4c2d92b65b7a352f217edcffed64936759cdff5240ea4f536"
   },
   {
-   "productMasterId": "20ea2fb1-8b73-439f-b887-8f707bcee289",
-   "koCanonicalId": "c3d0245b-6711-4f4d-92aa-90935fa5089d",
-   "koHash": "ec078424f11b2186d3416387a78991635e1348d44e9f83afc0dce59e0fb40521",
-   "newContentHash": "adc8a0037ae04dfe45b1cf968fe6161c79373208e1a96687b3c0e4eca39e3808"
+   "productMasterId": "10f696d8-9831-4197-a496-3df5928df1af",
+   "koCanonicalId": "44db3ec9-3784-4eda-b371-008c3f44f535",
+   "koHash": "07cd2aaf12d8c9688fa01a13915dea54dc210d7226759fd9732917e27d6aac44",
+   "newContentHash": "4ced4dcee8f8091c79391c6ffcb561e422aa2b7e0d877dc8739a8e1a28a021a8"
   },
   {
-   "productMasterId": "232f1f62-8342-402a-a875-fe5b2ab14932",
-   "koCanonicalId": "bad36dc4-ecdd-4ce1-bdc9-18089cf8310f",
-   "koHash": "5bbb10f3d25ef8903a6dc784a33359fa14b4e7803d5f33fa823143751af232a8",
-   "newContentHash": "60698a62a21206c2670770982c428b7162434a7e9c7f51f6aff257729db029f9"
+   "productMasterId": "13ebe32d-d8bc-4845-95a3-49af2acc7bb4",
+   "koCanonicalId": "60bec6ce-bd45-4339-ad14-df5cc97031c5",
+   "koHash": "21272b9afb6d258de2e050696cbcfed387c450cf0b0a21aa8dd93d556f682de9",
+   "newContentHash": "20f49139feb7a777731accb0f7d3a2fd862d5c0aeda299be6e815bc7587d4e14"
   },
   {
-   "productMasterId": "2359628d-37f6-4b7f-abda-3f2e2a8b8a56",
-   "koCanonicalId": "e533c3db-578d-4a17-a758-0d1b23bd39c3",
-   "koHash": "4aed257b7c2f48ba5834f4130f86154ffa83139226078fc4834a1d59a07ade26",
-   "newContentHash": "8f32639348bc381f80b8b6faa54b43c44d6b5c6bb672057a03e04c0fc996ef2d"
+   "productMasterId": "159970e9-3455-4f8b-9f57-db833d848184",
+   "koCanonicalId": "6beb2d9f-3d91-4154-877a-121c0e0c605c",
+   "koHash": "78fef69f797c8f88499dc9a3dbf21f6c230b7d38d4f9310b096a48b88c8dea24",
+   "newContentHash": "49c6caa21e257c298245bf4c82124413a5fe120357eb83c8ec3e606dc6a7a059"
   },
   {
-   "productMasterId": "2489cc50-ab48-4789-993e-c1cb7668876d",
-   "koCanonicalId": "7d6bf639-6ef1-4665-b56d-dde45ad1c2eb",
-   "koHash": "814b8c6fd55a69bf980aea364f74754d6d0a31109b90b46447f1e341549834e6",
-   "newContentHash": "2365474bfe0a263d245a88210ea6a97e6fcbc9182a053e0ced29398f79a50016"
+   "productMasterId": "19fef438-3122-4f07-a2ea-58ec0fd78594",
+   "koCanonicalId": "17b6df9d-af41-49ce-a3b0-2b82fdc13026",
+   "koHash": "48d287fb2848851c2870746030e0402b3241f471104198b496dda495c0b816ee",
+   "newContentHash": "f585e122e65a9c5015be621a784a60f366947144dff1c9afeb22210c24be6359"
   },
   {
-   "productMasterId": "272a231c-0545-4e05-9485-2f41b59022b3",
-   "koCanonicalId": "498f41ad-048c-48e1-8abc-b6889e6a8743",
-   "koHash": "908246b7cbb34743dc648fc7b498dc1490aa6ffdabf512eb16f3f94f22e55fc2",
-   "newContentHash": "4d7375e98f1d023ff5e56a30f3508595ca1497751a9f509812fa853e7e9c09ee"
+   "productMasterId": "213edb16-d933-4f72-b78a-6c08f1d1fb10",
+   "koCanonicalId": "517b13cf-1996-4b6b-b9ae-3a6511a4fd68",
+   "koHash": "2c2a0a90a9ff23fca75eb91a9bf88c59b9843db0e344a41bb1df0b3224b9d7c7",
+   "newContentHash": "fff28172d408627c4cc6b10fd848e8153858a09d2048b5340f1a88eaeb3dbd6b"
   },
   {
-   "productMasterId": "27fc738b-eecc-4ae7-b728-ca1ad9c1d264",
-   "koCanonicalId": "5409535f-f9d4-4bd5-ba6d-091657f8c7cc",
-   "koHash": "4d290368dc6747e8c306e1eea2561fdf317cc73fbba5b8c5807aba0ba0e7cf90",
-   "newContentHash": "9289aa0d0122b19268f24f1ed0effb6728e178d641ff1dfe0834fd690671501d"
+   "productMasterId": "24f995eb-2109-402c-a53f-069c2a76356d",
+   "koCanonicalId": "b1356b99-6f8b-465e-b753-3ce4e6f455d3",
+   "koHash": "649bce7909c5e086b5119815d80c8f338b4d3e22442ee27681f3c3ea6fc7e1a7",
+   "newContentHash": "fcdc1de85738551c3fdaecbf48053cfbe6078911ab33e1a7ce5e6d21db1cb7fb"
   },
   {
-   "productMasterId": "28154194-d073-4aba-a0c2-781434c8c8c4",
-   "koCanonicalId": "974c6531-d912-46a2-bd20-ca9fd8e55bbf",
-   "koHash": "96ecd8698a39d6c86af1943b858f1359ce4cce1530de42ab590ece79706f42d3",
-   "newContentHash": "730699713487c691b13adfe3d5b83c07cf2143627ee075eeb4e10ffef9ccca11"
+   "productMasterId": "2549c0c0-ad63-4a38-9e98-55637ee03314",
+   "koCanonicalId": "331f1a7e-3381-44eb-9eaf-91ed4d6b4117",
+   "koHash": "e69337a9151b3c33b52be3a51aac86d3d04aebfda9e7b15e843a6ed8e8acb60e",
+   "newContentHash": "85b5991fcfb5358e8bb4468aa31ee344a0e4e156edd62e58a7d4fa3c9e3780ba"
   },
   {
-   "productMasterId": "2bc3feb0-9f99-4d9c-83f4-08cc43b505f5",
-   "koCanonicalId": "c9373aa1-8241-4f5c-b036-b0c12d4c4b70",
-   "koHash": "e5b0694abf306d806fbc18d7f3c9818b9ca697841b7f7dfc7e91daf1081ff05a",
-   "newContentHash": "e824e4e114372857409cbf0314b063903a17c52ac511d15191b688697d14141e"
+   "productMasterId": "26207f11-a631-4731-8b1b-9a8bd1b0ec1b",
+   "koCanonicalId": "831f2a1a-d759-4649-a47a-946f99f4388a",
+   "koHash": "c5198854a256304a1e61c5cedb7bd7d550432321d6e48f592496db5cb4775e37",
+   "newContentHash": "8bab0f4c582d9d4f355e88186716aac01df477710a9a06b3e1d703654f8c22b4"
   },
   {
-   "productMasterId": "2dbfb3eb-e85c-4faf-8406-05ad3ae1b042",
-   "koCanonicalId": "05f8d277-bdcc-4b1f-aba3-102c146b1cba",
-   "koHash": "8661d6f9da6098262710e4154face15f5ef4d73cc0e50737331141f2c2258dda",
-   "newContentHash": "bb0394bff429dca32a42455cfe64efac8ccc101ac74416a2a1a9280ef44548da"
+   "productMasterId": "26ec7386-3af2-4cbd-a877-27cd7598b4f0",
+   "koCanonicalId": "1c59a1dc-7079-48d9-aafe-1e2ca83349be",
+   "koHash": "75706d0f4dc2bb679d52e6091f7db179d1df047f13a9e7f41d68040cd27f6a18",
+   "newContentHash": "72a8da4a2f293a20c67314c10788acdc98eea7d861f92e00e12b15d4cc60280e"
   },
   {
-   "productMasterId": "3175fb7f-9cbf-4910-9fb0-1a06cc0215bf",
-   "koCanonicalId": "70474e73-bd04-4957-8062-1dc92cd40f08",
-   "koHash": "f5f8a2d4de45e60f817328e285ec516c8be3afea7ff6b309a4b2a911cd8af729",
-   "newContentHash": "9d89d19c990659b9ced8784c9a6ac15027ced1f046d6b89247944e7cfc5943f4"
+   "productMasterId": "2a27a6f0-93c4-45cc-ba7e-1976fe5b9446",
+   "koCanonicalId": "54e17d97-d7fe-498a-acc6-92d5efa6e73c",
+   "koHash": "2a3a1ab5deae3e3143f0f4c4d54da75f9209f56c16d0282c366966c5f49ad20b",
+   "newContentHash": "4dbb95df332e7bdbbbf784efdd91e574fb3303e439476733fba325bf7c719be8"
   },
   {
-   "productMasterId": "320fcf7c-e4b0-409e-9b2b-0483aa7a1e5f",
-   "koCanonicalId": "c0b9270d-d5b0-40c0-bac2-cd918f03e739",
-   "koHash": "27023dc1e35d76e32ced4535c2ad7731eedb2dd1306c697a0487a2c57fd506d2",
-   "newContentHash": "071c7ec1ef68616dfc8f6ec5fd7e62332c27339b2aaf82ef0f5eb259bda64f84"
+   "productMasterId": "2aa2c597-7d6f-4c08-9308-7761791d2267",
+   "koCanonicalId": "8e481227-80bf-4b15-8fa8-66e13df89310",
+   "koHash": "3a9992576124988863378a4384385ad59f6d4f6e494763dd6ffcd485765b31d0",
+   "newContentHash": "65aa1dd29f51dc4b9cb79ed25ee276996d06d2fccde6a4b3d9aadb1e9625760a"
   },
   {
-   "productMasterId": "349fd267-9b67-4225-bfbd-5fa11e4214da",
-   "koCanonicalId": "94f2dade-2e23-485f-bbfd-85478dc78c00",
-   "koHash": "105459097894f4170fac67488d693f4570dcc0e6ce959899141bc9fdff78c9a0",
-   "newContentHash": "5a79ce4e88e013eb511e6dcb318ae95a56da91c01301e20affa22688ffb64f84"
+   "productMasterId": "2d0348e4-d9eb-4c94-abd1-5f5551080124",
+   "koCanonicalId": "207b912a-1da2-478f-80fd-dac967047ec9",
+   "koHash": "e3a518ef8eb476759b8da61e6ff76d5bab2fba5a3dbb98fb7fcddb9f1586ef9c",
+   "newContentHash": "127288e539d98d3000485689c367bd3d485eb722a4efd5d942a7632f1b265a1b"
   },
   {
-   "productMasterId": "37fa8e85-0576-4f73-98d7-7ddf535a0c14",
-   "koCanonicalId": "26e3e0c5-a97f-49b1-ac66-106cc4be3564",
-   "koHash": "35557ca148baed391a20fe80262ded3fe5680eac67795918b549a4d23ed80a50",
-   "newContentHash": "cac73d43eb7599d0616ded943e833842b0e7d218c8d720c3392f71b8f479622d"
+   "productMasterId": "2d7ede14-5120-451e-848f-e13d93f5824f",
+   "koCanonicalId": "a72b349e-4465-40b3-a1a2-786f45992568",
+   "koHash": "c117a07737c30c5873f7eb6bb79f670d5308f4d6ac38f140ec4fae2592bf1ad3",
+   "newContentHash": "296e58591097cc8720d510e5fd7169e5ece6b2d303ab3b6b3d52cee760680fce"
   },
   {
-   "productMasterId": "38c4de2f-a1bc-4438-a938-9018467b0e1f",
-   "koCanonicalId": "99768cca-7a39-4b81-9d93-6dcc058b017d",
-   "koHash": "b359b55356b1bf186c1159f6a8f33d466eca5642e35eec3107ca645d493a458a",
-   "newContentHash": "ba8f587d2b22f87a53b1446807f31cc06ee2b4748936d276f0d944cf82d28ea9"
+   "productMasterId": "2e4941c7-e8e9-4741-bad1-ed8f415688fa",
+   "koCanonicalId": "d26cabc8-dfd6-421f-9ed2-3509e04fc1a7",
+   "koHash": "3a337e543cdf67544ec2fa289e0423948d1ee1fe8b60b4bb9fce071a1eb0b01b",
+   "newContentHash": "78e96a2f1db75bb6c44b59ee1070e7ab1661b8983284d55e8615878646c1fe22"
   },
   {
-   "productMasterId": "3a7f3b58-f71c-4900-b904-599522642732",
-   "koCanonicalId": "a0d1a52e-377d-4159-9996-8a5864229661",
-   "koHash": "6a75f4c94b9b4170d9b40237d2e5f6b9eeab654bc38d3fa6ecbabecd2e3eeb53",
-   "newContentHash": "f1b83a2a539b0ad2930e302d6272e75a6ec5b4e6c476c68f45fad7befa13c9fe"
+   "productMasterId": "2ef59439-a067-466b-948e-256261ea260e",
+   "koCanonicalId": "162a8f4d-90d5-4ba3-83a3-101b72929e60",
+   "koHash": "2fa92e81906507f181dc2c60d78db415b49a34e509c6ad802bd32b31293e25ef",
+   "newContentHash": "3b2f2fbb9a5672b33c58d0ae0425ae458b677fd3241eed1f13ccb087f01d51c8"
   },
   {
-   "productMasterId": "3f657f98-bb6f-4eb5-839e-712f9a8013c0",
-   "koCanonicalId": "5670f463-2a4e-4d46-9637-55f959041202",
-   "koHash": "1b8366c17a71d2ae6d54fbb3d75d45e4b7e5ce8267e18c367066e4a513249ab5",
-   "newContentHash": "2d1319f0dab481d98564f483dc1c850cff862a6c8232d4fcd398b5505f53a88a"
+   "productMasterId": "30216e44-d51a-445b-9aeb-a2306ea2e9d0",
+   "koCanonicalId": "edad5ad1-dab4-469b-aa2d-c173f017b0a6",
+   "koHash": "71fa5a463c9c0016d5f089b21c88835825d729b147eee8203b2dad2801698f42",
+   "newContentHash": "fca92261db8d46e09946541a7d6f6ba22719f0f3987ca978854b3d3b3831415e"
   },
   {
-   "productMasterId": "4235d530-b34a-417e-96f3-e3693b1a5f37",
-   "koCanonicalId": "7d44822d-8f27-4d38-9375-1cd84b2f4259",
-   "koHash": "692be17f1d7b3ee5265b1529dc183a4fac714872d2f8e79f8ae52b4577fe85a2",
-   "newContentHash": "873bd17162422d5ba4402149a4f83a569af4696487dcdf7148030ecad74a06e8"
+   "productMasterId": "310df37e-a47a-4f07-84c4-ad7b0b83ce30",
+   "koCanonicalId": "a0295ae4-31b9-402b-98e7-b6e85d12f2c7",
+   "koHash": "673389edbb6334a9ed09a6d2aadfcfab586254acd54f9db12abca5618c34b02f",
+   "newContentHash": "ee0d6e5d4ecad941760760857022cc3d3f32bb435804ead9e399fea3f630558c"
   },
   {
-   "productMasterId": "443bc34e-db21-4745-968b-b2441054b4e3",
-   "koCanonicalId": "81eb5aab-36d5-42d5-8f6e-09aa1f6ed091",
-   "koHash": "3662db388e66de5873b83784c9c5357119e440fd20335d3ea602b00b53ed6a6f",
-   "newContentHash": "9371d6948b290c8f6773ac115994d8f57308985fc011e23ccc13dc0b5e7af60e"
+   "productMasterId": "31e8fb86-7911-4d54-9fd3-b987c950d10d",
+   "koCanonicalId": "9d4690e0-a45c-47ea-8664-d34b83e642f2",
+   "koHash": "9d4ef704568fd6a69167e392151464ff025934d67d08a46c18cdcc2841f1e52c",
+   "newContentHash": "2ef435ac7f4518f24892bbbb536da86c40cb21f713aeb448bbaff522fa1655a0"
   },
   {
-   "productMasterId": "48bdeeb0-18e8-49d7-9b3b-8be057870c71",
-   "koCanonicalId": "98275afd-bf87-4832-98dd-48814f867927",
-   "koHash": "c90aee76a6270ec7f966d17643432a6e463f2e101f14c5290bffd582829cf353",
-   "newContentHash": "bb771943a6eedbae426009299a9dfa90532656d3e1c2b1e4e6aa2b7e5bef6c51"
+   "productMasterId": "331dd735-1c5d-46ab-8ed7-7d89e29efce6",
+   "koCanonicalId": "dc822e8c-2e15-4463-82fc-14592544f725",
+   "koHash": "25ed61e12901391f282cc2eef8cff918b0c78270d04f1dfa0d92e82ff9cb02aa",
+   "newContentHash": "8420d34c42eb0c810ed9a66fb3ee67c0498a35bf1df9797608c7f8ba003d3303"
   },
   {
-   "productMasterId": "48de25b2-2646-4722-8bee-cbe3e787c437",
-   "koCanonicalId": "fc6411c5-0905-405e-a0ba-c068514fc0cd",
-   "koHash": "56c4b945d892db3dea4e6a91f55946a8f82c39ebfd0b7597a76a74d53cfef863",
-   "newContentHash": "8321fbb6a7a72c72ecc37a3c80d505d9d78b06b72594b47e6041ece2cd638280"
+   "productMasterId": "367bdc61-d2ae-45eb-9265-99a54ea46d53",
+   "koCanonicalId": "f89af6d9-1170-4bce-92b7-937abc1f1fbc",
+   "koHash": "7641602997838c3e69c82b32337652d676ccdfd99672f8860cc0662581ec0324",
+   "newContentHash": "2769c996c9eb7d9044a96d520b62c7dae097ae4d08a6d834e1600ef9051d8467"
   },
   {
-   "productMasterId": "497ece43-e293-4d44-8646-76a5161eb70f",
-   "koCanonicalId": "302e44c6-e49a-411c-8d60-de2168a0041b",
-   "koHash": "a9a261612fc1016dcebcb636cc9fce0fce71905553212968bcc2ff2ca589b8c9",
-   "newContentHash": "4679fcb76a3262901562648eb8f89f29ae275decf501293e3f4a179a1a649622"
+   "productMasterId": "391b1682-f54a-4e05-90c4-c840ceda95c2",
+   "koCanonicalId": "b8d400bf-2ef2-4da2-ae4e-2c0eef027d8b",
+   "koHash": "476bb6848fd12a60379df7233dd7b080d4b71d89e968fed9be1790df3b4038a7",
+   "newContentHash": "416b47f32b503d44c2e6dcbbe631d22cf82d4eea765c95fafe512cba954082cf"
   },
   {
-   "productMasterId": "50213c8c-193f-4579-805a-1ccd3ce8f484",
-   "koCanonicalId": "1e940847-0954-4c97-bc00-500705703a05",
-   "koHash": "a1387cbdb53d677915214d9208a5a453931ff968e1b4b9780ec0a85379dc2cc5",
-   "newContentHash": "5ad5ad76da3702911ce6fab1f9a65174e4a84bdd2c904b5a78509e09b1413591"
+   "productMasterId": "3bd1d1e8-fd57-4f84-bd85-1b79f0edb214",
+   "koCanonicalId": "083ca4b7-0640-43ff-b54e-67c5f4b64013",
+   "koHash": "435ff9385056ddbcd45e42cdeb8303fae7e93237f6075e7c5c5cb17e0be6debf",
+   "newContentHash": "ded2d56881adca25a02c39a948516359f76ca1d4c2255767662d15b6e6980304"
   },
   {
-   "productMasterId": "52c5f810-8f02-4483-9437-de458ba942f8",
-   "koCanonicalId": "17462035-89b9-462d-b102-548dd4b72632",
-   "koHash": "65fcb8124a78c0b5c6a5e41d2c3d7bb12df202868caa7b6396e6b0bf2883fc89",
-   "newContentHash": "09fb4a5a838115c81240f101f42b4cda381427c993da7d976db428f563d4aa30"
+   "productMasterId": "3cc2aebd-e31e-4be8-9469-c2599ec2fa78",
+   "koCanonicalId": "fce01c7c-c3f0-4dae-bc64-bfa9db99f78b",
+   "koHash": "49cf2bd9f3a365318403b4578fc2f2d10bc6b6b11c00db9e6b8fd86866d49650",
+   "newContentHash": "64159f2d2535f04dea4303b72a2791b4a982d58e6e335496fa80811791e0deff"
   },
   {
-   "productMasterId": "563e8f97-af84-4862-9af5-aa785f3488b3",
-   "koCanonicalId": "b0237901-0f0a-4b4c-8439-7da3e66dcdc7",
-   "koHash": "fea58b59df254be318411360f424145c6b327ef9a817f141ec7c87c93206bfd7",
-   "newContentHash": "a8868bf20ccc1c6c7701e197e0536beb2b2fcd50b39d756e5c590483b77bdc13"
+   "productMasterId": "3fe7cbbf-9057-405e-9004-66d11a1e8520",
+   "koCanonicalId": "1cc47141-ddb1-46e6-a514-3334587c3529",
+   "koHash": "454373c6e9b212fdbe6c65b4de1bd11d9e08336b7b7c45af9d2f223dbf45a908",
+   "newContentHash": "f52e457d6f1d70e7a83e5e464679cd121ec4b6443915c5236e4dde34c3653889"
   },
   {
-   "productMasterId": "5af03634-2d60-4050-b37c-8a388e8bc85d",
-   "koCanonicalId": "e43d1243-cf8e-465f-9e02-4af8589f0e5f",
-   "koHash": "c68c32e69f43a1fcfd1d84b5b73915ac1e554c01869cf451020ec9683b6ac2e3",
-   "newContentHash": "cf4fcd643a88967101a7af1936f0135734dd7e1a9780f94374bced92847a21f0"
+   "productMasterId": "405e4be6-4193-467a-90d0-796adc34187f",
+   "koCanonicalId": "0cf3da97-b804-49a0-a58e-25e78e2d1e45",
+   "koHash": "0c91fc15ae0ec81db0e8779a80b7fa299797d2709e40b76525e0ae32d96df00e",
+   "newContentHash": "a70d674fb0cb5d9429e003b5c3994d6102c233cc24a9a5ab0e6b8309af0f02e1"
   },
   {
-   "productMasterId": "5c4af66f-201a-4bc2-ba4e-f27ce779428a",
-   "koCanonicalId": "89a60c53-fef5-4370-8247-c3a229cdbafb",
-   "koHash": "e7fbe0ae3476401aa691ea5c8ae89a31fc930adc9abf282ed4faeae9312e3504",
-   "newContentHash": "36874230fdc05a1820d388b6fdb663d46cbae5f598eb22a2b6d5d5298fb8f8c9"
+   "productMasterId": "46570450-dcd6-41d7-b2d6-6a1af6eb7e70",
+   "koCanonicalId": "e1eaaad0-5bdf-4874-8133-3f7679f15776",
+   "koHash": "d2bdd7f50236bf4123236a8d96ff717b67bbad990c2216a96e365571681abb08",
+   "newContentHash": "c6a10d54cc4c59dbc22fbca05b4710c52671da239367057d3500af24ca1d4abe"
   },
   {
-   "productMasterId": "5e679478-7291-4e20-80fe-40cf270bde38",
-   "koCanonicalId": "b730e3ca-2aa1-42c7-b5c1-adea8a4a0a28",
-   "koHash": "f4c9ad1f6da5e9588d0a71dac6354df7c518abc49c0e8385d0fa4b9bcab2a137",
-   "newContentHash": "31a708dd13e3b8121c1a26f28ed30ab10fd0c1f7b48ed4ad4c3663feb233996a"
+   "productMasterId": "470b481e-7a14-449e-8081-6ece96b35f1e",
+   "koCanonicalId": "708ae85a-6275-494e-8b86-cf79409dbbdf",
+   "koHash": "8ac0ec0954f1acde56a2458f66325e60380cf9ecbb69e16668d9745e78e05b99",
+   "newContentHash": "4a9c68ed797d5b6989ebc06d58d423b49cd4587a2adf3081849e4b1f4e34d93a"
   },
   {
-   "productMasterId": "60497ba3-3bdc-40b1-8a18-dad90b0ac067",
-   "koCanonicalId": "07c7c47e-c314-41ef-acd9-20ee75967954",
-   "koHash": "6daa272ca9efe7feab8b11468cb4ab0cd731091906b0cd7e64523861f5d7279f",
-   "newContentHash": "fe6916ba15ad35fd77bfc4b612c9d10975c319eed0b87c7d7616889b8a3aab55"
+   "productMasterId": "474ff17e-a3fd-439c-80fc-85ace92b8551",
+   "koCanonicalId": "218b5ddb-8a71-48d7-a68e-b7fa57b9de4b",
+   "koHash": "55e94a43f2684f6a7b7fc7cadc6d0098d4d2a640e04c44d32b960cf702573e93",
+   "newContentHash": "22788533e215ff290e6cc52533f46c408885b9065dc8412f645de64ed152b80f"
   },
   {
-   "productMasterId": "635d5905-11a9-4408-a0d1-44c4f13de981",
-   "koCanonicalId": "e509a65d-b309-4f65-9694-74b464144574",
-   "koHash": "eb120dec95ef65004faa191868845d03dbb6c1e2f02ae827f30db5cfe99c0029",
-   "newContentHash": "0c9f15dd64246cea84b1a2948eb251c087bf2c11a3f34be2969014cadf6560be"
+   "productMasterId": "4897fc08-41ab-4cbe-93c5-7259bac81afc",
+   "koCanonicalId": "eac3611d-145f-4b3d-8952-b8998f83a1a3",
+   "koHash": "5ff3a8c9fca272740bd40dea9642290ef5578022f54572bbb0184adf19c50c3c",
+   "newContentHash": "6599d1bc654fcdca1668d8acc2749a9a36a7925376676bcd28d0d4544e8a6b2f"
   },
   {
-   "productMasterId": "67d219a4-1967-40ac-8dd4-49528abc14a2",
-   "koCanonicalId": "5debb110-dc17-47f8-80d4-876d44267777",
-   "koHash": "4b90203e5138f547bd3280edfcf44c8b93d4af7a959cb0c7e3466da446908295",
-   "newContentHash": "6b408277ae12ec9b354198206f5e84150afe3307894a0557f6525ca7801880b6"
+   "productMasterId": "4a72c414-7953-48ac-b337-fa03c97934b9",
+   "koCanonicalId": "b4696493-9c35-4aeb-933a-c7f094601b29",
+   "koHash": "9e88221b4b7a646141e330b66d11bffb03c4f4d79f4995149d88a1cdd6f9f078",
+   "newContentHash": "9d2f2005b012d6d81e205cc3753289f2e5fe9cbbdc14736336d75c2b6a0cd5e0"
   },
   {
-   "productMasterId": "6f8c9484-cc68-4767-b3ba-253ab58827b3",
-   "koCanonicalId": "c393ac90-60b4-4e92-b480-5c442d5f62b7",
-   "koHash": "a72437c15002be40daf641bdf06e9c1a9a55c375c8ddcb893e191db03693a4cf",
-   "newContentHash": "bd856c369ef1f3e241a41ef5e42ca1c466e9b70c2c8f5f94d47b415abb290573"
+   "productMasterId": "4a80dacd-e3d2-4053-8174-a5a63ea3b021",
+   "koCanonicalId": "fe985f9c-286e-43c3-8314-47e98cc52f62",
+   "koHash": "d0cbfbd91fc58455e7c9a60d96786e9818af5baffe5e53ba2d84a1f8fa2017ea",
+   "newContentHash": "5c3009194a28869615818d37a003706795ed376a8b1b7abb6472c4e23fa20fe6"
   },
   {
-   "productMasterId": "6fabbe4e-869d-4853-abaf-50b862d72278",
-   "koCanonicalId": "1c98e073-3d34-424b-86a4-0b8f0eefe493",
-   "koHash": "07af2c0ba6c58ec578907fe80b6b6a56b09ab45e392530a053f83a0c51786756",
-   "newContentHash": "08d07752ba07d37d6e303abb0028604015c80b2b15221060555c1118b638a2e8"
+   "productMasterId": "4ac2e3f8-1294-4c62-b483-7f0ed81b9226",
+   "koCanonicalId": "25eb43c4-ec34-45d7-bd93-c698380c4605",
+   "koHash": "e0b704f824b2b3b6a7aa24e51c1302552f8f528d5a6cab0dc524ad5e55357223",
+   "newContentHash": "ae61c504c553519441e87bbbdca4c7e97c30efbe0cc025db5dee51f1d3b99629"
   },
   {
-   "productMasterId": "7293f4df-09cd-4ea6-9d7a-34c5405cf072",
-   "koCanonicalId": "f4a09ba4-2b68-4e2a-8306-27e10a03eabd",
-   "koHash": "497b10810b9de84f1c3d5f2507d57e967c6021c179fa04ddcb29de9f828a6606",
-   "newContentHash": "d157af76953fb98cfc7097c2a27ecf9b75cd1ff9edf521e799389ec7e15f8854"
+   "productMasterId": "4db34f86-9a50-4bfa-ad6a-ef0d4ea6d263",
+   "koCanonicalId": "c0fc6bd3-c4cf-4c29-b63f-d8e26a129c24",
+   "koHash": "ef505f0520cef9502345743d166399df38dd187e90eb4bf52f35de5f15d02cc9",
+   "newContentHash": "e8988833ff4f9890b183f130e5f6d2d092a9db8adb003109dff31c063195fe38"
   },
   {
-   "productMasterId": "7824a401-fd85-4070-9466-af30bb48ca07",
-   "koCanonicalId": "75d92398-588c-4113-9065-3621e4107212",
-   "koHash": "4451ca2372fd2ab433427b1ac0799cba60f9b5a0a98638b3e857fdfbc5d81ff3",
-   "newContentHash": "8ed1538f676e02731ea9be2bcf9ceca16a6fbd2a5ace012684cd023be1223b81"
+   "productMasterId": "520452ba-b549-4c19-8051-388c5de2595c",
+   "koCanonicalId": "90ed8222-955c-4e7c-b4bc-6c4611583cfc",
+   "koHash": "9e0498e2fd959fddb64fcc77161d7503572056f2b3e863e0e6885f651f708b13",
+   "newContentHash": "e87f8140d34d19029a282638efa227ce0e58bd69698b57303c2faf747c808c8a"
   },
   {
-   "productMasterId": "79230abc-0d5a-48a5-a5ed-6180867477ab",
-   "koCanonicalId": "9243ff6f-4147-48fa-b156-94ad1d7310a8",
-   "koHash": "773c14941144aaad909f1326dbae4853e02d6c52ba07dd2e167ae7089a8f16aa",
-   "newContentHash": "686d09696aee93753e18cddaac474859cd82343b482f44ce8d337915b9735887"
+   "productMasterId": "54871009-2f34-4aa8-95e5-5f07c3786ee5",
+   "koCanonicalId": "ac582616-0977-4d4b-a209-8cf50b7acf22",
+   "koHash": "88699413db871e991170ad0f158e2c830a697cd985184eaa2bf7fcf6d112ed7e",
+   "newContentHash": "bf295fccc1eb8c3a237f0a6de24bb897dd2225e135324f21e200168c9c8bfc76"
   },
   {
-   "productMasterId": "7d921a21-1cec-4c13-b46d-dbeaa2816d9b",
-   "koCanonicalId": "cf327c24-6f44-49bb-9dd2-479f8a0ca4e4",
-   "koHash": "5332a3563e4176dcea48a3da13db53ec429bf9cdde274e019b3d3095d57b0408",
-   "newContentHash": "a43db3f10e416e278aa3411222309e84012e7339a31137eaec08c878e5355dc6"
+   "productMasterId": "57ef0728-7fe3-4ca8-94b3-b5ddac646b38",
+   "koCanonicalId": "ab59155a-4931-4f7f-918f-f383a400bd2e",
+   "koHash": "4adcdd337b2eb325062fc7dc37f589f23e7d451d8d884f26dc18e2045a6b6941",
+   "newContentHash": "5f00b94a96cc0c644c598eb87107eb34d76ee7e827f8fc271ea5cb8f186c618d"
   },
   {
-   "productMasterId": "83e85cc8-e322-49f2-b19a-7f9d7113f21c",
-   "koCanonicalId": "fa1bfb81-a06b-444c-b77e-de0d4d18c3d0",
-   "koHash": "89b510fb7749d8e38049acc4cb0fed64f39d59c932a780baec0c6103db5ebbeb",
-   "newContentHash": "91ea88ae8b94b3b78fcb41189fd3c966e6b4126da0c1d6f69207d868d3d65233"
+   "productMasterId": "5b6c5ef0-627a-4825-a03c-968ba09d36a2",
+   "koCanonicalId": "056153b9-4bcf-43fd-b71d-2d4a7fe7a88d",
+   "koHash": "9a61bff6268e08ae4affb33e235d3eecee0765754c74791a64898b6d3835efd1",
+   "newContentHash": "7cdf15fdfa5d4c2bb3b6672612c1adf6875a8038232e38ee50e10079b553a06c"
   },
   {
-   "productMasterId": "84f457a2-26d5-4de8-884e-1b510525a4b6",
-   "koCanonicalId": "3b37e0de-c8b5-4a2c-b761-592e208e266e",
-   "koHash": "996babae4cc43261f6ccb85243c52d191d981f977e5fb540a20df3cd5c4ec412",
-   "newContentHash": "55f338f62c36e74e80af04aa3b130d210acb9ff71b2e526eaf748b960f8933dd"
+   "productMasterId": "6187f5eb-2638-417b-82fd-b654fc0bd73e",
+   "koCanonicalId": "9a0d184f-daf3-4a5b-a71e-6287b5dafa30",
+   "koHash": "24ecbd999a01655d65169c486cefbcc1221caf52376398df0e9ab79959b25e2b",
+   "newContentHash": "05a84b35d5f4130a17e689ce0bfb3d69f815bd663c3cb533afd80ec22f92e19f"
   },
   {
-   "productMasterId": "854deb34-378f-4e10-bffc-42748fb39f29",
-   "koCanonicalId": "7bd57da6-5335-4b0a-abfb-0be16d1e9474",
-   "koHash": "683bd3dbf91fdbf71986fe511711fb4eedb58bdd961c3e6620dd1e97c2acc5b5",
-   "newContentHash": "75d4d2b44eaca04e85f52cbb042697eb80ab13bb6a101b809bcb2639d858744c"
+   "productMasterId": "6321ecf3-8bc4-49aa-aa19-796564afa128",
+   "koCanonicalId": "facdb17c-03e0-4962-99b6-a35d248b84a2",
+   "koHash": "27afce57daece3848f277a8f26c7ba0db492ede24bd4653a2c4f3b80f311d785",
+   "newContentHash": "1f40320f12f20d1b390b0b7e85f5a825890503427cb901b023ccadcecd762250"
   },
   {
-   "productMasterId": "85ee0109-fc19-4921-8310-17f51d4fb38f",
-   "koCanonicalId": "4250b391-79e4-4492-b218-f216e6e1eb1f",
-   "koHash": "aefecadf4b1fab09c4a128c01be9050f7203e88391b97e6013a292067a352168",
-   "newContentHash": "ab9cc24dd6bb3e3ab102c4fbff05b8e30160eff9580e385ade8b4ff1019f5961"
+   "productMasterId": "6a45e20e-155a-447e-b707-3bb2890f8f41",
+   "koCanonicalId": "79a1a2a4-affa-4873-823a-7c710aa44419",
+   "koHash": "c0ec6993f7bb655a724998c2fc40b683ebb85f31053237baf17b25815cfcbcaf",
+   "newContentHash": "d10e63dbf975f552fb774c7eff400ca49ed16cd19a9aecc34705b8f38711a893"
   },
   {
-   "productMasterId": "88746dd1-1ee0-498e-a874-71ba182c91a6",
-   "koCanonicalId": "bbd3e380-fbcc-4266-b9cc-d43d054c647c",
-   "koHash": "02e8388984c1f36107712f76b02cb389a50c282b9244aca012aa0e73d17929fd",
-   "newContentHash": "cc91dc943804bab577ea8b12f34f06134b21168e92378763c7e61da5dcb190c5"
+   "productMasterId": "6b669349-5c40-4b2e-b16f-eb658a96de8f",
+   "koCanonicalId": "937152a2-6695-476c-918a-a1ad1412c282",
+   "koHash": "164ee59d2d6feaf30712c7ee49a8d4035f94bfbc544c219096ade3ab7095583c",
+   "newContentHash": "d74ef34f5929946f0b63a1dc56ed612fadbe1df528fac514d8b6c92284db0c81"
   },
   {
-   "productMasterId": "8ecb2ad7-b522-4978-8319-47fef895a04c",
-   "koCanonicalId": "456ac842-43e9-4107-9035-feb3c007fed4",
-   "koHash": "448e893898ed5ad268e2702287b7b0c892305bf0dbc39c87f9e71fd8393f46ef",
-   "newContentHash": "f148a3d88b9e3bee8e21054044c11a6a413b06cd508b9bf14e7fb61ba94b6c06"
+   "productMasterId": "6d4c3367-e5b0-436b-a1ff-d7badb8401c5",
+   "koCanonicalId": "140613f3-7282-400c-a8ea-64702763f447",
+   "koHash": "00f4549439f90c260d53b9894ed75be705a35b7266f0d2cbdbae4a3ec284352a",
+   "newContentHash": "f5bc2e4fcecc782f1d22a5314e7bcbcff5a28cd74737f5399aacb50f58287d39"
   },
   {
-   "productMasterId": "935cfdb1-1049-4f16-a4e3-e5135a912c2c",
-   "koCanonicalId": "18cdb5d8-9eb4-486d-b380-9f2af5359318",
-   "koHash": "09f14704f22fae000e66bc32a9ffac142e1fdd2c5561656e2c349692f3e78910",
-   "newContentHash": "6bbe413850ea3765133fbb2ed873104f10f44737f34e7a8b76704e1715eecb1a"
+   "productMasterId": "6f02666d-1dd0-4f21-a842-38e4ee276827",
+   "koCanonicalId": "819ebdff-659c-410d-8411-aa66efb96a84",
+   "koHash": "d19c8817cea09d689f9e0917bca66d36e922d625fc78336a691fb88b9a2af0ba",
+   "newContentHash": "84a49f7fe5c04015330096eaa0e40146f98460a643e4b2c92fa2df6ddf03db9a"
   },
   {
-   "productMasterId": "97329572-91d9-48ab-843f-edc5983e531f",
-   "koCanonicalId": "3eb6acf2-8af8-4fae-99c9-749b8e6e7eed",
-   "koHash": "bd755c79e61e8a409441d3786a2724faf1f474d001b9001e33b0691e629f65c4",
-   "newContentHash": "0818a23ea1cd4f640d6309e033adb80137b32ff669708a36a1e614dd781260a7"
+   "productMasterId": "6f3cb06a-7709-4802-ab6b-dbf6581aa1da",
+   "koCanonicalId": "3f00d304-09b4-4fa5-889b-43cd27558f8e",
+   "koHash": "b220bf38142db913e0e4921b9ea963d7bfa76c782527831e8d084558138d6811",
+   "newContentHash": "f80b320375760ef534f045371cf7cff1269dd3541055b062cd5fd057384572c7"
   },
   {
-   "productMasterId": "a2fb2947-972a-4405-b873-ccb172f2aaac",
-   "koCanonicalId": "139df5c3-2820-4d18-8d63-36b7f776216a",
-   "koHash": "aebde5cc39c67e8d866ec431bfe5ce5dfbd9cf502b168cac4a4fd69e538779c1",
-   "newContentHash": "6575b9f4f866ab2a3f7f78ef4fa76d30c843f24407d54eeb54691e2d63909602"
+   "productMasterId": "71b0d886-9bb7-402b-9aee-6b9b66bd4a62",
+   "koCanonicalId": "a9b5fb8d-efa3-46df-b802-7b5b16410bed",
+   "koHash": "9a427c84a700b644c0dee526dc0e8718cff817e57020fe35d16fd3e31cd9a3a1",
+   "newContentHash": "c752f7f93de6511728bbc5a0c52e6c97d82e2461a668ee52b28abdb1e6f09b3f"
   },
   {
-   "productMasterId": "a4970507-93cb-4d63-b71e-48981e530008",
-   "koCanonicalId": "102922e4-f81a-409e-afa5-ac5780444614",
-   "koHash": "5a3a4df23c8acec334d96fd038ed68b9bc3cc5649d45a9a4ca16ffb5d2d2e6a1",
-   "newContentHash": "bacabc98cfc98e03702f2e757a0d704ec5cca8ed01b7e625d5dc032927bd18e1"
+   "productMasterId": "76535c99-62d8-457b-aeb6-298079a113a3",
+   "koCanonicalId": "0431d445-6693-4cba-8292-fd5f01ddc1c1",
+   "koHash": "ca483ca0359628544f790b81cf587a357463cd013cd6944df4d5866303c8a559",
+   "newContentHash": "c4bd99ad378f10a4e2373610bc8bada883255900a69ff611ca64e5aed37e0e7b"
   },
   {
-   "productMasterId": "a722c5a5-b755-4312-a8f4-5251e476fb47",
-   "koCanonicalId": "a5a30a88-71b7-4d1a-be2b-ef48d7c45b02",
-   "koHash": "52958d6ad167b4dc1417d96c79fcca37ef9406d80f8da656db4f454288d3b7fb",
-   "newContentHash": "ae8a587c0ab3cdd956e0889569f4b9f2a1b170a0ca101b19206a6087f4052f63"
+   "productMasterId": "7a9538e6-b939-456c-8fdb-65778530fa02",
+   "koCanonicalId": "eb26c937-aa22-43d5-aa4e-5b46885fef0d",
+   "koHash": "ee83fe7ba58ea8baa5d3adfb51d312fc425cf668d07057d1077b0b1c227c8e6a",
+   "newContentHash": "d87e059938c03d115723cc28a1e513acac5b065d4b09dabbea2365eda6d0faa8"
   },
   {
-   "productMasterId": "a8f1d53f-c504-447a-a9ac-561b7058ca65",
-   "koCanonicalId": "b153498b-b96d-41fa-aec4-23b0dc670fa2",
-   "koHash": "ef2e38ffeff78b495377136aa77c6bbaa71440a3c35a354a9f2c79497aab4735",
-   "newContentHash": "165528b1dd068236c34729c17d93d55ff60854cd3f5a5defc963cffdad992763"
+   "productMasterId": "84122e0f-0e44-449d-8af7-412722a4c875",
+   "koCanonicalId": "173bf7d1-8af1-45fd-bb6f-54d6a926c13c",
+   "koHash": "2c29f1f0115181bb3c48434f7a526fbbc3d567d2409ada7320ce9b47909647b7",
+   "newContentHash": "4deab81e7cfc81148cb9becfc3051b78b85a8180b56988d655292d3c5ab480b0"
   },
   {
-   "productMasterId": "aa522384-f709-4f39-8223-ecc45d15c960",
-   "koCanonicalId": "5a78c5a8-8df8-44d8-a1a9-9e8fb536e24d",
-   "koHash": "69ddf3fc3fbf7c84dbd1f17bf4b3414df57086d030add16e7d8692c7e31ff18f",
-   "newContentHash": "09824848bb0377c7f464c94f5fe6df1da8ffb1ffae9209b3c695fa1d26b2a91b"
+   "productMasterId": "86f4ba75-968a-4f31-9aa5-89c2fe4e3f21",
+   "koCanonicalId": "337fc549-8a71-43dc-9d2f-d915887cdcd7",
+   "koHash": "340552bd1dc5fc3aa9ad9de2b4b135fa73b47c2f054ac53973378bc496234557",
+   "newContentHash": "9bb63dc5f3cdae0ba1dc935d5ac1968aa1880613482198c7e6a20a288f4f9bf3"
   },
   {
-   "productMasterId": "ac984f22-adf4-4213-a675-15c72130d84a",
-   "koCanonicalId": "98aef7fb-af2f-4cca-8760-c5e3bd323639",
-   "koHash": "6cb24f228e5b5e821688b1e8fd8bd3e431df49c90bfa16977549540c5a8bc9e5",
-   "newContentHash": "409e9b4e36755d31aa78029392222082df2aa8971b080a1391d5de8af7d18089"
+   "productMasterId": "89d36e75-aa83-4672-9065-4a4cadb7fe53",
+   "koCanonicalId": "8ed5216e-66ad-43ff-8635-7fc63d317b87",
+   "koHash": "f8482a6b91ac26e8764ac035167dbb26ceee7fe4a2863a7d3bb204e37c656815",
+   "newContentHash": "1a45b1318aaf67ea3880c214b0f2110daac25f94ad2947536064a62800f1424c"
   },
   {
-   "productMasterId": "af88c653-7de3-42ae-b7c0-7ee6dcea91c1",
-   "koCanonicalId": "262cba97-2dfc-43fa-849c-82d6ad7240c1",
-   "koHash": "3bb04d02e66b6fb31271e2b4484e1b0d4ccfcd93a3b57b7ee629ed4ae0a6e494",
-   "newContentHash": "209282420a3dc069ea93e78e7ae517b000d26e01907a86067c16df26f6bbebe9"
+   "productMasterId": "8a9596ad-5c44-4006-8993-16a8677008a0",
+   "koCanonicalId": "114e1051-1a7d-405d-9e31-c25144d9e834",
+   "koHash": "c6a564eef7565595b3a9f02ab0410737d2a6ed44cae910c0f4b61fecb31ae247",
+   "newContentHash": "b0964e9c7807533980ce25cdbd5405721d9a5424630fc2b0e6c3434eaaaea452"
   },
   {
-   "productMasterId": "b1ffc65b-cc72-4834-affa-586f378010cf",
-   "koCanonicalId": "c4357ff2-4c9a-4c1e-b736-c19483b93f23",
-   "koHash": "1132e19f1a40a2bf74d3e3e869600cc5b1fe9664d3807f6f5f1dfdb8287125cd",
-   "newContentHash": "b6f7b1bd9bbb9e0a9e9a15913faaeb44ff5efe2e1d279d38372fc7fb5cdfb02f"
+   "productMasterId": "8aead717-056f-4c7a-bb03-1d2544a3ff5e",
+   "koCanonicalId": "05fea192-e6bf-44ba-ad14-e0f8a63b9037",
+   "koHash": "c21e4ccffcc1e8ee22dcbbe63c982e8339913aa4bb877b974468afb27fb4d1b7",
+   "newContentHash": "194626fc2ca15e2e1f5adfb2e624d702e5cc57a2040a6a73b809effeae77322b"
   },
   {
-   "productMasterId": "b3359161-7d3e-4e4d-ba1a-eb26e657c179",
-   "koCanonicalId": "730d4856-900a-4245-9cb9-2fa52c55b59e",
-   "koHash": "98791c7ee8a27ad87a7023c0b03d29c6d48fb0d9649815bc82c4b55a4217fdd0",
-   "newContentHash": "6686c6bacac919c547497028b4eaba5ed1c4b2d9157b52930d37ab1209e37e9d"
+   "productMasterId": "8eea4e59-6a67-4e30-ae65-09682ec970da",
+   "koCanonicalId": "32196a1e-e777-42bf-b6a2-6c4f4104796a",
+   "koHash": "031253e10e55db21a66e340e3bab08b82f1b6845fe5a88a6848feaef7cb50ad3",
+   "newContentHash": "996f21b31644f03d26a45268782d991a89b4ae230bc368b2d86cea8036af6a2e"
   },
   {
-   "productMasterId": "ba957082-8846-4f9d-b776-ca891874276a",
-   "koCanonicalId": "60870bef-a30c-4263-b370-bb2409e795a1",
-   "koHash": "d51036ab4040bc8a4dfbaf3007bd1a8bcda0aa2e3f3e8adb666fd5415e76f9d8",
-   "newContentHash": "ebc09e22ce2609bdf565f1f77abf26644f2d03067e5dcb0fbfce2bc5e1657c1f"
+   "productMasterId": "9f36f83b-3784-472e-be3d-1674d8ec3658",
+   "koCanonicalId": "4a3897c6-3619-4b0a-a614-382de9976aca",
+   "koHash": "bea01be251a8a9eb6b5467a5f05e8b72b91d71b48e9ede4f65b4502890d0d41f",
+   "newContentHash": "1dad540fa90c1e174ffa464383c51f1c5c32cdac2321218c38a695cf9af07298"
   },
   {
-   "productMasterId": "bc02ae57-bef3-44bc-916d-6cf9731c257b",
-   "koCanonicalId": "79e552d0-2b14-42d0-9abe-c0310aa1e40b",
-   "koHash": "f3c17adbd76b1d11b7099b85eab128cb86c7f481d29540ccb0d02df56c81c15f",
-   "newContentHash": "9298a9335cbfe47ffd20a90026a643ae5ef3c1c932e45d41b1ec3d8f12e033cc"
+   "productMasterId": "9f908ea1-f6e1-4625-bd90-53c807123c55",
+   "koCanonicalId": "88804c74-2457-4a08-b967-ce29f642178e",
+   "koHash": "dd9eec90e3c3098295beb85556e636be69a9e4d273a0d37157fb8bfe2b6ee1be",
+   "newContentHash": "c57e2a8347783a726f81ee9c8611072f8e441aa0fd73974f759ab42fe877f4a1"
   },
   {
-   "productMasterId": "be9d4831-6637-4459-9e38-8ffe0d6d996c",
-   "koCanonicalId": "3b8b3680-4b80-4c10-9b38-df6b56502a41",
-   "koHash": "5e995e9e5acef5d508d4c1105a1e77f258a41f4e7247b2f1797d2b793f8f3bac",
-   "newContentHash": "eb5c4185df04e53cb985abbbd5cd4d9f852ad1c66a7b4549a3196b9a703a67f6"
+   "productMasterId": "a1b89f41-dec4-49ad-8d29-9fbce75d7bb7",
+   "koCanonicalId": "27999d7b-d8e8-45b8-8e3e-5cd52b8ef2fd",
+   "koHash": "1069760e6253efc9e822d57fa4230c5214805ee1cee1364ee7cf700588077989",
+   "newContentHash": "0192624447de51f366b5acac3b67aef5d1618acd0151977234d9d6c07e02a6a5"
   },
   {
-   "productMasterId": "c2685544-2015-4f04-88fe-4f8935a3be12",
-   "koCanonicalId": "12d60ab1-8c88-4249-abbd-3b356607dd35",
-   "koHash": "d496f4d525224621a7a8f7cc18045406aa70fe91079aef6a4bbc4b8ea5354eef",
-   "newContentHash": "33af74bea5754e235ce0c02b2e4452b1ae7a2adf6d30c84710cdaa7745cc771b"
+   "productMasterId": "afd2e0b8-5820-4e17-bb77-819a66061856",
+   "koCanonicalId": "81f9b3d1-1c9e-487e-936b-2919f9f5ed9a",
+   "koHash": "6efa00324837d14e53402f6a77f562f0125a3f6c4b120fba95d9e9f520fa75d0",
+   "newContentHash": "9f1017dfe62ede06e542015cfedfc1fb790b1dcfb88d8e95eabbc57163417b98"
   },
   {
-   "productMasterId": "cd222e33-4341-420f-b115-3962970c5210",
-   "koCanonicalId": "15d7d225-7ecc-4204-9f7c-377cbc9378bc",
-   "koHash": "1c54d3187284d17ddd4344a00cfbd2fb77f99ca003dd16a7b53e9a0b956eff77",
-   "newContentHash": "2870ea926c18e83c99fdc91d1edf29fa34f6043e6c0e1fa3572831c536e9c968"
+   "productMasterId": "b4d070e3-f55d-4865-82ac-5e6e64ec1f34",
+   "koCanonicalId": "6de99189-2e10-4ea0-85b7-b5aa19fd592f",
+   "koHash": "498c530f9ba32aaad18f9ff010a8db85223f3fea26f19063cddaefa1d0993eca",
+   "newContentHash": "b1625977e285050351bd5a77661173327af34f43e0957c5009b667e50578c090"
   },
   {
-   "productMasterId": "d1dae285-eb3a-4f98-a80c-25738c85f8ce",
-   "koCanonicalId": "5e364bbc-7305-4cdf-bdbe-30bb73b9a477",
-   "koHash": "34f2fffc3410568efea1adef43360365d799491a98227447563fc1f64f554e8a",
-   "newContentHash": "02cf630cc32c984c8a872af4a2eac0b60499cf56876fc1ecbd516d162af10c8a"
+   "productMasterId": "b7a1afb3-3f43-4a88-b0f2-ca07d8864b46",
+   "koCanonicalId": "da07e1cc-15a5-407a-bad1-933b7376537f",
+   "koHash": "057f3c9f0b806b896309c51e5df4a11782700b2d53eaa4c64fd551c75cbaac0d",
+   "newContentHash": "03280204fdbf8dd735bf7cb8fe6e2cafb2dcc7ea28d4039c8ba272ff49b1b7d4"
   },
   {
-   "productMasterId": "d515bcc3-f0e3-4cc7-af0b-466755480f3a",
-   "koCanonicalId": "9a780feb-b691-459b-958f-716b2dcd4009",
-   "koHash": "3f8f704df4f50ad45200a6741ba889874a2a7539f0a94f769e80e12bd49a8eb1",
-   "newContentHash": "b373d68ae8586377e3bab7d6eb783ff05c5a6a551ba6469accc19e5761547e20"
+   "productMasterId": "b9e9801d-e4e0-456b-b681-bcacaaa0b3e6",
+   "koCanonicalId": "8fcc314e-2e79-497e-9cce-5a314cbbb282",
+   "koHash": "1ce19f0f82c73a32eaaadd2f117149739c75cbc285c97f43cf8319eeeb577359",
+   "newContentHash": "b181ac0268177361a352057a38f6574d3d9b3f97d12dc62791346aadb0a25d79"
   },
   {
-   "productMasterId": "d6399e6b-2fc9-4415-99ad-a1e6d9b74d27",
-   "koCanonicalId": "fcad912f-39fa-4c49-917d-77843c4e5014",
-   "koHash": "bd79de5076e6c3cd73ba6418b2719134d3b2a43be43fed0722403a0355188b42",
-   "newContentHash": "f3f8ac44f97280e53b387a13d90a710dde05728026c568debce2fe9a2069026d"
+   "productMasterId": "baf44608-38c5-4a5f-a4a2-c71e63334573",
+   "koCanonicalId": "bbfdadc7-20b5-472d-b5b8-a9710345d7be",
+   "koHash": "a45d52bfd74a713c927bf7d23c2f79ba62752d76e374578564ea2cd3b8996ab7",
+   "newContentHash": "9f3d58b2af23527d26288563ff39cee03425ae11858d5bedcdd9781ae721a3f0"
   },
   {
-   "productMasterId": "e18b2673-13df-42f6-b294-8afa10179f9b",
-   "koCanonicalId": "bad80493-d5d9-4867-9a05-6a8cf716d239",
-   "koHash": "e6b39e9b53addf145af791c32566ec63e20f72d38fdbac9d651eece10ee8e09c",
-   "newContentHash": "b5ff24fe476d09318c394a52d9604fbc6cf336a2c4f1625202c1dbec8f34aec8"
+   "productMasterId": "bb044e14-4f48-46c7-b1f4-9d7bc82b4a71",
+   "koCanonicalId": "b1da518e-d9f7-402a-8c5b-1686315ea17f",
+   "koHash": "b3ba559130022fecefd88d01837b082d8e11c9605d007c9b9bb6ec67807f88ac",
+   "newContentHash": "ce9e2fa5694e3f174641a0adf4bd38fee2344274a1eaf68f4647dcc0bcdba18a"
   },
   {
-   "productMasterId": "e4c7e697-f80a-40bf-9ec6-576189e5892e",
-   "koCanonicalId": "4e02c1bf-c491-40cb-ad08-009c55383322",
-   "koHash": "8ea6e57e0946ba6fb5210ad1cdab2ac0f8eb9228864ae9b4dd8c2a98f26ea778",
-   "newContentHash": "136aa24085c7bc17546c890a4e5c5caacd94a07ec7915ffc778400e1dbceb1cf"
+   "productMasterId": "bd665902-0964-4d1b-ac26-78002d8783a3",
+   "koCanonicalId": "60e4b099-9e24-4f18-823d-26819e9a0325",
+   "koHash": "e91c969aaa5ef641d8e065ebbfecb05cb09689228e3ac9d0ad4c96dcd477c5d1",
+   "newContentHash": "08c4b3804a50caad2d0c474237903e17f9d1d07db4cfd18b0d95eab4f8084bc5"
   },
   {
-   "productMasterId": "eaa0346e-0ed8-486f-ab9d-98be08ade4da",
-   "koCanonicalId": "97e9fd55-2e85-4241-99b3-1e1066ddb0b3",
-   "koHash": "e89e95aedf5717c3a3db2bf4988fc818fb77463a0f2af253a15eea7c4dd54c90",
-   "newContentHash": "8c6ca730a197a63b760b164918bc2c91e44d2a00b9b4da2678d1bde565ffbd9e"
+   "productMasterId": "bee59b3e-dd82-4bb9-8576-96cac98ab66f",
+   "koCanonicalId": "470c96ed-1ce0-4fc0-91aa-cf93a8f2b989",
+   "koHash": "ba48089349ab3d6de258120569f414068585c752443431df1dbecf2cdf935a56",
+   "newContentHash": "cd834b470642fef7482dc2746ac070a950efe2011f928c7e4c68235c79b680f8"
   },
   {
-   "productMasterId": "eace059e-2ab6-47cd-bdcd-daf33e2cc01d",
-   "koCanonicalId": "bb17ae1f-3ba2-448b-a6e9-9c1737bd125f",
-   "koHash": "090b58c341cab197600ef12efe51b1f03beaf1f0ee3554b7453d8aaada6079c8",
-   "newContentHash": "6ec0f0142ead0e1b9bf7ccb6c31432d5728a189f94ecbd3ad39f57dac9037964"
+   "productMasterId": "bf6d9eea-a10b-4fc6-a660-401daefd9140",
+   "koCanonicalId": "7c3fa29c-adb4-4978-9791-1121087b5e7e",
+   "koHash": "c1682fca57e6c663df81bbf44033cf4a7e4edbd3e0028802b1faeec2282b6910",
+   "newContentHash": "b6454a10247963db7d2858f0eb4da6ff9ce8a8391a2676973423616be9739453"
   },
   {
-   "productMasterId": "ece2a181-25d2-40b6-94fe-776de2bad9a4",
-   "koCanonicalId": "30c24d86-d261-427b-a2de-39d3631908d4",
-   "koHash": "a432456df9d73b39e2f75a736d55d5f471ccbb099bf68f9e70663b057ae71d94",
-   "newContentHash": "c61e07b31ad306fdca8b87db45d85c5e9c83e853298fe0ea7f220b265c36e903"
+   "productMasterId": "c00922bd-6d27-4720-9a42-450a5d76336b",
+   "koCanonicalId": "d52746e6-bb2d-4dd0-b2c3-9f2d12b8c095",
+   "koHash": "a8632f99f2302c59cd98fa7b8f7f35669537c7032848d6a9b2e6e3605c46ad55",
+   "newContentHash": "98bb9f2ea4bef8545a9eb757cca6a98087e55c94d9dc2675634c45ef8da411b6"
   },
   {
-   "productMasterId": "ef28c6ba-8b67-499f-82c1-a6b155f68986",
-   "koCanonicalId": "72eface7-1487-41d8-82ae-f59b4d55165e",
-   "koHash": "e8804b031fd4b7a7f5e850dbee80d5f655b50d2dd6cc86f79efac2f62a55cad7",
-   "newContentHash": "5062025374101501571609f2fae83ec3bb0ed1404e93f00e6b4d9558cbf7c975"
+   "productMasterId": "c07fe444-081e-47a7-912f-6428721a1b5c",
+   "koCanonicalId": "3d5d3bf0-63e3-4ddc-bf24-8ed9c34f8b34",
+   "koHash": "bacb577e854af46b1b11d14318af0db64d29a5e05793eb915698722b4f1f2699",
+   "newContentHash": "ff9f51b2edb962f4105087ebe0611cb4a274a5575ceeecca8f4e68847a38f3fe"
   },
   {
-   "productMasterId": "f1d17037-8e92-41d1-a82b-facf84473371",
-   "koCanonicalId": "a981ca3f-cc87-42f9-9e2c-58504609f364",
-   "koHash": "ebbc8848a5bf8b3fe698376e2bc666d46b77199015191c2eef7ea52547f45a30",
-   "newContentHash": "db43b534e34d72510b15201f0eb9c53283557c5cc12741ad36f52e476db63cf1"
+   "productMasterId": "c220219a-3b35-4808-b3b3-c69dae8ddddb",
+   "koCanonicalId": "c3326944-967e-49b7-b6d9-6f15411dec4e",
+   "koHash": "477de67433fc83ae98473af6f01b9daee4e5043723950f155203894985b25a0a",
+   "newContentHash": "bb3c52c607e7e10865de2e3179f5e5031339cf393c72d36613160cce88e8d54e"
   },
   {
-   "productMasterId": "f252373f-a6a8-4dd5-a56f-1a20f2f016bd",
-   "koCanonicalId": "dc6572af-decf-4682-87f6-c6f1a38d7a62",
-   "koHash": "afe3b5a56bc0830843d7dcda3bbcfbd4682529bf410edc8132c98940f7107298",
-   "newContentHash": "5a714dc9dc0bf146247bf68eda42b36da16b686085484f01293346caf162e6e9"
+   "productMasterId": "c2ddaf78-efc8-475d-84dc-237f9d5b7534",
+   "koCanonicalId": "b25b0868-2081-4751-ab41-d4082c97b625",
+   "koHash": "893f2f76df0ce927bc1737153385020d203ea0122bf3f738d4da918f02384b51",
+   "newContentHash": "8f6fa361310377a3acaf69413f88d2aeb7b867ea852c88c9cdcd1b5059759127"
   },
   {
-   "productMasterId": "f3279b5b-dabc-4efd-87f6-6585ea8d625d",
-   "koCanonicalId": "54ac1dcf-1ad5-4562-b461-0d829bdb42d0",
-   "koHash": "1b47b98146fced0b8c4a9d3a863e02f290aed145a0774490a299b16453dda033",
-   "newContentHash": "024099bf5dad4a978204a1f49035a4e9d428bb7b096f319760a15b9717056ccd"
+   "productMasterId": "c33888bc-b75b-473e-8a6c-bf6c1458d925",
+   "koCanonicalId": "ba48ed88-ca3e-43f2-a94b-f2393764178f",
+   "koHash": "8fab800d6ceb34d2468ee298924ff2ebd35e8d606265f1d9748162269e2c2bc5",
+   "newContentHash": "8e2ea47eb3c40fc582f64f81eee42956e788c7e5344d5de84e6faa3c63deb7c6"
   },
   {
-   "productMasterId": "f36a7e1b-33fb-4ef9-94e2-837ea4e662b3",
-   "koCanonicalId": "7366c6fb-272f-4c47-980e-4b42ce7702b7",
-   "koHash": "5ccacedc589d967568d68fdfe98b3e505434e69fe404068fbc6bebf4ff2a1b57",
-   "newContentHash": "0d44ebba6ec6e52d974705304f017eda712de8acb51087bd7342a39805f0227a"
+   "productMasterId": "c37eecb1-0191-4094-a9a6-298e6fe6f0a5",
+   "koCanonicalId": "1bcf03e4-63c6-422b-a9ab-67ec9cf27c92",
+   "koHash": "2a5ca54badf76284fc16a36a083777e8bb2ae9d3075a1802e63cd2fcb7e76097",
+   "newContentHash": "16b784dbf31abd2728eb9a71c2ecf28bc68dd7494d05ca93a940a8fe17ccf4b4"
   },
   {
-   "productMasterId": "f5d88106-046c-4b5d-942e-f4d3b0cf2bb9",
-   "koCanonicalId": "5844776f-240f-4cd0-81a8-e47f3feda80b",
-   "koHash": "55c4920d48142ecda7db66de19acd23fcd23df469d28067450fa31da1f75d5e0",
-   "newContentHash": "f2c24109714357b0cc69288b3149ac8ba1d5178675cad1b1498e0c4d09d9044b"
+   "productMasterId": "c39d8193-4791-434a-bef7-0d13b5d06715",
+   "koCanonicalId": "dfcdd25a-4c79-4417-95d5-ba0518d3f8d7",
+   "koHash": "e3098ced58f85a72b1dea6c290edc45f392520c83b85031c9372c9f0a1fa6cd6",
+   "newContentHash": "b55f1d9d59549db77be1184fd6aa129a929446c386fc6f25aa7522001591f051"
   },
   {
-   "productMasterId": "f9bfec75-ec79-402a-bd26-0bf44c434c2c",
-   "koCanonicalId": "7889abcd-8bf4-4de4-bcce-6cf36501e02b",
-   "koHash": "505488cb8f1ef2d6bb9ccbaffad6fd83aeaf0f596b0abe13764bf2e3df3b1ce9",
-   "newContentHash": "c20792a2b6d9acc2fca6ccf9dc8918e714eebe953945a0e9deee2949f7bbb4fb"
+   "productMasterId": "c421a190-4fd9-4a65-9484-72b52e5c05dc",
+   "koCanonicalId": "27c928ae-11d1-4b99-909c-d503017648a3",
+   "koHash": "876ad0f44bc0dcd4934fa88dd38bb5ac8b9f26bf58482a9ffe2fb7d2ef606954",
+   "newContentHash": "a4a46af8e66efaf51831c558a106bdc49f1e592fc744bd2801b1047ce1fc5d93"
+  },
+  {
+   "productMasterId": "c618b6be-8049-4d8c-b7ad-4da1314aea49",
+   "koCanonicalId": "195b6b0b-77d2-4c62-b433-8e26c767867e",
+   "koHash": "d2b0e454925df350d3fb7ba4c01141d9756958072cf00ae8a5c08ac5075ae5b9",
+   "newContentHash": "2f22dfc4b1d686385bce2173ec3b021383dfeb7358dedcc0a33f0f1a664afb12"
+  },
+  {
+   "productMasterId": "c7731268-ff60-406b-9224-5196ef37bfe5",
+   "koCanonicalId": "11fc802a-11c5-430f-97b7-efe202211f14",
+   "koHash": "6424dc104328a31b5ce830dd509cab784a6875acbab4929a4cee2553ccf2805e",
+   "newContentHash": "f8330fd7a49520b68958a256b8ea1a11086a16457670032f46175c97a492498e"
+  },
+  {
+   "productMasterId": "cc749cb3-c495-4f07-9422-35d53375ce56",
+   "koCanonicalId": "d4c5e9e3-8072-4896-90e7-14a3904dcbc8",
+   "koHash": "633ac39b7e57ce4826b091d43bba520bd3eafddfbd48959f41dace9fecba21f7",
+   "newContentHash": "857674a9bd556f822cf9cef1354a1472664989eac4e66c2a2dfc394ab40ee774"
+  },
+  {
+   "productMasterId": "ccb11335-6d7c-4fb7-ad03-672d62d8e8f2",
+   "koCanonicalId": "7654d7ba-91ed-492e-bc31-89c0e8719a19",
+   "koHash": "968d787deded89a2069b5a6f7ae354ecb8062a10357b0340094473d220702d55",
+   "newContentHash": "feb455ba6da1035a563f1a3e84cbcb2676e530d63073d6d2e0b575b899f53628"
+  },
+  {
+   "productMasterId": "d1810fd3-4b10-4481-a6b7-89b4eaca2886",
+   "koCanonicalId": "46d29dc5-d544-4287-9173-2bb34c2ace64",
+   "koHash": "087e877a9ec20863f50d5759324bc4001e94b28be86a6450ab4e746bf2b3644f",
+   "newContentHash": "84e74934425d3a7c9f8b69fd2cc96c67984c050380275357752a7e89e63257bf"
+  },
+  {
+   "productMasterId": "d18d005c-998d-47df-b1f4-2389bb3ba693",
+   "koCanonicalId": "c9f80d6c-498b-4b91-b95b-2728a58289dd",
+   "koHash": "55676708e3c16cdb14fd5b8b01fd63722b587dd179269b81918df52f0553de76",
+   "newContentHash": "8acb45e90e0f1137111ef0c5f6156301fdd34e5073509e327be61a1636ea0fe0"
+  },
+  {
+   "productMasterId": "d2b2b25c-ca39-45dc-ad2e-b699a7cd99ca",
+   "koCanonicalId": "1ffa0453-0fac-4d7d-b287-7a94a229b90d",
+   "koHash": "f61619f40b8abc437bafea447586cfe43442a935eb6226143628137275f42a52",
+   "newContentHash": "244b675b7ff0b6c1ee9eed7db34a8c9ae505e2506641caa60de2ffcc84af1814"
+  },
+  {
+   "productMasterId": "d3b9e8bc-ea8a-40c2-b991-42426699e9f6",
+   "koCanonicalId": "763ecb8b-04f7-40f5-ab13-affe3a5623ba",
+   "koHash": "1c83dc891c825809dc141cef26be1b2c12510674dc81262d7a5f3b2a0732b9a7",
+   "newContentHash": "ba1e3c8d5ea8373f6dac212e47e65a45251354456e74f1c1ab7c6ae465449648"
+  },
+  {
+   "productMasterId": "da9c48c3-3928-42c4-8835-c1ec528243a5",
+   "koCanonicalId": "014ee473-110f-467a-b2a0-25ae368d610a",
+   "koHash": "3a7c7c2e9a389fa6e39f80adf4b89bf991cd70c4c1e7e0714eabed6c8a1c2f41",
+   "newContentHash": "43c2e2d24f93661f35871bbc77c96c151f620b161bdfc7691261320cb704ca16"
+  },
+  {
+   "productMasterId": "dd47a928-7466-4b44-ab11-f552bd491655",
+   "koCanonicalId": "dd013678-e00a-4970-86df-a795c0c70afa",
+   "koHash": "aa1f40aba7f8bfc9768109a7cd30abea8dea32aad3ad8931681b3b822cf21da1",
+   "newContentHash": "be45bb11253a0539278eb51490671637b6e8a0c8dc9bc91380ba1cd9e19f53a5"
+  },
+  {
+   "productMasterId": "e3773d11-5831-4beb-9e26-c387fbbb859f",
+   "koCanonicalId": "21f07a45-c80e-4407-b2f6-51fd7ec39856",
+   "koHash": "63c266b3788971ad9fd4a40d315595354eed073e0a889310db99df0d5154a49c",
+   "newContentHash": "a5920353f5578bebe50939965ab4a4458b31957e7c5a8f311c58178a0503b018"
+  },
+  {
+   "productMasterId": "e406eaf7-60ea-42dd-b758-6d8462133c24",
+   "koCanonicalId": "f4c0e4c3-78a8-4c3f-a81d-b6910799fec2",
+   "koHash": "5d3a445d303f1993c6fb331cbaae3a4145bed4045c5f998ab68fc12366680dea",
+   "newContentHash": "1465b306908b9f4e4978be5aba3d053240b42ee0b4b73c8dd6888670c8d033b0"
+  },
+  {
+   "productMasterId": "eac39de3-71a1-40aa-a199-7f2c8e88820c",
+   "koCanonicalId": "811511c8-71f5-45f9-b6f4-f753bcea763f",
+   "koHash": "5450aaa2f95abe77fd48a8d9e7ee4658ca71f73ef1e2d11ab8651bde9a3a9b8b",
+   "newContentHash": "fcedb70d2b83c17018b5a994430898602277c495e476546f0efcc78417bf5a1f"
+  },
+  {
+   "productMasterId": "ec423fea-3ad8-4912-b377-2553e3e33781",
+   "koCanonicalId": "eca04949-d286-469e-8225-88635a06a8b6",
+   "koHash": "c82f83aa0c5d731f46a3681197133e96a5909bdb66b6f7585b90f212cf67903e",
+   "newContentHash": "2fc79c046b6882c5d4d8b4772ce3ca7fe579fba0d550a574e85265529e35cc3c"
+  },
+  {
+   "productMasterId": "ef6f435e-ab2f-4836-9f57-6d7fcd4ea6e9",
+   "koCanonicalId": "ab010af7-c3cc-4662-b60a-9373a3cbd6bf",
+   "koHash": "cf5bc18222481edb8dd24eebaed31a71258f3c6d26bd5d05420d2c34a4c68178",
+   "newContentHash": "6b81a20bfb82117718924fdd83a540c479f6ac38e886ab7040965e3b32c27c3c"
+  },
+  {
+   "productMasterId": "f8291fdd-ee4b-4434-854a-1ac182f8369c",
+   "koCanonicalId": "8a9e5292-32c8-485e-9052-480a310ad0b3",
+   "koHash": "2dc9dcbcbda7264d69c909eb3699699531a3d04305f705bce60250bf6f14c324",
+   "newContentHash": "3fcfafee62791050bc25b4ead92f313ee65d8893556d4ab06715a8c51bb194ec"
+  },
+  {
+   "productMasterId": "f875b23c-a1c7-47de-9402-794cbd36c5b3",
+   "koCanonicalId": "fc51fe65-152c-4ae4-ae7e-ff6d049684fd",
+   "koHash": "47b2289b516eb17cd9f544e580b48072977ffcb3d6916f66590d6e98aed5d8f7",
+   "newContentHash": "6416f4a0fa3e92c662c113586924deb7e51b84e7dfdcc3bd9faa4cc91738c2df"
   }
  ]
 }

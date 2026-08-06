@@ -1,13 +1,12 @@
 {
  "wo": "WO-O4O-HFF-ZH-ALL-REMAINING-10414-DIRECT-BULK-PRODUCTION-AND-TRACK-CLOSURE-V1",
- "generatedAt": "2026-08-05T09:53:15.794Z",
- "total": 420,
- "carriedForward": 0,
- "resolvedFromPriorQueue": 84,
- "addedByThisPass": 420,
+ "generatedAt": "2026-08-06T00:16:45.253Z",
+ "total": 319,
+ "carriedForward": 319,
+ "resolvedFromPriorQueue": 101,
+ "addedByThisPass": 0,
  "byType": {
-  "NUMBER_STRUCTURE_AMBIGUOUS": 101,
   "TRANSLATION_AMBIGUOUS": 319
  },
- "uniqueProductMasters": 420
+ "uniqueProductMasters": 319
 }
