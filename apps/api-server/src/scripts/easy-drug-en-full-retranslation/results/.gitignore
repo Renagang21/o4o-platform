@@ -1,4 +1,5 @@
 # 전수 원장(대용량). 요약 result.json 만 커밋한다.
 contract-recon-ledger.jsonl
+en-expectations.jsonl
 ko-units.jsonl
 tm-census.jsonl

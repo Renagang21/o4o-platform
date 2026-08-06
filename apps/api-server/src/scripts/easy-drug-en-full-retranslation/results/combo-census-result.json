@@ -1,0 +1,64 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "combo-census / en-expectations",
+  "rule": "생산 단위는 단일제·복합제 모두 master. 별도 공통 설명서 없음. 복합제는 검증 강도만 다름.",
+  "groundingFinding": {
+    "verdict": "NO_STRUCTURED_INGREDIENT_LEDGER",
+    "productDrugExtensionsRows": 177413,
+    "nonEmpty": {
+      "ingredient_summary": 0,
+      "active_ingredients": 0,
+      "strength": 0,
+      "dosage_form": 0,
+      "atc_code": 176962
+    },
+    "ingredientColumnsInDb": [
+      "product_drug_extensions.(active_ingredients|ingredient_summary|strength|dosage_form)"
+    ],
+    "easyDrugSourceSections": [
+      "efcyQesitm",
+      "useMethodQesitm",
+      "atpnWarnQesitm",
+      "atpnQesitm",
+      "intrcQesitm",
+      "seQesitm",
+      "depositMethodQesitm"
+    ],
+    "koFixedIdentityFields": [
+      "구분",
+      "제품명",
+      "제조·수입사",
+      "품목기준코드"
+    ],
+    "consequence": "성분·함량 검증은 외부 원장 대조가 불가하며 KO↔EN 보존 대조로만 실행 가능"
+  },
+  "masters": 19360,
+  "ingredientTokenHistogram": {
+    "0": 10040,
+    "1": 9316,
+    "2": 4
+  },
+  "combinationHint": 4,
+  "doseTokens": {
+    "total": 170204,
+    "mastersWithNone": 129,
+    "p50": 7,
+    "p95": 27,
+    "max": 47
+  },
+  "bareNumbers": {
+    "total": 215653,
+    "mastersWithNone": 88,
+    "p50": 9,
+    "p95": 32,
+    "max": 78
+  },
+  "sectionCountHistogram": {
+    "5": 135,
+    "6": 314,
+    "7": 2415,
+    "8": 6967,
+    "9": 9529
+  },
+  "dbWrites": 0
+}
