@@ -173,6 +173,10 @@ const freqTokens = (t, zhSide) => {
        같은 글자를 한쪽에서만 세면 없어지지 않은 수치가 유실로 잡힌다. */
     for (const m of t.matchAll(/(\d+)\s*일(?![가-힣])/g)) out.push(`PERDAY${m[1]}`);
     for (const m of t.matchAll(/(\d+)\s*회(?:당|에|시|씩)?(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
+    /* 한국어 `1일` 을 `每日` 로 옮기지 않고 표기 그대로 `1日` 로 두는 문구가 있다(`1일 (1,000mg/1,200mg)`
+       처럼 빈도가 아니라 **하루 기준량** 을 뜻하는 자리). 한국어 쪽은 이 `1일` 을 PERDAY 로 세므로
+       중국어 쪽도 같은 표기를 같은 축으로 세야 대조가 성립한다. 세는 축만 맞추는 것이며 값은 건드리지 않는다. */
+    for (const m of t.matchAll(/(?<!每\s*)(\d+)\s*(?:日|天)/g)) out.push(`PERDAY${m[1]}`);
   } else {
     for (const m of t.matchAll(/(\d+)\s*일(?![가-힣])/g)) out.push(`PERDAY${m[1]}`);
     for (const m of t.matchAll(/(\d+)\s*회(?:당|에|시|씩)?(?![가-힣])/g)) out.push(`TIMES${m[1]}`);
@@ -185,7 +189,7 @@ const freqTokens = (t, zhSide) => {
    섭취 빈도는 PERDAY/TIMES 축에서 이미 대조하므로 여기서 빼도 검사 강도는 줄지 않는다. */
 const FREQ_COMPOUND_KO = /(\d+)\s*(?:일|회)(?=[가-힣])/g;
 const stripFreq = (t, zhSide) => (zhSide
-  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ').replace(FREQ_COMPOUND_KO, ' ')
+  ? t.replace(/每\s*\d*\s*(?:日|天|次)/g, ' ').replace(/(\d+)\s*次/g, ' ').replace(/(\d+)\s*(?:日|天)/g, ' ').replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ').replace(FREQ_COMPOUND_KO, ' ')
   : t.replace(/(\d+)\s*(?:일|회(?:당|에|시|씩)?)(?![가-힣])/g, ' ').replace(FREQ_COMPOUND_KO, ' '));
 /* `每2000mg100亿 CFU` 처럼 단위 바로 뒤에 다음 수치가 붙는 표기가 있다. 이때 `100` 앞 글자가
    라틴 문자(`g`)여서 성분 코드 판정에 걸려 수치가 통째로 안 읽힌다. 이미 단위로 닫힌 자리 뒤에는
@@ -318,8 +322,11 @@ function dosage(t0) {
   if ((m = new RegExp(String.raw`^(\d+(?:\.\d+)?)\s*(${DU})$`).exec(t))) return `${m[1]}${UNIT_ZH[m[2]] ?? m[2]}`;
   return null;
 }
-const UNIT_ZH = { 정: '片', 캡슐: '粒胶囊', 포: '袋', 병: '瓶', 스푼: '勺', 알: '粒', 매: '张', 개: '个', 환: '丸' };
-const DU = '정|캡슐|포|병|스푼|알|매|개|환|㎖|ml|mL|g|mg';
+/* 구미·젤리·방울·스틱·팩은 제형 사전(FORM)에는 있었지만 **섭취 단위**로는 없어
+   `1회 2구미` `1일 1회 2젤리` 가 통째로 미해결로 남았다. 제형 표기와 같은 어휘를 쓴다. */
+const UNIT_ZH = { 정: '片', 캡슐: '粒胶囊', 포: '袋', 병: '瓶', 스푼: '勺', 알: '粒', 매: '张', 개: '个', 환: '丸',
+  구미: '粒软糖', 젤리: '粒凝胶软糖', 방울: '滴', 드롭: '滴', 스틱: '条', 팩: '包', 앰플: '支安瓿' };
+const DU = '젤리|구미|방울|드롭|스틱|팩|앰플|정|캡슐|포|병|스푼|알|매|개|환|㎖|ml|mL|g|mg';
 
 /** 원료명 + 표시량 (`루테인 20mg`). 용어집 + 원문 수치 토큰. */
 function ingredientAmount(t) {
@@ -329,7 +336,9 @@ function ingredientAmount(t) {
   if (/[~〜～\-–,，/]$/.test(m[1].trim())) return null;
   const head = resolveAtom(m[1].trim());
   if (!head) return null;
-  return `${head} ${m[2].replace(/\s+/g, '')}`;
+  /* 배수 접미사는 한국어 표기다 — 값은 그대로 두고 표기만 옮긴다(`5억 CFU` → `5亿CFU`).
+     여기서 원문 토큰을 그대로 흘리면 miss 없이 한국어가 남는다. */
+  return `${head} ${m[2].replace(/\s+/g, '').replace(/억/g, '亿').replace(/만/g, '万').replace(/천/g, '千')}`;
 }
 
 /** `A(B)` — 괄호 안은 별칭이거나 원문 표기다. 각각 해석되면 합친다. */
@@ -620,6 +629,15 @@ function appearance(t0, depth) {
     const a = resolveAtom(sm[2].trim(), depth + 1);
     if (shape && a) return `${shape}${a}`;
   }
+  /* `해, 달, 별, 하트 모양 젤리` — 젤리류 성상은 모양을 열거한다. 열거 순서를 그대로 유지한다.
+     모양 어휘는 사전으로만 옮긴다(하나라도 모르면 미해결로 남겨 임의 조립을 막는다). */
+  if ((sm = /^(.+?)\s*모양의?\s*(.+)$/.exec(t))) {
+    const names = sm[1].split(/\s*[,，·、]\s*|\s+및\s+|\s+또는\s+/).map((x) => x.trim()).filter(Boolean);
+    const shapes = names.map((x) => SHAPE_ZH[x] ?? null);
+    const a = resolveAtom(sm[2].trim(), depth + 1);
+    if (a && names.length && shapes.every(Boolean))
+      return shapes.length === 1 ? `${shapes[0]}形${a}` : `${shapes.join('、')}形状的${a}`;
+  }
   /* `A 또는 B` — 두 성상 표기의 병기. 순서를 유지한다. */
   if ((sm = /^(.+?)\s*(?:또는|혹은)\s*(.+)$/.exec(t))) {
     const a = resolveAtom(sm[1].trim(), depth + 1);
@@ -741,6 +759,15 @@ function colorCompose(t) {
   return out;
 }
 
+/* `… 모양 젤리` 의 모양 어휘. 캐릭터·사물 이름이 그대로 쓰여 제형 사전과는 축이 다르다. */
+const SHAPE_ZH = {
+  반원: '半圆', 원형: '圆', 원통: '圆筒', 타원: '椭圆', 정사각: '正方', 직사각: '长方', 삼각: '三角', 사각: '四方',
+  별: '星', 달: '月', 해: '太阳', 하트: '心', 클로버: '三叶草', 리본: '蝴蝶结', 꽃: '花', 나뭇잎: '树叶',
+  가위: '剪刀', 바위: '石头', 보: '布', 곰: '熊', 곰돌이: '小熊', 물고기: '鱼', 공룡: '恐龙', 동물: '动物',
+  포도: '葡萄', 딸기: '草莓', 사과: '苹果', 오렌지: '橙子', 레몬: '柠檬', 복숭아: '桃子', 수박: '西瓜',
+  뽀로로: '啵乐乐', 알약: '药片', 캡슐: '胶囊', 구슬: '珠', 방울: '水滴', 튜브: '管', 스틱: '条', 공: '球',
+};
+
 /* 제형 서술 — 모양·코팅·재질 수식어의 조합이다. 최장 일치로 토막 내 순서대로 잇는다. */
 const FORM_RAW = {
   점도가있는: '黏稠的', 내용물을함유한: '含内容物的', 분말을함유한: '含粉末的', 과립을함유한: '含颗粒的',
@@ -760,6 +787,7 @@ const FORM_RAW = {
   경질캡: '硬胶囊', 연질캡: '软胶囊', 하드캡슐: '硬胶囊', 소프트캡슐: '软胶囊',
   장용성: '肠溶', 장용: '肠溶', 원형정제: '圆形片剂', 장방형정제: '长方形片剂', 타원형정제: '椭圆形片剂',
   직사각형: '长方形', 물고기모양: '鱼形', 하트모양: '心形', 별모양: '星形', 튜브형: '管形',
+  클로버모양: '三叶草形', 곰모양: '熊形', 달모양: '月形', 해모양: '太阳形', 공모양: '球形',
   농축액: '浓缩液', 농축액상: '浓缩液状', 과립상: '颗粒状', 분말상: '粉末状', 유상: '油状',
   묽은: '稀薄的', 걸쭉한: '黏稠的', 현탁액: '悬浊液', 페이스트: '膏状', 겔상: '凝胶状', 겔: '凝胶',
   분말이든: '含粉末的', 과립이든: '含颗粒的', 액상이든: '含液状内容物的', 내용물을담은: '含内容物的',
@@ -791,7 +819,10 @@ function formCompose(t) {
 
 const ATOM_MEMO = new Map();
 function resolveAtom(t, depth = 0) {
-  if (depth > 4) return null;
+  /* 성상 문구는 `감각 서술 → 점박이 → 색 → 제형` 처럼 수식이 겹겹이 쌓여 5단을 넘는다.
+     한도가 4였을 때는 가장 안쪽 조각(`밝은 회황색의 장방형 제피정제`)만 해석되지 못한 채
+     바깥 규칙이 부분 결과를 돌려주어 **miss 없이** 한국어가 남았다. 메모가 있으므로 비용은 선형이다. */
+  if (depth > 8) return null;
   const t0 = norm(t);
   if (!t0) return null;
   /* 규칙이 서로를 다시 부르며 같은 조각을 반복 계산한다(지수 폭발). 결정적 함수이므로 메모한다. */
@@ -826,7 +857,10 @@ function resolveAtomRaw(t0, depth) {
   /* 순수 수치 토큰. 값·단위는 그대로 두고 배수 접미사 표기만 중국어로 옮긴다(값 동일). */
   if (NUMTOK.test(t0)) return t0.replace(/\s+/g, '').replace(/억/g, '亿').replace(/만/g, '万').replace(/천/g, '千')
     .replace(/정$/, '片').replace(/캡슐$/, '粒胶囊').replace(/포$/, '袋').replace(/병$/, '瓶')
-    .replace(/알$/, '粒').replace(/매$/, '张').replace(/개$/, '个').replace(/회$/, '次');
+    .replace(/알$/, '粒').replace(/매$/, '张').replace(/개$/, '个').replace(/회$/, '次')
+    /* `스푼`·`일` 은 단위 목록(UNITS)에 있어 여기로 들어오는데 대응 표기가 빠져 있었다.
+       그 결과 `1스푼`·`1일` 이 한국어 그대로 통과해(miss 아님) 문서에 남았다. */
+    .replace(/스푼$/, '勺').replace(/일$/, '日');
   /* `진세노사이드 Rg1, Rb1 및 Rg3의 합계로서 3~80 mg` — 지표성분 합계 표기.
      합계는 열거 전체에 걸린다. 어떤 분해 규칙보다 먼저 처리해 귀속을 마지막 원료로 좁히지 않는다(§5). */
   let mS;
@@ -1100,10 +1134,24 @@ function resolveAtomRaw(t0, depth) {
     if (a && b) return `${a} ${m2[2]} ${b}`;
   }
   if ((m2 = /^([·•])\s*(.+)$/.exec(t0))) { const a = resolveAtom(m2[2].trim(), depth + 1); if (a) return `${m2[1]} ${a}`; }
+  /* `(국문) … (영문) …` 이 한 조각에 여러 번 반복되는 표기가 있다. 먼저 병기 단위로 끊는다. */
+  if (/^[(（]국문[)）]/.test(t0) && (t0.match(/[(（]국문[)）]/g) ?? []).length > 1) {
+    const segs = t0.split(/(?=[(（]국문[)）])/).map((s) => s.trim()).filter(Boolean);
+    const outs = segs.map((s) => resolveAtom(s, depth + 1));
+    if (outs.every(Boolean)) return outs.join('，');
+  }
   /* `(국문) … (영문) …` — 개별인정 기능성의 국·영문 병기. 영문 원문은 그대로 둔다(§5 원문 보존). */
   if ((m2 = /^[(（]국문[)）]\s*(.+?)\s*[(（]영문[)）]\s*(.+)$/.exec(t0))) {
     const a = resolveAtom(m2[1].trim(), depth + 1);
-    if (a) return `（韩文）${a}（英文）${m2[2].trim()}`;
+    if (!a) return null;
+    const en = m2[2].trim().replace(/[\s,，]+$/, '');
+    /* 영문 뒤에 한국어 절이 이어 붙는 표기가 있다(`… body fat, 유산균 증식 및 …`).
+       영문만 원문 보존하고 뒤 절은 반드시 해석한다 — 못 하면 부분 번역을 만들지 않고 미해결로 넘긴다. */
+    const h = en.search(/[가-힣]/);
+    if (h < 0) return `（韩文）${a}（英文）${en}`;
+    const tail = resolveAtom(en.slice(h).trim(), depth + 1);
+    if (!tail || /[가-힣]/.test(tail.replace(KEEP_PROPER, ''))) return null;
+    return `（韩文）${a}（英文）${en.slice(0, h).replace(/[\s,，]+$/, '')}，${tail}`;
   }
   /* `…을 주원료로 한 4원료 복합 건강기능식품입니다.` — 앞 슬롯의 제품명을 받는 도입 문구. */
   if ((m2 = /^[을를]\s*주원료로\s*한\s*(\d+)\s*원료\s*복합\s*건강기능식품입니다[.]?\s*(.*)$/.exec(t0))) {
@@ -1145,6 +1193,18 @@ function resolveAtomRaw(t0, depth) {
  * 슬롯 번역. 해석 불가면 null 을 돌려주고 호출부가 문제 큐로 보낸다.
  * 반환된 문자열은 수치 보존 검사를 통과해야만 사용한다(호출부 계약).
  */
+/* 조립 결과에 남는 두 가지 **표기**만 마지막에 정리한다. 뜻을 바꾸는 치환이 아니다.
+   ① 수치에 붙은 배수 접미사(`1,000억 CFU`) — 사전·조립 어느 경로로 들어와도 한국어로 남을 수 있다.
+   ② 항목 기호로 쓰인 `(가)(나)(다)` — 문장 중간에 있으면 마커 경로를 타지 않는다.
+   둘 다 앞뒤 문맥을 좁게 못박아 `包衣`·`~하지만` 같은 오치환이 생기지 않게 한다. */
+const MULT = { 억: '亿', 만: '万', 천: '千' };
+function tailNorm(s) {
+  return s
+    .replace(/(?<=[\d,)])\s*([억천])(?=\s*(?:CFU|IU|[A-Za-z㎎㎍㎖]|개|마리|원|이상|以上|미만|[)/,]|$))/g, (_, c) => MULT[c])
+    .replace(/(?<=[\d,)])\s*(만)(?=\s*(?:CFU|IU|[A-Za-z㎎㎍㎖]|개|마리|원))/g, (_, c) => MULT[c])
+    .replace(/[(（]\s*([가나다라마바사])\s*[)）]/g, (_, c) => `(${{ 가: '甲', 나: '乙', 다: '丙', 라: '丁', 마: '戊', 바: '己', 사: '庚' }[c]})`);
+}
+
 const ZH_MEMO = new Map();
 export function zh(kind, text) {
   const t = norm(text);
@@ -1155,6 +1215,7 @@ export function zh(kind, text) {
   const res = zhCompute(kind, t);
   /* 기준·규격(spec) 밖에서는 동그라미 숫자를 `(n)` 으로 옮긴다 — 목록 슬롯의 기존 저작 자산(②→(2))과 같은 표기다. */
   if (res && kind !== 'spec' && typeof res.zh === 'string') res.zh = circled(res.zh);
+  if (res && typeof res.zh === 'string') res.zh = tailNorm(res.zh);
   ZH_MEMO.set(mk, res);
   return res;
 }

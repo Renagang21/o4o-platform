@@ -1,0 +1,305 @@
+{
+ "wo": "WO-O4O-HFF-ZH-TRANSLATION-AMBIGUOUS-319-REPAIR-AND-APPLY-V1",
+ "generatedAt": "2026-08-06T01:08:44.007Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documents": 319,
+ "leakAtoms": 36,
+ "byHow": {
+  "marker+compose": 2,
+  "compose": 33,
+  "dict(spec)": 1
+ },
+ "outsideSlotTokens": [
+  {
+   "token": "균수는",
+   "docs": 7
+  },
+  {
+   "token": "따로",
+   "docs": 7
+  },
+  {
+   "token": "계산하지",
+   "docs": 7
+  },
+  {
+   "token": "않았습니다",
+   "docs": 7
+  },
+  {
+   "token": "캡슐당",
+   "docs": 4
+  },
+  {
+   "token": "포당",
+   "docs": 3
+  },
+  {
+   "token": "가능",
+   "docs": 2
+  },
+  {
+   "token": "공식",
+   "docs": 2
+  },
+  {
+   "token": "표기",
+   "docs": 2
+  }
+ ],
+ "leaks": [
+  {
+   "kind": "spec",
+   "docs": 2,
+   "how": "marker+compose",
+   "ko": "5) 프로바이오틱스 수 100억CFU 이상/9g",
+   "zh": "5) 益生菌数 100억CFU以上/9g"
+  },
+  {
+   "kind": "clause",
+   "docs": 2,
+   "how": "compose",
+   "ko": "Lactobacillus gasseri BNR17 : (국문) 체지방 감소에 도움을 줄 수 있음(생리활성기능) (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제·배변활동 원활·장 건강에 도움을 줄 수 있음",
+   "zh": "Lactobacillus gasseri BNR17：（韩文）有助于减少体脂肪（生理活性功能）（英文）May help to reduce body fat, 유산균 증식及抑制有害菌·排便顺畅·有助于肠道健康"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging 눈의 피로도 개선에 도움을 줄 수 있음",
+   "zh": "（韩文）有助于维持因老化而可能降低的黄斑色素密度，从而有助于眼睛健康（英文）May help the eye health by maintaining the density of macular pigments which can be decreased by aging 눈의 피로도 개선에 도움을 줄 수 있음"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 (영문) May support eye health by maintaining the density of macular pigments which can be affected by aging 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "zh": "（韩文）有助于维持因老化而可能降低的黄斑色素密度，从而有助于眼睛健康（英文）May support eye health by maintaining the density of macular pigments which can be affected by aging 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging 어두운 곳에서 시각 적응을 위해 필요",
+   "zh": "（韩文）有助于维持因老化而可能降低的黄斑色素密度，从而有助于眼睛健康（英文）May help the eye health by maintaining the density of macular pigments which can be decreased by aging 어두운 곳에서 시각 적응을 위해 필요"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "(국문) 노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈건강에 도움을 줄 수 있음 (영문) May help the eye health by maintaining the density of macular pigments which can be decreased by aging 혈중 중성지질 개선･혈행 개선에 도움을 줄 수 있음",
+   "zh": "（韩文）有助于维持因老化而可能降低的黄斑色素密度，从而有助于眼睛健康（英文）May help the eye health by maintaining the density of macular pigments which can be decreased by aging 혈中有助于改善中性脂肪 • 改善血液循环"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "(국문) 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줄 수 있음 (영문) Can help reduce body fat by inhibiting carbohydrates from being synthesized into fat,(국문) 식이섬유 보충 (영문) dietary fiber supplementation",
+   "zh": "（韩文）有助于通过抑制碳水化合物合成为脂肪来减少体脂肪（英文）Can help reduce body fat by inhibiting carbohydrates from being synthesized into fat,(국문) 식이섬유 보충 (영문) dietary fiber supplementation"
+  },
+  {
+   "kind": "spec",
+   "docs": 1,
+   "how": "dict(spec)",
+   "ko": "(나) 카드뮴(mg/kg) : 1.0 이하(다) 수은(mg/kg) : 1.0 이하",
+   "zh": "(나) 镉(mg/kg)：1.0以下 (다) 汞(mg/kg)：1.0以下"
+  },
+  {
+   "kind": "spec",
+   "docs": 1,
+   "how": "marker+compose",
+   "ko": "2) 프로바이오틱스 수 (표시량 100,000,000,000(1,000억 CFU/g) : 표시량 이상",
+   "zh": "2) 益生菌数（标示量 100,000,000,000( 1,000억CFU/g）：标示量以上"
+  },
+  {
+   "kind": "intro",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2000mg당 5억 CFU",
+   "zh": "每2000mg 5억CFU"
+  },
+  {
+   "kind": "badge",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2000mg당 5억 CFU",
+   "zh": "每2000mg 5억CFU"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2000mg당 5억 CFU",
+   "zh": "每2000mg 5억CFU"
+  },
+  {
+   "kind": "intro",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2g당 20억 CFU",
+   "zh": "每2g 20억CFU"
+  },
+  {
+   "kind": "badge",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2g당 20억 CFU",
+   "zh": "每2g 20억CFU"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "2g당 20억 CFU",
+   "zh": "每2g 20억CFU"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 노랑색의 반원 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的黄色반원 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 밝은 녹갈색의 가위, 바위, 보 모양 젤리 · 코스맥스엔비티(주) 제조",
+   "zh": "具有固有风味且无异味、无异臭的亮绿褐色가위, 바위, 보 모양 젤리 · 코스맥스엔비티(주) 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 보라색의 별, 달 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的紫色별, 달 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 보라색의 뽀로로 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的紫色뽀로로 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 보라색의 원형 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的紫色원형 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 붉은색의 반원 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的红色반원 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 빨간색의 별, 달 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的红色별, 달 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 연한 노란 연두색의 해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 제조",
+   "zh": "具有固有风味且无异味、无异臭的浅黄黄绿色해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑 분홍색의 원형 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的浅黄粉红色원형 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 적갈색의 해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 제조",
+   "zh": "具有固有风味且无异味、无异臭的红褐色해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 주황색의 반원 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的橙色반원 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 주황색의 원통 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的橙色원통 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 주황색의 원형 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的橙色원형 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 진한 노란 주황색의 반원 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的深黄橙色반원 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 진한 주황색의 곰돌이 모양 젤리 · 코스맥스엔비티(주) 제조",
+   "zh": "具有固有风味且无异味、无异臭的深橙色곰돌이 모양 젤리 · 코스맥스엔비티(주) 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 초록색의 포도 모양 젤리 · (주)에스디푸드 제조",
+   "zh": "具有固有风味且无异味、无异臭的绿色포도 모양 젤리 · (주)에스디푸드 制造"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "고유의 향미가 있고 이미, 이취가 없는 흰 노랑색의 해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 제조",
+   "zh": "具有固有风味且无异味、无异臭的白黄色해, 달, 별, 하트 모양 젤리 · 코스맥스엔비티(주) 制造"
+  },
+  {
+   "kind": "meta",
+   "docs": 1,
+   "how": "compose",
+   "ko": "조아제약(주) 제조 · 1일 1회 1앰플",
+   "zh": "조아제약(주) 제조 · 1일 1회 1앰플"
+  },
+  {
+   "kind": "spec",
+   "docs": 1,
+   "how": "compose",
+   "ko": "프로바이오틱스 수 : 표시량(표시량 300,000,000,000(3,000억 CFU/g) 이상",
+   "zh": "益生菌数：标示量（标示量 300,000,000,000( 3,000억CFU/g）以上"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "Lactobacillus gasseriBNR17 : (국문) 체지방 감소에 도움을 줄 수 있음(생리활성기능) (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제, 배변활동 원활, 장건강에 도움을 줄 수 있음",
+   "zh": "Lactobacillus gasseriBNR17：（韩文）有助于减少体脂肪（生理活性功能）（英文）May help to reduce body fat, 유산균 증식及抑制有害菌，排便顺畅，有助于肠道健康"
+  },
+  {
+   "kind": "clause",
+   "docs": 1,
+   "how": "compose",
+   "ko": "plantarum KY1032의 프로바이오틱스 복합물(제2019-4호) : (국문) 체지방 감소에 도움을 줄 수 있음, (영문) May help to reduce body fat, 유산균 증식 및 유해균 억제에 도움을 줄 수 있음, 배변활동 원활에 도움을 줄 수 있음, 장 건강에 도움을 줄 수 있음,",
+   "zh": "plantarum KY1032 的益生菌复合物（第2019-4号）：：（韩文）有助于减少体脂肪（英文）May help to reduce body fat, 유산균 증식 및 유해균 억제에 도움을 줄 수 있음, 배변활동 원활에 도움을 줄 수 있음, 장 건강에 도움을 줄 수 있음,"
+  }
+ ]
+}

@@ -1,0 +1,276 @@
+{
+ "scannedAt": "2026-08-06T02:00:40.982Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documents": 40599,
+ "changedDocuments": 214,
+ "distinctChanges": 53,
+ "changes": [
+  {
+   "without": "⑤镉(mg/kg)：0.5以下",
+   "with": "⑤ 镉(mg/kg)：0.5以下",
+   "docs": 26
+  },
+  {
+   "without": "⑥镉(mg/kg)：1.0以下",
+   "with": "⑥ 镉(mg/kg)：1.0以下",
+   "docs": 18
+  },
+  {
+   "without": "4)镉(mg/kg)：0.5以下",
+   "with": "4) 镉(mg/kg)：0.5以下",
+   "docs": 17
+  },
+  {
+   "without": "⑥ 镉：(mg/kg)：0.5以下",
+   "with": "⑥ 镉(mg/kg)：0.5以下",
+   "docs": 12
+  },
+  {
+   "without": "⑥镉(mg/kg)：0.5以下",
+   "with": "⑥ 镉(mg/kg)：0.5以下",
+   "docs": 12
+  },
+  {
+   "without": "5)镉(mg/kg)：0.5以下",
+   "with": "5) 镉(mg/kg)：0.5以下",
+   "docs": 12
+  },
+  {
+   "without": "⑤镉(mg/kg)：1.0以下",
+   "with": "⑤ 镉(mg/kg)：1.0以下",
+   "docs": 10
+  },
+  {
+   "without": "5)镉(mg/kg)：1.0以下",
+   "with": "5) 镉(mg/kg)：1.0以下",
+   "docs": 7
+  },
+  {
+   "without": "镉(mg/kg) 0.5以下",
+   "with": "镉(mg/kg)：0.5以下",
+   "docs": 6
+  },
+  {
+   "without": "④镉(mg/kg)：1.0以下",
+   "with": "④ 镉(mg/kg)：1.0以下",
+   "docs": 6
+  },
+  {
+   "without": "(4)镉(mg/kg)：1.0以下",
+   "with": "(4) 镉(mg/kg)：1.0以下",
+   "docs": 6
+  },
+  {
+   "without": "4.镉(mg/kg)：1.0以下",
+   "with": "4. 镉(mg/kg)：1.0以下",
+   "docs": 6
+  },
+  {
+   "without": "5.镉(mg/kg)：0.5以下",
+   "with": "5. 镉(mg/kg)：0.5以下",
+   "docs": 5
+  },
+  {
+   "without": "(5) 镉(mg/kg)：0.5以下。",
+   "with": "(5) 镉(mg/kg)：0.5以下",
+   "docs": 4
+  },
+  {
+   "without": "(6)镉(mg/kg)：1.0以下",
+   "with": "(6) 镉(mg/kg)：1.0以下",
+   "docs": 4
+  },
+  {
+   "without": "4) 重金属：铅(mg/kg) 3.0以下，镉(mg/kg) 1.0以下，汞(mg/kg) 0.5以下",
+   "with": "4) 重金属：铅(mg/kg) 3.0以下，镉(mg/kg)：1.0以下，汞(mg/kg) 0.5以下",
+   "docs": 4
+  },
+  {
+   "without": "6)镉(mg/kg)：1.0以下",
+   "with": "6) 镉(mg/kg)：1.0以下",
+   "docs": 3
+  },
+  {
+   "without": "6.镉(mg/kg)：0.5以下",
+   "with": "6. 镉(mg/kg)：0.5以下",
+   "docs": 3
+  },
+  {
+   "without": "镉[mg/kg] 0.5以下",
+   "with": "镉(mg/kg)：0.5以下",
+   "docs": 3
+  },
+  {
+   "without": "④镉(mg/kg)：0.5以下",
+   "with": "④ 镉(mg/kg)：0.5以下",
+   "docs": 3
+  },
+  {
+   "without": "5.镉(mg/kg)：1.0以下",
+   "with": "5. 镉(mg/kg)：1.0以下",
+   "docs": 3
+  },
+  {
+   "without": "(6) 镉(mg/kg)：1.0以下。",
+   "with": "(6) 镉(mg/kg)：1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "镉(mg/kg) 1.0以下",
+   "with": "镉(mg/kg)：1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "(5) 镉(mg/kg)：1.0以下。",
+   "with": "(5) 镉(mg/kg)：1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "6.镉(mg/kg)：1.0以下",
+   "with": "6. 镉(mg/kg)：1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg) 0.5以下，汞(mg/kg) 0.4以下，砷(mg/kg) 1.0以下",
+   "with": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg)：0.5以下，汞(mg/kg) 0.4以下，砷(mg/kg) 1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "2)镉(mg/kg)：0.5以下",
+   "with": "2) 镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "4)镉(mg/kg)：1.0以下",
+   "with": "4) 镉(mg/kg)：1.0以下",
+   "docs": 2
+  },
+  {
+   "without": "(5)镉(mg/kg)：0.5以下",
+   "with": "(5) 镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "5) 镉(mg/kg)：0.5以下。",
+   "with": "5) 镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "4.镉(mg/kg)：0.5以下",
+   "with": "4. 镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "镉(mg/kg)：0.5以下。",
+   "with": "镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "6)镉(mg/kg)：0.5以下",
+   "with": "6) 镉(mg/kg)：0.5以下",
+   "docs": 2
+  },
+  {
+   "without": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg) 0.5以下，汞(mg/kg) 0.5以下，砷(mg/kg) 1.0以下",
+   "with": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg)：0.5以下，汞(mg/kg) 0.5以下，砷(mg/kg) 1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg) 0.5以下，总汞(mg/kg)；0.4以下，总砷(mg/kg) 1.0以下",
+   "with": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg)：0.5以下，总汞(mg/kg)；0.4以下，总砷(mg/kg) 1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "⑥ 镉：(mg/kg)：1.0以下",
+   "with": "⑥ 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "5)镉(mg/kg) 0.5以下",
+   "with": "5) 镉(mg/kg)：0.5以下",
+   "docs": 1
+  },
+  {
+   "without": "1)。性状：黑褐色液状产品，无异味、无异臭。",
+   "with": "1) 性状：黑褐色液状产品，应无异味、无异臭",
+   "docs": 1
+  },
+  {
+   "without": "镉(mg/kg) - 1.0以下",
+   "with": "镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "⑥ 镉(mg/kg)：1.0以下。",
+   "with": "⑥ 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "5) 镉：(mg/kg)：0.5以下",
+   "with": "5) 镉(mg/kg)：0.5以下",
+   "docs": 1
+  },
+  {
+   "without": "2) 镉(mg/kg) 1.0以下",
+   "with": "2) 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "⑤ 镉(mg/kg)：0.5以下。",
+   "with": "⑤ 镉(mg/kg)：0.5以下",
+   "docs": 1
+  },
+  {
+   "without": "(5)镉(mg/kg)：1.0以下",
+   "with": "(5) 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "镉 (mg/kg) - 0.5以下",
+   "with": "镉(mg/kg)：0.5以下",
+   "docs": 1
+  },
+  {
+   "without": "2.镉(mg/kg)：1.0以下",
+   "with": "2. 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "5.镉：(mg/kg)：1.0以下",
+   "with": "5. 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "镉(mg/kg)：1.0以下。",
+   "with": "镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "③ 镉(mg / kg)：0.5以下",
+   "with": "③ 镉(mg/kg)：0.5以下",
+   "docs": 1
+  },
+  {
+   "without": "6)镉(mg/kg)：1.0以下。",
+   "with": "6) 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg) 0.5以下，总汞(mg/kg) 0.5以下，总砷(mg/kg) 1.0以下",
+   "with": "重金属：铅(mg/kg)：1.0以下，镉(mg/kg)：0.5以下，总汞(mg/kg) 0.5以下，总砷(mg/kg) 1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "4) 镉(mg/kg )：1.0以下",
+   "with": "4) 镉(mg/kg)：1.0以下",
+   "docs": 1
+  },
+  {
+   "without": "6) 镉(mg / kg)：0.5以下",
+   "with": "6) 镉(mg/kg)：0.5以下",
+   "docs": 1
+  }
+ ],
+ "verdict": "CHANGES_FOUND"
+}
