@@ -1,0 +1,14 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "tm-seed-samples",
+  "sampleMasters": 13,
+  "bodyCountMismatch": 0,
+  "distinctSentences": 139,
+  "admitted": 139,
+  "rejected": 0,
+  "rejectedDetail": [],
+  "conflicts": 0,
+  "conflictDetail": [],
+  "tmSizeAfter": 139,
+  "dbWrites": 0
+}

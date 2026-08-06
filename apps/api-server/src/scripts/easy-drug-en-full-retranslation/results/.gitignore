@@ -3,3 +3,6 @@ contract-recon-ledger.jsonl
 en-expectations.jsonl
 ko-units.jsonl
 tm-census.jsonl
+
+# 조립 산출물(대용량, TM 에서 재생성 가능). tm-store.jsonl 은 **재생성 불가한 번역 자산이므로 반드시 커밋한다.**
+en-units.jsonl
