@@ -117,6 +117,9 @@ storybook-static
 .vscode/
 .claude/
 
+# Codex per-machine local configuration
+.codex/
+
 # OS-specific files
 .DS_Store
 Thumbs.db

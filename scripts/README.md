@@ -12,19 +12,32 @@
 
 ### Cloud Run 서비스 목록
 
-| 서비스 | 도메인 | 설명 |
-|--------|--------|------|
-| `o4o-core-api` | api.neture.co.kr | API 서버 |
-| `o4o-admin-web` | admin.neture.co.kr | Admin Dashboard |
-| `o4o-main-site` | neture.co.kr | Main Site |
+| 서비스 | 도메인 | 설명 | 배포 workflow |
+|--------|--------|------|---------------|
+| `o4o-core-api` | api.neture.co.kr | API 서버 | `deploy-api.yml` |
+| `o4o-admin-dashboard` | admin.neture.co.kr | Admin Dashboard | `deploy-admin.yml` |
+| `o4o-main-site` | neture.co.kr | Main Site | `deploy-main-site.yml` |
+| `neture-web` | neture.co.kr | 네처 서비스 웹 | `deploy-web-services.yml` |
+| `k-cosmetics-web` | k-cosmetics.site | K-화장품 | `deploy-web-services.yml` |
+| `kpa-society-web` | kpa-society.co.kr | 약사회 SaaS | `deploy-web-services.yml` |
+| `glycopharm-web` | glycopharm.co.kr | 글라이코팜 | `deploy-web-services.yml` |
+| `pharmacy-hub-web` | pharmacyhub.co.kr | 약국 허브 | `deploy-web-services.yml` |
 
 ### GitHub Actions Workflows
 
 ```bash
 .github/workflows/
-├── deploy-api.yml          # API 서버 배포
-├── deploy-admin.yml        # Admin Dashboard 배포
-└── deploy-main-site.yml    # Main Site 배포
+├── deploy-api.yml            # o4o-core-api 배포
+├── deploy-admin.yml          # o4o-admin-dashboard 배포
+├── deploy-main-site.yml      # o4o-main-site 배포
+├── deploy-web-services.yml   # 서비스별 웹 5종 배포 (변경 감지 후 선별 배포)
+├── ci-pipeline.yml           # lint · type-check · build 검증
+├── ci-appstore-guard.yml     # App Store 패키지 가드
+├── ci-guard-policy.yml       # 정책 가드
+├── ci-security.yml           # 보안 검사
+├── e2e-auth-runtime.yml      # 인증 런타임 E2E
+├── automation-pr-labeler.yml # PR 라벨 자동화
+└── automation-repo-setup.yml # 저장소 설정 자동화
 ```
 
 ## 개발 스크립트
@@ -37,9 +50,6 @@
 
 # 로컬 DB 설정
 ./scripts/setup-local-db.sh
-
-# 로컬 API 배포 테스트
-./scripts/deploy-api-local.sh
 ```
 
 ### CI/CD
@@ -85,7 +95,7 @@ gcloud run deploy o4o-core-api \
   --project=netureyoutube
 
 # Admin Dashboard 배포
-gcloud run deploy o4o-admin-web \
+gcloud run deploy o4o-admin-dashboard \
   --image=asia-northeast3-docker.pkg.dev/netureyoutube/o4o-api/admin-dashboard:latest \
   --region=asia-northeast3 \
   --project=netureyoutube
