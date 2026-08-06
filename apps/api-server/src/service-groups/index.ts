@@ -294,7 +294,9 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     apps: {
       requiredCoreApps: ['cms-core', 'organization-core', 'dropshipping-cosmetics'],
       recommendedExtensions: ['review-core', 'analytics-core'],
-      incompatibleApps: ['forum-yaksa'],
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+      //   'forum-yaksa' 제거 (패키지·카탈로그 등록 삭제). 남은 비호환 앱 없음.
+      incompatibleApps: [],
     },
     initPack: {
       initPackIdPattern: 'cosmetics-*-init',
@@ -317,7 +319,8 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     extensionRules: {
       required: [],
       recommended: ['review-core'],
-      incompatible: ['forum-yaksa'],
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+      incompatible: [],
     },
     isActive: true,
   },
@@ -356,7 +359,9 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
       },
     },
     apps: {
-      requiredCoreApps: ['cms-core', 'organization-core', 'forum-yaksa'],
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+      //   'forum-yaksa' 제거. 포럼 기능은 공용 forum-core 구조로 제공된다.
+      requiredCoreApps: ['cms-core', 'organization-core'],
       recommendedExtensions: [],
       incompatibleApps: ['dropshipping-cosmetics', 'cosmetics-core'],
     },
@@ -418,7 +423,8 @@ export const PREDEFINED_SERVICE_GROUPS: Record<string, ServiceGroupDefinition> =
     apps: {
       requiredCoreApps: ['cms-core', 'organization-core'],
       recommendedExtensions: [],
-      incompatibleApps: ['dropshipping-cosmetics', 'forum-yaksa'],
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+      incompatibleApps: ['dropshipping-cosmetics'],
     },
     initPack: {
       initPackIdPattern: 'hospital-*-init',

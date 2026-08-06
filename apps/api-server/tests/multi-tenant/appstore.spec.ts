@@ -63,9 +63,13 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(appIds).toContain('organization-forum');
 
             // NOT expected (yaksa-specific apps)
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 카탈로그 항목이 제거되었다. yaksa 전용 항목의 cosmetics 비노출은
+            //   현재 실제 운영 중인 yaksa 전용 앱(pharmacy-ai-insight) 으로 검증한다.
             expect(appIds).not.toContain('membership-yaksa');
             expect(appIds).not.toContain('forum-yaksa');
             expect(appIds).not.toContain('reporting-yaksa');
+            expect(appIds).not.toContain('pharmacy-ai-insight');
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
         });
@@ -80,8 +84,12 @@ describe('Multi-Tenant AppStore Filtering', () => {
             // Expected apps (yaksa-specific + global)
             // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
             //   membership-yaksa · reporting-yaksa · lms-yaksa · yaksa-scheduler · annualfee-yaksa
-            //   카탈로그 항목이 제거되었다. forum-yaksa 만 yaksa 전용 항목으로 남는다.
-            expect(appIds).toContain('forum-yaksa');
+            //   카탈로그 항목이 제거되었다.
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 도 제거되어, 잔존 yaksa 전용 항목은 pharmacy-ai-insight 다.
+            //   약사 조직의 포럼은 전용 앱이 아니라 공용 구조(organization-forum → forum-core)로 제공된다.
+            expect(appIds).toContain('pharmacy-ai-insight');
+            expect(appIds).not.toContain('forum-yaksa');
             expect(appIds).not.toContain('membership-yaksa');
             expect(appIds).not.toContain('reporting-yaksa');
             expect(appIds).not.toContain('lms-yaksa');
@@ -163,14 +171,22 @@ describe('Multi-Tenant AppStore Filtering', () => {
             const appIds = cosmeticsCatalog.map(app => app.appId);
 
             // Yaksa-specific apps should NOT be in cosmetics catalog
-            const yaksaSpecificApps = ['membership-yaksa', 'forum-yaksa', 'reporting-yaksa'];
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   제거된 항목(forum-yaksa 등) 의 비노출과 함께, 현재 카탈로그에 실재하는
+            //   yaksa 전용 앱(pharmacy-ai-insight) 의 비노출도 검증한다.
+            const yaksaSpecificApps = [
+                'membership-yaksa',
+                'forum-yaksa',
+                'reporting-yaksa',
+                'pharmacy-ai-insight',
+            ];
             for (const yaksaApp of yaksaSpecificApps) {
                 expect(appIds).not.toContain(yaksaApp);
             }
 
             // Verify isAppCompatibleWithServiceGroup helper
             expect(isAppCompatibleWithServiceGroup('membership-yaksa', 'cosmetics')).toBe(false);
-            expect(isAppCompatibleWithServiceGroup('forum-yaksa', 'cosmetics')).toBe(false);
+            expect(isAppCompatibleWithServiceGroup('pharmacy-ai-insight', 'cosmetics')).toBe(false);
 
             expect(cosmetics.serviceGroup).not.toBe('yaksa');
         });
@@ -248,8 +264,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // Should include yaksa-specific apps
             const appIds = recommended.map(app => app.appId);
-            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1: 잔존 yaksa 전용 항목은 forum-yaksa 뿐이다.
-            expect(appIds).toContain('forum-yaksa');
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   잔존 yaksa 전용 항목은 pharmacy-ai-insight 다 (forum-yaksa 제거).
+            expect(appIds).toContain('pharmacy-ai-insight');
+            expect(appIds).not.toContain('forum-yaksa');
             expect(appIds).not.toContain('membership-yaksa');
             expect(appIds).not.toContain('lms-yaksa');
 
@@ -271,10 +289,11 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(cosmeticsIds).toContain('cosmetics-sample-display-extension');
             expect(yaksaIds).not.toContain('cosmetics-sample-display-extension');
 
-            // Yaksa should have forum-yaksa, cosmetics should not
-            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1: membership-yaksa 제거에 따른 대체 검증
-            expect(yaksaIds).toContain('forum-yaksa');
-            expect(cosmeticsIds).not.toContain('forum-yaksa');
+            // Yaksa should have its own app, cosmetics should not
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 제거에 따라 pharmacy-ai-insight 로 대체 검증한다.
+            expect(yaksaIds).toContain('pharmacy-ai-insight');
+            expect(cosmeticsIds).not.toContain('pharmacy-ai-insight');
 
             expect(cosmetics.serviceGroup).not.toBe(yaksa.serviceGroup);
         });
@@ -313,8 +332,10 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
             //   membership-yaksa 는 카탈로그에서 제거되어 'App not found' 로 귀결된다.
-            //   incompatible 판정은 잔존 yaksa 전용 항목(forum-yaksa) 으로 검증한다.
-            const result = canInstallApp('forum-yaksa', 'cosmetics');
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 도 제거되어, incompatible 판정은 현재 카탈로그에 실재하는
+            //   yaksa 전용 항목(pharmacy-ai-insight) 으로 검증한다.
+            const result = canInstallApp('pharmacy-ai-insight', 'cosmetics');
 
             expect(result.canInstall).toBe(false);
             expect(result.reason).toContain('incompatible');
@@ -322,6 +343,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
             // 제거된 앱은 설치 후보로도 남지 않는다
             const result2 = canInstallApp('membership-yaksa', 'cosmetics');
             expect(result2.canInstall).toBe(false);
+
+            const result3 = canInstallApp('forum-yaksa', 'cosmetics');
+            expect(result3.canInstall).toBe(false);
 
             expect(cosmetics.serviceGroup).toBe('cosmetics');
         });
@@ -348,7 +372,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(canInstallApp('cosmetics-sample-display-extension', 'yaksa').canInstall).toBe(false);
 
             // Tourist cannot install yaksa app
-            expect(canInstallApp('forum-yaksa', 'tourist').canInstall).toBe(false);
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 제거에 따라 pharmacy-ai-insight 로 대체 검증한다.
+            expect(canInstallApp('pharmacy-ai-insight', 'tourist').canInstall).toBe(false);
 
             // Sellerops can install a sellerops-scoped app
             // WO-O4O-DROPSHIPPING-LEGACY-REMOVAL-V1: 'sellerops' 앱 항목 제거에 따른 대체 검증
@@ -418,10 +444,15 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(cosmeticsIds).not.toContain('dropshipping-cosmetics');
             expect(cosmeticsIds).not.toContain('dropshipping-core');
 
-            // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
-            //   forum-yaksa → forum-core 의존 체인으로 대체 검증한다.
-            expect(yaksaIds).toContain('forum-yaksa');
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 제거 후, yaksa 의 포럼 의존 체인은 공용 구조
+            //   organization-forum(global) → forum-core 로 해석되어야 한다.
+            //   yaksa 전용 앱은 pharmacy-ai-insight → organization-core 체인으로 검증한다.
+            expect(yaksaIds).toContain('organization-forum');
             expect(yaksaIds).toContain('forum-core');
+            expect(yaksaIds).toContain('pharmacy-ai-insight');
+            expect(yaksaIds).toContain('organization-core');
+            expect(yaksaIds).not.toContain('forum-yaksa');
             expect(yaksaIds).not.toContain('membership-yaksa');
 
             expect(cosmetics.serviceGroup).not.toBe(yaksa.serviceGroup);
@@ -449,7 +480,11 @@ describe('Multi-Tenant AppStore Filtering', () => {
 
             expect(appIds).not.toContain('reporting-yaksa');
             expect(appIds).not.toContain('membership-yaksa');
-            expect(appIds).toContain('forum-yaksa');
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   forum-yaksa 제거. 정상 해석되는 체인은 pharmacy-ai-insight → organization-core 다.
+            expect(appIds).not.toContain('forum-yaksa');
+            expect(appIds).toContain('pharmacy-ai-insight');
+            expect(appIds).toContain('organization-core');
         });
 
         test('Dependencies not available for incompatible service groups', async () => {
@@ -461,6 +496,9 @@ describe('Multi-Tenant AppStore Filtering', () => {
             expect(appIds).not.toContain('membership-yaksa');
             expect(appIds).not.toContain('reporting-yaksa');
             expect(appIds).not.toContain('forum-yaksa');
+            // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+            //   현재 카탈로그에 실재하는 yaksa 전용 앱도 tourist 에서 해석되지 않아야 한다.
+            expect(appIds).not.toContain('pharmacy-ai-insight');
         });
     });
 

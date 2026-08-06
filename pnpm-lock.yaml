@@ -685,9 +685,6 @@ importers:
       '@o4o-apps/digital-signage-core':
         specifier: workspace:*
         version: link:../../packages/digital-signage-core
-      '@o4o-apps/forum-yaksa':
-        specifier: workspace:*
-        version: link:../../packages/forum-yaksa
       '@o4o-apps/signage':
         specifier: workspace:*
         version: link:../../packages/@o4o-apps/signage
@@ -2050,34 +2047,6 @@ importers:
       '@types/node':
         specifier: ^20.0.0
         version: 20.19.25
-      rimraf:
-        specifier: ^5.0.0
-        version: 5.0.10
-      typescript:
-        specifier: ^5.3.0
-        version: 5.9.3
-
-  packages/forum-yaksa:
-    dependencies:
-      '@o4o/forum-core':
-        specifier: workspace:*
-        version: link:../forum-core
-      '@o4o/types':
-        specifier: workspace:*
-        version: link:../types
-      react:
-        specifier: 19.2.0
-        version: 19.2.0
-      react-router-dom:
-        specifier: ^6.0.0 || ^7.0.0
-        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.25
-      '@types/react':
-        specifier: 19.2.7
-        version: 19.2.7
       rimraf:
         specifier: ^5.0.0
         version: 5.0.10

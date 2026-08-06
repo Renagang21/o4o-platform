@@ -145,7 +145,8 @@ function runTypeCheck() {
 
   // Type check App Store packages
   log.info('Type checking App Store packages...');
-  const appStorePackages = ['forum-app', 'forum-neture', 'forum-yaksa'];
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+  const appStorePackages = ['forum-app', 'forum-neture'];
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);
@@ -194,7 +195,8 @@ function runTypeCheckFrontend() {
 
   // Type check App Store packages
   log.info('Type checking App Store packages...');
-  const appStorePackages = ['forum-app', 'forum-neture', 'forum-yaksa'];
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+  const appStorePackages = ['forum-app', 'forum-neture'];
 
   for (const pkg of appStorePackages) {
     const pkgPath = join('packages', pkg);

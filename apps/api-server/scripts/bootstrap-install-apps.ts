@@ -13,7 +13,7 @@ const CORE_APPS_INSTALL_ORDER = [
   'forum-core',
   'lms-core',
   'organization-forum',
-  'forum-yaksa',
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
   'sellerops',
   'supplierops',
   'partnerops',

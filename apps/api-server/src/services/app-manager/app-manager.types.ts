@@ -18,7 +18,8 @@ const __dirname = dirname(__filename);
 export const PACKAGE_MAP: Record<string, string> = {
   'forum': 'forum-app',
   'forum-core': 'forum-app',
-  'forum-yaksa': 'forum-yaksa',
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+  //   'forum-yaksa' 매핑 제거 (packages/forum-yaksa 삭제).
   'lms-core': 'lms-core',
   'organization-core': 'organization-core',
   'organization-forum': 'organization-forum',

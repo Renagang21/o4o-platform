@@ -30,7 +30,7 @@ export async function loadManifest(manifestPath: string): Promise<AppManifest> {
       'customer': 'customer',
       'admin': 'admin',
       'forum-neture': 'forum-neture',
-      'forum-yaksa': 'forum-yaksa',
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
     };
 
     const folderName = folderNameMap[packageName] || packageName;
@@ -171,14 +171,8 @@ function createStubManifest(packageName: string): AppManifest {
       category: 'content',
       enabled: true,
     },
-    'forum-yaksa': {
-      id: 'forum-yaksa',
-      name: 'Yaksa Forum',
-      version: '1.0.0',
-      description: 'Yaksa community forum',
-      category: 'content',
-      enabled: true,
-    },
+    // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+    //   'forum-yaksa' stub 제거 (registry 등록·패키지 삭제).
   };
 
   const stub = manifestStubs[packageName];

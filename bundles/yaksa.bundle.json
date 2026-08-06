@@ -26,12 +26,6 @@
       "description": "커뮤니티 포럼 코어 엔진"
     },
     {
-      "appId": "forum-yaksa",
-      "version": ">=1.0.0",
-      "required": true,
-      "description": "약사 특화 포럼 (복약지도, 케이스 스터디)"
-    },
-    {
       "appId": "education-core",
       "version": ">=1.0.0",
       "required": false,
@@ -62,7 +56,6 @@
     "b2b-core",
     "b2b-yaksa",
     "forum-core",
-    "forum-yaksa",
     "education-core",
     "attendance-core"
   ],

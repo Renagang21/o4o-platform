@@ -10,25 +10,9 @@ const ForumCategories = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/Fo
 const ForumPostDetail = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostDetail'));
 const ForumPostForm = lazy(() => import('@o4o/forum-core/src/admin-ui/pages/ForumPostForm'));
 
-// Yaksa Community Pages (from @o4o/forum-core-yaksa package - source imports)
-const YaksaCommunityList = lazy(() =>
-  // @ts-expect-error Package not yet implemented
-  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityList').catch(() => ({
-    default: () => <div className="p-6">Yaksa Community List - Coming Soon</div>,
-  }))
-);
-const YaksaCommunityDetail = lazy(() =>
-  // @ts-expect-error Package not yet implemented
-  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityDetail').catch(() => ({
-    default: () => <div className="p-6">Yaksa Community Detail - Coming Soon</div>,
-  }))
-);
-const YaksaCommunityFeed = lazy(() =>
-  // @ts-expect-error Package not yet implemented
-  import('@o4o/forum-core-yaksa/src/admin-ui/pages/YaksaCommunityFeed').catch(() => ({
-    default: () => <div className="p-6">Yaksa Community Feed - Coming Soon</div>,
-  }))
-);
+// WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+//   Yaksa Community 화면 3건(`@o4o/forum-core-yaksa/src/admin-ui/pages/*`) 의 동적 import 제거.
+//   `@o4o/forum-core-yaksa` Vite alias 와 `packages/forum-yaksa` 패키지를 함께 제거했다.
 
 // Pharmacy AI Insight (Phase 5 - Active)
 const PharmacyAiInsightSummary = lazy(() => import('@o4o/pharmacy-ai-insight').then(m => ({ default: m.SummaryPage })));
@@ -59,7 +43,7 @@ export function AppRoutes() {
     // WO-O4O-ADMIN-FORUM-BASE-FEATURE-GUARD-ALIGNMENT-V1:
     //   기존에는 <AppRouteGuard appId="forum"> 로 앱 availability 게이팅을 했으나,
     //   평문 appId 'forum' 은 app_registry / seed / appsCatalog 어디에도 존재하지 않는다
-    //   (카탈로그의 forum 계열은 forum-core / organization-forum / forum-yaksa 등 별도 확장 앱).
+    //   (카탈로그의 forum 계열은 forum-core / organization-forum 등 별도 확장 앱).
     //   그 결과 availability 조회가 정상이어도 항상 비활성으로 판정되어
     //   모든 사용자가 /error/app-disabled 로 튕겼다.
     //   Forum 은 전 서비스 공통 기본 기능이므로 설치형 앱 게이팅 대상이 아니다 → 게이팅만 제거.
@@ -70,7 +54,7 @@ export function AppRoutes() {
     //               운영자 관리(admin-forum.routes) router.use(authenticate)
     //   앱 availability 는 권한 검사를 대신하지 않는다.
     //
-    //   forum-yaksa 등 서비스별 확장 앱의 가드는 그대로 둔다(아래 Yaksa Community 블록).
+    //   서비스별 확장 앱(pharmacy-ai-insight / sellerops 등)의 가드는 그대로 둔다.
     <Route key="/forum" path="/forum" element={
       <AdminProtectedRoute requiredPermissions={['forum:read']}>
         <Suspense fallback={<PageLoader />}>
@@ -114,34 +98,14 @@ export function AppRoutes() {
       </AdminProtectedRoute>
     } />,
 
-    // Yaksa Community - App-based routes with AppRouteGuard
-    <Route key="/yaksa/communities" path="/yaksa/communities" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum-yaksa">
-          <Suspense fallback={<PageLoader />}>
-            <YaksaCommunityList />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/yaksa/communities/:id" path="/yaksa/communities/:id" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum-yaksa">
-          <Suspense fallback={<PageLoader />}>
-            <YaksaCommunityDetail />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
-    <Route key="/yaksa/communities/:id/feed" path="/yaksa/communities/:id/feed" element={
-      <AdminProtectedRoute requiredPermissions={['forum:read']}>
-        <AppRouteGuard appId="forum-yaksa">
-          <Suspense fallback={<PageLoader />}>
-            <YaksaCommunityFeed />
-          </Suspense>
-        </AppRouteGuard>
-      </AdminProtectedRoute>
-    } />,
+    // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+    //   /yaksa/communities 계열 3개 라우트 제거.
+    //   `forum-yaksa` 는 app_registry 에 등록된 적이 없어 AppRouteGuard 가 항상
+    //   /error/app-disabled 로 리다이렉트했고, admin 메뉴 진입점도 0건이었다.
+    //   백엔드 라우트(`createRoutes`)와 호출 대상 API(`/yaksa/forum/communities/*`) 도
+    //   구현이 존재하지 않았다 — 상세 근거는
+    //   docs/checks/WO-O4O-FORUM-YAKSA-AND-LEGACY-BUILD-TEST-RESIDUE-BOUNDARY-AUDIT-V1-CHECK.md
+    //   현재 운영 중인 공용 포럼(/forum 계열, /api/v1/forum · /api/v1/kpa/forum)은 영향 없음.
 
     // Pharmacy AI Insight - 약사 전용 AI 인사이트 (Phase 5)
     <Route key="/pharmacy-ai-insight" path="/pharmacy-ai-insight" element={

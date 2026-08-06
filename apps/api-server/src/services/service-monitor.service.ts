@@ -511,7 +511,8 @@ export class ServiceMonitorService {
     // Detect from installed apps
     if (apps.includes('cosmetics-core') || apps.includes('cosmetics-seller')) return 'cosmetics';
     if (apps.includes('yaksa-core') || apps.includes('yaksa-member')) return 'yaksa';
-    if (apps.includes('forum-core') || apps.includes('forum-yaksa')) return 'forum';
+    // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 조건 제거
+    if (apps.includes('forum-core')) return 'forum';
 
     return 'default';
   }
