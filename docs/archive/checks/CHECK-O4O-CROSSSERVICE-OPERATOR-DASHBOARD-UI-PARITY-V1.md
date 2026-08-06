@@ -2,7 +2,8 @@
 
 > WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-V1
 > GlycoPharm / KPA-Society / K-Cosmetics `/operator` 첫 화면 UI parity
-> 작성일: 2026-06-16 · 판정: **PASS (코드/빌드 단계)** · Neture 제외
+> 작성일: 2026-06-16 · **최종 갱신: 2026-08-06** · Neture 제외
+> **상태**: COMPLETED · 판정: **PASS (코드/빌드 + 라이브 smoke — §9-2)**
 
 ---
 
@@ -157,13 +158,45 @@
 
 즉 **카드의 존재·문구·링크는 3서비스 동일하나(내용 parity PASS), 배치 위치는 KPA만 다르다(배치 parity FAIL).**
 
-**판정**: 라이브 smoke **부분 PASS**. §9 4개 항목 중 1번(상단 렌더)이 KPA에서 미충족이므로 본 문서는 archive 하지 않고 현재 위치에 유지한다.
+**판정**: 라이브 smoke **부분 PASS**. §9 4개 항목 중 1번(상단 렌더)이 KPA에서 미충족.
+→ 후속 WO(§9-2)에서 코드 수정 후 재검증하여 최종 PASS 로 종결했다.
 
-**후속 WO 후보** (본 WO 범위 밖 — 코드 수정하지 않음)
+### 9-2. 배치 parity 수정 후 최종 라이브 smoke (2026-08-06)
 
-- KPA `OperatorRoleGuideCard` 를 `auxiliary` slot 최하단 → 공통 `aboveBlocks` 최상단으로 이동하여 3서비스 배치 parity 를 맞춘다.
-- 또는 §2 배치도를 KPA 레이아웃 구조(`auxiliary` slot 만 제공) 기준으로 정정하고, "상단 배치"를 parity 요건에서 제외한다.
-- 둘 중 어느 쪽이든 `KpaOperatorDashboardLayout` 의 slot 구조 확인이 선행되어야 한다.
+> **WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1**
+> 수정 커밋: `4f81fc614` (`fix(operator): align cross-service dashboard card placement`)
+> 배포 리비전: `kpa-society-web-01782-jmv` (2026-08-06 07:06 배포) · GlycoPharm·K-Cosmetics 는 무변경(detect-changes 로 재배포 없음, 회귀만 확인)
+> 계정: `sohae2100@gmail.com` · Chrome desktop · 캐시 무효화 쿼리(`?cb=`)로 신규 번들 확인
+
+**수정 내용** — `KpaOperatorDashboardLayout` 의 slot 을 `auxiliary`(5-Block **아래**) → `aboveBlocks`(5-Block **위**) 로 교체하고, 카드를 Axis **앞**으로 이동했다. 새 컴포넌트·상태·API 추가 없음.
+
+- `services/web-kpa-society/src/components/kpa-operator/KpaOperatorDashboardLayout.tsx` — prop 이름·렌더 위치 변경
+- `services/web-kpa-society/src/pages/operator/KpaOperatorDashboard.tsx` — `aboveBlocks={<카드/> + <Axis/>}` 순서로 전달
+- GlycoPharm·K-Cosmetics 파일은 이미 `aboveBlocks` 최상단 배치이므로 **무변경**
+
+| 검증 항목 | KPA | GlycoPharm | K-Cosmetics |
+|---|:---:|:---:|:---:|
+| 안내 카드 렌더 | ✅ | ✅ | ✅ |
+| 카드가 주요 블록 **상단**에 위치 | ✅ | ✅ | ✅ |
+| 문구 4종 일치 | ✅ | ✅ | ✅ |
+| 가이드 링크 렌더 (`href`) | ✅ `/guide/for/operator` | ✅ `/guide/usage` | ✅ `/guide/usage` |
+| Axis · 5-Block 회귀 없음 | ✅ | ✅ | ✅ |
+| sidebar · notification 정상 | ✅ | ✅ | ✅ |
+| console error / pageerror | 0 | 0 | 0 |
+| `/operator` API 4xx·5xx | 0 (7건 200) | 0 (3건 200) | 0 (3건 200) |
+
+**카드 위치 실측 재측정** (`getBoundingClientRect().top + scrollY`, px)
+
+| 서비스 | 안내 카드 | Axis 섹션 | Overview | 순서 판정 |
+|---|---:|---:|---:|---|
+| KPA (수정 전) | 1502 | 1280 | 151 | ❌ Overview → Axis → 카드 |
+| **KPA (수정 후)** | **172** | **357** | **558** | ✅ 카드 → Axis → 5-Block |
+| GlycoPharm | 172 | 357 | 482 | ✅ 동일 |
+| K-Cosmetics | 172 | 357 | 482 | ✅ 동일 |
+
+세 서비스 모두 카드 172px 로 동일하며, §2 배치도(`[안내 카드] → [Axis] → [5-Block]`)와 일치한다.
+
+**판정**: 라이브 smoke **최종 PASS** (3서비스 8개 항목 전부 충족).
 
 ---
 
@@ -184,6 +217,7 @@
 - 코드/타입/빌드 단계: **PASS**
 - 범위: 운영 철학 안내 카드 공통화 (합의된 최소 범위)
 - 데드링크 0 / route·menu·capability·API·backend·DB 무변경
-- ~~배포 후 브라우저 smoke로 최종 고정 권장~~ → **2026-08-06 수행 완료 (§9-1)**
-- 라이브 smoke 단계: **부분 PASS** — 카드 내용·링크·회귀·콘솔·API 는 3서비스 전부 PASS, **카드 배치 위치만 KPA 불일치**
-- 따라서 본 문서는 **`docs/investigations/` 에 유지**하며 archive 하지 않는다. 배치 parity 정리는 §9-1 의 후속 WO 후보로 넘긴다.
+- ~~배포 후 브라우저 smoke로 최종 고정 권장~~ → **2026-08-06 수행 완료 (§9-1 · §9-2)**
+- 라이브 smoke 1차(§9-1): **부분 PASS** — 카드 배치 위치만 KPA 불일치
+- 라이브 smoke 2차(§9-2, 배치 수정 후): **최종 PASS** — 3서비스 8개 항목 전부 충족
+- **최종 판정: PASS (코드/빌드 + 라이브 smoke 전 단계).** 실행 대상이 남아 있지 않으므로 본 문서는 COMPLETED 로 보고 `docs/archive/checks/` 로 이동한다.
