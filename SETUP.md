@@ -12,7 +12,8 @@
 | Node.js | 22.18.0 이상 | `node --version` |
 | pnpm | 9.0.0 이상 | `pnpm --version` |
 | gcloud CLI | 최신 | `gcloud --version` |
-| Cloud SQL Proxy | 최신 | `bin/cloud-sql-proxy.exe` 존재 |
+| Cloud SQL Auth Proxy | v2 (v2.14.3 기준) | `bin/cloud-sql-proxy-v2.exe --version` |
+| PostgreSQL (로컬 개발 DB) | 선택 | `psql --version` |
 
 Node/pnpm 버전은 루트 `package.json`의 Volta 설정에 고정되어 있습니다.
 Volta 사용 시 저장소 디렉터리에서 자동으로 해당 버전이 적용됩니다.
@@ -35,7 +36,8 @@ pnpm install
 .\setup-cloud-sql-proxy.cmd
 ```
 
-`bin/cloud-sql-proxy.exe`(약 15MB)를 내려받습니다. 이미 존재하면 건너뛰어도 됩니다.
+Cloud SQL Auth Proxy **v2** 바이너리를 `bin/cloud-sql-proxy-v2.exe`로 내려받습니다.
+이미 존재하면 건너뜁니다. 바이너리는 Git에 커밋하지 않습니다(`bin/`은 `.gitignore` 대상).
 
 ### 2-3. GCP 인증 (Application Default Credentials)
 
@@ -54,40 +56,50 @@ gcloud config get-value project
 
 ### 2-4. 환경변수 파일 생성
 
+API 서버가 **실제로 읽는 환경파일은 `apps/api-server/.env` 하나**입니다
+([apps/api-server/src/env-loader.ts](apps/api-server/src/env-loader.ts) 기준).
+
 ```bash
-cp .env.example .env
+cp apps/api-server/.env.example apps/api-server/.env
 ```
 
-`.env`에서 최소한 아래 값을 채웁니다.
+로컬 개발 DB(기본값) 또는 프록시 경유 운영 DB 중 하나를 선택해 값을 채웁니다.
+두 경로의 예제는 `.env.example`의 (A)/(B) 블록에 분리되어 있습니다.
 
-```env
-DB_PASSWORD=<Cloud SQL 비밀번호>
-```
-
-비밀번호는 GCP Console → Cloud SQL → `o4o-platform-db` → 사용자, 또는 프로젝트 관리자를 통해 확인합니다.
 **`.env`는 절대 커밋하지 않습니다** (`.gitignore` 처리됨).
-
-API 서버 전용 항목은 [apps/api-server/env.example](apps/api-server/env.example)를 참조하세요.
+비밀번호를 PC 간에 복사하지 말고 각 PC에서 개별 설정합니다.
 
 ---
 
 ## 3. 개발 시작 (매일)
 
-로컬에는 PostgreSQL을 설치하지 않고, **Cloud SQL Proxy를 통해 GCP Cloud SQL에 연결**합니다.
+로컬 개발 DB와 운영 DB는 **포트로 분리**합니다.
 
-### 터미널 1 — Cloud SQL Proxy (계속 실행)
+| 대상 | 주소 | 용도 |
+|---|---|---|
+| 로컬 PostgreSQL | `127.0.0.1:5432` | 개발 기본값 |
+| Cloud SQL Auth Proxy | `127.0.0.1:5442` | 운영 DB 접근 전용 |
+
+로컬 DB만 쓴다면 프록시는 띄우지 않아도 됩니다.
+
+### 터미널 1 — Cloud SQL Auth Proxy (운영 DB 접근 시에만)
 
 ```cmd
 .\start-cloud-sql-proxy.cmd
 ```
 
 ```
-Instance: netureyoutube:asia-northeast3:o4o-platform-db
-Local Port: 5432
-Listening on 127.0.0.1:5432
+Instance   : netureyoutube:asia-northeast3:o4o-platform-db
+Local Port : 5442
+Listening on 127.0.0.1:5442
 ```
 
-이 창은 개발 중 닫지 않습니다. 종료는 `Ctrl+C`.
+이 창은 사용 중 닫지 않습니다. 종료는 `Ctrl+C`.
+
+포트 점유 확인: `netstat -ano | findstr :5442`
+
+> 개발 모드(`NODE_ENV != production`)에서 운영 DB host로 **직접 TCP 연결하면 API 서버가 기동을 거부**합니다.
+> 운영 DB는 반드시 이 프록시를 경유하십시오. 예외가 필요하면 `ALLOW_REMOTE_DB=true`로 명시 opt-in 합니다.
 
 ### 터미널 2 — 개발 서버
 
@@ -105,14 +117,18 @@ API 상태 확인: `curl http://localhost:3001/health`
 
 ## 4. 데이터베이스
 
-| 항목 | 값 |
-|---|---|
-| 연결 방식 | Cloud SQL Proxy (`localhost:5432`) |
-| Instance | `netureyoutube:asia-northeast3:o4o-platform-db` |
-| Database | `o4o_platform` |
-| 엔진 | PostgreSQL |
+| 항목 | 로컬 개발 DB | 운영 DB (프록시 경유) |
+|---|---|---|
+| 연결 방식 | 로컬 PostgreSQL 직접 | Cloud SQL Auth Proxy |
+| `DB_HOST` | `127.0.0.1` | `127.0.0.1` |
+| `DB_PORT` | `5432` | `5442` |
+| Instance | — | `netureyoutube:asia-northeast3:o4o-platform-db` |
+| Database | `o4o_platform` | `o4o_platform` |
 
-환경변수 키는 `DB_HOST` / `DB_PORT` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` 입니다.
+환경변수 키는 `DB_HOST` / `DB_PORT` / `DB_USERNAME` / `DB_PASSWORD` / `DB_NAME` 이며,
+API 서버는 **`apps/api-server/.env`** 만 읽습니다 (루트 `.env` 아님).
+
+운영 DB에 대한 write는 CLAUDE.md §0의 승인 규칙을 그대로 따릅니다 (read-only 검증만 자유).
 
 다른 인스턴스(`neture-db` 등)에 연결하려면 `start-cloud-sql-proxy.cmd`의
 `INSTANCE_CONNECTION_NAME`을 수정합니다.
@@ -147,11 +163,18 @@ pnpm run verify           # 레지스트리 검증 (shortcode / block / CPT)
 ## 6. 문제 해결
 
 ### DB 연결 실패
-1. Cloud SQL Proxy가 실행 중인지 확인 (터미널 1)
-2. `.env`의 `DB_PASSWORD` 확인
-3. `gcloud auth application-default login` 재실행
-4. `gcloud sql instances describe o4o-platform-db`로 인스턴스 상태 확인
-5. `gcloud services enable sqladmin.googleapis.com` (API 미활성 시)
+1. `apps/api-server/.env`의 `DB_HOST` / `DB_PORT`가 의도한 대상인지 확인
+   (로컬 `5432` / 프록시 `5442`)
+2. 운영 DB를 쓴다면 Cloud SQL Auth Proxy가 실행 중인지 확인 (터미널 1)
+3. `apps/api-server/.env`의 `DB_PASSWORD` 확인
+4. `gcloud auth application-default login` 재실행 (프록시는 ADC 사용)
+5. `gcloud sql instances describe o4o-platform-db`로 인스턴스 상태 확인
+6. `gcloud services enable sqladmin.googleapis.com` (API 미활성 시)
+
+### `NODE_ENV=... 에서 원격 DB host 로 직접 연결할 수 없습니다`
+
+로컬/운영 분리 가드가 막은 것입니다. `DB_HOST`를 `127.0.0.1`로 바꾸고
+운영 DB는 프록시(`5442`)를 경유하십시오. 의도적 예외는 `ALLOW_REMOTE_DB=true`.
 
 ### `Module not found` 빌드 에러
 ```bash
@@ -160,13 +183,15 @@ pnpm run build:packages
 
 ### 포트 충돌
 ```cmd
-netstat -ano | findstr :5432
+netstat -ano | findstr :5432    :: 로컬 PostgreSQL
+netstat -ano | findstr :5442    :: Cloud SQL Auth Proxy
 netstat -ano | findstr :5173
 netstat -ano | findstr :3001
 taskkill /PID <PID> /F
 ```
-Cloud SQL Proxy 포트를 바꾸려면 `start-cloud-sql-proxy.cmd`의 `LOCAL_PORT`와
-`.env`의 `DB_PORT`를 함께 변경합니다.
+로컬 PostgreSQL이 `5432`를 점유하므로 프록시는 `5442`를 사용합니다.
+프록시 포트를 바꾸려면 `start-cloud-sql-proxy.cmd`의 `LOCAL_PORT`와
+`apps/api-server/.env`의 `DB_PORT`를 함께 변경합니다.
 
 ### 빌드 캐시 문제
 ```bash
@@ -181,8 +206,9 @@ pnpm run build:packages
 export NODE_OPTIONS="--max-old-space-size=4096"
 ```
 
-### Cloud SQL Proxy 다운로드 실패
-https://cloud.google.com/sql/docs/postgres/sql-proxy 에서 직접 받아 `bin/cloud-sql-proxy.exe`로 저장합니다.
+### Cloud SQL Auth Proxy 다운로드 실패
+https://github.com/GoogleCloudPlatform/cloud-sql-proxy/releases 에서 **v2** Windows x64 바이너리를
+직접 받아 `bin/cloud-sql-proxy-v2.exe`로 저장합니다. v1 바이너리는 실행 문법이 달라 사용하지 않습니다.
 
 ---
 

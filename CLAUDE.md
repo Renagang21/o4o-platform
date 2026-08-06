@@ -48,7 +48,7 @@
 - `gcloud logging read 'resource.type=cloud_run_revision AND ...'` — 로그 조회 (마이그레이션/에러/특정 키워드)
 - `gcloud sql connect o4o-platform-db --user=postgres --database=o4o_platform` — 인터랙티브 psql (단, psql 클라이언트 미설치 시 사용 불가)
 - **권장**: `gcloud sql` 대신 Cloud SQL Admin API 또는 `gcloud` 래퍼 스크립트로 SQL 실행
-- DB 접속 정보 (host/user/password/database) 는 로컬 `.env.apiserver` 및 `apps/api-server/.env`에 존재하나, **프로덕션 DB 방화벽은 Cloud Run/Console/CLI 외 차단**되므로 값을 알아도 로컬 접속은 불가. Claude Code는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI에 전달할 수 있음
+- DB 접속 정보 (host/user/password/database) 는 로컬 `apps/api-server/.env` 에 존재한다 (API 서버가 실제로 읽는 단일 환경파일 — `src/env-loader.ts` 기준). 프로덕션 DB 는 **Cloud SQL Auth Proxy 경유(`127.0.0.1:5442`)** 로만 접근하며, 로컬 PostgreSQL 은 `5432` 를 사용한다. Claude Code는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI 에 전달할 수 있음
 
 **SQL 검증 원칙:**
 - read-only 검증(SELECT, 마이그레이션 이력 확인 등)은 Claude Code가 직접 수행 가능

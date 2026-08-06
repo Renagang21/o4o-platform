@@ -26,8 +26,9 @@ async function updateProductStatus() {
   // Create DataSource
   const dataSource = new DataSource({
     type: 'postgres',
-    host: process.env.DB_HOST || '34.64.96.252',
-    port: parseInt(process.env.DB_PORT || '5432'),
+    // 운영 DB 접근은 Cloud SQL Auth Proxy 를 경유한다 (직접 host 지정 금지).
+    host: process.env.DB_HOST || '127.0.0.1',
+    port: parseInt(process.env.DB_PORT || '5442'),
     username: process.env.DB_USERNAME || 'o4o_api',
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME || 'o4o_platform',
