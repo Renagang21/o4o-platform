@@ -1,0 +1,36 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "contract-recon",
+  "population": 19363,
+  "populationNote": "HOLD 144 는 apply-result-live.jsonl 생성 시점에 이미 제외됨 — 재차감 금지",
+  "missingOfficialSourceHash": 0,
+  "koHashDrift": 0,
+  "koDescIdMismatch": 0,
+  "byClassification": {
+    "UPDATE_SINGLE_HIDDEN_EN": 18980,
+    "CREATE_NEW_EN": 380,
+    "ALREADY_CURRENT_EN": 0,
+    "BLOCK_MULTIPLE_HIDDEN_EN": 0,
+    "BLOCK_EXISTING_CANONICAL_EN": 0,
+    "BLOCK_KO_HASH_DRIFT": 0,
+    "BLOCK_UNEXPECTED_EN_STATUS": 3,
+    "BLOCK_TRANSLATION_VALIDATION": 0
+  },
+  "hiddenEnContentSharing": {
+    "mastersWithHiddenEn": 18980,
+    "distinctContents": 3764,
+    "sharedGroups": 3686,
+    "mastersOnSharedContent": 18902,
+    "maxMastersPerContent": 193
+  },
+  "duplicateItemSeq": {
+    "groups": 4739,
+    "masters": 19363
+  },
+  "enStatusHistogram": {
+    "deprecated": 3
+  },
+  "dbWrites": 0,
+  "actionable": 19360,
+  "blocked": 3
+}
