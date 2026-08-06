@@ -49,7 +49,6 @@
     { "path": "./packages/types" },
     { "path": "./packages/ui" },
     { "path": "./packages/utils" },
-    { "path": "./packages/forum-core" },
-    { "path": "./packages/forum-yaksa" }
+    { "path": "./packages/forum-core" }
   ]
 }

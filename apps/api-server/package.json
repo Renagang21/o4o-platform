@@ -115,7 +115,6 @@
     "@o4o-apps/cms-core": "workspace:*",
     "@o4o-apps/content-core": "workspace:*",
     "@o4o-apps/digital-signage-core": "workspace:*",
-    "@o4o-apps/forum-yaksa": "workspace:*",
     "@o4o-apps/signage": "workspace:*",
     "@o4o-extensions/organization-forum": "workspace:*",
     "@o4o/action-log-core": "workspace:*",

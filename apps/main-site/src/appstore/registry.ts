@@ -62,13 +62,8 @@ export const AppRegistry: AppRegistryEntry[] = [
     manifestPath: '@o4o/forum-core-neture/manifest.json',
     packageName: '@o4o/forum-core-neture',
   },
-  {
-    id: 'forum-yaksa',
-    label: 'Yaksa Forum',
-    enabled: true,
-    manifestPath: '@o4o/forum-core-yaksa/manifest.json',
-    packageName: '@o4o/forum-core-yaksa',
-  },
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+  //   'forum-yaksa' 등록 제거 (packages/forum-yaksa 삭제).
 
   // Future apps can be added here
   // {

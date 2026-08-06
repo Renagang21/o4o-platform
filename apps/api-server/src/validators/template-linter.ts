@@ -50,7 +50,8 @@ export interface TemplateLintResult {
 
 const REQUIRED_CORE_APPS: Record<string, string[]> = {
   cosmetics: ['cms-core', 'organization-core', 'cosmetics-core'],
-  yaksa: ['cms-core', 'organization-core', 'forum-yaksa'],
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+  yaksa: ['cms-core', 'organization-core'],
   tourist: ['cms-core', 'organization-core'],
   default: ['cms-core', 'organization-core'],
 };
@@ -71,7 +72,8 @@ const RECOMMENDED_EXTENSIONS: Record<string, string[]> = {
 // =============================================================================
 
 const INCOMPATIBLE_EXTENSIONS: Record<string, string[]> = {
-  cosmetics: ['yaksa-member', 'yaksa-extension', 'forum-yaksa'],
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1: 'forum-yaksa' 제거
+  cosmetics: ['yaksa-member', 'yaksa-extension'],
   yaksa: ['cosmetics-core', 'cosmetics-seller', 'cosmetics-extension'],
   tourist: ['yaksa-member', 'cosmetics-core'],
   default: [],

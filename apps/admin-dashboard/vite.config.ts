@@ -39,8 +39,10 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),
       '@o4o/slide-app': path.resolve(__dirname, '../../packages/slide-app/dist'),
       // Forum app packages - map to source directories for lazy loading
+      // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+      //   '@o4o/forum-core-yaksa' alias 제거 — 유일 소비처였던 /yaksa/communities
+      //   동적 import 3건과 packages/forum-yaksa 를 같은 커밋에서 함께 제거했다.
       '@o4o/forum-core': path.resolve(__dirname, '../../packages/forum-core'),
-      '@o4o/forum-core-yaksa': path.resolve(__dirname, '../../packages/forum-yaksa'),
       // Pharmacy AI Insight - map to source for lazy loading
       '@o4o/pharmacy-ai-insight': path.resolve(__dirname, '../../packages/pharmacy-ai-insight/src'),
       // AI Prompts - map to dist for subpath imports (@o4o/ai-prompts/admin)
@@ -99,8 +101,7 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/block-renderer', // Workspace package - pre-bundling 방지
       '@o4o/slide-app', // Workspace package - pre-bundling 방지
       '@o4o/pharmacy-ai-insight', // Pharmacy AI Insight - source imports
-      '@o4o/forum-core', // Forum app packages - source imports
-      '@o4o/forum-core-yaksa'
+      '@o4o/forum-core' // Forum app packages - source imports
     ],
     esbuildOptions: {
       define: {

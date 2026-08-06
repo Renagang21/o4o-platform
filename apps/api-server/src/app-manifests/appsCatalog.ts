@@ -358,20 +358,11 @@ export const APPS_CATALOG: AppCatalogItem[] = [
   // Yaksa Organization Apps (yaksa)
   // WO-O4O-LEGACY-YAKSA-ADMIN-AND-DOMAIN-FEATURES-FULL-REMOVAL-V1:
   //   membership-yaksa · reporting-yaksa · lms-yaksa · yaksa-scheduler · annualfee-yaksa
-  //   카탈로그 등록 제거 (패키지 삭제). forum-yaksa 는 공용 소비 여부 미확정으로 HOLD.
+  //   카탈로그 등록 제거 (패키지 삭제).
+  // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+  //   forum-yaksa 카탈로그 등록 제거 (HOLD 해제 — 감사 결과 실행 소비처 0건).
+  //   약사 조직의 포럼은 공용 forum-core / /api/v1/kpa/forum 구조로 운영된다.
   // ============================================
-  {
-    appId: 'forum-yaksa',
-    name: 'Forum Extension – Yaksa Organization',
-    version: '1.0.0',
-    description: '약사 조직 특화 포럼 (복약지도, 케이스 스터디, 약물 정보)',
-    category: 'community',
-    tags: ['약사', 'yaksa', 'forum', 'pharmacy', 'medication'],
-    type: 'extension',
-    dependencies: { 'forum-core': '>=1.0.0' },
-    author: 'O4O Platform',
-    serviceGroups: ['yaksa'],
-  },
   {
     appId: 'pharmacy-ai-insight',
     name: 'Pharmacy AI Insight',

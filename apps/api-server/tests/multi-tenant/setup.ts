@@ -324,12 +324,15 @@ function registerTestViews(vRegistry: ViewRegistry): void {
         priority: 100,
     }, 'membership-yaksa');
 
+    // WO-O4O-FORUM-YAKSA-DEAD-PACKAGE-ROUTE-AND-ALIAS-LOCKSTEP-REMOVAL-V1:
+    //   provider 를 제거된 'forum-yaksa' 대신 공용 포럼 구조의 'organization-forum' 으로 교체.
+    //   view id(yaksa.post.list) 와 serviceGroup 격리 검증 범위는 그대로 유지된다.
     vRegistry.registerView('yaksa.post.list', MockComponent, {
         type: 'list',
         cptName: 'forum_post',
         serviceGroups: ['yaksa'],
         priority: 100,
-    }, 'forum-yaksa');
+    }, 'organization-forum');
 
     vRegistry.registerView('yaksa.course.list', MockComponent, {
         type: 'list',
