@@ -5,14 +5,22 @@
 import pg from 'pg';
 const { Client } = pg;
 
+// 자격증명은 환경변수로만 주입한다. fallback 리터럴을 두지 않는다 (CLAUDE.md §15).
 const DB_CONFIG = {
-  host: '34.64.96.252',
-  port: 5432,
-  database: 'o4o_platform',
-  user: 'o4o_api',
-  password: 'seoChuran1!',
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT ?? 5432),
+  database: process.env.DB_NAME,
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
   ssl: false,
 };
+
+for (const key of ['DB_HOST', 'DB_NAME', 'DB_USERNAME', 'DB_PASSWORD'] as const) {
+  if (!process.env[key]) {
+    console.error(`❌ ${key} 환경변수가 필요합니다.`);
+    process.exit(1);
+  }
+}
 
 async function checkSchema() {
   const client = new Client(DB_CONFIG);

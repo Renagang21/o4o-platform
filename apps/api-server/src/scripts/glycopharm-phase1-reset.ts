@@ -27,14 +27,21 @@
 import pg from 'pg';
 const { Client } = pg;
 
-// 환경변수 또는 기본값
+// 자격증명은 환경변수로만 주입한다. fallback 리터럴을 두지 않는다 (CLAUDE.md §15).
 const DB_CONFIG = {
-  host: process.env.DB_HOST || '34.64.96.252',
+  host: process.env.DB_HOST,
   port: parseInt(process.env.DB_PORT || '5432', 10),
-  user: process.env.DB_USERNAME || 'o4o_api',
-  password: process.env.DB_PASSWORD || 'seoChuran1!',
-  database: process.env.DB_NAME || 'o4o_platform',
+  user: process.env.DB_USERNAME,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
 };
+
+for (const key of ['DB_HOST', 'DB_USERNAME', 'DB_PASSWORD', 'DB_NAME'] as const) {
+  if (!process.env[key]) {
+    console.error(`❌ ${key} 환경변수가 필요합니다.`);
+    process.exit(1);
+  }
+}
 
 // 삭제 순서 (FK 의존성 기반)
 const TABLES_TO_RESET = [
