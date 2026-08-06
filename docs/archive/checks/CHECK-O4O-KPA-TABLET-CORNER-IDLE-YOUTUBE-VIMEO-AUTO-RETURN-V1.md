@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1
 
 > 작업 완료 보고서 · 2026-07-03
-> WO: `docs/work-orders/WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1.md`
+> WO: `docs/archive/work-orders/WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1.md`
 
 ## 1. 사전 조사 / 재사용 범위
 기존 idle 구조를 **확장**(신규 구조 아님): idle mode·`idleTimeoutMs`(60s 고정)·IdleOverlay·`store_tablets.idle_playlist_items`·IdlePlaylistEditor·GET/PUT idle-playlist·GET `/:slug/tablet/idle`·`resolveTabletDisplaySource`(직전 WO). `videoEmbed.ts`는 services에 있어 공유 패키지에서 역참조 불가 → kiosk-core에 별도 `idleMedia.ts` 신설.

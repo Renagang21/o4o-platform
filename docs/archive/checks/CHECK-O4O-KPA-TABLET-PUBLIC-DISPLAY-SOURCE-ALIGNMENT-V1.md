@@ -1,7 +1,7 @@
 # CHECK-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1
 
 > 작업 완료 보고서 · 2026-07-03
-> WO: `docs/work-orders/WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1.md`
+> WO: `docs/archive/work-orders/WO-O4O-KPA-TABLET-PUBLIC-DISPLAY-SOURCE-ALIGNMENT-V1.md`
 
 ## 1. 사전 조사 결과
 - 공개 supplier(`queryTabletVisibleProducts`): TABLET channel 4중 gate 통과 상품 **전체** 반환. `store_tablet_displays`는 first active tablet 기준 **content_id attach 용도로만** LEFT JOIN(content_id IS NOT NULL).
