@@ -50,6 +50,32 @@ export const FOOTER = {
 };
 
 /**
+ * 함량·용량 토큰 — 원칙 9(KO 수치·단위 배열 및 **순서** 보존) 의 실제 판정 대상.
+ *
+ * 5단계 표본 검증 결과: 맨숫자 배열 동일성은 자연스러운 영어로 만족 불가능하다.
+ * 한국어의 구조적 계수사(`1일 3회` → "3 times a day", `1회 1정` → "1 tablet per dose")가
+ * 영어 관용구에 흡수되면서 `1` 이 사라지기 때문이다 — 13 표본 중 12 가 이 이유로 실패했다.
+ * 반면 **단위를 동반한 수치**(함량·용량·용적)는 13/13 이 순서까지 그대로 보존됐다.
+ * 복합제 성분별 함량 1:1 과 순서 보존은 바로 이 토큰 배열이 담보한다.
+ *
+ * 단위 뒤에 로마자가 이어지면 단위가 아니다(`IU` vs `diuretics`). 한글 조사(`15 mL씩`)는 허용한다.
+ */
+export const STRENGTH_RE =
+  /(\d[\d.,]*)\s*(mg|㎎|밀리그램|mcg|㎍|마이크로그램|g|그램|ml|mL|㎖|밀리리터|IU|국제단위|%)(?![A-Za-z])/g;
+export const STRENGTH_UNIT_CANON = {
+  '㎎': 'mg', '밀리그램': 'mg', '㎍': 'mcg', '마이크로그램': 'mcg', '그램': 'g',
+  '㎖': 'ml', '밀리리터': 'ml', 'mL': 'ml', '국제단위': 'iu', 'IU': 'iu',
+};
+
+/**
+ * 투여 경로를 판정하는 섹션 — 그 제품 **자신의** 투여 경로가 적히는 곳은 사용 방법뿐이다.
+ * 문서 전체를 훑으면 `내복용`(→`복용`) · `바르비탈계`(→`바르`) 같은 부분문자열,
+ * 그리고 병용약의 `투여` · 오연(誤嚥) 경고의 `복용` 이 전부 오탐이 된다.
+ * 5단계 표본에서 ROUTE_LOST 4건이 모두 이 유형이었다.
+ */
+export const ROUTE_SECTIONS = ['사용 방법'];
+
+/**
  * 투여 경로 동사 — 원칙 3(route 동사 정확히 번역).
  * 값은 **허용 EN 표현 집합**이다. 검증기는 "KO 에 이 경로가 있으면 EN 에 대응 표현이 있어야 한다" 로 쓴다.
  * 경로를 뭉개는 일반 동사(take/use)로만 번역되면 위반이다 — 외용제를 삼키는 오역이 이 지점에서 난다.
@@ -88,6 +114,9 @@ export const NEGATION_KO = [
 export const NEGATION_EN = [
   'do not', "don't", 'must not', 'should not', 'never', 'avoid', 'refrain',
   'discontinue', 'stop', 'contraindicat', 'not be used', 'without',
+  // 5단계 표본 검증에서 추가 — "Take care that it does not get into the eyes" 형태의
+  // 3인칭 부정을 놓쳐 정상 번역이 NEGATION_WEAKENED 로 떨어졌다.
+  'does not', 'did not', 'is not', 'are not', 'cannot', "can't",
 ];
 /** 경고 강도 — 강한 쪽이 약한 쪽으로 내려가면 위반이다. */
 export const WARNING_KO = ['경고', '주의', '위험', '심각', '즉시', '반드시'];

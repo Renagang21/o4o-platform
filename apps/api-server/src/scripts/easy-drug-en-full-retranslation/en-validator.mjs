@@ -14,13 +14,17 @@
  *   IDENTITY_ALTERED        제품명·제조사·품목기준코드가 원문 그대로가 아님
  *   IDENTITY_ROMANIZED      식별값 자리에 로마자·추정 영문명이 들어감
  *   LABEL_UNTRANSLATED      섹션 제목·필드 라벨·배지·푸터가 고정 영어 사전과 다름
- *   NUMBER_SEQUENCE         수치+단위 배열이 순서 또는 개수에서 KO 와 다름
- *   NUMBER_ADDED            KO 에 없는 수치가 EN 에 등장
+ *   STRENGTH_SEQUENCE       **단위를 동반한** 수치 배열이 순서 또는 개수에서 KO 와 다름
+ *                           — 5단계 표본 검증(13 master) 결과로 구 NUMBER_SEQUENCE(맨숫자 배열 동일성)를 대체했다.
+ *                             맨숫자는 `1일 3회`→"3 times a day", `1회 1정`→"1 tablet per dose" 처럼
+ *                             한국어 구조적 계수사가 영어 관용구에 흡수되면서 사라져 만족 불가능했다(13 중 12 실패).
+ *                             단위를 동반한 함량·용량은 13/13 순서까지 보존됐고, 복합제 성분별 함량 1:1 은 이쪽이 담보한다.
+ *   NUMBER_ADDED            KO 에 없는 수치가 EN 에 등장 (= 원문에 없는 의료 정보 추가) — 계속 엄격히 본다
  *   SENTENCE_COUNT          문장 수 불일치 (의료 내용 추가·삭제 의심)
  *                           — 실제로는 STRUCTURE_MISMATCH 가 먼저 걸러낸다(위치 1:1 대응이 깨지므로).
  *                             중복이지만 남겨 둔다: 향후 비위치대응 산출물이 들어와도 문장 증감은 잡혀야 한다.
  *   DOSING_LOST             연령 · 1회량 · 횟수 · 간격 · 기간 값이 EN 에서 소실
- *   ROUTE_LOST              KO 투여 경로에 대응하는 EN 표현 없음
+ *   ROUTE_LOST              KO 투여 경로에 대응하는 EN 표현 없음 (판정 범위 = 사용 방법 섹션, en-frame ROUTE_SECTIONS)
  *   NEGATION_WEAKENED       KO 부정·금기 문장이 EN 에서 부정 표지를 잃음
  *   WARNING_WEAKENED        경고 강도 표지 총량이 KO 보다 감소
  *   TRUNCATED               문장이 종결부호 없이 끊김 (고정 길이 절단)
@@ -31,18 +35,23 @@
  */
 import {
   SECTION_TITLE, FIELD_LABEL, BADGE, FOOTER,
-  ROUTE_VERB, NEGATION_KO, NEGATION_EN, WARNING_KO, WARNING_EN, DOSING_KO,
+  ROUTE_VERB, ROUTE_SECTIONS, STRENGTH_RE, STRENGTH_UNIT_CANON,
+  NEGATION_KO, NEGATION_EN, WARNING_KO, WARNING_EN, DOSING_KO,
 } from './en-frame.mjs';
 
-/** 수치+단위. en-frame 의 DOSING 과 달리 여기서는 **순서 보존**이 목적이라 배열로 뽑는다. */
 const NUM_RE = /\d+(?:[.,]\d+)?/g;
-const UNIT_ALIAS = new Map(Object.entries({
-  '밀리그램': 'mg', '㎎': 'mg', '그램': 'g', '마이크로그램': 'mcg', '㎍': 'mcg',
-  '밀리리터': 'ml', '㎖': 'ml', '국제단위': 'iu', 'IU': 'iu',
-}));
 const HANGUL_RE = /[가-힣]/;
 
-const numbers = (s) => [...String(s).matchAll(NUM_RE)].map((m) => m[0].replace(',', '.').replace(/\.0+$/, ''));
+const norm = (n) => n.replace(',', '.').replace(/\.0+$/, '');
+const numbers = (s) => [...String(s).matchAll(NUM_RE)].map((m) => norm(m[0]));
+
+/**
+ * 함량·용량 토큰. **순서 보존**이 목적이라 집합이 아니라 배열로 뽑는다.
+ * 단위는 정규화한다 — `500㎎` 과 `500 mg` 은 같은 값이고, 표기 차이로 위반을 만들면 안 된다.
+ */
+const strengths = (s) =>
+  [...String(s).matchAll(new RegExp(STRENGTH_RE.source, 'g'))]
+    .map((m) => `${norm(m[1])}${(STRENGTH_UNIT_CANON[m[2]] ?? m[2]).toLowerCase()}`);
 const lower = (s) => String(s).toLowerCase();
 const countAny = (s, list) => list.reduce((a, t) => a + (lower(s).split(lower(t)).length - 1), 0);
 const hasAny = (s, list) => list.some((t) => lower(s).includes(lower(t)));
@@ -122,13 +131,18 @@ export function validate(ko, en, opts = {}) {
   const koText = koBody.map((s) => s.text).join('\n');
   const enText = enBody.map((s) => s.text).join('\n');
 
-  /* 5-1. 수치 배열 — 순서까지 보존. 복합제 함량 1:1 이 여기서 걸린다. */
+  /* 5-1. 수치 — 두 갈래로 나눠 본다. 맨숫자 배열 동일성은 자연스러운 영어로 만족 불가능하다(en-frame 주석).
+   *   (a) STRENGTH_SEQUENCE : 단위를 동반한 수치의 **순서 배열** 동일. 복합제 함량 1:1 이 여기서 걸린다.
+   *   (b) NUMBER_ADDED      : EN 에만 있는 수치 = 원문에 없는 의료 정보 추가. 이쪽은 그대로 엄격히 본다. */
   const koNums = numbers(koText), enNums = numbers(enText);
-  if (JSON.stringify(koNums) !== JSON.stringify(enNums)) {
-    const added = enNums.filter((n) => !koNums.includes(n));
-    if (added.length) add('NUMBER_ADDED', `EN 전용 수치: ${[...new Set(added)].slice(0, 8).join(', ')}`);
-    add('NUMBER_SEQUENCE', `ko=${koNums.length} en=${enNums.length} 첫 불일치 idx=${koNums.findIndex((n, i) => enNums[i] !== n)}`);
+  const koStr = strengths(koText), enStr = strengths(enText);
+  if (JSON.stringify(koStr) !== JSON.stringify(enStr)) {
+    const idx = koStr.findIndex((n, i) => enStr[i] !== n);
+    add('STRENGTH_SEQUENCE', `ko=[${koStr.join(',')}] en=[${enStr.join(',')}] 첫 불일치 idx=${idx}`);
   }
+  const koPool = new Set(koNums);
+  const added = [...new Set(enNums.filter((n) => !koPool.has(n)))];
+  if (added.length) add('NUMBER_ADDED', `EN 전용 수치: ${added.slice(0, 8).join(', ')}`);
 
   /* 5-2. 용법 5축 — 값이 EN 에 남아 있는지. 표현은 달라도 숫자는 같아야 한다. */
   for (const [axis, re] of Object.entries(DOSING_KO)) {
@@ -141,9 +155,15 @@ export function validate(ko, en, opts = {}) {
     }
   }
 
-  /* 5-3. 투여 경로 — 뭉개면 외용제를 삼키는 오역이 된다. */
+  /* 5-3. 투여 경로 — 뭉개면 외용제를 삼키는 오역이 된다.
+   *   그 제품 **자신의** 경로가 적히는 곳은 사용 방법뿐이므로 판정 범위를 그 섹션으로 좁힌다.
+   *   문서 전체를 훑으면 `내복용`·`바르비탈계` 같은 부분문자열과 병용약·오연 경고가 전부 오탐이 된다.
+   *   대응 EN 표현은 같은 섹션 안에서 찾는다. */
+  const inRoute = (u) => u.segments.filter((s) => s.kind === 'BODY' && ROUTE_SECTIONS.includes(s.section))
+    .map((s) => s.text).join('\n');
+  const koRoute = inRoute(ko), enRoute = inRoute(en);
   for (const [koVerb, enForms] of Object.entries(ROUTE_VERB)) {
-    if (koText.includes(koVerb) && !hasAny(enText, enForms)) {
+    if (koRoute.includes(koVerb) && !hasAny(enRoute, enForms)) {
       add('ROUTE_LOST', `"${koVerb}" 대응 표현 없음 (기대: ${enForms.slice(0, 3).join(' / ')})`);
     }
   }

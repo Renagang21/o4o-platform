@@ -1,0 +1,117 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "en-sample-contract-check",
+  "note": "표본 EN 초안은 계약 시험 전용이며 DB 에 저장하지 않는다.",
+  "samples": 13,
+  "pass": 13,
+  "fail": 0,
+  "errors": 0,
+  "codeTally": {},
+  "results": [
+    {
+      "masterId": "000db5b5-a522-44b0-9a6c-658f3f9bae9f",
+      "itemSeq": "200308774",
+      "productName": "뮤코다인캡슐200mg(아세틸시스테인)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "002063d6-2bea-4975-9fab-7d13bba0a19f",
+      "itemSeq": "200708107",
+      "productName": "디알클리어점안액(카르복시메틸셀룰로오스나트륨)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "000eb144-db87-4d29-bcfa-dad852a15c3c",
+      "itemSeq": "201202817",
+      "productName": "쌍패원노즈액",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "012903c2-bdfb-474b-861e-042c01c45f4c",
+      "itemSeq": "200501321",
+      "productName": "신신파스아렉스",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "008c149e-b312-404a-922b-5c2ec1dec0ed",
+      "itemSeq": "201801542",
+      "productName": "써버쿨플라스타",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "0181e3ea-a445-407f-a647-b92d5eb4c479",
+      "itemSeq": "201708285",
+      "productName": "헥사메딘액0.12%(클로르헥시딘글루콘산염액)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "04a5c6eb-9f30-4928-93a0-09510d806a6f",
+      "itemSeq": "201210143",
+      "productName": "세네풀에스액",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "itemSeq": "200704064",
+      "productName": "지노베타딘질좌제(포비돈요오드)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "042bd399-345f-4031-8f65-d56f069566d8",
+      "itemSeq": "200410068",
+      "productName": "오트리빈베이비내추럴비강분무액(염화나트륨)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "0387c0ed-2c19-4beb-a618-742d91e60f06",
+      "itemSeq": "201508272",
+      "productName": "까스앤프리츄정80밀리그램(시메티콘)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "019254d1-a2eb-4adb-83a6-c7945d719849",
+      "itemSeq": "202400885",
+      "productName": "화이트티온정(글루타티온(환원형))",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "fffd2a52-0a34-408d-8bcd-ac9664759f93",
+      "itemSeq": "197000037",
+      "productName": "아로나민골드정",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    },
+    {
+      "masterId": "18745211-0b92-42b7-974a-e91c87a904ca",
+      "itemSeq": "198901310",
+      "productName": "콜대원키즈이부펜시럽(이부프로펜)",
+      "pass": true,
+      "codes": [],
+      "violations": []
+    }
+  ],
+  "dbWrites": 0
+}

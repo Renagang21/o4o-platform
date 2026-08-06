@@ -17,7 +17,10 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { validate } from './en-validator.mjs';
-import { SECTION_TITLE, FIELD_LABEL, BADGE, FOOTER, ROUTE_VERB } from './en-frame.mjs';
+import {
+  SECTION_TITLE, FIELD_LABEL, BADGE, FOOTER,
+  ROUTE_VERB, ROUTE_SECTIONS, STRENGTH_RE, NEGATION_EN,
+} from './en-frame.mjs';
 
 const HERE = path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'));
 const RESULTS = path.join(HERE, 'results');
@@ -62,7 +65,9 @@ function fakeTranslate(text) {
   for (const [k, e] of warnMap) out = out.split(k).join(` ${e} `);
   for (const [k, forms] of Object.entries(ROUTE_VERB)) out = out.split(k).join(` ${forms[0]} `);
   // 남은 한글 덩어리는 자리표시자로 바꾼다 (실번역이 아님을 분명히 한다).
-  out = out.replace(/[가-힣]+/g, 'lorem');
+  // **공백을 반드시 넣는다.** `5 g씩` → `5 glorem` 이 되면 단위 뒤 로마자 금지 규칙(STRENGTH_RE)에 걸려
+  // 합성 기준선이 STRENGTH_SEQUENCE 로 떨어진다 — 검증기 결함이 아니라 이 가짜 번역기의 결함이다.
+  out = out.replace(/[가-힣]+/g, ' lorem ');
   out = out.replace(/\s+/g, ' ').trim();
   if (!/[.!?:)\]]$/.test(out)) out += '.';
   return out;
@@ -88,14 +93,18 @@ const MUTATIONS = {
   IDENTITY_ALTERED: (en) => mutate(en, (s) => s.kind === 'FIXED_IDENTITY' && s.field === '제품명', (s) => ({ ...s, text: s.text + ' Tablet' })),
   IDENTITY_ROMANIZED: (en) => mutate(en, (s) => s.kind === 'FIXED_IDENTITY' && s.field === '제품명', (s) => ({ ...s, text: 'Mucodine Capsule 200mg' })),
   LABEL_UNTRANSLATED: (en) => mutate(en, (s) => s.kind === 'HEADING', (s) => ({ ...s, text: '효능·효과' })),
-  NUMBER_SEQUENCE: (en) => mutate(en, (s) => s.kind === 'BODY' && /\d/.test(s.text), (s) => ({ ...s, text: s.text.replace(/\d+/, '') })),
+  // 함량 토큰의 **값만** 바꾼다. 복합제에서 성분별 함량이 뒤바뀌는 상황의 대리 시험이다.
+  STRENGTH_SEQUENCE: (en) => mutate(en,
+    (s) => s.kind === 'BODY' && new RegExp(STRENGTH_RE.source).test(s.text),
+    (s) => ({ ...s, text: s.text.replace(new RegExp(STRENGTH_RE.source), (m, num, unit) => `${Number(num.replace(',', '.')) + 7}${unit}`) })),
   NUMBER_ADDED: (en) => mutate(en, (s) => s.kind === 'BODY', (s) => ({ ...s, text: s.text + ' Take 999 mg.' })),
   SENTENCE_COUNT: (en) => ({ ...en, segments: en.segments.filter((s, i) => !(s.kind === 'BODY' && i === en.segments.findIndex((x) => x.kind === 'BODY'))) }),
-  ROUTE_LOST: (en) => ({ ...en, segments: en.segments.map((s) => s.kind === 'BODY'
+  // 검증기가 사용 방법 섹션만 보므로 돌연변이도 그 범위로 맞춘다.
+  // 다른 섹션까지 훼손하면 "바뀌었지만 검증 대상이 아닌" 변형이 missed 로 잘못 집계된다.
+  ROUTE_LOST: (en) => ({ ...en, segments: en.segments.map((s) => s.kind === 'BODY' && ROUTE_SECTIONS.includes(s.section)
     ? { ...s, text: Object.values(ROUTE_VERB).flat().reduce((t, f) => t.replace(new RegExp(f, 'gi'), 'use'), s.text) } : s) }),
   NEGATION_WEAKENED: (en) => ({ ...en, segments: en.segments.map((s) => s.kind === 'BODY'
-    ? { ...s, text: ['do not', "don't", 'must not', 'should not', 'never', 'avoid', 'refrain', 'discontinue', 'stop', 'contraindicat', 'without']
-        .reduce((t, f) => t.replace(new RegExp(f, 'gi'), 'may'), s.text) } : s) }),
+    ? { ...s, text: NEGATION_EN.reduce((t, f) => t.replace(new RegExp(f, 'gi'), 'may'), s.text) } : s) }),
   TRUNCATED: (en) => mutate(en, (s) => s.kind === 'BODY' && s.text.length > 20, (s) => ({ ...s, text: s.text.slice(0, 15) })),
   HANGUL_LEFTOVER: (en) => mutate(en, (s) => s.kind === 'BODY', (s) => ({ ...s, text: s.text + ' 복용하십시오.' })),
   STRUCTURE_MISMATCH: (en) => ({ ...en, segments: en.segments.slice(0, -1) }),

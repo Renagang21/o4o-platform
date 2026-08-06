@@ -39,11 +39,11 @@
       "skipped": 0,
       "detectionRate": 100
     },
-    "NUMBER_SEQUENCE": {
-      "applicable": 298,
-      "caught": 298,
+    "STRENGTH_SEQUENCE": {
+      "applicable": 127,
+      "caught": 127,
       "missed": 0,
-      "skipped": 2,
+      "skipped": 173,
       "detectionRate": 100
     },
     "NUMBER_ADDED": {
@@ -61,10 +61,10 @@
       "detectionRate": 100
     },
     "ROUTE_LOST": {
-      "applicable": 289,
-      "caught": 289,
+      "applicable": 251,
+      "caught": 251,
       "missed": 0,
-      "skipped": 11,
+      "skipped": 49,
       "detectionRate": 100
     },
     "NEGATION_WEAKENED": {
