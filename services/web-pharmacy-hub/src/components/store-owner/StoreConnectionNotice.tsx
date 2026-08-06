@@ -15,7 +15,18 @@ export interface StoreConnectionState {
   errorCode?: string | null;
 }
 
-export function StoreConnectionNotice({ connection }: { connection: StoreConnectionState }) {
+/**
+ * @param subject 안내 문구에서 가리킬 대상 (기본 '매장 상품').
+ *   WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 에서 콘텐츠·자료함·블로그가 같은 안내를
+ *   재사용하므로 대상만 갈아 끼운다 (컴포넌트 복제 0).
+ */
+export function StoreConnectionNotice({
+  connection,
+  subject = '매장 상품',
+}: {
+  connection: StoreConnectionState;
+  subject?: string;
+}) {
   if (connection.status === 'connected') return null;
 
   const isAmbiguous = connection.status === 'ambiguous';
@@ -27,8 +38,8 @@ export function StoreConnectionNotice({ connection }: { connection: StoreConnect
       </p>
       <p className="mt-1 text-amber-700">
         {isAmbiguous
-          ? `승인된 약국이 ${connection.candidateCount}개 확인되어 어느 매장의 상품인지 결정할 수 없습니다. 운영자에게 문의해 주세요.`
-          : '약국 가입·승인이 완료되면 매장 상품을 등록·관리할 수 있습니다.'}
+          ? `승인된 약국이 ${connection.candidateCount}개 확인되어 어느 매장인지 결정할 수 없습니다. 운영자에게 문의해 주세요.`
+          : `약국 가입·승인이 완료되면 ${subject}을(를) 등록·관리할 수 있습니다.`}
       </p>
     </div>
   );

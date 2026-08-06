@@ -25,7 +25,9 @@
     /* Path alias */
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      /* WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1: dist-mode 패키지 (KPA·KCos 와 동일 매핑) */
+      "@o4o/content-editor": ["../../packages/content-editor/dist"]
     }
   },
   "include": ["src"]

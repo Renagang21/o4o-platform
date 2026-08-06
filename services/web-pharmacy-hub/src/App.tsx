@@ -25,6 +25,12 @@
  *     ├ /orders/:orderId         주문 상세
  *     ├ /handled-products        매장 경영활용 제품 (WO-...-STORE-HANDLED-PRODUCTS-V1)
  *     ├ /local-products          매장 자체 상품 (동일 WO)
+ *     ├ /content                 매장 콘텐츠 (WO-...-STORE-CONTENT-LIBRARY-V1)
+ *     ├ /library                 자료함 — 제작 자료 목록 (동일 WO)
+ *     ├ /library/resources       자료 등록·관리 (동일 WO)
+ *     ├ /blog                    매장 블로그 목록 (동일 WO)
+ *     ├ /blog/new                블로그 글쓰기 (동일 WO)
+ *     ├ /blog/:id/edit           블로그 글 수정 (동일 WO)
  *     ├ /info                  매장 정보 (조직 · WO-...-STORE-INFO-AND-ACCOUNT-V1)
  *     └ /account                 내 계정 (사용자 · 동일 WO)
  *   /store-owner/payment         결제 (셸 동일 · 사이드바 메뉴 미노출 deep route)
@@ -66,6 +72,12 @@ import PaymentFailPage from './pages/store-owner/PaymentFailPage';
 // WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1
 import HandledProductsPage from './pages/store-owner/HandledProductsPage';
 import LocalProductsPage from './pages/store-owner/LocalProductsPage';
+// WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1
+import ContentPage from './pages/store-owner/ContentPage';
+import LibraryPage from './pages/store-owner/LibraryPage';
+import LibraryResourcesPage from './pages/store-owner/LibraryResourcesPage';
+import BlogPage from './pages/store-owner/BlogPage';
+import BlogEditorPage from './pages/store-owner/BlogEditorPage';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
@@ -158,6 +170,13 @@ export default function App() {
             {/* WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1 — 매장 제품 (공급 상품과 다른 축) */}
             <Route path="handled-products" element={<HandledProductsPage />} />
             <Route path="local-products" element={<LocalProductsPage />} />
+            {/* WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 — 콘텐츠 · 자료함 · 블로그 (공통 원장 재사용) */}
+            <Route path="content" element={<ContentPage />} />
+            <Route path="library" element={<LibraryPage />} />
+            <Route path="library/resources" element={<LibraryResourcesPage />} />
+            <Route path="blog" element={<BlogPage />} />
+            <Route path="blog/new" element={<BlogEditorPage />} />
+            <Route path="blog/:id/edit" element={<BlogEditorPage />} />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}
             <Route path="info" element={<StoreInfoPage />} />
             <Route path="account" element={<AccountPage />} />

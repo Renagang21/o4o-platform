@@ -39,6 +39,21 @@ import type { AuthRequest } from '../../../types/auth.js';
 import { isStoreOwner } from '../../../utils/store-owner.utils.js';
 import { ContentTranslationService } from '../../../modules/store-ai/services/content-ai-translation.service.js';
 import type { TranslationLocale } from '@o4o/ai-prompts/store';
+import {
+  LINK_TYPE,
+  normalizeTags,
+  listStoreContents,
+  createDirectContent,
+  getDirectContent,
+  updateDirectContent,
+  deleteDirectContent,
+  prepareProductRef as prepareProductRefForOrg,
+  applyProductRefPlan as applyProductRefPlanForOrg,
+  resolveProductForLink as resolveProductForLinkInOrg,
+  type ContentFailure,
+  type ContentResult,
+  type ProductRefPlan,
+} from '../../../services/store/store-content.service.js';
 
 type AuthMiddleware = import('express').RequestHandler;
 
@@ -47,21 +62,23 @@ const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
 // WO-O4O-KPA-CONTENT-MULTILINGUAL-TRANSLATION-V1: 매장이 선택 가능한 번역 대상 언어.
 const TRANSLATION_LOCALES: TranslationLocale[] = ['en', 'zh', 'ja', 'vi', 'th', 'id'];
 
-// WO-O4O-KPA-CONTENT-LIST-TAG-FIELD-AND-DISPLAY-V1:
-//   태그 정규화 — 문자열 배열만 허용, trim, 빈 문자열 제거, 중복 제거, 길이/개수 제한.
-const TAG_MAX_COUNT = 20;
-const TAG_MAX_LEN = 30;
-export function normalizeTags(input: unknown): string[] {
-  if (!Array.isArray(input)) return [];
-  return Array.from(
-    new Set(
-      input
-        .filter((v): v is string => typeof v === 'string')
-        .map((v) => v.trim())
-        .filter(Boolean)
-        .map((v) => v.slice(0, TAG_MAX_LEN)),
-    ),
-  ).slice(0, TAG_MAX_COUNT);
+// WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1:
+//   목록 + direct CRUD + productRef 링크 로직을 services/store/store-content.service.ts 로 추출.
+//   이 컨트롤러는 KPA 조직 결정(isStoreOwner('kpa') + KpaMember fallback) + 응답 envelope 만 담당한다.
+//   Pharmacy-Hub 는 같은 서비스 함수를 enrollment 기준 조직 해석기와 함께 호출한다 (로직 복제 0).
+//   요청/응답 계약은 추출 전과 동일하다.
+export { normalizeTags };
+
+/**
+ * 실패 결과를 원본과 동일한 nested envelope 으로 내려보낸다.
+ * (strictNullChecks 가 꺼져 있어 `!result.ok` 로 union 이 좁혀지지 않는다.)
+ */
+function sendContentFailure(res: Response, result: ContentResult<unknown>): void {
+  const failure = result as ContentFailure;
+  res.status(failure.status).json({
+    success: false,
+    error: { code: failure.code, message: failure.message },
+  });
 }
 
 export function createStoreContentController(
@@ -80,119 +97,19 @@ export function createStoreContentController(
   //   - sourceType: 'listing'=O4O 기반 제품 / 'local'=매장 경영활용 제품
   //   - org 스코프 검증 + listing 의 master_id 부가 보존.
   // ───────────────────────────────────────────────────────────────────────────
-  const LINK_TYPE = 'product_description';
-
-  type ParsedProductRef =
-    | { kind: 'absent' }
-    | { kind: 'clear' }
-    | { kind: 'set'; sourceType: 'listing' | 'local'; sourceId: string }
-    | { kind: 'invalid'; message: string };
-
-  function parseProductRef(raw: unknown): ParsedProductRef {
-    if (raw === undefined) return { kind: 'absent' };
-    if (raw === null) return { kind: 'clear' };
-    if (typeof raw !== 'object') return { kind: 'invalid', message: 'productRef는 객체여야 합니다.' };
-    const ref = raw as { sourceType?: unknown; sourceId?: unknown };
-    if (ref.sourceType !== 'listing' && ref.sourceType !== 'local') {
-      return { kind: 'invalid', message: "productRef.sourceType은 'listing' 또는 'local' 이어야 합니다." };
-    }
-    if (typeof ref.sourceId !== 'string' || !UUID_RE.test(ref.sourceId)) {
-      return { kind: 'invalid', message: 'productRef.sourceId는 유효한 UUID 여야 합니다.' };
-    }
-    return { kind: 'set', sourceType: ref.sourceType, sourceId: ref.sourceId };
-  }
-
-  /**
-   * 제품이 해당 매장(organization)에 속하는지 검증하고 listing 의 master_id 를 반환.
-   * - listing: organization_product_listings 에서 master_id 조회
-   * - local:   store_local_products 존재만 확인 (master 없음)
-   * 미존재/타 매장이면 ok=false.
-   */
-  async function resolveProductForLink(
+  //   WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 에서 services/store/store-content.service.ts
+  //   로 이관했다. 아래는 dataSource 를 묶어주는 thin wrapper 일 뿐이며 동작은 동일하다.
+  const resolveProductForLink = (
     organizationId: string,
     sourceType: 'listing' | 'local',
     sourceId: string,
-  ): Promise<{ ok: true; masterId: string | null } | { ok: false }> {
-    if (sourceType === 'listing') {
-      const rows = await dataSource.query(
-        `SELECT master_id FROM organization_product_listings WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-        [sourceId, organizationId],
-      );
-      if (!rows.length) return { ok: false };
-      return { ok: true, masterId: rows[0].master_id ?? null };
-    }
-    const rows = await dataSource.query(
-      `SELECT id FROM store_local_products WHERE id = $1 AND organization_id = $2 LIMIT 1`,
-      [sourceId, organizationId],
-    );
-    if (!rows.length) return { ok: false };
-    return { ok: true, masterId: null };
-  }
+  ) => resolveProductForLinkInOrg(dataSource, organizationId, sourceType, sourceId);
 
-  async function clearProductLink(organizationId: string, contentId: string): Promise<void> {
-    await dataSource.query(
-      `DELETE FROM kpa_store_content_product_links
-       WHERE organization_id = $1 AND content_id = $2 AND link_type = $3`,
-      [organizationId, contentId, LINK_TYPE],
-    );
-  }
+  const prepareProductRef = (organizationId: string, raw: unknown) =>
+    prepareProductRefForOrg(dataSource, organizationId, raw);
 
-  async function replaceProductLink(
-    organizationId: string,
-    contentId: string,
-    sourceType: 'listing' | 'local',
-    sourceId: string,
-    masterId: string | null,
-  ): Promise<void> {
-    // V1: 콘텐츠당 product_description link 1개 유지 → 기존 제거 후 삽입.
-    await clearProductLink(organizationId, contentId);
-    await dataSource.query(
-      `INSERT INTO kpa_store_content_product_links
-         (organization_id, content_id, product_source_type, product_source_id, master_id, link_type)
-       VALUES ($1, $2, $3, $4, $5, $6)
-       ON CONFLICT (organization_id, content_id, product_source_type, product_source_id, link_type) DO NOTHING`,
-      [organizationId, contentId, sourceType, sourceId, masterId, LINK_TYPE],
-    );
-  }
-
-  type ProductRefPlan =
-    | { action: 'noop' }
-    | { action: 'clear' }
-    | { action: 'set'; sourceType: 'listing' | 'local'; sourceId: string; masterId: string | null };
-
-  /**
-   * productRef 형식 검증 + 제품 org 스코프 검증을 콘텐츠 저장 *이전* 에 수행한다
-   * (잘못된 productRef 로 콘텐츠가 먼저 저장되는 orphan 방지).
-   * ok=false 면 호출측이 400 으로 응답. ok=true 면 plan 을 저장 후 applyProductRefPlan 으로 적용.
-   */
-  async function prepareProductRef(
-    organizationId: string,
-    raw: unknown,
-  ): Promise<{ ok: true; plan: ProductRefPlan; error?: undefined } | { ok: false; error: string; plan?: undefined }> {
-    const parsed = parseProductRef(raw);
-    if (parsed.kind === 'absent') return { ok: true, plan: { action: 'noop' } };
-    if (parsed.kind === 'invalid') return { ok: false, error: parsed.message };
-    if (parsed.kind === 'clear') return { ok: true, plan: { action: 'clear' } };
-    const resolved = await resolveProductForLink(organizationId, parsed.sourceType, parsed.sourceId);
-    if (!resolved.ok) return { ok: false, error: '연결할 제품을 현재 매장에서 찾을 수 없습니다.' };
-    return {
-      ok: true,
-      plan: { action: 'set', sourceType: parsed.sourceType, sourceId: parsed.sourceId, masterId: resolved.masterId },
-    };
-  }
-
-  async function applyProductRefPlan(
-    organizationId: string,
-    contentId: string,
-    plan: ProductRefPlan,
-  ): Promise<void> {
-    if (plan.action === 'noop') return;
-    if (plan.action === 'clear') {
-      await clearProductLink(organizationId, contentId);
-      return;
-    }
-    await replaceProductLink(organizationId, contentId, plan.sourceType, plan.sourceId, plan.masterId);
-  }
+  const applyProductRefPlan = (organizationId: string, contentId: string, plan: ProductRefPlan) =>
+    applyProductRefPlanForOrg(dataSource, organizationId, contentId, plan);
 
   /**
    * GET /store-contents
@@ -220,22 +137,8 @@ export function createStoreContentController(
           return;
         }
 
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const contents = await repo.find({
-          where: { organization_id: organizationId },
-          order: { updated_at: 'DESC' },
-        });
-
-        res.json({
-          success: true,
-          data: contents.map((c) => ({
-            id: c.id,
-            sourceType: c.source_type,
-            snapshotId: c.snapshot_id,
-            title: c.title,
-            updatedAt: c.updated_at,
-          })),
-        });
+        const contents = await listStoreContents(dataSource, organizationId);
+        res.json({ success: true, data: contents });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -302,56 +205,15 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson, tags, productRef } = req.body as {
-          title?: string;
-          contentJson?: unknown;
-          tags?: unknown;
-          productRef?: unknown;
-        };
-
-        if (!title || !title.trim()) {
-          res.status(400).json({
-            success: false,
-            error: { code: 'VALIDATION_ERROR', message: 'title은 필수입니다.' },
-          });
-          return;
-        }
-
         // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1:
-        //   productRef 는 optional. 저장 전 형식/제품 org 스코프 검증.
-        const prepared = await prepareProductRef(organizationId, productRef);
-        if (!prepared.ok) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_PRODUCT_REF', message: prepared.error } });
+        //   productRef 는 optional. 저장 전 형식/제품 org 스코프 검증(서비스 내부).
+        const result = await createDirectContent(dataSource, organizationId, userId, req.body);
+        if (!result.ok) {
+          sendContentFailure(res, result);
           return;
         }
 
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = repo.create({
-          snapshot_id: null,
-          source_type: 'direct',
-          organization_id: organizationId,
-          title: title.trim(),
-          content_json: (contentJson ?? {}) as Record<string, unknown>,
-          tags: normalizeTags(tags),
-          updated_by: userId,
-        });
-        const saved = await repo.save(content);
-
-        await applyProductRefPlan(organizationId, saved.id, prepared.plan);
-
-        res.status(201).json({
-          success: true,
-          data: {
-            id: saved.id,
-            sourceType: saved.source_type,
-            organizationId: saved.organization_id,
-            title: saved.title,
-            contentJson: saved.content_json,
-            tags: saved.tags ?? [],
-            updatedAt: saved.updated_at,
-            updatedBy: saved.updated_by,
-          },
-        });
+        res.status(201).json({ success: true, data: result.data });
       } catch (error: any) {
         res.status(500).json({
           success: false,
@@ -838,28 +700,13 @@ export function createStoreContentController(
           return;
         }
 
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+        const result = await getDirectContent(dataSource, organizationId, id);
+        if (!result.ok) {
+          sendContentFailure(res, result);
           return;
         }
 
-        res.json({
-          success: true,
-          data: {
-            id: content.id,
-            sourceType: content.source_type,
-            title: content.title,
-            contentJson: content.content_json,
-            tags: content.tags ?? [],
-            updatedAt: content.updated_at,
-            updatedBy: content.updated_by,
-          },
-        });
+        res.json({ success: true, data: result.data });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -906,48 +753,14 @@ export function createStoreContentController(
           return;
         }
 
-        const { title, contentJson, tags, productRef } = req.body as { title?: string; contentJson?: Record<string, unknown>; tags?: unknown; productRef?: unknown };
-
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증(서비스 내부).
+        const result = await updateDirectContent(dataSource, organizationId, userId, id, req.body);
+        if (!result.ok) {
+          sendContentFailure(res, result);
           return;
         }
 
-        // WO-O4O-KPA-STORE-HANDLED-PRODUCTS-CONTENT-LINK-V1: productRef optional, 저장 전 검증.
-        const prepared = await prepareProductRef(organizationId, productRef);
-        if (!prepared.ok) {
-          res.status(400).json({ success: false, error: { code: 'INVALID_PRODUCT_REF', message: prepared.error } });
-          return;
-        }
-
-        if (title !== undefined) content.title = title.trim() || content.title;
-        if (contentJson !== undefined) content.content_json = contentJson as Record<string, unknown>;
-        // tags 미전송 시 기존 값 보존, 전송 시 sanitize 후 교체.
-        if (tags !== undefined) content.tags = normalizeTags(tags);
-        content.updated_by = userId;
-
-        const saved = await repo.save(content);
-
-        // productRef 미전송 → 기존 link 유지 / null → 제거 / 객체 → 교체.
-        await applyProductRefPlan(organizationId, saved.id, prepared.plan);
-
-        res.json({
-          success: true,
-          data: {
-            id: saved.id,
-            sourceType: saved.source_type,
-            title: saved.title,
-            contentJson: saved.content_json,
-            tags: saved.tags ?? [],
-            updatedAt: saved.updated_at,
-            updatedBy: saved.updated_by,
-          },
-        });
+        res.json({ success: true, data: result.data });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }
@@ -992,19 +805,13 @@ export function createStoreContentController(
           return;
         }
 
-        const repo = dataSource.getRepository(KpaStoreContent);
-        const content = await repo.findOne({
-          where: { id, organization_id: organizationId, source_type: 'direct' },
-        });
-
-        if (!content) {
-          res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Direct content not found' } });
+        const result = await deleteDirectContent(dataSource, organizationId, id);
+        if (!result.ok) {
+          sendContentFailure(res, result);
           return;
         }
 
-        await repo.remove(content);
-
-        res.json({ success: true, data: { deleted: true, id } });
+        res.json({ success: true, data: result.data });
       } catch (error: any) {
         res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: error.message } });
       }

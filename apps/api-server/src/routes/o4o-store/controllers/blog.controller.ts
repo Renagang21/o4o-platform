@@ -32,23 +32,33 @@ import { StoreBlogSettings } from '../../glycopharm/entities/store-blog-settings
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
 // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: 원본(source)→blog_post 관계 기록
-import { recordDerivations } from '../services/store-asset-derivation.service.js';
+// WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1:
+//   staff \uC800\uC791 \uB85C\uC9C1\uC744 services/store/store-blog.service.ts \uB85C \uCD94\uCD9C.
+//   \uC774 \uCEE8\uD2B8\uB864\uB7EC\uB294 slug\u2192\uB9E4\uC7A5 \uD574\uC11D + \uC18C\uC720 \uD655\uC778 + \uC751\uB2F5 envelope \uB9CC \uB2F4\uB2F9\uD55C\uB2E4.
+//   Pharmacy-Hub \uB294 \uAC19\uC740 \uC11C\uBE44\uC2A4 \uD568\uC218\uB97C enrollment \uAE30\uC900 \uC870\uC9C1 \uD574\uC11D\uAE30\uC640 \uD568\uAED8 \uD638\uCD9C\uD55C\uB2E4.
+import {
+  listStoreBlogPosts,
+  createStoreBlogPost,
+  updateStoreBlogPost,
+  publishStoreBlogPost,
+  archiveStoreBlogPost,
+  deleteStoreBlogPost,
+  type BlogFailure,
+  type BlogResult,
+} from '../../../services/store/store-blog.service.js';
 
 const DEFAULT_SERVICE_KEY = 'glycopharm';
 
 /**
- * Generate URL-friendly slug from title.
- * Keeps Korean characters (URL-encoded by browser), strips special chars.
+ * \uC2E4\uD328 \uACB0\uACFC\uB97C \uC6D0\uBCF8\uACFC \uB3D9\uC77C\uD55C nested envelope \uC73C\uB85C \uB0B4\uB824\uBCF4\uB0B8\uB2E4.
+ * (strictNullChecks \uAC00 \uAEBC\uC838 \uC788\uC5B4 `!result.ok` \uB85C union \uC774 \uC881\uD600\uC9C0\uC9C0 \uC54A\uB294\uB2E4.)
  */
-function generateSlug(title: string): string {
-  return title
-    .toLowerCase()
-    .trim()
-    .replace(/[^\w\uAC00-\uD7AF\u1100-\u11FF\u3130-\u318F\s-]/g, '')
-    .replace(/[\s_]+/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-    .substring(0, 140);
+function sendBlogFailure(res: Response, result: BlogResult<unknown>): void {
+  const failure = result as BlogFailure;
+  res.status(failure.status).json({
+    success: false,
+    error: { code: failure.code, message: failure.message },
+  });
 }
 
 /**
@@ -146,9 +156,6 @@ export function createBlogController(
       const { slug } = req.params;
       const authReq = req as unknown as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
-      const statusFilter = req.query.status as string | undefined;
 
       const pharmacy = await resolvePharmacy(slug);
       if (!pharmacy) {
@@ -161,22 +168,17 @@ export function createBlogController(
         return;
       }
 
-      const where: any = { storeId: pharmacy.id, serviceKey };
-      if (statusFilter && ['draft', 'published', 'archived'].includes(statusFilter)) {
-        where.status = statusFilter;
-      }
-
-      const [posts, total] = await blogRepo.findAndCount({
-        where,
-        order: { updatedAt: 'DESC' },
-        skip: (page - 1) * limit,
-        take: limit,
-      });
+      const { posts, page, limit, total, totalPages } = await listStoreBlogPosts(
+        dataSource,
+        pharmacy.id,
+        serviceKey,
+        { page: req.query.page, limit: req.query.limit, status: req.query.status },
+      );
 
       res.json({
         success: true,
         data: posts,
-        meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
+        meta: { page, limit, total, totalPages },
       });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
@@ -192,10 +194,8 @@ export function createBlogController(
       const { slug } = req.params;
       const authReq = req as unknown as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: optional sourceItems (원본 관계 기록용)
-      const { title, content, excerpt, slug: postSlug, sourceItems } = req.body;
-
-      if (!title || !content) {
+      // 원본 응답 순서 보존: 입력 누락(400)이 매장 조회(404)·소유 확인(403)보다 앞선다.
+      if (!req.body?.title || !req.body?.content) {
         res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title and content are required' } });
         return;
       }
@@ -211,50 +211,14 @@ export function createBlogController(
         return;
       }
 
-      const finalSlug = postSlug || generateSlug(title);
-
-      // Check slug uniqueness within store
-      const existing = await blogRepo.findOne({ where: { storeId: pharmacy.id, slug: finalSlug } });
-      if (existing) {
-        res.status(409).json({ success: false, error: { code: 'SLUG_CONFLICT', message: 'A post with this slug already exists' } });
+      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1: optional sourceItems (원본 관계 기록용)
+      const result = await createStoreBlogPost(dataSource, pharmacy.id, serviceKey, userId ?? null, req.body);
+      if (!result.ok) {
+        sendBlogFailure(res, result);
         return;
       }
 
-      const post = blogRepo.create({
-        storeId: pharmacy.id,
-        serviceKey,
-        title,
-        slug: finalSlug,
-        excerpt: excerpt || content.substring(0, 200),
-        content,
-        status: 'draft' as StoreBlogPostStatus,
-      });
-
-      const saved = await blogRepo.save(post);
-
-      // WO-KPA-STORE-ASSET-DERIVATION-BLOG-WRITEPATH-V1:
-      //   원본(source)→blog_post 관계 best-effort 기록. sourceItems 미전달 시 미기록(기존 동작 100%).
-      //   organization_id = pharmacy.id ( = organizations.id, derivation/read endpoint 와 정합).
-      //   실패해도 블로그 생성 응답을 막지 않는다(보조 트래킹).
-      if (Array.isArray(sourceItems) && sourceItems.length > 0) {
-        try {
-          await recordDerivations(dataSource, {
-            serviceKey,
-            organizationId: pharmacy.id,
-            createdBy: userId ?? null,
-            derivedKind: 'blog_post',
-            derivedId: saved.id,
-            derivedTitle: saved.title,
-            sources: sourceItems
-              .filter((s: any) => s && s.id && s.kind)
-              .map((s: any) => ({ kind: s.kind, id: s.id, title: s.title ?? null })),
-          });
-        } catch (derivationErr) {
-          console.error('[store-blog] derivation record failed (non-blocking)', derivationErr);
-        }
-      }
-
-      res.status(201).json({ success: true, data: saved });
+      res.status(201).json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
@@ -269,7 +233,6 @@ export function createBlogController(
       const { slug, id } = req.params;
       const authReq = req as unknown as AuthRequest;
       const userId = authReq.user?.id || authReq.authUser?.id;
-      const { title, content, excerpt, slug: postSlug } = req.body;
 
       const pharmacy = await resolvePharmacy(slug);
       if (!pharmacy) {
@@ -282,28 +245,13 @@ export function createBlogController(
         return;
       }
 
-      const post = await blogRepo.findOne({ where: { id, storeId: pharmacy.id } });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
+      const result = await updateStoreBlogPost(dataSource, pharmacy.id, id, req.body);
+      if (!result.ok) {
+        sendBlogFailure(res, result);
         return;
       }
 
-      // If slug is being changed, check uniqueness
-      if (postSlug && postSlug !== post.slug) {
-        const existing = await blogRepo.findOne({ where: { storeId: pharmacy.id, slug: postSlug } });
-        if (existing) {
-          res.status(409).json({ success: false, error: { code: 'SLUG_CONFLICT', message: 'A post with this slug already exists' } });
-          return;
-        }
-        post.slug = postSlug;
-      }
-
-      if (title) post.title = title;
-      if (content) post.content = content;
-      if (excerpt !== undefined) post.excerpt = excerpt;
-
-      const saved = await blogRepo.save(post);
-      res.json({ success: true, data: saved });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
@@ -330,21 +278,13 @@ export function createBlogController(
         return;
       }
 
-      const post = await blogRepo.findOne({ where: { id, storeId: pharmacy.id } });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
+      const result = await publishStoreBlogPost(dataSource, pharmacy.id, id);
+      if (!result.ok) {
+        sendBlogFailure(res, result);
         return;
       }
 
-      if (post.status === 'published') {
-        res.status(400).json({ success: false, error: { code: 'ALREADY_PUBLISHED', message: 'Post is already published' } });
-        return;
-      }
-
-      post.status = 'published';
-      post.publishedAt = new Date();
-      const saved = await blogRepo.save(post);
-      res.json({ success: true, data: saved });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
@@ -371,15 +311,13 @@ export function createBlogController(
         return;
       }
 
-      const post = await blogRepo.findOne({ where: { id, storeId: pharmacy.id } });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
+      const result = await archiveStoreBlogPost(dataSource, pharmacy.id, id);
+      if (!result.ok) {
+        sendBlogFailure(res, result);
         return;
       }
 
-      post.status = 'archived';
-      const saved = await blogRepo.save(post);
-      res.json({ success: true, data: saved });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
@@ -611,14 +549,13 @@ export function createBlogController(
         return;
       }
 
-      const post = await blogRepo.findOne({ where: { id, storeId: pharmacy.id } });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Blog post not found' } });
+      const result = await deleteStoreBlogPost(dataSource, pharmacy.id, id);
+      if (!result.ok) {
+        sendBlogFailure(res, result);
         return;
       }
 
-      await blogRepo.remove(post);
-      res.json({ success: true, data: { id, deleted: true } });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }

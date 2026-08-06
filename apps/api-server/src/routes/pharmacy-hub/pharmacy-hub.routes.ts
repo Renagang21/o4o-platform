@@ -19,6 +19,9 @@
  *   PATCH /api/v1/pharmacy-hub/store-owner/account/profile               (store_owner) 내 계정 수정
  *   *     /api/v1/pharmacy-hub/store-owner/handled-products*             (store_owner) 매장 경영활용 제품
  *   *     /api/v1/pharmacy-hub/store-owner/local-products*               (store_owner) 매장 자체 상품
+ *   *     /api/v1/pharmacy-hub/store-owner/content*                     (store_owner) 매장 콘텐츠
+ *   *     /api/v1/pharmacy-hub/store-owner/library*                     (store_owner) 자료함
+ *   *     /api/v1/pharmacy-hub/store-owner/blog*                        (store_owner) 블로그
  *
  * 포함하지 않는 것 (후속 WO):
  *   상품 카탈로그/장바구니/주문, 콘텐츠 저작·전달, 커뮤니티, 이벤트 오퍼.
@@ -47,6 +50,10 @@ import { PharmacyHubAccountController } from '../../controllers/pharmacy-hub/Pha
 // WO-PHARMACY-HUB-STORE-HANDLED-PRODUCTS-V1
 import { PharmacyHubHandledProductController } from '../../controllers/pharmacy-hub/PharmacyHubHandledProductController.js';
 import { PharmacyHubLocalProductController } from '../../controllers/pharmacy-hub/PharmacyHubLocalProductController.js';
+// WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1
+import { PharmacyHubStoreContentController } from '../../controllers/pharmacy-hub/PharmacyHubStoreContentController.js';
+import { PharmacyHubStoreLibraryController } from '../../controllers/pharmacy-hub/PharmacyHubStoreLibraryController.js';
+import { PharmacyHubStoreBlogController } from '../../controllers/pharmacy-hub/PharmacyHubStoreBlogController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -282,6 +289,47 @@ export function createPharmacyHubRoutes(): Router {
     ...storeOwnerGuards,
     PharmacyHubLocalProductController.deactivate,
   );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 콘텐츠 · 자료함 · 블로그 (WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1)
+  //
+  //   원장은 전부 공통 테이블이다 — 신규 Pharmacy-Hub 전용 테이블 0 / migration 0.
+  //     content : kpa_store_contents      (legacy physical name = Store Production Material)
+  //     library : store_execution_assets
+  //     blog    : store_blog_posts        (경계 = store_id + service_key)
+  //
+  //   검증·SQL 계약은 공통 services/store/store-{content,library,blog}.service.ts 를
+  //   그대로 호출한다 (KPA·K-Cosmetics 화면/로직 복사 0).
+  //
+  //   공통 `/api/v1/store/*` 를 그대로 마운트하지 않는 이유 — 세 축 모두 조직 해석이
+  //   Pharmacy-Hub 와 어긋난다:
+  //     library : createRequireStoreOwner(resolveStoreAccess) 가 service scope 없이
+  //               organization_members 를 정렬 없는 LIMIT 1 로 고른다
+  //     content : isStoreOwner(..., 'kpa') + KpaMember fallback (KPA 하드와이어)
+  //     blog    : URL slug 로 매장을 찾고 소유 확인이 서비스별로 갈린다
+  //   공통 resolveStoreAccess·공통 store-owner 가드는 변경 금지(WO)이므로 조직만 여기서 정한다.
+  //
+  //   블로그 V1 범위는 저작·관리까지다. Pharmacy-Hub 공개 블로그 렌더링 경로는
+  //   아직 없으며 본 WO 에서 만들지 않는다 (발행 상태만 기록).
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/content', ...storeOwnerGuards, PharmacyHubStoreContentController.list);
+  router.post('/store-owner/content', ...storeOwnerGuards, PharmacyHubStoreContentController.create);
+  router.get('/store-owner/content/:id', ...storeOwnerGuards, PharmacyHubStoreContentController.detail);
+  router.put('/store-owner/content/:id', ...storeOwnerGuards, PharmacyHubStoreContentController.update);
+  router.delete('/store-owner/content/:id', ...storeOwnerGuards, PharmacyHubStoreContentController.remove);
+
+  router.get('/store-owner/library', ...storeOwnerGuards, PharmacyHubStoreLibraryController.list);
+  router.post('/store-owner/library', ...storeOwnerGuards, PharmacyHubStoreLibraryController.create);
+  router.put('/store-owner/library/:id', ...storeOwnerGuards, PharmacyHubStoreLibraryController.update);
+  router.delete('/store-owner/library/:id', ...storeOwnerGuards, PharmacyHubStoreLibraryController.deactivate);
+
+  router.get('/store-owner/blog', ...storeOwnerGuards, PharmacyHubStoreBlogController.list);
+  router.post('/store-owner/blog', ...storeOwnerGuards, PharmacyHubStoreBlogController.create);
+  router.get('/store-owner/blog/:id', ...storeOwnerGuards, PharmacyHubStoreBlogController.detail);
+  router.put('/store-owner/blog/:id', ...storeOwnerGuards, PharmacyHubStoreBlogController.update);
+  router.patch('/store-owner/blog/:id/publish', ...storeOwnerGuards, PharmacyHubStoreBlogController.publish);
+  router.patch('/store-owner/blog/:id/archive', ...storeOwnerGuards, PharmacyHubStoreBlogController.archive);
+  router.delete('/store-owner/blog/:id', ...storeOwnerGuards, PharmacyHubStoreBlogController.remove);
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)

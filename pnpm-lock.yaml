@@ -3406,6 +3406,9 @@ importers:
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
+      '@o4o/content-editor':
+        specifier: workspace:*
+        version: link:../../packages/content-editor
       '@o4o/error-handling':
         specifier: workspace:*
         version: link:../../packages/error-handling

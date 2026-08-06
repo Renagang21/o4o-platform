@@ -200,6 +200,15 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
       { key: 'handled-products', label: '매장 경영활용 제품', subPath: '/handled-products' },
       { key: 'local-products',   label: '매장 자체 상품',     subPath: '/local-products' },
     ]},
+    // WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 (2026-08-06)
+    //   canonical tree 의 "자료함" 축. 원장은 공통 테이블(kpa_store_contents /
+    //   store_execution_assets / store_blog_posts) 재사용 — Pharmacy-Hub 전용 테이블 0.
+    //   QR·POP·태블릿·사이니지는 route 도 기능도 없으므로 메뉴를 만들지 않는다 (데드링크 0).
+    { label: '콘텐츠·자료함', items: [
+      { key: 'store-contents', label: '매장 콘텐츠', subPath: '/content' },
+      { key: 'library',        label: '자료함',      subPath: '/library' },
+      { key: 'blog',           label: '블로그',      subPath: '/blog' },
+    ]},
     // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)
     //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).
     //   매장 정보 = organizations(조직) / 내 계정 = users(사용자) — 서로 다른 축이라 항목을 분리한다.
