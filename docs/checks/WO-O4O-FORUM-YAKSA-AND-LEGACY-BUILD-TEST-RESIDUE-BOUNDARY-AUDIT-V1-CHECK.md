@@ -369,9 +369,11 @@ pnpm --filter @o4o/main-site run build
 | 항목 | 값 |
 |---|---|
 | CHECK 경로 | `docs/checks/WO-O4O-FORUM-YAKSA-AND-LEGACY-BUILD-TEST-RESIDUE-BOUNDARY-AUDIT-V1-CHECK.md` |
-| commit | (아래 §20 결과 참조) |
-| push | (아래 §20 결과 참조) |
-| 최종 ahead/behind | (아래 §20 결과 참조) |
+| commit | `3c9b1ac0c` — docs(check): forum-yaksa·Vite alias·멀티테넌트 fixture 소비 경계 감사 (1 file changed, 380 insertions(+)) |
+| push | `1c3ae52ec..3c9b1ac0c  main -> main` |
+| 최종 ahead/behind | **0 / 0** |
+
+commit 에 포함된 파일은 본 CHECK 1건뿐임을 `git show --name-only --format= HEAD` 로 확인했다. 타 세션 HFF ZH WIP 9건은 push 이후에도 작업 트리에 그대로 남아 있다.
 
 ---
 
