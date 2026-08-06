@@ -1,0 +1,100 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "en-validator-selftest",
+  "note": "합성 EN 은 검증기 시험 전용 산출물이며 DB 에 저장하지 않는다.",
+  "masters": 19360,
+  "sample": 300,
+  "frameCoverage": {
+    "uncoveredHeadings": {},
+    "uncoveredBadges": {},
+    "uncoveredFooters": {},
+    "uncoveredFooterTotal": 0,
+    "pass": true
+  },
+  "baseline": {
+    "pass": 300,
+    "fail": 0,
+    "failCodes": {},
+    "sampleFailures": []
+  },
+  "mutationDetection": {
+    "IDENTITY_ALTERED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "IDENTITY_ROMANIZED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "LABEL_UNTRANSLATED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "NUMBER_SEQUENCE": {
+      "applicable": 298,
+      "caught": 298,
+      "missed": 0,
+      "skipped": 2,
+      "detectionRate": 100
+    },
+    "NUMBER_ADDED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "SENTENCE_COUNT": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "ROUTE_LOST": {
+      "applicable": 289,
+      "caught": 289,
+      "missed": 0,
+      "skipped": 11,
+      "detectionRate": 100
+    },
+    "NEGATION_WEAKENED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "TRUNCATED": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "HANGUL_LEFTOVER": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    },
+    "STRUCTURE_MISMATCH": {
+      "applicable": 300,
+      "caught": 300,
+      "missed": 0,
+      "skipped": 0,
+      "detectionRate": 100
+    }
+  },
+  "dbWrites": 0
+}
