@@ -1,0 +1,24 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-api-verify(apismoke)",
+  "base": "https://api.neture.co.kr",
+  "populationWithLanding": 19360,
+  "requested": 50,
+  "checks": {
+    "HTTP_200": 50,
+    "AUTHED": 50,
+    "EN_IN_LANGUAGES": 50,
+    "EN_RESOLVED": 50,
+    "BODY_HASH_MATCH": 50
+  },
+  "allPassed": true,
+  "koRegression": {
+    "sample": 50,
+    "RESOLVED_KO": 50,
+    "KO_BODY_PRESENT": 50,
+    "NO_STORE_CACHE": 50
+  },
+  "failureCount": 0,
+  "failures": [],
+  "dbWrites": 0
+}

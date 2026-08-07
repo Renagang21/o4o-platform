@@ -1,0 +1,23 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-apply(rollback)",
+  "planDigest": "38c76c256fc6a9c03b77154fc45c29ff96e435242bd34555b22349aeb9a0bb4b",
+  "planRows": 19360,
+  "targets": 19360,
+  "shard": {
+    "offset": 18000,
+    "size": 1360,
+    "nextOffset": 19360
+  },
+  "examined": 1360,
+  "updated": 1329,
+  "inserted": 31,
+  "alreadyCurrent": 0,
+  "applyBlocked": 0,
+  "reconciled": true,
+  "stopReason": null,
+  "blockedSample": [],
+  "committed": false,
+  "dbWrites": 0,
+  "blockedAll": []
+}

@@ -1,0 +1,20 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-post-verify(post)",
+  "planRows": 19360,
+  "verified": 19360,
+  "reconciled": true,
+  "verdictTally": {
+    "APPLIED": 19360
+  },
+  "hiddenEnRemaining": 0,
+  "languageCombinations": {
+    "ko+en": 19360
+  },
+  "rerender": {
+    "checked": 19360,
+    "failed": 0
+  },
+  "problems": [],
+  "dbWrites": 0
+}

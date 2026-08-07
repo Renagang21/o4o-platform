@@ -1,0 +1,163 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "guard-snapshot(after)",
+  "distribution": [
+    {
+      "lang": "en",
+      "dt": "B2B",
+      "status": "canonical",
+      "alive": true,
+      "n": 15
+    },
+    {
+      "lang": "en",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": false,
+      "n": 9
+    },
+    {
+      "lang": "en",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": true,
+      "n": 63207
+    },
+    {
+      "lang": "en",
+      "dt": "STORE",
+      "status": "deprecated",
+      "alive": true,
+      "n": 34
+    },
+    {
+      "lang": "en",
+      "dt": "STORE",
+      "status": "hidden",
+      "alive": true,
+      "n": 101
+    },
+    {
+      "lang": "en",
+      "dt": "STORE",
+      "status": "needs_review",
+      "alive": false,
+      "n": 2
+    },
+    {
+      "lang": "ja",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": true,
+      "n": 32270
+    },
+    {
+      "lang": "ko",
+      "dt": "B2B",
+      "status": "canonical",
+      "alive": true,
+      "n": 28
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "candidate",
+      "alive": true,
+      "n": 273
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": false,
+      "n": 9
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": true,
+      "n": 63385
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "deprecated",
+      "alive": true,
+      "n": 39652
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "draft",
+      "alive": false,
+      "n": 2
+    },
+    {
+      "lang": "ko",
+      "dt": "STORE",
+      "status": "hidden",
+      "alive": true,
+      "n": 10
+    },
+    {
+      "lang": "zh",
+      "dt": "B2B",
+      "status": "canonical",
+      "alive": true,
+      "n": 13
+    },
+    {
+      "lang": "zh",
+      "dt": "STORE",
+      "status": "candidate",
+      "alive": true,
+      "n": 13
+    },
+    {
+      "lang": "zh",
+      "dt": "STORE",
+      "status": "canonical",
+      "alive": true,
+      "n": 41324
+    },
+    {
+      "lang": "zh",
+      "dt": "STORE",
+      "status": "hidden",
+      "alive": true,
+      "n": 912
+    }
+  ],
+  "fingerprints": [
+    {
+      "lang": "en",
+      "n": 63357,
+      "fp": "e116d1703cdc100e5313901f26c88259"
+    },
+    {
+      "lang": "ja",
+      "n": 32270,
+      "fp": "33babb66fa27488d57a3b702e9296e48"
+    },
+    {
+      "lang": "ko",
+      "n": 103348,
+      "fp": "ad22eb8fdc02d901a6a96ea90fb8e30e"
+    },
+    {
+      "lang": "zh",
+      "n": 42262,
+      "fp": "b02cc0ba5e8d811a5f8ce74954904dd1"
+    }
+  ],
+  "productMasters": 239361,
+  "productIdentifiers": 638428,
+  "migrations": {
+    "table": "typeorm_migrations",
+    "n": 630,
+    "maxTs": "2026052100001"
+  },
+  "schemaFingerprint": "11f43c5b4b2fdd9afd07a5e13832513e",
+  "dbWrites": 0
+}

@@ -1,0 +1,258 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-risk-sample-inspect",
+  "note": "브라우저 smoke 아님 — 브라우저 자동화 도구 부재로 §19 미수행. 공개 API 응답 HTML 의 구조 검사만 수행.",
+  "samples": 13,
+  "passedAll": 13,
+  "failures": [],
+  "results": [
+    {
+      "category": "ophthalmic",
+      "masterId": "000eb144-db87-4d29-bcfa-dad852a15c3c",
+      "itemSeq": "201202817",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 5714,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "oromucosal_gargle",
+      "masterId": "00118960-8492-4e7f-be55-eae5508ebfc5",
+      "itemSeq": "200300953",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 2838,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "topical_apply",
+      "masterId": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "itemSeq": "201905265",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 2914,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "rectal",
+      "masterId": "0044748c-e724-4783-8105-9034be750ca3",
+      "itemSeq": "201405042",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 3580,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "injection",
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "itemSeq": "200704064",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 3973,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "inhalation",
+      "masterId": "008c149e-b312-404a-922b-5c2ec1dec0ed",
+      "itemSeq": "201801542",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 3413,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "vaginal",
+      "masterId": "00c466a4-5451-44ce-a1a2-701db6f46684",
+      "itemSeq": "200503139",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 3717,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "math_gt",
+      "masterId": "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "itemSeq": "202501947",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 5790,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "longest_content",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 9082,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "shortest_content",
+      "masterId": "d77604ba-36a3-47cd-8334-1afdf5860819",
+      "itemSeq": "200511332",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 1438,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "numeric_heavy",
+      "masterId": "3ad7cd8d-68e9-45f5-ae42-2344d0a5c639",
+      "itemSeq": "199302363",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 8101,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "create_new_en",
+      "masterId": "605ba356-4180-4e9d-8360-bff9b7a510dd",
+      "itemSeq": "202402740",
+      "action": "CREATE_NEW_EN",
+      "htmlLength": 8127,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    },
+    {
+      "category": "update_hidden_en",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "htmlLength": 9082,
+      "TAG_BALANCE": true,
+      "SD_CLASSES": true,
+      "EN_HEADINGS": true,
+      "NO_KO_IN_BODY": true,
+      "koLeftoverSample": [],
+      "FOOTER_PRESENT": true,
+      "h2Sample": [
+        "Product overview",
+        "Indications",
+        "Directions for use",
+        "Do not use"
+      ]
+    }
+  ],
+  "dbWrites": 0
+}

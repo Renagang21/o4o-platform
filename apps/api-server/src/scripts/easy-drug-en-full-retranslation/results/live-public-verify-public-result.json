@@ -1,0 +1,29 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-public-verify(public)",
+  "population": 19360,
+  "checks": {
+    "EN_PRESENT": 19360,
+    "EN_RESOLVES": 19360,
+    "KO_DEFAULT": 19360,
+    "ORDER_KO_FIRST": 19360
+  },
+  "allPassed": true,
+  "failures": [],
+  "failureCount": 0,
+  "languageCombinations": {
+    "ko+en": 19360
+  },
+  "landing": {
+    "issued": 19360,
+    "active": 19360,
+    "blocked": 0,
+    "none": 0,
+    "byState": {
+      "active/ok": 19360
+    }
+  },
+  "publicEndpoint": "GET /api/v1/public/product-landings/:publicKey?locale=en",
+  "cacheContract": "Cache-Control: no-store, private + Vary: Authorization (공개 shared cache 미저장 — CDN stale 구조적으로 없음)",
+  "dbWrites": 0
+}

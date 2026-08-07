@@ -6,3 +6,12 @@ tm-census.jsonl
 
 # 조립 산출물(대용량, TM 에서 재생성 가능). tm-store.jsonl 은 **재생성 불가한 번역 자산이므로 반드시 커밋한다.**
 en-units.jsonl
+
+# LIVE apply 원장(대용량). 무결성 기준은 파일이 아니라 live-census-result.json 의 planDigest 다.
+#   live-apply-plan.jsonl      8MB — productionEnHash 는 md5(renderEnHtml(KO canonical, en-units)) 로 언제든 재계산된다
+#                                    (live-post-verify --rerender 가 전 모집단 19,360/0 실패로 증명).
+#   live-apply-undo.jsonl     70MB — UPDATE 직전 EN 본문 전량. 운영 콘텐츠라 커밋 대상 아님.
+#   live-expectations-*.jsonl        DB 에서 재생성 가능한 언어 기대값.
+live-apply-plan.jsonl
+live-apply-undo.jsonl
+live-expectations-*.jsonl

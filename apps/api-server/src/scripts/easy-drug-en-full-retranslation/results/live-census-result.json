@@ -1,0 +1,44 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-LIVE-APPLY-AND-PUBLIC-VERIFY-V1",
+  "step": "live-census-and-plan",
+  "population": 19360,
+  "classified": 19360,
+  "unclassified": 0,
+  "tally": {
+    "UPDATE_SINGLE_HIDDEN_EN": 18980,
+    "CREATE_NEW_EN": 380
+  },
+  "planDigest": "38c76c256fc6a9c03b77154fc45c29ff96e435242bd34555b22349aeb9a0bb4b",
+  "planFile": "../../../../../../../../tmp/plan-postrollback.jsonl",
+  "sourceTypeTally": {
+    "koCanonical": {
+      "mfds_easy_drug": 19360
+    },
+    "enHidden": {
+      "mfds_drug_otc": 14597,
+      "o4o_drug_otc_topical": 2528,
+      "mfds_drug_otc_nutrition_combo": 1855
+    },
+    "enCanonical": {}
+  },
+  "renderFail": 0,
+  "charNote": {
+    "gt": 12,
+    "rawAmp": 0,
+    "gtSamples": [
+      "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "062ac5ce-c577-4502-84a9-57350847ba92",
+      "21f34f2a-770b-438f-85cd-3af380f51464",
+      "2a80c422-6f9c-4ef7-9ca5-e0ff79ac264a",
+      "4dd50cbf-6bde-4a4a-97b5-6d7548fe1d96",
+      "545c0343-a56b-4624-8161-9dc63c3437bc",
+      "5f42343c-96a4-4f8e-a787-59c97227d5bf",
+      "613621e8-81b5-433a-8a8b-2ee33fc89f81",
+      "6c059fc7-2d4a-44a3-ad93-03c71b67730d",
+      "8e32ad9c-7a15-47a3-88c3-ee6afd8ac6d0"
+    ],
+    "ampSamples": []
+  },
+  "blockSamples": [],
+  "dbWrites": 0
+}

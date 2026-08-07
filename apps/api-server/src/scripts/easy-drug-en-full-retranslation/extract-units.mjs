@@ -174,4 +174,11 @@ async function main() {
   process.stdout.write(JSON.stringify(out, null, 2) + '\n');
 }
 
-main().catch((e) => { process.stderr.write(`${e?.stack || e}\n`); process.exit(1); });
+// **직접 실행일 때만 추출기를 돌린다.** 이 파일은 segment() 를 export 하므로 다른 모듈이 import 하는데,
+// 무조건 main() 을 호출하면 import 만으로 ko-units.jsonl 을 잘라내고 DB 재조회를 시작한다(실측 사고).
+const invokedDirectly = process.argv[1]
+  && new URL(`file:///${process.argv[1].replace(/\\/g, '/')}`).pathname.replace(/^\/([A-Za-z]:)/, '$1')
+     === new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1');
+if (invokedDirectly) {
+  main().catch((e) => { process.stderr.write(`${e?.stack || e}\n`); process.exit(1); });
+}
