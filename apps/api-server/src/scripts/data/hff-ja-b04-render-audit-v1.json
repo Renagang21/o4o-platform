@@ -1,0 +1,60 @@
+{
+ "wo": "WO-O4O-HFF-JA-REMAINING-16162-PHRASE-AUTHORING-STRUCTURED-COMPRESSION-AND-CONTINUOUS-SHARDS-V1",
+ "batch": "batch04",
+ "renderedAt": "2026-08-07T13:58:52.340Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "poolWithoutJa": 13504,
+ "targets": 2635,
+ "batchSize": 2635,
+ "canonicalDup": 0,
+ "truncated": false,
+ "producedCandidates": 2635,
+ "notProducedInPool": 10869,
+ "notProducedByWhy": {
+  "UNRESOLVED": 10462,
+  "GATE_PARTICLE_DUP": 160,
+  "GATE_KANJI_DUP": 184,
+  "SIMPLIFIED_REMAINS": 40,
+  "GATE_CLAIM_RUN": 21,
+  "NUMBER_DRIFT": 1,
+  "GATE_ABNORMAL_AFTER_NUM": 1
+ },
+ "remainingAfterBatch": 10869,
+ "nextRoundDistinctBlockingPhrases": 16064,
+ "documentsRendered": 1097,
+ "structureSignatures": 308,
+ "coverage": "signature-exhaustive + high-risk full",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "renders": 3291,
+ "counters": {
+  "structureParity": 0,
+  "pageOverflow": 0,
+  "elementOverflow": 0,
+  "clipped": 0,
+  "emptyH2": 0,
+  "emptyUl": 0,
+  "emptyLi": 0,
+  "undefinedClass": 0,
+  "rawHtml": 0,
+  "hangulVisible": 0,
+  "markerVisible": 0,
+  "labelLost": 0,
+  "licenseNoLost": 0,
+  "simplifiedVisible": 0
+ },
+ "totalIssues": 0,
+ "verdict": "PASS",
+ "failures": [],
+ "issueQueue": 394,
+ "issueQueueNew": 366,
+ "issueQueueResolvedFromPrior": 0,
+ "issueByType": {
+  "TRANSLATION_AMBIGUOUS": 393,
+  "NUMBER_STRUCTURE_AMBIGUOUS": 1
+ }
+}
