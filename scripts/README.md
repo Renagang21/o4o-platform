@@ -31,7 +31,7 @@
 ├── deploy-admin.yml          # o4o-admin-dashboard 배포
 ├── deploy-main-site.yml      # o4o-main-site 배포
 ├── deploy-web-services.yml   # 서비스별 웹 5종 배포 (변경 감지 후 선별 배포)
-├── ci-pipeline.yml           # lint · type-check · build 검증
+├── ci-pipeline.yml           # type-check · lint(ratchet) · test · build 검증 (대부분 blocking)
 ├── ci-appstore-guard.yml     # App Store 패키지 가드
 ├── ci-guard-policy.yml       # 정책 가드
 ├── ci-security.yml           # 보안 검사
@@ -42,14 +42,27 @@
 
 ## 개발 스크립트
 
-### 로컬 개발
+> **로컬 개발 절차의 정본은 [SETUP.md](../SETUP.md) 입니다.**
+> 아래 `.sh` 스크립트는 **Linux 전용 레거시**로, 현재 표준 절차가 아닙니다.
+> 표준 검증 명령(`pnpm run type-check` · `lint` · `test` · `clean`)은 `node scripts/dev.mjs`
+> 기반이라 Windows 에서 bash 없이 동작합니다.
+
+### 로컬 개발 (Linux 전용 · 레거시)
 
 ```bash
-# 개발 서버 시작
+# 개발 서버 시작 — sudo systemctl 사용. Windows 에서 동작하지 않음
 ./scripts/dev-start.sh
 
-# 로컬 DB 설정
+# 로컬 DB 설정 — apt 기반 PostgreSQL 설치. Windows 에서 동작하지 않음
 ./scripts/setup-local-db.sh
+```
+
+Windows 에서는 대신 다음을 사용합니다 (상세: [SETUP.md](../SETUP.md) §3).
+
+```bash
+pnpm run dev:api      # API 서버
+pnpm run dev:admin    # Admin Dashboard
+pnpm run dev          # web + admin 동시
 ```
 
 ### CI/CD

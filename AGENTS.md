@@ -16,7 +16,7 @@
 - 이 저장소는 pnpm workspace 기반의 O4O Platform monorepo다.
 - 주요 앱/서비스는 apps/ 아래에 위치한다.
 - 코드 변경은 해당 기능 영역에 맞춰서, 필요 시 공통 모듈 영향도도 함께 확인한다.
-- Node 22.18.0, pnpm 9.x 사용을 권장한다.
+- Node 22.18.0, pnpm 10.25.0 을 사용한다 (루트 package.json `volta` 기준, CI 동일). 실행환경 정본은 SETUP.md.
 - 비밀정보·자격정보는 문서·로그·커밋·스크린샷에 포함하지 않는다.
 
 ## 3. Work Order 실행 원칙

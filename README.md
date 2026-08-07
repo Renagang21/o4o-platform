@@ -15,8 +15,8 @@ KPA-Society · Neture · GlycoPharm · K-Cosmetics · Pharmacy-Hub 등 여러 �
 | Database | PostgreSQL (GCP Cloud SQL) |
 | Infra | GCP Cloud Run + Artifact Registry |
 | CI/CD | GitHub Actions (`.github/workflows/`) |
-| Node | 22.18.0 이상 |
-| Package Manager | pnpm 9.x 이상 |
+| Node | 22.18.0 (`volta` 고정) |
+| Package Manager | pnpm 10.25.0 (`volta` 고정) |
 
 ## 워크스페이스 구조
 
@@ -44,13 +44,16 @@ o4o-platform/
 git clone <repository-url>
 cd o4o-platform
 
-pnpm install
+pnpm install --frozen-lockfile
 
-cp .env.example .env
-# .env 편집하여 설정 입력
+cp apps/api-server/.env.example apps/api-server/.env
+# apps/api-server/.env 편집하여 설정 입력
 ```
 
-개발 DB는 GCP Cloud SQL을 Cloud SQL Proxy 경유로 사용합니다. 프록시 설치·GCP 인증·환경변수 등
+API 서버가 실제로 읽는 환경파일은 **`apps/api-server/.env`** 입니다(루트 `.env` 아님).
+로컬 개발 DB는 `127.0.0.1:5432`, 운영 DB는 Cloud SQL Auth Proxy 경유 `127.0.0.1:5442` 로 분리합니다.
+
+프록시 설치·GCP 인증·환경변수·검증 명령·CI 게이트 등
 로컬 실행환경 구성 절차의 **단일 기준 문서는 [SETUP.md](SETUP.md)** 입니다.
 
 ## 주요 명령
@@ -66,7 +69,8 @@ pnpm run build:packages   # 공유 패키지만
 pnpm run build:apps       # 앱만
 
 # 검증
-pnpm run type-check
+pnpm run type-check            # 전체 (api-server 포함)
+pnpm run type-check:frontend   # api-server 제외
 pnpm run lint
 pnpm test
 pnpm run verify           # 레지스트리 검증 (shortcode / block / CPT)
@@ -77,7 +81,11 @@ pnpm run clean
 
 특정 워크스페이스만 대상으로 하려면 `pnpm --filter <package-name> <script>` 형태를 사용합니다.
 
-전체 스크립트 목록은 루트 [package.json](package.json), 스크립트 시스템 상세는
+CI(`ci-pipeline.yml`)는 위 검증을 `main` push · PR 에서 실행하며 대부분 **실패 시 차단**합니다.
+lint 만 기존 오류 102건을 baseline 으로 둔 **회귀 차단(ratchet)** 상태입니다 —
+상세는 [SETUP.md](SETUP.md) §5.
+
+전체 스크립트 목록은 루트 [package.json](package.json), 배포 인프라·스크립트 목록은
 [scripts/README.md](scripts/README.md)를 참조하세요.
 
 ## 문서
@@ -85,7 +93,8 @@ pnpm run clean
 | 문서 | 내용 |
 |---|---|
 | [CLAUDE.md](CLAUDE.md) | 개발 규칙 · 아키텍처 경계 · 운영 정책 |
-| [SETUP.md](SETUP.md) | 로컬 실행환경 정본 (설치 · 인증 · DB · 검증) |
+| [SETUP.md](SETUP.md) | 로컬 실행환경 정본 (설치 · 인증 · DB · 검증 · CI 게이트) |
+| [docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | Git 병렬 작업 · PC 이동 정본 |
 | [AGENTS.md](AGENTS.md) | Codex 실행 지침 |
 | [docs/README.md](docs/README.md) | 문서 폴더 구조 및 우선순위 |
 | [docs/baseline/](docs/baseline/) | Frozen 정책 · Baseline 기준선 |
@@ -126,20 +135,8 @@ feat / fix / docs / style / refactor / test / chore
 
 ## 트러블슈팅
 
-```bash
-# 포트 확인 (API 3001 / Admin 5173)
-lsof -i :3001
-
-# 빌드 실패 시 캐시 정리 후 재설치
-pnpm run clean
-rm -rf node_modules
-pnpm install
-pnpm run build:packages
-
-# 메모리 부족
-export NODE_OPTIONS="--max-old-space-size=4096"
-pnpm run build
-```
+DB 연결 실패 · 포트 충돌 · `Module not found` · 빌드 캐시 · 메모리 부족 등
+로컬 문제 해결 절차는 **[SETUP.md](SETUP.md) §6** 에만 유지합니다(Windows 기준 명령 포함).
 
 ## 지원
 
