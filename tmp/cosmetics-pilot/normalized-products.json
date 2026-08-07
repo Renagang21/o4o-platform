@@ -25,6 +25,7 @@
       "R05": 161,
       "R07": 6,
       "R06": 1,
+      "R18": 1,
       "R12": 2
     },
     "sourceCleanNameCompared": 353,
@@ -11803,10 +11804,10 @@
       "englishProductName": "AESTURA Atobarrier 365 Body Cream 250mL"
     },
     {
-      "unitKey": "센텔리안24|마데카크림타임리버스트리플()",
+      "unitKey": "센텔리안24|마데카크림타임리버스트리플",
       "group": "general",
       "brandName": "센텔리안24",
-      "canonicalProductName": "마데카 크림 타임 리버스 트리플 ( )",
+      "canonicalProductName": "마데카 크림 타임 리버스 트리플",
       "productType": "크림",
       "typeKeyword": "크림",
       "productTypeSource": "NAME_KEYWORD",
@@ -11821,6 +11822,7 @@
             "R04",
             "R05",
             "R08",
+            "R18",
             "R09"
           ],
           "variants": [],
@@ -17970,7 +17972,7 @@
       "brandName": "클리오",
       "canonicalProductName": "샤프, 쏘 심플 워터프루프 펜슬 라이너",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이라이너",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [
         "[5호 애쉬브라운]"
@@ -18002,7 +18004,7 @@
       "brandName": "클리오",
       "canonicalProductName": "익스트림 젤프레소 펜슬 라이너 [004 그레이브라운]",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이라이너",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [
@@ -18027,7 +18029,7 @@
       "brandName": "키스미",
       "canonicalProductName": "히로인메이크 스무스 리퀴드 아이라이너 N [01 딥블랙]",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이라이너",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [
@@ -18050,7 +18052,7 @@
       "brandName": "페리페라",
       "canonicalProductName": "스피디 스키니 브로우카라 [005 피오니애쉬]",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이브로우",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [
@@ -18073,7 +18075,7 @@
       "brandName": "힌스",
       "canonicalProductName": "시그니처 브로우 쉐이퍼 [다크브라운]",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이브로우",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [
@@ -18125,7 +18127,7 @@
       "brandName": "슈에무라",
       "canonicalProductName": "(해외) 하드 포뮬라 [02 씰브라운]",
       "productType": "메이크업",
-      "typeKeyword": "아이메이크업",
+      "typeKeyword": "아이브로우",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [
@@ -19171,8 +19173,8 @@
       "group": "general",
       "brandName": "브르카",
       "canonicalProductName": "밸런스 샴푸",
-      "productType": "샴푸",
-      "typeKeyword": "샴푸",
+      "productType": "탈모케어",
+      "typeKeyword": "탈모케어",
       "productTypeSource": "RETAIL_CATEGORY",
       "variants": [],
       "members": [

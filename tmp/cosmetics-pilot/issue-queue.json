@@ -1141,7 +1141,7 @@
       "issueType": "POSSIBLE_SAME_UNIT",
       "group": "general",
       "brandName": "센텔리안24",
-      "sourceProductName": "마데카 크림 타임 리버스 트리플 ( ) / 마데카 크림 타임 리버스",
+      "sourceProductName": "마데카 크림 타임 리버스 트리플 / 마데카 크림 타임 리버스",
       "sourceUrl": null,
       "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
     },

@@ -1,0 +1,1317 @@
+{
+  "meta": {
+    "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+    "source": "OLIVEYOUNG_GLOBAL_BEST",
+    "uniqueProducts": 100,
+    "withEnglishName": 100,
+    "limitations": {
+      "paging": "limit/offset/page 무시 — 상위 100건 고정 (실측)",
+      "brandTraversal": "BLOCKED 403 https://global.oliveyoung.com/display/page/brand",
+      "oliveYoungKorea": "BLOCKED 403 https://www.oliveyoung.co.kr/store/main/main.do",
+      "policy": "차단 소스는 우회하지 않는다"
+    },
+    "elapsedSec": 1
+  },
+  "products": [
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA240423305",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240423305",
+      "brandName": "푸드올로지",
+      "rawProductName": "콜레올로지 컷팅 젤리 30포 (30일분)",
+      "canonicalProductName": null,
+      "englishProductName": "FOODOLOGY Coleology Cutting Jelly 30 Sticks (30-day supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "FOODOLOGY"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251236199",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236199",
+      "brandName": "휴족시간",
+      "rawProductName": "휴족시간 지압자극 12매입",
+      "canonicalProductName": null,
+      "englishProductName": "Kyusoku Jikan Acupressure Stimulation Gel Sheet 12P",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Kyusoku Jikan"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA240824996",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240824996",
+      "brandName": "메디힐",
+      "rawProductName": "메디힐 마데카소사이드 에센셜 마스크 흔적 리페어 10매 (+1매 증정기획) (OY단독)",
+      "canonicalProductName": null,
+      "englishProductName": "MEDIHEAL Essential Mask Sheet 10ea Set (+1ea) (OY-Exclusive)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MEDIHEAL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260741626",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741626",
+      "brandName": "비플레인",
+      "rawProductName": "비플레인 녹두 약산성 클렌징폼 160ml 더블 기획 (2608)",
+      "canonicalProductName": null,
+      "englishProductName": "beplain Mung Bean pH-Balanced Cleansing Foam 160ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "beplain"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA230518746",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA230518746",
+      "brandName": "스킨1004",
+      "rawProductName": "스킨1004 마다가스카르 센텔라 히알루-시카 워터핏 선 세럼 50mL*2ea (트윈 팩) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "SKIN1004 Madagascar Centella Hyalu-Cica Water-Fit Sun Serum 50mL*2ea (Twin pack)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "SKIN1004"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251235989",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235989",
+      "brandName": "릴리이브",
+      "rawProductName": "릴리이브 그로우턴 엑소좀 브러쉬 앰플 130ml 기획(+30ml)(온)",
+      "canonicalProductName": null,
+      "englishProductName": "lilyeve Grow Turn Exosome Brush Ampoule Set (130ml / 100ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "lilyeve"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260539969",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260539969",
+      "brandName": "토리든",
+      "rawProductName": "토리든 다이브인 저분자 히알루론산 세럼 50ml 더블 기획 (+밸런스풀 세럼 20ml+모이스처 선 20ml) (2606)",
+      "canonicalProductName": null,
+      "englishProductName": "[SET][Upgraded] Torriden Dive In Low Molecular Hyaluronic Acid Serum 50ml Set (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Torriden"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA240121573",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121573",
+      "brandName": "에스트라",
+      "rawProductName": "에스트라 아토베리어365 크림 80ml (24AD)",
+      "canonicalProductName": null,
+      "englishProductName": "AESTURA Atobarrier 365 Cream 80mL",
+      "category": null,
+      "raw": {
+        "englishBrandName": "AESTURA"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260339051",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260339051",
+      "brandName": "셀리맥스",
+      "rawProductName": "셀리맥스 더 비타 A 레티날 샷 타이트닝 부스터 15ml 기획 (+3ml)",
+      "canonicalProductName": null,
+      "englishProductName": "celimax The Vita A Retinal Shot Tightening Booster 15ml Set (+3ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "celimax"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260136559",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136559",
+      "brandName": "닥터엘시아",
+      "rawProductName": "닥터엘시아 345 릴리프 크림 50ml 기획 (+10ml*2ea+튜브링거)",
+      "canonicalProductName": null,
+      "englishProductName": "Dr. Althea 345 Relief Cream 50ml Set (+10ml*2ea+Tube Wringer)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Dr. Althea"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250329148",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329148",
+      "brandName": "아누아",
+      "rawProductName": "아누아 피디알엔 히알루론산 캡슐 100 세럼 30ml 리필 기획 (2504)",
+      "canonicalProductName": null,
+      "englishProductName": "Anua PDRN Hyaluronic Capsule 100 Serum 30ml Refill Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA230820183",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA230820183",
+      "brandName": "넘버즈인",
+      "rawProductName": "넘버즈인 5번 글루타치온C 흔적 앰플 30ml+30ml 듀오기획",
+      "canonicalProductName": null,
+      "englishProductName": "numbuzin No.5 Glutatione Vitamin Concentrated Serum 30ml Duo Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "numbuzin"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251235982",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235982",
+      "brandName": "로지킴",
+      "rawProductName": "로지킴 PDRN 틴티드 립 앰플 10ml 코코넛",
+      "canonicalProductName": null,
+      "englishProductName": "Losy Kim PDRN Tinted Lip Ampoule (Set/Single) (13 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Losy Kim"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260742136",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260742136",
+      "brandName": "멜라메이트",
+      "rawProductName": "멜라메이트 로우슈가 구미 40개 기획 (+감자숭이 피규어) (2608)",
+      "canonicalProductName": null,
+      "englishProductName": "[CJ Wellcare &times; Gamja Soongi] Tart Cherry Extract Low Sugar 40 Gummies (+Gamja Soongi Random Figure)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MelaMate"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250832765",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832765",
+      "brandName": "정샘물",
+      "rawProductName": "정샘물 에센셜 스킨 누더 쿠션 (단품) #10N 쉘 크림 (역)",
+      "canonicalProductName": null,
+      "englishProductName": "[30 SHADES/SINGLE] JUNGSAEMMOOL Essential Skin Nuder Cushion",
+      "category": null,
+      "raw": {
+        "englishBrandName": "JUNGSAEMMOOL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260238183",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238183",
+      "brandName": "퓌",
+      "rawProductName": "퓌 스파 글로잉 UV 톤업 베이스 35ml 듀오 기획 01 속광(복합성용)",
+      "canonicalProductName": null,
+      "englishProductName": "[NEW Shade] fwee Spa Glowing UV Tone Up Prep (SPF30 Semi Dewy / SPF50+ Wet Dewy&Airy) (Set/Single) (4 Shades)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "fwee"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA220916169",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA220916169",
+      "brandName": "어노브",
+      "rawProductName": "어노브 딥 데미지 트리트먼트 EX 320ml 더블 기획세트",
+      "canonicalProductName": null,
+      "englishProductName": "UNOVE Deep Damage Repair Hair Mask (Treatment / Hair Pack) 320mL Double Pack (4 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "UNOVE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA220815950",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA220815950",
+      "brandName": "메디힐",
+      "rawProductName": "메디힐 마데카소사이드 흔적 패드 100매 더블 기획",
+      "canonicalProductName": null,
+      "englishProductName": "MEDIHEAL Toner Pad 100+100 Pads Double Pack (10types)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MEDIHEAL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251135335",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135335",
+      "brandName": "코스노리",
+      "rawProductName": "코스노리 이지 브로우 무드 체인저 5회분 클라우드 토프 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "COSNORI Easy Brow Mood Changer 5 Applications (Mood Changer / Tone Changer)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "COSNORI"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250430320",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250430320",
+      "brandName": "샤르드",
+      "rawProductName": "샤르드 아이백 리프트 1100샷 리들 패치 2+1 기획 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "charde Eye Bag Lift 1100 Shot Patch 2+1 Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "charde"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260641085",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641085",
+      "brandName": "푸드올로지",
+      "rawProductName": "콜레올로지 컷팅 젤리 석류맛 10포 기획 (+석류맛 2포+키위맛 2포) (14일분) (2607)",
+      "canonicalProductName": null,
+      "englishProductName": "FOODOLOGY Coleology Cutting Jelly 10+2+2 Sticks SET (14Sticks) (14 day-supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "FOODOLOGY"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540030",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540030",
+      "brandName": "쏘내추럴",
+      "rawProductName": "쏘내추럴 올 데이 블러 메이크업 세팅 픽서 75ml",
+      "canonicalProductName": null,
+      "englishProductName": "[OY Pick/Limited] so natural All Day Blur Make Up Setting Fixx (120ml/75ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "so natural"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338435",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338435",
+      "brandName": "조선미녀",
+      "rawProductName": "조선미녀 맑은쌀 선크림 50ml 트리플 기획",
+      "canonicalProductName": null,
+      "englishProductName": "Beauty of Joseon Relief Sun Rice+Probiotics 50ml Triple Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Beauty of Joseon"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260641155",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641155",
+      "brandName": "어바웃톤",
+      "rawProductName": "어바웃톤 스킨 레이어 핏 블러셔 4g W01 핑크 블룸 (W) (온)",
+      "canonicalProductName": null,
+      "englishProductName": "ABOUT_TONE Skin Layer Fit Blusher (Cover Fit/Water Fit) (20 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ABOUT_TONE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260439626",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439626",
+      "brandName": "퓌",
+      "rawProductName": "퓌 올데이 커버 블랙 쿠션 13g 17N 리필 기획",
+      "canonicalProductName": null,
+      "englishProductName": "fwee All Day Cover Black Cushion Refill Set (5 Shades)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "fwee"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA210000040",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA210000040",
+      "brandName": "휴족시간",
+      "rawProductName": "휴족시간 지압자극시트 4매",
+      "canonicalProductName": null,
+      "englishProductName": "Kyusoku Jikan Tsubo-Shigeki Gel Sheet (4 Sheets)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Kyusoku Jikan"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338983",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338983",
+      "brandName": "바이오힐보",
+      "rawProductName": "바이오힐보 프로바이오덤&trade; 3D 리프팅 크림 50ml 리필기획 (+아이앤링클크림 2ea) (2604)",
+      "canonicalProductName": null,
+      "englishProductName": "BIOHEAL BOH Probioderm 3D Lifting Cream 50mL Refill Set (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BIOHEAL BOH"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250430113",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250430113",
+      "brandName": "라운드랩",
+      "rawProductName": "라운드랩 자작나무 수분 선크림 50ml 트리플 기획 (2505) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "[TRIPLE] ROUND LAB Birch Juice Moisturizing Sunscreen 50ml Triple Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ROUND LAB"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA240724566",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240724566",
+      "brandName": "마녀공장",
+      "rawProductName": "마녀공장 퓨어 클렌징오일 200ml 더블 기획",
+      "canonicalProductName": null,
+      "englishProductName": "manyo Pure Cleansing Oil 200ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "manyo"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540328",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540328",
+      "brandName": "퓨리토 서울",
+      "rawProductName": "퓨리토 서울 데일리 소프트 터치 선스크린 60ML 더블 기획 (+클렌저 30ml)(2605)",
+      "canonicalProductName": null,
+      "englishProductName": "Purito Seoul Daily Soft Touch Sunscreen 60ml Double Pack (+Cleanser 30ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Purito Seoul"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260237591",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237591",
+      "brandName": "라운드랩",
+      "rawProductName": "라운드랩 1025 독도 수분 워터겔 마스크 20매 (역)",
+      "canonicalProductName": null,
+      "englishProductName": "ROUND LAB 1025 Dokdo Hydrating Water Gel Mask Sheet 20ea",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ROUND LAB"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260640905",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260640905",
+      "brandName": "토리든",
+      "rawProductName": "토리든 다이브인 저분자 히알루론산 세럼 50ml 기획 (+멀티 패드 10매)",
+      "canonicalProductName": null,
+      "englishProductName": "[Upgraded] Torriden Dive In Low Molecular Hyaluronic Acid Serum 50ml Set (+Multi Pad 10 Sheets)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Torriden"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GS260741728",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GS260741728",
+      "brandName": "넘버즈인",
+      "rawProductName": "numbuzin No.5 Vitamin Concentrated Set",
+      "canonicalProductName": null,
+      "englishProductName": "numbuzin No.5 Glutathione Vitamin Concentrated Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "numbuzin"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250530726",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530726",
+      "brandName": "일소",
+      "rawProductName": "일소 슈퍼 멜팅 세범 소프트너 150ml 기획 (+화장솜 40매+모공 텐션 마스크팩 1매) (2505)",
+      "canonicalProductName": null,
+      "englishProductName": "ilso Super Melting Sebum Softener 150ml Set (+Cotton Pad 40P+Pore Tension Mask Sheet 1ea)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ilso"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA241026165",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026165",
+      "brandName": "어바웃톤",
+      "rawProductName": "어바웃톤 스킨 레이어 핏 파운데이션 30ml 19 페어 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "ABOUT_TONE Skin Layer Fit Foundation 30ml (Set/Single) (8 Shades)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ABOUT_TONE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250128210",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250128210",
+      "brandName": "메디힐",
+      "rawProductName": "메디힐 마데카소사이드 에센셜 마스크 흔적 리페어 20매 (OY단독) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "MEDIHEAL Essential Mask Sheet 20ea",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MEDIHEAL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260640947",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260640947",
+      "brandName": "멜라메이트",
+      "rawProductName": "멜라메이트 로우슈가 구미 50개 (50일분) (온)",
+      "canonicalProductName": null,
+      "englishProductName": "[CJ Wellcare] Tart Cherry Extract Low-Sugar Gummy 50 Gummies",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MelaMate"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260137046",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260137046",
+      "brandName": "퓌",
+      "rawProductName": "퓌 3D 볼류밍 글로스 5.3g B01 바닐라 70% 기획 (+스트레스 볼) (망그러진 곰) (2602)",
+      "canonicalProductName": null,
+      "englishProductName": "[NEW Vanilla Edition] fwee 3D Voluming Gloss Set (Set/Single) (26 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "fwee"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA210002919",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA210002919",
+      "brandName": "정샘물",
+      "rawProductName": "정샘물 에센셜 스킨 누더 쿠션(본품+리필)",
+      "canonicalProductName": null,
+      "englishProductName": "JUNGSAEMMOOL Essential Skin Nuder Cushion (Refill Included) (12 Shades)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "JUNGSAEMMOOL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250127656",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250127656",
+      "brandName": "퍼셀",
+      "rawProductName": "퍼셀 880억/mL 글루타치온 플렉서블 리포좀 20ml 기획 (+7ml)",
+      "canonicalProductName": null,
+      "englishProductName": "PURCELL 88B/mL L-Glutathione Flexible Liposome 20ml (+7ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "PURCELL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260136665",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136665",
+      "brandName": "푸드올로지",
+      "rawProductName": "FOODOLOGY Coleology PRO 600mg*60 Tablets (1-month supply)",
+      "canonicalProductName": null,
+      "englishProductName": "FOODOLOGY Coleology PRO 600mg*60 Tablets (30 days supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "FOODOLOGY"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260137121",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260137121",
+      "brandName": "올더베러",
+      "rawProductName": "올더베러 단백질쉐이크 45g",
+      "canonicalProductName": null,
+      "englishProductName": "ALL THE BETTER Protein Shake 45g",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ALL THE BETTER"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260237304",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237304",
+      "brandName": "아누아",
+      "rawProductName": "아누아 피디알엔 히알루론산 수분 캡슐 미스트 100ml 2입 기획 (2603)",
+      "canonicalProductName": null,
+      "englishProductName": "Anua PDRN Hyaluronic Acid Hydrating Capsule Mist 100ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260641116",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641116",
+      "brandName": "아로마티카",
+      "rawProductName": "아로마티카 로즈마리 루트 인핸서 100ml 더블 기획 (+티트리 토닉 30ml) (2607)",
+      "canonicalProductName": null,
+      "englishProductName": "AROMATICA Rosemary Root Enhancer 100ml (Double Set/Single)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "AROMATICA"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260640958",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260640958",
+      "brandName": "멜라메이트",
+      "rawProductName": "멜라메이트 식물성 멜라토닌 함유 구미 버라이어티팩 40개 기획 (2607)",
+      "canonicalProductName": null,
+      "englishProductName": "[CJ Wellcare] Variety Pack 40 Gummies (4 flavors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MelaMate"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA220113280",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA220113280",
+      "brandName": "에스트라",
+      "rawProductName": "에스트라 아토베리어365 바디크림 250ml",
+      "canonicalProductName": null,
+      "englishProductName": "AESTURA Atobarrier 365 Body Cream 250mL",
+      "category": null,
+      "raw": {
+        "englishBrandName": "AESTURA"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260641417",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641417",
+      "brandName": "센텔리안24",
+      "rawProductName": "센텔리안24 마데카 크림 타임 리버스 트리플 기획(50ml*3ea) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "Centellian24 Madeca Cream Time Reverse 50ml Triple Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Centellian24"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540500",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540500",
+      "brandName": "닥터지",
+      "rawProductName": "닥터지 레드 블레미쉬 클리어 수딩 크림 EX 70ml 튜브 기획 (+30ml+세럼10ml*2ea) (온)",
+      "canonicalProductName": null,
+      "englishProductName": "Dr.G Red Blemish Clear Soothing Cream EX 70ml Set (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Dr.G"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251235971",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251235971",
+      "brandName": "멜라메이트",
+      "rawProductName": "멜라메이트 식물성 멜라토닌 함유 멜라메이트 구미 50구미 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "[CJ Wellcare] Tart Cherry Extract Gummy 50 Gummies",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MelaMate"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA231020801",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA231020801",
+      "brandName": "3CE",
+      "rawProductName": "3CE 무드레시피 페이스 블러쉬",
+      "canonicalProductName": null,
+      "englishProductName": "3CE Mood Recipe Face Blush (16 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "3CE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260237864",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237864",
+      "brandName": "닥터포헤어",
+      "rawProductName": "닥터포헤어 폴리젠 씨크닝 스칼프 토닉 120ml 더블 기획 (2603)",
+      "canonicalProductName": null,
+      "englishProductName": "Dr.FORHAIR Folligen Thickening Scalp Tonic 120ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Dr.FORHAIR"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540627",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540627",
+      "brandName": "퍼셀",
+      "rawProductName": "퍼셀 80억퍼엠엘 글루타치온 TXA 캡슐 크림 80ml (온)",
+      "canonicalProductName": null,
+      "englishProductName": "PURCELL 8B/mL L-Glutathione TXA Capsule Cream 80ml",
+      "category": null,
+      "raw": {
+        "englishBrandName": "PURCELL"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338924",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338924",
+      "brandName": "닥터그루트",
+      "rawProductName": "닥터그루트 아쿠아 PDRN 헤어라인 부스터샷 15ml 더블 기획 (2604)",
+      "canonicalProductName": null,
+      "englishProductName": "Dr. Groot Aqua PDRN Hair Line Booster Shot 15ml Double Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Dr. Groot"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251034268",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251034268",
+      "brandName": "리쥬란",
+      "rawProductName": "리쥬란 더마 힐러 포어 타이트닝 토너 패드 60매 더블 한정기획(+2매*3ea) (2511)",
+      "canonicalProductName": null,
+      "englishProductName": "REJURAN Derma Healer Pore Tightening Toner Pad 60P Limited Double Pack (+2P*3ea)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "REJURAN"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GS260741731",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GS260741731",
+      "brandName": "넘버즈인",
+      "rawProductName": "numbuzin No.3 Skin Softening Set",
+      "canonicalProductName": null,
+      "englishProductName": "numbuzin No.3 Skin Softening Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "numbuzin"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA230518544",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA230518544",
+      "brandName": "바이오던스",
+      "rawProductName": "바이오던스 바이오 콜라겐 리얼 딥 마스크 16매 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "BIODANCE Real Deep Mask Sheet 16P (2 Types)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BIODANCE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250530907",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530907",
+      "brandName": "어노브",
+      "rawProductName": "어노브 딥 데미지 리페어 샴푸 500g 듀오 기획(스윗 브리즈/로지 아우라)(2506)",
+      "canonicalProductName": null,
+      "englishProductName": "UNOVE Deep Damage Repair Shampoo 500ml Double Set (3 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "UNOVE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250732567",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250732567",
+      "brandName": "웰라쥬",
+      "rawProductName": "웰라쥬 리얼 히알루로닉 블루 100 앰플 75ml 2입",
+      "canonicalProductName": null,
+      "englishProductName": "WELLAGE Real Hyaluronic Blue 100 Ampoule 75ml*2ea",
+      "category": null,
+      "raw": {
+        "englishBrandName": "WELLAGE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260539852",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260539852",
+      "brandName": "락토핏",
+      "rawProductName": "락토핏 골드 30포 트리플 기획 (90일분)(RE)",
+      "canonicalProductName": null,
+      "englishProductName": "LACTO-FIT Probiotics Gold 30 Sticks Triple Set (90-day supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "LACTO-FIT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GS260742208",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GS260742208",
+      "brandName": "멜라메이트",
+      "rawProductName": "[CJ WELLCARE] Tart Cherry Extract Gummies 2 Pack (Original+Low sugar)",
+      "canonicalProductName": null,
+      "englishProductName": "[CJ WELLCARE] Tart Cherry Extract Gummies 2 Pack (Original+Low sugar)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MelaMate"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA240121726",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240121726",
+      "brandName": "CLIO",
+      "rawProductName": "클리오 샤프 쏘 심플 워터프루프 펜슬라이너 01 블랙 (리뉴얼 2401)",
+      "canonicalProductName": null,
+      "englishProductName": "CLIO Sharp So Simple Waterproof Pencil Liner (13 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "CLIO"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260742069",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260742069",
+      "brandName": "딜라이트 프로젝트",
+      "rawProductName": "딜라이트 프로젝트 베이글칩",
+      "canonicalProductName": null,
+      "englishProductName": "DELIGHT PROJECT Bagel Chips",
+      "category": null,
+      "raw": {
+        "englishBrandName": "DELIGHT PROJECT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260136971",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136971",
+      "brandName": "센텔리안24",
+      "rawProductName": "센텔리안24 마데카 크림 타임 리버스 50ml 기획 (+15ml*2+더마 마스크팩 3매) (2601)",
+      "canonicalProductName": null,
+      "englishProductName": "Centellian24 Madeca Cream Time Reverse 50ml Set (+15ml*2ea+Derma Mask Sheet 3ea)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Centellian24"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260741751",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741751",
+      "brandName": "발란스핏",
+      "rawProductName": "발란스핏 EMS 하비컷 레깅스 M/L",
+      "canonicalProductName": null,
+      "englishProductName": "EMS Heavy-cut Leggings",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Balance Fit"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260136891",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260136891",
+      "brandName": "휴그랩",
+      "rawProductName": "휴그랩 리즈라인V2 PRO",
+      "canonicalProductName": null,
+      "englishProductName": "hugrab Leeds Line V2 PRO",
+      "category": null,
+      "raw": {
+        "englishBrandName": "hugrab"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260237301",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237301",
+      "brandName": "아임프롬",
+      "rawProductName": "아임프롬 라이스 토너 150ml (2602)",
+      "canonicalProductName": null,
+      "englishProductName": "I'm from Rice Toner 150ml",
+      "category": null,
+      "raw": {
+        "englishBrandName": "I'm from"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250530960",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530960",
+      "brandName": "퓨리토 서울",
+      "rawProductName": "퓨리토 서울 마이티 밤부 판테놀 크림 100ml 듀오 기획 (+15ml) (2506) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "Purito Seoul Mighty Bamboo Panthenol Cream 100ml Duo Set (+15ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Purito Seoul"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260439708",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439708",
+      "brandName": "아누아",
+      "rawProductName": "아누아 피디알엔 히알루론산 100 수분 크림 60ml 2입 기획 (+피디알엔 토너 40ml) (2606)",
+      "canonicalProductName": null,
+      "englishProductName": "Anua PDRN Hyaluronic Acid 100 Moisturizing Cream 60ml Double Set (+PDRN Toner 40ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338646",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338646",
+      "brandName": "에이페",
+      "rawProductName": "에이페 스칼프부스팅 앰플 150ml (온)",
+      "canonicalProductName": null,
+      "englishProductName": "epais Scalp Boosting Ampoule 150ml",
+      "category": null,
+      "raw": {
+        "englishBrandName": "epais"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250329378",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329378",
+      "brandName": "셀리맥스",
+      "rawProductName": "셀리맥스 브라이트닝 모공잡티패드 40매 (+10매 증정기획) (온)",
+      "canonicalProductName": null,
+      "englishProductName": "celimax Pore & Dark Spot Brightening Pad (40P / 80P)Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "celimax"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250731968",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250731968",
+      "brandName": "구달",
+      "rawProductName": "구달 청귤 비타C 잡티케어 세럼 알파 30ml 기획 (+20ml)",
+      "canonicalProductName": null,
+      "englishProductName": "goodal Green Tangerine Vita-C Dark Spot Care Serum &alpha; 30ml Set (+20ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "goodal"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250530761",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530761",
+      "brandName": "락토핏",
+      "rawProductName": "락토핏 다이어트 60포 (1개월분) (역)",
+      "canonicalProductName": null,
+      "englishProductName": "LACTO-FIT Diet 60 Sticks (1-Month Supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "LACTO-FIT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA220715446",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA220715446",
+      "brandName": "푸드올로지",
+      "rawProductName": "콜레올로지 버닝올로지 디데이 3.8g*5포 (5일분)",
+      "canonicalProductName": null,
+      "englishProductName": "FOODOLOGY Burningology D-day 3.8g*5 Packs (5-day supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "FOODOLOGY"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338239",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338239",
+      "brandName": "비비랩",
+      "rawProductName": "비비랩 비오틴 콜라겐V 에코패키지 기획 (100일분)",
+      "canonicalProductName": null,
+      "englishProductName": "BB LAB Biotin Collagen V Eco Package Set (100-day supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BB LAB"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540564",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540564",
+      "brandName": "오브제",
+      "rawProductName": "오브제 내추럴 커버 파운데이션 PRO 1호 아이보리 14g 기획 (+포어제로 올인원 30ml)",
+      "canonicalProductName": null,
+      "englishProductName": "OBgE Natural Cover Foundation PRO 14g (Set/Single) (4 Shades)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "OBgE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA241026439",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026439",
+      "brandName": "지노마스터",
+      "rawProductName": "마스터바이옴 리스펙타 질유산균 지노마스터 1개월분",
+      "canonicalProductName": null,
+      "englishProductName": "MASTERBIOM Gynomaster Female Lactobacillus (1 month supply)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Gyno Master"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260439312",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439312",
+      "brandName": "센텔리안24",
+      "rawProductName": "센텔리안24 엑스퍼트 마데카 크림 액티브 리뉴 PDRN 더블 기획 (역)",
+      "canonicalProductName": null,
+      "englishProductName": "Centellian24 Expert Madeca Cream Active Renew PDRN Double Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Centellian24"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA241026153",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA241026153",
+      "brandName": "프레시안",
+      "rawProductName": "프레시안 에그라이크 크림 블러쉬 6.5g 01호 퍼지 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "freshian Egg-like Cream Blush (Set/Single) (14 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "freshian"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260238178",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238178",
+      "brandName": "오프라 코스메틱",
+      "rawProductName": "오프라 코스메틱 미니 하이라이터 3g 글레이즈드 도넛 기획 (+미니샤이닝퍼프) (2603)",
+      "canonicalProductName": null,
+      "englishProductName": "[Idol's Must-Have] OFRA Cosmetic Mini Highlighter (Set/Single) (10 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "OFRA Cosmetics"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250127972",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250127972",
+      "brandName": "일리윤",
+      "rawProductName": "일리윤 세라마이드 아토 집중크림 150ml 2입 (2502)",
+      "canonicalProductName": null,
+      "englishProductName": "ILLIYOON Ceramide Ato Concentrate Cream 150mL Double Set",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ILLIYOON"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250832690",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250832690",
+      "brandName": "VT",
+      "rawProductName": "VT 리들샷 100 에센스 30ml 더블 기획 (+피디알엔 에센스 100 1.5ml*3ea) (2509)",
+      "canonicalProductName": null,
+      "englishProductName": "VT Reedle Shot 100 Essence 30ml Double Pack (+PDRN Essence 100 1.5ml*3ea)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "VT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260640977",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260640977",
+      "brandName": "바이오던스",
+      "rawProductName": "바이오던스 포어 퍼펙팅 콜라겐 펩타이드 세럼 30ml 리필기획 (+인형 키링) (퍼글러 콜라보) (2607)",
+      "canonicalProductName": null,
+      "englishProductName": "[FUGGLER EDITION] BIODANCE Pore Perfecting Collagen Peptide Serum 30ml Refill Set (+Doll Keyring)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BIODANCE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260439453",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260439453",
+      "brandName": "바이오던스",
+      "rawProductName": "바이오던스 캐비어 PDRN 리포좀 버블 부스터 95ml",
+      "canonicalProductName": null,
+      "englishProductName": "BIODANCE Liposome Bubble Booster 95ml (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BIODANCE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338984",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338984",
+      "brandName": "도미나스",
+      "rawProductName": "도미나스 크림 Rx 30ml",
+      "canonicalProductName": null,
+      "englishProductName": "Dominas Cream Rx 30ml Special Set (+7ml) (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Dominas"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA241227545",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227545",
+      "brandName": "페리페라",
+      "rawProductName": "페리페라 스피디스키니브로우마스카라 003 내추럴브라운",
+      "canonicalProductName": null,
+      "englishProductName": "[NEW Color] peripera Speedy Skinny Brow Mascara (10 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "peripera"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA250530674",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250530674",
+      "brandName": "아누아",
+      "rawProductName": "아누아 나이아신아마이드 10 트라넥사믹애씨드 4 다크 스팟 코렉팅 세럼 30mL 2입",
+      "canonicalProductName": null,
+      "englishProductName": "Anua Niacinamide 10 TXA 4 Dark Spot Correcting Serum 30ml*2ea",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260741995",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741995",
+      "brandName": "딜라이트 프로젝트",
+      "rawProductName": "딜라이트 프로젝트 단백질쉐이크 45g",
+      "canonicalProductName": null,
+      "englishProductName": "DELIGHT PROJECT Protein Shake 45g",
+      "category": null,
+      "raw": {
+        "englishBrandName": "DELIGHT PROJECT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540077",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540077",
+      "brandName": "토리든",
+      "rawProductName": "토리든 다이브인 저분자 히알루론산 마스크 10매 기획 (+다이브인 1매+밸런스풀 1매) (2026)",
+      "canonicalProductName": null,
+      "englishProductName": "[Upgraded] Torriden Dive In Low Molecular Hyaluronic Acid Mask 10ea Set (+Dive In 1ea+Balanceful 1ea)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Torriden"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260338814",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260338814",
+      "brandName": "오호라",
+      "rawProductName": "오호라 시럽 네일강화제 15ml 로즈힙 (온)",
+      "canonicalProductName": null,
+      "englishProductName": "ohora Natural Glow Milk Syrup Nail Strengthener 15ml (18 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "ohora"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260741487",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741487",
+      "brandName": "비비랩",
+      "rawProductName": "비비랩 올리브 듀얼샷 10포",
+      "canonicalProductName": null,
+      "englishProductName": "BB LAB Olive Dual Shot 10 Sticks (4 Flavors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BB LAB"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251135552",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251135552",
+      "brandName": "메디큐브 에이지알",
+      "rawProductName": "메디큐브 에이지알 부스터프로 미니플러스 핑크",
+      "canonicalProductName": null,
+      "englishProductName": "medicube AGE-R Booster Pro Mini Plus (2 Colors)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "MEDICUBE AGE-R"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251034089",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251034089",
+      "brandName": "아누아",
+      "rawProductName": "아누아 피디알엔 히알루론산 수분 캡슐 미스트 100ml",
+      "canonicalProductName": null,
+      "englishProductName": "Anua PDRN Hyaluronic Acid Hydrating Capsule Mist 100ml",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260237924",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237924",
+      "brandName": "아누아",
+      "rawProductName": "아누아 어성초 77 히알루론산 수분 진정 토너 350ml 리필 기획세트 (+350ml 리필팩)",
+      "canonicalProductName": null,
+      "englishProductName": "Anua Heartleaf 77 Hyaluron Soothing Toner 350ml Refill Set (+Refill 350ml)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Anua"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA230820054",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA230820054",
+      "brandName": "VT",
+      "rawProductName": "VT 리들샷 300 에센스 50ml (온)",
+      "canonicalProductName": null,
+      "englishProductName": "VT Reedle Shot 300 Essence 50mL",
+      "category": null,
+      "raw": {
+        "englishBrandName": "VT"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260238029",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260238029",
+      "brandName": "센텔리안24",
+      "rawProductName": "센텔리안24 엑스퍼트 마데카 멜라 캡처 앰플 맥스 30ml 더블 기획 (2601)",
+      "canonicalProductName": null,
+      "englishProductName": "Centellian24 Expert Madeca Mela Capture Ampoule Max 30ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Centellian24"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA241227536",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA241227536",
+      "brandName": "코링코",
+      "rawProductName": "코링코 톡톡하라 노글루 속눈썹 #샤프 54pcs",
+      "canonicalProductName": null,
+      "englishProductName": "CORINGCO Toktok Hara #No Glue Eyelash",
+      "category": null,
+      "raw": {
+        "englishBrandName": "CORINGCO"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA220916168",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA220916168",
+      "brandName": "어노브",
+      "rawProductName": "어노브 실크 오일 에센스 70ml 더블 기획세트",
+      "canonicalProductName": null,
+      "englishProductName": "UNOVE Silk Hair Oil Essence 70ml Double Pack (2 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "UNOVE"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260540725",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540725",
+      "brandName": "바이오힐보",
+      "rawProductName": "바이오힐보 프로바이오덤&trade; 3D 리프팅 아이&링클 크림 25ml 트리플 기획 (2606)",
+      "canonicalProductName": null,
+      "englishProductName": "BIOHEAL BOH PROBIODERM 3D Lifting Eye & Wrinkle Cream 25ml Set (3 Options)",
+      "category": null,
+      "raw": {
+        "englishBrandName": "BIOHEAL BOH"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA260741717",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260741717",
+      "brandName": "케어플러스",
+      "rawProductName": "케어플러스 상처커버 스팟패치 모음",
+      "canonicalProductName": null,
+      "englishProductName": "CAREPLUS Scar Cover Spot Patch",
+      "category": null,
+      "raw": {
+        "englishBrandName": "CAREPLUS"
+      }
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "sourceProductId": "GA251236255",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251236255",
+      "brandName": "아벤느",
+      "rawProductName": "아벤느 클리낭스 클렌징젤 400ml 더블 기획 (2501)",
+      "canonicalProductName": null,
+      "englishProductName": "Avene Cleanance Cleansing Gel 400ml Double Pack",
+      "category": null,
+      "raw": {
+        "englishBrandName": "Avene"
+      }
+    }
+  ]
+}

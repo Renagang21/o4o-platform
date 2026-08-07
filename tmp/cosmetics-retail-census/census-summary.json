@@ -1,0 +1,783 @@
+{
+  "meta": {
+    "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+    "generatedFrom": "소매 census 산출물"
+  },
+  "sources": {
+    "used": [
+      {
+        "source": "MUSINSA_BEAUTY",
+        "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+        "endpoint": "https://api.musinsa.com/api2/dp/v1/plp/goods (공개 카테고리 목록 API)",
+        "leafCategories": [
+          {
+            "code": "104001014",
+            "name": "뷰티|스킨케어|스킨/토너/패드",
+            "total": 1897,
+            "fetched": 1897
+          },
+          {
+            "code": "104001016",
+            "name": "뷰티|스킨케어|미스트/페이셜오일",
+            "total": 447,
+            "fetched": 447
+          },
+          {
+            "code": "104001003",
+            "name": "뷰티|스킨케어|에센스/세럼/앰플",
+            "total": 3016,
+            "fetched": 3016
+          },
+          {
+            "code": "104001015",
+            "name": "뷰티|스킨케어|로션/에멀젼/올인원",
+            "total": 572,
+            "fetched": 572
+          },
+          {
+            "code": "104001013",
+            "name": "뷰티|스킨케어|크림/아이크림",
+            "total": 2743,
+            "fetched": 2743
+          },
+          {
+            "code": "104001008",
+            "name": "뷰티|스킨케어|스팟케어",
+            "total": 240,
+            "fetched": 240
+          },
+          {
+            "code": "104001010",
+            "name": "뷰티|스킨케어|스킨케어 세트",
+            "total": 721,
+            "fetched": 721
+          },
+          {
+            "code": "104014002",
+            "name": "뷰티|베이스메이크업|파운데이션/콤팩트",
+            "total": 180,
+            "fetched": 180
+          },
+          {
+            "code": "104014009",
+            "name": "뷰티|베이스메이크업|메이크업 픽서",
+            "total": 60,
+            "fetched": 60
+          },
+          {
+            "code": "104014003",
+            "name": "뷰티|베이스메이크업|블러셔",
+            "total": 401,
+            "fetched": 401
+          },
+          {
+            "code": "104014005",
+            "name": "뷰티|베이스메이크업|하이라이터",
+            "total": 132,
+            "fetched": 132
+          },
+          {
+            "code": "104014001",
+            "name": "뷰티|베이스메이크업|쿠션",
+            "total": 681,
+            "fetched": 681
+          },
+          {
+            "code": "104014006",
+            "name": "뷰티|베이스메이크업|메이크업베이스/프라이머",
+            "total": 326,
+            "fetched": 326
+          },
+          {
+            "code": "104014010",
+            "name": "뷰티|베이스메이크업|BB/CC크림",
+            "total": 157,
+            "fetched": 157
+          },
+          {
+            "code": "104014004",
+            "name": "뷰티|베이스메이크업|셰이딩/컨투어링",
+            "total": 67,
+            "fetched": 67
+          },
+          {
+            "code": "104014007",
+            "name": "뷰티|베이스메이크업|컨실러",
+            "total": 155,
+            "fetched": 155
+          },
+          {
+            "code": "104014008",
+            "name": "뷰티|베이스메이크업|파우더/팩트",
+            "total": 226,
+            "fetched": 226
+          },
+          {
+            "code": "104016001",
+            "name": "뷰티|아이메이크업|아이섀도우",
+            "total": 354,
+            "fetched": 354
+          },
+          {
+            "code": "104016002",
+            "name": "뷰티|아이메이크업|마스카라",
+            "total": 229,
+            "fetched": 229
+          },
+          {
+            "code": "104016004",
+            "name": "뷰티|아이메이크업|아이브로우",
+            "total": 228,
+            "fetched": 228
+          },
+          {
+            "code": "104016003",
+            "name": "뷰티|아이메이크업|아이라이너",
+            "total": 260,
+            "fetched": 260
+          },
+          {
+            "code": "104015005",
+            "name": "뷰티|립메이크업|립스틱",
+            "total": 172,
+            "fetched": 172
+          },
+          {
+            "code": "104015004",
+            "name": "뷰티|립메이크업|립라이너",
+            "total": 65,
+            "fetched": 65
+          },
+          {
+            "code": "104015002",
+            "name": "뷰티|립메이크업|립틴트",
+            "total": 721,
+            "fetched": 721
+          },
+          {
+            "code": "104015003",
+            "name": "뷰티|립메이크업|립글로스",
+            "total": 239,
+            "fetched": 239
+          },
+          {
+            "code": "104015001",
+            "name": "뷰티|립메이크업|립밤",
+            "total": 662,
+            "fetched": 662
+          },
+          {
+            "code": "104010006",
+            "name": "뷰티|뷰티 디바이스/소품|피부관리기기",
+            "total": 195,
+            "fetched": 195
+          },
+          {
+            "code": "104010005",
+            "name": "뷰티|뷰티 디바이스/소품|헤어기기",
+            "total": 501,
+            "fetched": 501
+          },
+          {
+            "code": "104010007",
+            "name": "뷰티|뷰티 디바이스/소품|클렌징기기",
+            "total": 58,
+            "fetched": 58
+          },
+          {
+            "code": "104010010",
+            "name": "뷰티|뷰티 디바이스/소품|페이스소품",
+            "total": 557,
+            "fetched": 557
+          },
+          {
+            "code": "104010009",
+            "name": "뷰티|뷰티 디바이스/소품|네일관리기기",
+            "total": 16,
+            "fetched": 16
+          },
+          {
+            "code": "104010008",
+            "name": "뷰티|뷰티 디바이스/소품|마사지기기",
+            "total": 220,
+            "fetched": 220
+          },
+          {
+            "code": "104010011",
+            "name": "뷰티|뷰티 디바이스/소품|메이크업소품",
+            "total": 1095,
+            "fetched": 1095
+          },
+          {
+            "code": "104003005",
+            "name": "뷰티|클렌징/필링|클렌징폼/젤/비누",
+            "total": 1614,
+            "fetched": 1614
+          },
+          {
+            "code": "104003008",
+            "name": "뷰티|클렌징/필링|클렌징티슈/패드",
+            "total": 131,
+            "fetched": 131
+          },
+          {
+            "code": "104003003",
+            "name": "뷰티|클렌징/필링|필링/스크럽",
+            "total": 182,
+            "fetched": 182
+          },
+          {
+            "code": "104003006",
+            "name": "뷰티|클렌징/필링|클렌징오일/워터",
+            "total": 453,
+            "fetched": 453
+          },
+          {
+            "code": "104003007",
+            "name": "뷰티|클렌징/필링|클렌징로션/크림",
+            "total": 220,
+            "fetched": 220
+          },
+          {
+            "code": "104003004",
+            "name": "뷰티|클렌징/필링|립/아이 리무버",
+            "total": 62,
+            "fetched": 62
+          },
+          {
+            "code": "104013004",
+            "name": "뷰티|마스크팩|워시오프팩",
+            "total": 239,
+            "fetched": 239
+          },
+          {
+            "code": "104013005",
+            "name": "뷰티|마스크팩|필오프팩",
+            "total": 76,
+            "fetched": 76
+          },
+          {
+            "code": "104013002",
+            "name": "뷰티|마스크팩|부분마스크/코팩/패치",
+            "total": 173,
+            "fetched": 173
+          },
+          {
+            "code": "104013006",
+            "name": "뷰티|마스크팩|슬리핑팩",
+            "total": 89,
+            "fetched": 89
+          },
+          {
+            "code": "104013003",
+            "name": "뷰티|마스크팩|시트마스크(시트팩)",
+            "total": 1557,
+            "fetched": 1557
+          },
+          {
+            "code": "104013001",
+            "name": "뷰티|마스크팩|모델링/고무팩",
+            "total": 167,
+            "fetched": 167
+          },
+          {
+            "code": "104002005",
+            "name": "뷰티|선케어|태닝/애프터선",
+            "total": 21,
+            "fetched": 21
+          },
+          {
+            "code": "104002002",
+            "name": "뷰티|선케어|선스틱/선스프레이",
+            "total": 208,
+            "fetched": 208
+          },
+          {
+            "code": "104002006",
+            "name": "뷰티|선케어|선케어세트",
+            "total": 15,
+            "fetched": 15
+          },
+          {
+            "code": "104002003",
+            "name": "뷰티|선케어|선쿠션/파우더",
+            "total": 115,
+            "fetched": 115
+          },
+          {
+            "code": "104002001",
+            "name": "뷰티|선케어|선크림",
+            "total": 1347,
+            "fetched": 1347
+          },
+          {
+            "code": "104011004",
+            "name": "뷰티|미용소품|헤어소품",
+            "total": 350,
+            "fetched": 350
+          },
+          {
+            "code": "104011003",
+            "name": "뷰티|미용소품|네일소품",
+            "total": 450,
+            "fetched": 450
+          },
+          {
+            "code": "104007010",
+            "name": "뷰티|바디케어|핸드케어",
+            "total": 862,
+            "fetched": 862
+          },
+          {
+            "code": "104007009",
+            "name": "뷰티|바디케어|풋케어",
+            "total": 151,
+            "fetched": 151
+          },
+          {
+            "code": "104007013",
+            "name": "뷰티|바디케어|샤워/입욕",
+            "total": 1496,
+            "fetched": 1496
+          },
+          {
+            "code": "104007015",
+            "name": "뷰티|바디케어|바디미스트",
+            "total": 277,
+            "fetched": 277
+          },
+          {
+            "code": "104007014",
+            "name": "뷰티|바디케어|바디로션/크림/오일",
+            "total": 986,
+            "fetched": 986
+          },
+          {
+            "code": "104007012",
+            "name": "뷰티|바디케어|데오드란트",
+            "total": 172,
+            "fetched": 172
+          },
+          {
+            "code": "104006002",
+            "name": "뷰티|헤어케어|린스/컨디셔너",
+            "total": 141,
+            "fetched": 141
+          },
+          {
+            "code": "104006009",
+            "name": "뷰티|헤어케어|헤어브러쉬",
+            "total": 228,
+            "fetched": 228
+          },
+          {
+            "code": "104006001",
+            "name": "뷰티|헤어케어|샴푸",
+            "total": 1383,
+            "fetched": 1383
+          },
+          {
+            "code": "104006006",
+            "name": "뷰티|헤어케어|헤어케어 세트",
+            "total": 508,
+            "fetched": 508
+          },
+          {
+            "code": "104006008",
+            "name": "뷰티|헤어케어|헤어컬러/펌",
+            "total": 107,
+            "fetched": 107
+          },
+          {
+            "code": "104006012",
+            "name": "뷰티|헤어케어|헤어기기",
+            "total": 479,
+            "fetched": 479
+          },
+          {
+            "code": "104006007",
+            "name": "뷰티|헤어케어|헤어스타일링",
+            "total": 525,
+            "fetched": 525
+          },
+          {
+            "code": "104006010",
+            "name": "뷰티|헤어케어|헤어오일/에센스",
+            "total": 547,
+            "fetched": 547
+          },
+          {
+            "code": "104006003",
+            "name": "뷰티|헤어케어|트리트먼트/팩",
+            "total": 686,
+            "fetched": 686
+          },
+          {
+            "code": "104006011",
+            "name": "뷰티|헤어케어|탈모케어",
+            "total": 315,
+            "fetched": 315
+          },
+          {
+            "code": "104017005",
+            "name": "뷰티|네일|네일소품",
+            "total": 85,
+            "fetched": 85
+          },
+          {
+            "code": "104017003",
+            "name": "뷰티|네일|네일팁/스티커",
+            "total": 365,
+            "fetched": 365
+          },
+          {
+            "code": "104017001",
+            "name": "뷰티|네일|일반 네일 폴리시",
+            "total": 767,
+            "fetched": 767
+          },
+          {
+            "code": "104017002",
+            "name": "뷰티|네일|젤 네일 폴리시",
+            "total": 62,
+            "fetched": 62
+          },
+          {
+            "code": "104017004",
+            "name": "뷰티|네일|네일케어",
+            "total": 114,
+            "fetched": 114
+          },
+          {
+            "code": "104005001",
+            "name": "뷰티|프레그런스|향수",
+            "total": 3500,
+            "fetched": 3500
+          },
+          {
+            "code": "104005003",
+            "name": "뷰티|프레그런스|기타 향수",
+            "total": 71,
+            "fetched": 71
+          },
+          {
+            "code": "104005002",
+            "name": "뷰티|프레그런스|드레스퍼퓸",
+            "total": 1009,
+            "fetched": 1009
+          },
+          {
+            "code": "104012004",
+            "name": "뷰티|헬스/푸드|생리대",
+            "total": 142,
+            "fetched": 142
+          },
+          {
+            "code": "104012005",
+            "name": "뷰티|헬스/푸드|청결제",
+            "total": 233,
+            "fetched": 233
+          },
+          {
+            "code": "104012008",
+            "name": "뷰티|헬스/푸드|덴탈케어/용품",
+            "total": 997,
+            "fetched": 997
+          },
+          {
+            "code": "104012007",
+            "name": "뷰티|헬스/푸드|헬스 보충제",
+            "total": 611,
+            "fetched": 611
+          },
+          {
+            "code": "104012009",
+            "name": "뷰티|헬스/푸드|구강청정기기",
+            "total": 109,
+            "fetched": 109
+          },
+          {
+            "code": "104012002",
+            "name": "뷰티|헬스/푸드|이너뷰티",
+            "total": 1302,
+            "fetched": 1302
+          },
+          {
+            "code": "104012006",
+            "name": "뷰티|헬스/푸드|건강식품",
+            "total": 1052,
+            "fetched": 1052
+          },
+          {
+            "code": "104009003",
+            "name": "뷰티|쉐이빙/제모|눈썹관리기",
+            "total": 12,
+            "fetched": 12
+          },
+          {
+            "code": "104009005",
+            "name": "뷰티|쉐이빙/제모|제모/왁싱",
+            "total": 71,
+            "fetched": 71
+          },
+          {
+            "code": "104009004",
+            "name": "뷰티|쉐이빙/제모|기타 면도/제모기기",
+            "total": 75,
+            "fetched": 75
+          },
+          {
+            "code": "104009002",
+            "name": "뷰티|쉐이빙/제모|코털정리기",
+            "total": 23,
+            "fetched": 23
+          },
+          {
+            "code": "104009001",
+            "name": "뷰티|쉐이빙/제모|면도/제모기",
+            "total": 331,
+            "fetched": 331
+          }
+        ],
+        "reportedTotal": 44856,
+        "fetchedRows": 44856,
+        "duplicateAcrossCategory": 1472,
+        "uniqueProducts": 43384,
+        "elapsedSec": 45
+      },
+      {
+        "source": "HWAHAE_RANKING",
+        "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+        "nodesTraversed": 2515,
+        "nodesWithData": 2074,
+        "uniqueProducts": 5250,
+        "note": "노드당 상위 20건 제한. 검색 API 는 클라이언트 렌더링이라 공개 JSON 없음.",
+        "elapsedSec": 591
+      },
+      {
+        "source": "OLIVEYOUNG_GLOBAL_BEST",
+        "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+        "uniqueProducts": 100,
+        "withEnglishName": 100,
+        "limitations": {
+          "paging": "limit/offset/page 무시 — 상위 100건 고정 (실측)",
+          "brandTraversal": "BLOCKED 403 https://global.oliveyoung.com/display/page/brand",
+          "oliveYoungKorea": "BLOCKED 403 https://www.oliveyoung.co.kr/store/main/main.do",
+          "policy": "차단 소스는 우회하지 않는다"
+        },
+        "elapsedSec": 1
+      }
+    ],
+    "excluded": [
+      {
+        "source": "OLIVEYOUNG_KOREA",
+        "reason": "HTTP 403 봇 차단 — 우회하지 않음"
+      },
+      {
+        "source": "OLIVEYOUNG_GLOBAL 브랜드 목록",
+        "reason": "HTTP 403 — 우회하지 않음"
+      },
+      {
+        "source": "STYLEVANA",
+        "reason": "HTTP 403 — 우회하지 않음"
+      },
+      {
+        "source": "YESSTYLE",
+        "reason": "HTTP 500 + 클라이언트 렌더링, 공개 JSON 없음"
+      },
+      {
+        "source": "GLOWPICK",
+        "reason": "클라이언트 렌더링, 공개 목록 JSON 없음"
+      },
+      {
+        "source": "JOLSE",
+        "reason": "접근은 가능하나 상품명이 영문 전용 — 한국어 상품명 축과 이름 기준 대조가 불가해 unique 수를 부풀린다. 별도 EN 축 과제로 남긴다."
+      }
+    ]
+  },
+  "contributionCurve": [
+    {
+      "source": "MUSINSA_BEAUTY",
+      "rawCollected": 43384,
+      "gatedOutNonCosmetic": 8329,
+      "rawAfterGate": 35055,
+      "normalized": 35048,
+      "cumulativeUnique": 28967,
+      "newUniqueAdded": 28967,
+      "newUniqueRateVsPrevious": null,
+      "newUniqueRateOfOwnRows": 82.65
+    },
+    {
+      "source": "HWAHAE_RANKING",
+      "rawCollected": 5250,
+      "gatedOutNonCosmetic": 0,
+      "rawAfterGate": 5250,
+      "normalized": 5247,
+      "cumulativeUnique": 33037,
+      "newUniqueAdded": 4070,
+      "newUniqueRateVsPrevious": 14.05,
+      "newUniqueRateOfOwnRows": 77.57
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "rawCollected": 100,
+      "gatedOutNonCosmetic": 0,
+      "rawAfterGate": 100,
+      "normalized": 100,
+      "cumulativeUnique": 33106,
+      "newUniqueAdded": 69,
+      "newUniqueRateVsPrevious": 0.21,
+      "newUniqueRateOfOwnRows": 69
+    }
+  ],
+  "population": {
+    "totalRawAfterCosmeticGate": 40395,
+    "uniqueGuideCandidates": 33106,
+    "mergedIntoExistingUnit": 7299,
+    "withBrand": 33106,
+    "withType": 33079,
+    "withEnglishName": 98,
+    "topTypes": [
+      [
+        "향수",
+        3727
+      ],
+      [
+        "메이크업",
+        3662
+      ],
+      [
+        "세럼",
+        2617
+      ],
+      [
+        "크림",
+        2388
+      ],
+      [
+        "립",
+        1734
+      ],
+      [
+        "토너",
+        1660
+      ],
+      [
+        "선케어",
+        1645
+      ],
+      [
+        "클렌징폼",
+        1503
+      ],
+      [
+        "마스크",
+        1417
+      ],
+      [
+        "바디워시",
+        1312
+      ],
+      [
+        "샴푸",
+        1113
+      ],
+      [
+        "네일",
+        952
+      ],
+      [
+        "바디로션",
+        903
+      ],
+      [
+        "핸드크림",
+        785
+      ],
+      [
+        "팩",
+        721
+      ],
+      [
+        "트리트먼트",
+        616
+      ],
+      [
+        "로션",
+        597
+      ],
+      [
+        "스킨케어세트",
+        597
+      ],
+      [
+        "헤어에센스",
+        466
+      ],
+      [
+        "헤어케어",
+        432
+      ]
+    ]
+  },
+  "functional": {
+    "direction": "소매 → 기능성 (기능성은 규제정보 보강축)",
+    "functionalRows": 180412,
+    "RETAIL_FUNCTIONAL_MATCHED": 4259,
+    "RETAIL_NO_FUNCTIONAL_MATCH": 27608,
+    "CHECK": 1239,
+    "FUNCTIONAL_UNMATCHED": 175788,
+    "matchRule": "정규화 코어 완전일치(브랜드 접두 유무 포함)만 연결. 부분일치·유사도 매칭은 하지 않는다."
+  },
+  "existingO4O": {
+    "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+    "status": "OK",
+    "access": "read-only SELECT only",
+    "productMasterTotalByRegulatoryType": [
+      {
+        "t": "DRUG",
+        "c": 177413
+      },
+      {
+        "t": "건강기능식품",
+        "c": 40948
+      },
+      {
+        "t": "QUASI_DRUG",
+        "c": 17148
+      },
+      {
+        "t": "MEDICAL_DEVICE",
+        "c": 3826
+      },
+      {
+        "t": "일반",
+        "c": 15
+      },
+      {
+        "t": "GENERAL",
+        "c": 11
+      }
+    ],
+    "productMasterComparedRows": 61948,
+    "retailCandidates": 33106,
+    "matchedExisting": 188,
+    "newCandidates": 32918,
+    "note": "정규화 코어 완전일치 기준. product_masters 에 화장품 regulatory_type 은 존재하지 않는다."
+  },
+  "issueQueue": {
+    "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+    "issueCount": 872,
+    "byType": {
+      "MULTI_OPTION_BUNDLE": 123,
+      "MERGE_TYPE_CONFLICT": 739,
+      "NAME_TOO_SHORT_AFTER_NORMALIZE": 10
+    }
+  },
+  "productionJudgement": {
+    "threshold": 40000,
+    "uniqueGuideCandidates": 33106,
+    "decision": "전량 최소 설명서 생산 권고 (추가 복잡화 없이 진행)",
+    "note": "40,000 은 hard limit 이 아니라 현재 기획상의 판단선이다 (WO §13)."
+  }
+}
