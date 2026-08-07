@@ -27,6 +27,58 @@
 
 ---
 
+## Claude Code 진입점
+
+> **이 문서는 Claude Code 의 진입점이자 O4O 도메인 규칙의 색인이다.**
+> Codex/에이전트의 진입점은 [`AGENTS.md`](AGENTS.md) 이며 **두 문서는 동급**이다.
+> 한쪽이 다른 쪽의 선행 조건이 아니다. 공통 규칙은 양쪽 모두 아래 정본을 참조한다.
+
+**섹션 번호는 고정이다.** `§0`~`§15` 는 저장소 전역(문서 200여 곳 + 일부 소스 주석)에서
+`CLAUDE.md §N` 형태로 참조된다. **번호 변경·삭제·재배치를 하지 않는다.**
+
+### 시작 전 확인 — 외부 정본
+
+| 영역 | 정본 | 본 문서 |
+|---|---|---|
+| 개발환경 · 설치 · 검증 명령 · CI 게이트 | [`SETUP.md`](SETUP.md) | §0 에서 정책만 |
+| Git 병렬 작업 · stage · PC 이동 | [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) | §1 에서 브랜치 전략만 |
+| 사업 철학 · 3자 Flow | 위 Priority Chain 2·3번 | — |
+| 도메인·계층별 세부 규칙 | 하단 **상세 규칙 문서 목록** | §2~§13-A 요약 |
+
+### 실행 원칙
+
+```text
+조사 → 문제확정 → 최소 수정 → 검증 → CHECK/IR 갱신 → path-specific stage → commit → push → 완료 보고
+```
+
+- WO 가 **조사 전용**이면 구현하지 않는다.
+- WO 가 **구현을 명시**하면 조사 후 안전 범위 안에서 검증까지 중간 승인 없이 계속 진행한다.
+- **작업 범위 외 수정 금지.** 범위 밖에서 발견한 문제는 고치지 말고 보고 후 별도 WO 로 분리한다.
+
+### 중지 조건
+
+아래는 진행을 멈추고 사용자 판단을 요청한다.
+
+- WO 범위 밖 파일 수정 필요 / 다른 세션의 dirty·미추적 파일 접촉 필요
+- DB schema · migration · 데이터 삭제 · 대량 update · seed 변경 필요
+- `package.json` · lockfile · dependency 변경 필요
+- Docker · CI · build 인프라 변경 필요
+- Core · Frozen Baseline(§14) · 공통 계약 변경 필요
+- 권한 · role · route · API contract 변경 필요
+- 결제 · 정산 · 법률 · 규제 판단 필요
+- 실제 계정 · 자격정보 · 외부 서비스 승인 필요
+- 현재 변경과 무관한 build · test 실패
+
+### 완료 · 보고 원칙
+
+- 보고는 **한국어**. 기술 식별자(파일명 · route · API · component · commit hash)는 원문 유지.
+- 긴 diff 나 전체 파일을 그대로 붙이지 않는다.
+- 변경 / 미변경 / 검증 결과 / CHECK / Git 상태 중심으로 간결하게.
+- **검증 실패나 건너뛴 항목을 숨기지 않는다.** 통과한 것만 골라 보고하지 않는다.
+- 완료 조건은 저장소 전체 clean 이 아니라 `이번 WO 범위의 미커밋 변경 0건` + `HEAD == origin/main`.
+
+---
+
 ## 0. 환경 원칙 (CRITICAL)
 
 > **기본 환경은 프로덕션이다.** (2026-01-29~)
@@ -48,7 +100,7 @@
 - `gcloud logging read 'resource.type=cloud_run_revision AND ...'` — 로그 조회 (마이그레이션/에러/특정 키워드)
 - `gcloud sql connect o4o-platform-db --user=postgres --database=o4o_platform` — 인터랙티브 psql (단, psql 클라이언트 미설치 시 사용 불가)
 - **권장**: `gcloud sql` 대신 Cloud SQL Admin API 또는 `gcloud` 래퍼 스크립트로 SQL 실행
-- DB 접속 정보 (host/user/password/database) 는 로컬 `apps/api-server/.env` 에 존재한다 (API 서버가 실제로 읽는 단일 환경파일 — `src/env-loader.ts` 기준). 프로덕션 DB 는 **Cloud SQL Auth Proxy 경유(`127.0.0.1:5442`)** 로만 접근하며, 로컬 PostgreSQL 은 `5432` 를 사용한다. Claude Code는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI 에 전달할 수 있음
+- DB 접속 정보는 로컬 `apps/api-server/.env` 에 있다. Claude Code 는 필요 시 env 파일에서 값을 읽어 `gcloud sql` 계열 CLI 에 전달할 수 있음. **환경파일 위치 · 포트 분리(로컬 `5432` / 프록시 `5442`) · 프록시 기동 절차는 [`SETUP.md`](SETUP.md) 가 정본** (여기서 중복 서술하지 않는다)
 
 **SQL 검증 원칙:**
 - read-only 검증(SELECT, 마이그레이션 이력 확인 등)은 Claude Code가 직접 수행 가능
@@ -76,6 +128,11 @@
 - 작업 완료 후 main에 직접 commit → push
 - feature 브랜치는 명시적 요청 또는 특수 작업(대규모 리팩토링·실험적 변경)에서만 사용
 - 작업 범위 외 수정 금지 / smoke test 후 결과 보고
+
+> **다중 PC · 다중 세션(사람 + AI) 환경의 stage · 커밋 · PC 이동 절차는
+> [`docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md`](docs/baseline/operations/O4O-GIT-PARALLEL-WORK-SAFETY-V1.md) 가 정본이다.**
+> path-specific stage 강제, `git add .` 금지, 다른 세션 미추적 파일 불가침,
+> pre-commit lockfile 검증 계약, 완료 조건(`HEAD == origin/main`)이 모두 그 문서에 있다.
 
 ### App 계층 (절대 규칙)
 
