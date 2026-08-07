@@ -1,0 +1,16 @@
+{
+ "wo": "WO-O4O-HFF-JA-BATCH-02-10000-DIRECT-BULK-PRODUCTION-V1",
+ "checkedAt": "2026-08-07T01:10:26.426Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "scope": "batch01 stored JA canonical",
+ "documents": 10000,
+ "storedFound": 10000,
+ "storedModified": 0,
+ "storedMissing": 0,
+ "notProducible": 0,
+ "structureDiff": 0,
+ "parityBroken": 0,
+ "samples": [],
+ "verdict": "PASS"
+}
