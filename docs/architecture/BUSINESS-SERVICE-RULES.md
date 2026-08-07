@@ -1,6 +1,6 @@
 # Business Service Rules (Mandatory)
 
-> **CLAUDE.md §14-17에서 분리된 상세 규칙**
+> **CLAUDE.md §9 (도메인별 규칙) 의 Business Service 상세 규칙** (구 §14~§17 에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
 
 ---

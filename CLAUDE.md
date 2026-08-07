@@ -127,7 +127,9 @@
 
 현재 운영 단계에서는 **main 직접 작업**이 기본이다.
 
-- 작업 전 `git pull origin main` (sync first) 필수
+- 작업 전 sync 확인 필수: `git fetch origin` → `git status -sb`
+  단, **pull(merge/rebase)은 작업트리가 clean 할 때만 수행한다.** dirty 상태에서 pull 하면
+  다른 세션의 변경을 끌어들이거나 충돌로 훼손한다 (아래 Git 정본 §3 규칙 2)
 - 작업 완료 후 main에 직접 commit → push
 - feature 브랜치는 명시적 요청 또는 특수 작업(대규모 리팩토링·실험적 변경)에서만 사용
 - 작업 범위 외 수정 금지 / smoke test 후 결과 보고
@@ -476,7 +478,7 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 | **Operator HUB Content Publishing Standard V1** (RichTextEditor 기반 항목별 게시 — Source Ingestion 보류) | `docs/baseline/O4O-OPERATOR-HUB-CONTENT-PUBLISHING-STANDARD-V1.md` |
 | **Store Menu Canonical Tree V1** (매장 HUB ↔ 내 매장 메뉴 같은 축 정렬 — 6 항목, 설문 V1 외) | `docs/baseline/O4O-STORE-MENU-CANONICAL-TREE-V1.md` |
 | **Operator Core Design V1** | `docs/architecture/OPERATOR-CORE-DESIGN-V1.md` |
-| **Operator Core Extraction Verify Checklist V1** | `docs/archive/reports/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
+| **Operator Core Extraction Verify Checklist V1** (완료 기록 — 현행 기준 문서 아님) | `docs/archive/reports/OPERATOR-CORE-EXTRACTION-VERIFY-CHECKLIST-V1.md` |
 | **Guide sectionKey 충돌 정책** | `docs/architecture/O4O-GUIDE-SECTIONKEY-CONFLICT-POLICY-V1.md` |
 | **Guide Schema Validation** | `docs/architecture/O4O-GUIDE-SCHEMA-VALIDATION-V1.md` |
 | **Guide sectionKey Migration** | `docs/architecture/O4O-GUIDE-SECTIONKEY-MIGRATION-V1.md` |

@@ -1,6 +1,6 @@
 # Cosmetics Domain Rules (Mandatory)
 
-> **CLAUDE.md §11-13에서 분리된 상세 규칙**
+> **CLAUDE.md §9 (도메인별 규칙) 의 Cosmetics 상세 규칙** (구 §11~§13 에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
 
 ---

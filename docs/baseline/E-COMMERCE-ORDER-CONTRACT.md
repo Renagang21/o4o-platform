@@ -99,11 +99,11 @@ enum OrderType {
 
 | 항목 | 정책 |
 |------|------|
-| 주문 생성 | **별도 독립 Commerce** (CLAUDE.md §11-14) |
+| 주문 생성 | **별도 독립 Commerce** (CLAUDE.md §9 · docs/architecture/COSMETICS-DOMAIN-RULES.md) |
 | 독립 스키마 | `cosmetics_*` prefix 테이블 |
 | E-commerce Core 통합 | 미적용 (의도적 분리) |
 
-**참조 문서**: CLAUDE.md §11-14 (Cosmetics Domain Rules)
+**참조 문서**: CLAUDE.md §9 (도메인별 규칙) · docs/architecture/COSMETICS-DOMAIN-RULES.md
 
 ### 5.3 Dropshipping (OrderType: DROPSHIPPING)
 
@@ -259,7 +259,7 @@ CREATE TYPE checkout_orders_order_type_enum AS ENUM (
 ## 10. 관련 문서
 
 - CLAUDE.md §7: E-commerce Core 절대 규칙
-- CLAUDE.md §11-14: Cosmetics Domain Rules
+- CLAUDE.md §9 (도메인별 규칙) · docs/architecture/COSMETICS-DOMAIN-RULES.md — Cosmetics Domain Rules
 - WO-O4O-STRUCTURE-REFORM-PHASE5-V01: GlycoPharm 구조 개혁
 - WO-O4O-STRUCTURE-REFORM-PHASE5-A′-V01: E-commerce Core 주문 표준화
 
