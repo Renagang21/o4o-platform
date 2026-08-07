@@ -173,8 +173,31 @@ function typeCheckWorkspace(tracker, relPath) {
     log.warn(`  - Skipping ${relPath} (no type-check script, no tsconfig.json)`);
     return true;
   }
+  // solution tsconfig(`files: []` + `references`)에 `tsc --noEmit` 을 걸면 참조 프로젝트를
+  // 따라가지 않아 **아무 파일도 검사하지 않고 성공**한다(공허 검사). 이 경우 `tsc -b` 로
+  // 참조 프로젝트를 실제로 검사한다. 대상 tsconfig.app.json 은 noEmit:true 이므로 산출물은 없다.
+  if (isSolutionTsconfig(relPath)) {
+    console.log(`  - ${relPath} (npx tsc -b — solution tsconfig)`);
+    return tracker.track(`type-check ${relPath}`, exec('npx tsc -b', join(ROOT_DIR, relPath)));
+  }
+
   console.log(`  - ${relPath} (npx tsc --noEmit)`);
   return tracker.track(`type-check ${relPath}`, exec('npx tsc --noEmit', join(ROOT_DIR, relPath)));
+}
+
+/**
+ * tsconfig.json 이 solution 파일인지 판별한다 (`files: []` + `references: [...]`).
+ * tsconfig 는 주석/트레일링 콤마를 허용해 JSON.parse 가 실패할 수 있으므로 텍스트로 판별한다.
+ */
+function isSolutionTsconfig(relPath) {
+  const p = join(ROOT_DIR, relPath, 'tsconfig.json');
+  if (!existsSync(p)) return false;
+  try {
+    const raw = readFileSync(p, 'utf8');
+    return /"files"\s*:\s*\[\s*\]/.test(raw) && /"references"\s*:\s*\[\s*\{/.test(raw);
+  } catch {
+    return false;
+  }
 }
 
 /**
