@@ -86,7 +86,11 @@ export const ROUTE_VERB = {
   '바르': ['apply', 'applied', 'application'],
   '도포': ['apply', 'applied', 'application'],
   '점안': ['instill', 'instilled', 'eye drop', 'into the eye', 'into the affected eye'],
-  '점이': ['instill', 'instilled', 'ear drop', 'into the ear'],
+  // 배치 0009 에서 추가 — 맨 `점이` 는 "해명되지 않은 **점이** 많고" 같은 명사+조사에도 걸려
+  // 귀와 무관한 제품이 ROUTE_LOST 로 떨어졌다. 점이제 용법은 e약은요에서 항상 활용형으로 적힌다.
+  '점이하': ['instill', 'instilled', 'ear drop', 'into the ear'],
+  '점이합': ['instill', 'instilled', 'ear drop', 'into the ear'],
+  '점이용': ['instill', 'instilled', 'ear drop', 'into the ear'],
   '점비': ['instill', 'instilled', 'nasal drop', 'into the nostril', 'into the nose'],
   '붙이': ['attach', 'apply', 'affix', 'patch'],
   '부착': ['attach', 'apply', 'affix', 'patch'],
@@ -109,7 +113,10 @@ export const ROUTE_VERB = {
  */
 export const NEGATION_KO = [
   '안 되', '안됩', '하지 마', '하지 말', '말 것', '마십시오', '금지', '금기',
-  '사용하지', '복용하지', '투여하지', '삼가', '절대', '피하', '중단', '중지', '않도록', '없이',
+  '사용하지', '복용하지', '투여하지', '삼가', '절대', '중단', '중지', '않도록', '없이',
+  // 배치 0009 에서 활용형으로 좁힘 — 맨 `피하` 는 해부학 용어 `피하염증` · `피하지방` 에도 걸려
+  // 부정어가 전혀 없는 문장이 NEGATION_WEAKENED 로 떨어졌다.
+  '피하십시오', '피하고', '피하도록', '피하여', '피할', '피해야',
 ];
 export const NEGATION_EN = [
   'do not', "don't", 'must not', 'should not', 'never', 'avoid', 'refrain',

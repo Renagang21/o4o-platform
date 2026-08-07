@@ -144,13 +144,33 @@ export function validate(ko, en, opts = {}) {
   const added = [...new Set(enNums.filter((n) => !koPool.has(n)))];
   if (added.length) add('NUMBER_ADDED', `EN 전용 수치: ${added.slice(0, 8).join(', ')}`);
 
-  /* 5-2. 용법 5축 — 값이 EN 에 남아 있는지. 표현은 달라도 숫자는 같아야 한다. */
+  /* 5-2. 용법 5축 — 값이 EN 에 남아 있는지. 표현은 달라도 숫자는 같아야 한다.
+   *
+   *   단, `1회 …`·`1일 …` 의 **앞자리 1 은 값이 아니라 한국어 구조적 계수사**다.
+   *   STRENGTH_SEQUENCE 주석과 같은 사유로, 자연스러운 영어에서 이 1 은 표지 어구에 흡수되어 사라진다
+   *   ("1회 2캡슐" → "2 capsules per dose", "1일 3회" → "3 times a day").
+   *   실측 122건의 DOSING_LOST 가 전부 이 1 하나였고, 실제 용량·횟수 값은 100% 보존돼 있었다.
+   *   그래서 표지 자리의 1 만 수치 대조에서 빼되, 대신 **대응 표지 어구를 EN 에 요구**해
+   *   "1회당"·"1일당"이라는 뜻 자체가 사라지는 것은 그대로 막는다.
+   *   `1일 1회` 의 뒤 1 은 횟수 값이므로 계속 대조한다(EN 은 "1 time a day"). */
+  const DOSE_MARKER_EN = ['per dose', 'each dose', 'a dose', 'at a time', 'per administration'];
+  const DAILY_MARKER_EN = ['a day', 'per day', 'daily', 'each day'];
   for (const [axis, re] of Object.entries(DOSING_KO)) {
     const hits = [...koText.matchAll(new RegExp(re.source, 'g'))].map((m) => m[0]);
     for (const h of hits) {
-      const need = numbers(h);
+      let phrase = h, marker = null, markerKo = null;
+      if (axis === 'perDose') {
+        phrase = h.replace(/^\s*1\s*회\s*/, ''); marker = DOSE_MARKER_EN; markerKo = '1회';
+      } else if (axis === 'frequency') {
+        const m = /^\s*(1\s*일|하루)\s*/.exec(h);
+        if (m) { phrase = h.slice(m[0].length); marker = DAILY_MARKER_EN; markerKo = m[1]; }
+      }
+      const need = numbers(phrase);
       if (need.length && !need.every((n) => enNums.includes(n))) {
         add('DOSING_LOST', `${axis}: "${h.trim()}" 의 수치 ${need.join('/')} 가 EN 에 없음`);
+      }
+      if (marker && !hasAny(enText, marker)) {
+        add('DOSING_LOST', `${axis}: "${h.trim()}" 의 ${markerKo} 표지 대응 표현 없음 (기대: ${marker.slice(0, 2).join(' / ')})`);
       }
     }
   }

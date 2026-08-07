@@ -69,8 +69,20 @@ for (const ko of streamKoUnits()) {
 }
 
 fs.mkdirSync(BATCHES, { recursive: true });
-const seq = fs.readdirSync(BATCHES).filter((f) => /^batch-\d+\.json$/.test(f)).length + 1;
+/* 배치 id 는 **기존 최대 id + 1** 로 채번한다.
+ * 파일 "개수" 기반으로 채번하면 중간 배치가 하나라도 지워졌을 때 이미 수납이 끝난 배치 파일을
+ * 그대로 덮어쓴다(실제로 0006 삭제 후 0007 manifest 가 덮어써진 사고가 있었다).
+ * 덮어쓰기는 재현 원장을 훼손하므로, 채번 후에도 동일 id 파일이 있으면 아예 중단한다. */
+const ids = fs.readdirSync(BATCHES)
+  .map((f) => /^batch-(\d+)\.json$/.exec(f))
+  .filter(Boolean)
+  .map((m) => Number(m[1]));
+const seq = (ids.length ? Math.max(...ids) : 0) + 1;
 const id = String(seq).padStart(4, '0');
+if (fs.existsSync(path.join(BATCHES, `batch-${id}.json`))) {
+  console.error(`batch-${id}.json 이 이미 존재한다. 덮어쓰지 않고 중단한다.`);
+  process.exit(1);
+}
 const batch = {
   wo: 'WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1',
   batch: id,
