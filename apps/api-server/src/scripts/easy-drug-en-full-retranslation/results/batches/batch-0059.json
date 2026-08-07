@@ -1,0 +1,26 @@
+{
+  "batch": "0059",
+  "kind": "CORRECTION",
+  "note": "BLOCKED master 정정 — 기존 TM 문장의 번역만 교체한다(last-wins). 신규 master 선정 없음.",
+  "masters": [
+    "02423c2e-a1b7-4164-94da-f26964d6f8b8",
+    "4e371b12-c628-467e-9cde-efe292a8e855",
+    "a4344378-eb40-4861-9ba4-542c84eab38f",
+    "a7bb5df1-afa1-426b-aad7-83c9a82d43bd",
+    "d28b9ed8-31a4-4a99-836c-db2722bdeead"
+  ],
+  "sentences": [
+    {
+      "hash": "289c58a1024c66f63e94caa5ac0760f3",
+      "ko": "건강한 사람에서 비타민 D 결핍질환 위험으로부터의 예방 및 구루병 예방에 따른 질환에 이 약으로서 1회 1/2정씩(500 IU) 1일 1회 복용합니다.",
+      "section": "사용 방법",
+      "masters": 1
+    },
+    {
+      "hash": "d73f4f0218d69cf1ee3971ceb05a7b4a",
+      "ko": "출혈의 위험이 있으므로 수술(치과수술 포함)을 하는 경우에는 의사에게 이 약을 복용하고 있음을 알리십시오.",
+      "section": "사용 중 주의사항",
+      "masters": 4
+    }
+  ]
+}
