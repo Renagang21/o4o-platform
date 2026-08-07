@@ -1,0 +1,1171 @@
+{
+ "wo": "WO-O4O-HFF-EN-FULL-40902-SEMANTIC-LINGUISTIC-QUALITY-CENSUS-AND-REPAIR-PLANNING-V1",
+ "generatedAt": "2026-08-07T22:49:28.519Z",
+ "clusters": [
+  {
+   "clusterId": "C01",
+   "type": "REPAIR_LINGUISTIC",
+   "code": "HANGUL_RESIDUE_SECTION",
+   "section": "Labelled standard",
+   "affectedDocs": 40896,
+   "residueTokens": 969323,
+   "representativeKo": "성상 : 고유의 향미가 있고 이미",
+   "correctDirection": "해당 섹션 본문을 KO canonical 기준으로 영어로 재번역한다. 섹션 구조·항목 수는 유지.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "LOW — 섹션 단위 교체이며 수치·구조는 대조 게이트로 검증 가능"
+  },
+  {
+   "clusterId": "C02",
+   "type": "REPAIR_LINGUISTIC",
+   "code": "HANGUL_RESIDUE_SECTION",
+   "section": "Speak to our in-store expert",
+   "affectedDocs": 25404,
+   "residueTokens": 304848,
+   "representativeKo": "섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.",
+   "correctDirection": "해당 섹션 본문을 KO canonical 기준으로 영어로 재번역한다. 섹션 구조·항목 수는 유지.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "LOW — 섹션 단위 교체이며 수치·구조는 대조 게이트로 검증 가능"
+  },
+  {
+   "clusterId": "C03",
+   "type": "REPAIR_LINGUISTIC",
+   "code": "HANGUL_RESIDUE_SECTION",
+   "section": "Why this product",
+   "affectedDocs": 489,
+   "residueTokens": 506,
+   "representativeKo": "Functional ingredients: Mucopolysaccharide-protein (chondroitin) Coliform negative — meets its MFDS notified standard Ma",
+   "correctDirection": "해당 섹션 본문을 KO canonical 기준으로 영어로 재번역한다. 섹션 구조·항목 수는 유지.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "LOW — 섹션 단위 교체이며 수치·구조는 대조 게이트로 검증 가능"
+  },
+  {
+   "clusterId": "C04",
+   "type": "REPAIR_LINGUISTIC",
+   "code": "HANGUL_RESIDUE_SECTION",
+   "section": "Officially recognised functions",
+   "affectedDocs": 34,
+   "residueTokens": 121,
+   "representativeKo": "May help to moisturize (dry) skin May help to maintain good skin health by protecting against damage from UV exposure 비타",
+   "correctDirection": "해당 섹션 본문을 KO canonical 기준으로 영어로 재번역한다. 섹션 구조·항목 수는 유지.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "LOW — 섹션 단위 교체이며 수치·구조는 대조 게이트로 검증 가능"
+  },
+  {
+   "clusterId": "C05",
+   "type": "REPAIR_SEMANTIC",
+   "code": "NUMERIC_DRIFT",
+   "affectedDocs": 1010,
+   "correctDirection": "KO 의 단위 동반 수치가 EN 에 그대로 남도록 재생성. 수치 토큰은 원문 그대로 옮긴다.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "MEDIUM — 수치 보존 게이트 필수"
+  },
+  {
+   "clusterId": "C06",
+   "type": "REPAIR_SEMANTIC",
+   "code": "LICENSE_LOST",
+   "affectedDocs": 77,
+   "correctDirection": "개별인정번호(제20XX-N호)를 EN 본문에 원문 표기로 복원.",
+   "autoRepairable": true,
+   "retranslationRequired": false,
+   "regressionRisk": "LOW"
+  },
+  {
+   "clusterId": "C07",
+   "type": "REPAIR_STRUCTURE",
+   "code": "STRUCTURE_DIFF",
+   "affectedDocs": 452,
+   "correctDirection": "KO 와 섹션·항목 수를 일치시킨다. 누락 항목은 재번역, 빈 섹션은 제거 또는 채움.",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "MEDIUM"
+  },
+  {
+   "clusterId": "C90",
+   "type": "REPAIR_LINGUISTIC",
+   "code": "WORD_CONCATENATION",
+   "affectedDocInstances": 58734,
+   "distinctPairs": 12702,
+   "representative": "ZincNeeded for normal immune functionNeeded for normal cell division",
+   "correctDirection": "원료명과 기능성 문장이 구분자 없이 붙었다(`ZincNeeded for…`). 조립 시 라벨과 본문 사이 구분자(콜론·줄바꿈)를 넣어 재생성한다.",
+   "autoRepairable": true,
+   "retranslationRequired": false,
+   "regressionRisk": "LOW — 표기 분리만, 문구 내용 불변"
+  },
+  {
+   "clusterId": "C91",
+   "type": "REPAIR_SEMANTIC",
+   "code": "FUNCTIONAL_CLAIM_LOSS",
+   "affectedDocs": 4802,
+   "distinctPairs": 671,
+   "representative": {
+    "ko": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+    "en": "May help improve blood circulation by inhibiting platelet aggregation.",
+    "koClaims": 5,
+    "enClaims": 1
+   },
+   "correctDirection": "KO 가 나열한 기능성 개수를 EN 이 전부 담도록 재번역. 최다 사례는 5개 중 1개만 남았다(1,066문서).",
+   "autoRepairable": false,
+   "retranslationRequired": true,
+   "regressionRisk": "HIGH — 기능성 누락은 규제 리스크. 개수 대조 게이트 필수"
+  },
+  {
+   "clusterId": "C92",
+   "type": "REPAIR_TERMINOLOGY",
+   "code": "TERM_VARIANTS",
+   "koConcepts": 1375,
+   "affectedDocInstances": 325879,
+   "representative": {
+    "ko": "건강기능식품",
+    "variants": [
+     "Health functional food",
+     "Health Functional Food"
+    ]
+   },
+   "correctDirection": "의미 동일·안전한 변형은 통일하지 않는다(§7). 대문자 표기 흔들림(Health functional food / Health Functional Food)과 강도 차이만 표준화한다.",
+   "autoRepairable": true,
+   "retranslationRequired": false,
+   "regressionRisk": "LOW"
+  }
+ ],
+ "sectionResidueRanking": [
+  {
+   "section": "Labelled standard",
+   "docs": 40896,
+   "tokens": 969323
+  },
+  {
+   "section": "Speak to our in-store expert",
+   "docs": 25404,
+   "tokens": 304848
+  },
+  {
+   "section": "Why this product",
+   "docs": 489,
+   "tokens": 506
+  },
+  {
+   "section": "Officially recognised functions",
+   "docs": 34,
+   "tokens": 121
+  }
+ ],
+ "topResiduePhrases": [
+  {
+   "docs": 25404,
+   "section": "Speak to our in-store expert",
+   "ko": "섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오."
+  },
+  {
+   "docs": 1169,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 932,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오."
+  },
+  {
+   "docs": 819,
+   "section": "Labelled standard",
+   "ko": "어린이 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 743,
+   "section": "Labelled standard",
+   "ko": "영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 629,
+   "section": "Labelled standard",
+   "ko": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오."
+  },
+  {
+   "docs": 605,
+   "section": "Labelled standard",
+   "ko": "1) 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 490,
+   "section": "Labelled standard",
+   "ko": "직사광선을 피하여 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 481,
+   "section": "Labelled standard",
+   "ko": "어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 442,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 293,
+   "section": "Labelled standard",
+   "ko": "③ 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 249,
+   "section": "Labelled standard",
+   "ko": "② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 247,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 224,
+   "section": "Labelled standard",
+   "ko": "② 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 205,
+   "section": "Labelled standard",
+   "ko": "③어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 195,
+   "section": "Labelled standard",
+   "ko": "영"
+  },
+  {
+   "docs": 187,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 175,
+   "section": "Labelled standard",
+   "ko": "Storage 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 174,
+   "section": "Labelled standard",
+   "ko": "3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 166,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 165,
+   "section": "Labelled standard",
+   "ko": "2) 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오."
+  },
+  {
+   "docs": 143,
+   "section": "Labelled standard",
+   "ko": "② 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오."
+  },
+  {
+   "docs": 132,
+   "section": "Labelled standard",
+   "ko": "②유통 중 인습되지 않도록 포장의 파손에 주의하십시오."
+  },
+  {
+   "docs": 130,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 122,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오."
+  },
+  {
+   "docs": 108,
+   "section": "Labelled standard",
+   "ko": "(2) 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 106,
+   "section": "Labelled standard",
+   "ko": "제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 93,
+   "section": "Labelled standard",
+   "ko": "어린이의 손에 닿지 않도록 주의하시기 바랍니다."
+  },
+  {
+   "docs": 87,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 제조일로부터 24개월까지 Storage 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관."
+  },
+  {
+   "docs": 87,
+   "section": "Labelled standard",
+   "ko": "- 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오."
+  },
+  {
+   "docs": 86,
+   "section": "Labelled standard",
+   "ko": "직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오.2."
+  },
+  {
+   "docs": 85,
+   "section": "Labelled standard",
+   "ko": "성상: 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 81,
+   "section": "Labelled standard",
+   "ko": "② 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 75,
+   "section": "Labelled standard",
+   "ko": "어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 54,
+   "section": "Labelled standard",
+   "ko": "2) 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 50,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 50,
+   "section": "Labelled standard",
+   "ko": "유통하십시오."
+  },
+  {
+   "docs": 49,
+   "section": "Labelled standard",
+   "ko": "(2) 제품 개봉 후에는 바로 섭취하십시오."
+  },
+  {
+   "docs": 49,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 제조일로부터 24개월 Storage 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관."
+  },
+  {
+   "docs": 49,
+   "section": "Labelled standard",
+   "ko": "1) 성상 : 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 48,
+   "section": "Labelled standard",
+   "ko": "②제품은 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다."
+  },
+  {
+   "docs": 46,
+   "section": "Labelled standard",
+   "ko": "2) 유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오."
+  },
+  {
+   "docs": 45,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한노랑색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g (2,000억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 43,
+   "section": "Labelled standard",
+   "ko": "영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 43,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 24개월 Storage 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관."
+  },
+  {
+   "docs": 43,
+   "section": "Labelled standard",
+   "ko": "직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 실온에 보관하십시오."
+  },
+  {
+   "docs": 39,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다."
+  },
+  {
+   "docs": 38,
+   "section": "Labelled standard",
+   "ko": "직사광선을 피해 서늘한 곳에 보관하시고, 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 37,
+   "section": "Labelled standard",
+   "ko": "1) 성상: 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 34,
+   "section": "Labelled standard",
+   "ko": "2) 제품 개봉 후에는 변질될 수 있으니 바로 섭취하십시오."
+  },
+  {
+   "docs": 32,
+   "section": "Labelled standard",
+   "ko": "(1) 성상: 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함."
+  },
+  {
+   "docs": 32,
+   "section": "Labelled standard",
+   "ko": "1) 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다."
+  },
+  {
+   "docs": 32,
+   "section": "Labelled standard",
+   "ko": "② 유통 중 인습되지 않도록 포장의 파손에 주의하십시오."
+  },
+  {
+   "docs": 32,
+   "section": "Labelled standard",
+   "ko": "② 병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함."
+  },
+  {
+   "docs": 31,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "docs": 30,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 색택과 향미를 가지며 이미"
+  },
+  {
+   "docs": 30,
+   "section": "Labelled standard",
+   "ko": "3) 영유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 30,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 이미"
+  },
+  {
+   "docs": 29,
+   "section": "Labelled standard",
+   "ko": "Storage 수분 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 29,
+   "section": "Labelled standard",
+   "ko": "제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오."
+  },
+  {
+   "docs": 29,
+   "section": "Labelled standard",
+   "ko": "[기준규격] 1) 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 29,
+   "section": "Labelled standard",
+   "ko": "② 유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다."
+  },
+  {
+   "docs": 28,
+   "section": "Labelled standard",
+   "ko": "1.성상: 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 28,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이 손이 닿지 않도록 주의하시기 바랍니다."
+  },
+  {
+   "docs": 28,
+   "section": "Labelled standard",
+   "ko": "어린이의 손이 닿지 않는 곳에 보관하십시오 Precautions"
+  },
+  {
+   "docs": 27,
+   "section": "Labelled standard",
+   "ko": "제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오."
+  },
+  {
+   "docs": 27,
+   "section": "Labelled standard",
+   "ko": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오.2."
+  },
+  {
+   "docs": 26,
+   "section": "Labelled standard",
+   "ko": "3) 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 25,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 25,
+   "section": "Labelled standard",
+   "ko": "습한 곳에 오래 보관한 경우 캡슐 안에 가루가 굳는 현상이 발생 될 수 있습니다."
+  },
+  {
+   "docs": 25,
+   "section": "Labelled standard",
+   "ko": "②어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 25,
+   "section": "Labelled standard",
+   "ko": "이취가 없어야 한다."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "② 제품 개봉 후 주정이 날아가지 않도록 스포이드 대신 뚜껑으로 밀봉하여 보관하세요."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "이취가 없어야 함."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "이취가 없는 연한 노란 연두의 점도가 있는 내용물을 함유한 투명의 장방형 연질캡슐 Coliform Negative Shelf life 제조일로부터 24개월 Storage 1."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "2) 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "이취가 없다."
+  },
+  {
+   "docs": 24,
+   "section": "Labelled standard",
+   "ko": "병포장의 경우 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함."
+  },
+  {
+   "docs": 23,
+   "section": "Labelled standard",
+   "ko": "어린이의 손이 닿지 않는 곳에 보관하십시오.."
+  },
+  {
+   "docs": 23,
+   "section": "Labelled standard",
+   "ko": "1)성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 23,
+   "section": "Labelled standard",
+   "ko": "대장균군 : 음성."
+  },
+  {
+   "docs": 23,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다."
+  },
+  {
+   "docs": 23,
+   "section": "Labelled standard",
+   "ko": "제품 개봉 후에는 흡습이 일어날 수 있으니 즉시 섭취하시기 바랍니다."
+  },
+  {
+   "docs": 22,
+   "section": "Labelled standard",
+   "ko": "이취가 없는 흰색의 장방형 제피정제 Coliform Negative Shelf life 제조일로부터 24개월 Storage 직사광선을 피하고 서늘한 곳에 보관 및 유통(실온) Precautions"
+  },
+  {
+   "docs": 22,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 22,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미"
+  },
+  {
+   "docs": 22,
+   "section": "Labelled standard",
+   "ko": "(2) 제품 개봉 후에는 밀봉하여 보관하시고, 가급적 빨리 섭취하십시오."
+  },
+  {
+   "docs": 21,
+   "section": "Labelled standard",
+   "ko": "②유통 중 인습되지 않도록 포장의 파손에 주의하여야 한다."
+  },
+  {
+   "docs": 21,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 21,
+   "section": "Labelled standard",
+   "ko": "다습한 곳을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 21,
+   "section": "Labelled standard",
+   "ko": "[액상] 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관."
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "Storage 수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "2) 영"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "대장균군 : 음성"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 유백색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^10 CFU/g 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "성 상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 제조일로부터 24개월."
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 유백색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^9 CFU/g 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 노랑하양색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^10 CFU/g (100억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 20,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관 하십시오."
+  },
+  {
+   "docs": 19,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 향미를 지니고 이미"
+  },
+  {
+   "docs": 19,
+   "section": "Labelled standard",
+   "ko": "직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오."
+  },
+  {
+   "docs": 19,
+   "section": "Labelled standard",
+   "ko": "차고 건조한 곳에 보관 Precautions"
+  },
+  {
+   "docs": 19,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 색택과 향미가 있고 이미"
+  },
+  {
+   "docs": 19,
+   "section": "Labelled standard",
+   "ko": "이취가 없는 진한 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 Coliform Negative Shelf life 제조일로부터 24개월 Storage 1."
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한노랑색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "③ 대장군균 : 음성이어야 한다."
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다."
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 제조일로부터 2년."
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "1) 성상 : 이미"
+  },
+  {
+   "docs": 18,
+   "section": "Labelled standard",
+   "ko": "유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "- 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "어린이 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "영,유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 향미를 지니고 이미, 이취가 없는 점박이가 있는 노란 하얀색 또는 밝은 회황색의 타원형 제피정제 Coliform Negative Shelf life 제조일로부터 24개월까지 Storage 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오.3."
+  },
+  {
+   "docs": 17,
+   "section": "Labelled standard",
+   "ko": "유통하십시오.2) 유통 및 소비 중 변질되지 않도록 포장의 파손 등에 주의하십시오."
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오."
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "1.성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "Vitamin E labelled (11mg / 900mg), 80~150% Ginkgo leaf extract labelled (28mg / 900mg), 80~120% Phosphatidylserine labelled (300mg / 900mg), 80~120% Appearance "
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 색택과 향미를 가지고 이미, 이취가 없어야 한다."
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "영•유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "이취가 없는 노랑 하양색의 입자성이 있는 분말 프로바이오틱스 수 : 300,000,000,000(3,000억) CFU/g 이상 대장균군 : 음성 납 : 1.0 mg/kg 이하 카드뮴 : 0.3 mg/kg 이하"
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "성상: 이미"
+  },
+  {
+   "docs": 16,
+   "section": "Labelled standard",
+   "ko": "성상: 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "카드뮴(㎎/㎏) : 0.5 이하."
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 노랑하양색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^9 CFU/g (10억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "(2) 영"
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "대장균군 : 음성 붕해 : 적합"
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "영,유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "docs": 15,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 고유의 색택과 향미를 가지며 이미"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손이 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "전자레인지에 포를 데우지 않도록 주의하여 주십시오."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "1) 성 상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "총 수은(㎎/㎏) : 0.5 이하."
+  },
+  {
+   "docs": 14,
+   "section": "Why this product",
+   "ko": "Functional ingredients: Mucopolysaccharide-protein (chondroitin) Coliform negative — meets its MFDS notified standard Made by 주)팜크로스"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "[정제] 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "제품의 유통 중 인습되지 않도록 포장의 파손 등에 주의하여야 한다."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관하십시오.2."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "Storage 직사광선 및 고온다습한 곳을 피하여 건조하고 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "Storage 수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한노랑색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g (1,000억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.3."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 흐린 노란색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "Coliform Negative Shelf life 제조일로부터 36개월까지 Storage 고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관."
+  },
+  {
+   "docs": 14,
+   "section": "Labelled standard",
+   "ko": "-성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "2) 습한곳에 오래 보관한 경우 캡슐안에 가루가 굳는 현상이 발생 될 수 있습니다."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "영유아와 어린이의 손이 닿지 않도록 주의하십시오."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 연한노랑색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관하십시오.2."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "2) 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하십시오."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "어린이 손에 닿지 않는 곳에 보관한다."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이 손에 닿지않는 곳에서 보관하십시오."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "이취가 없는 밝은 적갈색의 점도가 있는 내용물을 함유한 갈흑색의 타원형 연질캡슐 Coliform Negative Shelf life 제조일로부터 24개월 Storage 1."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "카드뮴(mg/kg) : 1.0 이하이어야 한다."
+  },
+  {
+   "docs": 13,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 황색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "납(㎎/㎏) : 1.0 이하."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손에 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "Niacin labelled (15mg / 500mg), 80~150% Biotin labelled (30μg / 500mg), 80~180% Vitamin B1 labelled (1.2mg / 500mg), 80~180% Vitamin B12 labelled (2.4μg / 500mg"
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "직사광선 및 고온 다습한 곳을 피하여 서늘한 실온에 보관하십시오."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오.2."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "성상 :고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "②제품은 소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "Storage 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.어린이 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "1) 성상: 고유의 향미가 있고, 이미"
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "1.성상:고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 12,
+   "section": "Labelled standard",
+   "ko": "(5) 총비소(mg/kg) : 1.0 이하이어야 한다."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "실온 2."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "Probiotic count at least 100 million CFU per 2g Appearance 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 이미, 이취가 없고 고유의 향미가 있는 흰노랑색의 분말 ② 대장균군 : 음성 ③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g (1,000억) 이상 ④ 납 : 1.0mg/kg 이하 ⑤ 카드뮴 : 0.3mg/kg 이하"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "②제품의 향미에 영향을 줄 수 있는 다른 식품 또는 첨가물과 분리하여 보관하십시오."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "③ 제품 개봉 후 보관시 흡습방지를 위하여 뚜껑을 꼭 닫아주십시오."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "- 어린이의 손에 닿지 않도록 주의하시기 바랍니다."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 향미가 있고 이미."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 향미를 지니고 이미"
+  },
+  {
+   "docs": 11,
+   "section": "Why this product",
+   "ko": "Functional ingredient: Protein Coliform negative — meets its MFDS notified standard Made by 코뉴"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오 Precautions"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "1) 성상: 고유의 향미를 가지며 이미, 이취가 없는 흰노란색의 분말 2) 프로바이오틱스 수: 200,000,000,000(2,000억) CFU/g 이상 3) 대장균군: 음성 4) 납: 1.0 mg/kg 이하 5) 카드뮴: 0.3 mg/kg 이하"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "(6) 카드뮴(mg/kg) : 1.0 이하이어야 한다."
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "[연질캡슐] 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 11,
+   "section": "Labelled standard",
+   "ko": "② 제품 개봉 후에는 흡습 되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.3."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "1)성상 : 이미"
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "3) 대장균군 : 음성 4) 붕해도 : 20분"
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 섭취를 피하고 품질을 보호, 유지하기 위해 다른 용기에 넣지 마십시오."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "인습이 되지 않도록 주의하여 보관한다."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "1)성상 : 고유의 색택과 향미를 가지며 이미, 이취가 없어야 함 2)프로바이오틱스 수 : 100,000,000 cfu/g 이상 3)대장균군 : 음성"
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "영ㆍ유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "납(mg/kg) : 1.0 이하이어야 한다."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "- 개봉 후에는 공기의 노출을 최대한 차단하여 보관 하십시오.- 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "이취가 없어야한다."
+  },
+  {
+   "docs": 10,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 변질 될 수 있으므로 바로 섭취하십시오."
+  }
+ ],
+ "executionOrder": [
+  "C91 기능성 누락",
+  "C01 Labelled standard 한글 잔존",
+  "C02 전문가 안내 한글 잔존",
+  "C90 단어 붙음",
+  "C13 수치 drift",
+  "C14 개별인정번호",
+  "C16 구조",
+  "C92 용어",
+  "C03~C04 잔여 섹션",
+  "HOLD16"
+ ]
+}

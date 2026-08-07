@@ -1,0 +1,78 @@
+{
+ "wo": "WO-O4O-HFF-EN-FULL-40902-SEMANTIC-LINGUISTIC-QUALITY-CENSUS-AND-REPAIR-PLANNING-V1",
+ "censusedAt": "2026-08-07T22:45:18.940Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "totals": {
+  "ko": 40918,
+  "en": 40902,
+  "ja": 32270,
+  "zh": 40918
+ },
+ "koWithoutEn": 16,
+ "pairs": 40902,
+ "pairsHash": "bfa705456adf049666d6b65871e7c0e5075ee56a7bb255a1fe3383b4f9a0a0c4",
+ "canonicalDup": {
+  "ko": 0,
+  "en": 0
+ },
+ "enNonCanonicalRows": 31,
+ "productMasterDupInPairs": 0,
+ "enLineageByCreatedDay": [
+  {
+   "day": "Fri Jul 17 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 3733,
+   "correctedAfterCreate": 3733
+  },
+  {
+   "day": "Sat Jul 18 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 473,
+   "correctedAfterCreate": 473
+  },
+  {
+   "day": "Sun Jul 19 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 127,
+   "correctedAfterCreate": 127
+  },
+  {
+   "day": "Mon Jul 20 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 184,
+   "correctedAfterCreate": 184
+  },
+  {
+   "day": "Tue Jul 21 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 31,
+   "correctedAfterCreate": 31
+  },
+  {
+   "day": "Wed Jul 22 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 4219,
+   "correctedAfterCreate": 4219
+  },
+  {
+   "day": "Thu Jul 23 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 2910,
+   "correctedAfterCreate": 2910
+  },
+  {
+   "day": "Fri Jul 24 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 3821,
+   "correctedAfterCreate": 3821
+  },
+  {
+   "day": "Fri Jul 31 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 2149,
+   "correctedAfterCreate": 0
+  },
+  {
+   "day": "Sat Aug 01 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 22608,
+   "correctedAfterCreate": 396
+  },
+  {
+   "day": "Mon Aug 03 2026 00:00:00 GMT+0900 (대한민국 표준시)",
+   "n": 647,
+   "correctedAfterCreate": 0
+  }
+ ]
+}

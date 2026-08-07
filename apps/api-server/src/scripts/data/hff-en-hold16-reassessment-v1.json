@@ -1,0 +1,173 @@
+{
+ "wo": "WO-O4O-HFF-EN-FULL-40902-SEMANTIC-LINGUISTIC-QUALITY-CENSUS-AND-REPAIR-PLANNING-V1",
+ "generatedAt": "2026-08-07T22:52:16.564Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "total": 16,
+ "byCause": {
+  "TRANSLATION_AMBIGUOUS": 16
+ },
+ "note": "16건 모두 KO canonical 이 정상 구조(h2/li)를 갖추고 있어 KO_SOURCE_DAMAGED 는 0. 원인은 EN 저작 미완료(TRANSLATION_AMBIGUOUS). 이번 WO 에서는 생산하지 않는다.",
+ "items": [
+  {
+   "productMasterId": "01d73e2f-42c5-4bef-b919-714e9b4309af",
+   "koCanonicalId": "0276c7b2-aa45-4744-89f4-9ceda4cba75f",
+   "productName": "에브리타임 CaloTrim",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 538,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 에브리타임 CaloTrim 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진·피로개선·뼈 건강에 도움을 줄 수 있음 간 건강에 "
+  },
+  {
+   "productMasterId": "0f01e794-f0cd-4e3c-b051-a20b24b0fb2c",
+   "koCanonicalId": "8654606a-990d-4d75-83d5-8933b5e31d7d",
+   "productName": "마이핏 ORIGIN 눈건강 루테인 지아잔틴 A",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 1582,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 마이핏 ORIGIN 눈건강 루테인 지아잔틴 A 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 루테인지아잔틴복합추출물(제2018-4호) ("
+  },
+  {
+   "productMasterId": "20132cd0-c3fd-43c2-9025-759657d0b380",
+   "koCanonicalId": "79dcb158-2cab-4b26-baec-ed96cc39cf8e",
+   "productName": "우먼이소플라본",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 539,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 우먼이소플라본 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 대두이소플라본 뼈 건강에 도움을 줄 수 있습니다. 섭취량 및 섭취방법 (공식"
+  },
+  {
+   "productMasterId": "29db9eaf-43b7-4825-a922-aee32d6149fc",
+   "koCanonicalId": "e41d4528-4bf3-414b-90ba-1dafd10e87c7",
+   "productName": "골드 미소원 맵시",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 901,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 2회 골드 미소원 맵시 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 회화나무열매추출물 갱년기 여성의 건강에 도움을 줄 수 있음 대두이소플라본"
+  },
+  {
+   "productMasterId": "51d0e76b-1c2f-4e00-b9f9-db576ed78e8a",
+   "koCanonicalId": "c60ad35a-7899-4ebb-a86d-674696ce5fdb",
+   "productName": "홍삼분말13.0mg",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 541,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 홍삼분말13.0mg 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을"
+  },
+  {
+   "productMasterId": "644a1479-1d63-434f-aae5-e319afcee839",
+   "koCanonicalId": "04276051-2a88-4608-9de0-e8eaccc433cd",
+   "productName": "인삼분말10.0mg",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 522,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 인삼분말10.0mg 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진･피로개선에 도움을 줄 수 있음 섭취량 및 섭취방법 (공식 표기 그대로"
+  },
+  {
+   "productMasterId": "6f9ea8eb-3af3-48a0-9936-ae3166652d82",
+   "koCanonicalId": "d1de573a-3769-45e6-a6d4-ca2e2ae46386",
+   "productName": "레드메리 골드",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 969,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 레드메리 골드 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 베타카로틴 어두운곳에서 시각 적응을 위해 필요 피부의 잠막을 형성하고 기능을"
+  },
+  {
+   "productMasterId": "8d2b1b78-bb80-43d1-b228-08aeede5bf7f",
+   "koCanonicalId": "5eef76b0-583c-4483-afa3-41dbd3dbe6fe",
+   "productName": "공스킨 스트레스 완화 L-테아닌",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 733,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 공스킨 스트레스 완화 L-테아닌 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 테아닌 스트레스로 인한 긴장완화에 도움을 줄 수 있음 섭취"
+  },
+  {
+   "productMasterId": "97a052de-79d9-44ee-a3ca-313ffa548fc3",
+   "koCanonicalId": "2d2c059e-d160-4629-b05e-84facedde7d4",
+   "productName": "뒤끝있는 홍삼정",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 766,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 뒤끝있는 홍삼정 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력증진•피로개선•혈소판 응집억제를 통한 혈액흐름•기억력 개선•항산화•갱"
+  },
+  {
+   "productMasterId": "a96438be-dae5-4a7c-a94b-2824225736bf",
+   "koCanonicalId": "d2246406-b5ac-4b0c-b28e-2a94b594b6e3",
+   "productName": "철분엽산플러스",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 650,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 철분엽산플러스 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 철 체내 산소운반과 혈액생성에 필요 에너지 생성에 필요 엽산 세포와 혈액생성"
+  },
+  {
+   "productMasterId": "b410fc27-e9af-44d3-a922-5d2328f86188",
+   "koCanonicalId": "226f5ff4-4810-48aa-af73-cdbf7819e749",
+   "productName": "연어이리추출물(DOT™연어핵산)",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 573,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 연어이리추출물(DOT™연어핵산) 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 관절 건강에 도움을 줄 수 있음 위 점막을 보호하여 위 건강에 도움을"
+  },
+  {
+   "productMasterId": "bd7d9259-16cd-43ea-9962-11ed2ecfd67c",
+   "koCanonicalId": "6e1e6fe3-36d6-4b91-821c-2d44683e2d43",
+   "productName": "인삼분말 6.0mg",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 516,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 인삼분말 6.0mg 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진･피로개선에 도움을 줄 수 있음 섭취량 및 섭취방법 (공식 표기 그대로"
+  },
+  {
+   "productMasterId": "c0d863db-d768-4127-9293-1bc686a7b0e4",
+   "koCanonicalId": "61256e5f-fd5a-47ff-9ca3-c4e2971a8768",
+   "productName": "인삼농축액 7",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 636,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 인삼농축액 7 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진･피로개선･뼈 건강에 도움을 줄 수 있음, 최종제품 면역력 증진･"
+  },
+  {
+   "productMasterId": "c626fa91-fc44-4ec1-9d55-aa6fe4dfe0f8",
+   "koCanonicalId": "ec3254bd-2d9e-4650-8793-b1fea91fb43c",
+   "productName": "홍삼분말",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 483,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 홍삼분말 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 홍삼 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 "
+  },
+  {
+   "productMasterId": "e923fe02-ff3a-420a-9d75-7ca56d7f1b1f",
+   "koCanonicalId": "45c89368-eb25-4ff4-8805-6350d2e1f06e",
+   "productName": "홍삼정스틱 프리미엄",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 578,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 홍삼정스틱 프리미엄 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 * 홈삼 면역력 증진･피로개선에 도움을 줄 수 있음 혈소판 응집억제를 "
+  },
+  {
+   "productMasterId": "fa2a1038-1457-46fa-8c6d-eb71eb06ff3e",
+   "koCanonicalId": "6d6f0dba-8c0e-4ed2-a358-f1fb367f0889",
+   "productName": "에브리타임 PowerForm",
+   "cause": "TRANSLATION_AMBIGUOUS",
+   "koLen": 536,
+   "hasStructure": true,
+   "requiredNextAction": "KO 원문 확인 후 EN 직접 저작",
+   "koExcerpt": "건강기능식품 1일 1회 에브리타임 PowerForm 건강기능식품 · 공식 인정 기능성 기반 매장 설명서 이 제품은 식약처에 신고된 건강기능식품입니다. 공식적으로 인정된 기능성은 아래와 같습니다. 주요 기능성 면역력 증진·피로개선·뼈 건강에 도움을 줄 수 있음 간 건강에"
+  }
+ ]
+}

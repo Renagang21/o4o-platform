@@ -1,0 +1,168 @@
+{
+ "wo": "WO-O4O-HFF-EN-FULL-40902-SEMANTIC-LINGUISTIC-QUALITY-CENSUS-AND-REPAIR-PLANNING-V1",
+ "generatedAt": "2026-08-07T22:49:28.553Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "documents": 40902,
+ "passDocuments": 0,
+ "issueDocuments": 40902,
+ "totalIssues": 42435,
+ "countersByCode": {
+  "HANGUL_RESIDUE": 40896,
+  "NUMERIC_DRIFT": 1010,
+  "LICENSE_LOST": 77,
+  "STRUCTURE_DIFF": 0,
+  "SECTION_COUNT_DIFF": 63,
+  "ITEM_COUNT_DIFF": 285,
+  "EMPTY_SECTION": 104
+ },
+ "distinctResiduePhrases": 42610,
+ "sectionsWithResidue": 4,
+ "topSectionsByAffectedDocs": [
+  {
+   "section": "Labelled standard",
+   "docs": 40896,
+   "tokens": 969323
+  },
+  {
+   "section": "Speak to our in-store expert",
+   "docs": 25404,
+   "tokens": 304848
+  },
+  {
+   "section": "Why this product",
+   "docs": 489,
+   "tokens": 506
+  },
+  {
+   "section": "Officially recognised functions",
+   "docs": 34,
+   "tokens": 121
+  }
+ ],
+ "topResiduePhrases": [
+  {
+   "docs": 25404,
+   "section": "Speak to our in-store expert",
+   "ko": "섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오."
+  },
+  {
+   "docs": 1169,
+   "section": "Labelled standard",
+   "ko": "성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 932,
+   "section": "Labelled standard",
+   "ko": "개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오."
+  },
+  {
+   "docs": 819,
+   "section": "Labelled standard",
+   "ko": "어린이 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 743,
+   "section": "Labelled standard",
+   "ko": "영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 629,
+   "section": "Labelled standard",
+   "ko": "고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오."
+  },
+  {
+   "docs": 605,
+   "section": "Labelled standard",
+   "ko": "1) 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 490,
+   "section": "Labelled standard",
+   "ko": "직사광선을 피하여 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 481,
+   "section": "Labelled standard",
+   "ko": "어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 442,
+   "section": "Labelled standard",
+   "ko": "Appearance 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 293,
+   "section": "Labelled standard",
+   "ko": "③ 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 249,
+   "section": "Labelled standard",
+   "ko": "② 제품 개봉 후에는 흡습되지 않게 밀봉하여 보관하십시오."
+  },
+  {
+   "docs": 247,
+   "section": "Labelled standard",
+   "ko": "① 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 224,
+   "section": "Labelled standard",
+   "ko": "② 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 205,
+   "section": "Labelled standard",
+   "ko": "③어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 195,
+   "section": "Labelled standard",
+   "ko": "영"
+  },
+  {
+   "docs": 187,
+   "section": "Labelled standard",
+   "ko": "(1) 성상 : 고유의 향미가 있고 이미"
+  },
+  {
+   "docs": 175,
+   "section": "Labelled standard",
+   "ko": "Storage 수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "docs": 174,
+   "section": "Labelled standard",
+   "ko": "3) 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "docs": 166,
+   "section": "Labelled standard",
+   "ko": "유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  }
+ ],
+ "linguistic": {
+  "wordConcatenation": {
+   "pairs": 12702,
+   "docInstances": 58734
+  }
+ },
+ "semantic": {
+  "functionalClaimLoss": {
+   "pairs": 671,
+   "docs": 4802
+  }
+ },
+ "terminology": {
+  "koConceptsWithVariants": 1375,
+  "docInstances": 325879
+ },
+ "hold16": {
+  "total": 16,
+  "byCause": {
+   "TRANSLATION_AMBIGUOUS": 16
+  }
+ },
+ "verdict": "EN canonical 은 현 상태로 JA/ZH 등 타 언어의 기준본(pivot)으로 사용할 수 없다 — 40,896/40,902 문서에 한글 미번역 구간이 남아 있고, 기능성 누락 4,802문서·단어 붙음 58,734 인스턴스가 확인됨."
+}
