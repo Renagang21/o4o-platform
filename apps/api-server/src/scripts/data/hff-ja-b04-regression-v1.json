@@ -1,150 +1,150 @@
 {
  "wo": "WO-O4O-HFF-JA-REMAINING-16162-PHRASE-AUTHORING-STRUCTURED-COMPRESSION-AND-CONTINUOUS-SHARDS-V1",
- "checkedAt": "2026-08-07T16:28:43.899Z",
+ "checkedAt": "2026-08-07T18:24:11.688Z",
  "readOnly": true,
  "dbWrites": 0,
  "scope": "batch01+batch02+batch03 stored JA canonical",
  "ledgerTargets": 27414,
  "documents": 27414,
  "storedFound": 27414,
- "ledgerCorrectedRows": 120,
+ "ledgerCorrectedRows": 143,
  "storedModified": 0,
  "storedMissing": 0,
  "notProducible": 0,
  "structureDiff": 0,
  "parityBroken": 0,
- "gateDefectOnRebuild": 3322,
- "storedAbnormalMistranslation": 34,
+ "gateDefectOnRebuild": 215,
+ "storedAbnormalMistranslation": 11,
  "storedAbnormalSamples": [
   {
-   "m": "83b1700c-41ef-40cf-b615-5c941cfcc6dd",
-   "s": ">医薬品（抗凝固薬、抗血小板薬、血圧降下薬など）の服用時は専門家にご相談ください。</li><li>個人により皮膚関連の異常反応が生じることがありますのでご注意ください。</li><li>異常が生じた場合"
-  },
-  {
-   "m": "9907a52a-6d35-49c3-8004-9bb8791ecfaa",
-   "s": "談ください。</li><li>高カルシウム血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
+   "m": "406b1aa6-8487-47fd-b275-b3ccfb70fb32",
+   "s": "は摂取に注意</li><li>高カルシウム血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li><li>アレルギー体質"
   },
   {
    "m": "ac231a44-64bd-4f67-b8d2-6fe6517ef741",
    "s": "用時は摂取に注意</li><li>アレルギー体質の方などは個人によって過敏反応が現れることがあります。</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
   },
   {
+   "m": "543f5dfc-198d-4c5c-a26a-3a0ff83e3d8a",
+   "s": "ass=\"sd-item\"><ul><li>クロム - (1) 糖尿病がある場合の摂取前に専門家と相談すること/(2) 異常が生じた場合は摂取を中止し専門家にご相談ください</li><li>ビオチン - "
+  },
+  {
+   "m": "b8b568a0-e031-4959-b3cb-7bf9b95cb300",
+   "s": "-item\"><ul><li>高カルシウム血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li><li>抗凝固薬などの"
+  },
+  {
+   "m": "e06e025c-8d6f-4fb5-81f0-a281de384539",
+   "s": "-item\"><ul><li>高カルシウム血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
+  },
+  {
+   "m": "f9ddb884-b4b1-4362-af12-1b6d7f9c3170",
+   "s": "血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>手足のちくちく感、灼熱感またはしびれなどの異常が生じた場合は摂取を中止し専門家にご相談ください。</li><li>異常が生じた"
+  },
+  {
+   "m": "14c340dc-ad37-4ee6-9c4a-0546e76cfe72",
+   "s": "<li>摂取時にガスの発生、げっぷ、腹痛、腹部膨満感などが生じることがありますので、注意してください。</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li><li>特異体質、アレ"
+  },
+  {
+   "m": "97701852-67bf-4e70-8ef7-c4ea18c164d7",
+   "s": "てください。</li><li>高カルシウム血症がある場合や医薬品を服用中の場合は専門家にご相談ください</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
+  },
+  {
+   "m": "a4ed406c-937e-4308-b5d3-cc5f83192ec0",
+   "s": "。</p></div>\n  <h2>摂取時の参考事項</h2><div class=\"sd-item\"><ul><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
+  },
+  {
    "m": "c47a6e06-07dc-4ee1-abe9-3d50f0e47e14",
    "s": "器系の不快感や下痢を起こすことがあるため、食後に摂取すること</li><li>手足のちくちく感、灼熱感またはしびれなどの異常が生じた場合は摂取を中止し専門家にご相談ください。</li><li>小児、妊産婦"
-  },
-  {
-   "m": "d3f3270e-7bcf-44e0-bfad-3c37a2a82da8",
-   "s": "薬品（抗凝固薬、抗血小板薬、血圧降下薬など）の服用時は専門家にご相談ください。</li><li>個人によって皮膚に関する異常反応が生じることがあります。</li><li>過剰に摂取した場合、一時的に皮膚が"
-  },
-  {
-   "m": "dc6e2184-4447-48e9-aa1a-218d657fde23",
-   "s": "のある方、医薬品を服用中の方は専門家に相談すること</li><li>男性の場合は過剰な摂取を避けること</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li><li>消費期限の過ぎ"
-  },
-  {
-   "m": "e1fcbec6-533f-4fdb-87b2-56b5aa406ef3",
-   "s": ">医薬品（抗凝固薬、抗血小板薬、血圧降下薬など）の服用時は専門家にご相談ください。</li><li>個人により皮膚関連の異常反応が生じることがありますのでご注意ください。</li><li>異常が生じた場合"
-  },
-  {
-   "m": "b46c83ae-e320-484a-83d7-2ba565b485d2",
-   "s": "<li>摂取時にガスの発生、げっぷ、腹痛、腹部膨満感などが生じることがありますので、注意してください。</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
-  },
-  {
-   "m": "5e81eada-e961-4899-a15a-906596b2e66e",
-   "s": "煙者は摂取時に専門家に相談すること</li><li>糖尿病のある場合は摂取前に専門家にご相談ください。</li><li>異常が生じた場合は摂取を中止し専門家にご相談ください</li></ul></div>"
-  },
-  {
-   "m": "60ad8027-d6f4-4f19-858d-24cb2ebbdd0a",
-   "s": ">医薬品（抗凝固薬、抗血小板薬、血圧降下薬など）の服用時は専門家にご相談ください。</li><li>個人により皮膚関連の異常反応が生じることがありますのでご注意ください。</li><li>異常が生じた場合"
   }
  ],
  "samples": [
   {
-   "m": "00238074-caf1-40b4-a4d9-fbd620031eb5",
+   "m": "01431d86-3353-477d-a179-ba7879ad6117",
    "why": "GATE",
    "defect": "PARTICLE_DUP"
   },
   {
-   "m": "002cfa45-5f65-45a3-bccd-7f20b650d39f",
+   "m": "026573bd-cb55-4150-b2ee-cb5969eb5daa",
+   "why": "GATE",
+   "defect": "CLAIM_RUN"
+  },
+  {
+   "m": "04763c5a-f09c-4a2a-a9b7-9a32b8bc71e1",
    "why": "GATE",
    "defect": "PARTICLE_DUP"
   },
   {
-   "m": "0032accd-1381-48b3-9efc-08aa76059d60",
+   "m": "05d7d652-b9bf-4c2d-b534-953a933b6249",
    "why": "GATE",
    "defect": "KANJI_DUP"
   },
   {
-   "m": "004146b1-1586-46f3-ad62-b395d91d9195",
-   "why": "GATE",
-   "defect": "KANJI_DUP"
-  },
-  {
-   "m": "004375a2-49c0-442e-b375-3b4bcefda53f",
-   "why": "GATE",
-   "defect": "KANJI_DUP"
-  },
-  {
-   "m": "00448382-816d-4b35-ad83-d9ca4ff341f4",
-   "why": "GATE",
-   "defect": "KANJI_DUP"
-  },
-  {
-   "m": "0046c55a-cba1-4379-8029-9bd251815802",
-   "why": "GATE",
-   "defect": "KANJI_DUP"
-  },
-  {
-   "m": "00703827-6d2d-4a36-b29e-2fe4f97e26b9",
+   "m": "0675bb40-752b-46f8-98c5-c2363178f1f5",
    "why": "GATE",
    "defect": "PARTICLE_DUP"
   },
   {
-   "m": "007df19c-d03b-4470-a048-ff229b080453",
+   "m": "07e09f42-8a5b-49cf-b39e-6e189018953f",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "CLAIM_RUN"
   },
   {
-   "m": "008366f8-8cf9-47c7-9e6f-1d8cb80e5907",
+   "m": "096b8a3a-60be-40fd-aa79-2d6f5f1d6df7",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "009d18ac-9567-4e02-b0e6-6296df2c33fc",
+   "m": "0a00b39e-10d3-440d-805a-1ee686286006",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "00a15b90-3865-44e0-9888-a46788a1a1eb",
+   "m": "0b5d7761-6c96-4173-bc32-6b4d73d140f4",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "00dcbea2-c15f-439c-a221-a2947dd9c93e",
+   "m": "0c2806b3-bd7d-4e6d-ae65-7a95918b5876",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "CLAIM_RUN"
   },
   {
-   "m": "00e14a02-e1a1-4a02-aaa8-674f5e75b127",
+   "m": "0d0d1051-fa61-4356-9ba0-7f4b98011b4c",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "00f0ecab-5e58-4626-a79a-601ca31a02f0",
+   "m": "0d605eef-5447-4bb3-863a-4b43da227801",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "0119c441-846d-4f84-838b-1d722ff50ef4",
+   "m": "0e2d4685-6386-41ad-8cc0-8aeb84c12e39",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "CLAIM_RUN"
   },
   {
-   "m": "011e11b7-5951-4371-b2e5-355b8bd05206",
+   "m": "1040a723-67b2-4194-9db2-a7e57be32998",
    "why": "GATE",
-   "defect": "KANJI_DUP"
+   "defect": "PARTICLE_DUP"
   },
   {
-   "m": "012fee9f-5f67-40e1-980c-9c3193f42cc7",
+   "m": "128d4719-b34b-4ca7-8b05-7b291f4cc9d3",
+   "why": "GATE",
+   "defect": "PARTICLE_DUP"
+  },
+  {
+   "m": "12dbaa72-f04e-4820-bac5-dae0980a5af8",
+   "why": "GATE",
+   "defect": "PARTICLE_DUP"
+  },
+  {
+   "m": "12e82cd9-4914-49c4-bc85-d389b54801fd",
+   "why": "GATE",
+   "defect": "PARTICLE_DUP"
+  },
+  {
+   "m": "136c9c02-99ee-49f9-8683-9a872ea125fb",
    "why": "GATE",
    "defect": "PARTICLE_DUP"
   }

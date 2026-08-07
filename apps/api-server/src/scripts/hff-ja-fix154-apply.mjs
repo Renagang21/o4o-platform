@@ -17,7 +17,11 @@ const D = 'apps/api-server/src/scripts/data';
 const CACHE = process.env.JA_CACHE ?? 'apps/api-server/src/scripts/.cache';
 const WO = 'WO-O4O-HFF-JA-NUMERIC-IZYOU-MISTRANSLATION-154-CORRECTION-V1';
 const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
-const TARGETS = JSON.parse(fs.readFileSync(`${D}/hff-ja-fix154-targets-v1.json`, 'utf8')).targets;
+/* 입력 원장은 기본이 승인 baseline 이다. 재판정본으로 교정할 때는 FIX154_IN_SUFFIX 로 지정한다
+   — baseline 을 덮어쓰지 않고 새로 열린 대상만 처리하기 위해서다(§9 원장 보호). */
+const IN_SUF = process.env.FIX154_IN_SUFFIX ?? '-v1';
+const OUT_SUF = process.env.FIX154_OUT_SUFFIX ?? '-v1';
+const TARGETS = JSON.parse(fs.readFileSync(`${D}/hff-ja-fix154-targets${IN_SUF}.json`, 'utf8')).targets;
 if (!TARGETS.length) { console.error('NO_TARGETS'); process.exit(1); }
 
 /* ── 교정 전·후 대조 (§4) ─────────────────────────────────────── */
@@ -91,7 +95,7 @@ const globals = async () => (await c.query(`
     (SELECT count(*)::int FROM product_masters WHERE regulatory_type='건강기능식품') pm_hff`)).rows[0];
 const before = await globals();
 
-fs.writeFileSync(`${D}/hff-ja-fix154-rollback-v1.json`, JSON.stringify({
+fs.writeFileSync(`${D}/hff-ja-fix154-rollback${OUT_SUF}.json`, JSON.stringify({
   wo: WO, preparedAt: new Date().toISOString(),
   rollback: 'UPDATE 전용. 되돌리기는 아래 rows 의 oldContent 를 같은 id 에 다시 써 넣는 것이다.',
   before, rows: TARGETS.map((t) => ({ rowId: t.rowId, productMasterId: t.productMasterId, oldContentHash: t.oldContentHash, oldContent: t.oldContent })),
@@ -104,7 +108,7 @@ const head = {
   before,
 };
 if (!compareOk || !renderPass) {
-  fs.writeFileSync(`${D}/hff-ja-fix154-apply-result-v1.json`, JSON.stringify({ ...head, mode: 'STOP' }, null, 1));
+  fs.writeFileSync(`${D}/hff-ja-fix154-apply-result${OUT_SUF}.json`, JSON.stringify({ ...head, mode: 'STOP' }, null, 1));
   console.log(JSON.stringify({ ...head, mode: 'STOP' }, null, 2));
   await c.end(); process.exit(2);
 }
@@ -156,6 +160,6 @@ const out = {
   skippedSample: skipped.slice(0, 10), failed,
   updatedIds: updated.map((x) => x.id),
 };
-fs.writeFileSync(`${D}/hff-ja-fix154-apply-result-v1.json`, JSON.stringify(out, null, 1));
+fs.writeFileSync(`${D}/hff-ja-fix154-apply-result${OUT_SUF}.json`, JSON.stringify(out, null, 1));
 console.log(JSON.stringify({ ...out, updatedIds: undefined }, null, 2));
 await c.end();

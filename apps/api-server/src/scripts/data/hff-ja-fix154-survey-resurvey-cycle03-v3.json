@@ -1,0 +1,44 @@
+{
+ "wo": "WO-O4O-HFF-JA-NUMERIC-IZYOU-MISTRANSLATION-154-CORRECTION-V1",
+ "surveyedAt": "2026-08-07T18:20:25.284Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "jaWithNumericAbnormal": 34,
+ "jaWithAnyAbnormal": 24258,
+ "targets": 23,
+ "productMasterDup": 0,
+ "rejected": 11,
+ "rejectedByWhy": {
+  "GATE_PARTICLE_DUP": 1,
+  "STILL_MISTRANSLATED": 9,
+  "NO_KO_NUMERIC_IZYOU": 1
+ },
+ "totalNumericAbnormalOccurrences": 56,
+ "sample": [
+  {
+   "m": "05f3395f-53b5-40b8-9762-a60d87581ae8",
+   "before": "s=\"sd-item\">② 総(-) HCA：表示量（1,100 mg/100ml）の80%異常~ 120%以下</div><div class=\"sd-item\">",
+   "after": "=\"sd-item\">② 総(-) HCA：表示量（1,100 mg/100ml）の80%以上120%以下</div><div class=\"sd-item\">③ "
+  },
+  {
+   "m": "284c73f6-7cc4-455b-ada2-928d3c8cca9c",
+   "before": "\">2) EPAおよびDHAの合計(%)：表示量（890 mg / 1,204 mg）の80異常120以下</div><div class=\"sd-item\">3) ",
+   "after": ">2) EPAおよびDHAの合計(%)：表示量（890 mg / 1,204 mg）の80以上120以下</div><div class=\"sd-item\">3) "
+  },
+  {
+   "m": "4a7349ee-4a3e-4f06-8c0b-a1201f92e8a9",
+   "before": "lass=\"sd-item\">ビタミンC(%)：表示量（1,000 mg / 4 g）の80異常150以下</div><div class=\"sd-item\">大腸菌",
+   "after": "ass=\"sd-item\">ビタミンC(%)：表示量（1,000 mg / 4 g）の80以上150以下</div><div class=\"sd-item\">大腸菌"
+  },
+  {
+   "m": "5e81eada-e961-4899-a15a-906596b2e66e",
+   "before": "ss=\"sd-item\">ビタミンC(%)：表示量（365 mg/15,000 mg）の80異常150以下</div><div class=\"sd-item\">マグネ",
+   "after": "=\"sd-item\">食物繊維(%)：表示量(5,000 mg/15,000 mg)の80以上</div><div class=\"sd-item\">ビタミンC(%)"
+  },
+  {
+   "m": "60ad8027-d6f4-4f19-858d-24cb2ebbdd0a",
+   "before": "em\">2) EPAとDHAの合計(%)：表示量（500 mg / 1,000 mg）の80異常120以下</div><div class=\"sd-item\">3) ",
+   "after": "m\">2) EPAとDHAの合計(%)：表示量（500 mg / 1,000 mg）の80以上120以下</div><div class=\"sd-item\">3) "
+  }
+ ]
+}

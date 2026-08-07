@@ -34,8 +34,10 @@ const expectHash = new Map(PRIOR.map((t) => [t.productMasterId, t.newContentHash
    교정본 해시를 기대값으로 덮어써야 회귀 판정이 의미를 갖는다 — 그러지 않으면 승인된 교정이
    매번 `storedModified` 로 잡혀 실제 회귀를 가린다. */
 let correctedApplied = 0;
-if (fs.existsSync(`${D}/hff-ja-fix154-targets-v1.json`)) {
-  for (const t of JSON.parse(fs.readFileSync(`${D}/hff-ja-fix154-targets-v1.json`, 'utf8')).targets) {
+/* 교정 원장은 하나가 아니다 — baseline(`-v1`) 외에 사이클별 재판정본(`-resurvey-cycle0N-vN`)이 쌓인다.
+   전부 반영해야 승인된 교정이 `storedModified` 로 잡히지 않는다. */
+for (const f of fs.readdirSync(D).filter((x) => /^hff-ja-fix154-targets.*\.json$/.test(x)).sort()) {
+  for (const t of JSON.parse(fs.readFileSync(`${D}/${f}`, 'utf8')).targets ?? []) {
     if (expectHash.has(t.productMasterId)) { expectHash.set(t.productMasterId, t.newContentHash); correctedApplied++; }
   }
 }

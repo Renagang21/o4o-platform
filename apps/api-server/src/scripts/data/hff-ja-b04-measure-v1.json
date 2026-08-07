@@ -1,6 +1,6 @@
 {
  "wo": "WO-O4O-HFF-JA-ALL-REMAINING-13504-DIRECT-BULK-PRODUCTION-AND-TRACK-CLOSURE-V1",
- "measuredAt": "2026-08-07T14:54:59.474Z",
+ "measuredAt": "2026-08-07T17:16:40.682Z",
  "readOnly": true,
  "dbWrites": 0,
  "authoredRounds": [
@@ -23,1650 +23,46 @@
   "j17",
   "j18",
   "j19",
-  "j20"
+  "j20",
+  "j21",
+  "j22",
+  "j23",
+  "j24",
+  "j25",
+  "j26",
+  "j27",
+  "j28",
+  "j29",
+  "j30"
  ],
  "dictSize": {
-  "clause": 2494,
-  "label": 2494,
-  "meta": 2494,
-  "heading": 2505,
-  "badge": 2494,
-  "intro": 2494,
-  "foot": 2494,
-  "spec": 2494
+  "clause": 3307,
+  "label": 3307,
+  "meta": 3307,
+  "heading": 3318,
+  "badge": 3307,
+  "intro": 3307,
+  "foot": 3307,
+  "spec": 3307
  },
- "documents": 10869,
- "poolHash": "0fae3c55ba277d410640cdf6f8cfc3c14d8664f088f537730227f094b465324a",
+ "documents": 9521,
+ "poolHash": "d73eace34f0fff7527650a7e2c20533d36cb102b11909a09eb73fd6ec85e9ad8",
  "dupMaster": 0,
  "dupKo": 0,
  "koPermanentHoldOverlap": 0,
- "producible": 495,
- "blocked": 10374,
- "distinctMisses": 15916,
- "distinctFailedAtoms": 483971,
+ "producible": 680,
+ "blocked": 8841,
+ "distinctMisses": 13065,
+ "distinctFailedAtoms": 442353,
  "numberDrift": 1,
  "missesByWhy": {
-  "UNRESOLVED": 15915,
+  "UNRESOLVED": 13064,
   "NUMBER_DRIFT": 1
  },
  "topMisses": [
   {
-   "kind": "clause",
-   "text": "피부건강에 도움 2.",
-   "why": "UNRESOLVED",
-   "docs": 22
-  },
-  {
-   "kind": "clause",
-   "text": "항산화에 도움을 줄 수 있음 2.체지방 감소에 도움을 줄 수 있음3.",
-   "why": "UNRESOLVED",
-   "docs": 16
-  },
-  {
-   "kind": "spec",
-   "text": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10.",
-   "why": "UNRESOLVED",
-   "docs": 9
-  },
-  {
-   "kind": "clause",
-   "text": "IMT) 증가 억제를 통한 혈행개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "clause",
-   "text": "설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "spec",
-   "text": "설사, 위통, 복부팽만 등의 위장관계 장애가 나타나는 경우에는 섭",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "clause",
-   "text": "혈소판 응집 억제를 통한 혈액흐름.기억력 개선.항산화에 도움을 줄 수 있음.",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "spec",
-   "text": "혈소판 응집 억제를 통한 혈액흐름.기억력 개선.항산화에 도움을 줄 수 있음.",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "spec",
-   "text": "항산화에 도움을 줄 수 있음 2.체지방 감소에 도움을 줄 수 있음3.",
-   "why": "UNRESOLVED",
-   "docs": 6
-  },
-  {
-   "kind": "clause",
-   "text": "체지방 감소에 도움을 줄 수 있음3. 혈중 콜레스테롤 개손에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "foot",
-   "text": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "냉장보관",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "뚜껑을 개봉하여, 정제 2정을 액상과 함께 섭취 (1일 1회, 1회 1병)",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질 또는 알레르기 체질인 경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "직사광선을 피하고 서늘한 곳에 보관, 개봉 후 빨리 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "살아있는 유산균이므로 37가 넘는 뜨거운 물은 사용에 주의한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "살아있는 유산균이므로 37가 넘는 뜨거운 물은 사용에 주의한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(병포장 시) 습기방지제(방습제)는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(병포장 시) 습기방지제(방습제)는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "살아 있는 생균이므로 아주 뜨거운 물과 함께 복용하는 것은 피해주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "살아 있는 생균이므로 아주 뜨거운 물과 함께 복용하는 것은 피해주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화의 건강에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "질병을 치료중이거나 알레르기 체질인 경우 의사와 상담 후 섭취여부를 결정하십시오",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "질병을 치료중이거나 알레르기 체질인 경우 의사와 상담 후 섭취여부를 결정하십시오",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "고온다습한 곳과 직사광선을 피해 건냉한 곳에 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "➀칼슘과 인이 흡수되고 이용되는데 필요 ➁뼈의 형성과 유지에 필요 ➂골다공증발생 위험 감소에 도움을 줌",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "➀칼슘과 인이 흡수되고 이용되는데 필요 ➁뼈의 형성과 유지에 필요 ➂골다공증발생 위험 감소에 도움을 줌",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "직사광선을 피하여 실온에 보관하시고, 영ᆞ유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "의약품(당뇨치료제, 혈압항응고제) 복용 시 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "의약품(당뇨치료제, 혈압항응고제) 복용 시 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회, 1회 1캡슐(500mg)을 물, 음료 등과 같이 섭취한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "※ 알레르기 등 특이체질이신 경우 성분을 확인 후 섭취하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "※ 파우치 개봉시 내용물이 튈 수있으므로 주의를 기울여 개봉하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "※ 포장이 변형, 손상되었거나, 내용물이 변질 되었을 경우 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "※ 알레르기 등 특이체질이신 경우 성분을 확인 후 섭취하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "※ 파우치 개봉시 내용물이 튈 수있으므로 주의를 기울여 개봉하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "※ 포장이 변형, 손상되었거나, 내용물이 변질 되었을 경우 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(4) 요오드 함량이 높은 식품(해조류, 어패류 등)과 섭취 시 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(5) 갑상선질환, 위장관 장애(질환) 등을 보유하고 있는 사람은 섭취 시 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(4) 요오드 함량이 높은 식품(해조류, 어패류 등)과 섭취 시 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(5) 갑상선질환, 위장관 장애(질환) 등을 보유하고 있는 사람은 섭취 시 주의",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "㉮에너지 이용에 필요 ㉯신경과 근육기능 유지에 필요",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "㉮에너지 이용에 필요 ㉯신경과 근육기능 유지에 필요",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "섭취하는 개인의 체질이나 건강 특성에 따라 알레르기(발진, 붉어짐, 가려움 등), 복통, 설사, 구토, 호흡문제 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "소비기한을 확인하시기 바라며, 알레르기 및 과민증상이 있는 경우 성분을 확인한 후 섭취여부를 결정하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "찬물에 타서 드시고 원료 특성상 물과 혼합되면 젤리 형태로 변경되고 빠르게 굳어질 수 있으나, 이는 제품의 이상이 아니므로 안심하고 드셔도 됩니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "섭취하는 개인의 체질이나 건강 특성에 따라 알레르기(발진, 붉어짐, 가려움 등), 복통, 설사, 구토, 호흡문제 등의 이상사례 발생 시 섭취를 중단하고 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "소비기한을 확인하시기 바라며, 알레르기 및 과민증상이 있는 경우 성분을 확인한 후 섭취여부를 결정하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "찬물에 타서 드시고 원료 특성상 물과 혼합되면 젤리 형태로 변경되고 빠르게 굳어질 수 있으나, 이는 제품의 이상이 아니므로 안심하고 드셔도 됩니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "“스트레스로 인한 피로개선에 도움을 줄 수 있음”(생리활성기능 2등급)",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "제품은 변질 및 변색된 경우에는 섭취하시지 마시고 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "제품은 변질 및 변색된 경우에는 섭취하시지 마시고 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "항산화에 도움을 줄 수 있음 2.구강에서의 항균작용에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "항산화에 도움을 줄 수 있음 2.구강에서의 항균작용에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(4) 무기비소(mg/kg) : 0.1 이하 (비소시험결과 무기비소 기준 초과 검출 시 무기비소로 시험하여 기준 적용)",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "담즙분비를 촉진하여 지방 소화에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "기능성 내용 : 항산화 ․ 구강에서의 항균작용에 도움을 줄 수 있음 ※ 구강에서의 항균작용은 구강에 직접 접촉할 수 있는 형태에 한하며, 섭취량을 적용하지 않음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "[연질캡슐B]",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "직사광선이 들지 않는 서늘한 곳에 보관한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(4) 8주 이상 연속으로 섭취하지 말 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(5) 결핵, 백혈병, 교원증, 다발성 경화증, AIDS, HIV 감염 및 자가면역 장애가 있는 경우 섭취를 금지할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(6) 면역억제제를 복용할 경우 섭취 전 전문가와 상담할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(4) 8주 이상 연속으로 섭취하지 말 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(5) 결핵, 백혈병, 교원증, 다발성 경화증, AIDS, HIV 감염 및 자가면역 장애가 있는 경우 섭취를 금지할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "(6) 면역억제제를 복용할 경우 섭취 전 전문가와 상담할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "유통기한을 확인하시기 바라며, 임산부, 수유여성, 어린이는 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "유통기한을 확인하시기 바라며, 임산부, 수유여성, 어린이는 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "임신, 수유부나 질병으로 치료중이신 분은 섭취 전 전문가와 상의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "임신, 수유부나 질병으로 치료중이신 분은 섭취 전 전문가와 상의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "이상사례 발생 시 섭취를 중단하고, 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "이상사례 발생 시 섭취를 중단하고, 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "강황 알레르기 체질이거나 특정질환(담낭질환 등)이 있는 분은 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "강황 알레르기 체질이거나 특정질환(담낭질환 등)이 있는 분은 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "㉮병포장 : 1일 1회, 1회 20정을 씹어서 물과 함께 섭취. ㉯파우치 포장 : 1일 1회, 1회 1포씩 씹어서 물과 함께 섭취.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "유통기한이 지난 제품은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "유통기한이 지난 제품은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "운동으로 인한 피로 개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "에너지, 포도당, 지질의 합성에 필요 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "1) 직사광선 및 고온다습한 곳을 피하여 청결하고 서늘한 곳에 보관 2) 개봉 후에는 뚜껑을 완전히 닫아 보관 3) 영·유아, 어린이의 손에 닿지 않는 곳에 보관 4) 냉장보관 금지",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질, 알레르기 체질의 경우에는 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질, 알레르기 체질의 경우에는 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "정제를 삼킬 경우 목에 걸릴 수 있으므로 천천히 녹이거나 씹어서 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "용기 안의 방습제는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "개봉 후에는 뚜껑을 닫고 공기의 노출을 최대한 차단하여 보관하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "정제를 삼킬 경우 목에 걸릴 수 있으므로 천천히 녹이거나 씹어서 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "용기 안의 방습제는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "“간 건강에 도움을 줄 수 있음”",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "“간 건강에 도움을 줄 수 있음”",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "제품 개봉 후에는 밀봉 보관하여야 하며 가능한 빨리 사용한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "제품 개봉 후에는 밀봉 보관하여야 하며 가능한 빨리 사용한다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "개봉된 제품은 이물질이 들어가지 않도록 뚜껑으로 밀봉하여 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "개봉된 제품은 이물질이 들어가지 않도록 뚜껑으로 밀봉하여 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "[레몬버베나정제]",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "노화로 인해 감소될 수 있는 황반색소 밀도를 유지시켜 눈건강에 도움을 줍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "어린이의 경우 목에 걸릴 우려가 있으니 보호자가 주의하여 섭취할 수 있도록 하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "어린이의 경우 목에 걸릴 우려가 있으니 보호자가 주의하여 섭취할 수 있도록 하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "포장재의 모서리에 손이 다치지 않도록 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "본 제품은 건강기능식품으로 질병의 예방 및 치료를 위한 의약품이 아닙니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "포장재의 모서리에 손이 다치지 않도록 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "본 제품은 건강기능식품으로 질병의 예방 및 치료를 위한 의약품이 아닙니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "물기가 있는 도구를 사용 시에는 변질의 우려가 있으니 주의 하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "물기가 있는 도구를 사용 시에는 변질의 우려가 있으니 주의 하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "[연질캡슐D]",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "⑤ 납 : 1.0이하(mg/kg) 여야 함",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "⑥ 카드뮴 : 0.5 이하(mg/kg) 여야 함",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하기시 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "소비기한을 확인 후 섭취하시기 바라며, 섭취량 및 섭취방법을 준수하기시 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "원료에 의해 침전물이 생기는 경우가 있으나 품질에는 이상이 없으니 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "원료에 의해 침전물이 생기는 경우가 있으나 품질에는 이상이 없으니 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "임산부와 수유기 여성은 섭취를 피하시는 것이 좋습니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "임산부와 수유기 여성은 섭취를 피하시는 것이 좋습니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "항산화ㆍ체지방 감소·혈중 콜레스테롤 개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "체지방 감소 기능성의 건강기능식품과 함께 섭취를 피할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "체지방 감소 기능성의 건강기능식품과 함께 섭취를 피할 것",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "물이나 우유, 음료에 혼합하여 섭취",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "알러지 등 특이체질이신 경우 성분을 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "알러지 등 특이체질이신 경우 성분을 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "intro",
-   "text": "를 표시량으로 담았습니다(표시 기준 2000mg당). 비타민 C는 결합조직 형성과 기능유지에 필요, 철의 흡수에 필요, 유해산소로부터 세포를 보호하는데 필요한 영양성분입니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "1일 3회, 1회에 동봉된 스푼(1스푼 1g정도)을 이용하여 1스푼(1g)을 그대로 또는 냉ㆍ온수에 타서 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "meta",
-   "text": "1일 2회, 1회 1포를 직접 섭취하거나 음용수와 혼합하여 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "특정성분에 알레르기 체질을 가지신분은 섭취 전 제품의 성분을 확인 후 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "특정성분에 알레르기 체질을 가지신분은 섭취 전 제품의 성분을 확인 후 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "[비타민C정제]",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "(나)혈중 중성지질 개선에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 5.0~30 g (액상원료는 5.0~44 g)",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "임산부, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "임산부, 수유부나 의약품을 섭취하시는 분은 섭취 전 전문가와 상담하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "질환이 있거나 의약품 복용 시 전문가와 상담바랍니다..",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "질환이 있거나 의약품 복용 시 전문가와 상담바랍니다..",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기 등 특이체질이신 분은 제품 성분을 확인 후 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기 등 특이체질이신 분은 제품 성분을 확인 후 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 5
-  },
-  {
-   "kind": "clause",
-   "text": "제품개봉시 포장자재에 의해 상처를 입을수 있으니 주의하시고 개봉후에는 바로 섭취하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품개봉시 포장자재에 의해 상처를 입을수 있으니 주의하시고 개봉후에는 바로 섭취하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "혈액의 흐름을 방해할 수 있는 혈소판응집을 억제하는데 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "식사 후 또는 식사와 함께 할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "식사 후 또는 식사와 함께 할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "천연원료에 의한 침전물 및 응집물이 생길 수 있으나 이물질이 아니오니 안심하시고 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품의 보관상태 및 천연원료에 의해 약간의 점도 및 색상차이가 있을 수 있으나 품질에는 이상이 없으니 안심하고 드셔도 됩니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "천연원료에 의한 침전물 및 응집물이 생길 수 있으나 이물질이 아니오니 안심하시고 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품의 보관상태 및 천연원료에 의해 약간의 점도 및 색상차이가 있을 수 있으나 품질에는 이상이 없으니 안심하고 드셔도 됩니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "호박씨, 대두에 알레르기를 나타내는 사람은 섭취를 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "호박씨, 대두에 알레르기를 나타내는 사람은 섭취를 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "② Polyphenol derivatives(피로갈롤: Pyrogallol) : 표시량(10.5mg/1,400mg) 80~120%",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하여 주십시오. 고온에 보관 시 내용물이 녹아 변색 및 변질될 수 있습니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기나 특이체질이신 경우 성분을 확인한 후 섭취하여 주시기 바랍니다",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기나 특이체질이신 경우 성분을 확인한 후 섭취하여 주시기 바랍니다",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "전자레인지에 돌리지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "파우치면이 날카로우니 조심하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "전자레인지에 돌리지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "파우치면이 날카로우니 조심하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "잇몸상태 완화에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품 특성상 성상이 갈변 될 수 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품 특성상 성상이 갈변 될 수 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일3회,1회 1g을 동봉한 스푼을 이용하여 떠서 직접드시거나, 음용수 80ml에 타서 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "의약품(당뇨치료제,혈액항고제) 복용 시 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "의약품(당뇨치료제,혈액항고제) 복용 시 섭취에 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "섭취자의 신체상태에 따라 특이반응이 나타날 수 있습니다. 이 경우 섭취를 중단하신 후 구입처 또는 고객센터로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "섭취자의 신체상태에 따라 특이반응이 나타날 수 있습니다. 이 경우 섭취를 중단하신 후 구입처 또는 고객센터로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "붕해도 : 20분 내",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특정 성분에 알레르기 있으신 분은 원료명을 확인 후 섭취하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특정 성분에 알레르기 있으신 분은 원료명을 확인 후 섭취하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질 등 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "개봉후에는 내용물이 오염되지 않도록 뚜껑을 잘 닫아 냉장보관하시고 가급적 빨리",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질 등 알레르기 체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "개봉후에는 내용물이 오염되지 않도록 뚜껑을 잘 닫아 냉장보관하시고 가급적 빨리",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 2회, 1회 0.6 mL(4회 분무)를 구강에 분무하여 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 2회, 1회 한스푼 (1g)씩 먹는 물에 타거나 직접 섭취하십시오.15세 이하의 어린이는 위 섭취량의 절반 정도를 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알러지 체질인 경우 과민반응 우려가 있으니, 성분 확인 후 섭취하삽시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알러지 체질인 경우 과민반응 우려가 있으니, 성분 확인 후 섭취하삽시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기 반응을 보이는 사람의 경우 섭취전 성분 확인 필요함",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "임산부, 수유부, 어린이의 섭취는 전문의와 상담 후 섭취를 권장함",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기 반응을 보이는 사람의 경우 섭취전 성분 확인 필요함",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "임산부, 수유부, 어린이의 섭취는 전문의와 상담 후 섭취를 권장함",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "(1) 직사광선과 고온다습한 곳을 피하여 상온(15~25℃)에 보관하실 것을 권장드립니다. (2) 어린이의 손이 닿지 않는 곳에 보관하십시오. (3) 개봉 후에는 캡을 꼭 닫아주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "이상증상이 생길 경우 즉시 섭취를 중단하고, 전문의와 상담하시거나 고객상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "이상증상이 생길 경우 즉시 섭취를 중단하고, 전문의와 상담하시거나 고객상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "개봉 시 내용물이 튈 수 있으니 주의하여 천천히 개봉 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "개봉 시 내용물이 튈 수 있으니 주의하여 천천히 개봉 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "동봉된 실리카겔은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "동봉된 실리카겔은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "혈압이 높은 사람에게 도움을 줄 수 있음 -혈소판 응집억제를 통한 혈행개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "돌외잎주정추출분말(액티포닌®)(제2013-8호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "공복에 섭취 시 위장장애가 있으실 수 있으니 음식물과 함께 섭취하거나 식후에 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "공복에 섭취 시 위장장애가 있으실 수 있으니 음식물과 함께 섭취하거나 식후에 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "1) 성상 : 갈색의 환제로써 이미, 이취가 없어야 함.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "1.성상 : 고유의 색택과 향미를 가지며 이미.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "활성산소제거에 도움을 줄 수 있음(기타기능II)2.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "활성산소제거에 도움을 줄 수 있음(기타기능II)2.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일3회,1회에 동봉된 스푼(1스푼 약 5.5g정도)을 이용하여 2스푼(11g)을 그대로 또는 냉,온수에 타서 섭취한다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "㉮병포장 : 1일 1회, 1회 20정을 씹어서 물과 함께 섭취.㉯파우치 포장 : 1일 1회, 1회 1포씩 씹어서 물과 함께 섭취.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "foot",
-   "text": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오. · 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가와 상담하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "성상 : 고유의 색택과 향미를 가지며, 이미,이취가 없는 흑갈색의 액상",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "안트라퀴논계화합물(무수바바로인으로서)(%) : 0.005 이하(알로에 겔 100% 기준, 원료의 농축배수 및 알로에 겔 환산 함량에 따라 환산 적용함 / 환산적용시 0.055 이하)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "[콜레우스정제]",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특수체질이거나 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으므로 섭취 전에 원료명을 확인하신 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특수체질이거나 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으므로 섭취 전에 원료명을 확인하신 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "➀뼈와 치아 형성에 필요 ➁신경과 근육 기능 유지에 필요 ➂정상적인 혈액응고에 필요 ➃골다공증발생 위험 감소에 도움을 줌,",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "➀뼈와 치아 형성에 필요 ➁신경과 근육 기능 유지에 필요 ➂정상적인 혈액응고에 필요 ➃골다공증발생 위험 감소에 도움을 줌,",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일2회, 1회 동봉된 스픈으로 1스푼(1g)을 온수나 냉수에 넣어 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특정 또는 특이체질등 알러지체질의 경우 성분을 확인하신후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "섭취시 캅셀이 기도에 걸릴수 있으니 반드시 물과 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특정 또는 특이체질등 알러지체질의 경우 성분을 확인하신후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "섭취시 캅셀이 기도에 걸릴수 있으니 반드시 물과 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알러지 체질일 경우 성분을 확인하신 후 섭취할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알러지 체질일 경우 성분을 확인하신 후 섭취할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특정질환(알레르기(대두) 체질, 단장증후군 등)이 있는 분은 섭취에 주의할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특정질환(알레르기(대두) 체질, 단장증후군 등)이 있는 분은 섭취에 주의할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "면역력 증진·피로개선·혈소판 응집억제를 통한 핼액흐름·기억력개선·항산화에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품의 변질 및 변색된 경우에는 섭취하시지 마시고 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품의 변질 및 변색된 경우에는 섭취하시지 마시고 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "개인의 신체 상태에 따라 이상이 발생될 경우 섭취를 중단 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "개인의 신체 상태에 따라 이상이 발생될 경우 섭취를 중단 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일1회, 1회 1포(정제:550mg*2개+액상:20g)를 섭취 하십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회, 1회 1포를 찬물 100~200 ml에 섞어서 섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 3회, 1회 1g(동봉된 스푼 이용)을 직접 또는 온수나 냉수에 타서 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "※ 원료성분에 의한 침전물이 생기는 경우가 있으나 제품의 품질이나 기능에는 이상이 없으니 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "※ 원료성분에 의한 침전물이 생기는 경우가 있으나 제품의 품질이나 기능에는 이상이 없으니 잘 흔들어 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "label",
-   "text": "감국감태추출복합물(제2025-33호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "감국감태추출복합물(제2025-33호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색 분말을 함유한 상부 흑색 ATOMY, 하부 흑색 VITA로 인쇄된 투명한 경질캡슐",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "총 아플라톡신(ug/kg) : 15.0 이하(단 B1은 10.0 이하)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회 1방울(0.0279ml)을 섭취하십시오. 병마개를 연 다음 병을 꺼꾸로 잡고 한방울씩 섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "임산부, 수유부, 만성질환이 있거나 현재 질병치료중이신 분은 전문의와 상의 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "임산부, 수유부, 만성질환이 있거나 현재 질병치료중이신 분은 전문의와 상의 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "복용시 기도에 걸리지 않도록 물 또는 기호음료와 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "복용시 기도에 걸리지 않도록 물 또는 기호음료와 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "반드시 충분한 물과 함께 섭취하시기 바라며, 절대 입에 직접 털어 드시지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "반드시 충분한 물과 함께 섭취하시기 바라며, 절대 입에 직접 털어 드시지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "“스트레스로 인한 피로개선에 도움을 줄 수 있음”(생리활성기능 2등급)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기 체질이신 경우 성분을 확인 한 후 섭취요부를 결정하여야 함.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기 체질이신 경우 성분을 확인 한 후 섭취요부를 결정하여야 함.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품의 개봉시 유리 파손으로 인해 상처를 입을 수 있으니 주의 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품의 개봉시 유리 파손으로 인해 상처를 입을 수 있으니 주의 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 2회, 1회 1.5g(약1스푼)을 그대로 온수나 냉수 80~100ml에 타서 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품 개봉 시 유리파손으로 인해 상처를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품 개봉 시 유리파손으로 인해 상처를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 2회, 1회 1포를 충분한 양의 음용수와 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기 체칠 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기 체칠 등은 개인에 따라 과민반응을 나타낼 수 있습니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "(2) 간 질환이 있거나 혈전용해제 등 복용 시 전문가와 상담할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "(2) 간 질환이 있거나 혈전용해제 등 복용 시 전문가와 상담할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "실온/ 직사광선을 피해 건조하고 서늘한 실온에 보관",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "직사광선을 피하고 습기가 없는 서늘한 곳에 보관하십시오 / 실온보관",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1회 섭취시 동봉된 스푼을 이용하여 60g을 우유나 두유, 물에 혼합하여 하루 2회 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으니 서늘한곳에 보관해주시고, 제품 품질에는 이상이 없으니 안심하고 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "천연색소가 사용되어 빛에 의한 제품 변색 또는 묻어나올 수 있으니 서늘한곳에 보관해주시고, 제품 품질에는 이상이 없으니 안심하고 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "고유의 향미가 있고, 이미 이취가 없는 묽고 투명한 연한 노란색의 내용물을 함유한 투명한 타원형의 연질캡슐",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "label",
-   "text": "석류농축분말(기능성원료인정 제2018-8호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "석류농축분말(기능성원료인정 제2018-8호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "메스꺼움이나 설사 등 소화계통의 불편함을 유발할 수 있음.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "메스꺼움이나 설사 등 소화계통의 불편함을 유발할 수 있음.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "항산화작용 3.혈중 콜레스테롤 수치개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "피부건강에 도움 2.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "팩이 팽창되어 있거나 소비기한이 경과된 제품은 섭취하지 않도록 주의 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "임산부, 수유부, 만성질환이 있거나 현재 질병 치료 중이신 분은 전문의와 상의 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "팩이 팽창되어 있거나 소비기한이 경과된 제품은 섭취하지 않도록 주의 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "임산부, 수유부, 만성질환이 있거나 현재 질병 치료 중이신 분은 전문의와 상의 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "위장장애가 발생할 수 있음 영유아, 임산부는 섭취를 삼가야 함 식사조절, 운동을 병행하는 것이 체지방 감소에 효과적임",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "위장장애가 발생할 수 있음 영유아, 임산부는 섭취를 삼가야 함 식사조절, 운동을 병행하는 것이 체지방 감소에 효과적임",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "(1) 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온도가 낮은 곳에 보관하여 주십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "① 고온과 직사광선을 피해 25℃ 이하의 온, 습도가 낮은 곳에 보관하십시오. ② 제품 개봉 후에는 밀봉하여 보관하시고, 가급적 빨리 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
    "kind": "meta",
    "text": "자사 최종제품(건강기능식품)의 원료로사용",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "담즙분비를 촉진하여 지방 소화에 도움을 줄 수 있음(생리활성기능 2등급)",
    "why": "UNRESOLVED",
    "docs": 4
   },
@@ -1678,241 +74,7 @@
   },
   {
    "kind": "meta",
-   "text": "1일 1회, 1회 1병(액상+정제)을 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "포장 변형, 팽창, 손상 및 내용물이 변질되었을 경우에는 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "전자렌지에 데우지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "포장 변형, 팽창, 손상 및 내용물이 변질되었을 경우에는 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "전자렌지에 데우지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
    "text": "직접 드시거나 냉.온수에 타서 드십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "(1) 고온과 직사광선을 피해 25℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.(2) 제품 개봉 후에는 밀봉하여 보관하시고, 가급적 빨리 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 서늘하고 통풍이 잘 되는 실온에 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "이상증상이 생길 경우 섭취를 중단하시고, 전문의와 상담하시거나 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "이상증상이 생길 경우 섭취를 중단하시고, 전문의와 상담하시거나 소비자 상담실로 문의하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "혈소판 응집억제를 통한 혈액흐름.기억력 개선.항산화에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질, 알레르기 체질의 경우에는 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질, 알레르기 체질의 경우에는 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "개인의신체상태에따라이상이발생될경우섭취를중단하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "개인의신체상태에따라이상이발생될경우섭취를중단하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 3회, 1회 1g(스푼)을 냉수나 온수에 타서 섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.2. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품 개봉 또는 섭취시 유리파손 또는 포장재에 의한 상처를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품 개봉 또는 섭취시 유리파손 또는 포장재에 의한 상처를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "카페일 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "카페일 함유음료(커피, 홍차, 녹차 등)와의 병용 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "4)붕해시험: 적합(1액 60분, 2액60분 이내)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회, 1회 1포을(를) 물과 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "질환이 있거나 의약품 복용 시 전문가와 상담바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "질환이 있거나 의약품 복용 시 전문가와 상담바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "임산부 또는 특이체질, 알레르기 체질의 경우에는 원료를 확인 하신 후 섭취 바랍니다. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "이상 증상이 생길 경우 섭취를 중단하시고, 전문가와 상담바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "유통기한 경과나 변질, 부패 또는 파손된 제품은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "성분명 확인 후 특정 성분에 알레르기가 있는 분은 섭취에 주의 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "임산부 또는 특이체질, 알레르기 체질의 경우에는 원료를 확인 하신 후 섭취 바랍니다. 이상사례 발생 시 섭취를 중단하고 전문가와 상담하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "이상 증상이 생길 경우 섭취를 중단하시고, 전문가와 상담바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "유통기한 경과나 변질, 부패 또는 파손된 제품은 섭취하지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "성분명 확인 후 특정 성분에 알레르기가 있는 분은 섭취에 주의 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "[은행잎정제]",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "장내 유익균 증식, 유해균 억제 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "장내 유익균 증식, 유해균 억제 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "물 또는 차와 함께 섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "[공통]",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "① 제품은 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오. 2. 제품 개봉 후에는 변질될 수 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오. 3.",
    "why": "UNRESOLVED",
    "docs": 4
   },
@@ -1923,374 +85,8 @@
    "docs": 4
   },
   {
-   "kind": "clause",
-   "text": "알레르기, 특이체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기, 특이체질이신 경우 성분을 확인 하신 후 섭취하여 주시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 3회, 1회 1g(1스푼)을 직접섭취 하거나, 냉수 또는 온수에 용해 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "결합조작 형성과 기능유지에 필요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "① 컵에 물을 채워 입에 물 한모금을 머금고, 1포를 투여 후, 물과 함께 삼킵니다. 남은 물로 입안을 헹구어 줍니다. ② 섭취하기 불편하시면, 음료나 주스에 타서 드세요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "공복에 섭취시 위장장애가 있으실 수 있으니 음식물과 함께 섭취하거나 식후에 섭취하세요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "공복에 섭취시 위장장애가 있으실 수 있으니 음식물과 함께 섭취하거나 식후에 섭취하세요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "용기안의 방습제는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "용기안의 방습제는 먹지 마십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품개봉 또는 섭취 시 포장재에 의해 상처를 입을 수 있으니",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "섭취 전 반드시 분말이 잘 섞이도록 충분히 흔들어 섭취할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "섭취 전 반드시 분말이 잘 섞이도록 충분히 흔들어 섭취할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "① 성인 1일 1회, 1회 1포(10g)를 섭취하십시오. ② 15세 이하의 어린이는 성인의 1/2량을 섭취 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "산화스트레스로부터 인체보호에 도움",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "밀 단백질에 알르레기를 나타내는 사람은 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "밀 단백질에 알르레기를 나타내는 사람은 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "섭취를 위하여 포장을 개봉할 때, 간혹 제품에 포장재(알루미늄호일)가 따라오는 경우가 있으니 섭취 시 확인하시고 정제만 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "섭취를 위하여 포장을 개봉할 때, 간혹 제품에 포장재(알루미늄호일)가 따라오는 경우가 있으니 섭취 시 확인하시고 정제만 섭취하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "간, 신장 기능 이상자는 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "간, 신장 기능 이상자는 섭취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "전자레인지에 돌리지 마십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "전자레인지에 돌리지 마십시오",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "label",
-   "text": "솔잎증류농축액",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "황산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "알레르기체질이신경우성분을확인하고섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "알레르기체질이신경우성분을확인하고섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회, 1회 1포를 직접 섭취하거나 물, 음료 등과 같이 섭취",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질, 알레르기체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질, 알레르기체질인 경우 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "납(mg/kg) : 3.0 이하(우골분, 패각분 등 소성칼슘을 사용한 경우)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑 하양 분말",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "체내 산소운반과 혈액생성에 필, 에너지 생성에 필요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "체내 산소운반과 혈액생성에 필, 에너지 생성에 필요",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특이체질, 알러지체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특이체질, 알러지체질인 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "본 제품은 보존료를 사용하지 않으므로 개봉후에는 반드시 냉장보관 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "구입시 포장용기가 깨져 있거나, 뚜껑이 열려져 있을 경우에는 내용물이 변질될 우려가 있으니 절대 음용하지 마십시오. (구입처나 본사로 연락주시면 즉시 교환하여 드립니다.)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "본 제품은 보존료를 사용하지 않으므로 개봉후에는 반드시 냉장보관 하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "구입시 포장용기가 깨져 있거나, 뚜껑이 열려져 있을 경우에는 내용물이 변질될 우려가 있으니 절대 음용하지 마십시오. (구입처나 본사로 연락주시면 즉시 교환하여 드립니다.)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "meta",
-   "text": "1일 1회, 1회 1포(비타민미네랄정제1000mg*2T, 지용성비타민정제500mg*1T, 테아닌정제800mg*1T)를 물과 함께 섭취하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "취에 주의",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "제품 개봉 또는 섭취시 포장재 절단면에 의해 상해를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품 개봉 또는 섭취시 포장재 절단면에 의해 상해를 입을 수 있으니 주의하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "특정질환, 특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특정질환, 특이체질, 알레르기체질의 경우에는 간혹 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인하시고, 섭취전에 전문가와 상담하시기 바랍니다.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "간질환이 있거나 혈전용해제 등 복용 시 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "간질환이 있거나 혈전용해제 등 복용 시 전문가와 상담하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "2) Docosahexaenoic acid (DHA), eicosapentaenoic acid (EPA), docosapentaenoic acid (DPA), α-linolenic acid 전체합 : 표시량(73mg/400mg)의 80%~160%",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
    "kind": "spec",
    "text": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 실온에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "label",
-   "text": "타히보 추출물 (TabetriⓇ)(제2022-2호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "영 ･유아, 어린이, 임산부 및 수유부는 섭취에 주의할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "타히보 추출물 (TabetriⓇ)(제2022-2호)",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "영 ･유아, 어린이, 임산부 및 수유부는 섭취에 주의할 것",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "포 개봉시 주의하시기 바라며, 전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "포 개봉시 주의하시기 바라며, 전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "label",
-   "text": "Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "Lacticaseibacillus rhamnosus IDCC 3201 열처리배양건조물",
    "why": "UNRESOLVED",
    "docs": 4
   },
@@ -2301,154 +97,2368 @@
    "docs": 4
   },
   {
+   "kind": "clause",
+   "text": "참당귀추출분말(Nutragen)(기능성원료인정 제2014-44호) – 노화로 저하된 인지기능 개선에 도움을 줄 수 있음, 관절건강에 도움을 줄 수 있음(생리활성기능 2등급)",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
    "kind": "spec",
-   "text": "① 성상:고유의 향미를 가지며, 이미, 이취가 없는 어두운 갈색의 환",
+   "text": "제조일로 24개월",
    "why": "UNRESOLVED",
    "docs": 4
   },
   {
    "kind": "clause",
-   "text": "이상사례 발견 시 섭취를 중단하고 전문가와 상담할 것",
+   "text": "<프로바이오틱스>",
    "why": "UNRESOLVED",
    "docs": 4
   },
   {
    "kind": "spec",
-   "text": "이상사례 발견 시 섭취를 중단하고 전문가와 상담할 것",
+   "text": "<프로바이오틱스>",
    "why": "UNRESOLVED",
    "docs": 4
+  },
+  {
+   "kind": "meta",
+   "text": "원료용으로 사용",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선 및 고온 다습한 장소를 피하여 실온보관 하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선 및 고온 다습한 곳을 피해 건조하고 서늘한 곳에 보관하며 소비기한은 2년임",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "clause",
+   "text": "에키네시아추출물 : (국문) 면역기능 증진에 도움을 줄 수 있음, (영문) May help to improve immune function",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "spec",
+   "text": "<액상>",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "meta",
+   "text": "제조업체의 식품 원료용 또는1일 3회, 1회 1g을 온수 또는 냉수에 타거나 직접 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 4
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 3정씩 씹거나 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "혈관이완을 통한 혈행개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 한스푼(1g) 씩 먹는 물에 타거나 직접 섭취하십시오. 15세 이하의 어린이는 위 섭취량의 절반 정도를 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취 2) 원료성 제품 : 해당 없음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "세균수: 1 ㎖당 3,000 이하, 식품공전 제10.일반시험법, 3.미생물시험법 5)세균수 시험법",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "대장균군: 음성, 식품공전 제10.일반시험법, 3.미생물시험법 7)대장균군 시험법",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "Lactobacillus sakei Probio65: 표시량 이상{생균으로 10,000,000,000 CFU/3g 이상)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 차게 또는 따뜻하게 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "혈중 중성지질 개선ㆍ혈행 개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "내장된 스푼을 사용하여 1일 3회, 1회 3 g(3스푼)을 물에 타서 섭취하시거나 기호에 따라 벌꿀 또는 감미료 등을 넣어 드시면 좋습니다",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 0.6ml(4회 분무)를 구강에 분무하여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 직사광선 및 고온 다습한 곳을 피해 서늘한 곳에 보관하십시오. 특히 하절기 온도 및 습도가 높은 조건(온도 35℃ 이상, 상대습도 75% 이상)을 피하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "참당귀황기추출복합물(SHPro®)(제2024-28호) : (국문) 전립선 건강의 유지에 도움을 줄 수 있음 (영문) May help to maintain healthy prostate",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 동봉된 1스푼(3g)을 직접 섭취하거나,냉.온수에 타서 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[오메가 연질캡슐]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "2)프로바이오틱스균수 : 표시량(60억마리/2g) 이상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "(1) 1일 1회, 1회 1병(액상+정제 2정)을 섭취하십시오. (2) 뚜껑을 개봉하여 정제 2정을 액상과 함께 섭취하거나 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "이취가 없고 고유의 향미를 가지는 진한 자주색의 장방형 제피정제",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1매, 혀 위에 올려 녹여 섭취합니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "붕해 : 물을 시험액으로 하고 60분 이내 적합",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "고온, 다습, 직사광선을 피하여 실온에 보관",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "제품은 직사광선을 받지 아니하는 서늘한 곳인 실온 보관, 유통하여야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오. 2. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌 탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌탄수화물이 지방으로 합성되는 것을 억제하여 체지방 감소에 도움을 줌",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하며 건냉한 장소에 어린이 손이 닿지 않는 곳에 보관.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1)성상 : 연갈색의 고유의 맛과 향이 있는 액상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1. 원료성 : 건강기능식품, 식품에 적당량 사용한다. 2. 최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "관절 및 연골건강에 도움을 줄 수 있음 -기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "성상: 이미? 이취가 없고 고유의 향미가 있는 흑갈색의 점조성 액상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 0.3ml(0.15ml씩 약 2회 분사)를 구강에 분무하여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "자외선에 의한 피부 손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음,",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취 2) 원료성 : 건강기능식품, 식품에 적당량 사용한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1) 연질캡슐 특성상 보관 상태에 따라 외형 및 성상 변화가 생길 우려가 있으니 반드시 고온다습한 곳과 직사광선을 피하여 건조한 실온에 보관하십시오. 2) 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "⑷ 대장균군: 음성(시험방법: 식품공전 제10.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "④ 납(mg/kg) : 1.0 이하여야한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "⑤ 총비소(mg/kg) : 1.0 이하여야한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "⑥ 총수은(mg/kg) : 0.5 이하여야한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "인터루킨 4 감소를 통한 면역조절에 도움을 줄수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1. 건냉한 곳에 보관하여야 하며 섭취 후에는 마개를 잘 막아 어린이의 손이 닿지 않는 곳에 보관하십시오.2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하고, 서늘한 곳에 차광하여 보관하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회에 동봉된 수저(한 수저 당 1g)를 이용하여 1g씩 냉.온수에 타서 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "있는 액상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 제품은 직사광선을 피하고 실온에서 보관 유통하십시오. ② 제품 개봉 후에는 곧바로 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "제로일로부터 24개월",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(5ml)씩 그대로 또는 기호에 따라 희석하여 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회 1회에 동봉된 스푼(1스푼 5g정도)을 이용하여 2스푼(10g)을 그대로 또는 냉‧온수에 타서 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "투명한 튜브형 연질캡슐에 담긴 고유의 향미가 있고 이미, 이취가 없는 연한 노란색 유상의 액체",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "점성이 약한 분홍색 유동성의 반액상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 습기가 적고 직사광선을 피하여 서늘한 곳에 보관하며, 어린이 손에 닿지 않도록 주의 ② 개봉 후에는 냉장보관하고, 빠른 시일 내에 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(10ml)씩 그대로 또는 물에 타서 섭취하세요.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 기호에 맞게 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(2정)를 물과 함께 섭취하십시오. [정제A : 1정(700 mg), 정제B : 1정(700 mg)]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "실온 / 직사광선을 피하여 서늘하고 건조한 곳에 보관하십시오. 개봉 후에는 가능한 한 빨리 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "식후 혈중 중성지방 개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 직사광선 및 고온 다습한 곳을 받지 않는 서늘한 곳에 보관하십시오. ② 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 실온의 서늘하고, 습도가 낮은 곳에 보관하십시오.2. 제품 개봉 후에는 변질될 수 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.3. 어린이의 손이 닿지 않는 곳에 보관하십시오. 4.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 받지 아니하는 실온에서 보관 및 유통하십시오. 개봉 후에는 가급적 빨리 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "식품원료로 사용",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "루바브뿌리추출물(ERr731®)(제2024-17호) : (국문) 갱년기 여성 건강에 도움을 줄 수 있음 (영문) May help to maintain female health in menopause",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(2 g)씩 그대로 또는 물과 함께 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "유익한 유산균 증식, 유해균억제, 배변활동에 원활",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일2회,1회1포(10g)을 직접 섭취하거나, 냉온수에 타서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[나이아신정제]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "항산화 작용을 하여 유해산소로터 세포를 보호하는데 필요",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회시 2스푼(1스푼 0.5g기준)을 냉수나 온수에 용해하여 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "2) 옥타코사놀 : 표시량(7mg/6g)의 80%이상~ 120%",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 직사광선을 피하고 건조하고 서늘한 곳에 보관하십시오. ② 제품 개봉 후에는 인습 되지 않게 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하시고 서늘한 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "(1) 직사광선을 받지 아니하는 실온에 보관 유통하십시오. (2) 제품 개봉 후에는 밀봉하여 보관하시고, 가급적 빨리 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1g 정도를 냉수 또는 온수에 용해하여 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "비타민C : 표량의 80∼150% (100mg/1,000mg)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 1포를 물 120 mL에 타서 잘 섞은 후 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "디하이드로트라이진(mg/kg) : 불검출",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "면연력 증진에 도움을 줄 수 있음.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "건강기능식품의 원료용으로 판매",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[돌외정제]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병을 식사와 상관 없이 상부캡을 눌러 분말과 액상을 혼합하여 음용하여 주시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포씩 그대로 섭취하거나 물과 합께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "원료인정서(제2008-9호) 시험방법 (2)SOD활성",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "식품공전 제10.일반시험법 6.유해성금속시험법 1)시험용액의 조제 2)측정 (2)ICP법",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "동봉된 스푼을 이용하여 1일3회, 1회당 1스푼(1g 상당)씩 온수 또는 냉수에 넣고 저은 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 2포를 찬물 300ml 이상에 잘 섞은 후 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 건조한 곳에 보관하십시오. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "건강기능식품 등 원료로 사용, 1회 1g, 1일 3회 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "혈압조절에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1회 45g을 우유나 두유, 물, 쥬스에 혼합하여 하루 3회 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[가르시니아정제]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[경질1] [프로바이오틱스 경질캡슐 480mg]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1g을 그대로 또는 물에 타서 섭취하십시오. 식품 또는 건강기능식품 원료로 이용",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "건강기능식품의 원료로 적정량 사용",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "[MVM정제]",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 6g을 충분한 물과 함께 잘 섞어 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하는 건조하고 서늘한 곳에 보관ㆍ유통, 어린이의 손에 닿지 않도록 주의하시기 바립니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "크릴오일(SuperbaTM Boost)(제2023-13호) : (국문)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1g(스푼)을 냉수나 온수에 타서 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "식후혈당상승억제에 도움 3.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1. 실온2. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.3. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "- 직사광선 및 고온다습한 곳을 피하여 보관하십시오,- 고온에 보관시 정제가 녹아 변형 및 변질될 수 있습니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "노화로 인해 감소될 수 있는 황반색소밀도를 유지하여 눈 건강에 도움을 줄 수 있음 눈의 피로도 개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피한 서늘한 곳(실온)에 보관",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 인습되지 않게 밀봉하여 보관하며, 열원이나 직사광선을 피해 서늘한 곳에 보관하십시오. (온도 30℃이상, 상대습도 75% 이상에서는 캡슐이 변형될 수 있습니다.) 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "스푼을 사용하여 1일 2회, 1회 3g(2스푼)을 적정량의 온수 또는 냉수에 타서 감미료나 꿀 등을 기호에 맞게 넣어 잘 저어서 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "연한미황색을 띤 원형의 정제",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1) 최종제품 : 1일 1회, 1회 1g을 그대로 섭취하거나 냉온수에 타서 섭취 2) 원료성 제품 : 건강기능식품, 식품에 적당량 사용한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 그대로 섭취하시거나, 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "(실험방법: 관능검사를 실시하여 성상 변화 여부 확인)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "(실험방법: 건강기능식품공전 Ⅲ.3.7.1 진세노사이드 Rb1과 Rg1)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하여 건냉한 곳에 보관",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "성인 1일 3회, 1회 1g을 직접 드시거나 온수 또는 냉수에 희석하여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하고 건냉한 장소에 어린이 손이 닿지 않는 곳에 보관.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "EPA 및 DHA 함유 유지 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "요로의 유해균 흡착 억제로 요로건강에 도움을 줄 수 있음”(생리활성기능 2등급)",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "label",
-   "text": "아프리카망고 종자추출물(IGOB131)(제2015-14호)",
+   "text": "흔들어 섭취",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "물과 함께 섭취함",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "아프리카망고 종자추출물(IGOB131)(제2015-14호)",
+   "text": "상온보관",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "4) 붕해시험 : 1액 60분, 2액 60분이내에 붕해되어야한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 0.6ml(0.15ml씩 약 4회 분사)를 구강에 분무하여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회에 동봉된 스푼(1스푼 1g정도)을 이용하여 2스푼(2g)을 그대로 또는 냉ㆍ온수에 타서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1회 100g을 우유나 두유, 물, 쥬스에 혼합하여 하루 3회 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 향미가 있고 이미ᆞ이취가 없는 밝은 회황색의 분말",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 1. 직사광선 및 고온다습한 곳을 피해 서늘한 실온에 보관하십시오. 2. 정제상태로 공기 중에 방치하거나 다른 용기에 보관하지 마십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 계량컵을 이용하여 1회 80ml를 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 80ml씩 직접 또는 냉, 온수에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "습기가 적고 직사광선을 받지 않는 건조한 곳에 보관 하십시오. 어린이의 손이 닿지 않는 곳에 보관 하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선 및 고온다습(30℃ 이상, 상대습도 75% 이상)한 곳을 피해 보관, 유통하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일3회 1회에 동봉된 스푼(1스푼 5.5g정도)을 이용하여 2스푼(11g)을 그대로 또는 냉.온수에 타서 섭취한다",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "피부와 점막을 혈성하고 기능을 유지하는데 필요.",
+   "text": "정상적인 세포분열에 필요,오미자추출물 : 근력 개선에 도움을 줄 수 있음",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1정을 맛있게 씹어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "성인1일1회1포를 섭취하십시오 . 15세이하는 1포의 절반정도 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "피부와 점막을 혈성하고 기능을 유지하는데 필요.",
+   "text": "① 직사광선과 습기를 피해 서늘한 곳에 보관하십시오. ② 제품 개봉 후 보관시 흡습방지를 위해 뚜껑을 꼭 닫아야 함",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1. 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 2. 제품개봉 후에는 변질될 수 있으므로 곧바로 섭취하십시오. 3. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "제품 내 습기제거제 섭취 금지",
+   "text": "자외선에 의한 피부손상으로부터 피부 건강을 유지하는데 도움을 줄 수 있음 /",
    "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "제품 내 습기제거제 섭취 금지",
-   "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "면역력 증진.피로개선.혈소판 응집 억제를 통한 혈액흐름.기억력 개선.항산화에 도움을 줄 수 있음.",
+   "text": "프락토올리고당 : 장내 유익균 증식 및 배변활동 원활에 도움을 줄 수 있음 2) 아연 :",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1회 32g을 우유나 두유, 물, 쥬스에 혼합하여 하루 3회 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "면역력 증진.피로개선.혈소판 응집 억제를 통한 혈액흐름.기억력 개선.항산화에 도움을 줄 수 있음.",
+   "text": "1) 성상 : 점성을 지닌 갈색 또는 흑갈색의 액상제품으로 고유의 색택과 향미를 가지며 이미, 이취가 없어야 한다.",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하여 실온보관하며, 어린이의 손에 닿지 않는곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "- 프로바이오틱스 수 : 일일 섭취량 10,000,000,000(100억) CFU 이상/500mg 캡슐",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 2정(500mg×2정,1,000mg)을 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "원료 성분에 의해 침전물이 생길 수 있으나 이물질이 아니오니 안심하고 잘 흔들어 드십시오",
+   "text": "피부건강.항산화.혈중 콜레스테롤 개선에 도움을 줄 수 있음",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "원료 성분에 의해 침전물이 생길 수 있으나 이물질이 아니오니 안심하고 잘 흔들어 드십시오",
+   "text": "4) 붕해도 : 건강기능식품공전[1].2붕해도 시험의 캅셀제품 시험법에 따라 20분 내에 붕해",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "혈전용해제를 복용하시는 분은 의사와 상담하여 주시기 바랍니다.",
+   "text": "유산균 증식 및 유해균 억제ㆍ배변활동 원활에 도움을 줄 수 있음.",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1매를 씹거나 삼키지 말고, 입안에서 천천히 녹여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "혈전용해제를 복용하시는 분은 의사와 상담하여 주시기 바랍니다.",
+   "text": "성상 - 고유의 향미가 있고 이미·이취가 없고 흰색의 침전물이 있는 액상",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 30 ℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오. 2. 제품 개봉 후에는 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.",
+   "text": "습기가 적고 직사광선을 피하여 서늘한 곳에 보관",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 그냥 섭취하거나 물에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일1회 1회 한스푼(1g)씩 그대로 섭취하거나 온수 또는 냉수 80ml에 넣고 저은 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병(액상 20ml*1병, 정제 450mg*2정)을 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "4대장균군 : 음성",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "원료로 적당량 사용",
+   "why": "UNRESOLVED",
+   "docs": 3
   },
   {
    "kind": "clause",
-   "text": "특정질환, 특이체질, 알레르기 체질인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하시기 바랍니다.",
+   "text": "유산균 증식 및 유해균 억제ㆍ배변활동 원활에 도움을 줄 수 있음",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "특정질환, 특이체질, 알레르기 체질인 경우에는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 후 섭취하시기 바랍니다.",
+   "text": "직사광선을 피하고 습기가 없는 서늘한 곳에 보관하십시오. 개봉 후에는 변질될 수 있으니 냉장 보관하거나 빨리 드시기 바랍니다.",
    "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "면역력 증진‧피로개선에 도움을 줄 수 있음",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "임산부.수유부.특이체질,알레르기체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를",
-   "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "임산부.수유부.특이체질,알레르기체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를",
+   "text": "고온다습한 곳에 두시면 젤라틴 피막이 변형 될 수 있으므로 반드시 직사광선과 습기를 피하여 실온에 보관 하십시오.",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
-   "kind": "clause",
-   "text": "특정질환, 특이체질, 알레르기 체질인 경우는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 한 후 섭취여부를 결정하여야 함.",
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 씹어서 섭취하십시오,",
    "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "spec",
-   "text": "특정질환, 특이체질, 알레르기 체질인 경우는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인 한 후 섭취여부를 결정하여야 함.",
-   "why": "UNRESOLVED",
-   "docs": 4
-  },
-  {
-   "kind": "clause",
-   "text": "내용물의 손상이나 변형 또는 팽창 시에는 사용하지 말 것.",
-   "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
   },
   {
    "kind": "spec",
-   "text": "내용물의 손상이나 변형 또는 팽창 시에는 사용하지 말 것.",
+   "text": "성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색 알갱이가 섞인 어두운 회갈색 분말",
    "why": "UNRESOLVED",
-   "docs": 4
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 고유의 색택과 향미를 가지며, 이미, 이취가 없는 연한 노란색 분말",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "label",
+   "text": "저분자콜라겐펩타이드AG(제2023-10호)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(3제피정제, 1연질캡슐)를 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 제품은 직사광선을 피해 서늘한 곳에서 보관 유통하십시오. ② 제품 개봉 후에는 인습(흡습)되지 않게 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 1. 직사광선을 피하여 온, 습도가 낮은 곳에 보관하십시오. 2. 보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.3. 영·유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 고유의 색택과 향미를 가지며, 이미·이취가 없는 갈흑색의 액상",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "2) 비타민 c : 표시량(200mg/4,500mg(1500mgX3정))의 80 ~ 150%",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회,1회에 1ml(20방울)를 음용수나 주스에 혼합하여 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(1.5g)을 직접 섭취하거나, 물, 음료 등과 같이 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "장내 유익균 증식, 유해균 억제, 배변활동에 도움을 줄 수 있음”(기타기능II)",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1포(10.0g)를 충분한 물에 완전히 불려 씹어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 1스틱포(1g)을 물, 주스, 음료 등과 같이 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "제조일로부터 2년간",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "제조업체의 건강기능식품 원료로 사용한다.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "비타민 B2: 체네 애너지 생성에 필요",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1) 성상: 적갈색의 점조성이 있으며, 홍삼의 향취미가 있음",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "① 직사광선을 받지 아니하는 실온에 보관 유통하십시오. ② 제품 개봉 후에는 흡습 되지 않게 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회 1회한스푼(3g),직접또는 냉온수에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1) 고유의 색택과 향미를 가지미 이미, 이취가 없는 갈색의 환",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "아연 ⓛ정상적인 면역기능에 필요",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 서늘한 곳에 보관하십시오. 2. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "spec",
+   "text": "이미, 이취가 없고 고유의 향미가 있는 어두운 갈색의 액상 총",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "골다공증발생 위험 감소에 도움을 줌 *비타민 K",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 1정(1.7g)을 입안에서 녹이거나 씹어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 3
+  },
+  {
+   "kind": "clause",
+   "text": "특이체질, 알레르기 체질의 경우 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이체질, 알레르기 체질의 경우 개인에 따라 과민반응이 나타날 수 있으므로 원료를 확인한 후 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 3g을 직접 섭취하거나,냉.온수에 타서 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 1. 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 보관 하십시오. 2. 제품 개봉 후에는 흡습이 일어날 수 있으니 반드시 밀봉하여 보관 하십시오.3. 유아 및 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1포를 입에 털어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병(액상+정제2정)을 함께 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선 및 고온다습한 곳을 피해 서늘한 곳에 보관 소비하여야 한다. 소비 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "동봉된 스푼을 이용하여 1일 2회, 1회당 한스푼(1g 상당)씩 온수 또는 냉수 80ml에 넣고 저은 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 적갈색의 점조성이 있으며 이미.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "간 건강에 도움을 줄 수 있음[1) (2) (다)의 제조방법에 한함]",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "- 원료성 : 건강기능식품 원료로 사용 - 최종제품 : 1일 2회, 1회 1g(한스푼)씩 온수 또는 냉수에 타서 드시거나 직접 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "교유의 색택과 향미를 가지며 이미,이취가 없어야 함",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "어린이의 경우 과량섭취 및 목에 걸릴우려가 있으니 보호자의 관찰아래 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "어린이의 경우 과량섭취 및 목에 걸릴우려가 있으니 보호자의 관찰아래 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "성상: 클로렐라 고유의 색택과 향미를 가지며 이미,이취가 없어야 하며 원형의 탁하고 진한 광택이 없는 연두색으로 매끄러운 정제이어야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "별첨1: 제품의 규격 및 시험방법, 별첨2: 제품 성적서",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "뚜껑을 개봉하여, 연질(500mg)+정제(700mg)를 액상(20ml)과 함께 섭취 or 물과 함께 섭취 (1일 1회, 1회 1병)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고온다습한 (30℃이상, 상대습도 75%이상)곳에 두시면 변질 및 피막이 녹을 수 있으므로 직사광선을 피하여 서늘한 장소에 보관하십시오. 개봉 후에는 변질될 수 있으므로 바로 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1 g을 물에 타서 섭취하거나 기호에 따라 벌꿀 또는 감미료 등을 넣어 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1~2회 한포(15g)씩 직접섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "면역력 증진‧피로개선‧뼈 건강에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "엷은 미색의 분말이며, 이미, 이취가 없어야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선 및 고온다습한 곳을 피해 습기가 적고 서늘한 곳에 보관, 유통하십시오개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "개성인삼농협 · 식약처 신고 건강기능식품",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "알레르기 체질 등은 개인에 따라 과민방응을 나타낼 수 있습니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "알레르기 체질 등은 개인에 따라 과민방응을 나타낼 수 있습니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "(1) 제품은 직사광선 받지 아니하는 실온에 보관 유통하십시오. (2) 제품 개봉 후에는 흡습 되지 않게 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회 1포(3g)씩 물과 함께 섭취하거나, 기호에 따라 요구르트나 우유와 함께 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "프로바이오틱스 수: 표시량이상(생균으로 100,000,000 CFU/3g 이상)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 고유의 향미가 있고, 이미·이취가 없는 흑갈색의 입자성이 있는 점성의 액상",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회 동봉된 스푼을 이용하여 1회 1스푼(1g)을 물에 타서 섭취거나 기호에 따라 꿀이나 감미료를 첨가하여 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "[말레이시아, 호주]",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.2. 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.3.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 1. 직사광선 및 고온 다습한 곳을 피하여 서늘한 실온에 보관하십시오. 2. 어린이의 손이 닿지 않는 곳에 보관하십시오. 3. 제품 개봉 후에는 밀봉하여 냉장고에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(15 ml)를 물 150ml~200ml에 타서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1) 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오. 2) 개봉한 제품은 변질의 우려가 있으니 밀봉하여 보관하시고 가급적 빨리 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "시험법에 따라 20분내에 붕해",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정성분에 알레르기가 있는 분은 원재료명을 확인 후 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정성분에 알레르기가 있는 분은 원재료명을 확인 후 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정원료에 알레르기가 있거나 질병치료나 약물 투여 중인 분들은 전문가와 상의 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정원료에 알레르기가 있거나 질병치료나 약물 투여 중인 분들은 전문가와 상의 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 30ml씩 원액을 공복에 섭취하시거나 물에 타서 함께 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정 단백질 또는 성분에 알레르기를 나타내는 경우에는 섭취에 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정 단백질 또는 성분에 알레르기를 나타내는 경우에는 섭취에 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "① 성상 :고유의 향미를 가지며, 이미, 이취가 없는 점박이가 있는 회황색의 분말",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "-성상: 고유의 색택을 지니며 이미, 이취가 없는 흑갈색의 액상",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "혈중 중성지질·혈행 개선에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특이체질이나 알러지 체질의 경우 제품성분을 확인 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "의약품복용시 전문가와 상담 후 복용",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이체질이나 알러지 체질의 경우 제품성분을 확인 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "의약품복용시 전문가와 상담 후 복용",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "이미, 이취가 없고 고유의 향미가 있는 고동색의 분말을 함유한 갈색 경질캡슐",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1) 직사광선 및 고온다습한 곳을 피하여 실온보관하십시오. 특히 여름철 차량 내 등에 보관시 젤리의 물성이 변할 수 있으니 주의하여 보관하십시오. 2) 어린이 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "원료성분에 의한 침전물이 생길 수 있으나 변질이 아니오니 안심하고 흔들어 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "원료성분에 의한 침전물이 생길 수 있으나 변질이 아니오니 안심하고 흔들어 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특이 체질, 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으므로 반드시 원료(성분)를 확인하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이 체질, 알레르기 체질 등은 개인에 따라 과민반응을 나타낼 수 있으므로 반드시 원료(성분)를 확인하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 분홍빛 하얀색의 캐릭터 정제",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "면역력 증진에 도움을 줄 수 있음 2)피로개선에 도움을 줄 수 있음 3)혈소판 응집 억제를 통한 혈액흐름에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "기억력 개선에 도움을 줄 수 있음 5)항산화에 도움을 줄 수 있음",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "라임과피추출물(제2025-26호) : (국문) 수면의 질 개선에 도움을 줄 수 있음 (영문) May help to improve sleep quality",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "③ 데쿠르신: 표시량(22.40mg /2.2g)의 64.29%~135.71%",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "④ 사우치논: 표시량(0.32mg /2.2g)의 50%~150%",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "임산부, 수유부 또는 질병 치료나 약물투여 중이신 분들은 전문가와 상담 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "임산부, 수유부 또는 질병 치료나 약물투여 중이신 분들은 전문가와 상담 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "원료성분에 의한 침전물이 생기는 경우가 있으나 품질에는 이상이 없으니 잘 흔들어 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "원료성분에 의한 침전물이 생기는 경우가 있으나 품질에는 이상이 없으니 잘 흔들어 드십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "(나)배변활동 원활에 도움을 줄 수 있음 : 난소화성말토덱스트린 식이섬유로서 4.2~30 g (액상원료는 4.2~44 g)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "의약품(항응고제)복용 시 섭취에 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "의약품(항응고제)복용 시 섭취에 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "[연질1] [EPA및DHA함유유지+마리골드꽃추출물+헤마토코쿠스추출물+아연+비타민E 연질캡슐 1150mg]",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 향미가 있고 이미, 이취가 없는 흰색의 원통형 츄어블 정제",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "엷은 보라색의 분말이며, 이미, 이취가 없어야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특이체질, 알러지 체질인 경우에는 의사와 상담 후 섭취 여부를 결정하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이체질, 알러지 체질인 경우에는 의사와 상담 후 섭취 여부를 결정하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포{콜레우스정제(750 mg * 2T), 홍경천정제(600 mg * 1T)}를 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "알레르기 체질 등은 성분을 확인 한 후 섭취 하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "알레르기 체질 등은 성분을 확인 한 후 섭취 하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정질환(알레르지 체질 등)이 있는 분은 섭취에 주의할 것",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정질환(알레르지 체질 등)이 있는 분은 섭취에 주의할 것",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 개봉 후에는 밀봉 후 냉장에서 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 개봉 후에는 밀봉 후 냉장에서 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "가르시니아 캄보지아(HCA) : 표시량의 80이상~120이하(%) (800mg/일(3.5g))",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "뚜껑을 개봉하여, 정제1+정제2를 액상과 함께 섭취 or 물과 함께 섭취(1일 1회, 1회 1병)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정질환 있거나 특이체질, 알레르기 체질이신 분은 섭취 전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정질환 있거나 특이체질, 알레르기 체질이신 분은 섭취 전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1포, 1회 1포(12g) / 직접음용",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1포(3g)씩 냉·온수에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "①성상 : 고유의 향미가 있고 이미, 이취가 없는 노란색 액이 든 투명 연질캡슐",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 원료 특성상 칼슘 알갱이가 씹힐 수 있으니 꼭꼭 잘 씹어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 원료 특성상 칼슘 알갱이가 씹힐 수 있으니 꼭꼭 잘 씹어서 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "원료에 대한 알레르기 체질, 특이체질, 임산부, 수유부 또는 치료를 받고 계신 중증질환자의 경우에는 의사와 상담 후에 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "원료에 대한 알레르기 체질, 특이체질, 임산부, 수유부 또는 치료를 받고 계신 중증질환자의 경우에는 의사와 상담 후에 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "질병으로 치료 중이시거나 알레르기, 특이체질이신 분은 본 제품의 원료를 확인하시고 섭취 전 전문가와 상담할 것",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "질병으로 치료 중이시거나 알레르기, 특이체질이신 분은 본 제품의 원료를 확인하시고 섭취 전 전문가와 상담할 것",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병 섭취/제품 상단 캡에 있는 정제와 액상을 함께 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제조일로부터 24개월 실온보존",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "성인1일 3회, 1회에 1g씩 동봉된 스픈을 이용하여 직접 또는 냉수 또는 온수에 녹여서 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 색택을 가지며 이미, 이취, 이물이 없는 정제",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "4) 대장균구 : 음성",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 개봉 또는 섭치 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 개봉 또는 섭치 시 포장재에 의해 상처를 입을 수 있으니 주의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "캡슐이 기도에 걸릴 수 있으니 섭취 시 유의하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "캡슐이 기도에 걸릴 수 있으니 섭취 시 유의하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(4g)를 물 300ml에 넣고 녹여드시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "알레르기 체질 등은 개인에 따라 과민반응을 일으킬 수 있습니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "알레르기 체질 등은 개인에 따라 과민반응을 일으킬 수 있습니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "(1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오.(2) 제품 개봉 후에는 흡습 되지 않게 밀봉하여 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1회 25g을 우유나 두유, 물, 쥬스에 혼합하여 하루 3회 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 2정을 물과 함께 섭취하십시오. (소화가 어려우신 분들은 식후에 드시기 바랍니다.)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정원료 성분에 알레르기 체질이신 분은 원료 성분을 확인 하시고 섭취하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입지 않도록 주의하십시오. 목에 걸리거나 불편할 수 있으므로 물과 함께 섭취하십시오. 어린이의 경우 보호자의 관리 아래 섭취하십시오. 개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정원료 성분에 알레르기 체질이신 분은 원료 성분을 확인 하시고 섭취하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입지 않도록 주의하십시오. 목에 걸리거나 불편할 수 있으므로 물과 함께 섭취하십시오. 어린이의 경우 보호자의 관리 아래 섭취하십시오. 개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를 중단하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "원료 특성상 침전물이 발생할 수 있으므로 섭취 전 충분히 흔들어서 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "원료 특성상 침전물이 발생할 수 있으므로 섭취 전 충분히 흔들어서 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 특성상 침전물이 생길 수 있으니 이는 원료의 고유 성분이므로 안심하고",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 특성상 침전물이 생길 수 있으니 이는 원료의 고유 성분이므로 안심하고",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포를 그대로 드시거나 충분한 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "[정제A]",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정 성분에 민감한 분은 반드시 성분을 확인하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정 성분에 민감한 분은 반드시 성분을 확인하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포(비타민B x 1정, 비타민C x 2정, 지용성 x 1정)을 물과 함께 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "건강기능식품 원료(자사 소진용)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정질환이 있거나 특이체질, 알레르기 체질이신 분은 섭취전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정질환이 있거나 특이체질, 알레르기 체질이신 분은 섭취전 원료명을 확인하시고 의사, 약사 등 전문가와 상담 후 섭취여부를 결정하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1회 제공량당 Galactose와 Arabinose의 합 : 135mg/3g(표시량의 80 ~ 120%)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "카드뭄(mg/kg) : 0.2이하",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특이 체질, 알러지 체질의 경우 성분을 확인 하시고 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이 체질, 알러지 체질의 경우 성분을 확인 하시고 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "임산부, 수유부 환자, 영유아, 알레르기체질은 의사와 상담 후 섭취프로폴리스에 알레르기를 나타내는 사람은 섭취에 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "임산부, 수유부 환자, 영유아, 알레르기체질은 의사와 상담 후 섭취프로폴리스에 알레르기를 나타내는 사람은 섭취에 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 이미 이취가 없고 고유의 향미를 가지고 있는 회황색의 내용물을 함유한 상백하적의 경질캡슐",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "용기내 방습제는 드시지 마십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "용기내 방습제는 드시지 마십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1캡슐(450mg)을 충분한 물과 함깨 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1포{1포-2.6g(EPADHA+마리골드 0.5g/연질x2)+(비타민미네랄 0.8g/정)+(NAG 0.8g/정)}를 충분한 물과 함께 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하고 습기가 없는 서늘한 곳에 보관하십시오. 개봉 후에는 변질 될 수 있으므로 바로 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병을 상부캡을 눌러 분말과 액상(하부)을 혼합하여 충분히 흔들어 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "label",
+   "text": "풋사과 농축분말(APPLOZINⓇ)(제2024 – 4호)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "풋사과 농축분말(APPLOZINⓇ)(제2024 – 4호)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 1병을 뚜껑을 개봉하여, 정제(2정)를 액상과 함께 섭취하여 주시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ 직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 특성상 온도에 의해 젤리 성상이 불투명해지고 갈변될 수 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 특성상 온도에 의해 젤리 성상이 불투명해지고 갈변될 수 있으나, 품질에는 문제없으니 안심하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정 단백질에 알레르기를 나타내는 경우에는 섭취 주의특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정 단백질에 알레르기를 나타내는 경우에는 섭취 주의특이체질, 알레르기 체질의 경우는 간혹 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인하신 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "(1) 성상 : 연갈색의 분말로 고유한 향미를 띄며 이미, 이취가 없어야 한다",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "임산부, 수유부, 질병치료(의약품 복용) 중이신 분은 의사, 약사 등 전문가와 상담 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "이상사례 발생 시 섭취를 중단하고 의사, 약사 등 전문가와 상담하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "임산부, 수유부, 질병치료(의약품 복용) 중이신 분은 의사, 약사 등 전문가와 상담 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "이상사례 발생 시 섭취를 중단하고 의사, 약사 등 전문가와 상담하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회 1회 1g을 냉·온수에 타서 기호에 따라 설탕이나 꿀을 첨가해 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1. 직사광선 및 고온을 피하여 서늘한 곳에 보관하십시오.2. 영•유아 및 어린이 손에 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "임산부, 수유부, 질병으로 인하여 치료중인 분은 소비자 상담실로 문의하신 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "임산부, 수유부, 질병으로 인하여 치료중인 분은 소비자 상담실로 문의하신 후 섭취하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품의 특성상 약간의 성상 변화가 있을 수 있으나 품질에는 이상이 없으므로 안심하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품의 특성상 약간의 성상 변화가 있을 수 있으나 품질에는 이상이 없으므로 안심하고 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1.성상: 연한황색의 액이 들어있는 투명한 연질캅셀",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "제품 개봉시 포장재에 의해 상처를 입을 수 있으니 주의가 필요함",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "제품 개봉시 포장재에 의해 상처를 입을 수 있으니 주의가 필요함",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특이체질 알레르기 체질의 경우 제품성분 확인하여 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특이체질 알레르기 체질의 경우 제품성분 확인하여 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "어린 아이들에게 먹일 때는 목에 걸릴 수 있으므로 씹어서 먹을 수 있도록 하여 주십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "어린 아이들에게 먹일 때는 목에 걸릴 수 있으므로 씹어서 먹을 수 있도록 하여 주십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 향미를 가지고, 이미, 이취가 없는 연노랑색의 분말",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "요오드함량이 높은 식품(해조류, 어패류 등)을 섭취 시 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "임신부, 수유부 및 12세 이하 어린이는 섭취 시 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "요오드함량이 높은 식품(해조류, 어패류 등)을 섭취 시 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "임신부, 수유부 및 12세 이하 어린이는 섭취 시 주의",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회, 1회 1g을 온수 또는 냉수에 타서 드시거나 직접 섭취하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "물에 타서 섭취하거나 기호에 따라 벌꿀 또는 감미료 등을 넣어 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "(5) 붕해시험 : 제 1액에서 2시간 이상 미붕해, 제 2액에서 1시간 이내 붕해",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "label",
+   "text": "양춘사추출물",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "양춘사추출물",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "특정 성분에 알레르기가 있으신 분은 원료명을 확인하시고 섭취하십시오. 섭취시 불편할 수 있으므로 물과 함께 섭취하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을시 제품에 기재된 고객만족실로 문의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "특정 성분에 알레르기가 있으신 분은 원료명을 확인하시고 섭취하십시오. 섭취시 불편할 수 있으므로 물과 함께 섭취하십시오. 제품 개봉 또는 섭취시 포장재에 의해 상처를 입을 수 있으니 주의하시고 이상반응이 있을시 제품에 기재된 고객만족실로 문의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 동봉된 스푼(1g)을 사용하여 직접 또는 냉, 온수에 타서 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 3회 1회 1g씩 직접섭취 하거나, 냉수 또는 온수에 용해 후 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 섭취 시 불편할 수 있으므로 충분한 물과 함께 섭취하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 섭취 후 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "알레르기 체질이신 분은 성분 확인 후 섭취하십시오. 섭취 시 불편할 수 있으므로 충분한 물과 함께 섭취하십시오. 제품 개봉 시 포장재에 의해 상처를 입을 수 있으니 주의하시고 섭취 후 이상반응이 있을 시 제품에 기재된 고객상담실로 문의하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "이상증상이 생길 경우 섭취를 중단하고, 의사와 상담하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "이상증상이 생길 경우 섭취를 중단하고, 의사와 상담하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "영, 유아 섭취시 녹여서 섭취할 수 있도록 주의를 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "파우치안에 방습제는 섭취하지 마십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "영, 유아 섭취시 녹여서 섭취할 수 있도록 주의를 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "파우치안에 방습제는 섭취하지 마십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "2) 칼슘 : 표시량[210mg/9,000mg(1,500mg×6정)]의 80~150%",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "어린이나 임산부, 수유부는 섭취를 주의해야 함,",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "어린이나 임산부, 수유부는 섭취를 주의해야 함,",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "고유의 향미를 가지며, 이미, 이취가 없는 어두운 갈색의 정제",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 1포(30g)씩 물이나 우유에 타서 섭취",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "1. 사용 후 병마개를 꼭 닫고 직사광선을 피해 서늘한 곳에 보관하십시오.2. 어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 2회, 1회 2스푼(1스푼:1g)을 적당량의 온수 또는 냉수에 타서 기호에 따라 감미료나 꿀 등을 넣은 후 잘 저어서 음용하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "습기가 적고 직사광선을 받지 않는 서늘한 냉암소 보관",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "실온/ ①직사광선 및 고온 다습한 곳을 피하여 서늘한 곳에 보관 소비하여야 한다. ②소비 중 인습되지 않도록 포장의 파손에 주의하여야 한다. ③어린이의 손이 닿지 않는 곳에 보관하십시오.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일2회, 1회1스푼(5g)을 직접 또는 냉.온수에 녹여 섭취하십시오",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회, 1회 10mL(1포)씩 식, 전후에 직접 섭취한다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "meta",
+   "text": "1일 1회,1회 1정씩물에녹여섭취하십시오.(물 150~200ml)",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "직사광선을 피하고 서늘한 곳에 유통.보관",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "프로바이오틱스 원료이므로 희석하여 사용(섭취)하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "clause",
+   "text": "유통기한이 경과된 제품은 사용하지 않도록 주의하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "프로바이오틱스 원료이므로 희석하여 사용(섭취)하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "유통기한이 경과된 제품은 사용하지 않도록 주의하시기 바랍니다.",
+   "why": "UNRESOLVED",
+   "docs": 2
+  },
+  {
+   "kind": "spec",
+   "text": "성상 : 고유의 향미를 가지고, 이미·이취가 없는 갈색의 액상",
+   "why": "UNRESOLVED",
+   "docs": 2
   }
  ],
  "topAtoms": [
@@ -2589,58 +2599,6 @@
    "n": 9
   },
   {
-   "text": "제품개봉",
-   "n": 9
-  },
-  {
-   "text": "혈액의 호모시스테인 수준을 정상으로",
-   "n": 9
-  },
-  {
-   "text": "이용에 필요,",
-   "n": 9
-  },
-  {
-   "text": "이용에 필요",
-   "n": 9
-  },
-  {
-   "text": "항산화 작용을 하여 유해산소",
-   "n": 9
-  },
-  {
-   "text": "기능유지에 필요",
-   "n": 9
-  },
-  {
-   "text": "결합조직 형성과 기능유지",
-   "n": 9
-  },
-  {
-   "text": "형성과 기능유지에 필요",
-   "n": 9
-  },
-  {
-   "text": "에너지",
-   "n": 9
-  },
-  {
-   "text": "에너지 이용",
-   "n": 9
-  },
-  {
-   "text": "기능",
-   "n": 9
-  },
-  {
-   "text": "기능 유지에 필요",
-   "n": 9
-  },
-  {
-   "text": "근육 기능 유지에 필요",
-   "n": 9
-  },
-  {
    "text": "혈",
    "n": 9
   },
@@ -2649,19 +2607,11 @@
    "n": 9
   },
   {
-   "text": "도움을 줄 수 있음",
-   "n": 9
-  },
-  {
    "text": "있음,",
    "n": 9
   },
   {
    "text": "어린",
-   "n": 9
-  },
-  {
-   "text": "것",
    "n": 9
   },
   {
@@ -2674,10 +2624,6 @@
   },
   {
    "text": "이취가 없음",
-   "n": 9
-  },
-  {
-   "text": "한다.",
    "n": 9
   },
   {
@@ -2698,38 +2644,6 @@
   },
   {
    "text": "식",
-   "n": 9
-  },
-  {
-   "text": "하십시오",
-   "n": 9
-  },
-  {
-   "text": "하십시오.",
-   "n": 9
-  },
-  {
-   "text": "침전물",
-   "n": 9
-  },
-  {
-   "text": "흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "잘 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "안심하시고 잘 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "됩니다.",
-   "n": 9
-  },
-  {
-   "text": "드셔도 됩니다.",
    "n": 9
   },
   {
@@ -2754,14 +2668,6 @@
   },
   {
    "text": "기타원료 유래다당체 : 215mg/90ml",
-   "n": 9
-  },
-  {
-   "text": "대두에 알레르기를 나타내",
-   "n": 9
-  },
-  {
-   "text": "반드",
    "n": 9
   },
   {
@@ -2850,6 +2756,10 @@
   },
   {
    "text": "받지 않는 서늘한 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "대두에 알레르기를 나타내",
    "n": 9
   },
   {
@@ -2973,119 +2883,11 @@
    "n": 9
   },
   {
-   "text": "전",
-   "n": 9
-  },
-  {
-   "text": "개인의 신체상태",
-   "n": 9
-  },
-  {
-   "text": "개인의 신체상태에 따라 이상 증상",
-   "n": 9
-  },
-  {
-   "text": "단하십시오.",
-   "n": 9
-  },
-  {
-   "text": "있을 경우 섭취를 중단하십시오.",
-   "n": 9
-  },
-  {
-   "text": "증상이 있을 경우 섭취를 중단하십시오.",
-   "n": 9
-  },
-  {
-   "text": "변색",
-   "n": 9
-  },
-  {
-   "text": "고온에",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아 변색",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아 변색 및",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아 변색 및 변질",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아 변색 및 변질될 수 있습니다",
-   "n": 9
-  },
-  {
-   "text": "고온에 보관 시 내용물이 녹아 변색 및 변질될 수 있습니다.",
-   "n": 9
-  },
-  {
-   "text": "주십시오.",
-   "n": 9
-  },
-  {
-   "text": "간혹 침전물",
-   "n": 9
-  },
-  {
-   "text": "(간혹 침전물",
-   "n": 9
-  },
-  {
-   "text": "(간혹 침전물이 있을 수 있으나 제품 고유 성분이므로 안심하고 흔들어",
-   "n": 9
-  },
-  {
-   "text": "안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "제품 고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "있으나 제품 고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "수 있으나 제품 고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "있을 수 있으나 제품 고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "침전물이 있을 수 있으나 제품 고유 성분이므로 안심하고 흔들어 드십시오.",
-   "n": 9
-  },
-  {
-   "text": "마십시오.",
-   "n": 9
-  },
-  {
-   "text": "바랍니다.",
-   "n": 9
-  },
-  {
    "text": "특성상",
+   "n": 9
+  },
+  {
+   "text": "전",
    "n": 9
   },
   {
@@ -3097,23 +2899,11 @@
    "n": 9
   },
   {
+   "text": "주십시오.",
+   "n": 9
+  },
+  {
    "text": "피하여 주십시오.",
-   "n": 9
-  },
-  {
-   "text": "전에 의사와 상담하십시오.",
-   "n": 9
-  },
-  {
-   "text": "있습니다",
-   "n": 9
-  },
-  {
-   "text": "수 있습니다",
-   "n": 9
-  },
-  {
-   "text": "중",
    "n": 9
   },
   {
@@ -3153,11 +2943,11 @@
    "n": 9
   },
   {
-   "text": "소비 중",
+   "text": "중",
    "n": 9
   },
   {
-   "text": "소비 중 흡습되지 않도록 포장",
+   "text": "소비 중",
    "n": 9
   },
   {
@@ -3233,23 +3023,7 @@
    "n": 9
   },
   {
-   "text": "수 있음,",
-   "n": 9
-  },
-  {
-   "text": "줄 수 있음,",
-   "n": 9
-  },
-  {
-   "text": "도움을 줄 수 있음,",
-   "n": 9
-  },
-  {
    "text": "를",
-   "n": 9
-  },
-  {
-   "text": "건강에 도움을 줄 수 있음",
    "n": 9
   },
   {
@@ -3345,18 +3119,6 @@
    "n": 9
   },
   {
-   "text": "영",
-   "n": 9
-  },
-  {
-   "text": "동봉한 스푼",
-   "n": 9
-  },
-  {
-   "text": "음용",
-   "n": 9
-  },
-  {
    "text": "최종",
    "n": 9
   },
@@ -3421,47 +3183,19 @@
    "n": 9
   },
   {
-   "text": "하",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 구입처",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 구입처 또",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 구입처 또는 고객센터로",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 구입처 또는 고객센터로 문의하시기 바랍니다",
-   "n": 9
-  },
-  {
-   "text": "있습니다.",
-   "n": 9
-  },
-  {
-   "text": "수 있습니다.",
-   "n": 9
-  },
-  {
-   "text": "나타날 수 있습니다.",
-   "n": 9
-  },
-  {
-   "text": "따라 특이반응이 나타날 수 있습니다.",
-   "n": 9
-  },
-  {
    "text": "있으므로 주의하십시오.",
    "n": 9
   },
   {
    "text": "수 있으므로 주의하십시오.",
+   "n": 9
+  },
+  {
+   "text": "침전물",
+   "n": 9
+  },
+  {
+   "text": "것",
    "n": 9
   },
   {
@@ -3485,7 +3219,7 @@
    "n": 9
   },
   {
-   "text": "20분 내",
+   "text": "변색",
    "n": 9
   },
   {
@@ -3553,6 +3287,10 @@
    "n": 9
   },
   {
+   "text": "바랍니다.",
+   "n": 9
+  },
+  {
    "text": "피하여 서늘한 곳에 보관하십시오.",
    "n": 9
   },
@@ -3561,19 +3299,15 @@
    "n": 9
   },
   {
+   "text": "항산화 작용을 하여 유해산소",
+   "n": 9
+  },
+  {
    "text": "마",
    "n": 9
   },
   {
    "text": "시 섭취를 중단하고 전문가와 상담할 것",
-   "n": 9
-  },
-  {
-   "text": "섭취 전 제품에 이상이 있",
-   "n": 9
-  },
-  {
-   "text": "섭취 전 제품에 이상이 있는",
    "n": 9
   },
   {
@@ -3633,10 +3367,6 @@
    "n": 9
   },
   {
-   "text": "필요함",
-   "n": 9
-  },
-  {
    "text": "잘되는 실온에 보관하십시오.",
    "n": 9
   },
@@ -3662,26 +3392,6 @@
   },
   {
    "text": "직사광선 및 습기를 피해 서늘하고, 통풍이 잘되는 실온에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "단",
-   "n": 9
-  },
-  {
-   "text": "있음.",
-   "n": 9
-  },
-  {
-   "text": "수 있음.",
-   "n": 9
-  },
-  {
-   "text": "줄 수 있음.",
-   "n": 9
-  },
-  {
-   "text": "도움을 줄 수 있음.",
    "n": 9
   },
   {
@@ -4049,6 +3759,18 @@
    "n": 9
   },
   {
+   "text": "하",
+   "n": 9
+  },
+  {
+   "text": "됩니다.",
+   "n": 9
+  },
+  {
+   "text": "드셔도 됩니다.",
+   "n": 9
+  },
+  {
    "text": "고온 다습한 곳에 두시면 젤라틴 피막",
    "n": 9
   },
@@ -4089,10 +3811,6 @@
    "n": 9
   },
   {
-   "text": "하시기 바랍니다.",
-   "n": 9
-  },
-  {
    "text": "어린이의 손에 닿지 않도록",
    "n": 9
   },
@@ -4114,14 +3832,6 @@
   },
   {
    "text": "있는 갈색의 장용성 코팅정제 · 에스케이내추럴팜",
-   "n": 9
-  },
-  {
-   "text": "소비기한이 경과된",
-   "n": 9
-  },
-  {
-   "text": "소비기한이 경과된 제품",
    "n": 9
   },
   {
@@ -4225,10 +3935,6 @@
    "n": 9
   },
   {
-   "text": "영유아 및 어린",
-   "n": 9
-  },
-  {
    "text": "최대한 차단하여 보관 하십시오.",
    "n": 9
   },
@@ -4238,6 +3944,10 @@
   },
   {
    "text": "공기의 노출을 최대한 차단하여 보관 하십시오.",
+   "n": 9
+  },
+  {
+   "text": "영유아 및 어린",
    "n": 9
   },
   {
@@ -4305,11 +4015,15 @@
    "n": 9
   },
   {
-   "text": "발생할 수 있습니다.",
+   "text": "흔들어 드십시오.",
    "n": 9
   },
   {
-   "text": "등이 발생할 수 있습니다.",
+   "text": "있습니다.",
+   "n": 9
+  },
+  {
+   "text": "수 있습니다.",
    "n": 9
   },
   {
@@ -4433,6 +4147,18 @@
    "n": 9
   },
   {
+   "text": "결합조직 형성과 기능유지",
+   "n": 9
+  },
+  {
+   "text": "기능유지에 필요",
+   "n": 9
+  },
+  {
+   "text": "형성과 기능유지에 필요",
+   "n": 9
+  },
+  {
    "text": "1병(100ml씩 그대로 섭취 하십시오.",
    "n": 9
   },
@@ -4505,6 +4231,10 @@
    "n": 9
   },
   {
+   "text": "영",
+   "n": 9
+  },
+  {
    "text": "등 알러지 체질의 경우 성분을 확인하신 후 섭취하십시오.",
    "n": 9
   },
@@ -4545,15 +4275,15 @@
    "n": 9
   },
   {
-   "text": "· 섭취 시 캡슐이 기도에 걸릴 수 있음",
+   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품",
    "n": 9
   },
   {
-   "text": "· 섭취 시 캡슐이 기도에 걸릴 수 있으니 반드시 물",
+   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문",
    "n": 9
   },
   {
-   "text": "있으니 반드시 물과 함께 섭취하십시오.",
+   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가",
    "n": 9
   },
   {
@@ -4569,31 +4299,11 @@
    "n": 9
   },
   {
-   "text": "캡슐이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
+   "text": "있으니 반드시 물과 함께 섭취하십시오.",
    "n": 9
   },
   {
-   "text": "시 캡슐이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "섭취 시 캡슐이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "· 섭취 시 캡슐이 기도에 걸릴 수 있으니 반드시 물과 함께 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품",
-   "n": 9
-  },
-  {
-   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문",
-   "n": 9
-  },
-  {
-   "text": "· 건강기능식품은 질병의 예방·치료를 위한 의약품이 아니며, 궁금한 점은 매장 내 약사 등 전문가",
+   "text": "· 섭취 시 캡슐이 기도에 걸릴 수 있음",
    "n": 9
   },
   {
@@ -4613,7 +4323,11 @@
    "n": 9
   },
   {
-   "text": "과량",
+   "text": "이용에 필요,",
+   "n": 9
+  },
+  {
+   "text": "이용에 필요",
    "n": 9
   },
   {
@@ -4657,31 +4371,7 @@
    "n": 9
   },
   {
-   "text": "옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "하실때에는 다른 용기에 옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "바라며, 전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "주의하시기 바라며, 전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
-   "n": 9
-  },
-  {
-   "text": "개봉시 주의하시기 바라며, 전자레인지를 사용 하실때에는 다른 용기에 옮겨 데우십시오.",
+   "text": "과량",
    "n": 9
   },
   {
@@ -4717,23 +4407,11 @@
    "n": 9
   },
   {
-   "text": "20분내",
-   "n": 9
-  },
-  {
    "text": "20분내에",
    "n": 9
   },
   {
    "text": "20분내에 붕해",
-   "n": 9
-  },
-  {
-   "text": "정상으로 유지하는데 필요",
-   "n": 9
-  },
-  {
-   "text": "수준을 정상으로 유지하는데 필요",
    "n": 9
   },
   {
@@ -4746,6 +4424,10 @@
   },
   {
    "text": "(입에 직접 털어 드시",
+   "n": 9
+  },
+  {
+   "text": "마십시오.",
    "n": 9
   },
   {
@@ -4777,11 +4459,11 @@
    "n": 9
   },
   {
-   "text": "단하여 주시기 바랍니다.",
+   "text": "고유의 향미를 가지며, 이미·이취",
    "n": 9
   },
   {
-   "text": "고유의 향미를 가지며, 이미·이취",
+   "text": "제품개봉",
    "n": 9
   },
   {
@@ -4789,51 +4471,7 @@
    "n": 9
   },
   {
-   "text": "임산부와 수유기 여성",
-   "n": 9
-  },
-  {
-   "text": "임산부와 수유기 여성은",
-   "n": 9
-  },
-  {
-   "text": "임산부와 수유기 여성은 섭취",
-   "n": 9
-  },
-  {
-   "text": "좋습니다.",
-   "n": 9
-  },
-  {
-   "text": "개봉 후에는 캡을 꼭 닫아주십시오",
-   "n": 9
-  },
-  {
-   "text": "개봉 후에는 캡을 꼭 닫아주십시오.",
-   "n": 9
-  },
-  {
-   "text": "(3) 개봉 후에는 캡을 꼭 닫아주십시오",
-   "n": 9
-  },
-  {
-   "text": "(3) 개봉 후에는 캡을 꼭 닫아주십시오.",
-   "n": 9
-  },
-  {
-   "text": "권장드립니다.",
-   "n": 9
-  },
-  {
-   "text": "고객상담실로 문의하시기 바랍니다.",
-   "n": 9
-  },
-  {
    "text": "있거나 의약품",
-   "n": 9
-  },
-  {
-   "text": "십시오.",
    "n": 9
   },
   {
@@ -4885,10 +4523,6 @@
    "n": 9
   },
   {
-   "text": "발생 시 섭취를 중단하고 전문가와 상담할 것",
-   "n": 9
-  },
-  {
    "text": "차게 또는 따뜻하게 섭취하십시오.",
    "n": 9
   },
@@ -4909,23 +4543,15 @@
    "n": 9
   },
   {
+   "text": "에너지",
+   "n": 9
+  },
+  {
    "text": "생성에 필요",
    "n": 9
   },
   {
-   "text": "이상 증상이 생길",
-   "n": 9
-  },
-  {
-   "text": "이상 증상이 생길 경우",
-   "n": 9
-  },
-  {
-   "text": "이상 증상이 생길 경우 섭취",
-   "n": 9
-  },
-  {
-   "text": "이상 증상이 생길 경우 섭취를",
+   "text": "단하십시오.",
    "n": 9
   },
   {
@@ -4965,6 +4591,10 @@
    "n": 9
   },
   {
+   "text": "좋습니다.",
+   "n": 9
+  },
+  {
    "text": "것이 좋습니다.",
    "n": 9
   },
@@ -4989,11 +4619,7 @@
    "n": 9
   },
   {
-   "text": "유지하는데 필요,",
-   "n": 9
-  },
-  {
-   "text": "기능을 유지하는데 필요",
+   "text": "정상으로 유지하는데 필요",
    "n": 9
   },
   {
@@ -5002,6 +4628,10 @@
   },
   {
    "text": "의약품복용",
+   "n": 9
+  },
+  {
+   "text": "단",
    "n": 9
   },
   {
@@ -5082,10 +4712,6 @@
   },
   {
    "text": "이미,이취가 없",
-   "n": 9
-  },
-  {
-   "text": "장애",
    "n": 9
   },
   {
@@ -5373,14 +4999,6 @@
    "n": 9
   },
   {
-   "text": "알레르기 등 특이체질",
-   "n": 9
-  },
-  {
-   "text": "제품성분을 확인하신 후 섭취하십시오.",
-   "n": 9
-  },
-  {
    "text": "완전히 녹여 드십시오",
    "n": 9
   },
@@ -5426,10 +5044,6 @@
   },
   {
    "text": "1kg 포장(1일 2회, 1회 40g을 계량하여 충분한 음료에 타서 함께 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "항산화·체지방 감소·혈",
    "n": 9
   },
   {
@@ -5565,11 +5179,7 @@
    "n": 9
   },
   {
-   "text": "유통기한이 지난 제품은 섭취하지 마십시오",
-   "n": 9
-  },
-  {
-   "text": "유통기한이 지난 제품은 섭취하지 마십시오.",
+   "text": "잘 흔들어 드십시오.",
    "n": 9
   },
   {
@@ -5590,6 +5200,10 @@
   },
   {
    "text": "오메가 연질캡슐 720mg x 1C",
+   "n": 9
+  },
+  {
+   "text": "발생 시 섭취를 중단하고 전문가와 상담할 것",
    "n": 9
   },
   {
@@ -5617,7 +5231,7 @@
    "n": 9
   },
   {
-   "text": "고유의 색택과 향미를 가지며 이미.",
+   "text": "있을 경우 섭취를 중단하십시오.",
    "n": 9
   },
   {
@@ -5630,14 +5244,6 @@
   },
   {
    "text": "연질1",
-   "n": 9
-  },
-  {
-   "text": "활성산소제거에 도움을 줄 수 있음(기타기능II)2.",
-   "n": 9
-  },
-  {
-   "text": "냉장보관",
    "n": 9
   },
   {
@@ -5677,91 +5283,7 @@
    "n": 9
   },
   {
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음",
-   "n": 9
-  },
-  {
-   "text": "위장장애가 없는 경우 식전 공복에 섭취함이 좋음.",
-   "n": 9
-  },
-  {
-   "text": "단한다.",
-   "n": 9
-  },
-  {
-   "text": "생길 경우 섭취를 중단한다.",
-   "n": 9
-  },
-  {
-   "text": "이상증상이 생길 경우 섭취를 중단한다.",
-   "n": 9
-  },
-  {
-   "text": "따라 이상증상이 생길 경우 섭취를 중단한다.",
-   "n": 9
-  },
-  {
-   "text": "단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주",
-   "n": 9
-  },
-  {
-   "text": "생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "따라 이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "섭취함이 좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "공복에 섭취함이 좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "식전 공복에 섭취함이 좋음. 개인의 신체상태에 따라 이상증상이 생길 경우 섭취를 중단한다. 의약품",
-   "n": 9
-  },
-  {
-   "text": "스푼(1스푼",
-   "n": 9
-  },
-  {
-   "text": "알러지등 특이체질인 경우 제품성분을 확인 한 후 섭취여부를 결정하여야함",
-   "n": 9
-  },
-  {
    "text": "진세노사이드Rb1+Rg1",
-   "n": 9
-  },
-  {
-   "text": "(가) 칼슘과 인이 흡수되고",
-   "n": 9
-  },
-  {
-   "text": "칼슘과 인이 흡수되고 이용되는데 필요 (나",
-   "n": 9
-  },
-  {
-   "text": "(가) 칼슘과 인이 흡수되고 이용되는데 필요 (나)",
-   "n": 9
-  },
-  {
-   "text": "단백질 및 아미노산 이용에 필요 (나",
    "n": 9
   },
   {
@@ -5861,22 +5383,6 @@
    "n": 9
   },
   {
-   "text": "㉮병포장",
-   "n": 9
-  },
-  {
-   "text": "있으신 분은 원료명을 확인 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "[홍삼제품]의약품(당뇨치료제, 혈액항응고제) 복용 시 섭취에 주의 · 특정 성분에 알레르기가 있으신 분은 원료명을 확인 후 섭취하십시오.",
-   "n": 9
-  },
-  {
    "text": "입안",
    "n": 9
   },
@@ -5913,63 +5419,7 @@
    "n": 9
   },
   {
-   "text": "고유의 색택과 향미를 가지며",
-   "n": 9
-  },
-  {
-   "text": "고유의 색택과 향미를 가지며, 이미·이취",
-   "n": 9
-  },
-  {
-   "text": "등 알러지 체질의 경우 성분을 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "특이체질 등 알러지 체질의 경우 성분을 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "알로",
-   "n": 9
-  },
-  {
-   "text": "환산 함량",
-   "n": 9
-  },
-  {
-   "text": "겔 환산 함량",
-   "n": 9
-  },
-  {
-   "text": "알로에 겔 환산 함량",
-   "n": 9
-  },
-  {
-   "text": "및 알로에 겔 환산 함량",
-   "n": 9
-  },
-  {
-   "text": "알로에 겔 100% 기준, 원료의 농축배수 및 알로에 겔 환산 함량에 따라 환산 적용함",
-   "n": 9
-  },
-  {
-   "text": "0.005 이하(알로",
-   "n": 9
-  },
-  {
-   "text": "0.005 이하(알로에 겔 100% 기준,",
-   "n": 9
-  },
-  {
-   "text": "0.005 이하(알로에 겔 100% 기준, 원료의 농축배",
-   "n": 9
-  },
-  {
-   "text": "0.005 이하(알로에 겔 100% 기준, 원료의 농축배수",
-   "n": 9
-  },
-  {
-   "text": "콜레우스정제",
+   "text": "고객상담실로 문의하시기 바랍니다.",
    "n": 9
   },
   {
@@ -5977,35 +5427,7 @@
    "n": 9
   },
   {
-   "text": "[콜레우스정제]",
-   "n": 9
-  },
-  {
-   "text": "있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
-   "n": 9
-  },
-  {
-   "text": "경우에는 개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "text": "음용",
    "n": 9
   },
   {
@@ -6014,10 +5436,6 @@
   },
   {
    "text": "코큐텐+바나바 연질캡슐 500mg X 1C",
-   "n": 9
-  },
-  {
-   "text": "경우 제품성분을 확인하신 후 섭취하십시오.",
    "n": 9
   },
   {
@@ -6038,14 +5456,6 @@
   },
   {
    "text": "이미 이취가 없",
-   "n": 9
-  },
-  {
-   "text": "있다.",
-   "n": 9
-  },
-  {
-   "text": "수 있다.",
    "n": 9
   },
   {
@@ -6090,74 +5500,6 @@
   },
   {
    "text": "고유의 향미를 지니고 이미, 이취가 없",
-   "n": 9
-  },
-  {
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원",
-   "n": 9
-  },
-  {
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선",
-   "n": 9
-  },
-  {
-   "text": "열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳",
-   "n": 9
-  },
-  {
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)",
-   "n": 9
-  },
-  {
-   "text": "연질캡슐은 수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에",
-   "n": 9
-  },
-  {
-   "text": "열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "수분, 열에 의한 영향에 민감하므로 열원이나 직사광선을 피해 서늘한 곳(건냉암소)에 보관하십시오.",
    "n": 9
   },
   {
@@ -6221,7 +5563,7 @@
    "n": 9
   },
   {
-   "text": "항산화･체지방 감소･혈",
+   "text": "알로",
    "n": 9
   },
   {
@@ -6517,6 +5859,10 @@
    "n": 9
   },
   {
+   "text": "전에 의사와 상담하십시오.",
+   "n": 9
+  },
+  {
    "text": "씹어드셔도 좋습니다.",
    "n": 9
   },
@@ -6594,22 +5940,6 @@
   },
   {
    "text": "혈중 콜레스테롤 개선·혈행개선·면역과민반응에 의한 피부상태 개선·월경",
-   "n": 9
-  },
-  {
-   "text": "건냉한 곳에 보관하십시오.",
-   "n": 9
-  },
-  {
-   "text": "영ㆍ",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 고객상담실로",
-   "n": 9
-  },
-  {
-   "text": "이 경우 섭취를 중단하신 후 고객상담실로 문의하시기 바랍니다",
    "n": 9
   },
   {
@@ -6854,26 +6184,6 @@
   },
   {
    "text": "고유의 색택을 가지며 이미",
-   "n": 9
-  },
-  {
-   "text": "공액리놀렌산",
-   "n": 9
-  },
-  {
-   "text": "줄 수 있습니다",
-   "n": 9
-  },
-  {
-   "text": "도움을 줄 수 있습니다",
-   "n": 9
-  },
-  {
-   "text": "줄 수 있습니다.",
-   "n": 9
-  },
-  {
-   "text": "도움을 줄 수 있습니다.",
    "n": 9
   },
   {
@@ -7149,10 +6459,6 @@
    "n": 9
   },
   {
-   "text": "개인의 신체 상태에 따라 이상증상이 생길 경우 섭취를",
-   "n": 9
-  },
-  {
    "text": "이상증상이 생길 경우 섭취를 중단하십시오.",
    "n": 9
   },
@@ -7250,6 +6556,710 @@
   },
   {
    "text": "용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "다른 용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "위해 다른 용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "유지하기 위해 다른 용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "보호·유지하기 위해 다른 용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "품질을 보호·유지하기 위해 다른 용기로의 이동을 삼가해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "피하여 건조한 곳에 보관해 주십시오.",
+   "n": 9
+  },
+  {
+   "text": "규격적용",
+   "n": 9
+  },
+  {
+   "text": "시클로스트린",
+   "n": 9
+  },
+  {
+   "text": "시클로스트린 :",
+   "n": 9
+  },
+  {
+   "text": "시클로스트린 :75%",
+   "n": 9
+  },
+  {
+   "text": "시클로스트린 :75%, 로사빈",
+   "n": 9
+  },
+  {
+   "text": "시클로스트린 :75%, 로사빈 :",
+   "n": 9
+  },
+  {
+   "text": "보관 및 취급 부주의로 인해 정제 변색의 가능성",
+   "n": 9
+  },
+  {
+   "text": "보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로",
+   "n": 9
+  },
+  {
+   "text": "보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관",
+   "n": 9
+  },
+  {
+   "text": "보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다",
+   "n": 9
+  },
+  {
+   "text": "주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "보관 및 취급 부주의로 인해 정제 변색의 가능성이 있으므로 보관에 주의하기 바랍니다.",
+   "n": 9
+  },
+  {
+   "text": "영･유아 및 어린이의 손이 닿지 않",
+   "n": 9
+  },
+  {
+   "text": "영･유아 및 어린",
+   "n": 9
+  },
+  {
+   "text": "캡슐A",
+   "n": 9
+  },
+  {
+   "text": "에너지, 포도",
+   "n": 9
+  },
+  {
+   "text": "기능",
+   "n": 9
+  },
+  {
+   "text": "체내 필수 영양성분",
+   "n": 9
+  },
+  {
+   "text": "효소, 호르몬, 항체의 구성",
+   "n": 9
+  },
+  {
+   "text": "에너지 이용",
+   "n": 9
+  },
+  {
+   "text": "기호에 맞게",
+   "n": 9
+  },
+  {
+   "text": "제품 개봉 후에는 흡습되지 않게",
+   "n": 9
+  },
+  {
+   "text": "제품 개봉 후에는 흡습되지 않게 밀봉하여",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아 인습",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아 인습에",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아 인습에 주의하여",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아 인습에 주의하여 보관하십시오",
+   "n": 9
+  },
+  {
+   "text": "개봉 후에는 가급적 바로 드시고 뚜껑을 닫아 인습에 주의하여 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "탄수화물과 에너지",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온수",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온수 또",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온수 또는 음료수",
+   "n": 9
+  },
+  {
+   "text": "1) 냉",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온",
+   "n": 9
+  },
+  {
+   "text": "냉, 온수 또는 음료수에",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온수 또는 음료수에",
+   "n": 9
+  },
+  {
+   "text": "냉, 온수 또",
+   "n": 9
+  },
+  {
+   "text": "1) 냉, 온수 또는 음료",
+   "n": 9
+  },
+  {
+   "text": "냉, 온수 또는 음료수",
+   "n": 9
+  },
+  {
+   "text": "냉, 온수 또는 음료",
+   "n": 9
+  },
+  {
+   "text": "스푼을 이용하여 원액을 그대로 섭취하셔도 좋습니다",
+   "n": 9
+  },
+  {
+   "text": "스푼을 이용하여 원액을 그대로 섭취하셔도 좋습니다.",
+   "n": 9
+  },
+  {
+   "text": "2)스푼",
+   "n": 9
+  },
+  {
+   "text": "2)스푼을",
+   "n": 9
+  },
+  {
+   "text": "2)스푼을 이용하여 원액을 그대로 섭취하셔도 좋습니다",
+   "n": 9
+  },
+  {
+   "text": "2)스푼을 이용하여 원액을 그대로 섭취하셔도 좋습니다.",
+   "n": 9
+  },
+  {
+   "text": "냉장고보관 하십시오.",
+   "n": 9
+  },
+  {
+   "text": "반드시 냉장고보관 하십시오.",
+   "n": 9
+  },
+  {
+   "text": "후 반드시 냉장고보관 하십시오.",
+   "n": 9
+  },
+  {
+   "text": "구입 후 반드시 냉장고보관 하십시오.",
+   "n": 9
+  },
+  {
+   "text": "오미자추출물",
+   "n": 9
+  },
+  {
+   "text": "근력",
+   "n": 9
+  },
+  {
+   "text": "고유의 향미를 지니고 이미·이취가 없는 여러 가지 색의 입자",
+   "n": 9
+  },
+  {
+   "text": "실온/ 1. 제품이 고온에 약하니 직사광선을 피하여 30℃ 이하의 온, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･",
+   "n": 9
+  },
+  {
+   "text": "(가)면역력 증진･피로개선에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "일일섭취량 (가)면역력 증진･피로개선에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "(2) 일일섭취량 (가)면역력 증진･피로개선에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "있음 (2) 일일섭취량 (가)면역력 증진･피로개선에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "수 있음 (2) 일일섭취량 (가)면역력 증진･피로개선에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "(나)혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "합계",
+   "n": 9
+  },
+  {
+   "text": "여성의 건강에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "(다)갱년기 여성의 건강에 도움을 줄 수 있음",
+   "n": 9
+  },
+  {
+   "text": "있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": ": 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "(1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "(2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "(1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "(2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "이용에 필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "아미노산 이용에 필요 (2) 혈액의 호모시스테인 수준을 정상으로 유지하는데 필요 (1) 지방, 탄수화물, 단백질 대사와 에너지 생성에 필요 (1) 정상적인 면역기능에 필요 (2) 정상적인 세포분열에 필요 (1)기능성 내용 : 면역력 증진･피로개선･혈소판 응집억제를 통한 혈액흐름･기억력 개선･항산화･갱년기 여성의 건강에 도움을 줄 수 있음 (2) 일일섭취량",
+   "n": 9
+  },
+  {
+   "text": "비타민B",
+   "n": 9
+  },
+  {
+   "text": "한컵",
+   "n": 9
+  },
+  {
+   "text": "이미이취",
+   "n": 9
+  },
+  {
+   "text": "이미이취가",
+   "n": 9
+  },
+  {
+   "text": "이미이취가 없고 고유의 향미가 있",
+   "n": 9
+  },
+  {
+   "text": "카페인이 함유되어 있어 초조감",
+   "n": 9
+  },
+  {
+   "text": "나타날 수 있습니다.",
+   "n": 9
+  },
+  {
+   "text": "십시오.",
+   "n": 9
+  },
+  {
+   "text": "표기량",
+   "n": 9
+  },
+  {
+   "text": ": 표기량",
+   "n": 9
+  },
+  {
+   "text": "나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "n": 9
+  },
+  {
+   "text": "과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "n": 9
+  },
+  {
+   "text": "따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "n": 9
+  },
+  {
+   "text": "개인에 따라 과민반응을 나타낼 수 있으므로 원료를 확인한 후 섭취하십시오.",
+   "n": 9
+  },
+  {
+   "text": "고유의 맛",
+   "n": 9
+  },
+  {
+   "text": "홍삼성분",
+   "n": 9
+  },
+  {
+   "text": "이상이 없으므로 잘 흔들어 드십시오.",
+   "n": 9
+  },
+  {
+   "text": "혈액의 호모시스테인 수준을 정상으로",
+   "n": 9
+  },
+  {
+   "text": "1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로",
+   "n": 9
+  },
+  {
+   "text": "1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온",
+   "n": 9
+  },
+  {
+   "text": "1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수",
+   "n": 9
+  },
+  {
+   "text": "1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수에 타서",
+   "n": 9
+  },
+  {
+   "text": "최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로",
+   "n": 9
+  },
+  {
+   "text": "최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온",
+   "n": 9
+  },
+  {
+   "text": "최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수",
+   "n": 9
+  },
+  {
+   "text": "최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수에 타서",
+   "n": 9
+  },
+  {
+   "text": "최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로 섭취하거나 냉온수에 타서 섭취",
+   "n": 9
+  },
+  {
+   "text": "2. 최종제품 : 1일 1회, 1회 1g(동봉된 숟가락 사용)을 그대로",
+   "n": 9
+  },
+  {
+   "text": "[나] 최종 제품 : 표시량",
+   "n": 9
+  },
+  {
+   "text": "고유의 향미를 가지고 있",
+   "n": 9
+  },
+  {
+   "text": "없다.",
+   "n": 9
+  },
+  {
+   "text": "약사 등 전문가와 상의하십시오.",
+   "n": 9
+  },
+  {
+   "text": "비타민미네랄",
+   "n": 9
+  },
+  {
+   "text": "1포{1포-2.6g(EPADHA+마리골드",
+   "n": 9
+  },
+  {
+   "text": "특히 6세",
+   "n": 9
+  },
+  {
+   "text": "EPA및DHA함유유지+마리골드꽃추출물",
+   "n": 9
+  },
+  {
+   "text": "DHA함유유지+마리골드꽃추출물)",
+   "n": 9
+  },
+  {
+   "text": "성상(EPA및DHA함유유지+마리골드꽃추출물)",
+   "n": 9
+  },
+  {
+   "text": "상부",
+   "n": 9
+  },
+  {
+   "text": "하부",
+   "n": 9
+  },
+  {
+   "text": "유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다",
+   "n": 9
+  },
+  {
+   "text": "제품은 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다",
+   "n": 9
+  },
+  {
+   "text": "유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "n": 9
+  },
+  {
+   "text": "제품은 유통 중 흡습되지 않도록 포장의 파손 등에 주의 하여야 한다.",
+   "n": 9
+  },
+  {
+   "text": "가르시니아캄보지아 추출물 기능성",
+   "n": 9
+  },
+  {
+   "text": "없는 서늘한 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "습기가 없는 서늘한 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "피하고 습기가 없는 서늘한 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "직사광선을 피하고 습기가 없는 서늘한 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "이미?",
+   "n": 9
+  },
+  {
+   "text": "옅",
+   "n": 9
+  },
+  {
+   "text": "온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "이하의 온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "30℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "피하여 30℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "직사광선을 피하여 30℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "약하니 직사광선을 피하여 30℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.",
+   "n": 9
+  },
+  {
+   "text": "고온에 약하니 직사광선을 피하여 30℃ 이하의 온도, 습도가 낮은 곳에 보관하십시오.",
    "n": 9
   }
  ]
