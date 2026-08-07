@@ -16,6 +16,12 @@ import { createRoot } from 'react-dom/client';
 import { getBlockManager } from '@/utils/block-manager';
 import '../styles/o4o-admin-dashboard.css';
 
+/**
+ * WP 훅/compose 폴리필이 받는 콜백. 실제 시그니처는 훅 이름마다 다르므로
+ * 여기서는 `Function` 대신 호출 가능한 형태만 명시한다(동작 동일).
+ */
+type WpCallback = (...args: any[]) => any;
+
 // Initialize WordPress polyfills only when needed
 export async function initializeWordPress() {
   // Check if already initialized
@@ -82,11 +88,11 @@ export async function initializeWordPress() {
     };
 
     // Initialize hooks
-    const filters: Record<string, Function[]> = {};
-    const actions: Record<string, Function[]> = {};
+    const filters: Record<string, WpCallback[]> = {};
+    const actions: Record<string, WpCallback[]> = {};
     
     window.wp.hooks = {
-      addFilter: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
+      addFilter: (hookName: string, _namespace: string, callback: WpCallback, _priority = 10) => {
         filters[hookName] = filters[hookName] || [];
         filters[hookName].push(callback);
         return hookName;
@@ -95,7 +101,7 @@ export async function initializeWordPress() {
         const callbacks = filters[hookName] || [];
         return callbacks.reduce((val, callback) => callback(val, ...args), value);
       },
-      addAction: (hookName: string, _namespace: string, callback: Function, _priority = 10) => {
+      addAction: (hookName: string, _namespace: string, callback: WpCallback, _priority = 10) => {
         actions[hookName] = actions[hookName] || [];
         actions[hookName].push(callback);
         return hookName;
@@ -119,13 +125,13 @@ export async function initializeWordPress() {
     };
 
     // Simple publish-subscribe mechanism for block changes
-    const blockSubscribers = new Set<Function>();
+    const blockSubscribers = new Set<WpCallback>();
     
     // Initialize data with working subscribe mechanism
     window.wp.data = {
       select: () => ({}),
       dispatch: () => ({}),
-      subscribe: (callback: Function) => {
+      subscribe: (callback: WpCallback) => {
         // Add callback to block subscribers
         blockSubscribers.add(callback);
         
@@ -429,11 +435,11 @@ export async function initializeWordPress() {
     // Initialize compose
     window.wp.compose = {
       compose: (..._args: any[]) => (component: any) => component,
-      createHigherOrderComponent: (fn: Function) => fn,
-      debounce: (fn: Function, _delay: number) => fn,
+      createHigherOrderComponent: (fn: WpCallback) => fn,
+      debounce: (fn: WpCallback, _delay: number) => fn,
       ifCondition: () => (component: any) => component,
       pure: (component: any) => component,
-      throttle: (fn: Function, _delay: number) => fn,
+      throttle: (fn: WpCallback, _delay: number) => fn,
       withGlobalEvents: () => (component: any) => component,
       withInstanceId: (component: any) => component,
       withSafeTimeout: (component: any) => component,
@@ -497,7 +503,7 @@ export async function initializeWordPress() {
     };
 
     // Initialize domReady
-    window.wp.domReady = function(callback: Function) {
+    window.wp.domReady = function(callback: WpCallback) {
       if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', () => callback());
       } else {

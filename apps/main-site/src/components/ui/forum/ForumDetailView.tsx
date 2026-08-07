@@ -406,7 +406,7 @@ function ContentRenderer({ content }: { content: any[] }) {
                 {renderInlineContent(block.content)}
               </p>
             );
-          case 'heading':
+          case 'heading': {
             const HeadingTag = `h${block.attrs?.level || 2}` as React.ElementType;
             return (
               <HeadingTag
@@ -417,6 +417,7 @@ function ContentRenderer({ content }: { content: any[] }) {
                 {renderInlineContent(block.content)}
               </HeadingTag>
             );
+          }
           case 'bulletList':
             return (
               <ul key={index} className="list-disc list-inside mb-4">

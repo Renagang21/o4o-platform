@@ -146,11 +146,12 @@ function formatValue(value: number | string, format?: 'number' | 'currency' | 'p
     case 'percentage':
       return `${value.toFixed(1)}%`;
 
-    case 'duration':
+    case 'duration': {
       const hours = Math.floor(value / 3600);
       const minutes = Math.floor((value % 3600) / 60);
       if (hours > 0) return `${hours}시간 ${minutes}분`;
       return `${minutes}분`;
+    }
 
     case 'number':
     default:

@@ -18,7 +18,7 @@
  *   GET    /audit-logs                   - 삭제 이력 (action_logs 조회)
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { isServiceAdmin } from '../../utils/role.utils.js';
 import { AppDataSource } from '../../database/connection.js';
@@ -55,7 +55,7 @@ const router: Router = Router();
 router.use(authenticate);
 
 /** Middleware: serviceCode 검증 + admin 권한 검사 (operator 로는 진입 불가) */
-function requireServiceAdmin(req: Request, res: Response, next: Function): void {
+function requireServiceAdmin(req: Request, res: Response, next: NextFunction): void {
   const serviceCode = (req.query.serviceCode as string) || '';
   if (!serviceCode || !VALID_SERVICE_CODES.includes(serviceCode)) {
     res.status(400).json({ success: false, error: 'Valid serviceCode query param is required' });

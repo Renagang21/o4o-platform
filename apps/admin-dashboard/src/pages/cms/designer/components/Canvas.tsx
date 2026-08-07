@@ -228,13 +228,14 @@ function CanvasNode({ node }: { node: DesignerNode }) {
           </p>
         );
 
-      case 'Heading':
+      case 'Heading': {
         const HeadingTag = `h${node.props.level || 2}` as React.ElementType;
         return (
           <HeadingTag className={node.props.className || 'text-2xl font-bold'}>
             {node.props.content || 'Heading'}
           </HeadingTag>
         );
+      }
 
       case 'Button':
         return (

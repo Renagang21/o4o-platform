@@ -15,7 +15,7 @@ export interface CreateMediaSourceDto {
   isActive?: boolean;
 }
 
-export interface UpdateMediaSourceDto extends Partial<Omit<CreateMediaSourceDto, 'organizationId'>> {}
+export type UpdateMediaSourceDto = Partial<Omit<CreateMediaSourceDto, 'organizationId'>>;
 
 // Media List DTOs
 export interface CreateMediaListDto {
@@ -28,7 +28,7 @@ export interface CreateMediaListDto {
   isActive?: boolean;
 }
 
-export interface UpdateMediaListDto extends Partial<Omit<CreateMediaListDto, 'organizationId'>> {}
+export type UpdateMediaListDto = Partial<Omit<CreateMediaListDto, 'organizationId'>>;
 
 // Media List Item DTOs
 export interface CreateMediaListItemDto {
@@ -40,7 +40,7 @@ export interface CreateMediaListItemDto {
   isActive?: boolean;
 }
 
-export interface UpdateMediaListItemDto extends Partial<Omit<CreateMediaListItemDto, 'mediaListId' | 'mediaSourceId'>> {}
+export type UpdateMediaListItemDto = Partial<Omit<CreateMediaListItemDto, 'mediaListId' | 'mediaSourceId'>>;
 
 // Display DTOs
 export interface CreateDisplayDto {
@@ -55,7 +55,7 @@ export interface CreateDisplayDto {
   isActive?: boolean;
 }
 
-export interface UpdateDisplayDto extends Partial<Omit<CreateDisplayDto, 'organizationId'>> {}
+export type UpdateDisplayDto = Partial<Omit<CreateDisplayDto, 'organizationId'>>;
 
 // Display Slot DTOs
 export interface CreateDisplaySlotDto {
@@ -70,7 +70,7 @@ export interface CreateDisplaySlotDto {
   isActive?: boolean;
 }
 
-export interface UpdateDisplaySlotDto extends Partial<Omit<CreateDisplaySlotDto, 'displayId'>> {}
+export type UpdateDisplaySlotDto = Partial<Omit<CreateDisplaySlotDto, 'displayId'>>;
 
 // Schedule DTOs
 export interface CreateScheduleDto {
@@ -87,7 +87,7 @@ export interface CreateScheduleDto {
   isActive?: boolean;
 }
 
-export interface UpdateScheduleDto extends Partial<Omit<CreateScheduleDto, 'organizationId'>> {}
+export type UpdateScheduleDto = Partial<Omit<CreateScheduleDto, 'organizationId'>>;
 
 // List Query Options
 export interface ListQueryOptions {

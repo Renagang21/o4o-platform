@@ -69,8 +69,8 @@ export class TenantAwareRepository<Entity extends ObjectLiteral> {
   ) {
     this.repository = dataSource.getRepository(target);
     this.entityName = this.repository.metadata.name;
-    this.isTenantScoped = isTenantScoped(target as Function);
-    this.tenantColumn = getTenantColumn(target as Function);
+    this.isTenantScoped = isTenantScoped(target as object);
+    this.tenantColumn = getTenantColumn(target as object);
   }
 
   /**
@@ -81,7 +81,7 @@ export class TenantAwareRepository<Entity extends ObjectLiteral> {
       return; // Non-tenant-scoped entities don't need validation
     }
 
-    const options = getTenantScopedOptions(this.target as Function);
+    const options = getTenantScopedOptions(this.target as object);
 
     if (this.tenantContext.isGlobalAccess && options?.allowGlobalAccess) {
       return; // Global access is allowed
@@ -103,7 +103,7 @@ export class TenantAwareRepository<Entity extends ObjectLiteral> {
       return qb;
     }
 
-    const options = getTenantScopedOptions(this.target as Function);
+    const options = getTenantScopedOptions(this.target as object);
 
     if (this.tenantContext.isGlobalAccess && options?.allowGlobalAccess) {
       return qb; // Skip tenant filter for global access
@@ -128,7 +128,7 @@ export class TenantAwareRepository<Entity extends ObjectLiteral> {
       return options;
     }
 
-    const scopedOptions = getTenantScopedOptions(this.target as Function);
+    const scopedOptions = getTenantScopedOptions(this.target as object);
 
     if (this.tenantContext.isGlobalAccess && scopedOptions?.allowGlobalAccess) {
       return options;
@@ -156,7 +156,7 @@ export class TenantAwareRepository<Entity extends ObjectLiteral> {
       return entity;
     }
 
-    const options = getTenantScopedOptions(this.target as Function);
+    const options = getTenantScopedOptions(this.target as object);
 
     if (this.tenantContext.isGlobalAccess && options?.allowGlobalAccess) {
       return entity;

@@ -14,7 +14,7 @@ const createHooks = () => {
   const actions: Record<string, any[]> = {};
   
   return {
-    addFilter: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+    addFilter: (hookName: string, namespace: string, callback: (...args: any[]) => any, priority = 10) => {
         filters[hookName] = filters[hookName] || [];
         filters[hookName].push({ callback, priority, namespace });
         filters[hookName].sort((a, b) => a.priority - b.priority);
@@ -28,7 +28,7 @@ const createHooks = () => {
         }, value);
       },
       
-      addAction: (hookName: string, namespace: string, callback: Function, priority = 10) => {
+      addAction: (hookName: string, namespace: string, callback: (...args: any[]) => any, priority = 10) => {
         actions[hookName] = actions[hookName] || [];
         actions[hookName].push({ callback, priority, namespace });
         actions[hookName].sort((a, b) => a.priority - b.priority);

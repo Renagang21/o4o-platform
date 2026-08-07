@@ -99,7 +99,7 @@ export interface CreateChannelData {
   metadata?: Record<string, unknown>;
 }
 
-export interface UpdateChannelData extends Partial<CreateChannelData> {}
+export type UpdateChannelData = Partial<CreateChannelData>;
 
 interface APIListResponse<T> {
   success: boolean;

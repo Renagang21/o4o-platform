@@ -192,7 +192,7 @@ export function SurveyRunner({ survey, bundleId, onComplete, onClose }: SurveyRu
           </div>
         );
 
-      case 'multi':
+      case 'multi': {
         const selectedValues = (value as string[]) || [];
         return (
           <div className="space-y-3">
@@ -225,6 +225,7 @@ export function SurveyRunner({ survey, bundleId, onComplete, onClose }: SurveyRu
             })}
           </div>
         );
+      }
 
       case 'text':
         return (
@@ -237,7 +238,7 @@ export function SurveyRunner({ survey, bundleId, onComplete, onClose }: SurveyRu
           />
         );
 
-      case 'rating':
+      case 'rating': {
         const stars = Array.from({ length: question.scaleMax || 5 }, (_, i) => i + 1);
         return (
           <div className="flex items-center gap-2">
@@ -258,8 +259,9 @@ export function SurveyRunner({ survey, bundleId, onComplete, onClose }: SurveyRu
             )}
           </div>
         );
+      }
 
-      case 'scale':
+      case 'scale': {
         const min = question.scaleMin || 1;
         const max = question.scaleMax || 10;
         const scaleValues = Array.from({ length: max - min + 1 }, (_, i) => min + i);
@@ -287,6 +289,7 @@ export function SurveyRunner({ survey, bundleId, onComplete, onClose }: SurveyRu
             </div>
           </div>
         );
+      }
 
       case 'number':
         return (

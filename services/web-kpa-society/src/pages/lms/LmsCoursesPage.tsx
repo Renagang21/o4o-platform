@@ -100,7 +100,7 @@ export function LmsCoursesPage() {
         const res = await qualificationApi.getMyQualifications();
         const lmsQual = res.data.data?.find((q: MemberQualification) => q.qualification_type === 'lms_creator');
         if (lmsQual) setQualStatus(lmsQual.status);
-      } catch {}
+      } catch { /* 자격 조회 실패 시 기존 qualStatus 유지 — 목록 표시는 막지 않는다 */ }
     })();
   }, [isAuthenticated, isInstructor]);
 

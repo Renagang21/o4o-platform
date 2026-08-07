@@ -143,7 +143,7 @@ const ConditionRow: React.FC<ConditionRowProps> = ({
           />
         );
 
-      case 'daterange':
+      case 'daterange': {
         const dateRange = condition.value as DateRangeValue;
         return (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -176,8 +176,9 @@ const ConditionRow: React.FC<ConditionRowProps> = ({
             />
           </div>
         );
+      }
 
-      case 'timerange':
+      case 'timerange': {
         const timeRange = condition.value as TimeRangeValue;
         return (
           <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
@@ -210,6 +211,7 @@ const ConditionRow: React.FC<ConditionRowProps> = ({
             />
           </div>
         );
+      }
 
       case 'string':
       default:

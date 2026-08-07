@@ -7,6 +7,12 @@ import { conditionalHelpers } from './helpers/conditional';
 import { collectionHelpers } from './helpers/collection';
 import { mathHelpers } from './helpers/math';
 
+/**
+ * Handlebars helper. 인자 수·반환값이 helper 마다 다르므로
+ * `Function` 대신 호출 가능한 형태만 명시한다(동작 동일).
+ */
+export type TemplateHelper = (...args: any[]) => any;
+
 export interface TemplateContext {
   data: any;
   user?: any;
@@ -17,7 +23,7 @@ export interface TemplateContext {
 export interface TemplateOptions {
   strict?: boolean;
   noEscape?: boolean;
-  helpers?: Record<string, Function>;
+  helpers?: Record<string, TemplateHelper>;
   partials?: Record<string, string>;
 }
 
@@ -87,14 +93,14 @@ export class TemplateRenderer {
     });
   }
 
-  public registerHelper(name: string, helper: Function): void {
+  public registerHelper(name: string, helper: TemplateHelper): void {
     // Sandbox the helper function
     const sandboxedHelper = this.sandboxHelper(name, helper);
     this.handlebars.registerHelper(name, sandboxedHelper);
     this.registeredHelpers.add(name);
   }
 
-  private sandboxHelper(name: string, helper: Function): Function {
+  private sandboxHelper(name: string, helper: TemplateHelper): TemplateHelper {
     return (...args: any[]) => {
       try {
         // Remove Handlebars options object from args when calling helper

@@ -25,20 +25,22 @@ export const parseWordPressGalleryShortcode = (shortcode: string): Partial<Galle
     const [, key, value] = paramMatch;
 
     switch (key) {
-      case 'columns':
+      case 'columns': {
         const cols = parseInt(value);
         if (!isNaN(cols) && cols > 0 && cols <= 8) {
           attributes.columns = cols;
         }
         break;
+      }
 
-      case 'ids':
+      case 'ids': {
         // Parse comma-separated IDs
         const ids = value.split(',').map(id => id.trim()).filter(Boolean);
         attributes.ids = ids;
         break;
+      }
 
-      case 'size':
+      case 'size': {
         // Map WordPress image sizes to aspect ratios
         const sizeMap: Record<string, string> = {
           'thumbnail': 'square',
@@ -50,8 +52,9 @@ export const parseWordPressGalleryShortcode = (shortcode: string): Partial<Galle
           attributes.aspectRatio = sizeMap[value] as any;
         }
         break;
+      }
 
-      case 'link':
+      case 'link': {
         const linkMap: Record<string, any> = {
           'none': 'none',
           'file': 'media',
@@ -61,6 +64,7 @@ export const parseWordPressGalleryShortcode = (shortcode: string): Partial<Galle
           attributes.linkTo = linkMap[value];
         }
         break;
+      }
 
       case 'orderby':
         if (value === 'rand') {

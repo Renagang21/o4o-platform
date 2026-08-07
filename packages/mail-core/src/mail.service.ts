@@ -86,32 +86,24 @@ export class MailService {
   // ── Business email methods (Neture domain) ──
 
   async sendUserApprovalEmail(to: string, data: { userName: string; userEmail: string; userRole: string; approvalDate: string; notes?: string }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('userApproved', {
-        userName: data.userName,
-        userEmail: data.userEmail,
-        userRole: data.userRole,
-        approvalDate: data.approvalDate,
-        notes: data.notes || '',
-        loginUrl: process.env.FRONTEND_URL || 'https://admin.neture.co.kr',
-      }, ['notes']);
-      await this.sendEmail({ to, subject: '계정 승인 완료 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('userApproved', {
+      userName: data.userName,
+      userEmail: data.userEmail,
+      userRole: data.userRole,
+      approvalDate: data.approvalDate,
+      notes: data.notes || '',
+      loginUrl: process.env.FRONTEND_URL || 'https://admin.neture.co.kr',
+    }, ['notes']);
+    await this.sendEmail({ to, subject: '계정 승인 완료 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendUserRejectionEmail(to: string, data: { userName: string; rejectReason: string }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('userRejected', {
-        userName: data.userName,
-        rejectReason: data.rejectReason,
-        supportUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`,
-      });
-      await this.sendEmail({ to, subject: '계정 승인 거부 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('userRejected', {
+      userName: data.userName,
+      rejectReason: data.rejectReason,
+      supportUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`,
+    });
+    await this.sendEmail({ to, subject: '계정 승인 거부 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendAccountSuspensionEmail(to: string, data: {
@@ -120,18 +112,14 @@ export class MailService {
     suspendedDate: string;
     suspendDuration?: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('accountSuspended', {
-        userName: data.userName,
-        suspendReason: data.suspendReason,
-        suspendedDate: data.suspendedDate,
-        suspendDuration: data.suspendDuration || '',
-        appealUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support/appeal`,
-      }, ['suspendDuration']);
-      await this.sendEmail({ to, subject: '계정 정지 알림 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('accountSuspended', {
+      userName: data.userName,
+      suspendReason: data.suspendReason,
+      suspendedDate: data.suspendedDate,
+      suspendDuration: data.suspendDuration || '',
+      appealUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support/appeal`,
+    }, ['suspendDuration']);
+    await this.sendEmail({ to, subject: '계정 정지 알림 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendAccountReactivationEmail(to: string, data: {
@@ -139,19 +127,15 @@ export class MailService {
     reactivatedDate: string;
     notes?: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('accountReactivated', {
-        userName: data.userName,
-        reactivatedDate: data.reactivatedDate,
-        notes: data.notes || '',
-        loginUrl: process.env.FRONTEND_URL || 'https://admin.neture.co.kr',
-        termsUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/terms`,
-        policyUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/policy`,
-      }, ['notes']);
-      await this.sendEmail({ to, subject: '계정 재활성화 완료 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('accountReactivated', {
+      userName: data.userName,
+      reactivatedDate: data.reactivatedDate,
+      notes: data.notes || '',
+      loginUrl: process.env.FRONTEND_URL || 'https://admin.neture.co.kr',
+      termsUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/terms`,
+      policyUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/policy`,
+    }, ['notes']);
+    await this.sendEmail({ to, subject: '계정 재활성화 완료 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendCommissionCalculatedEmail(to: string, data: {
@@ -165,23 +149,19 @@ export class MailService {
     pendingAmount: string;
     settlementStatus: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('commissionCalculated', {
-        vendorName: data.vendorName,
-        orderDate: data.orderDate,
-        orderId: data.orderId,
-        orderAmount: data.orderAmount,
-        commissionRate: data.commissionRate.toString(),
-        commissionAmount: data.commissionAmount,
-        settlementDate: data.settlementDate,
-        pendingAmount: data.pendingAmount,
-        settlementStatus: data.settlementStatus,
-        dashboardUrl: `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/dashboard/commissions`,
-      });
-      await this.sendEmail({ to, subject: '💰 커미션 계산 완료 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('commissionCalculated', {
+      vendorName: data.vendorName,
+      orderDate: data.orderDate,
+      orderId: data.orderId,
+      orderAmount: data.orderAmount,
+      commissionRate: data.commissionRate.toString(),
+      commissionAmount: data.commissionAmount,
+      settlementDate: data.settlementDate,
+      pendingAmount: data.pendingAmount,
+      settlementStatus: data.settlementStatus,
+      dashboardUrl: `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/dashboard/commissions`,
+    });
+    await this.sendEmail({ to, subject: '💰 커미션 계산 완료 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendSettlementRequestEmail(to: string, data: {
@@ -197,25 +177,21 @@ export class MailService {
     reviewDeadline: string;
     expectedPaymentDate: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('settlementRequest', {
-        recipientName: data.recipientName,
-        requestId: data.requestId,
-        requestDate: data.requestDate,
-        settlementPeriod: data.settlementPeriod,
-        transactionCount: data.transactionCount.toString(),
-        settlementAmount: data.settlementAmount,
-        bankName: data.bankName,
-        accountNumber: data.accountNumber,
-        accountHolder: data.accountHolder,
-        reviewDeadline: data.reviewDeadline,
-        expectedPaymentDate: data.expectedPaymentDate,
-        settlementUrl: `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/settlements/${data.requestId}`,
-      });
-      await this.sendEmail({ to, subject: '📊 정산 요청 접수 - Neture Platform', html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('settlementRequest', {
+      recipientName: data.recipientName,
+      requestId: data.requestId,
+      requestDate: data.requestDate,
+      settlementPeriod: data.settlementPeriod,
+      transactionCount: data.transactionCount.toString(),
+      settlementAmount: data.settlementAmount,
+      bankName: data.bankName,
+      accountNumber: data.accountNumber,
+      accountHolder: data.accountHolder,
+      reviewDeadline: data.reviewDeadline,
+      expectedPaymentDate: data.expectedPaymentDate,
+      settlementUrl: `${process.env.FRONTEND_URL || 'https://admin.neture.co.kr'}/settlements/${data.requestId}`,
+    });
+    await this.sendEmail({ to, subject: '📊 정산 요청 접수 - Neture Platform', html, text: htmlToText(html) });
   }
 
   async sendRoleApplicationSubmittedEmail(to: string, data: {
@@ -225,19 +201,15 @@ export class MailService {
     businessNumber: string;
     appliedAt: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('roleApplicationSubmitted', {
-        userName: data.userName,
-        roleName: data.roleName,
-        businessName: data.businessName,
-        businessNumber: data.businessNumber,
-        appliedAt: data.appliedAt,
-        dashboardUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`,
-      });
-      await this.sendEmail({ to, subject: `[Neture] ${data.roleName} 역할 신청이 접수되었습니다`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('roleApplicationSubmitted', {
+      userName: data.userName,
+      roleName: data.roleName,
+      businessName: data.businessName,
+      businessNumber: data.businessNumber,
+      appliedAt: data.appliedAt,
+      dashboardUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`,
+    });
+    await this.sendEmail({ to, subject: `[Neture] ${data.roleName} 역할 신청이 접수되었습니다`, html, text: htmlToText(html) });
   }
 
   async sendRoleApplicationAdminNotificationEmail(to: string, data: {
@@ -249,21 +221,17 @@ export class MailService {
     appliedAt: string;
     note?: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('roleApplicationAdminNotification', {
-        userName: data.userName,
-        userEmail: data.userEmail,
-        roleName: data.roleName,
-        businessName: data.businessName,
-        businessNumber: data.businessNumber,
-        appliedAt: data.appliedAt,
-        note: data.note || '',
-        reviewUrl: `${process.env.ADMIN_URL || 'https://admin.neture.co.kr'}/dashboard/admin/role-applications`,
-      }, ['note']);
-      await this.sendEmail({ to, subject: `[Admin Alert] 새로운 ${data.roleName} 역할 신청 - ${data.userName}`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('roleApplicationAdminNotification', {
+      userName: data.userName,
+      userEmail: data.userEmail,
+      roleName: data.roleName,
+      businessName: data.businessName,
+      businessNumber: data.businessNumber,
+      appliedAt: data.appliedAt,
+      note: data.note || '',
+      reviewUrl: `${process.env.ADMIN_URL || 'https://admin.neture.co.kr'}/dashboard/admin/role-applications`,
+    }, ['note']);
+    await this.sendEmail({ to, subject: `[Admin Alert] 새로운 ${data.roleName} 역할 신청 - ${data.userName}`, html, text: htmlToText(html) });
   }
 
   async sendRoleApplicationApprovedEmail(to: string, data: {
@@ -273,18 +241,14 @@ export class MailService {
     approvedAt: string;
     workspaceUrl: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('roleApplicationApproved', {
-        userName: data.userName,
-        roleName: data.roleName,
-        businessName: data.businessName,
-        approvedAt: data.approvedAt,
-        workspaceUrl: data.workspaceUrl,
-      });
-      await this.sendEmail({ to, subject: `🎉 [Neture] ${data.roleName} 역할 신청이 승인되었습니다!`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('roleApplicationApproved', {
+      userName: data.userName,
+      roleName: data.roleName,
+      businessName: data.businessName,
+      approvedAt: data.approvedAt,
+      workspaceUrl: data.workspaceUrl,
+    });
+    await this.sendEmail({ to, subject: `🎉 [Neture] ${data.roleName} 역할 신청이 승인되었습니다!`, html, text: htmlToText(html) });
   }
 
   async sendRoleApplicationRejectedEmail(to: string, data: {
@@ -295,21 +259,17 @@ export class MailService {
     rejectedAt: string;
     reason?: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('roleApplicationRejected', {
-        userName: data.userName,
-        roleName: data.roleName,
-        businessName: data.businessName,
-        appliedAt: data.appliedAt,
-        rejectedAt: data.rejectedAt,
-        reason: data.reason || '',
-        supportUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`,
-        reapplyUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`,
-      }, ['reason']);
-      await this.sendEmail({ to, subject: `[Neture] ${data.roleName} 역할 신청 결과 안내`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('roleApplicationRejected', {
+      userName: data.userName,
+      roleName: data.roleName,
+      businessName: data.businessName,
+      appliedAt: data.appliedAt,
+      rejectedAt: data.rejectedAt,
+      reason: data.reason || '',
+      supportUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/support`,
+      reapplyUrl: `${process.env.FRONTEND_URL || 'https://neture.co.kr'}/apply`,
+    }, ['reason']);
+    await this.sendEmail({ to, subject: `[Neture] ${data.roleName} 역할 신청 결과 안내`, html, text: htmlToText(html) });
   }
 
   async sendServiceApplicationOperatorNotificationEmail(to: string, data: {
@@ -325,24 +285,20 @@ export class MailService {
     note?: string;
     reviewUrl: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('serviceApplicationOperatorNotification', {
-        serviceName: data.serviceName,
-        applicantName: data.applicantName,
-        applicantEmail: data.applicantEmail,
-        applicantPhone: data.applicantPhone || '',
-        appliedAt: data.appliedAt,
-        businessName: data.businessName || '',
-        businessNumber: data.businessNumber || '',
-        pharmacyName: data.pharmacyName || '',
-        licenseNumber: data.licenseNumber || '',
-        note: data.note || '',
-        reviewUrl: data.reviewUrl,
-      }, ['applicantPhone', 'businessName', 'businessNumber', 'pharmacyName', 'licenseNumber', 'note']);
-      await this.sendEmail({ to, subject: `[${data.serviceName}] 새로운 서비스 이용 신청 - ${data.applicantName}`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('serviceApplicationOperatorNotification', {
+      serviceName: data.serviceName,
+      applicantName: data.applicantName,
+      applicantEmail: data.applicantEmail,
+      applicantPhone: data.applicantPhone || '',
+      appliedAt: data.appliedAt,
+      businessName: data.businessName || '',
+      businessNumber: data.businessNumber || '',
+      pharmacyName: data.pharmacyName || '',
+      licenseNumber: data.licenseNumber || '',
+      note: data.note || '',
+      reviewUrl: data.reviewUrl,
+    }, ['applicantPhone', 'businessName', 'businessNumber', 'pharmacyName', 'licenseNumber', 'note']);
+    await this.sendEmail({ to, subject: `[${data.serviceName}] 새로운 서비스 이용 신청 - ${data.applicantName}`, html, text: htmlToText(html) });
   }
 
   async sendServiceApplicationSubmittedEmail(to: string, data: {
@@ -352,18 +308,14 @@ export class MailService {
     appliedAt: string;
     supportEmail: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('serviceApplicationSubmitted', {
-        serviceName: data.serviceName,
-        applicantName: data.applicantName,
-        applicantEmail: data.applicantEmail,
-        appliedAt: data.appliedAt,
-        supportEmail: data.supportEmail,
-      });
-      await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청이 접수되었습니다`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('serviceApplicationSubmitted', {
+      serviceName: data.serviceName,
+      applicantName: data.applicantName,
+      applicantEmail: data.applicantEmail,
+      appliedAt: data.appliedAt,
+      supportEmail: data.supportEmail,
+    });
+    await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청이 접수되었습니다`, html, text: htmlToText(html) });
   }
 
   async sendServiceApplicationApprovedEmail(to: string, data: {
@@ -373,18 +325,14 @@ export class MailService {
     serviceUrl: string;
     supportEmail: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('serviceApplicationApproved', {
-        serviceName: data.serviceName,
-        applicantName: data.applicantName,
-        approvedAt: data.approvedAt,
-        serviceUrl: data.serviceUrl,
-        supportEmail: data.supportEmail,
-      });
-      await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청이 승인되었습니다!`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('serviceApplicationApproved', {
+      serviceName: data.serviceName,
+      applicantName: data.applicantName,
+      approvedAt: data.approvedAt,
+      serviceUrl: data.serviceUrl,
+      supportEmail: data.supportEmail,
+    });
+    await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청이 승인되었습니다!`, html, text: htmlToText(html) });
   }
 
   async sendServiceApplicationRejectedEmail(to: string, data: {
@@ -394,18 +342,14 @@ export class MailService {
     rejectionReason?: string;
     supportEmail: string;
   }): Promise<void> {
-    try {
-      const html = await this.templates.renderFileTemplate('serviceApplicationRejected', {
-        serviceName: data.serviceName,
-        applicantName: data.applicantName,
-        rejectedAt: data.rejectedAt,
-        rejectionReason: data.rejectionReason || '',
-        supportEmail: data.supportEmail,
-      }, ['rejectionReason']);
-      await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청 결과 안내`, html, text: htmlToText(html) });
-    } catch (error) {
-      throw error;
-    }
+    const html = await this.templates.renderFileTemplate('serviceApplicationRejected', {
+      serviceName: data.serviceName,
+      applicantName: data.applicantName,
+      rejectedAt: data.rejectedAt,
+      rejectionReason: data.rejectionReason || '',
+      supportEmail: data.supportEmail,
+    }, ['rejectionReason']);
+    await this.sendEmail({ to, subject: `[${data.serviceName}] 서비스 이용 신청 결과 안내`, html, text: htmlToText(html) });
   }
 
   // ── Generic email methods (merged from emailService.ts B) ──

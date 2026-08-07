@@ -1,4 +1,4 @@
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import type { Router as ExpressRouter } from 'express';
 import { AppDataSource } from '../../database/connection.js';
 import { Site, SiteStatus } from './site.entity.js';
@@ -17,7 +17,7 @@ async function getScaffoldingService() {
 }
 
 // Middleware: Check if user has admin role
-const requireAdmin = (req: Request, res: Response, next: Function) => {
+const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
   const user = (req as any).user;
 
   if (!user) {

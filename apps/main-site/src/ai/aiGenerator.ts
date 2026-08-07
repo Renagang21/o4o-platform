@@ -26,8 +26,6 @@ export async function generateFromPrompt(
     // Step 1: Analyze intent
     const intent = await analyzeIntent(prompt, options);
 
-    if (intent.reasoning) {
-    }
     if (intent.suggestions && intent.suggestions.length > 0) {
       // DEV: intent.suggestions.forEach((s) => console.log(`    • ${s}`));
     }

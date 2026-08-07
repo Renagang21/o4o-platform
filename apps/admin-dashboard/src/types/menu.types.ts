@@ -11,7 +11,7 @@ export interface Role {
   label: string;
 }
 
-export interface RoleOption extends Role {}
+export type RoleOption = Role;
 
 // Content item types (for menu item selection)
 export interface ContentItem {

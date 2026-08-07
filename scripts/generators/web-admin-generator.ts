@@ -934,7 +934,7 @@ function generateFieldInput(field: FormField, entitySingular: string): string {
                   {${errorCheck} && <p className="mt-1 text-sm text-red-500">{${errorCheck}}</p>}
                 </div>`;
 
-    case 'select':
+    case 'select': {
       const options = field.options?.map(o =>
         `<option value="${o.value}">${o.label}</option>`
       ).join('\n                      ') || '';
@@ -953,6 +953,7 @@ function generateFieldInput(field: FormField, entitySingular: string): string {
                   </AGSelect>
                   {${errorCheck} && <p className="mt-1 text-sm text-red-500">{${errorCheck}}</p>}
                 </div>`;
+    }
 
     case 'number':
       return `                {/* ${field.label} */}

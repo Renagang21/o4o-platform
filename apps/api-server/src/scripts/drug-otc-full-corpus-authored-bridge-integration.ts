@@ -173,7 +173,7 @@ async function main(): Promise<void> {
         const conn = /ECONNRESET|Connection terminated|server closed|read ECONN|timeout|socket hang/i.test(msg);
         if (!conn || i === tries) throw e;
         console.error(`[retry ${i}/${tries}] ${msg.slice(0, 80)} — 재연결`);
-        try { await ds.destroy(); } catch {}
+        try { await ds.destroy(); } catch { /* 이미 끊긴 커넥션 정리 실패는 무시하고 재연결 */ }
         ds = mkDs(); await ds.initialize();
       }
     }

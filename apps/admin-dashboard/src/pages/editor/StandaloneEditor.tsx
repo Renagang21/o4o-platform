@@ -312,7 +312,7 @@ const StandaloneEditor: FC<StandaloneEditorProps> = ({ mode = 'post', postId: in
         if (currentPostId && !isNewPost) {
           // Prevent GutenbergBlockEditor from restoring previous session
           // which may belong to a different post
-          try { clearEditorSession(); } catch {}
+          try { clearEditorSession(); } catch { /* 세션 정리 실패는 무시 — 아래 loadPostData 가 어차피 덮어쓴다 */ }
           await loadPostData(currentPostId);
         } else {
           // Reset states for new post

@@ -9,7 +9,7 @@
 // WO-O4O-TRUSTED-CLIENT-IP-AND-SECURITY-LOG-REDACTION-V1
 import { getTrustedClientIp } from '../utils/trusted-client-ip.js';
 import rateLimit, { Store, MemoryStore } from 'express-rate-limit';
-import { Request, Response } from 'express';
+import { Request, Response, NextFunction } from 'express';
 import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.js';
 import logger from '../utils/logger.js';
 
@@ -125,7 +125,7 @@ export class SmartRateLimiter {
   private suspiciousIPs: Set<string> = new Set();
 
   middleware() {
-    return async (req: Request, res: Response, next: Function) => {
+    return async (req: Request, res: Response, next: NextFunction) => {
       const ip = getTrustedClientIp(req);
       const now = Date.now();
 
