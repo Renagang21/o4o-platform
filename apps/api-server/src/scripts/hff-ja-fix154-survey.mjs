@@ -13,7 +13,10 @@
  *
  * 세 조건을 모두 만족하는 행만 교정 대상이다. 정상 문맥의 `異常` 은 건드리지 않는다.
  *
- * 산출: data/hff-ja-fix154-survey-v1.json
+ * 산출(기본): data/hff-ja-fix154-survey-v1.json · data/hff-ja-fix154-targets-v1.json
+ *   — 이 두 파일은 **승인된 교정 원장(immutable baseline)** 이다.
+ *   재판정 목적으로 다시 돌릴 때는 반드시 `FIX154_OUT_SUFFIX` 를 지정해 별도 파일로 저장한다.
+ *   (원장을 덮어쓰면 회귀검증이 승인된 교정을 `storedModified` 로 잡아 실제 회귀를 가린다.)
  */
 import fs from 'node:fs';
 import crypto from 'node:crypto';
@@ -108,6 +111,8 @@ const out = {
     after: (t.newContent.match(/.{0,45}以上.{0,35}/) ?? [''])[0],
   })),
 };
-fs.writeFileSync(`${D}/hff-ja-fix154-survey-v1.json`, JSON.stringify(out, null, 1));
-fs.writeFileSync(`${D}/hff-ja-fix154-targets-v1.json`, JSON.stringify({ wo: WO, generatedAt: out.surveyedAt, count: targets.length, targets }, null, 1));
+const SUF = process.env.FIX154_OUT_SUFFIX ?? '';
+if (SUF && fs.existsSync(`${D}/hff-ja-fix154-targets-v1.json`)) console.error(`[ledger-protect] writing to *${SUF}.json — baseline preserved`);
+fs.writeFileSync(`${D}/hff-ja-fix154-survey${SUF || '-v1'}.json`, JSON.stringify(out, null, 1));
+fs.writeFileSync(`${D}/hff-ja-fix154-targets${SUF || '-v1'}.json`, JSON.stringify({ wo: WO, generatedAt: out.surveyedAt, count: targets.length, targets }, null, 1));
 console.log(JSON.stringify(out, null, 2));

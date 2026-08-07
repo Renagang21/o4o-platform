@@ -1,0 +1,19 @@
+{
+ "wo": "WO-O4O-HFF-JA-NUMERIC-IZYOU-MISTRANSLATION-154-CORRECTION-V1",
+ "surveyedAt": "2026-08-07T16:27:25.578Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "jaWithNumericAbnormal": 34,
+ "jaWithAnyAbnormal": 23644,
+ "targets": 0,
+ "productMasterDup": 0,
+ "rejected": 34,
+ "rejectedByWhy": {
+  "GATE_KANJI_DUP": 16,
+  "GATE_PARTICLE_DUP": 8,
+  "STILL_MISTRANSLATED": 9,
+  "NO_KO_NUMERIC_IZYOU": 1
+ },
+ "totalNumericAbnormalOccurrences": 0,
+ "sample": []
+}
