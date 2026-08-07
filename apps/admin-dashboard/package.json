@@ -11,7 +11,7 @@
     "build:prod": "cross-env NODE_OPTIONS=--max-old-space-size=4096 vite build --mode production",
     "build:with-typecheck": "tsc --noEmit && vite build",
     "preview": "npx vite preview",
-    "type-check": "bash -c 'tsc --noEmit'",
+    "type-check": "tsc --noEmit",
     "lint": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --report-unused-disable-directives --max-warnings 200 || true",
     "lint:fix": "eslint --config ../../eslint.config.js src/**/*.{ts,tsx} --fix",
     "test": "npx vitest run --passWithNoTests --reporter=verbose",
