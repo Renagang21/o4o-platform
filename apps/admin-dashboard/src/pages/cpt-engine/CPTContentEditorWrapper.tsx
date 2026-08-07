@@ -12,17 +12,18 @@ const CPTContentEditorWrapper: FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
+  // Generate unique key for component remounting (same pattern as EditorRouteWrapper)
+  // (Rules of Hooks — 아래 cptSlug 가드보다 위에서 호출해 렌더마다 호출 순서를 고정한다)
+  const componentKey = useMemo(
+    () => postId ? `cpt-${cptSlug}-${postId}` : `cpt-${cptSlug}-new-${location.key}`,
+    [cptSlug, postId, location.key]
+  );
+
   // Redirect if no cptSlug
   if (!cptSlug) {
     navigate('/cpt-engine');
     return null;
   }
-
-  // Generate unique key for component remounting (same pattern as EditorRouteWrapper)
-  const componentKey = useMemo(
-    () => postId ? `cpt-${cptSlug}-${postId}` : `cpt-${cptSlug}-new-${location.key}`,
-    [cptSlug, postId, location.key]
-  );
 
   // Use StandaloneEditor with 'post' mode for CPT content
   // This gives CPT the same Gutenberg editing experience as Posts

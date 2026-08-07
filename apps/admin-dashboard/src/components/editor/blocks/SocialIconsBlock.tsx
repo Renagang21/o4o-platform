@@ -96,6 +96,10 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
 }) => {
   // No longer need these state variables - settings moved to sidebar
 
+  // hover 상태는 아이콘마다 갖되, hook 을 map 콜백 안에서 호출할 수 없으므로
+  // (Rules of Hooks) 현재 hover 중인 아이콘 index 하나만 블록 레벨에서 관리한다.
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
   // Parse attributes with defaults
   const {
     links = [],
@@ -410,7 +414,7 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
 
             const platformInfo = PLATFORM_INFO[link.platform];
             const IconComponent = platformInfo.icon;
-            const [isHovered, setIsHovered] = useState(false);
+            const isHovered = hoveredIndex === index;
 
             return (
               <div
@@ -431,8 +435,8 @@ const SocialIconsBlock: React.FC<SocialIconsBlockProps> = ({
                       e.preventDefault();
                     }
                   }}
-                  onMouseEnter={() => setIsHovered(true)}
-                  onMouseLeave={() => setIsHovered(false)}
+                  onMouseEnter={() => setHoveredIndex(index)}
+                  onMouseLeave={() => setHoveredIndex((cur) => (cur === index ? null : cur))}
                 >
                   <div
                     style={{

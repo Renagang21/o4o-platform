@@ -214,18 +214,15 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const config = roleConfig[role];
-  if (!config) {
-    return <div>Invalid role configuration</div>;
-  }
-  const RoleIcon = config.icon;
 
   // ── Collapsible group state (for menuGroups mode) ──
   const isItemActive = (path: string, exact?: boolean) =>
     exact ? pathname === path : pathname.startsWith(path);
 
+  // Rules of Hooks — config 가드보다 위에서 호출해 렌더마다 호출 순서를 고정한다
   const [openGroups, setOpenGroups] = useState<Set<string>>(() => {
     const initial = new Set<string>();
-    if (config.menuGroups) {
+    if (config?.menuGroups) {
       for (const g of config.menuGroups) {
         if (g.items.some((it) => isItemActive(it.path, it.exact))) {
           initial.add(g.label);
@@ -234,6 +231,11 @@ export default function DashboardLayout({ role }: DashboardLayoutProps) {
     }
     return initial;
   });
+
+  if (!config) {
+    return <div>Invalid role configuration</div>;
+  }
+  const RoleIcon = config.icon;
 
   const toggleGroup = (label: string) => {
     setOpenGroups((prev) => {
