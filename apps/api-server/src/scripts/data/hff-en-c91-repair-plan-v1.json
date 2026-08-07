@@ -1,0 +1,139 @@
+{
+ "wo": "WO-O4O-HFF-EN-C91-FUNCTIONAL-CLAIM-LOSS-4802-FULL-REPAIR-V1",
+ "plannedAt": "2026-08-07T23:10:48.134Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "targetDocuments": 2956,
+ "harvestedClauses": 2109,
+ "repairableDocuments": 2769,
+ "skippedDocuments": 187,
+ "totalEdits": 2855,
+ "totalAddedClauses": 7339,
+ "unresolvedKoItems": 36,
+ "topUnresolved": [
+  {
+   "ko": "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+   "docs": 103
+  },
+  {
+   "ko": "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+   "docs": 25
+  },
+  {
+   "ko": "피부상태 개선",
+   "docs": 16
+  },
+  {
+   "ko": "비타민C - 결합조직 형성과 기능유지에 필요 - 철의 흡수에 필요 - 항산화 작용을 하여 유해산소로부터 세포를 보호하는데 필요",
+   "docs": 8
+  },
+  {
+   "ko": "비타민B1 - 탄수화물과 에너지 대사에 필요",
+   "docs": 8
+  },
+  {
+   "ko": "비타민B2 - 체내 에너지 생성에 필요",
+   "docs": 8
+  },
+  {
+   "ko": "나이아신 - 체내 에너지 생성에 필요",
+   "docs": 8
+  },
+  {
+   "ko": "단백질 대사와 에너지 생성에 필요",
+   "docs": 8
+  },
+  {
+   "ko": "비타민 E EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+   "docs": 6
+  },
+  {
+   "ko": "오메가3 EPA 및 DHA 함유유지 : 혈중 중성지질 개선",
+   "docs": 5
+  },
+  {
+   "ko": "오메가3 EPA 및 DHA 함유유지: 혈중 중성지질 개선",
+   "docs": 5
+  },
+  {
+   "ko": "EPA 및 DHA 함유유지 : 혈중 중성지질 개선",
+   "docs": 4
+  },
+  {
+   "ko": "정상적인 세포분열에 필요",
+   "docs": 3
+  },
+  {
+   "ko": "뼈의 구성에 필요,1) EPA및DHA함유유지 : 혈중 중성지질 개선",
+   "docs": 2
+  },
+  {
+   "ko": "홍삼 : 면역력 증진",
+   "docs": 2
+  },
+  {
+   "ko": "오메가3 EPA 및 DHA 함유 유지: 혈중 중성지질 개선",
+   "docs": 2
+  },
+  {
+   "ko": "프로폴리스 기능성 내용 : 항산화",
+   "docs": 2
+  },
+  {
+   "ko": "인체에 유해한 활성산소를 제거하는데 도움을 줄 수 있음(생리활성기능 2등급)",
+   "docs": 2
+  },
+  {
+   "ko": "기능성: 면역력증진",
+   "docs": 2
+  },
+  {
+   "ko": "마리골드꽃추출물",
+   "docs": 2
+  }
+ ],
+ "sampleEdits": [
+  {
+   "missing": [
+    "체지방 감소",
+    "혈중 콜레스테롤 개선"
+   ],
+   "from": "May help antioxidant activity.",
+   "to": "May help antioxidant activity; body-fat reduction; improving blood cholesterol."
+  },
+  {
+   "missing": [
+    "면역력 증진",
+    "피로개선",
+    "기억력 개선",
+    "항산화"
+   ],
+   "from": "May help improve blood circulation by inhibiting platelet aggregation.",
+   "to": "May help improve blood circulation by inhibiting platelet aggregation; boosting immunity; reducing fatigue; improving memory; antioxidant activity."
+  },
+  {
+   "missing": [
+    "혈행 개선"
+   ],
+   "from": "May help improve memory.",
+   "to": "May help improve memory; improving blood circulation."
+  },
+  {
+   "missing": [
+    "홍삼(원료성) 면역력 증진",
+    "피로개선",
+    "기억력 개선",
+    "항산화"
+   ],
+   "from": "Korean red ginseng (raw material) May help improve blood circulation by inhibiting platele",
+   "to": "Korean red ginseng (raw material) May help improve blood circulation by inhibiting platelet aggregation; boosting immunity; reducing fatigue; improving memory; "
+  },
+  {
+   "missing": [
+    "건조한 눈을 개선하여 눈 건강"
+   ],
+   "from": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation",
+   "to": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation; eye health by relieving dry eye."
+  }
+ ]
+}

@@ -1,0 +1,189 @@
+{
+ "wo": "WO-O4O-HFF-EN-C91-FUNCTIONAL-CLAIM-LOSS-4802-FULL-REPAIR-V1",
+ "surveyedAt": "2026-08-07T23:13:39.023Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "pairsScanned": 40902,
+ "realLossDocuments": 1102,
+ "rejectedNoRealLoss": 39524,
+ "distinctLossPairs": 276,
+ "totalMissingItems": 2431,
+ "topClusters": [
+  {
+   "docs": 124,
+   "missing": [
+    "홍삼 면역력 증진",
+    "피로개선",
+    "기억력 개선",
+    "항산화"
+   ],
+   "ko": "홍삼 면역력 증진·피로개선·혈소판 응집억제를 통한 혈액흐름·기억력 개선·항산화에 도움을 줄 수 있음",
+   "en": "Korean red ginseng May help improve blood circulation by inhibiting platelet aggregation."
+  },
+  {
+   "docs": 68,
+   "missing": [
+    "건조한 눈을 개선하여 눈 건강"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation."
+  },
+  {
+   "docs": 66,
+   "missing": [
+    "혈행 개선"
+   ],
+   "ko": "은행잎추출물 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "en": "Ginkgo biloba leaf extract May help improve memory."
+  },
+  {
+   "docs": 45,
+   "missing": [
+    "혈행 개선"
+   ],
+   "ko": "은행잎 추출물 기억력 개선·혈행 개선에 도움을 줄 수 있음",
+   "en": "Ginkgo biloba leaf extract May help improve memory."
+  },
+  {
+   "docs": 42,
+   "missing": [
+    "혈행 개선"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선·혈행 개선에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help improve blood triglycerides."
+  },
+  {
+   "docs": 33,
+   "missing": [
+    "EPA 및 DHA 함유 유지 혈중 중성지질 개선",
+    "혈행 개선",
+    "기억력 개선"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 30,
+   "missing": [
+    "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+    "혈행 개선"
+   ],
+   "ko": "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "Omega-3 May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 30,
+   "missing": [
+    "건조한 눈을 개선하여 눈 건강"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선, 혈행 개선, 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation."
+  },
+  {
+   "docs": 28,
+   "missing": [
+    "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+    "혈행 개선"
+   ],
+   "ko": "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선 · 혈행 개선 · 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "Omega-3 May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 24,
+   "missing": [
+    "프로폴리스 항산화"
+   ],
+   "ko": "프로폴리스 항산화ㆍ구강에서의 항균작용에 도움을 줄 수 있음",
+   "en": "Propolis May help with antibacterial action in the mouth"
+  },
+  {
+   "docs": 20,
+   "missing": [
+    "건조한 눈을 개선하여 눈 건강"
+   ],
+   "ko": "EPA및DHA함유유지 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation."
+  },
+  {
+   "docs": 16,
+   "missing": [
+    "높은 혈압 감소"
+   ],
+   "ko": "코엔자임Q10 항산화, 높은 혈압 감소에 도움을 줄 수 있음",
+   "en": "Coenzyme Q10 May help antioxidant activity."
+  },
+  {
+   "docs": 16,
+   "missing": [
+    "배변활동 원활"
+   ],
+   "ko": "난소화성말토덱스트린 식후 혈당상승 억제·배변활동 원활에 도움을 줄 수 있음",
+   "en": "Indigestible maltodextrin May help with suppressing the rise in blood sugar after meals"
+  },
+  {
+   "docs": 15,
+   "missing": [
+    "높은 혈압 감소"
+   ],
+   "ko": "코엔자임Q10 항산화·높은 혈압 감소에 도움을 줄 수 있음",
+   "en": "Coenzyme Q10 May help antioxidant activity."
+  },
+  {
+   "docs": 15,
+   "missing": [
+    "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+    "혈행 개선",
+    "기억력 개선"
+   ],
+   "ko": "오메가3 EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "Omega-3 May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 14,
+   "missing": [
+    "건조한 눈을 개선하여 눈 건강"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선 · 혈행 개선 · 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help improve blood triglycerides, improve blood circulation."
+  },
+  {
+   "docs": 14,
+   "missing": [
+    "감마리놀렌산 함유 유지 혈중 콜레스테롤 개선",
+    "혈행개선",
+    "면역과민반응에 의한 피부상태 개선"
+   ],
+   "ko": "감마리놀렌산 함유 유지 혈중 콜레스테롤 개선·혈행개선·월경전 변화에 의한 불편한 상태 개선·면역과민반응에 의한 피부상태 개선에 도움을 줄 수 있음",
+   "en": "Gamma-linolenic acid-containing oil May help with easing discomfort related to premenstrual changes"
+  },
+  {
+   "docs": 13,
+   "missing": [
+    "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선",
+    "혈행 개선"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 : 혈중 중성지질 개선·혈행 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 12,
+   "missing": [
+    "EPA 및 DHA 함유 유지 혈중 중성지질 개선",
+    "혈행 개선",
+    "기억력 개선"
+   ],
+   "ko": "EPA 및 DHA 함유 유지 혈중 중성지질 개선, 혈행 개선, 기억력 개선, 건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help with improving dry eyes for eye health"
+  },
+  {
+   "docs": 12,
+   "missing": [
+    "EPA및DHA함유유지 혈중 중성지질 개선",
+    "혈행 개선",
+    "기억력 개선"
+   ],
+   "ko": "EPA및DHA함유유지 혈중 중성지질 개선·혈행 개선·기억력 개선·건조한 눈을 개선하여 눈 건강에 도움을 줄 수 있음",
+   "en": "EPA and DHA-containing oil May help with improving dry eyes for eye health"
+  }
+ ]
+}

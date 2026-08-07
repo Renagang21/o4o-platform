@@ -1,6 +1,6 @@
 {
  "wo": "WO-O4O-HFF-EN-FULL-40902-SEMANTIC-LINGUISTIC-QUALITY-CENSUS-AND-REPAIR-PLANNING-V1",
- "censusedAt": "2026-08-07T22:45:18.940Z",
+ "censusedAt": "2026-08-07T23:13:14.077Z",
  "readOnly": true,
  "dbWrites": 0,
  "totals": {
@@ -62,17 +62,17 @@
   {
    "day": "Fri Jul 31 2026 00:00:00 GMT+0900 (대한민국 표준시)",
    "n": 2149,
-   "correctedAfterCreate": 0
+   "correctedAfterCreate": 169
   },
   {
    "day": "Sat Aug 01 2026 00:00:00 GMT+0900 (대한민국 표준시)",
    "n": 22608,
-   "correctedAfterCreate": 396
+   "correctedAfterCreate": 1928
   },
   {
    "day": "Mon Aug 03 2026 00:00:00 GMT+0900 (대한민국 표준시)",
    "n": 647,
-   "correctedAfterCreate": 0
+   "correctedAfterCreate": 35
   }
  ]
 }
