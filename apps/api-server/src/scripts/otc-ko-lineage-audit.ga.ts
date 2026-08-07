@@ -144,7 +144,8 @@ async function main(): Promise<void> {
 
       /* ① 효능 — 원문 효능 문장의 핵심 어휘가 현행 설명서에 남아 있는가 */
       if (rs.efficacy.trim()) {
-        const keys = (rs.efficacy.match(/[가-힣]{2,}/g) || []).filter((w) => w.length >= 3);
+        const words: string[] = rs.efficacy.match(/[가-힣]{2,}/g) || [];
+        const keys = words.filter((w) => w.length >= 3);
         const koE = alnum(ko.efficacy);
         const uniq = [...new Set(keys)];
         const kept = uniq.filter((w) => koE.includes(alnum(w))).length;

@@ -232,16 +232,18 @@ async function main(): Promise<void> {
   const audit = {
     wo: 'WO-O4O-OTC-TRACK-A-3H-PRODUCTION-GA-V1', readOnly: true, dbWrite: 0,
     doneCount: DONE.size, extraExcluded: [...EXTRA_EXCLUDE],
-    evaluated: evaluated.length, readyFile: ready.length, picked: picked.length,
+    evaluated: evaluated.length, readyFile: ready.length,
+    // 중복 key 정리: 이전에는 `picked: picked.length` 가 아래 `picked: picked.map(...)` 로 덮여
+    // 실제 산출 JSON 에는 map 결과만 남았다. 위치·값을 그대로 유지한 채 중복만 제거한다.
+    picked: picked.map((c) => ({ alias: c.alias, groupKey: c.groupKey, target: c.target, exclude: c.exclude, candidate: c.candidate, 예상write: c.예상write })),
     pickedTotalWrite: picked.reduce((s, c) => s + c.예상write.total_6T, 0),
     candidates: evaluated.map((c) => ({ groupKey: c.groupKey, target: c.target, bridge_n: c.bridge_n, exclude: c.exclude, verdict: c.verdict, reasons: c.excludeReasons, enSib: c.enSibling?.uniform ? c.enSibling.n : null, enFileReady: c.enFileReady })),
-    picked: picked.map((c) => ({ alias: c.alias, groupKey: c.groupKey, target: c.target, exclude: c.exclude, candidate: c.candidate, 예상write: c.예상write })),
   };
   fs.writeFileSync(path.join(OUT_DIR, 'otc-track-a-3h-ga.audit.json'), JSON.stringify(audit, null, 2), 'utf8');
   console.log(JSON.stringify({
-    doneCount: DONE.size, evaluated: evaluated.length, readyFile: ready.length, picked: picked.length,
-    pickedTotalWrite: audit.pickedTotalWrite,
+    doneCount: DONE.size, evaluated: evaluated.length, readyFile: ready.length,
     picked: picked.map((c) => `${c.groupKey} T=${c.target} (6T=${c.예상write.total_6T}) enSib=${c.enSibling.n}`),
+    pickedTotalWrite: audit.pickedTotalWrite,
     excludedTop: evaluated.filter((c) => c.verdict !== 'READY_FILE').slice(0, 12).map((c) => `${c.groupKey} T=${c.target}: ${c.excludeReasons.join(',')}`),
   }, null, 2));
 }

@@ -66,7 +66,7 @@ function derive(name: string, spec: string) {
 function safety9(dos: string, cau: string, interaction: string, multi: boolean): string {
   return [numericSig(dos), ageSig(dos + ' ' + cau), durationSig(dos + ' ' + cau), maxDoseSig(dos), contraSig(cau), pregnancySig(cau), H(normalize(interaction)), additiveSig(cau), multi ? 'multi' : 'single'].join(':');
 }
-function fingerprintOf(content: string, d: { ingredient: string; strength: string; form: string; route: string }): { fp: string; safety: string } {
+function fingerprintOf(content: string, d: { ingredient: string; strength: string; form: string; route: string; multiIngredient: boolean }): { fp: string; safety: string } {
   const sec = sections(content);
   const ind = sec['효능·효과'] || '', dos = sec['용법·용량'] || '';
   const cau = [sec['경고'], sec['사용상 주의사항'], sec['상호작용']].filter(Boolean).join('\n');

@@ -24,6 +24,15 @@ export const stripEllipsis = (s: string): string => s.trim().replace(ELLIPSIS_RE
 export type DeriveResult = { ok: true; text: string; ratio: number; cutAt: number } | { ok: false; reason: string };
 
 /**
+ * 실패 분기 판별.
+ *
+ * api-server tsconfig 는 `strictNullChecks: false` 이며, 이 설정에서는 boolean 리터럴 판별자에 대한
+ * 좁히기가 동작하지 않아 `if (!d.ok)` 블록 안에서도 `d.reason` 을 읽을 수 없다.
+ * 소비처는 이 사용자 정의 타입 가드로 판별한다(런타임 조건은 `!r.ok` 로 동일).
+ */
+export const isDeriveFailure = (r: DeriveResult): r is Extract<DeriveResult, { ok: false }> => !r.ok;
+
+/**
  * @param koCard  KO 카드 요약 원문(말줄임표 포함)
  * @param koFull  같은 문서의 완결본 KO(보통 intro)
  * @param fullZh  완결본의 검증된 번역문

@@ -31,7 +31,7 @@ import { slots, substitute, uid, T, type Slot } from './otc-zh-slots.ga.js';
 import { frameLookup } from './otc-zh-frame.ga.js';
 import { judgeDoc } from './otc-ko-truncation-policy.ga.js';
 import { assertSpec } from './otc-ko-truncation-policy.spec.ga.js';
-import { deriveCardSummary, verifyDerivedCard } from './otc-card-summary.ga.js';
+import { deriveCardSummary, isDeriveFailure, verifyDerivedCard } from './otc-card-summary.ga.js';
 
 const DATA = path.resolve(process.cwd(), 'src/scripts/data');
 const P = (f: string): string => path.join(DATA, f);
@@ -94,7 +94,7 @@ function composeZh(html: string): { zh: string; missing: Slot[]; numeric: string
     const fullZh = j >= 0 ? resolved[j] : null;
     if (!fullZh) continue;                                   // 완결본이 아직 번역 전 → 미해소로 남긴다
     const d = deriveCardSummary(sl[i].text, v.deriveFrom.text, fullZh);
-    if (!d.ok) { numeric.push(`${sl[i].kind}|DERIVE_FAILED:${d.reason}|${sl[i].text.slice(0, 60)}`); continue; }
+    if (isDeriveFailure(d)) { numeric.push(`${sl[i].kind}|DERIVE_FAILED:${d.reason}|${sl[i].text.slice(0, 60)}`); continue; }
     const e = verifyDerivedCard(d.text, fullZh);
     if (e) { numeric.push(`${sl[i].kind}|${e}|${sl[i].text.slice(0, 60)}`); continue; }
     resolved[i] = d.text; derivedCount++;

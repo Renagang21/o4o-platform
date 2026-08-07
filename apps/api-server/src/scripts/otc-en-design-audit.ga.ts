@@ -41,7 +41,8 @@ function designGaps(en: string, ko: string): string[] {
   for (const [o, c, n] of [[/<div[\s>]/g, /<\/div>/g, 'div'], [/<ul[\s>]/g, /<\/ul>/g, 'ul'],
     [/<li>/g, /<\/li>/g, 'li'], [/<p[\s>]/g, /<\/p>/g, 'p'], [/<h2>/g, /<\/h2>/g, 'h2']] as any)
     if (cnt(en, o) !== cnt(en, c)) { g.push(`UNBALANCED_${n}`); }
-  if ((en.match(/<li>/g) || []).length !== (en.match(/<ul class="sd-warn">[\s\S]*?<\/ul>/g) || []).reduce((a, u) => a + cnt(u, /<li>/g), 0)) g.push('LI_OUTSIDE_UL');
+  const ulBlocks: string[] = en.match(/<ul class="sd-warn">[\s\S]*?<\/ul>/g) || [];
+  if (cnt(en, /<li>/g) !== ulBlocks.reduce((a, u) => a + cnt(u, /<li>/g), 0)) g.push('LI_OUTSIDE_UL');
   if (/<li>\s*<\/li>/.test(en) || /<p[^>]*>\s*<\/p>/.test(en)) g.push('EMPTY_NODE');
   if (/<style|style=/.test(en)) g.push('INLINE_STYLE');       // 렌더러 sanitizer 가 제거 → 디자인 의존 금지
   if (/<table[\s>]/i.test(en)) g.push('TABLE_FORBIDDEN');
