@@ -36,7 +36,7 @@ jobs:
         node-version: ${{ env.NODE_VERSION }}
 
     - name: Install pnpm
-      uses: pnpm/action-setup@v5
+      uses: pnpm/action-setup@v6
       with:
         # package.json volta.pnpm 과 일치시킨다
         version: 10.25.0
