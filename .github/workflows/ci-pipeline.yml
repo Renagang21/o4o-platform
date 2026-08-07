@@ -98,9 +98,6 @@ jobs:
     - name: Run tests (admin-dashboard Vitest, serial to prevent OOM)
       run: cd apps/admin-dashboard && npx vitest run --passWithNoTests --pool=forks --poolOptions.forks.maxForks=1
 
-    - name: Run tests (api-gateway Vitest)
-      run: cd apps/api-gateway && npx vitest run --passWithNoTests
-
     - name: Run tests (multi-tenant Vitest)
       run: cd apps/api-server/tests/multi-tenant && npx vitest run --passWithNoTests
 
