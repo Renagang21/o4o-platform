@@ -118,4 +118,4 @@ lms-core-contract@{major}.{minor}.{patch}
 
 ---
 
-*이 문서는 CLAUDE.md §16에서 참조하는 기준 문서이다.*
+*이 문서는 CLAUDE.md §12 (플랫폼 개발 참조)에서 참조하는 기준 문서이다.*

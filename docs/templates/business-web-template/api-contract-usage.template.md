@@ -401,7 +401,7 @@ jwt.verify(token, secret);  // ❌
 - docs/services/{business}/openapi.yaml
 - docs/architecture/business-web-template.md
 - CLAUDE.md §14 API Contract Enforcement Rules
-- CLAUDE.md §16 Business Web Template Rules
+- docs/architecture/BUSINESS-SERVICE-RULES.md — Business Web Template Rules (CLAUDE.md 에서 분리된 상세 규칙)
 
 ---
 

@@ -10,7 +10,7 @@
  * Generated: 2025-12-29T12:26:37.425Z
  * Generator: scripts/generators/openapi-types-generator.ts
  *
- * 관련 규칙: CLAUDE.md §21
+ * 관련 규칙: docs/architecture/BUSINESS-SERVICE-RULES.md §1 (API Contract Enforcement)
  */
 
 /**

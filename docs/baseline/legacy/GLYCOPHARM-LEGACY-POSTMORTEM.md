@@ -72,7 +72,7 @@ if (orderType === OrderType.GLYCOPHARM) {
 - **스키마 검사**: `check-forbidden-tables.mjs`에서 `glycopharm_orders` 신규 생성 차단
 - **CI 검증**: 금지 테이블 패턴 검사 자동화
 
-### CLAUDE.md §20: 규칙 고정
+### CLAUDE.md §4 (E-commerce Core): 규칙 고정
 
 ```
 차단된 OrderType: GLYCOPHARM (Phase 5-A에서 차단)
@@ -168,8 +168,8 @@ const order = await checkoutService.createOrder({
 ## 8. 관련 문서
 
 - [CLAUDE.md §7](../../../CLAUDE.md) - E-commerce Core 절대 규칙
-- [CLAUDE.md §20](../../../CLAUDE.md) - Order Guardrails
-- [CLAUDE.md §21](../../../CLAUDE.md) - O4O Store Template Rules
+- [CLAUDE.md §4](../../../CLAUDE.md) - E-commerce Core 규칙 (구 Order Guardrails)
+- [CLAUDE.md §5](../../../CLAUDE.md) - O4O Store & Order (구 O4O Store Template Rules)
 - [E-COMMERCE-ORDER-CONTRACT.md](../E-COMMERCE-ORDER-CONTRACT.md)
 - [O4O Store Template](../../templates/o4o-store-template/STORE-TEMPLATE-README.md)
 

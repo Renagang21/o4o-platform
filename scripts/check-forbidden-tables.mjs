@@ -23,7 +23,7 @@
  *   run: node scripts/check-forbidden-tables.mjs
  * ```
  *
- * @see CLAUDE.md §21 - Order Guardrails (Phase 5-D)
+ * @see CLAUDE.md §4 - E-commerce Core 규칙 (금지 테이블) · docs/baseline/E-COMMERCE-ORDER-CONTRACT.md
  * @since Phase 5-D (2026-01-11)
  */
 
@@ -234,7 +234,7 @@ async function main() {
     console.log('Service-specific order/payment tables are FORBIDDEN.');
     console.log('All orders must go through E-commerce Core (checkout_orders).');
     console.log('');
-    console.log('See: CLAUDE.md §21 - Order Guardrails');
+    console.log('See: CLAUDE.md §4 - E-commerce Core 규칙 (금지 테이블)');
     console.log('See: docs/_platform/E-COMMERCE-ORDER-CONTRACT.md');
     console.log('');
     console.log('═══════════════════════════════════════════════════════════════');

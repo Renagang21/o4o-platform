@@ -105,7 +105,7 @@ function generateTypesForService(service: ServiceConfig): boolean {
  * Generated: ${new Date().toISOString()}
  * Generator: scripts/generators/openapi-types-generator.ts
  *
- * 관련 규칙: CLAUDE.md §21
+ * 관련 규칙: docs/architecture/BUSINESS-SERVICE-RULES.md §1 (API Contract Enforcement)
  */
 
 `;
@@ -142,7 +142,7 @@ function generateIndexFile(services: ServiceConfig[]): void {
  * Generated: ${new Date().toISOString()}
  * Generator: scripts/generators/openapi-types-generator.ts
  *
- * 관련 규칙: CLAUDE.md §21
+ * 관련 규칙: docs/architecture/BUSINESS-SERVICE-RULES.md §1 (API Contract Enforcement)
  */
 
 `;

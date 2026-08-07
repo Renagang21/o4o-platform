@@ -318,7 +318,7 @@
 - docs/architecture/business-web-template.md
 - docs/services/{business}/web-rules.md
 - docs/services/{business}/openapi.yaml
-- CLAUDE.md §16 Business Web Template Rules
+- docs/architecture/BUSINESS-SERVICE-RULES.md — Business Web Template Rules (CLAUDE.md 에서 분리된 상세 규칙)
 
 ---
 

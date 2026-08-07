@@ -157,10 +157,10 @@ web-*/pages/pharmacy/*          (UI Pages)
 
 ### 관련 Frozen 패키지
 
-- `@o4o/hub-core` — Hub UI 레이아웃 (CLAUDE.md §20)
+- `@o4o/hub-core` — Hub UI 레이아웃 (CLAUDE.md §14 F1 Operator OS)
 - `@o4o/hub-exploration-core` — Hub 탐색 컴포넌트
-- APP-CONTENT (`ContentQueryService`) — 기준선 APP (CLAUDE.md §18)
-- APP-SIGNAGE (`SignageQueryService`) — 기준선 APP (CLAUDE.md §18)
+- APP-CONTENT (`ContentQueryService`) — 기준선 APP (CLAUDE.md §13-A)
+- APP-SIGNAGE (`SignageQueryService`) — 기준선 APP (CLAUDE.md §13-A)
 
 ---
 

@@ -5,7 +5,7 @@
 
 ## 개요
 
-이 템플릿들은 **O4O Store Template Rules (CLAUDE.md §21)**을 준수하면서,
+이 템플릿들은 **O4O Store & Order 규칙 (CLAUDE.md §5 · docs/architecture/O4O-STORE-RULES.md)**을 준수하면서,
 B2C에 적합한 **톤/레이아웃/콘텐츠 구조**를 제공합니다.
 
 ### 공통 원칙 (Phase 8 고정)

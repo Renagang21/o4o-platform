@@ -141,7 +141,7 @@ NODE_ENV=development
 - [Business Web Template Rules](../../architecture/business-web-template.md)
 - [Business API Template Rules](../../architecture/business-api-template.md)
 - [Multi-Business Operations](../../architecture/multi-business-operations.md)
-- CLAUDE.md §16 Business Web Template Rules
+- docs/architecture/BUSINESS-SERVICE-RULES.md — Business Web Template Rules (CLAUDE.md 에서 분리된 상세 규칙)
 
 ---
 

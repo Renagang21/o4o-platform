@@ -1,6 +1,6 @@
 # O4O Store & Order Guardrails Rules (Mandatory)
 
-> **CLAUDE.md §19-21에서 분리된 상세 규칙**
+> **CLAUDE.md §4 (E-commerce Core) · §5 (O4O Store & Order) 의 상세 규칙** (구 §19-21에서 분리)
 > 이 문서는 CLAUDE.md의 보조 문서입니다.
 
 ---

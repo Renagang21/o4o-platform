@@ -162,4 +162,4 @@ Freeze 영역 변경 시: **Work Order 작성 → 전 서비스 영향도 분석
 ---
 
 *Merged from: OPERATOR_UX_CORE_FREEZE_V1.md + ADMIN_UX_CORE_FREEZE_V1.md*
-*Governed by: CLAUDE.md §20, §21*
+*Governed by: CLAUDE.md §14 F1 (Operator OS) · F2 (KPA UX)*

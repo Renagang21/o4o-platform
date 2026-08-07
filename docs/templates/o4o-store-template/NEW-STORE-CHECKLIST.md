@@ -6,7 +6,7 @@
 ## 사전 조건
 
 - [ ] CLAUDE.md §7 (E-commerce Core 절대 규칙) 숙지
-- [ ] CLAUDE.md §21 (O4O Store Template Rules) 숙지
+- [ ] CLAUDE.md §5 (O4O Store & Order) · docs/architecture/O4O-STORE-RULES.md 숙지
 - [ ] Reference Implementation (Cosmetics, Tourism) 코드 검토
 
 ---
@@ -246,7 +246,7 @@ node scripts/check-forbidden-tables.mjs
 - [ORDER-DELEGATION.md](./ORDER-DELEGATION.md)
 - [DOMAIN-BOUNDARY.md](./DOMAIN-BOUNDARY.md)
 - [CLAUDE.md §7](../../../CLAUDE.md) - E-commerce Core 절대 규칙
-- [CLAUDE.md §21](../../../CLAUDE.md) - O4O Store Template Rules
+- [CLAUDE.md §5](../../../CLAUDE.md) - O4O Store & Order · [O4O-STORE-RULES.md](../../architecture/O4O-STORE-RULES.md)
 
 ---
 
