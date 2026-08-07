@@ -30,6 +30,15 @@ const sha = (s) => crypto.createHash('sha256').update(s ?? '').digest('hex');
 const PRIOR = ['hff-ja-b01-safe-targets-v1.json', 'hff-ja-b02-safe-targets-v1.json', 'hff-ja-b03-safe-targets-v1.json']
   .flatMap((f) => (fs.existsSync(`${D}/${f}`) ? JSON.parse(fs.readFileSync(`${D}/${f}`, 'utf8')).targets : []));
 const expectHash = new Map(PRIOR.map((t) => [t.productMasterId, t.newContentHash]));
+/* 승인된 교정(WO-…-IZYOU-154-CORRECTION-V1)으로 갱신된 행은 **원 배치 해시와 다른 것이 정상**이다.
+   교정본 해시를 기대값으로 덮어써야 회귀 판정이 의미를 갖는다 — 그러지 않으면 승인된 교정이
+   매번 `storedModified` 로 잡혀 실제 회귀를 가린다. */
+let correctedApplied = 0;
+if (fs.existsSync(`${D}/hff-ja-fix154-targets-v1.json`)) {
+  for (const t of JSON.parse(fs.readFileSync(`${D}/hff-ja-fix154-targets-v1.json`, 'utf8')).targets) {
+    if (expectHash.has(t.productMasterId)) { expectHash.set(t.productMasterId, t.newContentHash); correctedApplied++; }
+  }
+}
 
 const c = new pg.Client({ host: '127.0.0.1', port: parseInt(process.env.PROXY_PORT ?? '5471', 10), user: 'o4o_api', password: process.env.PGPW, database: 'o4o_platform', statement_timeout: 1800000 });
 await c.connect();
@@ -107,6 +116,7 @@ const out = {
   wo: WO, checkedAt: new Date().toISOString(), readOnly: true, dbWrites: 0,
   scope: 'batch01+batch02+batch03 stored JA canonical', ledgerTargets: PRIOR.length,
   documents: koRows.length, storedFound: stored.size,
+  ledgerCorrectedRows: correctedApplied,
   storedModified, storedMissing, notProducible, structureDiff, parityBroken,
   /* 게이트는 이번 WO 에서 신설했다. 기존 산출물에 걸리는 건수는 회귀가 아니라 **기존 결함 실측치**다. */
   gateDefectOnRebuild: gateDefect,
