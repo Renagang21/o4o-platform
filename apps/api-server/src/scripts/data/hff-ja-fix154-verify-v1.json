@@ -1,0 +1,33 @@
+{
+ "wo": "WO-O4O-HFF-JA-NUMERIC-IZYOU-MISTRANSLATION-154-CORRECTION-V1",
+ "verifiedAt": "2026-08-07T14:35:28.106Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "updatedRowsFound": 120,
+ "expectedUpdate": 120,
+ "contractViolations": 0,
+ "contentMismatch": 0,
+ "notInTargets": 0,
+ "numericAbnormalLeftInTargets": 0,
+ "numericAbnormalLeftOverall": 34,
+ "hangulInSlots": 0,
+ "simplifiedInSlots": 0,
+ "writesOutsideTargets": 0,
+ "koHashDrift": 0,
+ "koUnchanged": true,
+ "enUnchanged": true,
+ "zhUnchanged": true,
+ "pmUnchanged": true,
+ "jaCanonNow": 30049,
+ "jaCountUnchanged": true,
+ "canonicalDup": 0,
+ "regression": {
+  "scope": "b01+b02+b03+b04 stored JA",
+  "documents": 30049,
+  "notProducible": 0,
+  "structureDiff": 0,
+  "parityBroken": 0
+ },
+ "samples": [],
+ "verdict": "PASS"
+}

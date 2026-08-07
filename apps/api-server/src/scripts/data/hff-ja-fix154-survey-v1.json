@@ -1,0 +1,45 @@
+{
+ "wo": "WO-O4O-HFF-JA-NUMERIC-IZYOU-MISTRANSLATION-154-CORRECTION-V1",
+ "surveyedAt": "2026-08-07T14:31:36.655Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "jaWithNumericAbnormal": 154,
+ "jaWithAnyAbnormal": 22760,
+ "targets": 120,
+ "productMasterDup": 0,
+ "rejected": 34,
+ "rejectedByWhy": {
+  "GATE_KANJI_DUP": 16,
+  "GATE_PARTICLE_DUP": 8,
+  "STILL_MISTRANSLATED": 9,
+  "NO_KO_NUMERIC_IZYOU": 1
+ },
+ "totalNumericAbnormalOccurrences": 356,
+ "sample": [
+  {
+   "m": "00125430-ac79-4b77-8302-7260f147cdff",
+   "before": "s=\"sd-item\">マグネシウム(%)：表示量（94.5 mg/3,000 mg）の80異常150以下</div><div class=\"sd-item\">ビタミ",
+   "after": "=\"sd-item\">マグネシウム(%)：表示量（94.5 mg/3,000 mg）の80以上150以下</div><div class=\"sd-item\">ビタミ"
+  },
+  {
+   "m": "04b6dd53-2a25-463c-ad66-7555ea6484aa",
+   "before": "em\">2) ホスファチジルセリン(%)：表示量（175 mg / 1,200 mg）の80異常120以下</div><div class=\"sd-item\">3) ",
+   "after": "m\">2) ホスファチジルセリン(%)：表示量（175 mg / 1,200 mg）の80以上120以下</div><div class=\"sd-item\">3) "
+  },
+  {
+   "m": "05abc433-4b19-4635-b57f-9846685d5161",
+   "before": "ss=\"sd-item\">ビタミンD(%)：表示量（20 μg / 1,800 mg）の80異常180以下</div><div class=\"sd-item\">ビタミ",
+   "after": "s=\"sd-item\">ビタミンD(%)：表示量（20 μg / 1,800 mg）の80以上180以下</div><div class=\"sd-item\">ビタミ"
+  },
+  {
+   "m": "0b2dbe80-76aa-4d4a-8e8a-8969f6980e25",
+   "before": "\"sd-item\">2) アスタキサンチン(%)：表示量（7 mg / 400 mg）の80異常120以下</div><div class=\"sd-item\">3) ",
+   "after": "sd-item\">2) アスタキサンチン(%)：表示量（7 mg / 400 mg）の80以上120以下</div><div class=\"sd-item\">3) "
+  },
+  {
+   "m": "0bba11ee-4d7a-453f-ae52-f31667bb9373",
+   "before": "item\">2) ポリγグルタミン酸(%)：表示量（60 mg / 2,000 mg）の80異常120以下</div><div class=\"sd-item\">3) ",
+   "after": "tem\">2) ポリγグルタミン酸(%)：表示量（60 mg / 2,000 mg）の80以上120以下</div><div class=\"sd-item\">3) "
+  }
+ ]
+}
