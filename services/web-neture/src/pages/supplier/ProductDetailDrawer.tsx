@@ -537,7 +537,8 @@ export default function ProductDetailDrawer({ product, open, onClose, onSaved, a
   const toggleSuggestion = (tag: string) => {
     setSelectedSuggestions((prev) => {
       const next = new Set(prev);
-      next.has(tag) ? next.delete(tag) : next.add(tag);
+      if (next.has(tag)) next.delete(tag);
+      else next.add(tag);
       return next;
     });
   };

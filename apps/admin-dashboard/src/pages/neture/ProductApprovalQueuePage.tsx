@@ -172,7 +172,8 @@ export default function ProductApprovalQueuePage() {
           checked={selectedIds.has(row.id)}
           onChange={(e) => {
             const next = new Set(selectedIds);
-            e.target.checked ? next.add(row.id) : next.delete(row.id);
+            if (e.target.checked) next.add(row.id);
+            else next.delete(row.id);
             setSelectedIds(next);
           }}
           onClick={(e) => e.stopPropagation()}

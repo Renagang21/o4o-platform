@@ -184,17 +184,13 @@ const PageList = () => {
       try {
         await authClient.api.put(`/posts/${quickEditId}`, quickEditData);
 
-        if (true) {
-          setPages(prevPages => prevPages.map(p => 
-            p.id === quickEditId 
-              ? { ...p, ...quickEditData }
-              : p
-          ));
-          setQuickEditId(null);
-          toast.success('Page updated successfully');
-        } else {
-          toast.error('Failed to update page');
-        }
+        setPages(prevPages => prevPages.map(p =>
+          p.id === quickEditId
+            ? { ...p, ...quickEditData }
+            : p
+        ));
+        setQuickEditId(null);
+        toast.success('Page updated successfully');
       } catch (error) {
         toast.error('Failed to update page');
       }
@@ -217,14 +213,10 @@ const PageList = () => {
       try {
         await authClient.api.put(`/posts/${id}`, { status: 'trash' });
 
-        if (true) {
-          setPages(prevPages => prevPages.map(p => 
-            p.id === id ? { ...p, status: 'trash' as const } : p
-          ));
-          toast.success('Page moved to trash');
-        } else {
-          toast.error('Failed to delete page');
-        }
+        setPages(prevPages => prevPages.map(p =>
+          p.id === id ? { ...p, status: 'trash' as const } : p
+        ));
+        toast.success('Page moved to trash');
       } catch (error) {
         toast.error('Failed to delete page');
       }
@@ -250,14 +242,10 @@ const PageList = () => {
       try {
         await authClient.api.put(`/posts/${id}`, { status: 'draft' });
 
-        if (true) {
-          setPages(prevPages => prevPages.map(p => 
-            p.id === id ? { ...p, status: 'draft' as const } : p
-          ));
-          toast.success('Page restored');
-        } else {
-          toast.error('Failed to restore page');
-        }
+        setPages(prevPages => prevPages.map(p =>
+          p.id === id ? { ...p, status: 'draft' as const } : p
+        ));
+        toast.success('Page restored');
       } catch (error) {
         toast.error('Failed to restore page');
       }
@@ -288,16 +276,12 @@ const PageList = () => {
 
           await Promise.all(promises);
 
-          if (true) {
-            setPages(prevPages => prevPages.map(p =>
-              selectedPages.has(p.id) ? { ...p, status: 'trash' as const } : p
-            ));
-            setSelectedPages(new Set());
-            setSelectedBulkAction('');
-            toast.success('Pages moved to trash');
-          } else {
-            toast.error('Some pages failed to move to trash');
-          }
+          setPages(prevPages => prevPages.map(p =>
+            selectedPages.has(p.id) ? { ...p, status: 'trash' as const } : p
+          ));
+          setSelectedPages(new Set());
+          setSelectedBulkAction('');
+          toast.success('Pages moved to trash');
         } catch (error) {
           toast.error('Failed to move pages to trash');
         }

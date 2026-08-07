@@ -348,7 +348,8 @@ export function SignagePlaybackPage() {
 
   const handleClose = () => {
     if (isFullscreen) exitFullscreen();
-    isScheduleMode ? navigate('/store/marketing/signage/player') : navigate(-1);
+    if (isScheduleMode) navigate('/store/marketing/signage/player');
+    else navigate(-1);
   };
 
   // ── Single root container — always in DOM ─────────────────────────────────

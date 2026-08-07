@@ -89,33 +89,27 @@ function prompt(question: string): Promise<string> {
   });
 }
 
-function promptSelect(question: string, options: string[]): Promise<number> {
-  return new Promise(async (resolve) => {
-    console.log(`\n${question}`);
-    options.forEach((opt, i) => {
-      console.log(`  ${i + 1}. ${opt}`);
-    });
-    const answer = await prompt(`선택 (1-${options.length}): `);
-    const index = parseInt(answer, 10) - 1;
-    if (index >= 0 && index < options.length) {
-      resolve(index);
-    } else {
-      console.log('잘못된 선택입니다. 다시 선택해주세요.');
-      resolve(await promptSelect(question, options));
-    }
+async function promptSelect(question: string, options: string[]): Promise<number> {
+  console.log(`\n${question}`);
+  options.forEach((opt, i) => {
+    console.log(`  ${i + 1}. ${opt}`);
   });
+  const answer = await prompt(`선택 (1-${options.length}): `);
+  const index = parseInt(answer, 10) - 1;
+  if (index >= 0 && index < options.length) {
+    return index;
+  }
+  console.log('잘못된 선택입니다. 다시 선택해주세요.');
+  return promptSelect(question, options);
 }
 
-function promptYesNo(question: string, defaultYes = true): Promise<boolean> {
-  return new Promise(async (resolve) => {
-    const hint = defaultYes ? '[Y/n]' : '[y/N]';
-    const answer = await prompt(`${question} ${hint}: `);
-    if (answer === '') {
-      resolve(defaultYes);
-    } else {
-      resolve(answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes');
-    }
-  });
+async function promptYesNo(question: string, defaultYes = true): Promise<boolean> {
+  const hint = defaultYes ? '[Y/n]' : '[y/N]';
+  const answer = await prompt(`${question} ${hint}: `);
+  if (answer === '') {
+    return defaultYes;
+  }
+  return answer.toLowerCase() === 'y' || answer.toLowerCase() === 'yes';
 }
 
 // ============================================================================

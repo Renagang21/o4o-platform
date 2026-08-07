@@ -45,7 +45,6 @@ export function ImageInsertModal({ open, url, defaultWidth, defaultAlign, onInse
         </div>
 
         <div style={styles.previewBox}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={url} alt="미리보기" style={styles.previewImg} />
         </div>
 
