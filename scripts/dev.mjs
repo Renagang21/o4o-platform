@@ -131,10 +131,39 @@ function typeCheckScriptName(relPath) {
 }
 
 /**
+ * 독립 install root 의 의존성 설치를 보장한다.
+ * (WO-O4O-VERIFICATION-HARNESS-RESIDUAL-CLEANUP-V1)
+ *
+ * `services/mobile-app` 은 pnpm-workspace.yaml 에서 **의도적으로 제외**된 독립
+ * Expo 프로젝트다(전역 React override 를 상속하지 않기 위함). 자체 pnpm-lock.yaml 을
+ * 가지며 `pnpm install --ignore-workspace` 로 설치한다.
+ *
+ * 그래서 루트 `pnpm install` 은 이 트리를 채우지 않는다. 실제로 발견된 상태는
+ * `node_modules/.bin/tsc` shim 만 남고 `node_modules/typescript` 실체가 없는
+ * **불완전 설치**였고, 그 결과 type-check 가 "Cannot find module ...\\typescript\\bin\\tsc" 로
+ * 실패했다. 선언(devDependencies) 과 lockfile 은 정상이었다.
+ *
+ * 자체 pnpm-lock.yaml 보유 = 독립 install root 라는 구조적 신호를 그대로 쓴다(별도 목록 없음).
+ * `--frozen-lockfile` 이므로 lockfile 은 변경되지 않는다.
+ */
+function ensureStandaloneInstall(tracker, relPath) {
+  const abs = join(ROOT_DIR, relPath);
+  if (!existsSync(join(abs, 'pnpm-lock.yaml'))) return true;   // 워크스페이스 소속 → 루트 install 이 담당
+  if (existsSync(join(abs, 'node_modules', 'typescript'))) return true;
+
+  log.warn(`  - ${relPath}: 독립 install 이 비어 있어 의존성을 설치합니다 (pnpm install --ignore-workspace)`);
+  return tracker.track(
+    `install ${relPath}`,
+    exec('pnpm install --ignore-workspace --frozen-lockfile', abs)
+  );
+}
+
+/**
  * 워크스페이스 1개 타입체크.
  * 자체 script 가 있으면 그것을 쓰고, 없으면 tsconfig 기준 `npx tsc --noEmit`.
  */
 function typeCheckWorkspace(tracker, relPath) {
+  if (!ensureStandaloneInstall(tracker, relPath)) return false;
   const script = typeCheckScriptName(relPath);
   if (script) {
     console.log(`  - ${relPath} (pnpm run ${script})`);
@@ -218,7 +247,9 @@ function runTypeCheck() {
   log.info('Running TypeScript checks...');
   const t = createFailureTracker();
 
-  // Build packages first
+  // Build packages first.
+  // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
+  // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes', 'block-core'];
 
   log.info('Building packages...');
@@ -267,7 +298,9 @@ function runTypeCheckFrontend() {
   log.info('Running TypeScript checks (Frontend only)...');
   const t = createFailureTracker();
 
-  // Build packages first
+  // Build packages first.
+  // 주의: 이 목록은 배포 산출물 목록(SSOT = 루트 `build:packages`)이 아니라, 타입 해석에
+  // 필요한 **최소 사전 빌드** 대상이다. `npx tsc` 로 in-place 빌드한다(buildPackages 참조).
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes'];
 
   log.info('Building packages...');
@@ -336,22 +369,25 @@ function runTests() {
   return t.report('test');
 }
 
+/**
+ * 패키지 빌드 — 루트 `pnpm run build:packages` 체인에 위임한다.
+ * (WO-O4O-VERIFICATION-HARNESS-RESIDUAL-CLEANUP-V1)
+ *
+ * 이전에는 여기에 9개짜리 자체 목록을 두었고, 그것이 실제 빌드 대상과 어긋나 있었다.
+ * 루트 체인은 17개(types · auth-utils · capabilities · appearance-system · auth-client ·
+ * content-editor · utils · ui · auth-context · shortcodes · block-renderer · slide-app ·
+ * organization-core · forum-core · pharmacy-ai-insight · ai-prompts · lms-client)를
+ * **의존 순서대로** 빌드하며, CI 의 dist 검증 목록(.github/workflows/ci-pipeline.yml)도
+ * 같은 17개를 확인한다. 즉 SSOT 는 루트 package.json 의 `build:packages` 하나다.
+ *
+ * 여기서 목록을 다시 적으면 세 번째 사본이 되어 또 어긋난다. 체인을 그대로 호출한다.
+ * (루트 `build:packages` 는 dev.mjs 를 호출하지 않으므로 재귀가 아니다.)
+ */
 function buildPackages(tracker) {
-  log.info('Building packages...');
+  log.info('Building packages (root build:packages chain)...');
   const t = tracker || createFailureTracker();
 
-  const packages = [
-    'types', 'utils', 'ui', 'auth-client', 'auth-context',
-    'appearance-system', 'shortcodes', 'block-renderer', 'slide-app'
-  ];
-
-  for (const pkg of packages) {
-    const pkgPath = join(ROOT_DIR, 'packages', pkg);
-    if (existsSync(pkgPath) && hasScript(`packages/${pkg}`, 'build')) {
-      console.log(`  - Building @o4o/${pkg}`);
-      t.track(`build packages/${pkg}`, exec('pnpm run build', pkgPath));
-    }
-  }
+  t.track('build:packages', exec('pnpm run build:packages', ROOT_DIR));
 
   return tracker ? t.failures.length === 0 : t.report('build:packages');
 }
