@@ -1,0 +1,1157 @@
+{
+  "meta": {
+    "issueCount": 143,
+    "byType": {
+      "CANDIDATE_CHECK": 77,
+      "CANDIDATE_UNCONFIRMED": 15,
+      "NORMALIZE_DISAGREE_WITH_SOURCE": 45,
+      "POSSIBLE_SAME_UNIT": 6
+    }
+  },
+  "issues": [
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "올리셀멜라쓰리엑스브라이트닝크림마스크",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2026000047",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "마녀공장글루타치온7다크스팟세럼",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2026000090",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "뷰스타비타씨청귤데일리브라이트닝마스크",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2025018337",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "에이에이치씨히알루로딥볼륨5오버데이나이트트리트먼트젤",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2023038508",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "에이에이치씨히알루로딥볼륨5트리트먼트에센스",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2023038507",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "에이에이치씨프로샷히알루로딥볼륨5인트라세럼",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2023038506",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "에이에이치씨히알루로딥볼륨5트리트먼트에멀젼",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2023038505",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "에이에이치씨프로샷히알루로딥볼륨5캡슐인퓨즈드아이크림포페이스",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2023038503",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "메드비데일리라이트톤업선크림에스피에프50+피에이+++",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2022005902",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "니들리페이스라이트오일",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2021022191",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "닥터엔디에스브라이트닝앰플",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2021022190",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "닥터드림콜드플라즈마브라이트닝크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2021015636",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "이안셀딥에너자이징부스팅마스크",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2020011181",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "클리오누디즘히알루론커버비비크림01라이트베이지",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2020004728",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "프레쉬라이트헤어칼라프리미엄베이지",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2019000183",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "아다마스브라이트닝크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2018015033",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "아다마스브라이트닝에멀전",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2018015034",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "아다마스브라이트닝토너",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2018015032",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "물다스킨핏파운데이션01라이트베이지",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2018015020",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "미샤시그너처볼륨브라이트닝컨실러",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2016010545",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "오휘글로우메탈쿠션21호라이트베이지",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2015000163",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "오휘셀라이트닝프리즘크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013027030",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "오휘셀라이트닝프리즘에센스",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013027028",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "네이처리퍼블릭보테니컬포어팩트",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013018787",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "트리플코렉트씨씨크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013018769",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "포에버라이트크리에이터세럼",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013018765",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "포에버라이트크리에이터로션",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013018763",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "손앤박-유브이360선팩트",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013018761",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "알지투럭셔리앰플",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011330",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "다나한영썬크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011329",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "십장생셀액티브리얼더블모이스트크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011328",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "꽃을든남자유브이썬라이트크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011327",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "십장생셀액티브리얼리프팅아이크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011326",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "다나한알지투프리미엄이엑스앰플",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011325",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "꽃을든남자코엔자임큐텐화이트닝썬크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011324",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "다나한수썬크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011322",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "인큐스비타큐텐썬크림",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011320",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_UNCONFIRMED",
+      "group": "functional",
+      "sourceProductName": "다나한알지투안티링클프로그램2제보양진액",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2013011319",
+      "note": "공식 효능효과 원문 없음 — grounding 불가"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "functional",
+      "sourceProductName": "랑유원데이브라이트너프리미엄",
+      "brandName": null,
+      "sourceUrl": "https://nedrug.mfds.go.kr/pbp/CCBDC01/getItem?cosmeticReportSeq=2026025331",
+      "note": "색상 계열 표기 포함"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "콜레올로지 컷팅 젤리 30포 (30일분)",
+      "brandName": "푸드올로지",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA240423305",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "아누아 피디알엔 히알루론산 캡슐 100 세럼 30ml 리필 기획 (2504)",
+      "brandName": "아누아",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA250329148",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "콜레올로지 컷팅 젤리 석류맛 10포 기획 (+석류맛 2포+키위맛 2포) (14일분) (2607)",
+      "brandName": "푸드올로지",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260641085",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "아누아 피디알엔 히알루론산 수분 캡슐 미스트 100ml 2입 기획 (2603)",
+      "brandName": "아누아",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260237304",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "퍼셀 80억퍼엠엘 글루타치온 TXA 캡슐 크림 80ml (온)",
+      "brandName": "퍼셀",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA260540627",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "아누아 피디알엔 히알루론산 수분 캡슐 미스트 100ml",
+      "brandName": "아누아",
+      "sourceUrl": "https://global.oliveyoung.com/product/detail?prdtNo=GA251034089",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "(1+1) 레드 블레미쉬 10-시카 캡슐 수딩 토너 300mL",
+      "brandName": "닥터지",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A0%88%EB%93%9C%20%EB%B8%94%EB%A0%88%EB%AF%B8%EC%89%AC%2010-%EC%8B%9C%EC%B9%B4%20%EC%BA%A1%EC%8A%90%20%EC%88%98%EB%94%A9%20%ED%86%A0%EB%84%88/2190667",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "콜라겐 아이패치 부활초 젤리 60매",
+      "brandName": "아비브",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%9C%EB%9D%BC%EA%B2%90%20%EC%95%84%EC%9D%B4%ED%8C%A8%EC%B9%98%20%EB%B6%80%ED%99%9C%EC%B4%88%20%EC%A0%A4%EB%A6%AC/2018396",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "어성초 캡슐팩",
+      "brandName": "올리브팜",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%96%B4%EC%84%B1%EC%B4%88%20%EC%BA%A1%EC%8A%90%ED%8C%A9/1991624",
+      "note": "내복 형태 표기 — 화장품 여부 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "데일리 유브이 쉴드 골프 패치",
+      "brandName": "다슈",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EC%9C%A0%EB%B8%8C%EC%9D%B4%20%EC%89%B4%EB%93%9C%20%EA%B3%A8%ED%94%84%20%ED%8C%A8%EC%B9%98/2001787",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 선케어 > 선케어 기타 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "시그니처 에센스 커버 팩트 마스터 모이스처 [SPF50+/PA++++] [23호]",
+      "brandName": "에이지투웨니스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%9C%EA%B7%B8%EB%8B%88%EC%B2%98%20%EC%97%90%EC%84%BC%EC%8A%A4%20%EC%BB%A4%EB%B2%84%20%ED%8C%A9%ED%8A%B8%20%EB%A7%88%EC%8A%A4%ED%84%B0%20%EB%AA%A8%EC%9D%B4%EC%8A%A4%EC%B2%98%20%5BSPF50%2B%2FPA%2B%2B%2B%2B%5D%20%5B23%ED%98%B8%5D/1934565",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "시카마누 세럼 쿠션 [SPF45/PA++] [21호]",
+      "brandName": "파넬",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%9C%EC%B9%B4%EB%A7%88%EB%88%84%20%EC%84%B8%EB%9F%BC%20%EC%BF%A0%EC%85%98%20%5BSPF45%2FPA%2B%2B%5D%20%5B21%ED%98%B8%5D/2096278",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "제주 프루넬라 비건 콜라겐 속눈썹 영양제 10ml",
+      "brandName": "밀바랩",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%A0%9C%EC%A3%BC%20%ED%94%84%EB%A3%A8%EB%84%AC%EB%9D%BC%20%EB%B9%84%EA%B1%B4%20%EC%BD%9C%EB%9D%BC%EA%B2%90%20%EC%86%8D%EB%88%88%EC%8D%B9%20%EC%98%81%EC%96%91%EC%A0%9C/2124954",
+      "note": "비화장품 품목 의심 — 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "이너퍼퓸 [오드씨엘] 5ml",
+      "brandName": "포엘리에",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%9D%B4%EB%84%88%20%ED%8D%BC%ED%93%B8%20%5B%EC%98%A4%EB%93%9C%EC%94%A8%EC%97%98%5D/1896526",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 바디 > 바디기타 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "100% 내추럴 호호바 오일",
+      "brandName": "코코케어",
+      "sourceUrl": "https://www.hwahae.co.kr/products/100%25%20%EB%82%B4%EC%B6%94%EB%9F%B4%20%ED%98%B8%ED%98%B8%EB%B0%94%20%EC%98%A4%EC%9D%BC/2032002",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 바디 > 핸드케어 기타 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "컬러 패스트 체인지 염색약 새치커버 [흑색] 120g",
+      "brandName": "다슈",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BB%AC%EB%9F%AC%20%ED%8C%A8%EC%8A%A4%ED%8A%B8%20%EC%B2%B4%EC%9D%B8%EC%A7%80%20%EC%97%BC%EC%83%89%EC%95%BD%20%5B%ED%9D%91%EC%83%89%5D/1828344",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "4주 솔루션 두피 영양제 인핸싱 폼",
+      "brandName": "바이브랩",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%9D%B8%ED%95%B8%EC%8B%B1%20%ED%8F%BC/2121229",
+      "note": "비화장품 품목 의심 — 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "마데카 분말 티트리 에이씨",
+      "brandName": "센텔리안24",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%88%EB%8D%B0%EC%B9%B4%20%EB%B6%84%EB%A7%90%20%ED%8B%B0%ED%8A%B8%EB%A6%AC%20%EC%97%90%EC%9D%B4%EC%94%A8/2119144",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 기타 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "물티슈 [퓨어]",
+      "brandName": "하늘수",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%AC%BC%ED%8B%B0%EC%8A%88%20%5B%ED%93%A8%EC%96%B4%5D/1712464",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 기타 > 물티슈 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "올리브3",
+      "brandName": "올록담",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%98%AC%EB%A6%AC%EB%B8%8C3/2180164",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "[6개월분] 링클프리 저분자 피쉬 콜라겐 비오틴 부스터",
+      "brandName": "데일리유",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%81%ED%81%B4%ED%94%84%EB%A6%AC%20%EC%A0%80%EB%B6%84%EC%9E%90%20%ED%94%BC%EC%89%AC%20%EC%BD%9C%EB%9D%BC%EA%B2%90%20%EB%B9%84%EC%98%A4%ED%8B%B4%20%EB%B6%80%EC%8A%A4%ED%84%B0/2174108",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "수분콜라겐 블러드오렌지맛",
+      "brandName": "링티",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%88%98%EB%B6%84%EC%BD%9C%EB%9D%BC%EA%B2%90%20%EB%B8%94%EB%9F%AC%EB%93%9C%EC%98%A4%EB%A0%8C%EC%A7%80%EB%A7%9B/2075036",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 피부 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "비오틴 10,000",
+      "brandName": "나트롤",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%B9%84%EC%98%A4%ED%8B%B4%2010%2C000/2061110",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 모발/손톱 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "더 슬림 다이어트 단백질 쉐이크 초코 40g*7개입",
+      "brandName": "솔루티오",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8D%94%20%EC%8A%AC%EB%A6%BC%20%EC%89%90%EC%9D%B4%ED%81%AC%20%5B%EC%B4%88%EC%BD%94%5D/2102640",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "디톡 콤부차 [납작복숭아]",
+      "brandName": "그린몬스터",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%94%94%ED%86%A1%20%EC%BD%A4%EB%B6%80%EC%B0%A8%20%5B%EB%82%A9%EC%9E%91%EB%B3%B5%EC%88%AD%EC%95%84%5D/2061599",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 체지방 관리 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "루나베라 질유래유산균 500mg 30캡슙 *1박스 (1개월분)",
+      "brandName": "오벤트",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A3%A8%EB%82%98%EB%B2%A0%EB%9D%BC%20%ED%94%84%EB%A1%9C%EB%B0%94%EC%9D%B4%EC%98%A4%ED%8B%B1%EC%8A%A4/2174616",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 소화/위장 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "코랄칼슘 앤 마그네슘 2:1 플러스",
+      "brandName": "내츄럴플러스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%94%EB%9E%84%EC%B9%BC%EC%8A%98%20%EC%95%A4%20%EB%A7%88%EA%B7%B8%EB%84%A4%EC%8A%98%202%3A1%20%ED%94%8C%EB%9F%AC%EC%8A%A4/2035115",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 근육량 증가 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "면역케어 고려은단 비타민C",
+      "brandName": "고려은단",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A9%B4%EC%97%AD%EC%BC%80%EC%96%B4%20%EA%B3%A0%EB%A0%A4%EC%9D%80%EB%8B%A8%20%EB%B9%84%ED%83%80%EB%AF%BCC/2029282",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 항산화 관리 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "실리마린",
+      "brandName": "나우푸드",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%A4%EB%A6%AC%EB%A7%88%EB%A6%B0/2028695",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 면역/피로 관리 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "트루바이타민 I",
+      "brandName": "덴프스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%8A%B8%EB%A3%A8%EB%B0%94%EC%9D%B4%ED%83%80%EB%AF%BC%20I/2029027",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 종합 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "알티지 오메가3",
+      "brandName": "나우푸드",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%95%8C%ED%8B%B0%EC%A7%80%20%EC%98%A4%EB%A9%94%EA%B0%803/2028710",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "루테인 지아잔틴 아스타잔틴",
+      "brandName": "GNM",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A3%A8%ED%85%8C%EC%9D%B8%20%EC%A7%80%EC%95%84%EC%9E%94%ED%8B%B4%20%EC%95%84%EC%8A%A4%ED%83%80%EC%9E%94%ED%8B%B4/2030296",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 눈 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "프리미엄 칼슘 마그네슘 아연 비타민D",
+      "brandName": "뉴트리디데이",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%94%84%EB%A6%AC%EB%AF%B8%EC%97%84%20%EC%B9%BC%EC%8A%98%20%EB%A7%88%EA%B7%B8%EB%84%A4%EC%8A%98%20%EC%95%84%EC%97%B0%20%EB%B9%84%ED%83%80%EB%AF%BCD/2033888",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 뼈/관절/치아 건강 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "콜린 이노시톨",
+      "brandName": "피토틱스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%9C%EB%A6%B0%20%EC%9D%B4%EB%85%B8%EC%8B%9C%ED%86%A8/2057140",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 이너뷰티 > 기타 식품 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "벅스골드 물티슈",
+      "brandName": "누누베베",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%B2%85%EC%8A%A4%EA%B3%A8%EB%93%9C%20%EB%AC%BC%ED%8B%B0%EC%8A%88/1938103",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 베이비&맘 > 기타 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "마데카 프라임",
+      "brandName": "센텔리안24",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%88%EB%8D%B0%EC%B9%B4%20%ED%94%84%EB%9D%BC%EC%9E%84/2155866",
+      "note": "비화장품 카테고리 — 카테고리별 랭킹 > 뷰티디바이스 > 전체"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "디자이너 글로우 파운데이션 [1.5호]",
+      "brandName": "아르마니뷰티",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%94%94%EC%9E%90%EC%9D%B4%EB%84%88%20%EA%B8%80%EB%A1%9C%EC%9A%B0%20%ED%8C%8C%EC%9A%B4%EB%8D%B0%EC%9D%B4%EC%85%98%20%5B1.5%ED%98%B8%5D/2084824",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "리얼 아이래쉬 세럼 속눈썹영양제 [블랙]",
+      "brandName": "손앤박",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%AC%EC%96%BC%20%EC%95%84%EC%9D%B4%EB%9E%98%EC%89%AC%20%EC%84%B8%EB%9F%BC%20%EC%86%8D%EB%88%88%EC%8D%B9%EC%98%81%EC%96%91%EC%A0%9C%20%5B%EB%B8%94%EB%9E%99%5D/2026491",
+      "note": "비화장품 품목 의심 — 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "콜드 왁스 스트립 [비키니라인＆언더암](24strips+4wipes)",
+      "brandName": "바이빠세",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%9C%EB%93%9C%20%EC%99%81%EC%8A%A4%20%EC%8A%A4%ED%8A%B8%EB%A6%BD%20%5B%EB%B9%84%ED%82%A4%EB%8B%88%EB%9D%BC%EC%9D%B8%EF%BC%86%EC%96%B8%EB%8D%94%EC%95%94%5D/1943692",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 건성 > 바디 > 바디기타"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "리치 글루타치온 포텐원샷",
+      "brandName": "트루알엑스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%AC%EC%B9%98%20%EA%B8%80%EB%A3%A8%ED%83%80%EC%B9%98%EC%98%A8%20%ED%8F%AC%ED%85%90%EC%9B%90%EC%83%B7/2100363",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 건성 > 이너뷰티 > 피부 건강"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "액티브 비타민B",
+      "brandName": "이너랩",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%95%A1%ED%8B%B0%EB%B8%8C%20%EB%B9%84%ED%83%80%EB%AF%BCB/2029510",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 건성 > 이너뷰티 > 근육량 증가"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "맨 멀티 비타민 미네랄",
+      "brandName": "센트룸",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%A8%20%EB%A9%80%ED%8B%B0%20%EB%B9%84%ED%83%80%EB%AF%BC%20%EB%AF%B8%EB%84%A4%EB%9E%84/2028915",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 건성 > 이너뷰티 > 종합 건강"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "수면건강",
+      "brandName": "정관장",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%88%98%EB%A9%B4%EA%B1%B4%EA%B0%95/2028660",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 건성 > 이너뷰티 > 기타 식품"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "광채버블마스크 [안색]",
+      "brandName": "큐어레스트",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EA%B4%91%EC%B1%84%EB%B2%84%EB%B8%94%EB%A7%88%EC%8A%A4%ED%81%AC%20%5B%EC%95%88%EC%83%89%5D/2131424",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "코어프로틴 프로 스틱",
+      "brandName": "셀렉스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%94%EC%96%B4%ED%94%84%EB%A1%9C%ED%8B%B4%20%ED%94%84%EB%A1%9C%20%EC%8A%A4%ED%8B%B1/2028581",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 지성 > 이너뷰티 > 근육량 증가"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "아연 50",
+      "brandName": "솔가",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%95%84%EC%97%B0%2050/2035694",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 지성 > 이너뷰티 > 면역/피로 관리"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "이노시톨 2000",
+      "brandName": "라이프허브",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%9D%B4%EB%85%B8%EC%8B%9C%ED%86%A8%202000/2043380",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 지성 > 이너뷰티 > 기타 식품"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "메가 펩타이드 에코 하이드로 수딩 비비크림 [21호]",
+      "brandName": "시드물",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A9%94%EA%B0%80%20%ED%8E%A9%ED%83%80%EC%9D%B4%EB%93%9C%20%EC%97%90%EC%BD%94%20%ED%95%98%EC%9D%B4%EB%93%9C%EB%A1%9C%20%EC%88%98%EB%94%A9%20%EB%B9%84%EB%B9%84%ED%81%AC%EB%A6%BC%20%5B21%ED%98%B8%5D/1834330",
+      "note": "색상/호수 표기 — 단위 판단 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "2주 속눈썹영양제 아이래쉬 세럼 9.5ml",
+      "brandName": "리오프",
+      "sourceUrl": "https://www.hwahae.co.kr/products/2%EC%A3%BC%20%EC%95%84%EC%9D%B4%EB%9E%98%EC%89%AC%20%EC%84%B8%EB%9F%BC/2003038",
+      "note": "비화장품 품목 의심 — 확인 필요"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "이지슬리밍 잔티젠 다이어트",
+      "brandName": "스키니랩",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%9D%B4%EC%A7%80%EC%8A%AC%EB%A6%AC%EB%B0%8D%20%EC%9E%94%ED%8B%B0%EC%A0%A0%20%EB%8B%A4%EC%9D%B4%EC%96%B4%ED%8A%B8/2028713",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 중성 > 이너뷰티 > 체지방 관리"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "멀티비타민 데일리",
+      "brandName": "아임비타",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A9%80%ED%8B%B0%EB%B9%84%ED%83%80%EB%AF%BC%20%EB%8D%B0%EC%9D%BC%EB%A6%AC/2030968",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 중성 > 이너뷰티 > 종합 건강"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "플러스 듀얼바이오틱스",
+      "brandName": "락토핏",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%94%8C%EB%9F%AC%EC%8A%A4%20%EB%93%80%EC%96%BC%EB%B0%94%EC%9D%B4%EC%98%A4%ED%8B%B1%EC%8A%A4/2029791",
+      "note": "비화장품 카테고리 — 피부별 랭킹 > 아토피 > 이너뷰티 > 소화/위장 건강"
+    },
+    {
+      "issueType": "CANDIDATE_CHECK",
+      "group": "general",
+      "sourceProductName": "여에스더 유산균 클래식",
+      "brandName": "에스더포뮬러",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%97%AC%EC%97%90%EC%8A%A4%EB%8D%94%20%EC%9C%A0%EC%82%B0%EA%B7%A0%20%ED%81%B4%EB%9E%98%EC%8B%9D/2037156",
+      "note": "비화장품 카테고리 — 연령대별 랭킹 > 10대 > 이너뷰티 > 소화/위장 건강"
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "[only화해] 마데카소사이드 에센셜 마스크 30매 기획(+마데카크림15ml+세럼10ml)",
+      "brandName": "메디힐",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%88%EB%8D%B0%EC%B9%B4%EC%86%8C%EC%82%AC%EC%9D%B4%EB%93%9C%20%EC%97%90%EC%84%BC%EC%85%9C%20%EB%A7%88%EC%8A%A4%ED%81%AC%20%5B%ED%9D%94%EC%A0%81%EB%A6%AC%ED%8E%98%EC%96%B4%5D/2107391",
+      "note": "우리 코어명 \"마데카소사이드 에센셜 마스크\" ≠ 화해 정리명 \"마데카소사이드 에센셜 마스크 [흔적리페어]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "(1+1) 레드 블레미쉬 클리어 수딩 크림 70mL 튜브 (블랙스네일 샤쉐 2열 증정)",
+      "brandName": "닥터지",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A0%88%EB%93%9C%20%EB%B8%94%EB%A0%88%EB%AF%B8%EC%89%AC%20%ED%81%B4%EB%A6%AC%EC%96%B4%20%EC%88%98%EB%94%A9%20%ED%81%AC%EB%A6%BC/1998036",
+      "note": "우리 코어명 \"레드 블레미쉬 클리어 수딩 크림 튜브\" ≠ 화해 정리명 \"레드 블레미쉬 클리어 수딩 크림\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "나이아신아마이드 브라이트닝 미백토너 150ml*2개세트",
+      "brandName": "띵코",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%82%98%EC%9D%B4%EC%95%84%EC%8B%A0%EC%95%84%EB%A7%88%EC%9D%B4%EB%93%9C%20%ED%86%A0%EB%84%88/2015032",
+      "note": "우리 코어명 \"나이아신아마이드 브라이트닝 미백토너\" ≠ 화해 정리명 \"나이아신아마이드 토너\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "더 심플 대용량 로션260ml+토너300ml",
+      "brandName": "싸이닉",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8D%94%20%EC%8B%AC%ED%94%8C%20%EB%8D%B0%EC%9D%BC%EB%A6%AC%20%EB%A1%9C%EC%85%98/1786624",
+      "note": "우리 코어명 \"더 심플 대용량 로션\" ≠ 화해 정리명 \"더 심플 데일리 로션\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "어드밴스드 더 비타민 씨 23 세럼 20ml (2개입)",
+      "brandName": "코스알엑스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%96%B4%EB%93%9C%EB%B0%B4%EC%8A%A4%EB%93%9C%20%EB%8D%94%20%EB%B9%84%ED%83%80%EB%AF%BC%20C%2023%20%EC%84%B8%EB%9F%BC/2163353",
+      "note": "우리 코어명 \"어드밴스드 더 비타민 씨 23 세럼\" ≠ 화해 정리명 \"어드밴스드 더 비타민 C 23 세럼\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "시카 피디알엔 스킨부스터 세럼 30ml(+10mlx2개 증정)",
+      "brandName": "비플레인",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%9C%EC%B9%B4%20PDRN%20%EC%8A%A4%ED%82%A8%20%EB%B6%80%EC%8A%A4%ED%84%B0%20%EC%84%B8%EB%9F%BC/2140532",
+      "note": "우리 코어명 \"시카 피디알엔 스킨부스터 세럼\" ≠ 화해 정리명 \"시카 PDRN 스킨 부스터 세럼\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "내추럴 발효동백 페이스오일 100 20ml",
+      "brandName": "스킨아이",
+      "sourceUrl": "https://www.hwahae.co.kr/products/100%25%20%EB%B0%9C%ED%9A%A8%20%EB%8F%99%EB%B0%B1%EC%98%A4%EC%9D%BC/1729007",
+      "note": "우리 코어명 \"내추럴 발효동백 페이스오일 100\" ≠ 화해 정리명 \"100% 발효 동백오일\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "리페어 PDRNTX+ 1500 크림 30g",
+      "brandName": "리쥬베닐",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%AC%ED%8E%98%EC%96%B4%20PDRN%201500%20%ED%81%AC%EB%A6%BC/2163930",
+      "note": "우리 코어명 \"리페어 PDRNTX+ 1500 크림\" ≠ 화해 정리명 \"리페어 PDRN 1500 크림\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "하이드리움 그린티 아쿠아 수딩 젤 크림 50ml",
+      "brandName": "코스알엑스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%95%98%EC%9D%B4%EB%93%9C%EB%A6%AC%EC%9B%80%20%EC%88%98%EB%94%A9%20%EC%A0%A4%20%ED%81%AC%EB%A6%BC/1831479",
+      "note": "우리 코어명 \"하이드리움 그린티 아쿠아 수딩 젤 크림\" ≠ 화해 정리명 \"하이드리움 수딩 젤 크림\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "레드 블레미쉬 클리어 더블 결 패드 60매",
+      "brandName": "닥터지",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A0%88%EB%93%9C%20%EB%B8%94%EB%A0%88%EB%AF%B8%EC%89%AC%20%ED%81%B4%EB%A6%AC%EC%96%B4%20%EB%8D%94%EB%B8%94%20%EA%B2%B0%20%ED%8C%A8%EB%93%9C/2105293",
+      "note": "우리 코어명 \"레드 블레미쉬 클리어 결 패드\" ≠ 화해 정리명 \"레드 블레미쉬 클리어 더블 결 패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "센텔라바이옴 시카 모공패드 75매",
+      "brandName": "닥터오라클",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%84%BC%ED%85%94%EB%9D%BC%EB%B0%94%EC%9D%B4%EC%98%B4%20%EC%8B%9C%EC%B9%B4%20%ED%86%A0%EB%84%88%20%EB%AA%A8%EA%B3%B5%ED%8C%A8%EB%93%9C/2010925",
+      "note": "우리 코어명 \"센텔라바이옴 시카 모공패드\" ≠ 화해 정리명 \"센텔라바이옴 시카 토너 모공패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "콜라겐 VC 탱글 크림 50ml",
+      "brandName": "아이스트",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%9C%EB%9D%BC%EA%B2%90%20VC%20%ED%83%B1%EA%B8%80%20%ED%8C%A8%EB%93%9C/2041134",
+      "note": "우리 코어명 \"콜라겐 VC 탱글 크림\" ≠ 화해 정리명 \"콜라겐 VC 탱글 패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "어성초 바하 지우개 패드 60매 (2개)",
+      "brandName": "셀리맥스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%A7%80%EC%9A%B0%EA%B0%9C%ED%8C%A8%EB%93%9C/1820724",
+      "note": "우리 코어명 \"어성초 바하 지우개 패드\" ≠ 화해 정리명 \"지우개패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "비건 리얼 딥 클렌징오일 330ml",
+      "brandName": "프리메이",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%AC%EC%96%BC%20%EB%94%A5%20%ED%81%B4%EB%A0%8C%EC%A7%95%EC%98%A4%EC%9D%BC/2119993",
+      "note": "우리 코어명 \"비건 리얼 딥 클렌징오일\" ≠ 화해 정리명 \"리얼 딥 클렌징오일\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "르마하 요거덤 딥 클렌징 밀크 클렌저 300ml 1ea",
+      "brandName": "르마하",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%9A%94%EA%B1%B0%EB%8D%A4%20%EB%94%A5%20%ED%81%B4%EB%A0%8C%EC%A7%95%EB%B0%80%ED%81%AC/2104854",
+      "note": "우리 코어명 \"요거덤 딥 클렌징 밀크 클렌저\" ≠ 화해 정리명 \"요거덤 딥 클렌징밀크\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "더블 클린 수정 화장 패드",
+      "brandName": "정샘물뷰티",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8D%94%EB%B8%94%20%ED%81%B4%EB%A6%B0%20%EC%88%98%EC%A0%95%20%ED%99%94%EC%9E%A5%20%ED%8C%A8%EB%93%9C/1895942",
+      "note": "우리 코어명 \"클린 수정 화장 패드\" ≠ 화해 정리명 \"더블 클린 수정 화장 패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "캐모마일 인텐스 보습 마스크 10매 (5매x2박스)",
+      "brandName": "비플레인",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BA%90%EB%AA%A8%EB%A7%88%EC%9D%BC%20%EC%9D%B8%ED%85%90%EC%8A%A4%20%EB%B3%B4%EC%8A%B5%20%EB%A7%88%EC%8A%A4%ED%81%AC/2061987",
+      "note": "우리 코어명 \"캐모마일 인텐스 보습 마스크 ( x )\" ≠ 화해 정리명 \"캐모마일 인텐스 보습 마스크\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "VT 스무스 31도 스킨팩 100매",
+      "brandName": "브이티코스메틱",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8A%A4%ED%82%A8%ED%8C%A9%20%5B%EC%8A%A4%EB%AC%B4%EC%8A%A431%EB%8F%84%5D/2128917",
+      "note": "우리 코어명 \"VT 스무스 31도 스킨팩\" ≠ 화해 정리명 \"스킨팩 [스무스31도]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "마니아홀릭 대용량 피지 녹이는 코패치 코팩 (50매입)",
+      "brandName": "마니아홀릭",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%94%BC%EC%A7%80%20%EB%85%B9%EC%9D%B4%EB%8A%94%20%EC%BD%94%ED%8C%A8%EC%B9%98/2079452",
+      "note": "우리 코어명 \"대용량 피지 녹이는 코패치 코팩\" ≠ 화해 정리명 \"피지 녹이는 코패치\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "샤인머스캣 시카 바하 푸드마스크 120g *유통기한 27년 6월",
+      "brandName": "스킨푸드",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%91%B8%EB%93%9C%20%EB%A7%88%EC%8A%A4%ED%81%AC%20%5B%EC%83%A4%EC%9D%B8%EB%A8%B8%EC%8A%A4%EC%BA%A3%20%EC%8B%9C%EC%B9%B4%20%EB%B0%94%ED%95%98%5D/2090960",
+      "note": "우리 코어명 \"샤인머스캣 시카 바하 푸드마스크 유통기한 27년 6월\" ≠ 화해 정리명 \"푸드 마스크 [샤인머스캣 시카 바하]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "3단계 빅사이즈 문어코팩 타코팩 노즈 (5회분)",
+      "brandName": "나이팅게일",
+      "sourceUrl": "https://www.hwahae.co.kr/products/3STEP%20%ED%83%80%EC%BD%94%ED%8C%A9%20%5B%EB%85%B8%EC%A6%88%5D/2015289",
+      "note": "우리 코어명 \"3단계 빅사이즈 문어코팩 타코팩 노즈\" ≠ 화해 정리명 \"3STEP 타코팩 [노즈]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "엔조이 무기자차 비건 선크림 SPF50+/PA++++ 50g (2개)",
+      "brandName": "싸이닉",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%97%94%EC%A1%B0%EC%9D%B4%20%EC%84%B8%EC%9D%B4%ED%94%84%ED%8B%B0%20%EB%A7%88%EC%9D%BC%EB%93%9C%20%EC%84%A0%ED%81%AC%EB%A6%BC%20%5BSPF50%2B%2FPA%2B%2B%2B%2B%5D/1997199",
+      "note": "우리 코어명 \"엔조이 무기자차 비건 선크림 SPF50\" ≠ 화해 정리명 \"엔조이 세이프티 마일드 선크림 [SPF50+/PA++++]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "선 프로젝트 실키 카밍 아웃도어 선스틱 14g",
+      "brandName": "땡큐파머",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%84%A0%20%ED%94%84%EB%A1%9C%EC%A0%9D%ED%8A%B8%20%EC%8B%A4%ED%82%A4%20%EC%B9%B4%EB%B0%8D%20%EC%84%A0%20%EC%8A%A4%ED%8B%B1%20%5BSPF50%2B%2FPA%2B%2B%2B%2B%5D/1952901",
+      "note": "우리 코어명 \"선 프로젝트 실키 카밍 아웃도어 선스틱\" ≠ 화해 정리명 \"선 프로젝트 실키 카밍 선 스틱 [SPF50+/PA++++]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "님프 광채 볼류머 [투명한 물광채] 24g",
+      "brandName": "에뛰드",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8B%98%ED%94%84%20%EA%B4%91%EC%B1%84%20%EB%B3%BC%EB%A5%98%EB%A8%B8/2097835",
+      "note": "우리 코어명 \"님프 광채 볼류머 [투명한 물광채]\" ≠ 화해 정리명 \"님프 광채 볼류머\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "시럽피 톡 치크 [001 생기품은복숭아]",
+      "brandName": "페리페라",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%9C%EB%9F%BD%ED%94%BC%20%ED%86%A1%20%EC%B9%98%ED%81%AC%20%5B01%20%EC%83%9D%EA%B8%B0%ED%92%88%EC%9D%80%EB%B3%B5%EC%88%AD%EC%95%84%5D/2130707",
+      "note": "우리 코어명 \"시럽피 톡 치크 [001 생기품은복숭아]\" ≠ 화해 정리명 \"시럽피 톡 치크 [01 생기품은복숭아]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "시럽피 톡 치크 [003 애정만땅모브]",
+      "brandName": "페리페라",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8B%9C%EB%9F%BD%ED%94%BC%20%ED%86%A1%20%EC%B9%98%ED%81%AC%20%5B03%20%EC%95%A0%EC%A0%95%EB%A7%8C%EB%95%85%EB%AA%A8%EB%B8%8C%5D/2130709",
+      "note": "우리 코어명 \"시럽피 톡 치크 [003 애정만땅모브]\" ≠ 화해 정리명 \"시럽피 톡 치크 [03 애정만땅모브]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "퍼스널 톤 치크 라이터 듀오 [쿨라이터]",
+      "brandName": "입큰&",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%8D%BC%EC%8A%A4%EB%84%90%20%ED%86%A4%20%EC%B9%98%ED%81%AC%20%EB%9D%BC%EC%9D%B4%ED%84%B0%20%EB%93%80%EC%98%A4%20%5B%EC%BF%A8%EB%9D%BC%EC%9D%B4%ED%84%B0%5D/2089675",
+      "note": "우리 코어명 \"퍼스널 톤 치크 라이터 [쿨라이터]\" ≠ 화해 정리명 \"퍼스널 톤 치크 라이터 듀오 [쿨라이터]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "글래스 앤 하이라이터 [02 말랑반죽]",
+      "brandName": "클리오",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EA%B8%80%EB%9E%98%EC%8A%A4%20%EC%95%A4%20%ED%95%98%EC%9D%B4%EB%9D%BC%EC%9D%B4%ED%84%B0%20%5B2%ED%98%B8%20%EB%A7%90%EB%9E%91%EB%B0%98%EC%A3%BD%5D/2100262",
+      "note": "우리 코어명 \"글래스 앤 하이라이터 [02 말랑반죽]\" ≠ 화해 정리명 \"글래스 앤 하이라이터 [2호 말랑반죽]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "마이페이브 피스 젤테일 [97 코코아 브륄레]",
+      "brandName": "홀리카홀리카",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%86%A0%EC%8A%A4%ED%8B%B0%20%26%20%EB%A1%9C%EC%8A%A4%ED%8B%B0%20%EC%97%90%EB%94%94%EC%85%98%20%EB%A7%88%EC%9D%B4%ED%8E%98%EC%9D%B4%EB%B8%8C%20%ED%94%BC%EC%8A%A4%20%EC%A0%A4%ED%85%8C%EC%9D%BC%20%5B97%20%EC%BD%94%EC%BD%94%EC%95%84%20%EB%B8%8C%EB%A5%84%EB%A0%88%5D/2162478",
+      "note": "우리 코어명 \"마이페이브 피스 젤테일 [97 코코아 브륄레]\" ≠ 화해 정리명 \"토스티 & 로스티 에디션 마이페이브 피스 젤테일 [97 코코아 브륄레]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "샤프, 쏘 심플 펜슬 라이너 (AD) [3호 블랙브라운] (0.14g) [3개입]",
+      "brandName": "클리오",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%83%A4%ED%94%84%20%EC%8F%98%20%EC%8B%AC%ED%94%8C%20%EC%9B%8C%ED%84%B0%ED%94%84%EB%A3%A8%ED%94%84%20%ED%8E%9C%EC%8A%AC%EB%9D%BC%EC%9D%B4%EB%84%88%20%5B3%ED%98%B8%20%EB%B8%94%EB%9E%99%EB%B8%8C%EB%9D%BC%EC%9A%B4%5D/2092298",
+      "note": "우리 코어명 \"샤프, 쏘 심플 펜슬 라이너 (AD)\" ≠ 화해 정리명 \"샤프 쏘 심플 워터프루프 펜슬라이너 [3호 블랙브라운]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "스피디 스키니 브로우카라 [005 피오니애쉬]",
+      "brandName": "페리페라",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%8A%A4%ED%94%BC%EB%94%94%20%EC%8A%A4%ED%82%A4%EB%8B%88%20%EB%B8%8C%EB%A1%9C%EC%9A%B0%20%EB%A7%88%EC%8A%A4%EC%B9%B4%EB%9D%BC%20%5B005%20%ED%94%BC%EC%98%A4%EB%8B%88%EC%95%A0%EC%89%AC%5D/2097079",
+      "note": "우리 코어명 \"스피디 스키니 브로우카라 [005 피오니애쉬]\" ≠ 화해 정리명 \"스피디 스키니 브로우 마스카라 [005 피오니애쉬]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "립 트리트먼트 밤 베리로즈 5g",
+      "brandName": "아이소이",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%BD%20%ED%8A%B8%EB%A6%AC%ED%8A%B8%EB%A8%BC%ED%8A%B8%20%EB%A1%9C%EC%A6%88%EB%A6%BD%EB%B0%A4%20%5B%EB%B2%A0%EB%A6%AC%EB%A1%9C%EC%A6%88%5D/2117708",
+      "note": "우리 코어명 \"립 트리트먼트 밤 베리로즈\" ≠ 화해 정리명 \"립 트리트먼트 로즈립밤 [베리로즈]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "퍼펙트 립스 쇼킹 립 틴트 (N09 플럼쇼킹) 4g",
+      "brandName": "토니모리",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%8D%BC%ED%8E%99%ED%8A%B8%EB%A6%BD%EC%8A%A4%20%EC%87%BC%ED%82%B9%EB%A6%BD%20%ED%8B%B4%ED%8A%B8%20%5B09%20%ED%94%8C%EB%9F%BC%EC%87%BC%ED%82%B9%5D/2101305",
+      "note": "우리 코어명 \"퍼펙트 립스 쇼킹 립 틴트 (N09 플럼쇼킹)\" ≠ 화해 정리명 \"퍼펙트립스 쇼킹립 틴트 [09 플럼쇼킹]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "립 메덱스 립밤 7g",
+      "brandName": "블리스텍스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%BD%EB%A9%94%EB%8D%B1%EC%8A%A4/1828972",
+      "note": "우리 코어명 \"립 메덱스 립밤\" ≠ 화해 정리명 \"립메덱스\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "퍼퓸 실키 촉감 핸드크림 50ml 1개입 호텔우드",
+      "brandName": "헤트라스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%8D%BC%ED%93%B8%EB%93%9C%20%ED%95%B8%EB%93%9C%ED%81%AC%EB%A6%BC%20%EB%A7%9D%EA%B3%A0%EC%94%A8%EB%93%9C%EB%B2%84%ED%84%B0%20%5B%ED%98%B8%ED%85%94%EC%9A%B0%EB%93%9C%5D/2074879",
+      "note": "우리 코어명 \"퍼퓸 실키 촉감 핸드크림 호텔우드\" ≠ 화해 정리명 \"퍼퓸드 핸드크림 망고씨드버터 [호텔우드]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "허브 페미닌 시크릿 클렌저 150ml",
+      "brandName": "닥터올가",
+      "sourceUrl": "https://www.hwahae.co.kr/products/100%20%ED%97%88%EB%B8%8C%20%ED%8E%98%EB%AF%B8%EB%8B%8C%20%EC%8B%9C%ED%81%AC%EB%A6%BF%20%ED%81%B4%EB%A0%8C%EC%A0%80/1928182",
+      "note": "우리 코어명 \"허브 페미닌 시크릿 클렌저\" ≠ 화해 정리명 \"100 허브 페미닌 시크릿 클렌저\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "롤온 데오드란트 코튼플라워 48H 50ml (2개입)",
+      "brandName": "바이빠세",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A1%A4%20%EC%98%A8%20%EB%8D%B0%EC%98%A4%EB%93%9C%EB%9E%80%ED%8A%B8%20New%20%5B%EC%BD%94%ED%8A%BC%ED%94%8C%EB%9D%BC%EC%9B%8C%5D/2058057",
+      "note": "우리 코어명 \"롤온 데오드란트 코튼플라워 48H\" ≠ 화해 정리명 \"롤 온 데오드란트 New [코튼플라워]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "바디 브라이트닝 패드 60매 (겨드랑이패드)",
+      "brandName": "셀리맥스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%B0%94%EB%94%94%20%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%8A%B8%EB%8B%9D%20%ED%8C%A8%EB%93%9C/1996790",
+      "note": "우리 코어명 \"바디 브라이트닝 패드 (겨드랑이패드)\" ≠ 화해 정리명 \"바디 브라이트닝 패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "샴푸바 S19 바오밥 100g",
+      "brandName": "톤28",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%83%B4%ED%91%B8%EB%B0%94%20S19%20%EB%B0%94%EC%98%A4%EB%B0%A5%20%5B%EB%AA%A8%EB%B0%9C%EB%B3%B4%EC%8A%B5%EC%BC%80%EC%96%B4%5D/1997221",
+      "note": "우리 코어명 \"샴푸바 S19 바오밥\" ≠ 화해 정리명 \"샴푸바 S19 바오밥 [모발보습케어]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "코어 에센스 단백질 폭탄 헤어팩 200ml",
+      "brandName": "루블리스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EC%BD%94%EC%96%B4%20%EC%97%90%EC%84%BC%EC%8A%A4%20%ED%97%A4%EC%96%B4%ED%8C%A9%20%5B%ED%99%94%EC%9D%B4%ED%8A%B8%5D/2025642",
+      "note": "우리 코어명 \"코어 에센스 단백질 폭탄 헤어팩\" ≠ 화해 정리명 \"코어 에센스 헤어팩 [화이트]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "환한 브라이트닝 업 선크림 [SPF50+/PA++++]50ml",
+      "brandName": "트루스오브뷰티",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%ED%99%98%ED%95%9C%20%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%8A%B8%EB%8B%9D%20%EC%84%A0%ED%81%AC%EB%A6%BC%20%5BSPF50%2B%2FPA%2B%2B%2B%2B%5D/2110050",
+      "note": "우리 코어명 \"환한 브라이트닝 업 선크림\" ≠ 화해 정리명 \"환한 브라이트닝 선크림 [SPF50+/PA++++]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "모공 순삭 클렌징 패드 50매 (2개입)",
+      "brandName": "클라뷰",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A6%AC%EC%96%BC%20%EB%B9%84%EA%B1%B4%20%ED%80%B5%20%ED%81%B4%EB%A0%8C%EC%A7%95%20%ED%8C%A8%EB%93%9C/1987470",
+      "note": "우리 코어명 \"모공 순삭 클렌징 패드\" ≠ 화해 정리명 \"리얼 비건 퀵 클렌징 패드\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "비비크림 블레미쉬밤 브라이트 40g",
+      "brandName": "비알워터풀",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%B9%84%EB%B9%84%ED%81%AC%EB%A6%BC%20%5B%EB%B8%8C%EB%9D%BC%EC%9D%B4%ED%8A%B8%5D/1990379",
+      "note": "우리 코어명 \"비비크림 블레미쉬밤 브라이트\" ≠ 화해 정리명 \"비비크림 [브라이트]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "단백질 본드 앰플 에센스 모던피치 145ml (1+1)",
+      "brandName": "헤어플러스",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%8B%A8%EB%B0%B1%EC%A7%88%20%EB%B3%B8%EB%93%9C%20%EC%95%B0%ED%94%8C%20%5B%EB%AA%A8%EB%8D%98%ED%94%BC%EC%B9%98%5D/2141773",
+      "note": "우리 코어명 \"단백질 본드 앰플 에센스 모던피치\" ≠ 화해 정리명 \"단백질 본드 앰플 [모던피치]\""
+    },
+    {
+      "issueType": "NORMALIZE_DISAGREE_WITH_SOURCE",
+      "group": "general",
+      "sourceProductName": "아쿠아 딥 워터풀 올인원 로션 153ml",
+      "brandName": "다슈",
+      "sourceUrl": "https://www.hwahae.co.kr/products/%EB%A7%A8%EC%A6%88%20%EC%95%84%EC%BF%A0%EC%95%84%20%EB%94%A5%20%EC%9B%8C%ED%84%B0%ED%92%80%20%EC%98%AC%EC%9D%B8%EC%9B%90%20%EB%A1%9C%EC%85%98/2009909",
+      "note": "우리 코어명 \"아쿠아 딥 워터풀 올인원 로션\" ≠ 화해 정리명 \"맨즈 아쿠아 딥 워터풀 올인원 로션\""
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "휴족시간",
+      "sourceProductName": "지압자극 / 지압자극시트",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "메디힐",
+      "sourceProductName": "마데카소사이드 에센셜 마스크 흔적 리페어 / 마데카소사이드 에센셜 마스크",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "멜라메이트",
+      "sourceProductName": "로우슈가 구미 / 로우슈가 구미 (50일분)",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "정샘물",
+      "sourceProductName": "에센셜 스킨 누더 쿠션 (단품) 10N 쉘 크림 / 에센셜 스킨 누더 쿠션",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "센텔리안24",
+      "sourceProductName": "마데카 크림 타임 리버스 트리플 ( ) / 마데카 크림 타임 리버스",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    },
+    {
+      "issueType": "POSSIBLE_SAME_UNIT",
+      "group": "general",
+      "brandName": "일리윤",
+      "sourceProductName": "세라마이드 아토 집중크림 2입 / 세라마이드 아토 집중 크림",
+      "sourceUrl": null,
+      "note": "코어명이 서로의 접두 — 같은 단위일 수 있으나 자동 병합하지 않음"
+    }
+  ]
+}
