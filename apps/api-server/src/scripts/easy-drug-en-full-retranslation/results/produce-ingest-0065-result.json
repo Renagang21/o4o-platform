@@ -1,0 +1,42 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FROM-REBUILT-KO-V1",
+  "step": "produce-ingest",
+  "batch": "0065",
+  "checkpointSize": 100,
+  "checkpoints": [
+    {
+      "checkpoint": "0065-cp01",
+      "sentences": 100,
+      "admitted": 100,
+      "produced": 9,
+      "blocked": 0,
+      "pass": true
+    },
+    {
+      "checkpoint": "0065-cp02",
+      "sentences": 74,
+      "admitted": 74,
+      "produced": 0,
+      "blocked": 0,
+      "pass": true
+    }
+  ],
+  "sentences": {
+    "offered": 174,
+    "admitted": 174,
+    "rejected": 0
+  },
+  "rejectedCodes": {},
+  "masters": {
+    "inBatch": 140,
+    "produced": 9,
+    "blocked": 0,
+    "resolved": 9,
+    "pending": 0
+  },
+  "blockedTotalAfter": 0,
+  "blockedCodes": {},
+  "tmSize": 15840,
+  "totalProduced": 19315,
+  "dbWrites": 0
+}
