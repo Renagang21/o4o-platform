@@ -27,6 +27,8 @@ jobs:
       uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
+        # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 검증 경로에서는 lockfile drift 를 실패로 만든다.
+        strict-lockfile: 'true'
 
     # WO-O4O-TYPES-AUTO-BUILD-GUARD-V1
     # setup-build-env가 이미 pnpm run build:packages를 실행하지만,
@@ -43,23 +45,36 @@ jobs:
     - name: Run TypeScript check (Frontend only)
       run: pnpm run type-check:frontend
 
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 실제로 green 이므로 blocking 으로 전환.
+    # (이전에는 `|| echo` 로 어떤 실패도 흡수했다.)
     - name: Run TypeScript check (App Store packages)
-      run: pnpm run typecheck:app-store-packages || echo "⚠️ App Store packages have type errors (non-blocking)"
+      run: pnpm run typecheck:app-store-packages
 
-    # WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1
-    # api-server 는 type-check:frontend 대상이 아니라 CI 에서 아예 검증되지 않았다.
-    # 기존 오류 baseline(19건)이 남아 있어 우선 non-blocking 으로 가시화한다.
-    # baseline 이 0 이 되면 continue-on-error 를 제거해 blocking 으로 전환할 것.
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
+    # api-server 는 @o4o/security-core · @o4o/ai-core 등 11개 워크스페이스 패키지의 타입을
+    # package.json "types" → dist/*.d.ts 로 해석한다. 그런데 이 패키지들은 build:packages
+    # 체인에 없어 clean 체크아웃에서 dist 가 아예 없었고, type-check 가 TS2307 193건
+    # (+ 그 여파 4건) 으로 실패한 채 continue-on-error 에 가려져 있었다.
+    # 배포 경로는 정상이었다 — deploy-api.yml 의 "Build API-specific packages" 가 이미 빌드한다.
+    # 하드코딩 목록은 drift 하므로 pnpm 의존성 토폴로지(`^...`)로 빌드한다.
+    - name: Build api-server workspace dependencies
+      run: pnpm --filter '@o4o/api-server^...' run build
+
+    # WO-O4O-VERIFICATION-COMMAND-COVERAGE-RESTORATION-V1 에서 non-blocking 으로 가시화했고,
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1 에서 위 사전 빌드로 실검사 가능해져 blocking 전환.
     - name: Run TypeScript check (api-server)
-      continue-on-error: true
       run: pnpm --filter @o4o/api-server run type-check
 
-    # 이전에는 lint 가 아무 검사도 하지 않고 항상 성공했다(스텁).
-    # 이제 실제 ESLint 를 실행한다. 기존 오류 baseline(282건)이 남아 있어
-    # 우선 non-blocking 으로 가시화하며, baseline 해소 후 blocking 으로 전환할 것.
-    - name: Run ESLint
-      continue-on-error: true
-      run: pnpm run lint
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
+    #
+    # lint 는 아직 **완전 blocking 이 아니다**. 기존 오류 baseline 102건이 남아 있고,
+    # 이를 0 으로 만드는 것(대규모 lint 수정)은 이 WO 의 범위가 아니다.
+    # 대신 continue-on-error(= 어떤 회귀도 통과) 를 **회귀 차단 ratchet** 으로 바꾼다:
+    # 오류 수가 baseline 을 넘으면 실패한다. 즉 신규 오류는 이제 CI 를 막는다.
+    #
+    # 검사 범위·rule·baseline 갱신 규칙·제거 조건은 모두 scripts/lint-ratchet.mjs 상단 주석 참조.
+    - name: Run ESLint (regression ratchet)
+      run: node scripts/lint-ratchet.mjs
     
     - name: Check for console.log statements
       run: |
@@ -118,6 +133,8 @@ jobs:
       uses: ./.github/actions/setup-build-env
       with:
         node-version: ${{ env.NODE_VERSION }}
+        # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1: 검증 경로에서는 lockfile drift 를 실패로 만든다.
+        strict-lockfile: 'true'
 
     - name: Verify package builds
       run: |

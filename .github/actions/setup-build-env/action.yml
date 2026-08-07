@@ -17,6 +17,16 @@ inputs:
     description: 'Whether to build shared packages'
     required: false
     default: 'true'
+  strict-lockfile:
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
+    # 기본값 'false' 는 기존 동작(frozen 실패 시 no-frozen 으로 재시도)을 그대로 둔다.
+    # 이 fallback 은 배포 경로를 지키기 위해 존재하지만(deploy-api.yml 의
+    # ERR_PNPM_LOCKFILE_CONFIG_MISMATCH 회피 주석 참조), 검증 경로에서는
+    # lockfile drift 를 조용히 흡수해 결함을 가린다.
+    # 따라서 CI Pipeline 만 'true' 로 opt-in 해 lockfile drift 를 실패로 만든다.
+    description: 'Fail (instead of falling back to --no-frozen-lockfile) when the lockfile is out of sync'
+    required: false
+    default: 'false'
 
 runs:
   using: 'composite'
@@ -37,8 +47,13 @@ runs:
       shell: bash
       run: |
         echo "📦 Installing dependencies..."
-        # CI 환경에서는 frozen-lockfile이 기본값이므로 명시적으로 해제 필요
-        pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+        if [ "${{ inputs.strict-lockfile }}" = "true" ]; then
+          # 검증 경로: lockfile drift 는 결함이므로 실패시킨다.
+          pnpm install --frozen-lockfile
+        else
+          # 배포 경로: 기존 동작 유지 (frozen 실패 시 no-frozen 으로 재시도)
+          pnpm install --frozen-lockfile || pnpm install --no-frozen-lockfile
+        fi
 
     - name: Build shared packages
       if: ${{ inputs.build-packages == 'true' }}
