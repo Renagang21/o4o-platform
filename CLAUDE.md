@@ -86,8 +86,11 @@
 | 항목 | 값 |
 |------|------|
 | Instance | `o4o-platform-db` |
-| Host | `34.64.96.252` |
+| Host | 환경설정 / Secret Manager 기준 (문서에 고정하지 않는다) |
 | Database | `o4o_platform` |
+
+> 실제 운영 endpoint 는 AI 작업 지침에 고정할 필요가 없어 제거했다(정보 최소화).
+> 접속은 항상 Cloud SQL Auth Proxy 또는 Cloud Run 의 `/cloudsql/...` 소켓을 경유한다 — [`SETUP.md`](SETUP.md).
 
 **DB 접근 정책:**
 - ✅ Cloud Run 내부 / Admin API / Google Cloud Console / `gcloud sql` CLI

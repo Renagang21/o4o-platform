@@ -80,7 +80,7 @@ gcloud logs read \
 
 **⚠️ BLOCKED IN PRODUCTION**
 
-Local development database only. Production DB (34.64.96.252) is not accessible from developer machines.
+Local development database only. The production DB is not directly accessible from developer machines (Cloud SQL Auth Proxy or the Cloud Run `/cloudsql/...` socket only).
 
 ```bash
 # Development only
