@@ -161,6 +161,10 @@ jobs:
     - name: Build ${{ matrix.app }}
       run: bash scripts/ci-build-app.sh ${{ matrix.app }}
     
+    # WO-O4O-CI-BLOCKING-GATE-FINALIZATION-V1
+    # 이 continue-on-error 는 **의도적으로 유지**한다.
+    # 검증이 아니라 산출물 업로드이며(빌드는 이미 위에서 성공), 업로드 실패는
+    # 코드 결함이 아니라 인프라 이슈다. 즉 결함을 숨기지 않는다.
     - name: Upload build artifacts
       uses: actions/upload-artifact@v7
       continue-on-error: true
