@@ -1,0 +1,55 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-HOME-RESUME-STATE-RECONSTRUCTION-V1",
+  "step": "recovery-reconstruct",
+  "resumeSource": "reconstructed-from-final-tm",
+  "historicalLastBatch": 38,
+  "note": "과거 batch-0003~0038 manifest 를 복원한 것이 아니다. 최종 TM 기준 current validated state 재계산이다.",
+  "population": 19360,
+  "tm": {
+    "lines": 18448,
+    "distinctHash": 11983,
+    "loadedSize": 11983,
+    "keyMismatch": 0,
+    "hashCollisions": 0,
+    "correctionOverrides": 29,
+    "repeatedLines": 6465
+  },
+  "reconstructed": {
+    "S": 16104,
+    "deltaVsHistorical": 215,
+    "notReady": 3256,
+    "validationFailed": 0,
+    "duplicates": 0,
+    "setSha256": "4fe5df13e1c99a554fc63afb4929210eb0f937d4811b0b2148d558b2033b9f3c"
+  },
+  "validationFailureCodes": {},
+  "notReadyMissingUniqueHistogramTop": {
+    "1": 59,
+    "2": 6,
+    "3": 6,
+    "4": 9,
+    "5": 23,
+    "6": 30,
+    "7": 44,
+    "8": 69,
+    "9": 445,
+    "10": 625,
+    "11": 547,
+    "12": 459
+  },
+  "tmMissingDistinctSentences": 4043,
+  "candidatesForNextBatch": 3256,
+  "blockedFinal": 0,
+  "gates": {
+    "population = 19,360": true,
+    "TM distinct = 11,983": true,
+    "TM key mismatch = 0": true,
+    "TM hash collision = 0": true,
+    "|S| >= 15,889": true,
+    "duplicate master = 0": true,
+    "validation failure inside S = 0": true,
+    "S + NOT_READY + FAILED = population": true
+  },
+  "verdict": "RECONSTRUCTION_PROVEN",
+  "dbWrites": 0
+}
