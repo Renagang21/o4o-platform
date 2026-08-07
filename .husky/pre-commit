@@ -1,22 +1,86 @@
 #!/bin/sh
+#
+# O4O pre-commit — WO-O4O-GIT-PARALLEL-WORK-SAFETY-CLEANUP-V1
+#
+# 원칙: pre-commit 은 **사용자가 stage 하지 않은 파일을 수정하거나 자동 stage 하지 않는다.**
+#
+# 이전 버전은 package.json 이 stage 되면 `pnpm install --no-frozen-lockfile` 을 실행하고
+# 결과 pnpm-lock.yaml 을 `git add` 했다. 다중 PC·다중 세션 환경에서는
+#   - 다른 세션이 진행 중인 의존성 변경이 lockfile 에 섞여 커밋되고
+#   - 사용자가 선택하지 않은 파일이 커밋에 들어가며
+#   - fallback 이 `pnpm@9` 라 저장소 기준(package.json volta.pnpm = 10.25.0)과 어긋났다.
+#
+# 그래서 "자동 동기화" 를 "검증" 으로 바꾼다. 워킹트리와 index 는 건드리지 않는다.
 
-# Check if any package.json was modified
-PACKAGE_JSON_CHANGED=$(git diff --cached --name-only | grep -E "package\.json$" || true)
+set -e
 
-if [ -n "$PACKAGE_JSON_CHANGED" ]; then
-  echo "📦 package.json changed, updating lockfile..."
+STAGED_PKG_JSON=$(git diff --cached --name-only --diff-filter=ACM | grep -E '(^|/)package\.json$' || true)
 
-  # Try pnpm directly, fall back to npx pnpm
-  if command -v pnpm >/dev/null 2>&1; then
-    pnpm install --no-frozen-lockfile
-  else
-    echo "⚠️ pnpm not found directly, trying npx..."
-    npx pnpm@9 install --no-frozen-lockfile || echo "⚠️ Lockfile update skipped - update manually if needed"
-  fi
-
-  # Only stage if lockfile exists and was modified
-  if [ -f "pnpm-lock.yaml" ]; then
-    git add pnpm-lock.yaml 2>/dev/null || true
-    echo "✅ Lockfile updated and staged"
-  fi
+if [ -z "$STAGED_PKG_JSON" ]; then
+  exit 0
 fi
+
+# 판정에는 node 만 사용한다(신규 의존성 없음). node 가 없으면 검증을 건너뛴다 —
+# 검증 hook 이 커밋을 막는 것이 목적이 아니기 때문이다.
+if ! command -v node >/dev/null 2>&1; then
+  echo "⚠️  node 를 찾을 수 없어 lockfile 정합 검증을 건너뜁니다."
+  exit 0
+fi
+
+# 의존성 필드가 실제로 바뀌었는지 판정한다.
+# (scripts / version / 설명만 바뀐 package.json 은 lockfile 과 무관하므로 통과시킨다.)
+DEP_CHANGED=$(
+  node -e '
+    const { execSync } = require("child_process");
+    const FIELDS = ["dependencies", "devDependencies", "optionalDependencies", "peerDependencies", "resolutions"];
+    const read = (ref, file) => {
+      try { return JSON.parse(execSync(`git show ${ref}:${file}`, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })); }
+      catch { return null; }   // HEAD 에 없는 신규 package.json → null
+    };
+    const pick = (pkg) => {
+      if (!pkg) return null;
+      const out = {};
+      for (const f of FIELDS) if (pkg[f]) out[f] = pkg[f];
+      if (pkg.pnpm && pkg.pnpm.overrides) out["pnpm.overrides"] = pkg.pnpm.overrides;
+      return out;
+    };
+    const changed = [];
+    for (const file of process.argv.slice(1)) {
+      const before = pick(read("HEAD", file));
+      const after = pick(read("", file));   // `git show :file` = index(= staged) 내용
+      if (JSON.stringify(before) !== JSON.stringify(after)) changed.push(file);
+    }
+    process.stdout.write(changed.join("\n"));
+  ' $STAGED_PKG_JSON
+)
+
+if [ -z "$DEP_CHANGED" ]; then
+  exit 0
+fi
+
+STAGED_LOCK=$(git diff --cached --name-only --diff-filter=ACM | grep -E '^pnpm-lock\.yaml$' || true)
+
+if [ -n "$STAGED_LOCK" ]; then
+  echo "📦 의존성 변경 + pnpm-lock.yaml 이 함께 stage 되었습니다."
+  exit 0
+fi
+
+echo ""
+echo "❌ 커밋을 중지했습니다: package.json 의 의존성이 바뀌었는데 pnpm-lock.yaml 이 stage 되지 않았습니다."
+echo ""
+echo "   변경된 파일:"
+for f in $DEP_CHANGED; do echo "     - $f"; done
+echo ""
+echo "   CI(ci-appstore-guard)는 \`pnpm install --frozen-lockfile\` 로 설치하므로"
+echo "   lockfile 이 어긋난 채로 push 되면 실패합니다."
+echo ""
+echo "   해결:"
+echo "     1) pnpm install            # lockfile 갱신 (pnpm 10.25.0 — package.json volta 기준)"
+echo "     2) git add pnpm-lock.yaml  # 직접 확인하고 stage"
+echo "     3) 다시 커밋"
+echo ""
+echo "   ※ 이 hook 은 자동 install·자동 stage 를 하지 않습니다."
+echo "      다른 세션의 의존성 변경이 섞여 들어가는 것을 막기 위한 의도적 설계입니다."
+echo "      의존성과 무관한 변경이라 확신하면 --no-verify 로 우회할 수 있습니다."
+echo ""
+exit 1
