@@ -146,8 +146,8 @@ export function useVendorsCommission() {
     // Sort
     if (sortField) {
       filtered = filtered.sort((a, b) => {
-        let aValue: any = a[sortField as keyof CommissionRecord];
-        let bValue: any = b[sortField as keyof CommissionRecord];
+        const aValue: any = a[sortField as keyof CommissionRecord];
+        const bValue: any = b[sortField as keyof CommissionRecord];
 
         if (typeof aValue === 'string') {
           return sortOrder === 'asc'

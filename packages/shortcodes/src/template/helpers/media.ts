@@ -73,7 +73,7 @@ export const mediaHelpers = {
       full: 1920
     };
 
-    let srcsetParts: string[] = [];
+    const srcsetParts: string[] = [];
 
     // If id is an object with sizes
     if (typeof id === 'object' && id.sizes) {

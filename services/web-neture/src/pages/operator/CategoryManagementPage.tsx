@@ -150,7 +150,7 @@ export default function CategoryManagementPage() {
   const visibleRows = flat.filter(({ node, level }) => {
     if (level === 0) return true;
     // 부모 체인이 모두 expanded 인지 확인
-    let current = node;
+    const current = node;
     // flat 에서 부모 찾기
     const findParent = (pid: string | null) => flat.find(f => f.node.id === pid);
     let parent = findParent(current.parentId);

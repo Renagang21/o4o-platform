@@ -14,7 +14,7 @@ import { getRedisClient, isRedisAvailable } from '../infrastructure/redis.guard.
 import logger from '../utils/logger.js';
 
 // Lazy RedisStore 생성
-let _redisStore: Store | null = null;
+const _redisStore: Store | null = null;
 
 function getRedisStore(prefix: string): Store | undefined {
   // Redis가 사용 불가능하면 undefined 반환 (memory store 사용)
@@ -32,8 +32,11 @@ function getRedisStore(prefix: string): Store | undefined {
     const RedisStore = require('rate-limit-redis').default;
     return new RedisStore({
       sendCommand: async (...args: string[]) => {
+        // `call` 의 첫 인자는 rest 가 아닌 고정 파라미터라 배열 전체를 spread 할 수 없다.
+        // 명령어와 나머지 인자를 분리해서 넘긴다(이전 `.apply` 와 동작 동일).
+        const [command, ...rest] = args;
         try {
-          const result = await client.call.apply(client, args);
+          const result = await client.call(command, ...rest);
           return result as boolean | number | string | (boolean | number | string)[];
         } catch (error) {
           logger.warn('[RateLimiter] Redis command failed, fallback to memory store');

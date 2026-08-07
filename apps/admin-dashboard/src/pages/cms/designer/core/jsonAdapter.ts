@@ -67,7 +67,9 @@ function viewComponentToDesignerNode(comp: any, idPrefix: string): DesignerNode 
   const node: DesignerNode = {
     id: comp.id || `${idPrefix}_${Date.now()}_${Math.random().toString(36).substring(7)}`,
     type: comp.type,
-    props: { ...comp.props } || {},
+    // 객체 리터럴은 항상 truthy 라 기존 `|| {}` 는 도달하지 않는 코드였다.
+    // spread 자체가 undefined 를 {} 로 처리하므로 동작은 동일하다.
+    props: { ...comp.props },
     children: [],
   };
 

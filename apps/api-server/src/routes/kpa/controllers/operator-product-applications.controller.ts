@@ -126,7 +126,7 @@ export function createOperatorProductApplicationsController(
 
     // 조직명 조인 (organizations 테이블 — lightweight)
     const orgIds = [...new Set(data.map((d: any) => d.organization_id))];
-    let orgMap: Record<string, string> = {};
+    const orgMap: Record<string, string> = {};
     if (orgIds.length > 0) {
       const orgs = await dataSource.query(
         `SELECT id, name FROM organizations WHERE id = ANY($1::uuid[])`,

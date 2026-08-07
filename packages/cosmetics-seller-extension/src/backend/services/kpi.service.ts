@@ -174,7 +174,7 @@ export class KPIService {
     }
 
     // Check if KPI already exists
-    let kpi = await this.findBySellerAndDate(sellerId, date, 'daily');
+    const kpi = await this.findBySellerAndDate(sellerId, date, 'daily');
 
     if (kpi) {
       kpi.consultations = consultations;
@@ -208,7 +208,7 @@ export class KPIService {
 
     const aggregated = this.aggregateKPIs(dailyKPIs);
 
-    let kpi = await this.findBySellerAndDate(sellerId, startDate, 'weekly');
+    const kpi = await this.findBySellerAndDate(sellerId, startDate, 'weekly');
 
     if (kpi) {
       Object.assign(kpi, aggregated);
@@ -239,7 +239,7 @@ export class KPIService {
 
     const aggregated = this.aggregateKPIs(dailyKPIs);
 
-    let kpi = await this.findBySellerAndDate(sellerId, startDate, 'monthly');
+    const kpi = await this.findBySellerAndDate(sellerId, startDate, 'monthly');
 
     if (kpi) {
       Object.assign(kpi, aggregated);

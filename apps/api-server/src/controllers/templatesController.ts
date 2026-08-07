@@ -179,7 +179,7 @@ export class TemplatesController {
       }
 
       // Generate unique slug
-      let slug = name.toLowerCase()
+      const slug = name.toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')
@@ -478,7 +478,7 @@ export class TemplatesController {
       }
 
       // Generate unique slug
-      let slug = parsedTemplate.name.toLowerCase()
+      const slug = parsedTemplate.name.toLowerCase()
         .replace(/[^a-z0-9\s-]/g, '')
         .replace(/\s+/g, '-')
         .replace(/-+/g, '-')

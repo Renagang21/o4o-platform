@@ -21,7 +21,7 @@ let _subClient: Redis | null = null;
 let _queueClient: Redis | null = null;
 
 // 연결 상태 추적
-let _connectionAttempted = false;
+const _connectionAttempted = false;
 let _connectionFailed = false;
 
 /**

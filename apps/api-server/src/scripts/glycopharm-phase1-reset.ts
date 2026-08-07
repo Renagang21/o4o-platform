@@ -154,7 +154,7 @@ async function main() {
     console.log('-'.repeat(50));
 
     let totalRows = 0;
-    let missingTables: string[] = [];
+    const missingTables: string[] = [];
 
     for (const tc of tableCounts) {
       if (!tc.exists) {

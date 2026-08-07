@@ -34,7 +34,7 @@ export class ForumPostController extends ForumControllerBase {
       const status = req.query.status as PostStatus;
       const sortBy = (req.query.sortBy as string) || 'latest';
 
-      let queryBuilder = this.postRepository
+      const queryBuilder = this.postRepository
         .createQueryBuilder('post')
         .leftJoinAndSelect('post.author', 'author');
 

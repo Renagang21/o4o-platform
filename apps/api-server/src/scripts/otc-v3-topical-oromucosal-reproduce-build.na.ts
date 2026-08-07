@@ -203,7 +203,7 @@ async function main(): Promise<void> {
     // ── KO 생성(fp 대표 기준) ────────────────────────────────────────────────────
     const fpArtifacts: any[] = [];
     let koAnomalyFps = 0;
-    let cov = { warn: 0, precaution: 0, adverse: 0, interaction: 0 };
+    const cov = { warn: 0, precaution: 0, adverse: 0, interaction: 0 };
     for (const [fp, ids] of fpGroups) {
       const rep = ids[0];
       const title = `${rep.form} (${rep.gencode})`;

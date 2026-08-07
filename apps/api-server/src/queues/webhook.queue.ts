@@ -139,8 +139,8 @@ async function processWebhookJob(job: Job<WebhookJobData>): Promise<WebhookResul
     logger.info(`[Webhook] Processing ${event} for partner ${partnerId} (attempt ${attempt})`);
 
     // If webhook URL not provided in job data, fetch from database
-    let url = webhookUrl;
-    let secret = webhookSecret;
+    const url = webhookUrl;
+    const secret = webhookSecret;
 
     if (!url) {
       throw new Error('Partner webhook URL not configured');

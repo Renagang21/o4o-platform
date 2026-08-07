@@ -200,7 +200,7 @@ export function LmsHubTemplate({ config }: { config: LmsHubConfig }) {
     {
       key: '_select',
       header: '',
-      system: true as true,
+      system: true as const,
       width: '44px',
       align: 'center' as const,
       onCellClick: () => {},

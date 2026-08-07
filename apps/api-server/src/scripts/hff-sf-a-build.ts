@@ -283,7 +283,7 @@ async function main(): Promise<void> {
       }
       if (functionsEn.some((e) => !e)) { hold.push({ stmt, name: r.name.trim(), reason: 'EN_UNRESOLVED' }); continue; }
 
-      const label0 = (r.fn.match(/\[([^\]]+?)\]/) || [, ''])[1] || '';
+      const label0 = (r.fn.match(/\[([^\]]+?)\]/) || ['', ''])[1] || '';
       const disp = cfg.display(label0, r.base, r.name);
       const ing = { key: cfg.slug, slug: cfg.slug, displayKo: disp.ko, displayEn: disp.en, labelRe: cfg.match, statusHint: 'READY' } as unknown as SfIngredient;
       const seed: SfSeed = { statementNo: stmt, candidateId: r.id, productName: r.name.trim(), manufacturer: r.maker.trim(),

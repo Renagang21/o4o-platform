@@ -195,7 +195,7 @@ async function main(): Promise<void> {
     if (eligibleForWrite.some((p) => p.validOtcMasters !== p.targetMasters)) {
       throw new Error('otc 방어검증 실패 — masterIds 에 비-OTC master 포함, apply 중단');
     }
-    let postInsertedByGroup: { candidateId: string; inserted: number }[] = [];
+    const postInsertedByGroup: { candidateId: string; inserted: number }[] = [];
     if (apply) {
       const qr = ds.createQueryRunner();
       await qr.connect();

@@ -187,7 +187,7 @@ const ProductGridWrapper: FC<{
   if (error || !productsData?.data) return <div className="text-gray-500">Products not found</div>;
   
   // Sort products based on orderBy and order
-  let products = [...productsData.data];
+  const products = [...productsData.data];
   products.sort((a, b) => {
     let aVal, bVal;
     

@@ -31,7 +31,7 @@ export function deepMerge<T extends Record<string, any>>(
 
   // Iterate over source properties
   for (const key in source) {
-    if (!source.hasOwnProperty(key)) continue;
+    if (!Object.prototype.hasOwnProperty.call(source, key)) continue;
 
     const sourceValue = source[key];
     const targetValue = result[key];

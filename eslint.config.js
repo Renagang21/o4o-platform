@@ -31,6 +31,14 @@ export default tseslint.config(
       '**/*.d.ts',
       'apps/*.backup/**',
       'packages/*.backup/**',
+      // WO-O4O-LINT-BASELINE-CLASSIFICATION-AND-REDUCTION-V1
+      // 아래 둘은 "결함 숨기기"가 아니라 lint 대상 범위 자체의 오류다.
+      // - archive/**: 보존용 아카이브 트리(수정 금지 대상). 위 *.backup/** 와 같은 성격이다.
+      // - test-samples/**: page-generator 변환기의 입력 fixture. 06-invalid-jsx.tsx 는
+      //   헤더에 "Expected: Parsing error" 라고 명시된 **의도적으로 잘못된** 샘플이라
+      //   파서를 통과할 수 없다(소스 코드가 아니라 테스트 데이터).
+      'archive/**',
+      'apps/page-generator/test-samples/**',
     ],
   },
   {
