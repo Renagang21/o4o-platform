@@ -268,9 +268,9 @@ VALUES (1234567890123, 'DescriptiveName1234567890123');
 
 ## Related Documents
 
-- [EXECUTE-PRODUCTION-MIGRATION.md](../../api-server/migrations-sql/EXECUTE-PRODUCTION-MIGRATION.md) — Current migration execution guide
-- [CLAUDE.md Section 0.1](../../CLAUDE.md) — Production Environment Policy
-- [deploy-api.yml](../../.github/workflows/deploy-api.yml) — CI/CD Pipeline
+- [EXECUTE-PRODUCTION-MIGRATION.md](../../../apps/api-server/migrations-sql/EXECUTE-PRODUCTION-MIGRATION.md) — Current migration execution guide
+- [CLAUDE.md Section 0.1](../../../CLAUDE.md) — Production Environment Policy
+- [deploy-api.yml](../../../.github/workflows/deploy-api.yml) — CI/CD Pipeline
 
 ---
 

@@ -65,9 +65,9 @@
 | **전환 필요** | 없음 — 이미 Core 연동. 공통 API 추출 시 래퍼 전환 |
 
 **코드 위치:**
-- Hero: [HeroSlider.tsx](services/web-neture/src/components/home/HeroSlider.tsx)
-- Ads: [HomepageAds.tsx](services/web-neture/src/components/home/HomepageAds.tsx)
-- Logos: [PartnerLogoCarousel.tsx](services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
+- Hero: [HeroSlider.tsx](../../../services/web-neture/src/components/home/HeroSlider.tsx)
+- Ads: [HomepageAds.tsx](../../../services/web-neture/src/components/home/HomepageAds.tsx)
+- Logos: [PartnerLogoCarousel.tsx](../../../services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
 - API: [content.ts](services/web-neture/src/lib/api/content.ts) (`homepageCmsApi`)
 
 ### 3.2 GlycoPharm

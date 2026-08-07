@@ -502,7 +502,7 @@ const OperatorStoresPage = lazy(() => import('./pages/operator/OperatorStoresPag
 - 상위 통합 문서: [OPERATOR-INTEGRATION-STATE-V1.md](OPERATOR-INTEGRATION-STATE-V1.md)
 - DataTable 정책: [OPERATOR-DATATABLE-POLICY-V1.md](OPERATOR-DATATABLE-POLICY-V1.md)
 - 5-Block 표준: [docs/platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md](../platform/operator/OPERATOR-DASHBOARD-STANDARD-V1.md)
-- 선례 (factory injection 패턴): [LMS-CLIENT-EXTRACTION-V2-COMPLETE.md](LMS-CLIENT-EXTRACTION-V2-COMPLETE.md)
+- 선례 (factory injection 패턴): [LMS-CLIENT-EXTRACTION-V2-COMPLETE.md](../archive/reports/LMS-CLIENT-EXTRACTION-V2-COMPLETE.md)
 - 패키지 본체:
   - 신설 예정: `packages/operator-core-ui/`
   - 기반: [`packages/operator-ux-core/`](../../packages/operator-ux-core/)

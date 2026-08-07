@@ -139,7 +139,7 @@ interface SlotHeroSliderProps {
 ```
 
 **레퍼런스 구현:**
-- Neture [HeroSlider.tsx](services/web-neture/src/components/home/HeroSlider.tsx) — CMS 기반
+- Neture [HeroSlider.tsx](../../../services/web-neture/src/components/home/HeroSlider.tsx) — CMS 기반
 - K-Cosmetics [HomePage.tsx](services/web-k-cosmetics/src/pages/HomePage.tsx) L223-402 — HeroSection 인라인
 - KPA [HeroSection.tsx](services/web-kpa-society/src/components/intranet/HeroSection.tsx) — 데이터 기반
 
@@ -169,7 +169,7 @@ interface SlotAdGridProps {
 ```
 
 **레퍼런스:**
-- Neture [HomepageAds.tsx](services/web-neture/src/components/home/HomepageAds.tsx)
+- Neture [HomepageAds.tsx](../../../services/web-neture/src/components/home/HomepageAds.tsx)
 - GlycoPharm [AdSection.tsx](services/web-glycopharm/src/components/community/AdSection.tsx)
 
 ### 4.3 SlotLogoCarousel
@@ -193,7 +193,7 @@ interface SlotLogoCarouselProps {
 ```
 
 **레퍼런스:**
-- Neture [PartnerLogoCarousel.tsx](services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
+- Neture [PartnerLogoCarousel.tsx](../../../services/web-neture/src/components/home/PartnerLogoCarousel.tsx)
 
 ### 4.4 SlotPromoBanner
 

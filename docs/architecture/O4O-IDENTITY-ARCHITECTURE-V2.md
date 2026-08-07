@@ -7,14 +7,14 @@
 - **채택 WO:** `WO-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-DOCUMENTATION-V1`
 - **채택 결정 문서:** [DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1](../decisions/DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1.md)
 - **승계 대상:** [O4O-IDENTITY-ARCHITECTURE-V1.md](O4O-IDENTITY-ARCHITECTURE-V1.md) (Legacy Baseline — 운영 코드 현행 동작 기록용)
-- **선행 IR:** [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../archive/investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md)
+- **선행 IR:** [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md)
 - **선행 정렬 WO:** `WO-O4O-IDENTITY-ARCHITECTURE-V2-DOCUMENT-ALIGNMENT-V1` (2026-05-23)
 - **작성일:** 2026-05-23 · **채택일:** 2026-05-23
 
 ### 채택 근거 (Adoption Grounds)
 
 1. **철학 정합성**: O4O 의 5개 핵심 철학 원칙(§1) 중 원칙 4 (Credential 의 서비스 범위 독립) 가 V1 모델과 명시적 충돌 — V2 채택으로 5개 원칙 모두 정합 회복 (§10 매트릭스)
-2. **선행 조사 결과**: [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../archive/investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md) §H 에서 V1 baseline 과 철학의 구조적 충돌 확인
+2. **선행 조사 결과**: [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md) §H 에서 V1 baseline 과 철학의 구조적 충돌 확인
 3. **이해관계자 합의**: 2026-05-23 사용자 명시 결정 — "Identity V2 공식 채택"
 4. **구현 비충돌**: 본 채택은 코드/migration/DB 변경을 수반하지 않는다 — V1 운영 코드는 그대로 동작하며, V2 는 향후 구현 WO 의 **계약 기준 (contract)** 이다
 
@@ -210,7 +210,7 @@ V2 의 "서비스별 독립 credential" 모델에서 같은 Handoff 흐름은 �
 **해석 A (SSO 유지):**
 - Handoff 는 **Identity 검증의 reuse** 이지 credential 검증의 reuse 가 아니다
 - "이미 한 번 자기 정체를 증명했으니 다른 서비스에 들어가는 데 추가 자격증명은 불요" — 일반적인 SSO 사용자 멘탈 모델
-- 단, **대상 서비스의 active membership 이 확인되어야 한다** — `WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1` (2026-05-24) 이후 generateHandoff / exchangeHandoff 양쪽에서 검증됨. 그 이전에는 검증되지 않았으며 [`IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1`](../archive/investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md) 에서 갭이 확인되어 후속 WO 로 보강됨 ([CHECK 결과](../archive/checks/CHECK-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1.md)).
+- 단, **대상 서비스의 active membership 이 확인되어야 한다** — `WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1` (2026-05-24) 이후 generateHandoff / exchangeHandoff 양쪽에서 검증됨. 그 이전에는 검증되지 않았으며 [`IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1`](../investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md) 에서 갭이 확인되어 후속 WO 로 보강됨 ([CHECK 결과](../archive/checks/CHECK-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1.md)).
 - **결론:** Handoff 유지 (축소 보존), V2 와 충돌하지 않음
 
 **해석 B (서비스 격리 강화):**
@@ -244,7 +244,7 @@ V2 의 "서비스별 독립 credential" 모델에서 같은 Handoff 흐름은 �
 | Credential 재확인 정책 | **Phase 6+ 보류** — 해석 A vs B 의 최종 결정은 향후 정책 WO 의 책임. |
 
 **관련 이력:**
-- [`IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1`](../archive/investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md) — 기존 구현이 active membership 을 검증하지 않음을 확인, Option B (축소 보존) 권고.
+- [`IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1`](../investigations/IR-O4O-AUTH-HANDOFF-POLICY-AUDIT-V1.md) — 기존 구현이 active membership 을 검증하지 않음을 확인, Option B (축소 보존) 권고.
 - `WO-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1` (commit `339dbb3da`) — generateHandoff / exchangeHandoff 양쪽에 active membership 검증 추가.
 - [`CHECK-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1`](../archive/checks/CHECK-O4O-AUTH-HANDOFF-ACTIVE-MEMBERSHIP-VERIFICATION-V1.md) — 프로덕션 E2E 검증, 필수 5/5 PASS.
 
@@ -408,7 +408,7 @@ V2 모델 도입은 다음 Frozen Baseline 에 영향을 미친다.
 |------|--------|
 | [O4O-IDENTITY-ARCHITECTURE-V1.md](O4O-IDENTITY-ARCHITECTURE-V1.md) | Legacy Baseline (운영 코드 현행 동작 기록 용도) |
 | [DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1.md](../decisions/DECISION-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-V1.md) | 본 V2 의 공식 채택 결정 문서 (2026-05-23) |
-| [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../archive/investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md) | 본 V2 의 선행 조사 (충돌 발견) |
+| [IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1](../investigations/IR-O4O-SERVICE-SPECIFIC-PASSWORD-CREDENTIAL-ARCHITECTURE-AUDIT-V1.md) | 본 V2 의 선행 조사 (충돌 발견) |
 | [USER-DOMAIN-SSOT-V1.md](../baseline/USER-DOMAIN-SSOT-V1.md) | service_memberships SSOT |
 | [USER-OPERATOR-FREEZE-V1.md](USER-OPERATOR-FREEZE-V1.md) | F11 — 3-테이블 구조 (§9.2 참조) — Identity V2 명시적 예외 승인 절차 표기 추가 |
 | [O4O-CORE-FREEZE-V1.md](O4O-CORE-FREEZE-V1.md) | F10 — Auth/Membership/Approval/RBAC (§9.1 참조) — Identity V2 명시적 예외 승인 절차 표기 추가 |

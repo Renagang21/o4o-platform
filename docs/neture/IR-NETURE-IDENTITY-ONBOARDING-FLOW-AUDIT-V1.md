@@ -76,7 +76,7 @@ Neture 공급자 온보딩은 **독립된 2단계**로 구성된다:
 
 ### C. 로그인 가능 조건
 
-로그인 게이트 ([authentication.service.ts:177](apps/api-server/src/services/authentication.service.ts#L177)):
+로그인 게이트 ([authentication.service.ts:177](../../apps/api-server/src/services/authentication.service.ts#L177)):
 ```
 user.status === ACTIVE || user.status === APPROVED
 ```
@@ -104,8 +104,8 @@ user.status === ACTIVE || user.status === APPROVED
 | 파일 | 역할 |
 |------|------|
 | [auth.controller.ts:282-448](apps/api-server/src/modules/auth/controllers/auth.controller.ts#L282-L448) | `register()` — User + RoleAssignment 생성 |
-| [authentication.service.ts:177](apps/api-server/src/services/authentication.service.ts#L177) | 로그인 게이트 (status 검증) |
-| [user.service.ts:127-139](apps/api-server/src/modules/auth/services/user.service.ts#L127-L139) | `updateUserStatus()` — 관리자 승인 |
+| [authentication.service.ts:177](../../apps/api-server/src/services/authentication.service.ts#L177) | 로그인 게이트 (status 검증) |
+| [user.service.ts:127-139](../../apps/api-server/src/modules/auth/services/user.service.ts#L127-L139) | `updateUserStatus()` — 관리자 승인 |
 | [neture.service.ts:135-193](apps/api-server/src/modules/neture/neture.service.ts#L135-L193) | `registerSupplier()` — Supplier 엔티티 생성 |
 | [neture.service.ts:198-232](apps/api-server/src/modules/neture/neture.service.ts#L198-L232) | `approveSupplier()` — Supplier 활성화 |
 | [SupplierDashboardLayout.tsx:53-63](services/web-neture/src/pages/supplier/SupplierDashboardLayout.tsx#L53-L63) | 프론트 역할 가드 |
@@ -208,10 +208,10 @@ user.status === ACTIVE || user.status === APPROVED
 
 | 파일 | 역할 |
 |------|------|
-| [NeturePartnerApplication.entity.ts](apps/api-server/src/modules/neture/entities/NeturePartnerApplication.entity.ts) | Application 엔티티 |
-| [NeturePartnerRecruitment.entity.ts](apps/api-server/src/modules/neture/entities/NeturePartnerRecruitment.entity.ts) | Recruitment 엔티티 |
-| [NetureSellerPartnerContract.entity.ts](apps/api-server/src/modules/neture/entities/NetureSellerPartnerContract.entity.ts) | Contract 엔티티 |
-| [NeturePartnerDashboardItem.entity.ts](apps/api-server/src/modules/neture/entities/NeturePartnerDashboardItem.entity.ts) | DashboardItem 엔티티 |
+| [NeturePartnerApplication.entity.ts](../../apps/api-server/src/modules/neture/entities/NeturePartnerApplication.entity.ts) | Application 엔티티 |
+| [NeturePartnerRecruitment.entity.ts](../../apps/api-server/src/modules/neture/entities/NeturePartnerRecruitment.entity.ts) | Recruitment 엔티티 |
+| [NetureSellerPartnerContract.entity.ts](../../apps/api-server/src/modules/neture/entities/NetureSellerPartnerContract.entity.ts) | Contract 엔티티 |
+| [NeturePartnerDashboardItem.entity.ts](../../apps/api-server/src/modules/neture/entities/NeturePartnerDashboardItem.entity.ts) | DashboardItem 엔티티 |
 | neture.service.ts:approvePartnerApplication() | 트랜잭션 승인 로직 |
 
 ---
@@ -246,7 +246,7 @@ user.status === ACTIVE || user.status === APPROVED
 
 ### B. 파트너십 요청 화면 (별도)
 
-**파일**: [PartnershipRequestCreatePage.tsx](services/web-neture/src/pages/partners/requests/PartnershipRequestCreatePage.tsx)
+**파일**: [PartnershipRequestCreatePage.tsx](../../services/web-neture/src/pages/partners/requests/PartnershipRequestCreatePage.tsx)
 
 이것은 회원가입이 아닌 **제휴 요청 폼**이다. 로그인 후 접근 가능.
 

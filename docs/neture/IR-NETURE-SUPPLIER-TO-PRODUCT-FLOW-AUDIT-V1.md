@@ -50,7 +50,7 @@ NetureSupplier row 생성
 
 | 파일 | 역할 |
 |------|------|
-| [NetureSupplier.entity.ts](apps/api-server/src/modules/neture/entities/NetureSupplier.entity.ts) | 엔티티 정의 (status enum: PENDING/ACTIVE/INACTIVE/REJECTED) |
+| [NetureSupplier.entity.ts](../../apps/api-server/src/modules/neture/entities/NetureSupplier.entity.ts) | 엔티티 정의 (status enum: PENDING/ACTIVE/INACTIVE/REJECTED) |
 | [neture.service.ts:135-193](apps/api-server/src/modules/neture/neture.service.ts#L135-L193) | `registerSupplier()` 비즈니스 로직 |
 | [neture.routes.ts:225-250](apps/api-server/src/modules/neture/neture.routes.ts#L225-L250) | `POST /supplier/register` 라우트 |
 
@@ -137,7 +137,7 @@ POST /admin/suppliers/:id/deactivate   (ACTIVE → INACTIVE)
 | [neture.service.ts:237-272](apps/api-server/src/modules/neture/neture.service.ts#L237-L272) | `rejectSupplier()` |
 | [neture.service.ts:302-354](apps/api-server/src/modules/neture/neture.service.ts#L302-L354) | `deactivateSupplier()` + 캐스케이드 |
 | [neture.routes.ts:270-293](apps/api-server/src/modules/neture/neture.routes.ts#L270-L293) | `POST /admin/suppliers/:id/approve` |
-| [neture-scope.middleware.ts](apps/api-server/src/middleware/neture-scope.middleware.ts) | `requireNetureScope('neture:admin')` |
+| [neture-scope.middleware.ts](../../apps/api-server/src/middleware/neture-scope.middleware.ts) | `requireNetureScope('neture:admin')` |
 
 ---
 
@@ -278,7 +278,7 @@ approveProduct(productId, adminUserId)
 | [neture.service.ts:1226-1288](apps/api-server/src/modules/neture/neture.service.ts#L1226-L1288) | `createSupplierProduct()` |
 | [neture.service.ts:421-472](apps/api-server/src/modules/neture/neture.service.ts#L421-L472) | `approveProduct()` + auto-listing |
 | [neture.routes.ts:619-648](apps/api-server/src/modules/neture/neture.routes.ts#L619-L648) | `POST /supplier/products` 라우트 |
-| [auto-listing.utils.ts](apps/api-server/src/utils/auto-listing.utils.ts) | `autoExpandPublicProduct()` |
+| [auto-listing.utils.ts](../../apps/api-server/src/utils/auto-listing.utils.ts) | `autoExpandPublicProduct()` |
 
 ---
 
