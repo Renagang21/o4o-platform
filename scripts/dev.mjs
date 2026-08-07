@@ -189,6 +189,31 @@ function runLint() {
   return t.report('lint');
 }
 
+/**
+ * WO-O4O-CONTENT-EDITOR-LLM-ASSIST-PANEL-EXPORT-RECOVERY-V1
+ *
+ * 소비처가 **소스가 아니라 dist(.gitignore 대상)의 .d.ts 로 타입을 해석**하는 패키지를
+ * type-check 직전에 빌드한다. dist 가 없거나 stale 하면 소스에 export 가 멀쩡히 있어도
+ * 소비처에서 TS2459(declares locally, but it is not exported) + 그 여파의 TS7006(implicit any)
+ * 가 발생한다. 실제 사례: `@o4o/content-editor` 의 `LlmAssistPanel` 을
+ * `@o4o/tablet-screen-set-editor` 가 import → web-kpa-society · web-neture type-check 실패.
+ *
+ * - 참조 경로: web-kpa-society · web-k-cosmetics · web-pharmacy-hub 는 tsconfig paths 로,
+ *   web-neture · tablet-screen-set-editor 는 package.json "types" 로 dist 를 가리킨다.
+ * - 위 `packages` 목록과 달리 `npx tsc` 로 빌드할 수 없다(tsup 기반)므로 자체 build script 를 쓴다.
+ * - 루트 `pnpm run build:packages` 체인에는 이미 포함되어 CI 는 영향을 받지 않는다.
+ *   이 단계는 clean 상태에서 로컬 type-check 가 재현 가능하도록 보완하는 것이다.
+ */
+function buildDistTypedPackages(t) {
+  for (const pkg of ['content-editor']) {
+    const pkgPath = join(ROOT_DIR, 'packages', pkg);
+    if (existsSync(pkgPath) && hasScript(`packages/${pkg}`, 'build')) {
+      console.log(`  - Building @o4o/${pkg}`);
+      t.track(`build packages/${pkg}`, exec('pnpm run build', pkgPath));
+    }
+  }
+}
+
 function runTypeCheck() {
   log.info('Running TypeScript checks...');
   const t = createFailureTracker();
@@ -197,6 +222,7 @@ function runTypeCheck() {
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes', 'block-core'];
 
   log.info('Building packages...');
+  buildDistTypedPackages(t);
   for (const pkg of packages) {
     const pkgPath = join('packages', pkg);
     if (existsSync(join(ROOT_DIR, pkgPath))) {
@@ -245,6 +271,7 @@ function runTypeCheckFrontend() {
   const packages = ['types', 'utils', 'ui', 'auth-client', 'auth-context', 'shortcodes'];
 
   log.info('Building packages...');
+  buildDistTypedPackages(t);
   for (const pkg of packages) {
     const pkgPath = join('packages', pkg);
     if (existsSync(join(ROOT_DIR, pkgPath))) {
