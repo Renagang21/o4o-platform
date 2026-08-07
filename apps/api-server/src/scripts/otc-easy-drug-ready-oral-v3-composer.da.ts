@@ -132,7 +132,7 @@ const KO_REQUIRED = ['efficacy', 'usage', 'summaryTable'] as const;
 export function buildKoV3Html(src: KoV3Source, opts: { title: string }): BuildResult {
   const missing: string[] = [];
   for (const f of KO_REQUIRED) {
-    const v = (src as Record<string, unknown>)[f];
+    const v = src[f];
     if (f === 'summaryTable') { if (!v || typeof v !== 'object' || Object.keys(v).length === 0) missing.push(f); }
     else if (isBlank(v)) missing.push(f);
   }
@@ -197,7 +197,7 @@ const EN_REQUIRED = ['title', 'efficacy', 'usage', 'summaryTable'] as const;
 export function buildEnV3Html(t: EnV3Payload): BuildResult {
   const missing: string[] = [];
   for (const f of EN_REQUIRED) {
-    const v = (t as Record<string, unknown>)[f];
+    const v = t[f];
     if (f === 'summaryTable') { if (!v || typeof v !== 'object' || Object.keys(v).length === 0) missing.push(f); }
     else if (typeof v !== 'string' || v.trim() === '') missing.push(f);
   }

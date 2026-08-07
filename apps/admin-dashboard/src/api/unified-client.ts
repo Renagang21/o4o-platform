@@ -42,7 +42,7 @@ class UnifiedApiClient {
     this.client.interceptors.request.use(
       (config) => {
         // Get token from multiple sources
-        let token = this.getAuthToken();
+        const token = this.getAuthToken();
 
         // Decode JWT token to check expiration
         let tokenInfo = null;

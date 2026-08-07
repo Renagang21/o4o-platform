@@ -152,7 +152,7 @@ export class ForumService {
     const limit = Math.min(options.limit || 20, 50);
     const skip = (page - 1) * limit;
 
-    let queryBuilder = this.postRepository
+    const queryBuilder = this.postRepository
       .createQueryBuilder('post')
       .leftJoinAndSelect('post.author', 'author')
       .leftJoinAndSelect('post.lastCommenter', 'lastCommenter')

@@ -45,7 +45,7 @@ function extractDeclared(base: string): { value: number; unit: string; basisAmou
   const b = normalizeSource(base);
   const uNorm = (u: string): string => { const x = u.replace(/\s/g, ''); if (/^(㎍|mcg|ug|μg|μ)$/i.test(x)) return 'μg'; if (/^iu$/i.test(x)) return 'IU'; if (/^mg$/i.test(x)) return 'mg'; if (/^g$/i.test(x)) return 'g'; return x; };
   const N = String.raw`[\d][\d,.]*`; const numOf = (s: string) => parseFloat(s.replace(/,/g, ''));
-  let m = b.match(new RegExp(String.raw`표시량\s*\(\s*(${N})\s*(㎍|mcg|ug|μg|IU|iu|mg|g)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*(${N})\s*(mg|g)\s*\)`, 'i'))
+  const m = b.match(new RegExp(String.raw`표시량\s*\(\s*(${N})\s*(㎍|mcg|ug|μg|IU|iu|mg|g)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*(${N})\s*(mg|g)\s*\)`, 'i'))
     ?? b.match(new RegExp(String.raw`(${N})\s*(㎍|mcg|ug|μg|IU|iu|mg|g)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*(${N})\s*(mg|g)\s*\(\s*표시량`, 'i'))
     ?? b.match(new RegExp(String.raw`표시량\s*[:：]?\s*(${N})\s*(㎍|mcg|ug|μg|IU|iu|mg|g)\s*(?:RE|α-?TE|NE|DFE)?\s*\/\s*(${N})\s*(mg|g)`, 'i'));
   if (!m) return null;

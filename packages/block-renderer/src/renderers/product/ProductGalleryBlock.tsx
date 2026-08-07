@@ -12,6 +12,11 @@ export const ProductGalleryBlock: React.FC<BlockRendererProps> = ({ block }) => 
   // Access post data injected by CPTSingle
   const postData = (block as any)._postData;
 
+  // Rules of Hooks — 아래 가드보다 위에서 호출해 렌더마다 호출 순서를 고정한다.
+  // 초기값을 이미지 목록에서 받을 수 없으므로, 실제 표시 이미지는 아래에서 목록으로부터 파생시킨다
+  // (postData 가 나중에 도착해도 기존과 동일하게 첫 번째 이미지가 표시된다).
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
   if (!postData) {
     return null;
   }
@@ -29,7 +34,7 @@ export const ProductGalleryBlock: React.FC<BlockRendererProps> = ({ block }) => 
     return null;
   }
 
-  const [selectedImage, setSelectedImage] = useState(images[0]);
+  const activeImage = selectedImage && images.includes(selectedImage) ? selectedImage : images[0];
 
   // Get styling options
   const className = getBlockData(block, 'className', '');
@@ -42,7 +47,7 @@ export const ProductGalleryBlock: React.FC<BlockRendererProps> = ({ block }) => 
       {/* Main Image */}
       <div className="relative aspect-square bg-gray-100 rounded-lg overflow-hidden mb-4">
         <img
-          src={selectedImage}
+          src={activeImage}
           alt={postData.title}
           className="w-full h-full object-cover"
         />
@@ -57,7 +62,7 @@ export const ProductGalleryBlock: React.FC<BlockRendererProps> = ({ block }) => 
               onClick={() => setSelectedImage(img)}
               className={clsx(
                 'aspect-square bg-gray-100 rounded-lg overflow-hidden border-2 transition-colors',
-                selectedImage === img ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
+                activeImage === img ? 'border-blue-500' : 'border-transparent hover:border-gray-300'
               )}
             >
               <img

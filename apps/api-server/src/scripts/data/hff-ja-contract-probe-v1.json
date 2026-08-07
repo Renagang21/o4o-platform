@@ -1,0 +1,308 @@
+{
+ "wo": "WO-O4O-HFF-JA-BATCH-01-10000-DIRECT-BULK-PRODUCTION-V1",
+ "probedAt": "2026-08-06T06:25:27.563Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "languageCodesAll": [
+  {
+   "lang": "ko",
+   "n": 103348
+  },
+  {
+   "lang": "en",
+   "n": 62977
+  },
+  {
+   "lang": "zh",
+   "n": 42262
+  }
+ ],
+ "languageCodesStoreCanonical": [
+  {
+   "lang": "ko",
+   "n": 63385
+  },
+  {
+   "lang": "en",
+   "n": 43847
+  },
+  {
+   "lang": "zh",
+   "n": 41324
+  }
+ ],
+ "japaneseLike": [],
+ "hffCanonical": {
+  "ko": 40918,
+  "en": 40902,
+  "zh": 40918,
+  "ja": 0
+ },
+ "sourceTypes": [
+  {
+   "source_type": "o4o_hff_generated",
+   "lang": "zh",
+   "n": 40918
+  },
+  {
+   "source_type": "o4o_hff_generated",
+   "lang": "ko",
+   "n": 40918
+  },
+  {
+   "source_type": "o4o_hff_generated",
+   "lang": "en",
+   "n": 40902
+  },
+  {
+   "source_type": "mfds_easy_drug",
+   "lang": "ko",
+   "n": 19392
+  },
+  {
+   "source_type": "mfds_drug_otc_nutrition_combo",
+   "lang": "ko",
+   "n": 1683
+  },
+  {
+   "source_type": "mfds_drug_otc_nutrition_combo",
+   "lang": "en",
+   "n": 1661
+  },
+  {
+   "source_type": "mfds_drug_otc",
+   "lang": "ko",
+   "n": 1318
+  },
+  {
+   "source_type": "mfds_drug_otc",
+   "lang": "en",
+   "n": 1269
+  },
+  {
+   "source_type": "mfds_drug_otc_nutrition_combo",
+   "lang": "zh",
+   "n": 377
+  },
+  {
+   "source_type": "manual",
+   "lang": "ko",
+   "n": 44
+  },
+  {
+   "source_type": "o4o_drug_otc_topical",
+   "lang": "ko",
+   "n": 30
+  },
+  {
+   "source_type": "manual",
+   "lang": "zh",
+   "n": 29
+  },
+  {
+   "source_type": "manual",
+   "lang": "en",
+   "n": 15
+  }
+ ],
+ "indexes": [
+  {
+   "indexname": "idx_shared_product_descriptions_created_by_supplier",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_created_by_supplier ON public.shared_product_descriptions USING btree (created_by_supplier_id) WHERE (created_by_supplier_id IS NOT NULL)"
+  },
+  {
+   "indexname": "idx_shared_product_descriptions_master",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_master ON public.shared_product_descriptions USING btree (master_id)"
+  },
+  {
+   "indexname": "idx_shared_product_descriptions_master_desctype",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_master_desctype ON public.shared_product_descriptions USING btree (master_id, description_type)"
+  },
+  {
+   "indexname": "idx_shared_product_descriptions_master_status",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_master_status ON public.shared_product_descriptions USING btree (master_id, status)"
+  },
+  {
+   "indexname": "idx_shared_product_descriptions_revision_due",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_revision_due ON public.shared_product_descriptions USING btree (revision_due_at) WHERE (((status)::text = 'revision_requested'::text) AND (revision_due_at IS NOT NULL))"
+  },
+  {
+   "indexname": "idx_shared_product_descriptions_source_type",
+   "indexdef": "CREATE INDEX idx_shared_product_descriptions_source_type ON public.shared_product_descriptions USING btree (source_type)"
+  },
+  {
+   "indexname": "shared_product_descriptions_pkey",
+   "indexdef": "CREATE UNIQUE INDEX shared_product_descriptions_pkey ON public.shared_product_descriptions USING btree (id)"
+  },
+  {
+   "indexname": "uniq_shared_product_descriptions_canonical_per_master_type_lang",
+   "indexdef": "CREATE UNIQUE INDEX uniq_shared_product_descriptions_canonical_per_master_type_lang ON public.shared_product_descriptions USING btree (master_id, description_type, COALESCE(language, 'ko'::character varying)) WHERE (((status)::text = 'canonical'::text) AND (deleted_at IS NULL))"
+  }
+ ],
+ "constraints": [
+  {
+   "conname": "shared_product_descriptions_created_by_supplier_id_fkey",
+   "def": "FOREIGN KEY (created_by_supplier_id) REFERENCES neture_suppliers(id) ON DELETE SET NULL"
+  },
+  {
+   "conname": "shared_product_descriptions_master_id_fkey",
+   "def": "FOREIGN KEY (master_id) REFERENCES product_masters(id) ON DELETE CASCADE"
+  },
+  {
+   "conname": "shared_product_descriptions_pkey",
+   "def": "PRIMARY KEY (id)"
+  }
+ ],
+ "columns": [
+  {
+   "column_name": "id",
+   "data_type": "uuid",
+   "is_nullable": "NO",
+   "column_default": "gen_random_uuid()"
+  },
+  {
+   "column_name": "master_id",
+   "data_type": "uuid",
+   "is_nullable": "NO",
+   "column_default": null
+  },
+  {
+   "column_name": "content",
+   "data_type": "text",
+   "is_nullable": "NO",
+   "column_default": null
+  },
+  {
+   "column_name": "summary",
+   "data_type": "text",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "source_type",
+   "data_type": "character varying",
+   "is_nullable": "NO",
+   "column_default": null
+  },
+  {
+   "column_name": "source_ref_id",
+   "data_type": "uuid",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "status",
+   "data_type": "character varying",
+   "is_nullable": "NO",
+   "column_default": "'candidate'::character varying"
+  },
+  {
+   "column_name": "language",
+   "data_type": "character varying",
+   "is_nullable": "YES",
+   "column_default": "'ko'::character varying"
+  },
+  {
+   "column_name": "quality_score",
+   "data_type": "numeric",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "curated_by",
+   "data_type": "uuid",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "curated_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "created_by",
+   "data_type": "uuid",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "updated_by",
+   "data_type": "uuid",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "created_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "NO",
+   "column_default": "now()"
+  },
+  {
+   "column_name": "updated_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "NO",
+   "column_default": "now()"
+  },
+  {
+   "column_name": "deleted_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "description_type",
+   "data_type": "character varying",
+   "is_nullable": "NO",
+   "column_default": "'STORE'::character varying"
+  },
+  {
+   "column_name": "created_by_supplier_id",
+   "data_type": "uuid",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "submitted_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "review_note",
+   "data_type": "text",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "revision_requested_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "YES",
+   "column_default": null
+  },
+  {
+   "column_name": "revision_due_at",
+   "data_type": "timestamp without time zone",
+   "is_nullable": "YES",
+   "column_default": null
+  }
+ ],
+ "dupByMasterTypeLang": 0,
+ "sourceRefUsage": [
+  {
+   "lang": "ko",
+   "n": 40918,
+   "with_ref": 40918
+  },
+  {
+   "lang": "zh",
+   "n": 40918,
+   "with_ref": 0
+  },
+  {
+   "lang": "en",
+   "n": 40902,
+   "with_ref": 15498
+  }
+ ]
+}

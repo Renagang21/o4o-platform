@@ -8,7 +8,7 @@ import type { PageData } from '../core/types';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://api.neture.co.kr';
 
-export interface PageCreateRequest extends PageData {}
+export type PageCreateRequest = PageData;
 
 export interface PageResponse {
   success: boolean;

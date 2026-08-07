@@ -80,8 +80,8 @@ export function createListAssetsHandler(dataSource: DataSource) {
         .map((r: any) => r.metadata?.sourceContentId)
         .filter(Boolean);
 
-      let viewCountMap: Record<string, number> = {};
-      let recCountMap: Record<string, number> = {};
+      const viewCountMap: Record<string, number> = {};
+      const recCountMap: Record<string, number> = {};
 
       if (sourceIds.length > 0) {
         try {

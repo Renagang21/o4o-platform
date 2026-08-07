@@ -212,7 +212,7 @@ export function setupMiddlewares(app: Application, options: { redisEnabled: bool
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
   // 9. Session configuration
-  let sessionConfig: any = {
+  const sessionConfig: any = {
     secret: env.getString('SESSION_SECRET', 'o4o-platform-session-secret'),
     resave: false,
     saveUninitialized: false,

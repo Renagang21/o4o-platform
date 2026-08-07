@@ -112,7 +112,7 @@ export class WebSocketSessionSync {
 
     // Handle specific events
     switch (event) {
-      case 'logout_all':
+      case 'logout_all': {
         // Force disconnect all sockets for this user
         const userSocketIds = this.userSockets.get(userId);
         if (userSocketIds) {
@@ -125,6 +125,7 @@ export class WebSocketSessionSync {
           });
         }
         break;
+      }
 
       case 'removed':
         // Notify specific session removal

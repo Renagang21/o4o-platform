@@ -145,20 +145,21 @@ class BlockCodeGenerator {
       devError('❌ Block code generation failed:', error);
 
       // Phase 1-D: Categorize unknown errors
-      if (!(error instanceof BlockGenerationError)) {
-        error = new BlockGenerationError(
-          BlockGenerationErrorType.UNKNOWN_ERROR,
-          error.message || 'Unknown error occurred',
-          error.stack
-        );
-      }
+      // catch 파라미터를 재대입하지 않고 별도 지역 변수로 분리한다(동작 동일).
+      const categorized = error instanceof BlockGenerationError
+        ? error
+        : new BlockGenerationError(
+            BlockGenerationErrorType.UNKNOWN_ERROR,
+            error.message || 'Unknown error occurred',
+            error.stack
+          );
 
       // Phase 1-D: Return fallback code with error attached
       const fallback = this.getFallbackCode(spec);
       fallback.isFallback = true;
 
       // Re-throw error with fallback code attached
-      const errorWithFallback: any = error;
+      const errorWithFallback: any = categorized;
       errorWithFallback.fallbackCode = fallback;
       throw errorWithFallback;
     }

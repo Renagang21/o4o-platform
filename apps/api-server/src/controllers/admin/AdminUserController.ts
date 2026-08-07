@@ -140,7 +140,7 @@ export class AdminUserController {
 
       // WO-OPERATOR-FIX-V1: Fetch roles for all users in batch
       const userIds = users.map(u => u.id);
-      let roleMap: Record<string, string[]> = {};
+      const roleMap: Record<string, string[]> = {};
       if (userIds.length > 0) {
         const roleRows = await AppDataSource.query(
           `SELECT user_id, ARRAY_AGG(role ORDER BY role) as roles

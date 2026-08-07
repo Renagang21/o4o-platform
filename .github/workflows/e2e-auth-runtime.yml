@@ -54,7 +54,8 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v5
         with:
-          version: '9'
+          # package.json volta.pnpm 과 일치시킨다
+          version: '10.25.0'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4

@@ -49,7 +49,7 @@ interface AuditReport {
  */
 function fileNameToBlockName(fileName: string): string {
   // Remove extensions
-  let baseName = fileName
+  const baseName = fileName
     .replace(/\.definition\.tsx?$/, '')
     .replace(/\.tsx?$/, '');
 

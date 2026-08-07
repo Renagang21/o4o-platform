@@ -98,7 +98,7 @@ function nodeToBlock(node: ChildNode, index: number): Block | null {
       };
 
     case 'ul':
-    case 'ol':
+    case 'ol': {
       const items = Array.from(element.querySelectorAll('li')).map(
         (li) => li.textContent?.trim() || ''
       );
@@ -110,8 +110,9 @@ function nodeToBlock(node: ChildNode, index: number): Block | null {
           ordered: tagName === 'ol',
         },
       };
+    }
 
-    case 'pre':
+    case 'pre': {
       const codeElement = element.querySelector('code');
       const code = codeElement ? codeElement.textContent || '' : textContent;
       return {
@@ -119,6 +120,7 @@ function nodeToBlock(node: ChildNode, index: number): Block | null {
         type: 'code',
         content: code,
       };
+    }
 
     case 'img':
       return {

@@ -6,7 +6,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { analyzeInput, extractParams } from './analyzer';
+import { analyzeInput } from './analyzer';
 import { selectLayout } from './rules/layoutRules';
 import { selectFunctionComponents } from './rules/componentRules';
 import { generateFetchConfig } from './rules/fetchRules';
@@ -32,13 +32,6 @@ export async function generateView(input: string): Promise<string> {
 
   // Step 4: Generate fetch config
   const fetchConf = generateFetchConfig(intent.viewId);
-  if (fetchConf) {
-  }
-
-  // Step 5: Extract params if any
-  const params = extractParams(input);
-  if (Object.keys(params).length > 0) {
-  }
 
   // Step 6: Assemble View Schema
   const view: ViewSchema = {

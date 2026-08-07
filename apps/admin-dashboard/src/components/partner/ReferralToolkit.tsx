@@ -51,9 +51,10 @@ export const ReferralToolkit: FC<ReferralToolkitProps> = ({
         return referralMessageTemplates.kakao(productName, referralCode);
       case 'sms':
         return referralMessageTemplates.sms(productName, referralCode, referralLink);
-      case 'email':
+      case 'email': {
         const emailTemplate = referralMessageTemplates.email(productName, referralCode, referralLink);
         return `제목: ${emailTemplate.subject}\n\n${emailTemplate.body}`;
+      }
       case 'custom':
         return customMessage || `${userName}님이 ${productName}을(를) 추천합니다!\n추천 코드: ${referralCode}\n${referralLink}`;
       default:

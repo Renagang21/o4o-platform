@@ -173,11 +173,12 @@ const GallerySlider: React.FC<GallerySliderProps> = ({
         newIndex = Math.min(images.length - 1, currentImageIndex + 1);
         break;
       case 'up':
-      case 'down':
+      case 'down': {
         // In slider, up/down moves by visible items count
         const moveAmount = direction === 'up' ? -currentColumns : currentColumns;
         newIndex = Math.max(0, Math.min(images.length - 1, currentImageIndex + moveAmount));
         break;
+      }
     }
 
     if (newIndex !== currentImageIndex) {

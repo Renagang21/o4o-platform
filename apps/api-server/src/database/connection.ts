@@ -55,6 +55,23 @@ if (DB_TYPE === 'sqlite') {
     };
   } else {
     // 일반 TCP 연결 (로컬 개발, 기타 환경)
+    //
+    // 로컬/운영 DB 분리 가드 (WO-O4O-LOCAL-AND-PRODUCTION-DB-CONNECTION-SEPARATION-V1)
+    // 개발 모드에서 운영 DB host 로 직접 TCP 연결하는 것을 막는다.
+    // 운영 DB 는 Cloud SQL Auth Proxy(127.0.0.1)를 경유해야 한다.
+    // 의도적으로 원격 host 를 써야 하면 ALLOW_REMOTE_DB=true 로 명시 opt-in 한다.
+    const isLoopbackHost = !DB_HOST || /^(localhost|127\.0\.0\.1|::1)$/i.test(DB_HOST);
+    const allowRemote = process.env.ALLOW_REMOTE_DB === 'true';
+
+    if (NODE_ENV !== 'production' && !isLoopbackHost && !allowRemote) {
+      throw new Error(
+        `[DB] NODE_ENV=${NODE_ENV} 에서 원격 DB host 로 직접 연결할 수 없습니다.\n` +
+          '  운영 DB 는 Cloud SQL Auth Proxy 를 경유하십시오 (DB_HOST=127.0.0.1, DB_PORT=5442).\n' +
+          '  프록시 기동: ./start-cloud-sql-proxy.cmd\n' +
+          '  의도적인 원격 연결이면 ALLOW_REMOTE_DB=true 를 설정하십시오.'
+      );
+    }
+
     dataSourceConfig = {
       type: 'postgres',
       host: DB_HOST,

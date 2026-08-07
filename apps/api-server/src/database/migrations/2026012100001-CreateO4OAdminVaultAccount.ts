@@ -6,7 +6,7 @@
  * on neture.co.kr main site.
  *
  * Email: o4o-admin-id@admin.co.kr
- * Password: o4o-admin1!
+ * Password: ADMIN_VAULT_PASSWORD 환경변수로 주입 (평문 리터럴 금지 — CLAUDE.md §15)
  */
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
@@ -15,7 +15,6 @@ import bcrypt from 'bcryptjs';
 const ADMIN_VAULT_ACCOUNT = {
   email: 'o4o-admin-id@admin.co.kr',
   name: 'O4O Admin',
-  password: 'o4o-admin1!',
   role: 'admin',
   domain: 'neture.co.kr',
   description: 'O4O Admin Vault 접근 계정',
@@ -23,7 +22,18 @@ const ADMIN_VAULT_ACCOUNT = {
 
 export class CreateO4OAdminVaultAccount2026012100001 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
-    const hashedPassword = await bcrypt.hash(ADMIN_VAULT_ACCOUNT.password, 10);
+    // 이미 적용된 환경에서는 재실행되지 않는다. 신규 DB 에서 환경변수가 없으면
+    // 배포 파이프라인을 깨지 않도록 계정 생성을 건너뛴다.
+    const plainPassword = process.env.ADMIN_VAULT_PASSWORD;
+    if (!plainPassword) {
+      console.warn(
+        'ADMIN_VAULT_PASSWORD 미설정 — Admin Vault 계정 생성을 건너뜁니다. ' +
+          '필요 시 환경변수를 설정한 뒤 계정을 별도 생성하십시오.'
+      );
+      return;
+    }
+
+    const hashedPassword = await bcrypt.hash(plainPassword, 10);
 
     // Check if account already exists (idempotent)
     const existing = await queryRunner.query(
@@ -65,7 +75,6 @@ export class CreateO4OAdminVaultAccount2026012100001 implements MigrationInterfa
     console.log('');
     console.log('=== O4O Admin Vault Account Created ===');
     console.log(`Email: ${ADMIN_VAULT_ACCOUNT.email}`);
-    console.log(`Password: ${ADMIN_VAULT_ACCOUNT.password}`);
     console.log('');
     console.log('This account provides access to Admin Vault on neture.co.kr');
   }

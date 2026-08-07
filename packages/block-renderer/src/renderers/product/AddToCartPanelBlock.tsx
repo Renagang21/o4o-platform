@@ -15,6 +15,9 @@ export const AddToCartPanelBlock: React.FC<BlockRendererProps> = ({ block }) => 
   // Access post data injected by CPTSingle
   const postData = (block as any)._postData;
 
+  // Rules of Hooks — postData 가드보다 위에서 호출해 렌더마다 호출 순서를 고정한다
+  const [quantity, setQuantity] = useState(1);
+
   if (!postData) {
     return null;
   }
@@ -27,8 +30,6 @@ export const AddToCartPanelBlock: React.FC<BlockRendererProps> = ({ block }) => 
   const isAvailable = customFields.is_available !== false;
   const seller_id = customFields.seller_id || postData.meta?.seller_id || '';
   const seller_name = customFields.seller_name || customFields.vendor || postData.meta?.seller_name || postData.meta?.vendor || 'Unknown Seller';
-
-  const [quantity, setQuantity] = useState(1);
 
   // Get styling options
   const className = getBlockData(block, 'className', '');

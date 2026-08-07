@@ -67,7 +67,7 @@ let dailyUsageCache: {
 };
 
 // Circuit breaker state
-let circuitBreakerState: {
+const circuitBreakerState: {
   state: CircuitBreakerState;
   stateChangedAt: Date;
   consecutiveTimeouts: number;

@@ -83,7 +83,7 @@ export interface LmsCertificateBase {
  * 통계 필드(`enrolledCount`, `completionRate`, `enrollmentCount`)는 서비스별 명칭이
  * 다르므로 본 base 에는 포함하지 않는다. 각 서비스가 확장한다.
  */
-export interface LmsInstructorCourseBase extends LmsCourseBase {}
+export type LmsInstructorCourseBase = LmsCourseBase;
 
 // ─── Paginated Response (학습자 목록 조회용) ────────────────────────────────
 

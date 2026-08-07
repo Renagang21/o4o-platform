@@ -258,3 +258,7 @@ main().catch((e) => {
   console.error('[drug-otc-nutrition-combo-membership-persist] FAILED:', e instanceof Error ? e.message : e);
   process.exit(1);
 });
+
+// top-level import/export 가 없으면 TS 가 이 파일을 global script 로 취급해
+// 다른 스크립트의 `main` 선언과 충돌한다(TS2393). 모듈로 고정한다.
+export {};

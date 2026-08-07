@@ -239,8 +239,9 @@ async function checkCatalogConsistency(packages: Map<string, string>): Promise<v
 async function checkFrozenCoreDependencies(packages: Map<string, string>): Promise<void> {
   result.info.push(`\n${colors.cyan}[3/4] FROZEN Core Dependency Guard${colors.reset}`);
 
-  let violations = 0;
-
+  // NOTE: 이 검사는 아직 stub 이다(아래 조건 분기 본문이 비어 있고, 위반을 기록하지 않는다).
+  // 이전에 있던 `let violations = 0` 은 증가·참조가 전혀 없는 dead 변수라 제거했다.
+  // 실제 위반 판정은 AST 분석이 필요하며 별도 WO 대상이다(동작은 이전과 동일).
   for (const [pkgName, manifestPath] of packages) {
     // Skip FROZEN cores themselves
     if (FROZEN_CORES.includes(pkgName)) {

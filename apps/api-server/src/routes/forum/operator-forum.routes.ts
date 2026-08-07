@@ -29,7 +29,7 @@
  *   POST   /delete-requests/batch-reject    - 일괄 삭제 반려
  */
 
-import { Router, Request, Response } from 'express';
+import { Router, Request, Response, NextFunction } from 'express';
 import { authenticate } from '../../middleware/auth.middleware.js';
 import { forumRequestService } from '../../services/forum/ForumRequestService.js';
 import { isServiceOperator } from '../../utils/role.utils.js';
@@ -86,7 +86,7 @@ router.use(authenticate);
 /**
  * Middleware: extract and validate serviceCode, check operator permission
  */
-function requireServiceOperator(req: Request, res: Response, next: Function): void {
+function requireServiceOperator(req: Request, res: Response, next: NextFunction): void {
   const serviceCode = (req.query.serviceCode as string) || '';
   if (!serviceCode || !VALID_SERVICE_CODES.includes(serviceCode)) {
     res.status(400).json({ success: false, error: 'Valid serviceCode query param is required' });

@@ -28,7 +28,7 @@ export interface CreateLessonRequest {
   metadata?: Record<string, any>;
 }
 
-export interface UpdateLessonRequest extends Partial<Omit<CreateLessonRequest, 'courseId'>> {}
+export type UpdateLessonRequest = Partial<Omit<CreateLessonRequest, 'courseId'>>;
 
 export interface LessonFilters {
   type?: LessonType;

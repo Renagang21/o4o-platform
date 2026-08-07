@@ -41,7 +41,8 @@ function checkDoc(html: string, lang: 'ko' | 'en'): string[] {
     [/<li>/g, /<\/li>/g, 'li'], [/<p[\s>]/g, /<\/p>/g, 'p'], [/<h2>/g, /<\/h2>/g, 'h2']] as any)
     if (cnt(html, o) !== cnt(html, c)) bad.push(`UNBALANCED_${n}`);
   /* <li> 는 반드시 <ul> 안에 있어야 한다 */
-  const liInUl = (html.match(/<ul class="sd-warn">[\s\S]*?<\/ul>/g) || []).reduce((a, u) => a + cnt(u, /<li>/g), 0);
+  const ulBlocks: string[] = html.match(/<ul class="sd-warn">[\s\S]*?<\/ul>/g) || [];
+  const liInUl = ulBlocks.reduce((a, u) => a + cnt(u, /<li>/g), 0);
   if (cnt(html, /<li>/g) !== liInUl) bad.push('LI_OUTSIDE_UL');
   /* 빈 항목 */
   if (/<li>\s*<\/li>/.test(html) || /<p[^>]*>\s*<\/p>/.test(html)) bad.push('EMPTY_NODE');

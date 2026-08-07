@@ -1,0 +1,63 @@
+{
+ "wo": "WO-O4O-HFF-JA-BATCH-02-10000-DIRECT-BULK-PRODUCTION-V1",
+ "batch": "batch02",
+ "renderedAt": "2026-08-07T01:56:17.128Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "globalsBefore": {
+  "ko": "40918",
+  "en": "40902",
+  "zh": "40918",
+  "ja": "10000"
+ },
+ "poolWithoutJa": 30918,
+ "excludedFromPool": 0,
+ "targets": 10000,
+ "batchSize": 10000,
+ "fullFallback": false,
+ "canonicalDup": 0,
+ "producedCandidates": 17414,
+ "notProducedInPool": 13504,
+ "notProducedByWhy": {
+  "UNRESOLVED": 13476,
+  "SIMPLIFIED_REMAINS": 27,
+  "NUMBER_DRIFT": 1
+ },
+ "remainingProducibleAfterBatch": 7414,
+ "documentsRendered": 5963,
+ "structureSignatures": 463,
+ "coverage": "signature-exhaustive + high-risk full",
+ "widths": [
+  430,
+  820,
+  1280
+ ],
+ "renders": 17889,
+ "counters": {
+  "structureParity": 0,
+  "pageOverflow": 0,
+  "elementOverflow": 0,
+  "clipped": 0,
+  "emptyH2": 0,
+  "emptyUl": 0,
+  "emptyLi": 0,
+  "undefinedClass": 0,
+  "rawHtml": 0,
+  "hangulVisible": 0,
+  "markerVisible": 0,
+  "labelLost": 0,
+  "licenseNoLost": 0,
+  "simplifiedVisible": 0
+ },
+ "totalIssues": 0,
+ "verdict": "PASS",
+ "failures": [],
+ "issueQueue": 28,
+ "issueQueueNew": 5,
+ "issueQueueCarriedOver": 23,
+ "issueQueueResolvedFromPrior": 0,
+ "issueByType": {
+  "TRANSLATION_AMBIGUOUS": 27,
+  "NUMBER_STRUCTURE_AMBIGUOUS": 1
+ }
+}

@@ -53,24 +53,19 @@ export class PluginLoader {
   private async doLoad(pluginId: string, options?: LoadOptions): Promise<BlockPlugin> {
     // Loading plugin
 
-    try {
-      // Dynamic import based on plugin ID
-      const module = await this.dynamicImport(pluginId, options);
-      
-      // Extract plugin from module
-      const plugin = module.default || module;
-      
-      // Validate plugin structure
-      if (!this.isValidPlugin(plugin)) {
-        throw new Error(`Invalid plugin structure for ${pluginId}`);
-      }
+    // Dynamic import based on plugin ID
+    const module = await this.dynamicImport(pluginId, options);
 
-      return plugin as BlockPlugin;
-      
-    } catch (error) {
-      // Failed to load plugin
-      throw error;
+    // Extract plugin from module
+    const plugin = module.default || module;
+
+    // Validate plugin structure
+    if (!this.isValidPlugin(plugin)) {
+      throw new Error(`Invalid plugin structure for ${pluginId}`);
     }
+
+    return plugin as BlockPlugin;
+
   }
 
   /**
@@ -97,13 +92,14 @@ export class PluginLoader {
         // @ts-ignore - Plugin modules will be available at runtime
         return import('@o4o/dynamic-blocks');
 
-      default:
+      default: {
         // Try to load from custom path if registered
         const customPath = this.pluginPaths.get(pluginId);
         if (customPath) {
           return import(customPath);
         }
         throw new Error(`Unknown plugin: ${pluginId}`);
+      }
     }
   }
 

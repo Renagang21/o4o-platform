@@ -58,9 +58,10 @@ const formatMetaValue = (value: any, key: string, format?: string): string => {
       return `Image ID: ${value}`;
     case '_wp_page_template':
       return value === 'default' ? 'Default Template' : value;
-    case '_edit_lock':
+    case '_edit_lock': {
       const [, userId] = String(value).split(':');
       return `Locked by user ${userId}`;
+    }
     case '_stock_status':
       return value === 'instock' ? '재고 있음' : value === 'outofstock' ? '품절' : value;
     case '_visibility':

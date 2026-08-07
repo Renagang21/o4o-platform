@@ -42,7 +42,7 @@ export function PartnerStats() {
 
   // Filter and sort partners
   const filteredPartners = useMemo(() => {
-    let filtered = allPartners.filter((p) =>
+    const filtered = allPartners.filter((p) =>
       p.userId.toLowerCase().includes(searchTerm.toLowerCase())
     );
 

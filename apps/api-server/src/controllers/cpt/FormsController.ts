@@ -679,19 +679,21 @@ export class FormsController {
   private validateFieldValue(field: FormField, value: any): { valid: boolean; value?: any; error?: string } {
     // Basic validation based on field type
     switch (field.type) {
-      case 'email':
+      case 'email': {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(value)) {
           return { valid: false, error: 'Invalid email format' };
         }
         break;
+      }
 
-      case 'number':
+      case 'number': {
         const numValue = Number(value);
         if (isNaN(numValue)) {
           return { valid: false, error: 'Must be a valid number' };
         }
         return { valid: true, value: numValue };
+      }
 
       case 'url':
         try {
@@ -701,12 +703,13 @@ export class FormsController {
         }
         break;
 
-      case 'tel':
+      case 'tel': {
         const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
         if (!phoneRegex.test(value.replace(/[\s\-\(\)]/g, ''))) {
           return { valid: false, error: 'Invalid phone number format' };
         }
         break;
+      }
 
       default:
         // For other field types, just ensure it's a string

@@ -1,0 +1,44 @@
+{
+  "meta": {
+    "wo": "WO-O4O-COSMETICS-RETAIL-PRODUCT-CENSUS-V1",
+    "normalizedRows": 40395,
+    "uniqueKeys": 33106,
+    "mergedRowsIntoExistingKey": 7299,
+    "note": "정규화 규칙 SSOT = cosmetics-census-pilot/normalize-core.mjs (기준문서 V0 §3~§4)"
+  },
+  "perSource": [
+    {
+      "source": "MUSINSA_BEAUTY",
+      "rawCollected": 43384,
+      "gatedOutNonCosmetic": 8329,
+      "rawAfterGate": 35055,
+      "normalized": 35048,
+      "cumulativeUnique": 28967,
+      "newUniqueAdded": 28967,
+      "newUniqueRateVsPrevious": null,
+      "newUniqueRateOfOwnRows": 82.65
+    },
+    {
+      "source": "HWAHAE_RANKING",
+      "rawCollected": 5250,
+      "gatedOutNonCosmetic": 0,
+      "rawAfterGate": 5250,
+      "normalized": 5247,
+      "cumulativeUnique": 33037,
+      "newUniqueAdded": 4070,
+      "newUniqueRateVsPrevious": 14.05,
+      "newUniqueRateOfOwnRows": 77.57
+    },
+    {
+      "source": "OLIVEYOUNG_GLOBAL_BEST",
+      "rawCollected": 100,
+      "gatedOutNonCosmetic": 0,
+      "rawAfterGate": 100,
+      "normalized": 100,
+      "cumulativeUnique": 33106,
+      "newUniqueAdded": 69,
+      "newUniqueRateVsPrevious": 0.21,
+      "newUniqueRateOfOwnRows": 69
+    }
+  ]
+}

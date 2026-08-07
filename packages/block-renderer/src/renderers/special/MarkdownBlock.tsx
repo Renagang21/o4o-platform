@@ -49,8 +49,7 @@ export const MarkdownBlock: React.FC<BlockRendererProps> = ({ block }) => {
     getBlockData(block, 'content') ||
     '';
 
-  if (!markdown) return null;
-
+  // Rules of Hooks — 빈 markdown 가드는 아래 hook 들을 모두 호출한 뒤에 둔다
   const [activeHeadingId, setActiveHeadingId] = useState<string>('');
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -129,6 +128,8 @@ export const MarkdownBlock: React.FC<BlockRendererProps> = ({ block }) => {
 
     return () => observer.disconnect();
   }, [showTOC, markdown]);
+
+  if (!markdown) return null;
 
   // Parse markdown to HTML
   let html = '';

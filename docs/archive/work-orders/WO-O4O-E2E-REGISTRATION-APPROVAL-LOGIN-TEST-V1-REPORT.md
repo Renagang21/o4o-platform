@@ -88,7 +88,7 @@ UI 회원관리:         1/3 성공 (GlycoPharm OK / GlucoseView 세션소실 / 
 | 단계 | 시간 | 조치 | 결과 |
 |------|------|------|------|
 | 1 | 08:40 | Revision 622 롤백 시도 | 실패 — DB 비밀번호가 소스에서 변경됨 |
-| 2 | 08:50 | Cloud Run env에서 DB_PASSWORD 확인 (`seoChuran1!`) | 비밀번호 확보 |
+| 2 | 08:50 | Cloud Run env에서 DB_PASSWORD 확인 (`[REDACTED]`) | 비밀번호 확보 |
 | 3 | 08:55 | `gcloud sql users set-password o4o_api` 실행 | Cloud SQL 비밀번호 동기화 |
 | 4 | 09:00 | Revision 626으로 트래픽 전환 | DB 연결 성공 |
 | 5 | 09:05 | `service_memberships` 테이블 미존재 발견 | 마이그레이션 필요 |

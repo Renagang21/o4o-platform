@@ -76,7 +76,7 @@ function mapColorsInObject(obj: any): any {
   if (obj !== null && typeof obj === 'object') {
     const result: any = {};
     for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
         result[key] = mapColorsInObject(obj[key]);
       }
     }

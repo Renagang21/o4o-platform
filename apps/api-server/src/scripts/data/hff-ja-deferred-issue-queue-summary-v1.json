@@ -1,0 +1,15 @@
+{
+ "wo": "WO-O4O-HFF-JA-ALL-CURRENTLY-PRODUCIBLE-7414-DIRECT-BULK-PRODUCTION-V1",
+ "generatedAt": "2026-08-07T03:08:44.135Z",
+ "total": 28,
+ "byBatch": {
+  "batch01": 23,
+  "batch02": 5
+ },
+ "byType": {
+  "TRANSLATION_AMBIGUOUS": 27,
+  "NUMBER_STRUCTURE_AMBIGUOUS": 1
+ },
+ "uniqueProductMasters": 28,
+ "resolvedFromPriorBatch": 0
+}

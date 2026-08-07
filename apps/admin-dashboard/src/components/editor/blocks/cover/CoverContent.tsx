@@ -324,7 +324,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
     };
 
     switch (block.type) {
-      case 'o4o/heading':
+      case 'o4o/heading': {
         const HeadingTag = `h${attributes.level || 2}` as React.ElementType;
         return (
           <div key={block.id} className="relative group" onClick={handleBlockClick}>
@@ -346,6 +346,7 @@ const CoverContent: React.FC<CoverContentProps> = ({
             <BlockToolbar block={block} />
           </div>
         );
+      }
 
       case 'o4o/paragraph':
         return (

@@ -242,10 +242,9 @@ const MediaLibraryAdmin: React.FC = () => {
         const fileType = getFileTypeFromMime(m.mimeType, m.filename);
         return ['document', 'markdown', 'json', 'pdf', 'text', 'spreadsheet'].includes(fileType);
       });
-    } else if (activeTab === 'unattached') {
-      // For now, show all as we don't track attachments
-      filtered = filtered;
     }
+    // activeTab === 'unattached': 첨부 여부를 추적하지 않으므로 별도 필터 없이 전체를 보여준다.
+    // (이전에는 `filtered = filtered` 자기 대입으로 같은 의미를 표현했다.)
 
     // Search filter
     if (searchQuery) {

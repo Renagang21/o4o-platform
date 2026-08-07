@@ -91,7 +91,7 @@ const renderBlock = (block: Block, index: number) => {
           {content}
         </p>
       );
-    case 'heading':
+    case 'heading': {
       const level = (block.attributes?.level as number) || 2;
       const HeadingTag = `h${level}` as React.ElementType;
       const headingClasses: Record<number, string> = {
@@ -109,6 +109,7 @@ const renderBlock = (block: Block, index: number) => {
           {content}
         </HeadingTag>
       );
+    }
     case 'quote':
     case 'blockquote':
       return (
@@ -120,7 +121,7 @@ const renderBlock = (block: Block, index: number) => {
           {content}
         </blockquote>
       );
-    case 'image':
+    case 'image': {
       const src = block.attributes?.src || block.content?.src || '';
       const alt = block.attributes?.alt || block.content?.alt || '';
       return src ? (
@@ -128,6 +129,7 @@ const renderBlock = (block: Block, index: number) => {
           <img src={src} alt={alt} className="w-full rounded-lg" loading="lazy" />
         </figure>
       ) : null;
+    }
     default:
       return content ? (
         <div key={block.id || index} className="mb-4" style={forumStyles.text}>

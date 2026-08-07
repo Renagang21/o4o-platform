@@ -190,7 +190,7 @@ export async function executeBeforePartnerCommissionApply(
 ): Promise<PartnerCommissionResult> {
   const hooks = extensionRegistry.beforePartnerCommissionApply;
 
-  let finalResult: PartnerCommissionResult = { allowed: true };
+  const finalResult: PartnerCommissionResult = { allowed: true };
 
   for (const hook of hooks) {
     try {

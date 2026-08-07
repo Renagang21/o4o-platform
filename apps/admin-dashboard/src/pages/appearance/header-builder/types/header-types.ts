@@ -164,11 +164,11 @@ export interface SocialIconsModuleSettings {
 
 /**
  * Secondary Menu Module Settings
+ *
+ * MenuModuleSettings 와 필드가 동일하며(menuRef 기본값만 'secondary'),
+ * 추가 멤버가 없어 별칭으로 둔다.
  */
-export interface SecondaryMenuModuleSettings extends MenuModuleSettings {
-  // Inherits from MenuModuleSettings
-  // menuRef defaults to 'secondary'
-}
+export type SecondaryMenuModuleSettings = MenuModuleSettings;
 
 /**
  * Search Module Settings

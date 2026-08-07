@@ -8,7 +8,7 @@
  */
 import { judgeSlot, judgeDoc, stripTrailingParenthetical, balancedDelimiters, BLOCKING } from './otc-ko-truncation-policy.ga.js';
 import { slots } from './otc-zh-slots.ga.js';
-import { deriveCardSummary, verifyDerivedCard } from './otc-card-summary.ga.js';
+import { deriveCardSummary, isDeriveFailure, verifyDerivedCard } from './otc-card-summary.ga.js';
 import type { ReasonCode } from './otc-ko-truncation-policy.ga.js';
 
 type Case = { name: string; kind: string; text: string; blocked: boolean; reason?: ReasonCode };
@@ -160,7 +160,7 @@ const ZH_FULL = '本品为非处方药，用于胃酸过多、烧心、胃部不
 function cardSpec(): string[] {
   const f: string[] = [];
   const d = deriveCardSummary(KO_CARD, KO_FULL, ZH_FULL);
-  if (!d.ok) { f.push(`[카드] 파생 실패: ${d.reason}`); return f; }
+  if (isDeriveFailure(d)) { f.push(`[카드] 파생 실패: ${d.reason}`); return f; }
   if (/[가-힣]/.test(d.text)) f.push('[카드] 파생문에 한글이 남았다');
   if (!/…$/.test(d.text)) f.push('[카드] 파생문이 말줄임표로 끝나지 않는다');
   if (d.text.length >= ZH_FULL.length) f.push('[카드] 파생문이 완결본보다 짧지 않다');

@@ -52,7 +52,7 @@ const formatACFValue = (value: any, type?: string, format?: string, attributes?:
       return null;
 
     case 'date_picker':
-    case 'date_time_picker':
+    case 'date_time_picker': {
       const date = new Date(value);
       return date.toLocaleDateString('ko-KR', {
         year: 'numeric',
@@ -63,6 +63,7 @@ const formatACFValue = (value: any, type?: string, format?: string, attributes?:
           minute: '2-digit'
         })
       });
+    }
 
     case 'time_picker':
       return value; // Already formatted from ACF

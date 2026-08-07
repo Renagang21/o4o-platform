@@ -21,7 +21,8 @@ async function main(): Promise<void> {
     let scanned = 0, shard0 = 0, unpromoted = 0, notTaken = 0;
     let after = '00000000-0000-0000-0000-000000000000';
     for (;;) {
-      const rows: Array<{ mid: string | null; stmt: string; name: string; sungsang: string; srv: string; fn: string }> = await ds.query(
+      // SELECT 는 keyset 페이징용 `id` 도 함께 반환한다(아래 `after` 갱신에 사용).
+      const rows: Array<{ mid: string | null; stmt: string; name: string; sungsang: string; srv: string; fn: string; id: string }> = await ds.query(
         `SELECT matched_product_master_id mid, coalesce(raw_payload->'source'->>'STTEMNT_NO','') stmt, coalesce(raw_payload->'source'->>'PRDUCT','') name, coalesce(raw_payload->'source'->>'SUNGSANG','') sungsang, coalesce(raw_payload->'source'->>'SRV_USE','') srv, coalesce(raw_payload->'source'->>'MAIN_FNCTN','') fn, id
          FROM product_candidates WHERE source_label='MFDS_HEALTH_FUNCTIONAL_FOOD' AND deleted_at IS NULL AND id > $1 ORDER BY id ASC LIMIT 5000`, [after]);
       if (!rows.length) break;

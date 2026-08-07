@@ -55,7 +55,7 @@ export interface CreateMenuDto {
   metadata?: Record<string, any>;
 }
 
-export interface UpdateMenuDto extends Partial<CreateMenuDto> {}
+export type UpdateMenuDto = Partial<CreateMenuDto>;
 
 export interface CreateMenuItemDto {
   menu_id: string;
@@ -74,7 +74,7 @@ export interface CreateMenuItemDto {
   metadata?: Record<string, any>;
 }
 
-export interface UpdateMenuItemDto extends Partial<CreateMenuItemDto> {}
+export type UpdateMenuItemDto = Partial<CreateMenuItemDto>;
 
 export interface ReorderMenuItem {
   id: string;

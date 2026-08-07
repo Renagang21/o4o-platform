@@ -84,7 +84,7 @@ async function main(): Promise<void> {
       report.totalPromotable += promotable.length; report.totalNewInsert += promotable.length;
     }
     // Batch01 master 집합 (동일 열거)
-    let b01 = new Set<string>();
+    const b01 = new Set<string>();
     for (const key of BATCH01) {
       const [ing, dose, form] = key.split('|');
       const rr: Array<{ id: string }> = await ds.query(`SELECT pm.id::text FROM product_masters pm WHERE ${grpBase}`, [ing, dose, form]);

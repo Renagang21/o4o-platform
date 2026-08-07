@@ -187,7 +187,7 @@ router.get('/ops/summary', authenticate, requireAdmin, async (_req, res: Respons
     const ds = AppDataSource;
 
     // provider별 호출/에러 건수
-    let providers: Record<string, { calls: number; errors: number }> = {
+    const providers: Record<string, { calls: number; errors: number }> = {
       gemini: { calls: 0, errors: 0 },
       openai: { calls: 0, errors: 0 },
       claude: { calls: 0, errors: 0 },

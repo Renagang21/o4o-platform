@@ -138,7 +138,7 @@ export function createMemberController(
         const isStudentType = membershipType === 'student' || membershipType === 'pharmacy_student_member';
 
         // 조직 확인 — 약사/학생 모두 조직 필수
-        let organizationId: string | null = req.body.organization_id || null;
+        const organizationId: string | null = req.body.organization_id || null;
         if (organizationId) {
           const org = await orgRepo.findOne({ where: { id: organizationId } });
           if (!org) {

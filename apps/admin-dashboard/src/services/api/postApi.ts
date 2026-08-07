@@ -92,7 +92,7 @@ apiClient.interceptors.response.use(
           // dev response observed (logging disabled)
         }
       }
-    } catch {}
+    } catch { /* dev 전용 관측 코드라 실패해도 응답·요청 흐름에 영향 주지 않는다 */ }
     return response;
   },
   (error) => Promise.reject(error)
@@ -108,7 +108,7 @@ apiV1Client.interceptors.response.use(
           // dev response observed (logging disabled)
         }
       }
-    } catch {}
+    } catch { /* dev 전용 관측 코드라 실패해도 응답·요청 흐름에 영향 주지 않는다 */ }
     return response;
   },
   (error) => Promise.reject(error)
@@ -160,7 +160,7 @@ apiClient.interceptors.request.use(
           // dev request observed (logging disabled)
         }
       }
-    } catch {}
+    } catch { /* dev 전용 관측 코드라 실패해도 응답·요청 흐름에 영향 주지 않는다 */ }
     return config;
   },
   (error) => {
@@ -214,7 +214,7 @@ apiV1Client.interceptors.request.use(
           // dev request observed (logging disabled)
         }
       }
-    } catch {}
+    } catch { /* dev 전용 관측 코드라 실패해도 응답·요청 흐름에 영향 주지 않는다 */ }
     return config;
   },
   (error) => {

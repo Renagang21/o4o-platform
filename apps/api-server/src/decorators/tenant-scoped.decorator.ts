@@ -52,7 +52,7 @@ export interface TenantScopedOptions {
  * ```
  */
 export function TenantScoped(options: TenantScopedOptions = {}): ClassDecorator {
-  return (target: Function) => {
+  return (target: object) => {
     const defaultOptions: TenantScopedOptions = {
       column: 'tenantId',
       required: true,
@@ -68,14 +68,14 @@ export function TenantScoped(options: TenantScopedOptions = {}): ClassDecorator 
 /**
  * Check if an entity class is tenant-scoped
  */
-export function isTenantScoped(target: Function): boolean {
+export function isTenantScoped(target: object): boolean {
   return Reflect.getMetadata(TENANT_SCOPED_KEY, target) === true;
 }
 
 /**
  * Get tenant scoped options for an entity
  */
-export function getTenantScopedOptions(target: Function): TenantScopedOptions | undefined {
+export function getTenantScopedOptions(target: object): TenantScopedOptions | undefined {
   if (!isTenantScoped(target)) {
     return undefined;
   }
@@ -85,7 +85,7 @@ export function getTenantScopedOptions(target: Function): TenantScopedOptions | 
 /**
  * Get tenant column name for an entity
  */
-export function getTenantColumn(target: Function): string {
+export function getTenantColumn(target: object): string {
   const options = getTenantScopedOptions(target);
   return options?.column || 'tenantId';
 }

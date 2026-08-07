@@ -1,0 +1,16 @@
+{
+ "wo": "WO-O4O-HFF-JA-ALL-CURRENTLY-PRODUCIBLE-7414-DIRECT-BULK-PRODUCTION-V1",
+ "checkedAt": "2026-08-07T02:54:35.683Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "scope": "batch01+batch02 stored JA canonical",
+ "documents": 20000,
+ "storedFound": 20000,
+ "storedModified": 0,
+ "storedMissing": 0,
+ "notProducible": 0,
+ "structureDiff": 0,
+ "parityBroken": 0,
+ "samples": [],
+ "verdict": "PASS"
+}

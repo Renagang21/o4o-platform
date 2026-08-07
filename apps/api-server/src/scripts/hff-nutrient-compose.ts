@@ -151,11 +151,14 @@ export function composeNutrient(seed: NSeed): Composed {
 
 export function toGuardInput(seed: NSeed, slug: string) {
   const { ko, en } = composeNutrient(seed);
+  // seed.grounding.serving 은 `& Record<string, unknown>` 이라 확장 필드가 unknown 으로 읽힌다.
+  // ServingSpec(GuardProductInput) 이 선언한 타입으로 좁혀 읽는다(런타임 동작 동일).
+  const servingExt = seed.grounding.serving as { servingTotalWeight?: number | null; servingTotalWeightUnit?: string | null };
   return {
     candidateId: slug, productName: seed.productName, productNameEn: seed.productName,
     manufacturer: seed.manufacturer, manufacturerEn: null, statementNo: seed.statementNo, category: 'hff',
     source: seed.source,
-    grounding: { declaredAmount: seed.grounding.declaredAmount, serving: { unitType: seed.grounding.serving.unitType, unitWeight: null, unitWeightUnit: null, unitsPerServing: seed.grounding.serving.unitsPerServing, servingTotalWeight: (seed.grounding.serving as Record<string, unknown>).servingTotalWeight ?? null, servingTotalWeightUnit: (seed.grounding.serving as Record<string, unknown>).servingTotalWeightUnit ?? null, servingsPerDay: seed.grounding.serving.servingsPerDay, servingsPerDayMax: seed.grounding.serving.servingsPerDayMax ?? null }, calculationAllowed: false, ageBandsRaw: seed.grounding.ageBandsRaw },
+    grounding: { declaredAmount: seed.grounding.declaredAmount, serving: { unitType: seed.grounding.serving.unitType, unitWeight: null, unitWeightUnit: null, unitsPerServing: seed.grounding.serving.unitsPerServing, servingTotalWeight: servingExt.servingTotalWeight ?? null, servingTotalWeightUnit: servingExt.servingTotalWeightUnit ?? null, servingsPerDay: seed.grounding.serving.servingsPerDay, servingsPerDayMax: seed.grounding.serving.servingsPerDayMax ?? null }, calculationAllowed: false, ageBandsRaw: seed.grounding.ageBandsRaw },
     drafts: { ko, en },
   };
 }

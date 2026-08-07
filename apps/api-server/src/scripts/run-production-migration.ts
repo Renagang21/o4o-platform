@@ -12,11 +12,12 @@ import pg from 'pg';
 
 const { Client } = pg;
 
-// Production database configuration
+// 운영 DB 접근은 Cloud SQL Auth Proxy 를 경유한다 (직접 host 지정 금지).
+// 기본값 127.0.0.1:5442 = start-cloud-sql-proxy.cmd 의 리스닝 주소.
 const DB_CONFIG = {
-  host: '34.64.96.252',
-  port: 5432,
-  database: 'o4o_platform',
+  host: process.env.DB_HOST || '127.0.0.1',
+  port: Number(process.env.DB_PORT || 5442),
+  database: process.env.DB_NAME || 'o4o_platform',
   user: process.env.DB_USERNAME || 'o4o_api',
   password: process.env.DB_PASSWORD,
   ssl: false, // Cloud SQL public IP doesn't require SSL for same GCP project

@@ -17,24 +17,30 @@ import {
 
 interface KpaOperatorDashboardLayoutProps {
   config: OperatorDashboardConfig;
-  auxiliary?: ReactNode;
+  /**
+   * WO-O4O-CROSSSERVICE-OPERATOR-DASHBOARD-UI-PARITY-FINALIZE-V1:
+   *   부가 섹션을 5-Block **위**에 배치하는 slot. GlycoPharm·K-Cosmetics 가 사용하는
+   *   공통 layout 의 `aboveBlocks` 와 같은 위치·같은 순서 컨벤션([안내 카드] → [Axis] → [5-Block]).
+   *   기존 `auxiliary`(5-Block 아래) 는 세 서비스 배치 parity 를 깨뜨려 대체했다.
+   */
+  aboveBlocks?: ReactNode;
 }
 
 export default function KpaOperatorDashboardLayout({
   config,
-  auxiliary,
+  aboveBlocks,
 }: KpaOperatorDashboardLayoutProps) {
   const hasActions = config.actionQueue.length > 0;
   const hasAiSummary = (config.aiSummary?.length ?? 0) > 0;
 
   return (
     <div className="space-y-6">
+      {aboveBlocks}
       {hasActions && <ActionQueueBlock items={config.actionQueue} />}
       <KpiGrid items={config.kpis} />
       <QuickActionBlock items={config.quickActions} />
       {hasAiSummary && <AiSummaryBlock items={config.aiSummary ?? []} />}
       <ActivityLogBlock items={config.activityLog} />
-      {auxiliary}
     </div>
   );
 }

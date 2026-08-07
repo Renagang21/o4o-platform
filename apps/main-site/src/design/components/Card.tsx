@@ -63,7 +63,7 @@ Card.displayName = 'Card';
 /**
  * Card Header Component
  */
-export interface CardHeaderProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardHeaderProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CardHeader = forwardRef<HTMLDivElement, CardHeaderProps>(
   ({ children, className, ...rest }, ref) => {
@@ -84,7 +84,7 @@ CardHeader.displayName = 'CardHeader';
 /**
  * Card Footer Component
  */
-export interface CardFooterProps extends React.HTMLAttributes<HTMLDivElement> {}
+export type CardFooterProps = React.HTMLAttributes<HTMLDivElement>;
 
 export const CardFooter = forwardRef<HTMLDivElement, CardFooterProps>(
   ({ children, className, ...rest }, ref) => {

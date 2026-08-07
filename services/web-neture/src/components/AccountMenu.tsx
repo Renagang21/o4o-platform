@@ -31,6 +31,42 @@ export default function AccountMenu() {
     navigate('/');
   };
 
+  // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles로 dashboard 경로 결정
+  // (Rules of Hooks — 아래 useMemo 가 조기 return 뒤에 오지 않도록 비로그인 분기보다 위에서 계산한다)
+  const dashboardPath = getNetureDashboardRoute(user?.roles ?? []);
+  const roleLabel = getNetureRoleLabel(user?.roles);
+
+  // WO-O4O-AUTH-RBAC-CLEANUP-V1: 대시보드 대상 역할 판별
+  const DASHBOARD_ROLES = DASHBOARD_B2B_ROLES;
+  const hasDashboardRole = user?.roles?.some((r: string) =>
+    r.endsWith(':admin') ||
+    r.endsWith(':operator') ||
+    r.endsWith(':supplier') ||
+    r.endsWith(':partner') ||
+    r.endsWith(':seller') ||
+    r === 'platform:super_admin' ||
+    DASHBOARD_ROLES.includes(r),
+  ) ?? false;
+
+  const menuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
+    const items: GlobalUserProfileMenuItem[] = [];
+    if (hasDashboardRole) {
+      items.push({
+        key: 'dashboard',
+        icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+        label: `${roleLabel} 대시보드`,
+        href: dashboardPath,
+      });
+    }
+    items.push({
+      key: 'mypage',
+      icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
+      label: '마이페이지',
+      href: '/mypage',
+    });
+    return items;
+  }, [hasDashboardRole, roleLabel, dashboardPath]);
+
   // 비로그인 상태
   if (!isAuthenticated || !user) {
     return (
@@ -51,42 +87,7 @@ export default function AccountMenu() {
     );
   }
 
-  // WO-O4O-NETURE-AUTH-ROLE-REDIRECT-FIX-V1: 전체 roles로 dashboard 경로 결정
-  const dashboardPath = getNetureDashboardRoute(user.roles);
-  const roleLabel = getNetureRoleLabel(user.roles);
-
-  // WO-O4O-AUTH-RBAC-CLEANUP-V1: 대시보드 대상 역할 판별
-  const DASHBOARD_ROLES = DASHBOARD_B2B_ROLES;
-  const hasDashboardRole = user.roles?.some((r: string) =>
-    r.endsWith(':admin') ||
-    r.endsWith(':operator') ||
-    r.endsWith(':supplier') ||
-    r.endsWith(':partner') ||
-    r.endsWith(':seller') ||
-    r === 'platform:super_admin' ||
-    DASHBOARD_ROLES.includes(r),
-  ) ?? false;
-
   const displayName = getUserDisplayName(user as any);
-
-  const menuItems: GlobalUserProfileMenuItem[] = useMemo(() => {
-    const items: GlobalUserProfileMenuItem[] = [];
-    if (hasDashboardRole) {
-      items.push({
-        key: 'dashboard',
-        icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
-        label: `${roleLabel} 대시보드`,
-        href: dashboardPath,
-      });
-    }
-    items.push({
-      key: 'mypage',
-      icon: <LayoutDashboard className="w-4 h-4 text-gray-500" />,
-      label: '마이페이지',
-      href: '/mypage',
-    });
-    return items;
-  }, [hasDashboardRole, roleLabel, dashboardPath]);
 
   return (
     <GlobalUserProfileDropdown

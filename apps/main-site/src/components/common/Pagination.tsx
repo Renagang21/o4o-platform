@@ -25,7 +25,7 @@ export function Pagination({
   const getVisiblePages = (): number[] => {
     const pages: number[] = [];
     let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+    const endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
     // 시작 페이지 조정
     if (endPage - startPage + 1 < maxVisiblePages) {

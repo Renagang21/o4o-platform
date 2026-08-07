@@ -103,12 +103,8 @@ export const seedFormPreset = async () => {
     roles: ['admin', 'editor', 'author']
   };
 
-  try {
-    const result = await formPresetsApi.create(formPreset);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const result = await formPresetsApi.create(formPreset);
+  return result;
 };
 
 /**
@@ -196,12 +192,8 @@ export const seedViewPreset = async () => {
     roles: ['admin', 'editor']
   };
 
-  try {
-    const result = await viewPresetsApi.create(viewPreset);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const result = await viewPresetsApi.create(viewPreset);
+  return result;
 };
 
 /**
@@ -270,31 +262,23 @@ export const seedTemplatePreset = async () => {
     roles: ['admin', 'editor']
   };
 
-  try {
-    const result = await templatePresetsApi.create(templatePreset);
-    return result;
-  } catch (error) {
-    throw error;
-  }
+  const result = await templatePresetsApi.create(templatePreset);
+  return result;
 };
 
 /**
  * Seed all presets at once
  */
 export const seedAllPresets = async () => {
-  try {
-    const formResult = await seedFormPreset();
-    const viewResult = await seedViewPreset();
-    const templateResult = await seedTemplatePreset();
+  const formResult = await seedFormPreset();
+  const viewResult = await seedViewPreset();
+  const templateResult = await seedTemplatePreset();
 
-    return {
-      formPreset: formResult.data,
-      viewPreset: viewResult.data,
-      templatePreset: templateResult.data
-    };
-  } catch (error) {
-    throw error;
-  }
+  return {
+    formPreset: formResult.data,
+    viewPreset: viewResult.data,
+    templatePreset: templateResult.data
+  };
 };
 
 // Export for window access in browser console

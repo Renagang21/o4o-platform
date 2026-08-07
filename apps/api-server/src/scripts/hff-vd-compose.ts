@@ -228,6 +228,9 @@ export function composeVd(seed: VdSeed): Composed {
 /** seed → GuardProductInput (가드 입력) */
 export function toGuardInput(seed: VdSeed, slug: string) {
   const { ko, en } = composeVd(seed);
+  // seed.grounding.serving 은 `& Record<string, unknown>` 이라 확장 필드가 unknown 으로 읽힌다.
+  // ServingSpec(GuardProductInput) 이 선언한 타입으로 좁혀 읽는다(런타임 동작 동일).
+  const servingExt = seed.grounding.serving as { servingTotalWeight?: number | null; servingTotalWeightUnit?: string | null };
   return {
     candidateId: `hff-vd:${slug}`,
     productName: seed.productName,
@@ -243,8 +246,8 @@ export function toGuardInput(seed: VdSeed, slug: string) {
         unitType: seed.grounding.serving.unitType,
         unitWeight: null, unitWeightUnit: null,
         unitsPerServing: seed.grounding.serving.unitsPerServing,
-        servingTotalWeight: (seed.grounding.serving as Record<string, unknown>).servingTotalWeight ?? null,
-        servingTotalWeightUnit: (seed.grounding.serving as Record<string, unknown>).servingTotalWeightUnit ?? null,
+        servingTotalWeight: servingExt.servingTotalWeight ?? null,
+        servingTotalWeightUnit: servingExt.servingTotalWeightUnit ?? null,
         servingsPerDay: seed.grounding.serving.servingsPerDay,
         servingsPerDayMax: seed.grounding.serving.servingsPerDayMax ?? null,
       },
