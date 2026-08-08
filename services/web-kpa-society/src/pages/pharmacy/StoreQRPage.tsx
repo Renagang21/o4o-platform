@@ -65,6 +65,15 @@ const LANDING_TYPE_LABELS: Record<string, string> = {
 // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: QR 목록 필터 키.
 type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
 
+/**
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1
+ * 보관된 화면 세트의 코너 QR — 목록에는 남지만(주소 유지, 복원 시 재개방) 출력·다운로드는 막는다.
+ * 서버가 이미 같은 판정으로 export/image 를 409 로 거부하므로, UI 는 그 사실을 미리 알린다(왕복 낭비 방지).
+ */
+function isArchivedCornerQr(q: StoreQrCode): boolean {
+  return q.landingType === 'screen_set' && q.screenSetStatus === 'archived';
+}
+
 function toSlug(text: string): string {
   return text
     .toLowerCase()
@@ -485,11 +494,15 @@ export function StoreQRPage() {
   // handleToggleSelect 는 더 이상 사용처 없음 — 행 selection 은 DataTable 이 처리.
   // handleSelectAll 은 외부 toolbar 의 "전체 선택" 라벨에서 그대로 사용.
 
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+  //   보관 코너 QR 은 일괄 출력 대상에서도 제외한다(개별 출력 차단과 동일 기준).
+  const printableItems = items.filter((i) => !isArchivedCornerQr(i));
+
   const handleSelectAll = () => {
-    if (selectedIds.size === items.length) {
+    if (selectedIds.size === printableItems.length) {
       setSelectedIds(new Set());
     } else {
-      setSelectedIds(new Set(items.map((i) => i.id)));
+      setSelectedIds(new Set(printableItems.map((i) => i.id)));
     }
   };
 
@@ -509,6 +522,15 @@ export function StoreQRPage() {
   };
 
   const handleOpenPrintModal = () => {
+    // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+    //   보관 코너 QR 이 선택에 섞여 있으면 **조용히 빼지 않고** 명시적으로 알린 뒤 제외한다.
+    const archivedSelected = items.filter((i) => selectedIds.has(i.id) && isArchivedCornerQr(i));
+    if (archivedSelected.length > 0) {
+      const keep = new Set(Array.from(selectedIds).filter((id) => !archivedSelected.some((a) => a.id === id)));
+      setSelectedIds(keep);
+      toast.error(`보관된 화면 세트의 코너 QR ${archivedSelected.length}건은 출력할 수 없어 선택에서 제외했습니다.`);
+      if (keep.size === 0) return;
+    }
     if (selectedIds.size === 0) {
       toast.error('출력할 QR을 먼저 선택해 주세요.');
       return;
@@ -585,6 +607,11 @@ export function StoreQRPage() {
     { key: 'ai', label: 'AI 설명', count: aiCount },
     { key: 'screen_set', label: '태블릿 코너', count: cornerCount },
   ];
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
+  //   홈 '활성 QR' KPI 와 **같은 판정(landable)** 으로 센 값. 두 화면의 숫자가 어긋나지 않아야 한다.
+  //   landable 미제공(구버전 응답)이면 isActive 로 안전 폴백.
+  const activeCount = items.filter((q) => q.landable ?? q.isActive).length;
+  const archivedCount = items.length - activeCount;
 
   return (
     <div style={styles.container}>
@@ -654,11 +681,12 @@ export function StoreQRPage() {
           <label style={styles.selectAllLabel}>
             <input
               type="checkbox"
-              checked={selectedIds.size === items.length && items.length > 0}
+              checked={selectedIds.size === printableItems.length && printableItems.length > 0}
               onChange={handleSelectAll}
               style={styles.checkbox}
             />
-            전체 선택 ({selectedIds.size}/{items.length})
+            {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1: 분모 = 출력 가능한 QR(보관 제외). */}
+            전체 선택 ({selectedIds.size}/{printableItems.length})
           </label>
           {selectedIds.size > 0 && (
             <button
@@ -1019,6 +1047,13 @@ export function StoreQRPage() {
                 </button>
               ))}
             </div>
+            {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
+                홈 '활성 QR' KPI 와 대조 가능한 숫자를 목록에도 명시(같은 landable 판정). */}
+            <p style={{ margin: '0 0 10px', fontSize: '12px', color: colors.neutral500 }}>
+              활성 {activeCount}건
+              {archivedCount > 0 && <> · 보관 {archivedCount}건</>}
+              <span style={{ color: colors.neutral400 }}> — 홈의 ‘활성 QR’ 숫자와 같은 기준입니다.</span>
+            </p>
             <DataTable<StoreQrCode>
               rowSelection={{
                 selectedRowKeys: Array.from(selectedIds),
@@ -1042,7 +1077,19 @@ export function StoreQRPage() {
                               AI 설명{item.aiDescriptionMode === 'corner' ? '·코너' : ''}
                             </span>
                           )}
+                          {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+                              보관된 화면 세트의 코너 QR — 목록에서 사라지지 않고 '보관' 으로 남는다. */}
+                          {isArchivedCornerQr(item) && (
+                            <span style={{ marginLeft: 6, display: 'inline-flex', padding: '1px 7px', borderRadius: '999px', fontSize: '10px', fontWeight: 600, backgroundColor: colors.neutral200, color: colors.neutral600, verticalAlign: 'middle' }}>
+                              보관
+                            </span>
+                          )}
                         </p>
+                        {isArchivedCornerQr(item) && (
+                          <p style={{ fontSize: '11px', color: colors.neutral500, margin: '2px 0 0 0' }}>
+                            화면 세트가 보관되어 이 QR은 열리지 않습니다 · 주소는 유지되며 보관 해제 시 다시 열립니다
+                          </p>
+                        )}
                         {item.description && (
                           <p style={{ fontSize: '12px', color: colors.neutral500, margin: '2px 0 0 0', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                             {item.description}
@@ -1137,10 +1184,24 @@ export function StoreQRPage() {
                       {/* WO-O4O-KPA-STORE-QR-EXPORT-MENU-CLIP-FIX-V1:
                           QR_EXPORT_PRESETS 메뉴(A4 PDF/4분할/PNG/SVG)를 portal 로 띄워 DataTable
                           overflow 클리핑 회피. handleExport 동작은 그대로 유지. */}
-                      <QrExportMenu
-                        exporting={exportingId === item.id}
-                        onExport={(format, preset) => handleExport(item.id, format, preset)}
-                      />
+                      {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+                          보관 코너 QR 은 출력·다운로드 차단(서버도 409 로 동일 판정). */}
+                      {isArchivedCornerQr(item) ? (
+                        <button
+                          type="button"
+                          disabled
+                          style={{ ...styles.downloadBtn, opacity: 0.45, cursor: 'not-allowed' }}
+                          title="보관된 화면 세트의 QR은 출력할 수 없습니다. 보관을 해제하면 같은 주소로 다시 출력됩니다."
+                        >
+                          <Download size={14} />
+                          출력 불가
+                        </button>
+                      ) : (
+                        <QrExportMenu
+                          exporting={exportingId === item.id}
+                          onExport={(format, preset) => handleExport(item.id, format, preset)}
+                        />
+                      )}
                       <button
                         onClick={(e) => { e.stopPropagation(); handleShowAnalytics(item.id); }}
                         style={{ ...styles.iconBtn, color: analyticsId === item.id ? colors.primary : colors.neutral400 }}

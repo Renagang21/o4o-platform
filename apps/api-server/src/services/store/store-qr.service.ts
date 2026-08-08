@@ -33,6 +33,12 @@ import { ensureStoreCopyForPageTarget } from '../../routes/o4o-store/services/qr
 import { resolveScreenSetSections } from '../../routes/platform/store-public/store-public-screen-set-resolve.js';
 // WO-O4O-SCREEN-SET-RESOLVER-CONTENT-SOURCE-SEAM-V1: content_list 원본 조회 기본 Store Adapter 명시 주입.
 import { createStoreContentSourceAdapter } from '../../routes/platform/store-public/store-public-tablet-content-source.js';
+// WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1: screen_set QR 상태 판정 SQL SSOT.
+import {
+  SCREEN_SET_QR_JOIN,
+  QR_LANDABLE_CONDITION,
+  ARCHIVED_SCREEN_SET_QR_CONDITION,
+} from '../../routes/platform/store-screen-set-qr.service.js';
 
 /**
  * QR 연결(landing) 타입.
@@ -367,11 +373,25 @@ export interface ListQrResult {
 }
 
 /**
- * GET — 매장 QR 목록 (활성 항목만, scanCount 포함).
+ * GET — 매장 QR 목록 (scanCount 포함).
  *
  * scanCount 는 store_qr_scan_events 집계이고, aiDescriptionMode 는 page QR 이 가리키는
  * 매장 직접 콘텐츠(kpa_store_contents source_type='direct')의 AI 설명 모드다.
  * landing_target_id 는 varchar(링크 QR=URL 등 비-UUID 가능)라 uuid 직접 비교 금지 — id::text 로 비교한다.
+ *
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+ *   과거 `is_active = true` 단독 필터는 Screen Set 보관 시 종속 코너 QR 을 목록에서 **완전히 사라지게** 했다.
+ *   보관은 QR row·slug 를 지우지 않고 복원하면 같은 주소로 다시 열리는데(lifecycle sync), 매장은 그 사실을
+ *   화면에서 확인할 수 없었다 — 즉 QR 관리 화면이 lifecycle 을 소비하지 않았다.
+ *   → 보관 Screen Set 종속 QR 을 **'보관' 상태로 함께 반환**한다.
+ *     사용자가 직접 삭제한 일반 QR(is_active=false, Screen Set 무관)은 기존대로 숨는다.
+ *
+ *   추가 응답 필드(additive — 기존 소비처 무영향):
+ *     screenSetId     : 코너 QR 이 가리키는 store_tablet_screen_sets.id (그 외 null)
+ *     screenSetStatus : 'active' | 'archived' | null (세트 미존재·비코너 QR)
+ *     landable        : 공개 /qr/:slug 가 실제로 열리는가 (KPI 산식과 동일 판정)
+ *
+ *   Pharmacy-Hub 소비처(PharmacyHubStoreQrController)는 screen_set QR 자체가 없어 결과 집합 불변이다.
  */
 export async function listStoreQrCodes(
   dataSource: DataSource,
@@ -400,7 +420,15 @@ export async function listStoreQrCodes(
          qr.consultation_cta_enabled AS "consultationCtaEnabled",
          qr.consultation_cta_label AS "consultationCtaLabel",
          COALESCE(sc.scan_count, 0)::int AS "scanCount",
-         dc.content_json->'aiDescription'->>'mode' AS "aiDescriptionMode"
+         dc.content_json->'aiDescription'->>'mode' AS "aiDescriptionMode",
+         -- WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1: 코너 QR 상태(additive)
+         qs.id AS "screenSetId",
+         CASE
+           WHEN qs.id IS NULL THEN NULL
+           WHEN qs.deleted_at IS NOT NULL OR qs.status = 'archived' THEN 'archived'
+           ELSE 'active'
+         END AS "screenSetStatus",
+         ${QR_LANDABLE_CONDITION} AS "landable"
        FROM store_qr_codes qr
        LEFT JOIN (
          SELECT qr_code_id, COUNT(*) AS scan_count
@@ -412,15 +440,20 @@ export async function listStoreQrCodes(
          ON dc.id::text = qr.landing_target_id
          AND dc.organization_id = qr.organization_id
          AND dc.source_type = 'direct'
-       WHERE qr.organization_id = $1 AND qr.is_active = true
+       ${SCREEN_SET_QR_JOIN}
+       WHERE qr.organization_id = $1
+         AND (qr.is_active = true OR ${ARCHIVED_SCREEN_SET_QR_CONDITION})
        ORDER BY qr.created_at DESC
        LIMIT $2 OFFSET $3`,
       [organizationId, limit, offset],
     ),
     dataSource.query(
+      // total 은 목록 WHERE 와 반드시 동일해야 한다(페이지네이션 정합).
       `SELECT COUNT(*)::int AS total
-       FROM store_qr_codes
-       WHERE organization_id = $1 AND is_active = true`,
+       FROM store_qr_codes qr
+       ${SCREEN_SET_QR_JOIN}
+       WHERE qr.organization_id = $1
+         AND (qr.is_active = true OR ${ARCHIVED_SCREEN_SET_QR_CONDITION})`,
       [organizationId],
     ),
   ]);
@@ -479,7 +512,13 @@ export async function getStoreQrAnalytics(
 
 /**
  * 출력(이미지/PDF) 대상 QR 단건 조회.
- * `requireActive` 를 켜면 비활성(삭제) QR 은 출력 대상에서 제외한다.
+ * `requireActive` 를 켜면 **출력할 수 없는 QR**(비활성 = 삭제, 또는 보관된 Screen Set 의 코너 QR)을 제외한다.
+ *
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1:
+ *   `is_active` 만 보면 판정이 공개 랜딩과 어긋난다. 코너 QR 은 **이중 게이트**(QR is_active + Screen Set 유효)
+ *   를 통과해야 열리므로, `is_active=true` 인데 대상 Screen Set 이 보관·삭제된 QR 은 랜딩이 410/404 인데도
+ *   출력물은 계속 뽑히는 상태가 된다(스캔하면 죽은 QR 을 인쇄·배포하게 됨).
+ *   → 출력 게이트를 공개 랜딩과 같은 판정으로 맞춘다. 목록·KPI·출력·랜딩 4곳이 같은 기준을 쓴다.
  */
 export async function findStoreQrCode(
   dataSource: DataSource,
@@ -492,6 +531,25 @@ export async function findStoreQrCode(
   if (opts.requireActive) where.isActive = true;
   const qr = await qrRepo.findOne({ where: where as any });
   if (!qr) return NOT_FOUND;
+
+  if (opts.requireActive && qr.landingType === 'screen_set' && qr.landingTargetId) {
+    // 보관·삭제된 Screen Set 의 코너 QR → 출력 차단(목록에는 '보관' 으로 남는다).
+    const [set] = await dataSource.query(
+      `SELECT id FROM store_tablet_screen_sets
+        WHERE id::text = $1 AND organization_id = $2 AND origin = 'store'
+          AND deleted_at IS NULL AND status <> 'archived'
+        LIMIT 1`,
+      [qr.landingTargetId, organizationId],
+    );
+    if (!set) {
+      return failure(
+        409,
+        'SCREEN_SET_ARCHIVED',
+        '보관된 화면 세트의 코너 QR 입니다. 보관을 해제하면 같은 주소로 다시 출력할 수 있습니다.',
+      );
+    }
+  }
+
   return { ok: true, data: qr };
 }
 

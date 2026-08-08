@@ -29,6 +29,14 @@ export interface StoreQrCode {
   scanCount?: number;
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 연결된 direct 콘텐츠가 AI 설명이면 'single'|'corner'
   aiDescriptionMode?: string | null;
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1: 코너 QR(screen_set) 상태(additive).
+  //   보관된 화면 세트의 코너 QR 은 목록에 '보관' 으로 남고(주소 유지) 출력만 차단된다.
+  /** 코너 QR 이 가리키는 화면 세트 id. 그 외 QR 은 null. */
+  screenSetId?: string | null;
+  /** 'active' | 'archived' | null(세트 미존재·비코너 QR) */
+  screenSetStatus?: 'active' | 'archived' | null;
+  /** 공개 /qr/:slug 가 실제로 열리는가 (홈 활성 QR KPI 와 동일 판정). */
+  landable?: boolean;
   // QR 설정 모달 프리필용 — 상담 CTA 현재값
   consultationCtaEnabled?: boolean | null;
   consultationCtaLabel?: string | null;

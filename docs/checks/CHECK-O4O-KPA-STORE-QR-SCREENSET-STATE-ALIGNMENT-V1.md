@@ -2,7 +2,10 @@
 
 > WO: `WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1`
 > 대상: KPA 매장 Screen Set(태블릿 코너 화면) ↔ 코너 QR 상태·상품 노출·목록·미리보기 정합
-> 상태: **부분 완료** — M-1(보관 QR 목록·출력 차단) 은 **병렬 세션 파일 충돌로 미착수**(§중지 조건 발동)
+> 상태: **구현 완료** — M-1 포함 전 범위 반영. 프로덕션 E2E 검증 진행 중.
+>
+> 이력: 1차(`90aef6023`)는 M-1 을 병렬 세션 파일 충돌로 보류했고, 병렬 세션이 `b3aae68b1`
+> (`feat(pharmacy-hub): add store execution assets`)로 QR service 추출을 커밋한 뒤 **같은 WO 를 재개**해 M-1 을 마감했다.
 
 ---
 
@@ -16,7 +19,21 @@
 | E-1 QR 목록 → 화면 세트 편집 이동 | 프론트 | ✅ 완료 |
 | M-4 편집기 QR 모바일 미리보기 정합 | 공유 편집기 + 매장 소비처 | ✅ 완료 |
 | §6 명칭·홈 진입점·dead 파일·주석 정비 | 프론트 | ✅ 완료 |
-| **M-1 보관 QR 상태 표시·출력 차단** | 서버 QR 목록/export | ⛔ **미착수 (중지 조건)** |
+| **M-1 보관 QR 상태 표시·출력 차단** | 공통 QR service + 라우트 + 프론트 | ✅ 완료 (2차) |
+
+### 이 WO 가 실제로 고친 것 (정정)
+
+보관/복원 **lifecycle 자체는 이미 구현되어 있었다**(`WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1` — §7).
+이번에 발견된 진짜 문제는 **QR 관리 화면과 출력 경로가 그 lifecycle 을 소비하지 않았다**는 것이다.
+
+| 소비처 | 이전 판정 | 실제(공개 랜딩) 판정 | 결과 |
+|---|---|---|---|
+| QR 목록 | `is_active` | 이중 게이트 | 보관 QR **완전 소실** |
+| 홈 활성 QR KPI | `is_active` | 이중 게이트 | 랜딩 불가 QR 과다 집계 |
+| `/image` 출력 | 게이트 **없음** | 이중 게이트 | 화면 차단 우회 다운로드 |
+| `/export`·`/print`·`/flyer` | `is_active` | 이중 게이트 | 세트 보관+QR 활성 시 죽은 QR 인쇄 |
+
+→ 목록 · KPI · 출력 · 공개 랜딩 **4곳이 같은 판정식**(`QR_LANDABLE_CONDITION`)을 쓰도록 통일했다.
 
 ---
 
@@ -71,10 +88,8 @@ ARCHIVED_SCREEN_SET_QR_CONDITION  -- 보관 세트 종속 QR (M-1 에서 소비 
 
 `landing_target_id` 는 varchar(링크 QR = URL 등 비-UUID 가능)이므로 `qs.id::text` 방향으로만 캐스팅한다.
 
-> ⚠️ **부분 반영 주의**: KPI 는 "실제 랜딩 가능 수"로 정정됐으나, **QR 목록은 여전히 `is_active=true` 기준**이다
-> (M-1 미착수). 따라서 `is_active=true` + 세트 보관/삭제 인 QR 이 존재하는 매장에서는
-> "KPI < 목록 표시 수" 가 될 수 있다. WO 검증 항목 "활성 QR KPI와 실제 활성 목록 수 일치" 는
-> **M-1 완료 후에만 성립**한다. KPI 값 자체는 공개 랜딩 실동작과 일치한다(더 정확해짐).
+> ~~부분 반영 주의~~ **해소됨(2차/M-1)**: 목록도 같은 `landable` 판정을 내려주고, 목록 상단에
+> `활성 N건 · 보관 M건` 을 표기해 홈 KPI 와 화면에서 직접 대조된다(§6-3).
 
 ---
 
@@ -131,32 +146,47 @@ ARCHIVED_SCREEN_SET_QR_CONDITION  -- 보관 세트 종속 QR (M-1 에서 소비 
 
 ---
 
-## 6. ⛔ M-1 미착수 — 중지 조건 발동
+## 6. M-1 — 보관 QR 상태 표시 · 출력 차단 (2차, 재개 후 완료)
 
-**WO 중지 조건: "병렬 작업 핵심 파일 충돌"**
+병렬 세션이 `b3aae68b1` 로 `store-qr.service.ts` 추출을 커밋해 충돌이 해소된 뒤 재개했다.
+**새 WO 를 만들지 않고 같은 WO 를 이어서** 마감했다. schema·migration 변경 0.
 
-M-1(보관 QR 목록 노출 · 출력/다운로드 차단)의 수정 지점이 **다른 세션이 지금 편집 중인 파일**이다.
+### 6-1. 목록 소실 수정 — `listStoreQrCodes()`
 
-| 필요한 수정 | 파일 | 상태 |
-|---|---|---|
-| QR 목록에 보관 세트 종속 QR 포함 + `screenSetStatus`/`landable` 필드 | `apps/api-server/src/services/store/store-qr.service.ts` | **untracked (병렬 세션 신규 생성)** |
-| `/pharmacy/qr/:id/image` 의 `isActive` 게이트 누락 보완 | `apps/api-server/src/routes/o4o-store/controllers/store-qr-landing.controller.ts` | **dirty (병렬 세션 수정 중)** |
+`WHERE qr.is_active = true` → `WHERE qr.is_active = true OR ARCHIVED_SCREEN_SET_QR_CONDITION`.
+§2 에서 신설해 둔 SSOT 조각(`SCREEN_SET_QR_JOIN` / `ARCHIVED_SCREEN_SET_QR_CONDITION`)을 그대로 재사용했다.
 
-- 병렬 세션은 Pharmacy-Hub QR·매뉴얼 기능(`routes/pharmacy-hub`, `controllers/pharmacy-hub/*`,
-  `services/web-pharmacy-hub/*`)을 위해 `store-qr-landing.controller.ts` 의 QR CRUD/목록/통계를
-  `services/store/store-qr.service.ts` 로 추출하는 리팩터링을 진행 중이다(작업 중 실시간 갱신 확인).
-- 해당 파일을 수정하면 병렬 세션의 미커밋 작업을 훼손하거나 반대로 덮어쓰일 수 있어 **미착수**로 남긴다.
+- 보관 Screen Set 의 코너 QR → 목록에 **'보관' 상태로 유지**(주소·row 불변).
+- 사용자가 직접 삭제한 일반 QR(`is_active=false`, Screen Set 무관) → 기존대로 숨김.
+- `total` 카운트 쿼리도 **동일 WHERE** 로 맞춤(페이지네이션 정합).
+- additive 응답 필드: `screenSetId` / `screenSetStatus`('active'|'archived'|null) / `landable`.
 
-### 확인된 M-1 결함(수정 대기 — 조사 결과 보존)
+> **공통 모듈 영향 확인(CLAUDE.md Shared Module Rule)**: `listStoreQrCodes` 소비처는
+> KPA 공통 라우트 + `PharmacyHubStoreQrController` 2곳. Pharmacy-Hub 는 태블릿·Screen Set 축이 없어
+> (병렬 세션이 `storeMenuConfig.ts` 에 "태블릿은 이 회차 제외" 명시) `landing_type='screen_set'` 행이 0건 →
+> **결과 집합 불변**. 추가 필드는 additive 라 기존 프론트 계약 무영향.
 
-1. **목록 소실**: `GET /pharmacy/qr` 이 `WHERE qr.is_active = true` 라, Screen Set 보관 시
-   `setScreenSetQrActive(..., false)` 로 비활성화된 코너 QR 이 **목록에서 완전히 사라진다**.
-   QR row·slug 는 남아 있고 복원하면 같은 주소로 다시 열리는데(§7 확인), 매장은 그 사실을 확인할 수 없다.
-   → 수정안: `SCREEN_SET_QR_JOIN` + `ARCHIVED_SCREEN_SET_QR_CONDITION`(§2 에서 이미 신설·미사용) 으로
-   보관 세트 종속 QR 만 추가 노출. 사용자가 직접 삭제한 일반 QR(`is_active=false`, 세트 무관)은 계속 숨김.
-2. **출력 게이트 비대칭**: `/pharmacy/qr/:id/export` · `/print` · `/flyer` 는 `isActive: true` 를 강제하지만
-   **`/pharmacy/qr/:id/image` 만 `findOne({ id, organizationId })` 로 `isActive` 검사가 없다**
-   → 보관 QR 의 PNG/SVG 다운로드가 가능하다. 나머지 3개와 동일하게 `isActive: true` 추가 필요.
+### 6-2. 출력 우회 차단 — `findStoreQrCode()` + `/image`
+
+두 가지를 함께 닫았다.
+
+1. **`/pharmacy/qr/:id/image` 만 게이트가 없었다** → `requireActive: true` 적용.
+   화면에서는 출력이 막혀도 URL 직접 호출로 이미지가 나오던 우회 제거.
+2. **`requireActive` 자체를 archive 판정으로 승격** — `is_active` 만 보면 공개 랜딩과 어긋난다.
+   코너 QR 은 `landingType='screen_set'` 일 때 대상 세트가 유효한지(`origin='store'`, 미삭제, 미보관)
+   추가 확인하고, 아니면 **409 `SCREEN_SET_ARCHIVED`** + 복원 안내를 돌려준다.
+   → `/image` · `/export` · `/print` · `/flyer` 4개 출력 경로가 공개 랜딩과 같은 기준을 쓴다.
+
+### 6-3. 프론트 (StoreQRPage)
+
+- 코너 QR 행에 **`보관` 배지** + 안내문("화면 세트가 보관되어 이 QR은 열리지 않습니다 · 주소는 유지되며 보관 해제 시 다시 열립니다").
+- 출력 버튼 → **`출력 불가`(disabled)** 로 대체(서버 409 와 동일 판정. 왕복 낭비 방지).
+- 일괄 출력: `전체 선택` 분모를 출력 가능 건수로 변경, 선택에 보관 QR 이 섞이면 **조용히 빼지 않고**
+  토스트로 알린 뒤 제외.
+- 목록 상단에 `활성 N건 · 보관 M건 — 홈의 '활성 QR' 숫자와 같은 기준입니다` 표기 →
+  **KPI ↔ 목록 대조가 화면에서 바로 가능**(§2 의 부분 반영 주의 해소).
+
+> `landable` 미제공(구버전 응답) 시 `isActive` 로 안전 폴백 — 배포 순서 무관하게 화면이 깨지지 않는다.
 
 ---
 
@@ -183,6 +213,18 @@ M-1(보관 QR 목록 노출 · 출력/다운로드 차단)의 수정 지점이 *
 | `api-server` tsc --noEmit (`build:types` 선행) | ✅ PASS (0) |
 | eslint (변경 5개 주요 파일) | ✅ 0 errors / 2 warnings — **둘 다 기존 경고**(stash 대조로 확인, 라인 번호만 이동) |
 | `store-public/__tests__` vitest | ⚠️ **기존 실패** — `describe is not defined`(vitest globals 미설정). 본 변경 stash 후 동일 실패 확인 → **무관**. CLAUDE.md 중지 조건 "현재 변경과 무관한 test 실패" 에 따라 미수정. |
+
+### 2차(M-1) 검증
+
+| 항목 | 결과 |
+|---|---|
+| `web-kpa-society` tsc --noEmit | ✅ PASS (0) |
+| `api-server` tsc --noEmit | ✅ PASS (0) |
+| `node scripts/lint-ratchet.mjs` (CI gate) | ✅ **102 errors = baseline 102** → 회귀 0 |
+| `services/store/__tests__/store-qr.service.test.ts` | ⚠️ **기존 실패** — `jest is not defined`(병렬 세션의 **미추적 WIP** 테스트가 vitest 러너에서 `jest.mock` 사용). 본 변경 stash 후 동일 실패 확인 → **무관**. 타 세션 소유 파일이라 미수정. |
+
+> 그 테스트 파일은 create/update/deactivate/resolvePublicQrLanding 만 다루고
+> `listStoreQrCodes`·`findStoreQrCode` 는 다루지 않아, 본 변경과 계약 충돌도 없다.
 | 브라우저 E2E (프로덕션) | ⏸ 미실시 — M-1 미착수로 WO 검증 항목 일부(보관 QR 목록 표시·출력 차단·KPI↔목록 일치)를 확인할 수 없어, **사용자 결정에 따라 M-1 완료 후 일괄 수행** |
 
 ### 배포 · CI (커밋 `90aef6023`)
