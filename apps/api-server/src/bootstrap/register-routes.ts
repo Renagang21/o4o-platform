@@ -1062,42 +1062,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 게시글 하드 삭제·개인정보 조회가 가능했다. 긴급 차단으로 비프로덕션 한정 등록한다.
     // 개별 endpoint 의 제거 / 정식 admin API 전환 / CLI 전환 판정은 후속 WO 에서 수행한다.
     if (process.env.NODE_ENV !== 'production') {
-    // 37-e. Register RBAC DB Audit debug endpoint (WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1)
-    try {
-      const { createRbacDbAuditRouter } = await import('../routes/debug/rbac-db-audit.controller.js');
-      app.use('/__debug__/rbac-db-audit', createRbacDbAuditRouter(dataSource));
-      logger.info('✅ RBAC DB Audit endpoint registered at /__debug__/rbac-db-audit');
-    } catch (rbacAuditError) {
-      logger.error('Failed to register RBAC DB Audit routes:', rbacAuditError);
-    }
-
-    // 37-f. Service Users Audit endpoint
-    try {
-      const { createServiceUsersAuditRouter } = await import('../routes/debug/service-users-audit.controller.js');
-      app.use('/__debug__/service-users', createServiceUsersAuditRouter(dataSource));
-      logger.info('✅ Service Users Audit endpoint registered at /__debug__/service-users');
-    } catch (serviceUsersError) {
-      logger.error('Failed to register Service Users Audit:', serviceUsersError);
-    }
-
-    // 37-e. Register RBAC Backfill User Role endpoint (WO-RBAC-DATA-NORMALIZATION-EXECUTION-V1)
-    try {
-      const { createRbacBackfillUserRoleRouter } = await import('../routes/debug/rbac-backfill-user-role.controller.js');
-      app.use('/__debug__/rbac-backfill-user-role', createRbacBackfillUserRoleRouter(dataSource));
-      logger.info('✅ RBAC Backfill User Role endpoint registered at /__debug__/rbac-backfill-user-role');
-    } catch (rbacBackfillError) {
-      logger.error('Failed to register RBAC Backfill User Role routes:', rbacBackfillError);
-    }
-
-    // Approval Test debug endpoint
-    try {
-      const { createApprovalTestRouter } = await import('../routes/debug/approval-test.controller.js');
-      app.use('/__debug__/approval-test', createApprovalTestRouter(dataSource));
-      logger.info('✅ Approval Test endpoint registered at /__debug__/approval-test');
-    } catch (approvalTestError) {
-      logger.error('Failed to register Approval Test routes:', approvalTestError);
-    }
-
     // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1)
     try {
       const { createUserDebugRouter } = await import('../routes/debug/user-debug.controller.js');
@@ -1116,23 +1080,6 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Pharmacy Debug routes:', pharmacyDebugError);
     }
 
-    // Forum Post Cleanup endpoint (WO-KPA-FORUM-LEGACY-TEST-POST-HARD-DELETE-V1)
-    try {
-      const { createForumPostCleanupRouter } = await import('../routes/debug/forum-post-cleanup.controller.js');
-      app.use('/__debug__/forum-post-cleanup', createForumPostCleanupRouter(dataSource));
-      logger.info('✅ Forum Post Cleanup endpoint registered at /__debug__/forum-post-cleanup');
-    } catch (forumCleanupError) {
-      logger.error('Failed to register Forum Post Cleanup routes:', forumCleanupError);
-    }
-
-    // Order Canonical Table Diagnostic endpoint (WO-O4O-ORDER-CANONICAL-TABLE-DIAGNOSTIC-ENDPOINT-V1)
-    try {
-      const { createOrderCanonicalTableDiagnosticRouter } = await import('../routes/debug/order-canonical-table.controller.js');
-      app.use('/__debug__/order-canonical-table', createOrderCanonicalTableDiagnosticRouter(dataSource));
-      logger.info('✅ Order Canonical Table Diagnostic endpoint registered at /__debug__/order-canonical-table');
-    } catch (orderCanonicalDiagError) {
-      logger.error('Failed to register Order Canonical Table Diagnostic routes:', orderCanonicalDiagError);
-    }
     } // ── end SECURITY gate: /__debug__/** (non-production only) ──
 
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)

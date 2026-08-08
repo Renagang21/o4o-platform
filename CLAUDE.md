@@ -292,6 +292,17 @@ import type { RelatedEntity } from './related.entity.js';
 
 `/__debug__/auth-bootstrap` / `/health/detailed` / `/health/database` / `/api/v1/auth/status`
 
+### 진단·seed·복구 경로 규칙 (필수)
+
+> 2026-08-08 사고: `/__debug__/**` 8개가 인증·환경 게이트 없이 프로덕션에 노출돼
+> 인증 없는 승인(권한 하드코딩)·RBAC 부여·하드 삭제가 가능했다. 재발 방지 규칙이다.
+
+1. **진단 · seed · repair · backfill 기능은 CLI 우선.** HTTP route 로 만들지 않는다.
+2. HTTP 가 불가피하면 **`requireAuth` + role guard 필수** (인증 없는 진단 route 금지).
+3. **debug / test 성격 route 는 프로덕션에 등록하지 않는다** (`NODE_ENV !== 'production'` 게이트).
+4. **GET 으로 상태를 변경하지 않는다.** 조회는 GET, 변경은 POST/PATCH/DELETE.
+5. **권한을 코드에서 하드코딩하지 않는다** (`isPlatformAdmin: true` 등). 항상 요청자 권한에서 파생한다.
+
 ### JSON 응답 표준
 
 `{ success: true, data: T }` 또는 `{ success: false, error: "msg", code: "ERROR_CODE" }`

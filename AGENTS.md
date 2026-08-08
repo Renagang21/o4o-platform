@@ -124,6 +124,9 @@
   단일 서비스 기준으로 완료 판단하지 않는다 (절차: 공통 모듈 변경 정본 문서).
 - route 없는 메뉴를 노출하지 않고, 실기능이 있는 메뉴를 은폐하지 않는다.
 - UI 정책 문제를 DB backfill · migration 으로 우회하지 않는다.
+- **진단·seed·repair·backfill 은 CLI 우선.** HTTP route 가 불가피하면 `requireAuth` + role guard 필수,
+  debug/test 성격은 프로덕션 미등록(`NODE_ENV !== 'production'`), **GET 으로 상태 변경 금지**,
+  권한 하드코딩(`isPlatformAdmin: true` 등) 금지. 상세는 `CLAUDE.md` §8.
 - TypeScript + ES modules. 명명·스타일 규칙은 [`README.md`](README.md) 코딩 컨벤션을 따른다.
 - 기존 코드 패턴을 우선 따르고, 명확한 이유 없이 과도한 추상화·리팩터링을 하지 않는다.
 
