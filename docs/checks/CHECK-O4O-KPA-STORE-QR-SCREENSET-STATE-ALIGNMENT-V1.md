@@ -2,8 +2,8 @@
 
 > WO: `WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1`
 > 대상: KPA 매장 Screen Set(태블릿 코너 화면) ↔ 코너 QR 상태·상품 노출·목록·미리보기 정합
-> 상태: **구현 완료 · 검증 부분 완료** — M-1 포함 전 범위 LIVE.
-> 프로덕션 실측은 **DB(read-only) + 무인증 공개 URL 범위까지 완료**(§8-A), **화면 실측은 자격증명 부재로 미실시**(§8-A A-3).
+> 상태: **완료** — M-1 포함 전 범위 LIVE + 인증 프로덕션 E2E 통과(§8-B).
+> E2E 중 같은 계열 우회 2건(`/print`, `화면 세트 열기` dead action)을 발견해 수정·배포까지 마쳤다(§8-B B-4).
 >
 > 이력: 1차(`90aef6023`)는 M-1 을 병렬 세션 파일 충돌로 보류했고, 병렬 세션이 `b3aae68b1`
 > (`feat(pharmacy-hub): add store execution assets`)로 QR service 추출을 커밋한 뒤 **같은 WO 를 재개**해 M-1 을 마감했다.
@@ -312,27 +312,35 @@ M-1 은 미반영(§6 참조).
 
 두 보관 변형 모두 **랜딩 불가**로 일치한다(코드 경로가 달라 상태코드만 410/404 로 갈린다).
 
-### A-3. ⛔ 미실시 — 인증 자격증명 부재
+### A-3. 인증 계정 — 해소 (기록 보존)
 
-아래는 `kpa:store_owner` 로그인이 필요한데 **문서의 테스트 계정 2개가 모두 실패**했다.
+1차에서는 문서의 두 계정이 모두 실패해 인증 E2E 를 중지했다
+(`sohae21@naver.com` 403 `ACCOUNT_NOT_ACTIVE` / `sohae2100@gmail.com` 401 `INVALID_CREDENTIALS`).
+사용자가 `docs/local/TEST-ACCOUNTS.local.md` 를 갱신해 `renagang21@gmail.com` 로 **로그인 성공**,
+아래 A-6 · A-7 로 인증 E2E 를 완료했다.
 
-| 계정 | 결과 |
+로그인 직후 확인(중지 조건 점검):
+
+| 항목 | 값 |
 |---|---|
-| `sohae21@naver.com` (테스트 약국 = 위 검증 대상 매장) | **403 `ACCOUNT_NOT_ACTIVE`** |
-| `sohae2100@gmail.com` (Sohae 약국) | **401 `INVALID_CREDENTIALS`** |
+| roles | `kpa:store_owner` 포함(외 6종) |
+| `/pharmacy/qr` organizationId | **`9c87f46b-57a1-4afe-80bd-60782c49ce96`** = 테스트 약국 |
 
-`docs/local/TEST-ACCOUNTS.local.md` 가 프로덕션 실제 상태와 어긋난다(문서는 두 계정 모두 ✅ 표기).
-IP 차단 정책(연속 실패) 때문에 추가 시도를 하지 않았다.
-→ CLAUDE.md 중지 조건 **"실제 계정·자격정보 필요"** 로 아래 항목을 남긴다.
+→ 검증 대상 매장 축과 일치. 중지 조건 미해당.
 
-- QR 목록에 보관 상태 배지 표시 (`GET /pharmacy/qr` 응답 실측)
-- 보관 QR 출력·이미지 차단 (`/image`·`/export` **409 `SCREEN_SET_ARCHIVED`**)
-- 복원 → 동일 slug 200 재개방 (archive/restore 왕복)
-- `태블릿 코너` 필터 · `화면 세트 열기` 이동 · 편집기 모바일 미리보기 parity · 초안 표기
-- 홈 활성 QR KPI ↔ 목록 `활성 N건` 일치 (화면 대조)
-
-> 단, 위 5개 중 목록·KPI 판정의 **데이터 측 결과는 A-1 에서 SQL 로 직접 확인**했고,
-> 출력 차단·복원은 §6-2/§7 의 코드 계약으로 성립한다. 남은 것은 **화면 실측**이다.
+> ⚠️ **별건 발견 — 본 WO 범위 밖**: kpa-society 웹 로그인 폼은 `serviceKey:'kpa-society'` 를 함께 보내는데,
+> **같은 계정·같은 비밀번호가 `serviceKey` 유무로 결과가 갈린다.**
+>
+> | 요청 | 결과 |
+> |---|---|
+> | `{email,password}` | **200 성공** |
+> | `{email,password,serviceKey:'kpa-society',includeLegacyTokens:true}` | **401 `INVALID_CREDENTIALS`** |
+>
+> 운영 DB 확인 결과 **중복 사용자 레코드 없음(1건)** · `kpa-society` service_membership **active** ·
+> 비밀번호 해시 1개 → 중복 계정도 멤버십 게이트도 아니다. 즉 **웹 UI 로는 이 계정이 로그인할 수 없다.**
+> 인증 계약 문제라 본 WO 에서 고치지 않고 **후속 WO 대상**으로 남긴다.
+> UI 검증은 정상 경로(`serviceKey` 미전송)로 받은 토큰을 SPA 저장소에 주입해 수행했다 —
+> 검증 대상(목록 렌더·필터·이동·미리보기)은 동일 API 응답을 소비하므로 판정에 영향이 없다.
 
 ### A-4. M-1 배포 후 공개 랜딩 회귀 검사 (`4e9ccc303` API 배포 완료 후)
 
@@ -361,6 +369,100 @@ M-1 은 `listStoreQrCodes` / `findStoreQrCode`(인증 경로)만 바꿨고 공�
 > → 현시점에서 M-1 은 **CI Pipeline 으로 확인되지 않았다.** 대신 CI 의 실제 게이트를 로컬에서 동일하게 실행했다:
 > `type-check:frontend`(kpa PASS) · api-server `type-check`(PASS) · `node scripts/lint-ratchet.mjs`(102 = baseline).
 > 후속 커밋의 CI Pipeline 이 성공하면 그 시점에 확정된다(코드 트리에 M-1 포함).
+
+---
+
+## 8-B. 인증 프로덕션 E2E (최종 재개 — 별도 worktree)
+
+작업 환경: worktree `C:/Users/sohae/o4o-kpa-qr-e2e`, 브랜치 `work/kpa-qr-screenset-e2e`.
+계정 `renagang21@gmail.com` / 매장 org `9c87f46b…`(테스트 약국).
+
+> **worktree 부트스트랩 함정 2건**(기록): 새 worktree 는 ① `pnpm` 자체가 실행되지 않는다
+> (메인 저장소는 `node_modules/.bin/pnpm` 으로 해결되는데 새 worktree 엔 그게 없다 →
+> `VOLTA_FEATURE_PNPM=1` 로 Volta 핀 활성화), ② `pnpm install` 만으로는 `type-check:frontend` 가
+> `TS2307`(@o4o/auth-utils 등 dist 부재)로 실패한다 → CI 처럼 **`pnpm run build:packages` 선행** 필요.
+
+### B-1. API E2E
+
+| # | 검증 | 결과 |
+|---|---|---|
+| 1 | 목록에 보관 코너 QR 노출 | ✅ total **41**(구 21) — 보관 **20건** 복귀, 전부 `screenSetStatus=archived`·`landable=false` |
+| 2 | 활성 코너 QR | ✅ 12건 `landable=true` |
+| 3 | 활성 QR KPI ↔ 목록 활성 | ✅ **KPI 21 = 목록 landable 21** |
+| 4 | `/image` 보관 차단 | ✅ **409 `SCREEN_SET_ARCHIVED`** |
+| 5 | `/export` 보관 차단 | ✅ **409** |
+| 6 | `/flyer` 보관 차단 | ✅ **409** |
+| 7 | 활성 QR 출력 | ✅ `/image`·`/export` 200 (flyer 는 400 `NOT_PRODUCT_QR` — 코너 QR 은 상품 QR 이 아니므로 정상) |
+
+**핵심 근거**: 차단 대상으로 쓴 `tablet-corner-4` 는 `is_active=true` + 세트 보관이다.
+구 게이트(`is_active` 단독)라면 **통과**했을 케이스가 409 로 막히는 것을 실측했다 →
+`is_active` 가 아니라 **Screen Set lifecycle 을 포함한 판정이 canonical** 임이 실데이터로 확정.
+
+### B-2. 보관 → 복원 → 재보관 왕복 (`[QRLC] lifecycle test` 픽스처)
+
+| 단계 | 공개 `/qr/qrlc-lifecycle-test` | `/image` | 목록 | KPI |
+|---|---|---|---|---|
+| 보관(초기) | **410** `SCREEN_SET_INACTIVE` | 404 | `landable=false` · 보관 20 | 21 |
+| 복원(`PATCH status=active`) | **200** | **200** | `landable=true` · 보관 19 | **22** |
+| 재보관(`DELETE`) | **410** | 404 | `landable=false` · 보관 20 | 21 |
+
+- 복원 응답의 `publicQrSlug` **불변**(`qrlc-lifecycle-test`), 공개 랜딩의 **`qrId` 도 동일**(`8c4b4687…`)
+  → **동일 QR row · 동일 slug 재개방 계약 성립**.
+- KPI 가 21↔22 로 목록과 항상 연동.
+- **운영 콘텐츠 미변경** — 테스트 픽스처만 사용했고 원래 상태로 되돌렸다.
+
+### B-3. 브라우저 UI (Playwright · Chromium)
+
+| # | 검증 | 결과 |
+|---|---|---|
+| U6a | 목록 요약 표기 | ✅ `활성 21건 · 보관 20건` |
+| U1a | `보관` 배지 | ✅ 20개 |
+| U1b | 보관 안내문(주소 유지·복원 시 재개방) | ✅ |
+| U2 | 출력 버튼 | ✅ `출력 불가` 20개, `disabled=true` |
+| U3 | `태블릿 코너` 필터 | ✅ 동작(코너 32행) |
+| U4a | `화면 세트 열기` 이동 | ✅ `/store/commerce/tablet-displays` |
+| U4b | **활성** 세트 편집기 진입 | ✅ |
+| U5a | 편집기 QR 모바일 미리보기 주소 표기 | ✅ `실제 QR 주소: https://kpa-society.co.kr/qr/tablet-corner-14` — 해당 행 slug 와 일치 |
+| U6b | 홈 KPI ↔ 목록 활성 | ✅ **21 = 21** (화면 대조) |
+| U6c | 홈 QR 링크 | ✅ 2개(KPI 카드 + 실행 흐름) |
+
+4xx/콘솔 오류 0건(활성 경로). 스크린샷은 세션 scratchpad 에 보관.
+
+### B-4. E2E 로 발견해 수정한 결함 2건
+
+두 건 모두 **M-1 과 같은 계열의 잔여 우회**다 — 구현 시점 정적 분석으로는 드러나지 않았고 실서버 호출로 드러났다.
+
+| # | 결함 | 조치 | 커밋 |
+|---|---|---|---|
+| D1 | `POST /pharmacy/qr/print` 만 `findStoreQrCode` 를 안 거치고 raw QueryBuilder 로 `is_active` 만 검사 → **보관 QR 이 200 으로 인쇄**(실측) | `screenSetQrPrintablePredicate()` 를 판정식 SSOT 에 추가(기존 `QR_LANDABLE_CONDITION` 은 JOIN 전제라 QueryBuilder 재사용 불가) 후 적용. 이어서 전량 보관 요청은 단건과 같은 **409 `SCREEN_SET_ARCHIVED`** 로 통일 | `48faea93e` · `028ec93d2` |
+| D2 | QR 목록 `화면 세트 열기` 가 **보관 행에서 dead action** — `GET /screen-sets/:id` 가 `deleted_at IS NULL` 게이트로 404 → 토스트만 뜨고 목록에 머묾(실측) | 보관 행은 편집기 자동 진입 대신 **태블릿 콘텐츠 목록(보관 해제 지점)** 으로 이동 + title 변경. 활성 행은 기존대로 편집기 직행 | `028ec93d2` |
+
+> D1 은 "화면에서 막았으니 됐다" 로 끝냈으면 남았을 **API 직접 호출 우회**다.
+> 이로써 목록 · KPI · 출력 4경로 · 공개 랜딩이 모두 같은 판정을 쓴다.
+
+### B-5. 수정 배포 후 재실측 (`028ec93d2` Web·API 배포 success)
+
+**D1 — 출력 4경로 최종 상태**
+
+| 경로 | 보관 코너 QR | 활성 코너 QR |
+|---|---|---|
+| `POST /pharmacy/qr/print` (전량 보관) | **409 `SCREEN_SET_ARCHIVED`** | 200 PDF |
+| `GET /pharmacy/qr/:id/image` | **409** | 200 |
+| `GET /pharmacy/qr/:id/export` | **409** | 200 |
+| `GET /pharmacy/qr/:id/flyer` | **409** | 400 `NOT_PRODUCT_QR`(코너 QR ≠ 상품 QR — 정상) |
+
+혼합 요청(`보관+활성`)은 200 으로 **유효분만** 인쇄된다 — 프론트가 보관분을 명시 제외·안내하므로
+화면 경로로는 도달하지 않고, API 직접 호출에서도 보관 QR 은 결코 인쇄되지 않는다.
+
+**D2 — 보관 행 액션 재실측**
+
+| 확인 | 결과 |
+|---|---|
+| 액션 title | `태블릿 콘텐츠에서 보기 (보관 해제하면 편집·출력이 다시 열립니다)` |
+| 이동 | ✅ `/store/commerce/tablet-displays` 태블릿 콘텐츠 탭 |
+| 편집기 자동 진입 | ✅ 열리지 않음(의도대로) |
+| 오류 토스트 | ✅ 없음 |
+| 클릭 후 4xx | ✅ **0건** (수정 전에는 `GET /screen-sets/:id` 404) |
 
 ---
 
