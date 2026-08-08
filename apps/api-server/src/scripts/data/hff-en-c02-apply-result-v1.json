@@ -1,0 +1,48 @@
+{
+ "wo": "WO-O4O-HFF-EN-C02-IN-STORE-EXPERT-GUIDANCE-25404-FULL-REPAIR-V1",
+ "at": "2026-08-08T00:16:05.580Z",
+ "koFixed": "섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오.",
+ "enFixed": "If you have questions about how to take this product or whether it is right for you, please ask our in-store pharmacist or another expert.",
+ "targets": 25404,
+ "ready": 25404,
+ "rejected": 0,
+ "rejectedByWhy": {
+  "missing": 0,
+  "enDrift": 0,
+  "sliceMismatch": 0,
+  "structureDiff": 0,
+  "ctaHangulLeft": 0,
+  "emptyCta": 0,
+  "duplicateSentence": 0,
+  "otherAreaChanged": 0
+ },
+ "before": {
+  "ko_canon": 40918,
+  "en_canon": 40902,
+  "ja_canon": 32270,
+  "zh_canon": 40918,
+  "pm_hff": 40948
+ },
+ "startedAt": "2026-08-08T00:16:05.580Z",
+ "appliedAt": "2026-08-08T00:19:03.054Z",
+ "mode": "APPLY",
+ "expectedUpdate": 25404,
+ "actualUpdate": 25404,
+ "expectedInsert": 0,
+ "actualInsert": 0,
+ "skipped": 0,
+ "failedShards": 0,
+ "after": {
+  "ko_canon": 40918,
+  "en_canon": 40902,
+  "ja_canon": 32270,
+  "zh_canon": 40918,
+  "pm_hff": 40948
+ },
+ "koUnchanged": true,
+ "jaUnchanged": true,
+ "zhUnchanged": true,
+ "pmUnchanged": true,
+ "enCountUnchanged": true,
+ "expectedEqualsActual": true
+}

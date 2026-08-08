@@ -1,0 +1,29 @@
+{
+ "wo": "WO-O4O-HFF-EN-C02-IN-STORE-EXPERT-GUIDANCE-25404-FULL-REPAIR-V1",
+ "verifiedAt": "2026-08-08T00:19:46.189Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "ctaKoResidueBefore": 25404,
+ "ctaKoResidueAfter": 0,
+ "ctaEnglishNow": 25404,
+ "ctaEmpty": 0,
+ "ctaDuplicateSentence": 0,
+ "anyCtaHangulRemaining": 0,
+ "enRowsUpdatedInWindow": 25404,
+ "expectedUpdatedInWindow": 25404,
+ "writesOutsideTarget": 0,
+ "canonicalDup": 0,
+ "totals": {
+  "ko": 40918,
+  "en": 40902,
+  "ja": 32270,
+  "zh": 40918,
+  "pm": 40948
+ },
+ "koUnchanged": true,
+ "enCountUnchanged": true,
+ "jaUnchanged": true,
+ "zhUnchanged": true,
+ "pmUnchanged": true,
+ "verdict": "PASS"
+}

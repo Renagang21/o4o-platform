@@ -1,0 +1,26 @@
+{
+ "wo": "WO-O4O-HFF-EN-C02-IN-STORE-EXPERT-GUIDANCE-25404-FULL-REPAIR-V1",
+ "surveyedAt": "2026-08-08T00:11:29.955Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "totals": {
+  "ko": 40918,
+  "en": 40902,
+  "ja": 32270,
+  "zh": 40918
+ },
+ "enCanonicalDup": 0,
+ "enScanned": 40902,
+ "sectionMissing": 15498,
+ "noResidue": 0,
+ "targetDocuments": 25404,
+ "productMasterDup": 0,
+ "distinctResiduePhrases": 1,
+ "slotsWithInlineTag": 0,
+ "phrases": [
+  {
+   "docs": 25404,
+   "ko": "섭취 방법이나 본인 상태에 맞는지 궁금하시면 매장 내 약사 등 전문가에게 문의하십시오."
+  }
+ ]
+}
