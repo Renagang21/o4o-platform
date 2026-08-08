@@ -1,0 +1,55 @@
+{
+ "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
+ "at": "2026-08-08T07:15:13.079Z",
+ "planned": 314,
+ "ready": 314,
+ "rejected": 0,
+ "rejectedByWhy": {
+  "missing": 0,
+  "oldNotFound": 0,
+  "oldNotUnique": 0,
+  "retranslateFailed": 0,
+  "noChange": 0,
+  "hangulLeft": 0,
+  "structureDiff": 0,
+  "otherAreaChanged": 0
+ },
+ "samples": [
+  {
+   "ko": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색 점박이가 있는 회황색의 타원형 정제",
+   "from": "1) Appearance : A white greyish yellow speckled oval tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "1) Appearance : A greyish yellow oval tablet with white speckles with a characteristic flavour and no off-taste or off-odour"
+  },
+  {
+   "ko": "1.성상 : 고유의 향미가 있고 이미, 이취가 없는 주황색 점박이가 있는 연한 노란색의 장방형 코팅정제",
+   "from": "1.Appearance : A orange pale yellow speckled oblong coated tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "1.Appearance : A pale yellow oblong coated tablet with orange speckles with a characteristic flavour and no off-taste or off-odour"
+  },
+  {
+   "ko": "<b>Appearance</b> 이미, 이취가 없고 고유의 향미가 있는 주황색 점박이가 있는 흰노란색의 원형 정제",
+   "from": "<b>Appearance</b> A orange white-yellow speckled round tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "<b>Appearance</b> A white-yellow round tablet with orange speckles with a characteristic flavour and no off-taste or off-odour"
+  },
+  {
+   "ko": "<b>Appearance</b> 고유의 향미를 지니고 이미, 이취가 없는 회황색 점박이가 있는 흰 노란색의 타원형 정제",
+   "from": "<b>Appearance</b> A greyish yellow white yellow speckled oval tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "<b>Appearance</b> A white yellow oval tablet with greyish yellow speckles with a characteristic flavour and no off-taste or off-odour"
+  },
+  {
+   "ko": "<b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 갈색 점박이가 있는 하양색의 장방형 제피정제",
+   "from": "<b>Appearance</b> A brown white speckled oblong film-coated tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "<b>Appearance</b> A white oblong film-coated tablet with brown speckles with a characteristic flavour and no off-taste or off-odour"
+  },
+  {
+   "ko": "<b>Appearance</b> 고유의 향미가 있고 이미, 이취가 없는 하양색 점박이가 있는 밝은 갈색의 장방형 정제",
+   "from": "<b>Appearance</b> A white light brown speckled oblong tablet with a characteristic flavour and no off-taste or off-odour",
+   "to": "<b>Appearance</b> A light brown oblong tablet with white speckles with a characteristic flavour and no off-taste or off-odour"
+  }
+ ],
+ "mode": "APPLY",
+ "expectedUpdate": 314,
+ "actualUpdate": 314,
+ "skipped": 0,
+ "failedShards": 0,
+ "expectedEqualsActual": true
+}

@@ -1,0 +1,324 @@
+{
+ "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
+ "harvestedAt": "2026-08-08T06:58:50.772Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "assetPairs": 33263,
+ "koEnDocPairs": 40902,
+ "alignedDocs": 40884,
+ "misalignedDocs": 18,
+ "headTerms": 62,
+ "bodyPhrases": 12819,
+ "specForms": 11,
+ "ambiguousHeads": 0,
+ "specFormTop": [
+  {
+   "n": 20892,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nmg/Nmg)의 N~N%",
+   "en": "labelled (Nmg / Nmg)N N~N%",
+   "variants": 3
+  },
+  {
+   "n": 7209,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nμg/Nmg)의 N~N%",
+   "en": "labelled (Nμg / Nmg)N N~N%",
+   "variants": 2
+  },
+  {
+   "n": 3818,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nmg/Ng)의 N~N%",
+   "en": "labelled (Nmg / Ng)N N~N%",
+   "variants": 3
+  },
+  {
+   "n": 1220,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nμg/Ng)의 N~N%",
+   "en": "labelled (Nμg / Ng)N N~N%",
+   "variants": 2
+  },
+  {
+   "n": 174,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nmg/NmL)의 N~N%",
+   "en": "labelled (Nmg / NmL)N N~N%",
+   "variants": 1
+  },
+  {
+   "n": 127,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Ng/Ng)의 N~N%",
+   "en": "labelled (Ng / Ng)N N~N%",
+   "variants": 2
+  },
+  {
+   "n": 56,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Ng/Nmg)의 N~N%",
+   "en": "labelled (Ng / Nmg)N N~N%",
+   "variants": 1
+  },
+  {
+   "n": 44,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Ng/NmL)의 N~N%",
+   "en": "labelled (Ng / NmL)N N~N%",
+   "variants": 1
+  },
+  {
+   "n": 6,
+   "ko": "SPEC_RANGE_PAREN | 표시량(Nμg/NmL)의 N~N%",
+   "en": "labelled (Nμg / NmL)N N~N%",
+   "variants": 1
+  },
+  {
+   "n": 3,
+   "ko": "SPEC_RANGE_PAREN | 표시량(N IU/Ng)의 N~N%",
+   "en": "labelled (N IU / Ng)N N~N%",
+   "variants": 1
+  },
+  {
+   "n": 3,
+   "ko": "SPEC_RANGE_PAREN | 표시량(N IU/Nmg)의 N~N%",
+   "en": "labelled (N IU / Nmg)N N~N%",
+   "variants": 1
+  }
+ ],
+ "headTop": [
+  {
+   "n": 15422,
+   "ko": "성상",
+   "en": "Appearance",
+   "variants": 1
+  },
+  {
+   "n": 15119,
+   "ko": "유통기한",
+   "en": "Shelf life",
+   "variants": 1
+  },
+  {
+   "n": 14732,
+   "ko": "대장균군",
+   "en": "Coliform",
+   "variants": 1
+  },
+  {
+   "n": 3070,
+   "ko": "비타민 D",
+   "en": "Vitamin D",
+   "variants": 1
+  },
+  {
+   "n": 3012,
+   "ko": "아연",
+   "en": "Zinc",
+   "variants": 1
+  },
+  {
+   "n": 2219,
+   "ko": "비타민 E",
+   "en": "Vitamin E",
+   "variants": 1
+  },
+  {
+   "n": 2037,
+   "ko": "비타민 C",
+   "en": "Vitamin C",
+   "variants": 1
+  },
+  {
+   "n": 1991,
+   "ko": "비타민 B6",
+   "en": "Vitamin B6",
+   "variants": 1
+  },
+  {
+   "n": 1863,
+   "ko": "비타민 B1",
+   "en": "Vitamin B1",
+   "variants": 1
+  },
+  {
+   "n": 1791,
+   "ko": "비타민 B2",
+   "en": "Vitamin B2",
+   "variants": 1
+  },
+  {
+   "n": 1282,
+   "ko": "나이아신",
+   "en": "Niacin",
+   "variants": 1
+  },
+  {
+   "n": 1212,
+   "ko": "비타민 A",
+   "en": "Vitamin A",
+   "variants": 1
+  },
+  {
+   "n": 1208,
+   "ko": "판토텐산",
+   "en": "Pantothenic acid",
+   "variants": 1
+  },
+  {
+   "n": 1128,
+   "ko": "셀레늄",
+   "en": "Selenium",
+   "variants": 1
+  },
+  {
+   "n": 1063,
+   "ko": "마그네슘",
+   "en": "Magnesium",
+   "variants": 1
+  },
+  {
+   "n": 1030,
+   "ko": "칼슘",
+   "en": "Calcium",
+   "variants": 1
+  },
+  {
+   "n": 1017,
+   "ko": "엽산",
+   "en": "Folate",
+   "variants": 1
+  },
+  {
+   "n": 978,
+   "ko": "오메가3",
+   "en": "Omega-3",
+   "variants": 1
+  },
+  {
+   "n": 932,
+   "ko": "비타민 B12",
+   "en": "Vitamin B12",
+   "variants": 1
+  },
+  {
+   "n": 823,
+   "ko": "비오틴",
+   "en": "Biotin",
+   "variants": 1
+  },
+  {
+   "n": 820,
+   "ko": "프로바이오틱스 수",
+   "en": "Probiotic count",
+   "variants": 1
+  },
+  {
+   "n": 778,
+   "ko": "루테인",
+   "en": "Lutein",
+   "variants": 1
+  },
+  {
+   "n": 583,
+   "ko": "밀크씨슬",
+   "en": "Milk thistle",
+   "variants": 1
+  },
+  {
+   "n": 555,
+   "ko": "망간",
+   "en": "Manganese",
+   "variants": 1
+  },
+  {
+   "n": 541,
+   "ko": "가르시니아캄보지아 추출물",
+   "en": "Garcinia cambogia extract",
+   "variants": 1
+  },
+  {
+   "n": 438,
+   "ko": "프로폴리스",
+   "en": "Propolis",
+   "variants": 1
+  },
+  {
+   "n": 400,
+   "ko": "비타민 K",
+   "en": "Vitamin K",
+   "variants": 1
+  },
+  {
+   "n": 340,
+   "ko": "은행잎추출물",
+   "en": "Ginkgo leaf extract",
+   "variants": 1
+  },
+  {
+   "n": 291,
+   "ko": "코엔자임Q10",
+   "en": "Coenzyme Q10",
+   "variants": 1
+  },
+  {
+   "n": 284,
+   "ko": "식이섬유",
+   "en": "Dietary fibre",
+   "variants": 1
+  },
+  {
+   "n": 284,
+   "ko": "포스파티딜세린",
+   "en": "Phosphatidylserine",
+   "variants": 1
+  },
+  {
+   "n": 271,
+   "ko": "지표성분",
+   "en": "Indicator component",
+   "variants": 1
+  },
+  {
+   "n": 270,
+   "ko": "녹차 카테킨",
+   "en": "Green tea catechin",
+   "variants": 1
+  },
+  {
+   "n": 231,
+   "ko": "옥타코사놀",
+   "en": "Octacosanol",
+   "variants": 1
+  },
+  {
+   "n": 211,
+   "ko": "헤마토코쿠스추출물(아스타잔틴)",
+   "en": "Haematococcus extract (astaxanthin)",
+   "variants": 1
+  },
+  {
+   "n": 203,
+   "ko": "철",
+   "en": "Iron",
+   "variants": 1
+  },
+  {
+   "n": 202,
+   "ko": "글루코사민",
+   "en": "Glucosamine",
+   "variants": 1
+  },
+  {
+   "n": 199,
+   "ko": "L-테아닌",
+   "en": "L-theanine",
+   "variants": 1
+  },
+  {
+   "n": 168,
+   "ko": "구리",
+   "en": "Copper",
+   "variants": 1
+  },
+  {
+   "n": 128,
+   "ko": "쏘팔메토열매추출물 (로르산)",
+   "en": "Saw palmetto fruit extract (lauric acid)",
+   "variants": 1
+  }
+ ]
+}

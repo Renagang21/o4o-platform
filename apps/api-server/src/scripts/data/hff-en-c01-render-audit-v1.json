@@ -1,0 +1,209 @@
+{
+ "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
+ "renderedAt": "2026-08-08T07:06:42.821Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "baselineTotal": 4200,
+ "afterTotal": 2037,
+ "changed": {
+  "hangulVisibleWholeDoc": {
+   "before": 2100,
+   "after": 2037
+  },
+  "sectionHangul": {
+   "before": 2100,
+   "after": 0
+  }
+ },
+ "newDefects": "NONE",
+ "sectionHangulBefore": 2100,
+ "sectionHangulAfter": 0,
+ "wrapperProof": {
+  "withoutWrapper": "",
+  "withWrapper": "860px",
+  "specGap": "block",
+  "cssActuallyApplied": true
+ },
+ "verdict": "PASS",
+ "base": {
+  "label": "BEFORE",
+  "documents": 700,
+  "widths": [
+   430,
+   820,
+   1280
+  ],
+  "renders": 2100,
+  "wrapperProof": {
+   "withoutWrapper": "",
+   "withWrapper": "860px",
+   "specGap": "block",
+   "cssActuallyApplied": true
+  },
+  "counters": {
+   "pageOverflow": 0,
+   "elementOverflow": 0,
+   "clipped": 0,
+   "emptySlot": 0,
+   "emptySpec": 0,
+   "undefinedClass": 0,
+   "rawHtml": 0,
+   "hangulVisibleWholeDoc": 2100,
+   "sectionHangul": 2100,
+   "sectionMissing": 0
+  },
+  "total": 4200,
+  "failures": [
+   {
+    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+   },
+   {
+    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+   },
+   {
+    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+   },
+   {
+    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+   },
+   {
+    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+   },
+   {
+    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+   },
+   {
+    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+   },
+   {
+    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+   },
+   {
+    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+   },
+   {
+    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+   },
+   {
+    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+   },
+   {
+    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+   },
+   {
+    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+   },
+   {
+    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+   },
+   {
+    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+   },
+   {
+    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+   },
+   {
+    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+   },
+   {
+    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "w": 1280,
+    "why": "SECTION_HANGUL",
+    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+   },
+   {
+    "m": "0015df53-6e21-4d1a-a9fe-ee68c9adf673",
+    "w": 430,
+    "why": "SECTION_HANGUL",
+    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 밝은 회황색의 장방형 제피정제2) 비타민C : 표시량(500 mg / 1,"
+   },
+   {
+    "m": "0015df53-6e21-4d1a-a9fe-ee68c9adf673",
+    "w": 820,
+    "why": "SECTION_HANGUL",
+    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 밝은 회황색의 장방형 제피정제2) 비타민C : 표시량(500 mg / 1,"
+   }
+  ]
+ },
+ "after": {
+  "label": "AFTER",
+  "documents": 700,
+  "widths": [
+   430,
+   820,
+   1280
+  ],
+  "renders": 2100,
+  "wrapperProof": {
+   "withoutWrapper": "",
+   "withWrapper": "860px",
+   "specGap": "block",
+   "cssActuallyApplied": true
+  },
+  "counters": {
+   "pageOverflow": 0,
+   "elementOverflow": 0,
+   "clipped": 0,
+   "emptySlot": 0,
+   "emptySpec": 0,
+   "undefinedClass": 0,
+   "rawHtml": 0,
+   "hangulVisibleWholeDoc": 2037,
+   "sectionHangul": 0,
+   "sectionMissing": 0
+  },
+  "total": 2037,
+  "failures": []
+ }
+}
