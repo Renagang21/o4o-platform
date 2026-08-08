@@ -22,6 +22,7 @@ import {
 } from './supplier-regulated-category.service.js';
 // WO-O4O-DRUG-SERVICE-CONNECTION-GATE-V1: 약국 대상 서비스 정책(DB) 참조
 import { ServiceAudienceService } from './service-audience.service.js';
+import { assertDrugOfferAllowed } from '../guards/drug-access.guard.js';
 
 /**
  * WO-NETURE-DISTRIBUTION-MODEL-SPLIT-PUBLIC-AND-SERVICE-SUPPLY-V1
@@ -1045,6 +1046,23 @@ export class NetureOfferService {
       }
       const resolvedIsPublic = data.isPublic ?? (data.distributionType === OfferDistributionType.PUBLIC);
 
+      // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+      // 의약품 판정 SSOT = product_masters.regulatory_type='DRUG'.
+      // 위 is_regulated 축은 실측상 DRUG 를 전혀 커버하지 못하므로(카테고리 미연결 100%)
+      // DRUG 축 게이트를 별도로 적용한다. 빈 serviceKeys·PUBLIC 전환도 여기서 거부된다.
+      const drugCreateGate = await assertDrugOfferAllowed(AppDataSource, {
+        action: 'OFFER_CREATE',
+        masterId,
+        serviceKeys: filteredServiceKeys,
+        isPublic: resolvedIsPublic,
+      });
+      if (!drugCreateGate.allowed) {
+        logger.warn(
+          `[NetureOfferService] DRUG OFFER_CREATE denied: supplier=${supplierId}, master=${masterId}, keys=[${filteredServiceKeys.join(',')}], isPublic=${resolvedIsPublic}, code=${drugCreateGate.code}`,
+        );
+        return { success: false, error: drugCreateGate.code!, message: drugCreateGate.message };
+      }
+
       const offer = this.offerRepo.create({
         supplierId,
         masterId,
@@ -1192,6 +1210,23 @@ export class NetureOfferService {
       // distributionType 파생 (isPublic + serviceKeys 기반)
       offer.distributionType = deriveDistributionType(offer.isPublic, offer.serviceKeys || []);
 
+      // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+      // 본 경로는 기존에 의약품 게이트가 전혀 없었고, isPublic=true 전환 시 아래에서
+      // autoExpandPublicProduct 로 전 서비스 확산까지 유발했다 (선행 감사 P0).
+      // 저장 직전에 최종 상태(isPublic + serviceKeys)를 기준으로 판정한다.
+      const drugUpdateGate = await assertDrugOfferAllowed(AppDataSource, {
+        action: offer.isPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE',
+        masterId: offer.masterId,
+        serviceKeys: offer.serviceKeys || [],
+        isPublic: offer.isPublic,
+      });
+      if (!drugUpdateGate.allowed) {
+        logger.warn(
+          `[NetureOfferService] DRUG offer update denied: offer=${offerId}, supplier=${supplierId}, master=${offer.masterId}, isPublic=${offer.isPublic}, code=${drugUpdateGate.code}`,
+        );
+        return { success: false, error: drugUpdateGate.code!, message: drugUpdateGate.message };
+      }
+
       if (updates.allowedSellerIds !== undefined) {
         offer.allowedSellerIds = updates.allowedSellerIds;
       }
@@ -1298,7 +1333,7 @@ export class NetureOfferService {
     input: { isPublic?: boolean; serviceKeys?: string[] },
   ): Promise<{ success: boolean; error?: string; data?: Record<string, unknown> }> {
     const [offer] = await AppDataSource.query(
-      `SELECT id, supplier_id, is_public, service_keys FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL`,
+      `SELECT id, supplier_id, is_public, service_keys, master_id FROM supplier_product_offers WHERE id = $1 AND deleted_at IS NULL`,
       [offerId],
     );
     if (!offer) return { success: false, error: 'OFFER_NOT_FOUND' };
@@ -1326,6 +1361,22 @@ export class NetureOfferService {
     const added = nextEligible.filter((k) => !currentEligible.includes(k));
     const removed = currentEligible.filter((k) => !nextEligible.includes(k));
     const nextDist = deriveDistributionType(nextIsPublic, nextKeys);
+
+    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+    // 본 경로는 serviceKeys 와 is_public 을 모두 바꾸지만 의약품 게이트가 없었다.
+    // 최종 상태(nextKeys + nextIsPublic) 기준으로 판정한다.
+    const drugDistGate = await assertDrugOfferAllowed(AppDataSource, {
+      action: nextIsPublic ? 'OFFER_PUBLISH' : 'OFFER_UPDATE',
+      masterId: offer.master_id,
+      serviceKeys: nextKeys,
+      isPublic: nextIsPublic,
+    });
+    if (!drugDistGate.allowed) {
+      logger.warn(
+        `[NetureOfferService] DRUG updateDistribution denied: offer=${offerId}, supplier=${supplierId}, master=${offer.master_id}, keys=[${nextKeys.join(',')}], isPublic=${nextIsPublic}, code=${drugDistGate.code}`,
+      );
+      return { success: false, error: drugDistGate.code! };
+    }
 
     const approvalService = new OfferServiceApprovalService(AppDataSource);
     const queryRunner = AppDataSource.createQueryRunner();
@@ -1417,8 +1468,11 @@ export class NetureOfferService {
       is_public: boolean;
       service_keys: string[] | null;
       is_regulated: boolean | null;
+      master_id: string;
+      regulatory_type: string | null;
     }> = await AppDataSource.query(
-      `SELECT o.id, o.supplier_id, o.is_public, o.service_keys, pc.is_regulated
+      `SELECT o.id, o.supplier_id, o.is_public, o.service_keys, pc.is_regulated,
+              o.master_id, pm.regulatory_type
          FROM supplier_product_offers o
          JOIN product_masters pm ON pm.id = o.master_id
          LEFT JOIN product_categories pc ON pc.id = pm.category_id
@@ -1439,6 +1493,25 @@ export class NetureOfferService {
           error: OfferErrorCode.REGULATED_PRODUCT_NON_PHARMACY_SERVICE,
           message: '규제 상품은 약국 전용 서비스에만 연결할 수 있습니다.',
         };
+      }
+    }
+
+    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+    // 위 is_regulated 축은 실측상 DRUG 를 전혀 커버하지 못한다(카테고리 미연결 100%).
+    // DRUG SSOT(regulatory_type) 기준으로 다시 판정한다. 제공 중지(enabled=false)는 막지 않는다.
+    if (input.enabled) {
+      const drugDeliveryGate = await assertDrugOfferAllowed(AppDataSource, {
+        action: 'OFFER_UPDATE',
+        masterId: row.master_id,
+        regulatoryType: row.regulatory_type,
+        serviceKeys: [serviceKey],
+        isPublic: false, // 본 경로는 is_public 을 바꾸지 않는다
+      });
+      if (!drugDeliveryGate.allowed) {
+        logger.warn(
+          `[NetureOfferService] DRUG setServiceDelivery denied: offer=${offerId}, master=${row.master_id}, service=${serviceKey}, code=${drugDeliveryGate.code}`,
+        );
+        return { success: false, error: drugDeliveryGate.code!, message: drugDeliveryGate.message };
       }
     }
 

@@ -37,6 +37,7 @@ import { createRequireStoreOwner } from '../../../utils/store-owner.utils.js';
 import { NetureService } from '../../../modules/neture/neture.service.js';
 import { ImageStorageService } from '../../../modules/neture/services/image-storage.service.js';
 import { deriveProductClassification, classificationToFilter } from '../../../modules/neture/utils/product-type.util.js';
+import { assertDrugActionAllowed } from '../../../modules/neture/guards/drug-access.guard.js';
 import logger from '../../../utils/logger.js';
 
 // ─────────────────────────────────────────────────────
@@ -246,6 +247,24 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
         });
       }
 
+      // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+      // 의약품은 약국 대상 서비스에만 진열될 수 있다. 비의약품은 no-op.
+      const drugGate = await assertDrugActionAllowed(dataSource, {
+        action: 'OPL_CREATE',
+        masterId: resolvedMasterId,
+        serviceKey: listingServiceKey,
+        organizationId,
+      });
+      if (!drugGate.allowed) {
+        logger.warn(
+          `[StoreProductLibrary] DRUG OPL_CREATE denied (offer): org=${organizationId}, service=${listingServiceKey}, master=${resolvedMasterId}, code=${drugGate.code}`,
+        );
+        return res.status(403).json({
+          success: false,
+          error: { code: drugGate.code, message: drugGate.message },
+        });
+      }
+
       const insertResult = await dataSource.query(
         `INSERT INTO organization_product_listings
           (id, organization_id, service_key, master_id, offer_id, is_active, price, created_at, updated_at)
@@ -283,6 +302,26 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
         return res.status(403).json({
           success: false,
           error: { code: 'NO_ACTIVE_MEMBERSHIP', message: 'No active service membership to derive listing service_key' },
+        });
+      }
+
+      // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+      // offer 를 경유하지 않는 master 직접 등록 경로. 운영 DB 의 비약국 DRUG OPL 5건이
+      // 이 경로로 생성됐다(전부 offer_id IS NULL). offer 축 게이트만으로는 막히지 않으므로
+      // 여기서도 동일한 공통 게이트를 통과시킨다.
+      const drugGate = await assertDrugActionAllowed(dataSource, {
+        action: 'OPL_CREATE',
+        masterId,
+        serviceKey: listingServiceKey,
+        organizationId,
+      });
+      if (!drugGate.allowed) {
+        logger.warn(
+          `[StoreProductLibrary] DRUG OPL_CREATE denied (master): org=${organizationId}, service=${listingServiceKey}, master=${masterId}, code=${drugGate.code}`,
+        );
+        return res.status(403).json({
+          success: false,
+          error: { code: drugGate.code, message: drugGate.message },
         });
       }
 
@@ -376,6 +415,27 @@ export function createStoreProductLibraryController(dataSource: DataSource): Rou
 
     if (!listing) {
       return res.status(404).json({ success: false, error: { code: 'NOT_FOUND', message: 'Listing not found' } });
+    }
+
+    // WO-O4O-DRUG-GATE-SSOT-AND-OFFER-OPL-INGRESS-GUARD-V1:
+    // 비활성 DRUG listing 을 다시 활성화하는 것도 유입이다 (false→true 전환).
+    // 비활성화(true→false)와 가격 변경만 하는 경우는 막지 않는다.
+    if (isActive === true && listing.is_active !== true) {
+      const drugGate = await assertDrugActionAllowed(dataSource, {
+        action: 'OPL_ACTIVATE',
+        masterId: listing.master_id,
+        serviceKey: listing.service_key,
+        organizationId,
+      });
+      if (!drugGate.allowed) {
+        logger.warn(
+          `[StoreProductLibrary] DRUG OPL_ACTIVATE denied: listing=${id}, org=${organizationId}, service=${listing.service_key}, code=${drugGate.code}`,
+        );
+        return res.status(403).json({
+          success: false,
+          error: { code: drugGate.code, message: drugGate.message },
+        });
+      }
     }
 
     if (isActive !== undefined) listing.is_active = isActive;
