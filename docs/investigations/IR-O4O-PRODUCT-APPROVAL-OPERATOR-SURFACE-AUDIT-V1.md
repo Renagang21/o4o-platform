@@ -5,6 +5,18 @@
 > **작성일:** 2026-06-13 · 기준 HEAD `43c34bc2b`
 > **선행:** `IR-O4O-PRODUCT-APPROVAL-TO-OPL-CROSSSERVICE-AUDIT-V1`(승인→OPL backend 공통, OPL is_active=false[V2 path], 승인 operator surface 미확정 E/D)
 
+> ## ⚠️ 본 IR 은 일부 SUPERSEDED (2026-08-08)
+>
+> 작성 **다음날** 후속 작업으로 아래 두 항목이 무효화됐다. 조사 시점 기록으로는 유효하나, 현행 판단 근거로 인용하지 말 것.
+>
+> 1. **"GP/K-Cos 는 operator UI 없음 → 유일 경로는 `product-policy-v2.internal.routes`"** (§0, §7 표, §145)
+>    → `WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1` (2026-06-14, `677a9e61c`·`face32609`·`3500d1215`·`71f280860`) 로
+>    `/api/v1/glycopharm/operator/product-applications` · `/api/v1/cosmetics/operator/product-applications` 가 신설됐다.
+>    `requireAuth` + 서비스 스코프 가드 + `ActionLogService` 를 갖춘 정식 route 이며 KPA 와 공유 컨트롤러를 쓴다.
+> 2. **`/api/internal/v2/product-policy/*` 전체** → `WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1` (2026-08-08) 로 **제거**됐다.
+>    당시 실측에서 프로덕션 `product_approvals` 는 **0 row** 로, 이 경로가 승인한 실적은 없었다.
+>    `ProductApprovalV2Service`(서비스 레이어)는 정식 operator route 들이 계속 사용하므로 유지된다.
+
 ---
 
 ## 0. 핵심 결론 (Executive Summary)

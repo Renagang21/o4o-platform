@@ -103,4 +103,4 @@
 | 1 | ~~`/__debug__/pharmacy` POST `/deactivate`~~ | **종결** — `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` 에서 router 전체 제거. 정식 admin API 는 신설하지 않았다 |
 | 2 | `/api/v1/neture/__test__/tier1/*` | `Tier1TestPage` 존치/폐기 방침 확정 시 재판정. 현재는 소비처가 있어 제거 불가 |
 | 3 | 프로덕션 잔존 데이터 | 두 seed 가 과거 프로덕션에 생성한 픽스처(`e0000000%` / `f0000000%` prefix)의 잔존 여부·정리는 **이번 범위 밖**. DB 변경이므로 별도 승인 필요 |
-| 4 | `X-Admin-Secret` + `JWT_SECRET` 패턴 | **잔존 1건** — `modules/product-policy-v2/product-policy-v2.internal.routes.ts:32` 가 `ADMIN_INTERNAL_SECRET \|\| JWT_SECRET` fallback 사용. `ENABLE_INTERNAL_V2` 플래그로 기본 미등록이라 이번엔 손대지 않았다. fallback 제거(= `ADMIN_INTERNAL_SECRET` 필수화)는 환경변수 운영 절차 변경을 수반하므로 별도 WO |
+| 4 | ~~`X-Admin-Secret` + `JWT_SECRET` 패턴~~ | **종결** — `WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1` 에서 해당 router 자체를 제거해 fallback 이 소멸했다. `ADMIN_INTERNAL_SECRET` 신규 발급은 불필요해졌다. ⚠️ 본 행의 "`ENABLE_INTERNAL_V2` 플래그로 기본 미등록" 은 **오기** — `.github/workflows/deploy-api.yml:319` 가 `ENABLE_INTERNAL_V2=true` 를 설정해 **프로덕션에 등록돼 있었다** |

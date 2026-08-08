@@ -316,7 +316,6 @@ jobs:
           --set-env-vars="REDIS_HOST=10.165.134.11" \
           --set-env-vars="REDIS_PORT=6379" \
           --set-env-vars="REDIS_ENABLED=true" \
-          --set-env-vars="ENABLE_INTERNAL_V2=true" \
           --set-env-vars="GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_CLIENT_KEY=${{ secrets.TOSS_PAYMENTS_CLIENT_KEY }}" \
           --set-env-vars="TOSS_PAYMENTS_SECRET_KEY=${{ secrets.TOSS_PAYMENTS_SECRET_KEY }}" \

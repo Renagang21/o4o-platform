@@ -1090,17 +1090,14 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Hub Content routes:', hubContentError);
     }
 
-    // 40. Register Product Policy v2 Internal routes (WO-PRODUCT-POLICY-V2-INTERNAL-TEST-ENDPOINT-V1)
-    if (process.env.ENABLE_INTERNAL_V2 === 'true') {
-      try {
-        const { createProductPolicyV2InternalRouter } = await import('../modules/product-policy-v2/product-policy-v2.internal.routes.js');
-        const v2InternalRoutes = createProductPolicyV2InternalRouter(dataSource);
-        app.use('/api/internal/v2/product-policy', v2InternalRoutes);
-        logger.info('✅ Product Policy v2 internal routes registered at /api/internal/v2/product-policy');
-      } catch (v2InternalError) {
-        logger.error('Failed to register Product Policy v2 internal routes:', v2InternalError);
-      }
-    }
+    // 40. (제거됨) /api/internal/v2/product-policy — ENABLE_INTERNAL_V2 게이트 포함
+    // WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1
+    // "Internal Test Endpoints" 로 만들어진 9개 endpoint 가 X-Admin-Secret(= JWT_SECRET
+    // fallback)만으로 승인·Listing 생성·offer distributionType 변경을 수행했다.
+    // 생명주기 판정 결과 휴면 — SERVICE 승인은 3서비스 정식 operator route 로 대체됐고
+    // (WO-O4O-PRODUCT-APPROVAL-OPERATOR-SURFACE-ENABLE-GP-KCOS-V1),
+    // 프로덕션 product_approvals 는 0 row 로 승인할 대상 자체가 없었다.
+    // ProductApprovalV2Service 는 정식 route 들이 계속 사용하므로 유지한다.
 
     logger.info('✅ Routes registered via module loader');
 
