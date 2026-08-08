@@ -19,7 +19,7 @@
 | `/__debug__/order-canonical-table` | authenticate+requireAdmin | read-only | A | 제거됨 |
 | `/__debug__/forum-post-cleanup` | **없음** | DELETE forum_post 외 3테이블 | A | 제거됨 (1회성 완료) |
 | `/__debug__/user` | **없음** | (쓰기 제거됨) | D | 비운영 한정 + 읽기 전용화 |
-| `/__debug__/pharmacy` | **없음** | POST `/deactivate` → UPDATE organizations | **보류** | 비운영 한정 유지, 판정 미확정 |
+| `/__debug__/pharmacy` | **없음** | POST `/deactivate` → UPDATE organizations | ~~보류~~ → **A 제거** | `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` 에서 router 째 제거 완료 |
 
 ### B. `/api/v1/ops/seed-*` — **이번 커밋에서 처리**
 
@@ -100,7 +100,7 @@
 
 | # | 항목 | 조건 |
 |---|------|------|
-| 1 | `/__debug__/pharmacy` POST `/deactivate` | `32f97773f` 가 REVIEW 로 남김. 조직 비활성화의 정식 admin API 확정 후 제거/전환 판정 |
+| 1 | ~~`/__debug__/pharmacy` POST `/deactivate`~~ | **종결** — `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` 에서 router 전체 제거. 정식 admin API 는 신설하지 않았다 |
 | 2 | `/api/v1/neture/__test__/tier1/*` | `Tier1TestPage` 존치/폐기 방침 확정 시 재판정. 현재는 소비처가 있어 제거 불가 |
 | 3 | 프로덕션 잔존 데이터 | 두 seed 가 과거 프로덕션에 생성한 픽스처(`e0000000%` / `f0000000%` prefix)의 잔존 여부·정리는 **이번 범위 밖**. DB 변경이므로 별도 승인 필요 |
 | 4 | `X-Admin-Secret` + `JWT_SECRET` 패턴 | **잔존 1건** — `modules/product-policy-v2/product-policy-v2.internal.routes.ts:32` 가 `ADMIN_INTERNAL_SECRET \|\| JWT_SECRET` fallback 사용. `ENABLE_INTERNAL_V2` 플래그로 기본 미등록이라 이번엔 손대지 않았다. fallback 제거(= `ADMIN_INTERNAL_SECRET` 필수화)는 환경변수 운영 절차 변경을 수반하므로 별도 WO |

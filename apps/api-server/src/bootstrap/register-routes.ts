@@ -1046,12 +1046,14 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     // 재실행이 필요하면 33bccc567 / 582dd5285 의 SQL 을 일회성 스크립트로 복구한다.
 
     // ── SECURITY: /__debug__/** 는 프로덕션에 등록하지 않는다 ──────────────
-    // 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
+    // 원래 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
     // 인증 없이 승인(isPlatformAdmin 하드코딩)·RBAC 변경·매장 비활성화·
-    // 게시글 하드 삭제·개인정보 조회가 가능했다. 긴급 차단으로 비프로덕션 한정 등록한다.
-    // 개별 endpoint 의 제거 / 정식 admin API 전환 / CLI 전환 판정은 후속 WO 에서 수행한다.
+    // 게시글 하드 삭제·개인정보 조회가 가능했다(9bf1ed23f 긴급 차단).
+    // 생명주기 판정 완료 — 32f97773f 로 6개, 이후 pharmacy 제거로 남은 것은 user 1개뿐이다.
+    // 신규 debug router 는 반드시 이 게이트 안에 넣고 읽기 전용으로 만든다.
+    // 정본: docs/platform/debug/DEBUG-SSR-TEST-PAGE-GUIDE-V1.md
     if (process.env.NODE_ENV !== 'production') {
-    // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1)
+    // User Debug Info endpoint (WO-O4O-DEBUG-USER-JSON-PAGE-V1) — 읽기 전용
     try {
       const { createUserDebugRouter } = await import('../routes/debug/user-debug.controller.js');
       app.use('/__debug__/user', createUserDebugRouter(dataSource));
@@ -1060,14 +1062,11 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register User Debug routes:', userDebugError);
     }
 
-    // Pharmacy Debug endpoint (임시 운영 도구)
-    try {
-      const { createPharmacyDebugRouter } = await import('../routes/debug/pharmacy-debug.controller.js');
-      app.use('/__debug__/pharmacy', createPharmacyDebugRouter(dataSource));
-      logger.info('✅ Pharmacy Debug endpoint registered at /__debug__/pharmacy');
-    } catch (pharmacyDebugError) {
-      logger.error('Failed to register Pharmacy Debug routes:', pharmacyDebugError);
-    }
+    // (제거됨) /__debug__/pharmacy — WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1
+    // POST /deactivate 가 사유·감사·재활성화 없이 organizations.isActive 와 glycopharm
+    // enrollment 를 함께 껐다. 읽기 3종(/ · /lookup · /appointment-trace)도 일회성 실측
+    // 목적이 종료됐고 소비처 0 이라 router 째 제거했다. 비활성화 업무가 다시 필요하면
+    // 정식 기능으로 별도 설계한다(임시 debug route 재도입 금지).
 
     } // ── end SECURITY gate: /__debug__/** (non-production only) ──
 
