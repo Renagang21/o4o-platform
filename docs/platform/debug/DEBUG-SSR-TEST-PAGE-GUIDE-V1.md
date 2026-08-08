@@ -279,19 +279,27 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 - [ ] Email-first 검색 지원 (`@` 포함 시 이메일로 조회)
 - [ ] Raw JSON 덤프 포함 (`<pre>` 블록)
 - [ ] 에러 시 상세 정보 표시 (message + code + stack)
-- [ ] `main.ts`에 `app.use('/__debug__/{name}', ...)` 등록
+- [ ] `bootstrap/register-routes.ts` 의 **`NODE_ENV !== 'production'` 게이트 블록 안에** `app.use('/__debug__/{name}', ...)` 등록 (게이트 밖 등록 금지)
 - [ ] Parameter Binding 사용 (String Interpolation 금지)
+- [ ] **읽기 전용일 것** — 디버그 페이지에서 상태 변경(UPDATE/INSERT/DELETE) 금지. 변경이 필요하면 정식 admin API 를 사용한다 (`AdminUserController` · `MembershipConsoleController` 등)
 
 ---
 
 ## 8. 참조 — 기존 디버그 페이지
 
+**backend `/__debug__/**` — 전부 `NODE_ENV !== 'production'` 에서만 등록된다.**
+
 | 경로 | 파일 | 용도 |
 |------|------|------|
-| `/__debug__/approval-test` | `routes/debug/approval-test.controller.ts` | 가입 승인 테스트 + 불일치 사용자 감지/복구 |
-| `/__debug__/auth-bootstrap` | (기존) | 인증 부트스트랩 진단 |
+| `/__debug__/user` | `routes/debug/user-debug.controller.ts` | 사용자 진단 (읽기 전용) |
+| `/__debug__/pharmacy` | `routes/debug/pharmacy-debug.controller.ts` | 약국 진단 — 판정 보류(REVIEW), POST `/deactivate` 상태 변경 잔존 |
+
+> `/__debug__/auth-bootstrap` · `/__debug__/login` · `/__debug__/neture-tier1` 은 **`apps/admin-dashboard` 의 프런트 라우트**이며 backend 라우터가 아니다. CLAUDE.md §8 의 진단 Entry Point 도 이쪽을 가리킨다.
+
+**제거 이력** — `32f97773f` 로 `approval-test` · `forum-post-cleanup` · `order-canonical-table` · `rbac-db-audit` · `rbac-backfill-user-role` · `service-users-audit` 6개 제거. `WO-O4O-API-DEBUG-SEED-ROUTE-OPERATIONAL-BOUNDARY-CLEANUP-V1` 로 `/api/v1/ops/seed-store-hub` · `/api/v1/ops/seed-neture-offers` 제거.
 
 ---
 
 *Created: 2026-03-17*
-*Version: 1.0*
+*Updated: 2026-08-08*
+*Version: 1.1*

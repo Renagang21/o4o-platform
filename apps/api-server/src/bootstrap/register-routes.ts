@@ -1038,23 +1038,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Admin Ops Metrics routes:', opsMetricsError);
     }
 
-    // 37-b. Store HUB Test Seed routes (VERIFICATION-STORE-HUB-STAGE-1)
-    try {
-      const { createSeedStoreHubRouter } = await import('../modules/admin/seed-store-hub.controller.js');
-      app.use('/api/v1/ops/seed-store-hub', createSeedStoreHubRouter(dataSource));
-      logger.info('✅ Store HUB Seed routes registered at /api/v1/ops/seed-store-hub');
-    } catch (seedStoreHubError) {
-      logger.error('Failed to register Store HUB Seed routes:', seedStoreHubError);
-    }
-
-    // 37-b2. Neture Supplier Offers Test Seed routes (WO-NETURE-TEST-PRODUCT-RESET-AND-RESEED-V1)
-    try {
-      const { createSeedNetureOffersRouter } = await import('../modules/admin/seed-neture-offers.controller.js');
-      app.use('/api/v1/ops/seed-neture-offers', createSeedNetureOffersRouter(dataSource));
-      logger.info('✅ Neture Offers Seed routes registered at /api/v1/ops/seed-neture-offers');
-    } catch (seedNetureOffersError) {
-      logger.error('Failed to register Neture Offers Seed routes:', seedNetureOffersError);
-    }
+    // 37-b / 37-b2. (제거됨) /api/v1/ops/seed-store-hub · /api/v1/ops/seed-neture-offers
+    // WO-O4O-API-DEBUG-SEED-ROUTE-OPERATIONAL-BOUNDARY-CLEANUP-V1
+    // 일회성 검증 픽스처였고 목적 달성 후 휴면(각 2026-03-22 / 2026-04-10 이후 변경 없음),
+    // 호출처 0. 프로덕션에 등록된 채 x-admin-secret(= JWT_SECRET 재사용)만으로
+    // 테스트 계정 생성·UUID prefix 대량 DELETE 가 가능해 HTTP 노출을 종료한다.
+    // 재실행이 필요하면 33bccc567 / 582dd5285 의 SQL 을 일회성 스크립트로 복구한다.
 
     // ── SECURITY: /__debug__/** 는 프로덕션에 등록하지 않는다 ──────────────
     // 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
