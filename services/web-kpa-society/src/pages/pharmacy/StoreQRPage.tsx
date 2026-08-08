@@ -1164,12 +1164,24 @@ export function StoreQRPage() {
                           landingTargetId = store_tablet_screen_sets.id → 그 세트의 편집 화면으로 바로 이동한다
                           (태블릿 화면 제작 페이지의 '태블릿 콘텐츠' 탭 + 해당 세트 편집기 진입). */}
                       {item.landingType === 'screen_set' && item.landingTargetId && (
+                        // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1 (E2E 후속 수정):
+                        //   보관된 세트는 상세 조회(GET /screen-sets/:id)가 deleted_at IS NULL 게이트로 404 라
+                        //   편집기를 열 수 없다. 그대로 두면 '화면 세트 열기' 가 토스트만 띄우는 dead action 이 된다.
+                        //   → 보관 행은 편집기 자동 진입 대신 **태블릿 콘텐츠 목록(보관 해제 지점)** 으로 보낸다.
                         <Link
                           to="/store/commerce/tablet-displays"
-                          state={{ tab: 'contents', editScreenSetId: item.landingTargetId, highlightScreenSetId: item.landingTargetId }}
+                          state={
+                            isArchivedCornerQr(item)
+                              ? { tab: 'contents', highlightScreenSetId: item.landingTargetId }
+                              : { tab: 'contents', editScreenSetId: item.landingTargetId, highlightScreenSetId: item.landingTargetId }
+                          }
                           onClick={(e) => e.stopPropagation()}
                           style={styles.iconBtn}
-                          title="화면 세트 열기 (코너 화면 편집)"
+                          title={
+                            isArchivedCornerQr(item)
+                              ? '태블릿 콘텐츠에서 보기 (보관 해제하면 편집·출력이 다시 열립니다)'
+                              : '화면 세트 열기 (코너 화면 편집)'
+                          }
                         >
                           <LayoutTemplate size={16} />
                         </Link>
