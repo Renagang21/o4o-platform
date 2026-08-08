@@ -206,12 +206,83 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 
 **런타임 오류** — 배포 후 25분간 `o4o-core-api` severity≥ERROR 로그 **0건**.
 
-### 5-6. 인증 사용자 실측 — **BLOCKED (자격증명 부재)**
+### 5-7. 인증 사용자 실측 (2026-08-08, 자격증명 갱신 후 재수행)
+
+`docs/local/TEST-ACCOUNTS.local.md` 갱신으로 **`pharmacy-hub:store_owner` 계정을 확보**했다.
+`renagang21@gmail.com` — PH membership `active`, roleType `store_owner`(2026-07-30 승인),
+`entryPoints.storeOwner=true`. §5-6 의 BLOCKED 는 아래 범위에서 해소됐다.
+
+#### (A) 검증 6 — 조직 격리 · 미연결 계정 : **23/23 PASS**
+
+`renagang21` 은 PH 에서 `not_connected`(candidateCount=0) 이면서 **타 서비스에는 실제 자산이 있다** —
+공통 `/api/v1/store/handled-products` 20건, `/api/v1/kpa/pharmacy/qr` **41건**.
+즉 공통 해석기(`resolveStoreAccess`)라면 다른 서비스 조직을 반환했을 계정이다.
+
+| 검증 | 건수 | 결과 |
+|---|:--:|---|
+| PH 읽기 7종 — 200 + `not_connected` + **노출 0건** | 7 | ✅ 전부 PASS |
+| PH write 11종 — `409 STORE_NOT_CONNECTED` | 11 | ✅ 전부 PASS |
+| client 주입 차단 — `organizationId`·`storeId`·`serviceKey`·`authorRole` → `400 FIELD_NOT_ACCEPTED` | 5 | ✅ 전부 PASS |
+
+**"타 서비스 조직 fallback 금지" 가 프로덕션에서 실증됐다.** 같은 세션·같은 사용자로
+공통 경로는 20~41건을 반환하는데 PH 경로는 전부 0건이고 write 는 전부 차단된다.
+(부채 ① 도 같은 실측으로 재확인 — §8)
+
+#### (B) 검증 2 — 기존 서비스 QR 회귀 : **PASS (위임 전환 회귀 0)**
+
+`renagang21` 은 KPA 매장(`네뚜레-약국`) 경영자라 owner 경로까지 실측했다. **write 0 · 읽기 전용.**
+
+| 항목 | 결과 |
+|---|---|
+| KPA QR 목록 | `200` · 41건 · `success:true` · 파생 필드(`scanCount`·`landingType`·`slug`·`aiDescriptionMode`) 전부 유지 |
+| 스캔 통계 | `200` · `totalScans`/`deviceStats` 정상 |
+| 스캔 통계 경계 | 타 매장 id → `404 QR_NOT_FOUND` (nested envelope) |
+| QR 출력 (page QR) | PNG `200 image/png` 21,160B · SVG `200 image/svg+xml` 1,602B · PDF `200 application/pdf` 11,653B |
+| QR 이미지 `/image` | `200 image/png` 3,165B |
+| 공개 랜딩 `page` | `200` · 본문 렌더(`pageContent` 있음) · `storeSlug=네뚜레-약국` · `Cache-Control: no-store` |
+| 공개 랜딩 `screen_set`(비활성) | `410 SCREEN_SET_INACTIVE` + 종료 안내 문구 — **의도된 계약** |
+| 공개 랜딩 없는 slug | `404 QR_NOT_FOUND` (nested) |
+| 비활성 QR 출력 | `404` — 비활성 QR 출력 차단(기존 계약, 병행 세션 M-1 과도 정합) |
+| GlycoPharm QR owner | `200` · 20건 |
+| K-Cosmetics QR owner | `200` · 20건 |
+
+> 초회 실행에서 4건이 FAIL 로 보였으나 **전부 검증 스크립트의 기대값 오류**였다.
+> 첫 항목이 비활성 `screen_set` QR 이어서 출력 404·랜딩 410 이 나온 것이고,
+> `page` 타입으로 재실행하니 출력 3종 모두 200 이다. **코드 결함 아님**을 확인하고 정정했다.
+
+#### (C) 검증 1·3·4·5 — PH 정상 경로 : **여전히 BLOCKED (매장 조직 미프로비저닝)**
+
+`renagang21` 은 store_owner 승인까지 끝났으나 **PH enrollment 를 가진 매장 조직이 없다.**
+운영자 콘솔 실측: PH membership `active` 2건, `pending` 0건 — 그러나 PH 매장 조직 0개.
+
+| 필요 조건 | 현재 |
+|---|:--:|
+| `role_assignments` = `pharmacy-hub:store_owner` | ✅ |
+| `service_memberships` = `pharmacy-hub` / `active` | ✅ |
+| `organization_members` (owner/admin/manager, left_at IS NULL) | ❌ |
+| `organization_service_enrollments` = `pharmacy-hub` / `active` | ❌ |
+
+따라서 QR 생성·POP 작성/발행/보관·사이니지 재생목록/항목·설명서 조회의 **정상 경로**와
+**교차 조직 격리**(PH 조직 2개 필요)는 아직 실측할 수 없다.
+이는 W9 구현 결함이 아니라 **검증 대상 데이터 부재**이며,
+매장 조직 생성은 프로덕션 조직·RBAC write 라 임의로 수행하지 않았다(§9 승격 조건).
+
+> **부수 발견(후속 관측 대상)**: PH store_owner 로 **승인 완료(2026-07-30)** 된 계정에
+> 매장 조직이 만들어져 있지 않다. W1 프로비저닝
+> (`CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1`)이 이 계정에는 적용되지 않은 것으로 보인다.
+> 승인된 매장 경영자가 자기 매장 없이 남는 상태라 **제품 갭일 수 있다** — W9 범위 밖이므로
+> 고치지 않고 기록만 남긴다.
+
+### 5-6. (경과) 인증 사용자 실측이 한때 BLOCKED 였던 이유
+
+> **이 절은 경과 기록이다.** 사용자가 비밀번호를 일괄 교체하고 SSOT 문서에 Pharmacy-Hub
+> 절을 추가해 §5-7 로 재수행했다 — `renagang21@gmail.com` 이 `pharmacy-hub:store_owner`
+> 로 정상 로그인되며, 검증 2·6 은 완료됐다.
 
 작업요청서가 요구한 실측 7개 항목 중 **1·3·4·5·6·7 은 인증된 `pharmacy-hub:store_owner`
-세션이 있어야 한다.** 프로덕션에서 확보하지 못했다.
+세션이 있어야 한다.** 당시에는 확보하지 못했다.
 
-| 계정 | 로그인 결과 |
+| 계정 | 로그인 결과 (자격증명 갱신 **전**) |
 |---|---|
 | `sohae2100@gmail.com` | `401 INVALID_CREDENTIALS` — SSOT 문서의 비밀번호가 프로덕션과 불일치 |
 | `sohae21@naver.com` | `403 ACCOUNT_NOT_ACTIVE` |
@@ -319,34 +390,37 @@ back-compat 경로가 `pharmacy-hub:store_owner` 를 포함한 **모든** store_
 
 | # | 기준 | 결과 |
 |:--:|---|---|
-| 1 | QR 관리 정상 | ⚠️ 구현 완료 · 배포 · 마운트/가드 PASS — **인증 경로 실측 BLOCKED (§5-6)** |
+| 1 | QR 관리 정상 | ⚠️ 구현·배포·가드 PASS / 미연결 경로 PASS — **정상 경로 실측 BLOCKED (§5-7C)** |
 | 2 | POP 관리 정상 | ⚠️ 동일 |
 | 3 | 태블릿 screen-set 관리 정상 | ⏸ **HOLD** — 병행 세션 충돌, 후속 WO 분리 |
 | 4 | 디지털 사이니지 관리 정상 | ⚠️ 동일 |
 | 5 | 상품 설명서 조회 정상 | ⚠️ 동일 |
-| 6 | 전부 PH enrollment 조직으로 격리 | ⚠️ 코드 경로 단일화 확인 · 단위 테스트 고정 — **실계정 실측 BLOCKED** |
+| 6 | 전부 PH enrollment 조직으로 격리 | ✅ **PASS** — 미연결 계정 실측 23/23 (§5-7A). 타 서비스 20~41건 보유 계정에서 PH 노출 0건 |
 | 7 | 원본·사본 독립성 유지 | ✅ §4 — POP import 원본 FK 부재는 단위 테스트로 고정 |
-| 8 | 미연결·ambiguous write 0 | ⚠️ 미인증 write 8종 401 확인 · 코드 경로 `sendWriteBlocked` 선행 — **실계정 실측 BLOCKED** |
+| 8 | 미연결·ambiguous write 0 | ✅ **PASS(미연결)** — write 11종 전부 `409 STORE_NOT_CONNECTED` · 주입 5종 `400` (§5-7A). AMBIGUOUS 는 실계정 부재 — fixture 미생성 |
 | 9 | 메뉴·route 정합 | ✅ '매장 실행' = QR · POP · 디지털 사이니지 · 상품 설명서 (번들 실측 확인) |
 | 10 | dead link · 준비 중 화면 0 | ✅ 태블릿은 메뉴를 만들지 않았다 |
-| 11 | W1~W8 및 타 서비스 회귀 0 | ⚠️ typecheck 5개 + 단위테스트 33개 + 공개 랜딩 4서비스 + 런타임 오류 0건 PASS / **브라우저 회귀 BLOCKED** |
-| 12 | 테스트 자산 원상 복구 | — 해당 없음 (DB write 0) |
-| 13 | 배포 · production smoke PASS | ⚠️ 배포 ✅ / 미인증 smoke ✅ / **인증 smoke BLOCKED** |
+| 11 | W1~W8 및 타 서비스 회귀 0 | ✅ **타 서비스 회귀 0 PASS** (§5-7B: KPA owner CRUD·출력·랜딩 + GP·KCos 각 20건) / PH W1~W8 브라우저 회귀는 매장 조직 부재로 미수행 |
+| 12 | 테스트 자산 원상 복구 | ✅ 해당 없음 — **프로덕션 DB write 0** (전 검증 읽기 전용) |
+| 13 | 배포 · production smoke PASS | ⚠️ 배포 ✅ / 미인증 smoke ✅ / 미연결·회귀 smoke ✅ / **PH 정상 경로 BLOCKED** |
 | 14 | CHECK · commit · push 완료 | ✅ |
 
 **최종 판정**: `IMPLEMENTATION_COMPLETE / PENDING_PRODUCTION_VERIFICATION / TABLET_DEFERRED`
 
-`PASS with TABLET_DEFERRED` 로 닫지 **않는다.** §5-6 의 인증 실측이 자격증명 부재로
-수행 불가이기 때문이다. 구현·배포 실패가 아니라 **검증 수단 부재**이며, 아래가 해소되면
-남은 항목만 실측해 판정을 승격할 수 있다.
+`PASS with TABLET_DEFERRED` 로 닫지 **않는다.** 검증 6·2·8·11 은 실측 PASS 했으나
+1·3·4·5 의 **PH 정상 경로**가 매장 조직 부재로 남아 있다(§5-7C).
+구현·배포 결함이 아니라 **검증 대상 데이터 부재**다.
 
 ### 판정 승격에 필요한 것 (사용자 결정 사항)
 
-1. `pharmacy-hub:store_owner` role + PH 매장 조직 `active` enrollment 를 가진 **검증용 계정**
-   (프로덕션 RBAC·조직 write 라 승인 없이 만들지 않았다)
-2. 해당 계정의 유효한 비밀번호 → `docs/local/TEST-ACCOUNTS.local.md` 갱신
-   (현재 문서의 3개 계정 모두 프로덕션 로그인 실패 — §5-6)
-3. 교차 조직 격리 실측을 위해서는 **서로 다른 PH 조직 2개**에 각각 매장 경영자가 필요하다
+1. **PH 매장 조직 1개** — `renagang21@gmail.com` 을 `organization_members`(owner) 로 두고
+   `organization_service_enrollments(service_code='pharmacy-hub', status='active')` 를 가진 조직.
+   role·membership 은 **이미 충족**돼 있으므로 이 두 가지만 채우면 1·3·4·5 를 즉시 실측할 수 있다.
+   → 정석 경로는 W1 프로비저닝(`CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1`) 이며,
+     수동 SQL 은 운영 데이터 write 라 승인 없이 수행하지 않는다.
+2. 교차 조직 격리 실측에는 **서로 다른 PH 조직 2개**에 각각 매장 경영자가 필요하다.
+3. AMBIGUOUS 실측에는 한 사용자가 PH 조직 2개에 소속돼야 한다 —
+   작업요청서가 운영 fixture 생성을 금지하므로 **만들지 않았고**, 코드 경로 + 단위 테스트로만 고정했다.
 
 ---
 
