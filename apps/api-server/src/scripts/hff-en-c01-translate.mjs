@@ -29,6 +29,8 @@ export const DICT = new Map();            // KO 문구 → EN (몸통·문장)
 export const HEAD = new Map();            // KO 머리 → EN
 export const ATOM = new Map();            // 저작 라운드가 추가하는 원자
 export const ROUNDS = [];
+/** 저작한 문장 목록 — 보관 문구는 정규화 열쇠로도 색인한다(`skey` 정의 뒤에 채운다). */
+const AUTHORED = [];
 /** 값이 영문 단어를 포함하지 않으면 번역이 아니다 — 수확기 오염에 대한 2차 방어선. */
 const usable = (v) => typeof v === 'string' && /[A-Za-z]{2}/.test(v) && !/^[\d\s./,:%()-]+$/.test(v);
 for (const [ko, en] of Object.entries(g.asset)) if (usable(en)) DICT.set(ko, en);
@@ -40,6 +42,7 @@ for (const f of fs.readdirSync(D).filter((x) => /^hff-en-c01-a\d+-translations-v
   for (const [ko, en] of Object.entries(j.head ?? {})) HEAD.set(norm(ko), en);
   for (const [ko, en] of Object.entries(j.body ?? {})) DICT.set(norm(ko), en);
   for (const [ko, en] of Object.entries(j.atom ?? {})) ATOM.set(norm(ko), en);
+  AUTHORED.push(...Object.entries(j.body ?? {}));
 }
 
 /* ── 원자 사전 ────────────────────────────────────────────────── */
@@ -78,6 +81,8 @@ const FORM = {
   '액상': 'liquid', '액제': 'liquid', '액': 'liquid', '농축액': 'concentrate', '음료': 'beverage',
   '환': 'pill', '젤리': 'jelly', '필름': 'film', '스틱': 'stick', '페이스트': 'paste', '겔': 'gel',
   '시럽': 'syrup', '차': 'tea', '바': 'bar', '구미': 'gummy', '분말스틱': 'powder stick', '내용물': 'contents',
+  '캅셀': 'capsule', '경질캅셀': 'hard capsule', '연질캅셀': 'soft capsule', '내용액': 'liquid contents',
+  '유상액': 'oily liquid', '현탁액': 'suspension', '유동액': 'free-flowing liquid', '고형': 'solid',
 };
 /** 제형 앞에 붙는 성질 수식어 */
 const QUAL_PRE = {
@@ -95,24 +100,35 @@ const QUAL_TAIL = new Set(['있는', '지닌', '가진', '있고', '있으며', 
 /* ── 성상 품질 문구 ───────────────────────────────────────────── */
 const Q_FLAVOUR = 'with a characteristic flavour and no off-taste or off-odour';
 const Q_COLOUR = 'with a characteristic colour and flavour and no off-taste or off-odour';
-const SEP = '[,·․、]?\\s*';
+/** 이미/이취 사이의 구분자는 원문마다 제각각이다(`,` `·` `.` `∙` `와`). */
+const SEP = '(?:[,·․、.∙・]|와|과)?\\s*';
+/** `고유의 향미가 있고` 계열 어미 변형 */
+const HAVE = '(?:가\\s*있고|가\\s*있으며|가\\s*있는|를\\s*가지며|를\\s*가지고\\s*있으며|를\\s*가지고\\s*있는|를\\s*가지고|를\\s*지니고|를\\s*지니며|를\\s*가진|를\\s*지닌)';
+/** `이취가 없는` 계열 어미 변형 */
+const NONE = '(?:없는|없으며|없고|없이|없어야\\s*하는)';
+const Q_NONE = 'free from off-taste and off-odour';
 /** 품질 문구 접두 — `고유의 (색택과 )?향미…이미·이취가 없는 <형상설명>` */
 const PREFIX_RE = [
-  [new RegExp('^고유의\\s*색택과\\s*향미(?:가\\s*있고|를\\s*가지며|를\\s*가지고|를\\s*지니고|가\\s*있으며|를\\s*가진)\\s*이미' + SEP + '이취가\\s*(?:없는|없으며|없고|없이)\\s*'), Q_COLOUR],
-  [new RegExp('^고유의\\s*향미(?:가\\s*있고|를\\s*가지며|를\\s*가지고|를\\s*지니고|가\\s*있으며|를\\s*가진)' + SEP + '\\s*이미' + SEP + '이취가\\s*(?:없는|없으며|없고|없이)\\s*'), Q_FLAVOUR],
-  [new RegExp('^이미' + SEP + '이취가\\s*없(?:고|으며|이)' + SEP + '\\s*고유의\\s*색택과\\s*향미(?:가\\s*있는|를\\s*가진|를\\s*지닌)\\s*'), Q_COLOUR],
-  [new RegExp('^이미' + SEP + '이취가\\s*없(?:고|으며|이)' + SEP + '\\s*고유의\\s*향미(?:가\\s*있는|를\\s*가진|를\\s*지닌)\\s*'), Q_FLAVOUR],
+  [new RegExp('^고유의\\s*색택과\\s*향미' + HAVE + SEP + '\\s*이미' + SEP + '이취가\\s*' + NONE + '\\s*'), Q_COLOUR],
+  [new RegExp('^고유의\\s*향미' + HAVE + SEP + '\\s*이미' + SEP + '이취가\\s*' + NONE + '\\s*'), Q_FLAVOUR],
+  [new RegExp('^이미' + SEP + '이취가\\s*없(?:고|으며|이)' + SEP + '\\s*고유의\\s*색택과\\s*향미' + HAVE + '\\s*'), Q_COLOUR],
+  [new RegExp('^이미' + SEP + '이취가\\s*없(?:고|으며|이)' + SEP + '\\s*고유의\\s*향미' + HAVE + '\\s*'), Q_FLAVOUR],
+  /* 향미 절이 아예 없는 형태 — `이미, 이취가 없는 암갈색의 액상` */
+  [new RegExp('^이미' + SEP + '이취가\\s*' + NONE + '\\s*'), Q_NONE],
 ];
 /** 품질 문구가 뒤에 오는 형태 — `<형상설명>으로 이미, 이취가 없음` */
 const SUFFIX_RE = [
-  [new RegExp('(?:으로|로|이며|이고)?' + SEP + '\\s*고유의\\s*색택과\\s*향미를\\s*가지며' + SEP + '\\s*이미' + SEP + '이취가\\s*없(?:음|다|어야\\s*함|어야\\s*한다)\\.?$'), Q_COLOUR],
-  [new RegExp('(?:으로|로|이며|이고)?' + SEP + '\\s*이미' + SEP + '이취가\\s*없(?:음|다)\\.?$'), Q_FLAVOUR],
+  [new RegExp('(?:으로서|으로|로서|로|이며|이고)?' + SEP + '\\s*고유의\\s*색택과\\s*향미를\\s*(?:가지며|가지고|지니며)' + SEP + '\\s*이미' + SEP + '이취가\\s*없(?:음|다|어야\\s*함|어야\\s*한다)\\.?$'), Q_COLOUR],
+  [new RegExp('(?:으로서|으로|로서|로|이며|이고)?' + SEP + '\\s*고유의\\s*향미를\\s*(?:가지며|가지고|지니며)' + SEP + '\\s*이미' + SEP + '이취가\\s*없(?:음|다|어야\\s*함|어야\\s*한다)\\.?$'), Q_FLAVOUR],
+  [new RegExp('(?:으로서|으로|로서|로|이며|이고)?' + SEP + '\\s*이미' + SEP + '이취가\\s*없(?:음|다|어야\\s*함|어야\\s*한다)\\.?$'), Q_NONE],
 ];
 /** 형상 설명이 없는 독립 문장 — 의무형(`없어야 함`) */
 const STANDALONE_RE = [
   [new RegExp('^고유의\\s*색택과\\s*향미를\\s*(?:가지며|가지고|지니며|지니고)' + SEP + '\\s*이미' + SEP + '이취가\\s*없어야\\s*(?:함|한다)\\.?$'), 'Must have its characteristic colour and flavour, with no off-taste or off-odour'],
   [new RegExp('^고유의\\s*향미를\\s*(?:가지며|가지고|지니며|지니고)' + SEP + '\\s*이미' + SEP + '이취가\\s*없어야\\s*(?:함|한다)\\.?$'), 'Must have its characteristic flavour, with no off-taste or off-odour'],
   [new RegExp('^고유의\\s*색택과\\s*향미가\\s*있고' + SEP + '\\s*이미' + SEP + '이취가\\s*없어야\\s*(?:함|한다)\\.?$'), 'Must have its characteristic colour and flavour, with no off-taste or off-odour'],
+  [/^이취가\s*없어야\s*(?:함|한다)\.?$/, 'Must be free from off-odour'],
+  [/^이미\s*[,·]?\s*이취가\s*없어야\s*(?:함|한다)\.?$/, 'Must be free from off-taste and off-odour'],
 ];
 
 /* ── 색 형태소 분해 ───────────────────────────────────────────── */
@@ -209,14 +225,34 @@ export function describeForm(tailRaw) {
     }
     if (w === '또는') { colours.push('__OR__'); continue; }
     if (QUAL_TAIL.has(w)) continue;
+    /* `연한 노랑 빛이 도는 백색` — 색조를 나타내는 보조 어절은 색 판독에 쓰지 않는다. */
+    if (/^(빛이|빛을|빛|도는|띠는|나는|섞인)$/.test(w)) continue;
+    /* `빨간 갈색(적갈색)` — 괄호 안이 같은 색의 다른 표기다. 둘 다 남긴다. */
+    const cp = /^(.+?)[(（](.+?)[)）]$/.exec(w);
+    if (cp) { const ca = colourPhrase(cp[1]), cb = colourPhrase(cp[2]); if (ca && cb) { colours.push(`${[...pendingMod, ca].join(' ')} (${cb})`); pendingMod = []; continue; } }
     if (QUAL_PRE[w]) { const v = QUAL_PRE[w]; if (v === '__PARTICULATE__') post.push('containing particulate matter'); else pre.push(v); continue; }
     if (COLOUR_MOD[w]) { pendingMod.push(COLOUR_MOD[w]); continue; }
     if (SHAPE[w]) { shape = shape ? shape + ' ' + SHAPE[w] : SHAPE[w]; continue; }
     /* 색은 `…색` 이거나 형태소로 읽히는 어절이다. 제형/형상보다 **뒤에** 판정한다. */
     const f = formWord(w);
     if (f && !/색$/.test(w)) { form = form ? form + ' ' + f : f; continue; }
+    /* `미백색~미황색` — 색의 범위. 원문 순서대로 `A to B` 로 옮긴다. */
+    if (/[~〜～∼]/.test(w)) {
+      const ends = w.split(/[~〜～∼]/).map((x) => colourPhrase(x));
+      if (ends.length === 2 && ends.every(Boolean)) { colours.push([...pendingMod, `${ends[0]} to ${ends[1]}`].join(' ')); pendingMod = []; continue; }
+    }
     const c = colourPhrase(w);
     if (c) { colours.push([...pendingMod, c].join(' ')); pendingMod = []; continue; }
+    /* `갈색투명` — 색과 성질 수식어가 붙어 있는 형태 */
+    let split = false;
+    for (let k = 1; k < w.length && !split; k++) {
+      const ca = colourPhrase(w.slice(0, k)), qb = QUAL_PRE[w.slice(k)] ?? FORM[w.slice(k)] ?? ATOM.get(w.slice(k));
+      if (!ca || !qb || qb === '__PARTICULATE__') continue;
+      colours.push([...pendingMod, ca].join(' ')); pendingMod = [];
+      if (QUAL_PRE[w.slice(k)]) pre.push(qb); else form = form ? form + ' ' + qb : qb;
+      split = true;
+    }
+    if (split) continue;
     if (f) { form = form ? form + ' ' + f : f; continue; }
     return null;
   }
@@ -269,7 +305,8 @@ export function bracketForm(t) {
   const m = /^\[\s*([^\]]+?)\s*\]$/.exec(norm(t));
   if (!m) return null;
   const inner = m[1].replace(/(\d+)$/, '').trim(), suffix = (/(\d+)$/.exec(m[1]) ?? [])[1] ?? '';
-  const f = FORM[inner] ?? ATOM.get(inner);
+  /* `[멀티비타민 정제]` 처럼 여러 어절이 오므로 형상 설명기에 맡긴다. */
+  const f = FORM[inner] ?? ATOM.get(inner) ?? describeForm(inner);
   if (!f) return null;
   const cap = f.charAt(0).toUpperCase() + f.slice(1);
   return `[${cap}${suffix ? ' ' + suffix : ''}]`;
@@ -277,8 +314,19 @@ export function bracketForm(t) {
 
 /* ── 수치 도우미 ──────────────────────────────────────────────── */
 const U = (u) => String(u).replaceAll('㎎', 'mg').replaceAll('㎏', 'kg').replaceAll('㎖', 'mL').replace(/^ml$/, 'mL').replaceAll('㎍', 'μg').replaceAll('㎕', 'μL').replaceAll('ℓ', 'L');
-/** 수치는 그대로, 단위의 CJK 호환문자(㎎㎏㎖㎍)만 표준 표기로 편다. */
-const num = (s) => U(norm(s)).replace(/\s*\/\s*/g, ' / ');
+/**
+ * 표시량 괄호 안의 값. 수치는 그대로 두고 단위의 CJK 호환문자만 편다.
+ * 괄호 안에 한글이 섞이는 경우가 있다 — `3,000억 CFU/g`, `378mg/1.0g, 1회 섭취기준`,
+ * `니코틴산아미드로서 15mg`. 옮길 수 없으면 `null` 로 차단한다.
+ */
+function num(s) {
+  let t = U(norm(s)).replace(/\s*\/\s*/g, ' / ');
+  if (!HANGUL.test(t)) return t;
+  t = t.replace(/([\d,.]+)\s*억/g, (_, v) => { const e = eokToEnglish(v); return e ?? `${v}억`; });
+  t = t.replace(/,?\s*1\s*회\s*섭취\s*기준/g, ', per serving');
+  t = t.replace(/(\S+)\s*으?로서\s*/g, (_, w) => { const e = HEAD.get(hkey(w)) ?? HEADK.get(hkey(w)); return e ? `as ${e.charAt(0).toLowerCase() + e.slice(1)} ` : `${w}로서 `; });
+  return HANGUL.test(t) ? null : t.replace(/\s+/g, ' ').trim();
+}
 const LIMIT_EN = { '이하': 'or less', '이상': 'or more', '미만': 'less than', '초과': 'more than' };
 /** `2,000억` → 200 billion. 본문 수치와 대조해 **일치할 때만** 쓴다. */
 function eokToEnglish(numStr, expect) {
@@ -293,34 +341,82 @@ function eokToEnglish(numStr, expect) {
 }
 
 /* ── 몸통 번역 ────────────────────────────────────────────────── */
+/**
+ * 보관 문구의 표기 변형을 하나로 접는 열쇠.
+ *
+ * 같은 문장이 띄어쓰기·구분자·어미만 바꿔 수백 가지로 나타난다
+ * (`피하여/피해/피하고`, `보관하십시오/보관한다/보관`, `영·유아/영유아/영,유아`).
+ * **저작한 문장에만** 이 열쇠를 걸어 변형을 자동으로 흡수한다.
+ * 부정형(`마십시오`)은 건드리지 않는다 — 의미가 뒤집히면 안 된다.
+ */
+export function skey(s) {
+  let t = norm(s);
+  if (!/보관|유통|직사광선|실온/.test(t)) return null;
+  if (/마십시오|마시기|말것|말아야/.test(t)) return null;
+  t = t.replace(/\s+/g, '').replace(/[·ㆍ・･,，、]/g, '').replace(/[.。]+$/, '');
+  t = t.replace(/받지아니하는|받지않는/g, '피하').replace(/피하여서|피하여|피해서|피해|피하고|피한/g, '피하');
+  t = t.replace(/(보관|유통|주의)(하십시오|하세요|하시기바랍니다|하시길바랍니다|합니다|한다|하여야한다|해야한다|할것|하시고|하며|하도록)/g, '$1');
+  t = t.replace(/영유아|영ㆍ유아|영·유아|유아/g, '영유아');
+  t = t.replace(/곳에서/g, '곳에');
+  return t;
+}
+const NORMDICT = new Map();
+for (const [ko, en] of AUTHORED) { const k = skey(ko); if (k) NORMDICT.set(k, en); }
+
 export function translateBody(bodyRaw) {
   const t = norm(bodyRaw);
   if (!HANGUL.test(t)) return t;
   const hit = DICT.get(t);
   if (hit) return hit;
+  const sk = skey(t);
+  if (sk) { const nh = NORMDICT.get(sk); if (nh) return nh; }
 
   let m;
+  /* 슬롯 전체가 괄호 주석인 경우 — `(시험방법: 관능검사를 실시하여 …)` */
+  m = /^[(（]\s*([\s\S]*?)\s*[)）]?$/.exec(t);
+  if (m && t.startsWith('(') && HANGUL.test(m[1])) {
+    const innerEn = translateBody(m[1]);
+    if (innerEn) return `(${innerEn}${t.endsWith(')') ? ')' : ''}`;
+  }
+  /* `시험방법: X` — 콜론이 몸통 안에 있는 형태 */
+  m = /^([^:：]{1,30})\s*[:：]\s*([\s\S]+)$/.exec(t);
+  if (m && HANGUL.test(m[1])) {
+    const hEn = translateHead(m[1]), bEn = HANGUL.test(m[2]) ? translateBody(m[2]) : norm(m[2]);
+    if (hEn && bEn) return `${hEn}: ${bEn}`;
+  }
+  /* `A, B` 나열 — 각 조각이 모두 옮겨질 때만.
+     `3,000` 처럼 **천 단위 구분자**가 있으면 나열이 아니다. 쪼개면 수치가 깨진다. */
+  if (/,/.test(t) && !/\d\s*,\s*\d/.test(t) && t.length <= 120) {
+    const parts = t.split(/\s*,\s*/).map(norm).filter(Boolean);
+    if (parts.length >= 2 && parts.every((x) => x.length > 1 && !/^\d+$/.test(x) && !/[.]$/.test(x))) {
+      const en = parts.map((x) => (HANGUL.test(x) ? (translateHead(x) ?? translateBody(x)) : x));
+      if (en.every(Boolean)) return en.join(', ');
+    }
+  }
+
   /* ── 표시량 계열 ── */
   /* 표시량(A/B)의 X~Y%  |  표시량(A/B)의 X% 이상 Y% 이하 */
-  m = /^(.*?)표시량\s*[(（]([^)）]*)[)）]\s*의\s*([\d.,]+)\s*%?\s*(?:[~〜～-]|이상)\s*([\d.,]+)\s*%\s*(?:이하)?\.?$/.exec(t);
-  if (m) { const lead = specLead(m[1]); return lead === null ? null : `${lead}labelled (${num(m[2])}), ${m[3]}~${m[4]}%`; }
+  m = /^(.*?)표시량\s*[(（\[]([^)）\]]*)[)）\]]\s*의\s*([\d.,]+)\s*%?\s*(?:[~〜～-]|이상)\s*([\d.,]+)\s*%\s*(?:이하)?\.?$/.exec(t);
+  if (m) { const lead = specLead(m[1]), v = num(m[2]); return (lead === null || v === null) ? null : `${lead}labelled (${v}), ${m[3]}~${m[4]}%`; }
   /* 표시량의 X ~ Y% (표시량 : A / B) */
   m = /^(.*?)표시량의\s*([\d.,]+)\s*%?\s*(?:[~〜～-]|이상)\s*([\d.,]+)\s*%\s*(?:이하\s*)?[(（]\s*표시량\s*[:：]?\s*([^)）]*)[)）]\.?$/.exec(t);
-  if (m) { const lead = specLead(m[1]); return lead === null ? null : `${lead}labelled (${num(m[4])}), ${m[2]}~${m[3]}%`; }
+  if (m) { const lead = specLead(m[1]), v = num(m[4]); return (lead === null || v === null) ? null : `${lead}labelled (${v}), ${m[2]}~${m[3]}%`; }
   /* A / B (표시량의 X-Y%) */
   m = /^([^()（）]*?)\s*[(（]\s*표시량의\s*([\d.,]+)\s*%?\s*[~〜～-]\s*([\d.,]+)\s*%\s*[)）]\.?$/.exec(t);
-  if (m && !HANGUL.test(m[1])) return `labelled (${num(m[1])}), ${m[2]}~${m[3]}%`;
+  if (m && !HANGUL.test(m[1])) { const v = num(m[1]); if (v !== null) return `labelled (${v}), ${m[2]}~${m[3]}%`; }
   /* 표시량의 X% 이상 / 이하 */
   m = /^(.*?)표시량\s*(?:[(（]([^)）]*)[)）])?\s*의?\s*([\d.,]+)\s*%\s*(이상|이하)\.?$/.exec(t);
   if (m) {
     const lead = specLead(m[1]);
     if (lead === null) return null;
-    const of = m[2] ? ` of the labelled amount (${num(m[2])})` : ' of the labelled amount';
+    const v2 = m[2] ? num(m[2]) : '';
+    if (v2 === null) return null;
+    const of = m[2] ? ` of the labelled amount (${v2})` : ' of the labelled amount';
     return `${lead}${m[4] === '이상' ? 'at least' : 'at most'} ${m[3]}%${of}`;
   }
   /* 표시량 이상 */
-  m = /^표시량\s*(?:[(（]([^)）]*)[)）]\s*)?이상\.?$/.exec(t);
-  if (m) return m[1] ? `at least the labelled amount (${num(m[1])})` : 'at least the labelled amount';
+  m = /^표시량\s*(?:[(（\[]([^)）\]]*)[)）\]]\s*)?(?:의\s*)?이상\.?$/.exec(t);
+  if (m) { const v = m[1] ? num(m[1]) : ''; if (v === null) return null; return m[1] ? `at least the labelled amount (${v})` : 'at least the labelled amount'; }
 
   /* ── 한계치 계열 ── */
   m = /^([\d.,]+)\s*(mg\/kg|mg\/g|g\/kg|㎎\/㎏|mg|㎎)?\s*(이하|이상|미만|초과)\.?$/.exec(t);
@@ -360,10 +456,10 @@ export function translateBody(bodyRaw) {
   m = /^적합\s*[(（]\s*([\d.,]+)\s*(이하|이상)\s*[)）]\.?$/.exec(t);
   if (m) return `Conforms (${m[1]} ${LIMIT_EN[m[2]]})`;
   /* 유통기한 */
-  m = /^제조일로부터\s*([\d.,]+)\s*(개월|년)\s*(까지)?\.?$/.exec(t);
+  m = /^제조일\s*(?:로\s*)?부터\s*([\d.,]+)\s*(개월|년)\s*(까지)?\.?$/.exec(t);
   if (m) return `${m[3] ? 'Up to ' : ''}${m[1]} ${unitTime(m[1], m[2])} from the date of manufacture`;
-  m = /^([\d.,]+)\s*(개월|년)\.?$/.exec(t);
-  if (m) return `${m[1]} ${unitTime(m[1], m[2])}`;
+  m = /^([\d.,]+)\s*(개월|년)\s*(까지)?\.?$/.exec(t);
+  if (m) return `${m[3] ? 'Up to ' : ''}${m[1]} ${unitTime(m[1], m[2])}`;
   /* 단문 상수 */
   const CONST = {
     '음성': 'Negative', '음 성': 'Negative', '음성(-)': 'Negative (-)', '양성': 'Positive',
@@ -410,6 +506,21 @@ export function translateBody(bodyRaw) {
   /* `일일섭취량 중 300 이하` */
   m = /^일일섭취량\s*중\s*([\d.,]+)\s*(이하|이상)\.?$/.exec(t);
   if (m) return `${m[1]} ${LIMIT_EN[m[2]]} per daily intake`;
+
+  /* `납(mg/kg) 1.0이하` — 콜론 없이 항목명·단위·수치가 이어진 형태 */
+  m = /^(.+?)\s*[(（]\s*([^)）]*)\s*[)）]\s*([\d.,]+)\s*(이하|이상|미만|초과)\.?$/.exec(t);
+  if (m && !HANGUL.test(m[2])) { const h = translateHead(m[1]); if (h) return `${h} (${U(m[2])}) ${m[3]} ${LIMIT_EN[m[4]]}`; }
+  /* `100,000,000개/2g 이상` — 마릿수 단위 */
+  m = /^([\d,.]+)\s*(?:개|CFU|cfu)?\s*\/\s*([\d.]*\s*(?:g|mL|ml|㎖|kg))\s*(이상|이하)\.?$/.exec(t);
+  if (m) return `${m[1]} per ${U(norm(m[2]))} ${LIMIT_EN[m[3]]}`;
+  /* `100이하(ml 당)` `3,000이하/1 ml당` `100cfu이하/mL` */
+  m = /^([\d,.]+)\s*(?:cfu|CFU)?\s*(이하|이상)\s*[(（]\s*(?:1\s*)?(mL|ml|㎖|g)\s*당\s*[)）]\.?$/.exec(t);
+  if (m) return `${m[1]} per ${U(m[3])} ${LIMIT_EN[m[2]]}`;
+  m = /^([\d,.]+)\s*(?:cfu|CFU)?\s*(이하|이상)\s*\/\s*(?:1\s*)?(mL|ml|㎖|g)\s*당?\.?$/.exec(t);
+  if (m) return `${m[1]} per ${U(m[3])} ${LIMIT_EN[m[2]]}`;
+  /* `3mg/33g의 80%이상` */
+  m = /^([^가-힣]+?)\s*의\s*([\d.,]+)\s*%\s*(이상|이하)\.?$/.exec(t);
+  if (m) return `${m[3] === '이상' ? 'at least' : 'at most'} ${m[2]}% of ${norm(m[1])}`;
 
   const bk = bracketForm(t);
   if (bk) return bk;
@@ -481,7 +592,9 @@ export function splitParts(tRaw) {
     out.push({ marker, text: norm(c.slice(last)) });
     for (const seg of out) {
       if (!seg.text) { if (seg.marker) flat.push(seg); continue; }
-      const sents = seg.text.split(/(?<=[.。])\s+/).map(norm).filter(Boolean);
+      /* `보관하십시오.제품 개봉 후에는…` 처럼 마침표 뒤에 공백이 없는 표기가 흔하다.
+         소수점을 자르지 않도록 **한글 뒤의 마침표**에서만 나눈다. */
+      const sents = seg.text.split(/(?<=[가-힣][.。])\s*/).map(norm).filter(Boolean);
       sents.forEach((s, i) => flat.push({ marker: i === 0 ? seg.marker : '', text: s }));
     }
   });
@@ -490,7 +603,8 @@ export function splitParts(tRaw) {
 
 export function sentenceCompose(tRaw) {
   const parts = splitParts(tRaw);
-  if (parts.length < 2) return null;
+  /* 조각이 하나라도 번호가 붙어 있으면 분해한 보람이 있다 — `(1) 제품은 …` */
+  if (parts.length < 2 && !(parts.length === 1 && parts[0].marker)) return null;
   const out = [];
   for (const p of parts) {
     if (!p.text) { out.push(p.marker); continue; }
@@ -575,6 +689,31 @@ export function translateHead(headRaw) {
   /* `X 수` / `X수` → `X count` */
   m = /^(.+?)\s*수$/.exec(t);
   if (m) { const inner = translateHead(m[1]); if (inner) return `${inner} count`; }
+  /* `세균수(1ml당)` — 괄호 안이 한글 단위 표현인 경우 */
+  m = /^(.+?)\s*[(（]\s*(?:1\s*)?(mL|ml|㎖|g|㎏|kg|L)\s*당?\s*[)）]$/i.exec(t);
+  if (m) { const base = translateHead(m[1]); if (base) return `${base} (per ${U(m[2])})`; }
+  /* `X(Y으로서)` → `X (as y)` */
+  m = /^(.+?)\s*[(（]\s*(.+?)\s*으?로서\s*[)）]$/.exec(t);
+  if (m) { const base = translateHead(m[1]), as = translateHead(m[2]) ?? (HANGUL.test(m[2]) ? null : m[2]); if (base && as) return `${base} (as ${as.charAt(0).toLowerCase() + as.slice(1)})`; }
+  /* `X 중 Y` → `Y in x` */
+  m = /^(.+?)\s*중\s*(.+)$/.exec(t);
+  if (m) { const a = translateHead(m[1]), b = translateHead(m[2]); if (a && b) return `${b} in ${a.charAt(0).toLowerCase() + a.slice(1)}`; }
+  /* `A와 B의 합` → `Sum of A and B` */
+  m = /^(.+?)\s*(?:와|과|\+|&amp;|&)\s*(.+?)의?\s*합(?:계)?$/.exec(t);
+  if (m) { const a = translateHead(m[1]), b = translateHead(m[2]); if (a && b) return `Sum of ${a.charAt(0).toLowerCase() + a.slice(1)} and ${b.charAt(0).toLowerCase() + b.slice(1)}`; }
+  /* `A, B, C` 나열 — 천 단위 구분자는 제외한다 */
+  if (/,/.test(t) && !/\d\s*,\s*\d/.test(t)) {
+    const parts = t.split(/\s*,\s*/).map(norm).filter((x) => x.length > 1);
+    if (parts.length >= 2) { const en = parts.map((x) => translateHead(x)); if (en.every(Boolean)) return en.join(', '); }
+  }
+  /* `X(Y)` — 괄호 안이 라틴 학명/약어이고 기본어를 모르는 경우 그 표기를 쓴다 */
+  m = /^(.+?)\s*[(（]\s*([^)）]*[A-Za-z][^)）]*)\s*[)）]$/.exec(t);
+  /* 약어(`(EGCG)`)는 그것만 남기면 항목이 무엇인지 알 수 없다. **소문자 낱말**이 있는
+     학명·정식명일 때만 쓴다. */
+  if (m && !HANGUL.test(m[2]) && /[a-z]{3}/.test(m[2])) {
+    const inner = norm(m[2]);
+    return inner.charAt(0).toUpperCase() + inner.slice(1);
+  }
   return null;
 }
 

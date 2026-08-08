@@ -1,14 +1,14 @@
 {
  "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
- "renderedAt": "2026-08-08T07:06:42.821Z",
+ "renderedAt": "2026-08-08T07:56:30.128Z",
  "readOnly": true,
  "dbWrites": 0,
  "baselineTotal": 4200,
- "afterTotal": 2037,
+ "afterTotal": 2028,
  "changed": {
   "hangulVisibleWholeDoc": {
    "before": 2100,
-   "after": 2037
+   "after": 2028
   },
   "sectionHangul": {
    "before": 2100,
@@ -55,124 +55,124 @@
   "total": 4200,
   "failures": [
    {
-    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "m": "002bf922-92ea-4373-bd3a-7d4aa51e4c47",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+    "txt": "성상 : 고유의 색택과 향미를 가지며 이미·이취가 없어야 함진세노사이드 Rg1과 Rb1의 합(가) 원료성 제품 : 표시량 이상(나) 최종 제품 "
    },
    {
-    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "m": "002bf922-92ea-4373-bd3a-7d4aa51e4c47",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+    "txt": "성상 : 고유의 색택과 향미를 가지며 이미·이취가 없어야 함진세노사이드 Rg1과 Rb1의 합(가) 원료성 제품 : 표시량 이상(나) 최종 제품 "
    },
    {
-    "m": "0000a97d-f49a-4790-af56-8a5b54060934",
+    "m": "002bf922-92ea-4373-bd3a-7d4aa51e4c47",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 하양색의 분말자일로올리고당 : 표시량(0.7 g / 5 g)의 80~120%프락토올리고당 : 표"
+    "txt": "성상 : 고유의 색택과 향미를 가지며 이미·이취가 없어야 함진세노사이드 Rg1과 Rb1의 합(가) 원료성 제품 : 표시량 이상(나) 최종 제품 "
    },
    {
-    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "m": "00462107-b602-4147-9213-43cd866da7f0",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+    "txt": "성상:이미,이취가 없고 고유의 향미를 가지고 있는 연한 황갈색의 내용물을 함유한 검정 장방형 연질캡슐로르산 : 표시량(70mg/1,000mg)의"
    },
    {
-    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "m": "00462107-b602-4147-9213-43cd866da7f0",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+    "txt": "성상:이미,이취가 없고 고유의 향미를 가지고 있는 연한 황갈색의 내용물을 함유한 검정 장방형 연질캡슐로르산 : 표시량(70mg/1,000mg)의"
    },
    {
-    "m": "00040b4f-3685-491f-9992-0c1040a9ee93",
+    "m": "00462107-b602-4147-9213-43cd866da7f0",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "Lutein labelled (20mg / 300mg), 80~120%Vitamin A labelled (700μg / 300mg), 80~15"
+    "txt": "성상:이미,이취가 없고 고유의 향미를 가지고 있는 연한 황갈색의 내용물을 함유한 검정 장방형 연질캡슐로르산 : 표시량(70mg/1,000mg)의"
    },
    {
-    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "m": "00695b36-6381-4930-9f5c-720ab353dece",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 점박이가 있는 탁한 노란 주황의 장방형 제피정제대장균군 : 음성카테킨, 카페인산, 탁시폴"
    },
    {
-    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "m": "00695b36-6381-4930-9f5c-720ab353dece",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 점박이가 있는 탁한 노란 주황의 장방형 제피정제대장균군 : 음성카테킨, 카페인산, 탁시폴"
    },
    {
-    "m": "00042b6a-0428-41ea-a482-c90874cd5600",
+    "m": "00695b36-6381-4930-9f5c-720ab353dece",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 회황색의 타원형 제피정제2) 총(-)-Hydroxycitric acid : 표시량의 80 "
+    "txt": "성상 : 고유의 향미가 있고 이미, 이취가 없는 흰색의 점박이가 있는 탁한 노란 주황의 장방형 제피정제대장균군 : 음성카테킨, 카페인산, 탁시폴"
    },
    {
-    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "m": "0070e361-9747-4d9c-9b99-9b5b34f8355a",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+    "txt": "① 성상 : 갈색의 액상제품으로 고유의 향미를 가지며,이미,이취가 없음② 진세노사이드Rg1,Rb1및Rg3의 합 :표시량(10mg/ 35ml)의 "
    },
    {
-    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "m": "0070e361-9747-4d9c-9b99-9b5b34f8355a",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+    "txt": "① 성상 : 갈색의 액상제품으로 고유의 향미를 가지며,이미,이취가 없음② 진세노사이드Rg1,Rb1및Rg3의 합 :표시량(10mg/ 35ml)의 "
    },
    {
-    "m": "0005b601-93ff-436b-bf4e-17699cbe0801",
+    "m": "0070e361-9747-4d9c-9b99-9b5b34f8355a",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "[연질캡슐]성상 : 고유의 향미가 있고 이미, 이취가 없는 진한 노랑색의 내용물을 함유한 빨간 검정색의 타원형 연질캡슐로르산 : 표시량(115㎎"
+    "txt": "① 성상 : 갈색의 액상제품으로 고유의 향미를 가지며,이미,이취가 없음② 진세노사이드Rg1,Rb1및Rg3의 합 :표시량(10mg/ 35ml)의 "
    },
    {
-    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "m": "007df19c-d03b-4470-a048-ff229b080453",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+    "txt": "Vitamin A labelled (700μg / 1520mg), 80~150%Vitamin E labelled (5.1mg / 1520mg),"
    },
    {
-    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "m": "007df19c-d03b-4470-a048-ff229b080453",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+    "txt": "Vitamin A labelled (700μg / 1520mg), 80~150%Vitamin E labelled (5.1mg / 1520mg),"
    },
    {
-    "m": "000d892e-b030-4264-88da-f039ca1f253e",
+    "m": "007df19c-d03b-4470-a048-ff229b080453",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "Probiotic count at least 5 billion CFU per 250mgAppearance 고유의 향미가 있고 이미, 이취가 없는"
+    "txt": "Vitamin A labelled (700μg / 1520mg), 80~150%Vitamin E labelled (5.1mg / 1520mg),"
    },
    {
-    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "m": "0083332a-b498-451a-87db-bac2a9a1c859",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+    "txt": "Zinc labelled (5mg / 20g), 80~180%Appearance 고유의 향미가 있고 이미,이취가 없는 갈색의 액상Coliform"
    },
    {
-    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "m": "0083332a-b498-451a-87db-bac2a9a1c859",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+    "txt": "Zinc labelled (5mg / 20g), 80~180%Appearance 고유의 향미가 있고 이미,이취가 없는 갈색의 액상Coliform"
    },
    {
-    "m": "000f5c9c-99af-4aff-9099-af3e9d8aad28",
+    "m": "0083332a-b498-451a-87db-bac2a9a1c859",
     "w": 1280,
     "why": "SECTION_HANGUL",
-    "txt": "Appearance 고유의 향미가 있고 이미·이취가 없는 점박이를 포함한 흐린 황갈색의 노란 회색 장방형 제피 정제Coliform Negativ"
+    "txt": "Zinc labelled (5mg / 20g), 80~180%Appearance 고유의 향미가 있고 이미,이취가 없는 갈색의 액상Coliform"
    },
    {
-    "m": "0015df53-6e21-4d1a-a9fe-ee68c9adf673",
+    "m": "0085e43e-3dae-4e38-b93e-be882cb8d161",
     "w": 430,
     "why": "SECTION_HANGUL",
-    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 밝은 회황색의 장방형 제피정제2) 비타민C : 표시량(500 mg / 1,"
+    "txt": "Vitamin C labelled (30mg / 500mg), 80~150%Iron labelled (30mg / 500mg), 80~150%A"
    },
    {
-    "m": "0015df53-6e21-4d1a-a9fe-ee68c9adf673",
+    "m": "0085e43e-3dae-4e38-b93e-be882cb8d161",
     "w": 820,
     "why": "SECTION_HANGUL",
-    "txt": "1) 성상 : 고유의 향미가 있고 이미, 이취가 없는 점박이를 포함한 밝은 회황색의 장방형 제피정제2) 비타민C : 표시량(500 mg / 1,"
+    "txt": "Vitamin C labelled (30mg / 500mg), 80~150%Iron labelled (30mg / 500mg), 80~150%A"
    }
   ]
  },
@@ -199,11 +199,11 @@
    "emptySpec": 0,
    "undefinedClass": 0,
    "rawHtml": 0,
-   "hangulVisibleWholeDoc": 2037,
+   "hangulVisibleWholeDoc": 2028,
    "sectionHangul": 0,
    "sectionMissing": 0
   },
-  "total": 2037,
+  "total": 2028,
   "failures": []
  }
 }

@@ -1,0 +1,16 @@
+{
+ "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
+ "checkedAt": "2026-08-08T08:00:11.040Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "priorCycleDocuments": 19976,
+ "checked": 19976,
+ "missingRow": 0,
+ "notCanonical": 0,
+ "sectionMissing": 0,
+ "hangulBack": 0,
+ "slotCountDrift": 0,
+ "numericRegression": 0,
+ "samples": [],
+ "verdict": "PASS"
+}

@@ -16,7 +16,7 @@ export const norm = (s) => String(s ?? '').replace(/\s+/g, ' ').trim();
 export function splitSlot(inner) {
   /* 번호 표기는 종류가 많고 겹쳐 붙는다(`(가) `, `⑴ `, `1-1) `, `2, `, `* `).
      `\d+,` 는 `1,000` 을 번호로 오인할 수 있으므로 **뒤에 공백이 있을 때만** 번호로 본다. */
-  const num = /^(?:\s*(?:[①-⑳㉑-㉟⓵-⓾ⅰ-ⅹ⑴-⒇]|\(\s*[\d가나다라마바사아자차]\s*\)|\d+\s*[-‐]\s*\d+\)|\d+\)|\d+\.(?!\d)|\d+,(?=\s)|[-·•*])\s*)+/.exec(inner);
+  const num = /^(?:\s*(?:[①-⑳㉑-㉟⓵-⓾ⅰ-ⅹ⑴-⒇ⓛⓐ-ⓩ]|[ㆍ・]|\(\s*[\d가나다라마바사아자차]\s*\)|\d+\s*[-‐]\s*\d+\)|\d+\)|\d+\.(?!\d)|\d+,(?=\s)|[-·•*])\s*)+/.exec(inner);
   const lead = num ? num[0] : '';
   const rest = inner.slice(lead.length);
   const b = /^<b>([\s\S]*?)<\/b>(\s*)([\s\S]*)$/.exec(rest);
@@ -45,10 +45,26 @@ export function bodyShape(body) {
   return 'OTHER';
 }
 
-/** `sd-spec` 안의 슬롯 문자열 목록. KO↔EN 정렬 수확에 쓴다. */
+/**
+ * `sd-spec` 안의 슬롯 문자열 목록. KO↔EN 정렬 수확에 쓴다.
+ *
+ * 정규식으로 `sd-spec` 블록을 떼어내면 **중첩 div 때문에 마지막 슬롯이 잘린다**
+ * (비탐욕 `</div>` 가 안쪽 슬롯의 닫는 태그에 걸린다). 여는/닫는 태그를 세어
+ * 블록의 끝을 정확히 찾는다.
+ */
 export function specSlots(html) {
-  const m = SPEC.exec(html ?? '');
-  return m ? [...m[1].matchAll(SLOT_G())].map((x) => x[1]) : [];
+  const s = String(html ?? '');
+  const open = /<div class="sd-spec"[^>]*>/.exec(s);
+  if (!open) return [];
+  let i = open.index + open[0].length, depth = 1;
+  const TAG = /<div\b[^>]*>|<\/div>/g;
+  TAG.lastIndex = i;
+  let mm, end = s.length;
+  while ((mm = TAG.exec(s))) {
+    depth += mm[0] === '</div>' ? -1 : 1;
+    if (depth === 0) { end = mm.index; break; }
+  }
+  return [...s.slice(i, end).matchAll(SLOT_G())].map((x) => x[1]);
 }
 
 /* ── 수치 보존 판정 (apply·verify 공용) ───────────────────────────

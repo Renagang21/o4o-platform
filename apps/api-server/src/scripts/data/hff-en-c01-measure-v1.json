@@ -1,54 +1,52 @@
 {
  "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
- "measuredAt": "2026-08-08T07:00:00.391Z",
+ "measuredAt": "2026-08-08T07:53:24.359Z",
  "authoringRounds": [
   "hff-en-c01-a01-translations-v1.json",
-  "hff-en-c01-a02-translations-v1.json"
+  "hff-en-c01-a02-translations-v1.json",
+  "hff-en-c01-a03-translations-v1.json"
  ],
- "documents": 40896,
- "docsFullyResolved": 20242,
- "docsPartial": 20137,
- "docsNone": 517,
- "slots": 182211,
- "slotsResolved": 149278,
- "slotsUnresolved": 32933,
- "slotCoveragePct": 81.93,
- "docCoveragePct": 49.5,
+ "documents": 20920,
+ "docsFullyResolved": 4171,
+ "docsPartial": 16441,
+ "docsNone": 308,
+ "slots": 94700,
+ "slotsResolved": 69089,
+ "slotsUnresolved": 25611,
+ "slotCoveragePct": 72.96,
+ "docCoveragePct": 19.94,
  "resolvedByShape": {
-  "SPEC_RANGE_PAREN": 39727,
-  "APPEARANCE": 30902,
-  "LIMIT": 18068,
-  "OTHER": 16951,
-  "SHELF": 14663,
-  "NEGATIVE": 11980,
-  "STORAGE": 10482,
-  "SPEC_RANGE_TRAIL": 6024,
-  "NO_RESIDUE": 481
+  "SPEC_RANGE_PAREN": 15841,
+  "APPEARANCE": 13349,
+  "OTHER": 10102,
+  "LIMIT": 9590,
+  "SHELF": 6962,
+  "NEGATIVE": 6890,
+  "STORAGE": 3775,
+  "SPEC_RANGE_TRAIL": 2205,
+  "NO_RESIDUE": 375
  },
  "unresolvedByShapeWhy": {
-  "APPEARANCE|BODY_UNKNOWN": 11082,
-  "OTHER|BODY_UNKNOWN": 8567,
-  "STORAGE|BODY_UNKNOWN": 4548,
-  "SPEC_RANGE_PAREN|BODY_UNKNOWN": 2154,
-  "SPEC_RANGE_TRAIL|BODY_UNKNOWN": 1534,
-  "SPEC_RANGE_PAREN|HEAD_UNKNOWN": 1413,
-  "OTHER|HEAD_UNKNOWN": 1329,
-  "SHELF|BODY_UNKNOWN": 631,
-  "LIMIT|HEAD_UNKNOWN": 511,
-  "APPEARANCE|HEAD_UNKNOWN": 282,
-  "SPEC_RANGE_PAREN|RESIDUE_LEFT": 239,
-  "SPEC_RANGE_TRAIL|HEAD_UNKNOWN": 204,
-  "NO_RESIDUE|HEAD_UNKNOWN": 161,
-  "OTHER|RESIDUE_LEFT": 135,
-  "NEGATIVE|HEAD_UNKNOWN": 103,
-  "SPEC_RANGE_TRAIL|RESIDUE_LEFT": 40
+  "APPEARANCE|BODY_UNKNOWN": 8620,
+  "OTHER|BODY_UNKNOWN": 7427,
+  "STORAGE|BODY_UNKNOWN": 3137,
+  "SPEC_RANGE_PAREN|BODY_UNKNOWN": 2219,
+  "SPEC_RANGE_TRAIL|BODY_UNKNOWN": 1594,
+  "OTHER|HEAD_UNKNOWN": 932,
+  "SPEC_RANGE_PAREN|HEAD_UNKNOWN": 858,
+  "APPEARANCE|HEAD_UNKNOWN": 233,
+  "LIMIT|HEAD_UNKNOWN": 219,
+  "SPEC_RANGE_TRAIL|HEAD_UNKNOWN": 142,
+  "NO_RESIDUE|HEAD_UNKNOWN": 113,
+  "SHELF|BODY_UNKNOWN": 78,
+  "NEGATIVE|HEAD_UNKNOWN": 39
  },
- "distinctUnresolvedHeads": 1485,
- "distinctUnresolvedBodies": 20403,
- "headsFor50pct": 160,
- "headsFor80pct": 685,
- "bodiesFor50pct": 5938,
- "bodiesFor80pct": 14617,
+ "distinctUnresolvedHeads": 1210,
+ "distinctUnresolvedBodies": 17655,
+ "headsFor50pct": 176,
+ "headsFor80pct": 703,
+ "bodiesFor50pct": 6118,
+ "bodiesFor80pct": 13040,
  "topUnresolvedHeads": [
   {
    "n": 293,
@@ -59,213 +57,163 @@
    "ko": "진세노사이드"
   },
   {
-   "n": 69,
-   "ko": "대장군균"
-  },
-  {
-   "n": 69,
-   "ko": "세균수(1ml당)"
-  },
-  {
-   "n": 44,
-   "ko": "세균수(1mL당)"
-  },
-  {
    "n": 36,
    "ko": "[정제"
-  },
-  {
-   "n": 35,
-   "ko": "대장균균"
-  },
-  {
-   "n": 29,
-   "ko": "프로바이오틱스균수"
-  },
-  {
-   "n": 27,
-   "ko": "세균수(1 ㎖당)"
-  },
-  {
-   "n": 21,
-   "ko": "ⓛ성상"
-  },
-  {
-   "n": 18,
-   "ko": "카테킨, 카페인산, 탁시폴린, 페룰릭산"
-  },
-  {
-   "n": 17,
-   "ko": "프로바이오틱스 수(비피더스 균)"
   },
   {
    "n": 16,
    "ko": "Polyphenol derivatives(피로갈롤"
   },
   {
-   "n": 16,
-   "ko": "이소프로필알콜(mg/kg)"
-  },
-  {
-   "n": 16,
-   "ko": "총 프로시아니딘"
-  },
-  {
-   "n": 16,
-   "ko": "AKBA와 KBA의 합"
-  },
-  {
-   "n": 16,
-   "ko": "Hydrangenol 함량"
-  },
-  {
-   "n": 16,
-   "ko": "Dicyandiamide 함량(mg/kg)"
-  },
-  {
-   "n": 15,
-   "ko": "뮤코다당･단백"
-  },
-  {
-   "n": 15,
-   "ko": "프로토카테츄산(Protocatechuic acid)"
-  },
-  {
-   "n": 15,
-   "ko": "테트라싸이클린(mg/kg)"
-  },
-  {
-   "n": 15,
-   "ko": "AKBA 함량"
-  },
-  {
-   "n": 15,
-   "ko": "인지질 중 포스파티딜콜린"
-  },
-  {
-   "n": 15,
-   "ko": "ㆍ성상"
-  },
-  {
-   "n": 15,
-   "ko": "감마-아미노부틸산(γ-aminobutyric acid, GABA)"
-  },
-  {
-   "n": 15,
-   "ko": "L-주석산"
-  },
-  {
-   "n": 15,
-   "ko": "에피갈로카테킨갈레이트(EGCG)"
-  },
-  {
-   "n": 14,
-   "ko": "클로로테트라싸이클린, 테트라싸이클린"
-  },
-  {
-   "n": 14,
-   "ko": "Dihydrotriazine 함량"
-  },
-  {
-   "n": 14,
-   "ko": "파라-쿠마르산"
-  },
-  {
-   "n": 13,
-   "ko": "카테킨, 카페인산, 탁시폴린, 페롤릭산"
-  },
-  {
-   "n": 13,
-   "ko": "인지질"
-  },
-  {
-   "n": 13,
-   "ko": "세균수(1ml 당)"
-  },
-  {
-   "n": 12,
-   "ko": "루틴(Rutin)"
-  },
-  {
-   "n": 12,
-   "ko": "에피갈로카테킨갈레이트"
-  },
-  {
-   "n": 12,
-   "ko": "Total curcuminoids 함량"
-  },
-  {
-   "n": 12,
-   "ko": "알콕시글리세롤"
-  },
-  {
    "n": 12,
    "ko": "총(-)Hydroxycitric acid"
   },
   {
-   "n": 12,
-   "ko": "ㆍ붕해"
+   "n": 11,
+   "ko": ".성상"
   },
   {
-   "n": 12,
-   "ko": "콜레스테롤(mg/kg)"
+   "n": 11,
+   "ko": "[정제1"
+  },
+  {
+   "n": 9,
+   "ko": "진세노사이드 Rg1, Rb1 및 Rg3의 합(원료성)"
+  },
+  {
+   "n": 9,
+   "ko": "(실험방법"
+  },
+  {
+   "n": 8,
+   "ko": "총 폴라보노이드"
+  },
+  {
+   "n": 8,
+   "ko": "1&gt;성상"
+  },
+  {
+   "n": 8,
+   "ko": "1 성상"
+  },
+  {
+   "n": 7,
+   "ko": "진세노사이드 Rg1, Rb1 및 Rg3의 합(원료성제품)"
+  },
+  {
+   "n": 7,
+   "ko": "프로바이오틱스 수(개별인정 제2013-11호)"
+  },
+  {
+   "n": 7,
+   "ko": ".카드뮴(mg/kg)"
+  },
+  {
+   "n": 7,
+   "ko": ".2.프로바이오틱스 수"
+  },
+  {
+   "n": 7,
+   "ko": "총(-)-Hydroxycitiric acid"
+  },
+  {
+   "n": 7,
+   "ko": "바닐릭산"
+  },
+  {
+   "n": 7,
+   "ko": "일반판매용"
+  },
+  {
+   "n": 7,
+   "ko": "미리세틴"
+  },
+  {
+   "n": 7,
+   "ko": "비타민B1(표시량"
+  },
+  {
+   "n": 7,
+   "ko": "총(-)-Hydroxycitric acid로서"
+  },
+  {
+   "n": 7,
+   "ko": "총 아플라톡신(B1, B2, G1 및 G2의 합)(μg/kg)"
+  },
+  {
+   "n": 7,
+   "ko": "외관 및 성상"
+  },
+  {
+   "n": 7,
+   "ko": "Withanoside Ⅳ (위타노사이드 Ⅳ)"
+  },
+  {
+   "n": 7,
+   "ko": "디메틸설폰"
+  },
+  {
+   "n": 6,
+   "ko": "※최종제품"
+  },
+  {
+   "n": 6,
+   "ko": "※원료성제품"
+  },
+  {
+   "n": 6,
+   "ko": "용출규격"
+  },
+  {
+   "n": 6,
+   "ko": ".총(-)-Hydroxycitric acid"
+  },
+  {
+   "n": 6,
+   "ko": ".납(mg/kg)"
+  },
+  {
+   "n": 6,
+   "ko": "안드로그라폴라이드"
+  },
+  {
+   "n": 6,
+   "ko": "대두이소플라본 배당체의 합"
+  },
+  {
+   "n": 6,
+   "ko": "총(-)-HCA의 함량"
+  },
+  {
+   "n": 6,
+   "ko": "Withanoside IV (위타노사이드 IV)"
+  },
+  {
+   "n": 6,
+   "ko": "무수바바로인"
+  },
+  {
+   "n": 6,
+   "ko": "난소화성말토덱스트린 식이섬유"
+  },
+  {
+   "n": 6,
+   "ko": "[가] 원료성 제품"
+  },
+  {
+   "n": 6,
+   "ko": "진세노사이드 Rg1, Rb1 및 Rg3의 합(최종제품)"
+  },
+  {
+   "n": 6,
+   "ko": "텍토크리신"
   }
  ],
  "topUnresolvedBodies": [
   {
-   "n": 277,
-   "shape": "SHELF",
-   "ko": "제조일부터 24개월"
-  },
-  {
    "n": 102,
    "shape": "OTHER",
    "ko": "에피갈로카테킨갈레이트((-)-epigallocatechin gallate, EGCG)(mg) : 일일섭취량 중 300 이하"
-  },
-  {
-   "n": 59,
-   "shape": "SHELF",
-   "ko": "제조일부터 18개월"
-  },
-  {
-   "n": 52,
-   "shape": "STORAGE",
-   "ko": "습기와 직사광선을 피하여 서늘한 곳에 보관하십시오.제품 개봉 후에는 인습되지 않게 주의하여 보관하십시오."
-  },
-  {
-   "n": 50,
-   "shape": "SHELF",
-   "ko": "제조일부터 24 개월"
-  },
-  {
-   "n": 46,
-   "shape": "OTHER",
-   "ko": "[기준규격]"
-  },
-  {
-   "n": 34,
-   "shape": "OTHER",
-   "ko": "1ml당 3,000이하(농축액에 한함)"
-  },
-  {
-   "n": 31,
-   "shape": "OTHER",
-   "ko": "50.0 이하(초산에틸을 사용한 경우)"
-  },
-  {
-   "n": 30,
-   "shape": "SHELF",
-   "ko": "제조일로 부터 2년"
-  },
-  {
-   "n": 30,
-   "shape": "STORAGE",
-   "ko": "① 고온다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오."
-  },
-  {
-   "n": 29,
-   "shape": "STORAGE",
-   "ko": "(1) 제품은 직사광선을 피하고 실온에서 보관 유통하십시오."
   },
   {
    "n": 29,
@@ -278,39 +226,9 @@
    "ko": "이미."
   },
   {
-   "n": 26,
-   "shape": "SHELF",
-   "ko": "제조일로 부터 24개월 까지"
-  },
-  {
-   "n": 25,
-   "shape": "SHELF",
-   "ko": "24개월까지"
-  },
-  {
    "n": 25,
    "shape": "STORAGE",
    "ko": "고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관 및 유통하시고, 영·유아 및 어린이 손이 닿지 않도록 주의하시기 바랍니다."
-  },
-  {
-   "n": 25,
-   "shape": "STORAGE",
-   "ko": "수분 및 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오.어린이 손에 닿지 않는 곳에 보관하십시오."
-  },
-  {
-   "n": 24,
-   "shape": "APPEARANCE",
-   "ko": "고유의 향미가 있고 이미, 이취가 없는 연한 노랑 빛이 도는 백색 분말"
-  },
-  {
-   "n": 23,
-   "shape": "STORAGE",
-   "ko": "습기가 적고 직사광선을 받지 않는 실온에 보관하십시오,어린이의 손에 닿지 않는 곳에 보관하십시오"
-  },
-  {
-   "n": 23,
-   "shape": "STORAGE",
-   "ko": "수분, 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 제품 개봉 후에는 인습되지 않게 밀봉하여 보관하십시오. 제품의 향미에 영향을 줄 수 있는 다른 식품, 식품첨가물과는 분리 보관하십시오."
   },
   {
    "n": 23,
@@ -318,24 +236,19 @@
    "ko": "정제1"
   },
   {
-   "n": 23,
-   "shape": "STORAGE",
-   "ko": "직사광선 및 고온다습한 곳을 피하여 서늘한 곳에 보관"
-  },
-  {
-   "n": 23,
-   "shape": "STORAGE",
-   "ko": "직사광선을 받지 아니하는 서늘한 곳에서 보관 및 유통, 어린이의 손에 닿지 않도록 주의"
-  },
-  {
    "n": 22,
    "shape": "APPEARANCE",
    "ko": "고유의 향미가 있고 이미."
   },
   {
-   "n": 21,
+   "n": 22,
    "shape": "SPEC_RANGE_TRAIL",
    "ko": "표시량의 80~120%"
+  },
+  {
+   "n": 22,
+   "shape": "SPEC_RANGE_TRAIL",
+   "ko": "표시량의 80 ~ 120%"
   },
   {
    "n": 21,
@@ -348,36 +261,6 @@
    "ko": "직사광선을 피하고 서늘하고 건조한 곳에 보관하십시오."
   },
   {
-   "n": 21,
-   "shape": "STORAGE",
-   "ko": "직사광선을 피하여 서늘한 곳에 보관"
-  },
-  {
-   "n": 20,
-   "shape": "OTHER",
-   "ko": "1ml 당 3,000 이하(농축액에 한함)"
-  },
-  {
-   "n": 20,
-   "shape": "STORAGE",
-   "ko": "- 직사광선 및 고온다습한 곳을 피하여 보관하십시오.- 고온다습한 곳에 두면 흡습되어 변경 될 수 있으므로 밀봉 보관하십시오."
-  },
-  {
-   "n": 20,
-   "shape": "STORAGE",
-   "ko": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하십시오"
-  },
-  {
-   "n": 20,
-   "shape": "STORAGE",
-   "ko": "실온/ 직사광선을 피해 건조하고 서늘한 곳에 보관"
-  },
-  {
-   "n": 20,
-   "shape": "STORAGE",
-   "ko": "직사광선 및 고온다습한 곳을 피해 보관하십시오."
-  },
-  {
    "n": 20,
    "shape": "STORAGE",
    "ko": "습기가 적고 직사광선을 받지 않는 실온에 보관하여 주십시오."
@@ -388,29 +271,144 @@
    "ko": "고온다습한 곳이나 직사광선을 피하고 서늘한 곳에 보관한다."
   },
   {
-   "n": 20,
+   "n": 19,
    "shape": "STORAGE",
-   "ko": "고온다습한 곳이나 직사광선을 피하여 서늘한 곳에 보관"
+   "ko": "수분, 열에 의해 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하십시오. 어린이 손에 닿지 않는 곳에 보관하십시오."
   },
   {
-   "n": 19,
+   "n": 18,
+   "shape": "STORAGE",
+   "ko": "1) 직사광선이나 고온 다습한 곳을 피하여 청결하고 서늘한 곳에 밀봉하여 보관 하십시오.2) 영ㆍ유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오.3) 잘못된 사용 및 남용을 피하고 품질 보존을 위해 다른 용기에 넣지 마십시오."
+  },
+  {
+   "n": 17,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하여 서늘한 곳에 보관하고, 유통 중 흡습되지 않도록 포장의 파손 등에 주의하십시오."
+  },
+  {
+   "n": 16,
+   "shape": "STORAGE",
+   "ko": "직사광선 및 고온 다습한 곳을 피하여 습기가 적고 건조한 실온보관"
+  },
+  {
+   "n": 16,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하고 습기가 없는 서늘한 곳에 보관"
+  },
+  {
+   "n": 15,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하고 습기가 없는 서늘한 곳에 실온 보관하십시오."
+  },
+  {
+   "n": 14,
+   "shape": "STORAGE",
+   "ko": "습기가 적고 직사광선을 받지 않는 서늘한 곳에 보관하시고, 어린이의 손에 닿지 않도록 주의하시기 바랍니다."
+  },
+  {
+   "n": 14,
+   "shape": "STORAGE",
+   "ko": "고온다습한 곳과 직사광선을 피하여 서늘한 실온에 보관하십시오."
+  },
+  {
+   "n": 14,
+   "shape": "SPEC_RANGE_TRAIL",
+   "ko": "표시량의 80 ~ 150%"
+  },
+  {
+   "n": 14,
+   "shape": "STORAGE",
+   "ko": "고온다습, 직사광선을 받지 아니하는 건조하고 서늘한 곳에서 보관하십시오. 영,유아 및 어린이 손에 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "n": 13,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하고 서늘한곳에 실온 보관"
+  },
+  {
+   "n": 13,
+   "shape": "OTHER",
+   "ko": "2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "n": 13,
+   "shape": "STORAGE",
+   "ko": "습기 및 열에 의해 품질에 영향을 받을 수 있으므로 직사광선을 피해 서늘한 곳에 보관하시고 어린이의 손이 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "n": 13,
+   "shape": "STORAGE",
+   "ko": "습기 및 직사광선을 피하여 건조하고 서늘한 곳에 보관하십시오."
+  },
+  {
+   "n": 13,
+   "shape": "STORAGE",
+   "ko": "습기와 직사광선을 피하여 실온에 보관하십시오."
+  },
+  {
+   "n": 13,
+   "shape": "STORAGE",
+   "ko": "습기에 약해 변질될 우려가 있으므로, 스틱포 개봉 후에는 바로 섭취하시고 직사광선 및 습기를 피해 서늘한 곳에 보관하십시오."
+  },
+  {
+   "n": 12,
+   "shape": "SPEC_RANGE_PAREN",
+   "ko": "차전자피 식이섬유로서 표시량 (4.9g/11g)의 80% 이상"
+  },
+  {
+   "n": 12,
+   "shape": "SHELF",
+   "ko": "제조일로부터 실온에서 24개월"
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "습기와 직사광선을 피하여 서늘한 장소에 보관"
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "고온 다습한 곳과 직사광선을 피하여 습기가 적고 건조한 곳에 보관하십시오. 개봉 후에는 공기의 노출을 최대한 차단하여 보관하십시오. 영유아 및 어린이의 손에 닿지 않는 곳에 보관하십시오."
+  },
+  {
+   "n": 12,
+   "shape": "SPEC_RANGE_PAREN",
+   "ko": "표시량(750mg/1800mg) 80~120%"
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "습기에 약해 변색의 우려가 있으므로, 습기와 직사광선을 피하여 실온에 보관하십시오."
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하여 서늘한 곳에 실온보관"
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "직사광선 및 고온 다습한 곳을 피하여 실온에 보관하여 주십시오."
+  },
+  {
+   "n": 12,
+   "shape": "STORAGE",
+   "ko": "(1) 제품이 고온에 약하니 직사광선을 피하여 25℃ 이하의 온도가 낮은 곳에 보관하여 주십시오. (2) 제품 개봉 후에는 밀봉하여 보관하시고, 가급적 빨리 섭취하십시오."
+  },
+  {
+   "n": 11,
+   "shape": "STORAGE",
+   "ko": "직사광선을 피하여 건조하고 서늘한 곳에서 보관 및 유통하십시오. 영·유아 및 어린이의 손에 닿지 않는 곳에서 보관하십시오."
+  },
+  {
+   "n": 11,
    "shape": "APPEARANCE",
-   "ko": "이미, 이취가 없고 고유의 향미가 있는 미색의 분말"
+   "ko": "갈색의 점조성 액상으로서 홍삼의 향취미가 있고 이미, 이취가 없다."
   },
   {
-   "n": 19,
+   "n": 11,
    "shape": "STORAGE",
-   "ko": "실온. 차고 건조한 곳에 보관"
-  },
-  {
-   "n": 19,
-   "shape": "STORAGE",
-   "ko": "고온, 다습한 곳과 직사광선을 피하여 실온에 보관하십시오."
-  },
-  {
-   "n": 19,
-   "shape": "STORAGE",
-   "ko": "고온 다습, 직사광선을 피하여 서늘한 곳에 보관. 고온다습 한 곳에 두면 흡습되어 변형될 수 있으므로 밀봉 보관."
+   "ko": "직사광선과 고온다습한 곳을 피하여 습기가 적고 건조한 곳에 보관하십시오. 영·유아 및 어린이의 손에 닿지 않도록 주의하시기 바랍니다."
   }
  ]
 }

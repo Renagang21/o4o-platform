@@ -1,0 +1,2649 @@
+{
+ "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
+ "builtAt": "2026-08-08T08:02:04.362Z",
+ "readOnly": true,
+ "dbWrites": 0,
+ "slotsByReason": {
+  "PENDING_AUTHORING": 25109,
+  "TRANSLATION_AMBIGUOUS": 298,
+  "KO_SOURCE_DAMAGED": 205,
+  "CANONICAL_STRUCTURE_UNSAFE": 16
+ },
+ "documentsByReason": {
+  "PENDING_AUTHORING": 16460,
+  "TRANSLATION_AMBIGUOUS": 297,
+  "KO_SOURCE_DAMAGED": 200,
+  "CANONICAL_STRUCTURE_UNSAFE": 15
+ },
+ "finalQueueSlots": 519,
+ "finalQueueDocuments": 512,
+ "samples": {
+  "KO_SOURCE_DAMAGED": [
+   "(시험방법: 식품공전 제9.",
+   "(가)최종제품: 표시량(49mg/6.75g(250mgx27정)의 80~120%",
+   "성상: 이미.",
+   "(시험방법: 건강기능식품공전 제4.",
+   "1)성상: 이미.",
+   "성상 : 이미.",
+   "1)성상: 이미.",
+   "[EPA 및 DHA 함유 유지+칼슘+비타민E - 연질캡슐1"
+  ],
+  "TRANSLATION_AMBIGUOUS": [
+   "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상",
+   "※원료성제품 : 표시량(18mg/g)의 이상",
+   "2) 프로바이오틱스 : 표시량[300,000,000cfu/6g(3포)]의 이상",
+   "*최종제품:표시량 7mg/10 g 이상의 80% 이상",
+   "*최종제품:표시량 5 mg / 10 g 이상의 80% 이상",
+   "*최종제품:표시량 4mg/10 ml 이상의 80% 이상",
+   "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상",
+   "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  ],
+  "CANONICAL_STRUCTURE_UNSAFE": [
+   "3&gt;중금속",
+   "&lt;적색캡슐&gt;",
+   "3&gt;중금속",
+   "3&gt;중금속",
+   "2&gt;키토올리고당 함량 ; 표시량(413.3 mg/1600mg)의 80~120%",
+   "3&gt;중금속",
+   "&lt;캡슐&gt;",
+   "&lt;아연+프로바이오틱스 캅셀&gt;"
+  ]
+ },
+ "rows": [
+  {
+   "productMasterId": "0043f774-e988-420d-acf6-a8b298599c82",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "00547014-f839-453d-b78f-1da6d43dea1b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "00595651-dd28-4247-9298-59453924b4ac",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(18mg/g)의 이상"
+  },
+  {
+   "productMasterId": "00d88a52-12ea-46d5-9301-fb8cb7bc16f6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 : 표시량[300,000,000cfu/6g(3포)]의 이상"
+  },
+  {
+   "productMasterId": "0177daa1-0fb1-4406-800c-9fd0610b644c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "028144e2-3c69-4ae2-8b01-584940b33d8d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(가)최종제품: 표시량(49mg/6.75g(250mgx27정)의 80~120%"
+  },
+  {
+   "productMasterId": "02bf82b2-2f45-403a-97da-f562ee51277f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "031f431e-dcb7-4ac1-9a0d-6ee84fc81b34",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5 mg / 10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "034c6a08-7dbc-4244-a44a-cb5624af18fd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "038aa18f-6122-47f1-b882-fc409c33524d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "03f578bb-5424-44d0-a359-3078c3aeb006",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "042f5ed3-0ccd-4c05-9d25-104f041ddf57",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(1,000,000,000 (10억) CFU/2g)의 이상"
+  },
+  {
+   "productMasterId": "0448a948-3862-4fec-8426-e651f4812671",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^10 CFU/g 이상 (100억) 이상"
+  },
+  {
+   "productMasterId": "05b8f592-4ca0-44f8-aec8-c707cb2bf6fa",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.6 X 10^11 CFU/g 이상 (2,600억) 이상"
+  },
+  {
+   "productMasterId": "05cdb50e-5059-48d1-a78e-007772e6ab90",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "065689a3-e914-4cdb-a4a9-2f56e4482bf5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.4 X 10^11 CFU/g 이상 (3,400억) 이상"
+  },
+  {
+   "productMasterId": "06791f20-e5f4-4cc2-a95e-3f78377f760f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "1)성상: 이미."
+  },
+  {
+   "productMasterId": "076f0622-f727-4a1e-9d96-b3bf247c5132",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "077f637a-6685-47da-b10a-b858629e2029",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.3 X 10^11 CFU/g 이상 (3,300억) 이상"
+  },
+  {
+   "productMasterId": "0782840b-95dc-4a9c-aaf6-58e8abb84f64",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "1)성상: 이미."
+  },
+  {
+   "productMasterId": "07cd7f42-d5b8-47ac-8d23-689abe6d08fa",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "[EPA 및 DHA 함유 유지+칼슘+비타민E - 연질캡슐1"
+  },
+  {
+   "productMasterId": "08369cf8-066c-43b7-9fb2-656d11df884c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "* 코로솔산 : 표시량(1.3."
+  },
+  {
+   "productMasterId": "08a0fc70-7db7-44bf-9ff6-23b2cf599640",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^9 CFU/g 이상 (10억) 이상"
+  },
+  {
+   "productMasterId": "08e10547-8538-4d45-ad34-7a8865ce4992",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑤ 셀레늄(셀렌) : 표시량(55μg/1,800mg의 80~150%"
+  },
+  {
+   "productMasterId": "08edf72e-f273-48be-94ff-ce1529d8cfaa",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(Gly-Pro-Hyp(GPH) 32.9mg/10g (표시량의 80~120% )"
+  },
+  {
+   "productMasterId": "09241d60-2628-4d78-a6b0-606412f63ff3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "096b8a3a-60be-40fd-aa79-2d6f5f1d6df7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/20g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "097774b7-4a28-425b-adba-fb52824e678c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱수: 표시량이상(생균으로 2,000,000,000CFU/일(3.5g) 이상)"
+  },
+  {
+   "productMasterId": "0a271bb1-5e38-4cc3-a6d4-f96de9d409d7",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "0ac7073d-5f25-4bd9-83f5-2092efb62d0b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 : 표시량[100,000,000cfu/1.5g(1포)]의 이상"
+  },
+  {
+   "productMasterId": "0b7957e1-a9c1-4fc1-a272-4aa628023884",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "0bef5000-d765-4c22-9068-fb898f365389",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "0d3243de-9091-4237-9530-e3c7d330e455",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량[500,000,000(5억)CFU/5g]의 이상"
+  },
+  {
+   "productMasterId": "0d369aea-e7bf-4cf8-af45-2366ee9fb228",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량 (10,000,000,000(100억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "0d39a69c-dc7f-4408-927b-a60d1143c4fd",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "0e2af2bb-1db2-4513-a0bf-25a9c836d774",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1069ef3f-cb4a-4f81-a295-99c0ea4edb8a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량(3,000,000,000CFU(30억CFU)/510mg)의 이상"
+  },
+  {
+   "productMasterId": "108e5bda-b969-4b73-a285-fe66f16c5110",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 18mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1177d620-cbf7-44a2-8105-b994c8348863",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "117b76da-425c-4087-993b-92ecc044b64a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "117b76da-425c-4087-993b-92ecc044b64a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑷ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "11efddc8-15ac-4032-b1a8-515b440754bf",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 투입량 (10,000,000,000(100억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "125b6afe-d1ae-4f60-b7ad-2794a66dfd68",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "12742bae-5651-44ac-a03a-94a8d4c84251",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "14775034-e95b-4fba-9d25-58b4f7e916a7",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3) 에피갈로카테킨갈레이트 :((-)-epigallocatechin gallate,EGCG(mg) : 일일섭취량 중 300 이하"
+  },
+  {
+   "productMasterId": "1505b942-dc72-44eb-8ec4-53ea126647f3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.9 X 10^11 CFU/g 이상 (1,900억) 이상"
+  },
+  {
+   "productMasterId": "1552b154-fd91-4212-9d72-d4f237bcd3b1",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 20mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "16550ce9-370a-430e-8eed-467da1d1ee7d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(3,000,000,000(30억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "16aa4b09-25df-4ac9-a52b-04bcd536c179",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.9 X 10^11 CFU/g 이상 (2,900억) 이상"
+  },
+  {
+   "productMasterId": "174f33e6-0835-48a1-929d-2569a5b87952",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "183d25d6-4bb0-427f-8e85-2cee24b415aa",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "2 비타민E :표시량(11mg α-TE(/900mg)의80~150%"
+  },
+  {
+   "productMasterId": "193b6820-2c10-4694-8ea2-2497e950b06d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "195e421c-e0f7-4458-bdd3-fed1b3751020",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 :표시량[(100mg /20g(기타유래다당체 : 606.47mg /20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "199b7575-e121-473d-92da-536b3b4fbd2f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "19a0c0b2-1b87-4f7c-96b5-111b539e3372",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 24mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "19e3f322-f9f9-4c26-a7fb-1f72f7a5a1f8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수: 표시량[100,000,000(1억)cfu/2.5g]의 이상"
+  },
+  {
+   "productMasterId": "1c5d606d-52fe-4222-909e-423a1472b54a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1d7b8f25-02ae-4cfd-8db1-980f1c1b95a3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 11.6mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1db5c57c-a051-4617-8ee4-9a0bdde8909d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "1dc75b2a-bcee-4666-aa88-812a20e1d7e7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 30mg/70 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1e3d1500-6813-43f6-8f70-0cf1dc973283",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "진세노사이드(Rb1+Rg1+Rg3 합 표시량(12mg/10g) 80%이상"
+  },
+  {
+   "productMasterId": "1f2c0c5f-b185-44bb-b4c9-0f666a31963a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "1f3756fe-859f-449b-bc42-e9f314624ad6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "1f7898f7-cdc4-4720-b247-6dc99ab56b0c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "1fc3e6a7-fecf-4b19-9bc0-de385d54f004",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "201d289c-3dbf-4c4e-866e-cbe34e63f93d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량(10,000,000,000(100억)/2g)의 이상"
+  },
+  {
+   "productMasterId": "2023f4b8-c5d1-473a-83d5-14d7cf7db606",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "20a4c279-37b4-4f7a-a587-89e1d734e2db",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^9 CFU/g 이상 (10억) 이상"
+  },
+  {
+   "productMasterId": "20f8124f-6b27-4aee-bc40-048acc899821",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "4.코로솔산: 표시량(1.3mg/250mg의 80 ~ 120%"
+  },
+  {
+   "productMasterId": "21bbcc9c-a454-4229-b0d2-a69b4fafded9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "진세노사이드 Rg1, Rb1과 Rg3의 합 (최종제품 : 표시량(11mg/g)의 80%이상"
+  },
+  {
+   "productMasterId": "2229b80b-d08f-488d-84de-41ffd765c5c6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "③ 비타민 D : 표시량(10μg(400IU) /15g)의 80~180%(8μg (320IU) ~18μg(720IU)"
+  },
+  {
+   "productMasterId": "2229ce2d-d7f6-4b00-a529-87c419fc9163",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "22937925-f886-47d5-b625-219bf76f7c52",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "22e76961-927c-4202-b3ff-1753e86e7e95",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "판토텐산 : 표시량의 80∼180% (30mg/1,000mg"
+  },
+  {
+   "productMasterId": "2311cad6-78d0-490b-b135-43245986b08c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품 : 표시량 13mg/50ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "23ceb254-30c3-47ed-8e45-337a00113ca4",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량 [10,000,000,000cfu/2g(1포)]의 이상"
+  },
+  {
+   "productMasterId": "23fcb4ed-ba0f-4457-a6bf-e2c0bf6ff43b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "240be799-f746-4276-916d-d1b1c08a31b9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "25cfcd79-a68d-473e-9b35-1e54325859ad",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "엘라그산 : 표시량[(31.92㎎/150mL(160g)]의 70~130%"
+  },
+  {
+   "productMasterId": "25f3a63a-4017-41c3-a12e-efd8bdc7ac87",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "269551f9-cf18-4a3a-a349-c67b407eab06",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "26a76087-0cd3-4245-9c08-59911413cb13",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량(5,000,000,000 (50억) CFU/450mg)의 이상"
+  },
+  {
+   "productMasterId": "27b4b648-9836-412e-a28e-823944493618",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 4.0 X 10^11 CFU/g 이상 (4,000억) 이상"
+  },
+  {
+   "productMasterId": "284e51cc-7760-47af-875d-e8e65a624062",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "29e3b382-0d66-4d5f-93a2-b61af35d04a0",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "2a8a7abc-17b8-49ba-89a1-1244f63d1164",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "2bbb0012-6c4f-4265-9646-d4b3792bfaf9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "2c0be562-f754-4763-8cfe-733b74ee1b67",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제8."
+  },
+  {
+   "productMasterId": "2c1e481b-6ffb-4860-af24-af8067334d34",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "2c726d2e-d74f-4985-ac49-a8de42fb42b4",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "[경질캡슐2] [B."
+  },
+  {
+   "productMasterId": "2d090a6e-c909-49f5-a9fa-2ca2d7a71b7f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 9mg/20ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "2d3ad709-e7bd-4188-97b8-8890af57c963",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/20 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "2dbfb3eb-e85c-4faf-8406-05ad3ae1b042",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "2e4c542d-e641-4a41-b1a9-93f31c5448b6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "2e732cef-6b24-4c6b-8bbe-7a26ba5de6fd",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(200mg / 20g(기타유래다당체 : 230.4mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "2eaf0d3e-2c22-4108-8bd9-667c75707315",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "2ef59439-a067-466b-948e-256261ea260e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "2f3de99a-84bb-4a8d-a5bb-2db571a0a973",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "③ 아연(mg/800 mg）：표시량의(4.2)의 80~150%"
+  },
+  {
+   "productMasterId": "2f54fec1-d5cc-4fec-b6f8-0db88f2356c1",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "30141117-469f-4ce9-aa12-1b6c9b7a6f1b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "30a81823-b7e1-4747-a488-bf91e1ffe840",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "30df34e6-d4a0-4458-b678-15cd72d87a19",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 35mg/120 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "30fcea7d-b6d6-4f7d-a8da-c73015d991a7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(100,000,000 (1억)CFU / 500mg)의 이상"
+  },
+  {
+   "productMasterId": "316b3871-aafd-4a9b-abef-c4b4bd0d8ced",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(원료성제품) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(6mg/g)의 이상"
+  },
+  {
+   "productMasterId": "31727198-93f8-415f-bf11-88a39c4026c7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.9 X 10^11 CFU/g 이상 (2,900억) 이상"
+  },
+  {
+   "productMasterId": "320fcf7c-e4b0-409e-9b2b-0483aa7a1e5f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "3265b776-50a3-48e3-9564-52b6cbee6727",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.8 X 10^11 CFU/g 이상 (3,800억) 이상"
+  },
+  {
+   "productMasterId": "33604e1d-c00e-4ec6-90e6-03ae11d8416c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "33836fdf-1808-42e6-a7ec-241972edc172",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "339dd6a8-b583-4cda-8e44-e071bf168561",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "33b285f8-fb9a-47cb-8e4b-28511d0eb577",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "34080018-ecd8-422a-9d23-be410aa274a2",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 20mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "342b5c77-ba16-4fd2-a931-e051fa5eee5e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 54mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "344a9c27-a33a-491e-be0c-424bee4d1ab4",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "34826e25-9d4c-42e5-a72b-0389dc5d760a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg / 10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "34b4b7f3-b5a8-4765-a9a6-431eb36855bc",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(3) 프로바이오틱스 : 표시량(1,000,000,000(10억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "351ef71d-600f-4676-9d14-df56b9cf9575",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "35483a7c-5d4f-4ac5-99fb-0717b7a19e80",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "358f66bf-6fed-44b5-98b2-6cf632a451b4",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "368d9a64-1e83-4dfd-be24-2ff32e8ae7fa",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(11mg/g)의 이상"
+  },
+  {
+   "productMasterId": "373f39a0-9eb3-41db-97d1-b8bcf8b900ac",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 17mg/70 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "37e51046-26ee-4c52-8a32-884b7050b065",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "37f9869b-4069-4c1c-ad7e-0bd8c57e21eb",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "비타민B1 : 50 mg / 850 mg (표시량의 80-180%"
+  },
+  {
+   "productMasterId": "38153cf9-6ac7-449b-86a3-8079636c445f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "38de2972-5ce5-43e5-801e-a048842e523d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "프로바이오틱스 수 : 표시량(표시량 300,000,000,000(3,000억 CFU/g) 이상"
+  },
+  {
+   "productMasterId": "38e11ed0-db21-4d91-b158-65930831c6ea",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "3991253a-39ff-42a4-b7f5-af3a25d07fa9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "진세노사이드 Rg1과 Rb1의 합 : 표시량(18mg/6캅셀 (2.88g)의 80%이상"
+  },
+  {
+   "productMasterId": "3a7874b5-f7d8-4d61-bcee-fb12769531f2",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.2 X 10^11 CFU/g 이상 (2,200억) 이상"
+  },
+  {
+   "productMasterId": "3adb5575-591a-4892-8160-76effdd6cab5",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "3adcb6a5-c70d-4e02-bfee-c0801c8c710a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "3b547d5c-9d56-492e-a745-ddaf44df41dc",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "3c273d6b-42b5-4d18-93f7-8d8eb92d6e9e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.2 X 10^11 CFU/g 이상 (2,200억) 이상"
+  },
+  {
+   "productMasterId": "3c4e3a92-1dec-4d3e-9450-be6b30169840",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수: 표시량 (10,000,000,000(100억)CFU/2g)의 이상"
+  },
+  {
+   "productMasterId": "3c7f6835-8ded-4bee-b034-48901730f74c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "3c8efe6d-fa40-4ca2-9895-8e26040a4642",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "3ca24032-44d0-4d72-89f5-760a7c2c4623",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량[1,000,000,000(10억) CFU/2g)의 이상"
+  },
+  {
+   "productMasterId": "3d1bc07e-cb10-409d-ac4b-c2606dcb62cf",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "5 대장균군 : 음성."
+  },
+  {
+   "productMasterId": "3deaee9c-35e8-497e-ac2c-ec7b2eea9418",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.2 X 10^11 CFU/g 이상 (3,200억) 이상"
+  },
+  {
+   "productMasterId": "3e3650f0-93f6-4b36-bcf8-1da01fbc3b02",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/15g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "3e5200aa-7350-478f-89d8-12b01dc213d9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "3eb6c992-a4bd-4f53-8676-cb735d6a1132",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량[1,000,000,000(10억)CFU/2g]의 이상"
+  },
+  {
+   "productMasterId": "3f657f98-bb6f-4eb5-839e-712f9a8013c0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "3f7f7cb2-7860-4945-b260-3c37bbf031b6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "406c26ff-bfef-4d6a-9024-96fe3bcc31e5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 21mg/70ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "40d74101-a763-4e5b-ac92-745514d1950e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "식품공전 제 10."
+  },
+  {
+   "productMasterId": "41abb578-daba-4004-a767-71d228ff242c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "진세노사이드 Rb1, Rg1 및 Rg3의 합 : 표시량(3mg/15g의 80% 이상"
+  },
+  {
+   "productMasterId": "41bcb992-a414-4672-9853-d4b788348037",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "41bd3b28-5b9c-4ab9-b749-6ad7d9986d95",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.6 X 10^11 CFU/g 이상 (3,600억) 이상"
+  },
+  {
+   "productMasterId": "41cff8ba-52a1-482d-af71-91e9f611681a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "42055ea6-a6ac-4c4a-9e9a-d6be9b07afb1",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "42c49d72-06c9-42c3-9f38-e0cec9e34706",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "42feda4c-112f-4297-a229-7efa8b2447fa",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량[500,000,000(5억)CFU/2g]의 이상"
+  },
+  {
+   "productMasterId": "43760adc-1fe5-4e7a-bc14-82a8c1b61b3f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "4378e208-cb30-4831-925d-494b2c1880b3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 20mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "439b6a87-1814-4961-9843-82e4105f7cd6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑤ 셀레늄(셀렌) : 표시량(55μg/1,800mg의 80~150%"
+  },
+  {
+   "productMasterId": "446f4cd0-7f42-431f-a83c-ca297e8850b5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "4478e1b2-d0a8-4af8-841c-df0e2c821ea3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 고유의 향미가 있고."
+  },
+  {
+   "productMasterId": "464f34f6-cb61-416b-b90a-e91c25e6b143",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 10mg/80ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "479a345d-99f2-4c80-b0e0-b5963a90d5b8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.7 X 10^11 CFU/g 이상 (1,700억) 이상"
+  },
+  {
+   "productMasterId": "47ccc905-ce52-42da-a2fe-aa666f087110",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 10mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "4806dcb8-6365-4467-aabd-cd378b1a8ef5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "489b9813-d810-4e8b-8fa6-026276947258",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 :표시량[(100mg /20g(기타유래다당체 : 615.8mg /20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "48d7913a-c346-4554-ae28-c240bd39299a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4.5mg/20 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "49093d01-e38e-4284-8c7c-ebfc5bd145aa",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 4.0 X 10^11 CFU/g 이상 (4,000억) 이상"
+  },
+  {
+   "productMasterId": "4a1ea391-d75a-4fec-9fba-56141e37ec0f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "4b866713-cd24-4e26-a4b1-95aa6c22eda5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "4c8c3b82-d25d-44d4-91f1-24568de75585",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.1 X 10^11 CFU/g 이상 (2,100억) 이상"
+  },
+  {
+   "productMasterId": "4cc31e96-fe71-47f8-857f-fe77e6eada25",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "4cf56925-a95f-4455-a1a5-42e2b02621e4",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.7 X 10^11 CFU/g 이상 (3,700억) 이상"
+  },
+  {
+   "productMasterId": "4d0ea47e-a371-4b67-a414-82e1a2fdb80a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "4d2d462e-fcb6-4c22-aaf2-e2d852448a22",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "*원료성제품 : 표시량(30mg/g의 이상"
+  },
+  {
+   "productMasterId": "4eb47e83-3507-4d71-9ae9-893c6fe7beee",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "뮤코다당."
+  },
+  {
+   "productMasterId": "4ef91731-607d-49f8-9e1c-df4cb130c229",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량 (3,000,000,000(30억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "4faf852b-d15e-4a2c-a996-5f9b9200f855",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "503e559d-e411-4a4a-b00c-e57de1cd5d59",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.9 X 10^11 CFU/g 이상 (3,900억) 이상"
+  },
+  {
+   "productMasterId": "507ad4e0-0aac-4eb3-af7a-bc6f5584e4ff",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "3) 프로바이오틱스 수 : 표시량 [100,000,000(1억)CFU/3.5g] 의 이상"
+  },
+  {
+   "productMasterId": "5126c4e0-59d5-4157-b191-28275abe2f78",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량(100,000,000(1억) cfu/ 2.4g)의 이상"
+  },
+  {
+   "productMasterId": "51fbd019-fac8-4491-8cbd-12d15e65035b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.8 X 10^11 CFU/g 이상 (2,800억) 이상"
+  },
+  {
+   "productMasterId": "520452ba-b549-4c19-8051-388c5de2595c",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;적색캡슐&gt;"
+  },
+  {
+   "productMasterId": "52699010-0a6d-4bc6-aa32-45304c7a627e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/40 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "535ece09-fb6a-40ac-b7d1-3dc213377711",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "53db9592-d79a-4f37-b000-33d1a8a6cd1d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "548bc0bc-7ad2-4c99-b8bc-3a3d59153446",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/12ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "54c8273f-4aa0-4aa1-ae4b-b0c19e179ed0",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3 비타민C: 표시량의(30 mg/300 mg)의 80~150%"
+  },
+  {
+   "productMasterId": "54c8273f-4aa0-4aa1-ae4b-b0c19e179ed0",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(4 대장균군 : 음성"
+  },
+  {
+   "productMasterId": "552bf85c-35a9-45b2-a4ec-cd860bb097ce",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "5553ed26-0798-41a6-bd47-65f6c58c7075",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수: 표시량(100,000,000 CFU(1억) / 6g)의 이상"
+  },
+  {
+   "productMasterId": "5596e71d-3afe-4bd3-85b2-5aaacd583f7a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 31mg/70 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "5683b216-dba9-46da-90b4-db23858e3117",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.6 X 10^11 CFU/g 이상 (2,600억) 이상"
+  },
+  {
+   "productMasterId": "5686f955-2979-48c9-a61d-cb80ec827f1d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "568f40d2-24f2-43a1-98de-7ce458fdbb61",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "56f50c2c-58f8-4656-bb65-7ee3a1056f41",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "57828f25-421a-4b25-9e91-f39c44fa443c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "57cfaf8a-def8-41d0-a068-5b141ecb645f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱수: 표시량이상(생균으로 4,000,000,000CFU/일(3.5g) 이상마리)"
+  },
+  {
+   "productMasterId": "5847c26d-4f13-44e5-a54d-7a25e75a43e0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25mg/12g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "58a4adf8-848a-43c5-899b-69e2d9329696",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량 (10,000,000,000(100억) CFU/5 g)의 이상"
+  },
+  {
+   "productMasterId": "58d30ebc-10a0-45d6-a446-30fa3226b42b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "58f4d4af-cac4-482f-96a3-4226be8a08c0",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(120mg / 20g(기타유래다당체 : 330.6mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "595b91ba-992e-4ef4-b38d-5328bee19fc2",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 29mg/60 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "5998a909-4eb8-43c8-b183-0157905fb4dd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "5aa89783-c02d-4aec-8518-8893c578a0c9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 18mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "5ac02bcd-dce1-4797-a26e-4303d40fcc46",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "5b03f316-6a52-47d9-99be-aa4b7ed93207",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2.진세노사이드 Rg1, Rb1 및 Rg3의 합(원료성제품): 표시량(15mg/g)의 이상"
+  },
+  {
+   "productMasterId": "5bcd1eec-df23-4a21-8748-f52139400e29",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "5c759e93-a6f0-42fa-ab62-e04929e157d9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "5c892d77-bab9-4c12-ae8f-a6a0d416ab46",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량[1,000,000,000(10억) CFU/2g)의 이상"
+  },
+  {
+   "productMasterId": "5d246eaa-d872-4fab-af3b-48cd1a28cb58",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "5de62267-2faf-4d16-a89f-e6276d0d1a7b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3) 프로바이오틱스 표시량 이상 (일일섭취량 100,000,000(1억)"
+  },
+  {
+   "productMasterId": "5e2c98fd-e76d-49b6-bbe0-9f5e0181115e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량[1,000,000,000(10억)CFU/2g]의 이상"
+  },
+  {
+   "productMasterId": "5e679478-7291-4e20-80fe-40cf270bde38",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(2)HCA함량: 표시량(5.4g/100g(270mg/5000mg:1회섭취량)의 80-120%"
+  },
+  {
+   "productMasterId": "5ef5c59b-d98d-422a-a540-b4fba8a5386e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "5fab31ed-14e7-43a6-b35e-befe818d3d29",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "5ffd6920-ffa6-4f12-8460-da0b26b49623",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "60271381-3bd8-46a3-9c98-61e83eea7825",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/4 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "6056553c-0716-4ca5-9a54-44ab8cc9b8e1",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 :이미."
+  },
+  {
+   "productMasterId": "6074b630-d21c-400c-ab70-0b791a73637f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "622863e9-543d-4ab4-9614-ba056a5c51f7",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "624974fb-cf44-4e52-90f7-101c950a18a6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "627a66c4-48e0-4aec-b2d4-bd93897cc089",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.1 X 10^11 CFU/g 이상 (1,100억) 이상"
+  },
+  {
+   "productMasterId": "62991a4f-a087-4c01-98a4-02997ca55adc",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "62a1cbec-a289-45ac-b7b7-41d23f7e9c17",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 14.8mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "644660d5-231e-46ae-b98a-13a785296adc",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(16.5 mg/3 g)의 80% 이상(원료성 : 표시량(5.5 mg/g) 이상)"
+  },
+  {
+   "productMasterId": "64511abc-523e-4717-9943-f482470ceae7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "6458cb9f-3816-471f-afce-8ff8fdd289bd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "64f6e2e9-85ef-4ce2-9e6f-08e487485dbd",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "65a1d12e-f8e8-425e-aa65-e9a111d6a48b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "661ad078-abe6-47ef-b020-130e830e2d3e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^10 CFU/g 이상 (100억) 이상"
+  },
+  {
+   "productMasterId": "672e6613-9247-4b9a-8c83-feec895c030e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(23mg/g)의 이상"
+  },
+  {
+   "productMasterId": "6757e76a-1555-46cf-913c-6e606f112602",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "67a2d624-dca0-4735-85b3-806d7226c42d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "6840a2eb-cbe9-48be-898c-8d5dc439ead7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.7 X 10^11 CFU/g 이상 (3,700억) 이상"
+  },
+  {
+   "productMasterId": "6943aaec-1a14-4ac8-8726-d22d63ab4c71",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "6af65468-155b-4d83-8400-cfe30ac5de43",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.9 X 10^11 CFU/g 이상 (3,900억) 이상"
+  },
+  {
+   "productMasterId": "6c203b76-0621-48ed-815e-c19ad9ec58db",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "비타민B6 : 표시량(1.5mg/620mg의 80~150%"
+  },
+  {
+   "productMasterId": "6c5e5a08-8106-4942-ba5b-cab453a031c9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 4.0 X 10^11 CFU/g 이상 (4,000억) 이상"
+  },
+  {
+   "productMasterId": "6cc1cd54-1a09-4155-94ec-65a3290b8052",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 : 표시량[100,000,000cfu/2.5g(1포)]의 이상"
+  },
+  {
+   "productMasterId": "6cec817e-e007-4365-9870-5b3d61df6cdd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/50ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "6dc7c04b-15a5-4887-9ea5-59af9a34e3d8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "6e15e864-a9ae-4796-bcaf-cbdf2aedd2e9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "[녹차추출물."
+  },
+  {
+   "productMasterId": "6e18a682-0bd9-4532-a2a2-30f9f5afdeda",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "2&gt;키토올리고당 함량 ; 표시량(413.3 mg/1600mg)의 80~120%"
+  },
+  {
+   "productMasterId": "6e18a682-0bd9-4532-a2a2-30f9f5afdeda",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "6e19d7a5-b43f-4e9c-ad2d-751e4039458d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "6e8f0110-7f1b-418f-a98f-3acc63f1895d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량:7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "6f891435-d1b7-42f1-b2af-3695895de537",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "70b4fb26-18cf-42ba-af81-19873b621689",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12.5mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "71439ff1-d04a-4c35-8108-7d104ce9765f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "715bd741-f424-47d4-9b15-795983177506",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "6) 프로바이오틱스 수 : 표시량(1,000,000,000(10억)CFU / 6,000mg)의 이상"
+  },
+  {
+   "productMasterId": "719ea507-1215-427e-a16d-d32a37212079",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/7000mg)의 이상"
+  },
+  {
+   "productMasterId": "71c2c003-8651-4677-a969-4e99e94570ef",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "유산균 수(L."
+  },
+  {
+   "productMasterId": "72038146-1dbc-4d8f-9227-4939dafe119c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "721de7bc-ce2f-4c00-a082-4680a5025700",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "736c823a-71bf-4253-8623-f23c9f5e882d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "7385877a-edd0-45ef-9f60-57dea3b50f89",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.9 X 10^11 CFU/g 이상 (2,900억) 이상"
+  },
+  {
+   "productMasterId": "738a89be-1cfb-42a4-a6d0-52e960719620",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시랑[(120mg/20g(기타유래다당체 : 330.6mg/20g)]의 80% 이상"
+  },
+  {
+   "productMasterId": "73d8bf3d-610a-49aa-bb86-b0d07f1f570f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "7460a554-405e-4a80-83dd-dfadcdb1a7f0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(10,000,000,000(100억) CFU/0.21 g)의 이상"
+  },
+  {
+   "productMasterId": "74b950ff-d7fd-423b-80c6-8c1dba222f87",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 37mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "75f5dfe3-6b06-4b0e-9f71-089e1ed452b9",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;캡슐&gt;"
+  },
+  {
+   "productMasterId": "76134ec8-0d6a-496d-b906-11b645d1d982",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 : 표시량[100,000,000cfu/2g(1포)]의 이상"
+  },
+  {
+   "productMasterId": "76ba881d-7d72-4596-b9db-cdb1e19814a9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 4.5 X 10^11 CFU/g 이상 (4,500억) 이상"
+  },
+  {
+   "productMasterId": "778858ad-44c4-4b59-8c1d-0817a1c3a515",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;아연+프로바이오틱스 캅셀&gt;"
+  },
+  {
+   "productMasterId": "77922a9b-9011-4e05-9a34-1219cad76fb4",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/0.23 g)의 이상"
+  },
+  {
+   "productMasterId": "78ae8f0c-25bf-44db-af02-b52472b5a598",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "78f4abbb-7252-4355-8650-eabacdeb3998",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "비타민D : 표시량(10μg/2000mg의 80~180%"
+  },
+  {
+   "productMasterId": "79095ef8-b79d-4e06-9c07-6aa3f9c18fe8",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(200mg / 20g(기타유래다당체 : 192.4mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "7a54a5fd-33bb-47c5-b460-2bcb61b0185d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3.9mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "7c74f356-e62f-44cb-9217-823c732b3e4f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "7c79474e-4dd7-4717-a128-c4e1582cf2c3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "7cc6470d-9640-4d5a-acb7-94a4d2d41471",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.6 X 10^11 CFU/g 이상 (2,600억) 이상"
+  },
+  {
+   "productMasterId": "7d62de94-880a-48a4-9ad0-f5b61cf2a7e9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "7d703aaa-43ac-4bdb-8a01-46527666be39",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "7d737ef6-0a36-49a9-bcc2-ba4f6a7db622",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 식이섬유 : 차전자피식이섬유로서 표시량(900mg/g)의 이상"
+  },
+  {
+   "productMasterId": "7e3ad72f-cf01-4925-bd5e-02ea25eda187",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg / 10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "7e715d0b-b3bd-4075-a037-e50943a41d26",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량[2,000,000,000(20억)CFU/2g]의 이상"
+  },
+  {
+   "productMasterId": "7f2e3b30-f84e-48d1-bf80-fe3417cfb6bf",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(200mg / 20g(기타유래다당체 : 197mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "7f30c589-a976-4205-8441-f0bd1a332640",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 100/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "7f30c589-a976-4205-8441-f0bd1a332640",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑷ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "8007045b-eeba-4c81-a175-5c8678d60b6c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3) 비타민B1 : 표시량(1.2 mg/4,400 mg의 80% 이상 180% 이하"
+  },
+  {
+   "productMasterId": "8099cac6-883c-4ec9-87a1-53664730c14f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "80bfabeb-8992-4027-a706-61afbd2205ba",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(100,000,000(1억) CFU / 500mg)의 이상"
+  },
+  {
+   "productMasterId": "81c081e8-3ee9-4ef3-874d-52d80657cdbb",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "Lactobacillus sakei Probio65 : 표시량 이상 (생균으로 10,000,000,000 CFU/일(3g) 이상)"
+  },
+  {
+   "productMasterId": "81c081e8-3ee9-4ef3-874d-52d80657cdbb",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량 이상 (생균으로 100,000,000 CFU/일(3g) 이상)"
+  },
+  {
+   "productMasterId": "83b31dfb-0ab3-4497-bc6b-20aa2bdc258c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 48mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "83becf5c-9954-42e3-b604-0d5cd9907b9e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "846df8d8-35de-4d25-80f5-16d1eab2b048",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/3 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "847abe70-5cdf-4096-809e-00504782212b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "84e43e5c-cda9-428c-b77a-0815a02744cb",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;수용성은행잎추출물 기준규격&gt;"
+  },
+  {
+   "productMasterId": "863bda07-9f4f-4af7-92db-eeb2f3d1212b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "86839bde-0ec4-49b0-8773-4e4b4e199b55",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "87e6669a-3830-4a7b-a8cd-2e6d8a413eaf",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.1 X 10^11 CFU/g 이상 (2,100억) 이상"
+  },
+  {
+   "productMasterId": "87f7d7e5-95f4-4662-8fff-7b8ce281c486",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "892e608d-0ae6-4d9f-ae54-8e378aa878c6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(원료성제품) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(6mg/g)의 이상"
+  },
+  {
+   "productMasterId": "8a2b6165-bd2e-426a-928d-2ff373c8d5c0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "8a6c46d2-9f6e-46bd-abda-b589ff8ff33a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25.6mg/20 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "8a88d29e-17d5-4a58-b377-be031d8f509a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 10mg/20ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "8afe5754-c126-4472-a68e-5c98fa0180f7",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "8b6099fa-a60d-4084-806d-4f5dd69eb394",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 50mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "8bd0d81c-29dc-439f-87cc-b2e17c27cd92",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.3 X 10^11 CFU/g 이상 (2,300억) 이상"
+  },
+  {
+   "productMasterId": "8c94abae-6a3c-4438-b03c-bed7d3d5245b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "8da1406a-9694-4113-ace7-88a63e02f2be",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량 이상 (생균으로 140,000,000,000 CFU/1회(1g)이상)"
+  },
+  {
+   "productMasterId": "8e1391ee-848a-4457-bad1-5d6932dda9e4",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "8e4c3bc9-74d3-4579-8623-cff10b4e8b82",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "<b>Appearance</b> 연갈색의 정제 2&gt;글루코사민"
+  },
+  {
+   "productMasterId": "8f0f2fe8-8f74-464a-9d7b-2a242cc354f6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(5000000000(50억)CFU/2000 mg)의 이상"
+  },
+  {
+   "productMasterId": "8f397e42-39da-4e78-a411-e80a9887470d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "8f9e65cc-1aa7-4218-8a37-5217b3c2e4b0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/15ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "8fd68f03-95b2-4537-ada8-801f595064a8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12 mg / 10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "900d2017-2c75-495e-911b-2b5cb8d33d9d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.2 X 10^11 CFU/g 이상 (3,200억) 이상"
+  },
+  {
+   "productMasterId": "900ff0e7-6dce-4364-a2cb-c6a73e355360",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(200mg / 20g(기타유래다당체 : 192.4mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "90c8b352-23ee-4a65-a092-852f9f533cb9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(110mg / 20g(기타유래다당체 : 209.3850mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "91544446-5f22-44f3-8cca-9551a1ca12f3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "9421b097-c1eb-43df-8ae8-2d6b082d1e41",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "946ba146-67c5-4bd3-b0a6-8f8c4280faa3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "954f257b-264d-4d2e-af94-bbf72ed1bd0e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 30mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "963f99d7-f991-437b-9f3e-7991f46dfa86",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "9656a964-ef4d-43c1-adaa-d02566bf6586",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "프로바이오틱스 : 표시량((500,000,000(5억) CFU/500mg) 이상"
+  },
+  {
+   "productMasterId": "96d87d92-10e5-43e8-be18-91685ae829d5",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "971fb2ca-2029-4ea0-80b8-0c031e18095a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "98bea9df-fe87-4052-ba23-5dd6f100b2b6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "98fde11d-71c0-4afe-a678-2b8515d3299f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.5 X 10^11 CFU/g 이상 (3,500억) 이상"
+  },
+  {
+   "productMasterId": "99d06e97-77e9-4670-8d72-866bd531a7df",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "9a5c231e-c0da-4752-a068-79def3106f66",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 14mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "9ade874b-d153-4052-a839-4e759dbb2954",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.8 X 10^11 CFU/g 이상 (2,800억) 이상"
+  },
+  {
+   "productMasterId": "9b884580-d61d-4ee8-abae-61c52d7a3145",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "9d18087b-7cb6-425c-b191-29f400e05811",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "9d2e96c7-e8ff-4609-8d4b-3a19711814b2",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량(10,000,000,000(100억)/2g)의 이상"
+  },
+  {
+   "productMasterId": "9dbe0d96-270c-402e-8097-3c1844a4fc0b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "9e35334d-4ef9-431b-a144-7d83c593dfac",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "9f0f472d-30eb-41af-952d-69770516441a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "3) 프로바이오틱스 수 : 표시량 (1,000,000,000(10억) CFU/ 1 g)의 이상"
+  },
+  {
+   "productMasterId": "9f406d62-1865-44e6-98c5-59b04f69a3e7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7.5mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "9f4dab55-6c45-4f4c-9976-11a856783742",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "a011fc4c-8409-4122-9493-c89c58d2be89",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "a05eabdf-d204-4add-a29c-0d270c499bca",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "a144e538-a984-481d-8ce2-6219ed2ad608",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 13mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "a20ed618-b3d4-46ec-a629-9c4d851ade3c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "a216ade0-4591-437b-acf5-c662ec6fc790",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.0 X 10^11 CFU/g 이상 (3,000억) 이상"
+  },
+  {
+   "productMasterId": "a4c795f3-05c5-4473-888a-1a41620f83cc",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5.8mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "a53e125b-8afa-425d-ae3d-797e6f113a65",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "a57c4a03-cc7d-4ec3-8c4e-93a7a842c9fa",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "4&gt;붕해시험(20분 이내)"
+  },
+  {
+   "productMasterId": "a5bfdae9-0127-4b9f-8ef2-26d2f52b41f9",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "3&gt;중금속"
+  },
+  {
+   "productMasterId": "a5e4b782-60c5-42a3-99cd-817f601d8236",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.3 X 10^11 CFU/g 이상 (3,300억) 이상"
+  },
+  {
+   "productMasterId": "a6401c5f-a1b6-409f-bbe4-665782e0749e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 고유의 향미가 있고 이미, 이취가 없는 흐린 황갈색 또는"
+  },
+  {
+   "productMasterId": "a66a2e26-c69c-4730-b33e-7a7747f39c4f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "a7110696-dc39-44eb-9a1f-e4f7748f234d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "a87b1b1c-a83e-4608-a724-c503dca8de09",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "2 공액리놀레산(cis-9 및 trans-11 공액리놀레산, trans-10 및 cis-12 공액리놀레산, cis-9 및 cis-11 공액리놀레산,"
+  },
+  {
+   "productMasterId": "a94b0768-9475-41c0-aabd-a19d0d22879c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 : 표시량[2,000,000,000(20억)cfu/1.5g]의 이상"
+  },
+  {
+   "productMasterId": "ab88d298-6108-4321-bdef-02aed7e5a5d8",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(2)HCA함량 : 표시량(5.4g/100g(324mg/6000mg:1회섭취량)의 80~120%"
+  },
+  {
+   "productMasterId": "ac231a44-64bd-4f67-b8d2-6fe6517ef741",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(18 mg/3 g)의 80% 이상 (원료성 : 표시량(6 mg/g) 이상)"
+  },
+  {
+   "productMasterId": "acbfdcb0-b145-49af-8e37-a533211ad7e4",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "대두이소플라본(비배당체로서)(25 mg/4,000 mg: 표시량의 80~120%"
+  },
+  {
+   "productMasterId": "ae78c836-ae8b-4641-94e1-a2d4be81a098",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량 (500,000,000(5억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "aea92989-006d-4ee1-aab0-2f4ff74590c4",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.3 X 10^11 CFU/g 이상 (3,300억) 이상"
+  },
+  {
+   "productMasterId": "af4c6de3-7711-41de-a5e7-0e6c7be03b4b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "3) 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/ 1.5 g)의 이상"
+  },
+  {
+   "productMasterId": "b01288e2-630d-4115-8691-07fa108ba064",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 37.8mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "b02ba487-c5c6-4c93-92f1-46eb9c210713",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(4) 비타민B1 : 표시량(1.2 mg/80ml의 80%~180%"
+  },
+  {
+   "productMasterId": "b031b405-f6cf-45f7-829d-c4242dddb409",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "b0991a72-c4a8-4904-b38b-89bc1203a278",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "납(mg/kg) : 3.0 이하(우골분, 패각분 등 소성칼슘을 사용한 경우"
+  },
+  {
+   "productMasterId": "b0ab8845-791e-4a2b-bc72-13e20137761e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(200mg / 20g(기타유래다당체 : 187.2mg)] 의 80%이상"
+  },
+  {
+   "productMasterId": "b0d94ff0-d42c-4c11-b5d0-a3f8a530c8aa",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "b1a0555b-93e6-4d10-9aee-d97fa50e1610",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(3,000,000,000 (30억)CFU / 450mg)의 이상"
+  },
+  {
+   "productMasterId": "b2d05e5c-2925-4ee3-a32a-217302651a2e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "b39fd34e-9ba1-4165-958a-d0525ad7ab04",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "b3f290b3-1aa3-4614-97d8-97d3f3d25896",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "b431fa2b-542c-4840-a704-f032237e2d94",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;가르시니아 정제&gt;"
+  },
+  {
+   "productMasterId": "b449e7bf-3137-463c-9b8a-0ee0d39047d1",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "b44f1abf-44ae-441b-9115-ef88830516e5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "b4eccd98-2de7-4510-8055-31cd89b78088",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "b4eccd98-2de7-4510-8055-31cd89b78088",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑷ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "b52882e5-471c-4036-b292-447fd02e442a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 13mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "b56522de-cdc9-4653-a14c-143638ed8210",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "아연(% :표시량(4mg/550mg)의 80~150%"
+  },
+  {
+   "productMasterId": "b5923eb0-6862-45bc-930d-27dacb24401e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "b5c61522-48c1-4c43-bcea-2603c1b7e9ba",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "b5f86840-c8d0-4dbe-8758-4b5e933e0b43",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "b702d176-3119-4271-aff3-c79c0c62fe90",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg / 10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "b7602b2f-1b37-44cb-9472-091fd14adf2f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.5 X 10^11 CFU/g 이상 (2,500억) 이상"
+  },
+  {
+   "productMasterId": "b7a5a7a4-51f8-4faa-aee9-3afed6375edb",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "b7e916d0-0776-4d41-849d-5152b1976146",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.35 X 10^11 CFU/g 이상 (2,350억) 이상"
+  },
+  {
+   "productMasterId": "b8e1bc40-8579-4f44-872e-7d0a4b56249f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/50g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "b9efe86b-d441-46f5-afe8-7e1531f22261",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(5,000,000,000(50억) CFU/0.23 g)의 이상"
+  },
+  {
+   "productMasterId": "ba2e3cee-b081-412d-9a8f-f44f75036d1f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "ba620ade-5cb6-4ec5-a696-33fa0bf6f20c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/50 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ba98d26f-3018-404a-9c14-83cd28057a36",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "bad61158-ea65-43e8-8092-8cbaaa66dd04",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.1 X 10^11 CFU/g 이상 (2,100억) 이상"
+  },
+  {
+   "productMasterId": "bb11ef0d-b33f-4032-9eab-b30babc5c419",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(1) 성상 : 이미."
+  },
+  {
+   "productMasterId": "bc3dc26e-9723-45c8-a455-e5d0225ad800",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "bcf0654c-0323-46ee-9d7b-53cb8a1e140d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.35 X 10^11 CFU/g 이상 (3,400억) 이상"
+  },
+  {
+   "productMasterId": "bd21a95d-4dc5-46ab-86a6-3081a7499748",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/20g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "bd3f5b57-6297-46a1-9ff4-62357b010168",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.6 X 10^11 CFU/g 이상 (3,600억) 이상"
+  },
+  {
+   "productMasterId": "bddbd405-63be-4d3e-9b86-98e3a93bd6cf",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량 이상 (생균으로 4,000,000,000 CFU/일(6g) 이상))"
+  },
+  {
+   "productMasterId": "bde85acb-1ae9-45dd-bf64-0cef5f482eae",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.9 X 10^11 CFU/g 이상 (3,900억) 이상"
+  },
+  {
+   "productMasterId": "bf536c18-8033-4efe-94b1-04ecb2212943",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "c07697f7-5e3a-4525-af5c-e81432289a8e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "c15d6783-f7b7-431f-af79-799dd2333675",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(2 대두이소플라본 비배당체로서: 표시량 (27mg/ 25mL)의 80~120%"
+  },
+  {
+   "productMasterId": "c1a94d86-c510-4b24-a3fe-6e9dd161de88",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "1)성상 : 이미."
+  },
+  {
+   "productMasterId": "c1cf02b1-caa4-496e-b2b2-dc7d6f8d22ce",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU / 4.5 g)의 이상"
+  },
+  {
+   "productMasterId": "c235f401-1e35-43ca-a419-8df60e970dcd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3.2mg / 10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "c2ddaf78-efc8-475d-84dc-237f9d5b7534",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "c39d0630-627c-4edf-a3af-ad33952b1427",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(420mg / 20g(기타유래다당체 : 148.6mg/20g)] 의 80%이상"
+  },
+  {
+   "productMasterId": "c3f7c91e-965e-4c6c-8975-4403569629ab",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(10,000,000,000(100억) CFU/2000mg)의 이상"
+  },
+  {
+   "productMasterId": "c40195b7-04c4-47ce-8d4d-177170b1d870",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(2) 포스파티딜세린 : 표시량(300 mg/900 mg의 80~120%"
+  },
+  {
+   "productMasterId": "c43c67a6-9585-49ce-baa4-7c1c520c2a0f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "c5598ab0-183a-4ed1-aa52-5b07c5c61703",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "2) 프로바이오틱스 수(제2014-27호) : 표시량(유산간구균(L."
+  },
+  {
+   "productMasterId": "c5598ab0-183a-4ed1-aa52-5b07c5c61703",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "3) 프로바이오틱스 수: 표시량(비피더스균(B."
+  },
+  {
+   "productMasterId": "c6133f1e-c23e-47c0-88a8-71ffacd30ea7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "c6dbd683-bbd2-4cea-b59b-d801ddfa9e58",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "진세노사이드 : Rg1 및 Rb1, Rg3 합 : 표시량 (5 mg/g)의 이상"
+  },
+  {
+   "productMasterId": "c6f7c42a-1f15-4066-86b9-9ba89959bf70",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 3.4 X 10^11 CFU/g 이상 (3,400억) 이상"
+  },
+  {
+   "productMasterId": "c7398427-b9bc-46e1-b446-0ee43e3fb76d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.9 X 10^11 CFU/g 이상 (1,900억) 이상"
+  },
+  {
+   "productMasterId": "c7881b1c-2c41-4991-bcc2-6e96bd669189",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상: 이미."
+  },
+  {
+   "productMasterId": "c8fb43d7-c4c4-4620-8a23-bb98ed0c850f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "c96cd3b4-f616-408e-acef-2f84766ad960",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.8 X 10^11 CFU/g 이상 (2,800억) 이상"
+  },
+  {
+   "productMasterId": "c9afb29e-b74d-4735-a94b-e83a77fc8ba3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(6) 안트라퀴논계화합물(무수바바로인으로서)(%) : 0.11 이하 [(알로에베라겔동결건조분말(100:1) 22%]"
+  },
+  {
+   "productMasterId": "caf678a0-112d-4f4a-82ac-4a517f27fb39",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(7mg/g)의 이상"
+  },
+  {
+   "productMasterId": "cb4e9d3f-aca0-41b9-801f-d7bec5ea14c3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "cc082fb5-8c04-4037-9ef2-36b90a4bb9c2",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ccef0089-ab6f-4033-a000-fe20c26467ea",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 5mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "cd1e7046-ae35-4fc3-a51e-fcbbd3b8bffa",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "cd3b07a4-c803-4530-adc6-0f5015fe69f0",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "철 : 표시량( 3.6 mg/3,000 mg0의 80~150%"
+  },
+  {
+   "productMasterId": "cd55ed89-df06-403e-91e1-599c600838fc",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3) 비타민D : 표시량의 80~180%(표시량 : 2.5μg(100IU)/1,000mg"
+  },
+  {
+   "productMasterId": "cd771ed9-1a7d-40ff-8f5e-87f068613758",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "cee65f58-e5ca-47be-8bdc-2404b7bcddc3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "cf5596bb-c409-412f-9f19-a3f492fb84cf",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "유산균 수(L."
+  },
+  {
+   "productMasterId": "d085f2bb-7b53-4df5-9d16-2087240b4d95",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d0c81975-7125-4b26-8927-d0dc0a69745c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "4.코로솔산: 표시량(1.3mg/500mg의 80 ~ 120%"
+  },
+  {
+   "productMasterId": "d1074e57-5287-4df2-9763-7bec8d408b9f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3.5mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d197338c-78ee-43ca-a648-d522a71b9eeb",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량(2,000,000,000(20억) CFU/4g)의 이상"
+  },
+  {
+   "productMasterId": "d1c10125-36ee-4b46-a8bd-04e5ddca6d7e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량(2,000,000,000 (20억) CFU/4g)의 이상"
+  },
+  {
+   "productMasterId": "d267693d-c814-4fca-bf14-7272388f82f0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d3170087-a593-4c3c-832b-9e07004c3998",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(11mg/g)의 이상"
+  },
+  {
+   "productMasterId": "d354eca3-1a2f-4788-9ede-cade059bbc4a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량(100,000,000(1억) CFU/3000mg)의 이상"
+  },
+  {
+   "productMasterId": "d3749e77-cdc9-45b8-b1f2-d57261aa3c13",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 8mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d3a899b0-dfc5-4d0c-8d26-6ac3955ff426",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "2) 프로바이오틱스 수(개별인정형 제2014-27호) : 표시량(유산간구균(L."
+  },
+  {
+   "productMasterId": "d3ac1adc-9ae6-4ee5-b598-2dbc5e39e25e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "d3ce85d1-a63a-4a5e-9f9f-76f89534c408",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 8mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d4a81242-c523-4659-aec5-169db11aaabd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d4dc480b-c807-4d68-8079-e9ed40c8a6a1",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "&lt;밀크씨슬멀티비타민정제&gt;"
+  },
+  {
+   "productMasterId": "d54552c8-325b-46c1-955a-7f8489adaad9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "d5c5afbb-eb47-4c3b-961f-5513a3028472",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 9mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d6815c43-c8a8-4c10-b3fd-53d7a6d88bb8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d6ba32d6-4a7a-40fd-9909-e3e26f62db13",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "d6d84a47-722f-4105-84c7-51474717380f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.3 X 10^11 CFU/g 이상 (2,300억) 이상"
+  },
+  {
+   "productMasterId": "d724334a-5619-4f3d-98bf-f2add552d67e",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "d7bf591d-91f5-4156-ac43-eae242674399",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2)총 다당체 : 표시량[(200 mg / 20 g(기타유래다당체 : 203.1704 mg)] 의 이상"
+  },
+  {
+   "productMasterId": "d8407b7f-c6dd-45f9-bea9-fe5afd26b1f0",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "d8601025-b22f-4c7e-ba1f-fae70e7798b6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "d90019f3-4d18-44ac-ad83-f1d5e0be8cba",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7 mg / 10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d9593771-0798-4eb6-8964-e5e49062a228",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "d98010eb-4c52-4594-9a38-a9ec61d308d4",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.0 X 10^11 CFU/g 이상 (2,000억) 이상"
+  },
+  {
+   "productMasterId": "d9b650f2-094a-4e75-89f3-033ec236233c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "da9d6969-b9a2-4811-8fbf-70623867773b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "dba7637c-cb3b-46ed-a43d-fd71f7a1f5f7",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "dbc99d7c-e5f1-405a-bc14-bc117076cc6a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.1 X 10^11 CFU/g 이상 (2,100억) 이상"
+  },
+  {
+   "productMasterId": "dc1b3bc7-281a-406d-bdbe-1b23cecdad0b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 6mg/30ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "dca44390-a8d5-402d-b3a2-7b46cae9ec0f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 이미."
+  },
+  {
+   "productMasterId": "dced66fe-759b-44f0-8d04-184c60c2bdbe",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(3 비타민C : 표시량(100 mg/1.3g)의 80%~150%"
+  },
+  {
+   "productMasterId": "de74344d-3352-4339-9298-d4fa857a644a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "식품공전 제 10."
+  },
+  {
+   "productMasterId": "de7ba10f-6ae4-4ec6-be17-9c3a9b447b07",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "df98f139-68d5-466b-bd31-649c53aab249",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "e00a1b57-8dfe-4567-b376-62c04827afb5",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "e0a52c93-125d-4ba0-9cf4-c51fdf10c616",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e0da538c-ca25-42ee-bfec-14b3e10971fc",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 고유의 향미가 있고."
+  },
+  {
+   "productMasterId": "e174f10a-c546-4fa3-89c3-15699093a9ae",
+   "reason": "CANONICAL_STRUCTURE_UNSAFE",
+   "ko": "진세노사이드Rg1+Rb1+Rg3의 합 : &lt;원료성제품&gt;표시량(9mg/g) 이상, &lt;최종제품&gt;표시량(27mg/3g) 의 80%이상"
+  },
+  {
+   "productMasterId": "e1ba4581-df86-4dc3-9750-1bda877d4429",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25.6mg/20 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e20659fa-fb9a-4043-8e00-45117cd0ee1a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 4.0 X 10^11 CFU/g 이상 (4,000억) 이상"
+  },
+  {
+   "productMasterId": "e2715bb9-39a7-4057-a252-600f1d4961a6",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "-성상 : 이미."
+  },
+  {
+   "productMasterId": "e2dc1d1f-6774-4f2d-b960-936b939dc07d",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "e316ea43-b2d9-4388-880c-f1dfeb60f7af",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 25mg/100 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e35a4564-59b1-4198-8ab5-f574dfeeb42b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "e3e8499c-59c5-4350-9f88-c8c93438af6b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "e405f3b9-2ab6-423e-a7d1-69fbd4f382dd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4.8mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e4079e0a-eaa0-4d02-bea6-10674b2eb9b5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 7mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e4778cee-a7ec-493e-8f59-7e7c4c56c0cc",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 6.0 X 10^11 CFU/g 이상 (6,000억)이상"
+  },
+  {
+   "productMasterId": "e500867a-9928-4e8d-af37-f22c17c950f9",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "① 성상 : 이미."
+  },
+  {
+   "productMasterId": "e5759771-717f-48f7-a17e-82171cb2b66a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "⑤프로바이오틱스 수 : 표시량(100,000,000(1억) CFU / 30,000mg)의 이상"
+  },
+  {
+   "productMasterId": "e66be2c8-5575-4303-b9b9-9d8754e5b7f7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2.(원료성제품) 진세노사이드 Rg1, Rb1 및 Rg3의 합: 표시량(5mg/g)의 이상"
+  },
+  {
+   "productMasterId": "e68afe3c-5d85-45e6-9275-acad796e2e95",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(원료성제품) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(6mg/g)의 이상"
+  },
+  {
+   "productMasterId": "e6d5d2bb-e1fb-4221-987b-206f3c1cb438",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 wp 4."
+  },
+  {
+   "productMasterId": "e77d625e-2ce9-400c-8725-af44524aa032",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "e87423a8-f5c5-4484-a232-bf2ed5e3bc6f",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "총 다당체 : 표시량[(250 mg / 20 g (기타유래다당체 : 216.8025 mg/20 g)] 의 80% 이상"
+  },
+  {
+   "productMasterId": "e9320a64-7e5c-4497-a4c7-40245588fdcd",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품 : 표시량 23mg/10ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "e98de2f3-1711-4651-af57-a64163b1aa0b",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/40 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ea02d4d2-583a-4d0e-8abd-aea64ecad07b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 대장균군: 음성(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "ea940bbd-1af8-4a42-9285-82a30ef3d751",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.9 X 10^11 CFU/g 이상 (1,900억) 이상"
+  },
+  {
+   "productMasterId": "eb6a72fd-a3de-4b86-8266-e1dac5530736",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2.진세노사이드 Rg1, Rb1 및 Rg3의 합(원료성제품): 표시량(25mg/g)의 이상"
+  },
+  {
+   "productMasterId": "ecf218c9-833c-4cf1-a759-5e98ce4e6c48",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3mg/20ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ed984d92-0984-41db-8b45-160c0d33b0b9",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량 (2,000,000,000(20억) CFU/2 g)의 이상"
+  },
+  {
+   "productMasterId": "edef8428-04eb-42ab-9192-9a5b30b0e31b",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "비타민D: 표시량(5 ㎍/2,000mg의 80~180%"
+  },
+  {
+   "productMasterId": "eee8ada3-4ba3-4c37-a789-4ee97117fe6a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 20.2mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ef5dbf52-6deb-4492-9bc8-1b45cee0f979",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수 : 표시량[10,000,000,000cfu/2g(1포)]의 이상"
+  },
+  {
+   "productMasterId": "eff8f34c-0bb0-494c-9adf-2f6e4860b1f5",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 1.0 X 10^11 CFU/g 이상 (1,000억) 이상"
+  },
+  {
+   "productMasterId": "f0afd854-53a7-47e8-9ef2-f6f071b5c10d",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "f1d1d05f-32df-4364-99a8-03d7b27d295a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "공액리놀레산(cis-9 및 trans-11 공액리놀레산, trans-10 및 cis-12 공액리놀레산, cis-9 및 cis-11 공액리놀레산,"
+  },
+  {
+   "productMasterId": "f1ebc98b-c3f5-4640-b50b-28115702573a",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "[밀크씨슬(표시량 : 130mg / 700mg)"
+  },
+  {
+   "productMasterId": "f1ec83b8-ca0e-433d-9aab-c0b7544bcf8a",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "※원료성제품 : 표시량(15mg/g)의 이상"
+  },
+  {
+   "productMasterId": "f23cc592-009d-40ef-930d-1d88b8ddd835",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "성상 : 고유의 향미가 있고."
+  },
+  {
+   "productMasterId": "f2baeb35-cd3c-4d23-9321-a44b1ed886bd",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "f2e8cc97-a7d7-4ede-b516-14d3dbb693de",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.2 X 10^11 CFU/g 이상 (2,200억) 이상"
+  },
+  {
+   "productMasterId": "f332bfc0-1a06-43d1-b2e2-11516d693587",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(원료성제품) 진세노사이드 Rg1, Rb1 및 Rg3의 합 : 표시량(6mg/g)의 이상"
+  },
+  {
+   "productMasterId": "f332d366-6c44-414c-bd24-a64f217c2def",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "(3) 프로바이오틱스 수 : 표시량(1,000,000,000(10억) CFU/4 g)의 이상"
+  },
+  {
+   "productMasterId": "f341967e-d2ef-444e-8b8c-76e02ca1a7d8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.7 X 10^11 CFU/g 이상 (2,700억) 이상"
+  },
+  {
+   "productMasterId": "f3c7928e-b7d4-4308-82f3-4961add616c1",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량[100,000,000(1억) CFU/3g]의 이상"
+  },
+  {
+   "productMasterId": "f446442c-c73d-408e-9086-7128f8e12f90",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "f49169b3-e06c-4af7-b780-bc483b57c73c",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 4mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "f4d74c5e-f6fd-4704-96ee-a4483b31197f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스 수 : 표시량[100,000,000(1억)CFU/4.3g]의 이상"
+  },
+  {
+   "productMasterId": "f5176e23-f390-42cb-8556-cc1ecfb069f8",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제 4."
+  },
+  {
+   "productMasterId": "f5de6a27-9177-4512-b7b1-a254b941a830",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "나이아신 : 표시량(28mgNE/1,550mg의 80~150%"
+  },
+  {
+   "productMasterId": "f67b927e-467b-4f28-8f06-c70e6ad5c466",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 39mg/10g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "f6a39c15-3358-4b5e-ab43-448ed80273a0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "프로바이오틱스수 : 표시량[3,000,000,000(30억)CFU/2g]의 이상"
+  },
+  {
+   "productMasterId": "f8e7af5a-91c0-4240-b029-e8267c82b0f1",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 2.4 X 10^11 CFU/g 이상 (2,400억) 이상"
+  },
+  {
+   "productMasterId": "f923ed19-c3b0-4bac-962e-03ed19a03c3e",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 15mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "fa3fde90-3725-4a16-bed7-bdb418dc04d3",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "fa6dcc1e-c3d4-4b88-953c-2e8be3b77b27",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 8.5mg/3g 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "fbefe4d9-eb70-44eb-b736-60bba7555608",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 12mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "fbfdbf82-f998-4ac7-b1e3-d395963c6b41",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 건강기능식품공전 제4."
+  },
+  {
+   "productMasterId": "fc18921e-faff-4eb5-b0ad-a3fc73f62e71",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "(시험방법: 식품공전 제9."
+  },
+  {
+   "productMasterId": "fc3d0636-ba3f-46f9-aac7-3a3a16f1f1d8",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2) 프로바이오틱스 수: 표시량 (3,000,000,000(30억) CFU/2,000 mg)의 이상"
+  },
+  {
+   "productMasterId": "fc95030e-fb03-4114-b5b4-dd7c7b2a4db3",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "2-1.진세노사이드 Rg1, Rb1 및 Rg3의 합: 표시량(5.9mg/g)의 이상"
+  },
+  {
+   "productMasterId": "fd24ebef-6046-4ead-9c42-bd8fe0ded9d6",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "③ 프로바이오틱스 수 : 5.0 X 10^10 CFU/g 이상 (500억) 이상"
+  },
+  {
+   "productMasterId": "ff01e3ee-0d8e-48df-b822-4713feed43a7",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 3.7mg/10 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ff3b8001-71e2-40bb-901d-7523f01ae13f",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 8mg/15 ml 이상의 80% 이상"
+  },
+  {
+   "productMasterId": "ffa129f9-f49e-4401-8c39-97840b30ee7c",
+   "reason": "KO_SOURCE_DAMAGED",
+   "ko": "⑶ 세균수(CFUs): 3,000/mL 이하(시험방법: 식품공전 제10."
+  },
+  {
+   "productMasterId": "ffb44a58-d760-4e62-9cfd-93c32189ccb0",
+   "reason": "TRANSLATION_AMBIGUOUS",
+   "ko": "*최종제품:표시량 21mg/50 ml 이상의 80% 이상"
+  }
+ ]
+}

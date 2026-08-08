@@ -1,100 +1,91 @@
 {
  "wo": "WO-O4O-HFF-EN-C01-LABELLED-STANDARD-40896-FULL-TRANSLATION-REPAIR-V1",
- "at": "2026-08-08T07:07:36.156Z",
+ "at": "2026-08-08T07:57:12.203Z",
  "rounds": [
   "hff-en-c01-a01-translations-v1.json",
-  "hff-en-c01-a02-translations-v1.json"
+  "hff-en-c01-a02-translations-v1.json",
+  "hff-en-c01-a03-translations-v1.json"
  ],
- "candidateDocuments": 40896,
- "ready": 19976,
- "rejected": 41,
+ "candidateDocuments": 20920,
+ "ready": 4115,
+ "rejected": 43,
  "rejectedByWhy": {
   "missing": 0,
   "enDrift": 0,
-  "notFullyResolved": 20879,
+  "notFullyResolved": 16762,
   "sliceMismatch": 0,
   "structureDiff": 0,
   "hangulLeft": 0,
-  "numericLoss": 39,
-  "hygiene": 2,
+  "numericLoss": 40,
+  "hygiene": 3,
   "otherAreaChanged": 0,
   "sectionMissing": 0
  },
  "numericSamples": [
   {
-   "ko": "프로바이오틱스 수 : 표시량(1.0 x 10^9 CFU/2g) 이상",
-   "en": "Probiotic count : at least 1 billion CFU per 2g",
+   "ko": "2)비타민C(%): 표시량(13.65mg/1.3g, 1회 섭취기준)의 80.0~150.0%",
+   "en": "2)Vitamin C (%): labelled (13.65mg / 1.3g, per serving), 80.0~150.0%",
    "lost": [
-    "1.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "프로바이오틱스 수 : 표시량(2.0 x 10^9 CFU/2g) 이상",
-   "en": "Probiotic count : at least 2 billion CFU per 2g",
+   "ko": "(2) 총(-)-HCA 함량(%) : 표시량(375mg/1.0g, 1회 섭취기준)의 80.0~120.0%",
+   "en": "(2) Total (-)-HCA content (%) : labelled (375mg / 1.0g, per serving), 80.0~120.0%",
    "lost": [
-    "2.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "프로바이오틱스 수 : 표시량(2.0 x 10^9 CFU/500mg) 이상",
-   "en": "Probiotic count : at least 2 billion CFU per 500mg",
+   "ko": "(2) 코엔자임Q10(%) : 표시량(50mg/0.75g, 1회 섭취기준)의 80.0~120.0%",
+   "en": "(2) Coenzyme Q10 (%) : labelled (50mg / 0.75g, per serving), 80.0~120.0%",
    "lost": [
-    "2.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "프로바이오틱스 수 : 표시량(3.0 x 10^9 CFU/500mg) 이상",
-   "en": "Probiotic count : at least 3 billion CFU per 500mg",
+   "ko": "(4) 붕해시험 : 1차 60분 이내, 2차 60분 이내",
+   "en": "(4) Disintegration test : Within 60 minutes in the first stage and within 60 minutes in the second stage",
    "lost": [
-    "3.0",
-    "10",
-    "9"
+    "1",
+    "2"
    ]
   },
   {
-   "ko": "② 프로바이오틱스 수 : 표시량(1.0 x 10^9 CFU/2g) 이상",
-   "en": "② Probiotic count : at least 1 billion CFU per 2g",
+   "ko": "(2) 총(-)-HCA 함량(%) : 표시량(378mg/1.0g, 1회 섭취기준)의 80.0~120.0%",
+   "en": "(2) Total (-)-HCA content (%) : labelled (378mg / 1.0g, per serving), 80.0~120.0%",
    "lost": [
-    "1.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "② 프로바이오틱스 수 : 표시량(1.0 x 10^9 CFU/4g) 이상",
-   "en": "② Probiotic count : at least 1 billion CFU per 4g",
+   "ko": "(2) Quinic acid : 표시량(17mg/1.2g, 1회 섭취기준)의 80.0~120.0%",
+   "en": "(2) Quinic acid : labelled (17mg / 1.2g, per serving), 80.0~120.0%",
    "lost": [
-    "1.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "프로바이오틱스 수 : 표시량(2.0 x 10^9 CFU/180mg) 이상",
-   "en": "Probiotic count : at least 2 billion CFU per 180mg",
+   "ko": "2)코엔자임Q10(%): 표시량(50mg/0.75g, 1회 섭취기준)의 80.0~120.0%",
+   "en": "2)Coenzyme Q10 (%): labelled (50mg / 0.75g, per serving), 80.0~120.0%",
    "lost": [
-    "2.0",
-    "10",
-    "9"
+    "1"
    ]
   },
   {
-   "ko": "프로바이오틱스수 : 표시량(1.0x10^9CFU/2g) 이상",
-   "en": "Probiotic count : at least 1 billion CFU per 2g",
+   "ko": "(4) 붕해시험 : 1차 60분 이내, 2차 60분 이내",
+   "en": "(4) Disintegration test : Within 60 minutes in the first stage and within 60 minutes in the second stage",
    "lost": [
-    "1.0",
-    "10",
-    "9"
+    "1",
+    "2"
    ]
   }
  ],
  "hygieneSamples": [
+  {
+   "why": "DOUBLE_SPACE",
+   "sec": "<div class=\"sd-spec\"><div class=\"sd-item\">Appearance : An off-white powder with a characteristic flavour and no off-taste or off-odour</div><div class=\"sd-item\">Probiotic count : at least the labelled"
+  },
   {
    "why": "EMPTY_PAREN",
    "sec": "<div class=\"sd-spec\"><div class=\"sd-item\">① Appearance : A yellow white powder with a characteristic flavour and no off-taste or off-odour</div><div class=\"sd-item\">② Vitamin D : 3 ㎍ / 2 g</div><div c"
@@ -111,11 +102,11 @@
   "zh_canon": 40918,
   "pm_hff": 40948
  },
- "startedAt": "2026-08-08T07:07:36.156Z",
- "appliedAt": "2026-08-08T07:09:44.247Z",
+ "startedAt": "2026-08-08T07:57:12.203Z",
+ "appliedAt": "2026-08-08T07:57:43.147Z",
  "mode": "APPLY",
- "expectedUpdate": 19976,
- "actualUpdate": 19976,
+ "expectedUpdate": 4115,
+ "actualUpdate": 4115,
  "expectedInsert": 0,
  "actualInsert": 0,
  "skipped": 0,
