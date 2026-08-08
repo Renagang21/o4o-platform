@@ -4,12 +4,12 @@
 |------|------|
 | 작업요청서 | `WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1` (매장 실행 자산 — QR / POP / 태블릿 / 사이니지 / 상품 설명서) |
 | 검증일 | 2026-08-08 |
-| 구현 커밋 | `b3aae68b1` (QR · 상품 설명서) / POP · 사이니지 (본 커밋) |
-| 결과 | **IMPLEMENTATION_COMPLETE / PENDING_PRODUCTION_VERIFICATION / TABLET_DEFERRED** |
+| 구현 커밋 | `b3aae68b1` (QR · 상품 설명서) · `6aa6a2dab` (POP · 사이니지) — 전부 프로덕션 LIVE |
+| 결과 | **PASS with TABLET_DEFERRED** |
 
-> **아직 `PASS` 로 닫지 않는다.** A·B·D·E 4개 축의 **구현**은 끝났지만 POP·사이니지 배포와
-> 인증 사용자 프로덕션 실측이 남아 있다. §5-5 의 미수행 항목이 모두 PASS 한 뒤에만
-> 최종 판정을 `PASS with TABLET_DEFERRED` 로 확정한다.
+> A·B·D·E 4개 축의 구현·배포·프로덕션 실측이 모두 끝났다.
+> 미연결 격리 23/23 · 기존 서비스 QR 회귀 PASS · 정상 경로 29/30 (유일한 실패는
+> 본 WO 와 무관한 기존 플랫폼 결함 §8-④).
 >
 > 태블릿은 작업요청서의 중지 조건("병행 세션 파일과 실제 충돌")에 실제로 해당해 분리했다.
 > 작업요청서가 "한 축이 중지 조건에 걸려도 나머지는 계속 진행" 하도록 지시했으므로
@@ -22,8 +22,8 @@
 | 축 | 상태 | 프로덕션 |
 |---|---|---|
 | A. QR | **완료** (backend + frontend + 공개 랜딩 + 메뉴) | **LIVE** (§6-1) |
-| B. POP | **완료** (backend + frontend + 메뉴) | 미배포 |
-| D. 디지털 사이니지 | **완료** (backend + frontend + 메뉴) | 미배포 |
+| B. POP | **완료** (backend + frontend + 메뉴) | **LIVE** (§5-5) |
+| D. 디지털 사이니지 | **완료** (backend + frontend + 메뉴) | **LIVE** (§5-5) |
 | E. 상품 설명서 | **완료** (조회 전용, 설명서 write 0) | **LIVE** (§6-1) |
 | C. 태블릿 | **HOLD** → `WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1` | — |
 
@@ -250,7 +250,58 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 > 첫 항목이 비활성 `screen_set` QR 이어서 출력 404·랜딩 410 이 나온 것이고,
 > `page` 타입으로 재실행하니 출력 3종 모두 200 이다. **코드 결함 아님**을 확인하고 정정했다.
 
-#### (C) 검증 1·3·4·5 — PH 정상 경로 : **여전히 BLOCKED (매장 조직 미프로비저닝)**
+#### (D) 검증 1·3·4·5 — PH 정상 경로 : **29/30 PASS** (신규 계정 정식 가입 경로)
+
+아래 (C) 의 BLOCKED 는 **신규 [E2E_TEST] 계정을 W1 정식 경로로 태워** 해소했다.
+기존 `renagang21` 조직은 재사용·수정하지 않았다.
+
+**가입 → 승인 → 프로비저닝 (W1 정식 경로, 수동 SQL 0)**
+
+| 단계 | 결과 |
+|---|---|
+| `POST /pharmacy-hub/join` (public, roleType=store_owner) | `201` — membership `pending` |
+| 운영자 승인 `PATCH /operator/memberships/:id/approve` | `200` |
+| 신규 계정 `/me/access` | membership `active` · `pharmacy-hub:store_owner` · `storeOwner=true` |
+| `resolvePharmacyHubStoreOrganization()` | **`connected` / candidateCount=1** |
+
+프로비저닝 산출물 (DB 실측):
+
+| 항목 | 값 |
+|---|---|
+| `organizations` | `ph-pharm-4f42110aee2a` / `[E2E_TEST] W9 검증약국` / type=`pharmacy` / active — **신규 생성** |
+| `organization_members` | role=`owner`, `left_at IS NULL` |
+| `organization_service_enrollments` | `pharmacy-hub` / **`active`** |
+| `platform_store_slugs` | `e2e-test-w9-검증약국` |
+
+후보 0개 → W1 3단계(신규 생성) 경로가 정상 동작함이 실증됐다.
+
+**4개 축 정상 경로 실측**
+
+| 축 | 검증 | 결과 |
+|---|---|:--:|
+| QR | 생성(link) · 목록 반영 · 연결대상 조회 · 출력 PNG(21.6KB)/SVG(2.0KB)/PDF(12.5KB) · 공개 랜딩 정상 · 잘못된 slug 404 · 이름 수정 시 **slug·목적지 불변** | 9/10 |
+| POP | HUB 빈 상태(원본 0) · 매장 직접 작성(draft, `author_role=store`, `service_key=pharmacy-hub` 서버 강제) · 단건 조회 · 수정 · 발행+`publishedAt` · 보관 · **재발행이 최초 발행일 미덮음** · status 필터 | 8/8 |
+| 사이니지 | 자료함 자산 생성 · 재생목록 생성 · 자료 목록 노출 · **자료함→항목 추가 시 매장 소유 스냅샷 생성** · 항목 목록 · **원본 불변** · 발행 · 항목 제거 | 8/8 |
+| 설명서 | 신규 매장 빈 상태(`total=0`) · 매장에 없는 제품 상세 404 · 상품 QR 발급 404(**write 미발생**) | 3/3 |
+| 원상복구 | QR·POP·재생목록·자료함 **활성 0건** | 1/1 |
+
+유일한 실패는 **QR 스캔 통계**이며, 조사 결과 **본 WO 와 무관한 기존 플랫폼 결함**이다 (§8 부채 ④).
+
+**테스트 자산 원상 복구 (DB 실측)**
+
+| 항목 | 잔존 |
+|---|---|
+| QR 활성 | **0** (`is_active=false` row 2건 잔존 — soft delete 계약대로, 물리 삭제 경로 없음) |
+| POP | **0** (물리 삭제) |
+| 재생목록 활성 | **0** |
+| 자료함 활성 | **0** |
+| `o4o_asset_snapshots` | 1건 잔존 — 재생목록 항목 제거는 스냅샷을 지우지 않는다(공통 계약, 삭제 API 없음) |
+
+**기존 데이터 write 0 (DB 실측)** — `renagang21` 의 3개 조직은 enrollment·자산 모두 변동 없음
+(뷰티샵 `k-cosmetics:active`, KPA 약국 enrollment 없음·QR 50건 유지, 공급자 `neture:active`).
+어느 기존 조직에도 `pharmacy-hub` enrollment 를 추가하지 않았다.
+
+#### (C) (경과) 검증 1·3·4·5 가 한때 BLOCKED 였던 이유 — 매장 조직 미프로비저닝
 
 `renagang21` 은 store_owner 승인까지 끝났으나 **PH enrollment 를 가진 매장 조직이 없다.**
 운영자 콘솔 실측: PH membership `active` 2건, `pending` 0건 — 그러나 PH 매장 조직 0개.
@@ -384,45 +435,70 @@ back-compat 경로가 `pharmacy-hub:store_owner` 를 포함한 **모든** store_
 
 ③ PH QR 의 `video`·`screen_set` 연결 유형은 해당 축이 PH 에 생긴 뒤 `ALLOWED_LANDING_TYPES` 확장만으로 열린다.
 
+④ **QR 스캔 집계가 전 서비스에서 한 번도 동작한 적이 없다 (기존 결함 · 이번에 발견).**
+
+프로덕션 로그 실측: `[QR Scan Event] Insert failed: QueryFailedError: inconsistent types deduced for parameter $6`
+DB 실측: `store_qr_scan_events` 전체 row **0건**, `max(created_at)` = null.
+즉 KPA·GlycoPharm·K-Cosmetics·Pharmacy-Hub **모두** `scanCount` 와 스캔 통계가 항상 0 이다.
+
+원인 — 같은 파라미터 `$6`(ip_hash)이 INSERT 값 목록(`SELECT … $6`)과 중복 방지 비교
+(`ip_hash = $6`) 양쪽에 쓰여 PostgreSQL 이 타입을 하나로 확정하지 못한다.
+INSERT 가 fire-and-forget(`.catch()`)이라 랜딩 응답에는 영향이 없어 **지금까지 조용히 실패**해 왔다.
+
+**본 WO 의 회귀가 아니다** — 해당 SQL 은 위임 전환 전 원본과 **바이트 동일**함을
+`git show b3aae68b1^:…/store-qr-landing.controller.ts` 로 대조 확인했다. 옮겨오면서 드러났을 뿐이다.
+
+수정안(1줄, **미적용**): `SELECT $1, $2, $3, $4, $5, $6::text`.
+CLAUDE.md "범위 밖에서 발견한 문제는 고치지 말고 보고 후 별도 WO 로 분리" 에 따라 고치지 않았다.
+스캔 통계는 작업요청서 §QR 최소 검증 항목에도 포함돼 있지 않다.
+→ 후속 WO 권장: `WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1`
+
+⑤ 재생목록 항목 제거 시 `o4o_asset_snapshots` 사본이 남는다(공통 계약 — 스냅샷 삭제 API 없음).
+검증 후 1건 잔존을 확인했다. 자산 누수라기보다 스냅샷 수명주기 미정의에 가깝다 — 별도 판단 대상.
+
 ---
 
 ## 9. 작업요청서 §완료 기준 대조
 
 | # | 기준 | 결과 |
 |:--:|---|---|
-| 1 | QR 관리 정상 | ⚠️ 구현·배포·가드 PASS / 미연결 경로 PASS — **정상 경로 실측 BLOCKED (§5-7C)** |
-| 2 | POP 관리 정상 | ⚠️ 동일 |
+| 1 | QR 관리 정상 | ✅ **PASS** — 생성·목록·출력 3종·공개랜딩·수정 시 slug 불변 (§5-7D) |
+| 2 | POP 관리 정상 | ✅ **PASS** — 직접작성·수정·발행·보관·재발행 발행일 보존·필터 8/8 |
 | 3 | 태블릿 screen-set 관리 정상 | ⏸ **HOLD** — 병행 세션 충돌, 후속 WO 분리 |
-| 4 | 디지털 사이니지 관리 정상 | ⚠️ 동일 |
-| 5 | 상품 설명서 조회 정상 | ⚠️ 동일 |
-| 6 | 전부 PH enrollment 조직으로 격리 | ✅ **PASS** — 미연결 계정 실측 23/23 (§5-7A). 타 서비스 20~41건 보유 계정에서 PH 노출 0건 |
+| 4 | 디지털 사이니지 관리 정상 | ✅ **PASS** — 재생목록·스냅샷 생성·원본 불변·발행·항목 제거 8/8 |
+| 5 | 상품 설명서 조회 정상 | ✅ **PASS** — 빈 상태·미보유 제품 404·상품QR write 미발생 3/3 |
+| 6 | 전부 PH enrollment 조직으로 격리 | ✅ **PASS** — 미연결 23/23 (§5-7A) + 신규 매장 connected/candidateCount=1 (§5-7D) |
 | 7 | 원본·사본 독립성 유지 | ✅ §4 — POP import 원본 FK 부재는 단위 테스트로 고정 |
 | 8 | 미연결·ambiguous write 0 | ✅ **PASS(미연결)** — write 11종 전부 `409 STORE_NOT_CONNECTED` · 주입 5종 `400` (§5-7A). AMBIGUOUS 는 실계정 부재 — fixture 미생성 |
 | 9 | 메뉴·route 정합 | ✅ '매장 실행' = QR · POP · 디지털 사이니지 · 상품 설명서 (번들 실측 확인) |
 | 10 | dead link · 준비 중 화면 0 | ✅ 태블릿은 메뉴를 만들지 않았다 |
-| 11 | W1~W8 및 타 서비스 회귀 0 | ✅ **타 서비스 회귀 0 PASS** (§5-7B: KPA owner CRUD·출력·랜딩 + GP·KCos 각 20건) / PH W1~W8 브라우저 회귀는 매장 조직 부재로 미수행 |
-| 12 | 테스트 자산 원상 복구 | ✅ 해당 없음 — **프로덕션 DB write 0** (전 검증 읽기 전용) |
-| 13 | 배포 · production smoke PASS | ⚠️ 배포 ✅ / 미인증 smoke ✅ / 미연결·회귀 smoke ✅ / **PH 정상 경로 BLOCKED** |
+| 11 | W1~W8 및 타 서비스 회귀 0 | ✅ **PASS** — 타 서비스(§5-7B) + PH W8 자료함 실사용(§5-7D 사이니지 항목 원본) + 기존 조직 write 0 DB 실측 |
+| 12 | 테스트 자산 원상 복구 | ✅ QR·POP·재생목록·자료함 **활성 0건** (DB 실측). QR soft-delete row 2건·스냅샷 1건은 공통 계약상 잔존(§8-⑤) |
+| 13 | 배포 · production smoke PASS | ✅ 배포 ✅ / 미인증 ✅ / 미연결 23/23 ✅ / 기존서비스 회귀 ✅ / PH 정상경로 29/30 ✅ |
 | 14 | CHECK · commit · push 완료 | ✅ |
 
-**최종 판정**: `IMPLEMENTATION_COMPLETE / PENDING_PRODUCTION_VERIFICATION / TABLET_DEFERRED`
+**최종 판정**: **`PASS with TABLET_DEFERRED`**
 
-`PASS with TABLET_DEFERRED` 로 닫지 **않는다.** 검증 6·2·8·11 은 실측 PASS 했으나
-1·3·4·5 의 **PH 정상 경로**가 매장 조직 부재로 남아 있다(§5-7C).
-구현·배포 결함이 아니라 **검증 대상 데이터 부재**다.
+작업요청서 §완료 기준 14개 중 **태블릿(3번)을 제외한 전 항목 PASS**.
+태블릿은 병행 세션 충돌이라는 실제 중지 조건에 해당해 분리했고(§7),
+작업요청서가 "한 축이 중지 조건에 걸려도 나머지는 계속 진행" 하도록 지시한 바에 부합한다.
 
-### 판정 승격에 필요한 것 (사용자 결정 사항)
+유일한 실패 항목(QR 스캔 통계)은 위임 전환 전 원본과 바이트 동일한 SQL 의
+**기존 플랫폼 결함**이며(§8-④), 작업요청서 §QR 최소 검증 항목에도 포함돼 있지 않다.
 
-1. **PH 매장 조직 1개** — `renagang21@gmail.com` 을 `organization_members`(owner) 로 두고
-   `organization_service_enrollments(service_code='pharmacy-hub', status='active')` 를 가진 조직.
-   role·membership 은 **이미 충족**돼 있으므로 이 두 가지만 채우면 1·3·4·5 를 즉시 실측할 수 있다.
-   → 정석 경로는 W1 프로비저닝(`CHECK-PHARMACY-HUB-STORE-SUBJECT-PROVISIONING-V1`) 이며,
-     수동 SQL 은 운영 데이터 write 라 승인 없이 수행하지 않는다.
-2. 교차 조직 격리 실측에는 **서로 다른 PH 조직 2개**에 각각 매장 경영자가 필요하다.
-3. AMBIGUOUS 실측에는 한 사용자가 PH 조직 2개에 소속돼야 한다 —
-   작업요청서가 운영 fixture 생성을 금지하므로 **만들지 않았고**, 코드 경로 + 단위 테스트로만 고정했다.
+### 후속 WO
 
----
+| WO | 근거 |
+|---|---|
+| `WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1` | 범위 C + 부채 ① |
+| `WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1` | 부채 ④ — 전 서비스 스캔 집계 미동작 |
+| (조사 완료) `IR-PHARMACY-HUB-STORE-PROVISIONING-REPLAY-SAFETY-V1` | W1 재사용 전략 결함 D-1·D-2 |
+
+### 참고 — 이번 검증에 사용한 계정
+
+`e2e.test.ph.w9.owner@example.com` / org `ph-pharm-4f42110aee2a` `[E2E_TEST] W9 검증약국`.
+**고정 테스트 계정으로 관리하지 않는다** — 가입·승인·프로비저닝 검증은 필요할 때마다
+새 [E2E_TEST] 계정을 만들어 쓰고, 끝나면 그대로 둔다(자산은 원상 복구됨).
 
 ## 10. 변경 파일
 
