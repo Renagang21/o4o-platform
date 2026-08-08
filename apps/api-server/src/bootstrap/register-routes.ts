@@ -1056,6 +1056,12 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
       logger.error('Failed to register Neture Offers Seed routes:', seedNetureOffersError);
     }
 
+    // ── SECURITY: /__debug__/** 는 프로덕션에 등록하지 않는다 ──────────────
+    // 이 블록의 debug router 8개는 인증·환경 게이트가 없어 프로덕션에서
+    // 인증 없이 승인(isPlatformAdmin 하드코딩)·RBAC 변경·매장 비활성화·
+    // 게시글 하드 삭제·개인정보 조회가 가능했다. 긴급 차단으로 비프로덕션 한정 등록한다.
+    // 개별 endpoint 의 제거 / 정식 admin API 전환 / CLI 전환 판정은 후속 WO 에서 수행한다.
+    if (process.env.NODE_ENV !== 'production') {
     // 37-e. Register RBAC DB Audit debug endpoint (WO-RBAC-DB-AUDIT-JSON-ENDPOINT-V1)
     try {
       const { createRbacDbAuditRouter } = await import('../routes/debug/rbac-db-audit.controller.js');
@@ -1127,6 +1133,7 @@ export async function registerDomainRoutes(app: Application, dataSource: DataSou
     } catch (orderCanonicalDiagError) {
       logger.error('Failed to register Order Canonical Table Diagnostic routes:', orderCanonicalDiagError);
     }
+    } // ── end SECURITY gate: /__debug__/** (non-production only) ──
 
     // 38. Register Platform Hub routes (WO-PLATFORM-GLOBAL-HUB-V1)
     try {
