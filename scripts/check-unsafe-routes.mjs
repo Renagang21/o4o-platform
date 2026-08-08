@@ -48,23 +48,8 @@ const ALLOWLIST = [
       '공개 QR 랜딩의 스캔 집계(append-only 이벤트 적재). 업무 엔티티 상태를 바꾸지 않는 ' +
       '조회 로깅이며 5초 중복 방지 + IP 해시를 적용한다. 페이지뷰 집계는 GET 예외로 인정한다.',
   },
-  // ── /api/v1/ops/seed-* 2건 ────────────────────────────────────────────────
-  // 이 둘은 컨트롤러에서 x-admin-secret 가드를 강제하며 프로덕션에서 401/404 로 실측 확인됐다.
-  // 규칙상 seed 는 공개 HTTP route 로 두지 않는 것이 원칙이라 CLI 전환 대상이지만,
-  // 그 전환은 WO-O4O-DEBUG-ROUTE-LIFECYCLE-...-V1 의 FOLLOW-UP F1 로 분리돼 있다.
-  // 전환이 끝나면 아래 두 항목을 제거한다. (규칙을 끄는 것이 아니라 개별 위치 예외다.)
-  {
-    file: 'bootstrap/register-routes.ts',
-    rule: 'R3',
-    match: 'seed-store-hub',
-    reason: 'x-admin-secret 가드 있음. CLI 전환은 F1 로 분리됨.',
-  },
-  {
-    file: 'bootstrap/register-routes.ts',
-    rule: 'R3',
-    match: 'seed-neture-offers',
-    reason: 'x-admin-secret 가드 있음. CLI 전환은 F1 로 분리됨.',
-  },
+  // 주: `/api/v1/ops/seed-*` 2건은 한시적으로 여기 있었으나, 해당 route 가 저장소에서
+  //     제거되어(FOLLOW-UP F1 완료) 항목을 삭제했다. allowlist 는 비어 가는 방향이 정상이다.
 ];
 
 const SQL_WRITE = [
