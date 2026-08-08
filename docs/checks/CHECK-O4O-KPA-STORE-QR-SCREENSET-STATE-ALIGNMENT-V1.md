@@ -183,7 +183,29 @@ M-1(보관 QR 목록 노출 · 출력/다운로드 차단)의 수정 지점이 *
 | `api-server` tsc --noEmit (`build:types` 선행) | ✅ PASS (0) |
 | eslint (변경 5개 주요 파일) | ✅ 0 errors / 2 warnings — **둘 다 기존 경고**(stash 대조로 확인, 라인 번호만 이동) |
 | `store-public/__tests__` vitest | ⚠️ **기존 실패** — `describe is not defined`(vitest globals 미설정). 본 변경 stash 후 동일 실패 확인 → **무관**. CLAUDE.md 중지 조건 "현재 변경과 무관한 test 실패" 에 따라 미수정. |
-| 브라우저 E2E (프로덕션) | ⏸ 미실시 — M-1 미착수로 WO 검증 항목 일부(보관 QR 목록 표시·출력 차단·KPI↔목록 일치)를 확인할 수 없어, M-1 완료 후 일괄 수행이 타당 |
+| 브라우저 E2E (프로덕션) | ⏸ 미실시 — M-1 미착수로 WO 검증 항목 일부(보관 QR 목록 표시·출력 차단·KPI↔목록 일치)를 확인할 수 없어, **사용자 결정에 따라 M-1 완료 후 일괄 수행** |
+
+### 배포 · CI (커밋 `90aef6023`)
+
+| 워크플로 | 커밋 | 결과 |
+|---|---|---|
+| Deploy Web Services (Cloud Run) | `90aef6023` | ✅ success |
+| Deploy Admin Dashboard (Cloud Run) | `90aef6023` | ✅ success |
+| Deploy API Server (Cloud Run) | `90aef6023` | ✅ success |
+| CI Pipeline | `90aef6023` | ⚠️ **cancelled** — 실패 아님(아래 주) |
+| CodeQL Security Analysis | `90aef6023` | ⚠️ **cancelled** — 실패 아님(아래 주) |
+| CI Pipeline | `a414d9ff6` | ✅ success |
+| CodeQL Security Analysis | `a414d9ff6` | ✅ success |
+
+> **취소 사유**: 본 커밋 직후 병렬 세션이 **docs-only** 커밋 `a414d9ff6`
+> ("의약품 접근정책 확정 + 운영 DB 노출 실측")를 push 했고, CI Pipeline·CodeQL 의
+> `concurrency: cancel-in-progress` 정책이 이전 실행을 대체했다.
+> `a414d9ff6` 는 문서만 변경해 **코드 트리가 `90aef6023` 과 동일**하므로,
+> 그 커밋의 CI Pipeline·CodeQL success 가 본 변경의 CI 검증에 해당한다.
+> (취소된 실행 자체를 "통과"로 기록하지 않는다 — 대체 실행 결과로 확정.)
+
+**프로덕션 반영 상태**: 3개 배포 모두 success → M-2·M-5(서버) + M-3·M-4·§6(프론트) LIVE.
+M-1 은 미반영(§6 참조).
 
 ### 미실시 E2E 항목(M-1 완료 후 수행 대상)
 
