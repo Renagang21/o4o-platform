@@ -164,7 +164,7 @@ DELETE FROM users WHERE id = '000...0';             → ERROR: cannot execute DE
    (본 조사가 그 규칙의 근거 사례다. 아래는 원래 권고 문구.)
    **prefix 기반 일괄 삭제를 금지 규칙으로 둘 것** — `e0000000%` 는 KPA 게시 콘텐츠와, `f0000000%` 는 live 상수와 충돌한다. fixture 식별은 반드시 **2번째 세그먼트까지** 본다.
 3. **SET C 의 slot 미연결 29건** — fixture 가 아니라 KPA 콘텐츠 큐레이션 사안이다. 정리하려면 별도 트랙으로 다룬다(본 WO 범위 밖).
-4. **market-trial 상수** — 참조 행이 없는 상수. 별도 조사 대상.
+4. ~~**market-trial 상수** — 참조 행이 없는 상수. 별도 조사 대상.~~ → **조사 완료**: `WO-O4O-MARKET-TRIAL-FEATURE-LIFECYCLE-INVENTORY-V1`. 상수 자체가 문제가 아니라 **migration(`forum_category` 단수) ↔ 컨트롤러(`forum_category_requests`) 테이블 불일치**로 KPA 포럼 연동이 무음 skip 되고 있었다. market-trial 전체 판정은 `MIXED`(제거 대상 아님).
 
 ---
 
