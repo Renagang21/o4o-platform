@@ -294,18 +294,21 @@ read-only SELECT 를 시도했으나 채널 확보 실패. **코드 감사는 �
 
 ## 10. 최소 보완 원칙 · 정책 충돌
 
-### 10.1 선결 정책 결정 (코드만으로 판단 불가 — 사용자 판단 필요)
+### 10.1 정책 결정 — **확정됨** (2026-08-08)
 
-**`ProductMaster` 는 service-neutral 인가, 아닌가?**
+> **정정 (2026-08-08):** 본 절의 초판은 두 원칙이 *"양립 불가능"* 하다고 기술했다. **이 표현은 부정확하다.**
+> `ProductMaster 전 서비스 공용` 은 **데이터의 소유·저장 구조**이고, `일반 서비스는 의약품을 조회·활용할 수 없다` 는 **접근권한 정책**이다.
+> 두 축은 직교(orthogonal)하며 **함께 유지할 수 있다.** 충돌이 아니라 계층 분리 문제였다.
 
-- [product-access.utils.ts:9-14](apps/api-server/src/modules/store-ai/utils/product-access.utils.ts#L9-L14) — *"전 서비스 공용, service 소유권 없음"* (2026-07-29 승인)
-- 본 WO 정책 2 — *"일반 서비스는 의약품을 조회할 수 없어야 한다"*
+확정 정책 및 실측 결과는 별도 결정 문서가 정본이다 →
+[**IR-O4O-DRUG-ACCESS-POLICY-DECISION-AND-LIVE-EXPOSURE-AUDIT-V1.md**](IR-O4O-DRUG-ACCESS-POLICY-DECISION-AND-LIVE-EXPOSURE-AUDIT-V1.md)
 
-**두 명제는 양립 불가능하다.** 어느 쪽을 상위로 둘지 확정하지 않으면 보완 설계가 불가능하다.
+요지: ProductMaster 는 공용 SSOT 로 유지하고(복제·서비스 소유권 분리 없음),
+의약품만 **횡단 접근 게이트**로 통제한다. 판정 SSOT 는 `product_masters.regulatory_type='DRUG'`.
 
-> **권고: "ProductMaster 는 service-neutral 하되, `regulatory_type='DRUG'` 인 master 는 예외적으로 pharmacy-audience gate 를 통과한 호출자에게만 노출한다"** —
-> 즉 service 소유권 모델은 유지하고, **의약품만 횡단 관심사(cross-cutting gate)로 분리**한다.
-> 이렇게 하면 기존 F12 Product Resource Baseline·전역 자원 모델을 깨지 않으면서 정책을 만족한다.
+> **또한 §4·§5 의 "ENFORCED 3건" 은 실측으로 무효화되었다** — DRUG master 177,413건 전량이
+> `category_id IS NULL` 이므로 `is_regulated` 기반 gate 는 **한 번도 작동한 적이 없다**(gate 실효 0%).
+> 결정 문서 §3 참조.
 
 ### 10.2 최소 보완 원칙
 
