@@ -159,6 +159,37 @@ DELETE FROM users WHERE id = '000...0';             → ERROR: cannot execute DE
 ## 9. 후속 처리 권고
 
 1. **데이터 정리 WO 불필요** — SET A·B 가 `ABSENT` 이므로 삭제 작업 자체가 성립하지 않는다. 선행 CHECK 들의 "과거 seed fixture 잔존" 보류 항목을 **종결**한다.
-2. **prefix 기반 일괄 삭제를 금지 규칙으로 둘 것** — `e0000000%` 는 KPA 게시 콘텐츠와, `f0000000%` 는 live 상수와 충돌한다. fixture 식별은 반드시 **2번째 세그먼트까지** 본다.
+2. **prefix 기반 일괄 삭제 금지 — 규칙으로 승격됨**
+   → [`docs/baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md`](../baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md)
+   (본 조사가 그 규칙의 근거 사례다. 아래는 원래 권고 문구.)
+   **prefix 기반 일괄 삭제를 금지 규칙으로 둘 것** — `e0000000%` 는 KPA 게시 콘텐츠와, `f0000000%` 는 live 상수와 충돌한다. fixture 식별은 반드시 **2번째 세그먼트까지** 본다.
 3. **SET C 의 slot 미연결 29건** — fixture 가 아니라 KPA 콘텐츠 큐레이션 사안이다. 정리하려면 별도 트랙으로 다룬다(본 WO 범위 밖).
 4. **market-trial 상수** — 참조 행이 없는 상수. 별도 조사 대상.
+
+---
+
+## 10. 트랙 종료 (2026-08-08)
+
+본 WO 로 **legacy seed fixture 정비 트랙을 종료**한다. 추가 삭제 작업은 하지 않는다.
+
+| 항목 | 결론 |
+|------|------|
+| SET A `e0000000-ee01..ee05` | **ABSENT** |
+| SET B `f0000000-aa01/bb01` | **ABSENT** |
+| 운영 DB 삭제·격리·비활성화 | **불필요** |
+| 후속 데이터 정리 WO | **불필요** |
+| 선행 CHECK 의 seed 잔존 보류 3건 | **종결** |
+| 운영 DB write | **0** |
+| 재현 근거 | 조사 SQL + 본 CHECK 로 저장소에 잔존 |
+
+이번 조사의 판정 원칙은 [`O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1`](../baseline/operations/O4O-DATA-CLEANUP-IDENTIFICATION-SAFETY-V1.md) 로 승격했다.
+
+**분리해 둔 두 항목** — 이번 트랙에 섞지 않는다.
+
+- **SET C 미연결 콘텐츠 29건** — fixture 가 아니라 `cms_contents` 의 KPA 게시 콘텐츠이며, 같은 계열 23건은
+  활성 slot 에서 소비 중이다. 보관 중인 콘텐츠인지 / 해제된 콘텐츠인지 / 재사용 가능한 라이브러리인지는
+  현재 근거로 판정할 수 없다. **KPA 콘텐츠 큐레이션·보관 정책 정비**에서 함께 조사한다.
+  미연결 상태 자체는 삭제 후보를 의미하지 않는다.
+- **market-trial live 상수** — 참조 행이 없어도 코드가 존재 여부를 확인한 뒤 분기하므로 운영 장애가 아니다.
+  초기화 기준값 / 예약 식별자 / 과거 기능 잔재 / 휴면 기능 중 무엇인지는 **market-trial 영역 정비**에서
+  생명주기 조사로 판정한다.
