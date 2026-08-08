@@ -131,7 +131,7 @@ WO 판정 원칙 "운영·개발 어느 쪽에서도 사용 근거가 없으면 
 | `/__debug__/user` | 읽기 전용 1개 잔존 (프로덕션 미등록) |
 | 재발 방지 | `check:unsafe-routes` CI, 위반 0 |
 
-**남은 후속:** 과거 seed fixture(`e0000000%` · `f0000000%`) **운영 DB 읽기 전용 조사** — 코드가 아닌 데이터 정리 트랙.
+**남은 후속:** ~~과거 seed fixture 운영 DB 조사~~ → `WO-O4O-LEGACY-SEED-FIXTURE-PRODUCTION-DATA-INVENTORY-V1` 에서 **종결(잔존 0)**. 정리할 데이터가 없어 후속 삭제 WO 도 불필요하다.
 
 ---
 

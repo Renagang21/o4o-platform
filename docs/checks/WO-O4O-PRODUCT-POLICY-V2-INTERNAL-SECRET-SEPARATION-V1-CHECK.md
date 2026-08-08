@@ -128,4 +128,4 @@ secret 비교는 타이밍 비교 취약점(`===`)이 있으나, 값 자체를 �
 | 1 | `ProductApprovalV2Service.approvePrivateProduct()` · `rejectPrivateApproval()` | router 제거로 호출처 0 이 됐다. **PRIVATE 승인 operator surface 부재**는 기존 갭 그대로다. 도메인 리팩터링이므로 본 WO 범위 외 |
 | 2 | PRIVATE 승인 흐름 설계 | 매장이 PRIVATE offer 를 신청할 수는 있으나(`pharmacy-products` `/apply`) 승인할 operator UI 가 없다. 실사용이 생기면 SERVICE 와 동일하게 정식 operator route 로 설계할 것 |
 | 3 | ~~`__test__/tier1/*`~~ | **종결** — `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 에서 API 5개 + `Tier1TestPage` 를 함께 제거 |
-| 4 | 과거 seed fixture | 운영 DB `e0000000%` / `f0000000%` 잔존 조사 미착수 |
+| 4 | ~~과거 seed fixture~~ | **종결 — 잔존 0** (`WO-O4O-LEGACY-SEED-FIXTURE-PRODUCTION-DATA-INVENTORY-V1`) |
