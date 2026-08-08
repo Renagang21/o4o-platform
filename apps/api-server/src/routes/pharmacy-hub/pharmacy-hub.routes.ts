@@ -57,6 +57,8 @@ import { PharmacyHubStoreBlogController } from '../../controllers/pharmacy-hub/P
 // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (매장 실행 자산)
 import { PharmacyHubStoreQrController } from '../../controllers/pharmacy-hub/PharmacyHubStoreQrController.js';
 import { PharmacyHubStoreManualController } from '../../controllers/pharmacy-hub/PharmacyHubStoreManualController.js';
+import { PharmacyHubStorePopController } from '../../controllers/pharmacy-hub/PharmacyHubStorePopController.js';
+import { PharmacyHubStoreSignageController } from '../../controllers/pharmacy-hub/PharmacyHubStoreSignageController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -363,6 +365,67 @@ export function createPharmacyHubRoutes(): Router {
    * 상태 변경이 없는 조회 전용 GET 이며, 매장 소유 공개 콘텐츠만 응답에 담긴다.
    */
   router.get('/qr/public/:slug', PharmacyHubStoreQrController.publicLanding);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — POP (동일 WO 범위 B)
+  //
+  //   원장은 공통 store_pops 다 (author_role='store', service_key='pharmacy-hub').
+  //   저장·검증 계약은 공통 services/store/store-pop.service.ts 를 그대로 호출한다.
+  //
+  //   공통 `/stores/:slug/pop/staff/*` 를 마운트하지 않는 이유:
+  //   그 라우트는 매장을 URL slug 로 찾고 소유를 created_by_user_id 로 확인한다.
+  //   PH 매장은 프로비저닝이 만든 조직이라 created_by 가 경영자와 일치한다는 보장이 없다.
+  //
+  //   PH 에는 아직 운영자 POP 원본이 없다 — 억지 HUB 를 만들지 않고 기존 구조가 이미
+  //   허용하는 매장 직접 작성(WO-O4O-POP-SAVE-AS-CONTENT-V1)을 주 경로로 둔다.
+  //   `/pop/hub` 는 같은 계약을 노출할 뿐이며 원본이 없으면 정상적으로 빈 목록이다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/pop', ...storeOwnerGuards, PharmacyHubStorePopController.list);
+  // 정적 세그먼트 `hub` 는 `/:id` 보다 먼저 등록해야 :id 로 포획되지 않는다.
+  router.get('/store-owner/pop/hub', ...storeOwnerGuards, PharmacyHubStorePopController.hubSources);
+  router.post('/store-owner/pop', ...storeOwnerGuards, PharmacyHubStorePopController.create);
+  router.post('/store-owner/pop/import', ...storeOwnerGuards, PharmacyHubStorePopController.importFromHub);
+  router.get('/store-owner/pop/:id', ...storeOwnerGuards, PharmacyHubStorePopController.detail);
+  router.put('/store-owner/pop/:id', ...storeOwnerGuards, PharmacyHubStorePopController.update);
+  router.patch('/store-owner/pop/:id/publish', ...storeOwnerGuards, PharmacyHubStorePopController.publish);
+  router.patch('/store-owner/pop/:id/archive', ...storeOwnerGuards, PharmacyHubStorePopController.archive);
+  router.delete('/store-owner/pop/:id', ...storeOwnerGuards, PharmacyHubStorePopController.remove);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — 디지털 사이니지 (동일 WO 범위 D)
+  //
+  //   canonical 구조 그대로: 재생 단위 = store_playlists(+items), 항목 실체 =
+  //   o4o_asset_snapshots(매장 소유 사본). 공통 StorePlaylistRepository 를 그대로 호출한다.
+  //   항목 추가는 AssetCopyService 를 거쳐 매장 소유 스냅샷을 만든다 — 원본 직접 수정·row 공유 0.
+  //   signage_media 는 매장 소유(organizationId 일치)만 추가 대상이며, 신규 미디어 등록
+  //   경로는 만들지 않는다(운영자·공급자 영역).
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/signage/playlists', ...storeOwnerGuards, PharmacyHubStoreSignageController.listPlaylists);
+  router.post('/store-owner/signage/playlists', ...storeOwnerGuards, PharmacyHubStoreSignageController.createPlaylist);
+  router.get('/store-owner/signage/sources', ...storeOwnerGuards, PharmacyHubStoreSignageController.sources);
+  router.patch('/store-owner/signage/playlists/:id', ...storeOwnerGuards, PharmacyHubStoreSignageController.updatePlaylist);
+  router.delete('/store-owner/signage/playlists/:id', ...storeOwnerGuards, PharmacyHubStoreSignageController.archivePlaylist);
+  router.get('/store-owner/signage/playlists/:id/items', ...storeOwnerGuards, PharmacyHubStoreSignageController.listItems);
+  router.post(
+    '/store-owner/signage/playlists/:id/items/from-library',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageController.addItemFromLibrary,
+  );
+  router.post(
+    '/store-owner/signage/playlists/:id/items/from-media',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageController.addItemFromMedia,
+  );
+  router.patch(
+    '/store-owner/signage/playlists/:id/items/reorder',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageController.reorderItems,
+  );
+  router.delete(
+    '/store-owner/signage/playlists/:id/items/:itemId',
+    ...storeOwnerGuards,
+    PharmacyHubStoreSignageController.deleteItem,
+  );
 
   // ───────────────────────────────────────────────────────────────────────────
   // 매장 실행 자산 — 상품 설명서 (동일 WO 범위 E, 조회 전용)

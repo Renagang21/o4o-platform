@@ -81,8 +81,10 @@ import BlogEditorPage from './pages/store-owner/BlogEditorPage';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
-// WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · 상품 설명서)
+// WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · POP · 사이니지 · 상품 설명서)
 import QrPage from './pages/store-owner/QrPage';
+import PopPage from './pages/store-owner/PopPage';
+import SignagePage from './pages/store-owner/SignagePage';
 import ManualsPage from './pages/store-owner/ManualsPage';
 import ManualDetailPage from './pages/store-owner/ManualDetailPage';
 import QrLandingPage from './pages/QrLandingPage';
@@ -184,6 +186,8 @@ export default function App() {
             <Route path="blog/:id/edit" element={<BlogEditorPage />} />
             {/* WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (출력·실행) */}
             <Route path="qr" element={<QrPage />} />
+            <Route path="pop" element={<PopPage />} />
+            <Route path="signage" element={<SignagePage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:listingId" element={<ManualDetailPage />} />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}

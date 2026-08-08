@@ -210,12 +210,17 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     ]},
     // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (2026-08-08)
     //   콘텐츠·자료(입력)와 다른 축이다 — 매장에서 실제로 쓰는 출력·실행 자산.
-    //   원장은 공통 테이블(store_qr_codes / shared_product_descriptions) 재사용 — PH 전용 테이블 0.
-    //   POP · 태블릿 · 디지털 사이니지는 아직 route 도 기능도 없으므로 메뉴를 만들지 않는다
-    //   (데드링크 0 / "준비 중" 메뉴 0 — 기능이 완료되는 시점에 이 그룹에 추가한다).
+    //   원장은 전부 공통 테이블 재사용 — Pharmacy-Hub 전용 테이블 0:
+    //     QR       store_qr_codes            POP      store_pops(author_role='store')
+    //     사이니지  store_playlists(+items)    설명서   shared_product_descriptions
+    //   **태블릿은 이 회차에서 제외**한다 (병행 세션이 screen-set 축을 동시 수정 중 —
+    //   WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 로 분리).
+    //   route 도 기능도 없는 항목은 메뉴를 만들지 않는다 (데드링크 0 / "준비 중" 메뉴 0).
     { label: '매장 실행', items: [
-      { key: 'qr',      label: 'QR',        subPath: '/qr' },
-      { key: 'manuals', label: '상품 설명서', subPath: '/manuals' },
+      { key: 'qr',      label: 'QR',           subPath: '/qr' },
+      { key: 'pop',     label: 'POP',          subPath: '/pop' },
+      { key: 'signage', label: '디지털 사이니지', subPath: '/signage' },
+      { key: 'manuals', label: '상품 설명서',    subPath: '/manuals' },
     ]},
     // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)
     //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).

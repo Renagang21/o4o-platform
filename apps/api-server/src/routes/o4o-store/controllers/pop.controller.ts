@@ -11,22 +11,23 @@
  *
  * Staff (인증 + 매장 owner 확인):
  *   GET    /stores/:slug/pop/staff           — 매장 store_pops 사본 목록 (author_role='store')
+ *   POST   /stores/:slug/pop/staff           — 매장 직접 POP 작성 (WO-O4O-POP-SAVE-AS-CONTENT-V1)
  *   POST   /stores/:slug/pop/staff/import    — 운영자 HUB POP 가져오기 (author_role='store' INSERT)
  *   PUT    /stores/:slug/pop/staff/:id       — 사본 수정
  *   DELETE /stores/:slug/pop/staff/:id       — 사본 삭제
  *
- * 본 WO 범위 외 (후속):
- *   - POST /stores/:slug/pop/staff (매장 직접 POP 작성)
- *   - PATCH /stores/:slug/pop/staff/:id/publish (매장 사본 발행)
- *   - PATCH /stores/:slug/pop/staff/:id/archive
- *
  * 기존 createStorePopController (PDF 생성, /pharmacy/pop/generate) 는 별도 controller —
  * 본 controller 는 store_pops 사본 row 관리 전용.
  *
- * Drift Guard:
+ * WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1:
+ *   저장·검증 계약을 services/store/store-pop.service.ts 로 추출했다. 이 controller 는
+ *   **slug → 매장 해석 + 소유 확인 + 응답 매핑**만 담당한다 (조직 해석 방식 무변경).
+ *   Pharmacy-Hub 는 같은 service 함수를 쓰되 조직만 PH enrollment 기준으로 해석한다.
+ *
+ * Drift Guard (service 안에서 강제):
  *   - import endpoint 는 author_role='operator' AND status='published' 원본만 통과
- *   - 사본 author_role='store' AND storeId NOT NULL 강제 (DB CHECK 제약 + 본 controller)
- *   - storeId 게이트 (storeId=pharmacy.id) 로 매장 간 사본 접근 차단
+ *   - 사본 author_role='store' AND storeId NOT NULL 강제 (DB CHECK 제약 + service)
+ *   - (storeId, serviceKey) 복합 게이트로 매장 간·서비스 간 사본 접근 차단
  */
 
 import { Router, Request, Response, RequestHandler } from 'express';
@@ -34,10 +35,17 @@ import { DataSource } from 'typeorm';
 import { OrganizationStore } from '../../../modules/store-core/entities/organization-store.entity.js';
 // WO-O4O-KPA-APPROVED-STORE-OWNER-AUTO-AUTHORIZATION-FIX-V1
 import { kpaStoreOwnerOwnsStore } from '../utils/kpa-store-owner.util.js';
-import { StorePop } from '../entities/store-pop.entity.js';
-import type { StorePopStatus, StorePopAuthorRole } from '../entities/store-pop.entity.js';
 import type { AuthRequest } from '../../../types/auth.js';
 import { StoreSlugService } from '@o4o/platform-core/store-identity';
+import {
+  listStorePops,
+  createStorePop,
+  importStorePop,
+  updateStorePop,
+  deleteStorePop,
+  type PopResult,
+  type PopFailure,
+} from '../../../services/store/store-pop.service.js';
 
 const DEFAULT_SERVICE_KEY = 'kpa';
 
@@ -48,7 +56,6 @@ export function createStorePopStaffController(
 ): Router {
   const router = Router();
   const orgRepo = dataSource.getRepository(OrganizationStore);
-  const popRepo = dataSource.getRepository(StorePop);
   const slugService = new StoreSlugService(dataSource);
 
   // Helper: resolve organization by slug (active stores only) — blog.controller.ts mirror
@@ -69,218 +76,110 @@ export function createStorePopStaffController(
     return pharmacy.created_by_user_id === userId;
   }
 
+  /**
+   * 공통 service 실패 결과 → 이 라우트의 envelope(nested error).
+   *
+   * api-server tsconfig 는 strictNullChecks 가 꺼져 있어 `if (!result.ok)` 로 union 이
+   * 좁혀지지 않는다. 호출은 항상 실패 분기에서만 하므로 여기서 형만 확정한다.
+   */
+  function sendPopFailure(res: Response, result: PopResult<unknown>): void {
+    const failure = result as PopFailure;
+    res.status(failure.status).json({
+      success: false,
+      error: { code: failure.code, message: failure.message },
+    });
+  }
+
+  /**
+   * slug → 매장 해석 + 소유 확인을 한 번에 처리한다.
+   * 통과하면 store_id 를, 실패하면 응답을 이미 보낸 상태로 null 을 돌려준다.
+   */
+  async function resolveOwnedStoreId(req: Request, res: Response): Promise<string | null> {
+    const { slug } = req.params;
+    const authReq = req as unknown as AuthRequest;
+    const userId = authReq.user?.id || authReq.authUser?.id;
+
+    const pharmacy = await resolvePharmacy(slug);
+    if (!pharmacy) {
+      res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+      return null;
+    }
+    if (!userId || !(await verifyOwner(pharmacy, userId))) {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' },
+      });
+      return null;
+    }
+    return pharmacy.id;
+  }
+
   // ============================================================================
   // STAFF — 매장 store_pops 사본 목록 (author_role='store' 한정)
   // GET /stores/:slug/pop/staff
   // ============================================================================
   router.get('/:slug/pop/staff', requireAuth, async (req: Request, res: Response) => {
     try {
-      const { slug } = req.params;
-      const authReq = req as unknown as AuthRequest;
-      const userId = authReq.user?.id || authReq.authUser?.id;
-      const page = Math.max(1, parseInt(req.query.page as string) || 1);
-      const limit = Math.min(50, Math.max(1, parseInt(req.query.limit as string) || 20));
-      const statusFilter = req.query.status as string | undefined;
+      const storeId = await resolveOwnedStoreId(req, res);
+      if (!storeId) return;
 
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
-        return;
-      }
-      if (!userId || !(await verifyOwner(pharmacy, userId))) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
-        return;
-      }
-
-      const where: any = {
-        storeId: pharmacy.id,
+      const { items, page, limit, total, totalPages } = await listStorePops(
+        dataSource,
+        storeId,
         serviceKey,
-        authorRole: 'store' as StorePopAuthorRole,
-      };
-      if (statusFilter && ['draft', 'published', 'archived'].includes(statusFilter)) {
-        where.status = statusFilter as StorePopStatus;
-      }
-
-      const [posts, total] = await popRepo.findAndCount({
-        where,
-        order: { updatedAt: 'DESC' },
-        skip: (page - 1) * limit,
-        take: limit,
-      });
-
-      res.json({
-        success: true,
-        data: posts,
-        meta: { page, limit, total, totalPages: Math.ceil(total / limit) },
-      });
+        { page: req.query.page, limit: req.query.limit, status: req.query.status },
+      );
+      // 기존 계약: data = 배열, 페이지 정보는 meta 로 분리한다.
+      res.json({ success: true, data: items, meta: { page, limit, total, totalPages } });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
   });
 
   // ============================================================================
-  // STAFF — 운영자 HUB POP 가져오기 (Operator HUB → 매장 사본)
-  // POST /stores/:slug/pop/staff/import
-  // body: { sourceId: string }
-  //
-  // blog import 패턴 mirror.
-  //   - 소스: store_pops WHERE id=sourceId AND author_role='operator'
-  //           AND service_key=serviceKey AND status='published'
-  //   - 사본: store_pops INSERT (author_role='store', storeId=pharmacy.id,
-  //           serviceKey, status='draft', title/excerpt/content 복사)
-  //
-  // 슬러그 충돌 시 timestamp suffix 로 fallback.
-  // 사본 excerpt 앞에 "[운영자 자료 가져옴] " 접두어로 출처 표시 (schema 변경 없는 MVP).
-  // 향후 별도 origin/source_metadata 컬럼 도입 시 그쪽으로 이관.
-  // ============================================================================
-  // ============================================================================
   // STAFF — 매장 직접 POP 콘텐츠 저장 (author_role='store' INSERT)
-  // POST /stores/:slug/pop/staff
-  //   WO-O4O-POP-SAVE-AS-CONTENT-V1: POP 제작 결과(title/content/excerpt)를 재편집 가능한
-  //   매장 POP 콘텐츠로 저장. status='draft'. DB schema 변경 없음(기존 컬럼만 사용).
-  //   author_role='store' + storeId NOT NULL 강제(DB CHECK + 본 controller).
+  // POST /stores/:slug/pop/staff        (WO-O4O-POP-SAVE-AS-CONTENT-V1)
   // ============================================================================
   router.post('/:slug/pop/staff', requireAuth, async (req: Request, res: Response) => {
     try {
-      const { slug } = req.params;
-      const authReq = req as unknown as AuthRequest;
-      const userId = authReq.user?.id || authReq.authUser?.id;
-      const { title, content, excerpt } = (req.body ?? {}) as { title?: string; content?: string; excerpt?: string };
+      const storeId = await resolveOwnedStoreId(req, res);
+      if (!storeId) return;
 
-      if (typeof title !== 'string' || title.trim().length === 0) {
-        res.status(400).json({ success: false, error: { code: 'VALIDATION_ERROR', message: 'title is required' } });
+      const result = await createStorePop(dataSource, storeId, serviceKey, req.body);
+      if (!result.ok) {
+        sendPopFailure(res, result);
         return;
       }
-
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
-        return;
-      }
-      if (!userId || !(await verifyOwner(pharmacy, userId))) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
-        return;
-      }
-
-      // slug 생성 (title slugify + 매장 내 충돌 시 timestamp)
-      const baseSlug =
-        title.trim().toLowerCase().replace(/[^a-z0-9가-힣]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 120) ||
-        `pop-${Date.now().toString(36)}`;
-      let finalSlug = baseSlug;
-      const existing = await popRepo.findOne({ where: { storeId: pharmacy.id, slug: baseSlug } });
-      if (existing) finalSlug = `${baseSlug}-${Date.now().toString(36)}`;
-
-      const created = popRepo.create({
-        storeId: pharmacy.id,
-        serviceKey,
-        authorRole: 'store' as StorePopAuthorRole,
-        title: title.trim(),
-        slug: finalSlug,
-        excerpt: (excerpt ?? '').trim() || undefined,
-        content: content ?? '',
-        status: 'draft' as StorePopStatus,
-      });
-      const saved = await popRepo.save(created);
-      res.status(201).json({ success: true, data: saved });
+      res.status(201).json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
   });
 
+  // ============================================================================
+  // STAFF — 운영자 HUB POP 가져오기 (Operator 원본 → 매장 독립 사본)
+  // POST /stores/:slug/pop/staff/import   body: { sourceId }
+  //
+  // 값 복사다 — 새 id · 매장 store_id · status='draft'. 원본 FK 를 만들지 않으므로
+  // 이후 원본 수정·삭제가 사본에 영향을 주지 않는다. 출처는 excerpt 접두어로만 표시.
+  // ============================================================================
   router.post('/:slug/pop/staff/import', requireAuth, async (req: Request, res: Response) => {
     try {
-      const { slug } = req.params;
-      const authReq = req as unknown as AuthRequest;
-      const userId = authReq.user?.id || authReq.authUser?.id;
-      const { sourceId } = req.body ?? {};
+      const storeId = await resolveOwnedStoreId(req, res);
+      if (!storeId) return;
 
-      if (typeof sourceId !== 'string' || sourceId.trim().length === 0) {
-        res.status(400).json({
-          success: false,
-          error: { code: 'VALIDATION_ERROR', message: 'sourceId is required' },
-        });
+      const result = await importStorePop(dataSource, storeId, serviceKey, req.body?.sourceId);
+      if (!result.ok) {
+        sendPopFailure(res, result);
         return;
       }
-
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
-        return;
-      }
-      if (!userId || !(await verifyOwner(pharmacy, userId))) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
-        return;
-      }
-
-      // 1. 소스 POP 조회 — 운영자 게시 + published + 같은 서비스만 허용
-      const source = await popRepo.findOne({
-        where: {
-          id: sourceId,
-          serviceKey,
-          authorRole: 'operator' as StorePopAuthorRole,
-          status: 'published' as StorePopStatus,
-        },
-      });
-      if (!source) {
-        res.status(404).json({
-          success: false,
-          error: {
-            code: 'SOURCE_NOT_FOUND',
-            message: 'Operator-published HUB POP not found for this service',
-          },
-        });
-        return;
-      }
-
-      // 2. 슬러그 충돌 방지 — 매장 내 (store_id+slug) unique 정합
-      const baseSlug = source.slug;
-      let finalSlug = baseSlug;
-      const existingBase = await popRepo.findOne({
-        where: { storeId: pharmacy.id, slug: baseSlug },
-      });
-      if (existingBase) {
-        finalSlug = `${baseSlug}-${Date.now().toString(36)}`;
-      }
-
-      // 3. 매장 사본 생성 (author_role='store' + storeId NOT NULL)
-      //    출처 표시: excerpt 접두어 (schema 변경 없는 MVP)
-      const ORIGIN_PREFIX = '[운영자 자료 가져옴] ';
-      const sourceExcerpt = (source.excerpt ?? '').trim();
-      const copiedExcerpt = sourceExcerpt
-        ? `${ORIGIN_PREFIX}${sourceExcerpt}`
-        : ORIGIN_PREFIX.trim();
-
-      const copy = popRepo.create({
-        storeId: pharmacy.id,
-        serviceKey,
-        authorRole: 'store' as StorePopAuthorRole,
-        title: source.title,
-        slug: finalSlug,
-        excerpt: copiedExcerpt,
-        content: source.content,
-        status: 'draft' as StorePopStatus,
-      });
-
-      const saved = await popRepo.save(copy);
+      // 기존 계약: 사본 필드 + importSource 메타를 같은 객체로 평탄화해 내려준다.
       res.status(201).json({
         success: true,
-        data: {
-          ...saved,
-          // 응답 메타 — frontend 가 "운영자 자료에서 가져옴" 토스트/표시 활용 가능
-          importSource: {
-            sourceId: source.id,
-            sourceTitle: source.title,
-            sourceServiceKey: source.serviceKey,
-            sourceAuthorRole: source.authorRole,
-            importedAt: new Date().toISOString(),
-          },
-        },
+        data: { ...result.data.pop, importSource: result.data.importSource },
       });
     } catch (err: any) {
-      res.status(500).json({
-        success: false,
-        error: { code: 'INTERNAL_ERROR', message: err.message },
-      });
+      res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
   });
 
@@ -289,59 +188,19 @@ export function createStorePopStaffController(
   // PUT /stores/:slug/pop/staff/:id
   //
   // 강제 보호: author_role / serviceKey / storeId 는 body 로 변경 불가.
-  // body 변경 허용: title, content, excerpt, slug
-  // 본 endpoint 는 author_role='store' 사본만 대상 — operator 원본은 조회 안 됨.
+  // 본 endpoint 는 author_role='store' 사본만 대상 — operator 원본은 조회되지 않는다.
   // ============================================================================
   router.put('/:slug/pop/staff/:id', requireAuth, async (req: Request, res: Response) => {
     try {
-      const { slug, id } = req.params;
-      const authReq = req as unknown as AuthRequest;
-      const userId = authReq.user?.id || authReq.authUser?.id;
-      const { title, content, excerpt, slug: postSlug } = req.body ?? {};
+      const storeId = await resolveOwnedStoreId(req, res);
+      if (!storeId) return;
 
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+      const result = await updateStorePop(dataSource, storeId, serviceKey, req.params.id, req.body);
+      if (!result.ok) {
+        sendPopFailure(res, result);
         return;
       }
-      if (!userId || !(await verifyOwner(pharmacy, userId))) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
-        return;
-      }
-
-      const post = await popRepo.findOne({
-        where: {
-          id,
-          storeId: pharmacy.id,
-          serviceKey,
-          authorRole: 'store' as StorePopAuthorRole,
-        },
-      });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Store POP copy not found' } });
-        return;
-      }
-
-      // If slug is being changed, check uniqueness within store
-      if (typeof postSlug === 'string' && postSlug.trim().length > 0 && postSlug.trim() !== post.slug) {
-        const newSlug = postSlug.trim();
-        const existing = await popRepo.findOne({ where: { storeId: pharmacy.id, slug: newSlug } });
-        if (existing) {
-          res.status(409).json({
-            success: false,
-            error: { code: 'SLUG_CONFLICT', message: 'A POP with this slug already exists in this store' },
-          });
-          return;
-        }
-        post.slug = newSlug;
-      }
-
-      if (typeof title === 'string') post.title = title;
-      if (typeof content === 'string') post.content = content;
-      if (excerpt !== undefined) post.excerpt = typeof excerpt === 'string' ? excerpt : undefined;
-
-      const saved = await popRepo.save(post);
-      res.json({ success: true, data: saved });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
@@ -353,39 +212,20 @@ export function createStorePopStaffController(
   // ============================================================================
   router.delete('/:slug/pop/staff/:id', requireAuth, async (req: Request, res: Response) => {
     try {
-      const { slug, id } = req.params;
-      const authReq = req as unknown as AuthRequest;
-      const userId = authReq.user?.id || authReq.authUser?.id;
+      const storeId = await resolveOwnedStoreId(req, res);
+      if (!storeId) return;
 
-      const pharmacy = await resolvePharmacy(slug);
-      if (!pharmacy) {
-        res.status(404).json({ success: false, error: { code: 'STORE_NOT_FOUND', message: 'Store not found' } });
+      const result = await deleteStorePop(dataSource, storeId, serviceKey, req.params.id);
+      if (!result.ok) {
+        sendPopFailure(res, result);
         return;
       }
-      if (!userId || !(await verifyOwner(pharmacy, userId))) {
-        res.status(403).json({ success: false, error: { code: 'FORBIDDEN', message: '이 매장의 경영자만 접근할 수 있습니다.' } });
-        return;
-      }
-
-      const post = await popRepo.findOne({
-        where: {
-          id,
-          storeId: pharmacy.id,
-          serviceKey,
-          authorRole: 'store' as StorePopAuthorRole,
-        },
-      });
-      if (!post) {
-        res.status(404).json({ success: false, error: { code: 'POST_NOT_FOUND', message: 'Store POP copy not found' } });
-        return;
-      }
-
-      await popRepo.remove(post);
-      res.json({ success: true, data: { id, deleted: true } });
+      res.json({ success: true, data: result.data });
     } catch (err: any) {
       res.status(500).json({ success: false, error: { code: 'INTERNAL_ERROR', message: err.message } });
     }
   });
+
 
   return router;
 }
