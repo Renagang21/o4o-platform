@@ -2,7 +2,8 @@
 
 > WO: `WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1`
 > 대상: KPA 매장 Screen Set(태블릿 코너 화면) ↔ 코너 QR 상태·상품 노출·목록·미리보기 정합
-> 상태: **구현 완료** — M-1 포함 전 범위 반영. 프로덕션 E2E 검증 진행 중.
+> 상태: **구현 완료 · 검증 부분 완료** — M-1 포함 전 범위 LIVE.
+> 프로덕션 실측은 **DB(read-only) + 무인증 공개 URL 범위까지 완료**(§8-A), **화면 실측은 자격증명 부재로 미실시**(§8-A A-3).
 >
 > 이력: 1차(`90aef6023`)는 M-1 을 병렬 세션 파일 충돌로 보류했고, 병렬 세션이 `b3aae68b1`
 > (`feat(pharmacy-hub): add store execution assets`)로 QR service 추출을 커밋한 뒤 **같은 WO 를 재개**해 M-1 을 마감했다.
@@ -249,18 +250,117 @@ ARCHIVED_SCREEN_SET_QR_CONDITION  -- 보관 세트 종속 QR (M-1 에서 소비 
 **프로덕션 반영 상태**: 3개 배포 모두 success → M-2·M-5(서버) + M-3·M-4·§6(프론트) LIVE.
 M-1 은 미반영(§6 참조).
 
-### 미실시 E2E 항목(M-1 완료 후 수행 대상)
+---
 
-- 보관 시 QR 목록 보관 상태 표시 / 보관 QR 출력·다운로드 불가
-- 활성 QR KPI ↔ 실제 활성 목록 수 일치
-- 복원 후 동일 slug 재개방(코드상 성립 확인, 실측 대기)
+## 8-A. 프로덕션 실측 (운영 DB read-only + 무인증 공개 URL)
 
-### M-1 무관하게 실측 가능한 항목(E2E 대기)
+검증 스크립트: `scripts/audits/qr-screenset-state-alignment-verify.sql` (READ-ONLY, 세션 고정).
+접속: Cloud SQL Auth Proxy v2 (`--token $(gcloud auth print-access-token)`).
 
-- `태블릿 코너` 필터 / QR 목록 → 정확한 Screen Set 편집 화면 이동
-- 편집기 모바일 미리보기 ↔ 실제 QR 랜딩 일치 / 초안 표기
-- 미적용·상품 미선택 Screen Set QR 상품 0건 / 적용 세트는 선택 상품만
-- 태블릿 공개 화면 회귀 없음
+### A-1. 판정식이 운영 데이터에서 바꾸는 것 (M-1·M-2 근거)
+
+`screen_set` QR 전량 상태 분포:
+
+| QR `is_active` | Screen Set 상태 | 건수 | 의미 |
+|:---:|:---:|---:|---|
+| `true` | active | 12 | 정상 활성 (구·신 판정 동일) |
+| `true` | **archived** | **6** | ⚠️ 구 KPI 가 활성으로 **과다 집계**하던 건 (공개 랜딩은 404) |
+| `false` | archived | 16 | 구 목록에서 **완전히 사라지던** 건 |
+
+매장별 구/신 대조:
+
+| 매장 | 구 `is_active` 집계 | 신 `landable` | 신규 목록 노출(보관) |
+|---|---:|---:|---:|
+| 테스트 약국 | 27 | **21** | **20** |
+| Sohae 약국 | 0 | 0 | **2** |
+
+→ **M-2**: 활성 QR KPI 과다 집계 **6건** 실제로 존재했고 정정된다.
+→ **M-1**: 보이지 않던 보관 코너 QR **22건**이 '보관' 상태로 복귀한다.
+
+> 데이터 특성 확인: 보관분 중 3건은 `status='draft'` + `deleted_at IS NOT NULL` 이다.
+> `ARCHIVED_SCREEN_SET_QR_CONDITION` 을 `status='archived'` 단독이 아니라
+> **`(deleted_at IS NOT NULL OR status='archived')`** 로 둔 판단이 실데이터로 검증됐다
+> (status 만 봤으면 이 3건을 놓쳤다).
+
+### A-2. 공개 QR 랜딩 실측 (무인증 `GET /qr/public/:slug`)
+
+**M-5 — 상품 fallback 제거 (1차 배포분 `90aef6023` 이미 LIVE)**
+
+| slug | 코너 적용 | product_list config | 결과 |
+|---|:---:|---|---|
+| `tablet-corner-14` (감기 코너) | 미적용 | `legacy_tablet_displays` | `products=0` ✅ |
+| `tablet-corner-13` (위장약) | 미적용 | `legacy_tablet_displays` | `products=0` ✅ |
+| `tablet-corner-8` · `-11` | 미적용 | `(none)` | `products=0` ✅ |
+| `tablet-corner-2` · `-5` | **적용됨** | legacy | `products=0` ✅ |
+
+전부 `selectionMode=selected` · `localProductsEndpoint=null` — 소비처가 매장 전체 상품을 재조회할 경로가 없다.
+동시에 `corner_description + content_list + qr_guide` 섹션은 그대로 내려온다
+→ **"상품 0건이면 빈 상태 또는 코너 콘텐츠만 표시"** 계약 성립. 다른 코너 상품 유입 0.
+
+> ⚠️ **운영상 중요**: 현재 운영 DB 의 `product_list` 블록 **12개 전부가 legacy**(선택 상품 0)다
+> (`selected_products` 사용 0건). 따라서 이 변경 이후 **모든 코너 QR 의 상품 노출이 0** 이며,
+> 매장이 편집기에서 상품을 직접 고르는 시점부터 다시 표시된다. 이는 WO §5 가 지시한 계약 그대로다
+> (과거에 보이던 상품은 그 코너의 상품이 아니라 매장 전체 폴백이었다).
+
+**보관 QR 공개 랜딩 차단**
+
+| slug | 상태 | 응답 |
+|---|---|---|
+| `tablet-corner-15` | `is_active=false` | **410** `SCREEN_SET_INACTIVE` + 종료 안내 ✅ |
+| `tablet-corner-4` | `is_active=true` + 세트 보관 | **404** `SCREEN_SET_UNAVAILABLE` ✅ |
+| `tablet-corner-2/5/8/11/13/14` | 활성 | **200** ✅ |
+
+두 보관 변형 모두 **랜딩 불가**로 일치한다(코드 경로가 달라 상태코드만 410/404 로 갈린다).
+
+### A-3. ⛔ 미실시 — 인증 자격증명 부재
+
+아래는 `kpa:store_owner` 로그인이 필요한데 **문서의 테스트 계정 2개가 모두 실패**했다.
+
+| 계정 | 결과 |
+|---|---|
+| `sohae21@naver.com` (테스트 약국 = 위 검증 대상 매장) | **403 `ACCOUNT_NOT_ACTIVE`** |
+| `sohae2100@gmail.com` (Sohae 약국) | **401 `INVALID_CREDENTIALS`** |
+
+`docs/local/TEST-ACCOUNTS.local.md` 가 프로덕션 실제 상태와 어긋난다(문서는 두 계정 모두 ✅ 표기).
+IP 차단 정책(연속 실패) 때문에 추가 시도를 하지 않았다.
+→ CLAUDE.md 중지 조건 **"실제 계정·자격정보 필요"** 로 아래 항목을 남긴다.
+
+- QR 목록에 보관 상태 배지 표시 (`GET /pharmacy/qr` 응답 실측)
+- 보관 QR 출력·이미지 차단 (`/image`·`/export` **409 `SCREEN_SET_ARCHIVED`**)
+- 복원 → 동일 slug 200 재개방 (archive/restore 왕복)
+- `태블릿 코너` 필터 · `화면 세트 열기` 이동 · 편집기 모바일 미리보기 parity · 초안 표기
+- 홈 활성 QR KPI ↔ 목록 `활성 N건` 일치 (화면 대조)
+
+> 단, 위 5개 중 목록·KPI 판정의 **데이터 측 결과는 A-1 에서 SQL 로 직접 확인**했고,
+> 출력 차단·복원은 §6-2/§7 의 코드 계약으로 성립한다. 남은 것은 **화면 실측**이다.
+
+### A-4. M-1 배포 후 공개 랜딩 회귀 검사 (`4e9ccc303` API 배포 완료 후)
+
+M-1 은 `listStoreQrCodes` / `findStoreQrCode`(인증 경로)만 바꿨고 공개 랜딩 경로는 건드리지 않았다.
+배포 후 재실측으로 **회귀 0** 확인:
+
+| 대상 | 결과 |
+|---|---|
+| 활성 코너 QR 6종(`-2` `-5` `-8` `-11` `-13` `-14`) | 전부 **200**, `products=0 selectionMode=selected endpoint=null`, 4개 섹션 유지 — 배포 전과 동일 |
+| `tablet-corner-15`(is_active=false) | **410** 유지 |
+| `tablet-corner-4`(세트 보관 + is_active=true) | **404** 유지 |
+
+### A-5. 배포 · CI (`4e9ccc303`)
+
+| 워크플로 | 결과 |
+|---|---|
+| Deploy Web Services (Cloud Run) | ✅ success |
+| Deploy API Server (Cloud Run) | ✅ success |
+| CodeQL Security Analysis | ✅ success |
+| CI Pipeline | ⚠️ **cancelled** — 아래 주 |
+
+> **CI Pipeline 미확정 주의(정직 기록)**: 병렬 세션이 짧은 간격으로 계속 push 하고 있어
+> `concurrency: cancel-in-progress` 로 **연속 6개 커밋의 CI Pipeline 이 전부 취소**됐다
+> (`442646b87` · `e30358f92` · `79e611c57` · `4e9ccc303` · `a7486832a` · `89dc2599c`).
+> 마지막 success 는 `a414d9ff6` 로, **M-1(`4e9ccc303`) 을 포함하지 않는다.**
+> → 현시점에서 M-1 은 **CI Pipeline 으로 확인되지 않았다.** 대신 CI 의 실제 게이트를 로컬에서 동일하게 실행했다:
+> `type-check:frontend`(kpa PASS) · api-server `type-check`(PASS) · `node scripts/lint-ratchet.mjs`(102 = baseline).
+> 후속 커밋의 CI Pipeline 이 성공하면 그 시점에 확정된다(코드 트리에 M-1 포함).
 
 ---
 
