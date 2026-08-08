@@ -38,7 +38,7 @@
 
 | 경로 | 인증 | 판정 | 근거 |
 |------|------|:---:|------|
-| `/api/v1/neture/__test__/tier1/*` (5개) | requireAuth+adminGuard | **E 한시 유지** | 실사용 소비처 존재 — `apps/admin-dashboard/src/pages/neture/Tier1TestPage.tsx:274~433` |
+| `/api/v1/neture/__test__/tier1/*` (5개) | requireAuth+adminGuard | ~~E 한시 유지~~ → **A 제거** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 에서 `Tier1TestPage` 와 함께 제거. 당시 "소비처 존재" 로 유지했으나, 프로덕션 호출 30일 0건 + 메뉴 미노출 + 정식 대체 존재로 재판정 |
 | `/api/v1/neture/operator/product-cleanup/*` | requireAuth+requireNetureScope(`neture:operator`) | **C 정식 운영 기능** | 운영자 메뉴 노출 + 소비처 5곳 (`web-neture` App.tsx:1059 / operatorMenuGroups.ts:63,168 / operatorProductCleanup.ts:25 / serviceApproval.ts:165). 휴지통·복원 포함 |
 | `/api/internal/v2/product-policy/*` (9개) | `X-Admin-Secret` = `ADMIN_INTERNAL_SECRET` **또는 `JWT_SECRET` fallback** | **D 유지 (보류 4로 이월)** | `register-routes.ts:1095` 에서 `ENABLE_INTERNAL_V2 === 'true'` 일 때만 등록되어 기본 미노출. 다만 `JWT_SECRET` fallback 은 seed route 와 동일한 안티패턴 |
 

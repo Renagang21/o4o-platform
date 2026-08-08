@@ -40,7 +40,6 @@ import { createOperatorCategoryController } from './controllers/operator-categor
 import { createOperatorBrandController } from './controllers/operator-brand.controller.js';
 import { createNetureAssetSnapshotController } from './controllers/neture-asset-snapshot.controller.js';
 import { createNetureHubTriggerController } from './controllers/hub-trigger.controller.js';
-import { createNeureTier1TestController } from './controllers/neture-tier1-test.controller.js';
 import { createOperatorServiceApprovalController } from './controllers/operator-service-approval.controller.js';
 import { createOperatorProductApprovalController } from './controllers/operator-product-approval.controller.js';
 // WO-NETURE-CURATION-PHASE3-FULL-REMOVAL-V1: createOperatorCurationController 제거
@@ -216,12 +215,12 @@ export default function createNetureModuleRoutes(dataSource: DataSource): Expres
   });
   router.use('/hub/trigger', hubTriggerController);
   router.use('/assets', createNetureAssetSnapshotController(dataSource, requireAuth as RequestHandler));
-  router.use(createNeureTier1TestController({
-    dataSource,
-    requireAuth: requireAuth as RequestHandler,
-    requireNetureScope,
-    netureService,
-  }));
+
+  // (제거됨) /__test__/tier1/* — WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1
+  // 헤더에 "NOT for production use" 라고 적힌 채 환경 게이트 없이 프로덕션에 등록돼 있었고,
+  // fixture 가 아니라 실제 offer 생성·승인·공급자 비활성화 cascade 를 수행했다.
+  // 프로덕션 호출 30일간 0건 · 정식 경로 전부 존재(supplier-product.controller 등록,
+  // admin.controller 승인·비활성화) 이므로 프런트 Tier1TestPage 와 함께 제거했다.
 
   // ==================== Public Read-Only Endpoints ====================
 

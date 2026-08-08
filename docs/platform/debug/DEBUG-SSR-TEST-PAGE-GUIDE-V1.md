@@ -295,7 +295,7 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 
 **현재 backend debug router 는 위 1개뿐이며, 상태를 변경하는 `/__debug__` route 는 0개다.**
 
-> `/__debug__/auth-bootstrap` · `/__debug__/login` · `/__debug__/neture-tier1` 은 **`apps/admin-dashboard` 의 프런트 라우트**이며 backend 라우터가 아니다. CLAUDE.md §8 의 진단 Entry Point 도 이쪽을 가리킨다.
+> `/__debug__/auth-bootstrap` · `/__debug__/login` · `/debug/auth` · `/auth-inspector` 는 **`apps/admin-dashboard` 의 프런트 라우트**이며 backend 라우터가 아니다. CLAUDE.md §8 의 진단 Entry Point 도 이쪽을 가리킨다. (`/__debug__/neture-tier1` 은 `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` 로 제거됐다.)
 
 ### 제거 이력
 
@@ -303,7 +303,9 @@ await dataSource.query(`SELECT * FROM users WHERE id = '${userId}'`);
 |------|------|-----|
 | `32f97773f` | `approval-test` · `forum-post-cleanup` · `order-canonical-table` · `rbac-db-audit` · `rbac-backfill-user-role` · `service-users-audit` (6) | `WO-O4O-DEBUG-ROUTE-LIFECYCLE-AND-GUARDRAIL-CLEANUP-V1` |
 | `4971381fb` | `/api/v1/ops/seed-store-hub` · `/api/v1/ops/seed-neture-offers` (2) | `WO-O4O-API-DEBUG-SEED-ROUTE-OPERATIONAL-BOUNDARY-CLEANUP-V1` |
-| 본 커밋 | `/__debug__/pharmacy` (1) — debug route 생명주기 정비 마감 | `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` |
+| `abf6c8a0e` | `/__debug__/pharmacy` (1) | `WO-O4O-PHARMACY-DEBUG-ROUTE-FINAL-LIFECYCLE-CLEANUP-V1` |
+| `824ffe54c` | `/api/internal/v2/product-policy/*` (9) — `JWT_SECRET` 관리키 재사용 소멸 | `WO-O4O-PRODUCT-POLICY-V2-INTERNAL-SECRET-SEPARATION-V1` |
+| 본 커밋 | `/api/v1/neture/__test__/tier1/*` (5) + 프런트 `/__debug__/neture-tier1` — **코드 차원 test/debug surface 정비 마감** | `WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1` |
 
 > **임시 상태 변경 도구를 debug route 로 만들지 않는다.** 상태 변경이 필요하면 사유·권한·감사·영향 범위·재활성화를 갖춘 정식 기능으로 설계한다. 재발 방지는 `scripts/check-unsafe-routes.mjs` (CI `check:unsafe-routes`) 가 강제한다.
 

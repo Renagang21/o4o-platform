@@ -18,7 +18,6 @@ const StorefrontRouter = lazy(() => import('@/pages/storefront/StorefrontRouter'
 const AuthBootstrapDebug = lazy(() => import('@/pages/__debug__/AuthBootstrapDebug'));
 const AuthStateJsonDebug = lazy(() => import('@/pages/__debug__/AuthStateJsonDebug'));
 const LoginDiagnostic = lazy(() => import('@/pages/__debug__/LoginDiagnostic'));
-const NeureTier1TestPage = lazy(() => import('@/pages/neture/Tier1TestPage'));
 const AuthInspector = lazy(() => import('@/pages/test/AuthInspector'));
 
 // Loading component
@@ -82,12 +81,9 @@ export function PublicRoutes() {
       </Suspense>
     } />,
 
-    // Neture Tier1 JSON Test Center - WO-NETURE-TIER1-PUBLIC-JSON-TEST-CENTER-V1
-    <Route key="/__debug__/neture-tier1" path="/__debug__/neture-tier1" element={
-      <Suspense fallback={<PageLoader />}>
-        <NeureTier1TestPage />
-      </Suspense>
-    } />,
+    // (제거됨) /__debug__/neture-tier1 — WO-O4O-TIER1-TEST-SURFACE-FINAL-LIFECYCLE-V1
+    // 공개 라우트로 프로덕션 admin-dashboard 에 배포돼 있던 JSON 테스트 콘솔.
+    // 백엔드 /__test__/tier1/* 와 함께 제거했다(프로덕션 호출 30일간 0건).
 
     // 루트 경로 - 인증 상태에 따라 리다이렉트
     <Route key="/" path="/" element={<InitialRedirect />} />,
