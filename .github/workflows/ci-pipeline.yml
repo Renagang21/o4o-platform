@@ -76,6 +76,13 @@ jobs:
     - name: Run ESLint (regression ratchet)
       run: node scripts/lint-ratchet.mjs
     
+    # WO-O4O-SECURITY-ROUTE-STATIC-GUARD-CI-V1
+    # 2026-08-08 사고(/__debug__/** 무인증 노출) 재발 방지. blocking.
+    #   R1 GET handler 안의 DB write · R2 권한 하드코딩 · R3 debug/test route 무가드 등록
+    # 규칙 본문과 allowlist 는 scripts/check-unsafe-routes.mjs 상단 주석 참조.
+    - name: Guard unsafe operational routes
+      run: node scripts/check-unsafe-routes.mjs
+
     - name: Check for console.log statements
       run: |
         # Find all console.log statements, excluding comments, test files, CLI scripts, config files, migrations, and logger utilities
