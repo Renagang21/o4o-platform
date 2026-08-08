@@ -90,6 +90,31 @@ export const ARCHIVED_SCREEN_SET_QR_CONDITION = `(
 )`;
 
 /**
+ * 위 판정의 **JOIN 없는 EXISTS 형태**. `SCREEN_SET_QR_JOIN` 을 붙일 수 없는 호출부
+ * (TypeORM QueryBuilder 등)가 같은 기준을 쓰도록 한다.
+ *
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6-2 (E2E 후속 수정):
+ *   일괄 출력 `POST /pharmacy/qr/print` 만 `findStoreQrCode` 를 거치지 않고 raw QueryBuilder 로
+ *   `is_active = true` 만 검사해, **보관된 Screen Set 의 코너 QR(is_active=true)이 계속 인쇄되던**
+ *   우회가 남아 있었다(프로덕션 E2E 에서 200 실측). 단건 출력 3경로와 판정을 일치시킨다.
+ *
+ * @param qrAlias QR 테이블/엔티티 alias (기본 `qr`)
+ */
+export function screenSetQrPrintablePredicate(qrAlias = 'qr'): string {
+  return `(
+  ${qrAlias}.landing_type <> 'screen_set'
+  OR EXISTS (
+    SELECT 1 FROM store_tablet_screen_sets s
+     WHERE s.id::text = ${qrAlias}.landing_target_id
+       AND s.organization_id = ${qrAlias}.organization_id
+       AND s.origin = 'store'
+       AND s.deleted_at IS NULL
+       AND s.status <> 'archived'
+  )
+)`;
+}
+
+/**
  * WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1
  * Screen Set 종속 QR(store_qr_codes, landing_type='screen_set')의 is_active 만 동기화한다.
  *  - archive → false, restore → true. **slug·QR row·landing_target_id 불변**(재사용/재생성/삭제 없음).
