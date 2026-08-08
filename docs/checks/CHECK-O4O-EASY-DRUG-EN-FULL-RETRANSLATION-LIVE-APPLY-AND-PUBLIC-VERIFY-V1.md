@@ -5,7 +5,8 @@
 > 선행 CHECK: [`CHECK-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FINAL-PRODUCTION-CLOSE-V1.md`](CHECK-O4O-EASY-DRUG-EN-FULL-RETRANSLATION-FINAL-PRODUCTION-CLOSE-V1.md)
 
 **결과: 19,360 / 19,360 적용 완료. APPLY_BLOCKED 0. 공개 API 전수 검증 통과.**
-단, **§19 브라우저 smoke 는 수행하지 못했다** (아래 §19 참조).
+§19 브라우저 smoke 는 후속 `WO-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1` 에서 39/39 PASS 로 완료 —
+**본 WO 는 최종 DONE.**
 
 ---
 
@@ -198,13 +199,16 @@ en|STORE|needs_review|deleted    2 →      2   (   +0)
 마지막 항목이 핵심이다 — 사용자가 실제로 받는 응답이 production artifact 와 **바이트 단위로 동일**하다.
 KO 회귀(표본 500): `resolvedLocale='ko'` 500/500, KO 본문 존재 500/500.
 
-### §19 브라우저 smoke — **미수행**
+### §19 브라우저 smoke — **후속 WO 에서 완료 (39/39 PASS)**
 
-이번 세션에 **브라우저 자동화 도구가 없어 명세대로 수행하지 못했다.** 통과로 보고하지 않는다.
-화면 렌더(CSS 적용·레이아웃·폰트·언어 선택 UI 동작)는 **검증되지 않은 상태로 남는다.**
+작성 시점에는 브라우저 자동화 도구가 없다고 판단해 미수행으로 보고했다. 이후 저장소에
+Playwright + Chromium 이 이미 설치되어 있음을 확인하고 후속 WO 에서 실제 브라우저로 완료했다.
 
-대체로, 위험 범주 13개 표본의 **실제 공개 API 응답 HTML** 을 받아 구조를 기계 검사했다
-(`live-risk-sample-inspect.mjs`). 브라우저 검증의 대체물이 아니라 부분 보완이다.
+> **결과 정본**: [`CHECK-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1.md`](CHECK-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1.md)
+> 13 표본 × 3 viewport = **39 케이스 전건 PASS**, 검사 10종 각 39/39, console error 0.
+
+아래는 그 전에 수행한 API 응답 HTML 구조 검사다(`live-risk-sample-inspect.mjs`). 브라우저 검증의
+대체물이 아니라 선행 보완이며, 기록으로 남긴다.
 
 표본: 안과 · 구강/가글 · 외용 · 직장 · 주사 · 흡입 · 질 · 수식 `>` 포함 · 최장 본문(9,082자) ·
 최단 본문(1,438자) · 숫자 최다 · 신규 INSERT · hidden UPDATE — **13 / 13 전항목 통과**.
@@ -303,8 +307,7 @@ UPDATE 0 · INSERT 0 · 신규 차단 0 · DB write 0. 요구 조건 그대로 �
 
 ## 7. 남은 것 / 후속
 
-1. **§19 브라우저 smoke 미수행** — 브라우저 자동화 도구가 있는 세션에서 화면 렌더·언어 선택 UI 를 확인해야 한다.
-   메모리 규칙상 렌더 검증에는 `.store-desc-content` CSS 스코프 래퍼가 필요하다(없으면 무스타일 상태로 허위 PASS).
+1. ~~**§19 브라우저 smoke 미수행**~~ → **완료**. `WO-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1` 39/39 PASS.
 2. **플랫폼 전체 hidden EN 101건** — 이번 모집단 밖. census 만 했고 판단·삭제는 하지 않았다.
 3. `results/ko-units.jsonl` 은 0바이트 상태다. 이번 WO 에서 쓰지 않았고 DB 에서 재생성 가능하다.
    생산 트랙을 다시 돌릴 때 `extract-units.mjs` 를 직접 실행해 복구하면 된다.

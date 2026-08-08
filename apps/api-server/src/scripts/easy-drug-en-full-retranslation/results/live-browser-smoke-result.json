@@ -1,0 +1,1090 @@
+{
+  "wo": "WO-O4O-EASY-DRUG-EN-PUBLIC-BROWSER-SMOKE-CLOSE-V1",
+  "step": "live-browser-smoke",
+  "web": "https://neture.co.kr",
+  "samples": 13,
+  "viewports": [
+    "mobile 390x844",
+    "tablet 768x1024",
+    "desktop 1440x900"
+  ],
+  "cases": 39,
+  "passed": 39,
+  "failed": 0,
+  "perCheck": {
+    "LOAD_OK": 39,
+    "KO_DEFAULT_RENDER": 39,
+    "CSS_SCOPE_APPLIED": 39,
+    "LANG_UI_PRESENT": 39,
+    "EN_RENDER": 39,
+    "IDENTITY_KO_PRESERVED": 39,
+    "NO_FOREIGN_MASTER": 39,
+    "NO_H_OVERFLOW": 39,
+    "NO_CLIPPING": 39,
+    "KO_ROUNDTRIP": 39
+  },
+  "authGate": {
+    "anonBodyHidden": true,
+    "bodyVisibleAfterLogin": true
+  },
+  "consoleErrors": [],
+  "consoleErrorCount": 0,
+  "findings": [],
+  "rows": [
+    {
+      "viewport": "mobile",
+      "category": "ophthalmic",
+      "masterId": "000eb144-db87-4d29-bcfa-dad852a15c3c",
+      "itemSeq": "201202817",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "쌍패원노즈액"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "oromucosal_gargle",
+      "masterId": "00118960-8492-4e7f-be55-eae5508ebfc5",
+      "itemSeq": "200300953",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "덴타민캡슐"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "topical_apply",
+      "masterId": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "itemSeq": "201905265",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "리도킨연고5%(리도카인)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "rectal",
+      "masterId": "0044748c-e724-4783-8105-9034be750ca3",
+      "itemSeq": "201405042",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "메이킨큐장용정"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "injection",
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "itemSeq": "200704064",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "지노베타딘질좌제(포비돈요오드)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "inhalation",
+      "masterId": "008c149e-b312-404a-922b-5c2ec1dec0ed",
+      "itemSeq": "201801542",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "써버쿨플라스타"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "vaginal",
+      "masterId": "00c466a4-5451-44ce-a1a2-701db6f46684",
+      "itemSeq": "200503139",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "테르나졸크림(염산테르비나핀)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "math_gt",
+      "masterId": "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "itemSeq": "202501947",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "알파키연질캡슐0.5마이크로그램(알파칼시돌)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "longest_content",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "shortest_content",
+      "masterId": "d77604ba-36a3-47cd-8334-1afdf5860819",
+      "itemSeq": "200511332",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 5,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "코네티비나겔"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "numeric_heavy",
+      "masterId": "3ad7cd8d-68e9-45f5-ae42-2344d0a5c639",
+      "itemSeq": "199302363",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이부서스펜시럽(이부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "create_new_en",
+      "masterId": "605ba356-4180-4e9d-8360-bff9b7a510dd",
+      "itemSeq": "202402740",
+      "action": "CREATE_NEW_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지페인덱시연질캡슐(덱시부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "mobile",
+      "category": "update_hidden_en",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "ophthalmic",
+      "masterId": "000eb144-db87-4d29-bcfa-dad852a15c3c",
+      "itemSeq": "201202817",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "쌍패원노즈액"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "oromucosal_gargle",
+      "masterId": "00118960-8492-4e7f-be55-eae5508ebfc5",
+      "itemSeq": "200300953",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "덴타민캡슐"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "topical_apply",
+      "masterId": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "itemSeq": "201905265",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "리도킨연고5%(리도카인)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "rectal",
+      "masterId": "0044748c-e724-4783-8105-9034be750ca3",
+      "itemSeq": "201405042",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "메이킨큐장용정"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "injection",
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "itemSeq": "200704064",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "지노베타딘질좌제(포비돈요오드)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "inhalation",
+      "masterId": "008c149e-b312-404a-922b-5c2ec1dec0ed",
+      "itemSeq": "201801542",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "써버쿨플라스타"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "vaginal",
+      "masterId": "00c466a4-5451-44ce-a1a2-701db6f46684",
+      "itemSeq": "200503139",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "테르나졸크림(염산테르비나핀)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "math_gt",
+      "masterId": "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "itemSeq": "202501947",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "알파키연질캡슐0.5마이크로그램(알파칼시돌)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "longest_content",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "shortest_content",
+      "masterId": "d77604ba-36a3-47cd-8334-1afdf5860819",
+      "itemSeq": "200511332",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 5,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "코네티비나겔"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "numeric_heavy",
+      "masterId": "3ad7cd8d-68e9-45f5-ae42-2344d0a5c639",
+      "itemSeq": "199302363",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이부서스펜시럽(이부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "create_new_en",
+      "masterId": "605ba356-4180-4e9d-8360-bff9b7a510dd",
+      "itemSeq": "202402740",
+      "action": "CREATE_NEW_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지페인덱시연질캡슐(덱시부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "tablet",
+      "category": "update_hidden_en",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "ophthalmic",
+      "masterId": "000eb144-db87-4d29-bcfa-dad852a15c3c",
+      "itemSeq": "201202817",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "쌍패원노즈액"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "oromucosal_gargle",
+      "masterId": "00118960-8492-4e7f-be55-eae5508ebfc5",
+      "itemSeq": "200300953",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "덴타민캡슐"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "topical_apply",
+      "masterId": "0033a532-e034-45aa-bf81-031b0a6d6598",
+      "itemSeq": "201905265",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "리도킨연고5%(리도카인)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "rectal",
+      "masterId": "0044748c-e724-4783-8105-9034be750ca3",
+      "itemSeq": "201405042",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "메이킨큐장용정"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "injection",
+      "masterId": "004eb9d6-9378-43fb-9d22-6f232e57d7c3",
+      "itemSeq": "200704064",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "지노베타딘질좌제(포비돈요오드)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "inhalation",
+      "masterId": "008c149e-b312-404a-922b-5c2ec1dec0ed",
+      "itemSeq": "201801542",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "써버쿨플라스타"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "vaginal",
+      "masterId": "00c466a4-5451-44ce-a1a2-701db6f46684",
+      "itemSeq": "200503139",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "테르나졸크림(염산테르비나핀)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "math_gt",
+      "masterId": "01ec3251-af70-43c6-a8e7-ad1bdb3a1abf",
+      "itemSeq": "202501947",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 8,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "알파키연질캡슐0.5마이크로그램(알파칼시돌)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "longest_content",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "shortest_content",
+      "masterId": "d77604ba-36a3-47cd-8334-1afdf5860819",
+      "itemSeq": "200511332",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 5,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "코네티비나겔"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "numeric_heavy",
+      "masterId": "3ad7cd8d-68e9-45f5-ae42-2344d0a5c639",
+      "itemSeq": "199302363",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이부서스펜시럽(이부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "create_new_en",
+      "masterId": "605ba356-4180-4e9d-8360-bff9b7a510dd",
+      "itemSeq": "202402740",
+      "action": "CREATE_NEW_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지페인덱시연질캡슐(덱시부프로펜)"
+      },
+      "pass": true,
+      "failed": []
+    },
+    {
+      "viewport": "desktop",
+      "category": "update_hidden_en",
+      "masterId": "0ac07346-e021-40e9-a1b2-fda0c06adb19",
+      "itemSeq": "200400463",
+      "action": "UPDATE_SINGLE_HIDDEN_EN",
+      "checks": {
+        "LOAD_OK": true,
+        "KO_DEFAULT_RENDER": true,
+        "CSS_SCOPE_APPLIED": true,
+        "LANG_UI_PRESENT": true,
+        "EN_RENDER": true,
+        "IDENTITY_KO_PRESERVED": true,
+        "NO_FOREIGN_MASTER": true,
+        "NO_H_OVERFLOW": true,
+        "NO_CLIPPING": true,
+        "KO_ROUNDTRIP": true
+      },
+      "details": {
+        "h2Count": 9,
+        "hOverflow": 0,
+        "clipped": [],
+        "h1": "이지엔6애니연질캡슐(이부프로펜)(비매품)"
+      },
+      "pass": true,
+      "failed": []
+    }
+  ],
+  "screenshotsDir": "C:\\Users\\sohae\\o4o-platform\\apps\\api-server\\src\\scripts\\easy-drug-en-full-retranslation\\results\\browser-smoke-shots",
+  "dbWrites": 0
+}

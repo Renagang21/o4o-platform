@@ -15,3 +15,6 @@ en-units.jsonl
 live-apply-plan.jsonl
 live-apply-undo.jsonl
 live-expectations-*.jsonl
+
+# 브라우저 smoke 스크린샷(바이너리 ≈4.5MB). live-browser-smoke.mjs 재실행으로 재생성된다.
+browser-smoke-shots/
