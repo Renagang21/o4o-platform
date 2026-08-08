@@ -183,3 +183,18 @@ Service Extension
 | 코드 · 패키지 · DB 변경 0 | ✅ |
 
 **판정: PASS**
+
+---
+
+## 7. 후속 정정 (2026-08-08)
+
+본 WO 로 재진입해 산출물을 재검증했다. 실행 결과(§5)·완료 기준(§6) 판정은 **모두 유지**되며, V3 편집이 만든 마크다운 결함 1건만 정정했다.
+
+| 항목 | 내용 |
+|------|------|
+| 기준 commit | `4e9ccc303` (V3 커밋 `8189f04ff` 는 `origin/main` 에 포함, 작업 트리 clean) |
+| 결함 | `O4O-COMMONIZATION-STANDARD` §9.3 에서 GlycoPharm 미조사 note 가 표 중간에 삽입돼 `/mypage` 행이 표 밖으로 떨어져 렌더링됨 |
+| 정정 | `/mypage` 행을 표 안으로 복귀 · note 를 표 뒤로 이동 (STANDARD Changelog V3.1) |
+| 재검증 | `historical out-of-scope` 잔존 활성 표현 0 — 남은 매칭은 전부 **폐기 사실을 기록한 문장**(STANDARD §3.4 · 본 WO) 또는 **무수정 대상인 과거 WO/IR**(V2 WO · operator-core IR · PharmacyHub IR) |
+| 변경 없음 | 판정·표기·스코프 내용 · 코드 · 패키지 · DB · 배포 · PharmacyHub · GlycoPharm 코드 |
+

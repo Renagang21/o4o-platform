@@ -407,9 +407,9 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 |------|----------|------|
 | `/store` | `STORE-LAYER-ARCHITECTURE.md` | KPA · K-Cos (Neture 부분 · PharmacyHub 미채택 · **GlycoPharm 미조사**) |
 | `/operator` | `OPERATOR-DASHBOARD-STANDARD-V1.md` | KPA · K-Cos · Neture (PharmacyHub 미채택 · **GlycoPharm 미조사**) |
+| `/mypage` | (별도 표준 문서 미정) | 서비스별 운영, 향후 표준화 검토 |
 
 > GlycoPharm 은 V3 에서 대상 서비스로 복귀했으나(§3.4), Hub 외 영역의 실측은 수행되지 않았다. §9.0 "미조사 = 공백" 원칙에 따라 추정으로 채우지 않는다.
-| `/mypage` | (별도 표준 문서 미정) | 서비스별 운영, 향후 표준화 검토 |
 
 > 상세 adoption 실측(공통 패키지 25종 × 4서비스)은 [`IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1` §7](../investigations/IR-O4O-EXISTING-COMMONIZATION-ASSET-AND-STATUS-REGISTRY-V1.md) 참조.
 
@@ -468,4 +468,5 @@ Override 정책 상세: [`O4O-HUB-TEMPLATE-STANDARD-V1.md` § 8](../platform/hub
 | 2026-05-02 | V1 | 초안 작성 — 공통화 정의, 6개 Hub 채택 매트릭스 코드 검증, Neture 부분 채택 명시, 판정 체크리스트, 금지/dead code 정리 기준 |
 | 2026-08-03 | V2 | **공식 대상 서비스 재정렬** — §0 스코프 선언 신설(Cycle 1 CLOSED 계승 · frozen baseline 불변 · legacy↔adoption 분리) · §3.0 공식 4서비스(KPA/K-Cos/Neture/PharmacyHub) + 역할·성숙도 · §3.0.1 KPA reference 3분류 · §3.3 PharmacyHub 취급 원칙(3구분, 의무 적용 아님) · §3.4 GlycoPharm historical out-of-scope(삭제 아닌 표시) · §9.0 매트릭스 갱신 원칙(dependency≠adoption) · §9.1~9.3 매트릭스 열 재정렬 · §10 현재 트랙 3축(기존 §10 참조 문서 → §11). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·금지사항은 변경 없음** |
 | 2026-08-04 | V3 | **서비스 프레임 정의 정렬 + GlycoPharm 대상 복귀** — §1.1 신설(O4O Common Service Frame ↔ Service Extension 구조, 공통화 5요소, 공통 core 서비스 조건문 금지) · §3.0 대상 서비스 표를 "프레임 + extension" 기준으로 재기술(GlycoPharm 행 복귀) · §3.0.1 **KPA Society ↔ K-Cosmetics 동일 프레임 지위** 명시(하위 서비스·단순 frame 검증체 표현 폐기) · §3.2 신설 **매장 경영자 공통 역할**(구매·판매·콘텐츠 실행 병행, "KPA=판매자 / PharmacyHub=구매자" 구분 폐기) · §3.3 **PharmacyHub 해석 정정**(공통 매장 경영 프레임 + B2B extension, `MISSING_BASE_FUNCTION` 표기 도입) · §3.4 **GlycoPharm historical out-of-scope 폐기 → 공통화 대상 복귀**(삭제 검토 보류) · §7 금지사항 1행 추가 · §9.0 표기 원칙 2행 추가 · §9.1~9.3 매트릭스 열 재정렬(GlycoPharm `(historical)` 해제, Hub 외 영역은 `미조사`). **공통화 정의·Hub 표준·Layout 정책·Template 원칙·체크리스트·Cycle 1 종료 판정·Neture 독립 경계는 변경 없음. 코드·패키지·DB 변경 0** |
+| 2026-08-08 | V3.1 | **§9.3 표 렌더링 정정** — V3 편집 시 `/mypage` 행이 GlycoPharm 미조사 note 아래로 밀려 표 밖으로 떨어져 있던 것을 표 안으로 복귀시키고 note 를 표 뒤로 이동. **판정·표기 내용 변경 없음. 코드·패키지·DB 변경 0** |
 | 2026-08-03 | V2.1 | **축 C `operator-core` 상태 정정** — §10.1 신설(`legacy 제거 대상` 이 아니라 `superseded` 판정 · 빌드 경로 참조 16곳 · 은퇴 판단과 core 재정의 판단 분리) · §9.0 각주 실측 정정(3서비스 → 4서비스 + Dockerfile/tailwind 참조). 근거: `IR-O4O-OPERATOR-CORE-CANONICAL-ROLE-AND-MODULAR-COMPOSITION-AUDIT-V1` |
