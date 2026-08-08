@@ -5,8 +5,12 @@
 | 작업요청서 | `WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1` (매장 실행 자산 — QR / POP / 태블릿 / 사이니지 / 상품 설명서) |
 | 검증일 | 2026-08-08 |
 | 구현 커밋 | `b3aae68b1` (QR · 상품 설명서) / POP · 사이니지 (본 커밋) |
-| 결과 | **PASS with TABLET_DEFERRED** — A·B·D·E 4개 축 구현 완료 / C(태블릿)는 병행 세션 충돌로 분리 |
+| 결과 | **IMPLEMENTATION_COMPLETE / PENDING_PRODUCTION_VERIFICATION / TABLET_DEFERRED** |
 
+> **아직 `PASS` 로 닫지 않는다.** A·B·D·E 4개 축의 **구현**은 끝났지만 POP·사이니지 배포와
+> 인증 사용자 프로덕션 실측이 남아 있다. §5-5 의 미수행 항목이 모두 PASS 한 뒤에만
+> 최종 판정을 `PASS with TABLET_DEFERRED` 로 확정한다.
+>
 > 태블릿은 작업요청서의 중지 조건("병행 세션 파일과 실제 충돌")에 실제로 해당해 분리했다.
 > 작업요청서가 "한 축이 중지 조건에 걸려도 나머지는 계속 진행" 하도록 지시했으므로
 > 나머지 4개 축을 완결하고 태블릿만 후속 WO 로 넘긴다.
