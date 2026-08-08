@@ -1,12 +1,12 @@
 /**
- * TabletScreenSetManager — 매장(store) 태블렛 콘텐츠 라이브러리 페이지(리스트 + 제작 셸 진입)
+ * TabletScreenSetManager — 매장(store) 태블릿 콘텐츠 라이브러리 페이지(리스트 + 제작 셸 진입)
  *
  * WO-O4O-TABLET-SCREEN-SET-EDITOR-SHARED-EXTRACTION-V2A
  *   단계형 authoring 편집기(TabletContentStepBuilder)와 그 내부(picker/미리보기/템플릿 메타)는
  *   `@o4o/tablet-screen-set-editor` 공유 패키지로 추출됨. 이 파일에는 **매장 전용 리스트 페이지**와
  *   **매장 API 인스턴스(defaultStoreBuilderApi)** 만 잔류한다. store 동작·저장 payload·5섹션 계약 불변.
  */
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Layers } from 'lucide-react';
 import {
   fetchScreenSets, fetchScreenSet, createScreenSet, updateScreenSet,
@@ -27,6 +27,11 @@ import type { MediaInsert } from '@o4o/content-editor';
 // WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1: library 목록을 O4O 표준 테이블로 정비.
 import TabletContentLibraryList from './TabletContentLibraryList';
 import type { TabletKioskApi } from '@o4o/tablet-kiosk-core';
+// WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4:
+//   'QR 모바일 화면' 미리보기 = 실제 /qr/:slug 랜딩과 **같은 컴포넌트**.
+//   공유 편집기는 서비스 계층을 import 하지 않으므로(계층 역전 금지) 매장 소비처가 렌더러를 주입한다.
+import PublicScreenSetViewer from '../qr/PublicScreenSetViewer';
+import type { QrScreenSet } from '../../api/storeQr';
 // 공유 편집기 + 라벨/상수/계약을 패키지에서 소비.
 import {
   TabletContentStepBuilder, templateLabel, LEGACY_ONLY_TEMPLATE_KEYS,
@@ -62,7 +67,26 @@ const fetchStoreQrOptions = async () => {
   }));
 };
 
-// '사용 중인 코너' 계산용 최소 태블렛 정보(페이지의 TabletType 하위집합).
+/**
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4
+ * 편집기 'QR 모바일 화면' 미리보기를 실제 코너 QR 랜딩과 동일 렌더러로 그린다.
+ *
+ * 실제 랜딩(`GET /qr/public/:slug`)과 draft 미리보기(`POST /screen-sets/preview`)는 **같은 sections 계약**을
+ * 산출한다(공용 resolver / 공용 헬퍼). 따라서 sections 를 그대로 공개 뷰어에 넘기면 배치·섹션 처리가 일치한다.
+ * slug 는 표시용이며(뷰어는 sections 만 렌더) 미저장 초안은 빈 문자열이다.
+ */
+function renderQrMobilePreview(screen: { templateKey?: string; screenSet?: { name?: string }; sections?: unknown[] }) {
+  const viewerSet: QrScreenSet = {
+    landingType: 'screen_set',
+    slug: '',
+    name: screen.screenSet?.name ?? '',
+    templateKey: screen.templateKey ?? 'corner_information_basic_v1',
+    sections: (screen.sections ?? []) as QrScreenSet['sections'],
+  };
+  return <PublicScreenSetViewer screenSet={viewerSet} />;
+}
+
+// '사용 중인 코너' 계산용 최소 태블릿 정보(페이지의 TabletType 하위집합).
 export interface ScreenSetUsageTablet {
   id: string;
   name: string;
@@ -79,13 +103,19 @@ interface Props {
   storeSlug?: string | null;
   // WO-O4O-KPA-TABLET-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 리스트 미리보기 코너 문맥(단독=코너 없음) 전달.
   onPreviewContext?: (tabletId: string | null) => void;
-  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 카드 → 대상 태블렛에 바로 적용(기존 current-screen-set API).
+  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 카드 → 대상 태블릿에 바로 적용(기존 current-screen-set API).
   onApplyToTablet?: (screenSetId: string, tabletId: string) => Promise<void>;
   // 방금 가져온 사본 하이라이트(HUB 가져오기 완료 시 전달).
   highlightId?: string | null;
+  /**
+   * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1:
+   *   진입 시 이 화면 세트의 편집기를 바로 연다(QR 목록의 '화면 세트 열기' 동선).
+   *   미지정이면 기존처럼 목록부터 시작한다. 세트를 못 찾으면 목록에 머물고 안내만 띄운다.
+   */
+  autoEditId?: string | null;
 }
 
-export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId }: Props) {
+export default function TabletScreenSetManager({ onToast, tablets, previewApi, storeSlug, onPreviewContext, onApplyToTablet, highlightId, autoEditId }: Props) {
   const [sets, setSets] = useState<ScreenSet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -138,6 +168,16 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
 
   const openCreate = useCallback(() => setBuilder({ detail: null }), []);
 
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1:
+  //   QR 목록에서 넘어온 화면 세트 편집기를 1회만 자동 오픈한다(호출부가 history state 를 즉시 비우므로
+  //   재마운트로 반복 열리지 않는다). 보관·삭제된 세트는 상세 조회가 404 → openEdit 이 안내 토스트만 띄운다.
+  const autoEditDone = useRef(false);
+  useEffect(() => {
+    if (!autoEditId || autoEditDone.current) return;
+    autoEditDone.current = true;
+    openEdit(autoEditId);
+  }, [autoEditId, openEdit]);
+
   // WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1: 사용자 문구 '보관' → '리스트에서 제거'(내부는 archived/soft-delete 그대로).
   const handleArchive = async (set: ScreenSet) => {
     if (busy) return;
@@ -189,6 +229,8 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
           fetchStoreQrCodes={fetchStoreQrOptions}
           onImageUpload={handleImageUpload}
           onMediaLibraryPick={(insertMedia) => setMediaPickerTarget(() => insertMedia)}
+          // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 뷰어 주입.
+          renderMobilePreview={renderQrMobilePreview}
         />
         <MediaPickerModal
           open={!!mediaPickerTarget}
@@ -208,13 +250,13 @@ export default function TabletScreenSetManager({ onToast, tablets, previewApi, s
     <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-indigo-100">
       <div className="px-4 py-3 border-b bg-indigo-50/60 flex items-center justify-between">
         <h3 className="text-sm font-bold text-indigo-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> 태블렛 콘텐츠 (화면 세트)
+          <Layers className="w-4 h-4 text-indigo-600" /> 태블릿 콘텐츠 (화면 세트)
         </h3>
       </div>
 
       <div className="p-4 space-y-4">
         <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 text-[11px] text-slate-600 leading-relaxed space-y-1">
-          <p><b className="text-slate-700">화면 세트</b>는 태블렛 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
+          <p><b className="text-slate-700">화면 세트</b>는 태블릿 코너에 표시할 화면 구성 묶음(콘텐츠 원본)입니다. 여기서 만들고 수정하며, 실제 코너 연결·교체는 <b className="text-slate-700">코너별 운영</b> 탭에서 합니다.</p>
           <p><b className="text-slate-700">템플릿</b>은 같은 내용을 어떤 <b>배치</b>로 보여줄지 정하고, <b className="text-slate-700">블록</b>은 화면에 들어가는 <b>내용</b>(코너 설명·제품 목록·QR 안내·대기화면)입니다.</p>
           <p><b className="text-slate-700">저장</b>은 세트 내용만 저장합니다(코너에 자동 적용되지 않음). <b className="text-slate-700">보관</b>은 목록에서 숨깁니다(코너에서 사용/연결 중이면 먼저 해제해야 합니다).</p>
         </div>

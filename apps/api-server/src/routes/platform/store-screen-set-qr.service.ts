@@ -53,6 +53,43 @@ export interface EnsureScreenSetQrResult {
 type QueryExecutor = { query: (sql: string, params?: unknown[]) => Promise<unknown> };
 
 /**
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §1·§2 — QR 상태 판정 SQL SSOT.
+ *
+ * screen_set QR 은 `is_active` 만으로 상태를 결정할 수 없다. 공개 `/qr/:slug` 는 **이중 게이트**
+ * (QR is_active + Screen Set 유효)를 통과해야 랜딩되므로, `is_active = true` 인데 대상 Screen Set 이
+ * 보관·삭제·타 origin 이면 **랜딩 불가**다. 활성 QR KPI(§2)와 QR 목록 상태 배지(§1)가 서로,
+ * 그리고 실제 공개 랜딩과 어긋나지 않도록 판정식을 여기 한 곳에 둔다.
+ *
+ * 사용 규칙: QR 테이블 alias = `qr`, 아래 JOIN 이 붙이는 Screen Set alias = `qs`.
+ * `qs.id::text = qr.landing_target_id` — landing_target_id 는 varchar(link QR=URL 등 비-UUID 가능)라
+ * uuid 직접 비교를 하지 않는다(uuid → text 캐스팅 방향 고정).
+ */
+export const SCREEN_SET_QR_JOIN = `
+  LEFT JOIN store_tablet_screen_sets qs
+    ON qs.id::text = qr.landing_target_id
+   AND qs.organization_id = qr.organization_id
+   AND qs.origin = 'store'`;
+
+/** 공개 `/qr/:slug` 가 실제로 랜딩되는(=진짜 활성) QR 조건. */
+export const QR_LANDABLE_CONDITION = `(
+  qr.is_active = true
+  AND (
+    qr.landing_type <> 'screen_set'
+    OR (qs.id IS NOT NULL AND qs.deleted_at IS NULL AND qs.status <> 'archived')
+  )
+)`;
+
+/**
+ * 보관된 Screen Set 에 종속된 QR — 목록에 '보관' 상태로 계속 보여준다(§1).
+ * 사용자가 직접 삭제한 일반 QR(is_active=false, Screen Set 무관)은 여기 걸리지 않아 계속 숨는다.
+ */
+export const ARCHIVED_SCREEN_SET_QR_CONDITION = `(
+  qr.landing_type = 'screen_set'
+  AND qs.id IS NOT NULL
+  AND (qs.deleted_at IS NOT NULL OR qs.status = 'archived')
+)`;
+
+/**
  * WO-O4O-SCREEN-SET-QR-LIFECYCLE-SYNC-V1
  * Screen Set 종속 QR(store_qr_codes, landing_type='screen_set')의 is_active 만 동기화한다.
  *  - archive → false, restore → true. **slug·QR row·landing_target_id 불변**(재사용/재생성/삭제 없음).

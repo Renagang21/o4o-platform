@@ -26,7 +26,7 @@ import { listContentHubItems } from '../../api/contentHub';
 import { cmsApi } from '../../api/cms';
 import { hubContentApi } from '../../api/hubContent';
 // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-7):
-//   태블렛 화면은 공통 /hub/contents 에 없고 전용 HUB API 를 쓴다 → 읽기 전용으로만 호출해 홈에서 병합한다.
+//   태블릿 화면은 공통 /hub/contents 에 없고 전용 HUB API 를 쓴다 → 읽기 전용으로만 호출해 홈에서 병합한다.
 //   (backend 무변경. 실패해도 allSettled 로 다른 섹션에 전파되지 않는다.)
 import { listOperatorTemplates } from '../../api/storeScreenSetHub';
 
@@ -99,7 +99,7 @@ interface DigitalFeedItem {
   date: string | null;
   thumbnailUrl: string | null;
   producer: string | null;
-  // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-7): 태블렛 화면(screen-set) 편입.
+  // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-7): 태블릿 화면(screen-set) 편입.
   kind: 'pop' | 'qr' | 'video' | 'signage' | 'screen-set';
 }
 
@@ -108,12 +108,12 @@ const DIGITAL_META: Record<DigitalFeedItem['kind'], { label: string; icon: React
   qr: { label: 'QR 템플릿', icon: <QrCode size={14} />, route: '/store-hub/qr', color: '#4338CA', bg: '#E0E7FF' },
   video: { label: '동영상', icon: <Video size={14} />, route: '/store-hub/video', color: '#BE185D', bg: '#FCE7F3' },
   signage: { label: '사이니지', icon: <MonitorPlay size={14} />, route: '/store-hub/signage', color: '#047857', bg: '#D1FAE5' },
-  'screen-set': { label: '태블렛 화면', icon: <MonitorSmartphone size={14} />, route: '/store-hub/screen-set', color: '#7C3AED', bg: '#EDE9FE' },
+  'screen-set': { label: '태블릿 화면', icon: <MonitorSmartphone size={14} />, route: '/store-hub/screen-set', color: '#7C3AED', bg: '#EDE9FE' },
 };
 
 /** `/hub/contents` 로 조회하는 4종 — 응답 형태가 같아 index 로 kind 를 매핑한다. */
 const HUB_DIGITAL_KINDS: DigitalFeedItem['kind'][] = ['pop', 'qr', 'video', 'signage'];
-/** 섹션 헤더의 '유형별 전체 보기' 링크 대상 — 태블렛 화면 포함(A-7). */
+/** 섹션 헤더의 '유형별 전체 보기' 링크 대상 — 태블릿 화면 포함(A-7). */
 const DIGITAL_SECTION_KINDS: DigitalFeedItem['kind'][] = ['pop', 'qr', 'video', 'signage', 'screen-set'];
 
 // ─── 셀 조각 ────────────────────────────────────────────────────────────────
@@ -218,10 +218,10 @@ export function StoreHubLatestFeed() {
     });
   }, []);
 
-  // 3) 새로운 디지털 자료 (POP/QR/동영상 = operator@kpa, 사이니지 = kpa-society, 태블렛 화면 = 전용 HUB API)
+  // 3) 새로운 디지털 자료 (POP/QR/동영상 = operator@kpa, 사이니지 = kpa-society, 태블릿 화면 = 전용 HUB API)
   //    → 날짜순 최대 5
   // WO-O4O-KPA-STORE-HUB-UX-CONSISTENCY-CLEANUP-V1 (A-7):
-  //   태블렛 화면은 매장 화면 송출 계열이므로 '디지털 자료' 에 편입한다.
+  //   태블릿 화면은 매장 화면 송출 계열이므로 '디지털 자료' 에 편입한다.
   //   응답 형태가 /hub/contents 와 달라 index 매핑에서 분리해 별도로 병합한다.
   //   행 수는 기존 PREVIEW_ROWS_DIGITAL(5) 유지 — 소스만 늘리고 총량은 늘리지 않는다.
   const loadDigital = useCallback(() => {
@@ -249,7 +249,7 @@ export function StoreHubLatestFeed() {
         }
       });
 
-      // 태블렛 화면(운영자 원본) — 전용 API. 실패해도 다른 소스에 영향을 주지 않는다.
+      // 태블릿 화면(운영자 원본) — 전용 API. 실패해도 다른 소스에 영향을 주지 않는다.
       try {
         const templates = await listOperatorTemplates();
         anyOk = true;
@@ -264,7 +264,7 @@ export function StoreHubLatestFeed() {
           });
         }
       } catch {
-        // 태블렛 화면만 조용히 제외 (섹션 전체를 오류로 만들지 않는다)
+        // 태블릿 화면만 조용히 제외 (섹션 전체를 오류로 만들지 않는다)
       }
 
       merged.sort((a, b) => tsOf(b.date) - tsOf(a.date));
@@ -437,7 +437,7 @@ export function StoreHubLatestFeed() {
       </FeedSection>
 
       {/* 3. 새로운 디지털 자료
-          POP/QR/동영상/사이니지 + 태블렛 화면 5개 도메인 병합 — 통합 전체 목록 route 가 없으므로
+          POP/QR/동영상/사이니지 + 태블릿 화면 5개 도메인 병합 — 통합 전체 목록 route 가 없으므로
           섹션 헤더에 유형별 전체 목록 링크를 제공한다(신규 route 생성 없음). */}
       <FeedSection
         title="새로운 디지털 자료"

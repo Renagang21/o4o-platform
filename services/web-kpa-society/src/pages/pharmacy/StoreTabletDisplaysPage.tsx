@@ -105,21 +105,34 @@ export default function StoreTabletDisplaysPage() {
 
   // WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 두 업무를 탭으로 분리.
   //   'corners'  = 코너별 운영(코너 선택 → 현재 콘텐츠 · 교체 · 화면 열기)
-  //   'contents' = 태블렛 콘텐츠(화면 세트 = 콘텐츠 원본 목록 · 수정 · 보관)
+  //   'contents' = 태블릿 콘텐츠(화면 세트 = 콘텐츠 원본 목록 · 수정 · 보관)
   // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: HUB 가져오기 완료 시 navigation state 로
   //   { tab:'contents', highlightScreenSetId } 를 받아 초기 탭·하이라이트를 연결한다(신규 API 없음).
-  const navState = (location.state ?? null) as { tab?: 'corners' | 'contents'; highlightScreenSetId?: string } | null;
-  const [activeTab, setActiveTab] = useState<'corners' | 'contents'>(navState?.tab === 'contents' ? 'contents' : 'corners');
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1: QR 목록의 '화면 세트 열기' 는
+  //   editScreenSetId 를 함께 보내 해당 세트의 **편집 화면까지** 바로 연다(탭만 열고 다시 찾게 하지 않는다).
+  const navState = (location.state ?? null) as {
+    tab?: 'corners' | 'contents';
+    highlightScreenSetId?: string;
+    editScreenSetId?: string;
+  } | null;
+  const [activeTab, setActiveTab] = useState<'corners' | 'contents'>(
+    navState?.tab === 'contents' || navState?.editScreenSetId ? 'contents' : 'corners',
+  );
   const [highlightScreenSetId] = useState<string | null>(navState?.highlightScreenSetId ?? null);
+  const [autoEditScreenSetId] = useState<string | null>(navState?.editScreenSetId ?? null);
   // 소비 후 history state 제거(새로고침·뒤로가기 시 재트리거 방지).
   useEffect(() => {
-    if (navState?.tab || navState?.highlightScreenSetId) {
+    if (navState?.tab || navState?.highlightScreenSetId || navState?.editScreenSetId) {
       navigate(location.pathname, { replace: true, state: null });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   // 코너 상세의 legacy 실행 편집기(대기화면·화면설정·진열·공통영상)는 primary 에서 접이식 '고급 설정'으로.
-  //   공개 뷰어가 아직 화면 세트를 소비하지 않아 legacy 가 실제 고객 화면을 결정하므로 제거하지 않고 보존한다.
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6 (오래된 주석 정정):
+  //   공개 뷰어는 이미 화면 세트를 소비한다 — 태블릿 공개 runtime(`GET /:slug/tablet/screen`)과 코너 QR
+  //   (`GET /qr/public/:slug`)이 모두 resolveScreenSetSections 로 세트를 렌더한다.
+  //   legacy 값은 세트가 적용되지 않은 코너(current_screen_set_id 없음)의 fallback 경로에서만 화면을 결정하므로
+  //   제거하지 않고 보존한다.
   const [showAdvanced, setShowAdvanced] = useState(false);
 
   // Tablet state
@@ -174,7 +187,7 @@ export default function StoreTabletDisplaysPage() {
 
   // Display settings state (WO-O4O-KPA-TABLET-DISPLAY-SETTINGS-V1) — 매장 공통
   // WO-O4O-KPA-TABLET-PUBLIC-INFO-UX-PRIVACY-INPUT-REMOVAL-V1:
-  //   태블렛 V1 = 공용 안내 화면. 상담 요청 버튼 기본 OFF(후속 기능).
+  //   태블릿 V1 = 공용 안내 화면. 상담 요청 버튼 기본 OFF(후속 기능).
   const [settings, setSettings] = useState<TabletDisplaySettings>({
     showPrice: true,
     showQr: true,
@@ -215,14 +228,14 @@ export default function StoreTabletDisplaysPage() {
   const [previewLoading, setPreviewLoading] = useState(false);
 
   // WO-O4O-KPA-TABLET-CORNER-IDLE-YOUTUBE-VIMEO-AUTO-RETURN-V1:
-  //   코너별 태블렛 공개 URL(?tabletId=). 매장 slug 는 한 번 조회해 보관.
+  //   코너별 태블릿 공개 URL(?tabletId=). 매장 slug 는 한 번 조회해 보관.
   const [storeSlug, setStoreSlug] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     getStoreSlug().then((s) => { if (!cancelled) setStoreSlug(s); }).catch(() => {});
     return () => { cancelled = true; };
   }, []);
-  // 미리보기가 열릴 때 대상 tabletId(선택 태블렛). previewApi 재생성을 피하려 ref 사용.
+  // 미리보기가 열릴 때 대상 tabletId(선택 태블릿). previewApi 재생성을 피하려 ref 사용.
   const previewTabletIdRef = useRef<string | null>(null);
 
   const publicTabletUrl = (tabletId: string): string => {
@@ -233,18 +246,18 @@ export default function StoreTabletDisplaysPage() {
   // WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1: 실행 액션(신규 API/pairing 없음 — 기존 URL 재사용).
   //   화면 열기 = 공개 viewer 새 탭. 팝업 차단/ slug 부재 시 안내.
   const handleOpenTabletScreen = (tabletId: string) => {
-    if (!storeSlug) { setToast({ type: 'error', message: '태블렛 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
     const w = window.open(publicTabletUrl(tabletId), '_blank', 'noopener,noreferrer');
-    if (!w) setToast({ type: 'error', message: '팝업이 차단되어 화면을 열지 못했습니다. 주소를 복사해 태블렛에서 직접 열어 주세요.' });
+    if (!w) setToast({ type: 'error', message: '팝업이 차단되어 화면을 열지 못했습니다. 주소를 복사해 태블릿에서 직접 열어 주세요.' });
   };
   const handleCopyTabletUrl = (tabletId: string) => {
-    if (!storeSlug) { setToast({ type: 'error', message: '태블렛 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
+    if (!storeSlug) { setToast({ type: 'error', message: '태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보를 먼저 확인해 주세요.' }); return; }
     navigator.clipboard?.writeText(publicTabletUrl(tabletId))
-      .then(() => setToast({ type: 'success', message: '태블렛 실행 주소가 복사되었습니다.' }))
+      .then(() => setToast({ type: 'success', message: '태블릿 실행 주소가 복사되었습니다.' }))
       .catch(() => setToast({ type: 'error', message: '주소를 복사하지 못했습니다. 직접 열어 다시 시도해 주세요.' }));
   };
 
-  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블렛별 1개 선택)
+  // WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개 선택)
   const [ocSelection, setOcSelection] = useState<OperatorCommonIdleSelection | null>(null);
   const [ocModalOpen, setOcModalOpen] = useState(false);
   const [ocCandidates, setOcCandidates] = useState<OperatorCommonIdleCandidate[]>([]);
@@ -386,19 +399,19 @@ export default function StoreTabletDisplaysPage() {
     setPreviewSlug(null);
   }, []);
 
-  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블렛 콘텐츠' 카드 → 대상 태블렛에 바로 적용.
+  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿 콘텐츠' 카드 → 대상 태블릿에 바로 적용.
   //   기존 current-screen-set API 재사용(신규 백엔드 없음). 적용 후 현재 적용 상태 즉시 반영 + 되돌리기.
   const handleApplyToTablet = useCallback(async (screenSetId: string, tabletId: string) => {
     const target = tablets.find((t) => t.id === tabletId);
     const prevId = target?.currentScreenSetId ?? null;
-    const cornerName = target ? (target.location?.trim() || target.name) : '태블렛';
+    const cornerName = target ? (target.location?.trim() || target.name) : '태블릿';
     const setName = screenSetIndex[screenSetId]?.name || '선택한 콘텐츠';
     try {
       await applyCurrentScreenSet(tabletId, screenSetId);
       setTablets((prev) => prev.map((t) => (t.id === tabletId ? { ...t, currentScreenSetId: screenSetId } : t)));
       setToast({
         type: 'success',
-        message: `“${cornerName}” 태블렛에 ‘${setName}’를 적용했어요.`,
+        message: `“${cornerName}” 태블릿에 ‘${setName}’를 적용했어요.`,
         action: {
           label: '되돌리기',
           onClick: async () => {
@@ -416,7 +429,7 @@ export default function StoreTabletDisplaysPage() {
     } catch (e: any) {
       const msg = e?.code === 'SCREEN_SET_NOT_ACTIVE'
         ? '이 콘텐츠는 지금 적용할 수 없는 상태입니다. 콘텐츠를 열어 저장한 뒤 다시 시도해 주세요.'
-        : (e?.message || '태블렛에 적용하지 못했습니다.');
+        : (e?.message || '태블릿에 적용하지 못했습니다.');
       setToast({ type: 'error', message: msg });
       throw e;
     }
@@ -435,7 +448,7 @@ export default function StoreTabletDisplaysPage() {
 
   // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1·§2: 코너 카드에서 여는 '화면 바꾸기' 모달 대상.
   const [swapCorner, setSwapCorner] = useState<{ tabletId: string; name: string } | null>(null);
-  // §3: 미리보기 모달 보기 전환(태블렛=넓게 / 휴대전화=390px).
+  // §3: 미리보기 모달 보기 전환(태블릿=넓게 / 휴대전화=390px).
   const [previewView, setPreviewView] = useState<'tablet' | 'mobile'>('tablet');
 
   // Toast auto-clear — §2: 되돌리기 액션이 있는 토스트는 눌러볼 시간을 위해 더 오래 유지.
@@ -457,7 +470,7 @@ export default function StoreTabletDisplaysPage() {
         // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 기본 화면 = 코너 현황판(카드).
         //   자동 선택하지 않는다 — 근무자가 모든 코너를 한눈에 보고 카드를 눌러 들어간다.
       } catch (err: any) {
-        setError(err.message || '태블렛 목록을 불러오는데 실패했습니다.');
+        setError(err.message || '태블릿 목록을 불러오는데 실패했습니다.');
       } finally {
         setLoadingTablets(false);
       }
@@ -502,7 +515,7 @@ export default function StoreTabletDisplaysPage() {
       setHasChanges(false);
       setSelectedPoolIds(new Set());
     } catch (err: any) {
-      setError(err.message || '태블렛 데이터를 불러오는데 실패했습니다.');
+      setError(err.message || '태블릿 데이터를 불러오는데 실패했습니다.');
     } finally {
       setLoadingPool(false);
     }
@@ -734,7 +747,7 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
-  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블렛 등록
+  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블릿 등록
   const handleRegister = async () => {
     if (!registerName.trim()) return;
     setRegistering(true);
@@ -745,17 +758,17 @@ export default function StoreTabletDisplaysPage() {
       setRegisterName('');
       setRegisterLocation('');
       setShowRegisterForm(false);
-      setToast({ type: 'success', message: `태블렛 "${created.name}"이 등록되었습니다.` });
+      setToast({ type: 'success', message: `태블릿 "${created.name}"이 등록되었습니다.` });
     } catch (err: any) {
-      setToast({ type: 'error', message: err.message || '태블렛 등록에 실패했습니다.' });
+      setToast({ type: 'error', message: err.message || '태블릿 등록에 실패했습니다.' });
     } finally {
       setRegistering(false);
     }
   };
 
-  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블렛 삭제(비활성화)
+  // WO-O4O-STORE-TABLET-REGISTER-UI-V1 — 태블릿 삭제(비활성화)
   const handleDeleteTablet = async (id: string, name: string) => {
-    if (!confirm(`"${name}" 태블렛을 삭제하시겠습니까?\n삭제 후에는 진열 구성도 함께 사라집니다.`)) return;
+    if (!confirm(`"${name}" 태블릿을 삭제하시겠습니까?\n삭제 후에는 진열 구성도 함께 사라집니다.`)) return;
     setDeletingTabletId(id);
     try {
       await deleteTablet(id);
@@ -764,7 +777,7 @@ export default function StoreTabletDisplaysPage() {
       if (selectedTabletId === id) {
         setSelectedTabletId(remaining.length > 0 ? remaining[0].id : null);
       }
-      setToast({ type: 'success', message: `태블렛 "${name}"이 삭제되었습니다.` });
+      setToast({ type: 'success', message: `태블릿 "${name}"이 삭제되었습니다.` });
     } catch (err: any) {
       setToast({ type: 'error', message: err.message || '삭제에 실패했습니다.' });
     } finally {
@@ -772,7 +785,7 @@ export default function StoreTabletDisplaysPage() {
     }
   };
 
-  // WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 정렬 (같은 위치끼리 묶임, 위치 없는 태블렛은 뒤로)
+  // WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 정렬 (같은 위치끼리 묶임, 위치 없는 태블릿은 뒤로)
   const sortedTablets = useMemo(
     () =>
       [...tablets].sort(
@@ -803,10 +816,10 @@ export default function StoreTabletDisplaysPage() {
           <div>
             <h1 className="text-2xl font-bold text-slate-900 flex items-center gap-3">
               <Tablet className="w-7 h-7 text-teal-600" />
-              태블렛 상품 안내 관리
+              태블릿 상품 안내 관리
             </h1>
             <p className="text-sm text-slate-500 mt-1">
-              크롬 태블렛에서 실행되는 매장 공용 안내 화면입니다. 태블렛에 보여줄 상품과 상세 설명, 대기 화면을 구성합니다. 주문 채널이 아니라 매장 내 제품·코너 안내 화면입니다.
+              크롬 태블릿에서 실행되는 매장 공용 안내 화면입니다. 태블릿에 보여줄 상품과 상세 설명, 대기 화면을 구성합니다. 주문 채널이 아니라 매장 내 제품·코너 안내 화면입니다.
             </p>
           </div>
         </div>
@@ -825,11 +838,11 @@ export default function StoreTabletDisplaysPage() {
         </div>
       </div>
 
-      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 상단 탭 — 코너별 운영 / 태블렛 콘텐츠 */}
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 상단 탭 — 코너별 운영 / 태블릿 콘텐츠 */}
       <div className="flex gap-1 border-b border-slate-200">
         {([
           { key: 'corners', label: '코너별 운영' },
-          { key: 'contents', label: '태블렛 콘텐츠' },
+          { key: 'contents', label: '태블릿 콘텐츠' },
         ] as const).map((t) => (
           <button
             key={t.key}
@@ -860,7 +873,7 @@ export default function StoreTabletDisplaysPage() {
           >
             <div className="px-5 py-4 border-b flex items-center justify-between">
               <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-                <Tablet className="w-5 h-5 text-sky-600" /> 크롬 태블렛 운영 안내
+                <Tablet className="w-5 h-5 text-sky-600" /> 크롬 태블릿 운영 안내
               </h3>
               <button onClick={() => setShowGuide(false)} className="text-slate-400 hover:text-slate-600" aria-label="닫기">
                 <X className="w-5 h-5" />
@@ -868,13 +881,13 @@ export default function StoreTabletDisplaysPage() {
             </div>
             <div className="px-5 py-4 overflow-y-auto">
               <ol className="list-decimal pl-5 space-y-2 text-sm text-slate-700 leading-relaxed">
-                <li>크롬 브라우저에서 매장 태블렛 주소를 열어 사용합니다.</li>
+                <li>크롬 브라우저에서 매장 태블릿 주소를 열어 사용합니다.</li>
                 <li>홈 화면에 바로가기로 추가하면 주소 입력 없이 실행할 수 있습니다.</li>
                 <li>화면 자동 꺼짐(절전) 시간을 매장 상황에 맞게 확인하세요.</li>
-                <li>화면 구성을 바꾼 뒤에는 태블렛에서 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
-                <li>‘고객 화면 미리보기’로 실제 태블렛 화면을 미리 확인할 수 있습니다.</li>
-                <li>고객 태블렛 화면에는 해당 코너에 적용된 화면 세트의 내용(코너 설명·콘텐츠·상품·QR·대기화면)이 표시됩니다.</li>
-                <li>공개 URL에 tabletId가 포함되면 해당 코너/태블렛 화면이 표시됩니다. tabletId가 없거나 유효하지 않으면 기본 활성 태블렛 기준으로 표시됩니다.</li>
+                <li>화면 구성을 바꾼 뒤에는 태블릿에서 새로고침하거나 다시 열어 최신 화면을 확인하세요.</li>
+                <li>‘고객 화면 미리보기’로 실제 태블릿 화면을 미리 확인할 수 있습니다.</li>
+                <li>고객 태블릿 화면에는 해당 코너에 적용된 화면 세트의 내용(코너 설명·콘텐츠·상품·QR·대기화면)이 표시됩니다.</li>
+                <li>공개 URL에 tabletId가 포함되면 해당 코너/태블릿 화면이 표시됩니다. tabletId가 없거나 유효하지 않으면 기본 활성 태블릿 기준으로 표시됩니다.</li>
               </ol>
             </div>
             <div className="px-5 py-3 border-t flex justify-end">
@@ -890,7 +903,7 @@ export default function StoreTabletDisplaysPage() {
       {loadingTablets && (
         <div className="flex items-center justify-center py-16">
           <Loader2 className="w-8 h-8 text-teal-600 animate-spin" />
-          <span className="ml-3 text-slate-400">태블렛 로딩 중...</span>
+          <span className="ml-3 text-slate-400">태블릿 로딩 중...</span>
         </div>
       )}
 
@@ -899,20 +912,20 @@ export default function StoreTabletDisplaysPage() {
         <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-teal-100">
           <div className="px-4 py-3 bg-teal-50 border-b border-teal-100 flex items-center gap-2">
             <Plus className="w-4 h-4 text-teal-600" />
-            <h3 className="text-sm font-bold text-teal-700">태블렛 추가</h3>
+            <h3 className="text-sm font-bold text-teal-700">태블릿 추가</h3>
           </div>
           <div className="p-4 flex flex-col gap-3">
             <div className="flex gap-3 flex-wrap">
               <div className="flex-1 min-w-[160px]">
                 <label className="block text-xs font-medium text-slate-600 mb-1">
-                  태블렛 이름 <span className="text-red-500">*</span>
+                  태블릿 이름 <span className="text-red-500">*</span>
                 </label>
                 <input
                   type="text"
                   value={registerName}
                   onChange={(e) => setRegisterName(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && handleRegister()}
-                  placeholder="예: 카운터 태블렛"
+                  placeholder="예: 카운터 태블릿"
                   className="w-full px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500"
                   disabled={registering}
                   autoFocus
@@ -947,7 +960,7 @@ export default function StoreTabletDisplaysPage() {
                 className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-medium text-white bg-teal-600 rounded-lg hover:bg-teal-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 {registering ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Plus className="w-3.5 h-3.5" />}
-                {registering ? '추가 중...' : '태블렛 추가'}
+                {registering ? '추가 중...' : '태블릿 추가'}
               </button>
             </div>
           </div>
@@ -958,14 +971,14 @@ export default function StoreTabletDisplaysPage() {
       {activeTab === 'corners' && !loadingTablets && tablets.length === 0 && !showRegisterForm && (
         <div className="text-center py-16 bg-white rounded-2xl shadow-sm">
           <Tablet className="w-16 h-16 text-slate-200 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-slate-800 mb-2">아직 등록된 태블렛이 없습니다</h3>
-          <p className="text-slate-500 mb-4">태블렛을 추가하면 설치 코너별로 화면을 준비하고 적용할 수 있습니다.</p>
+          <h3 className="text-lg font-medium text-slate-800 mb-2">아직 등록된 태블릿이 없습니다</h3>
+          <p className="text-slate-500 mb-4">태블릿을 추가하면 설치 코너별로 화면을 준비하고 적용할 수 있습니다.</p>
           <button
             onClick={() => setShowRegisterForm(true)}
             className="inline-flex items-center gap-2 px-4 py-2 bg-teal-600 text-white text-sm font-medium rounded-xl hover:bg-teal-700 transition-colors"
           >
             <Plus className="w-4 h-4" />
-            태블렛 추가
+            태블릿 추가
           </button>
         </div>
       )}
@@ -978,24 +991,24 @@ export default function StoreTabletDisplaysPage() {
         </div>
       )}
 
-      {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 첫 화면 = 코너 카드 홈(태블렛 목록 아님).
+      {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-CORNER-HOME-V1: 첫 화면 = 코너 카드 홈(태블릿 목록 아님).
           코너 = store_tablets(location||name). 카드 선택 시 기존 상세/편집기(아래) 재사용.
           미선택(selectedTabletId=null) 상태에서만 홈을 표시한다. */}
       {activeTab === 'corners' && !loadingTablets && tablets.length > 0 && !selectedTabletId && (
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <h2 className="text-base font-bold text-slate-800 flex items-center gap-2">
-              <Tablet className="w-5 h-5 text-teal-600" /> 태블렛
+              <Tablet className="w-5 h-5 text-teal-600" /> 태블릿
               <span className="text-sm font-normal text-slate-400">({tablets.length})</span>
             </h2>
             <button
               onClick={() => setShowRegisterForm(true)}
               className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-teal-700 bg-white border border-teal-200 rounded-xl hover:bg-teal-50"
             >
-              <Plus className="w-4 h-4" /> 태블렛 추가
+              <Plus className="w-4 h-4" /> 태블릿 추가
             </button>
           </div>
-          <p className="text-xs text-slate-400">카드 하나가 태블렛 1대이며, 카드 제목은 그 태블렛의 <b className="font-semibold text-slate-500">설치 코너</b>(위치)입니다. 지금 나오는 화면을 보고 바로 바꿀 수 있고, 카드를 누르면 상세 설정으로 들어갑니다.</p>
+          <p className="text-xs text-slate-400">카드 하나가 태블릿 1대이며, 카드 제목은 그 태블릿의 <b className="font-semibold text-slate-500">설치 코너</b>(위치)입니다. 지금 나오는 화면을 보고 바로 바꿀 수 있고, 카드를 누르면 상세 설정으로 들어갑니다.</p>
           {/* WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §1: 코너 현황판 —
               각 카드 = 코너명 · 지금 나오는 화면 · 대표 미리보기(경량, kiosk 상시 렌더 아님) · [화면 바꾸기]·[미리보기].
               내부 용어(화면 세트/블록 수/연결/current) 미노출. 카드 본문 클릭 = 상세 설정. */}
@@ -1060,7 +1073,7 @@ export default function StoreTabletDisplaysPage() {
             <ArrowLeft className="w-4 h-4" /> 코너 목록
           </button>
           {/* WO-O4O-KPA-TABLET-LOCATION-FIRST-UX-REFIT-V1: 위치/코너 우선 2단 레이아웃
-              좌측 = 위치/코너 태블렛 목록(1차 기준축), 우측 = 선택 코너의 현재 구성.
+              좌측 = 위치/코너 태블릿 목록(1차 기준축), 우측 = 선택 코너의 현재 구성.
               데이터 구조·API·public runtime 무변경 (UI 재배치만). */}
           <div className="lg:grid lg:grid-cols-[300px_minmax(0,1fr)] lg:gap-6 lg:items-start">
             {/* 좌측: 위치/코너 사이드바 */}
@@ -1100,7 +1113,7 @@ export default function StoreTabletDisplaysPage() {
                           onClick={(e) => { e.stopPropagation(); handleDeleteTablet(t.id, t.name); }}
                           disabled={deletingTabletId === t.id}
                           className="p-1 rounded text-slate-300 hover:text-red-600 hover:bg-red-50 flex-shrink-0 disabled:opacity-50"
-                          title="이 태블렛 삭제"
+                          title="이 태블릿 삭제"
                         >
                           {deletingTabletId === t.id ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <X className="w-3.5 h-3.5" />}
                         </button>
@@ -1110,21 +1123,21 @@ export default function StoreTabletDisplaysPage() {
                 </div>
               </div>
               <p className="text-[11px] text-slate-400 px-1">
-                코너/위치는 태블렛의 ‘위치’ 값 기준으로 정렬됩니다. 위치를 입력하면 같은 코너끼리 모여 보입니다.
+                코너/위치는 태블릿의 ‘위치’ 값 기준으로 정렬됩니다. 위치를 입력하면 같은 코너끼리 모여 보입니다.
               </p>
             </aside>
 
             {/* 우측: 선택 코너의 현재 구성 */}
             <div className="space-y-6 min-w-0">
               {/* WO-O4O-KPA-TABLET-TOUCH-FIRST-TABLET-CONNECT-FLOW-V1:
-                  상단 = 태블렛 연결·실행(현재 상태·화면 세트·실행 액션), 하단 = 화면 구성 요약(제작 컨텍스트).
+                  상단 = 태블릿 연결·실행(현재 상태·화면 세트·실행 액션), 하단 = 화면 구성 요약(제작 컨텍스트).
                   긴 실행 URL 은 기본 숨김(보조 토글). QR 은 재사용 가능한 client QR 컴포넌트 부재로 Deferred(화면 열기+주소 복사). */}
               {selectedTablet && (
                 <div className="bg-white rounded-2xl shadow-sm border border-teal-100 overflow-hidden">
-                  {/* 상단: 태블렛 연결·실행 */}
+                  {/* 상단: 태블릿 연결·실행 */}
                   <div className="p-4 space-y-3">
                     <div className="min-w-0">
-                      <div className="text-[11px] font-medium text-teal-600 mb-0.5">태블렛 연결·실행</div>
+                      <div className="text-[11px] font-medium text-teal-600 mb-0.5">태블릿 연결·실행</div>
                       <h2 className="text-lg font-bold text-slate-900 truncate">{cornerPrimary(selectedTablet)}</h2>
                       <div className="flex items-center gap-2 mt-1 text-xs flex-wrap">
                         <span className={selectedTablet.is_active ? 'text-emerald-600 font-medium' : 'text-slate-400'}>
@@ -1139,13 +1152,13 @@ export default function StoreTabletDisplaysPage() {
 
                     {storeSlug ? (
                       <>
-                        <p className="text-xs text-slate-500">이 코너 화면을 태블렛에서 실행할 수 있습니다. 태블렛 크롬에서 ‘화면 열기’로 열거나, 주소를 복사해 북마크하세요.</p>
+                        <p className="text-xs text-slate-500">이 코너 화면을 태블릿에서 실행할 수 있습니다. 태블릿 크롬에서 ‘화면 열기’로 열거나, 주소를 복사해 북마크하세요.</p>
                         <div className="flex gap-2 flex-wrap">
                           <button
                             onClick={() => handleOpenTabletScreen(selectedTablet.id)}
                             className="flex-1 min-w-[150px] min-h-[44px] inline-flex items-center justify-center gap-1.5 px-4 py-2 text-sm font-semibold text-white bg-teal-600 rounded-xl hover:bg-teal-700"
                           >
-                            <Tv className="w-4 h-4" /> 태블렛에서 화면 열기
+                            <Tv className="w-4 h-4" /> 태블릿에서 화면 열기
                           </button>
                           <button
                             onClick={() => handleCopyTabletUrl(selectedTablet.id)}
@@ -1179,7 +1192,7 @@ export default function StoreTabletDisplaysPage() {
                       </>
                     ) : (
                       <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
-                        태블렛 실행 주소를 만들 수 없습니다. 매장 기본 정보(공개 주소)를 먼저 확인해 주세요.
+                        태블릿 실행 주소를 만들 수 없습니다. 매장 기본 정보(공개 주소)를 먼저 확인해 주세요.
                       </div>
                     )}
                   </div>
@@ -1217,7 +1230,7 @@ export default function StoreTabletDisplaysPage() {
               )}
 
               {/* WO-O4O-KPA-TABLET-CORNER-CONTENT-LINK-UI-V1: 코너 = 연결(store_tablet_corner_contents) 기반.
-                  연결 목록 · 현재 사용 중 · 빠른 교체 · 순서 · 연결 추가/해제. 원본 수정/생성/보관은 '태블렛 콘텐츠' 탭. */}
+                  연결 목록 · 현재 사용 중 · 빠른 교체 · 순서 · 연결 추가/해제. 원본 수정/생성/보관은 '태블릿 콘텐츠' 탭. */}
               {selectedTabletId && (
                 <TabletCornerContentsPanel
                   tabletId={selectedTabletId}
@@ -1231,8 +1244,10 @@ export default function StoreTabletDisplaysPage() {
 
               {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 고급 설정(접이식) —
                   대기화면·화면설정·진열·공통 대기영상은 legacy 실행 편집기다.
-                  공개 뷰어가 아직 화면 세트를 소비하지 않아 이 값들이 현재 실제 고객 화면을 결정하므로
-                  제거하지 않고 primary 에서 접어 둔다(교체·화면 열기 중심으로 코너 상세를 축소). */}
+                  WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §6 (오래된 주석 정정):
+                  공개 뷰어는 이미 화면 세트를 소비한다(태블릿 runtime · 코너 QR 모두 resolveScreenSetSections).
+                  이 값들은 **화면 세트가 적용되지 않은 코너**의 fallback 화면을 결정하므로 제거하지 않고
+                  primary 에서 접어 둔다(교체·화면 열기 중심으로 코너 상세를 축소). */}
               <div className="rounded-2xl border border-slate-200 bg-slate-50/60 overflow-hidden">
                 <button
                   onClick={() => setShowAdvanced((v) => !v)}
@@ -1248,7 +1263,7 @@ export default function StoreTabletDisplaysPage() {
 
               {showAdvanced && (
               <>
-          {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블렛별 1개) */}
+          {/* WO-O4O-KPA-TABLET-OPERATOR-COMMON-IDLE-VIDEO-SELECTION-V1: 서비스 공통 대기 영상(태블릿별 1개) */}
           {selectedTabletId && (
             <div className="bg-white rounded-2xl shadow-sm p-4 border border-slate-100">
               <div className="flex items-center justify-between gap-2 mb-1">
@@ -1273,7 +1288,7 @@ export default function StoreTabletDisplaysPage() {
                 </div>
               </div>
               <p className="text-[11px] text-slate-400 mb-2">
-                서비스 운영자가 제공한 영상 중 이 태블렛 대기화면에 사용할 영상을 1개 선택합니다. 영상 자체는 매장에서 수정할 수 없습니다.
+                서비스 운영자가 제공한 영상 중 이 태블릿 대기화면에 사용할 영상을 1개 선택합니다. 영상 자체는 매장에서 수정할 수 없습니다.
               </p>
               {ocSelection ? (
                 <div className="text-xs text-slate-700 bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
@@ -1283,7 +1298,7 @@ export default function StoreTabletDisplaysPage() {
                   </div>
                   {(ocSelection.status === 'expired' || ocSelection.status === 'unavailable') && (
                     <div className="text-amber-600 mt-1">
-                      선택한 서비스 공통 영상의 방영 기간이 종료되었습니다. 현재 태블렛에는 사용 가능한 공통 영상이 자동 노출됩니다. 코너에 맞는 다른 공통 영상을 선택해 주세요.
+                      선택한 서비스 공통 영상의 방영 기간이 종료되었습니다. 현재 태블릿에는 사용 가능한 공통 영상이 자동 노출됩니다. 코너에 맞는 다른 공통 영상을 선택해 주세요.
                     </div>
                   )}
                 </div>
@@ -1325,7 +1340,7 @@ export default function StoreTabletDisplaysPage() {
               </div>
               <div className="p-4">
                 <p className="text-xs text-slate-500 mb-3">
-                  매장이 일정 시간 사용되지 않을 때 태블렛이 자동으로 보여줄 이미지/영상 목록입니다.
+                  매장이 일정 시간 사용되지 않을 때 태블릿이 자동으로 보여줄 이미지/영상 목록입니다.
                   고객이 화면을 터치하면 즉시 상품 안내 화면으로 돌아갑니다.
                 </p>
                 <IdlePlaylistEditor
@@ -1342,7 +1357,7 @@ export default function StoreTabletDisplaysPage() {
           {!loadingPool && (
             <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
               <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between">
-                <h3 className="text-sm font-bold text-slate-700">태블렛 화면 설정</h3>
+                <h3 className="text-sm font-bold text-slate-700">태블릿 화면 설정</h3>
                 <button
                   onClick={handleSaveSettings}
                   disabled={savingSettings}
@@ -1354,14 +1369,14 @@ export default function StoreTabletDisplaysPage() {
               </div>
               <div className="p-4 space-y-4">
                 <p className="text-xs text-slate-500">
-                  태블렛 고객 화면에서 가격, QR, 상담 버튼, 자동 전환 방식을 설정합니다. 매장의 모든 태블렛에 공통 적용됩니다.
+                  태블릿 고객 화면에서 가격, QR, 상담 버튼, 자동 전환 방식을 설정합니다. 매장의 모든 태블릿에 공통 적용됩니다.
                 </p>
 
                 {/* 토글: 가격 / QR / 상담 버튼 */}
                 {([
-                  { key: 'showPrice', label: '가격 표시', desc: '태블렛 고객 화면에 제품 가격을 표시합니다.' },
+                  { key: 'showPrice', label: '가격 표시', desc: '태블릿 고객 화면에 제품 가격을 표시합니다.' },
                   { key: 'showQr', label: 'QR 표시', desc: '제품 상세·모바일 확인용 QR을 표시합니다.' },
-                  { key: 'showConsultationButton', label: '상담 요청 버튼 (후속 기능 · 권장하지 않음)', desc: '태블렛 V1은 공용 안내 화면으로, 고객 개인정보 입력·상담 접수를 받지 않습니다. 상담 요청/개인정보 입력은 후속 모바일 앱/PWA 기능에서 다룹니다. 기본은 꺼짐이며, 켜더라도 개인정보 없이 관심만 전송됩니다.' },
+                  { key: 'showConsultationButton', label: '상담 요청 버튼 (후속 기능 · 권장하지 않음)', desc: '태블릿 V1은 공용 안내 화면으로, 고객 개인정보 입력·상담 접수를 받지 않습니다. 상담 요청/개인정보 입력은 후속 모바일 앱/PWA 기능에서 다룹니다. 기본은 꺼짐이며, 켜더라도 개인정보 없이 관심만 전송됩니다.' },
                 ] as const).map(({ key, label, desc }) => (
                   <label key={key} className="flex items-start justify-between gap-3 cursor-pointer">
                     <div className="min-w-0">
@@ -1423,9 +1438,9 @@ export default function StoreTabletDisplaysPage() {
               {/* Left: Product Pool */}
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-4 py-3 border-b bg-slate-50">
-                  {/* WO-O4O-KPA-TABLET-STORE-PRODUCT-LINKING-V1: 취급 중인 O4O 제품 ↔ 태블렛 진열 연결 명시 */}
+                  {/* WO-O4O-KPA-TABLET-STORE-PRODUCT-LINKING-V1: 취급 중인 O4O 제품 ↔ 태블릿 진열 연결 명시 */}
                   <div className="flex items-center justify-between gap-2">
-                    <h3 className="text-sm font-bold text-slate-700">태블렛에 보여줄 상품 선택</h3>
+                    <h3 className="text-sm font-bold text-slate-700">태블릿에 보여줄 상품 선택</h3>
                     <button
                       type="button"
                       onClick={() => navigate('/store/my-products')}
@@ -1435,7 +1450,7 @@ export default function StoreTabletDisplaysPage() {
                     </button>
                   </div>
                   <p className="text-[11px] text-slate-400 mt-1">
-                    취급 중인 O4O 제품에 등록된 제품을 선택해 이 태블렛에 진열합니다.
+                    취급 중인 O4O 제품에 등록된 제품을 선택해 이 태블릿에 진열합니다.
                   </p>
                   <div className="flex gap-1 mt-2">
                     <button
@@ -1468,8 +1483,8 @@ export default function StoreTabletDisplaysPage() {
                     <div className="py-8 px-4 text-center text-sm text-slate-400">
                       {poolTab === 'supplier' ? (
                         <>
-                          <p>태블렛에 진열할 취급 중인 O4O 제품이 없습니다.</p>
-                          <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 태블렛에 배치해 주세요.</p>
+                          <p>태블릿에 진열할 취급 중인 O4O 제품이 없습니다.</p>
+                          <p className="mt-1">취급 중인 O4O 제품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
                           <button
                             type="button"
                             onClick={() => navigate('/store/my-products')}
@@ -1483,8 +1498,8 @@ export default function StoreTabletDisplaysPage() {
                           {/* WO-O4O-KPA-STORE-LOCAL-PRODUCTS-ENTRY-ALIGNMENT-V1:
                               local pool 빈 상태 문구를 실제 데이터 축(store_local_products = '매장 자체 상품')과
                               복원된 메뉴 라벨에 맞춰 정정. 이동 대상 route 무변경. */}
-                          <p>태블렛에 진열할 매장 자체 상품이 없습니다.</p>
-                          <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블렛에 배치해 주세요.</p>
+                          <p>태블릿에 진열할 매장 자체 상품이 없습니다.</p>
+                          <p className="mt-1">매장 자체 상품을 먼저 등록한 뒤 태블릿에 배치해 주세요.</p>
                           <button
                             type="button"
                             onClick={() => navigate('/store/commerce/local-products')}
@@ -1543,7 +1558,7 @@ export default function StoreTabletDisplaysPage() {
               <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
                 <div className="px-4 py-3 border-b bg-slate-50 flex items-center justify-between gap-2">
                   <h3 className="text-sm font-bold text-slate-700">
-                    현재 태블렛 화면 구성 ({displays.length})
+                    현재 태블릿 화면 구성 ({displays.length})
                     {hasChanges && <span className="ml-1 text-xs font-medium text-amber-600">· 변경됨</span>}
                   </h3>
                   {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 진열 저장(상단 헤더 저장 제거 → 진열 섹션 맥락 저장) */}
@@ -1560,7 +1575,7 @@ export default function StoreTabletDisplaysPage() {
                 <div className="max-h-[400px] overflow-y-auto">
                   {displays.length === 0 ? (
                     <div className="py-8 text-center text-sm text-slate-400">
-                      이 태블렛에 진열된 제품이 없습니다. 왼쪽에서 제품을 선택해 추가하세요.
+                      이 태블릿에 진열된 제품이 없습니다. 왼쪽에서 제품을 선택해 추가하세요.
                     </div>
                   ) : (
                     <div className="divide-y">
@@ -1631,7 +1646,7 @@ export default function StoreTabletDisplaysPage() {
                                 <span className="text-xs text-slate-400">불러오는 중…</span>
                               ) : candidates.length === 0 ? (
                                 <span className="text-xs text-slate-400">
-                                  연결된 설명 콘텐츠가 없습니다. 태블렛 상세 화면에는 기본 상품 설명이 표시됩니다.
+                                  연결된 설명 콘텐츠가 없습니다. 태블릿 상세 화면에는 기본 상품 설명이 표시됩니다.
                                   상품별 설명을 따로 보여주려면 먼저 상품 설명 콘텐츠를 만들고 이 제품에 연결하세요.
                                 </span>
                               ) : (
@@ -1649,11 +1664,11 @@ export default function StoreTabletDisplaysPage() {
                                     ))}
                                   </select>
                                   <p className="mt-1 text-[10px] text-slate-400">
-                                    연결된 설명 콘텐츠가 있으면 태블렛 상세 화면에서 우선 표시됩니다. 선택 안 함 = 기본 상품 설명이 표시됩니다.
+                                    연결된 설명 콘텐츠가 있으면 태블릿 상세 화면에서 우선 표시됩니다. 선택 안 함 = 기본 상품 설명이 표시됩니다.
                                   </p>
                                   {/* WO-O4O-KPA-TABLET-INLINE-MULTILINGUAL-DESCRIPTION-BRIDGE-V1 */}
                                   <p className="mt-0.5 text-[10px] text-teal-600">
-                                    선택한 설명 콘텐츠에 검수 완료된 다국어 번역이 있으면, 태블렛 상세 화면에서 고객이 언어를 선택해 볼 수 있습니다.
+                                    선택한 설명 콘텐츠에 검수 완료된 다국어 번역이 있으면, 태블릿 상세 화면에서 고객이 언어를 선택해 볼 수 있습니다.
                                   </p>
                                 </>
                               )}
@@ -1674,12 +1689,12 @@ export default function StoreTabletDisplaysPage() {
         </>
       )}
 
-      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 태블렛 콘텐츠 탭 — 화면 세트(콘텐츠 원본) 라이브러리.
+      {/* WO-O4O-KPA-TABLET-CONTENT-LIBRARY-TAB-SPLIT-V1: 태블릿 콘텐츠 탭 — 화면 세트(콘텐츠 원본) 라이브러리.
           목록/수정/보관/생성 담당. 코너 연결·교체는 코너별 운영 탭. tablets 로 '사용 중인 코너' 표시. */}
       {activeTab === 'contents' && (
         <div className="space-y-3">
           <p className="text-sm text-slate-500">
-            태블렛 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 연결·교체는 <b>코너별 운영</b> 탭에서 합니다.
+            태블릿 코너에 보여줄 화면 세트(콘텐츠)를 만들고 수정·보관합니다. 실제 코너 연결·교체는 <b>코너별 운영</b> 탭에서 합니다.
           </p>
           <TabletScreenSetManager
             onToast={setToast}
@@ -1689,13 +1704,15 @@ export default function StoreTabletDisplaysPage() {
             onPreviewContext={setPreviewContext}
             onApplyToTablet={handleApplyToTablet}
             highlightId={highlightScreenSetId}
+            // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §E-1: QR 목록 → 해당 화면 세트 편집기 직행.
+            autoEditId={autoEditScreenSetId}
           />
         </div>
       )}
 
       {/* 고객 화면 미리보기 오버레이 (WO-O4O-KPA-TABLET-PREVIEW-V1)
           WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §3: 미리보기 1종으로 통합 —
-          태블렛/휴대전화 보기 전환 + 보조(새 창에서 열기 · 주소 복사). 코너 카드/상세 모두 이 모달을 연다. */}
+          태블릿/휴대전화 보기 전환 + 보조(새 창에서 열기 · 주소 복사). 코너 카드/상세 모두 이 모달을 연다. */}
       {previewOpen && previewSlug && (
         <div style={{ position: 'fixed', inset: 0, zIndex: 100000, background: 'rgba(15,23,42,0.85)' }}>
           {/* 상단 바: 보기 전환 + 보조 메뉴 + 닫기 */}
@@ -1705,10 +1722,10 @@ export default function StoreTabletDisplaysPage() {
           >
             <div className="flex items-center gap-3 min-w-0">
               <p className="text-sm font-semibold whitespace-nowrap">고객 화면 미리보기</p>
-              {/* 태블렛 / 휴대전화 보기 */}
+              {/* 태블릿 / 휴대전화 보기 */}
               <div className="flex rounded-lg overflow-hidden border border-white/20">
                 {([
-                  { key: 'tablet', label: '태블렛' },
+                  { key: 'tablet', label: '태블릿' },
                   { key: 'mobile', label: '휴대전화' },
                 ] as const).map((v) => (
                   <button

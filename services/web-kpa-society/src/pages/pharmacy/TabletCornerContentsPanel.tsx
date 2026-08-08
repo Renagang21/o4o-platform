@@ -9,7 +9,7 @@
  *
  * 이 패널의 범위 = **링크만**:
  *   현재 사용 중 표시 / 빠른 교체(current 전환) / 적용 해제 / 순서 / 연결 추가 / 연결 해제.
- *   콘텐츠 원본 생성·수정·보관은 '태블렛 콘텐츠' 탭 담당(여기서 원본을 바꾸지 않는다).
+ *   콘텐츠 원본 생성·수정·보관은 '태블릿 콘텐츠' 탭 담당(여기서 원본을 바꾸지 않는다).
  *
  * 미제공(사유 명시):
  *   - 표시숨김(is_visible): 서버 토글 엔드포인트 부재(INSERT 시 TRUE 고정) + 공개 런타임이 연결을 미소비.
@@ -245,7 +245,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
           <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 text-center py-8 px-4 space-y-3">
             <p className="text-sm text-slate-500 leading-relaxed">
               이 코너에 연결된 콘텐츠가 없습니다.<br />
-              <b>태블렛 콘텐츠</b> 탭에서 만든 콘텐츠를 이 코너에 연결해 주세요.
+              <b>태블릿 콘텐츠</b> 탭에서 만든 콘텐츠를 이 코너에 연결해 주세요.
             </p>
             <button onClick={() => setPicking(true)} className={`${btn} text-white bg-indigo-600 hover:bg-indigo-700`}>
               <Plus className="w-4 h-4" /> 기존 콘텐츠 추가
@@ -320,7 +320,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
               <span className="text-sm font-semibold truncate">{preview.name}</span>
               <div className="flex gap-1 flex-shrink-0">
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블렛</button>
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블릿</button>
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일</button>
               </div>
@@ -337,7 +337,7 @@ export default function TabletCornerContentsPanel({ tabletId, onCurrentChange, o
             </div>
           </div>
           <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            저장된 내용을 보여 주는 미리보기입니다. 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            저장된 내용을 보여 주는 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
         </div>
       )}

@@ -1,5 +1,5 @@
 /**
- * @o4o/tablet-screen-set-editor — 공유 태블렛 Screen Set authoring 편집기
+ * @o4o/tablet-screen-set-editor — 공유 태블릿 Screen Set authoring 편집기
  *
  * WO-O4O-TABLET-SCREEN-SET-EDITOR-SHARED-EXTRACTION-V2A
  *   web-kpa-society 의 TabletScreenSetManager 에서 **단계형 제작 편집기**(TabletContentStepBuilder)와
@@ -155,7 +155,7 @@ interface TemplateMeta {
 //   바뀌었으므로, 평문만 요구하던 이전 요청문을 HTML 산출용으로 교체한다.
 //   ContentRenderer 는 sanitizeRichHtml(DOMPurify)로 script/위험 속성을 제거하고
 //   iframe 은 youtube/vimeo 만 허용하므로, 요청문에서도 그 범위를 벗어나지 않게 지시한다.
-const CORNER_DESC_PROMPT = `약국 매장 태블렛의 코너 화면에 넣을 내용을 HTML로 만들어 주세요.
+const CORNER_DESC_PROMPT = `약국 매장 태블릿의 코너 화면에 넣을 내용을 HTML로 만들어 주세요.
 
 [코너 이름]
 예: 구강관리 코너
@@ -168,7 +168,7 @@ const CORNER_DESC_PROMPT = `약국 매장 태블렛의 코너 화면에 넣을 �
 (짧은 소개 한 단락만 원할 수도 있고, 소제목이 여러 개인 긴 안내여도 됩니다 — 원하는 구성을 여기에 적어 주세요.)
 
 조건:
-- 손님이 태블렛 화면에서 읽는 글입니다. 문장은 짧고 읽기 쉽게.
+- 손님이 태블릿 화면에서 읽는 글입니다. 문장은 짧고 읽기 쉽게.
 - O4O 편집기의 HTML 탭에 그대로 붙여 넣을 수 있는 형태로 만들어 주세요.
 - 사용할 태그: p, h2, h3, strong, em, ul, ol, li, br, a, table, img 정도면 충분합니다.
 - 강조·여백 같은 꾸미기는 태그 안 style 속성(인라인 CSS)으로만 해 주세요.
@@ -341,7 +341,7 @@ function ContentListEditor({ items, onChange, api, contentSources = DEFAULT_CONT
   const upd = (i: number, patch: Partial<ContentListItem>) => onChange(updateContentItem(items, i, patch));
   const move = (i: number, dir: 'up' | 'down') => onChange(moveContentItem(items, i, dir));
   const remove = (i: number) => {
-    if (!window.confirm('이 추가 정보를 현재 태블렛 콘텐츠에서 삭제하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
+    if (!window.confirm('이 추가 정보를 현재 태블릿 콘텐츠에서 삭제하시겠습니까?\n원본 콘텐츠는 삭제되지 않습니다.')) return;
     // 현재 Screen Set 의 content_list 에서만 제거(원본 설명서·콘텐츠·Resource 불변).
     onChange(removeContentItem(items, i));
   };
@@ -911,14 +911,14 @@ function ProductSelectEditor({ selected, onChange, fetchProductPool, fetchStoreQ
 // WO-O4O-KPA-TABLET-BUILDER-BUSINESS-FIELDS-V1: 단계 = 업무 3항목 고정(BUILDER_STEPS). 블록은 자동 준비.
 // WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.2:
 //   RichTextEditor.onChange 는 { html, json } 객체를 준다. corner_description.config.body 는 항상 HTML 문자열이어야
-//   한다(공개 렌더 str()·태블렛 ContentRenderer 계약). 과거 잘못된 연결로 body 에 { html, json } 객체가 들어왔을
+//   한다(공개 렌더 str()·태블릿 ContentRenderer 계약). 과거 잘못된 연결로 body 에 { html, json } 객체가 들어왔을
 //   가능성을 읽기 경계에서 방어. 정규화는 여기(hydrate) 한 곳 + onChange(쓰기) 한 곳으로 끝낸다.
 // normalizeCornerBody: @o4o/screen-content-core 에서 소비(로컬 정의 제거, 외부 소비처 없음).
 
 // WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.6:
 //   실제 공개 QR(PublicScreenSetViewer)은 대기 영상(idle_media)을 제외한다. draft 미리보기 endpoint 는
 //   idle_media 를 포함하므로, QR 모바일 미리보기만 idle_media 섹션을 걷어내 공개 QR 과 핵심 구성을 맞춘다.
-//   (태블렛 미리보기는 그대로 — 대기 영상은 태블렛 개념.) kiosk-core·resolver·공개 viewer 무변경.
+//   (태블릿 미리보기는 그대로 — 대기 영상은 태블릿 개념.) kiosk-core·resolver·공개 viewer 무변경.
 function stripIdleForMobilePreview(screen: TabletScreenResponse | null): TabletScreenResponse | null {
   const secs = (screen as unknown as { sections?: Array<{ blockType?: string }> })?.sections;
   if (!screen || !Array.isArray(secs)) return screen;
@@ -948,6 +948,7 @@ function EditorSection({ title, note, children }: { title: string; note?: string
 export function TabletContentStepBuilder({
   initialDetail, onCancel, onSaved, onToast, previewApi, storeSlug, api,
   contentSources = DEFAULT_CONTENT_SOURCES, fetchProductPool, fetchStoreQrCodes, onImageUpload, onMediaLibraryPick,
+  renderMobilePreview,
 }: {
   initialDetail: ScreenSetDetail | null;
   onCancel: () => void;
@@ -973,6 +974,17 @@ export function TabletContentStepBuilder({
   onImageUpload?: (file: File) => Promise<string>;
   /** §4.3: 코너 설명 편집기 미디어 라이브러리 선택(표준 편집기 props 를 그대로 전달). */
   onMediaLibraryPick?: (insertMedia: (media: MediaInsert) => void) => void;
+  /**
+   * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4:
+   *   'QR 모바일 화면' 미리보기를 **실제 `/qr/:slug` 와 동일한 렌더러**로 그린다.
+   *
+   *   기존에는 모바일 미리보기도 태블릿 kiosk(TabletKioskPage)로 그려서, 실제 코너 QR 랜딩
+   *   (모바일 세로형 공개 뷰어)과 배치·섹션 처리가 달랐다 — 매장이 미리보기로 확인한 화면이
+   *   고객이 보는 화면과 일치하지 않았다.
+   *   공개 뷰어는 서비스 계층 컴포넌트라 이 패키지가 직접 import 하지 않고(계층 역전 금지)
+   *   소비처가 렌더러를 주입한다. 미주입 소비처(운영자·공급자 제작기)는 기존 kiosk 렌더 그대로.
+   */
+  renderMobilePreview?: (screen: TabletScreenResponse) => ReactNode;
 }) {
   const isEdit = !!initialDetail;
   const [name, setName] = useState(initialDetail?.name ?? '');
@@ -991,7 +1003,7 @@ export function TabletContentStepBuilder({
     setBlocks((prev) => ensureAutoBlocks(prev));
   };
 
-  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블렛 / QR 모바일). 모달은 편집 상태를 잃지 않는다.
+  // WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 미리보기(태블릿 / QR 모바일). 모달은 편집 상태를 잃지 않는다.
   const canPreview = !!previewApi && !!storeSlug;
   const [preview, setPreview] = useState<{ screen: TabletScreenResponse; view: 'tablet' | 'mobile' } | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
@@ -1035,6 +1047,39 @@ export function TabletContentStepBuilder({
   }, [liveKey, canPreview]);
   // §4.6: QR 모바일 미리보기는 대기 영상을 제외(공개 QR 정합). identity 안정화 위해 memo.
   const liveScreenMobile = useMemo(() => stripIdleForMobilePreview(liveScreen), [liveScreen]);
+
+  // ── WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 미리보기 ↔ 실제 QR 주소 정합 ──
+  //   저장된 세트는 이미 발급된 실제 slug/URL 이 있다(SSOT=store_qr_codes, 저장 응답이 additive 로 내려줌).
+  //   미리보기 화면에 그 주소를 그대로 보여줘, 매장이 지금 보고 있는 화면이 어느 QR 로 열리는지 확정한다.
+  //   미저장(신규)·slug 미발급 세트는 '초안'으로 명시한다 — 공개 주소가 아직 없음을 감추지 않는다.
+  const savedQrSlug = initialDetail?.publicQrSlug ?? null;
+  const savedQrUrl = initialDetail?.publicQrUrl ?? (savedQrSlug ? `/qr/${savedQrSlug}` : null);
+  const isDraftPreview = !isEdit || !savedQrSlug;
+
+  /** 'QR 모바일' 렌더 — 주입된 실제 공개 뷰어 우선, 미주입 소비처는 기존 kiosk 렌더. */
+  const renderMobileScreen = (screen: TabletScreenResponse | null) => {
+    if (!screen) return null;
+    const stripped = stripIdleForMobilePreview(screen) as TabletScreenResponse;
+    if (renderMobilePreview) {
+      // 실제 /qr/:slug 와 같은 컴포넌트 — 스크롤 가능한 모바일 세로형 문서.
+      return <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', background: '#fff' }}>{renderMobilePreview(stripped)}</div>;
+    }
+    // 미주입 소비처(운영자·공급자) 폴백 — 기존 kiosk 렌더. previewApi 없으면 렌더 대상이 없다.
+    if (!previewApi) return null;
+    return <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={stripped} embedded showQrBadge={false} previewLayoutOnly />;
+  };
+
+  /** 미리보기 하단 주소 표시 — 저장본은 실제 QR 주소, 미저장은 초안 표기. */
+  const QrIdentityNote = ({ tone }: { tone: 'light' | 'dark' }) => (
+    <span
+      className={tone === 'dark' ? 'text-slate-300' : 'text-slate-500'}
+      style={{ fontSize: '11px', wordBreak: 'break-all' }}
+    >
+      {isDraftPreview
+        ? '초안 — 아직 저장되지 않은 화면입니다. 저장하면 코너 QR 주소가 열립니다.'
+        : <>실제 QR 주소: <b>{savedQrUrl}</b> (이 주소로 열리는 화면과 같습니다)</>}
+    </span>
+  );
   // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1:
   //   명시 선택 상품은 미리보기에도 실제 화면과 동일하게 표시된다. 다만 공개 노출 게이트(승인·활성 등)에서
   //   제외된 상품은 실제 화면에도 나오지 않으므로, 그 수를 제작자에게 알려 준다(원인 진단 가능하게).
@@ -1117,7 +1162,7 @@ export function TabletContentStepBuilder({
       await api.saveBlocks(id!, blocks);
       // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 여기까지 왔으면 QR 까지 준비된 것이다
       //   (QR 확보 실패는 저장 트랜잭션과 함께 롤백되어 위에서 예외로 떨어진다).
-      onToast({ type: 'success', message: isEdit ? '태블렛 콘텐츠가 저장되었습니다.' : `태블렛 콘텐츠 "${name.trim()}" 생성됨` });
+      onToast({ type: 'success', message: isEdit ? '태블릿 콘텐츠가 저장되었습니다.' : `태블릿 콘텐츠 "${name.trim()}" 생성됨` });
       onSaved();
     } catch (e: any) {
       // QR 준비 실패 = 저장 실패(부분 성공 아님). 사용자에게 재시도를 명확히 안내한다.
@@ -1195,7 +1240,7 @@ export function TabletContentStepBuilder({
             placeholder="예: 구강관리 코너"
             className="w-full mt-1 px-3 py-2 rounded-lg border border-slate-200 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
           />
-          <p className="text-[11px] text-slate-400 mt-1">고객 태블렛·QR 화면에 표시되는 제목입니다.</p>
+          <p className="text-[11px] text-slate-400 mt-1">고객 태블릿·QR 화면에 표시되는 제목입니다.</p>
         </div>
         <div>
           <div className="flex items-center justify-between gap-2 flex-wrap">
@@ -1212,7 +1257,7 @@ export function TabletContentStepBuilder({
             />
           </div>
           {/* WO-O4O-KPA-TABLET-STANDARD-EDITOR-UNIFY-V1: 평문 textarea → O4O 표준 편집기.
-              저장 HTML 은 태블렛/QR 모바일 모두 ContentRenderer 로 렌더된다(동일 계약).
+              저장 HTML 은 태블릿/QR 모바일 모두 ContentRenderer 로 렌더된다(동일 계약).
               별도 HTML 입력창은 만들지 않는다 — 표준 편집기의 기존 HTML 탭/붙여넣기를 쓴다. */}
           <div className="mt-1">
             {/* WO-O4O-KPA-TABLET-CORNER-EDITOR-AND-DRAFT-PREVIEW-RUNTIME-FIX-V1 §4.1:
@@ -1232,7 +1277,7 @@ export function TabletContentStepBuilder({
           <p className="text-[11px] text-slate-400 mt-1">
             글·이미지·표·목록을 자유롭게 구성할 수 있습니다. 하나의 긴 내용으로 만들지, 여러 콘텐츠로 나눌지는 직접 정하시면 됩니다.
             LLM으로 만든 HTML은 위 <b>LLM으로 작업하기</b> 또는 편집기의 HTML 탭에 붙여 넣으세요.
-            오른쪽 미리보기에서 실제 태블렛에 보이는 모습을 확인할 수 있습니다.
+            오른쪽 미리보기에서 실제 태블릿에 보이는 모습을 확인할 수 있습니다.
           </p>
         </div>
       </div>
@@ -1267,7 +1312,7 @@ export function TabletContentStepBuilder({
              단계 인디케이터·순차 진행 표현 없음. 저장은 어느 시점에서든 가능하다. ── */}
       <div className="flex items-center justify-between gap-2 flex-wrap">
         <h3 className="text-base font-bold text-slate-800 flex items-center gap-2">
-          <Layers className="w-4 h-4 text-indigo-600" /> {isEdit ? '태블렛 화면 수정' : '태블렛 화면 만들기'}
+          <Layers className="w-4 h-4 text-indigo-600" /> {isEdit ? '태블릿 화면 수정' : '태블릿 화면 만들기'}
           {isDirty && <span className="text-[10px] font-semibold text-amber-700 bg-amber-100 px-1.5 py-0.5 rounded">변경됨</span>}
         </h3>
         <div className="flex items-center gap-2">
@@ -1362,7 +1407,7 @@ export function TabletContentStepBuilder({
           {!nameValid && <p className="text-[11px] text-amber-600 mt-1">저장하려면 이름이 필요합니다. 코너 제목을 입력하면 자동으로 채워집니다.</p>}
         </div>
         <p className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
-          저장한 콘텐츠는 코너에 자동 적용되지 않습니다. 실제 태블렛 화면은 ‘코너별 운영’에서 선택합니다.
+          저장한 콘텐츠는 코너에 자동 적용되지 않습니다. 실제 태블릿 화면은 ‘코너별 운영’에서 선택합니다.
         </p>
         <div className="rounded-lg border border-slate-200 bg-white p-3 space-y-1.5">
           <div className="text-sm font-bold text-slate-800">{name.trim() || '(이름 없음)'}</div>
@@ -1374,12 +1419,12 @@ export function TabletContentStepBuilder({
             <li>대기 화면: <b>{idleSummary}</b></li>
           </ul>
         </div>
-        {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 전체화면 미리보기(태블렛 / QR 모바일). */}
+        {/* WO-O4O-KPA-TABLET-CONTENT-DRAFT-PREVIEW-V1: 저장 전 전체화면 미리보기(태블릿 / QR 모바일). */}
         <div className="flex flex-wrap gap-2">
           <button onClick={() => openPreview('tablet')} disabled={!canPreview || previewLoading}
             className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
             title={canPreview ? undefined : '매장 공개 주소를 불러오는 중이거나 미리보기를 사용할 수 없습니다.'}>
-            {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블렛 크게 보기
+            {previewLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Layers className="w-4 h-4" />} 태블릿 크게 보기
           </button>
           <button onClick={() => openPreview('mobile')} disabled={!canPreview || previewLoading}
             className="min-h-[44px] px-4 py-2 text-sm font-semibold text-indigo-700 bg-white border border-indigo-200 rounded-xl hover:bg-indigo-50 disabled:opacity-50 inline-flex items-center gap-1.5"
@@ -1393,7 +1438,7 @@ export function TabletContentStepBuilder({
         </p>
         <button onClick={handleSave} disabled={saving || !nameValid}
           className="w-full sm:w-auto min-h-[44px] px-5 py-2 text-sm font-semibold text-white bg-indigo-600 rounded-xl hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2">
-          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블렛 콘텐츠 저장
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />} 태블릿 콘텐츠 저장
         </button>
       </EditorSection>
       </div>{/* /왼쪽: 편집 영역 */}
@@ -1406,7 +1451,7 @@ export function TabletContentStepBuilder({
             <span className="text-xs font-bold text-slate-700">실제 화면 미리보기</span>
             <div className="flex gap-1">
               {([
-                { key: 'tablet', label: '태블렛 화면' },
+                { key: 'tablet', label: '태블릿 화면' },
                 { key: 'mobile', label: 'QR 모바일 화면' },
               ] as const).map((v) => (
                 <button
@@ -1442,8 +1487,9 @@ export function TabletContentStepBuilder({
                 <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreen} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             ) : (
+              /* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 렌더러로 표시. */
               <div style={{ position: 'relative', overflow: 'hidden', width: 'min(100%, 240px)', aspectRatio: '9 / 19', background: '#000', borderRadius: 18 }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={liveScreenMobile} embedded showQrBadge={false} previewLayoutOnly />
+                {renderMobileScreen(liveScreenMobile)}
               </div>
             )}
             {/* 재조회 중에도 이전 화면을 유지(깜빡임 방지) — 오류 상태에선 오류 배지가 우선 */}
@@ -1464,12 +1510,19 @@ export function TabletContentStepBuilder({
           {/* WO-O4O-KPA-TABLET-NEW-SCREEN-INITIAL-PREVIEW-CONTEXT-FIX-V1 §9: 상품 출처·미리보기 문맥 안내.
               Screen Set 은 코너와 독립된 원본(§3.1) — 빌더 미리보기는 코너 문맥이 없어 배치 골격만 보여준다.
               실제 상품은 이 콘텐츠를 코너에 적용했을 때 그 코너의 진열 상품으로 공개 화면에 표시된다. */}
+          {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4:
+              'QR 모바일 화면' 을 보는 동안 이 화면이 어느 주소로 열리는지(또는 아직 초안인지) 명시한다. */}
+          {liveView === 'mobile' && (
+            <div className={`px-3 py-1.5 border-t leading-relaxed ${isDraftPreview ? 'bg-amber-50' : 'bg-slate-50'}`}>
+              <QrIdentityNote tone="light" />
+            </div>
+          )}
           <div className="px-3 py-1.5 border-t bg-white text-[10px] text-slate-400 leading-relaxed">
             {/* WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1: 상품을 직접 선택한 경우 미리보기 = 실제 화면. */}
             {productPreviewInfo
               ? `직접 선택한 상품 ${productPreviewInfo.shownCount}개를 실제 화면과 같은 순서·QR 로 표시합니다.`
               : '템플릿의 화면 배치를 미리 보여드립니다. 상품은 이 콘텐츠를 적용한 코너의 진열 상품으로 표시됩니다.'}
-            {' '}저장 전 미리보기이며, 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            {' '}저장 전 미리보기이며, 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
           {productPreviewInfo && productPreviewInfo.excludedCount > 0 && (
             <div className="px-3 py-1.5 border-t bg-amber-50 text-[10px] text-amber-800 leading-relaxed">
@@ -1493,7 +1546,7 @@ export function TabletContentStepBuilder({
               <div className="flex gap-1">
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>
-                  태블렛
+                  태블릿
                 </button>
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>
@@ -1511,13 +1564,15 @@ export function TabletContentStepBuilder({
                 <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={preview.screen} embedded showQrBadge={false} previewLayoutOnly />
               </div>
             ) : (
+              /* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §4: 실제 /qr/:slug 렌더러로 표시. */
               <div style={{ position: 'relative', overflow: 'hidden', width: 390, maxWidth: '100%', height: 'min(86vh, 780px)', background: '#000', borderRadius: 24, boxShadow: '0 10px 40px rgba(0,0,0,0.5)' }}>
-                <TabletKioskPage api={previewApi} slug={storeSlug ?? undefined} previewScreen={stripIdleForMobilePreview(preview.screen)} embedded showQrBadge={false} previewLayoutOnly />
+                {renderMobileScreen(preview.screen)}
               </div>
             )}
           </div>
-          <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            저장 전 미리보기입니다. 실제 태블렛에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.
+          <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0 space-y-0.5" onClick={(e) => e.stopPropagation()}>
+            <div>{preview.view === 'mobile' ? <QrIdentityNote tone="dark" /> : null}</div>
+            <div>편집 중인 내용 기준 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 표시가 달라질 수 있습니다. 상담 요청은 전송되지 않습니다.</div>
           </div>
         </div>
       )}

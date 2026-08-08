@@ -84,7 +84,7 @@ const LOCALE_LABELS: Record<string, string> = {
 const localeLabel = (code: string): string => LOCALE_LABELS[code] ?? code.toUpperCase();
 
 // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1:
-//   이용자 표시 언어 선택 목록 = **기존 LOCALE_LABELS 재사용**(태블렛 전용 목록을 새로 하드코딩하지 않음).
+//   이용자 표시 언어 선택 목록 = **기존 LOCALE_LABELS 재사용**(태블릿 전용 목록을 새로 하드코딩하지 않음).
 //   O4O 1차 지원 7개 언어(ko/en/zh/ja/vi/th/id) — 순서는 LOCALE_LABELS 정의 순(ko 우선).
 //   선택값은 브라우저 localStorage 에만 유지(서버·Screen Set 저장 없음). fallback = 선택 언어 → ko → 없음(서버 strict).
 const SUPPORTED_VIEWER_LOCALES: string[] = Object.keys(LOCALE_LABELS);
@@ -582,7 +582,7 @@ export function TabletKioskPage({
   const cornerQrUnavailable = screen?.mode === 'screen_set' && !cornerQrUrl;
   const hideHeaderBand = !!cornerQrUrl;
   const showFloatingQr = !!cornerQrUrl && !isIdleTouch && displaySettings?.showQr !== false;
-  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 언어 선택은 실제 태블렛 런타임(비-미리보기)에서
+  // WO-O4O-TABLET-VIEWER-LANGUAGE-SELECT-AND-SPD-FALLBACK-V1: 언어 선택은 실제 태블릿 런타임(비-미리보기)에서
   //   적용된 Screen Set(콘텐츠 존재)일 때만 노출. legacy/미리보기/임베드는 미노출.
   const showLangSelector = !previewScreen && !previewLayoutOnly && !!slug && !!api.fetchScreen && screen?.mode === 'screen_set';
   const hideProductsBody = isCornerOverview; // 코너 소개형: 설명·콘텐츠·QR 중심 → 상품 그리드 생략

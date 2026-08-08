@@ -75,7 +75,7 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     items: [
       { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
       { label: '매장용 설명서', path: '/supplier/store-descriptions' },
-      { label: '태블렛', path: '/supplier/tablet-screen-sets' },
+      { label: '태블릿', path: '/supplier/tablet-screen-sets' },
       { label: '디지털 사이니지', path: '/supplier/signage' },
     ],
   },

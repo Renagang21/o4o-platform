@@ -15,6 +15,8 @@ import { Router, Request, Response, RequestHandler } from 'express';
 import { DataSource } from 'typeorm';
 import { asyncHandler } from '../../../middleware/error-handler.js';
 import { createRequireStoreOwner, type StoreOwnerServiceKey } from '../../../utils/store-owner.utils.js';
+// WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2: 활성 QR = 실제 공개 랜딩 가능 QR(판정식 SSOT).
+import { SCREEN_SET_QR_JOIN, QR_LANDABLE_CONDITION } from '../../platform/store-screen-set-qr.service.js';
 
 type AuthMiddleware = RequestHandler;
 
@@ -49,10 +51,15 @@ export function createStoreAnalyticsController(
         ),
 
         // 2. 활성 QR 수
+        // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §2:
+        //   과거 `is_active = true` 단독 집계는 **보관된 Screen Set 의 코너 QR**(공개 랜딩 410/404)까지
+        //   활성으로 세어, 홈 KPI 가 QR 목록의 실제 활성 수보다 많았다.
+        //   → 공개 `/qr/:slug` 이중 게이트와 동일한 판정식(QR_LANDABLE_CONDITION)으로 센다.
         dataSource.query(
           `SELECT COUNT(*)::int AS count
-           FROM store_qr_codes
-           WHERE organization_id = $1 AND is_active = true`,
+           FROM store_qr_codes qr
+           ${SCREEN_SET_QR_JOIN}
+           WHERE qr.organization_id = $1 AND ${QR_LANDABLE_CONDITION}`,
           [organizationId],
         ),
 

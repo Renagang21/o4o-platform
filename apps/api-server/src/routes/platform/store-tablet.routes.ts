@@ -992,7 +992,7 @@ export function createStoreTabletRoutes(
    * 매장(조직) 기준 상품 풀 — 물리 태블릿과 무관.
    *
    * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
-   *   Screen Set(태블렛 콘텐츠)은 코너·태블릿과 독립된 라이브러리 원본이라 tabletId 가 없다
+   *   Screen Set(태블릿 콘텐츠)은 코너·태블릿과 독립된 라이브러리 원본이라 tabletId 가 없다
    *   (태블릿이 0대인 매장도 콘텐츠를 만든다). 기존 /tablets/:id/product-pool 은 tabletId 를
    *   소유 확인에만 쓰고 실제 조회는 organization 기준이므로, **동일 SQL** 을 태블릿 없이 노출한다.
    *   신규 테이블·컬럼 없음. 반환 형태도 기존과 동일( { supplierProducts, localProducts } ).

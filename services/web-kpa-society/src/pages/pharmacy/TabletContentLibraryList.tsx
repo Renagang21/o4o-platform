@@ -1,10 +1,10 @@
 /**
- * TabletContentLibraryList — 태블렛 콘텐츠(화면 세트) O4O 표준 리스트
+ * TabletContentLibraryList — 태블릿 콘텐츠(화면 세트) O4O 표준 리스트
  *
  * WO-O4O-KPA-TABLET-CONTENT-STANDARD-LIST-V1 (기반)
  * WO-O4O-KPA-TABLET-CONTENT-LIST-SEARCH-PAGINATION-PREVIEW-V1
  *   - 검색 + 템플릿/상태/사용코너 필터 + 페이지네이션(페이지당 표시 수 선택)
- *   - 행 단위 미리보기(kebab '미리보기' + 콘텐츠명 클릭) → read-only Screen Set preview 모달(태블렛/QR 모바일)
+ *   - 행 단위 미리보기(kebab '미리보기' + 콘텐츠명 클릭) → read-only Screen Set preview 모달(태블릿/QR 모바일)
  * WO-O4O-KPA-TABLET-CONTENT-LIST-REMOVE-LABEL-V1
  *   - 사용자 문구 '보관' → '리스트에서 제거'(내부 status/API 는 archived/soft-delete 그대로).
  *
@@ -71,8 +71,8 @@ const contentActionPolicy = defineActionPolicy<ScreenSet>('kpa:tablet-content', 
   inlineMax: 0,
   rules: [
     { key: 'preview', label: '미리보기' },
-    // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 → 대상 태블렛에 바로 적용(보관 제외).
-    { key: 'apply', label: '태블렛에 적용', visible: (s) => s.status !== 'archived' },
+    // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 콘텐츠 → 대상 태블릿에 바로 적용(보관 제외).
+    { key: 'apply', label: '태블릿에 적용', visible: (s) => s.status !== 'archived' },
     // WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦: 자동 생성된 코너 QR 보기·출력 진입.
     //   slug 가 없는 콘텐츠(아직 QR 미확보)는 노출하지 않는다 — 없는 QR 을 있는 것처럼 보이지 않게.
     { key: 'qr', label: 'QR 보기·출력', visible: (s) => !!s.publicQrSlug && s.status !== 'archived' },
@@ -94,7 +94,7 @@ const ACTION_ICONS: Record<string, ReactNode> = {
   qr: <QrCode className="w-4 h-4" />,
 };
 
-/** 적용 대상 태블렛(최소 형태 — StoreTabletDisplaysPage 의 TabletType 하위집합). */
+/** 적용 대상 태블릿(최소 형태 — StoreTabletDisplaysPage 의 TabletType 하위집합). */
 export interface ApplyTargetTablet {
   id: string;
   name: string;
@@ -116,7 +116,7 @@ interface Props {
   /** WO-O4O-KPA-TABLET-REMOVE-IDLE-VIDEO-TEMPLATE-V1: 필터 드롭다운에서 숨길 legacy 전용 template_key.
    *  (기존 콘텐츠는 목록 '템플릿 전체'에 그대로 노출·편집 가능 — 필터 선택지에서만 제외.) */
   hiddenTemplateFilterKeys?: string[];
-  /** 태블렛 화면 만들기 진입(부모 생성 폼 오픈). */
+  /** 태블릿 화면 만들기 진입(부모 생성 폼 오픈). */
   onCreate: () => void;
   /** 개별 수정(부모 인라인 편집 패널 오픈). dirty guard 는 부모에서 처리. */
   onEdit: (id: string) => void;
@@ -134,9 +134,9 @@ interface Props {
   storeSlug?: string | null;
   /** WO-...-PREVIEW-CORNER-CONTEXT-AND-LABEL-FIX-V1: 미리보기 코너 문맥. 리스트 단독은 코너 없음(상품 미표시). */
   onPreviewContext?: (tabletId: string | null) => void;
-  /** WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 적용 대상 태블렛 목록(설치 코너 표시용). */
+  /** WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: 적용 대상 태블릿 목록(설치 코너 표시용). */
   tablets?: ApplyTargetTablet[];
-  /** 콘텐츠 → 대상 태블렛 적용(기존 current-screen-set API). 성공 시 부모가 tablets 상태 갱신. */
+  /** 콘텐츠 → 대상 태블릿 적용(기존 current-screen-set API). 성공 시 부모가 tablets 상태 갱신. */
   onApplyToTablet?: (screenSetId: string, tabletId: string) => Promise<void>;
   /** HUB 가져오기 완료 후 방금 가져온 사본 하이라이트. */
   highlightId?: string | null;
@@ -170,7 +170,7 @@ export default function TabletContentLibraryList({
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(new Set());
   const batch = useBatchAction();
 
-  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블렛에 적용' 모달 + 하이라이트/스크롤.
+  // WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿에 적용' 모달 + 하이라이트/스크롤.
   const [applyFor, setApplyFor] = useState<ScreenSet | null>(null);
   const [applyBusyTabletId, setApplyBusyTabletId] = useState<string | null>(null);
   const [activeHighlight, setActiveHighlight] = useState<string | null>(null);
@@ -195,7 +195,7 @@ export default function TabletContentLibraryList({
   const openApply = useCallback((s: ScreenSet) => {
     if (!onApplyToTablet) return;
     if (!tablets || tablets.length === 0) {
-      toast.error('먼저 ‘코너별 운영’에서 태블렛을 추가해 주세요.');
+      toast.error('먼저 ‘코너별 운영’에서 태블릿을 추가해 주세요.');
       return;
     }
     setApplyFor(s);
@@ -476,7 +476,7 @@ export default function TabletContentLibraryList({
         <div className="flex items-center gap-2 rounded-xl border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-800">
           <Check className="w-4 h-4 shrink-0" />
           <span className="min-w-0">
-            방금 가져온 <b className="truncate">“{highlightedSet.name}”</b> 을(를) 표시했습니다. <b>태블렛에 적용</b>으로 원하는 태블렛에 바로 띄울 수 있어요.
+            방금 가져온 <b className="truncate">“{highlightedSet.name}”</b> 을(를) 표시했습니다. <b>태블릿에 적용</b>으로 원하는 태블릿에 바로 띄울 수 있어요.
           </span>
         </div>
       )}
@@ -523,7 +523,7 @@ export default function TabletContentLibraryList({
           onClick={onCreate}
           className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-lg text-sm font-semibold hover:bg-indigo-700 shrink-0"
         >
-          <Plus className="w-4 h-4" /> 태블렛 화면 만들기
+          <Plus className="w-4 h-4" /> 태블릿 화면 만들기
         </button>
       </div>
 
@@ -561,8 +561,8 @@ export default function TabletContentLibraryList({
         loading={loading}
         emptyMessage={
           search || statusFilter !== 'available' || templateFilter || cornerFilter
-            ? '조건에 맞는 태블렛 콘텐츠가 없습니다.'
-            : '아직 태블렛 콘텐츠가 없습니다. ‘태블렛 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
+            ? '조건에 맞는 태블릿 콘텐츠가 없습니다.'
+            : '아직 태블릿 콘텐츠가 없습니다. ‘태블릿 화면 만들기’로 첫 화면 세트를 만들어 주세요.'
         }
         tableId="kpa-tablet-content-list"
         onRowClick={(s) => handlePreview(s)}
@@ -586,7 +586,7 @@ export default function TabletContentLibraryList({
         </div>
       </div>
 
-      {/* ── 미리보기 모달(read-only, 태블렛/QR 모바일 전환) ── */}
+      {/* ── 미리보기 모달(read-only, 태블릿/QR 모바일 전환) ── */}
       {preview && previewApi && (
         <div className="fixed inset-0 z-[100000] bg-slate-900/70 flex flex-col" onClick={() => setPreview(null)} role="presentation">
           <div className="bg-slate-900/95 text-white px-4 py-2 flex items-center justify-between gap-3 flex-shrink-0" onClick={(e) => e.stopPropagation()}>
@@ -594,7 +594,7 @@ export default function TabletContentLibraryList({
               <span className="text-sm font-semibold truncate">{preview.name}</span>
               <div className="flex gap-1 flex-shrink-0">
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'tablet' } : p))}
-                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블렛 화면</button>
+                  className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'tablet' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>태블릿 화면</button>
                 <button onClick={() => setPreview((p) => (p ? { ...p, view: 'mobile' } : p))}
                   className={`px-3 py-1 text-xs font-medium rounded-full ${preview.view === 'mobile' ? 'bg-white text-slate-900' : 'bg-white/10 text-white hover:bg-white/20'}`}>QR 모바일 화면</button>
               </div>
@@ -611,7 +611,7 @@ export default function TabletContentLibraryList({
             </div>
           </div>
           <div className="bg-slate-900/90 text-slate-300 text-[11px] px-4 py-1.5 text-center flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            저장된 내용을 보여 주는 미리보기입니다. 실제 태블렛에서는 화면 크기·방향에 따라 달라질 수 있습니다.
+            저장된 내용을 보여 주는 미리보기입니다. 실제 태블릿에서는 화면 크기·방향에 따라 달라질 수 있습니다.
           </div>
         </div>
       )}
@@ -625,7 +625,7 @@ export default function TabletContentLibraryList({
       )}
 
       {/* ── 코너 QR 보기·출력 모달 (WO-O4O-SCREEN-SET-CORNER-QR-VISIBILITY-V1 §범위⑦) ──
-          태블렛 화면(대기·메인)에 상시 표시되는 것과 같은 QR. 파일 출력은 기존 QR export 재사용. */}
+          태블릿 화면(대기·메인)에 상시 표시되는 것과 같은 QR. 파일 출력은 기존 QR export 재사용. */}
       {qrFor && (
         <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={closeQr}>
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[85vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
@@ -689,22 +689,22 @@ export default function TabletContentLibraryList({
               )}
               <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
                 이 QR은 콘텐츠를 저장할 때 자동으로 만들어지며, 이름을 바꾸어도 주소는 그대로 유지됩니다.
-                태블렛 대기 화면과 메인 화면에도 같은 QR이 표시됩니다.
+                태블릿 대기 화면과 메인 화면에도 같은 QR이 표시됩니다.
               </p>
             </div>
           </div>
         </div>
       )}
 
-      {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블렛에 적용' — 대상 태블렛 선택 모달.
-          기존 current-screen-set API 재사용. 적용 = 그 태블렛의 '지금 나오는 화면' 교체(코너별 운영과 동일 결과). */}
+      {/* WO-O4O-STORE-TABLET-LAST-MILE-UX-CLEANUP-V1: '태블릿에 적용' — 대상 태블릿 선택 모달.
+          기존 current-screen-set API 재사용. 적용 = 그 태블릿의 '지금 나오는 화면' 교체(코너별 운영과 동일 결과). */}
       {applyFor && (
         <div className="fixed inset-0 z-[100001] bg-slate-900/50 flex items-center justify-center p-4" role="dialog" aria-modal="true" onClick={() => !applyBusyTabletId && setApplyFor(null)}>
           <div className="bg-white rounded-2xl w-full max-w-md max-h-[80vh] overflow-hidden flex flex-col" onClick={(e) => e.stopPropagation()}>
             <div className="px-5 py-4 border-b flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-slate-800">태블렛에 적용</h3>
-                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 태블렛에 띄울지 고르세요.</p>
+                <h3 className="text-base font-bold text-slate-800">태블릿에 적용</h3>
+                <p className="text-xs text-slate-500 mt-0.5 truncate">“{applyFor.name}” 을(를) 어느 태블릿에 띄울지 고르세요.</p>
               </div>
               <button onClick={() => !applyBusyTabletId && setApplyFor(null)} className="p-1.5 rounded hover:bg-slate-100 shrink-0" aria-label="닫기">
                 <X className="w-4 h-4 text-slate-500" />
@@ -744,7 +744,7 @@ export default function TabletContentLibraryList({
                 })}
               </ul>
               <p className="text-[11px] text-slate-400 mt-3 leading-relaxed">
-                적용하면 해당 태블렛의 ‘지금 나오는 화면’이 바뀝니다. 자동으로 QR이 만들어지지 않으며, 공개 태블렛 화면에서 새로고침하면 반영됩니다.
+                적용하면 해당 태블릿의 ‘지금 나오는 화면’이 바뀝니다. 자동으로 QR이 만들어지지 않으며, 공개 태블릿 화면에서 새로고침하면 반영됩니다.
               </p>
             </div>
           </div>

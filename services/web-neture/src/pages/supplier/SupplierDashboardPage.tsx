@@ -597,7 +597,7 @@ export default function SupplierDashboardPage() {
           ) : (
             <p className="text-sm text-slate-400 py-2">작성한 매장용 설명서가 없습니다.</p>
           )}
-          {/* 제품 콘텐츠·태블렛·사이니지는 공통 count API 가 없어 진입점만 제공한다. */}
+          {/* 제품 콘텐츠·태블릿·사이니지는 공통 count API 가 없어 진입점만 제공한다. */}
           <div className="mt-4 flex flex-wrap gap-2">
             {CONTENT_LINKS.map((link) => (
               <Link
@@ -966,7 +966,7 @@ const QUICK_LINKS = [
 const CONTENT_LINKS = [
   { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
   { label: '매장용 설명서', path: '/supplier/store-descriptions' },
-  { label: '태블렛', path: '/supplier/tablet-screen-sets' },
+  { label: '태블릿', path: '/supplier/tablet-screen-sets' },
   { label: '디지털 사이니지', path: '/supplier/signage' },
 ];
 

@@ -438,7 +438,7 @@ export async function fetchProductPool(
  * 매장(조직) 기준 상품 풀 — 물리 태블릿과 무관.
  *
  * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
- *   태블렛 콘텐츠(Screen Set)는 코너·태블릿과 독립된 원본이라 tabletId 가 없다.
+ *   태블릿 콘텐츠(Screen Set)는 코너·태블릿과 독립된 원본이라 tabletId 가 없다.
  *   반환 형태는 fetchProductPool 과 동일.
  */
 export async function fetchStoreProductPool(): Promise<ProductPool> {

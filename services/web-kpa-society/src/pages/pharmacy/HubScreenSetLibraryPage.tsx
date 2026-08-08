@@ -1,10 +1,10 @@
 /**
- * HubScreenSetLibraryPage — 매장 HUB 태블렛 화면(운영자·공급자 제공) 진열 + 내 태블렛 콘텐츠로 가져오기
+ * HubScreenSetLibraryPage — 매장 HUB 태블릿 화면(운영자·공급자 제공) 진열 + 내 태블릿 콘텐츠로 가져오기
  *
  * WO-O4O-OPERATOR-SCREEN-SET-HUB-PUBLISH-AND-STORE-INDEPENDENT-COPY-V1 (운영자 제공)
  * WO-O4O-SUPPLIER-SCREEN-SET-UI-STORE-HUB-INTEGRATION-V2C           (공급자 제공 섹션 추가)
  *
- * 운영자/공급자가 제작한 Screen Set 원본을 보고, "내 태블렛 콘텐츠로 가져오기" 로 **매장 소유 독립 사본**을
+ * 운영자/공급자가 제작한 Screen Set 원본을 보고, "내 태블릿 콘텐츠로 가져오기" 로 **매장 소유 독립 사본**을
  * 만든다(가져오기=사본 불변식). 공급자 제공은 별도 소스 탭으로 구분하며, 공급자명·게시 대상(매장 유형)이
  * 추가로 표시된다. 매장 유형·의약품 정책 검사는 모두 서버(V2b)가 수행하며, 프론트는 서버 결과를 신뢰한다.
  *
@@ -125,7 +125,7 @@ export function HubScreenSetLibraryPage() {
         setTotal(res.pagination.total);
       }
     } catch (e: any) {
-      setError(e?.message || '태블렛 화면을 불러올 수 없습니다');
+      setError(e?.message || '태블릿 화면을 불러올 수 없습니다');
     } finally {
       setIsLoading(false);
     }
@@ -204,7 +204,7 @@ export function HubScreenSetLibraryPage() {
         ? await importOperatorTemplate(detail.id)
         : await importSupplierTemplate(detail.id);
       setImported({ id: copy.id, name: copy.name });
-      toast.success(`“${copy.name}” 을(를) 내 태블렛 콘텐츠로 가져왔습니다.`);
+      toast.success(`“${copy.name}” 을(를) 내 태블릿 콘텐츠로 가져왔습니다.`);
     } catch (e: any) {
       const msg = e?.code === 'MEDICATION_PHARMACY_ONLY'
         ? '의약품이 포함된 콘텐츠는 약국 매장만 가져올 수 있습니다.'
@@ -325,10 +325,10 @@ export function HubScreenSetLibraryPage() {
       <div className="mb-4">
         <h1 className="text-xl font-bold text-slate-800 flex items-center gap-2">
           <MonitorSmartphone className="w-5 h-5 text-indigo-600" />
-          태블렛 화면 (HUB)
+          태블릿 화면 (HUB)
         </h1>
         <p className="text-sm text-slate-500 mt-1">
-          운영자·공급자가 제작한 태블렛 화면을 내 매장으로 가져올 수 있습니다. 가져오면 <b>내 매장 소유의 사본</b>이 만들어지며,
+          운영자·공급자가 제작한 태블릿 화면을 내 매장으로 가져올 수 있습니다. 가져오면 <b>내 매장 소유의 사본</b>이 만들어지며,
           이후 원본을 수정·삭제해도 내 콘텐츠는 영향을 받지 않습니다.
         </p>
       </div>
@@ -394,7 +394,7 @@ export function HubScreenSetLibraryPage() {
           data={operatorItems}
           rowKey="id"
           loading={isLoading}
-          emptyMessage="아직 운영자가 게시한 태블렛 화면이 없습니다"
+          emptyMessage="아직 운영자가 게시한 태블릿 화면이 없습니다"
           tableId="store-hub-screen-set-operator"
           onRowClick={(row) => void openOperatorDetail(row)}
         />
@@ -404,7 +404,7 @@ export function HubScreenSetLibraryPage() {
           data={supplierItems}
           rowKey="id"
           loading={isLoading}
-          emptyMessage="아직 내 매장 유형에 게시된 공급자 태블렛 화면이 없습니다"
+          emptyMessage="아직 내 매장 유형에 게시된 공급자 태블릿 화면이 없습니다"
           tableId="store-hub-screen-set-supplier"
           onRowClick={(row) => void openSupplierDetail(row)}
         />
@@ -439,11 +439,11 @@ export function HubScreenSetLibraryPage() {
             {imported ? (
               <div className="rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-3 space-y-2">
                 <div className="text-sm font-semibold text-emerald-800">
-                  “{imported.name}” 을(를) 내 태블렛 콘텐츠로 가져왔습니다.
+                  “{imported.name}” 을(를) 내 태블릿 콘텐츠로 가져왔습니다.
                 </div>
                 <p className="text-[12px] text-emerald-900 leading-relaxed">
                   매장 소유의 <b>독립 사본</b>이 만들어졌습니다. 이후 원본이 수정·게시 해제되어도 이 사본은 영향을 받지 않습니다.
-                  <br /><b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블렛에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주세요.
+                  <br /><b>코너에는 아직 적용되지 않았습니다.</b> 실제 태블릿에 띄우려면 ‘코너별 운영’에서 이 콘텐츠를 선택해 주세요.
                 </p>
                 <button
                   onClick={() => navigate('/store/commerce/tablet-displays', {
@@ -451,14 +451,14 @@ export function HubScreenSetLibraryPage() {
                   })}
                   className="px-3 py-1.5 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700"
                 >
-                  내 태블렛 콘텐츠에서 확인
+                  내 태블릿 콘텐츠에서 확인
                 </button>
               </div>
             ) : (
               <>
                 <p className="text-[12px] text-slate-500 leading-relaxed bg-slate-50 border border-slate-200 rounded-lg px-3 py-2">
                   이 화면을 가져오면 <b>그 시점의 내용을 복사한 매장 소유 독립 사본</b>이 만들어집니다. 가져온 후 수정할 수 있으며,
-                  {detail.source === 'supplier' ? ' 공급자 원본' : ' 운영자 원본'}의 변경 사항은 자동으로 반영되지 않습니다. 가져오기만으로 태블렛에 자동 적용되지 않습니다.
+                  {detail.source === 'supplier' ? ' 공급자 원본' : ' 운영자 원본'}의 변경 사항은 자동으로 반영되지 않습니다. 가져오기만으로 태블릿에 자동 적용되지 않습니다.
                 </p>
                 <button
                   onClick={() => void handleImport()}
@@ -466,7 +466,7 @@ export function HubScreenSetLibraryPage() {
                   className="w-full px-4 py-2.5 rounded-lg bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 disabled:opacity-50 inline-flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" />
-                  {importing ? '가져오는 중…' : '내 태블렛 콘텐츠로 가져오기'}
+                  {importing ? '가져오는 중…' : '내 태블릿 콘텐츠로 가져오기'}
                 </button>
               </>
             )}
@@ -479,7 +479,7 @@ export function HubScreenSetLibraryPage() {
                   <button
                     onClick={() => setView('tablet')}
                     className={`px-2 py-1 text-xs rounded border ${view === 'tablet' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'border-slate-200 text-slate-500'}`}
-                  >태블렛 화면</button>
+                  >태블릿 화면</button>
                   <button
                     onClick={() => setView('mobile')}
                     className={`px-2 py-1 text-xs rounded border ${view === 'mobile' ? 'bg-indigo-50 border-indigo-300 text-indigo-700' : 'border-slate-200 text-slate-500'}`}

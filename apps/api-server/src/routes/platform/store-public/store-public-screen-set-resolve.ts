@@ -55,10 +55,13 @@ export interface ResolveScreenSetInput {
   tabletContext?: ScreenSetTabletContext | null;
   /**
    * product_list 처리:
-   *  - 'full' : 태블릿 gate 상품(runtime 기본)
-   *  - 'org'  : 매장 org 기준 상품(QR)
-   *  - 'skip' : 상품 섹션 생략
+   *  - 'full' / 'org' : 상품 섹션 산출(실제 집합은 tabletContext 유무로 결정 — 아래 §5 계약)
+   *  - 'skip'         : 상품 섹션 생략
    * 기본값: tabletContext 있으면 'full', 없으면 'org'.
+   *
+   * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5:
+   *   'org' 는 더 이상 "매장 org 전체 상품"이 아니다. QR 경로는 **직접 선택된 상품만** 노출하며
+   *   선택이 없으면 0건이다(매장 전체 폴백 금지). 'skip' 만 섹션 자체를 생략한다.
    */
   productMode?: 'full' | 'org' | 'skip';
   /**
@@ -85,50 +88,22 @@ export interface ResolvedScreenSet {
 }
 
 /**
- * 모바일/QR 미러용 로컬 상품 resolve — /tablet/products 의 local 경로와 동일 기준.
- * 이 Screen Set 이 적용된 태블릿(current_screen_set_id)의 visible local 진열이 있으면 코너별로 제한,
- * 없으면 매장(org) 전체 활성 로컬로 폴백. 반환 형태는 모바일 뷰어 ProductCard 와 호환.
+ * WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5:
+ *   공개 QR(모바일) 경로의 상품 노출은 **Screen Set 에 직접 선택된 상품만**이다.
+ *   과거에는 명시 선택이 없으면(legacy config) 매장 org 전체 supplier 상품 + 매장 전체 활성 로컬 상품으로
+ *   폴백해, 이 코너와 무관한 상품이 코너 QR 화면에 유입됐다(다른 코너 상품·미적용 세트 포함).
+ *   → 선택이 없으면 상품 0건(빈 섹션 데이터)로 내려보내고, 매장 전체 폴백 조회를 하지 않는다.
+ *   (`resolveScreenSetLocalProducts` 매장 전체 로컬 폴백 헬퍼는 이 계약에 따라 제거됐다.)
+ *   태블릿 runtime(tabletContext 있음)은 기존 코너 진열 기준을 그대로 유지한다 — 이 계약은 QR 경로 전용.
  */
-async function resolveScreenSetLocalProducts(
-  dataSource: DataSource,
-  organizationId: string,
-  screenSetId: string,
-): Promise<Array<{ id: string; type: 'local'; name: string; price: number | null; imageUrl: string | null }>> {
-  const tabletRows = await dataSource.query(
-    `SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`,
-    [screenSetId, organizationId],
-  );
-  const tabletId: string | null = tabletRows?.[0]?.id ?? null;
-
-  let rows: any[] = [];
-  if (tabletId) {
-    rows = await dataSource.query(
-      `SELECT lp.id, lp.name, lp.price_display AS "priceDisplay", lp.thumbnail_url AS "thumbnailUrl", disp.sort_order AS "sortOrder"
-         FROM store_tablet_displays disp
-         JOIN store_local_products lp ON lp.id = disp.product_id AND lp.organization_id = $2 AND lp.is_active = true
-        WHERE disp.tablet_id = $1 AND disp.product_type = 'local' AND disp.is_visible = true
-        ORDER BY disp.sort_order ASC NULLS LAST, lp.name ASC`,
-      [tabletId, organizationId],
-    );
-  }
-  if (rows.length === 0) {
-    // 진열 미구성(legacy) → 매장 전체 활성 로컬.
-    rows = await dataSource.query(
-      `SELECT id, name, price_display AS "priceDisplay", thumbnail_url AS "thumbnailUrl", sort_order AS "sortOrder"
-         FROM store_local_products
-        WHERE organization_id = $1 AND is_active = true
-        ORDER BY sort_order ASC NULLS LAST, name ASC LIMIT 50`,
-      [organizationId],
-    );
-  }
-  return rows.map((r) => ({
-    id: r.id,
-    type: 'local' as const,
-    name: r.name,
-    price: r.priceDisplay != null ? Number(r.priceDisplay) : null,
-    imageUrl: r.thumbnailUrl ?? null,
-  }));
-}
+const EMPTY_QR_PRODUCT_SECTION: SelectedProductListSectionData = {
+  products: [],
+  // kiosk/미리보기가 자체 상품 조회(/tablet/products)로 되돌아가지 않도록 '선택 결과' 표식을 유지한다.
+  selectionMode: 'selected',
+  localProductsEndpoint: null,
+  selectedCount: 0,
+  excludedCount: 0,
+};
 
 /**
  * WO-O4O-SCREEN-SET-CORNER-CONTENT-FREE-AUTHORING-AND-LLM-ASSIST-V1:
@@ -378,46 +353,28 @@ export async function resolveScreenSetSections(
           sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: selectedData });
           continue;
         }
-        // WO-O4O-KPA-TABLET-STORE-UX-AND-SAMPLE-GUIDE-FIX-V1 §5: QR/모바일도 태블릿과 상품 parity.
-        //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)하는데,
-        //   QR(tabletContext 없음)은 그동안 configured=false → org 전체 supplier 라 상품이 더 많았다.
-        //   여기서 current_screen_set_id 로 이 Screen Set 의 코너 태블릿을 도출해 supplier 도 진열로 제한한다(local 과 동일 기준).
-        let supplierTabletId: string | null = tabletContext?.tabletId ?? null;
-        let supplierConfigured: boolean = tabletContext?.configured ?? false;
+        // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §5:
+        //   QR/모바일 경로(tabletContext 없음)는 **직접 선택한 상품만** 노출한다.
+        //   명시 선택이 없으면 매장 전체 상품으로 폴백하지 않고 상품 0건으로 내려간다
+        //   (뷰어는 상품 섹션을 렌더하지 않고 코너 콘텐츠만 표시).
         if (!tabletContext) {
-          const tRows = await dataSource.query(
-            `SELECT id FROM store_tablets WHERE current_screen_set_id = $1 AND organization_id = $2 LIMIT 1`,
-            [input.screenSetId, input.organizationId],
-          );
-          const tId: string | null = tRows?.[0]?.id ?? null;
-          if (tId) {
-            const cnt = await dataSource.query(
-              `SELECT COUNT(*)::int AS c FROM store_tablet_displays WHERE tablet_id = $1 AND is_visible = true`,
-              [tId],
-            );
-            supplierTabletId = tId;
-            supplierConfigured = Number(cnt?.[0]?.c || 0) > 0;
-          }
+          sections.push({ blockType: 'product_list', sortOrder: b.sortOrder, data: { ...EMPTY_QR_PRODUCT_SECTION } });
+          continue;
         }
+        // 태블릿 runtime(tabletContext 있음) 전용 legacy 경로 — 코너 진열 기준 유지(회귀 0).
+        //   태블릿은 supplier 를 코너 진열(store_tablet_displays)로 제한(configured=true)한다.
+        //   kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products)로 상품을 그리므로
+        //   여기 products 는 하위 호환 payload 이다.
         const supplierResult: any = await queryTabletVisibleProducts(dataSource, input.storeId, resolveServiceKeys(input.serviceKey), {
           page: 1, limit: 50, sort: 'sort_order', order: 'asc',
-          firstTabletId: supplierTabletId,
-          configured: supplierConfigured,
+          firstTabletId: tabletContext.tabletId,
+          configured: tabletContext.configured,
         });
-        let products: any[] = supplierResult?.data ?? [];
-        // QR 모바일 미러는 section.products 만 소비하고 /tablet/products(로컬)를 재조회하지 않는다.
-        //   태블릿 kiosk 는 section.products 를 쓰지 않고 fetchProducts(/tablet/products, supplier+local)로 상품을 그린다.
-        //   → tabletContext 없는(모바일/QR) 경로에서만 로컬 상품을 section 에 포함해 태블릿과 상품 parity 를 맞춘다.
-        //   (태블릿 runtime 경로는 기존과 동일하게 supplier 만 — kiosk 미소비라 무영향.)
-        if (!tabletContext) {
-          const locals = await resolveScreenSetLocalProducts(dataSource, input.organizationId, input.screenSetId);
-          products = [...products, ...locals];
-        }
         sections.push({
           blockType: 'product_list',
           sortOrder: b.sortOrder,
           data: {
-            products,
+            products: supplierResult?.data ?? [],
             localProductsEndpoint: input.storeSlug ? `/${input.storeSlug}/tablet/products` : null,
           },
         });

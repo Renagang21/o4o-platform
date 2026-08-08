@@ -203,11 +203,19 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     // WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1 (2026-08-06)
     //   canonical tree 의 "자료함" 축. 원장은 공통 테이블(kpa_store_contents /
     //   store_execution_assets / store_blog_posts) 재사용 — Pharmacy-Hub 전용 테이블 0.
-    //   QR·POP·태블릿·사이니지는 route 도 기능도 없으므로 메뉴를 만들지 않는다 (데드링크 0).
     { label: '콘텐츠·자료함', items: [
       { key: 'store-contents', label: '매장 콘텐츠', subPath: '/content' },
       { key: 'library',        label: '자료함',      subPath: '/library' },
       { key: 'blog',           label: '블로그',      subPath: '/blog' },
+    ]},
+    // WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (2026-08-08)
+    //   콘텐츠·자료(입력)와 다른 축이다 — 매장에서 실제로 쓰는 출력·실행 자산.
+    //   원장은 공통 테이블(store_qr_codes / shared_product_descriptions) 재사용 — PH 전용 테이블 0.
+    //   POP · 태블릿 · 디지털 사이니지는 아직 route 도 기능도 없으므로 메뉴를 만들지 않는다
+    //   (데드링크 0 / "준비 중" 메뉴 0 — 기능이 완료되는 시점에 이 그룹에 추가한다).
+    { label: '매장 실행', items: [
+      { key: 'qr',      label: 'QR',        subPath: '/qr' },
+      { key: 'manuals', label: '상품 설명서', subPath: '/manuals' },
     ]},
     // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)
     //   route 와 실제 기능이 함께 준비된 뒤에만 노출한다 ("준비 중" 메뉴 0).
@@ -372,7 +380,7 @@ export const KPA_SOCIETY_STORE_CONFIG: StoreDashboardConfig = {
       //   진입점은 이미 존재하나 '타블렛 구성'이 '화면 제작' 진입으로 읽히지 않음 →
       //   라벨만 '태블릿 화면 제작'으로 정비(코너별 화면·대기화면 제작·적용). key/subPath/route/기능 무변경.
       //   신규 메뉴 추가 아님(같은 route 중복 방지). GP/KCos 무영향.
-      { key: 'tablet-displays', label: '태블렛 화면 제작', subPath: '/commerce/tablet-displays' },
+      { key: 'tablet-displays', label: '태블릿 화면 제작', subPath: '/commerce/tablet-displays' },
     ]},
     // WO-O4O-KPA-QR-POP-RESULT-SCOPE-V1: KPA 사이드바에서 "매장 제작 자료" 메뉴 숨김.
     //   POP/제작 결과물은 콘텐츠 목록(QR·POP 바로 만들기) + 결과물 메뉴 중심으로 안내한다.

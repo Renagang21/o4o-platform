@@ -62,6 +62,9 @@ const LANDING_TYPE_LABELS: Record<string, string> = {
   video: '동영상',
 };
 
+// WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: QR 목록 필터 키.
+type QrListFilter = 'all' | 'content' | 'ai' | 'screen_set';
+
 function toSlug(text: string): string {
   return text
     .toLowerCase()
@@ -186,7 +189,8 @@ export function StoreQRPage() {
   const [items, setItems] = useState<StoreQrCode[]>([]);
   const [loading, setLoading] = useState(true);
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터 + QR 설정 모달
-  const [listFilter, setListFilter] = useState<'all' | 'content' | 'ai'>('all');
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: 'screen_set'(태블릿 코너) 추가.
+  const [listFilter, setListFilter] = useState<QrListFilter>('all');
   const [settingsQr, setSettingsQr] = useState<StoreQrCode | null>(null);
   const [showSelector, setShowSelector] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
@@ -564,17 +568,22 @@ export function StoreQRPage() {
   const qrBaseUrl = `${window.location.origin}/qr/`;
 
   // WO-O4O-KPA-QR-AI-DESCRIPTION-SINGLE-CORNER-V1: 목록 필터(전체 | 콘텐츠 연결 | AI 설명)
+  // WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3: '태블릿 코너'(screen_set) 필터 추가.
+  //   일반 QR · AI 설명 QR · 코너 QR 구분을 유지한다(코너 QR 은 화면 세트 저장 시 자동 생성 — 수동 생성 경로 없음).
   const filteredItems = items.filter((q) => {
     if (listFilter === 'ai') return !!q.aiDescriptionMode;
     if (listFilter === 'content') return q.landingType === 'page' && !q.aiDescriptionMode;
+    if (listFilter === 'screen_set') return q.landingType === 'screen_set';
     return true;
   });
   const aiCount = items.filter((q) => !!q.aiDescriptionMode).length;
   const contentCount = items.filter((q) => q.landingType === 'page' && !q.aiDescriptionMode).length;
-  const FILTER_TABS: { key: 'all' | 'content' | 'ai'; label: string; count: number }[] = [
+  const cornerCount = items.filter((q) => q.landingType === 'screen_set').length;
+  const FILTER_TABS: { key: QrListFilter; label: string; count: number }[] = [
     { key: 'all', label: '전체', count: items.length },
     { key: 'content', label: '콘텐츠 연결', count: contentCount },
     { key: 'ai', label: 'AI 설명', count: aiCount },
+    { key: 'screen_set', label: '태블릿 코너', count: cornerCount },
   ];
 
   return (
@@ -1102,6 +1111,21 @@ export function StoreQRPage() {
                             <Sparkles size={16} />
                           </Link>
                         </>
+                      )}
+                      {/* WO-O4O-KPA-STORE-QR-SCREENSET-STATE-ALIGNMENT-V1 §3:
+                          코너 QR(screen_set)은 QR 자체를 편집하는 대상이 아니라 **화면 세트**가 원본이다.
+                          landingTargetId = store_tablet_screen_sets.id → 그 세트의 편집 화면으로 바로 이동한다
+                          (태블릿 화면 제작 페이지의 '태블릿 콘텐츠' 탭 + 해당 세트 편집기 진입). */}
+                      {item.landingType === 'screen_set' && item.landingTargetId && (
+                        <Link
+                          to="/store/commerce/tablet-displays"
+                          state={{ tab: 'contents', editScreenSetId: item.landingTargetId, highlightScreenSetId: item.landingTargetId }}
+                          onClick={(e) => e.stopPropagation()}
+                          style={styles.iconBtn}
+                          title="화면 세트 열기 (코너 화면 편집)"
+                        >
+                          <LayoutTemplate size={16} />
+                        </Link>
                       )}
                       <button
                         onClick={(e) => { e.stopPropagation(); setSettingsQr(item); }}
