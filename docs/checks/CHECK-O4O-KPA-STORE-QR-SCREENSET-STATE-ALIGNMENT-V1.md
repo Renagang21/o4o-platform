@@ -362,13 +362,12 @@ M-1 은 `listStoreQrCodes` / `findStoreQrCode`(인증 경로)만 바꿨고 공�
 | CodeQL Security Analysis | ✅ success |
 | CI Pipeline | ⚠️ **cancelled** — 아래 주 |
 
-> **CI Pipeline 미확정 주의(정직 기록)**: 병렬 세션이 짧은 간격으로 계속 push 하고 있어
-> `concurrency: cancel-in-progress` 로 **연속 6개 커밋의 CI Pipeline 이 전부 취소**됐다
-> (`442646b87` · `e30358f92` · `79e611c57` · `4e9ccc303` · `a7486832a` · `89dc2599c`).
-> 마지막 success 는 `a414d9ff6` 로, **M-1(`4e9ccc303`) 을 포함하지 않는다.**
-> → 현시점에서 M-1 은 **CI Pipeline 으로 확인되지 않았다.** 대신 CI 의 실제 게이트를 로컬에서 동일하게 실행했다:
-> `type-check:frontend`(kpa PASS) · api-server `type-check`(PASS) · `node scripts/lint-ratchet.mjs`(102 = baseline).
-> 후속 커밋의 CI Pipeline 이 성공하면 그 시점에 확정된다(코드 트리에 M-1 포함).
+> **CI Pipeline 취소 이력(기록)**: 병렬 세션의 잦은 push 로 `concurrency: cancel-in-progress` 가
+> 연속 커밋들의 CI Pipeline 을 취소했다(`442646b87` · `e30358f92` · `79e611c57` · `4e9ccc303` ·
+> `a7486832a` · `89dc2599c` · `48faea93e` · `028ec93d2`).
+> 마지막 `028ec93d2` 취소는 **본 세션의 CHECK 커밋(`566224d2d`)이 원인**이다 —
+> 코드 CI 가 도는 중에 문서 커밋을 올렸다. **교훈: 코드 CI 완주 후 문서 커밋을 올린다.**
+> → **§8-C 에서 최종 확정**(`566224d2d` CI Pipeline success, 전 코드 커밋 포함).
 
 ---
 
@@ -463,6 +462,24 @@ M-1 은 `listStoreQrCodes` / `findStoreQrCode`(인증 경로)만 바꿨고 공�
 | 편집기 자동 진입 | ✅ 열리지 않음(의도대로) |
 | 오류 토스트 | ✅ 없음 |
 | 클릭 후 4xx | ✅ **0건** (수정 전에는 `GET /screen-sets/:id` 404) |
+
+---
+
+## 8-C. 최종 CI · 배포 확정
+
+| 커밋 | 내용 | Deploy Web | Deploy API | CodeQL | CI Pipeline |
+|---|---|:---:|:---:|:---:|:---:|
+| `90aef6023` | M-2·M-3·M-4·M-5·§6 | ✅ | ✅ | ✅ | cancelled |
+| `4e9ccc303` | M-1 | ✅ | ✅ | ✅ | cancelled |
+| `48faea93e` | D1 (print 차단) | — | ✅ | ✅ | cancelled |
+| `028ec93d2` | D1 409 통일 + D2 | ✅ | ✅ | ✅ | cancelled |
+| **`566224d2d`** | CHECK(문서) — **코드 트리 = `028ec93d2`** | — | — | ✅ | ✅ **success** |
+
+`566224d2d` 의 CI Pipeline success 가 위 **모든 코드 커밋을 포함**함을 확인했다
+(`git merge-base --is-ancestor` 로 `90aef6023` · `4e9ccc303` · `48faea93e` · `028ec93d2` 전부 ancestor 검증).
+
+→ **WO 검증 조건 충족**: typecheck/test PASS · lint-ratchet 회귀 0 · 최신 descendant CI GREEN ·
+Web/API 배포 success · 프로덕션 E2E PASS.
 
 ---
 
