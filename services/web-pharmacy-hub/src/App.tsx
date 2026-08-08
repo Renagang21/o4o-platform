@@ -81,6 +81,11 @@ import BlogEditorPage from './pages/store-owner/BlogEditorPage';
 // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1
 import StoreInfoPage from './pages/store-owner/StoreInfoPage';
 import AccountPage from './pages/store-owner/AccountPage';
+// WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (QR · 상품 설명서)
+import QrPage from './pages/store-owner/QrPage';
+import ManualsPage from './pages/store-owner/ManualsPage';
+import ManualDetailPage from './pages/store-owner/ManualDetailPage';
+import QrLandingPage from './pages/QrLandingPage';
 import { ROLES } from './config/service';
 
 export default function App() {
@@ -177,6 +182,10 @@ export default function App() {
             <Route path="blog" element={<BlogPage />} />
             <Route path="blog/new" element={<BlogEditorPage />} />
             <Route path="blog/:id/edit" element={<BlogEditorPage />} />
+            {/* WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 — 매장 실행 자산 (출력·실행) */}
+            <Route path="qr" element={<QrPage />} />
+            <Route path="manuals" element={<ManualsPage />} />
+            <Route path="manuals/:listingId" element={<ManualDetailPage />} />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}
             <Route path="info" element={<StoreInfoPage />} />
             <Route path="account" element={<AccountPage />} />
@@ -194,6 +203,13 @@ export default function App() {
             <Route path="success" element={<PaymentSuccessPage />} />
             <Route path="fail" element={<PaymentFailPage />} />
           </Route>
+
+          {/*
+            공개 QR 랜딩 (WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1)
+            매장 QR payload = https://pharmacyhub.co.kr/qr/{slug}. 소비자가 스캔하는 화면이라
+            로그인·매장 셸을 요구하지 않는다.
+          */}
+          <Route path="/qr/:slug" element={<QrLandingPage />} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

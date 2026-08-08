@@ -54,6 +54,9 @@ import { PharmacyHubLocalProductController } from '../../controllers/pharmacy-hu
 import { PharmacyHubStoreContentController } from '../../controllers/pharmacy-hub/PharmacyHubStoreContentController.js';
 import { PharmacyHubStoreLibraryController } from '../../controllers/pharmacy-hub/PharmacyHubStoreLibraryController.js';
 import { PharmacyHubStoreBlogController } from '../../controllers/pharmacy-hub/PharmacyHubStoreBlogController.js';
+// WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 (매장 실행 자산)
+import { PharmacyHubStoreQrController } from '../../controllers/pharmacy-hub/PharmacyHubStoreQrController.js';
+import { PharmacyHubStoreManualController } from '../../controllers/pharmacy-hub/PharmacyHubStoreManualController.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -330,6 +333,51 @@ export function createPharmacyHubRoutes(): Router {
   router.patch('/store-owner/blog/:id/publish', ...storeOwnerGuards, PharmacyHubStoreBlogController.publish);
   router.patch('/store-owner/blog/:id/archive', ...storeOwnerGuards, PharmacyHubStoreBlogController.archive);
   router.delete('/store-owner/blog/:id', ...storeOwnerGuards, PharmacyHubStoreBlogController.remove);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — QR (WO-PHARMACY-HUB-STORE-EXECUTION-ASSETS-V1 범위 A)
+  //
+  //   원장은 공통 store_qr_codes / store_qr_scan_events 다 — 신규 테이블 0 / migration 0.
+  //   저장·검증·집계 계약은 공통 services/store/store-qr.service.ts 를 그대로 호출한다
+  //   (KPA·GlycoPharm·K-Cosmetics 와 같은 함수 — 새 QR 엔진 0).
+  //
+  //   공통 `/pharmacy/qr/*` 를 마운트하지 않는 이유는 content/library 와 같다:
+  //   createRequireStoreOwner(=resolveStoreAccess) 가 service scope 없이
+  //   organization_members 를 정렬 없는 LIMIT 1 로 골라 PH enrollment 조직과 어긋날 수 있다.
+  //
+  //   연결 대상은 **매장 소유 자료만** 통과한다 (자료함 · 매장 콘텐츠 · 매장 경영활용 제품).
+  //   `/store-owner/products` 의 B2B 공급 offer 를 실행 자산 SSOT 로 쓰지 않는다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/qr', ...storeOwnerGuards, PharmacyHubStoreQrController.list);
+  // 정적 세그먼트 `sources` 는 `/:id/...` 보다 먼저 등록해야 :id 로 포획되지 않는다.
+  router.get('/store-owner/qr/sources', ...storeOwnerGuards, PharmacyHubStoreQrController.sources);
+  router.post('/store-owner/qr', ...storeOwnerGuards, PharmacyHubStoreQrController.create);
+  router.get('/store-owner/qr/:id/analytics', ...storeOwnerGuards, PharmacyHubStoreQrController.analytics);
+  router.get('/store-owner/qr/:id/export', ...storeOwnerGuards, PharmacyHubStoreQrController.exportFile);
+  router.put('/store-owner/qr/:id', ...storeOwnerGuards, PharmacyHubStoreQrController.update);
+  router.delete('/store-owner/qr/:id', ...storeOwnerGuards, PharmacyHubStoreQrController.deactivate);
+
+  /**
+   * 공개 QR 랜딩 (인증 없음) — QR payload 가 https://pharmacyhub.co.kr/qr/{slug} 이므로
+   * Pharmacy-Hub 도메인에서 스캔이 해석되어야 한다. 해석·스캔 기록은 위와 같은 공통 service 다.
+   * 상태 변경이 없는 조회 전용 GET 이며, 매장 소유 공개 콘텐츠만 응답에 담긴다.
+   */
+  router.get('/qr/public/:slug', PharmacyHubStoreQrController.publicLanding);
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — 상품 설명서 (동일 WO 범위 E, 조회 전용)
+  //
+  //   canonical = shared_product_descriptions (description_type='STORE', status='canonical').
+  //   본 WO 는 설명서를 새로 만들거나 번역하지 않는다 — 설명서 write 0.
+  //   유일한 write 는 상품 QR(product_landings) 멱등 발급이며 명시적 POST 에서만 일어난다.
+  // ───────────────────────────────────────────────────────────────────────────
+  router.get('/store-owner/manuals', ...storeOwnerGuards, PharmacyHubStoreManualController.list);
+  router.get('/store-owner/manuals/:listingId', ...storeOwnerGuards, PharmacyHubStoreManualController.detail);
+  router.post(
+    '/store-owner/manuals/:listingId/qr',
+    ...storeOwnerGuards,
+    PharmacyHubStoreManualController.issueProductQr,
+  );
 
   // ───────────────────────────────────────────────────────────────────────────
   // 약국 장바구니 · 주문 (WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1, Phase 1)
