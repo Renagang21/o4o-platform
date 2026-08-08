@@ -177,19 +177,73 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 | `/pharmacy-hub/store-owner/pop` | `404` | **미배포** (본 커밋 대상) |
 | `/pharmacy-hub/store-owner/signage/playlists` | `404` | **미배포** (본 커밋 대상) |
 
-### 5-5. 수행하지 않은 검증 — 숨기지 않고 명시한다
+### 5-5. 배포 후 프로덕션 실측 (2026-08-08, 커밋 `79e611c57` 배포분)
 
-| 항목 | 상태 |
+| 워크플로 | 커밋 | 결과 |
+|---|---|---|
+| Deploy API Server (Cloud Run) | `79e611c57` | ✅ success |
+| Deploy Admin Dashboard (Cloud Run) | `79e611c57` | ✅ success |
+| Deploy Web Services (Cloud Run) | `4e9ccc303` (내 커밋의 자손) | ✅ success |
+| CI Pipeline · CodeQL | `79e611c57` | ⚠️ cancelled — 병행 세션의 후속 push 가 `concurrency: cancel-in-progress` 로 대체. 자손 커밋 `a7486832a`·`4e9ccc303` 의 CodeQL success 로 대체 확인 |
+
+**엔드포인트 마운트 · 가드 (전 축)**
+
+| endpoint | 결과 |
 |---|---|
-| KPA QR **인증 경로** CRUD·출력(PNG/SVG/PDF)·스캔통계 브라우저 실측 | ❌ 미수행 |
-| 공개 랜딩 **분기별**(page/product/video/screen_set) 실데이터 실측 | ❌ 미수행 (404 분기만 확인) |
-| screen_set QR 멱등 재사용 **프로덕션** 실측 | ❌ 미수행 (단위 테스트로만 고정) |
-| GlycoPharm · K-Cosmetics QR 목록/생성 실측 | ❌ 미수행 (공개 랜딩만 확인) |
-| PH QR·POP·사이니지·설명서 브라우저 smoke | ❌ 미수행 |
-| 미연결(renagang21) · AMBIGUOUS 계정 실측 | ❌ 미수행 (코드 경로 검토만) |
-| 교차 조직 격리 실측 (2개 자산 유형) | ❌ 미수행 |
-| W1~W8 런타임 회귀 | ❌ 미수행 |
-| POP·사이니지 프로덕션 배포 | ❌ 미수행 |
+| `store-owner/qr` · `qr/sources` · `pop` · `pop/hub` · `signage/playlists` · `signage/sources` · `manuals` | 전부 `401 AUTH_REQUIRED` — 마운트 + 가드 정상 |
+| 쓰기 8종 (POST qr / pop / pop·import / signage·playlists, PUT qr/:id, PATCH pop/:id/publish, DELETE signage/playlists/:id, POST manuals/:id/qr) | 전부 `401` — **500·200 0건** (미인증 write 차단 확인) |
+
+**공개 QR 랜딩 4개 서비스** (위임 전환 최대 위험 축)
+
+| 서비스 | 응답 | envelope |
+|---|---|---|
+| kpa · glycopharm · cosmetics | `404 QR_NOT_FOUND` | nested `{error:{code,message}}` — **기존 계약 보존** |
+| pharmacy-hub | `404 QR_NOT_FOUND` | flat `{error,code}` — PH 계약대로 |
+
+**PH 웹 배포 확인** — `https://pharmacyhub.co.kr` 200, 번들(`index-BJKehv_A.js`)에
+`디지털 사이니지` · `상품 설명서` · `재생 목록 만들기` · `POP 작성` · `QR 만들기` ·
+`store-owner/signage` · `store-owner/pop` · `qr/public` 전부 포함 — 4개 축 화면·메뉴 배포됨.
+
+**런타임 오류** — 배포 후 25분간 `o4o-core-api` severity≥ERROR 로그 **0건**.
+
+### 5-6. 인증 사용자 실측 — **BLOCKED (자격증명 부재)**
+
+작업요청서가 요구한 실측 7개 항목 중 **1·3·4·5·6·7 은 인증된 `pharmacy-hub:store_owner`
+세션이 있어야 한다.** 프로덕션에서 확보하지 못했다.
+
+| 계정 | 로그인 결과 |
+|---|---|
+| `sohae2100@gmail.com` | `401 INVALID_CREDENTIALS` — SSOT 문서의 비밀번호가 프로덕션과 불일치 |
+| `sohae21@naver.com` | `403 ACCOUNT_NOT_ACTIVE` |
+| `renagang21@gmail.com` | SSOT 문서에 이미 **무효** 로 기록됨 (2026-08-03 정정) |
+
+더 근본적으로, `docs/local/TEST-ACCOUNTS.local.md` 의 역할 인벤토리상
+**`pharmacy-hub:store_owner` 를 가진 계정이 하나도 없다.**
+`sohae2100` = `pharmacy-hub:operator`, `sohae21` = `pharmacy-hub:supplier` 뿐이다.
+즉 비밀번호를 되살려도 **PH 매장 경영자 화면에는 진입할 수 없다.**
+
+이는 CLAUDE.md 중지 조건 **"실제 계정 · 자격정보 · 외부 서비스 승인 필요"** 에 해당한다.
+해소하려면 프로덕션에서 (a) 계정 비밀번호 재설정 또는 (b) `pharmacy-hub:store_owner`
+role 부여 + 매장 조직 enrollment 가 필요한데, 둘 다 **RBAC·운영 데이터 write** 이고
+작업요청서도 "운영 fixture 는 만들지 않는다" 로 금지한다. **임의로 수행하지 않았다.**
+
+| 미수행 항목 | 사유 |
+|---|---|
+| PH QR 목록/생성/상세 · 공개 랜딩 정상 분기 · screen_set 멱등 재사용 실측 | 인증 세션 없음 |
+| PH POP 작성·조회·수정·publish/archive · HUB 빈 상태 · import 독립성 | 인증 세션 없음 |
+| PH 사이니지 목록·항목 추가·스냅샷 생성·제거·원본 불변 | 인증 세션 없음 |
+| PH 설명서 canonical 조회 · 언어 전환 · 빈 상태 | 인증 세션 없음 |
+| 조직 격리(미연결 · 교차 조직 · client organizationId 주입 차단) | 인증 세션 없음 |
+| AMBIGUOUS | 실계정 없음 — 작업요청서 지시대로 **fixture 만들지 않고** 코드 경로 + 후속 관측으로 기록 |
+| KPA · GlycoPharm · K-Cosmetics QR **owner CRUD** 실측 | 인증 세션 없음 (공개 랜딩 계약은 확인 §5-5) |
+| W1~W8 브라우저 회귀 | 인증 세션 없음 |
+
+> 코드 경로 근거는 남아 있다: 조직 해석은 4개 컨트롤러 모두
+> `resolvePharmacyHubStoreOrganization()` 단일 경로이고, write 는 전부
+> `sendWriteBlocked()` 선행, client `organizationId`/`storeId`/`serviceKey`/`authorRole` 은
+> `rejectsOrganizationId`/`rejectsForeignKeys` 로 400 거부, 교차 조직은
+> `(organization_id)` · `(store_id, service_key)` 복합 WHERE 로 404 처리된다(§5-1 단위 테스트로 고정).
+> **다만 이는 정적 근거이며 프로덕션 실측을 대체하지 않는다.**
 
 ---
 
@@ -210,9 +264,18 @@ PH 전용 운영자 HUB 를 신설하는 대신, 기존 구조가 **이미 허�
 > 그 커밋을 함께 밀어낸다. "커밋하되 push 하지 않는다" 는 두 세션이 같은 브랜치에서 동시에
 > 작업하는 동안에는 **성립하지 않는다.** 배포를 실제로 막으려면 별도 브랜치가 필요하다.
 
-### 6-2. POP · 사이니지는 미배포
+### 6-2. POP · 사이니지 — 배포 완료
 
-본 커밋 시점 기준 프로덕션에 없다(§5-4 의 404). 다음 배포에 함께 나간다.
+사용자 결정에 따라 `6aa6a2dab` + `79e611c57` 을 main 에 명시적으로 push 했고
+(`e30358f92..79e611c57`), Deploy API Server / Web Services 모두 success 다.
+§5-5 실측으로 4개 축 전부 프로덕션에서 응답함을 확인했다.
+
+### 6-3. 다음 회차 권고 — 병렬 개발 격리
+
+같은 checkout 의 `main` 에서 여러 세션이 동시에 작업하면 "내 커밋은 push 하지 않는다" 가
+기술적으로 보장되지 않는다(§6-1 이 실제 사례). 다음 작업부터는 세션별
+**`git worktree` + 작업 브랜치** 분리를 권고한다 — commit·checkout·build·push 가
+서로 간섭하지 않는다. 이번 WO 를 닫은 뒤 개발환경 정비 항목으로 잡는다.
 
 ---
 
@@ -256,20 +319,34 @@ back-compat 경로가 `pharmacy-hub:store_owner` 를 포함한 **모든** store_
 
 | # | 기준 | 결과 |
 |:--:|---|---|
-| 1 | QR 관리 정상 | ✅ 구현 완료 · LIVE (인증 경로 브라우저 실측 미수행) |
-| 2 | POP 관리 정상 | ✅ 구현 완료 (미배포) |
+| 1 | QR 관리 정상 | ⚠️ 구현 완료 · 배포 · 마운트/가드 PASS — **인증 경로 실측 BLOCKED (§5-6)** |
+| 2 | POP 관리 정상 | ⚠️ 동일 |
 | 3 | 태블릿 screen-set 관리 정상 | ⏸ **HOLD** — 병행 세션 충돌, 후속 WO 분리 |
-| 4 | 디지털 사이니지 관리 정상 | ✅ 구현 완료 (미배포) |
-| 5 | 상품 설명서 조회 정상 | ✅ 구현 완료 · LIVE |
-| 6 | 전부 PH enrollment 조직으로 격리 | ✅ 4개 축 전부 `resolvePharmacyHubStoreOrganization()` 단일 경로 |
-| 7 | 원본·사본 독립성 유지 | ✅ §4 — POP 은 단위 테스트로 고정 |
-| 8 | 미연결·ambiguous write 0 | ✅ 코드 경로상 write 전부 `sendWriteBlocked` 선행 — **실계정 실측 미수행** |
-| 9 | 메뉴·route 정합 | ✅ '매장 실행' 그룹 = QR · POP · 디지털 사이니지 · 상품 설명서 |
+| 4 | 디지털 사이니지 관리 정상 | ⚠️ 동일 |
+| 5 | 상품 설명서 조회 정상 | ⚠️ 동일 |
+| 6 | 전부 PH enrollment 조직으로 격리 | ⚠️ 코드 경로 단일화 확인 · 단위 테스트 고정 — **실계정 실측 BLOCKED** |
+| 7 | 원본·사본 독립성 유지 | ✅ §4 — POP import 원본 FK 부재는 단위 테스트로 고정 |
+| 8 | 미연결·ambiguous write 0 | ⚠️ 미인증 write 8종 401 확인 · 코드 경로 `sendWriteBlocked` 선행 — **실계정 실측 BLOCKED** |
+| 9 | 메뉴·route 정합 | ✅ '매장 실행' = QR · POP · 디지털 사이니지 · 상품 설명서 (번들 실측 확인) |
 | 10 | dead link · 준비 중 화면 0 | ✅ 태블릿은 메뉴를 만들지 않았다 |
-| 11 | W1~W8 및 타 서비스 회귀 0 | ⚠️ typecheck·build 5개 + 단위테스트 33개 + 공개 랜딩 4서비스 실측 PASS / **인증 경로 런타임 회귀 미수행** |
-| 12 | 테스트 자산 원상 복구 | — 해당 없음 (DB write 미수행) |
-| 13 | 배포 · production smoke PASS | ⚠️ QR·설명서 배포됨(§6-1) + 공개 랜딩 smoke PASS / POP·사이니지 미배포 / 브라우저 smoke 미수행 |
-| 14 | CHECK · commit · push 완료 | ✅ CHECK · commit 완료 (push 는 §6-1 참조) |
+| 11 | W1~W8 및 타 서비스 회귀 0 | ⚠️ typecheck 5개 + 단위테스트 33개 + 공개 랜딩 4서비스 + 런타임 오류 0건 PASS / **브라우저 회귀 BLOCKED** |
+| 12 | 테스트 자산 원상 복구 | — 해당 없음 (DB write 0) |
+| 13 | 배포 · production smoke PASS | ⚠️ 배포 ✅ / 미인증 smoke ✅ / **인증 smoke BLOCKED** |
+| 14 | CHECK · commit · push 완료 | ✅ |
+
+**최종 판정**: `IMPLEMENTATION_COMPLETE / PENDING_PRODUCTION_VERIFICATION / TABLET_DEFERRED`
+
+`PASS with TABLET_DEFERRED` 로 닫지 **않는다.** §5-6 의 인증 실측이 자격증명 부재로
+수행 불가이기 때문이다. 구현·배포 실패가 아니라 **검증 수단 부재**이며, 아래가 해소되면
+남은 항목만 실측해 판정을 승격할 수 있다.
+
+### 판정 승격에 필요한 것 (사용자 결정 사항)
+
+1. `pharmacy-hub:store_owner` role + PH 매장 조직 `active` enrollment 를 가진 **검증용 계정**
+   (프로덕션 RBAC·조직 write 라 승인 없이 만들지 않았다)
+2. 해당 계정의 유효한 비밀번호 → `docs/local/TEST-ACCOUNTS.local.md` 갱신
+   (현재 문서의 3개 계정 모두 프로덕션 로그인 실패 — §5-6)
+3. 교차 조직 격리 실측을 위해서는 **서로 다른 PH 조직 2개**에 각각 매장 경영자가 필요하다
 
 ---
 
