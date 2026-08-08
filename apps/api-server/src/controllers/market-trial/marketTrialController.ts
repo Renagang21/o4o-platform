@@ -29,6 +29,7 @@ import {
 import { MarketTrialService } from '@o4o/market-trial';
 import { marketTrialNotification } from '../../services/marketTrial.notification.js';
 import { computeKpiSnapshot } from './marketTrialOperatorController.js';
+import logger from '../../utils/logger.js';
 
 /** Trial 참여 가능 상태 목록 */
 const JOINABLE_STATUSES: TrialStatus[] = [
@@ -325,7 +326,16 @@ export class MarketTrialController {
         data: evaluated.map((t) => toTrialDTO(t, forumMap.get(t.id), productMap.get(t.productId ?? ''))),
       });
     } catch (error) {
-      console.error('Get trials error:', error);
+      // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1 §E:
+      // 프로덕션에서 이 경로의 500 이 관측됐으나(30일 2건, 검색엔진 봇의 목록 호출)
+      // console.error 로만 남아 Cloud Logging 에서 severity·stack 으로 조회되지 않아
+      // 원인을 특정할 수 없었다. 추측 수정 대신 진단 가능한 로그로 교체한다.
+      logger.error('[MarketTrial] getTrials failed', {
+        event: 'market_trial.get_trials_error',
+        statusFilter: (req.query?.status as string) ?? null,
+        errorMessage: error instanceof Error ? error.message : String(error),
+        errorStack: error instanceof Error ? error.stack : undefined,
+      });
       res.status(500).json({
         success: false,
         message: 'Failed to get trials',

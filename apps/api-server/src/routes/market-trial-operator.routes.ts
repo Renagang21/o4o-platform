@@ -120,6 +120,9 @@ export function createNetureOperatorTrialRoutes(): Router {
   router.patch('/:id/participants/:participantId/payment-status', MarketTrialOperatorController.updateParticipantPaymentStatus);
   router.patch('/:id/status', MarketTrialOperatorController.updateTrialStatus);
   router.patch('/:id/approve', MarketTrialOperatorController.approve1st);
+  // WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1: 포럼 공고 게시 재시도 (멱등)
+  // 상단 router.use(requireAuth) + requireNetureScope('neture:operator') 가 적용된다.
+  router.post('/:id/forum-sync/retry', MarketTrialOperatorController.retryForumSync);
   router.patch('/:id/reject', MarketTrialOperatorController.reject1st);
 
   return router;

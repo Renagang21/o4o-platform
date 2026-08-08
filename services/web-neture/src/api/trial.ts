@@ -634,6 +634,20 @@ export async function resolveForumSyncFailure(
   return data.data || data;
 }
 
+/**
+ * WO-O4O-MARKET-TRIAL-NETURE-FORUM-SYNC-RECOVERY-V1
+ * 포럼 공고 게시 재시도 (운영자 전용 · 멱등).
+ * 이미 게시된 trial 은 already_linked 로 응답하며 중복 생성하지 않는다.
+ */
+export async function retryTrialForumSync(
+  trialId: string,
+): Promise<{ status: 'created' | 'already_linked'; forumPostId: string }> {
+  const { data } = await api.post(
+    `${API_BASE_URL}/api/v1/neture/operator/market-trial/${trialId}/forum-sync/retry`,
+  );
+  return data.data || data;
+}
+
 // ============================================================================
 // Shipping / Fulfillment (existing)
 // ============================================================================
