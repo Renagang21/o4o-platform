@@ -7,6 +7,13 @@
  * Usage:
  *   npx tsx src/scripts/diagnose-admin-login.ts [--fix]
  *   npx tsx src/scripts/diagnose-admin-login.ts --email=admin@neture.co.kr [--fix]
+ *
+ * ⚠️ Identity V2 범위 (WO-O4O-PASSWORD-RESET-SCRIPT-IDENTITY-V2-ALIGNMENT-V1)
+ *    `--fix` 의 비밀번호 복구는 **L1 `users.password` 전용**이다.
+ *    `service_credentials`(L2)는 변경하지 않으므로, credential 을 가진 계정은
+ *    serviceKey 로그인(웹 로그인 폼)이 **여전히 L2 비밀번호를 쓴다.**
+ *    → 플랫폼 계정 복구용으로만 쓰고, 서비스 로그인 복구로 오인하지 말 것.
+ *      실행 시 보유 credential 이 있으면 경고를 출력한다.
  */
 
 import { AppDataSource } from '../database/connection.js';
@@ -269,14 +276,41 @@ async function diagnoseAdminLogin(targetEmail: string, shouldFix: boolean = fals
     // Apply fixes if requested
     // =====================================================
     if (shouldFix) {
+      // WO-O4O-PASSWORD-RESET-SCRIPT-IDENTITY-V2-ALIGNMENT-V1:
+      //   --fix 의 비밀번호 복구는 **L1(users.password) 전용**이다.
+      //   Identity V2 에서 로그인은 credential 이 있으면 users.password 를 보지 않으므로
+      //   (`auth-login.service.ts` — targetHash = credentialHash ?? user.password),
+      //   credential 보유 계정은 이 복구로 **서비스 로그인이 고쳐지지 않는다.**
+      //   "복구됐다"는 오인을 막기 위해 적용 전에 범위를 고지하고, 보유 서비스가 있으면 경고한다.
       logger.info('\n─── Applying Fixes ───');
+      logger.info('ℹ️  Scope: this fix updates only users.password (L1, platform identity).');
+      logger.info('ℹ️  It does NOT update service_credentials (L2). serviceKey logins may still use L2.');
+
+      // 보유 credential 조회 — read-only. serviceKey 목록만 읽고 해시는 읽지 않는다.
+      try {
+        const credRows: Array<{ service_key: string }> = await AppDataSource.query(
+          `SELECT service_key FROM service_credentials WHERE user_id = $1 ORDER BY service_key`,
+          [user.id],
+        );
+        const serviceKeys = credRows.map((r) => r.service_key).filter(Boolean);
+        if (serviceKeys.length > 0) {
+          logger.warn('\n⚠️  Warning: this account has service-specific credentials.');
+          logger.warn(`⚠️  Services: ${serviceKeys.join(', ')}`);
+          logger.warn('⚠️  This fix changes only the L1 platform password.');
+          logger.warn('⚠️  Service login passwords are NOT changed — use each service\'s password reset.');
+        }
+      } catch (credErr: any) {
+        // 안내 실패가 진단·복구를 막지 않는다.
+        logger.warn(`⚠️  Could not check service credentials: ${credErr?.message ?? 'unknown error'}`);
+      }
+
       for (const result of results) {
         if (result.status !== 'OK' && result.fix) {
           logger.info(`Fixing: ${result.step}...`);
           await result.fix();
         }
       }
-      logger.info('\n✅ All fixes applied. Re-running diagnosis...\n');
+      logger.info('\n✅ All fixes applied (L1 only). Re-running diagnosis...\n');
       return diagnoseAdminLogin(targetEmail, false);
     }
 
@@ -340,6 +374,9 @@ Usage:
 Options:
   --email=<email>  Target email (default: admin@neture.co.kr)
   --fix            Auto-fix any issues found
+                   NOTE: password repair applies to users.password (L1) ONLY.
+                   service_credentials (L2) are not changed — serviceKey logins
+                   keep using their service-specific password.
   --help           Show this help message
 
 Examples:
