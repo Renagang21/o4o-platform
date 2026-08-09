@@ -59,6 +59,9 @@ import { PharmacyHubStoreQrController } from '../../controllers/pharmacy-hub/Pha
 import { PharmacyHubStoreManualController } from '../../controllers/pharmacy-hub/PharmacyHubStoreManualController.js';
 import { PharmacyHubStorePopController } from '../../controllers/pharmacy-hub/PharmacyHubStorePopController.js';
 import { PharmacyHubStoreSignageController } from '../../controllers/pharmacy-hub/PharmacyHubStoreSignageController.js';
+// WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 (태블릿 · Screen Set)
+import { createStoreTabletRoutes } from '../platform/store-tablet.routes.js';
+import { resolvePharmacyHubOrganizationForRoute } from '../../controllers/pharmacy-hub/pharmacy-hub-store-org.seam.js';
 // WO-PHARMACY-HUB-B2B-CART-AND-BUYER-ORDER-V1
 import { PharmacyHubCartController } from '../../controllers/pharmacy-hub/PharmacyHubCartController.js';
 import { PharmacyHubOrderController } from '../../controllers/pharmacy-hub/PharmacyHubOrderController.js';
@@ -508,6 +511,51 @@ export function createPharmacyHubRoutes(): Router {
     '/operator/fulfillment/:orderId/recover',
     ...operatorGuards,
     PharmacyHubOperatorFulfillmentController.recover,
+  );
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // 매장 실행 자산 — 태블릿 · Screen Set (WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1)
+  //
+  //   W9(실행 자산)에서 병행 세션 충돌로 HOLD 했던 축이다. 충돌이 해소돼 여기서 마감한다.
+  //
+  //   **공통 라우터를 그대로 재사용한다** — 태블릿/Screen Set 모델을 새로 만들지 않는다.
+  //   `createStoreTabletRoutes` 의 40여 엔드포인트는 전부 같은 seam(`withStoreAuth`)을 통과해
+  //   organizationId 하나만 주입받으므로, 조직 해석기만 PH enrollment 기준으로 갈아 끼우면
+  //   전 라우트가 서비스 스코프로 동작한다 (로직 복제 0 · 신규 테이블 0 · migration 0).
+  //
+  //   기본 마운트(`/api/v1/store`)는 무변경이다 — 옵션 미지정 시 기존 해석기를 그대로 쓴다.
+  //
+  //   주입값:
+  //     resolveOrganizationId      PH active enrollment 기준 (클라이언트 organizationId 미신뢰)
+  //     qrServiceKey               screen_set QR 공개 URL 을 pharmacyhub.co.kr 로 발급
+  //     operatorTemplateServiceKey PH 운영자 Screen Set 원본 축. 아직 원본이 없어 HUB 는
+  //                                정상적으로 빈 목록이다 — 다른 서비스 원본을 끌어오지 않는다.
+  //
+  //   인증은 아래 storeOwnerGuards 가 담당한다(공통 라우터는 주입 경로에서 인증을 하지 않는다).
+  // ───────────────────────────────────────────────────────────────────────────
+
+  /**
+   * 바코드 상품 등록은 Pharmacy-Hub 에서 열지 않는다.
+   * 매장 제품 등록 축은 W7 (`/store-owner/handled-products` · `/store-owner/local-products`)이
+   * 이미 SSOT 다 — 태블릿 라우터를 통해 두 번째 write 경로가 생기지 않도록 명시적으로 막는다.
+   * (공통 라우터보다 **먼저** 등록해야 가려진다.)
+   */
+  router.all('/store-owner/products/register-by-barcode', ...storeOwnerGuards, (_req, res) =>
+    res.status(404).json({
+      success: false,
+      error: '매장 제품 등록은 "매장 제품" 메뉴에서 진행해 주세요.',
+      code: 'NOT_AVAILABLE_IN_PHARMACY_HUB',
+    }),
+  );
+
+  router.use(
+    '/store-owner',
+    ...storeOwnerGuards,
+    createStoreTabletRoutes(AppDataSource, {
+      resolveOrganizationId: resolvePharmacyHubOrganizationForRoute,
+      qrServiceKey: SERVICE_KEY,
+      operatorTemplateServiceKey: SERVICE_KEY,
+    }),
   );
 
   return router;

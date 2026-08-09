@@ -89,9 +89,12 @@ async function withQrLink(
   organizationId: string,
   screenSetId: string,
   base: Record<string, unknown>,
+  // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1:
+  //   QR 공개 URL 도메인·service_key 는 마운트한 서비스를 따른다(기본 kpa).
+  serviceKey: string,
 ): Promise<Record<string, unknown>> {
   try {
-    const qr = await ensureScreenSetQr(executor, { organizationId, screenSetId, serviceKey: TABLET_QR_SERVICE_KEY });
+    const qr = await ensureScreenSetQr(executor, { organizationId, screenSetId, serviceKey });
     if (qr) return { ...base, publicQrSlug: qr.slug, publicQrUrl: qr.url };
     // QR 대상이 아닌 세트(보관/미소유/운영자·공급자 원본) — 정상.
     return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
@@ -110,9 +113,10 @@ async function withQrLinkBestEffort(
   organizationId: string,
   screenSetId: string,
   base: Record<string, unknown>,
+  serviceKey: string,
 ): Promise<Record<string, unknown>> {
   try {
-    return await withQrLink(executor, organizationId, screenSetId, base);
+    return await withQrLink(executor, organizationId, screenSetId, base, serviceKey);
   } catch {
     return { ...base, publicQrSlug: (base.publicQrSlug as string) ?? null, publicQrUrl: null };
   }
@@ -208,11 +212,44 @@ async function validateDisplayItems(
 // Controller
 // ─────────────────────────────────────────────────────
 
+/**
+ * WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1
+ *
+ * 이 라우터의 40여 개 엔드포인트는 **전부 같은 seam**(`withStoreAuth`)을 통과해
+ * `organizationId` 하나만 주입받는다. 따라서 조직 해석기만 갈아 끼우면 서비스별 스코프가
+ * 붙는다 — 로직을 복제하거나 라우트를 다시 쓸 필요가 없다.
+ *
+ * 기본값(옵션 미지정)은 기존 동작 그대로다. `/api/v1/store` 마운트는 무변경이며
+ * KPA·GlycoPharm·K-Cosmetics 의 응답·경계가 달라지지 않는다.
+ */
+export interface StoreTabletRoutesOptions {
+  /**
+   * 조직 해석기 주입 (Pharmacy-Hub 등 service-scoped 마운트용).
+   *
+   *   - 반환 `string`: 그 조직으로 핸들러 실행
+   *   - 반환 `null`  : **이미 응답을 보낸 상태**(미연결·모호·권한 없음 등) → 핸들러 미실행
+   *
+   * 주입 시 이 라우터는 인증을 적용하지 않는다 — 호출 측 라우터가 이미
+   * `requireAuth` + 서비스 scope guard 를 걸었다고 본다(이중 인증 방지).
+   */
+  resolveOrganizationId?: (req: Request, res: Response) => Promise<string | null>;
+  /** screen_set QR 발급·공개 URL 도메인에 쓰이는 서비스 키 (기본 `kpa`) */
+  qrServiceKey?: string;
+  /** 매장 HUB 가 열람·복사하는 운영자 Screen Set 원본의 service_key (기본 `kpa`) */
+  operatorTemplateServiceKey?: string;
+}
+
 export function createStoreTabletRoutes(
   dataSource: DataSource,
+  options: StoreTabletRoutesOptions = {},
 ): Router {
   const router = Router();
   const requirePharmacyOwner = createRequireStoreOwner(dataSource);
+
+  // 서비스별 주입값 — 미지정 시 기존 상수(kpa)와 동일하다.
+  const qrServiceKey = options.qrServiceKey ?? TABLET_QR_SERVICE_KEY;
+  const operatorTemplateServiceKey =
+    options.operatorTemplateServiceKey ?? OPERATOR_TEMPLATE_SERVICE_KEY;
 
   // Lazy-loaded requireAuth middleware
   let _requireAuth: AuthMiddleware;
@@ -225,11 +262,21 @@ export function createStoreTabletRoutes(
   }
 
   /**
-   * Helper: applies requireAuth + requirePharmacyOwner, then calls handler.
-   * Replaces the old authenticateAndGetOrg pattern.
+   * Helper: 조직을 해석해 handler 에 넘긴다.
+   *
+   * 기본 경로(주입 없음)는 기존과 동일하게 requireAuth + requirePharmacyOwner 를 적용한다.
+   * 주입 경로는 호출 측 라우터가 이미 인증·scope 를 건 뒤이므로 조직 해석만 수행한다.
    */
   function withStoreAuth(handler: (req: Request, res: Response, organizationId: string) => Promise<void>) {
     return async (req: Request, res: Response): Promise<void> => {
+      if (options.resolveOrganizationId) {
+        const injected = await options.resolveOrganizationId(req, res);
+        // null = 해석기가 이미 응답을 보냈다(미연결·모호 등). 핸들러를 실행하지 않는다.
+        if (!injected || res.headersSent) return;
+        await handler(req, res, injected);
+        return;
+      }
+
       try {
         const auth = await getRequireAuth();
         await new Promise<void>((resolve, reject) => {
@@ -1375,7 +1422,7 @@ export function createStoreTabletRoutes(
       );
       // WO-O4O-KPA-TABLET-QR-AUTO-LINK-AND-GUIDE-URL-V1 §4: 관리 상세 진입 시 owner 인증 하 lazy ensure
       //   (과거 저장/연결 누락 콘텐츠 복구). 공개 runtime 은 read-only 유지(여기 아님).
-      res.json({ success: true, data: await withQrLinkBestEffort(dataSource, organizationId, req.params.id, { ...rows[0], blocks }) });
+      res.json({ success: true, data: await withQrLinkBestEffort(dataSource, organizationId, req.params.id, { ...rows[0], blocks }, qrServiceKey) });
     } catch (error: any) {
       console.error('[StoreTablet] GET /screen-sets/:id error:', error);
       res.status(500).json({ success: false, error: 'Failed to fetch screen set', code: 'INTERNAL_ERROR' });
@@ -1414,7 +1461,7 @@ export function createStoreTabletRoutes(
            RETURNING ${setCols('')}`,
           [organizationId, tabletId, name, status, templateKey, userId],
         );
-        data = await withQrLink(m, organizationId, ins[0].id, ins[0]);
+        data = await withQrLink(m, organizationId, ins[0].id, ins[0], qrServiceKey);
       });
       res.status(201).json({ success: true, data });
     } catch (error: any) {
@@ -1513,7 +1560,7 @@ export function createStoreTabletRoutes(
           await setScreenSetQrActive(m, organizationId, id, statusChange !== 'archived');
         }
         // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 같은 트랜잭션에서 QR 확보(보관 상태는 대상 아님 → null 정상).
-        data = await withQrLink(m, organizationId, id, updated);
+        data = await withQrLink(m, organizationId, id, updated, qrServiceKey);
       });
       if (!updated) { res.status(404).json({ success: false, error: 'Screen set not found', code: 'SCREEN_SET_NOT_FOUND' }); return; }
       res.json({ success: true, data });
@@ -1610,7 +1657,7 @@ export function createStoreTabletRoutes(
           );
         }
         await manager.query(`UPDATE store_tablet_screen_sets SET updated_at = NOW() WHERE id = $1`, [id]);
-        qrLink = await withQrLink(manager, organizationId, id, {});
+        qrLink = await withQrLink(manager, organizationId, id, {}, qrServiceKey);
       });
       const updated = await dataSource.query(`SELECT ${blockCols('')} FROM store_tablet_screen_blocks WHERE screen_set_id = $1 ORDER BY sort_order ASC`, [id]);
       //   data(blocks 배열)는 그대로 두고 publicQrSlug/publicQrUrl 를 top-level additive 로 병합(프론트 호환).
@@ -1654,7 +1701,7 @@ export function createStoreTabletRoutes(
       // WO-O4O-SCREEN-SET-PREVIEW-PRODUCT-PARITY-V1:
       //   선택 상품 resolve 는 공개 경로와 동일한 store 스코프(serviceKey/slug)를 써야 결과가 일치한다.
       //   공개 경로는 platform_store_slugs 의 service_key 를 사용 → 미리보기도 같은 행에서 도출(없으면 기본 kpa).
-      let previewServiceKey = TABLET_QR_SERVICE_KEY;
+      let previewServiceKey = qrServiceKey;
       let previewStoreSlug: string | null = null;
       if (visible.some(({ b }: any) => b.blockType === 'product_list')) {
         try {
@@ -1739,7 +1786,7 @@ export function createStoreTabletRoutes(
       const page = Math.max(1, parseInt(req.query.page as string) || 1);
       const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
       const offset = (page - 1) * limit;
-      const params: any[] = [OPERATOR_TEMPLATE_SERVICE_KEY];
+      const params: any[] = [operatorTemplateServiceKey];
       const where: string[] = [OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')];
       const q = typeof req.query.q === 'string' ? req.query.q.trim() : '';
       if (q) { params.push(`%${q}%`); where.push(`name ILIKE $${params.length}`); }
@@ -1777,7 +1824,7 @@ export function createStoreTabletRoutes(
                 created_at AS "createdAt", updated_at AS "updatedAt"
          FROM store_tablet_screen_sets
          WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
-        [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+        [operatorTemplateServiceKey, req.params.id],
       );
       if (!rows?.[0]) { res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' }); return; }
       const blocks = await dataSource.query(
@@ -1804,7 +1851,7 @@ export function createStoreTabletRoutes(
         `SELECT id, name, template_key AS "templateKey"
          FROM store_tablet_screen_sets
          WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
-        [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+        [operatorTemplateServiceKey, req.params.id],
       );
       const src = srcRows?.[0];
       if (!src) { res.status(404).json({ success: false, error: 'Operator template not found', code: 'OPERATOR_TEMPLATE_NOT_FOUND' }); return; }
@@ -1817,7 +1864,7 @@ export function createStoreTabletRoutes(
           `SELECT id, name, template_key AS "templateKey"
            FROM store_tablet_screen_sets
            WHERE id = $2 AND ${OPERATOR_TEMPLATE_WHERE.replace('$SVC', '$1')} LIMIT 1`,
-          [OPERATOR_TEMPLATE_SERVICE_KEY, req.params.id],
+          [operatorTemplateServiceKey, req.params.id],
         );
         const s = reSrc?.[0];
         if (!s) throw Object.assign(new Error('source gone'), { code: 'OPERATOR_TEMPLATE_NOT_FOUND' });
@@ -1828,7 +1875,7 @@ export function createStoreTabletRoutes(
              (organization_id, service_key, supplier_id, tablet_id, name, origin, status, template_key, created_by_user_id)
            VALUES ($1, $2, NULL, NULL, $3, 'store', 'active', $4, $5)
            RETURNING ${setCols('')}`,
-          [organizationId, OPERATOR_TEMPLATE_SERVICE_KEY, s.name, s.templateKey, userId],
+          [organizationId, operatorTemplateServiceKey, s.name, s.templateKey, userId],
         );
         created = ins?.[0];
 
@@ -1842,13 +1889,13 @@ export function createStoreTabletRoutes(
         );
 
         // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 사본 생성과 같은 트랜잭션에서 QR 확보(실패 시 사본도 롤백).
-        importedData = await withQrLink(m, organizationId, created.id, created);
+        importedData = await withQrLink(m, organizationId, created.id, created, qrServiceKey);
       });
 
       // 4) provenance 기록(best-effort, 기존 store_asset_derivations 재사용 — 신규 컬럼·테이블 0, FK 없음)
       try {
         await recordDerivations(dataSource, {
-          serviceKey: OPERATOR_TEMPLATE_SERVICE_KEY,
+          serviceKey: operatorTemplateServiceKey,
           organizationId,
           createdBy: userId,
           derivedKind: 'screen_set',
@@ -1880,7 +1927,7 @@ export function createStoreTabletRoutes(
   //             AND 현재 매장 유형(organizations.type)과 hub_target_store_type 일치 AND 의약품 약국 전용 가드 통과.
   //   매장 유형: pharmacy→약국 / store→비약국 / 그 외 유형·판별 불가 조직 → HUB 대상 제외.
   //   목록·상세·가져오기 각각에서 대상·상태·의약품 조건을 재검사(목록 필터만으로 권한 보장하지 않음).
-  const SUPPLIER_HUB_SERVICE_KEY = OPERATOR_TEMPLATE_SERVICE_KEY; // 'kpa'
+  const SUPPLIER_HUB_SERVICE_KEY = operatorTemplateServiceKey; // 'kpa'
 
   // 현재 매장 유형 → HUB 매장 유형('pharmacy'|'non_pharmacy') 또는 null(대상 제외).
   async function resolveStoreHubType(orgId: string): Promise<'pharmacy' | 'non_pharmacy' | null> {
@@ -2024,7 +2071,7 @@ export function createStoreTabletRoutes(
           [created.id, s.id],
         );
         // WO-O4O-SCREEN-SET-QR-WRITE-BOUNDARY-FIX-V1: 사본 QR 을 같은 트랜잭션에서 확보(실패 시 가져오기 롤백).
-        importedData = await withQrLink(m, organizationId, created.id, created);
+        importedData = await withQrLink(m, organizationId, created.id, created, qrServiceKey);
       });
 
       // provenance(best-effort) — source_kind='supplier_screen_set'.

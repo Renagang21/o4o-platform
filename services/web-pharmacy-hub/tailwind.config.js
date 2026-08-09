@@ -11,6 +11,11 @@ export default {
     './src/**/*.{js,ts,jsx,tsx}',
     '../../packages/store-ui-core/src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
+    // WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1:
+    //   태블릿 Screen Set 편집기·kiosk 미리보기를 공유 패키지에서 그대로 쓴다.
+    '../../packages/tablet-screen-set-editor/src/**/*.{ts,tsx}',
+    '../../packages/tablet-kiosk-core/src/**/*.{ts,tsx}',
+    '../../packages/content-editor/src/**/*.{ts,tsx}',
   ],
   theme: {
     extend: {

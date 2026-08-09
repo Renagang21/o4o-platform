@@ -213,13 +213,15 @@ export const PHARMACY_HUB_STORE_CONFIG: StoreDashboardConfig = {
     //   원장은 전부 공통 테이블 재사용 — Pharmacy-Hub 전용 테이블 0:
     //     QR       store_qr_codes            POP      store_pops(author_role='store')
     //     사이니지  store_playlists(+items)    설명서   shared_product_descriptions
-    //   **태블릿은 이 회차에서 제외**한다 (병행 세션이 screen-set 축을 동시 수정 중 —
-    //   WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 로 분리).
+    //   태블릿은 W9 에서 병행 세션 충돌로 분리했다가
+    //   WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 에서 마감했다
+    //   (공통 태블릿 라우터를 조직 해석기만 갈아 끼워 재사용 — 신규 모델 0).
     //   route 도 기능도 없는 항목은 메뉴를 만들지 않는다 (데드링크 0 / "준비 중" 메뉴 0).
     { label: '매장 실행', items: [
       { key: 'qr',      label: 'QR',           subPath: '/qr' },
       { key: 'pop',     label: 'POP',          subPath: '/pop' },
       { key: 'signage', label: '디지털 사이니지', subPath: '/signage' },
+      { key: 'tablets', label: '태블릿',           subPath: '/tablets' },
       { key: 'manuals', label: '상품 설명서',    subPath: '/manuals' },
     ]},
     // WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 (2026-08-05)

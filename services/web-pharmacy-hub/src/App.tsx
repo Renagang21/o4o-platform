@@ -88,6 +88,8 @@ import SignagePage from './pages/store-owner/SignagePage';
 import ManualsPage from './pages/store-owner/ManualsPage';
 import ManualDetailPage from './pages/store-owner/ManualDetailPage';
 import QrLandingPage from './pages/QrLandingPage';
+// WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1 — 태블릿 · 화면 세트
+import TabletsPage from './pages/store-owner/TabletsPage';
 import { ROLES } from './config/service';
 
 export default function App() {
@@ -188,6 +190,7 @@ export default function App() {
             <Route path="qr" element={<QrPage />} />
             <Route path="pop" element={<PopPage />} />
             <Route path="signage" element={<SignagePage />} />
+            <Route path="tablets" element={<TabletsPage />} />
             <Route path="manuals" element={<ManualsPage />} />
             <Route path="manuals/:listingId" element={<ManualDetailPage />} />
             {/* WO-PHARMACY-HUB-STORE-INFO-AND-ACCOUNT-V1 — 설정 (매장 정보 / 내 계정) */}
