@@ -24,6 +24,7 @@ import {
 } from '../../lib/api';
 import { PROFILE_FIELD_LABELS } from '../../lib/api';
 import SupplierStoreDescriptionEditorDrawer from './SupplierStoreDescriptionEditorDrawer';
+import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 
 const PROFILE_PATH = '/mypage/business-profile';
 const PRODUCTS_PATH = '/supplier/products';
@@ -146,6 +147,10 @@ export default function SupplierStoreDescriptionsPage() {
           공간입니다.
         </p>
       </div>
+
+      {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1: 매장 활용 채널 안내(읽기 전용).
+          공급자는 QR 을 만들거나 태블릿에 적용하지 않는다 — 매장이 사본으로 가져가 활용한다. */}
+      <StoreMaterialUsageNote className="mb-6" channels="QR · 태블릿 · 매장 자료함" />
 
       {/* 상태별 안내 */}
       {loading ? (

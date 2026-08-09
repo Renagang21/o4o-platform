@@ -33,6 +33,7 @@ import {
 //   공급자 원본은 매장 상품 문맥이 없으므로 fetchProductPool 은 주입하지 않는다(상품 영역 비노출 = 기존 동작).
 import { mediaApi } from '../../lib/api/media';
 import MediaPickerModal from '../../components/common/MediaPickerModal';
+import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 import type { MediaInsert } from '@o4o/content-editor';
 
 // 공급자 원본은 매장 상품·공개 slug 가 없다. 미리보기(previewLayoutOnly)는 sections 만 렌더하고
@@ -262,6 +263,10 @@ export default function SupplierTabletScreenSetsPage() {
           <Plus className="w-4 h-4" /> 원본 만들기
         </button>
       </div>
+
+      {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1: 매장 활용 채널 안내(읽기 전용).
+          공급자는 코너 적용·QR 발급을 하지 않는다(supplier-screen-set.controller.ts:33 차단). */}
+      <StoreMaterialUsageNote channels="태블릿 코너 화면 · 코너 QR" />
 
       <div className="bg-white rounded-2xl border border-slate-200 overflow-hidden">
         {loading ? (

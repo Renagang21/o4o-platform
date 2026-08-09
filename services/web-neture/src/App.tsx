@@ -195,6 +195,10 @@ const SupplierTabletScreenSetsPage = lazy(() =>
 const SupplierSignagePage = lazy(() =>
   import('./pages/supplier/SupplierSignagePage').then((m) => ({ default: m.default }))
 );
+// WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1: 매장 제공 자료 검수·게시 현황(읽기 전용 집계)
+const SupplierStoreMaterialsStatusPage = lazy(() =>
+  import('./pages/supplier/SupplierStoreMaterialsStatusPage').then((m) => ({ default: m.default }))
+);
 // WO-O4O-FORUM-MY-FORUM-EXPANSION-V1
 const MyForumDashboardPage = lazy(() =>
   import('./pages/supplier').then((m) => ({ default: m.MyForumDashboardPage }))
@@ -858,6 +862,10 @@ function App() {
               {/* WO-O4O-NETURE-SUPPLIER-DIGITAL-SIGNAGE-AUTHORING-HUB-IMPORT-V1:
                   공급자 소유 사이니지(canonical 아님) 제작·게시 → KPA 매장 HUB 제공. 매장은 독립 사본으로 가져감. */}
               <Route path="/supplier/signage" element={<SupplierSignagePage />} />
+              {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1:
+                  매장 제공 자료 3종(설명서·태블릿 화면·사이니지)의 검수·게시 상태 집계.
+                  기존 3개 목록 API 의 클라이언트 집계 — 신규 백엔드 API·테이블 0. 읽기 전용. */}
+              <Route path="/supplier/store-materials-status" element={<SupplierStoreMaterialsStatusPage />} />
               <Route path="/supplier/forum" element={<ForumPage title="공급자 포럼" description="공급자 간 소통 공간" basePath="/supplier/forum" />} />
               <Route path="/supplier/forum/write" element={<ForumWritePage backPath="/supplier/forum" />} />
               <Route path="/supplier/forum/post/:slug" element={<ForumPostPage basePath="/supplier/forum" />} />
