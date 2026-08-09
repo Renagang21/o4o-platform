@@ -758,13 +758,27 @@ export class MembershipApprovalService {
         [reactivatedBy, membershipIds]
       );
 
-      // STEP2: Activate user account (idempotent — only if currently suspended)
-      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId });
+      // STEP2: Activate user account (idempotent)
+      //
+      // WO-O4O-MEMBERSHIP-REACTIVATION-PLATFORM-SUSPENSION-BOUNDARY-V1:
+      //   users.status='suspended' 를 기록하는 경로는 admin API 뿐이다
+      //   (AdminUserController:376·425, UserManagementController:205).
+      //   즉 users 축의 'suspended' 는 **플랫폼 조치**이며, 서비스 운영자의 재활성화가 이를
+      //   해제하면 "서비스 운영자는 자기 서비스 Membership 만 통제한다" 경계가
+      //   반대 방향으로 뚫린다(WO-...-REJECTION-CROSS-SERVICE-ISOLATION-V1 의 대칭 결함).
+      //
+      //   'deleted' 는 서비스 운영자도 호출할 수 있는 deleteMember(mode='soft') 의 역동작이므로
+      //   운영자 복구 대상으로 남긴다 — WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1 의
+      //   "suspend / soft-delete 모두 이 canonical 경로로 되돌린다" 계약 보존.
+      //   (soft-delete 자체가 users 전역을 쓰는 문제는 withdrawn/delete 의미 감사에서 다룬다.)
+      const liftableUserStatuses = isPlatformAdmin ? ['suspended', 'deleted'] : ['deleted'];
+
+      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId, isPlatformAdmin, liftableUserStatuses });
 
       await queryRunner.query(
         `UPDATE users SET status = 'active', "isActive" = true, "updatedAt" = NOW()
-         WHERE id = $1 AND status IN ('suspended', 'deleted')`,
-        [userId]
+         WHERE id = $1 AND status = ANY($2)`,
+        [userId, liftableUserStatuses]
       );
 
       // STEP3: Reactivate role_assignments for each membership role
@@ -1190,18 +1204,37 @@ export class MembershipApprovalService {
           usersDeactivated: remainingMemberships.length === 0,
         });
       } else {
-        // Soft delete: 비활성화만 수행 (users 삭제 없음)
-        await queryRunner.query(
-          `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-          [userId]
-        );
-        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
-        //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
-        //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
-        await queryRunner.query(
-          `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
-          [userId]
-        );
+        // Soft delete: 비활성화만 수행 (users row 삭제 없음)
+        //
+        // WO-O4O-SERVICE-MEMBER-SOFT-DELETE-CROSS-SERVICE-ISOLATION-V1:
+        //   이전 구현은 호출자 권한과 무관하게 두 개의 **전역** write 를 실행했다.
+        //     1) UPDATE users SET status='deleted', "isActive"=false   → 모든 서비스 로그인 차단
+        //     2) UPDATE service_memberships ... WHERE user_id = $1     → 다른 서비스 membership 까지 종료
+        //   requireAuth 가 매 요청 users.isActive 를 검사하므로(authentication.middleware.ts),
+        //   한 서비스 운영자의 탈퇴 처리가 그 사용자의 **다른 서비스 진행 중 세션까지** 끊었다.
+        //
+        //   서비스 운영자 = 자기 서비스 membership 종료만. users 는 건드리지 않는다.
+        //   플랫폼 관리자 = 계정 전체 탈퇴(기존 계약 보존).
+        //   role 정리는 아래 prefixesToClean 이 이미 권한별로 스코프하고 있어 그대로 둔다.
+        if (isPlatformAdmin) {
+          await queryRunner.query(
+            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+            [userId]
+          );
+          // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+          //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
+          //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
+          await queryRunner.query(
+            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
+            [userId]
+          );
+        } else {
+          await queryRunner.query(
+            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW()
+             WHERE user_id = $1 AND service_key = ANY($2)`,
+            [userId, serviceKeys]
+          );
+        }
 
         // WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1: role_assignments 서비스 prefix 범위 내 비활성화.
         // 플랫폼 역할(super_admin, admin, operator)은 절대 자동 비활성화하지 않는다.

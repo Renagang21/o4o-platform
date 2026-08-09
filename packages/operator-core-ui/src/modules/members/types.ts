@@ -92,7 +92,16 @@ export interface MembersConsoleClient {
   /** Batch status change. Backend supports approved/rejected/suspended. */
   batchUpdateStatus(ids: string[], status: 'approved' | 'rejected' | 'suspended'): Promise<any>;
   /** Update password (operator-as-user). */
-  updatePassword(userId: string, password: string): Promise<void>;
+  /**
+   * 회원 비밀번호 변경.
+   *
+   * WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+   *   비밀번호는 **서비스별로 독립**하다(Identity V2 `service_credentials`).
+   *   따라서 어느 서비스의 비밀번호인지 반드시 함께 보낸다 — `serviceKey` 는 필수다.
+   *   서버는 이 값으로 정확히 한 건의 credential 만 갱신하며,
+   *   미지정·모호한 요청은 400(`SERVICE_KEY_REQUIRED`)으로 거절한다.
+   */
+  updatePassword(userId: string, password: string, serviceKey: string): Promise<void>;
 }
 
 // ─── Tabs ────────────────────────────────────────────────────

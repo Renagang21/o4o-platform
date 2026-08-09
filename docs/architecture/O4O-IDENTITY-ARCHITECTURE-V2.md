@@ -20,10 +20,37 @@
 
 ### 구현 상태 안내 (Implementation Status)
 
-본 V2 는 **공식 채택된 Canonical Baseline** 이며 동시에 **구현은 미진행** 상태다. 두 사실은 양립한다:
-- **문서 기준으로는** — 모든 신규 Identity 관련 IR / WO / 설계 판단은 V2 를 기준으로 한다
-- **운영 코드 기준으로는** — V1 모델 (공통 password) 이 그대로 동작 중이다 (V1 문서가 현행 동작을 기술)
-- **구현 진입은** — 별도 후속 WO (`WO-O4O-IDENTITY-V2-PHASE1-*` 등) 의 책임 — F10/F11 명시적 예외 승인 절차를 거쳐 진행
+> **현행화 2026-08-09** — `WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1`
+> 이전 문구("구현은 미진행 / V1 공통 password 가 동작 중")는 **더 이상 사실이 아니다.**
+> Phase 1·2 는 구현·배포·운영 E2E 검증까지 완료됐다.
+
+본 V2 는 **공식 채택된 Canonical Baseline** 이며, **서비스별 credential 이 실제 운영 코드에서 동작 중**이다.
+
+- **문서 기준** — 모든 신규 Identity 관련 IR / WO / 설계 판단은 V2 를 기준으로 한다
+- **운영 코드 기준** — 서비스 로그인은 `service_credentials` 를 **우선** 사용한다.
+  `auth-login.service.ts` 의 판정은 `targetHash = credentialHash ?? user.password` 이며,
+  해당 서비스 credential 이 있으면 `users.password` 를 **보지 않는다.**
+- **`users.password` 의 현재 역할** — ① `serviceKey` 없는 로그인 ② credential 이 없는 서비스의 fallback
+  ③ 아직 V2 로 연결되지 않은 일부 관리자 경로. Phase 4·5 에서 정리 대상이다.
+
+**구현된 것**
+
+| 범위 | 상태 | 근거 |
+|---|---|---|
+| `service_credentials` 스키마 | ✅ | `20260523000000-CreateServiceCredentials` |
+| 로그인 dual-read | ✅ | `auth-login.service.ts` — credential 우선 + fallback |
+| 가입 dual-write | ✅ | `auth-register.controller.ts` (신규 / 타 서비스 추가 가입) |
+| **본인** 비밀번호 변경 (서비스 범위) | ✅ | `WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1` (`1410bc4fc`) — `PUT /users/password` |
+| 비밀번호 재설정 (서비스 범위) | ✅ | `passwordResetService` — reset token 에 serviceKey 격리 |
+| **운영자의 회원** 비밀번호 변경 (서비스 범위) | ✅ | 본 WO — `PUT /operator/members/:userId` |
+
+**아직 V2 에 연결되지 않은 것**
+
+| 범위 | 현재 동작 | 비고 |
+|---|---|---|
+| 관리자 계정 재설정 (`PUT /admin/users/:id`, `PATCH /admin/platform-accounts/:id/password`) | `users.password` 만 갱신 | credential 보유 서비스에는 미적용. `admin-password-reset-scope.service.ts` 가 영향 범위를 **안내만** 한다 |
+| 운영 스크립트 (`reset-admin-password` 등) | `users.password` 만 갱신 | 동일 |
+| Phase 4 (기존 사용자 credential backfill) / Phase 5 (`users.password` deprecation) | 미착수 | 아래 Phase 표 참조 |
 
 ---
 
@@ -182,13 +209,25 @@ V1 §9 의 "제거 사유" 는 V1 시점의 모델 (공통 password) 안에서�
 | Phase | 작업 | 코드 변경 | 비고 |
 |-------|------|----------|------|
 | **Phase 0 (완료 — 2026-05-23)** | 문서 정렬, IR + V2 채택 합의 | **없음** | `WO-O4O-IDENTITY-ARCHITECTURE-V2-DOCUMENT-ALIGNMENT-V1` (정렬) + `WO-O4O-IDENTITY-ARCHITECTURE-V2-ADOPTION-DOCUMENTATION-V1` (채택) |
-| Phase 1 | `service_credentials` 테이블 신설 (빈 상태) | migration only | F10/F11 Freeze 영향 검토 후 별도 WO |
-| Phase 2 | login/register/change/reset 의 dual-read 도입 (credential 우선, fallback to users.password) | controller 변경 | 별도 WO |
-| Phase 3 | 신규 가입자는 service_credentials 만 사용 | register 분기 | 별도 WO |
-| Phase 4 | 기존 active membership 의 credential backfill (또는 강제 reset) | 데이터 작업 | IR-V1 §F.2/§F.3 참조 |
-| Phase 5 | users.password deprecation 선언 + 코드 제거 | controller 정리 | F11 Freeze 의 명시적 변경 — 별도 WO 필요 |
+| **Phase 1 (완료)** | `service_credentials` 테이블 신설 | migration | `20260523000000-CreateServiceCredentials` |
+| **Phase 2 (완료)** | login/register/change/reset 의 dual-read·dual-write (credential 우선, fallback to users.password) | controller 변경 | `WO-O4O-IDENTITY-V2-PHASE1-REGISTER-LOGIN-V1` · `WO-O4O-IDENTITY-V2-PHASE2-CHANGE-PASSWORD-SERVICE-SCOPE-V1` (`1410bc4fc`) · `WO-O4O-PASSWORD-RESET-SERVICE-ISOLATION-V1` |
+| **Phase 2-A (완료 — 2026-08-09)** | **운영자의 회원** 비밀번호 변경을 서비스 범위로 연결 | controller 변경 | `WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1` — Phase 2 에서 누락됐던 타인 변경 경로 |
+| Phase 3 (부분) | 신규 가입자는 service_credentials 만 사용 | register 분기 | credential 은 생성되나 `users.password` 도 함께 기록 중 |
+| Phase 4 (미착수) | 기존 active membership 의 credential backfill (또는 강제 reset) | 데이터 작업 | IR-V1 §F.2/§F.3 참조 |
+| Phase 5 (미착수) | users.password deprecation 선언 + 코드 제거 | controller 정리 | 관리자 재설정 경로 정리 선행 필요. F11 Freeze 의 명시적 변경 — 별도 WO |
 
-→ **Phase 0 (본 WO) 의 종료 조건은 V2 모델에 대한 이해관계자 합의**이다. Phase 1 이후는 별도 WO 들의 책임.
+→ Phase 0 의 종료 조건은 V2 모델에 대한 이해관계자 합의였고, **Phase 1·2·2-A 는 구현·검증 완료**다.
+   남은 것은 Phase 3 잔여 · Phase 4 · Phase 5 이며 각각 별도 WO 의 책임이다.
+
+**Phase 2 운영 E2E 검증 결과 (서비스별 독립성 실측)**
+
+| 검증 | 결과 |
+|---|---|
+| GlycoPharm 비밀번호 변경 | 성공 |
+| GlycoPharm 새 비밀번호 로그인 | 성공 |
+| KPA 기존 비밀번호 로그인 | 성공 (영향 없음) |
+| GlycoPharm 새 비밀번호로 KPA 로그인 | **실패** (독립성 성립) |
+| `users.password` | 무변경 |
 
 ---
 
