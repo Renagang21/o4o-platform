@@ -106,7 +106,8 @@ resolveAdminPasswordResetScope(userId) → {
 | CI Pipeline | **success** (`31298334652`) — Code Quality / Build(admin-dashboard) / Build(main-site) 전부 success |
 | Deploy API Server | **success** (`31298334643`, headSha `788c564c7`) → revision `o4o-core-api-03256-h9v` |
 | Deploy Admin Dashboard | **success** (`31298334640`, headSha `788c564c7`) |
-| 실브라우저 / API smoke | ⚠️ **미수행** — 사유 §7-2 |
+| **API smoke (프로덕션)** | ✅ **통과** — 두 분기 실측 (§7-3) |
+| 관리자 UI smoke | ⚠️ **미수행** — 프론트 권한 게이트 차단 (§7-4) |
 
 ---
 
@@ -135,9 +136,12 @@ migration 0 · DB 스키마 0
 | Deploy Admin Dashboard `31298334640` | **success** — headSha `788c564c7` |
 | 라우팅 | `PATCH /admin/platform-accounts/:id/password` 미인증 호출 → **401**(=라우트 존재, 인증 게이트 정상). 404 아님 |
 
-### 7-2. ⚠️ 수행하지 못한 검증과 사유 (숨기지 않음)
+### 7-2. ⚠️ 수행하지 못한 검증과 사유 (→ **§7-3 에서 API 부분 해소됨**, 이력)
 
-**관리자 비밀번호 재설정 실행 smoke(API·UI)를 수행하지 못했다.**
+> **상태 갱신:** 아래는 검증 계정 확보 **이전** 기록이다. API smoke 는 §7-3 에서 통과했고,
+> UI smoke 만 §7-4 의 별건 사유로 남아 있다.
+
+**(당시) 관리자 비밀번호 재설정 실행 smoke(API·UI)를 수행하지 못했다.**
 
 > **정정 (2026-08-09, 원인 재확정).** 최초 기록은 *"`sohae2100` 의 문서 비밀번호가 프로덕션과
 > 불일치(401)"* 였다. **이는 오류다** — 조사자가 `sohae21@naver.com` 의 비밀번호를
@@ -192,6 +196,47 @@ DB 실측(read-only): `platform:super_admin` 보유 계정 **2개**, 그중 `TES
 
 ---
 
+### 7-3. ✅ API smoke 통과 (2026-08-09, 검증 계정 확보 후)
+
+사용자가 검증용 `platform:super_admin` 계정을 지정해 §7-2 의 차단이 해소됐다.
+DB 실측으로 role 보유(`platform:super_admin` = true, `status=approved`)를 먼저 확인했다.
+
+**안전 조치 — 비밀번호를 현재 값 그대로 재설정**해 실질 변경 없이 응답만 검증했다.
+
+| # | 대상 | `data.unaffectedServiceKeys` | `notice` |
+|:-:|------|------------------------------|:--------:|
+| 1 | credential **없는** 계정 | `[]` | `null` ✅ |
+| 2 | credential **4개 보유** 계정 | `["glycopharm","k-cosmetics","kpa-society","neture"]` | 문구 포함 ✅ |
+
+2번 목록은 **DB 실측 결과와 정확히 일치**한다(같은 4개 serviceKey).
+
+**무해성 확인** — 재설정 후 두 계정 모두 재로그인 **200**. 동일값이라 사용자 영향 0.
+
+```text
+GET /api/v1/admin/platform-accounts                     → 200 (super_admin 접근 확인)
+PATCH /admin/platform-accounts/:id/password (빈 케이스)   → 200, unaffectedServiceKeys=[]
+PATCH /admin/platform-accounts/:id/password (비어있지 않음) → 200, 4개 serviceKey + notice
+```
+
+→ **본 WO 의 핵심 동작(적용 범위 산출·응답 노출)이 프로덕션에서 실증됐다.**
+
+### 7-4. ⚠️ 관리자 UI smoke — 별건 차단 (본 WO 무관, 미수정)
+
+`https://admin.neture.co.kr/settings/admin-accounts` 진입 시 **"접근 권한이 없습니다"**.
+
+- **백엔드는 통과한다** — 같은 계정으로 `/admin/platform-accounts` API 는 **200**.
+- 프론트 라우트가 `AdminProtectedRoute requiredPermissions={['settings:read']}` 를 요구하는데
+  (`routes/appearance.routes.tsx:141-147`), `platform:super_admin` 이 그 권한으로 매핑되지 않는다.
+- 즉 **프론트 권한 매핑 갭**이며 본 WO 변경(페이지 내부 문구 추가)과 무관한 **기존 문제**다.
+- **수정하지 않았다** — 권한·role 변경은 중지 조건(CLAUDE.md)이다.
+
+따라서 UI 렌더(모달 사전 경고·결과 패널)는 여전히 미관측이다. 다만 **UI 는 §7-3 에서 실증된
+응답 payload 를 그대로 표시**하는 얇은 층이고, 표시 분기(`unaffected.length > 0`)는 그 payload 로만 결정된다.
+
+> 후속 후보 5번으로 등록.
+
+---
+
 ## 8. 후속 후보
 
 | # | 내용 | 등급 |
@@ -200,6 +245,7 @@ DB 실측(read-only): `platform:super_admin` 보유 계정 **2개**, 그중 `TES
 | 2 | `WO-O4O-TEST-ACCOUNTS-SERVICE-CREDENTIAL-DOCUMENTATION-V1` — 테스트 계정 문서를 서비스별 비밀번호 구조로 (결정 D) | P3 |
 | 3 | 운영 스크립트(§4-6)에도 동일 안내 출력 | P3 |
 | 4 | 관리자가 **serviceKey 를 지정해** 특정 서비스 credential 을 재설정하는 경로(결정 A-(다)) | 정책 재검토 시 |
+| **5** | **`platform:super_admin` 이 프론트 `settings:read` 권한으로 매핑되지 않아 admin-dashboard 설정 화면 접근 불가** (§7-4). 백엔드는 200, 프론트만 차단 — 기존 문제 | **P2** |
 
 ---
 
