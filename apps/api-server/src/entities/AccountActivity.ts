@@ -24,6 +24,21 @@ export class AccountActivity {
   @Column({ name: 'action', type: 'varchar', length: 50 })
   type!: string;
 
+  /**
+   * 시도에 사용된 이메일. **계정이 없는 시도도 기록할 수 있어야 하므로 `userId` 와 독립**이다.
+   *
+   * WO-O4O-AUTH-ACCOUNT-ACTIVITIES-EMAIL-MAPPING-V1
+   *   DB 컬럼(`email varchar(255) NULL`)은 처음부터 존재했으나 **entity 에 선언이 없어**
+   *   INSERT 에서 지정되지 않았다. 실측(2026-08-09): 전체 5,712행 중 컬럼이 채워진 행 **0건**
+   *   (같은 값이 `details.email` 에는 5,712행 전부 존재).
+   *   → 이메일 기준 감사·실패 분석을 컬럼으로 하면 **전량 누락**된다. `success` 와 동일한 유형의 미매핑이다.
+   *
+   *   신규 컬럼이 아니므로 **migration 불필요**(기존 DB 컬럼에 매핑만 추가).
+   *   비밀번호·해시·토큰은 절대 담지 않는다.
+   */
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  email?: string | null;
+
   @Column({ type: 'varchar', length: 50, nullable: true })
   ipAddress?: string;
 
