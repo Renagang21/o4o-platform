@@ -35,6 +35,13 @@ const INVALID_USER_ID_RESPONSE = {
   message: '유효하지 않은 회원 ID입니다.',
 };
 
+/**
+ * WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+ *   승인/중지/반려 외에 운영자 UI 가 보내는 상태. service_memberships.status 로만 전이하며
+ *   users 공통 계정은 건드리지 않는다. (계정 전체 정지·삭제는 DELETE /:userId 및 admin API 담당)
+ */
+const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
+
 
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
@@ -545,11 +552,16 @@ export class MembershipConsoleController {
           }
         } else {
           // No pending memberships — just activate user (idempotent)
+          // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+          //   가드 없이 활성화하면 **다른 서비스가 정지시킨 계정을 되살린다.**
+          //   MembershipApprovalService.approveMembership STEP2 와 동일한 status 화이트리스트를
+          //   적용해 'suspended'(플랫폼/타 서비스 정지)는 건드리지 않는다.
           await AppDataSource.query(
             `UPDATE users SET status = 'active', "isActive" = true,
              "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
              "updatedAt" = NOW()
-             WHERE id = $2`,
+             WHERE id = $2
+               AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
             [updatedBy, userId]
           );
         }
@@ -567,38 +579,81 @@ export class MembershipConsoleController {
           res.status(404).json({ success: false, error: 'No active memberships found to suspend' });
           return;
         }
-      } else {
-        const dbStatus = status.toLowerCase();
-
+      } else if (status.toLowerCase() === 'rejected') {
+        // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+        //   반려는 **해당 서비스 membership 에만** 적용한다.
+        //   이전 구현은 rejectMembership 뒤에 `UPDATE users SET status='rejected', isActive=false` 를
+        //   스코프 없이 실행해서, 한 서비스 운영자의 반려가 그 사용자의 **다른 서비스 로그인과
+        //   진행 중 세션까지** 끊었다 (requireAuth 가 매 요청 users.isActive 를 검사한다).
+        //   suspendMembership 이 이미 users 를 건드리지 않는 계약이므로 그 형태로 통일한다.
+        //
         // WO-GLYCOPHARM-MEMBER-REGISTRATION-PENDING-VISIBILITY-FIX-V1:
-        // For rejection, also update service_memberships.status (SSOT)
-        // to keep consistent with the membership-based listing filter
-        if (dbStatus === 'rejected') {
-          const pendingMemberships = scope.isPlatformAdmin
-            ? await AppDataSource.query(
-                `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
-                [userId]
-              )
-            : await AppDataSource.query(
-                `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
-                [userId, scope.serviceKeys]
-              );
+        //   service_memberships.status(SSOT) 갱신은 그대로 유지 — 목록 필터가 이 값을 본다.
+        const rejectableMemberships = scope.isPlatformAdmin
+          ? await AppDataSource.query(
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active')`,
+              [userId]
+            )
+          : await AppDataSource.query(
+              `SELECT id FROM service_memberships WHERE user_id = $1 AND status IN ('pending', 'active') AND service_key = ANY($2)`,
+              [userId, scope.serviceKeys]
+            );
 
-          for (const m of pendingMemberships) {
-            await approvalService.rejectMembership({
-              membershipId: m.id,
-              reason: req.body.reason || null,
-              isPlatformAdmin: scope.isPlatformAdmin,
-              serviceKeys: scope.serviceKeys,
-            });
-          }
+        let rejectedCount = 0;
+        for (const m of rejectableMemberships) {
+          const rejected = await approvalService.rejectMembership({
+            membershipId: m.id,
+            reason: req.body.reason || null,
+            isPlatformAdmin: scope.isPlatformAdmin,
+            serviceKeys: scope.serviceKeys,
+          });
+          if (rejected) rejectedCount += 1;
         }
 
-        await AppDataSource.query(
-          `UPDATE users SET status = $1, "isActive" = false, "updatedAt" = NOW()
-           WHERE id = $2`,
-          [dbStatus, userId]
-        );
+        // suspend 분기와 동일한 계약 — 스코프 안에 대상이 없으면 404.
+        if (rejectedCount === 0) {
+          res.status(404).json({ success: false, error: 'No memberships found to reject' });
+          return;
+        }
+      } else if (MEMBERSHIP_SCOPED_STATUSES.includes(status.toLowerCase())) {
+        // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+        //   'withdrawn'(탈퇴) · 'pending'(가입 신청으로 되돌림) 은 라이브 운영자 UI 의 실제 액션이다.
+        //   이전 구현은 이 값들을 users.status 에 그대로 기록했다. 'withdrawn' 은 UserStatus enum
+        //   에 없는 값이라 resolveAccountAccess 가 fail-closed 로 'blocked' 판정 →
+        //   **미정의 값으로 계정이 전역 차단**되는 상태였다. membership 축으로 되돌린다.
+        //
+        //   서비스 접근 차단은 membership 만으로 성립한다 —
+        //   membership-guard.middleware 가 `membership.status !== 'active'` 를 403 으로 막는다.
+        const target = status.toLowerCase();
+        const updated = scope.isPlatformAdmin
+          ? await AppDataSource.query(
+              `UPDATE service_memberships SET status = $1, updated_at = NOW()
+               WHERE user_id = $2 AND status <> $1 RETURNING id`,
+              [target, userId]
+            )
+          : await AppDataSource.query(
+              `UPDATE service_memberships SET status = $1, updated_at = NOW()
+               WHERE user_id = $2 AND service_key = ANY($3) AND status <> $1 RETURNING id`,
+              [target, userId, scope.serviceKeys]
+            );
+
+        // pg driver 는 `UPDATE ... RETURNING` 에 [rows, rowCount] 를 반환한다.
+        const updatedRows = Array.isArray(updated?.[0]) ? updated[0] : updated;
+        if (!updatedRows || updatedRows.length === 0) {
+          res.status(404).json({ success: false, error: `No memberships found to set ${target}` });
+          return;
+        }
+      } else {
+        // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+        //   이전에는 임의 status 문자열이 그대로 users.status 에 기록됐다(스코프·검증 없음).
+        //   서비스 운영자 경로가 다루는 축은 membership 이며 허용 전이는 위 목록뿐이다.
+        //   계정 전체 정지·삭제는 platform 권한의 별도 경로(DELETE /:userId, admin users API)가 담당한다.
+        res.status(400).json({
+          success: false,
+          error: '허용되지 않는 상태입니다. (approved/active | suspended | rejected | withdrawn | pending)',
+          code: 'INVALID_MEMBER_STATUS',
+        });
+        return;
       }
 
       res.json({ success: true, message: `User status updated to ${status}` });
@@ -675,11 +730,14 @@ export class MembershipConsoleController {
                 await this.ensureCosmeticsStoreContext(approved);
               }
             } else {
+              // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+              //   단건 경로와 동일 가드 — 'suspended' 계정은 되살리지 않는다.
               await AppDataSource.query(
                 `UPDATE users SET status = 'active', "isActive" = true,
                  "approvedAt" = COALESCE("approvedAt", NOW()), "approvedBy" = COALESCE("approvedBy", $1),
                  "updatedAt" = NOW()
-                 WHERE id = $2`,
+                 WHERE id = $2
+                   AND status IN ('PENDING', 'pending', 'ACTIVE', 'active', 'inactive', 'deleted', 'rejected')`,
                 [updatedBy, userId]
               );
             }
@@ -705,20 +763,23 @@ export class MembershipConsoleController {
                   [userId, scope.serviceKeys]
                 );
 
+            // WO-O4O-SERVICE-MEMBERSHIP-REJECTION-CROSS-SERVICE-ISOLATION-V1:
+            //   단건 경로와 동일 — membership 만 반려하고 users 전역 상태는 건드리지 않는다.
+            let rejectedCount = 0;
             for (const m of pendingMemberships) {
-              await approvalService.rejectMembership({
+              const rejected = await approvalService.rejectMembership({
                 membershipId: m.id,
                 reason: req.body.reason || null,
                 isPlatformAdmin: scope.isPlatformAdmin,
                 serviceKeys: scope.serviceKeys,
               });
+              if (rejected) rejectedCount += 1;
             }
 
-            await AppDataSource.query(
-              `UPDATE users SET status = 'rejected', "isActive" = false, "updatedAt" = NOW()
-               WHERE id = $1`,
-              [userId]
-            );
+            if (rejectedCount === 0) {
+              results.push({ id: userId, status: 'skipped', error: 'No memberships found to reject' });
+              continue;
+            }
           }
 
           const serviceKey = scope.serviceKeys[0] || 'platform';
