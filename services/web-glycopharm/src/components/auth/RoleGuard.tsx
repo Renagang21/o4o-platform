@@ -3,49 +3,32 @@
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefixed JWT roles 직접 사용
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+ *   판정 순서를 @o4o/auth-react 의 createRouteGuard 로 위임. GlycoPharm 고유분은
+ *   로딩 스피너 · MembershipGate · OperatorRoute 의 역할 술어뿐이다.
+ *
+ * GlycoPharm 전용 Guard(GlycoHubGuard / PharmacyStoreGuard)는 이번 WO 범위 밖이며 그대로 둔다.
  */
 
-import { Navigate, useLocation } from 'react-router-dom';
-import { hasAnyRole, isOperatorOrAbove } from '@o4o/auth-utils';
+import type { ReactNode } from 'react';
+import { isOperatorOrAbove } from '@o4o/auth-utils';
+import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 
-interface RoleGuardProps {
-  children: React.ReactNode;
-  allowedRoles?: string[];
-  fallback?: string;
-  /**
-   * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
-   *   role 통과 후 service_membership active 강제. 기본 true.
-   */
-  enforceMembership?: boolean;
-}
+const LoadingSpinner = () => (
+  <div className="min-h-screen flex items-center justify-center">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+  </div>
+);
 
-export function RoleGuard({ children, allowedRoles, fallback = '/login', enforceMembership = true }: RoleGuardProps) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && user && !hasAnyRole(user.roles, allowedRoles)) {
-    return <Navigate to="/" replace />;
-  }
-
-  if (enforceMembership) {
-    return <MembershipGate>{children}</MembershipGate>;
-  }
-  return <>{children}</>;
-}
+export const RoleGuard = createRouteGuard({
+  useAuth,
+  renderLoading: () => <LoadingSpinner />,
+  // GlycoPharm 은 접근 거부 시 항상 홈으로 — 안내 카드 계약이 없다(기존 동작 유지).
+  deniedRedirect: '/',
+  MembershipGate,
+});
 
 /**
  * OperatorRoute — service_memberships 기반 Operator 접근 제어
@@ -57,31 +40,15 @@ export function RoleGuard({ children, allowedRoles, fallback = '/login', enforce
  *     상태별 안내 화면으로 대체 (none/pending/rejected/suspended/withdrawn 별 메시지).
  *   - Platform super_admin 만 bypass — service-prefixed role(glycopharm:admin 등) 도
  *     membership 검사를 거친다 (role 만 있고 membership 없는 케이스 차단).
+ *
+ * role 체크: glycopharm:admin / glycopharm:operator / platform:super_admin 중 하나 필요.
+ * WO-O4O-ROLEGUARD-RUNTIME-CANONICALIZATION-V1: isOperatorOrAbove(@o4o/auth-utils) 사용 —
+ * canonical 화 규칙이 들어간 술어라 배열로 펼치지 않고 isAllowed 로 주입한다.
  */
-
-export function OperatorRoute({ children, fallback = '/login' }: Omit<RoleGuardProps, 'allowedRoles' | 'enforceMembership'>) {
-  const { isAuthenticated, user, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (!user) return <Navigate to="/" replace />;
-
-  // role 체크: glycopharm:admin / glycopharm:operator / platform:super_admin 중 하나 필요.
-  // WO-O4O-ROLEGUARD-RUNTIME-CANONICALIZATION-V1: isOperatorOrAbove(@o4o/auth-utils) 사용.
-  if (!isOperatorOrAbove(user.roles, 'glycopharm')) {
-    return <Navigate to="/" replace />;
-  }
-
-  return <MembershipGate>{children}</MembershipGate>;
+export function OperatorRoute({ children, fallback = '/login' }: { children: ReactNode; fallback?: string }) {
+  return (
+    <RoleGuard isAllowed={(roles) => isOperatorOrAbove(roles, 'glycopharm')} fallback={fallback}>
+      {children}
+    </RoleGuard>
+  );
 }

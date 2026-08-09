@@ -54,6 +54,14 @@ export interface RouteGuardProps {
   children: ReactNode;
   /** 하나라도 포함하면 통과. 미지정 시 role 검사를 건너뛴다(인증만 요구). */
   allowedRoles?: string[];
+  /**
+   * 배열로 표현할 수 없는 역할 판정(예: `isOperatorOrAbove(roles, prefix)` 처럼
+   * canonical 화 규칙이 들어간 술어)을 위한 주입점.
+   *
+   * `allowedRoles` 와 함께 주면 **둘 다** 통과해야 한다. 서비스별 판정 함수를
+   * 그대로 넘기게 해서, Core 안에 서비스명 조건문이 생기지 않도록 한다.
+   */
+  isAllowed?: (roles: string[]) => boolean;
   /** 미인증 시 이동 경로. */
   fallback?: string;
   /** 지정 시 role 불충족에서 리다이렉트 대신 안내 렌더(KPA 계약). */
@@ -82,6 +90,7 @@ export function createRouteGuard(deps: RouteGuardDeps) {
   return function RouteGuard({
     children,
     allowedRoles,
+    isAllowed,
     fallback = '/login',
     accessDeniedMessage,
     enforceMembership = true,
@@ -111,7 +120,12 @@ export function createRouteGuard(deps: RouteGuardDeps) {
       }
     }
 
-    if (allowedRoles && !hasAnyRole(userRoles, allowedRoles)) {
+    // allowedRoles / isAllowed 는 각각 선택이며, 준 것은 모두 통과해야 한다.
+    const roleOk =
+      (allowedRoles ? hasAnyRole(userRoles, allowedRoles) : true) &&
+      (isAllowed ? isAllowed(userRoles) : true);
+
+    if (!roleOk) {
       if (renderDenied) {
         const denied = renderDenied({ message: accessDeniedMessage });
         if (denied !== null) return denied;
