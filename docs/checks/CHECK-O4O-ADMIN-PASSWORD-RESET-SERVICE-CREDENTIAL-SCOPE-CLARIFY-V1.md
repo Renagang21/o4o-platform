@@ -1,5 +1,23 @@
 # CHECK-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1
 
+> ## ⚠ SUPERSEDED FOR POLICY (2026-08-09)
+>
+> **이 문서의 §8 결정 A 는 정책으로서 대체되었다.**
+> 결정 A("서비스 운영 주체는 `users.password` 만 변경하고 service credential 은 변경하지 않는다")는
+> 당시 **사일런트 무효를 사용자에게 안내하기 위한 임시 처리**였다.
+>
+> 확정된 운영 정책은 **서비스 운영 주체가 자기 서비스 범위의 `service_credentials` 를 변경한다** 이며,
+> 그 구현은 `WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1`
+> (→ `CHECK-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1`) 을 따른다.
+>
+> **본 문서의 실측 결과·당시 코드 동작 기록은 그대로 유효하며 변경하지 않는다.**
+> 대체되는 것은 "앞으로 어떻게 할 것인가"(정책)뿐이다.
+>
+> **적용 범위 주의:** 대체는 **운영자 경로**(`PUT /operator/members/:userId`)에 한정된다.
+> **관리자 계정 재설정 경로**(`PUT /admin/users/:id`, `PATCH /admin/platform-accounts/:id/password`,
+> 운영 스크립트)는 **여전히 `users.password` 만 갱신**하며, 본 문서가 도입한
+> `admin-password-reset-scope.service.ts` 의 안내도 그대로 유효하다.
+
 > **결과: 구현 완료** — 관리자 비밀번호 재설정의 **적용 범위**를 응답·UI 에 명시.
 > **작성일:** 2026-08-09
 > **근거:** `CHECK-O4O-AUTH-SERVICEKEY-LOGIN-INVALID-CREDENTIALS-P0-V1` §5-1 · §8 **결정 A**

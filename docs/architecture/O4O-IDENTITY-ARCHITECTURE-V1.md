@@ -9,8 +9,18 @@
 >
 > **현재 상태:** **본 V1 문서는 Legacy Baseline 으로 격하되었다.** [O4O-IDENTITY-ARCHITECTURE-V2.md](O4O-IDENTITY-ARCHITECTURE-V2.md) 가 O4O Identity 의 공식 Canonical 기준이다.
 >
+> **⚠ 2026-08-09 정정 (`WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1`):**
+> **본 문서는 더 이상 "운영 코드의 현행 동작"을 기술하지 않는다.** Identity V2 의 Phase 1·2 가
+> 구현·배포·운영 E2E 검증까지 완료되어, **서비스 로그인과 본인 비밀번호 변경의 기준은 V2** 다
+> (`service_credentials` 우선, `users.password` 미조회).
+> V1 은 **역사적 Legacy 문서**이며, 아래 잔여 영역만 여전히 설명한다:
+> - `serviceKey` 없는 로그인의 `users.password` 경로
+> - credential 이 없는 서비스의 fallback
+> - 아직 V2 로 연결되지 않은 관리자 재설정·운영 스크립트 경로
+>
 > **V1 유지 사유 (Why V1 still exists):**
-> 1. **운영 코드 현행 동작 기록** — V1 은 현재 코드 베이스의 실제 동작 (공통 password 모델, users.password 단일 컬럼) 을 정확히 기술한다. 코드가 V2 모델로 이행되기 전까지 V1 은 **운영 사실의 기록** 으로 유지된다.
+> 1. **잔여 fallback 경로 기록** — 위 세 영역은 V1 이 기술하는 `users.password` 모델을 아직 따른다.
+>    Phase 4·5 완료 시 이 사유는 소멸한다. (전면적인 "공통 password 모델"이 아니라 **부분 잔여**임에 유의)
 > 2. **역사적 판단 기록** — §9 의 Password Sync 제거 결정 (2026-03-25) 등 V1 시점의 의사결정 맥락은 향후 회고/감사에 필요하다.
 > 3. **V1↔V2 의 차이 명확화** — §2.1 / §9 의 V2 재해석은 두 모델의 차이를 진단할 때 직접 참조된다.
 >

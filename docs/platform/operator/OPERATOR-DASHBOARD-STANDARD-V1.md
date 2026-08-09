@@ -158,6 +158,39 @@ if (user.roles.includes('admin')) { ... }
 </ProtectedRoute>
 ```
 
+### 3-3. 회원 비밀번호 변경 권한 (Identity V2 서비스별 credential)
+
+> `WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1` (2026-08-09)
+> 근거 Canonical: [O4O-IDENTITY-ARCHITECTURE-V2](../../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)
+
+**비밀번호는 서비스별로 독립한다.** 같은 사용자라도 서비스마다 다른 비밀번호를 가질 수 있으며,
+저장소는 `service_credentials(user_id, service_key)` 다. **`users.password` 를 변경하지 않는다.**
+
+| 변경 주체 | 변경 대상 | 변경되는 credential |
+|---|---|---|
+| 플랫폼 관리자 | 서비스 admin 운영자 | 명시한 대상 서비스 |
+| admin 운영자 | 자기 서비스 operator · 회원 | 해당 서비스 |
+| operator 운영자 | 자기 서비스 회원 | 해당 서비스 |
+| 모든 사용자 | 자기 자신 | 현재 로그인 서비스 (`PUT /users/password`) |
+| 서비스 운영자 | **다른 서비스 회원** | **불가** |
+| 어느 주체든 | **플랫폼 계정(`platform:super_admin`)** | **불가** — 별도 경로 |
+
+**구현 규칙**
+
+1. **계층 순위** `member < operator < admin < platform` — **상위만 하위를 변경**한다.
+   동급 변경(operator → 다른 operator)은 금지한다.
+2. **대상 서비스는 정확히 하나여야 한다.** 운영 서비스가 하나면 자동 확정하고,
+   복수 서비스 운영자·플랫폼 관리자는 `serviceKey` 를 명시해야 한다
+   (미지정 시 `400 SERVICE_KEY_REQUIRED`). **전 서비스 일괄 변경 경로를 만들지 않는다.**
+3. 대상이 그 서비스 회원이 아니면 `404 SERVICE_NOT_MEMBER`.
+4. 자기 스코프 밖 `serviceKey` 지정은 `403 SERVICE_SCOPE_FORBIDDEN`.
+5. credential row 가 없으면 **그 서비스 row 만** 생성한다(다른 서비스 credential 무변경).
+
+> **관리자 계정 재설정 경로는 예외다.** `PUT /admin/users/:id` ·
+> `PATCH /admin/platform-accounts/:id/password` · 운영 스크립트는 아직 `users.password` 만 갱신하며,
+> credential 보유 서비스에는 적용되지 않는다
+> (`admin-password-reset-scope.service.ts` 가 영향 범위를 안내한다). Identity V2 Phase 5 정리 대상.
+
 ---
 
 ## 4. UI 레이아웃 표준
