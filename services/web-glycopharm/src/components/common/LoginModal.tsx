@@ -59,7 +59,14 @@ export default function LoginModal() {
     setIsSubmitting(true);
 
     try {
-      const loggedInUser = await login(email, password);
+      // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+      //   login() 이 throw 대신 result object 를 반환한다. 안내 문구는 기존 그대로.
+      const result = await login(email, password);
+      if (!result.success) {
+        setError(result.error || '이메일 또는 비밀번호가 올바르지 않습니다.');
+        return;
+      }
+      const loggedInUser = result.user!;
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -85,8 +92,10 @@ export default function LoginModal() {
       }
 
       onLoginSuccess?.();
-    } catch (err: any) {
-      setError(err.message || '이메일 또는 비밀번호가 올바르지 않습니다.');
+    } catch (err: unknown) {
+      // login() 은 더 이상 throw 하지 않는다 — 여기 도달하면 로그인 이후 처리 오류다.
+      console.error('[Login] Post-login error:', err);
+      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setIsSubmitting(false);
     }

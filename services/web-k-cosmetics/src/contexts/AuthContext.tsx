@@ -4,11 +4,16 @@
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient 기반 자동 갱신
  * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
+ *
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+ *   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 @o4o/auth-react 의 useServiceAuth 로 이동.
+ *   K-Cosmetics 고유분(lazy session check 계약)만 남는다.
  */
 
-import { createContext, useContext, useState, useRef, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, resolveAuthError, buildPlatformUser, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
+import { createContext, useContext, useState, useRef, useEffect, useCallback, useMemo, ReactNode } from 'react';
+import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
+import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for backward compatibility
@@ -34,12 +39,15 @@ export interface User {
   memberships?: { serviceKey: string; status: string }[];
 }
 
+/** 기존 호출부 계약 보존 — success 시 role/roles 도 함께 준다. */
+type KCosLoginResult = AuthLoginResult<User> & { role?: UserRole; roles?: UserRole[] };
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   isSessionChecked: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }>;
+  login: (email: string, password: string) => Promise<KCosLoginResult>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
@@ -51,126 +59,75 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  // smart init: 토큰이 있으면 checkSession 완료 전까지 isLoading=true → RoleGuard 성급한 redirect 방지
-  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
+  const core = useServiceAuth<User>(
+    useMemo(
+      () => ({
+        // canonical service key — role prefix('cosmetics')가 아니라 service_memberships.service_key.
+        serviceKey: 'k-cosmetics',
+        authClient,
+        getAccessToken,
+        toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+      }),
+      [],
+    ),
+  );
+
+  const { user, setUser } = core;
+
+  // WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1 계약 보존:
+  //   RoleGuard 가 lazy 로 checkSession() 을 부르되 중복 호출은 하지 않는다.
+  //   Core 가 mount 시 1회 세션 복구를 수행하므로, 그 완료를 isSessionChecked 로 노출한다.
   const [isSessionChecked, setIsSessionChecked] = useState(false);
-  // WO-O4O-AUTH-RUNTIME-ORCHESTRATION-STABILIZATION-V1:
-  // 여러 RoleGuard 동시 마운트 시 병렬 중복 호출 방지 (ref는 동기적으로 업데이트됨)
-  const sessionCheckInProgressRef = useRef(false);
-
-  // Lazy session check - only called when entering protected routes
-  const checkSession = async () => {
-    if (isSessionChecked || sessionCheckInProgressRef.current) return;
-    // WO-O4O-AUTH-RUNTIME-DRIFT-CLEANUP-V1: token guard — 토큰 없으면 API 호출 생략 (GlycoPharm/KPA/Neture 패턴 정렬)
-    if (!getAccessToken()) {
-      setIsSessionChecked(true);
-      return;
-    }
-    sessionCheckInProgressRef.current = true;
-
-    setIsLoading(true);
-    try {
-      const response = await api.get('/auth/me');
-      const data = response.data;
-      const { user: apiUser } = parseAuthResponse(data);
-      if (apiUser) {
-        setUser(buildPlatformUser(apiUser));
-      }
-    } catch {
-      // 세션 없음 - 정상
-    } finally {
-      setIsLoading(false);
-      setIsSessionChecked(true);
-      sessionCheckInProgressRef.current = false;
-    }
-  };
-
-  // WO-O4O-STORE-OWNER-GUARD-CHECKSESSION-FIX-V1:
-  //   mount 시 1회 세션 부트스트랩. RoleGuard 를 거치지 않는 경로(StoreOwnerRoute /store/*)에서도
-  //   isLoading 이 해제되도록 — cold load/새로고침 무한 로딩 해소. GlycoPharm/KPA AuthContext canonical 정합.
-  //   내부 가드(isSessionChecked + sessionCheckInProgressRef)로 RoleGuard lazy 호출과 중복되지 않는다.
+  const isSessionCheckedRef = useRef(false);
   useEffect(() => {
-    void checkSession();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }> => {
-    try {
-      setIsLoading(true);
-
-      // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
-      // which stores tokens to localStorage (api.post() alone does not)
-      // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
-      // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
-      // K-Cosmetics 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
-      const result = await authClient.login({ email, password, serviceKey: 'k-cosmetics' });
-      const apiUser = result.user as any;
-      if (apiUser) {
-        const built = buildPlatformUser(apiUser);
-        setUser(built);
-        setIsSessionChecked(true);
-        return { success: true, role: built.roles[0], roles: built.roles };
-      }
-
-      return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
-    } catch (error: any) {
-      const errData = error?.response?.data;
-      if (errData) {
-        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
-        //   서비스별 안내 UX(가입 링크 등) 노출을 위해 응답 code 를 그대로 전달한다.
-        return {
-          success: false,
-          error: resolveAuthError(errData, error?.response?.status),
-          code: typeof errData.code === 'string' ? errData.code : undefined,
-        };
-      }
-      return { success: false, error: '로그인에 실패했습니다.' };
-    } finally {
-      setIsLoading(false);
+    if (!core.isLoading && !isSessionCheckedRef.current) {
+      isSessionCheckedRef.current = true;
+      setIsSessionChecked(true);
     }
-  };
+  }, [core.isLoading]);
 
-  const logout = async () => {
-    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
-    await authClient.logout();
-    setUser(null);
+  const checkSession = useCallback(async () => {
+    if (isSessionCheckedRef.current) return; // 기존 dedup 계약
+    await core.refresh();
+  }, [core.refresh]);
+
+  const login = async (email: string, password: string): Promise<KCosLoginResult> => {
+    const result = await core.login(email, password);
+    if (result.success && result.user) {
+      isSessionCheckedRef.current = true;
+      setIsSessionChecked(true);
+      return { ...result, role: result.user.roles[0], roles: result.user.roles };
+    }
+    return result;
   };
 
   const logoutAll = async () => {
+    // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
     await api.post('/auth/logout-all');
   };
 
   const switchRole = (role: UserRole) => {
-    if (user && user.roles.includes(role)) {
-      setUser({ ...user, roles: [role, ...user.roles.filter(r => r !== role)] });
-    }
+    setUser((prev) => {
+      if (!prev || !prev.roles.includes(role)) return prev;
+      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
+    });
   };
 
   const updateUser = (updates: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...updates });
-    }
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
   };
 
   const hasMultipleRoles = user ? user.roles.length > 1 : false;
-
-  // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리 + lazy check 초기화
-  useEffect(() => {
-    const handleTokenCleared = () => { setUser(null); setIsSessionChecked(false); };
-    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-  }, []);
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
-        isLoading,
+        isAuthenticated: core.isAuthenticated,
+        isLoading: core.isLoading,
         isSessionChecked,
         login,
-        logout,
+        logout: core.logout,
         logoutAll,
         switchRole,
         hasMultipleRoles,

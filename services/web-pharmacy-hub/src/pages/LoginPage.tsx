@@ -26,19 +26,24 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
     try {
-      const loggedIn = await login(email, password);
+      // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1: result object 계약
+      const result = await login(email, password);
+      if (!result.success) {
+        setError(
+          result.code === 'SERVICE_NOT_MEMBER'
+            ? `${BRAND.nameKo} 가입 회원이 아닙니다. 가입 신청 후 운영자 승인을 받아 주세요.`
+            : (result.error ?? '로그인에 실패했습니다.'),
+        );
+        return;
+      }
       // WO-O4O-RESTRICTED-LOGIN-FOR-PENDING-REJECTED-V1 §5-F:
       //   제한 로그인 계정(users.status=pending)은 가입 상태 확인 화면으로만 보낸다.
       //   상품·주문·콘텐츠 진입점은 노출하지 않는다.
-      const accountAccess = (loggedIn as { accountAccess?: string } | null)?.accountAccess;
+      const accountAccess = (result.user as { accountAccess?: string } | undefined)?.accountAccess;
       navigate(accountAccess === 'restricted' ? '/join/status' : '/');
     } catch (err) {
-      const wrapped = err as Error & { code?: string };
-      setError(
-        wrapped.code === 'SERVICE_NOT_MEMBER'
-          ? `${BRAND.nameKo} 가입 회원이 아닙니다. 가입 신청 후 운영자 승인을 받아 주세요.`
-          : wrapped.message,
-      );
+      console.error('[Login] Post-login error:', err);
+      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setSubmitting(false);
     }

@@ -9,9 +9,13 @@
  * - Service User는 약국 서비스 전용 인증
  */
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, useMemo, useCallback, useRef } from 'react';
 import { AuthClient, getAccessToken } from '@o4o/auth-client';
-import { parseAuthResponse, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT, type ApiUser } from '@o4o/auth-utils';
+import { normalizeMemberships, type ApiUser } from '@o4o/auth-utils';
+// WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+//   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 공통 Core 로 이동.
+//   KPA 고유분(KPA context 비동기 로딩 · activityType · Service User)만 이 파일에 남는다.
+import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
 import { configureStoreProductsApi } from '@o4o/store-products-ui';
 
 // Re-export for client.ts to use
@@ -177,7 +181,12 @@ interface AuthContextType {
   isLoading: boolean;
   /** WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 로딩 완료 여부 */
   isKpaContextLoaded: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  /**
+   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+   *   반환 계약을 result object 로 통일(기존 throw 방식 폐기).
+   *   서버 `code`(SERVICE_NOT_MEMBER 등)를 호출부가 그대로 분기할 수 있다.
+   */
+  login: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   loginAsTestAccount: (accountType: TestAccountType) => void;
   logout: () => Promise<void>;
   logoutAll: () => Promise<void>;
@@ -246,16 +255,41 @@ function createUserFromApiResponse(apiUser: ApiUser): User {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  // WO-O4O-KPA-AUTH-ISLOADING-SMART-INIT-V1: Neture/GlycoPharm 패턴 정렬
-  // 토큰 없는 비로그인 방문자: false로 즉시 시작 / 토큰 있는 사용자: true로 시작
-  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
   // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context 비동기 로딩 상태
   // true = 로딩 불필요 또는 로딩 완료 / false = 아직 로딩 중
   const [isKpaContextLoaded, setIsKpaContextLoaded] = useState(true);
 
   // Phase 2-b: Service User state (WO-AUTH-SERVICE-IDENTITY-PHASE2B-KPA-PHARMACY)
   const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
+
+  /**
+   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+   *   인증 상태·세션 복구·로그인/로그아웃은 공통 Core 가 담당한다.
+   *   KPA 차이는 아래 주입값이 전부다 — serviceKey / 자체 authClient(localStorage 전략) /
+   *   KPA 필드 확장(createUserFromApiResponse) / 인증 직후 KPA context 후속 로딩.
+   *
+   *   isLoading 초기값(토큰 유무), 토큰 없을 때 /auth/me 생략, AUTH_TOKEN_CLEARED_EVENT 처리는
+   *   Core 가 동일 규칙으로 수행하므로 여기서 중복 구현하지 않는다.
+   */
+  const core = useServiceAuth<User>(
+    useMemo(
+      () => ({
+        // canonical service key — role prefix('kpa')가 아니라 service_memberships.service_key.
+        serviceKey: 'kpa-society',
+        authClient,
+        getAccessToken,
+        toUser: (apiUser: Record<string, unknown>) => createUserFromApiResponse(apiUser as unknown as ApiUser),
+        // 인증 확정 직후 KPA context 를 비동기로 채운다(화면 진입을 막지 않는다).
+        onAuthenticated: () => {
+          setIsKpaContextLoaded(false);
+          void fetchKpaContextRef.current();
+        },
+      }),
+      [],
+    ),
+  );
+
+  const { user, setUser } = core;
 
   /**
    * WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context를 별도 API로 비동기 조회
@@ -267,7 +301,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
    */
   const fetchKpaContext = useCallback(async () => {
     try {
-      const response = await authClient.api.get('/kpa/me-context');
+      const response = await authClient.api.get('/kpa/me-context') as { data: unknown };
       const data = response.data as { success: boolean; data: any };
       if (data.success && data.data) {
         const ctx = data.data;
@@ -298,95 +332,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const checkAuth = useCallback(async () => {
-    // WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1:
-    // 토큰 없으면 /auth/me 호출 자체를 생략 → 불필요한 401 방지
-    const token = getAccessToken();
-    if (!token) {
-      setUser(null);
-      setIsLoading(false);
-      setIsKpaContextLoaded(true);
-      return;
-    }
+  // onAuthenticated 는 useMemo(deps=[]) 안에서 호출되므로 최신 fetchKpaContext 를 ref 로 참조한다.
+  const fetchKpaContextRef = useRef(fetchKpaContext);
+  fetchKpaContextRef.current = fetchKpaContext;
 
-    try {
-      const response = await authClient.api.get('/auth/me');
-      const data = response.data as { success: boolean; data: any };
+  /**
+   * WO-KPA-A-AUTH-LOOP-GUARD-STABILIZATION-V1 의 "토큰 없으면 /auth/me 생략" 규칙과
+   * 로그인/로그아웃/전체 로그아웃은 Core(useServiceAuth)가 동일하게 수행한다.
+   * checkAuth 는 기존 이름을 유지하되 Core.refresh 로 위임한다(외부 계약 불변).
+   */
+  const checkAuth = core.refresh;
 
-      if (data.success && data.data) {
-        // WO-O4O-AUTH-CHAIN-UNIFICATION-V1: parseAuthResponse로 user 추출 통일
-        const { user: apiUser } = parseAuthResponse(data);
-        if (!apiUser) { setUser(null); setIsLoading(false); setIsKpaContextLoaded(true); return; }
-        const userData = createUserFromApiResponse(apiUser);
+  /**
+   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+   *   기존 KPA login 은 성공 시 User 를 반환하고 실패 시 throw 했다.
+   *   공통 계약(result object)으로 통일한다 — 호출부(LoginModal)도 함께 수정했다.
+   *   KPA context 후속 로딩은 Core 의 onAuthenticated 훅에서 일어난다.
+   */
+  const login = core.login;
 
-        // 즉시 user 설정 → 화면 표시 차단 해제
-        setUser(userData);
-        // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context는 비동기 후속 로딩
-        setIsKpaContextLoaded(false);
-        void fetchKpaContext();
-      } else {
-        setUser(null);
-      }
-    } catch (error) {
-      console.error('Auth check failed:', error);
-      setUser(null);
-    } finally {
-      setIsLoading(false);
-    }
-  }, [fetchKpaContext]);
-
-  useEffect(() => {
-    checkAuth();
-  }, [checkAuth]);
-
-  // 토큰 갱신 실패 시 user 상태 정리 (api/token-refresh.ts에서 이벤트 발행)
-  useEffect(() => {
-    const handleTokenCleared = () => setUser(null);
-    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-  }, []);
-
-  const login = async (email: string, password: string): Promise<User> => {
-    // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
-    // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
-    // KPA-Society 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
-    const response = await authClient.login({ email, password, serviceKey: 'kpa-society' });
-
-    if (response.success && response.user) {
-      const apiUser = response.user as any;
-      const userData = createUserFromApiResponse(apiUser as ApiUser);
-
-      // 즉시 user 설정 → 로그인 모달 닫기 + 화면 진입
-      setUser(userData);
-      // WO-KPA-LOGIN-LATENCY-CLEANUP-V1: KPA context는 비동기 후속 로딩
-      setIsKpaContextLoaded(false);
-      void fetchKpaContext();
-
-      return userData;
-    } else {
-      throw new Error('로그인 응답 형식이 올바르지 않습니다.');
-    }
-  };
-
-  const logout = async () => {
-    try {
-      await authClient.logout();
-    } catch (error) {
-      console.error('Logout request failed:', error);
-    } finally {
-      setUser(null);
-    }
-  };
+  const logout = core.logout;
 
   const logoutAll = async () => {
-    try {
-      await authClient.api.post('/auth/logout-all');
-    } catch (error) {
-      console.error('Logout all request failed:', error);
-      throw error;
-    } finally {
-      setUser(null);
-    }
+    // 기존 계약 보존: 실패를 호출부로 전파한다(Core 는 삼키지 않고 그대로 throw).
+    await core.logoutAll();
   };
 
   /**
@@ -472,10 +441,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   return (
     <AuthContext.Provider
       value={{
-        // Platform User
+        // Platform User (인증 상태는 공통 Core 산출)
         user,
-        isAuthenticated: !!user,
-        isLoading,
+        isAuthenticated: core.isAuthenticated,
+        isLoading: core.isLoading,
         isKpaContextLoaded,
         login,
         loginAsTestAccount,

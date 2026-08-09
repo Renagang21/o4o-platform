@@ -1530,6 +1530,28 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/auth-react:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../auth-utils
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/auth-utils:
     dependencies:
       '@o4o/types':
@@ -2809,6 +2831,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -2945,6 +2970,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3051,6 +3079,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3169,6 +3200,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3272,6 +3306,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -9256,11 +9293,11 @@ packages:
 
   glob@7.1.6:
     resolution: {integrity: sha512-LwaxwyZ72Lk7vZINtNNrywX0ZuLyStrdDtabefZKAY5ZGJhVtgdznluResxNmPitE0SAO+O26sWTHeKSI2wMBA==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   glob@7.2.3:
     resolution: {integrity: sha512-nFR0zLpU2YCaRxwoCJvL6UvCH2JFyFVIvwTLsIf21AuHlMskA1hhTdk+LlYJtOlYt9v6dvszD2BGRqBL+iQK9Q==}
-    deprecated: Glob versions prior to v9 are no longer supported
+    deprecated: Old versions of glob are not supported, and contain widely publicized security vulnerabilities, which have been fixed in the current version. Please update. Support for old versions may be purchased (at exorbitant rates) by contacting i@izs.me
 
   globals@14.0.0:
     resolution: {integrity: sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ==}

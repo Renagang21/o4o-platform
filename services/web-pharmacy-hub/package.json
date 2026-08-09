@@ -12,6 +12,7 @@
   "dependencies": {
     "@o4o/account-ui": "workspace:*",
     "@o4o/auth-client": "workspace:*",
+    "@o4o/auth-react": "workspace:*",
     "@o4o/auth-utils": "workspace:*",
     "@o4o/content-editor": "workspace:*",
     "@o4o/error-handling": "workspace:*",

@@ -17,6 +17,11 @@ export interface AuthLoginResult<TUser> {
    * 이 값이 필요해서 throw 대신 result object 를 canonical 로 택했다.
    */
   code?: string;
+  /**
+   * HTTP 상태코드. 서비스가 code 로 구분되지 않는 분기(예: 429 rate limit)에서 쓴다.
+   * 기존 서비스들이 catch 블록에서 `err.response.status` 로 하던 분기를 보존하기 위한 필드다.
+   */
+  status?: number;
   /** 성공 시 변환된 사용자. 실패 시 undefined. */
   user?: TUser;
 }
