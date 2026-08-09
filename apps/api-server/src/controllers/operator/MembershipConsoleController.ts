@@ -18,6 +18,9 @@ import { roleAssignmentService } from '../../modules/auth/services/role-assignme
 import { roleService } from '../../modules/auth/services/role.service.js';
 import { isOperationalRole } from '../../types/roles.js';
 import { ActionLogService } from '@o4o/action-log-core';
+// WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1:
+//   canonical service_key → role prefix 는 @o4o/security-core SSOT 위임 (로컬 매핑 금지).
+import { resolveRolePrefixFromCanonicalServiceKey } from '@o4o/security-core';
 
 const approvalService = new MembershipApprovalService();
 
@@ -42,6 +45,40 @@ const INVALID_USER_ID_RESPONSE = {
  */
 const MEMBERSHIP_SCOPED_STATUSES = ['withdrawn', 'pending'];
 
+/**
+ * WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1
+ * WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2
+ *
+ * 운영 계층. 비밀번호 변경은 **상위 계층만 하위 계층에 대해** 허용한다.
+ * 판정 축은 `isOperationalRole` 과 동일하게 role 의 마지막 세그먼트다.
+ */
+type OperationalTier = 'member' | 'operator' | 'admin' | 'platform';
+
+/** 비밀번호 변경 실패 응답. 성공 시 null 을 반환한다. */
+interface PasswordChangeFailure {
+  status: number;
+  error: string;
+  code: string;
+}
+
+const OPERATIONAL_TIER_RANK: Record<OperationalTier, number> = {
+  member: 0,
+  operator: 1,
+  admin: 2,
+  platform: 3,
+};
+
+/**
+ * 주어진 서비스(rolePrefix) 기준 운영 계층을 판정한다.
+ * platform 계정은 서비스와 무관하게 최상위다.
+ */
+function resolveOperationalTier(roles: string[], rolePrefix: string): OperationalTier {
+  if (roles.includes(PLATFORM_SUPER_ADMIN_ROLE) || roles.includes('super_admin')) return 'platform';
+  if (roles.includes(`${rolePrefix}:admin`)) return 'admin';
+  if (roles.includes(`${rolePrefix}:operator`)) return 'operator';
+  return 'member';
+}
+
 
 export class MembershipConsoleController {
   private actionLogService?: ActionLogService;
@@ -51,6 +88,106 @@ export class MembershipConsoleController {
       this.actionLogService = new ActionLogService(AppDataSource);
     }
     return this.actionLogService!;
+  }
+
+  /**
+   * 운영자의 회원 비밀번호 변경 — Identity V2 서비스별 credential 경로.
+   *
+   * WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1
+   *
+   * 계약:
+   *   - `users.password` 를 건드리지 않는다 (V1 공통 비밀번호 경로 종료).
+   *   - **정확히 하나의 serviceKey** 에 해당하는 `service_credentials` 만 갱신한다.
+   *     대상 서비스가 모호하면 전역 변경 대신 400 으로 거절한다.
+   *   - 운영 계층 순위(member < operator < admin < platform)에서 **상위만 하위를 변경**한다.
+   *     동급(operator → 다른 operator)·상위(operator → admin) 변경은 금지.
+   *   - credential row 가 없으면 그 서비스 row 만 생성한다(다른 서비스 credential 무변경).
+   */
+  private async changeMemberServicePassword(params: {
+    req: Request;
+    scope: ServiceScope;
+    targetUserId: string;
+    newPassword: string;
+  }): Promise<PasswordChangeFailure | null> {
+    const { req, scope, targetUserId, newPassword } = params;
+
+    // (1) 대상 서비스 결정 — 모호하면 거절한다(전역·일괄 변경 금지).
+    const requested = req.body?.serviceKey ?? req.body?.membershipServiceKey;
+    const explicitKey = typeof requested === 'string' && requested.trim() ? requested.trim() : undefined;
+
+    let serviceKey: string | undefined;
+    if (explicitKey) {
+      if (!scope.isPlatformAdmin && !scope.serviceKeys.includes(explicitKey)) {
+        return {
+          status: 403,
+          error: '다른 서비스 회원의 비밀번호는 변경할 수 없습니다.',
+          code: 'SERVICE_SCOPE_FORBIDDEN',
+        };
+      }
+      serviceKey = explicitKey;
+    } else if (!scope.isPlatformAdmin && scope.serviceKeys.length === 1) {
+      // 운영 서비스가 하나면 그 서비스로 확정한다.
+      serviceKey = scope.serviceKeys[0];
+    }
+
+    if (!serviceKey) {
+      // 플랫폼 관리자이거나 복수 서비스 운영자 — 어느 서비스 비밀번호인지 특정해야 한다.
+      return {
+        status: 400,
+        error: '대상 서비스(serviceKey)를 지정해야 합니다.',
+        code: 'SERVICE_KEY_REQUIRED',
+      };
+    }
+
+    // (2) 대상이 그 서비스의 회원인지 확인
+    const membershipRows = await AppDataSource.query(
+      `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
+      [targetUserId, serviceKey]
+    );
+    if (membershipRows.length === 0) {
+      return {
+        status: 404,
+        error: '해당 서비스의 회원이 아닙니다.',
+        code: 'SERVICE_NOT_MEMBER',
+      };
+    }
+
+    // (3) 운영 계층 검증 — 상위 계층만 하위 계층을 변경한다.
+    const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
+    const callerRoles: string[] = (req as any).user?.roles ?? [];
+    const targetRoleRows = await AppDataSource.query(
+      `SELECT role FROM role_assignments WHERE user_id = $1 AND is_active = true`,
+      [targetUserId]
+    );
+    const targetRoles: string[] = targetRoleRows.map((r: { role: string }) => r.role);
+
+    const callerTier = resolveOperationalTier(callerRoles, rolePrefix);
+    const targetTier = resolveOperationalTier(targetRoles, rolePrefix);
+
+    if (OPERATIONAL_TIER_RANK[callerTier] <= OPERATIONAL_TIER_RANK[targetTier]) {
+      return {
+        status: 403,
+        error: '이 회원의 비밀번호를 변경할 권한이 없습니다.',
+        code: 'INSUFFICIENT_OPERATOR_TIER',
+      };
+    }
+
+    // (4) 해당 서비스 credential 만 갱신 — users.password·타 서비스 credential 무변경.
+    const passwordHash = await hashPassword(newPassword);
+    await AppDataSource.query(
+      `INSERT INTO service_credentials (user_id, service_key, password_hash, created_at, updated_at)
+       VALUES ($1, $2, $3, NOW(), NOW())
+       ON CONFLICT ON CONSTRAINT "uq_service_credentials_user_service"
+       DO UPDATE SET password_hash = EXCLUDED.password_hash, updated_at = NOW()`,
+      [targetUserId, serviceKey, passwordHash]
+    );
+
+    logger.info('[MembershipConsole] service credential password changed', {
+      targetUserId, serviceKey, callerTier, targetTier,
+      changedBy: (req as any).user?.id ?? null,
+    });
+
+    return null;
   }
 
   /**
@@ -925,13 +1062,31 @@ export class MembershipConsoleController {
         }
       }
 
-      // 1. Password update (기존 로직)
+      // 1. Password update — Identity V2 서비스별 credential
+      //
+      // WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1:
+      //   이전 구현은 `UPDATE users SET password` 로 V1 공통 비밀번호를 갱신했다.
+      //   Identity V2(DECISION-...-V2-ADOPTION-V1) 채택 후 서비스 로그인은
+      //   service_credentials 가 있으면 users.password 를 **보지 않는다**
+      //   (auth-login.service.ts: `credentialHash ?? user.password`).
+      //   따라서 credential 을 가진 회원에게는 성공 응답만 돌아가고 실제 로그인 비밀번호는
+      //   바뀌지 않는 **사일런트 무효** 상태였다. Phase 2 에서 본인 변경(`PUT /users/password`)만
+      //   서비스 범위로 전환되고 운영자의 타인 변경 경로가 누락된 결과다.
       if (password) {
-        const hashedPassword = await hashPassword(password);
-        await AppDataSource.query(
-          `UPDATE users SET password = $1, "updatedAt" = NOW() WHERE id = $2`,
-          [hashedPassword, userId]
-        );
+        const pwFailure = await this.changeMemberServicePassword({
+          req,
+          scope,
+          targetUserId: userId,
+          newPassword: password,
+        });
+        if (pwFailure) {
+          res.status(pwFailure.status).json({
+            success: false,
+            error: pwFailure.error,
+            code: pwFailure.code,
+          });
+          return;
+        }
       }
 
       // 2. Profile fields update
