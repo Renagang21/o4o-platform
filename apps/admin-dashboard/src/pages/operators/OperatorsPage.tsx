@@ -83,6 +83,9 @@ interface UserFormState {
 export default function OperatorsPage() {
   const [users, setUsers] = useState<AdminUserDto[]>([]);
   const [loading, setLoading] = useState(true);
+  // WO-O4O-OPERATORS-PAGE-SILENT-NOOP-FIX-V1:
+  //   목록 조회 실패를 "0건" 과 구분하기 위한 지속 상태. toast 는 사라지므로 별도로 유지한다.
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [search, setSearch] = useState('');
   const [facets, setFacets] = useState<Facets>(EMPTY_FACETS);
 
@@ -102,20 +105,52 @@ export default function OperatorsPage() {
     fetchUsers();
   }, []);
 
+  /**
+   * 운영자 목록 조회.
+   *
+   * WO-O4O-OPERATORS-PAGE-SILENT-NOOP-FIX-V1
+   *   종전에는 실패 시 `setUsers([])` 로 목록을 비워, 표가 emptyMessage
+   *   ("조건에 맞는 운영 권한이 없습니다.")를 그대로 보여줬다. 실패 신호는 **사라지는 toast** 뿐이라
+   *   운영자가 "권한이 하나도 없다"고 오인할 수 있었다 — 실패를 0건으로 위장한 것이다.
+   *
+   *   변경:
+   *     - 실패를 **지속 상태(loadError)** 로 표면화하고 재시도 버튼을 제공한다.
+   *     - 재조회 실패 시 **기존 목록을 비우지 않는다**(마지막으로 성공한 화면을 유지).
+   *     - HTTP 200 이지만 `success:false` 이거나 배열이 아닌 응답도 **실패로 판정**한다.
+   */
   const fetchUsers = async () => {
     try {
       setLoading(true);
       const response = await authClient.api.get('/admin/users', { params: { limit: 1000 } });
+
+      // 200 인데 실패를 실은 응답을 성공으로 오인하지 않는다.
+      if (response.data?.success === false) {
+        throw new Error(response.data?.error || response.data?.message || '목록 조회에 실패했습니다.');
+      }
+
       const raw =
         response.data?.users ||
         response.data?.data?.users ||
         response.data?.data ||
         response.data ||
         [];
-      setUsers(Array.isArray(raw) ? (raw as AdminUserDto[]) : []);
-    } catch {
-      toast.error('Failed to load operators');
-      setUsers([]);
+
+      // 예상과 다른 응답 형태를 "0건" 으로 흘려보내지 않는다.
+      if (!Array.isArray(raw)) {
+        throw new Error('운영자 목록 응답 형식이 올바르지 않습니다.');
+      }
+
+      setUsers(raw as AdminUserDto[]);
+      setLoadError(null);
+    } catch (err: any) {
+      const msg =
+        err?.response?.data?.error ||
+        err?.response?.data?.message ||
+        err?.message ||
+        '운영자 목록을 불러오지 못했습니다.';
+      setLoadError(msg);
+      toast.error(msg);
+      // 기존 목록은 유지한다 — 비우면 "권한 0건" 과 구분되지 않는다.
     } finally {
       setLoading(false);
     }
@@ -454,6 +489,32 @@ export default function OperatorsPage() {
         </div>
       )}
 
+      {/* WO-O4O-OPERATORS-PAGE-SILENT-NOOP-FIX-V1:
+          목록 조회 실패를 지속 배너로 드러낸다. toast 만으로는 사라진 뒤 빈 표와 구분되지 않는다. */}
+      {loadError && (
+        <div
+          role="alert"
+          className="mb-3 flex items-start justify-between gap-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-800"
+        >
+          <div>
+            <p className="font-semibold">운영자 목록을 불러오지 못했습니다.</p>
+            <p className="mt-1 break-all">{loadError}</p>
+            <p className="mt-1 text-xs text-red-700">
+              아래 표는 마지막으로 조회에 성공한 내용이거나 비어 있을 수 있습니다. 실제 권한 현황과 다를 수 있으니
+              다시 시도한 뒤 확인하세요.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={fetchUsers}
+            disabled={loading}
+            className="shrink-0 rounded-md bg-red-100 px-3 py-1 font-medium text-red-800 hover:bg-red-200 disabled:opacity-50"
+          >
+            다시 시도
+          </button>
+        </div>
+      )}
+
       {/* DataTable (canonical operator-ux-core) */}
       <DataTable<AssignmentRow>
         columns={columns}
@@ -461,7 +522,11 @@ export default function OperatorsPage() {
         rowKey={(row) => row.key}
         tableId="admin-operators-assignments-list"
         loading={loading}
-        emptyMessage="조건에 맞는 운영 권한이 없습니다."
+        emptyMessage={
+          loadError
+            ? '목록을 불러오지 못해 표시할 수 없습니다. 위의 [다시 시도]를 눌러 주세요.'
+            : '조건에 맞는 운영 권한이 없습니다.'
+        }
         selectable
         selectedKeys={selectedIds}
         onSelectionChange={setSelectedIds}
