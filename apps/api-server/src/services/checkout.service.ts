@@ -25,6 +25,10 @@ import {
   calculateSupplierShippingFee,
   type SupplierShippingPolicy,
 } from './shipping/supplier-shipping.js';
+import {
+  assertNoDrugInCommerceOrThrow,
+  toCommerceRefFromOrderItem,
+} from '../modules/neture/guards/drug-commerce.guard.js';
 
 /**
  * 주문 아이템
@@ -135,9 +139,31 @@ class CheckoutService {
   }
 
   /**
+   * 의약품 주문 절대 차단 (WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1).
+   *
+   * 판정에는 DataSource 가 필요하므로 연결만 확보한다 — 연결 실패 시에는 게이트 코드로
+   * 바꿔치지 않고 **기존과 동일한 오류를 그대로 던진다**(주문은 어차피 생성되지 않는다).
+   */
+  private async assertNoDrugItems(items: OrderItem[]): Promise<void> {
+    if (!AppDataSource.isInitialized) {
+      await AppDataSource.initialize();
+    }
+    await assertNoDrugInCommerceOrThrow(
+      AppDataSource,
+      (items ?? []).map(toCommerceRefFromOrderItem),
+    );
+  }
+
+  /**
    * 주문 생성
    */
   async createOrder(dto: CreateOrderDto): Promise<CheckoutOrder> {
+    // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1:
+    //   주문 경로의 최종 방어선. `ensureInitialized()` · 금액 계산 · 주문 row 생성보다
+    //   **먼저** items 전량을 일괄 판정한다. 의약품이 하나라도 섞이면 주문 전체를 거부한다
+    //   (부분 주문 생성 없음). 모든 createOrder 호출부가 이 한 지점을 공유한다.
+    await this.assertNoDrugItems(dto.items);
+
     await this.ensureInitialized();
 
     const subtotal = dto.items.reduce((sum, item) => sum + item.subtotal, 0);
