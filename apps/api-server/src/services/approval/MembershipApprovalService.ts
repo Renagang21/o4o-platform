@@ -1204,18 +1204,37 @@ export class MembershipApprovalService {
           usersDeactivated: remainingMemberships.length === 0,
         });
       } else {
-        // Soft delete: 비활성화만 수행 (users 삭제 없음)
-        await queryRunner.query(
-          `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
-          [userId]
-        );
-        // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
-        //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
-        //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
-        await queryRunner.query(
-          `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
-          [userId]
-        );
+        // Soft delete: 비활성화만 수행 (users row 삭제 없음)
+        //
+        // WO-O4O-SERVICE-MEMBER-SOFT-DELETE-CROSS-SERVICE-ISOLATION-V1:
+        //   이전 구현은 호출자 권한과 무관하게 두 개의 **전역** write 를 실행했다.
+        //     1) UPDATE users SET status='deleted', "isActive"=false   → 모든 서비스 로그인 차단
+        //     2) UPDATE service_memberships ... WHERE user_id = $1     → 다른 서비스 membership 까지 종료
+        //   requireAuth 가 매 요청 users.isActive 를 검사하므로(authentication.middleware.ts),
+        //   한 서비스 운영자의 탈퇴 처리가 그 사용자의 **다른 서비스 진행 중 세션까지** 끊었다.
+        //
+        //   서비스 운영자 = 자기 서비스 membership 종료만. users 는 건드리지 않는다.
+        //   플랫폼 관리자 = 계정 전체 탈퇴(기존 계약 보존).
+        //   role 정리는 아래 prefixesToClean 이 이미 권한별로 스코프하고 있어 그대로 둔다.
+        if (isPlatformAdmin) {
+          await queryRunner.query(
+            `UPDATE users SET status = 'deleted', "isActive" = false, "updatedAt" = NOW() WHERE id = $1`,
+            [userId]
+          );
+          // WO-O4O-SM-WITHDRAWN-STATUS-CANONICAL-ALIGNMENT-V1:
+          //   soft delete 도 lifecycle 종료 status 'withdrawn' 으로 일원화.
+          //   withdrawMembership() 과 동일 enum 사용 (별도 'inactive' 분리 금지).
+          await queryRunner.query(
+            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW() WHERE user_id = $1`,
+            [userId]
+          );
+        } else {
+          await queryRunner.query(
+            `UPDATE service_memberships SET status = 'withdrawn', updated_at = NOW()
+             WHERE user_id = $1 AND service_key = ANY($2)`,
+            [userId, serviceKeys]
+          );
+        }
 
         // WO-O4O-SOFT-DELETE-ROLE-CLEANUP-V1: role_assignments 서비스 prefix 범위 내 비활성화.
         // 플랫폼 역할(super_admin, admin, operator)은 절대 자동 비활성화하지 않는다.
