@@ -1,0 +1,21 @@
+{
+  "name": "@o4o/auth-react",
+  "version": "1.0.0",
+  "description": "Shared React authentication layer for O4O service frontends (session restore, login/logout, route guard). Pure judgement helpers stay in @o4o/auth-utils; transport stays in @o4o/auth-client. Admin-dashboard keeps its own @o4o/auth-context.",
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0",
+    "react-dom": "^18.0.0 || ^19.0.0",
+    "react-router-dom": "^6.0.0 || ^7.0.0",
+    "@o4o/auth-utils": "workspace:*",
+    "@o4o/auth-client": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5"
+  }
+}
