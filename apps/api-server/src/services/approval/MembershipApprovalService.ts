@@ -758,13 +758,27 @@ export class MembershipApprovalService {
         [reactivatedBy, membershipIds]
       );
 
-      // STEP2: Activate user account (idempotent — only if currently suspended)
-      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId });
+      // STEP2: Activate user account (idempotent)
+      //
+      // WO-O4O-MEMBERSHIP-REACTIVATION-PLATFORM-SUSPENSION-BOUNDARY-V1:
+      //   users.status='suspended' 를 기록하는 경로는 admin API 뿐이다
+      //   (AdminUserController:376·425, UserManagementController:205).
+      //   즉 users 축의 'suspended' 는 **플랫폼 조치**이며, 서비스 운영자의 재활성화가 이를
+      //   해제하면 "서비스 운영자는 자기 서비스 Membership 만 통제한다" 경계가
+      //   반대 방향으로 뚫린다(WO-...-REJECTION-CROSS-SERVICE-ISOLATION-V1 의 대칭 결함).
+      //
+      //   'deleted' 는 서비스 운영자도 호출할 수 있는 deleteMember(mode='soft') 의 역동작이므로
+      //   운영자 복구 대상으로 남긴다 — WO-O4O-NETURE-SUPPLIER-WITHDRAWN-RESTORE-ACTION-V1 의
+      //   "suspend / soft-delete 모두 이 canonical 경로로 되돌린다" 계약 보존.
+      //   (soft-delete 자체가 users 전역을 쓰는 문제는 withdrawn/delete 의미 감사에서 다룬다.)
+      const liftableUserStatuses = isPlatformAdmin ? ['suspended', 'deleted'] : ['deleted'];
+
+      logger.info('[REACTIVATE][STEP2] user UPDATE', { userId, isPlatformAdmin, liftableUserStatuses });
 
       await queryRunner.query(
         `UPDATE users SET status = 'active', "isActive" = true, "updatedAt" = NOW()
-         WHERE id = $1 AND status IN ('suspended', 'deleted')`,
-        [userId]
+         WHERE id = $1 AND status = ANY($2)`,
+        [userId, liftableUserStatuses]
       );
 
       // STEP3: Reactivate role_assignments for each membership role
