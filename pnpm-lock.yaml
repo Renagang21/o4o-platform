@@ -308,6 +308,9 @@ importers:
       '@o4o/pharmacy-ai-insight':
         specifier: workspace:*
         version: link:../../packages/pharmacy-ai-insight
+      '@o4o/security-core':
+        specifier: workspace:*
+        version: link:../../packages/security-core
       '@o4o/shortcodes':
         specifier: workspace:*
         version: link:../../packages/shortcodes

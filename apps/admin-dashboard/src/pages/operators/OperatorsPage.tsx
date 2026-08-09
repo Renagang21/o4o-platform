@@ -38,6 +38,10 @@ import {
   isOperatorRole,
   parseRole,
 } from '@/lib/rbac-catalog';
+// WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+//   role prefix → canonical service_key 변환 SSOT. 로컬 매핑 상수를 만들지 않는다.
+//   security-core 는 전 파일이 `import type` 뿐이라 런타임 의존이 없다(브라우저 안전).
+import { resolveCanonicalServiceKey } from '@o4o/security-core';
 
 // ─── Create/Edit 모달용 — 운영 역할 카탈로그 ───
 // 정책: WO-OPERATOR-ROLE-CLEANUP-V1 — Super Admin = 전체 접근, 각 서비스 = Admin + Operator만
@@ -95,6 +99,11 @@ export default function OperatorsPage() {
   const [showModal, setShowModal] = useState(false);
   const [editingUserId, setEditingUserId] = useState<string | null>(null);
   const [formData, setFormData] = useState<UserFormState>({ email: '', password: '', lastName: '', firstName: '', roles: [] });
+  // 서비스 비밀번호 변경 모달 — 대상 행(서비스 고정)
+  const [pwTarget, setPwTarget] = useState<AssignmentRow | null>(null);
+  const [pwValue, setPwValue] = useState('');
+  const [pwError, setPwError] = useState('');
+  const [pwSubmitting, setPwSubmitting] = useState(false);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -184,12 +193,61 @@ export default function OperatorsPage() {
     setFormErrors({});
   };
 
+  // ─── 서비스 비밀번호 변경 (WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1) ───
+  //   대상은 클릭한 행의 서비스 하나로 고정한다. 한 번의 조작으로 하나의 credential 만 바꾼다.
+  const openServicePasswordModal = (row: AssignmentRow) => {
+    setPwTarget(row);
+    setPwValue('');
+    setPwError('');
+  };
+
+  const closeServicePasswordModal = () => {
+    setPwTarget(null);
+    setPwValue('');
+    setPwError('');
+  };
+
+  const submitServicePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!pwTarget) return;
+    if (pwValue.length < 8) {
+      setPwError('비밀번호는 최소 8자 이상이어야 합니다.');
+      return;
+    }
+    // role prefix('kpa','cosmetics') ≠ canonical service_key('kpa-society','k-cosmetics').
+    // 변환은 @o4o/security-core SSOT 에 위임한다 — 로컬 중복 매핑을 만들지 않는다.
+    const serviceKey = resolveCanonicalServiceKey(pwTarget.service.key);
+    setPwSubmitting(true);
+    setPwError('');
+    try {
+      // B6 계약 재사용: 서버가 serviceKey 의 service_credentials 한 건만 갱신한다.
+      //   users.password 와 다른 서비스 credential 은 건드리지 않는다.
+      await authClient.api.put(`/operator/members/${pwTarget.userId}`, {
+        password: pwValue,
+        serviceKey,
+      });
+      // 성공 표시는 실제 credential 변경이 완료된 뒤에만 한다.
+      toast.success(`${pwTarget.service.label} 비밀번호가 변경되었습니다.`);
+      closeServicePasswordModal();
+    } catch (err: any) {
+      setPwError(
+        err?.response?.data?.error || err?.message || '비밀번호 변경에 실패했습니다.',
+      );
+    } finally {
+      setPwSubmitting(false);
+    }
+  };
+
   const validateForm = (): boolean => {
     const errors: Record<string, string> = {};
     if (!formData.email) errors.email = 'Email is required';
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) errors.email = 'Invalid email format';
-    if (!editingUserId && !formData.password) errors.password = 'Password is required for new operator';
-    else if (formData.password && formData.password.length < 8) errors.password = 'Password must be at least 8 characters';
+    // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+    //   비밀번호는 신규 생성에서만 입력받는다(편집 경로에서 제거).
+    if (!editingUserId) {
+      if (!formData.password) errors.password = 'Password is required for new operator';
+      else if (formData.password.length < 8) errors.password = 'Password must be at least 8 characters';
+    }
     if (!formData.lastName) errors.lastName = 'Last name is required';
     if (!formData.firstName) errors.firstName = 'First name is required';
     if (formData.roles.length === 0) errors.roles = 'At least one role is required';
@@ -209,19 +267,11 @@ export default function OperatorsPage() {
           name: `${formData.lastName} ${formData.firstName}`.trim(),
           roles: formData.roles,
         };
-        if (formData.password) data.password = formData.password;
-        const res = await authClient.api.put(`/admin/users/${editingUserId}`, data);
+        // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+        //   password 를 보내지 않는다. 서버도 400(PASSWORD_NOT_ALLOWED_HERE)으로 거부한다.
+        //   서비스 비밀번호는 행별 "서비스 비밀번호 변경" 액션이 담당한다.
+        await authClient.api.put(`/admin/users/${editingUserId}`, data);
         toast.success('Operator updated successfully');
-        // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
-        //   비밀번호를 함께 바꾼 경우, 서비스별 credential 이 있는 계정은 그 서비스 로그인
-        //   비밀번호가 **바뀌지 않는다**. 성공 toast 만 띄우면 관리자가 전부 바뀐 것으로 오인한다.
-        const unaffected: string[] = res.data?.passwordScope?.unaffectedServiceKeys ?? [];
-        if (unaffected.length > 0) {
-          toast(
-            `비밀번호는 플랫폼 로그인에만 적용됐습니다. 다음 서비스의 로그인 비밀번호는 변경되지 않았습니다: ${unaffected.join(', ')} — 사용자가 각 서비스의 "비밀번호 찾기"로 직접 재설정해야 합니다.`,
-            { duration: 12000, icon: '⚠️' },
-          );
-        }
       } else {
         await authClient.api.post('/admin/users', {
           email: formData.email,
@@ -382,6 +432,17 @@ export default function OperatorsPage() {
         <RowActionMenu
           actions={[
             { key: 'edit', label: '편집', variant: 'primary', onClick: () => openEditModal(row) },
+            // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+            //   비밀번호는 서비스별로 독립하므로 **이 행의 서비스** 를 대상으로 고정한다.
+            //   platform 행은 서비스 credential 개념이 없어 액션을 제공하지 않는다
+            //   (플랫폼 계정 비밀번호는 플랫폼 계정 관리 화면이 담당).
+            ...(row.service.key === 'platform'
+              ? []
+              : [{
+                  key: 'service-password',
+                  label: `서비스 비밀번호 변경 (${row.service.label})`,
+                  onClick: () => openServicePasswordModal(row),
+                }]),
             { key: 'revoke', label: `권한 해제 (${row.roleMeta.label})`, variant: 'danger', onClick: () => handleRevokeRole(row) },
           ]}
         />
@@ -550,6 +611,83 @@ export default function OperatorsPage() {
         )}
       </BaseDetailDrawer>
 
+      {/* 서비스 비밀번호 변경 Modal
+          WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1
+          대상 서비스는 클릭한 행으로 **고정**된다. 화면에 canonical serviceKey 와
+          사람이 읽는 서비스명을 함께 표시해 어느 로그인 비밀번호가 바뀌는지 분명히 한다. */}
+      {pwTarget && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+            <div className="flex items-center justify-between p-4 border-b">
+              <h2 className="text-lg font-semibold">서비스 비밀번호 변경</h2>
+              <button onClick={closeServicePasswordModal} className="p-1 hover:bg-gray-100 rounded">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <form onSubmit={submitServicePassword} className="p-4 space-y-4">
+              <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm">
+                <div>
+                  <span className="text-slate-500">대상 회원</span>
+                  <span className="ml-2 font-medium text-slate-800">
+                    {pwTarget.userName} ({pwTarget.userEmail})
+                  </span>
+                </div>
+                <div className="mt-1">
+                  <span className="text-slate-500">대상 서비스</span>
+                  <span className="ml-2 font-semibold text-slate-800">{pwTarget.service.label}</span>
+                  <code className="ml-2 text-xs text-slate-500">
+                    {resolveCanonicalServiceKey(pwTarget.service.key)}
+                  </code>
+                </div>
+                <p className="mt-2 text-xs text-slate-500">
+                  이 서비스의 로그인 비밀번호만 변경됩니다. 다른 서비스와 플랫폼 로그인은 영향받지 않습니다.
+                </p>
+              </div>
+
+              {pwError && (
+                <div className="flex items-start gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>{pwError}</span>
+                </div>
+              )}
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  새 비밀번호 <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="password"
+                  value={pwValue}
+                  onChange={(e) => setPwValue(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
+                  placeholder="8자 이상"
+                  minLength={8}
+                  required
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={closeServicePasswordModal}
+                  className="flex-1 py-2 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                >
+                  취소
+                </button>
+                <button
+                  type="submit"
+                  disabled={pwSubmitting || pwValue.length < 8}
+                  className="flex-1 py-2 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {pwSubmitting ? '변경 중...' : '변경'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Create/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -585,28 +723,38 @@ export default function OperatorsPage() {
                 )}
               </div>
 
-              {/* Password */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Password {!editingUserId && <span className="text-red-500">*</span>}
-                  {editingUserId && <span className="text-gray-400 text-xs ml-1">(leave empty to keep current)</span>}
-                </label>
-                <input
-                  type="password"
-                  value={formData.password}
-                  onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                    formErrors.password ? 'border-red-500' : 'border-gray-300'
-                  }`}
-                  placeholder="••••••••"
-                />
-                {formErrors.password && (
-                  <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
-                    <AlertCircle className="w-4 h-4" />
-                    {formErrors.password}
-                  </p>
-                )}
-              </div>
+              {/* Password — 신규 생성에서만 입력받는다.
+                  WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+                    비밀번호는 서비스별로 독립하므로(Identity V2) "이 사람의 비밀번호" 라는
+                    사용자 단위 개념이 성립하지 않는다. 편집에서는 제거하고
+                    행별 "서비스 비밀번호 변경" 액션으로 분리했다. */}
+              {!editingUserId ? (
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Password <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="password"
+                    value={formData.password}
+                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
+                      formErrors.password ? 'border-red-500' : 'border-gray-300'
+                    }`}
+                    placeholder="••••••••"
+                  />
+                  {formErrors.password && (
+                    <p className="mt-1 text-sm text-red-500 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      {formErrors.password}
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm text-slate-600">
+                  비밀번호는 여기서 변경하지 않습니다. 목록에서 해당 <b>서비스 행</b>의
+                  <b> “서비스 비밀번호 변경”</b> 을 사용하세요 — 서비스마다 비밀번호가 독립적입니다.
+                </div>
+              )}
 
               {/* Name */}
               <div className="grid grid-cols-2 gap-3">

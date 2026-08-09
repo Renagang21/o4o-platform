@@ -48,6 +48,7 @@
     "@o4o/pharmacy-ai-insight": "workspace:*",
     "@o4o/types": "workspace:*",
     "@o4o/operator-ux-core": "workspace:*",
+    "@o4o/security-core": "workspace:*",
     "@o4o/ui": "workspace:*",
     "@o4o/utils": "workspace:*",
     "@radix-ui/react-accordion": "^1.2.12",

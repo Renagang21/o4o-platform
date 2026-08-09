@@ -34,6 +34,12 @@ export default defineConfig(mergeConfig(sharedViteConfig, {
       '@o4o/utils': path.resolve(__dirname, '../../packages/utils/dist'),
       '@o4o/ui': path.resolve(__dirname, '../../packages/ui/dist'),
       '@o4o/auth-client': path.resolve(__dirname, '../../packages/auth-client/dist'),
+      // WO-O4O-ADMIN-OPERATORS-SERVICE-PASSWORD-WRITE-CONTRACT-FIX-V1:
+      //   role prefix → canonical service_key 변환(resolveCanonicalServiceKey) SSOT 재사용.
+      //   security-core 는 전 파일이 `import type` 뿐이라 런타임 의존이 없다(브라우저 안전).
+      //   build:packages 체인에 없는 패키지라 dist 를 전제하지 않고 src 를 직접 가리킨다
+      //   (@o4o/types 등 기존 tsconfig paths 와 동일 패턴).
+      '@o4o/security-core': path.resolve(__dirname, '../../packages/security-core/src'),
       '@o4o/auth-context': path.resolve(__dirname, '../../packages/auth-context/dist'),
       '@o4o/shortcodes': path.resolve(__dirname, '../../packages/shortcodes/dist'),
       '@o4o/block-renderer': path.resolve(__dirname, '../../packages/block-renderer/dist'),

@@ -39,6 +39,7 @@
       "@o4o/types": ["../../packages/types/src"],
       "@o4o/utils": ["../../packages/utils/src"],
       "@o4o/ui": ["../../packages/ui/src"],
+      "@o4o/security-core": ["../../packages/security-core/src"],
       "@o4o/forum-core/*": ["../../packages/forum-core/*"],
       "@o4o/content-editor": ["../../packages/content-editor/src"],
       "@o4o/ai-prompts": ["../../packages/ai-prompts/src"],
