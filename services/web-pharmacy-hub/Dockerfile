@@ -39,6 +39,13 @@ COPY packages/ui/package.json ./packages/ui/
 COPY packages/account-ui/package.json ./packages/account-ui/
 # WO-PHARMACY-HUB-STORE-CONTENT-LIBRARY-V1: 표준 편집기 (@o4o/* 의존 없음 — tiptap only)
 COPY packages/content-editor/package.json ./packages/content-editor/
+# WO-PHARMACY-HUB-STORE-TABLET-SERVICE-SCOPED-INTEGRATION-V1:
+#   태블릿 Screen Set 편집기·kiosk 미리보기를 공유 패키지로 재사용한다.
+#   package.json 블록과 source 블록 **양쪽** 에 넣어야 한다 — 한쪽만 넣으면
+#   ERR_PNPM_WORKSPACE_PKG_NOT_FOUND(설치 단계) 또는 빌드 시 모듈 미해결로 실패한다.
+COPY packages/tablet-screen-set-editor/package.json ./packages/tablet-screen-set-editor/
+COPY packages/screen-content-core/package.json ./packages/screen-content-core/
+COPY packages/tablet-kiosk-core/package.json ./packages/tablet-kiosk-core/
 
 # Copy service package.json
 COPY services/web-pharmacy-hub/package.json ./services/web-pharmacy-hub/
@@ -56,6 +63,9 @@ COPY packages/error-handling/ ./packages/error-handling/
 COPY packages/ui/ ./packages/ui/
 COPY packages/account-ui/ ./packages/account-ui/
 COPY packages/content-editor/ ./packages/content-editor/
+COPY packages/tablet-screen-set-editor/ ./packages/tablet-screen-set-editor/
+COPY packages/screen-content-core/ ./packages/screen-content-core/
+COPY packages/tablet-kiosk-core/ ./packages/tablet-kiosk-core/
 
 # Copy service source
 COPY services/web-pharmacy-hub/ ./services/web-pharmacy-hub/
