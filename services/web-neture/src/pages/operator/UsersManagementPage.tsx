@@ -160,8 +160,10 @@ const netureMembersClient: MembersConsoleClient = {
     ];
     return { data: { results } };
   },
-  async updatePassword(userId, password) {
-    await api.put(`/operator/members/${userId}`, { password });
+  async updatePassword(userId, password, serviceKey) {
+    // WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+    //   서비스별 credential 이므로 대상 serviceKey 를 함께 보낸다(미전달 시 서버가 400).
+    await api.put(`/operator/members/${userId}`, { password, serviceKey });
   },
 };
 

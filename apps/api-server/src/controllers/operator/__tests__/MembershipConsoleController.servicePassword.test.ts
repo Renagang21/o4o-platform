@@ -66,9 +66,9 @@ function primeQuery({ memberOf = ['glycopharm'], targetRoles = [] }: Prime = {})
       const keys: string[] = params[1] ?? [];
       return Promise.resolve(memberOf.some((k) => keys.includes(k)) ? [{ ok: 1 }] : []);
     }
-    // 대상 서비스 membership 확인
-    if (/^SELECT 1 FROM service_memberships WHERE user_id = \$1 AND service_key = \$2/i.test(s)) {
-      return Promise.resolve(memberOf.includes(params[1]) ? [{ ok: 1 }] : []);
+    // 후보 산출 — 대상자의 전체 membership serviceKey
+    if (/^SELECT service_key FROM service_memberships WHERE user_id = \$1/i.test(s)) {
+      return Promise.resolve(memberOf.map((service_key) => ({ service_key })));
     }
     if (/^SELECT role FROM role_assignments/i.test(s)) {
       return Promise.resolve(targetRoles.map((role) => ({ role })));
@@ -147,7 +147,21 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
       expect(credentialWrites()[0].params[1]).toBe('glycopharm');
     });
 
-    it('복수 서비스 운영자가 serviceKey 를 안 주면 400 으로 거절한다 (전역 변경 금지)', async () => {
+    it('복수 서비스 운영자여도 후보가 1개면(대상이 한 서비스에만 속함) 자동 확정한다', async () => {
+      // 운영자는 glycopharm·kpa-society 둘 다 관리하지만 대상은 glycopharm 회원만이다.
+      primeQuery({ memberOf: ['glycopharm'] });
+      const res = makeRes();
+
+      await controller.updateMember(
+        makeReq({ password: 'NewPw12345!' }, { serviceKeys: ['glycopharm', 'kpa-society'] }),
+        res,
+      );
+
+      expect(credentialWrites()).toHaveLength(1);
+      expect(credentialWrites()[0].params[1]).toBe('glycopharm');
+    });
+
+    it('후보가 복수면 serviceKey 없이는 400 으로 거절한다 (전역 변경 금지)', async () => {
       primeQuery({ memberOf: ['glycopharm', 'kpa-society'] });
       const res = makeRes();
 
@@ -160,6 +174,38 @@ describe('updateMember 비밀번호 변경 — Identity V2 서비스 credential'
       expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'SERVICE_KEY_REQUIRED' }));
       expect(credentialWrites()).toEqual([]);
       expect(usersPasswordWrites()).toEqual([]);
+    });
+
+    it('운영자 관리 범위 밖 회원은 진입 자체가 404 다 (checkServiceBoundary 선행 차단)', async () => {
+      // 운영자는 glycopharm 만 관리, 대상은 kpa-society 회원만 →
+      // updateMember 최상단 boundary check 에서 이미 막힌다. 비밀번호 로직까지 가지 않는다.
+      primeQuery({ memberOf: ['kpa-society'] });
+      const res = makeRes();
+
+      await controller.updateMember(makeReq({ password: 'NewPw12345!' }), res);
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(credentialWrites()).toEqual([]);
+      expect(usersPasswordWrites()).toEqual([]);
+    });
+
+    it('플랫폼 관리자 + 대상이 어느 서비스에도 속하지 않으면 404 NO_MANAGEABLE_SERVICE 다', async () => {
+      // platform admin 은 boundary check 를 건너뛰므로 후보 산출 단계에서 걸린다.
+      primeQuery({ memberOf: [] });
+      const res = makeRes();
+
+      await controller.updateMember(
+        makeReq(
+          { password: 'NewPw12345!', serviceKey: 'glycopharm' },
+          { isPlatformAdmin: true, serviceKeys: [] },
+          ['platform:super_admin'],
+        ),
+        res,
+      );
+
+      expect(res.status).toHaveBeenCalledWith(404);
+      expect(res.json).toHaveBeenCalledWith(expect.objectContaining({ code: 'NO_MANAGEABLE_SERVICE' }));
+      expect(credentialWrites()).toEqual([]);
     });
 
     it('플랫폼 관리자가 serviceKey 를 안 주면 400 으로 거절한다', async () => {

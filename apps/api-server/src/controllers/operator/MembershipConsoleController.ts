@@ -111,27 +111,48 @@ export class MembershipConsoleController {
   }): Promise<PasswordChangeFailure | null> {
     const { req, scope, targetUserId, newPassword } = params;
 
-    // (1) 대상 서비스 결정 — 모호하면 거절한다(전역·일괄 변경 금지).
+    // (1) 후보 서비스 산출 = **호출자 관리 범위 ∩ 대상자 Membership**
+    //     WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+    //       이전 구현은 `scope.serviceKeys.length === 1` 만 자동 확정해서,
+    //       2개 서비스를 관리하는 운영자가 **한 서비스에만 속한 회원**을 바꿀 때도 400 이 났다.
+    //       기준은 운영자가 관리하는 서비스 수가 아니라 **교집합 후보 수**여야 한다.
+    const targetMembershipRows = await AppDataSource.query(
+      `SELECT service_key FROM service_memberships WHERE user_id = $1`,
+      [targetUserId]
+    );
+    const targetServiceKeys: string[] = targetMembershipRows.map((r: { service_key: string }) => r.service_key);
+    const candidates = scope.isPlatformAdmin
+      ? targetServiceKeys
+      : targetServiceKeys.filter((k) => scope.serviceKeys.includes(k));
+
+    if (candidates.length === 0) {
+      return {
+        status: 404,
+        error: '비밀번호를 변경할 수 있는 서비스가 없습니다.',
+        code: 'NO_MANAGEABLE_SERVICE',
+      };
+    }
+
+    // (2) 대상 서비스 확정 — 모호하면 거절한다(전역·일괄 변경 금지).
     const requested = req.body?.serviceKey ?? req.body?.membershipServiceKey;
     const explicitKey = typeof requested === 'string' && requested.trim() ? requested.trim() : undefined;
 
     let serviceKey: string | undefined;
     if (explicitKey) {
-      if (!scope.isPlatformAdmin && !scope.serviceKeys.includes(explicitKey)) {
-        return {
-          status: 403,
-          error: '다른 서비스 회원의 비밀번호는 변경할 수 없습니다.',
-          code: 'SERVICE_SCOPE_FORBIDDEN',
-        };
+      if (!candidates.includes(explicitKey)) {
+        // 관리 범위 밖이거나 대상이 그 서비스 회원이 아니다. 어느 쪽인지 구분해 응답한다.
+        const inScope = scope.isPlatformAdmin || scope.serviceKeys.includes(explicitKey);
+        return inScope
+          ? { status: 404, error: '해당 서비스의 회원이 아닙니다.', code: 'SERVICE_NOT_MEMBER' }
+          : { status: 403, error: '다른 서비스 회원의 비밀번호는 변경할 수 없습니다.', code: 'SERVICE_SCOPE_FORBIDDEN' };
       }
       serviceKey = explicitKey;
-    } else if (!scope.isPlatformAdmin && scope.serviceKeys.length === 1) {
-      // 운영 서비스가 하나면 그 서비스로 확정한다.
-      serviceKey = scope.serviceKeys[0];
+    } else if (!scope.isPlatformAdmin && candidates.length === 1) {
+      // 후보가 하나뿐이면 자동 확정. 플랫폼 관리자는 항상 명시적으로 선택해야 한다.
+      serviceKey = candidates[0];
     }
 
     if (!serviceKey) {
-      // 플랫폼 관리자이거나 복수 서비스 운영자 — 어느 서비스 비밀번호인지 특정해야 한다.
       return {
         status: 400,
         error: '대상 서비스(serviceKey)를 지정해야 합니다.',
@@ -139,20 +160,11 @@ export class MembershipConsoleController {
       };
     }
 
-    // (2) 대상이 그 서비스의 회원인지 확인
-    const membershipRows = await AppDataSource.query(
-      `SELECT 1 FROM service_memberships WHERE user_id = $1 AND service_key = $2 LIMIT 1`,
-      [targetUserId, serviceKey]
-    );
-    if (membershipRows.length === 0) {
-      return {
-        status: 404,
-        error: '해당 서비스의 회원이 아닙니다.',
-        code: 'SERVICE_NOT_MEMBER',
-      };
-    }
-
-    // (3) 운영 계층 검증 — 상위 계층만 하위 계층을 변경한다.
+    // (3) 운영 계층 검증 — **선택된 서비스 안에서만** 판정한다.
+    //     다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다.
+    //     예) 대상이 kpa:admin 이어도 glycopharm 에서 일반 회원이면 glycopharm 에서는 member 다.
+    //     platform 계정만 서비스와 무관한 최상위이며, 이는 "플랫폼 계정 비밀번호는
+    //     이 경로가 다루지 않는다"는 계약을 표현한다(대상이 platform 이면 항상 차단).
     const rolePrefix = resolveRolePrefixFromCanonicalServiceKey(serviceKey);
     const callerRoles: string[] = (req as any).user?.roles ?? [];
     const targetRoleRows = await AppDataSource.query(

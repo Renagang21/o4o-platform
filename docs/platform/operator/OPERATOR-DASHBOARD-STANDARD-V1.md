@@ -177,14 +177,25 @@ if (user.roles.includes('admin')) { ... }
 
 **구현 규칙**
 
-1. **계층 순위** `member < operator < admin < platform` — **상위만 하위를 변경**한다.
+1. **후보 서비스 = 호출자 관리 범위 ∩ 대상자 Membership.**
+   운영자가 관리하는 서비스 수가 아니라 **이 교집합**이 기준이다.
+   (2개 서비스를 관리해도 대상이 한 서비스에만 속하면 후보는 1개다.)
+2. **대상 서비스는 정확히 하나로 확정한다.**
+   - 후보 0 → `404 NO_MANAGEABLE_SERVICE` (UI 는 변경 버튼 비활성 + 사유 표시)
+   - 후보 1 → 자동 확정. **단, 화면에는 서비스명을 반드시 표시한다.**
+   - 후보 복수 → 운영자가 **명시적으로 선택**해야 한다. 미지정은 `400 SERVICE_KEY_REQUIRED`
+   - 플랫폼 관리자 → 후보가 1개여도 **항상 명시적 선택**
+   **전 서비스 일괄 변경 경로를 만들지 않는다.**
+3. **권한은 선택된 serviceKey 안에서만 판정한다.**
+   계층 순위 `member < operator < admin < platform`, 허용 조건은 `rank(caller) > rank(target)`.
    동급 변경(operator → 다른 operator)은 금지한다.
-2. **대상 서비스는 정확히 하나여야 한다.** 운영 서비스가 하나면 자동 확정하고,
-   복수 서비스 운영자·플랫폼 관리자는 `serviceKey` 를 명시해야 한다
-   (미지정 시 `400 SERVICE_KEY_REQUIRED`). **전 서비스 일괄 변경 경로를 만들지 않는다.**
-3. 대상이 그 서비스 회원이 아니면 `404 SERVICE_NOT_MEMBER`.
-4. 자기 스코프 밖 `serviceKey` 지정은 `403 SERVICE_SCOPE_FORBIDDEN`.
+   **다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다** —
+   대상이 `kpa:admin` 이어도 GlycoPharm 에서 일반 회원이면 GlycoPharm 에서는 `member` 다.
+4. 후보 밖 `serviceKey` 지정은 사유에 따라 `403 SERVICE_SCOPE_FORBIDDEN`(관리 범위 밖) 또는
+   `404 SERVICE_NOT_MEMBER`(대상이 그 서비스 회원 아님).
 5. credential row 가 없으면 **그 서비스 row 만** 생성한다(다른 서비스 credential 무변경).
+6. **공통 모듈 계약** — `MembersConsoleClient.updatePassword(userId, password, serviceKey)`.
+   `serviceKey` 는 필수다. 서비스별 구현은 이 값을 그대로 `PUT /operator/members/:userId` 에 실어 보낸다.
 
 > **관리자 계정 재설정 경로는 예외다.** `PUT /admin/users/:id` ·
 > `PATCH /admin/platform-accounts/:id/password` · 운영 스크립트는 아직 `users.password` 만 갱신하며,
