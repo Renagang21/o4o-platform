@@ -15,6 +15,8 @@ import type { ServiceMembership } from '../../modules/auth/entities/ServiceMembe
 import { resolveCanonicalServiceKey } from '@o4o/security-core';
 // WO-O4O-ADMIN-USER-LIST-SENSITIVE-FIELD-EXPOSURE-FIX-V1
 import { sanitizeAdminUser } from './admin-user-sanitizer.js';
+// WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
+import { resolveAdminPasswordResetScope } from '../../services/auth/admin-password-reset-scope.service.js';
 
 // WO-O4O-ADMIN-OPERATOR-MEMBERSHIP-CANONICAL-KEY-FIX-V1 +
 // WO-O4O-BACKFILL-MIGRATION-CANONICAL-KEY-CONSISTENCY-V1:
@@ -381,10 +383,18 @@ export class AdminUserController {
 
       const updatedUser = await userRepo.save(user);
 
+      // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+      //   비밀번호를 바꾼 경우에만 적용 범위를 조회한다. 이 경로는 users.password(L1) 만 갱신하므로
+      //   service_credentials(L2) 를 가진 서비스의 로그인 비밀번호는 바뀌지 않는다(사일런트 무효).
+      //   응답 필드는 **additive** — 기존 소비처(user/message)는 그대로다. credential 변경 없음.
+      const passwordScope = password ? await resolveAdminPasswordResetScope(id) : null;
+
       res.json({
         success: true,
         user: sanitizeAdminUser(updatedUser),
-        message: 'User updated successfully'
+        message: 'User updated successfully',
+        ...(passwordScope ? { passwordScope } : {}),
+        ...(passwordScope?.notice ? { notice: passwordScope.notice } : {})
       });
     } catch (error) {
       logger.error('Error updating user:', error);

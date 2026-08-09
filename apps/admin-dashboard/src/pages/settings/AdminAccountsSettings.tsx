@@ -78,6 +78,9 @@ export default function AdminAccountsSettings() {
   const [pw1, setPw1] = useState('');
   const [pw2, setPw2] = useState('');
   const [pwSaving, setPwSaving] = useState(false);
+  // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+  //   재설정이 **적용되지 않은** 서비스 목록. toast 는 사라지므로 별도 결과 패널로 남긴다.
+  const [pwResult, setPwResult] = useState<{ email: string; unaffected: string[] } | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -171,7 +174,20 @@ export default function AdminAccountsSettings() {
     setPwSaving(true);
     try {
       const res = await authClient.api.patch(`/admin/platform-accounts/${pwTarget.id}/password`, { newPassword: pw1 });
-      if (res.data?.success) { toast.success('비밀번호가 재설정되었습니다.'); setPwTarget(null); setPw1(''); setPw2(''); }
+      if (res.data?.success) {
+        // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+        //   재설정은 플랫폼 자격(users.password)에만 적용된다. 서비스별 credential 이 있는 계정은
+        //   그 서비스 로그인 비밀번호가 **바뀌지 않는다** — 성공 toast 만 띄우면 관리자가
+        //   "전부 바뀌었다"고 오인한다. 서버가 내려준 미적용 범위를 그대로 노출한다.
+        const unaffected: string[] = res.data?.data?.unaffectedServiceKeys ?? [];
+        if (unaffected.length > 0) {
+          setPwResult({ email: pwTarget.email, unaffected });
+          toast.success('플랫폼 로그인 비밀번호가 재설정되었습니다.');
+        } else {
+          toast.success('비밀번호가 재설정되었습니다.');
+        }
+        setPwTarget(null); setPw1(''); setPw2('');
+      }
       else toast.error(res.data?.error || '비밀번호 재설정에 실패했습니다.');
     } catch (e: any) {
       toast.error(e?.response?.data?.error || '비밀번호 재설정에 실패했습니다.');
@@ -408,6 +424,15 @@ export default function AdminAccountsSettings() {
           <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-base font-bold text-o4o-text-primary">비밀번호 재설정</h3>
             <p className="mt-1 text-sm text-slate-500">{pwTarget.email} 계정의 새 비밀번호를 설정합니다. 기존 비밀번호는 표시되지 않습니다.</p>
+            {/* WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+                적용 범위를 **설정 전에** 알린다. 서비스별 비밀번호를 따로 쓰는 계정은
+                이 재설정으로 해당 서비스 로그인이 바뀌지 않는다(설계된 자격 분리). */}
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+              이 재설정은 <span className="font-semibold">플랫폼 로그인 비밀번호</span>에 적용됩니다.
+              서비스별 로그인 비밀번호를 따로 사용하는 계정은 해당 서비스의 비밀번호가 변경되지 않으며,
+              사용자가 각 서비스의 &ldquo;비밀번호 찾기&rdquo;로 직접 재설정해야 합니다.
+              설정 후 적용되지 않은 서비스를 안내합니다.
+            </div>
             <div className="mt-4 space-y-3">
               <div>
                 <label className="block text-xs font-medium text-slate-600 mb-1">새 비밀번호</label>
@@ -429,6 +454,33 @@ export default function AdminAccountsSettings() {
                 className="inline-flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50">
                 {pwSaving && <Loader2 className="w-4 h-4 animate-spin" />} 새 비밀번호 설정
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+          재설정이 적용되지 않은 서비스 결과. toast 는 사라지므로 닫을 때까지 남는 패널로 알린다. */}
+      {pwResult && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4" onClick={() => setPwResult(null)}>
+          <div className="w-full max-w-md rounded-xl bg-white p-5 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-base font-bold text-o4o-text-primary">일부 서비스에는 적용되지 않았습니다</h3>
+            <p className="mt-1 text-sm text-slate-600">
+              {pwResult.email} 계정의 <span className="font-semibold">플랫폼 로그인 비밀번호</span>는 재설정됐습니다.
+            </p>
+            <div className="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm text-amber-900">
+              <p className="font-semibold">아래 서비스의 로그인 비밀번호는 변경되지 않았습니다.</p>
+              <ul className="mt-2 list-disc pl-5">
+                {pwResult.unaffected.map((k) => (<li key={k}>{k}</li>))}
+              </ul>
+              <p className="mt-2 text-xs">
+                이 서비스들은 서비스 전용 비밀번호를 사용합니다. 사용자가 각 서비스의
+                &ldquo;비밀번호 찾기&rdquo;로 직접 재설정해야 로그인할 수 있습니다.
+              </p>
+            </div>
+            <div className="mt-5 flex justify-end">
+              <button type="button" onClick={() => setPwResult(null)}
+                className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">확인</button>
             </div>
           </div>
         </div>

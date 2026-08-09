@@ -210,8 +210,18 @@ export default function OperatorsPage() {
           roles: formData.roles,
         };
         if (formData.password) data.password = formData.password;
-        await authClient.api.put(`/admin/users/${editingUserId}`, data);
+        const res = await authClient.api.put(`/admin/users/${editingUserId}`, data);
         toast.success('Operator updated successfully');
+        // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+        //   비밀번호를 함께 바꾼 경우, 서비스별 credential 이 있는 계정은 그 서비스 로그인
+        //   비밀번호가 **바뀌지 않는다**. 성공 toast 만 띄우면 관리자가 전부 바뀐 것으로 오인한다.
+        const unaffected: string[] = res.data?.passwordScope?.unaffectedServiceKeys ?? [];
+        if (unaffected.length > 0) {
+          toast(
+            `비밀번호는 플랫폼 로그인에만 적용됐습니다. 다음 서비스의 로그인 비밀번호는 변경되지 않았습니다: ${unaffected.join(', ')} — 사용자가 각 서비스의 "비밀번호 찾기"로 직접 재설정해야 합니다.`,
+            { duration: 12000, icon: '⚠️' },
+          );
+        }
       } else {
         await authClient.api.post('/admin/users', {
           email: formData.email,
