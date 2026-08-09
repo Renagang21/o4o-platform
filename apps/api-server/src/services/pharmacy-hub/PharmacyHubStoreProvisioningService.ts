@@ -64,7 +64,66 @@ export type ProvisionHoldReason =
   | 'AMBIGUOUS_ORGANIZATION'
   | 'DUPLICATE_BUSINESS_NUMBER'
   | 'MISSING_STORE_NAME'
-  | 'SLUG_UNRESOLVABLE';
+  | 'SLUG_UNRESOLVABLE'
+  // WO-PHARMACY-HUB-STORE-PROVISIONING-ORGANIZATION-REUSE-GUARD-V1 (신규 3종)
+  | 'ORGANIZATION_TYPE_NOT_COMPATIBLE'
+  | 'ORGANIZATION_HAS_OTHER_SERVICE_ENROLLMENT'
+  | 'ORGANIZATION_HAS_SERVICE_NEUTRAL_ASSETS';
+
+/**
+ * WO-PHARMACY-HUB-STORE-PROVISIONING-ORGANIZATION-REUSE-GUARD-V1
+ *
+ * Pharmacy-Hub 약국으로 **자동 재사용**할 수 있는 organizations.type allowlist.
+ *
+ * 프로덕션 실측(2026-08-09): type 은 pharmacy(11) · supplier(7) · store(2) ·
+ * association(1) · division(1) 다섯 가지이고, **PH enrollment 를 가진 조직은 전부 `pharmacy`** 다
+ * (신규 생성 경로도 `ORG_TYPE='pharmacy'` 로 만든다).
+ * 약국을 나타내는 canonical type 이 둘 이상 충돌하지 않음을 확인했으므로 allowlist 는 1개다.
+ * 추측으로 확대하지 않는다 — 새 type 을 넣으려면 실데이터 근거가 필요하다.
+ */
+const REUSABLE_ORG_TYPES = ['pharmacy'] as const;
+
+/**
+ * **실효적으로 service-neutral 한** 매장 자산 — 즉 조회 경로가 `organization_id` 만 보고
+ * service 축으로 거르지 않아, 조직에 PH enrollment 만 추가해도 그대로 PH 화면에 유입되는 것들.
+ *
+ * ⚠️ "service_key 컬럼이 있다" 와 "실제로 service 로 거른다" 는 다르다. 컬럼 유무가 아니라
+ *    **조회 경로**를 기준으로 확정했다 (2026-08-09 조사):
+ *
+ *   store_qr_codes                 organization_id 단독            (컬럼 자체가 org 뿐)
+ *   store_local_products           organization_id 단독
+ *   store_execution_assets         organization_id 단독
+ *   store_playlists                organization_id 단독
+ *   store_tablets                  organization_id 단독
+ *   kpa_store_contents             organization_id 단독
+ *   organization_product_listings  service_key 컬럼은 있으나 조회가 org 만 필터 → 실효 neutral
+ *   store_tablet_screen_sets       service_key 컬럼은 있으나 조회가 org+origin 만 필터 → 실효 neutral
+ *
+ * 반대로 store_pops · store_blog_posts 는 조회가 (store_id, service_key) 복합으로 걸러
+ * 다른 서비스 자산이 유입되지 않으므로 여기 넣지 않는다.
+ */
+/**
+ * 재사용 안전성 판정 결과.
+ *
+ * api-server tsconfig 는 strictNullChecks 가 꺼져 있어 `{safe:true}|{safe:false,...}` 유니온이
+ * `if (!r.safe)` 로 좁혀지지 않는다. 선택 필드를 가진 단일 형태로 두고 safe 로만 분기한다.
+ */
+interface ReuseSafetyResult {
+  safe: boolean;
+  hold?: ProvisionHoldReason;
+  detail?: string;
+}
+
+const SERVICE_NEUTRAL_ASSET_TABLES: ReadonlyArray<{ table: string; column: string; label: string }> = [
+  { table: 'store_qr_codes', column: 'organization_id', label: 'QR' },
+  { table: 'store_local_products', column: 'organization_id', label: '매장 자체 상품' },
+  { table: 'store_execution_assets', column: 'organization_id', label: '자료함' },
+  { table: 'store_playlists', column: 'organization_id', label: '사이니지 재생목록' },
+  { table: 'store_tablets', column: 'organization_id', label: '태블릿' },
+  { table: 'kpa_store_contents', column: 'organization_id', label: '매장 콘텐츠' },
+  { table: 'organization_product_listings', column: 'organization_id', label: '경영활용 제품' },
+  { table: 'store_tablet_screen_sets', column: 'organization_id', label: '화면 세트' },
+];
 
 export interface ProvisionResult {
   userId: string;
@@ -468,6 +527,17 @@ export class PharmacyHubStoreProvisioningService {
       };
     }
     if (memberOrgs.length === 1) {
+      // WO-...-ORGANIZATION-REUSE-GUARD-V1: 후보가 1개여도 "그 조직이 무엇인지" 확인한다.
+      const safety = await this.validateOrganizationReuseSafety(memberOrgs[0].id);
+      if (!safety.safe) {
+        return {
+          organizationId: null,
+          organizationCode: null,
+          reason: 'unsafe reuse (organization_members)',
+          hold: safety.hold,
+          detail: safety.detail,
+        };
+      }
       return {
         organizationId: memberOrgs[0].id,
         organizationCode: memberOrgs[0].code ?? null,
@@ -496,6 +566,18 @@ export class PharmacyHubStoreProvisioningService {
         };
       }
       if (bnOrgs.length === 1) {
+        // 같은 가드를 통과해야 한다 — 사업자번호가 맞는다는 사실만으로 약국이라고 볼 수 없다.
+        // (실제로 사업자번호가 일치하는 K-Cosmetics 뷰티샵이 존재한다 — IR §4-3)
+        const safety = await this.validateOrganizationReuseSafety(bnOrgs[0].id);
+        if (!safety.safe) {
+          return {
+            organizationId: null,
+            organizationCode: null,
+            reason: 'unsafe reuse (business_number)',
+            hold: safety.hold,
+            detail: safety.detail,
+          };
+        }
         return {
           organizationId: bnOrgs[0].id,
           organizationCode: bnOrgs[0].code ?? null,
@@ -506,6 +588,105 @@ export class PharmacyHubStoreProvisioningService {
 
     // 3) 신규 생성 대상
     return { organizationId: null, organizationCode: null, reason: 'new organization' };
+  }
+
+  /**
+   * WO-PHARMACY-HUB-STORE-PROVISIONING-ORGANIZATION-REUSE-GUARD-V1
+   *
+   * **기존 조직을 Pharmacy-Hub 약국으로 재사용해도 안전한가**를 판정한다.
+   * 두 재사용 경로(organization_members 단일 후보 · businessNumber 단일 매칭)가
+   * 이 함수 하나를 공유한다 — 검사 로직을 복제하지 않는다.
+   *
+   * 왜 필요한가 (IR-PHARMACY-HUB-STORE-PROVISIONING-REPLAY-SAFETY-V1 D-1·D-2):
+   *   기존 구현은 후보가 정확히 1개면 **그 조직이 무엇인지 보지 않고** 재사용했다.
+   *   - D-1: 사업자번호만 맞으면 K-Cosmetics 뷰티샵(type='store')도 약국으로 재사용될 수 있었다.
+   *   - D-2: 그 조직이 이미 다른 서비스의 매장 자산을 갖고 있으면, PH enrollment 추가만으로
+   *          그 자산이 Pharmacy-Hub 화면에 그대로 나타난다(경계가 organization_id 단독이라).
+   *          실제로 KPA 약국 조직 1개가 QR 50건·자료함 7건·경영활용 제품 20건을 갖고 있었다.
+   *
+   * 판정은 **보수적**이다 — 애매하면 재사용하지 않고 held 로 사람 판단에 넘긴다.
+   * 자산을 옮기거나 지우지 않고, 다른 서비스의 enrollment 도 건드리지 않는다(읽기만 한다).
+   */
+  private async validateOrganizationReuseSafety(
+    organizationId: string,
+  ): Promise<ReuseSafetyResult> {
+    // ── 0. 이미 우리 매장이면 가드 대상이 아니다 (멱등 재실행) ──
+    //   이 가드는 **남의 조직을 PH 약국으로 입양하는 것**을 막기 위한 것이지,
+    //   이미 PH 매장으로 쓰고 있는 조직을 다시 확인하는 것을 막기 위한 것이 아니다.
+    //   PH active enrollment 가 이미 있으면 그 조직은 정의상 이 서비스의 매장이고,
+    //   그때 쌓인 QR·자료함·태블릿은 **PH 자산**이지 타 서비스 유입이 아니다.
+    //   (이 분기가 없으면 backfill --mode=apply 재실행이 noop 이 아니라 held 가 되어
+    //    멱등 계약이 깨진다 — 실제 운영 모집단 실측에서 발견했다.)
+    const [phEnrollment] = await this.dataSource.query(
+      `SELECT 1 FROM organization_service_enrollments
+        WHERE organization_id = $1 AND service_code = $2 AND status = 'active' LIMIT 1`,
+      [organizationId, SERVICE_KEY],
+    );
+    if (phEnrollment) return { safe: true };
+
+    // ── 1. 조직 type — 약국이 아니면 재사용하지 않는다 ──
+    const [org] = await this.dataSource.query(
+      `SELECT id, code, name, type FROM organizations WHERE id = $1 LIMIT 1`,
+      [organizationId],
+    );
+    if (!org) {
+      return {
+        safe: false,
+        hold: 'ORGANIZATION_TYPE_NOT_COMPATIBLE',
+        detail: `조직 ${organizationId} 을 찾을 수 없습니다.`,
+      };
+    }
+    if (!(REUSABLE_ORG_TYPES as readonly string[]).includes(String(org.type))) {
+      return {
+        safe: false,
+        hold: 'ORGANIZATION_TYPE_NOT_COMPATIBLE',
+        detail:
+          `${org.code || org.id}(${org.name}) 의 type 이 '${org.type}' 입니다. ` +
+          `Pharmacy-Hub 약국으로 자동 재사용할 수 있는 type 은 ${REUSABLE_ORG_TYPES.join(', ')} 뿐입니다.`,
+      };
+    }
+
+    // ── 2. 다른 서비스의 active enrollment — 조직 공유는 사람이 판단할 대상이다 ──
+    const otherEnrollments = await this.dataSource.query(
+      `SELECT service_code FROM organization_service_enrollments
+        WHERE organization_id = $1 AND service_code <> $2 AND status = 'active'
+        ORDER BY service_code`,
+      [organizationId, SERVICE_KEY],
+    );
+    if (otherEnrollments.length > 0) {
+      return {
+        safe: false,
+        hold: 'ORGANIZATION_HAS_OTHER_SERVICE_ENROLLMENT',
+        detail:
+          `${org.code || org.id}(${org.name}) 은 이미 다른 서비스에 참여 중입니다 ` +
+          `(${otherEnrollments.map((e: any) => e.service_code).join(', ')}). ` +
+          `조직을 공유하면 매장 자산 경계가 섞이므로 자동 재사용하지 않습니다.`,
+      };
+    }
+
+    // ── 3. 이미 가진 service-neutral 매장 자산 ──
+    //   경계가 organization_id 단독이라, enrollment 만 추가해도 그대로 PH 화면에 유입된다.
+    //   한 번의 쿼리로 어떤 자산이 몇 건인지 함께 파악한다(사람이 판단할 근거를 남긴다).
+    const counts = await this.dataSource.query(
+      SERVICE_NEUTRAL_ASSET_TABLES.map(
+        (a) => `SELECT '${a.label}' AS label, count(*)::int AS n FROM ${a.table} WHERE ${a.column} = $1`,
+      ).join(' UNION ALL '),
+      [organizationId],
+    );
+    const owned = counts.filter((r: any) => Number(r.n) > 0);
+    if (owned.length > 0) {
+      return {
+        safe: false,
+        hold: 'ORGANIZATION_HAS_SERVICE_NEUTRAL_ASSETS',
+        detail:
+          `${org.code || org.id}(${org.name}) 은 이미 매장 자산을 갖고 있습니다 ` +
+          `(${owned.map((r: any) => `${r.label} ${r.n}건`).join(', ')}). ` +
+          `이 자산들은 organization_id 만으로 경계가 정해져 Pharmacy-Hub 에 그대로 노출되므로 ` +
+          `자동 재사용하지 않습니다.`,
+      };
+    }
+
+    return { safe: true };
   }
 
   private async hasStoreMembership(userId: string, organizationId: string): Promise<boolean> {
