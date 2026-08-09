@@ -107,7 +107,7 @@ resolveAdminPasswordResetScope(userId) → {
 | Deploy API Server | **success** (`31298334643`, headSha `788c564c7`) → revision `o4o-core-api-03256-h9v` |
 | Deploy Admin Dashboard | **success** (`31298334640`, headSha `788c564c7`) |
 | **API smoke (프로덕션)** | ✅ **통과** — 두 분기 실측 (§7-3) |
-| 관리자 UI smoke | ⚠️ **미수행** — 프론트 권한 게이트 차단 (§7-4) |
+| **관리자 UI smoke (프로덕션)** | ✅ **통과** — 사전 경고·결과 패널 실측 (§7-5) |
 
 ---
 
@@ -220,9 +220,15 @@ PATCH /admin/platform-accounts/:id/password (비어있지 않음) → 200, 4개 
 
 → **본 WO 의 핵심 동작(적용 범위 산출·응답 노출)이 프로덕션에서 실증됐다.**
 
-### 7-4. ⚠️ 관리자 UI smoke — 별건 차단 (본 WO 무관, 미수정)
+### 7-4. ~~관리자 UI smoke — 별건 차단~~ → **오진, §7-5 에서 해소** (이력)
 
-`https://admin.neture.co.kr/settings/admin-accounts` 진입 시 **"접근 권한이 없습니다"**.
+> **정정 (2026-08-09).** 아래 "프론트 권한 매핑 갭" 진단은 **오류다.**
+> 차단은 제품 결함이 아니라 **토큰 주입 우회의 부작용**이었다 — `AuthProvider` 가 사용자 프로필을
+> 갖추지 못해 `collectUserRoles()` 가 빈 배열을 반환했고, 역할 게이트가 false 가 됐다.
+> **실제 로그인 폼으로는 정상 접근**한다. 근거: `CHECK-O4O-ADMIN-DASHBOARD-PLATFORM-SUPER-ADMIN-SETTINGS-READ-MAPPING-V1`
+> (`ADMIN_LEVEL_ROLES` 에 `platform:super_admin` 이 이미 포함 · 실측 `permissions: []` → 역할 게이트 통과).
+
+**(당시 관측)** `https://admin.neture.co.kr/settings/admin-accounts` 진입 시 **"접근 권한이 없습니다"**.
 
 - **백엔드는 통과한다** — 같은 계정으로 `/admin/platform-accounts` API 는 **200**.
 - 프론트 라우트가 `AdminProtectedRoute requiredPermissions={['settings:read']}` 를 요구하는데
@@ -233,7 +239,20 @@ PATCH /admin/platform-accounts/:id/password (비어있지 않음) → 200, 4개 
 따라서 UI 렌더(모달 사전 경고·결과 패널)는 여전히 미관측이다. 다만 **UI 는 §7-3 에서 실증된
 응답 payload 를 그대로 표시**하는 얇은 층이고, 표시 분기(`unaffected.length > 0`)는 그 payload 로만 결정된다.
 
-> 후속 후보 5번으로 등록.
+### 7-5. ✅ 관리자 UI smoke 통과 — 검증 공백 최종 종료
+
+실제 로그인 폼으로 재검증한 결과 화면 접근이 정상이었고, UI 요소도 전부 확인됐다.
+**비밀번호를 현재 값과 동일하게 재설정**해 실질 변경 없이 관측했다(재로그인 200).
+
+| 검증 | 결과 |
+|------|:----:|
+| 재설정 모달 **사전 경고** (플랫폼 한정 · 서비스 미변경 · 비밀번호 찾기 안내) | ✅ 3요소 전부 |
+| 재설정 후 **결과 패널** ("일부 서비스에는 적용되지 않았습니다") | ✅ |
+| 결과 패널의 미적용 서비스 목록 | ✅ `glycopharm` `k-cosmetics` `kpa-society` `neture` |
+| 콘솔 에러 · 실패 API | **0 / 0** |
+
+목록은 §7-3 API 응답 및 DB 실측과 **완전히 일치**한다.
+→ **본 WO 는 API·UI 양쪽 실증으로 검증 완료.**
 
 ---
 
@@ -245,7 +264,7 @@ PATCH /admin/platform-accounts/:id/password (비어있지 않음) → 200, 4개 
 | 2 | `WO-O4O-TEST-ACCOUNTS-SERVICE-CREDENTIAL-DOCUMENTATION-V1` — 테스트 계정 문서를 서비스별 비밀번호 구조로 (결정 D) | P3 |
 | 3 | 운영 스크립트(§4-6)에도 동일 안내 출력 | P3 |
 | 4 | 관리자가 **serviceKey 를 지정해** 특정 서비스 credential 을 재설정하는 경로(결정 A-(다)) | 정책 재검토 시 |
-| **5** | **`platform:super_admin` 이 프론트 `settings:read` 권한으로 매핑되지 않아 admin-dashboard 설정 화면 접근 불가** (§7-4). 백엔드는 200, 프론트만 차단 — 기존 문제 | **P2** |
+| ~~5~~ | ~~프론트 `settings:read` 매핑 갭~~ → **철회.** 오진이었다(§7-4 정정, §7-5 통과) | — |
 
 ---
 
