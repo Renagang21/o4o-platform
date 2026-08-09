@@ -159,7 +159,7 @@ table:      store_execution_assets
 | 콘텐츠(`kpa_store_contents`) | 공급자 SPD → 운영자 검수 → canonical → 매장이 `import-b2c-description` 으로 복사 | **LIVE (간접)** |
 | 자료(`store_execution_assets`) | 공급자 직접 경로 **없음**. content_hub(운영자) 사본만 유입 | 미연결 |
 | Screen Set | 공급자 원본 → HUB → 매장 독립 사본 | **LIVE (직접)** |
-| Signage | 공급자 publish → HUB → 매장 Full Copy | **LIVE (직접, 가드 없음)** |
+| Signage | 공급자 publish → HUB → 매장 Full Copy | **LIVE (직접, 상품 분류 가드 없음 — 확정 정책)** |
 | POP / 블로그 / QR 템플릿 / 동영상 | 운영자 전용(`operator_*`). 공급자 축 없음 | 미연결 |
 
 ---
@@ -474,7 +474,7 @@ store_tablet_screen_sets (origin='store'|'operator'|'supplier', status, template
 | B | **"매장용 설명서" 라벨** | 현행 유지 / `O4O 표준 상품 설명서` 로 개칭 | 매장 쪽 동명 메뉴(자체 상품 설명)와 혼동(§4.1) |
 | C | **`검수·게시 현황` 통합 뷰 신설 여부** | 신설 / 각 화면 배지로 분산 유지 | 신설 시 SPD·ScreenSet·Signage 3축 상태 스키마 통일 필요 |
 | D | **그룹명 `콘텐츠` → `매장 제공 자료`** | 개칭 / 유지 | `SupplierSpaceLayout` 은 web-neture 전용이라 공용 모듈 미접촉 |
-| E | **Signage HUB 게시의 대상 셀렉터·의약품 가드 부재** | 지금 정합 / 별도 WO | Screen Set 에는 있고 Signage 에는 없다(선행 IR §8) — **안전 비대칭** |
+| E | ~~**Signage HUB 게시의 대상 셀렉터·의약품 가드 부재**~~ | **종결 (2026-08-09)** | **가드 도입하지 않음으로 확정.** Signage 는 ProductMaster 를 구조적으로 참조하지 않는 단순 콘텐츠 자료라 상품 분류 가드의 대상이 아니다. 자기신고 방식도 미채택(공급자에게 적합성 판단을 지우므로). → `CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1 §0-A` |
 | F | **QR 화면의 `원본 갱신됨` 신호** | 추가 / 자료함에만 유지 | 매장 측 개선이며 공급자 IA 와 별개(§5.6) |
 
 ---
@@ -485,12 +485,14 @@ store_tablet_screen_sets (origin='store'|'operator'|'supplier', status, template
 |----|-----------|------|:---:|
 | WO-1 | **공급자 대시보드 IA 정비 — '매장 제공 자료' 그룹화 + 활용 채널 안내 문구** | web-neture 프론트 한정. 라우트·API·DB 무변경 | P2 |
 | WO-2 | **공급자 검수·게시 현황 통합 뷰** | SPD/ScreenSet/Signage 3축 상태 집계(read-only). A·C 결정 선행 | P2 |
-| WO-3 | **Signage HUB 게시 대상·의약품 가드 정합** | Screen Set 과 동일 가드 적용. **안전 이슈 — 우선순위 상향 검토** | P1 |
+| ~~WO-3~~ | ~~**Signage HUB 게시 대상·의약품 가드 정합**~~ | **CANCEL / 정책상 미진행 (2026-08-09).** 안전 결함이 아니라 자료 유형 차이였다 — §11-E 참조 | — |
 | WO-4 | **`SupplierStoreDescriptionsPage` load-error 계약 표준화** | silent swallow → throw+재시도 | P2 |
 | WO-5 | **매장 QR 목록 `원본 갱신됨` 신호 노출** | KPA 매장 프론트 + 목록 API additive 필드 | P3 |
 | WO-6 | **매장 태블릿 last-mile UX**(D-1 탭 단절 등) | 선행 IR §8 에서 이미 제안된 건 — 중복 착수 주의 | P3 |
 
-> WO-3 은 이번 IR 범위 밖에서 발견한 **안전 비대칭**이다. 규칙에 따라 고치지 않고 분리 보고한다.
+> **2026-08-09 정정:** WO-3 은 분리 보고 후 조사 결과 **안전 결함이 아님**이 확인되어 CANCEL 됐다.
+> 근거·확정 정책은 `docs/checks/CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1 §0-A`.
+> 확정 축: `SPD=상품 기준 검수 가능` / `Screen Set=상품 블록 있으면 의약품 가드` / `Signage=단순 콘텐츠, 상품 분류 가드 없음` / `활용 판단=매장 경영자`.
 
 ---
 
