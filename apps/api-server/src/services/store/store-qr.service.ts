@@ -160,14 +160,27 @@ export async function resolvePublicQrLanding(
   }
 
   // 5초 중복 방지: 같은 ipHash + qrCodeId
+  //
+  // WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1:
+  //   `$6`(ip_hash)는 INSERT 값 목록과 중복 방지 비교(`ip_hash = $6`) **두 곳**에 쓰인다.
+  //   `INSERT … SELECT` 의 select-list 파라미터는 대상 컬럼과 별개로 해석돼 unknown 으로 남고
+  //   비교식에서는 컬럼 타입으로 추론되면서, 한 파라미터에 두 타입이 잡혀
+  //   `inconsistent types deduced for parameter $6` 로 **INSERT 전체가 실패**했다.
+  //   이 쿼리는 fire-and-forget(.catch) 이라 랜딩 응답에는 영향이 없었고, 그래서 전 서비스에서
+  //   스캔 집계가 **한 번도 기록되지 못한 채** 조용히 실패해 왔다 (store_qr_scan_events 0건).
+  //   → 두 자리 모두 `::text` 로 명시 캐스팅해 타입을 하나로 고정한다.
+  //
+  //   ipHash 가 null 이면(신뢰 가능한 IP 미확보) `ip_hash = NULL` 이 참이 되지 않아 중복 방지가
+  //   걸리지 않고 매 스캔이 기록된다 — 식별자 없이 중복 판정을 할 수 없으므로 기존 의도를
+  //   그대로 둔다(본 수정으로 바뀐 동작이 아니다).
   dataSource
     .query(
       `INSERT INTO store_qr_scan_events
          (organization_id, qr_code_id, device_type, user_agent, referer, ip_hash)
-       SELECT $1, $2, $3, $4, $5, $6
+       SELECT $1, $2, $3, $4, $5, $6::text
        WHERE NOT EXISTS (
          SELECT 1 FROM store_qr_scan_events
-         WHERE qr_code_id = $2 AND ip_hash = $6
+         WHERE qr_code_id = $2 AND ip_hash = $6::text
            AND created_at > NOW() - INTERVAL '5 seconds'
        )`,
       [

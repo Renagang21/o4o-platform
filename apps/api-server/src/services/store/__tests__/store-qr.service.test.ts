@@ -298,4 +298,76 @@ describe('resolvePublicQrLanding', () => {
     // 원문 IP 가 아니라 해시만 저장한다.
     expect(insert?.[1]).toContain('h');
   });
+
+  // ── WO-O4O-STORE-QR-SCAN-EVENT-INSERT-TYPE-FIX-V1 회귀 가드 ──
+  //
+  // 이 INSERT 는 fire-and-forget 이라 실패해도 랜딩 응답이 200 으로 나간다.
+  // 그래서 타입 결함(`inconsistent types deduced for parameter $6`)이 프로덕션에서
+  // **한 번도 드러나지 않은 채** 전 서비스 스캔 집계를 0 으로 만들었다
+  // (store_qr_scan_events 전체 0건 · 로그로 확인).
+  // 응답만 보는 테스트로는 이 회귀를 잡을 수 없으므로 SQL 자체를 고정한다.
+
+  function insertCallOf(query: jest.Mock) {
+    return query.mock.calls.find((c: any[]) => String(c[0]).includes('INSERT INTO store_qr_scan_events'));
+  }
+
+  function landingDataSource() {
+    return makeDataSource({
+      queryResults: [
+        [{ id: 'q', landingType: 'link', landingTargetId: 'https://x', isActive: true, organizationId: ORG, slug: 's' }],
+        [],
+        [{ slug: 'store-slug' }],
+      ],
+    });
+  }
+
+  it('스캔 INSERT 는 ip_hash 파라미터를 두 자리 모두 명시 캐스팅한다', async () => {
+    const { ds, query } = landingDataSource();
+    await resolvePublicQrLanding(ds, 's', 'kpa', scan);
+
+    const sql = String(insertCallOf(query)?.[0] ?? '');
+    // 값 목록과 중복 방지 비교 양쪽 — 한쪽만 캐스팅하면 타입이 다시 갈린다.
+    expect(sql).toContain('$6::text');
+    expect(sql).toMatch(/ip_hash\s*=\s*\$6::text/);
+    // 캐스팅 없는 raw `$6` 이 남아 있으면 회귀다.
+    expect(sql).not.toMatch(/\$6(?!::text)/);
+  });
+
+  it('스캔 INSERT 는 5초 중복 방지 조건을 유지한다', async () => {
+    const { ds, query } = landingDataSource();
+    await resolvePublicQrLanding(ds, 's', 'kpa', scan);
+
+    const sql = String(insertCallOf(query)?.[0] ?? '');
+    expect(sql).toContain('NOT EXISTS');
+    expect(sql).toMatch(/created_at\s*>\s*NOW\(\)\s*-\s*INTERVAL\s*'5 seconds'/);
+    expect(sql).toMatch(/qr_code_id\s*=\s*\$2/);
+  });
+
+  it('스캔 INSERT 파라미터는 (org, qr, device, ua, referer, ipHash) 순서다', async () => {
+    const { ds, query } = landingDataSource();
+    await resolvePublicQrLanding(ds, 's', 'kpa', {
+      deviceType: 'tablet',
+      userAgent: 'UA/1.0',
+      referer: 'https://ref',
+      ipHash: 'hashed-ip',
+    });
+
+    expect(insertCallOf(query)?.[1]).toEqual([ORG, 'q', 'tablet', 'UA/1.0', 'https://ref', 'hashed-ip']);
+  });
+
+  it('스캔 INSERT 가 실패해도 랜딩 응답은 정상이다 (fire-and-forget)', async () => {
+    const { ds } = landingDataSource();
+    const original = ds.query;
+    // INSERT 만 실패시키고 나머지 조회는 그대로 둔다.
+    ds.query = jest.fn(async (sql: string, params?: unknown[]) => {
+      if (String(sql).includes('INSERT INTO store_qr_scan_events')) {
+        throw new Error('inconsistent types deduced for parameter $6');
+      }
+      return original(sql, params);
+    });
+
+    const result = await resolvePublicQrLanding(ds, 's', 'kpa', scan);
+
+    expect(result.ok).toBe(true);
+  });
 });
