@@ -565,6 +565,11 @@ export class AuthLoginService {
           type: `login_${provider}`,
           ipAddress,
           userAgent,
+          // WO-O4O-AUTH-ACCOUNT-ACTIVITIES-SUCCESS-FLAG-FIX-V1:
+          //   컬럼을 **명시 지정**한다. 종전에는 details.success 만 채우고 컬럼을 비워
+          //   DB 기본값 true 가 남아, 실패 행까지 success=true 로 저장됐다(전량 오집계).
+          //   details.success 는 기존 소비처 호환을 위해 그대로 유지한다(중복이지만 제거하지 않는다).
+          success,
           details: {
             provider,
             email,
