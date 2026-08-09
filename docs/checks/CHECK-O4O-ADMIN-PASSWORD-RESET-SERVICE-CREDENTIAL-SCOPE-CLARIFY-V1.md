@@ -139,12 +139,28 @@ migration 0 · DB 스키마 0
 
 **관리자 비밀번호 재설정 실행 smoke(API·UI)를 수행하지 못했다.**
 
+> **정정 (2026-08-09, 원인 재확정).** 최초 기록은 *"`sohae2100` 의 문서 비밀번호가 프로덕션과
+> 불일치(401)"* 였다. **이는 오류다** — 조사자가 `sohae21@naver.com` 의 비밀번호를
+> `sohae2100@gmail.com` 에 잘못 대입한 결과였다. 문서 기재값으로 다시 시도하니 **200** 이다.
+> 문서 drift 가 원인이 아니었다.
+
+**실제 원인: `platform:super_admin` 을 가진 테스트 계정이 존재하지 않는다.**
+
 | 시도 | 결과 |
 |------|------|
-| `sohae2100@gmail.com` (`platform:super_admin` 보유 계정) 로그인 | **401** — `TEST-ACCOUNTS.local.md` 기재 비밀번호가 프로덕션과 불일치 |
-| `renagang21@gmail.com` 로그인 → `GET /admin/platform-accounts` | 로그인 200 / **403 `ROLE_REQUIRED`** — `platform:super_admin` 미보유 |
+| `sohae2100@gmail.com` 로그인 (문서 기재값) | **200** ✅ |
+| `sohae2100` → `GET /admin/platform-accounts` | **403 `ROLE_REQUIRED`** — 보유 role 은 `kpa:admin` · `neture:admin` 등 **서비스 레벨 admin** 뿐 |
+| `renagang21@gmail.com` 로그인 → 동일 엔드포인트 | 로그인 200 / **403 `ROLE_REQUIRED`** |
 
-즉 **`platform:super_admin` 로 접근 가능한 유효 자격증명이 없다.**
+두 관리자 경로 모두 `platform:super_admin` **전용**이다.
+
+```text
+platform-accounts.routes.ts : ADMIN_ACCESS_ROLES → platform:super_admin
+users.routes.ts:32          : const ADMIN_ROLES = ['platform:super_admin']
+```
+
+DB 실측(read-only): `platform:super_admin` 보유 계정 **2개**, 그중 `TEST-ACCOUNTS.local.md` 의
+테스트 계정은 **0개**.
 
 - 비밀번호 **추측·대입은 하지 않았다** — 계정 잠금(5회/30분) 유발이자 부적절한 행위다.
 - 실계정의 비밀번호를 실제로 **재설정해 보는 검증도 하지 않았다** — 다른 세션이 쓰는 운영 계정의
@@ -157,9 +173,10 @@ migration 0 · DB 스키마 0
 2) 관리자 UI 의 사전 경고·결과 패널이 실제로 렌더되는지
 ```
 
-> **이 공백 자체가 결정 D(`TEST-ACCOUNTS.local.md` 개편)의 필요성을 보여준다** — 문서 자격증명 drift 가
-> 이제 **검증을 막는 단계**에 도달했다. 유효한 `platform:super_admin` 자격증명이 확보되면
-> 아래 3단계로 즉시 확정할 수 있다(소요 5분 내외).
+> **해소 조건이 바뀌었다.** 문서 비밀번호 갱신으로는 풀리지 않는다 — **검증용
+> `platform:super_admin` 계정 지정**이 필요하며, 이는 권한 부여라 **사용자 결정 사항**이다
+> (에이전트가 임의로 role 을 부여하지 않는다).
+> 계정이 지정되면 아래 3단계로 즉시 확정할 수 있다(소요 5분 내외).
 >
 > ```text
 > 1. credential 이 없는 계정에 재설정 → data.unaffectedServiceKeys = []      (안내 없음 경로)
