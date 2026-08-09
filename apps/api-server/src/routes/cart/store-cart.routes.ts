@@ -93,7 +93,8 @@ export function createStoreCartRoutes(dataSource: DataSource): Router {
 
   function handleError(res: Response, error: unknown, context: string): void {
     if (error instanceof CartError) {
-      const status = error.code === 'NOT_FOUND' ? 404 : 400;
+      // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1: 의약품 차단은 error.status(403)를 갖는다.
+      const status = error.status ?? (error.code === 'NOT_FOUND' ? 404 : 400);
       res.status(status).json({ success: false, error: error.message, code: error.code });
       return;
     }
