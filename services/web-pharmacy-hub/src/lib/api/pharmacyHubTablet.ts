@@ -40,15 +40,23 @@ function unwrap<T>(body: any, fallback: string): T {
 
 // ─── 태블릿 ──────────────────────────────────────────────────────────────────
 
+/**
+ * 공통 `GET /tablets` 응답 형태 그대로다 —
+ * `is_active`/`created_at` 은 snake_case 이고 `currentScreenSetId` 만 camel 로 alias 된다.
+ * (실측으로 확인. 임의로 camel 로 가정하면 화면에서 undefined 가 된다.)
+ */
 export interface StoreTablet {
   id: string;
   name: string;
   location?: string | null;
-  isActive: boolean;
+  is_active?: boolean;
+  created_at?: string;
   currentScreenSetId?: string | null;
-  currentScreenSetName?: string | null;
-  createdAt?: string;
-  updatedAt?: string;
+}
+
+/** 목록은 비활성(내린) 태블릿도 함께 반환한다 — 화면에서 걸러 쓴다. */
+export function isTabletActive(t: StoreTablet): boolean {
+  return t.is_active !== false;
 }
 
 export async function fetchTablets(): Promise<StoreTablet[]> {

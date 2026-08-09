@@ -25,6 +25,7 @@ import {
   archiveScreenSet,
   fetchScreenSetProductPool,
   pharmacyHubScreenSetApi,
+  isTabletActive,
   type StoreTablet,
 } from '../../lib/api/pharmacyHubTablet';
 import { StoreConnectionNotice, type StoreConnectionState } from '../../components/store-owner/StoreConnectionNotice';
@@ -50,7 +51,8 @@ export default function StoreOwnerTabletsPage() {
     setLoading(true);
     Promise.all([fetchTablets(), fetchScreenSets()])
       .then(([t, s]) => {
-        setTablets(t);
+        // 목록은 내린 태블릿도 함께 오므로 화면에서 제외한다(soft delete 계약).
+        setTablets(t.filter(isTabletActive));
         setScreenSets(s);
         setConnection({ status: 'connected', candidateCount: 1 });
         setError(null);
@@ -72,6 +74,13 @@ export default function StoreOwnerTabletsPage() {
   useEffect(() => {
     load();
   }, [load]);
+
+  /**
+   * 적용 가능한 화면 세트 = status 'active' 만.
+   * 서버가 draft 적용을 409(SCREEN_SET_NOT_ACTIVE)로 막으므로, 고를 수 없는 것을 목록에
+   * 올려두고 실패시키지 않는다(실측으로 확인한 제약).
+   */
+  const applicableSets = screenSets.filter((s) => s.status === 'active');
 
   const act = async (fn: () => Promise<unknown>, confirmMessage?: string) => {
     if (confirmMessage && !window.confirm(confirmMessage)) return;
@@ -170,7 +179,7 @@ export default function StoreOwnerTabletsPage() {
                         {t.location && <span>{t.location}</span>}
                         {t.currentScreenSetId ? (
                           <span className="rounded bg-green-50 px-1.5 py-0.5 text-green-700">
-                            적용 중: {t.currentScreenSetName || '화면 세트'}
+                            적용 중: {screenSets.find((s) => s.id === t.currentScreenSetId)?.name ?? '화면 세트'}
                           </span>
                         ) : (
                           <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">미적용</span>
@@ -178,7 +187,7 @@ export default function StoreOwnerTabletsPage() {
                       </p>
                     </div>
                     <div className="flex flex-shrink-0 flex-wrap items-center gap-2">
-                      {screenSets.length > 0 && (
+                      {applicableSets.length > 0 && (
                         <select
                           aria-label={`${t.name} 화면 세트 적용`}
                           value={t.currentScreenSetId ?? ''}
@@ -192,7 +201,7 @@ export default function StoreOwnerTabletsPage() {
                           className="rounded-md border border-gray-200 px-2 py-1.5 text-xs"
                         >
                           <option value="">— 적용 안 함 —</option>
-                          {screenSets.map((s) => (
+                          {applicableSets.map((s) => (
                             <option key={s.id} value={s.id}>
                               {s.name}
                             </option>
@@ -247,7 +256,10 @@ export default function StoreOwnerTabletsPage() {
                       <div className="min-w-0">
                         <p className="truncate text-sm font-medium text-gray-900">{s.name}</p>
                         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">{s.status}</span>
+                          <span className="rounded bg-gray-100 px-1.5 py-0.5 text-gray-600">
+                            {s.status === 'active' ? '적용 가능' : s.status === 'draft' ? '작성 중' : s.status}
+                          </span>
+                          {s.status === 'draft' && <span>제작을 마치면 태블릿에 적용할 수 있습니다.</span>}
                           {appliedTo.length > 0 && (
                             <span className="text-green-700">
                               적용 중 · {appliedTo.map((t) => t.name).join(', ')}
@@ -270,7 +282,7 @@ export default function StoreOwnerTabletsPage() {
                               () => archiveScreenSet(s.id),
                               appliedTo.length > 0
                                 ? `"${s.name}" 은 적용 중입니다. 먼저 적용을 해제해야 보관할 수 있습니다.`
-                                : `"${s.name}" 화면 세트를 보관할까요?`,
+                                : `"${s.name}" 화면 세트를 보관할까요? 태블릿에 연결돼 있으면 먼저 연결을 해제해야 합니다.`,
                             )
                           }
                           className="rounded-md border border-gray-200 px-3 py-1.5 text-xs text-red-600 hover:bg-red-50"
