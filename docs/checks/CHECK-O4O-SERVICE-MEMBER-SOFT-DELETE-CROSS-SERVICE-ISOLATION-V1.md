@@ -219,6 +219,16 @@ node scripts/lint-ratchet.mjs                 → ESLint 102 errors (baseline 10
 | `7ea975c2c` 재활성화 경계 | `services/approval/MembershipApprovalService.ts` (**reactivateMembership STEP2**) |
 | `본 브랜치` soft delete 격리 | `services/approval/MembershipApprovalService.ts` (**deleteMember soft 분기**) |
 
-`7ea975c2c` 와 본 브랜치는 **같은 파일의 서로 다른 메서드**를 고친다 —
-텍스트 충돌 가능성은 낮으나 병합 후 `npx jest src/services/approval` 로 4개 테스트 파일이
-함께 통과하는지 확인하는 것을 권장한다. `6443a322b` 는 파일이 달라 무관하다.
+`7ea975c2c` 와 본 브랜치는 **같은 파일의 서로 다른 메서드**를 고친다
+(`reactivateMembership` STEP2 vs `deleteMember` soft 분기).
+
+**병합 충돌 실측** — `git merge-tree --write-tree` 3쌍 전부 충돌 0:
+
+```
+reactivation x rejection      → exit 0
+reactivation x soft-delete    → exit 0
+soft-delete  x rejection      → exit 0
+```
+
+병합 순서는 무관하다. 병합 후 `npx jest src/services/approval` 로 3개 테스트 파일
+(rejection 14 / reactivationBoundary 8 / softDeleteBoundary 8)이 함께 통과하는지만 확인하면 된다.
