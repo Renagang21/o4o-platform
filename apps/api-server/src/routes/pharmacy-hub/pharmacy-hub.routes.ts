@@ -172,17 +172,9 @@ export function createPharmacyHubRoutes(): Router {
   /** 역할별 진입점 guard 동작 확인 (Foundation ping) */
   //
   // WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1:
-  //   admin ⊃ operator 계층을 실제로 관측할 수 있는 최소 진입점이다.
-  //   admin/ping   → admin 만 통과 (operator 는 403)
-  //   operator/ping → operator + admin 통과
-  //   Admin 전용 관리 화면은 만들지 않는다 — 현재 분리할 근거 있는 기능이 없다 (WO §3 실행 3).
-  router.get(
-    '/admin/ping',
-    requireAuth as any,
-    requirePharmacyHubScope(`${SERVICE_KEY}:admin`),
-    (_req, res) => res.json({ success: true, data: { scope: `${SERVICE_KEY}:admin` } })
-  );
-
+  //   admin ⊃ operator 계층 관측용 `/admin/ping` 은 프로덕션 smoke 완료 후 제거했다.
+  //   계층 보존은 `__tests__/security/pharmacy-hub-scope-guard.spec.ts` 가 담당한다.
+  //   Admin 전용 route·화면은 만들지 않는다 — 현재 분리할 근거 있는 기능이 없다 (WO §3 실행 3).
   router.get(
     '/operator/ping',
     requireAuth as any,

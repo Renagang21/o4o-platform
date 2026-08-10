@@ -17,7 +17,13 @@
  * membership 축은 별도 테스트가 담당한다.
  */
 
-import { createServiceScopeGuard } from '@o4o/security-core';
+import {
+  createServiceScopeGuard,
+  KPA_SCOPE_CONFIG,
+  NETURE_SCOPE_CONFIG,
+  GLYCOPHARM_SCOPE_CONFIG,
+  COSMETICS_SCOPE_CONFIG,
+} from '@o4o/security-core';
 import { PHARMACY_HUB_SCOPE_CONFIG } from '../../middleware/pharmacy-hub-scope.middleware';
 import { createMockUser, executeGuard } from './test-utils';
 
@@ -122,6 +128,28 @@ describe('Pharmacy-Hub Scope Guard', () => {
       const result = await check(ADMIN, ['pharmacy-hub:unknown']);
       expect(result.allowed).toBe(false);
       expect(result.statusCode).toBe(403);
+    });
+  });
+
+  // 프로덕션 smoke 로는 격리 검증이 불가능한 축이다 —
+  // 실제 Admin 계정(sohae2100)은 타 서비스 admin 역할도 **원래부터** 보유하기 때문에
+  // "pharmacy-hub:admin 이 타 서비스를 열지 않는다" 를 브라우저로 분리 관측할 수 없다.
+  // 따라서 이 방향은 자동 테스트가 유일한 보존 장치다.
+  describe('pharmacy-hub:admin 은 타 서비스 scope 를 열지 않는다', () => {
+    const OTHERS: Array<[string, Parameters<typeof createServiceScopeGuard>[0]]> = [
+      ['kpa', KPA_SCOPE_CONFIG],
+      ['neture', NETURE_SCOPE_CONFIG],
+      ['glycopharm', GLYCOPHARM_SCOPE_CONFIG],
+      ['cosmetics', COSMETICS_SCOPE_CONFIG],
+    ];
+
+    it.each(OTHERS)('%s 의 admin · operator scope 모두 403', async (service, config) => {
+      const guard = createServiceScopeGuard(config);
+      for (const scope of [`${service}:admin`, `${service}:operator`]) {
+        const result = await executeGuard(guard(scope), createMockUser({ roles: [ADMIN] }));
+        expect(result.allowed).toBe(false);
+        expect(result.statusCode).toBe(403);
+      }
     });
   });
 
