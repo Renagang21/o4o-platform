@@ -7,9 +7,12 @@
  * `@o4o/operator-core-ui/modules/contact-inquiry` 에 serviceKey('glycopharm') +
  * authClient api 어댑터를 주입한다. backend: /api/v1/admin/services/glycopharm/contact-inquiries.
  *
- * 권한: 해당 backend 가드는 requireServiceLegalScope('admin') 이나, GlycoPharm scope config 에는
- *   scopeRoleMapping 이 없어 fallback 이 allowedRoles(['glycopharm:admin','glycopharm:operator']) 다.
- *   즉 active membership 을 가진 glycopharm:operator 도 통과한다 → backend 변경 불필요.
+ * 권한: 해당 backend 가드는 requireServiceLegalScope('operator') 다
+ *   (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1 에서 admin → operator 로 조정).
+ *   GlycoPharm scopeRoleMapping 상 'glycopharm:operator' → ['glycopharm:operator','glycopharm:admin']
+ *   이므로 active membership 을 가진 operator·admin 모두 통과한다
+ *   (WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1 이전에는 mapping 부재 fallback 이었으나
+ *    본 화면의 접근 결과는 동일하다) → backend 변경 불필요.
  *
  * admin 의존 제거: admin 의 ContactInquiriesPage 를 import 하지 않고 operator 가 어댑터를
  *   자체 보유한다. 후속 WO 에서 admin 문의 관리 메뉴/페이지를 제거해도 operator 는 영향 없다.

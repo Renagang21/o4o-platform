@@ -11,7 +11,9 @@
  *
  * 권한: requireServiceLegalScope('operator') — 문의 '처리'는 operator 업무다 (WO-O4O-KCOS-OPERATOR-CONTACT-MANAGEMENT-MIGRATION-V1).
  *   scopeRoleMapping 상 admin ⊃ operator 이므로 admin 도 그대로 통과한다.
- *   - GlycoPharm: scopeRoleMapping 부재 → operator/admin 모두 allowedRoles fallback 통과 (기존 동작 동일).
+ *   - GlycoPharm: 'glycopharm:operator' → ['glycopharm:operator','glycopharm:admin'] 통과
+ *     (WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1 이전에는 mapping 부재로
+ *      allowedRoles fallback 이었다. 본 route 는 operator 레벨이라 접근 결과는 동일하다.)
  *   - K-Cosmetics: 'cosmetics:operator' → ['cosmetics:operator','cosmetics:admin'] 통과 (기존 admin-only 403 해소).
  *   문의 '설정'(admin-service-contact-settings.controller)은 그대로 admin 전용 유지.
  *   + serviceKey 화이트리스트 = glycopharm / k-cosmetics (Neture/KPA 는 자체 contact 시스템 → 거부).

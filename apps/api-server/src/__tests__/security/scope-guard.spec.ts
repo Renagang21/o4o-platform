@@ -259,6 +259,54 @@ describe('GlycoPharm Scope Guard', () => {
     });
   });
 
+  // WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1
+  //   scopeRoleMapping 부재로 'glycopharm:admin' scope 가 operator 에게도 열려 있었다.
+  //   admin 전용 API(/api/v1/glycopharm/admin/*, action execute, legal/contact-settings write)
+  //   의 경계를 이 블록이 보존한다.
+  describe('scope hierarchy (admin ⊃ operator)', () => {
+    it('glycopharm:admin role → passes glycopharm:operator scope', async () => {
+      const guard = requireGlycopharmScope('glycopharm:operator');
+      const user = createMockUser({ roles: ['glycopharm:admin'] });
+      const result = await executeGuard(guard, user);
+      expect(result.allowed).toBe(true);
+    });
+
+    it('glycopharm:operator role → denied for glycopharm:admin scope (403)', async () => {
+      const guard = requireGlycopharmScope('glycopharm:admin');
+      const user = createMockUser({ roles: ['glycopharm:operator'] });
+      const result = await executeGuard(guard, user);
+      expect(result.allowed).toBe(false);
+      expect(result.statusCode).toBe(403);
+    });
+
+    it('타 서비스 role 은 glycopharm scope 를 열지 않는다', async () => {
+      for (const scope of ['glycopharm:admin', 'glycopharm:operator']) {
+        for (const role of ['kpa:admin', 'neture:admin', 'cosmetics:admin']) {
+          const result = await executeGuard(
+            requireGlycopharmScope(scope),
+            createMockUser({ roles: [role] }),
+          );
+          expect(result.allowed).toBe(false);
+          expect(result.statusCode).toBe(403);
+        }
+      }
+    });
+  });
+
+  describe('config 계약', () => {
+    it('scopeRoleMapping 이 모든 scope 에 명시돼 있다 (fallback 의존 금지)', () => {
+      const mapping = GLYCOPHARM_SCOPE_CONFIG.scopeRoleMapping ?? {};
+      expect(Object.keys(mapping).sort()).toEqual(
+        ['glycopharm:admin', 'glycopharm:operator'].sort(),
+      );
+      expect(mapping['glycopharm:admin']).toEqual(['glycopharm:admin']);
+      expect(mapping['glycopharm:operator']).toEqual([
+        'glycopharm:operator',
+        'glycopharm:admin',
+      ]);
+    });
+  });
+
   describe('platform bypass ENABLED', () => {
     it('platform:admin → denied (only super_admin bypasses)', async () => {
       const guard = requireGlycopharmScope('glycopharm:admin');

@@ -186,6 +186,16 @@ export const GLYCOPHARM_SCOPE_CONFIG: ServiceScopeGuardConfig = {
   platformBypass: true,
   legacyRoles: [],
   blockedServicePrefixes: ['kpa', 'neture', 'cosmetics'],
+  // WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1:
+  //   mapping 부재 시 guard 는 allowedRoles 전체로 fallback 하므로 'glycopharm:admin'
+  //   scope 가 glycopharm:operator 에게도 열려 admin/operator 계층이 무너져 있었다.
+  //   frontend 는 이미 /admin/* = admin 전용, /operator/* = operator 이상으로 분리돼 있어
+  //   backend 만 어긋난 상태였다. KPA · Neture · K-Cosmetics · Pharmacy-Hub 와 동일한
+  //   admin ⊃ operator 계층을 명시한다 (fallback 의존 제거).
+  scopeRoleMapping: {
+    'glycopharm:admin': ['glycopharm:admin'],
+    'glycopharm:operator': ['glycopharm:operator', 'glycopharm:admin'],
+  },
 };
 
 /**

@@ -40,7 +40,7 @@
 
 #### Admin ⊃ Operator 계층
 
-KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
+KPA · Neture · K-Cosmetics · Pharmacy-Hub · GlycoPharm 은 동일 계층을 `scopeRoleMapping` 으로 **명시**한다.
 
 ```text
 {service}:admin    요구 → admin 만 허용
@@ -51,8 +51,9 @@ KPA · Neture · K-Cosmetics · Pharmacy-Hub 는 동일 계층을 `scopeRoleMapp
   (`pharmacy-hub:admin` 은 운영 권한만 포괄).
 - Pharmacy-Hub scope config 위치는 `apps/api-server/src/middleware/pharmacy-hub-scope.middleware.ts` 다.
   `security-core` 가 F1 Freeze 대상이라 의도적으로 로컬에 둔 것이며, 아래 §5 절차 2번의 예외다.
-- **GlycoPharm 은 `scopeRoleMapping` 이 없어** 두 역할이 fallback(allowedRoles 전체 허용) 으로 평가된다.
-  별도 정비 대상 (WO-PHARMACY-HUB-ADMIN-ROLE-HIERARCHY-V1 §4 제외 범위).
+- GlycoPharm 은 `scopeRoleMapping` 이 없어 두 역할이 fallback(allowedRoles 전체 허용) 으로
+  평가되던 상태였으나 **WO-O4O-GLYCOPHARM-AUTHORIZATION-HIERARCHY-AUDIT-AND-FIX-V1 에서 해소**됐다.
+  이제 5개 서비스 모두 fallback 에 의존하지 않는다.
 
 ---
 
