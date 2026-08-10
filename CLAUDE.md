@@ -538,6 +538,56 @@ Content / LMS / Signage / CMS / Extension 개발 시 선행 참조:
 
 ---
 
-*Updated: 2026-05-07*
-*Version: 8.10*
+## 16. 문서 Drift 발견 시 정비 (Inline Documentation Hygiene)
+
+> 문서 상태·archive·헤더 형식의 **정본은 [`docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md)** 다.
+> 본 §16 은 그 규칙을 **일상 작업 중 언제 발동하는지**만 정한다. 규칙을 복사하지 않는다.
+
+문서 정비는 **일괄 정리가 아니라 조사·개발 과정에서 발견 시 처리**한다 (정본 §7: 전체 문서에 한 번에 적용하지 않는다).
+
+### 16-1. 적용 대상 (좁게 유지한다)
+
+- ✅ **기준 문서** — `docs/baseline/` · `docs/architecture/` · `docs/rules/` · `docs/rbac/` · `docs/platform/` · `docs/guides/`
+- ✅ **본 CLAUDE.md 의 상세 규칙 문서 목록** 및 `AGENTS.md` §1 정본 표
+- ❌ **기록물은 대상이 아니다** — `docs/checks/` · `docs/investigations/` · `docs/ir/` · `docs/work-orders/` · `docs/archive/**`
+  과거 시점의 사실 기록이므로 현재 지침과 충돌하지 않는다. "낡았다"는 이유로 손대지 않는다.
+
+### 16-2. 기본 동작은 **보고**다
+
+WO 범위 밖 문서를 발견 즉시 수정하는 것은 **범위 외 수정**이다 (실행 원칙 · 중지 조건). 기본은 완료 보고에 적고 넘어간다.
+
+### 16-3. 인라인 허용 — 다음 2가지뿐
+
+WO 없이 발견 즉시 처리할 수 있다.
+
+1. **SUPERSEDED 표기 추가** — 낡은 기준 문서 **상단에 한 줄만** 덧붙인다. 본문은 건드리지 않는다.
+   ```markdown
+   > **상태**: SUPERSEDED · **대체 문서**: <경로> · **표기일**: YYYY-MM-DD
+   ```
+   대체 문서 경로를 적을 수 없으면 SUPERSEDED 가 아니다 (정본 §2 판정 원칙 2). 그때는 보고만 한다.
+2. **깨진 링크 · 이동된 경로 수정** — 의미 판단이 없는 기계적 교정에 한한다.
+
+### 16-4. 인라인 금지 — 반드시 보고 후 별도 WO
+
+- 문서 **삭제** (정본 §5-4 삭제 금지) · 통합 · 분할 · `docs/archive/**` 이동
+- 본 CLAUDE.md 색인 줄 추가/제거, 링크된 문서의 **경로 변경** (정본 §5-3)
+- Frozen Baseline(§14) 본문 수정 (§14: 구조 변경은 명시적 WO 필수)
+- 기준 문서의 **내용·판정 변경** (표기 추가와 내용 수정은 다르다)
+
+### 16-5. 완료 보고 필수 항목
+
+모든 완료 보고에 **`문서 정합`** 한 줄을 포함한다. 발견이 없으면 `해당 없음` 이라고 쓴다.
+
+```text
+문서 정합: 발견 N건 / SUPERSEDED 표기 N건 / 링크 수정 N건 / 별도 WO 제안 N건
+```
+
+### 16-6. 판단 불가는 그대로 둔다
+
+애매하면 ACTIVE 로 유지하고 보고만 한다 (정본 §2 판정 원칙 3). **잘못된 표기·이동보다 방치가 안전하다.**
+
+---
+
+*Updated: 2026-08-07*
+*Version: 8.11*
 *Status: Active Constitution*

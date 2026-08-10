@@ -146,3 +146,20 @@
 - 변경 / 미변경 / 검증 결과 / CHECK / Git 상태 중심으로 간결하게 쓴다.
 - 검증에 실패했거나 건너뛴 항목이 있으면 **숨기지 않고 그대로** 보고한다.
 - 작업이 끝나면 관련 CHECK / IR 문서를 갱신한다.
+- **`문서 정합` 한 줄을 반드시 포함한다** (§10). 발견이 없으면 `해당 없음` 이라고 쓴다.
+
+---
+
+## 10. 문서 Drift 발견 시 정비
+
+> 정본: [`docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md`](docs/rules/DOCUMENT-LIFECYCLE-AND-ARCHIVE-RULES-V1.md) · 발동 조건: [`CLAUDE.md`](CLAUDE.md) §16
+> 아래는 요약이며, 충돌 시 위 두 문서가 우선한다.
+
+문서 정비는 일괄 정리가 아니라 **조사·개발 중 발견 시** 처리한다.
+
+- **대상은 기준 문서뿐** — `docs/baseline/` · `architecture/` · `rules/` · `rbac/` · `platform/` · `guides/` 와 `CLAUDE.md` 색인 · 본 문서 §1 정본 표.
+  `checks/` · `investigations/` · `ir/` · `work-orders/` · `archive/**` 는 **과거 기록물이므로 대상이 아니다.**
+- **기본 동작은 보고다.** 범위 밖 문서를 즉시 고치는 것은 범위 외 수정이다(§5 · §6).
+- **인라인 허용은 2가지뿐** — ① 낡은 기준 문서 상단에 `> **상태**: SUPERSEDED · **대체 문서**: <경로> · **표기일**: YYYY-MM-DD` 한 줄 추가(본문 불변, 대체 문서를 못 적으면 보고만) ② 깨진 링크·이동된 경로의 기계적 수정.
+- **삭제 · 통합 · archive 이동 · `CLAUDE.md` 색인 변경 · Frozen Baseline 본문 수정은 인라인 금지.** 보고 후 별도 WO 로 분리한다.
+- **애매하면 ACTIVE 로 두고 보고만 한다.** 잘못된 표기보다 방치가 안전하다.
