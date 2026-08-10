@@ -6,7 +6,20 @@
 
 import { apiClient } from '../api-client';
 
-const BASE_PATH = '/api/v1/lms/instructor';
+/**
+ * WO-O4O-ADMIN-LMS-INSTRUCTOR-API-DOUBLE-PREFIX-FIX-V1
+ *
+ * 프로덕션 빌드는 VITE_API_URL=https://api.neture.co.kr/api 로 주입되어
+ * apiClient.baseURL 이 이미 `/api` 로 끝난다. 여기에 `/api/v1/...` 을 붙이면
+ * 최종 요청 경로에 `/api` 가 두 번 붙는 이중 접두가 되어 404 가 난다.
+ * baseURL 이 `/api` 로 끝나는 경우에만 `/v1` 부터 붙인다
+ * (VITE_API_URL 미주입 시 fallback baseURL 은 `/api` 가 없으므로 기존 경로 유지).
+ */
+const API_PREFIX = String(apiClient.defaults.baseURL ?? '').replace(/\/+$/, '').endsWith('/api')
+  ? ''
+  : '/api';
+
+const BASE_PATH = `${API_PREFIX}/v1/lms/instructor`;
 
 // ============================================
 // Types
