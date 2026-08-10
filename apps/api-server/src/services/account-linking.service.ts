@@ -302,9 +302,11 @@ export class AccountLinkingService {
       await sessionRepo.save(session);
 
       // Log activity
+      // WO-O4O-AUTH-ACCOUNT-ACTIVITIES-EMAIL-MAPPING-V1: email 컬럼도 함께 기록(details 는 유지).
       await activityRepo.save(activityRepo.create({
         userId: session.userId,
         type: 'linked_email',
+        email: email ? String(email).slice(0, 255) : null,
         ipAddress: '',
         userAgent: '',
         details: { provider: 'email', email }

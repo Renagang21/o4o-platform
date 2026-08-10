@@ -21,6 +21,18 @@ import { injectServiceScope } from '../../utils/serviceScope.js';
 import type { ServiceScope } from '../../utils/serviceScope.js';
 import { resolveOperatorScope, logCrossServiceQuery, PLATFORM_ADMIN_SCOPE_REQUIRED_RESPONSE } from '../../utils/serviceScope.js';
 
+/**
+ * action_logs.status 저장값 (SSOT: `@o4o/action-log-core` — `ActionStatus = 'success' | 'failed'`).
+ *
+ * WO-O4O-AUTH-FAILURE-RATE-DASHBOARD-SUCCESS-COLUMN-AUDIT-V1
+ *   본 라우트는 실패를 `'failure'` 로 비교하고 있었으나 **저장값은 `'failed'`** 다.
+ *   그 결과 요약의 `failure_count` 가 항상 0 이었고, 인증 로그의 실패 필터가 아무것도 반환하지 않았다.
+ *   상수를 여기 한 곳에 두어 리터럴이 다시 갈라지지 않게 한다.
+ *   (`action-log-core` 는 F1 Frozen Baseline 이라 패키지는 건드리지 않고 소비 측만 정합화한다.)
+ */
+const ACTION_STATUS_SUCCESS = 'success';
+const ACTION_STATUS_FAILED = 'failed';
+
 // WO-O4O-REQUIREADMIN-PREFIXED-ONLY-V1: legacy unprefixed roles 제거
 // WO-O4O-KPA-OPERATOR-CANONICAL-ROLE-GUARD-FIX-V1: canonical service_key('kpa-society')를
 //   role prefix 자리에 잘못 쓴 오타 교정. requireRole 은 정확 문자열 매칭이라
@@ -90,10 +102,14 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       );
 
       // Total counts
+      // WO-O4O-AUTH-FAILURE-RATE-DASHBOARD-SUCCESS-COLUMN-AUDIT-V1:
+      //   저장되는 실패 상태는 'failed' 다 (@o4o/action-log-core — ActionStatus = 'success' | 'failed').
+      //   여기서 'failure' 로 비교하고 있어 **failure_count 가 항상 0** 이었다(실측: 'failure' 매칭 0건,
+      //   실제 저장값은 success 4,135 / failed 1,716). 응답 필드명(failure_count)은 외부 계약이라 유지한다.
       const totalRow = await dataSource.query(
         `SELECT COUNT(*)::int AS total,
-                COUNT(*) FILTER (WHERE status = 'success')::int AS success_count,
-                COUNT(*) FILTER (WHERE status = 'failure')::int AS failure_count
+                COUNT(*) FILTER (WHERE status = '${ACTION_STATUS_SUCCESS}')::int AS success_count,
+                COUNT(*) FILTER (WHERE status = '${ACTION_STATUS_FAILED}')::int AS failure_count
          FROM action_logs
          WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}`,
@@ -214,9 +230,14 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       const params: any[] = [];
       let idx = 1;
 
-      if (status === 'success' || status === 'failure') {
+      // WO-O4O-AUTH-FAILURE-RATE-DASHBOARD-SUCCESS-COLUMN-AUDIT-V1:
+      //   프런트(AuthAnalyticsPage)는 'failure' 를 보내지만 **저장값은 'failed'** 라
+      //   실패 필터가 항상 0건이었다(실측: 최근 30일 실제 로그인 실패 54건이 전부 미표시).
+      //   외부 쿼리 계약('success'|'failure')은 그대로 두고, 저장값으로 변환해 비교한다.
+      //   'failed' 를 직접 보내는 호출자도 함께 받아준다.
+      if (status === 'success' || status === 'failure' || status === 'failed') {
         conditions.push(`status = $${idx++}`);
-        params.push(status);
+        params.push(status === 'success' ? ACTION_STATUS_SUCCESS : ACTION_STATUS_FAILED);
       }
 
       conditions.push(`created_at >= NOW() - INTERVAL '30 days'`);
@@ -298,10 +319,11 @@ export function createOperatorAnalyticsRoutes(dataSource: DataSource): Router {
       const dateParamIdx = params.length + 1;
 
       // 1. Total counts
+      // WO-O4O-AUTH-FAILURE-RATE-DASHBOARD-SUCCESS-COLUMN-AUDIT-V1: 위와 동일 — 'failure' → 'failed'.
       const totalRow = await dataSource.query(
         `SELECT COUNT(*)::int AS total,
-                COUNT(*) FILTER (WHERE status = 'success')::int AS success_count,
-                COUNT(*) FILTER (WHERE status = 'failure')::int AS failure_count
+                COUNT(*) FILTER (WHERE status = '${ACTION_STATUS_SUCCESS}')::int AS success_count,
+                COUNT(*) FILTER (WHERE status = '${ACTION_STATUS_FAILED}')::int AS failure_count
          FROM action_logs
          WHERE created_at >= $${dateParamIdx}
            ${serviceFilter}`,

@@ -158,6 +158,50 @@ if (user.roles.includes('admin')) { ... }
 </ProtectedRoute>
 ```
 
+### 3-3. 회원 비밀번호 변경 권한 (Identity V2 서비스별 credential)
+
+> `WO-O4O-OPERATOR-SERVICE-CREDENTIAL-PASSWORD-CHANGE-AND-DOC-ALIGNMENT-V1` (2026-08-09)
+> 근거 Canonical: [O4O-IDENTITY-ARCHITECTURE-V2](../../architecture/O4O-IDENTITY-ARCHITECTURE-V2.md)
+
+**비밀번호는 서비스별로 독립한다.** 같은 사용자라도 서비스마다 다른 비밀번호를 가질 수 있으며,
+저장소는 `service_credentials(user_id, service_key)` 다. **`users.password` 를 변경하지 않는다.**
+
+| 변경 주체 | 변경 대상 | 변경되는 credential |
+|---|---|---|
+| 플랫폼 관리자 | 서비스 admin 운영자 | 명시한 대상 서비스 |
+| admin 운영자 | 자기 서비스 operator · 회원 | 해당 서비스 |
+| operator 운영자 | 자기 서비스 회원 | 해당 서비스 |
+| 모든 사용자 | 자기 자신 | 현재 로그인 서비스 (`PUT /users/password`) |
+| 서비스 운영자 | **다른 서비스 회원** | **불가** |
+| 어느 주체든 | **플랫폼 계정(`platform:super_admin`)** | **불가** — 별도 경로 |
+
+**구현 규칙**
+
+1. **후보 서비스 = 호출자 관리 범위 ∩ 대상자 Membership.**
+   운영자가 관리하는 서비스 수가 아니라 **이 교집합**이 기준이다.
+   (2개 서비스를 관리해도 대상이 한 서비스에만 속하면 후보는 1개다.)
+2. **대상 서비스는 정확히 하나로 확정한다.**
+   - 후보 0 → `404 NO_MANAGEABLE_SERVICE` (UI 는 변경 버튼 비활성 + 사유 표시)
+   - 후보 1 → 자동 확정. **단, 화면에는 서비스명을 반드시 표시한다.**
+   - 후보 복수 → 운영자가 **명시적으로 선택**해야 한다. 미지정은 `400 SERVICE_KEY_REQUIRED`
+   - 플랫폼 관리자 → 후보가 1개여도 **항상 명시적 선택**
+   **전 서비스 일괄 변경 경로를 만들지 않는다.**
+3. **권한은 선택된 serviceKey 안에서만 판정한다.**
+   계층 순위 `member < operator < admin < platform`, 허용 조건은 `rank(caller) > rank(target)`.
+   동급 변경(operator → 다른 operator)은 금지한다.
+   **다른 서비스의 role 이나 사용자의 전체 최고 role 로 판정하지 않는다** —
+   대상이 `kpa:admin` 이어도 GlycoPharm 에서 일반 회원이면 GlycoPharm 에서는 `member` 다.
+4. 후보 밖 `serviceKey` 지정은 사유에 따라 `403 SERVICE_SCOPE_FORBIDDEN`(관리 범위 밖) 또는
+   `404 SERVICE_NOT_MEMBER`(대상이 그 서비스 회원 아님).
+5. credential row 가 없으면 **그 서비스 row 만** 생성한다(다른 서비스 credential 무변경).
+6. **공통 모듈 계약** — `MembersConsoleClient.updatePassword(userId, password, serviceKey)`.
+   `serviceKey` 는 필수다. 서비스별 구현은 이 값을 그대로 `PUT /operator/members/:userId` 에 실어 보낸다.
+
+> **관리자 계정 재설정 경로는 예외다.** `PUT /admin/users/:id` ·
+> `PATCH /admin/platform-accounts/:id/password` · 운영 스크립트는 아직 `users.password` 만 갱신하며,
+> credential 보유 서비스에는 적용되지 않는다
+> (`admin-password-reset-scope.service.ts` 가 영향 범위를 안내한다). Identity V2 Phase 5 정리 대상.
+
 ---
 
 ## 4. UI 레이아웃 표준
