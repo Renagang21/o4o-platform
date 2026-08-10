@@ -88,17 +88,54 @@ select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사�
 | build (api-server / admin-dashboard) | PASS |
 | migration | **0건** (스키마 변경 없음) |
 
-## 4. 미검증 · 제한 사항
+## 4. 프로덕션 실측 (2026-08-10, read-only + 브라우저)
 
-- **프로덕션 브라우저 검증 미수행.** 등록·로그인 검증은 프로덕션에 **실제 운영자 계정을 생성**하는
-  write 이며, 배포된 리비전이 필요하다. CLAUDE.md §0 (데이터 변경 승인) · 중지 조건(실제 계정·자격정보)에
-  따라 **배포 후 사용자 승인 하에 수행**한다. 대상 시나리오:
-  1. 5개 서비스 노출 확인 → Pharmacy-Hub 선택 → 역할 목록이 Operator 하나로 바뀜 → 신규 운영자 등록
-  2. 생성 credential 로 Pharmacy-Hub 로그인 성공 / 잘못된 비밀번호 실패
-  3. Pharmacy-Hub 보호 route 진입 · 다른 서비스 route 거부
-  4. 기존 사용자 권한 추가 시 타 서비스 credential 불변
+배포된 화면에서 관리자가 Pharmacy-Hub 운영자를 실제로 등록한 뒤 실측한 결과다.
+**자격증명 값은 이 문서에 기록하지 않는다** (SSOT = `docs/local/TEST-ACCOUNTS.local.md`, git 추적 제외).
+
+### 4-1. 등록 결과 — DB read-only
+
+| 확인 | 결과 |
+|---|---|
+| `role_assignments` | `pharmacy-hub:operator` active (해당 계정) |
+| `service_memberships` | `service_key = 'pharmacy-hub'` · `status = active` ✅ |
+| `service_credentials` | `service_key = 'pharmacy-hub'` **신규 1건 생성** (2026-08-10) · bcrypt(`$2a$`) ✅ |
+| 최근 24h write | pharmacy-hub credential **1건뿐** — 부분 생성·중복 write 없음 |
+| 기존 role/membership | 이미 있던 것을 재사용(중복 생성 0) — **기존 사용자 권한 추가** 경로가 설계대로 동작 |
+| 타 서비스 credential | kpa-society · neture · glycopharm · k-cosmetics 4건 **updated_at 불변** ✅ |
+
+→ 이번 WO 의 핵심(등록이 서비스 credential 을 실제로 만든다)이 프로덕션에서 확인됐다.
+
+### 4-2. 인증 경로 — service credential vs `users.password`
+
+| 시나리오 | 결과 | 의미 |
+|---|---|---|
+| 동일 계정·동일 비밀번호로 `serviceKey='kpa-society'` 로그인 | **200** | 그 서비스 credential 로 인증 |
+| 동일 계정·**같은** 비밀번호로 Pharmacy-Hub 로그인 | **401** | pharmacy-hub credential 은 **독립**. `users.password` 로 fallback 했다면 통과했을 것 → **fallback 아님** ✅ |
+| 잘못된 비밀번호 | **401** + "비밀번호가 올바르지 않습니다." | 실패 표면화 정상 ✅ |
+
+### 4-3. 보호 route
+
+| 시나리오 | 결과 |
+|---|---|
+| 미로그인 상태 `https://pharmacyhub.co.kr/operator` | "로그인이 필요합니다" 차단 화면 ✅ |
+| 토큰 없이 `GET /api/v1/pharmacy-hub/operator/ping` | **401 AUTH_REQUIRED** ✅ |
+| `pharmacy-hub:operator` 보유 토큰 | operator/ping · operator/memberships **200** ✅ |
+| `pharmacy-hub:store_owner` 만 보유한 계정 | operator/ping **403 FORBIDDEN** (`Required scope: pharmacy-hub:operator`) / store-owner/ping 200 ✅ |
+
+관측: scope guard 는 **role 기준**이라 로그인 시 사용한 serviceKey 와 무관하다.
+(다른 서비스로 로그인해도 pharmacy-hub role 을 가진 계정이면 통과한다 — 현행 설계이며 결함 아님.)
+
+## 5. 미검증 · 제한 사항
+
+- **로그인 성공 케이스(§4-2 첫 줄)는 미수행.** 등록 시 관리자가 입력한 초기 서비스 비밀번호는
+  `docs/local/TEST-ACCOUNTS.local.md` 에 Pharmacy-Hub 항목이 없어 검증자가 알 수 없다.
+  값을 그 문서(git 추적 제외)에 추가하면 즉시 수행한다:
+  로그인 성공 → 운영자 기본 화면 진입 → `/operator/memberships` 콘솔 표시 → 로그아웃 후 재차단.
+  (실패 케이스·미인증 차단·scope 거부는 §4-2 / §4-3 에서 이미 실측 완료)
 - 실패 주입에 의한 부분 생성 0 은 **트랜잭션 stub 단위 테스트**로 검증했다(실 DB 롤백 관측 아님).
+  프로덕션에서는 §4-1 의 "최근 24h write = credential 1건" 으로 잔여물 없음만 확인했다.
 
-## 5. 문서 정합
+## 6. 문서 정합
 
 발견 0건 / SUPERSEDED 표기 0건 / 링크 수정 0건 / 별도 WO 제안 0건
