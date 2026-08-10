@@ -3,63 +3,36 @@
  *
  * WO-O4O-GUARD-PATTERN-NORMALIZATION-V1
  * WO-KPA-OPERATOR-AUTH-QUICK-FIX-PHASE1-V1: accessDeniedMessage prop 추가
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+ *   판정 순서(로딩 → 미인증 → 역할 → membership)를 @o4o/auth-react 의 createRouteGuard 로 위임.
+ *   KPA 고유분(로딩 문구 · AccessDeniedCard · MembershipGate)만 주입으로 남는다.
  *
  * KPA는 user.roles[] 배열 기반 역할 체크.
- * 단순 역할 체크용 — 분회 소유권 검증은 BranchAdminAuthGuard/BranchOperatorAuthGuard 사용.
+ * 단순 역할 체크용 — 분회 소유권 검증은 KPA 전용 Guard 를 사용한다.
+ * (KPA 전용 Guard: AdminAuthGuard / HubGuard / PharmacyGuard / PharmacyOwnerOnlyGuard /
+ *  PharmacistOnlyGuard — 이번 WO 에서 통합하지 않는다.)
  *
  * accessDeniedMessage가 지정되면 역할 불일치 시 에러 카드를 표시.
  * 미지정이면 기존처럼 `/`로 리다이렉트 (하위호환).
  */
 
-import { Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { hasAnyRole } from '@o4o/auth-utils';
+import { useNavigate } from 'react-router-dom';
+import { createRouteGuard } from '@o4o/auth-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { MembershipGate } from './MembershipGate';
 
-interface RoleGuardProps {
-  children: React.ReactNode;
-  allowedRoles?: string[];
-  fallback?: string;
-  /** 지정 시 역할 불일치에서 리다이렉트 대신 에러 카드 표시 */
-  accessDeniedMessage?: string;
-  /**
-   * WO-O4O-SERVICE-MEMBERSHIP-LOGIN-GATE-V1:
-   *   role 체크 통과 후 service_membership active 까지 강제할지 여부. 기본 true.
-   *   role 만 있고 membership 없는 사용자는 가입/대기/제한 안내로 보낸다.
-   *   public landing page 등 membership 검사가 의미 없는 곳에서만 false 사용.
-   */
-  enforceMembership?: boolean;
-}
-
-export function RoleGuard({ children, allowedRoles, fallback = '/login', accessDeniedMessage, enforceMembership = true }: RoleGuardProps) {
-  const { user, isAuthenticated, isLoading } = useAuth();
-  const location = useLocation();
-
-  if (isLoading) {
-    return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
-        <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
-      </div>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return <Navigate to={fallback} state={{ from: location.pathname + location.search }} replace />;
-  }
-
-  if (allowedRoles && !hasAnyRole(user.roles, allowedRoles)) {
-    if (accessDeniedMessage) {
-      return <AccessDeniedCard message={accessDeniedMessage} />;
-    }
-    return <Navigate to="/" replace />;
-  }
-
-  // role 통과 후 membership active 검사 (super_admin 예외, 자세한 정책은 MembershipGate)
-  if (enforceMembership) {
-    return <MembershipGate>{children}</MembershipGate>;
-  }
-  return <>{children}</>;
-}
+export const RoleGuard = createRouteGuard({
+  useAuth,
+  renderLoading: () => (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '400px' }}>
+      <p style={{ color: '#64748B' }}>권한을 확인하는 중...</p>
+    </div>
+  ),
+  // message 가 없으면 null 을 돌려 Core 가 deniedRedirect('/') 로 보내게 한다 — 기존 하위호환 동작.
+  renderDenied: ({ message }) => (message ? <AccessDeniedCard message={message} /> : null),
+  deniedRedirect: '/',
+  MembershipGate,
+});
 
 // ─── Access Denied Card (AdminAuthGuard 패턴 차용) ───
 

@@ -27,6 +27,34 @@ import { getKpaPostLoginRoute } from '../config/dashboard';
 
 const REMEMBER_EMAIL_KEY = 'kpasociety_remember_email';
 
+/**
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
+ * 기존 catch 블록의 code 별 한글 안내를 **문구 변경 없이** 옮긴 것.
+ * login() 이 result object 를 반환하도록 바뀌었을 뿐, 사용자에게 보이는 메시지와
+ * 부가 상태(가입 승인 대기 / 미가입 안내)는 이전과 동일하다.
+ */
+function resolveLoginErrorMessage(
+  result: { error?: string; code?: string; status?: number },
+  flags: { setIsPendingError: (v: boolean) => void; setIsNotMember: (v: boolean) => void },
+): string {
+  const { code, status } = result;
+  if (code === 'INVALID_USER') return '등록되지 않은 이메일입니다.';
+  if (code === 'INVALID_CREDENTIALS') return '비밀번호가 올바르지 않습니다.';
+  if (code === 'ACCOUNT_NOT_ACTIVE') {
+    flags.setIsPendingError(true);
+    return '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
+  }
+  if (code === 'ACCOUNT_LOCKED') return '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
+  if (code === 'SERVICE_NOT_MEMBER') {
+    // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1
+    flags.setIsNotMember(true);
+    return '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 회원가입 또는 서비스 이용 절차를 진행해 주세요.';
+  }
+  if (status === 429) return '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
+  // Core 가 resolveAuthError 로 만든 한국어 메시지를 우선 사용(네트워크 오류 문구 포함).
+  return result.error || '로그인에 실패했습니다.';
+}
+
 export default function LoginModal() {
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -88,7 +116,15 @@ export default function LoginModal() {
 
     try {
       // WO-O4O-ROLE-BASED-POST-LOGIN-REDIRECT-V1: 반환값 캡처 (역할 기반 redirect용)
-      const loggedInUser = await login(email, password);
+      // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+      //   login() 이 throw 대신 result object 를 반환한다. 아래 안내 문구·부가 상태는 전부 보존.
+      const result = await login(email, password);
+
+      if (!result.success) {
+        setError(resolveLoginErrorMessage(result, { setIsPendingError, setIsNotMember }));
+        return;
+      }
+      const loggedInUser = result.user!;
 
       // 이메일 저장 처리
       if (rememberEmail) {
@@ -117,44 +153,10 @@ export default function LoginModal() {
           navigate(redirectTo);
         }
       }
-    } catch (err: any) {
-      // 에러 상세 정보 추출
-      let errorMessage = '로그인에 실패했습니다.';
-
-      if (err?.response) {
-        // 서버 응답이 있는 경우 (4xx, 5xx)
-        const serverError = err.response.data?.error || err.response.data?.message;
-        const errorCode = err.response.data?.code;
-
-        // 에러 코드/메시지별 한글화
-        if (errorCode === 'INVALID_USER') {
-          errorMessage = '등록되지 않은 이메일입니다.';
-        } else if (errorCode === 'INVALID_CREDENTIALS') {
-          errorMessage = '비밀번호가 올바르지 않습니다.';
-        } else if (errorCode === 'ACCOUNT_NOT_ACTIVE') {
-          errorMessage = '가입 승인 대기 중입니다. 운영자 승인 후 이용 가능합니다.';
-          setIsPendingError(true);
-        } else if (errorCode === 'ACCOUNT_LOCKED') {
-          errorMessage = '로그인 시도가 너무 많아 계정이 일시적으로 잠겼습니다.';
-        } else if (errorCode === 'SERVICE_NOT_MEMBER') {
-          // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1
-          errorMessage = '이 계정은 KPA-Society 서비스에 가입되어 있지 않습니다. 회원가입 또는 서비스 이용 절차를 진행해 주세요.';
-          setIsNotMember(true);
-        } else if (err.response.status === 429) {
-          errorMessage = '로그인 시도가 너무 많습니다. 잠시 후 다시 시도해주세요.';
-        } else {
-          errorMessage = serverError || `서버 오류 (${err.response.status})`;
-        }
-      } else if (err?.request) {
-        // 요청이 전송됐지만 응답이 없는 경우 (네트워크 오류)
-        errorMessage = '서버에 연결할 수 없습니다. 네트워크를 확인해주세요.';
-        console.error('[Login] Network error - request sent but no response:', err.request);
-      } else if (err instanceof Error) {
-        errorMessage = err.message;
-      }
-
-      console.error('[Login] Error:', err);
-      setError(errorMessage);
+    } catch (err: unknown) {
+      // login() 은 더 이상 throw 하지 않는다 — 여기 도달하면 로그인 이후 처리(리다이렉트 등) 오류다.
+      console.error('[Login] Post-login error:', err);
+      setError('로그인 처리 중 오류가 발생했습니다. 다시 시도해주세요.');
     } finally {
       setLoading(false);
     }

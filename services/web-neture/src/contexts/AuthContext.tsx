@@ -4,11 +4,16 @@
  * WO-O4O-AUTH-AUTO-REFRESH-IMPLEMENTATION-V1: authClient.api 기반 자동 갱신
  * WO-O4O-AUTH-CHAIN-UNIFICATION-V1: @o4o/auth-utils 기반 통일
  * WO-O4O-AUTH-RBAC-UNIFICATION-V2: prefix 유지, mapApiRoles 제거
+ *
+ * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+ *   세션 복구 · 토큰 정리 이벤트 · login/logout/logoutAll 은 @o4o/auth-react 의 useServiceAuth 로 이동.
+ *   이 파일에는 **Neture 고유분**만 남는다 — serviceKey/user 변환 주입 + 역할 전환 UI 상태.
  */
 
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { parseAuthResponse, resolveAuthError, buildPlatformUser, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
+import { createContext, useContext, useMemo, ReactNode } from 'react';
+import { buildPlatformUser } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
+import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
 import { authClient, api } from '../lib/apiClient';
 
 // Re-export for consumers that import getAccessToken from AuthContext
@@ -31,11 +36,14 @@ export interface User {
   memberships?: { serviceKey: string; status: string }[];
 }
 
+/** 기존 호출부 계약 보존 — success 시 role/roles 도 함께 준다. */
+type NetureLoginResult = AuthLoginResult<User> & { role?: UserRole; roles?: UserRole[] };
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }>;
+  login: (email: string, password: string) => Promise<NetureLoginResult>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   switchRole: (role: UserRole) => void;
@@ -46,101 +54,44 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  // WO-O4O-AUTH-RUNTIME-DRIFT-CLEANUP-V1: 토큰 없으면 spinner 불필요 — GlycoPharm 패턴 정렬
-  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
+  // WO-...-COMMONIZATION-V1: Core 는 공통 인증 상태·행동만. Neture 차이는 아래 주입값이 전부다.
+  const core = useServiceAuth<User>(
+    useMemo(
+      () => ({
+        // canonical service key (service_memberships.service_key). role prefix 가 아니다.
+        serviceKey: 'neture',
+        authClient,
+        getAccessToken,
+        toUser: (apiUser) => buildPlatformUser(apiUser as never) as User,
+      }),
+      [],
+    ),
+  );
 
-  useEffect(() => {
-    const checkSession = async () => {
-      // WO-O4O-AUTH-RUNTIME-ORCHESTRATION-STABILIZATION-V1:
-      // 토큰 없으면 /auth/me 호출 생략 — 불필요한 401 방지 (GlycoPharm/KPA 패턴 정렬)
-      if (!getAccessToken()) {
-        setIsLoading(false);
-        return;
-      }
-      try {
-        const response = await api.get('/auth/me');
-        const data = response.data;
-        const { user: apiUser } = parseAuthResponse(data);
-        if (apiUser) {
-          setUser(buildPlatformUser(apiUser));
-        }
-      } catch {
-        // 세션 없음 - 정상
-      }
-      setIsLoading(false);
-    };
+  const { user, setUser } = core;
 
-    checkSession();
-  }, []);
-
-  // WO-O4O-AUTH-TOKEN-CLEARED-UNIFICATION-V1: 토큰 갱신 실패 시 stale auth 정리
-  useEffect(() => {
-    const handleTokenCleared = () => setUser(null);
-    window.addEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-    return () => window.removeEventListener(AUTH_TOKEN_CLEARED_EVENT, handleTokenCleared);
-  }, []);
-
-  const login = async (email: string, password: string): Promise<{ success: boolean; error?: string; code?: string; role?: UserRole; roles?: UserRole[] }> => {
-    try {
-      setIsLoading(true);
-
-      // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
-      // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
-      // Neture 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
-      const result = await authClient.login({ email, password, serviceKey: 'neture' });
-      const apiUser = result.user as any;
-      if (apiUser) {
-        const built = buildPlatformUser(apiUser);
-        setUser(built);
-        return { success: true, role: built.roles[0], roles: built.roles };
-      }
-
-      return { success: false, error: '로그인 응답이 올바르지 않습니다.' };
-    } catch (error: any) {
-      const responseData = error?.response?.data;
-      const status = error?.response?.status;
-
-      if (responseData) {
-        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
-        //   서비스별 안내 UX(가입 링크 등) 노출을 위해 응답 code 를 그대로 전달한다.
-        return {
-          success: false,
-          error: resolveAuthError(responseData, status),
-          code: typeof responseData.code === 'string' ? responseData.code : undefined,
-        };
-      }
-
-      // CORS/네트워크 오류 vs 서버 오류 구분
-      if (error instanceof TypeError || error?.code === 'ERR_NETWORK') {
-        return { success: false, error: '서버에 연결할 수 없습니다. 잠시 후 다시 시도해주세요.' };
-      }
-      return { success: false, error: '로그인에 실패했습니다.' };
-    } finally {
-      setIsLoading(false);
+  const login = async (email: string, password: string): Promise<NetureLoginResult> => {
+    const result = await core.login(email, password);
+    if (result.success && result.user) {
+      return { ...result, role: result.user.roles[0], roles: result.user.roles };
     }
-  };
-
-  const logout = async () => {
-    await authClient.logout();
-    setUser(null);
+    return result;
   };
 
   const logoutAll = async () => {
+    // Neture 는 기존에 로컬 user 를 비우지 않고 서버 호출만 했다 — 동작 보존.
     await api.post('/auth/logout-all');
   };
 
   const switchRole = (role: UserRole) => {
-    if (user && user.roles.includes(role)) {
-      const reordered = [role, ...user.roles.filter(r => r !== role)];
-      setUser({ ...user, roles: reordered });
-    }
+    setUser((prev) => {
+      if (!prev || !prev.roles.includes(role)) return prev;
+      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
+    });
   };
 
   const updateUser = (updates: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...updates });
-    }
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
   };
 
   const hasMultipleRoles = user ? user.roles.length > 1 : false;
@@ -149,10 +100,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        isAuthenticated: !!user,
-        isLoading,
+        isAuthenticated: core.isAuthenticated,
+        isLoading: core.isLoading,
         login,
-        logout,
+        logout: core.logout,
         logoutAll,
         switchRole,
         hasMultipleRoles,
@@ -171,4 +122,3 @@ export function useAuth() {
   }
   return context;
 }
-

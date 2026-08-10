@@ -58,7 +58,17 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      await login(email, password);
+      // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1: result object 계약
+      const result = await login(email, password);
+      if (!result.success) {
+        if (result.code === 'SERVICE_NOT_MEMBER') {
+          setIsNotMember(true);
+          setError('이 계정은 GlycoPharm 서비스 이용 권한이 없습니다. 서비스 가입 또는 이용 신청 후 로그인할 수 있습니다.');
+        } else {
+          setError(result.error || '이메일 또는 비밀번호가 올바르지 않습니다.');
+        }
+        return;
+      }
 
       // 아이디 기억하기
       if (rememberEmail) {

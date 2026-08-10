@@ -6,10 +6,12 @@
  * - localStorage 전략 (o4o_accessToken / o4o_refreshToken)
  */
 
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, useMemo, type ReactNode } from 'react';
 import type { User, UserRole } from '@/types';
-import { parseAuthResponse, normalizeUser, resolveAuthError, extractRoles, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
+import { normalizeUser, extractRoles, normalizeMemberships, AUTH_TOKEN_CLEARED_EVENT } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
+// WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
+import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
 import { authClient, api } from '../lib/apiClient';
 // Re-export for backward compatibility (API files, pages 등에서 import)
 export { getAccessToken } from '@o4o/auth-client';
@@ -64,7 +66,7 @@ interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<User>;
+  login: (email: string, password: string) => Promise<AuthLoginResult<User>>;
   logout: () => void;
   logoutAll: () => Promise<void>;
   selectRole: (role: UserRole) => void;
@@ -88,114 +90,64 @@ export { GLYCOPHARM_ROLE_PRIORITY, GLYCOPHARM_DASHBOARD_MAP, getGlycopharmDashbo
 export { GLYCOPHARM_ROLES, isPharmacistRole, ROLE_LABELS, ROLE_ICONS } from '../lib/role-constants';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
   // 토큰이 있으면 세션 확인 필요, 없으면 바로 로딩 완료
-  const [isLoading, setIsLoading] = useState(() => !!getAccessToken());
   const [availableRoles, setAvailableRoles] = useState<UserRole[]>([]);
 
   // Phase 2: Service User state (WO-AUTH-SERVICE-IDENTITY-PHASE2-GLYCOPHARM)
   const [serviceUser, setServiceUser] = useState<ServiceUser | null>(null);
 
-  // authClient.api 기반 세션 확인 — 401 시 자동 refresh
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        const token = getAccessToken();
-        if (!token) {
-          setIsLoading(false);
-          return;
-        }
-
-        const response = await api.get('/auth/me');
-        const data = response.data;
-        const { user: apiUser } = parseAuthResponse(data);
-        if (apiUser) {
-          const rawRoles = extractRoles(apiUser, []);
-          const base = normalizeUser(apiUser);
-          const userData: User = {
+  // WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+  //   세션 복구·로그인/로그아웃·토큰 정리 이벤트는 공통 Core 가 수행한다.
+  //   GlycoPharm 차이는 user 변환(status 기본값 'approved' 포함)과 availableRoles 파생뿐이다.
+  const core = useServiceAuth<User>(
+    useMemo(
+      () => ({
+        serviceKey: 'glycopharm', // canonical == role prefix (self-map)
+        authClient,
+        getAccessToken,
+        toUser: (apiUser: Record<string, unknown>) =>
+          ({
             ...apiUser,
-            ...base,
-            roles: rawRoles,
-            memberships: normalizeMemberships(apiUser),
+            ...normalizeUser(apiUser as never),
+            roles: extractRoles(apiUser as never, []),
+            memberships: normalizeMemberships(apiUser as never),
             status: (apiUser.status as string) || 'approved',
-          } as User;
-          setUser(userData);
-          setAvailableRoles(rawRoles);
-        }
-      } catch {
-        // 세션 없음 또는 refresh 실패 — 정상
-      } finally {
-        setIsLoading(false);
-      }
-    };
+          }) as User,
+        onAuthenticated: (u) => setAvailableRoles(u.roles as UserRole[]),
+      }),
+      [],
+    ),
+  );
 
-    checkSession();
-  }, []);
+  const { user, setUser } = core;
 
-  const login = async (email: string, password: string) => {
-    // WO-O4O-AUTH-TOKEN-STORAGE-HOTFIX-V1: use authClient.login()
-    // which stores tokens to localStorage (api.post() alone does not)
-    try {
-      // WO-O4O-LOGIN-SERVICEKEY-FRONTEND-ALIGNMENT-V1:
-      // backend 가 service_memberships 를 검증하도록 serviceKey 를 명시.
-      // GlycoPharm 미가입자는 401 SERVICE_NOT_MEMBER 로 차단된다.
-      const result = await authClient.login({ email, password, serviceKey: 'glycopharm' });
-      const apiUser = result.user as any;
-
-      if (apiUser) {
-        const rawRoles = extractRoles(apiUser, []);
-        const base = normalizeUser(apiUser);
-        const typedUser: User = {
-          ...apiUser,
-          ...base,
-          roles: rawRoles,
-          memberships: normalizeMemberships(apiUser),
-          status: (apiUser.status as string) || 'approved',
-        } as User;
-
-        setUser(typedUser);
-        setAvailableRoles(rawRoles);
-        return typedUser;
-      }
-
-      throw new Error('로그인 응답이 올바르지 않습니다.');
-    } catch (error: any) {
-      // Axios는 non-2xx 시 throw — error.response.data로 서버 에러 접근
-      const data = error.response?.data;
-      if (data) {
-        // WO-O4O-LOGIN-SERVICE-NOT-MEMBER-UX-V1:
-        //   LoginPage 가 SERVICE_NOT_MEMBER 분기를 할 수 있도록 Error 객체에 code 속성을 부여한다.
-        //   resolveAuthError 의 한국어 메시지 반환은 그대로 유지(기존 흐름 보존).
-        const wrapped: any = new Error(resolveAuthError(data, error.response?.status));
-        if (typeof data.code === 'string') wrapped.code = data.code;
-        throw wrapped;
-      }
-      throw new Error('로그인에 실패했습니다.');
-    }
-  };
+  /**
+   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+   *   기존 login 은 성공 시 User 반환 / 실패 시 code 를 붙인 Error 를 throw 했다.
+   *   공통 계약(result object)으로 통일한다 — 호출부(LoginModal/LoginPage/ServiceLoginPage)도 함께 수정.
+   *   `resolveAuthError` 한국어 메시지와 `code` 전달은 Core 가 동일하게 수행하므로 문구 변화 없음.
+   */
+  const login = core.login;
 
   const logout = async () => {
-    // WO-O4O-AUTH-CLIENT-API-HARDENING-V1: authClient.logout() handles API call + token cleanup
-    await authClient.logout();
-    setUser(null);
+    await core.logout();
     setAvailableRoles([]);
   };
 
   const logoutAll = async () => {
+    // 기존 동작 보존: 서버 호출만 하고 로컬 user 는 비우지 않는다.
     await api.post('/auth/logout-all');
   };
 
   const selectRole = (role: UserRole) => {
-    if (user && availableRoles.includes(role)) {
-      const reordered = [role, ...user.roles.filter(r => r !== role)];
-      setUser({ ...user, roles: reordered });
-    }
+    setUser((prev) => {
+      if (!prev || !availableRoles.includes(role)) return prev;
+      return { ...prev, roles: [role, ...prev.roles.filter((r) => r !== role)] };
+    });
   };
 
   const updateUser = (updates: Partial<User>) => {
-    if (user) {
-      setUser({ ...user, ...updates });
-    }
+    setUser((prev) => (prev ? { ...prev, ...updates } : prev));
   };
 
   const switchRole = selectRole;
@@ -255,8 +207,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       value={{
         // Platform User
         user,
-        isAuthenticated: !!user,
-        isLoading,
+        isAuthenticated: core.isAuthenticated,
+        isLoading: core.isLoading,
         login,
         logout,
         logoutAll,

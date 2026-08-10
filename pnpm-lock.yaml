@@ -1533,6 +1533,28 @@ importers:
         specifier: ^5.7.2
         version: 5.9.3
 
+  packages/auth-react:
+    dependencies:
+      '@o4o/auth-client':
+        specifier: workspace:*
+        version: link:../auth-client
+      '@o4o/auth-utils':
+        specifier: workspace:*
+        version: link:../auth-utils
+      react:
+        specifier: 19.2.0
+        version: 19.2.0
+      react-dom:
+        specifier: 19.2.0
+        version: 19.2.0(react@19.2.0)
+      react-router-dom:
+        specifier: ^6.0.0 || ^7.0.0
+        version: 7.9.6(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+    devDependencies:
+      typescript:
+        specifier: 5.4.5
+        version: 5.4.5
+
   packages/auth-utils:
     dependencies:
       '@o4o/types':
@@ -2812,6 +2834,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -2948,6 +2973,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3054,6 +3082,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3172,6 +3203,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils
@@ -3275,6 +3309,9 @@ importers:
       '@o4o/auth-client':
         specifier: workspace:*
         version: link:../../packages/auth-client
+      '@o4o/auth-react':
+        specifier: workspace:*
+        version: link:../../packages/auth-react
       '@o4o/auth-utils':
         specifier: workspace:*
         version: link:../../packages/auth-utils

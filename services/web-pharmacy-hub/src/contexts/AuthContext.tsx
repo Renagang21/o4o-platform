@@ -11,17 +11,17 @@
  * Foundation 범위이므로 역할 선택/전환 UI 는 넣지 않는다 (후속 WO).
  */
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import {
-  parseAuthResponse,
   normalizeUser,
   normalizeMemberships,
   extractRoles,
-  resolveAuthError,
   type UserLike,
 } from '@o4o/auth-utils';
 import { getAccessToken } from '@o4o/auth-client';
-import { authClient, api } from '../lib/apiClient';
+// WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1
+import { useServiceAuth, type AuthLoginResult } from '@o4o/auth-react';
+import { authClient } from '../lib/apiClient';
 import { SERVICE_KEY } from '../config/service';
 
 export interface PharmacyHubUser extends UserLike {
@@ -34,7 +34,7 @@ interface AuthContextValue {
   user: PharmacyHubUser | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<PharmacyHubUser>;
+  login: (email: string, password: string) => Promise<AuthLoginResult<PharmacyHubUser>>;
   logout: () => void;
 }
 
@@ -50,57 +50,34 @@ function toUser(apiUser: Record<string, unknown>): PharmacyHubUser {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<PharmacyHubUser | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkSession = async () => {
-      try {
-        if (!getAccessToken()) {
-          setIsLoading(false);
-          return;
-        }
-        const response = await api.get('/auth/me');
-        const { user: apiUser } = parseAuthResponse(response.data);
-        if (apiUser) setUser(toUser(apiUser as Record<string, unknown>));
-      } catch {
-        // 세션 없음 또는 refresh 실패 — 정상 (비로그인 상태로 진행)
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    void checkSession();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    try {
-      const result = await authClient.login({ email, password, serviceKey: SERVICE_KEY });
-      const apiUser = result.user as Record<string, unknown> | undefined;
-      if (!apiUser) throw new Error('로그인 응답이 올바르지 않습니다.');
-      const typed = toUser(apiUser);
-      setUser(typed);
-      return typed;
-    } catch (error: unknown) {
-      const err = error as { response?: { data?: { code?: string }; status?: number } };
-      const data = err.response?.data;
-      if (data) {
-        const wrapped = new Error(
-          resolveAuthError(data, err.response?.status ?? 0),
-        ) as Error & { code?: string };
-        if (typeof data.code === 'string') wrapped.code = data.code;
-        throw wrapped;
-      }
-      throw new Error('로그인에 실패했습니다.');
-    }
-  };
-
-  const logout = () => {
-    void authClient.logout();
-    setUser(null);
-  };
+  /**
+   * WO-O4O-FRONTEND-AUTH-CONTEXT-AND-ROUTE-GUARD-COMMONIZATION-V1:
+   *   Pharmacy-Hub 는 제한형 서비스라 Core 계약 그대로면 충분하다(고유 확장 없음).
+   *   기존 login 은 throw 방식이었으나 공통 계약(result object)으로 통일한다.
+   */
+  const core = useServiceAuth<PharmacyHubUser>(
+    useMemo(
+      () => ({
+        // config/service.ts 의 canonical service key 를 그대로 쓴다.
+        serviceKey: SERVICE_KEY,
+        authClient,
+        getAccessToken,
+        toUser: (apiUser) => toUser(apiUser),
+      }),
+      [],
+    ),
+  );
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{
+        user: core.user,
+        isAuthenticated: core.isAuthenticated,
+        isLoading: core.isLoading,
+        login: core.login,
+        logout: () => { void core.logout(); },
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
