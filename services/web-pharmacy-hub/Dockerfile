@@ -29,6 +29,7 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/auth-react/package.json ./packages/auth-react/
 # WO-PHARMACY-HUB-STORE-SHELL-AND-MENU-CONFIG-V1: 공통 매장 셸 의존 체인
 #   store-ui-core → { error-handling, operator-ux-core, ui } → types
 COPY packages/store-ui-core/package.json ./packages/store-ui-core/
@@ -57,6 +58,7 @@ RUN pnpm install --filter pharmacy-hub-web... --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/store-ui-core/ ./packages/store-ui-core/
 COPY packages/operator-ux-core/ ./packages/operator-ux-core/
 COPY packages/error-handling/ ./packages/error-handling/

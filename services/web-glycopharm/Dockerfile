@@ -22,6 +22,7 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/utils/package.json ./packages/utils/
 COPY packages/ui/package.json ./packages/ui/
 COPY packages/operator-core/package.json ./packages/operator-core/
@@ -56,6 +57,7 @@ RUN pnpm install --filter glycopharm-web... --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/utils/ ./packages/utils/
 COPY packages/ui/ ./packages/ui/
 COPY packages/operator-core/ ./packages/operator-core/

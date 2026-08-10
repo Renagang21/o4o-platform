@@ -22,6 +22,7 @@ COPY tsconfig.packages.json ./
 COPY packages/types/package.json ./packages/types/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/content-editor/package.json ./packages/content-editor/
 COPY packages/organization-core/package.json ./packages/organization-core/
 COPY packages/forum-core/package.json ./packages/forum-core/
@@ -62,6 +63,7 @@ RUN pnpm install --filter @o4o/web-kpa-society... --ignore-scripts
 COPY packages/types/ ./packages/types/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/content-editor/ ./packages/content-editor/
 COPY packages/organization-core/ ./packages/organization-core/
 COPY packages/forum-core/ ./packages/forum-core/

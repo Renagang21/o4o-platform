@@ -20,6 +20,7 @@ COPY tsconfig.packages.json ./
 
 # Copy workspace packages needed for this service
 COPY packages/auth-client/package.json ./packages/auth-client/
+COPY packages/auth-react/package.json ./packages/auth-react/
 COPY packages/auth-utils/package.json ./packages/auth-utils/
 COPY packages/types/package.json ./packages/types/
 COPY packages/ui/package.json ./packages/ui/
@@ -52,6 +53,7 @@ RUN pnpm install --filter @o4o/web-k-cosmetics... --ignore-scripts
 
 # Copy workspace package source
 COPY packages/auth-client/ ./packages/auth-client/
+COPY packages/auth-react/ ./packages/auth-react/
 COPY packages/auth-utils/ ./packages/auth-utils/
 COPY packages/types/ ./packages/types/
 COPY packages/ui/ ./packages/ui/
