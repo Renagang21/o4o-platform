@@ -160,6 +160,19 @@ backend 는 여전히 `store_owner` scope 를 요구하므로 admin 이 매장 A
 > `pharmacy-hub:admin` 부여는 **사용자가 직접 수행**했다. 본 세션은 프로덕션 write 를 한 건도 하지 않았다.
 > 계정 아이디·비밀번호는 본 문서에 기록하지 않는다 — SSOT 는 `docs/local/TEST-ACCOUNTS.local.md` (gitignored).
 
+### 6-4. `/admin/ping` 제거 후 재배포 · 재smoke
+
+`Deploy API Server (Cloud Run)` **success** (commit `c5e8bbf98`).
+
+| 항목 | 결과 |
+|---|---|
+| `GET /pharmacy-hub/admin/ping` | **404** (제거 확인) |
+| `GET /pharmacy-hub/operator/ping` | **200** (회귀 없음) |
+| `GET /pharmacy-hub/operator/memberships` (실 Operator 기능) | **200** |
+| `GET /pharmacy-hub/store-owner/ping` | **403** (사업자 신분 비포괄 유지) |
+| 실브라우저 `/operator` · `/operator/memberships` | 정상 렌더 · console error 0 · 실패 API 0 |
+| 로그아웃 후 `/operator` | 재차단 |
+
 ---
 
 ## 7. 문서 정합
