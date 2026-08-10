@@ -32,6 +32,27 @@
 - 서버 계약 코드(`SERVICE_PASSWORD_REQUIRED` / `SERVICE_PASSWORD_TOO_SHORT` /
   `MULTI_SERVICE_NOT_ALLOWED` / `SERVICE_KEY_MISMATCH`)를 해당 입력 필드 오류로 표면화.
 
+#### 2-2-1. 재정비 — 대상 서비스 선택이 KPA 로 고정되던 결함 (사용자 지적, 동일 WO 범위)
+
+1차 구현은 서비스 `<select>` 를 두었으나 **첫 서비스(KPA)를 기본값으로 자동 확정**했고,
+select 가 입력창처럼 보여 다른 서비스를 고를 수 있다는 사실이 화면에서 드러나지 않았다.
+→ 등록 대상이 KPA 로 고정될 위험(핵심 목적인 Pharmacy-Hub 등록 불가).
+
+| 항목 | 재정비 후 |
+|---|---|
+| 단계 분리 | **1. 대상 서비스** / **2. 역할** 을 별도 블록으로 분리 |
+| 서비스 목록 | KPA · Neture · Pharmacy-Hub · GlycoPharm · K-Cosmetics 5개를 라디오 카드로 **모두 노출** |
+| 표시값 | 각 항목에 `resolveCanonicalServiceKey(key)` 결과를 함께 표기 (kpa-society / neture / pharmacy-hub / glycopharm / k-cosmetics) — 표시명에서 키를 추론하지 않는다 |
+| 기본값 | **없음.** `targetServiceKey=''` · `targetRole=''` 로 시작하고 모달을 열 때도 자동 확정하지 않는다 |
+| 역할 목록 | 선택한 서비스의 역할만 렌더. 미선택이면 안내문만 표시 (Pharmacy-Hub 는 Operator 하나) |
+| 서비스 변경 | 역할 선택을 **초기화**한다(첫 역할 자동 확정 금지) — 표시 서비스와 실제 role 이 어긋나지 않는다 |
+| 제출 차단 | 미선택 시 제출 버튼 disabled + `targetService`/`roles` 필드 오류 + 요청 생성 가드 |
+| 적용 범위 | 신규 등록 / 기존 사용자 권한 추가 **양쪽 동일 구조** |
+
+선택값 → 요청(`roles:[targetRole]`, `serviceKey: resolveCanonicalServiceKey(targetServiceKey)`)
+→ 서버의 Membership · service_credentials 생성까지 **같은 값 하나**로 연결된다
+(서버는 role 접두어에서 파생한 키와 다르면 `SERVICE_KEY_MISMATCH` 로 거부).
+
 ### 2-3. `POST /admin/users` 계약
 - `resolveOperatorTargetServiceKey(roles, body.serviceKey)` 로 **대상 서비스 1개** 확정.
   다중 서비스 / 명시 키 불일치는 **아무것도 쓰기 전에** 400.
@@ -60,7 +81,8 @@
 |------|------|
 | api-server jest 전체 | **83 suites / 1349 tests PASS** |
 | 신규 등록 계약 테스트 (14) | PASS — 단일 트랜잭션 · credential 생성 · 기존 credential 유지 · 부분 생성 0 · 다중 서비스 거절 |
-| admin-dashboard vitest 전체 | **12 files / 201 tests PASS** (OperatorsPage P1·B6 회귀 포함) |
+| admin-dashboard vitest 전체 | **12 files / 207 tests PASS** (OperatorsPage P1·B6 회귀 + 서비스 선택 재정비 6건 포함) |
+| 서비스 선택 계약 테스트 (신규 6) | PASS — 5서비스 노출 · 기본값 없음 · 서비스 변경 시 역할 초기화 · 미선택 제출 차단 · 선택 서비스 역할만 렌더 · canonical key SSOT 표시 |
 | type-check (api-server / admin-dashboard) | PASS |
 | lint (변경 6파일) | error 0 (기존 warning 1건 — `AdminAccountsSettings` useMemo deps, 본 변경과 무관) |
 | build (api-server / admin-dashboard) | PASS |
@@ -71,7 +93,7 @@
 - **프로덕션 브라우저 검증 미수행.** 등록·로그인 검증은 프로덕션에 **실제 운영자 계정을 생성**하는
   write 이며, 배포된 리비전이 필요하다. CLAUDE.md §0 (데이터 변경 승인) · 중지 조건(실제 계정·자격정보)에
   따라 **배포 후 사용자 승인 하에 수행**한다. 대상 시나리오:
-  1. Pharmacy-Hub 선택 → 신규 운영자 등록
+  1. 5개 서비스 노출 확인 → Pharmacy-Hub 선택 → 역할 목록이 Operator 하나로 바뀜 → 신규 운영자 등록
   2. 생성 credential 로 Pharmacy-Hub 로그인 성공 / 잘못된 비밀번호 실패
   3. Pharmacy-Hub 보호 route 진입 · 다른 서비스 route 거부
   4. 기존 사용자 권한 추가 시 타 서비스 credential 불변

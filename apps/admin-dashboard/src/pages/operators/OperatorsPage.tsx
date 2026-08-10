@@ -64,6 +64,9 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
     { value: 'neture:admin', label: 'Admin', description: 'Neture 관리자' },
     { value: 'neture:operator', label: 'Operator', description: 'Neture 운영자' },
   ],
+  'pharmacy-hub': [
+    { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
+  ],
   glycopharm: [
     { value: 'glycopharm:admin', label: 'Admin', description: 'GlycoPharm 관리자' },
     { value: 'glycopharm:operator', label: 'Operator', description: 'GlycoPharm 운영자' },
@@ -71,9 +74,6 @@ const ASSIGNABLE_ROLES: Record<string, { value: string; label: string; descripti
   cosmetics: [
     { value: 'cosmetics:admin', label: 'Admin', description: 'K-Cosmetics 관리자' },
     { value: 'cosmetics:operator', label: 'Operator', description: 'K-Cosmetics 운영자' },
-  ],
-  'pharmacy-hub': [
-    { value: 'pharmacy-hub:operator', label: 'Operator', description: 'Pharmacy-Hub 운영자' },
   ],
 };
 
@@ -121,8 +121,10 @@ export default function OperatorsPage() {
   const [formData, setFormData] = useState<UserFormState>({ email: '', password: '', lastName: '', firstName: '', roles: [] });
   // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1 — 등록 모달 상태
   const [registerMode, setRegisterMode] = useState<RegisterMode>('new');
-  const [targetServiceKey, setTargetServiceKey] = useState<string>(REGISTRABLE_SERVICE_KEYS[0]);
-  const [targetRole, setTargetRole] = useState<string>(ASSIGNABLE_ROLES[REGISTRABLE_SERVICE_KEYS[0]][0].value);
+  // 대상 서비스는 **기본값 없이 시작**한다. 첫 서비스를 자동 확정하면 관리자가 고르지 않은 서비스로
+  // 등록이 나가고(과거 KPA 고정 결함), 화면 표시와 실제 serviceKey 가 어긋날 수 있다.
+  const [targetServiceKey, setTargetServiceKey] = useState<string>('');
+  const [targetRole, setTargetRole] = useState<string>('');
   // 서비스 비밀번호 변경 모달 — 대상 행(서비스 고정)
   const [pwTarget, setPwTarget] = useState<AssignmentRow | null>(null);
   const [pwValue, setPwValue] = useState('');
@@ -226,16 +228,21 @@ export default function OperatorsPage() {
     setEditingUserId(null);
     setFormData({ email: '', password: '', lastName: '', firstName: '', roles: [] });
     setRegisterMode('new');
-    setTargetServiceKey(REGISTRABLE_SERVICE_KEYS[0]);
-    setTargetRole(ASSIGNABLE_ROLES[REGISTRABLE_SERVICE_KEYS[0]][0].value);
+    setTargetServiceKey('');
+    setTargetRole('');
     setFormErrors({});
     setShowModal(true);
   };
 
-  /** 대상 서비스를 바꾸면 역할도 그 서비스의 첫 역할로 맞춘다(다른 서비스 role 이 남는 것을 막는다). */
+  /**
+   * 대상 서비스 변경 — 역할 선택은 **항상 초기화**한다.
+   * 자동으로 첫 역할을 채우지 않는다(관리자가 보지 않은 역할이 확정되는 것을 막는다).
+   * 다른 서비스의 role 이 남아 표시 서비스와 실제 role 이 어긋나는 것도 함께 막는다.
+   */
   const changeTargetService = (svc: string) => {
     setTargetServiceKey(svc);
-    setTargetRole(ASSIGNABLE_ROLES[svc][0].value);
+    setTargetRole('');
+    setFormErrors((prev) => ({ ...prev, targetService: '', roles: '' }));
   };
 
   const openEditModal = (row: AssignmentRow) => {
@@ -313,7 +320,17 @@ export default function OperatorsPage() {
       if (!formData.lastName) errors.lastName = '성을 입력하세요.';
       if (!formData.firstName) errors.firstName = '이름을 입력하세요.';
       if (formData.roles.length === 0) errors.roles = '역할을 최소 1개 선택하세요.';
-    } else if (registerMode === 'new') {
+      setFormErrors(errors);
+      return Object.keys(errors).length === 0;
+    }
+
+    // ── 등록(신규/기존 공통) — 대상 서비스와 역할은 **명시 선택**이어야 한다 ──
+    // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1 (재정비):
+    //   서비스가 선택되지 않으면 역할도 제출도 불가능하다. 숨은 기본값을 만들지 않는다.
+    if (!targetServiceKey) errors.targetService = '대상 서비스를 선택하세요.';
+    else if (!targetRole) errors.roles = '역할을 선택하세요.';
+
+    if (registerMode === 'new') {
       // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1:
       //   신규 등록의 최초 비밀번호는 **선택한 서비스 credential** 로 저장된다.
       if (!formData.password) errors.password = '신규 등록에는 최초 서비스 비밀번호가 필요합니다.';
@@ -352,6 +369,11 @@ export default function OperatorsPage() {
         // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1
         //   대상 서비스는 **하나**다. canonical serviceKey 변환은 security-core SSOT 에 위임한다.
         //   서버는 role 에서 파생한 키와 이 serviceKey 가 다르면 SERVICE_KEY_MISMATCH 로 거부한다.
+        // 선택이 비어 있으면 요청 자체를 만들지 않는다(validateForm 이 이미 막지만 계약을 코드로 고정한다).
+        if (!targetServiceKey || !targetRole) {
+          setSubmitting(false);
+          return;
+        }
         const canonicalServiceKey = resolveCanonicalServiceKey(targetServiceKey);
         const isNewUser = registerMode === 'new';
         const payload: Record<string, unknown> = {
@@ -967,54 +989,104 @@ export default function OperatorsPage() {
                     여러 서비스를 한 번에 고르면 어느 credential 을 만드는지 정의되지 않는다
                     (서버도 MULTI_SERVICE_NOT_ALLOWED 로 거부한다). */}
               {!editingUserId ? (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    대상 서비스 · 역할 <span className="text-red-500">*</span>
-                  </label>
-                  {formErrors.roles && (
-                    <p className="mb-2 text-sm text-red-500 flex items-center gap-1">
-                      <AlertCircle className="w-4 h-4" />
-                      {formErrors.roles}
-                    </p>
-                  )}
-                  <select
-                    value={targetServiceKey}
-                    onChange={(e) => changeTargetService(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-                  >
-                    {REGISTRABLE_SERVICE_KEYS.map((key) => (
-                      <option key={key} value={key}>
-                        {SERVICES[key as keyof typeof SERVICES]?.label ?? key}
-                      </option>
-                    ))}
-                  </select>
-                  <div className="mt-1 text-xs text-slate-500">
-                    canonical service key: <code>{resolveCanonicalServiceKey(targetServiceKey)}</code>
+                <div className="space-y-4">
+                  {/* STEP 1 — 대상 서비스 */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      1. 대상 서비스 <span className="text-red-500">*</span>
+                    </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {REGISTRABLE_SERVICE_KEYS.map((key) => {
+                        const meta = SERVICES[key as keyof typeof SERVICES];
+                        const selected = targetServiceKey === key;
+                        return (
+                          <label
+                            key={key}
+                            className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                              selected ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                            }`}
+                          >
+                            <input
+                              type="radio"
+                              name="target-service"
+                              value={key}
+                              checked={selected}
+                              onChange={() => changeTargetService(key)}
+                              className="mt-0.5 text-blue-600"
+                            />
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">{meta?.label ?? key}</div>
+                              {/* 표시명이 아니라 SSOT 변환 결과를 그대로 보여준다 — 화면과 요청이 같은 값이다. */}
+                              <div className="text-[10px] text-gray-400 mt-0.5 font-mono">
+                                {resolveCanonicalServiceKey(key)}
+                              </div>
+                            </div>
+                          </label>
+                        );
+                      })}
+                    </div>
+                    {formErrors.targetService && (
+                      <p className="mt-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {formErrors.targetService}
+                      </p>
+                    )}
                   </div>
-                  <div className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {ASSIGNABLE_ROLES[targetServiceKey].map((role) => (
-                      <label
-                        key={role.value}
-                        className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
-                          targetRole === role.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
-                        }`}
-                      >
-                        <input
-                          type="radio"
-                          name="target-role"
-                          checked={targetRole === role.value}
-                          onChange={() => setTargetRole(role.value)}
-                          className="mt-0.5 text-blue-600"
-                        />
-                        <div>
-                          <div className="text-sm font-medium text-gray-900">{role.label}</div>
-                          <div className="text-xs text-gray-500">{role.description}</div>
-                          <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{role.value}</div>
+
+                  {/* STEP 2 — 역할 (선택한 서비스의 역할만) */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      2. 역할 <span className="text-red-500">*</span>
+                    </label>
+                    {formErrors.roles && (
+                      <p className="mb-2 text-sm text-red-500 flex items-center gap-1">
+                        <AlertCircle className="w-4 h-4" />
+                        {formErrors.roles}
+                      </p>
+                    )}
+                    {!targetServiceKey ? (
+                      <div className="rounded-lg bg-slate-50 border border-dashed border-slate-300 px-3 py-3 text-sm text-slate-500">
+                        먼저 대상 서비스를 선택하세요. 선택한 서비스의 역할만 표시됩니다.
+                      </div>
+                    ) : (
+                      <>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                          {ASSIGNABLE_ROLES[targetServiceKey].map((role) => (
+                            <label
+                              key={role.value}
+                              className={`flex items-start gap-2 p-2 rounded border cursor-pointer transition-colors ${
+                                targetRole === role.value ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:border-gray-300'
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="target-role"
+                                checked={targetRole === role.value}
+                                onChange={() => setTargetRole(role.value)}
+                                className="mt-0.5 text-blue-600"
+                              />
+                              <div>
+                                <div className="text-sm font-medium text-gray-900">{role.label}</div>
+                                <div className="text-xs text-gray-500">{role.description}</div>
+                                <div className="text-[10px] text-gray-400 mt-0.5 font-mono">{role.value}</div>
+                              </div>
+                            </label>
+                          ))}
                         </div>
-                      </label>
-                    ))}
+                        <div className="mt-2 text-xs text-slate-500">
+                          요청에 실리는 값 — service key:{' '}
+                          <code>{resolveCanonicalServiceKey(targetServiceKey)}</code>
+                          {targetRole && (
+                            <>
+                              {' '}· role: <code>{targetRole}</code>
+                            </>
+                          )}
+                        </div>
+                      </>
+                    )}
                   </div>
-                  <p className="mt-2 text-xs text-slate-500">
+
+                  <p className="text-xs text-slate-500">
                     플랫폼 계정(<code>platform:super_admin</code>)은 서비스 운영자 등록 대상이 아닙니다 —
                     <b> 설정 &gt; 관리자 계정</b> 화면에서 관리합니다.
                   </p>
@@ -1099,7 +1171,8 @@ export default function OperatorsPage() {
                 </button>
                 <button
                   type="submit"
-                  disabled={submitting}
+                  // 등록에서는 대상 서비스·역할이 확정되기 전에는 제출할 수 없다.
+                  disabled={submitting || (!editingUserId && (!targetServiceKey || !targetRole))}
                   className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 disabled:opacity-50 flex items-center gap-2"
                 >
                   {submitting ? (

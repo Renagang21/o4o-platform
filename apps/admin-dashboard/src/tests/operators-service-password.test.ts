@@ -71,6 +71,55 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
       expect(SRC).toMatch(/기존 비밀번호는 그대로 유지됩니다/);
     });
 
+    // WO-O4O-ADMIN-SERVICE-OPERATOR-REGISTRATION-IDENTITY-V2-V1 (재정비):
+    //   화면에 KPA 가 고정 표시되고 다른 서비스를 고를 수 없던 결함의 회귀 방지.
+    it('다섯 서비스가 모두 등록 카탈로그에 있다', () => {
+      const catalog = SRC.slice(
+        SRC.indexOf('const ASSIGNABLE_ROLES'),
+        SRC.indexOf('CATALOG_ROLE_VALUES'),
+      );
+      for (const key of ['kpa', 'neture', 'pharmacy-hub', 'glycopharm', 'cosmetics']) {
+        expect(catalog).toMatch(new RegExp(`${key}:`));
+      }
+      // Pharmacy-Hub 는 operator 만 — admin 역할이 backend 에 없다.
+      const phBlock = catalog.slice(catalog.indexOf("'pharmacy-hub': ["));
+      expect(phBlock.slice(0, phBlock.indexOf('],'))).not.toMatch(/pharmacy-hub:admin/);
+    });
+
+    it('대상 서비스에 기본값(KPA 고정)을 두지 않는다', () => {
+      expect(SRC).toMatch(/const \[targetServiceKey, setTargetServiceKey\] = useState<string>\(''\)/);
+      expect(SRC).toMatch(/const \[targetRole, setTargetRole\] = useState<string>\(''\)/);
+      // 모달을 열 때도 첫 서비스를 자동 확정하지 않는다.
+      expect(SRC).toMatch(/setTargetServiceKey\(''\)/);
+      expect(SRC).toMatch(/setTargetRole\(''\)/);
+    });
+
+    it('서비스를 바꾸면 역할 선택을 초기화한다 (자동 확정 없음)', () => {
+      const fn = SRC.slice(SRC.indexOf('const changeTargetService'), SRC.indexOf('const openEditModal'));
+      expect(fn).toMatch(/setTargetServiceKey\(svc\)/);
+      expect(fn).toMatch(/setTargetRole\(''\)/);
+      expect(fn).not.toMatch(/ASSIGNABLE_ROLES\[svc\]\[0\]/);
+    });
+
+    it('서비스·역할 미선택이면 제출을 차단한다', () => {
+      expect(SRC).toMatch(/errors\.targetService = '대상 서비스를 선택하세요\.'/);
+      expect(SRC).toMatch(/errors\.roles = '역할을 선택하세요\.'/);
+      // 요청 생성 자체를 막는 가드
+      expect(SRC).toMatch(/if \(!targetServiceKey \|\| !targetRole\) \{/);
+      // 제출 버튼 비활성화
+      expect(SRC).toMatch(/disabled=\{submitting \|\| \(!editingUserId && \(!targetServiceKey \|\| !targetRole\)\)\}/);
+    });
+
+    it('역할 목록은 선택한 서비스의 역할만 렌더한다', () => {
+      expect(SRC).toMatch(/ASSIGNABLE_ROLES\[targetServiceKey\]\.map/);
+      expect(SRC).toMatch(/먼저 대상 서비스를 선택하세요/);
+    });
+
+    it('서비스 선택 목록은 canonical serviceKey 를 SSOT 에서 표시한다', () => {
+      expect(SRC).toMatch(/REGISTRABLE_SERVICE_KEYS\.map/);
+      expect(SRC).toMatch(/resolveCanonicalServiceKey\(key\)/);
+    });
+
     it('편집 화면은 카탈로그 밖 역할을 읽기 전용으로 보존한다', () => {
       expect(SRC).toMatch(/CATALOG_ROLE_VALUES\.has\(r\)/);
       expect(SRC).toMatch(/이 화면에서 변경하지 않는 권한/);
@@ -91,8 +140,11 @@ describe('OperatorsPage — 비밀번호 write 계약', () => {
     });
 
     it('대상 서비스는 클릭한 행 하나로 고정된다 (선택 UI 없음)', () => {
-      // 서비스 선택 select 가 없어야 한다 — 행이 곧 대상이다.
-      expect(SRC).not.toMatch(/서비스를 선택하세요/);
+      // 비밀번호 변경 모달 안에는 서비스 선택 UI 가 없어야 한다 — 행이 곧 대상이다.
+      // (등록 모달은 별개다. 등록에서는 대상 서비스를 명시적으로 골라야 한다.)
+      const pwModal = SRC.slice(SRC.indexOf('{pwTarget && ('), SRC.indexOf('{showModal && ('));
+      expect(pwModal.length).toBeGreaterThan(0);
+      expect(pwModal).not.toMatch(/서비스를 선택하세요|name="target-service"/);
       expect(SRC).toMatch(/setPwTarget\(row\)/);
     });
 
