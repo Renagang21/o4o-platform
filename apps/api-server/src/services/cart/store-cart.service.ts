@@ -31,6 +31,11 @@ import {
   calculateSupplierShippingFee,
   type SupplierShippingPolicy,
 } from '../shipping/supplier-shipping.js';
+import {
+  assertNoDrugInCommerce,
+  toCommerceRefFromCartItem,
+  DrugCommerceErrorCode,
+} from '../../modules/neture/guards/drug-commerce.guard.js';
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -185,6 +190,18 @@ export class StoreCartService {
       throw new CartError('priceSnapshot must be a non-negative integer', 'VALIDATION_ERROR');
     }
 
+    // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1:
+    //   저장 **전** 의약품 판정. 서비스·역할·운영자 예외 없이 거부한다.
+    //   요청 body 가 그대로 흘러들어오는 경로(`POST /cart/:serviceKey/items`)라
+    //   클라이언트가 임의의 productMasterId 를 보낼 수 있다 — 서버에서만 해석한다.
+    await this.assertNotDrug({
+      productName,
+      productMasterId: input.productMasterId ?? null,
+      supplierProductOfferId: input.supplierProductOfferId ?? null,
+      organizationProductListingId: input.organizationProductListingId ?? null,
+      eventOfferId: input.eventOfferId ?? null,
+    });
+
     const item = this.repo.create({
       buyerId: scope.buyerId,
       serviceKey: scope.serviceKey,
@@ -220,8 +237,30 @@ export class StoreCartService {
     });
     if (!item) throw new CartError('cart item not found', 'NOT_FOUND');
 
+    // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1:
+    //   기존 항목이라도 저장 **전** 다시 판정한다. 게이트 도입 전에 담겼거나, 상품의
+    //   regulatory_type 이 나중에 DRUG 로 정정된 항목이 수량 변경으로 되살아나면 안 된다.
+    await this.assertNotDrug(item);
+
     item.quantity = input.quantity;
     return this.repo.save(item);
+  }
+
+  /**
+   * 의약품 거래 절대 차단 (WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1).
+   * 거부 시 CartError(403) 로 던진다. 비의약품은 no-op.
+   */
+  private async assertNotDrug(item: {
+    productName?: string | null;
+    productMasterId?: string | null;
+    supplierProductOfferId?: string | null;
+    organizationProductListingId?: string | null;
+    eventOfferId?: string | null;
+  }): Promise<void> {
+    const gate = await assertNoDrugInCommerce(this.dataSource, [toCommerceRefFromCartItem(item)]);
+    if (!gate.allowed) {
+      throw new CartError(gate.message ?? '요청을 진행할 수 없습니다.', gate.code!);
+    }
   }
 
   async remove(scope: CartScope, id: string): Promise<void> {
@@ -379,12 +418,23 @@ export class StoreCartService {
   }
 }
 
+export type CartErrorCode = 'VALIDATION_ERROR' | 'NOT_FOUND' | DrugCommerceErrorCode;
+
+const DRUG_COMMERCE_CODES = new Set<string>(Object.values(DrugCommerceErrorCode));
+
 export class CartError extends Error {
+  /**
+   * 의약품 거래 차단 등 **403 이 필요한 경우에만** 설정된다.
+   * 기존 코드(VALIDATION_ERROR / NOT_FOUND)의 상태 매핑은 바꾸지 않는다.
+   */
+  readonly status?: number;
+
   constructor(
     message: string,
-    public code: 'VALIDATION_ERROR' | 'NOT_FOUND',
+    public code: CartErrorCode,
   ) {
     super(message);
     this.name = 'CartError';
+    if (DRUG_COMMERCE_CODES.has(code)) this.status = 403;
   }
 }

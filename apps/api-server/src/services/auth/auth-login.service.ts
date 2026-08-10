@@ -563,8 +563,19 @@ export class AuthLoginService {
         this.activityRepository.create({
           userId: userId || undefined,
           type: `login_${provider}`,
+          // WO-O4O-AUTH-ACCOUNT-ACTIVITIES-EMAIL-MAPPING-V1:
+          //   컬럼을 명시 지정한다. 종전에는 details.email 만 채우고 컬럼은 비어 있었다.
+          //   userId 가 null 인 실패(account_not_found 등)에서도 **시도된 이메일**이 남아야
+          //   미가입 계정 대상 공격·오타 유입을 컬럼 기준으로 분석할 수 있다.
+          //   varchar(255) 이므로 초과분은 잘라 저장한다(기록 실패로 로그인 흐름을 막지 않는다).
+          email: email ? email.slice(0, 255) : null,
           ipAddress,
           userAgent,
+          // WO-O4O-AUTH-ACCOUNT-ACTIVITIES-SUCCESS-FLAG-FIX-V1:
+          //   컬럼을 **명시 지정**한다. 종전에는 details.success 만 채우고 컬럼을 비워
+          //   DB 기본값 true 가 남아, 실패 행까지 success=true 로 저장됐다(전량 오집계).
+          //   details.success 는 기존 소비처 호환을 위해 그대로 유지한다(중복이지만 제거하지 않는다).
+          success,
           details: {
             provider,
             email,

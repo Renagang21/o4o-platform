@@ -244,6 +244,9 @@ export class AuthGuestService {
         this.activityRepository.create({
           userId: undefined,
           type: 'guest_upgrade_to_service',
+          // WO-O4O-AUTH-ACCOUNT-ACTIVITIES-EMAIL-MAPPING-V1: email 컬럼도 함께 기록(details 는 유지).
+          //   게스트 승격은 userId 가 없으므로 컬럼 email 이 유일한 계정 식별 축이 된다.
+          email: serviceUser.email ? String(serviceUser.email).slice(0, 255) : null,
           ipAddress,
           userAgent: 'unknown',
           details: {

@@ -21,6 +21,8 @@ import { hashPassword } from '../../utils/auth.utils.js';
 import { roleAssignmentService } from '../../modules/auth/services/role-assignment.service.js';
 import { authenticate, requireRole } from '../../middleware/auth.middleware.js';
 import logger from '../../utils/logger.js';
+// WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1: 재설정 적용 범위 안내(read-only)
+import { resolveAdminPasswordResetScope } from '../../services/auth/admin-password-reset-scope.service.js';
 
 const router: Router = Router();
 
@@ -113,7 +115,18 @@ router.patch('/:id/password', requireRole(ADMIN_ACCESS_ROLES), async (req: Reque
 
     user.password = await hashPassword(newPassword); // 기존 해싱 정책 재사용
     await repo.save(user);
-    res.json({ success: true, message: '비밀번호가 재설정되었습니다.' });
+
+    // WO-O4O-ADMIN-PASSWORD-RESET-SERVICE-CREDENTIAL-SCOPE-CLARIFY-V1:
+    //   이 경로는 users.password(L1) 만 갱신한다. service_credentials(L2) 를 가진 서비스의
+    //   로그인 비밀번호는 바뀌지 않으므로(사일런트 무효), 적용 범위를 응답에 명시한다.
+    //   credential 은 변경하지 않는다(결정 A — 서비스별 자격 분리 유지).
+    const scope = await resolveAdminPasswordResetScope(id);
+    res.json({
+      success: true,
+      message: '비밀번호가 재설정되었습니다.',
+      data: scope,
+      ...(scope.notice ? { notice: scope.notice } : {}),
+    });
   } catch (error) {
     logger.error('[platform-accounts] password reset failed:', error);
     res.status(500).json({ success: false, error: '비밀번호 재설정 실패', code: 'PASSWORD_RESET_FAILED' });

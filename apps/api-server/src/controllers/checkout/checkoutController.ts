@@ -13,6 +13,7 @@ import { Response } from 'express';
 import { AuthRequest } from '../../types/auth.js';
 import { tossPaymentsService } from '../../services/toss-payments.service.js';
 import { checkoutService } from '../../services/checkout.service.js';
+import { DrugCommerceBlockedError } from '../../modules/neture/guards/drug-commerce.guard.js';
 import logger from '../../utils/logger.js';
 
 // Phase N-1 고정 설정
@@ -155,6 +156,18 @@ export class CheckoutController {
         },
       });
     } catch (error) {
+      // WO-O4O-DRUG-COMMERCE-ABSOLUTE-BLOCK-V1: 의약품 주문 차단은 403 + 사유 코드로 응답한다.
+      if (error instanceof DrugCommerceBlockedError) {
+        logger.warn('Checkout initiate blocked (drug commerce):', {
+          code: error.code,
+          userId: (req as any).user?.id,
+        });
+        return res.status(error.status).json({
+          success: false,
+          message: error.message,
+          code: error.code,
+        });
+      }
       logger.error('Checkout initiate error:', error);
       res.status(500).json({
         success: false,

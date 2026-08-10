@@ -51,6 +51,9 @@ import {
 } from '@o4o/operator-ux-core';
 import type { ListColumnDef, MemberTab, BuiltAction } from '@o4o/operator-ux-core';
 import { toast } from '@o4o/error-handling';
+// WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+//   서비스 표시명은 @o4o/types 의 SSOT 를 사용한다(하드코딩 금지).
+import { getServiceDisplayName } from '@o4o/types';
 import type {
   MembersConsoleClient,
   MembersConsoleListParams,
@@ -97,8 +100,25 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
+  // WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+  //   비밀번호는 서비스별로 독립하므로 **어느 서비스의 비밀번호인지** 반드시 정해야 한다.
+  //   후보 = 호출자 관리 범위 ∩ 대상자 Membership.
+  //   목록 API 가 이미 운영자 scope 로 memberships 를 필터해 내려주므로(platform admin 은 전체),
+  //   여기서는 그 값을 그대로 후보로 쓴다 — 별도 API 를 추가하지 않는다.
+  const candidates = useMemo(() => {
+    const keys = (user.memberships ?? []).map((m) => m.serviceKey).filter(Boolean);
+    return Array.from(new Set(keys));
+  }, [user.memberships]);
+
+  // 후보가 하나면 자동 확정한다(그래도 화면에는 서비스명을 표시한다).
+  const [serviceKey, setServiceKey] = useState(candidates.length === 1 ? candidates[0] : '');
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!serviceKey) {
+      setError('비밀번호를 변경할 서비스를 선택해주세요.');
+      return;
+    }
     if (password.length < 8) {
       setError('비밀번호는 최소 8자 이상이어야 합니다.');
       return;
@@ -106,8 +126,8 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
     setLoading(true);
     setError('');
     try {
-      await client.updatePassword(user.id, password);
-      toast.success('비밀번호가 변경되었습니다.');
+      await client.updatePassword(user.id, password, serviceKey);
+      toast.success(`${getServiceDisplayName(serviceKey)} 비밀번호가 변경되었습니다.`);
       onSuccess();
       onClose();
     } catch (err: any) {
@@ -129,6 +149,49 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
         <p className="text-sm text-slate-500 mb-4">
           {getUserName(user)} ({user.email})
         </p>
+
+        {/* WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+            비밀번호는 서비스별로 독립하므로 대상 서비스를 항상 화면에 드러낸다.
+            후보 0 → 변경 불가 안내 / 1 → 표시 후 자동 확정 / 복수 → 명시적 선택 필수 */}
+        {candidates.length === 0 ? (
+          <div className="flex items-start gap-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 mb-4">
+            <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+            <span>
+              이 회원의 비밀번호를 변경할 수 있는 서비스가 없습니다.
+              <br />
+              내가 관리하는 서비스 중 이 회원이 가입한 서비스가 없습니다.
+            </span>
+          </div>
+        ) : candidates.length === 1 ? (
+          <div className="rounded-lg bg-slate-50 border border-slate-200 px-3 py-2 text-sm mb-4">
+            <span className="text-slate-500">대상 서비스</span>
+            <span className="ml-2 font-semibold text-slate-800">{getServiceDisplayName(candidates[0])}</span>
+            <p className="mt-1 text-xs text-slate-500">이 서비스의 로그인 비밀번호만 변경됩니다.</p>
+          </div>
+        ) : (
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-slate-700 mb-1">
+              대상 서비스 <span className="text-red-500">*</span>
+            </label>
+            <select
+              value={serviceKey}
+              onChange={(e) => setServiceKey(e.target.value)}
+              className="w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+              required
+            >
+              <option value="">서비스를 선택하세요</option>
+              {candidates.map((key) => (
+                <option key={key} value={key}>
+                  {getServiceDisplayName(key)}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-slate-500">
+              선택한 서비스의 로그인 비밀번호만 변경됩니다. 다른 서비스는 영향받지 않습니다.
+            </p>
+          </div>
+        )}
+
         {error && (
           <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-700 mb-3">
             <AlertCircle className="w-4 h-4 shrink-0" />
@@ -164,7 +227,7 @@ function PasswordModal({ user, client, onClose, onSuccess }: PasswordModalProps)
             </button>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !serviceKey}
               className="flex-1 py-2 text-sm bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50"
             >
               {loading ? '처리 중...' : '변경'}

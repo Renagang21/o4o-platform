@@ -239,7 +239,7 @@ export default function MemberManagementPage() {
       const mapped: MemberStatus = status === 'approved' ? 'active' : status;
       return fanOutStatusBatch(ids, mapped);
     },
-    async updatePassword(memberId: string, password: string) {
+    async updatePassword(memberId: string, password: string, serviceKey: string) {
       const userId = memberIdToUserIdRef.current.get(memberId);
       if (!userId) {
         throw new Error('사용자 정보를 찾을 수 없습니다. 목록을 새로고침한 뒤 다시 시도해 주세요.');
@@ -248,7 +248,9 @@ export default function MemberManagementPage() {
       //   비밀번호 변경은 플랫폼 공통 operator 콘솔 API(`/api/v1/operator/members/:userId`) 다.
       //   kpa 전용 apiClient(base `/api/v1/kpa`) 로 호출하면 `/api/v1/kpa/operator/members/:userId`
       //   → 404 (해당 라우트 미존재, 프로덕션 probe 확인). base 없는 coreApiClient 사용.
-      await coreApiClient.put(`/operator/members/${userId}`, { password });
+      // WO-O4O-SERVICE-PASSWORD-CHANGE-UI-SCOPE-AND-INTEGRATION-V2:
+      //   서비스별 credential 이므로 대상 serviceKey 를 함께 보낸다(미전달 시 서버가 400).
+      await coreApiClient.put(`/operator/members/${userId}`, { password, serviceKey });
     },
   }), []);
 

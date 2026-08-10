@@ -62,21 +62,38 @@ const SUPPLIER_SIDEBAR_GROUPS: SidebarGroup[] = [
     //   CSV Import 는 독립 주요 메뉴에서 제거(대량 등록으로 흡수). 메뉴 진입점 제거됨.
     //   WO-O4O-NETURE-SUPPLIER-LEGACY-CSV-IMPORT-RETIREMENT-V1: 레거시 CSV Import 화면 은퇴 —
     //   라우트 /supplier/csv-import 는 canonical 대량 등록(/supplier/products/bulk)으로 영구 redirect.
+    // WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1:
+    //   '제품 콘텐츠'(/supplier/b2b-content)를 이 그룹으로 이동. B2B offer 의
+    //   businessShort/DetailDescription 직접 편집 = **도매 거래 상품 정보**이지 매장 제공 자료가 아니다
+    //   (IR §8 — SPD 검수 큐와 다른 컬럼·다른 소비처인데 같은 그룹에 있어 혼동을 유발했다).
+    //   route/page/API 무변경 — 그룹 소속만 이동(기능 은폐 0, 데드링크 0).
     items: [
       { label: '상품 목록', path: '/supplier/products' },
       { label: '상품 등록', path: '/supplier/products/register' },
       { label: '대량 등록', path: '/supplier/products/bulk' },
       { label: '등록 도우미', path: '/supplier/products/import-assistant' },
+      { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
     ],
   },
+  // WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1:
+  //   '콘텐츠' → '매장 제공 자료'. 공급자 산출물이 매장에 닿는 3경로를 한 그룹으로 묶고
+  //   상태 집계(검수·게시 현황)를 추가한다. 근거 IR-O4O-KPA-STORE-QR-TABLET-CONTENT-FLOW-AUDIT-V1 §9·§10.
+  //
+  //   QR·태블릿 코너 적용은 **메뉴로 만들지 않는다** — 공급자에게 백엔드가 차단한 기능이라
+  //   (supplier-screen-set.controller.ts:33) 메뉴를 두면 403/빈 화면 dead-end 가 된다.
+  //   대신 각 자료 화면의 StoreMaterialUsageNote 안내로 "매장이 어디에 쓸 수 있는지"만 알린다.
+  //
+  //   라벨 정합: 매장 측 canonical 어휘를 따른다(매장용 상품 설명서 / 태블릿 화면 / 디지털 사이니지).
+  //   '매장용 설명서' → '매장용 상품 설명서' — 매장 사이드바의 동명 메뉴('상품 설명' = 매장 자체 상품
+  //   store_local_products.detail_html)와 축이 다르다는 점을 드러내기 위해 '상품'을 명시한다(IR §4.1).
   {
-    label: '콘텐츠',
+    label: '매장 제공 자료',
     icon: FileText,
     items: [
-      { label: '제품 콘텐츠', path: '/supplier/b2b-content' },
-      { label: '매장용 설명서', path: '/supplier/store-descriptions' },
-      { label: '태블릿', path: '/supplier/tablet-screen-sets' },
+      { label: '매장용 상품 설명서', path: '/supplier/store-descriptions' },
+      { label: '태블릿 화면 자료', path: '/supplier/tablet-screen-sets' },
       { label: '디지털 사이니지', path: '/supplier/signage' },
+      { label: '검수·게시 현황', path: '/supplier/store-materials-status' },
     ],
   },
   {

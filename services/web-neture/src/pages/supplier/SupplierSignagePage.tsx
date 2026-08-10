@@ -22,6 +22,7 @@ import {
   type SupplierSignageMedia,
 } from '../../lib/api/supplierSignage';
 import { supplierApi, type SupplierProduct } from '../../lib/api';
+import StoreMaterialUsageNote from '../../components/supplier/StoreMaterialUsageNote';
 
 const STATUS_META: Record<string, { label: string; cls: string }> = {
   active: { label: '게시 중', cls: 'bg-emerald-50 text-emerald-700' },
@@ -158,6 +159,11 @@ export default function SupplierSignagePage() {
           새 사이니지
         </button>
       </div>
+
+      {/* WO-O4O-NETURE-SUPPLIER-DASHBOARD-STORE-MATERIALS-IA-V1: 매장 활용 채널 안내(읽기 전용).
+          사이니지는 매장 유형·상품 분류 대상이 아니므로 약국/의약품 표기를 넣지 않는다
+          (CHECK-O4O-SUPPLIER-SIGNAGE-HUB-TARGET-AND-MEDICATION-GUARD-ALIGN-V1 §0-A). */}
+      <StoreMaterialUsageNote className="mb-4" channels="매장 사이니지 화면 · 매장 자료함" />
 
       {message && (
         <div
