@@ -1,5 +1,11 @@
 /**
- * QrListPage
+ * QrListPage — **현재 라우팅되지 않는다 (미렌더)**
+ *
+ * WO-O4O-ADMIN-STORE-QR-LEGACY-UI-GUIDE-V1:
+ *   `/store/qr` 는 `StoreQrGuidePage` 로 연결된다. 이 컴포넌트는 어디에서도 렌더되지 않는다.
+ *   호출하던 `/api/v1/pharmacy/qr/*` 는 마운트된 적이 없어 생성 시점부터 404 였다
+ *   (docs/investigations/IR-O4O-ADMIN-QR-SOURCE-PRODUCTS-LEGACY-ROUTE-AUDIT-V1.md · REPLACE).
+ *   파일 삭제는 후속 cleanup WO 범위다. **다시 라우팅하지 않는다.**
  *
  * WO-STORE-QR-PRODUCT-DIRECT-LINK-V1
  *

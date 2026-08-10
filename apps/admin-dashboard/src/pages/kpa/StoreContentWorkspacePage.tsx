@@ -128,14 +128,15 @@ export default function StoreContentWorkspacePage() {
     setQrWarningAsset(asset);
   };
 
+  /**
+   * WO-O4O-ADMIN-STORE-QR-LEGACY-UI-GUIDE-V1
+   *   종전에는 `/store/qr/create` 로 `prefillTitle` · `prefillLibraryItemId` 를 넘겼다.
+   *   그 화면은 `QrCreatePage` 였고 state 를 읽지도 않았으며, 호출하던
+   *   `/api/v1/pharmacy/qr/*` 는 마운트된 적이 없어 항상 404 였다.
+   *   QR 생성은 매장 경영자 기능이므로 여기서는 안내 화면으로만 보낸다.
+   */
   const handleQrConfirm = () => {
-    // assetId를 QR create 페이지에 전달 (state 방식)
-    navigate('/store/qr/create', {
-      state: {
-        prefillTitle: qrWarningAsset?.title,
-        prefillLibraryItemId: qrWarningAsset?.id,
-      },
-    });
+    navigate('/store/qr');
     setQrWarningAsset(null);
   };
 
@@ -217,13 +218,14 @@ export default function StoreContentWorkspacePage() {
       width: 300,
       render: (row) => (
         <div className="flex flex-wrap items-center gap-1.5">
-          {/* QR 만들기 — Warning Modal 경유 */}
+          {/* QR 적용 안내 — Warning Modal 경유 (WO-O4O-ADMIN-STORE-QR-LEGACY-UI-GUIDE-V1)
+              운영자 콘솔은 QR 을 생성하지 않는다. 매장 화면 안내로 연결한다. */}
           <button
             onClick={() => handleQrClick(row)}
             className="flex items-center gap-1 rounded border border-blue-300 bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700 hover:bg-blue-100 transition-colors"
           >
             <QrCode size={12} />
-            QR 만들기
+            QR 적용 안내
           </button>
 
           {/* POP 만들기 */}
@@ -351,7 +353,7 @@ export default function StoreContentWorkspacePage() {
             <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
               <div className="flex items-center gap-2">
                 <AlertTriangle size={18} className="text-amber-500" />
-                <h3 className="text-base font-semibold text-gray-900">QR 코드 생성 전 확인</h3>
+                <h3 className="text-base font-semibold text-gray-900">QR 적용 전 확인</h3>
               </div>
               <button
                 onClick={() => setQrWarningAsset(null)}
@@ -386,7 +388,7 @@ export default function StoreContentWorkspacePage() {
                 선택한 자산: <span className="font-medium text-gray-900">"{qrWarningAsset.title}"</span>
               </p>
               <p className="mt-1 text-xs text-gray-400">
-                QR 생성 페이지로 이동합니다. 세부 설정은 다음 단계에서 진행하세요.
+                QR 생성은 매장 화면에서 진행합니다. 안내 화면으로 이동합니다.
               </p>
             </div>
 
@@ -403,7 +405,7 @@ export default function StoreContentWorkspacePage() {
                 className="flex items-center gap-1.5 rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
               >
                 <QrCode size={14} />
-                QR 생성 페이지로 이동
+                QR 안내 화면으로 이동
               </button>
             </div>
           </div>
