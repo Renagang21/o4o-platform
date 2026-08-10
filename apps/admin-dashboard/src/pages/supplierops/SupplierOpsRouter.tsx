@@ -10,9 +10,16 @@ import { Routes, Route } from 'react-router-dom';
 // Lazy load pages
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const Profile = lazy(() => import('./pages/Profile'));
-const Products = lazy(() => import('./pages/Products'));
-const ProductSearchPage = lazy(() => import('./pages/ProductSearchPage'));
-const ProductCreatePage = lazy(() => import('./pages/ProductCreatePage'));
+/**
+ * 공급자 상품 목록·검색·등록 (WO-O4O-SUPPLIEROPS-PRODUCT-CREATE-LEGACY-UI-GUIDE-V1)
+ *
+ * 기존 `Products` 는 setTimeout 기반 데모 데이터였고,
+ * `ProductCreatePage` → `SupplierProductForm` 의 저장은 backend 에 없는
+ * `/api/vendor/products` 로 갔다(admin 오리진 → index.html 200 위장 실패).
+ * 상품 등록 canonical 원장은 Neture 공급자 화면이므로 세 경로를 안내 화면으로 교체했다.
+ * 근거: docs/checks/CHECK-O4O-ADMIN-VENDOR-APIREQUEST-SAME-ORIGIN-FIX-V1.md
+ */
+const SupplierOpsProductGuidePage = lazy(() => import('./pages/SupplierOpsProductGuidePage'));
 const BulkImportPage = lazy(() => import('./pages/BulkImportPage'));
 const Orders = lazy(() => import('./pages/Orders'));
 const Settlement = lazy(() => import('./pages/Settlement'));
@@ -40,9 +47,11 @@ const SupplierOpsRouter: React.FC = () => {
       <Routes>
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="profile" element={<Profile />} />
-        <Route path="products" element={<Products />} />
-        <Route path="products/new" element={<ProductSearchPage />} />
-        <Route path="products/create" element={<ProductCreatePage />} />
+        {/* 세 경로 모두 안내 화면 — WO-O4O-SUPPLIEROPS-PRODUCT-CREATE-LEGACY-UI-GUIDE-V1 */}
+        <Route path="products" element={<SupplierOpsProductGuidePage />} />
+        <Route path="products/new" element={<SupplierOpsProductGuidePage />} />
+        <Route path="products/create" element={<SupplierOpsProductGuidePage />} />
+        {/* 대량 등록은 canonical API(/neture/supplier/csv-import/upload)를 사용하므로 유지 */}
         <Route path="products/bulk-import" element={<BulkImportPage />} />
         {/* /supplierops/offers — 공급자 상품 보강은 neture.co.kr/supplier/products 에서 이용 */}
         <Route path="orders" element={<Orders />} />
